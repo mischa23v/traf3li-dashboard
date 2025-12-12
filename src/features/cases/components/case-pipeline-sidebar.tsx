@@ -19,6 +19,7 @@ import { caseTypes } from '../data/case-pipeline-schema'
 interface CasePipelineSidebarProps {
     context?: 'pipeline' | 'list'
     selectedCaseType?: string
+    selectedCase?: any
     analytics?: {
         totalCases: number
         wonCases: number
@@ -35,6 +36,7 @@ interface CasePipelineSidebarProps {
 export function CasePipelineSidebar({
     context = 'pipeline',
     selectedCaseType = 'labor',
+    selectedCase,
     analytics
 }: CasePipelineSidebarProps) {
     const { t, i18n } = useTranslation()

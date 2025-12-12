@@ -1,28 +1,18 @@
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo } from 'react'
 import {
-  Plus,
   Scale,
-  TrendingUp,
   Search,
   Bell,
   AlertCircle,
-  GripVertical,
   Phone,
   MoreHorizontal,
-  ArrowUpRight,
   DollarSign,
   User,
   Clock,
-  Target,
-  Filter,
   Calendar,
-  Star,
   AlertTriangle,
   CheckCircle,
   XCircle,
-  Timer,
-  ArrowUp,
-  ArrowDown,
   FileText,
   Users,
   Lightbulb,
@@ -32,6 +22,10 @@ import {
   Gavel,
   Building2,
   Flag,
+  ArrowRight,
+  ArrowLeft,
+  Play,
+  MapPin,
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCases, useUpdateCase } from '@/hooks/useCasesAndClients'
@@ -50,6 +44,8 @@ import { Link } from '@tanstack/react-router'
 import {
   Card,
   CardContent,
+  CardHeader,
+  CardTitle,
 } from '@/components/ui/card'
 import {
   Select,
@@ -82,481 +78,121 @@ import {
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
-import { Progress } from '@/components/ui/progress'
 import { CasePipelineSidebar } from './case-pipeline-sidebar'
 import { cn } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
-import { formatDistanceToNow, differenceInDays } from 'date-fns'
+import { differenceInDays, format } from 'date-fns'
 import { ar, enUS } from 'date-fns/locale'
 import {
   getCasePipeline,
   caseTypes,
   caseOutcomes,
   caseEndReasons,
-  type CasePipelineStage,
-  type CasePipelineCard,
-  type CasePipelineConfig,
 } from '../data/case-pipeline-schema'
-
-// Analytics metric card component
-function MetricCard({
-  title,
-  value,
-  icon: Icon,
-  trend,
-  trendValue,
-  color = 'emerald',
-  subtitle,
-}: {
-  title: string
-  value: string | number
-  icon: React.ElementType
-  trend?: 'up' | 'down' | 'neutral'
-  trendValue?: string
-  color?: 'emerald' | 'blue' | 'purple' | 'orange' | 'red'
-  subtitle?: string
-}) {
-  const { t } = useTranslation()
-  const colorClasses = {
-    emerald: 'bg-emerald-50 text-emerald-600',
-    blue: 'bg-blue-50 text-blue-600',
-    purple: 'bg-purple-50 text-purple-600',
-    orange: 'bg-orange-50 text-orange-600',
-    red: 'bg-red-50 text-red-600',
-  }
-
-  return (
-    <Card className="border-0 shadow-sm">
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between">
-          <div className="space-y-1">
-            <p className="text-sm text-slate-500">{title}</p>
-            <p className="text-2xl font-bold text-navy">{value}</p>
-            {subtitle && (
-              <p className="text-xs text-slate-500">{subtitle}</p>
-            )}
-          </div>
-          <div className={cn('p-2 rounded-xl', colorClasses[color])}>
-            <Icon className="w-5 h-5" />
-          </div>
-        </div>
-        {trend && trendValue && (
-          <div className="mt-2 flex items-center gap-1 text-xs">
-            {trend === 'up' && (
-              <>
-                <ArrowUp className="w-3 h-3 text-emerald-500" />
-                <span className="text-emerald-600">{trendValue}</span>
-              </>
-            )}
-            {trend === 'down' && (
-              <>
-                <ArrowDown className="w-3 h-3 text-red-500" />
-                <span className="text-red-600">{trendValue}</span>
-              </>
-            )}
-            {trend === 'neutral' && (
-              <span className="text-slate-500">{trendValue}</span>
-            )}
-            <span className="text-slate-500 me-1">{t('casePipeline.fromLastMonth', 'من الشهر الماضي')}</span>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  )
-}
-
-// Case card component
-function CaseCard({
-  caseItem,
-  onDragStart,
-  onDragEnd,
-  isDragging,
-  onEndCase,
-}: {
-  caseItem: any
-  onDragStart: (e: React.DragEvent, caseId: string) => void
-  onDragEnd: () => void
-  isDragging: boolean
-  onEndCase: (caseId: string) => void
-}) {
-  const { t, i18n } = useTranslation()
-  const locale = i18n.language === 'ar' ? ar : enUS
-
-  // Calculate days in current stage
-  const daysInStage = differenceInDays(new Date(), new Date(caseItem.stageEnteredAt || caseItem.updatedAt || caseItem.createdAt))
-  const isStale = daysInStage > 30 // Consider stale after 30 days in same stage
-  const isUrgent = caseItem.priority === 'critical' || caseItem.priority === 'high'
-
-  // Get priority badge style
-  const getPriorityBadge = () => {
-    switch (caseItem.priority) {
-      case 'critical':
-        return <Badge className="bg-red-100 text-red-700 border-0 text-xs px-1.5">{t('casePipeline.priority.critical', 'حرج')}</Badge>
-      case 'high':
-        return <Badge className="bg-orange-100 text-orange-700 border-0 text-xs px-1.5">{t('casePipeline.priority.high', 'عالي')}</Badge>
-      case 'medium':
-        return <Badge className="bg-amber-100 text-amber-700 border-0 text-xs px-1.5">{t('casePipeline.priority.medium', 'متوسط')}</Badge>
-      default:
-        return <Badge className="bg-green-100 text-green-700 border-0 text-xs px-1.5">{t('casePipeline.priority.low', 'منخفض')}</Badge>
-    }
-  }
-
-  return (
-    <div
-      draggable
-      onDragStart={(e) => onDragStart(e, caseItem._id)}
-      onDragEnd={onDragEnd}
-      className={cn(
-        'bg-white p-4 rounded-xl shadow-sm cursor-grab active:cursor-grabbing border transition-all',
-        isDragging ? 'opacity-50 ring-2 ring-emerald-400 border-emerald-300' : 'border-transparent hover:border-emerald-300 hover:shadow-md',
-        isStale && !isDragging && 'border-orange-200 bg-orange-50/50',
-      )}
-    >
-      {/* Header */}
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <GripVertical className="h-4 w-4 text-slate-300 flex-shrink-0" />
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-navy text-sm">{caseItem.caseNumber || t('casePipeline.noCaseNumber', 'بدون رقم')}</span>
-              {getPriorityBadge()}
-            </div>
-            <p className="text-sm text-slate-700 font-medium line-clamp-1 mt-0.5">{caseItem.title}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-1">
-          {isUrgent && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <AlertTriangle className="w-4 h-4 text-red-500" aria-hidden="true" />
-                </TooltipTrigger>
-                <TooltipContent>{t('casePipeline.urgent', 'عاجل')}</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-          {isStale && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Clock className="w-4 h-4 text-orange-500" aria-hidden="true" />
-                </TooltipTrigger>
-                <TooltipContent>{daysInStage} {t('casePipeline.daysInStage', 'يوم في هذه المرحلة')}</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-6 w-6">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem asChild>
-                <Link to={`/dashboard/cases/${caseItem._id}`}>
-                  <Scale className="h-4 w-4 ms-2" />
-                  {t('casePipeline.viewCase', 'عرض القضية')}
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to={`/dashboard/cases/${caseItem._id}/notion`}>
-                  <Lightbulb className="h-4 w-4 ms-2 text-emerald-500" />
-                  {t('casePipeline.openBrainstorm', 'العصف الذهني')}
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => onEndCase(caseItem._id)}>
-                <CheckCircle className="h-4 w-4 ms-2 text-purple-500" />
-                {t('casePipeline.endCase', 'إنهاء القضية')}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-
-      {/* Parties */}
-      <div className="space-y-1.5 mb-3 text-sm">
-        {/* Plaintiff */}
-        {(caseItem.plaintiffName || caseItem.laborCaseDetails?.plaintiff?.name) && (
-          <div className="flex items-center gap-2 text-emerald-600">
-            <User className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
-            <span className="truncate">
-              <span className="text-slate-500">{t('casePipeline.plaintiff', 'المدعي')}:</span>{' '}
-              {caseItem.plaintiffName || caseItem.laborCaseDetails?.plaintiff?.name}
-            </span>
-          </div>
-        )}
-        {/* Defendant */}
-        {(caseItem.defendantName || caseItem.laborCaseDetails?.company?.name) && (
-          <div className="flex items-center gap-2 text-red-600">
-            <Building2 className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
-            <span className="truncate">
-              <span className="text-slate-500">{t('casePipeline.defendant', 'المدعى عليه')}:</span>{' '}
-              {caseItem.defendantName || caseItem.laborCaseDetails?.company?.name}
-            </span>
-          </div>
-        )}
-        {/* Client */}
-        {caseItem.clientId?.name && (
-          <div className="flex items-center gap-2 text-blue-600">
-            <Users className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
-            <span className="truncate">
-              <span className="text-slate-500">{t('casePipeline.client', 'العميل')}:</span>{' '}
-              {caseItem.clientId.name}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Court & Next Hearing */}
-      {(caseItem.court || caseItem.nextHearing) && (
-        <div className="space-y-1.5 mb-3 text-xs text-slate-500">
-          {caseItem.court && (
-            <div className="flex items-center gap-2">
-              <Gavel className="h-3 w-3" aria-hidden="true" />
-              <span className="truncate">{caseItem.court}</span>
-            </div>
-          )}
-          {caseItem.nextHearing && (
-            <div className="flex items-center gap-2 text-orange-600">
-              <Calendar className="h-3 w-3" aria-hidden="true" />
-              <span>{t('casePipeline.nextHearing', 'الجلسة القادمة')}: {new Date(caseItem.nextHearing).toLocaleDateString('ar-SA')}</span>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Latest Note Preview */}
-      {caseItem.notes && caseItem.notes.length > 0 && (
-        <div className="mb-3 p-2 bg-slate-50 rounded-lg text-xs text-slate-600">
-          <div className="flex items-center gap-1 mb-1 text-slate-500">
-            <FileText className="h-3 w-3" />
-            <span>{t('casePipeline.latestNote', 'آخر ملاحظة')}</span>
-          </div>
-          <p className="line-clamp-2">{caseItem.notes[caseItem.notes.length - 1]?.text}</p>
-        </div>
-      )}
-
-      {/* Linked Items */}
-      <div className="flex flex-wrap items-center gap-2 mb-3">
-        {(caseItem.tasksCount || 0) > 0 && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Badge variant="outline" className="text-xs gap-1 px-1.5 py-0.5">
-                  <CheckSquare className="h-3 w-3 text-blue-500" />
-                  {caseItem.tasksCount}
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>{caseItem.tasksCount} {t('casePipeline.tasks', 'مهام')}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
-        {(caseItem.notionPagesCount || 0) > 0 && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Badge variant="outline" className="text-xs gap-1 px-1.5 py-0.5">
-                  <Lightbulb className="h-3 w-3 text-emerald-500" />
-                  {caseItem.notionPagesCount}
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>{caseItem.notionPagesCount} {t('casePipeline.notionPages', 'صفحات')}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
-        {(caseItem.eventsCount || 0) > 0 && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Badge variant="outline" className="text-xs gap-1 px-1.5 py-0.5">
-                  <Calendar className="h-3 w-3 text-purple-500" />
-                  {caseItem.eventsCount}
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>{caseItem.eventsCount} {t('casePipeline.events', 'أحداث')}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
-        {(caseItem.remindersCount || 0) > 0 && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Badge variant="outline" className="text-xs gap-1 px-1.5 py-0.5">
-                  <Bell className="h-3 w-3 text-amber-500" />
-                  {caseItem.remindersCount}
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>{caseItem.remindersCount} {t('casePipeline.reminders', 'تذكيرات')}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
-      </div>
-
-      {/* Footer: Amount & Time */}
-      <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-        {caseItem.claimAmount > 0 && (
-          <span className="text-emerald-600 font-semibold text-sm">
-            {caseItem.claimAmount.toLocaleString('ar-SA')} {t('casePipeline.sar', 'ر.س')}
-          </span>
-        )}
-        <span className="text-xs text-slate-500">
-          {formatDistanceToNow(new Date(caseItem.createdAt), {
-            addSuffix: true,
-            locale,
-          })}
-        </span>
-      </div>
-    </div>
-  )
-}
 
 // Main Pipeline View Component
 export function CasePipelineView() {
   const { t, i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
+  const locale = isRTL ? ar : enUS
+
+  // State
   const [selectedCaseType, setSelectedCaseType] = useState<string>('labor')
-  const [draggedCaseId, setDraggedCaseId] = useState<string | null>(null)
-  const [filterPriority, setFilterPriority] = useState<string>('all')
+  const [selectedCaseId, setSelectedCaseId] = useState<string>('')
   const [endCaseDialogOpen, setEndCaseDialogOpen] = useState(false)
-  const [selectedCaseForEnd, setSelectedCaseForEnd] = useState<string | null>(null)
   const [endOutcome, setEndOutcome] = useState<string>('settled')
   const [endReason, setEndReason] = useState<string>('')
   const [endNotes, setEndNotes] = useState<string>('')
   const [finalAmount, setFinalAmount] = useState<string>('')
 
-  // Fetch cases
+  // Fetch cases filtered by type
   const { data: casesData, isLoading, isError, error, refetch } = useCases({
     category: selectedCaseType !== 'all' ? selectedCaseType : undefined,
   })
 
   const { mutate: updateCase, isPending: isUpdatingCase } = useUpdateCase()
 
+  // Get cases of selected type
+  const casesOfType = useMemo(() => {
+    if (!casesData?.cases) return []
+    return casesData.cases.filter((c: any) =>
+      selectedCaseType === 'all' || c.category === selectedCaseType
+    )
+  }, [casesData, selectedCaseType])
+
+  // Get selected case data
+  const selectedCase = useMemo(() => {
+    if (!selectedCaseId || !casesData?.cases) return null
+    return casesData.cases.find((c: any) => c._id === selectedCaseId)
+  }, [selectedCaseId, casesData])
+
   // Get current pipeline configuration
-  const currentPipeline = useMemo(() => getCasePipeline(selectedCaseType), [selectedCaseType])
-
-  // Group cases by stage
-  const casesByStage = useMemo(() => {
-    if (!casesData?.cases) return {}
-
-    const grouped: Record<string, any[]> = {}
-
-    // Initialize all stages with empty arrays
-    currentPipeline.stages.forEach(stage => {
-      grouped[stage.id] = []
-    })
-
-    // Group cases by their current stage
-    casesData.cases.forEach((caseItem: any) => {
-      // Determine case stage based on status or custom stage field
-      let stageId = caseItem.currentStage || caseItem.pipelineStage
-
-      // If no stage set, use filing as default
-      if (!stageId || !grouped[stageId]) {
-        stageId = 'filing'
-      }
-
-      // Apply priority filter
-      if (filterPriority !== 'all' && caseItem.priority !== filterPriority) {
-        return
-      }
-
-      if (grouped[stageId]) {
-        grouped[stageId].push(caseItem)
-      }
-    })
-
-    return grouped
-  }, [casesData, currentPipeline, filterPriority])
-
-  // Calculate analytics
-  const analytics = useMemo(() => {
-    const allCases = casesData?.cases || []
-
-    const totalCases = allCases.length
-    const totalClaimAmount = allCases.reduce((sum: number, c: any) => sum + (c.claimAmount || 0), 0)
-    const avgClaimAmount = totalCases > 0 ? totalClaimAmount / totalCases : 0
-
-    // Cases by outcome
-    const wonCases = allCases.filter((c: any) => c.outcome === 'won').length
-    const lostCases = allCases.filter((c: any) => c.outcome === 'lost').length
-    const settledCases = allCases.filter((c: any) => c.outcome === 'settled').length
-    const ongoingCases = allCases.filter((c: any) => c.outcome === 'ongoing' || !c.outcome).length
-
-    // Win rate
-    const completedCases = wonCases + lostCases + settledCases
-    const winRate = completedCases > 0 ? ((wonCases / completedCases) * 100).toFixed(1) : '0'
-
-    // Stale cases (>30 days in same stage)
-    const staleCases = allCases.filter((c: any) => {
-      const daysInStage = differenceInDays(new Date(), new Date(c.stageEnteredAt || c.updatedAt || c.createdAt))
-      return daysInStage > 30
-    }).length
-
-    // Urgent cases
-    const urgentCases = allCases.filter((c: any) =>
-      c.priority === 'critical' || c.priority === 'high'
-    ).length
-
-    return {
-      totalCases,
-      totalClaimAmount,
-      avgClaimAmount,
-      wonCases,
-      lostCases,
-      settledCases,
-      ongoingCases,
-      winRate,
-      staleCases,
-      urgentCases,
+  const currentPipeline = useMemo(() => {
+    if (selectedCase) {
+      return getCasePipeline(selectedCase.category || selectedCaseType)
     }
-  }, [casesData])
+    return getCasePipeline(selectedCaseType)
+  }, [selectedCaseType, selectedCase])
 
-  // Handle drag and drop
-  const handleDragStart = (e: React.DragEvent, caseId: string) => {
-    setDraggedCaseId(caseId)
-    e.dataTransfer.effectAllowed = 'move'
+  // Get current stage index
+  const currentStageIndex = useMemo(() => {
+    if (!selectedCase) return 0
+    const stageId = selectedCase.currentStage || selectedCase.pipelineStage || 'filing'
+    const index = currentPipeline.stages.findIndex(s => s.id === stageId)
+    return index >= 0 ? index : 0
+  }, [selectedCase, currentPipeline])
+
+  // Handle case type change
+  const handleCaseTypeChange = (type: string) => {
+    setSelectedCaseType(type)
+    setSelectedCaseId('') // Reset case selection when type changes
   }
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'move'
+  // Handle moving case to a stage
+  const handleMoveToStage = (stageId: string) => {
+    if (!selectedCaseId) return
+
+    updateCase({
+      id: selectedCaseId,
+      data: {
+        currentStage: stageId,
+        pipelineStage: stageId,
+        stageEnteredAt: new Date().toISOString(),
+      } as any,
+    }, {
+      onSuccess: () => {
+        refetch()
+      }
+    })
   }
 
-  const handleDrop = (e: React.DragEvent, stageId: string) => {
-    e.preventDefault()
-    if (draggedCaseId) {
-      // Update case stage
-      updateCase({
-        id: draggedCaseId,
-        data: {
-          currentStage: stageId,
-          pipelineStage: stageId,
-          stageEnteredAt: new Date().toISOString(),
-        },
-      }, {
-        onSuccess: () => {
-          refetch()
-        }
-      })
-      setDraggedCaseId(null)
+  // Handle moving to next/previous stage
+  const handleMoveNext = () => {
+    if (currentStageIndex < currentPipeline.stages.length - 1) {
+      const nextStage = currentPipeline.stages[currentStageIndex + 1]
+      handleMoveToStage(nextStage.id)
     }
   }
 
-  const handleDragEnd = () => {
-    setDraggedCaseId(null)
+  const handleMovePrevious = () => {
+    if (currentStageIndex > 0) {
+      const prevStage = currentPipeline.stages[currentStageIndex - 1]
+      handleMoveToStage(prevStage.id)
+    }
   }
 
   // Handle end case
-  const handleOpenEndCase = (caseId: string) => {
-    setSelectedCaseForEnd(caseId)
-    setEndCaseDialogOpen(true)
+  const handleOpenEndCase = () => {
+    if (selectedCaseId) {
+      setEndCaseDialogOpen(true)
+    }
   }
 
   const handleEndCase = () => {
-    if (!selectedCaseForEnd) return
+    if (!selectedCaseId) return
 
     updateCase({
-      id: selectedCaseForEnd,
+      id: selectedCaseId,
       data: {
         status: 'closed',
         outcome: endOutcome as any,
@@ -564,12 +200,11 @@ export function CasePipelineView() {
         endNotes,
         finalAmount: finalAmount ? parseFloat(finalAmount) : undefined,
         endDate: new Date().toISOString(),
-      },
+      } as any,
     }, {
       onSuccess: () => {
         refetch()
         setEndCaseDialogOpen(false)
-        setSelectedCaseForEnd(null)
         setEndOutcome('settled')
         setEndReason('')
         setEndNotes('')
@@ -578,14 +213,14 @@ export function CasePipelineView() {
     })
   }
 
-  // Calculate stage totals
-  const getStageTotals = (stageId: string) => {
-    const cases = casesByStage[stageId] || []
-    return {
-      count: cases.length,
-      value: cases.reduce((sum: number, c: any) => sum + (c.claimAmount || 0), 0),
-    }
-  }
+  // Calculate days in current stage
+  const daysInCurrentStage = useMemo(() => {
+    if (!selectedCase) return 0
+    return differenceInDays(
+      new Date(),
+      new Date(selectedCase.stageEnteredAt || selectedCase.updatedAt || selectedCase.createdAt)
+    )
+  }, [selectedCase])
 
   const topNav = [
     { title: t('casePipeline.nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },
@@ -638,222 +273,431 @@ export function CasePipelineView() {
         {/* Header */}
         <ProductivityHero badge={t('casePipeline.badge', 'مسار القضايا')} title={t('casePipeline.title', 'مسار القضايا')} type="cases" />
 
-        {/* Case Type Selector */}
-        <div className="flex items-center gap-4 flex-wrap">
-          <label className="text-sm font-medium text-slate-700">{t('casePipeline.selectCaseType', 'نوع القضية')}:</label>
-          <Select value={selectedCaseType} onValueChange={setSelectedCaseType}>
-            <SelectTrigger className="w-[200px] rounded-xl h-10">
-              <SelectValue placeholder={t('casePipeline.selectCaseType', 'اختر نوع القضية')} />
-            </SelectTrigger>
-            <SelectContent>
-              {caseTypes.map((type) => (
-                <SelectItem key={type.value} value={type.value}>
-                  {i18n.language === 'ar' ? type.label : type.labelEn}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {/* Priority Filter */}
-          <div className="flex items-center gap-2 ms-auto">
-            <Filter className="w-4 h-4 text-slate-600" aria-hidden="true" />
-            <span className="text-sm text-slate-600">{t('casePipeline.filter', 'تصفية')}:</span>
-          </div>
-          <Select value={filterPriority} onValueChange={setFilterPriority}>
-            <SelectTrigger className="w-[140px] rounded-xl h-9 text-sm">
-              <SelectValue placeholder={t('casePipeline.priority', 'الأولوية')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('casePipeline.allPriorities', 'كل الأولويات')}</SelectItem>
-              <SelectItem value="critical">{t('casePipeline.priority.critical', 'حرج')}</SelectItem>
-              <SelectItem value="high">{t('casePipeline.priority.high', 'عالي')}</SelectItem>
-              <SelectItem value="medium">{t('casePipeline.priority.medium', 'متوسط')}</SelectItem>
-              <SelectItem value="low">{t('casePipeline.priority.low', 'منخفض')}</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Analytics Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          <MetricCard
-            title={t('casePipeline.totalCases', 'إجمالي القضايا')}
-            value={analytics.totalCases}
-            icon={Scale}
-            color="blue"
-          />
-          <MetricCard
-            title={t('casePipeline.totalClaims', 'إجمالي المطالبات')}
-            value={`${(analytics.totalClaimAmount / 1000).toFixed(0)}K`}
-            subtitle={`${analytics.totalClaimAmount.toLocaleString('ar-SA')} ${t('casePipeline.sar', 'ر.س')}`}
-            icon={DollarSign}
-            color="emerald"
-          />
-          <MetricCard
-            title={t('casePipeline.winRate', 'معدل الفوز')}
-            value={`${analytics.winRate}%`}
-            icon={TrendingUp}
-            color="emerald"
-          />
-          <MetricCard
-            title={t('casePipeline.ongoing', 'قيد النظر')}
-            value={analytics.ongoingCases}
-            icon={Timer}
-            color="blue"
-          />
-          <MetricCard
-            title={t('casePipeline.won', 'كسب')}
-            value={analytics.wonCases}
-            icon={CheckCircle}
-            color="emerald"
-          />
-          <MetricCard
-            title={t('casePipeline.needsAttention', 'تحتاج متابعة')}
-            value={analytics.staleCases}
-            subtitle={`${analytics.urgentCases} ${t('casePipeline.urgentLabel', 'عاجل')}`}
-            icon={AlertTriangle}
-            color={analytics.staleCases > 5 ? 'red' : 'orange'}
-          />
-        </div>
-
-        {/* Quick Stats Row */}
-        {analytics.totalCases > 0 && (
-          <div className="flex flex-wrap gap-4">
-            <Badge variant="outline" className="px-3 py-1.5 gap-2">
-              <CheckCircle className="w-3 h-3 text-emerald-500" />
-              {analytics.wonCases} {t('casePipeline.won', 'كسب')}
-            </Badge>
-            <Badge variant="outline" className="px-3 py-1.5 gap-2">
-              <XCircle className="w-3 h-3 text-red-500" />
-              {analytics.lostCases} {t('casePipeline.lost', 'خسارة')}
-            </Badge>
-            <Badge variant="outline" className="px-3 py-1.5 gap-2">
-              <Star className="w-3 h-3 text-purple-500" />
-              {analytics.settledCases} {t('casePipeline.settled', 'تسوية')}
-            </Badge>
-          </div>
-        )}
-
         {/* MAIN GRID LAYOUT */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* MAIN CONTENT - Pipeline Board */}
-          <div className="lg:col-span-2">
+          {/* MAIN CONTENT */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Case Selection Card */}
+            <Card className="border-0 shadow-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg">{t('casePipeline.selectCase', 'اختر القضية')}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Case Type Selector */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>{t('casePipeline.caseType', 'نوع القضية')}</Label>
+                    <Select value={selectedCaseType} onValueChange={handleCaseTypeChange}>
+                      <SelectTrigger className="rounded-xl h-11">
+                        <SelectValue placeholder={t('casePipeline.selectCaseType', 'اختر نوع القضية')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {caseTypes.map((type) => (
+                          <SelectItem key={type.value} value={type.value}>
+                            {isRTL ? type.label : type.labelEn}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Case Selector */}
+                  <div className="space-y-2">
+                    <Label>{t('casePipeline.case', 'القضية')}</Label>
+                    <Select
+                      value={selectedCaseId}
+                      onValueChange={setSelectedCaseId}
+                      disabled={isLoading || casesOfType.length === 0}
+                    >
+                      <SelectTrigger className="rounded-xl h-11">
+                        <SelectValue placeholder={
+                          isLoading
+                            ? t('common.loading', 'جاري التحميل...')
+                            : casesOfType.length === 0
+                              ? t('casePipeline.noCasesOfType', 'لا توجد قضايا من هذا النوع')
+                              : t('casePipeline.selectCase', 'اختر القضية')
+                        } />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {casesOfType.map((caseItem: any) => (
+                          <SelectItem key={caseItem._id} value={caseItem._id}>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium">{caseItem.caseNumber || caseItem._id.slice(-6)}</span>
+                              <span className="text-slate-500">-</span>
+                              <span className="text-slate-600 truncate max-w-[200px]">{caseItem.title}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Selected Case Summary */}
+                {selectedCase && (
+                  <div className="mt-4 p-4 bg-slate-50 rounded-xl space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-bold text-navy text-lg">{selectedCase.title}</h3>
+                        <p className="text-sm text-slate-600">{selectedCase.caseNumber}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge className={cn(
+                          "border-0",
+                          selectedCase.priority === 'critical' && "bg-red-100 text-red-700",
+                          selectedCase.priority === 'high' && "bg-orange-100 text-orange-700",
+                          selectedCase.priority === 'medium' && "bg-amber-100 text-amber-700",
+                          selectedCase.priority === 'low' && "bg-green-100 text-green-700",
+                        )}>
+                          {t(`casePipeline.priority.${selectedCase.priority}`, selectedCase.priority)}
+                        </Badge>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild>
+                              <Link to={`/dashboard/cases/${selectedCase._id}`}>
+                                <Scale className="h-4 w-4 ms-2" />
+                                {t('casePipeline.viewCase', 'عرض القضية')}
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link to={`/dashboard/cases/${selectedCase._id}/notion`}>
+                                <Lightbulb className="h-4 w-4 ms-2 text-emerald-500" />
+                                {t('casePipeline.openBrainstorm', 'العصف الذهني')}
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={handleOpenEndCase}>
+                              <CheckCircle className="h-4 w-4 ms-2 text-purple-500" />
+                              {t('casePipeline.endCase', 'إنهاء القضية')}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+
+                    {/* Case Info Grid */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                      {/* Plaintiff */}
+                      {(selectedCase.plaintiffName || selectedCase.laborCaseDetails?.plaintiff?.name) && (
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4 text-emerald-500" />
+                          <div>
+                            <p className="text-xs text-slate-500">{t('casePipeline.plaintiff', 'المدعي')}</p>
+                            <p className="font-medium text-slate-700 truncate">
+                              {selectedCase.plaintiffName || selectedCase.laborCaseDetails?.plaintiff?.name}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      {/* Defendant */}
+                      {(selectedCase.defendantName || selectedCase.laborCaseDetails?.company?.name) && (
+                        <div className="flex items-center gap-2">
+                          <Building2 className="h-4 w-4 text-red-500" />
+                          <div>
+                            <p className="text-xs text-slate-500">{t('casePipeline.defendant', 'المدعى عليه')}</p>
+                            <p className="font-medium text-slate-700 truncate">
+                              {selectedCase.defendantName || selectedCase.laborCaseDetails?.company?.name}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      {/* Court */}
+                      {selectedCase.court && (
+                        <div className="flex items-center gap-2">
+                          <Gavel className="h-4 w-4 text-purple-500" />
+                          <div>
+                            <p className="text-xs text-slate-500">{t('casePipeline.court', 'المحكمة')}</p>
+                            <p className="font-medium text-slate-700 truncate">{selectedCase.court}</p>
+                          </div>
+                        </div>
+                      )}
+                      {/* Claim Amount */}
+                      {selectedCase.claimAmount > 0 && (
+                        <div className="flex items-center gap-2">
+                          <DollarSign className="h-4 w-4 text-emerald-500" />
+                          <div>
+                            <p className="text-xs text-slate-500">{t('casePipeline.claimAmount', 'مبلغ المطالبة')}</p>
+                            <p className="font-medium text-emerald-600">
+                              {selectedCase.claimAmount.toLocaleString('ar-SA')} {t('casePipeline.sar', 'ر.س')}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Next Hearing */}
+                    {selectedCase.nextHearing && (
+                      <div className="flex items-center gap-2 text-orange-600 bg-orange-50 p-2 rounded-lg">
+                        <Calendar className="h-4 w-4" />
+                        <span className="text-sm font-medium">
+                          {t('casePipeline.nextHearing', 'الجلسة القادمة')}: {format(new Date(selectedCase.nextHearing), 'dd MMMM yyyy', { locale })}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Pipeline Stages */}
             {isLoading ? (
-              <div className="flex gap-4 overflow-x-auto pb-4">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="flex-shrink-0 w-80">
-                    <Skeleton className="h-12 w-full rounded-t-xl" />
-                    <div className="bg-slate-100 p-3 rounded-b-xl space-y-3 min-h-[400px]">
-                      {[1, 2, 3].map((j) => (
-                        <Skeleton key={j} className="h-40 w-full rounded-xl" />
+              <Card className="border-0 shadow-sm">
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    <Skeleton className="h-8 w-48" />
+                    <div className="flex gap-4 overflow-x-auto">
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <Skeleton key={i} className="h-24 w-48 flex-shrink-0 rounded-xl" />
                       ))}
                     </div>
                   </div>
-                ))}
-              </div>
+                </CardContent>
+              </Card>
             ) : isError ? (
-              <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
-                <div className="flex justify-center mb-4">
-                  <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                    <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
-                  </div>
-                </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">
-                  {t('casePipeline.errorLoading', 'حدث خطأ أثناء التحميل')}
-                </h3>
-                <p className="text-slate-500 mb-4">
-                  {error?.message || t('casePipeline.connectionError', 'تعذر الاتصال بالخادم')}
-                </p>
-                <Button
-                  onClick={() => refetch()}
-                  className="bg-emerald-500 hover:bg-emerald-600"
-                >
-                  {t('casePipeline.retry', 'إعادة المحاولة')}
-                </Button>
-              </div>
-            ) : (
-              <div
-                className="flex gap-4 overflow-x-auto pb-4"
-                style={{ direction: 'rtl' }}
-              >
-                {currentPipeline.stages.map((stage, index) => {
-                  const totals = getStageTotals(stage.id)
-                  const stageCases = casesByStage[stage.id] || []
-                  const stagePercent = analytics.totalCases > 0
-                    ? Math.round((totals.count / analytics.totalCases) * 100)
-                    : 0
-
-                  return (
-                    <div key={stage.id} className="flex-shrink-0 w-80">
-                      {/* Stage Header */}
-                      <div
-                        className="p-4 rounded-t-xl text-white font-semibold"
-                        style={{ backgroundColor: stage.color }}
-                      >
-                        <div className="flex justify-between items-center mb-2">
-                          <div className="flex items-center gap-2">
-                            <span>{i18n.language === 'ar' ? stage.nameAr : stage.name}</span>
-                            {stage.canEnd && (
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger>
-                                    <Flag className="w-3 h-3 text-white/70" />
-                                  </TooltipTrigger>
-                                  <TooltipContent>{t('casePipeline.canEndHere', 'يمكن إنهاء القضية هنا')}</TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            )}
-                          </div>
-                          <Badge className="bg-white/20 text-white border-0">
-                            {totals.count}
-                          </Badge>
-                        </div>
-                        {/* Stage progress bar */}
-                        <Progress
-                          value={stagePercent}
-                          className="h-1.5 bg-white/20"
-                        />
-                      </div>
-
-                      {/* Stage Value */}
-                      <div className="bg-slate-100 px-4 py-2 text-xs text-slate-600 border-x border-slate-200 flex justify-between items-center">
-                        <span>
-                          {totals.value > 0 ? `${totals.value.toLocaleString('ar-SA')} ${t('casePipeline.sar', 'ر.س')}` : t('casePipeline.noValue', 'لا قيمة')}
-                        </span>
-                      </div>
-
-                      {/* Droppable Area */}
-                      <div
-                        onDragOver={handleDragOver}
-                        onDrop={(e) => handleDrop(e, stage.id)}
-                        className={cn(
-                          'min-h-[400px] p-3 rounded-b-xl border border-t-0 transition-colors',
-                          draggedCaseId
-                            ? 'bg-emerald-50 border-emerald-200'
-                            : 'bg-slate-50 border-slate-200'
-                        )}
-                      >
-                        {stageCases.length === 0 ? (
-                          <div className="h-full flex items-center justify-center text-slate-500 text-sm">
-                            {t('casePipeline.dragCasesHere', 'اسحب القضايا هنا')}
-                          </div>
-                        ) : (
-                          <div className="space-y-3">
-                            {stageCases.map((caseItem: any) => (
-                              <CaseCard
-                                key={caseItem._id}
-                                caseItem={caseItem}
-                                onDragStart={handleDragStart}
-                                onDragEnd={handleDragEnd}
-                                isDragging={draggedCaseId === caseItem._id}
-                                onEndCase={handleOpenEndCase}
-                              />
-                            ))}
-                          </div>
-                        )}
-                      </div>
+              <Card className="border-0 shadow-sm">
+                <CardContent className="p-12 text-center">
+                  <div className="flex justify-center mb-4">
+                    <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+                      <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                     </div>
-                  )
-                })}
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">
+                    {t('casePipeline.errorLoading', 'حدث خطأ أثناء التحميل')}
+                  </h3>
+                  <p className="text-slate-500 mb-4">
+                    {error?.message || t('casePipeline.connectionError', 'تعذر الاتصال بالخادم')}
+                  </p>
+                  <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600">
+                    {t('casePipeline.retry', 'إعادة المحاولة')}
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : !selectedCaseId ? (
+              <Card className="border-0 shadow-sm">
+                <CardContent className="p-12 text-center">
+                  <div className="flex justify-center mb-4">
+                    <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center">
+                      <Scale className="w-8 h-8 text-slate-400" aria-hidden="true" />
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">
+                    {t('casePipeline.selectCasePrompt', 'اختر قضية لعرض مسارها')}
+                  </h3>
+                  <p className="text-slate-500">
+                    {t('casePipeline.selectCaseDescription', 'حدد نوع القضية ثم اختر القضية من القائمة أعلاه')}
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card className="border-0 shadow-sm">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <MapPin className="h-5 w-5 text-emerald-500" />
+                      {t('casePipeline.caseJourney', 'مسار القضية')}
+                    </CardTitle>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="gap-1">
+                        <Clock className="h-3 w-3" />
+                        {daysInCurrentStage} {t('casePipeline.daysInStage', 'يوم في هذه المرحلة')}
+                      </Badge>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6">
+                  {/* Pipeline Visualization */}
+                  <div className="relative">
+                    {/* Progress Line */}
+                    <div className="absolute top-8 left-0 right-0 h-1 bg-slate-200 rounded-full" />
+                    <div
+                      className="absolute top-8 left-0 h-1 bg-emerald-500 rounded-full transition-all duration-500"
+                      style={{
+                        width: `${((currentStageIndex) / (currentPipeline.stages.length - 1)) * 100}%`,
+                        direction: 'ltr'
+                      }}
+                    />
+
+                    {/* Stages */}
+                    <div className="relative flex justify-between">
+                      {currentPipeline.stages.map((stage, index) => {
+                        const isCompleted = index < currentStageIndex
+                        const isCurrent = index === currentStageIndex
+                        const isFuture = index > currentStageIndex
+
+                        return (
+                          <div key={stage.id} className="flex flex-col items-center" style={{ width: `${100 / currentPipeline.stages.length}%` }}>
+                            {/* Stage Circle */}
+                            <button
+                              onClick={() => handleMoveToStage(stage.id)}
+                              disabled={isUpdatingCase}
+                              className={cn(
+                                "w-16 h-16 rounded-full flex items-center justify-center border-4 transition-all relative z-10",
+                                isCompleted && "bg-emerald-500 border-emerald-500 text-white",
+                                isCurrent && "bg-white border-emerald-500 text-emerald-600 ring-4 ring-emerald-100",
+                                isFuture && "bg-white border-slate-300 text-slate-400 hover:border-emerald-300 hover:text-emerald-500"
+                              )}
+                            >
+                              {isCompleted ? (
+                                <CheckCircle className="w-8 h-8" />
+                              ) : isCurrent ? (
+                                <Play className="w-6 h-6" />
+                              ) : (
+                                <span className="text-lg font-bold">{index + 1}</span>
+                              )}
+                            </button>
+
+                            {/* Stage Name */}
+                            <div className="mt-3 text-center">
+                              <p className={cn(
+                                "font-semibold text-sm",
+                                isCurrent ? "text-emerald-600" : isCompleted ? "text-slate-700" : "text-slate-400"
+                              )}>
+                                {isRTL ? stage.nameAr : stage.name}
+                              </p>
+                              {stage.isMandatory && (
+                                <Badge className="mt-1 bg-amber-100 text-amber-700 border-0 text-xs">
+                                  {t('casePipeline.mandatory', 'إلزامي')}
+                                </Badge>
+                              )}
+                              {stage.canEnd && isCurrent && (
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger>
+                                      <Badge className="mt-1 bg-purple-100 text-purple-700 border-0 text-xs gap-1">
+                                        <Flag className="h-3 w-3" />
+                                        {t('casePipeline.canEnd', 'يمكن الإنهاء')}
+                                      </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      {t('casePipeline.canEndHere', 'يمكن إنهاء القضية في هذه المرحلة')}
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="mt-8 flex items-center justify-center gap-4">
+                    <Button
+                      variant="outline"
+                      onClick={handleMovePrevious}
+                      disabled={currentStageIndex === 0 || isUpdatingCase}
+                      className="rounded-xl gap-2"
+                    >
+                      {isRTL ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
+                      {t('casePipeline.previousStage', 'المرحلة السابقة')}
+                    </Button>
+
+                    <Button
+                      onClick={handleOpenEndCase}
+                      variant="outline"
+                      className="rounded-xl gap-2 border-purple-300 text-purple-600 hover:bg-purple-50"
+                    >
+                      <CheckCircle className="h-4 w-4" />
+                      {t('casePipeline.endCase', 'إنهاء القضية')}
+                    </Button>
+
+                    <Button
+                      onClick={handleMoveNext}
+                      disabled={currentStageIndex === currentPipeline.stages.length - 1 || isUpdatingCase}
+                      className="rounded-xl gap-2 bg-emerald-500 hover:bg-emerald-600"
+                    >
+                      {t('casePipeline.nextStage', 'المرحلة التالية')}
+                      {isRTL ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
+                    </Button>
+                  </div>
+
+                  {/* Current Stage Description */}
+                  {currentPipeline.stages[currentStageIndex] && (
+                    <div className="mt-6 p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+                      <h4 className="font-semibold text-emerald-800 mb-1">
+                        {t('casePipeline.currentStage', 'المرحلة الحالية')}: {isRTL ? currentPipeline.stages[currentStageIndex].nameAr : currentPipeline.stages[currentStageIndex].name}
+                      </h4>
+                      {currentPipeline.stages[currentStageIndex].descriptionAr && (
+                        <p className="text-sm text-emerald-700">
+                          {isRTL
+                            ? currentPipeline.stages[currentStageIndex].descriptionAr
+                            : currentPipeline.stages[currentStageIndex].description}
+                        </p>
+                      )}
+                      {currentPipeline.stages[currentStageIndex].maxDurationDays && (
+                        <p className="text-xs text-emerald-600 mt-2">
+                          {t('casePipeline.expectedDuration', 'المدة المتوقعة')}: {currentPipeline.stages[currentStageIndex].maxDurationDays} {t('casePipeline.days', 'يوم')}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Pipeline Notes */}
+                  {currentPipeline.notesAr && (
+                    <div className="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
+                      <p className="text-sm text-amber-700">
+                        <AlertTriangle className="h-4 w-4 inline ms-1" />
+                        {isRTL ? currentPipeline.notesAr : currentPipeline.notes}
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Linked Items */}
+            {selectedCase && (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <Card className="border-0 shadow-sm">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-blue-50">
+                      <CheckSquare className="h-5 w-5 text-blue-500" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-navy">{selectedCase.tasksCount || 0}</p>
+                      <p className="text-xs text-slate-500">{t('casePipeline.tasks', 'مهام')}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="border-0 shadow-sm">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-emerald-50">
+                      <Lightbulb className="h-5 w-5 text-emerald-500" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-navy">{selectedCase.notionPagesCount || 0}</p>
+                      <p className="text-xs text-slate-500">{t('casePipeline.notionPages', 'صفحات')}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="border-0 shadow-sm">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-purple-50">
+                      <Calendar className="h-5 w-5 text-purple-500" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-navy">{selectedCase.eventsCount || 0}</p>
+                      <p className="text-xs text-slate-500">{t('casePipeline.events', 'أحداث')}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="border-0 shadow-sm">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-amber-50">
+                      <FileText className="h-5 w-5 text-amber-500" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-navy">{selectedCase.notes?.length || 0}</p>
+                      <p className="text-xs text-slate-500">{t('casePipeline.notes', 'ملاحظات')}</p>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             )}
           </div>
@@ -862,7 +706,7 @@ export function CasePipelineView() {
           <CasePipelineSidebar
             context="pipeline"
             selectedCaseType={selectedCaseType}
-            analytics={analytics}
+            selectedCase={selectedCase}
           />
         </div>
       </Main>
@@ -886,7 +730,7 @@ export function CasePipelineView() {
                 <SelectContent>
                   {caseOutcomes.filter(o => o.value !== 'ongoing').map((outcome) => (
                     <SelectItem key={outcome.value} value={outcome.value}>
-                      {i18n.language === 'ar' ? outcome.label : outcome.labelEn}
+                      {isRTL ? outcome.label : outcome.labelEn}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -901,7 +745,7 @@ export function CasePipelineView() {
                 <SelectContent>
                   {caseEndReasons.map((reason) => (
                     <SelectItem key={reason.value} value={reason.value}>
-                      {i18n.language === 'ar' ? reason.label : reason.labelEn}
+                      {isRTL ? reason.label : reason.labelEn}
                     </SelectItem>
                   ))}
                 </SelectContent>
