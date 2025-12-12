@@ -968,11 +968,23 @@ export const whatsAppService = {
 
   /**
    * Send message
+   * Supports both phoneNumber-based and conversationId-based messaging
    */
   sendMessage: async (data: SendMessageData): Promise<WhatsAppMessage> => {
     try {
-      const response = await apiClient.post('/whatsapp/messages/send', data)
-      return response.data.data
+      // Normalize the data for the API
+      const normalizedData = {
+        // Use conversationId if provided, otherwise phoneNumber
+        ...(data.conversationId && { conversationId: data.conversationId }),
+        ...(data.phoneNumber && { phoneNumber: data.phoneNumber }),
+        // Normalize message content field
+        text: data.message || data.content || '',
+        // Normalize message type
+        type: data.type || data.messageType || 'text',
+        ...(data.mediaUrl && { mediaUrl: data.mediaUrl }),
+      }
+      const response = await apiClient.post('/whatsapp/messages/send', normalizedData)
+      return response.data.data || response.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

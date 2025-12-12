@@ -383,11 +383,9 @@ export function WhatsAppListView() {
                                         </div>
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد محادثات</h3>
                                         <p className="text-slate-500 mb-4">ابدأ محادثة جديدة مع عميل</p>
-                                        <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                                            <Link to="/dashboard/crm/whatsapp/new">
-                                                <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
-                                                محادثة جديدة
-                                            </Link>
+                                        <Button className="bg-emerald-500 hover:bg-emerald-600" disabled>
+                                            <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
+                                            محادثة جديدة (قريباً)
                                         </Button>
                                     </div>
                                 )}
@@ -509,11 +507,9 @@ export function WhatsAppListView() {
                                 </div>
 
                                 <div className="p-4 pt-0 text-center">
-                                    <Button asChild variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-4">
-                                        <Link to="/dashboard/crm/whatsapp/templates">
-                                            عرض جميع القوالب
-                                            <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
-                                        </Link>
+                                    <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-4" disabled>
+                                        عرض جميع القوالب (قريباً)
+                                        <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
                                     </Button>
                                 </div>
                             </div>
