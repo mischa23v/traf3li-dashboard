@@ -410,6 +410,79 @@ export function LeadDetailsView() {
 
                       <div className="p-6 bg-slate-50/50 min-h-[500px]">
                         <TabsContent value="overview" className="mt-0 space-y-6">
+                          {/* Identity Info - Najiz */}
+                          {(lead.nationalId || lead.iqamaNumber || lead.passportNumber || lead.identityType) && (
+                            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                              <CardHeader>
+                                <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                  <FileText className="h-5 w-5 text-amber-500" aria-hidden="true" />
+                                  معلومات الهوية
+                                  {lead.isVerified && (
+                                    <Badge className="bg-emerald-100 text-emerald-700 text-xs ms-2">
+                                      موثق
+                                    </Badge>
+                                  )}
+                                </CardTitle>
+                              </CardHeader>
+                              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {lead.identityType && (
+                                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                                    <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                                      <FileText className="h-5 w-5 text-purple-600" />
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-slate-500">نوع الهوية</p>
+                                      <p className="font-medium text-navy">
+                                        {lead.identityType === 'national_id' && 'الهوية الوطنية'}
+                                        {lead.identityType === 'iqama' && 'الإقامة'}
+                                        {lead.identityType === 'gcc_id' && 'هوية مواطني الخليج'}
+                                        {lead.identityType === 'passport' && 'جواز السفر'}
+                                        {lead.identityType === 'border_number' && 'رقم الحدود'}
+                                        {lead.identityType === 'visitor_id' && 'هوية زائر'}
+                                      </p>
+                                    </div>
+                                  </div>
+                                )}
+                                {lead.nationalId && (
+                                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                                    <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                                      <FileText className="h-5 w-5 text-amber-600" />
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-slate-500">رقم الهوية الوطنية</p>
+                                      <p className="font-medium text-navy" dir="ltr">{lead.nationalId}</p>
+                                    </div>
+                                  </div>
+                                )}
+                                {lead.iqamaNumber && (
+                                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                                    <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                                      <FileText className="h-5 w-5 text-blue-600" />
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-slate-500">رقم الإقامة</p>
+                                      <p className="font-medium text-navy" dir="ltr">{lead.iqamaNumber}</p>
+                                    </div>
+                                  </div>
+                                )}
+                                {lead.passportNumber && (
+                                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                                    <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
+                                      <FileText className="h-5 w-5 text-indigo-600" />
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-slate-500">رقم جواز السفر</p>
+                                      <p className="font-medium text-navy" dir="ltr">{lead.passportNumber}</p>
+                                      {lead.passportCountry && (
+                                        <p className="text-xs text-slate-400">{lead.passportCountry}</p>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                              </CardContent>
+                            </Card>
+                          )}
+
                           {/* Contact Info */}
                           <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                             <CardHeader>

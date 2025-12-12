@@ -1643,7 +1643,21 @@
       "companyName": "اسم الشركة",
       "contactMethod": "طريقة التواصل",
       "status": "الحالة",
-      "type": "نوع العميل"
+      "type": "نوع العميل",
+      "identityType": "نوع الهوية",
+      "verified": "التحقق"
+    },
+    "verified": "موثق",
+    "notVerified": "غير موثق",
+    "identityTypes": {
+      "national_id": "الهوية الوطنية",
+      "iqama": "الإقامة",
+      "gcc_id": "هوية مواطني الخليج",
+      "passport": "جواز السفر",
+      "border_number": "رقم الحدود",
+      "visitor_id": "هوية زائر",
+      "temporary_id": "هوية مؤقتة",
+      "diplomatic_id": "هوية دبلوماسية"
     },
     "types": {
       "individual": "فرد",
@@ -1691,7 +1705,24 @@
       "addressPlaceholder": "أدخل العنوان التفصيلي",
       "selectStatus": "اختر الحالة",
       "notes": "ملاحظات",
-      "notesPlaceholder": "أضف ملاحظات عن العميل..."
+      "notesPlaceholder": "أضف ملاحظات عن العميل...",
+      "identityType": "نوع الهوية",
+      "iqamaNumber": "رقم الإقامة",
+      "gccId": "هوية مواطني الخليج",
+      "passportNumber": "رقم جواز السفر",
+      "companyNameAr": "اسم الشركة (عربي)",
+      "unifiedNumber": "الرقم الموحد",
+      "vatNumber": "رقم ضريبة القيمة المضافة",
+      "legalForm": "الشكل القانوني",
+      "capital": "رأس المال",
+      "nationalAddress": "العنوان الوطني",
+      "buildingNumber": "رقم المبنى",
+      "streetName": "اسم الشارع",
+      "district": "الحي",
+      "region": "المنطقة",
+      "postalCode": "الرمز البريدي",
+      "additionalNumber": "الرقم الإضافي",
+      "shortAddress": "العنوان المختصر"
     },
     "tabs": {
       "info": "المعلومات",

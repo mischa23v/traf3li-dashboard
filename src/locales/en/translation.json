@@ -1550,7 +1550,21 @@
       "city": "City",
       "companyName": "Company Name",
       "contactMethod": "Contact Method",
-      "status": "Status"
+      "status": "Status",
+      "identityType": "Identity Type",
+      "verified": "Verification"
+    },
+    "verified": "Verified",
+    "notVerified": "Not Verified",
+    "identityTypes": {
+      "national_id": "Saudi National ID",
+      "iqama": "Resident ID (Iqama)",
+      "gcc_id": "GCC Citizen ID",
+      "passport": "Passport",
+      "border_number": "Border Number",
+      "visitor_id": "Visitor ID",
+      "temporary_id": "Temporary ID",
+      "diplomatic_id": "Diplomatic ID"
     },
     "statuses": {
       "active": "Active",
@@ -1593,7 +1607,24 @@
       "addressPlaceholder": "Enter detailed address",
       "selectStatus": "Select status",
       "notes": "Notes",
-      "notesPlaceholder": "Add notes about the client..."
+      "notesPlaceholder": "Add notes about the client...",
+      "identityType": "Identity Type",
+      "iqamaNumber": "Iqama Number",
+      "gccId": "GCC Citizen ID",
+      "passportNumber": "Passport Number",
+      "companyNameAr": "Company Name (Arabic)",
+      "unifiedNumber": "Unified Number (700)",
+      "vatNumber": "VAT Number",
+      "legalForm": "Legal Form",
+      "capital": "Capital",
+      "nationalAddress": "National Address",
+      "buildingNumber": "Building Number",
+      "streetName": "Street Name",
+      "district": "District",
+      "region": "Region",
+      "postalCode": "Postal Code",
+      "additionalNumber": "Additional Number",
+      "shortAddress": "Short Address"
     },
     "tabs": {
       "info": "Information",
