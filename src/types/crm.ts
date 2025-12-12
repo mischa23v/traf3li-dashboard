@@ -1,7 +1,19 @@
 /**
  * CRM Types
  * Types for Lead, Pipeline, Referral, and Activity management
+ * Includes Najiz (Ministry of Justice) integration fields
  */
+
+import type {
+  ArabicName,
+  NationalAddress,
+  NajizIdentityType,
+  GCCCountry,
+  Gender,
+  MaritalStatus,
+  Sponsor,
+  POBox,
+} from './najiz'
 
 // ═══════════════════════════════════════════════════════════════
 // LEAD TYPES
@@ -24,35 +36,113 @@ export interface Lead {
   lawyerId: string
   type: LeadType
 
-  // Individual
+  // ─── Individual Name Fields ───
   firstName?: string
+  middleName?: string
   lastName?: string
+  preferredName?: string
+  salutation?: string
+  suffix?: string
+  fullNameArabic?: string
+  fullNameEnglish?: string
 
-  // Company
+  // ─── Arabic Name (الاسم الرباعي) - Najiz ───
+  arabicName?: ArabicName
+  salutationAr?: string
+
+  // ─── Company Fields ───
   companyName?: string
   companyNameAr?: string
+  companyNameEnglish?: string
   contactPerson?: string
+  crNumber?: string
+  unifiedNumber?: string
+  vatNumber?: string
+  municipalityLicense?: string
+  chamberNumber?: string
+  legalForm?: string
+  legalFormAr?: string
+  capital?: number
+  capitalCurrency?: string
+  establishmentDate?: string
+  crExpiryDate?: string
 
-  // Contact
+  // ─── Authorized Person (Company) ───
+  authorizedPerson?: string
+  authorizedPersonAr?: string
+  authorizedPersonTitle?: string
+  authorizedPersonIdentityType?: NajizIdentityType
+  authorizedPersonIdentityNumber?: string
+
+  // ─── Contact Info ───
   email?: string
   phone: string
   alternatePhone?: string
   whatsapp?: string
+  fax?: string
+  website?: string
+
+  // ─── Identity Information (Najiz) ───
+  identityType?: NajizIdentityType
+  nationalId?: string
+  iqamaNumber?: string
+  gccId?: string
+  gccCountry?: GCCCountry
+  borderNumber?: string
+  visitorId?: string
+  passportNumber?: string
+  passportCountry?: string
+  passportIssueDate?: string
+  passportExpiryDate?: string
+  passportIssuePlace?: string
+  identityIssueDate?: string
+  identityExpiryDate?: string
+  identityIssuePlace?: string
+
+  // ─── Personal Details (Najiz) ───
+  dateOfBirth?: string
+  dateOfBirthHijri?: string
+  placeOfBirth?: string
+  gender?: Gender
+  maritalStatus?: MaritalStatus
+  nationality?: string
+  nationalityCode?: string
+
+  // ─── Sponsor (for Iqama holders) ───
+  sponsor?: Sponsor
+
+  // ─── National Address (العنوان الوطني) - Najiz ───
+  nationalAddress?: NationalAddress
+  workAddress?: NationalAddress
+  poBox?: POBox
+  headquartersAddress?: NationalAddress
+  branchAddresses?: NationalAddress[]
+
+  // ─── Legacy Address Fields ───
   address?: {
     street?: string
     city?: string
+    district?: string
     postalCode?: string
-    country: string
+    country?: string
+    region?: string
+    regionCode?: string
   }
+  city?: string
+  district?: string
+  province?: string
+  region?: string
+  postalCode?: string
+  country?: string
 
-  // Pipeline
+  // ─── Pipeline ───
   status: LeadStatus
   pipelineId?: string
   pipelineStageId?: string
   probability: number
   expectedCloseDate?: string
 
-  // Source
+  // ─── Source ───
   // Backend values: website | referral | ads | social | walkin | cold_call | event
   // Frontend also supports: social_media, advertising, walk_in, other (mapped to backend equivalents)
   source?: {
@@ -74,7 +164,7 @@ export interface Lead {
     campaign?: string
   }
 
-  // Intake
+  // ─── Intake ───
   intake?: {
     caseType?: string
     caseDescription?: string
@@ -83,7 +173,7 @@ export interface Lead {
     conflictCheckCompleted?: boolean
   }
 
-  // Qualification
+  // ─── Qualification (BANT) ───
   qualification?: {
     budget?: 'unknown' | 'low' | 'medium' | 'high' | 'premium'
     authority?: 'unknown' | 'decision_maker' | 'influencer' | 'researcher'
@@ -98,14 +188,14 @@ export interface Lead {
     score?: number
   }
 
-  // Value
+  // ─── Value ───
   estimatedValue: number
   currency: string
 
-  // Assignment
+  // ─── Assignment ───
   assignedTo?: string
 
-  // Organization/Contact Links (NEW)
+  // ─── Organization/Contact Links ───
   organizationId?: string | {
     _id: string
     legalName: string
@@ -118,53 +208,161 @@ export interface Lead {
     title?: string
   }
 
-  // Activity
+  // ─── Activity ───
   lastContactedAt?: string
   lastActivityAt?: string
   nextFollowUpDate?: string
   nextFollowUpNote?: string
   activityCount: number
 
-  // Conversion
+  // ─── Conversion ───
   convertedToClient: boolean
   clientId?: string
   convertedAt?: string
 
-  // Meta
+  // ─── Communication Preferences ───
+  preferredLanguage?: 'ar' | 'en'
+  preferredContactMethod?: 'email' | 'phone' | 'sms' | 'whatsapp'
+  bestTimeToContact?: string
+  doNotContact?: boolean
+  doNotEmail?: boolean
+  doNotCall?: boolean
+  doNotSMS?: boolean
+
+  // ─── Risk & Conflict ───
+  riskLevel?: 'low' | 'medium' | 'high'
+  isBlacklisted?: boolean
+  blacklistReason?: string
+  conflictCheckStatus?: 'not_checked' | 'clear' | 'potential_conflict' | 'confirmed_conflict'
+  conflictNotes?: string
+  conflictCheckDate?: string
+
+  // ─── Verification Status (Wathq/MOJ) ───
+  isVerified?: boolean
+  verificationSource?: string
+  verifiedAt?: string
+  verificationData?: any
+
+  // ─── Meta ───
   tags?: string[]
   notes?: string
+  priority?: 'low' | 'normal' | 'high' | 'vip'
+  vipStatus?: boolean
   displayName: string
   daysSinceCreated: number
   daysSinceContact?: number
+  createdBy?: string
+  updatedBy?: string
   createdAt: string
   updatedAt: string
 }
 
 export interface CreateLeadData {
   type: LeadType
+
+  // Individual fields
   firstName?: string
+  middleName?: string
   lastName?: string
+  preferredName?: string
+  salutation?: string
+  salutationAr?: string
+  fullNameArabic?: string
+  fullNameEnglish?: string
+  arabicName?: ArabicName
+
+  // Company fields
   companyName?: string
+  companyNameAr?: string
+  companyNameEnglish?: string
+  contactPerson?: string
+  crNumber?: string
+  unifiedNumber?: string
+  vatNumber?: string
+  legalForm?: string
+  legalFormAr?: string
+  authorizedPerson?: string
+  authorizedPersonAr?: string
+  authorizedPersonTitle?: string
+  authorizedPersonIdentityType?: NajizIdentityType
+  authorizedPersonIdentityNumber?: string
+
+  // Contact
   phone: string
   email?: string
+  alternatePhone?: string
+  whatsapp?: string
+
+  // Identity (Najiz)
+  identityType?: NajizIdentityType
+  nationalId?: string
+  iqamaNumber?: string
+  gccId?: string
+  gccCountry?: GCCCountry
+  borderNumber?: string
+  visitorId?: string
+  passportNumber?: string
+  passportCountry?: string
+  passportIssueDate?: string
+  passportExpiryDate?: string
+
+  // Personal details
+  dateOfBirth?: string
+  dateOfBirthHijri?: string
+  gender?: Gender
+  maritalStatus?: MaritalStatus
+  nationality?: string
+  nationalityCode?: string
+
+  // Addresses
+  nationalAddress?: NationalAddress
+  workAddress?: NationalAddress
+  headquartersAddress?: NationalAddress
+  poBox?: POBox
+  sponsor?: Sponsor
+
+  // Legacy address
+  address?: Lead['address']
+  city?: string
+  country?: string
+
+  // Source & Pipeline
   source?: Lead['source']
   intake?: Lead['intake']
   estimatedValue?: number
   pipelineId?: string
   assignedTo?: string
+
+  // Links
   organizationId?: string
   contactId?: string
+
+  // Preferences
+  preferredLanguage?: 'ar' | 'en'
+  preferredContactMethod?: 'email' | 'phone' | 'sms' | 'whatsapp'
+
+  // Meta
   tags?: string[]
   notes?: string
+  priority?: 'low' | 'normal' | 'high' | 'vip'
 }
 
 export interface LeadFilters {
   status?: LeadStatus
+  type?: LeadType
   source?: string
   assignedTo?: string
   pipelineId?: string
   search?: string
   convertedToClient?: boolean
+  city?: string
+  region?: string
+  regionCode?: string
+  identityType?: NajizIdentityType
+  nationality?: string
+  country?: string
+  priority?: string
+  tags?: string[]
   sortBy?: string
   sortOrder?: 'asc' | 'desc'
   page?: number
