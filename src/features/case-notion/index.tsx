@@ -21,7 +21,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { cn } from '@/lib/utils'
-import { useCase } from '@/hooks/useCasesAndClients'
+import { useCaseFromList } from '@/hooks/useCasesAndClients'
 import { NotionSidebar } from './components/notion-sidebar'
 import { NotionPageView } from './components/notion-page-view'
 
@@ -41,8 +41,8 @@ export default function CaseNotion({ caseId: propsCaseId, pageId: propsPageId }:
   const [selectedPageId, setSelectedPageId] = useState<string | undefined>(propsPageId)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
-  // Fetch case data
-  const { data: caseData, isLoading: caseLoading } = useCase(caseId)
+  // Fetch case data from list (workaround for 403 on GET /cases/:id)
+  const { data: caseData, isLoading: caseLoading } = useCaseFromList(caseId)
 
   const topNav = [
     { title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },

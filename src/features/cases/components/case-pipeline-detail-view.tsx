@@ -27,7 +27,7 @@ import {
   ListChecks,
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useCase, useUpdateCase } from '@/hooks/useCasesAndClients'
+import { useCaseFromList, useUpdateCase } from '@/hooks/useCasesAndClients'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -107,8 +107,8 @@ export function CasePipelineDetailView() {
   const [endNotes, setEndNotes] = useState<string>('')
   const [finalAmount, setFinalAmount] = useState<string>('')
 
-  // Fetch case data
-  const { data: selectedCase, isLoading, isError, error, refetch } = useCase(caseId)
+  // Fetch case data from list (workaround for 403 on GET /cases/:id)
+  const { data: selectedCase, isLoading, isError, error, refetch } = useCaseFromList(caseId)
   const { mutate: updateCase, isPending: isUpdatingCase } = useUpdateCase()
 
   // Get current pipeline configuration

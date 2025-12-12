@@ -63,6 +63,30 @@ export const useCase = (id: string) => {
 }
 
 /**
+ * Fetch single case by ID from the cases list (workaround for 403 on GET /cases/:id)
+ * This fetches all cases and finds the one with matching ID
+ * Use this when GET /api/v1/cases/:id returns 403 but GET /api/v1/cases works
+ */
+export const useCaseFromList = (id: string) => {
+  const casesQuery = useCases()
+
+  // Extract the case from the list
+  const caseData = casesQuery.data?.data?.find(
+    (c: Case) => c._id === id
+  ) || casesQuery.data?.cases?.find(
+    (c: Case) => c._id === id
+  )
+
+  return {
+    data: caseData,
+    isLoading: casesQuery.isLoading,
+    isError: casesQuery.isError && !caseData,
+    error: caseData ? null : casesQuery.error || (casesQuery.data && !caseData ? new Error('Case not found') : null),
+    refetch: casesQuery.refetch,
+  }
+}
+
+/**
  * Calculate case statistics from fetched cases
  */
 export const useCaseStatistics = (cases: Case[] | undefined) => {
