@@ -298,7 +298,7 @@ export function EditInvoiceView() {
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <User className="w-4 h-4 text-blue-500" aria-hidden="true" />
-                                                العميل <span className="text-red-500">*</span>
+                                                العميل
                                             </label>
                                             <Select
                                                 value={formData.clientId}
@@ -359,14 +359,13 @@ export function EditInvoiceView() {
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-blue-500" aria-hidden="true" />
-                                                تاريخ الاستحقاق <span className="text-red-500">*</span>
+                                                تاريخ الاستحقاق
                                             </label>
                                             <Input
                                                 type="date"
                                                 className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
                                                 value={formData.dueDate}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
-                                                required
                                             />
                                         </div>
                                     </div>
@@ -529,7 +528,7 @@ export function EditInvoiceView() {
                                     <Button
                                         type="submit"
                                         className="bg-blue-500 hover:bg-blue-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-blue-500/20"
-                                        disabled={isUpdating || lineItems.length === 0}
+                                        disabled={isUpdating}
                                     >
                                         {isUpdating ? (
                                             <span className="flex items-center gap-2">
