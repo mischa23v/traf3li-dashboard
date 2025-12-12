@@ -384,31 +384,93 @@ export function ClientDetails() {
 
                         {/* Identity & Company Info */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {/* Identity Card */}
-                          {client.nationalId && (
+                          {/* Identity Card - Enhanced for Najiz */}
+                          {(client.nationalId || client.iqamaNumber || client.passportNumber || client.gccId) && (
                             <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                               <CardHeader className="pb-3">
                                 <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
                                   <FileText className="w-4 h-4 text-amber-600" />
                                   {t('clients.form.identityInfo')}
+                                  {client.isVerified && (
+                                    <Badge className="bg-emerald-100 text-emerald-700 text-xs ms-2">
+                                      {t('clients.verified')}
+                                    </Badge>
+                                  )}
                                 </CardTitle>
                               </CardHeader>
-                              <CardContent>
-                                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
-                                  <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
-                                    <Lock className="h-5 w-5 text-amber-600" />
+                              <CardContent className="space-y-3">
+                                {/* Identity Type */}
+                                {client.identityType && (
+                                  <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
+                                    <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                                      <Lock className="h-5 w-5 text-purple-600" />
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-slate-500">{t('clients.form.identityType')}</p>
+                                      <p className="font-medium text-slate-900">{t(`clients.identityTypes.${client.identityType}`)}</p>
+                                    </div>
                                   </div>
-                                  <div>
-                                    <p className="text-xs text-slate-500">{t('clients.form.nationalId')}</p>
-                                    <p className="font-medium text-slate-900">{client.nationalId}</p>
+                                )}
+                                {/* National ID */}
+                                {client.nationalId && (
+                                  <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
+                                    <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                                      <Lock className="h-5 w-5 text-amber-600" />
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-slate-500">{t('clients.form.nationalId')}</p>
+                                      <p className="font-medium text-slate-900" dir="ltr">{client.nationalId}</p>
+                                    </div>
                                   </div>
-                                </div>
+                                )}
+                                {/* Iqama */}
+                                {client.iqamaNumber && (
+                                  <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
+                                    <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                                      <Lock className="h-5 w-5 text-blue-600" />
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-slate-500">{t('clients.form.iqamaNumber')}</p>
+                                      <p className="font-medium text-slate-900" dir="ltr">{client.iqamaNumber}</p>
+                                    </div>
+                                  </div>
+                                )}
+                                {/* GCC ID */}
+                                {client.gccId && (
+                                  <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
+                                    <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center">
+                                      <Lock className="h-5 w-5 text-teal-600" />
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-slate-500">{t('clients.form.gccId')}</p>
+                                      <p className="font-medium text-slate-900" dir="ltr">{client.gccId}</p>
+                                      {client.gccCountry && (
+                                        <p className="text-xs text-slate-500">{client.gccCountry}</p>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                                {/* Passport */}
+                                {client.passportNumber && (
+                                  <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
+                                    <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
+                                      <Lock className="h-5 w-5 text-indigo-600" />
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-slate-500">{t('clients.form.passportNumber')}</p>
+                                      <p className="font-medium text-slate-900" dir="ltr">{client.passportNumber}</p>
+                                      {client.passportCountry && (
+                                        <p className="text-xs text-slate-500">{client.passportCountry}</p>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
                               </CardContent>
                             </Card>
                           )}
 
-                          {/* Company Card */}
-                          {(client.companyName || client.crNumber) && (
+                          {/* Company Card - Enhanced for Najiz */}
+                          {(client.companyName || client.crNumber || client.vatNumber) && (
                             <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                               <CardHeader className="pb-3">
                                 <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
@@ -423,16 +485,123 @@ export function ClientDetails() {
                                     <span className="font-medium text-slate-900">{client.companyName}</span>
                                   </div>
                                 )}
+                                {client.companyNameAr && client.companyNameAr !== client.companyName && (
+                                  <div className="flex justify-between text-sm">
+                                    <span className="text-slate-500">{t('clients.form.companyNameAr')}</span>
+                                    <span className="font-medium text-slate-900">{client.companyNameAr}</span>
+                                  </div>
+                                )}
                                 {client.crNumber && (
                                   <div className="flex justify-between text-sm">
                                     <span className="text-slate-500">{t('clients.form.companyRegistration')}</span>
-                                    <span className="font-medium text-slate-900">{client.crNumber}</span>
+                                    <span className="font-medium text-slate-900" dir="ltr">{client.crNumber}</span>
+                                  </div>
+                                )}
+                                {client.unifiedNumber && (
+                                  <div className="flex justify-between text-sm">
+                                    <span className="text-slate-500">{t('clients.form.unifiedNumber')}</span>
+                                    <span className="font-medium text-slate-900" dir="ltr">{client.unifiedNumber}</span>
+                                  </div>
+                                )}
+                                {client.vatNumber && (
+                                  <div className="flex justify-between text-sm">
+                                    <span className="text-slate-500">{t('clients.form.vatNumber')}</span>
+                                    <span className="font-medium text-slate-900" dir="ltr">{client.vatNumber}</span>
+                                  </div>
+                                )}
+                                {client.legalForm && (
+                                  <div className="flex justify-between text-sm">
+                                    <span className="text-slate-500">{t('clients.form.legalForm')}</span>
+                                    <span className="font-medium text-slate-900">{isArabic ? client.legalFormAr || client.legalForm : client.legalForm}</span>
+                                  </div>
+                                )}
+                                {client.capital && (
+                                  <div className="flex justify-between text-sm">
+                                    <span className="text-slate-500">{t('clients.form.capital')}</span>
+                                    <span className="font-medium text-slate-900">{client.capital.toLocaleString()} {client.capitalCurrency || 'SAR'}</span>
                                   </div>
                                 )}
                               </CardContent>
                             </Card>
                           )}
                         </div>
+
+                        {/* National Address Card - Saudi Format */}
+                        {client.nationalAddress && (
+                          <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
+                                <MapPin className="w-4 h-4 text-emerald-600" />
+                                {t('clients.form.nationalAddress')}
+                                {client.nationalAddress.isVerified && (
+                                  <Badge className="bg-emerald-100 text-emerald-700 text-xs ms-2">
+                                    {t('clients.verified')}
+                                  </Badge>
+                                )}
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                {client.nationalAddress.buildingNumber && (
+                                  <div className="p-3 rounded-xl bg-slate-50">
+                                    <p className="text-xs text-slate-500">{t('clients.form.buildingNumber')}</p>
+                                    <p className="font-medium text-slate-900">{client.nationalAddress.buildingNumber}</p>
+                                  </div>
+                                )}
+                                {(client.nationalAddress.streetNameAr || client.nationalAddress.streetName) && (
+                                  <div className="p-3 rounded-xl bg-slate-50 col-span-2">
+                                    <p className="text-xs text-slate-500">{t('clients.form.streetName')}</p>
+                                    <p className="font-medium text-slate-900">
+                                      {isArabic ? client.nationalAddress.streetNameAr || client.nationalAddress.streetName : client.nationalAddress.streetName || client.nationalAddress.streetNameAr}
+                                    </p>
+                                  </div>
+                                )}
+                                {(client.nationalAddress.districtAr || client.nationalAddress.district) && (
+                                  <div className="p-3 rounded-xl bg-slate-50">
+                                    <p className="text-xs text-slate-500">{t('clients.form.district')}</p>
+                                    <p className="font-medium text-slate-900">
+                                      {isArabic ? client.nationalAddress.districtAr || client.nationalAddress.district : client.nationalAddress.district || client.nationalAddress.districtAr}
+                                    </p>
+                                  </div>
+                                )}
+                                {(client.nationalAddress.cityAr || client.nationalAddress.city) && (
+                                  <div className="p-3 rounded-xl bg-slate-50">
+                                    <p className="text-xs text-slate-500">{t('clients.form.city')}</p>
+                                    <p className="font-medium text-slate-900">
+                                      {isArabic ? client.nationalAddress.cityAr || client.nationalAddress.city : client.nationalAddress.city || client.nationalAddress.cityAr}
+                                    </p>
+                                  </div>
+                                )}
+                                {(client.nationalAddress.regionAr || client.nationalAddress.region) && (
+                                  <div className="p-3 rounded-xl bg-slate-50">
+                                    <p className="text-xs text-slate-500">{t('clients.form.region')}</p>
+                                    <p className="font-medium text-slate-900">
+                                      {isArabic ? client.nationalAddress.regionAr || client.nationalAddress.region : client.nationalAddress.region || client.nationalAddress.regionAr}
+                                    </p>
+                                  </div>
+                                )}
+                                {client.nationalAddress.postalCode && (
+                                  <div className="p-3 rounded-xl bg-slate-50">
+                                    <p className="text-xs text-slate-500">{t('clients.form.postalCode')}</p>
+                                    <p className="font-medium text-slate-900" dir="ltr">{client.nationalAddress.postalCode}</p>
+                                  </div>
+                                )}
+                                {client.nationalAddress.additionalNumber && (
+                                  <div className="p-3 rounded-xl bg-slate-50">
+                                    <p className="text-xs text-slate-500">{t('clients.form.additionalNumber')}</p>
+                                    <p className="font-medium text-slate-900" dir="ltr">{client.nationalAddress.additionalNumber}</p>
+                                  </div>
+                                )}
+                                {client.nationalAddress.shortAddress && (
+                                  <div className="p-3 rounded-xl bg-emerald-50">
+                                    <p className="text-xs text-emerald-600">{t('clients.form.shortAddress')}</p>
+                                    <p className="font-bold text-emerald-700" dir="ltr">{client.nationalAddress.shortAddress}</p>
+                                  </div>
+                                )}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        )}
 
                         {/* Address Card */}
                         {(client.city || client.address) && (

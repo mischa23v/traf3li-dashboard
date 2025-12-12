@@ -4,7 +4,8 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/data-table'
 import { LongText } from '@/components/long-text'
-import { clientStatusColors, clientStatuses, contactMethods } from '../data/data'
+import { BadgeCheck, AlertCircle } from 'lucide-react'
+import { clientStatusColors, clientStatuses, contactMethods, identityTypes, verificationStatusColors } from '../data/data'
 import { type Client } from '../data/schema'
 import { DataTableRowActions } from './data-table-row-actions'
 import { useTranslation } from 'react-i18next'
@@ -21,7 +22,8 @@ const getDisplayName = (client: Client): string => {
 }
 
 export const useClientsColumns = (): ColumnDef<Client>[] => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const isArabic = i18n.language === 'ar'
 
   return [
     {
@@ -134,6 +136,51 @@ export const useClientsColumns = (): ColumnDef<Client>[] => {
       filterFn: (row, id, value) => {
         const method = row.original.preferredContactMethod || row.original.preferredContact || 'phone'
         return value.includes(method)
+      },
+      enableSorting: false,
+    },
+    {
+      id: 'identityType',
+      accessorFn: (row) => row.identityType || 'national_id',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('clients.columns.identityType')} />
+      ),
+      cell: ({ row }) => {
+        const idType = row.original.identityType || 'national_id'
+        const identityType = identityTypes.find((i) => i.value === idType)
+        const IdIcon = identityType?.icon
+        return (
+          <div className='flex items-center gap-2'>
+            {IdIcon && <IdIcon size={16} className='text-muted-foreground' />}
+            <span className='text-sm'>
+              {isArabic ? identityType?.label : identityType?.labelEn}
+            </span>
+          </div>
+        )
+      },
+      enableSorting: false,
+    },
+    {
+      id: 'isVerified',
+      accessorFn: (row) => row.isVerified,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('clients.columns.verified')} />
+      ),
+      cell: ({ row }) => {
+        const isVerified = row.original.isVerified
+        const badgeColor = verificationStatusColors.get(isVerified ? 'verified' : 'not_verified')
+        return (
+          <div className='flex items-center gap-2'>
+            {isVerified ? (
+              <BadgeCheck size={16} className='text-emerald-600' />
+            ) : (
+              <AlertCircle size={16} className='text-muted-foreground' />
+            )}
+            <Badge variant='outline' className={cn('text-xs', badgeColor)}>
+              {isVerified ? t('clients.verified') : t('clients.notVerified')}
+            </Badge>
+          </div>
+        )
       },
       enableSorting: false,
     },
