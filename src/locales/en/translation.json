@@ -1667,7 +1667,7 @@
     "caseType": "Case Type",
     "case": "Case",
     "selectCaseType": "Select Case Type",
-    "noCasesOfType": "No cases of this type",
+    "noCasesOfType": "No active cases of this type",
     "selectCasePrompt": "Select a case to view its pipeline",
     "selectCaseDescription": "Choose a case type then select a case from the list above",
     "caseJourney": "Case Journey",
