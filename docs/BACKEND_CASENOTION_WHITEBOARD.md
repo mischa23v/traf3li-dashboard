@@ -6,11 +6,13 @@ This document provides detailed backend implementation instructions for the **Wh
 
 ## Table of Contents
 1. [Overview](#overview)
-2. [Schema Updates Required](#schema-updates-required)
-3. [New API Endpoints](#new-api-endpoints)
-4. [Controller Implementation](#controller-implementation)
-5. [Request/Response Examples](#requestresponse-examples)
-6. [Migration Guide](#migration-guide)
+2. [**GitHub Repos to Study**](#github-repos-to-study) ⭐ **START HERE**
+3. [Schema Updates Required](#schema-updates-required)
+4. [New API Endpoints](#new-api-endpoints)
+5. [Controller Implementation](#controller-implementation)
+6. [Request/Response Examples](#requestresponse-examples)
+7. [Migration Guide](#migration-guide)
+8. [Critical Implementation Notes](#critical-implementation-notes)
 
 ---
 
@@ -23,6 +25,108 @@ The Whiteboard feature transforms CaseNotion from a document-style editor to a v
 - **Blocks can be linked** to case entities (events, tasks, hearings, documents)
 - **Blocks can be color-coded** and prioritized
 - **Pages can switch** between document and whiteboard views
+
+---
+
+## GitHub Repos to Study
+
+**IMPORTANT**: Before implementing, study these production-grade whiteboard/canvas implementations to understand best practices:
+
+### 1. **Excalidraw** ⭐ (89k+ Stars) - TOP PRIORITY
+- **Repo**: https://github.com/excalidraw/excalidraw
+- **Why Study**: Industry-leading open-source whiteboard
+- **Key Files to Examine**:
+  - `/packages/excalidraw/data/` - Data structures for elements
+  - `/packages/excalidraw/element/` - Element types and operations
+  - `/packages/excalidraw/actions/` - Action system for mutations
+  - `/packages/excalidraw/scene/` - Scene management
+- **Key Concepts**:
+  - `BoundElements` for connection management
+  - Immutable element updates
+  - Efficient collision detection
+  - Undo/redo with history stack
+
+### 2. **tldraw** ⭐ (44k+ Stars) - EXCELLENT FOR ARCHITECTURE
+- **Repo**: https://github.com/tldraw/tldraw
+- **Why Study**: Modern TypeScript architecture, excellent documentation
+- **Key Files to Examine**:
+  - `/packages/tldraw/src/lib/shapes/` - Shape definitions
+  - `/packages/editor/src/lib/editor/` - Core editor logic
+  - `/packages/store/` - State management patterns
+- **Key Concepts**:
+  - Shape system with `TLShape` base type
+  - Geometry-based collision detection
+  - Transaction batching for performance
+  - Record-based store architecture
+
+### 3. **ReactFlow** ⭐ (34k+ Stars) - BEST FOR NODE/EDGE PATTERNS
+- **Repo**: https://github.com/xyflow/xyflow
+- **Why Study**: Production-ready node/edge system (exactly what we need)
+- **Key Files to Examine**:
+  - `/packages/core/src/store/` - Zustand store patterns
+  - `/packages/core/src/types/` - TypeScript type definitions
+  - `/packages/core/src/hooks/` - Custom hooks
+- **Key Concepts**:
+  - Node and Edge data structures
+  - Handle positions (connection points)
+  - `nodrag` class for interactive elements inside draggable nodes
+  - Viewport transformation (zoom/pan)
+
+### 4. **AFFiNE** (60k+ Stars) - NOTION-LIKE WITH WHITEBOARD
+- **Repo**: https://github.com/toeverything/AFFiNE
+- **Why Study**: Notion competitor with whiteboard mode
+- **Key Files to Examine**:
+  - `/packages/blocksuite/` - Block system
+  - `/packages/blocksuite/blocks/surface-block/` - Canvas/surface block
+- **Key Concepts**:
+  - XYWH positioning (x, y, width, height)
+  - Fractional indexing for z-order
+  - CRDT for real-time sync
+  - Block-based architecture
+
+### 5. **BlockSuite** (7k+ Stars) - BLOCK EDITOR ENGINE
+- **Repo**: https://github.com/toeverything/blocksuite
+- **Why Study**: Core engine behind AFFiNE
+- **Key Concepts**:
+  - Rich block type system
+  - Canvas rendering
+  - Collaborative editing
+
+### Key Architectural Patterns to Adopt
+
+From these repos, implement these patterns:
+
+```javascript
+// 1. ELEMENT STRUCTURE (from Excalidraw/tldraw)
+// Store position at TOP LEVEL, not nested in properties
+{
+  _id: "block123",
+  type: "text",
+  // Canvas positioning - TOP LEVEL (not in properties!)
+  x: 350,           // or canvasX
+  y: 200,           // or canvasY
+  width: 200,       // or canvasWidth
+  height: 150,      // or canvasHeight
+  // Other fields...
+}
+
+// 2. CONNECTION STRUCTURE (from ReactFlow)
+{
+  _id: "conn123",
+  source: "block1",      // sourceBlockId
+  target: "block2",      // targetBlockId
+  sourceHandle: "right", // which side of source block
+  targetHandle: "left",  // which side of target block
+  type: "arrow",
+}
+
+// 3. VIEWPORT STATE (from tldraw)
+{
+  zoom: 1.0,
+  panX: 0,
+  panY: 0,
+}
+```
 
 ---
 
@@ -1356,3 +1460,155 @@ caseNotionService.updatePage(caseId, pageId, data)
 ```
 
 The frontend is ready - implement these backend changes to enable the full whiteboard functionality!
+
+---
+
+## Critical Implementation Notes
+
+### ⚠️ IMPORTANT: Data Structure for Position Updates
+
+The frontend sends position updates in two formats. Your backend MUST handle both:
+
+**Format 1: Direct top-level fields (PREFERRED)**
+```javascript
+// PATCH /api/v1/cases/:caseId/notion/blocks/:blockId
+{
+  "canvasX": 350,
+  "canvasY": 200
+}
+```
+
+**Format 2: Nested in data object**
+```javascript
+// This is how the frontend mutation sends it
+{
+  "data": {
+    "canvasX": 350,
+    "canvasY": 200
+  }
+}
+```
+
+**Backend Handler Must Support Both:**
+```javascript
+exports.updateBlock = async (req, res) => {
+  const { blockId } = req.params;
+
+  // Handle both formats
+  const data = req.body.data || req.body;
+
+  const updateData = {
+    lastEditedBy: req.user._id,
+    lastEditedAt: new Date()
+  };
+
+  // Extract whiteboard fields from wherever they are
+  if (data.canvasX !== undefined) updateData.canvasX = data.canvasX;
+  if (data.canvasY !== undefined) updateData.canvasY = data.canvasY;
+  if (data.canvasWidth !== undefined) updateData.canvasWidth = data.canvasWidth;
+  if (data.canvasHeight !== undefined) updateData.canvasHeight = data.canvasHeight;
+  if (data.blockColor !== undefined) updateData.blockColor = data.blockColor;
+  if (data.priority !== undefined) updateData.priority = data.priority;
+
+  // Also check nested 'properties' for backwards compatibility
+  if (data.properties) {
+    if (data.properties.canvasX !== undefined) updateData.canvasX = data.properties.canvasX;
+    if (data.properties.canvasY !== undefined) updateData.canvasY = data.properties.canvasY;
+    if (data.properties.canvasWidth !== undefined) updateData.canvasWidth = data.properties.canvasWidth;
+    if (data.properties.canvasHeight !== undefined) updateData.canvasHeight = data.properties.canvasHeight;
+  }
+
+  const block = await CaseNotionBlock.findByIdAndUpdate(blockId, updateData, { new: true });
+  res.json({ success: true, data: block });
+};
+```
+
+### ⚠️ Frontend Debounces Position Updates
+
+The frontend debounces drag operations (300ms delay). This means:
+- During a drag, you'll receive ONE update at the end, not continuous updates
+- This reduces server load significantly
+- Don't implement rate limiting that would reject these updates
+
+### ⚠️ Connection Cascade Delete
+
+When a block is deleted, ALL its connections must be deleted too:
+
+```javascript
+exports.deleteBlock = async (req, res) => {
+  const { blockId } = req.params;
+
+  // First, delete all connections involving this block
+  await BlockConnection.deleteMany({
+    $or: [
+      { sourceBlockId: blockId },
+      { targetBlockId: blockId }
+    ]
+  });
+
+  // Then delete the block
+  const block = await CaseNotionBlock.findByIdAndDelete(blockId);
+
+  res.json({ success: true, message: 'Block and connections deleted' });
+};
+```
+
+### ⚠️ Include Connections in Page Response
+
+When fetching a page, ALWAYS include its connections:
+
+```javascript
+exports.getPage = async (req, res) => {
+  const { pageId } = req.params;
+
+  const page = await CaseNotionPage.findById(pageId);
+  const blocks = await CaseNotionBlock.find({ pageId });
+  const connections = await BlockConnection.find({ pageId }); // CRITICAL!
+
+  res.json({
+    success: true,
+    data: {
+      ...page.toObject(),
+      blocks,
+      connections  // Frontend expects this!
+    }
+  });
+};
+```
+
+### Performance Optimization Tips
+
+From studying the GitHub repos, here are performance tips:
+
+1. **Batch Updates**: Allow batch position updates for moving multiple blocks
+2. **Minimal Responses**: Only return changed fields, not entire objects
+3. **Indexed Queries**: Add indexes on `pageId`, `canvasX`, `canvasY`
+4. **WebSocket for Real-time**: Consider WebSocket for live collaboration (like tldraw)
+
+### Testing the Implementation
+
+After implementing, test these scenarios:
+
+1. **Create block** → Verify it has default `canvasX: 0, canvasY: 0`
+2. **Move block** → Verify position updates persist
+3. **Resize block** → Verify width/height updates persist
+4. **Create connection** → Verify it links two blocks
+5. **Delete block** → Verify associated connections are deleted
+6. **Fetch page** → Verify blocks AND connections are returned
+
+### API Summary Quick Reference
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `PUT /blocks/:blockId` | PATCH | Update block (position, size, color, etc.) |
+| `GET /pages/:pageId` | GET | Get page with blocks AND connections |
+| `POST /pages/:pageId/connections` | POST | Create connection between blocks |
+| `DELETE /connections/:connectionId` | DELETE | Delete a connection |
+| `DELETE /blocks/:blockId` | DELETE | Delete block (cascade delete connections!) |
+| `PATCH /pages/:pageId/whiteboard-config` | PATCH | Update viewport (zoom, pan) |
+
+---
+
+## Questions?
+
+If you have questions about the implementation, refer to the GitHub repos listed above. They contain production-tested solutions for every scenario you'll encounter.
