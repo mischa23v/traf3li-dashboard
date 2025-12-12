@@ -462,29 +462,58 @@ export interface SendTemplateMessageData {
 
 export interface WhatsAppBroadcast {
   _id: string
+  broadcastId?: string
   firmId: string
   name: string
-  templateId: string
-  recipients: string[]
-  status: 'draft' | 'sending' | 'completed' | 'failed'
+  description?: string
+  type: 'template' | 'text' | 'media' | 'location'
+  template?: {
+    templateId?: string
+    templateName?: string
+    language?: string
+    variables?: Array<{
+      position: number
+      type: 'static' | 'dynamic'
+      value?: string
+      fieldName?: string
+    }>
+  }
+  audienceType?: 'all_leads' | 'all_clients' | 'segment' | 'custom' | 'tags' | 'csv_import'
+  status: 'draft' | 'scheduled' | 'sending' | 'paused' | 'completed' | 'cancelled' | 'failed'
   stats: {
-    total: number
+    totalRecipients: number
+    pending: number
     sent: number
     delivered: number
     read: number
     failed: number
+    skipped: number
   }
   scheduledAt?: Date
   startedAt?: Date
   completedAt?: Date
-  createdBy: string
+  createdBy?: string
   createdAt: Date
+  tags?: string[]
 }
 
 export interface CreateBroadcastData {
   name: string
-  templateId: string
-  recipients: string[]
+  description?: string
+  type: 'template' | 'text' | 'media' | 'location'
+  template?: {
+    templateId?: string
+    templateName: string
+    language: string
+    variables?: Array<{
+      position: number
+      type: 'static' | 'dynamic'
+      value?: string
+      fieldName?: string
+    }>
+  }
+  audienceType?: 'all_leads' | 'all_clients' | 'segment' | 'custom' | 'tags' | 'csv_import'
+  tags?: string[]
   scheduledAt?: Date
 }
 
