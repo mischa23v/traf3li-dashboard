@@ -92,7 +92,7 @@ export function SalesSidebar({
             viewAll: '/dashboard/crm/lead-scoring'
         },
         'whatsapp': {
-            create: '/dashboard/crm/whatsapp/new',
+            create: '/dashboard/crm/whatsapp/start',
             viewAll: '/dashboard/crm/whatsapp'
         }
     }

@@ -435,7 +435,7 @@ export function WhatsAppListView() {
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد محادثات</h3>
                                         <p className="text-slate-500 mb-4">ابدأ محادثة جديدة مع عميل عبر واتساب</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/20">
-                                            <Link to="/dashboard/crm/whatsapp/new">
+                                            <Link to="/dashboard/crm/whatsapp/start">
                                                 <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 محادثة جديدة
                                             </Link>
