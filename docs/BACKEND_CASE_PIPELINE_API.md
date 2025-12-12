@@ -1,10 +1,65 @@
-# Case Pipeline & Case Notion - Backend API Requirements
+# Case Pipeline - Backend API Requirements
+
+## ⚠️ CRITICAL: What the Frontend Needs
+
+The Case Pipeline feature has TWO views:
+
+1. **List View** (`/dashboard/cases/pipeline`) - Shows all cases with progress bars
+2. **Detail View** (`/dashboard/cases/:caseId/pipeline`) - Shows single case pipeline
+
+### What Endpoints Are Actually Being Called
+
+The frontend currently uses these endpoints:
+
+```
+GET  /api/v1/cases              → List all cases (used by list view)
+GET  /api/v1/cases/:id          → Get single case (used by detail view)
+PATCH /api/v1/cases/:id         → Update case (for stage changes)
+```
+
+### Minimum Required Fields in Case Response
+
+```json
+{
+  "_id": "64a1b2c3d4e5f6g7h8i9j0k1",
+  "caseNumber": "1446/labor/001",
+  "title": "دعوى مطالبة بمستحقات نهاية الخدمة",
+  "category": "labor",              // REQUIRED: labor, commercial, civil, family, criminal, administrative
+  "status": "active",               // REQUIRED: active, closed, completed, archived
+  "priority": "high",               // Optional: low, medium, high, critical
+  "outcome": "ongoing",             // Optional: ongoing, won, lost, settled
+
+  "currentStage": "labor_court",    // REQUIRED: Stage ID (see valid stages below)
+  "pipelineStage": "labor_court",   // ALIAS: Same as currentStage
+  "stageEnteredAt": "2024-01-20T10:00:00Z",  // REQUIRED: When entered current stage
+
+  "plaintiffName": "محمد أحمد",     // Optional but displayed
+  "defendantName": "شركة ABC",      // Optional but displayed
+  "court": "محكمة العمل بالرياض",   // Optional but displayed
+  "claimAmount": 150000,            // Optional but displayed
+  "nextHearing": "2024-02-15T09:00:00Z", // Optional but displayed
+
+  "clientId": {                     // Optional
+    "_id": "client123",
+    "name": "محمد أحمد"
+  },
+
+  "tasksCount": 5,                  // Optional: linked tasks count
+  "notionPagesCount": 3,            // Optional: linked notion pages count
+  "eventsCount": 1,                 // Optional: linked events count
+  "notes": [],                      // Optional: case notes array
+
+  "createdAt": "2024-01-01T10:00:00Z",
+  "updatedAt": "2024-02-01T10:00:00Z"
+}
+```
+
+---
 
 ## Overview
 
 This document provides complete backend API specifications for:
 1. **Case Pipeline** - Visual tracker for individual case progression through legal stages
-2. **Case Notion** - Case brainstorming and documentation (already partially implemented)
 
 ### How Case Pipeline Works (Frontend)
 
@@ -636,6 +691,306 @@ getPipelineStatistics: async (filters?: StatisticsFilters): Promise<PipelineStat
 3. **Admin Appeal (محكمة الاستئناف الإدارية)** - Within 30 days
 4. **High Admin Court (المحكمة الإدارية العليا)** - Final
 5. **Execution (التنفيذ)** - Enforcement
+
+---
+
+## 10. Frontend Integration Details
+
+### How the Frontend Moves Case Stage
+
+When user clicks a stage or "Next Stage" button, the frontend sends:
+
+**Request:**
+```
+PATCH /api/v1/cases/:caseId
+```
+
+**Request Body:**
+```json
+{
+  "currentStage": "labor_court",
+  "pipelineStage": "labor_court",
+  "stageEnteredAt": "2024-02-10T14:30:00.000Z"
+}
+```
+
+**Backend Implementation:**
+```javascript
+// In caseController.js
+exports.updateCase = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+
+    // If stage is being changed, record in history
+    if (updateData.currentStage || updateData.pipelineStage) {
+      const currentCase = await Case.findById(id);
+
+      if (currentCase && currentCase.currentStage !== (updateData.currentStage || updateData.pipelineStage)) {
+        // Add to stage history
+        if (!currentCase.stageHistory) currentCase.stageHistory = [];
+        currentCase.stageHistory.push({
+          stage: currentCase.currentStage,
+          enteredAt: currentCase.stageEnteredAt,
+          exitedAt: new Date(),
+          changedBy: req.user._id
+        });
+
+        // Set new stage timestamp
+        updateData.stageEnteredAt = new Date();
+
+        // Ensure both fields are synced
+        if (updateData.currentStage) updateData.pipelineStage = updateData.currentStage;
+        if (updateData.pipelineStage) updateData.currentStage = updateData.pipelineStage;
+
+        updateData.stageHistory = currentCase.stageHistory;
+      }
+    }
+
+    const updatedCase = await Case.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    ).populate('clientId', 'name phone');
+
+    res.json({ error: false, case: updatedCase });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+```
+
+### How the Frontend Ends a Case
+
+When user clicks "End Case" and fills the dialog:
+
+**Request:**
+```
+PATCH /api/v1/cases/:caseId
+```
+
+**Request Body:**
+```json
+{
+  "status": "closed",
+  "outcome": "won",
+  "endReason": "final_judgment",
+  "endNotes": "صدر الحكم لصالح الموكل",
+  "finalAmount": 125000,
+  "endDate": "2024-02-10T00:00:00.000Z"
+}
+```
+
+**Expected Response:**
+```json
+{
+  "error": false,
+  "case": {
+    "_id": "...",
+    "status": "closed",
+    "outcome": "won",
+    "endReason": "final_judgment",
+    "endNotes": "صدر الحكم لصالح الموكل",
+    "finalAmount": 125000,
+    "endDate": "2024-02-10T00:00:00.000Z",
+    // ... other fields
+  }
+}
+```
+
+---
+
+## 11. Case Model Schema (Complete)
+
+```javascript
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+const caseSchema = new Schema({
+  // Basic Info
+  caseNumber: { type: String, required: true, unique: true },
+  title: { type: String, required: true },
+  titleAr: String,
+  description: String,
+
+  // Category & Status
+  category: {
+    type: String,
+    enum: ['labor', 'commercial', 'civil', 'family', 'criminal', 'administrative', 'other'],
+    default: 'other',
+    required: true
+  },
+  status: {
+    type: String,
+    enum: ['active', 'pending', 'on_hold', 'closed', 'completed', 'archived'],
+    default: 'active'
+  },
+  priority: {
+    type: String,
+    enum: ['low', 'medium', 'high', 'critical'],
+    default: 'medium'
+  },
+  outcome: {
+    type: String,
+    enum: ['ongoing', 'won', 'lost', 'settled'],
+    default: 'ongoing'
+  },
+
+  // ============ PIPELINE FIELDS (REQUIRED) ============
+  currentStage: {
+    type: String,
+    default: 'filing'
+  },
+  pipelineStage: {  // Alias for currentStage
+    type: String,
+    default: 'filing'
+  },
+  stageEnteredAt: {
+    type: Date,
+    default: Date.now
+  },
+  stageHistory: [{
+    stage: String,
+    enteredAt: Date,
+    exitedAt: Date,
+    notes: String,
+    changedBy: { type: Schema.Types.ObjectId, ref: 'User' }
+  }],
+
+  // Case End Details
+  endDate: Date,
+  endReason: {
+    type: String,
+    enum: ['final_judgment', 'settlement', 'withdrawal', 'dismissal', 'reconciliation', 'execution_complete', 'other']
+  },
+  endNotes: String,
+  finalAmount: Number,
+
+  // Parties
+  plaintiffName: String,
+  plaintiffNameAr: String,
+  defendantName: String,
+  defendantNameAr: String,
+
+  // Court Info
+  court: String,
+  courtAr: String,
+  judge: String,
+  nextHearing: Date,
+
+  // Financial
+  claimAmount: { type: Number, default: 0 },
+  expectedWinAmount: Number,
+
+  // Relations
+  clientId: { type: Schema.Types.ObjectId, ref: 'Client' },
+  lawyerId: { type: Schema.Types.ObjectId, ref: 'User' },
+  teamMembers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  firmId: { type: Schema.Types.ObjectId, ref: 'Firm' },
+  createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
+
+  // Linked Items Counts (computed or stored)
+  tasksCount: { type: Number, default: 0 },
+  notionPagesCount: { type: Number, default: 0 },
+  eventsCount: { type: Number, default: 0 },
+  remindersCount: { type: Number, default: 0 },
+
+  // Notes
+  notes: [{
+    text: String,
+    createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    createdAt: { type: Date, default: Date.now }
+  }],
+
+  // Labor Case Specific
+  laborCaseDetails: {
+    plaintiff: {
+      name: String,
+      idNumber: String,
+      phone: String
+    },
+    company: {
+      name: String,
+      crNumber: String
+    }
+  }
+
+}, {
+  timestamps: true
+});
+
+// Indexes
+caseSchema.index({ category: 1, currentStage: 1 });
+caseSchema.index({ firmId: 1, status: 1 });
+caseSchema.index({ lawyerId: 1, status: 1 });
+caseSchema.index({ createdBy: 1 });
+
+// Pre-save: sync pipelineStage with currentStage
+caseSchema.pre('save', function(next) {
+  if (this.currentStage) this.pipelineStage = this.currentStage;
+  if (this.pipelineStage) this.currentStage = this.pipelineStage;
+  next();
+});
+
+module.exports = mongoose.model('Case', caseSchema);
+```
+
+---
+
+## 12. Quick Start Checklist for Backend Team
+
+### Step 1: Update Case Model
+Add these fields if not present:
+- [ ] `currentStage` (String, default: 'filing')
+- [ ] `pipelineStage` (String, default: 'filing')
+- [ ] `stageEnteredAt` (Date, default: Date.now)
+- [ ] `stageHistory` (Array)
+- [ ] `outcome` (String, enum: ongoing/won/lost/settled)
+- [ ] `endDate` (Date)
+- [ ] `endReason` (String)
+- [ ] `endNotes` (String)
+- [ ] `finalAmount` (Number)
+
+### Step 2: Verify GET /api/v1/cases Returns Required Fields
+Make sure each case in the response includes:
+- [ ] `category`
+- [ ] `status`
+- [ ] `currentStage` OR `pipelineStage`
+- [ ] `stageEnteredAt`
+
+### Step 3: Verify PATCH /api/v1/cases/:id Accepts These Fields
+- [ ] `currentStage`
+- [ ] `pipelineStage`
+- [ ] `stageEnteredAt`
+- [ ] `status`
+- [ ] `outcome`
+- [ ] `endReason`
+- [ ] `endNotes`
+- [ ] `finalAmount`
+- [ ] `endDate`
+
+### Step 4: Test the Pipeline
+1. Create a case with `category: 'labor'`
+2. Verify `currentStage` defaults to `'filing'`
+3. PATCH to change `currentStage` to `'labor_court'`
+4. Verify response includes updated fields
+5. PATCH to end case with `status: 'closed'`, `outcome: 'won'`
+
+---
+
+## Valid Stage IDs by Category
+
+**These are the ONLY valid stage IDs for each category:**
+
+| Category | Valid Stage IDs |
+|----------|-----------------|
+| `labor` | `filing`, `friendly_settlement_1`, `friendly_settlement_2`, `labor_court`, `appeal`, `execution` |
+| `commercial` | `filing`, `mediation`, `commercial_court`, `appeal`, `supreme`, `execution` |
+| `civil` | `filing`, `reconciliation`, `general_court`, `appeal`, `supreme`, `execution` |
+| `family` | `filing`, `reconciliation_committee`, `family_court`, `appeal`, `supreme`, `execution` |
+| `criminal` | `investigation`, `prosecution`, `criminal_court`, `appeal`, `supreme`, `execution` |
+| `administrative` | `grievance`, `administrative_court`, `admin_appeal`, `supreme_admin`, `execution` |
+| `other` | `filing`, `first_hearing`, `ongoing_hearings`, `appeal`, `final` |
 
 ---
 
