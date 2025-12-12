@@ -112,12 +112,18 @@ export function CasePipelineView() {
 
   const { mutate: updateCase, isPending: isUpdatingCase } = useUpdateCase()
 
-  // Get cases of selected type
+  // Get ACTIVE cases of selected type (exclude closed/completed cases)
   const casesOfType = useMemo(() => {
     if (!casesData?.cases) return []
-    return casesData.cases.filter((c: any) =>
-      selectedCaseType === 'all' || c.category === selectedCaseType
-    )
+    return casesData.cases.filter((c: any) => {
+      // Filter by case type
+      const matchesType = selectedCaseType === 'all' || c.category === selectedCaseType
+      // Only show active cases (exclude closed, completed, archived)
+      const isActive = c.status !== 'closed' && c.status !== 'completed' && c.status !== 'archived'
+      // Also exclude cases with final outcomes
+      const notEnded = c.outcome !== 'won' && c.outcome !== 'lost' && c.outcome !== 'settled'
+      return matchesType && isActive && notEnded
+    })
   }, [casesData, selectedCaseType])
 
   // Get selected case data

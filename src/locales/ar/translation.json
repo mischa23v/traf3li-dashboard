@@ -1749,7 +1749,7 @@
     "caseType": "نوع القضية",
     "case": "القضية",
     "selectCaseType": "اختر نوع القضية",
-    "noCasesOfType": "لا توجد قضايا من هذا النوع",
+    "noCasesOfType": "لا توجد قضايا نشطة من هذا النوع",
     "selectCasePrompt": "اختر قضية لعرض مسارها",
     "selectCaseDescription": "حدد نوع القضية ثم اختر القضية من القائمة أعلاه",
     "caseJourney": "مسار القضية",
