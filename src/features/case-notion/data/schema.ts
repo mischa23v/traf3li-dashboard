@@ -535,6 +535,19 @@ export const updatePageInputSchema = z.object({
   isFavorite: z.boolean().optional(),
   isPinned: z.boolean().optional(),
   blocks: z.array(blockSchema).optional(),
+  // FIX: Add whiteboard-related fields that were missing
+  viewMode: z.enum(['document', 'whiteboard']).optional(),
+  whiteboardConfig: z.object({
+    canvasWidth: z.number().optional(),
+    canvasHeight: z.number().optional(),
+    zoom: z.number().optional(),
+    panX: z.number().optional(),
+    panY: z.number().optional(),
+    gridEnabled: z.boolean().optional(),
+    snapToGrid: z.boolean().optional(),
+    gridSize: z.number().optional(),
+  }).optional(),
+  connections: z.array(blockConnectionSchema).optional(),
 })
 
 export type UpdatePageInput = z.infer<typeof updatePageInputSchema>

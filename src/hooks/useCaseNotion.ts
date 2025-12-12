@@ -258,6 +258,8 @@ export function useUpdateBlock() {
     }) => caseNotionService.updateBlock(caseId, blockId, data),
     onSuccess: (_, { caseId, pageId }) => {
       queryClient.invalidateQueries({ queryKey: caseNotionKeys.blocks(caseId, pageId) })
+      // FIX: Also invalidate page query since CaseNotionPage includes blocks array
+      queryClient.invalidateQueries({ queryKey: caseNotionKeys.page(caseId, pageId) })
     },
   })
 }

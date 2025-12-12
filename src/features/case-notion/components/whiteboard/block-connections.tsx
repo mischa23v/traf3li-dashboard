@@ -10,7 +10,6 @@
 
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Block, BlockConnection } from '../../data/schema'
 
@@ -270,8 +269,8 @@ export function BlockConnections({
           ? 'stroke-emerald-500'
           : 'stroke-slate-400'
 
-        const strokeDash =
-          connection.connectionType === 'dashed' ? '8,4' : connection.connectionType === 'line' ? '' : ''
+        // FIX: Simplified redundant ternary
+        const strokeDash = connection.connectionType === 'dashed' ? '8,4' : ''
 
         const markerEnd =
           connection.connectionType === 'line'
@@ -310,7 +309,7 @@ export function BlockConnections({
               markerStart={markerStart}
             />
 
-            {/* Connection label */}
+            {/* Connection label - FIX: Use direct SVG attributes instead of Tailwind classes */}
             {connection.label && (
               <g transform={`translate(${midX}, ${midY})`}>
                 <rect
@@ -320,34 +319,38 @@ export function BlockConnections({
                   height="20"
                   rx="4"
                   fill="white"
-                  stroke="currentColor"
-                  className="text-slate-200"
+                  stroke="#e2e8f0"
+                  strokeWidth="1"
                 />
                 <text
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  className="text-xs fill-slate-600 pointer-events-none"
+                  fontSize="12"
+                  fill="#475569"
+                  style={{ pointerEvents: 'none' }}
                 >
                   {connection.label}
                 </text>
               </g>
             )}
 
-            {/* Delete button on hover */}
+            {/* Delete button on hover - FIX: Use native SVG instead of React component */}
             {(isHovered || isSelected) && !readOnly && (
               <g
                 transform={`translate(${midX}, ${midY})`}
-                className="pointer-events-auto cursor-pointer"
+                style={{ pointerEvents: 'auto', cursor: 'pointer' }}
                 onClick={(e) => {
                   e.stopPropagation()
                   onConnectionDelete(connection._id)
                 }}
               >
-                <circle r="12" fill="white" stroke="currentColor" className="text-red-200" />
-                <X
-                  size={12}
-                  className="text-red-500"
-                  style={{ transform: 'translate(-6px, -6px)' }}
+                <circle r="12" fill="white" stroke="#fecaca" strokeWidth="1" />
+                {/* X icon using SVG path instead of Lucide component */}
+                <path
+                  d="M-4,-4 L4,4 M4,-4 L-4,4"
+                  stroke="#ef4444"
+                  strokeWidth="2"
+                  strokeLinecap="round"
                 />
               </g>
             )}
