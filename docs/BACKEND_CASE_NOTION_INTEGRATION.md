@@ -2,13 +2,159 @@
 
 This document provides detailed backend implementation instructions for the CaseNotion (Case Brainstorm) feature - a Notion-like workspace for legal case documentation and strategy planning.
 
+## ⚠️ CRITICAL: 403 Forbidden Error Troubleshooting
+
+If the frontend is receiving **403 Forbidden** errors when accessing CaseNotion endpoints, check the following:
+
+### Common 403 Error Causes
+
+1. **Missing Authorization Header**
+   - Frontend sends: `Authorization: Bearer <token>`
+   - Verify token is being passed correctly
+
+2. **Case Access Permission Check**
+   - User must have access to the case itself before accessing CaseNotion
+   - Check if user belongs to the same `firmId` as the case
+   - Check if user is assigned to the case (lawyerId, teamMembers, or createdBy)
+
+3. **Route Not Registered**
+   - Ensure all CaseNotion routes are registered in Express
+   - Routes must be at `/api/v1/cases/:caseId/notion/...`
+
+4. **Middleware Order Issue**
+   - `canAccessCase` middleware must run BEFORE route handlers
+   - Check middleware chain order
+
+### Quick Fix Checklist
+
+```javascript
+// 1. Ensure route is registered
+app.use('/api/v1', require('./routes/caseNotion'));
+
+// 2. Check auth middleware
+router.get('/cases/:caseId/notion/pages', auth, canAccessCase, controller.listPages);
+
+// 3. Check canAccessCase middleware allows admin override
+exports.canAccessCase = async (req, res, next) => {
+  const { caseId } = req.params;
+
+  // Admin always has access
+  if (req.user.role === 'admin') {
+    return next();
+  }
+
+  const caseDoc = await Case.findOne({
+    _id: caseId,
+    firmId: req.user.firmId, // IMPORTANT: Same firm check
+    $or: [
+      { lawyerId: req.user._id },
+      { teamMembers: req.user._id },
+      { createdBy: req.user._id }
+    ]
+  });
+
+  if (!caseDoc) {
+    return res.status(403).json({
+      error: true,
+      message: 'Access denied to this case'
+    });
+  }
+
+  next();
+};
+```
+
+---
+
 ## Table of Contents
 1. [Overview](#overview)
-2. [List Page API](#list-page-api)
-3. [Database Schemas](#database-schemas)
-4. [API Endpoints](#api-endpoints)
-5. [Real-time Features](#real-time-features)
-6. [Security Considerations](#security-considerations)
+2. [COMPLETE API Endpoints Reference](#complete-api-endpoints-reference)
+3. [List Page API](#list-page-api)
+4. [Database Schemas](#database-schemas)
+5. [API Endpoints Implementation](#api-endpoints-implementation)
+6. [Real-time Features](#real-time-features)
+7. [Security Considerations](#security-considerations)
+
+---
+
+## COMPLETE API Endpoints Reference
+
+**IMPORTANT:** The frontend uses `/api/v1/` prefix. All endpoints below must be prefixed with `/api/v1`.
+
+### Page Operations
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/cases/:caseId/notion/pages` | List all pages for a case |
+| `GET` | `/cases/:caseId/notion/pages/:pageId` | Get single page with blocks |
+| `POST` | `/cases/:caseId/notion/pages` | Create new page |
+| `PATCH` | `/cases/:caseId/notion/pages/:pageId` | Update page |
+| `DELETE` | `/cases/:caseId/notion/pages/:pageId` | Delete page (soft delete) |
+| `POST` | `/cases/:caseId/notion/pages/:pageId/archive` | Archive page |
+| `POST` | `/cases/:caseId/notion/pages/:pageId/restore` | Restore archived page |
+| `POST` | `/cases/:caseId/notion/pages/:pageId/duplicate` | Duplicate page |
+| `POST` | `/cases/:caseId/notion/pages/:pageId/favorite` | Toggle favorite status |
+| `POST` | `/cases/:caseId/notion/pages/merge` | Merge multiple pages |
+
+### Block Operations
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/cases/:caseId/notion/pages/:pageId/blocks` | Get blocks for a page |
+| `POST` | `/cases/:caseId/notion/pages/:pageId/blocks` | Create new block |
+| `PATCH` | `/cases/:caseId/notion/blocks/:blockId` | Update block |
+| `DELETE` | `/cases/:caseId/notion/blocks/:blockId` | Delete block |
+| `POST` | `/cases/:caseId/notion/blocks/:blockId/move` | Move block |
+| `POST` | `/cases/:caseId/notion/blocks/:blockId/lock` | Lock block for editing |
+| `POST` | `/cases/:caseId/notion/blocks/:blockId/unlock` | Unlock block |
+
+### Synced Blocks
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/cases/:caseId/notion/synced-blocks` | Create synced block |
+| `GET` | `/cases/:caseId/notion/synced-blocks/:blockId` | Get synced block info |
+| `POST` | `/cases/:caseId/notion/synced-blocks/:blockId/unsync` | Unsync block |
+
+### Comments
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/cases/:caseId/notion/blocks/:blockId/comments` | Get block comments |
+| `POST` | `/cases/:caseId/notion/blocks/:blockId/comments` | Add comment |
+| `POST` | `/cases/:caseId/notion/comments/:commentId/resolve` | Resolve comment |
+| `DELETE` | `/cases/:caseId/notion/comments/:commentId` | Delete comment |
+
+### Templates
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/notion/templates` | Get available templates |
+| `POST` | `/cases/:caseId/notion/pages/:pageId/apply-template` | Apply template to page |
+| `POST` | `/cases/:caseId/notion/pages/:pageId/save-as-template` | Save page as template |
+
+### Activity & Search
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/cases/:caseId/notion/pages/:pageId/activity` | Get page activity history |
+| `GET` | `/cases/:caseId/notion/search?q=query` | Search within case's pages |
+
+### Export
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/cases/:caseId/notion/pages/:pageId/export/pdf` | Export page as PDF |
+| `GET` | `/cases/:caseId/notion/pages/:pageId/export/markdown` | Export as Markdown |
+| `GET` | `/cases/:caseId/notion/pages/:pageId/export/html` | Export as HTML |
+
+### Task Linking
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/cases/:caseId/notion/blocks/:blockId/link-task` | Link task to block |
+| `POST` | `/cases/:caseId/notion/blocks/:blockId/unlink-task` | Unlink task from block |
+| `POST` | `/cases/:caseId/notion/blocks/:blockId/create-task` | Create task from block |
 
 ---
 
@@ -1489,6 +1635,309 @@ module.exports = templates;
 
 ---
 
+## Detailed Request/Response Examples
+
+### List Pages - GET `/api/v1/cases/:caseId/notion/pages`
+
+**Request Headers:**
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+```
+
+**Query Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| pageType | string | No | Filter by page type |
+| search | string | No | Search in title |
+| isFavorite | boolean | No | Filter favorites only |
+| isPinned | boolean | No | Filter pinned only |
+| parentPageId | string | No | Filter by parent page |
+| isArchived | boolean | No | Include archived (default: false) |
+| page | number | No | Page number (default: 1) |
+| limit | number | No | Items per page (default: 50) |
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "pages": [
+      {
+        "_id": "674a1b2c3d4e5f6g7h8i9j0k",
+        "caseId": "6926b5d06fbe980abbc0465a",
+        "title": "استراتيجية القضية",
+        "titleAr": "استراتيجية القضية",
+        "pageType": "strategy",
+        "icon": { "type": "emoji", "emoji": "🎯" },
+        "cover": null,
+        "parentPageId": null,
+        "childPageIds": [],
+        "isFavorite": true,
+        "isPinned": false,
+        "isPublic": false,
+        "version": 3,
+        "createdBy": {
+          "_id": "user123",
+          "firstName": "محمد",
+          "lastName": "أحمد"
+        },
+        "lastEditedBy": {
+          "_id": "user123",
+          "firstName": "محمد",
+          "lastName": "أحمد"
+        },
+        "createdAt": "2024-01-15T10:00:00.000Z",
+        "updatedAt": "2024-02-01T14:30:00.000Z"
+      }
+    ],
+    "count": 5,
+    "totalPages": 1
+  }
+}
+```
+
+**Error Response (403) - Access Denied:**
+```json
+{
+  "error": true,
+  "message": "Access denied to this case",
+  "code": "FORBIDDEN"
+}
+```
+
+---
+
+### Get Single Page - GET `/api/v1/cases/:caseId/notion/pages/:pageId`
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "674a1b2c3d4e5f6g7h8i9j0k",
+    "caseId": "6926b5d06fbe980abbc0465a",
+    "title": "استراتيجية القضية",
+    "titleAr": "استراتيجية القضية",
+    "pageType": "strategy",
+    "icon": { "type": "emoji", "emoji": "🎯" },
+    "cover": null,
+    "blocks": [
+      {
+        "_id": "block123",
+        "type": "heading_1",
+        "content": [
+          {
+            "type": "text",
+            "text": { "content": "النقاط الرئيسية" },
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "plainText": "النقاط الرئيسية"
+          }
+        ],
+        "properties": {},
+        "children": [],
+        "order": 0,
+        "indent": 0,
+        "isCollapsed": false,
+        "pageId": "674a1b2c3d4e5f6g7h8i9j0k"
+      },
+      {
+        "_id": "block124",
+        "type": "bulleted_list",
+        "content": [
+          {
+            "type": "text",
+            "text": { "content": "تقديم دعوى مطالبة بمستحقات نهاية الخدمة" },
+            "plainText": "تقديم دعوى مطالبة بمستحقات نهاية الخدمة"
+          }
+        ],
+        "order": 1,
+        "indent": 0
+      }
+    ],
+    "parentPageId": null,
+    "childPageIds": [],
+    "backlinks": [],
+    "isFavorite": true,
+    "isPinned": false,
+    "sharedWith": [],
+    "version": 3,
+    "createdBy": { "_id": "user123", "firstName": "محمد", "lastName": "أحمد" },
+    "lastEditedBy": { "_id": "user123", "firstName": "محمد", "lastName": "أحمد" },
+    "createdAt": "2024-01-15T10:00:00.000Z",
+    "updatedAt": "2024-02-01T14:30:00.000Z"
+  }
+}
+```
+
+**Error Response (404) - Page Not Found:**
+```json
+{
+  "error": true,
+  "message": "Page not found",
+  "code": "NOT_FOUND"
+}
+```
+
+---
+
+### Create Page - POST `/api/v1/cases/:caseId/notion/pages`
+
+**Request Body:**
+```json
+{
+  "title": "ملاحظات الجلسة الأولى",
+  "titleAr": "ملاحظات الجلسة الأولى",
+  "pageType": "meeting_notes",
+  "icon": { "type": "emoji", "emoji": "📝" },
+  "parentPageId": null,
+  "templateId": "template123"
+}
+```
+
+**Success Response (201):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "newpage123",
+    "caseId": "6926b5d06fbe980abbc0465a",
+    "title": "ملاحظات الجلسة الأولى",
+    "pageType": "meeting_notes",
+    "blocks": [],
+    "createdBy": { "_id": "user123" },
+    "createdAt": "2024-02-10T10:00:00.000Z"
+  }
+}
+```
+
+---
+
+### Create Block - POST `/api/v1/cases/:caseId/notion/pages/:pageId/blocks`
+
+**Request Body:**
+```json
+{
+  "pageId": "674a1b2c3d4e5f6g7h8i9j0k",
+  "type": "party_statement",
+  "content": [
+    {
+      "type": "text",
+      "text": { "content": "أقر المدعى عليه بوجود علاقة عمل" },
+      "plainText": "أقر المدعى عليه بوجود علاقة عمل"
+    }
+  ],
+  "partyType": "defendant",
+  "statementDate": "2024-02-01",
+  "afterBlockId": "block123",
+  "indent": 0
+}
+```
+
+**Success Response (201):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "newblock456",
+    "type": "party_statement",
+    "content": [...],
+    "partyType": "defendant",
+    "statementDate": "2024-02-01T00:00:00.000Z",
+    "pageId": "674a1b2c3d4e5f6g7h8i9j0k",
+    "order": 5
+  }
+}
+```
+
+---
+
+### Update Block - PATCH `/api/v1/cases/:caseId/notion/blocks/:blockId`
+
+**Request Body:**
+```json
+{
+  "content": [
+    {
+      "type": "text",
+      "text": { "content": "النص المحدث" },
+      "plainText": "النص المحدث"
+    }
+  ],
+  "checked": true
+}
+```
+
+**Error Response (423) - Block Locked:**
+```json
+{
+  "error": true,
+  "message": "Block is being edited by another user",
+  "code": "BLOCK_LOCKED",
+  "lockedBy": {
+    "userId": "user456",
+    "userName": "أحمد محمد"
+  }
+}
+```
+
+---
+
+## Block Types Reference
+
+The frontend supports these block types:
+
+| Block Type | Arabic | Description |
+|------------|--------|-------------|
+| `text` | نص | Plain text paragraph |
+| `heading_1` | عنوان 1 | Large heading |
+| `heading_2` | عنوان 2 | Medium heading |
+| `heading_3` | عنوان 3 | Small heading |
+| `bulleted_list` | قائمة نقطية | Bullet point |
+| `numbered_list` | قائمة مرقمة | Numbered item |
+| `todo` | مهمة | Checkbox item |
+| `toggle` | قائمة قابلة للطي | Collapsible section |
+| `quote` | اقتباس | Block quote |
+| `callout` | تنبيه | Highlighted note |
+| `divider` | فاصل | Horizontal line |
+| `code` | كود | Code block |
+| `table` | جدول | Table |
+| `image` | صورة | Image |
+| `file` | ملف | File attachment |
+| `party_statement` | أقوال الطرف | Legal party statement |
+| `evidence_item` | عنصر دليل | Evidence item |
+| `legal_citation` | استشهاد قانوني | Legal citation |
+| `timeline_entry` | حدث زمني | Timeline event |
+
+---
+
+## Page Types Reference
+
+| Page Type | Arabic | English |
+|-----------|--------|---------|
+| `general` | ملاحظات عامة | General Notes |
+| `strategy` | استراتيجية القضية | Case Strategy |
+| `timeline` | الجدول الزمني | Timeline |
+| `evidence` | الأدلة | Evidence |
+| `arguments` | الحجج القانونية | Legal Arguments |
+| `research` | البحث القانوني | Legal Research |
+| `meeting_notes` | محاضر الاجتماعات | Meeting Notes |
+| `correspondence` | المراسلات | Correspondence |
+| `witnesses` | الشهود | Witnesses |
+| `discovery` | الاكتشاف | Discovery |
+| `pleadings` | المذكرات | Pleadings |
+| `settlement` | التسوية | Settlement |
+| `brainstorm` | العصف الذهني | Brainstorm |
+
+---
+
 ## Summary
 
 This CaseNotion backend provides:
@@ -1501,3 +1950,48 @@ This CaseNotion backend provides:
 7. **Security** - Role-based access, page sharing, audit logging
 
 The frontend is ready to use these endpoints - implement the backend following this guide to enable full CaseNotion functionality.
+
+---
+
+## Debugging 403 Errors Checklist
+
+If you're getting 403 errors:
+
+1. **Check if the case exists:**
+   ```javascript
+   // GET /api/v1/cases/:caseId should return the case
+   const caseDoc = await Case.findById(caseId);
+   console.log('Case exists:', !!caseDoc);
+   ```
+
+2. **Check user's firmId matches case's firmId:**
+   ```javascript
+   console.log('User firmId:', req.user.firmId);
+   console.log('Case firmId:', caseDoc.firmId);
+   console.log('Match:', req.user.firmId.toString() === caseDoc.firmId.toString());
+   ```
+
+3. **Check user has case access:**
+   ```javascript
+   const hasAccess =
+     caseDoc.lawyerId?.toString() === req.user._id.toString() ||
+     caseDoc.teamMembers?.includes(req.user._id) ||
+     caseDoc.createdBy?.toString() === req.user._id.toString() ||
+     req.user.role === 'admin';
+   console.log('Has access:', hasAccess);
+   ```
+
+4. **Check route is registered:**
+   ```javascript
+   // In your routes/index.js or app.js
+   app.use('/api/v1', require('./routes/caseNotion'));
+
+   // Log all registered routes
+   app._router.stack.forEach(r => {
+     if (r.route) console.log(r.route.path, Object.keys(r.route.methods));
+   });
+   ```
+
+5. **Test with admin user first:**
+   - If admin works but regular user doesn't, it's a permission issue
+   - If admin also fails, it's a route registration or middleware issue
