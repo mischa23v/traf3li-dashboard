@@ -58,6 +58,7 @@ import {
 import { cn } from '@/lib/utils'
 import {
   useCaseNotionPage,
+  useCaseNotionBlocks,
   useUpdateCaseNotionPage,
   useToggleFavoritePage,
   useDuplicateCaseNotionPage,
@@ -104,8 +105,23 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
   const [showExportDialog, setShowExportDialog] = useState(false)
 
   // Fetch page data
-  const { data: page, isLoading, isError } = useCaseNotionPage(caseId, pageId)
+  const { data: page, isLoading: pageLoading, isError: pageError } = useCaseNotionPage(caseId, pageId)
+
+  // Fetch blocks separately (in case they're not included in page response)
+  const { data: blocksData, isLoading: blocksLoading } = useCaseNotionBlocks(caseId, pageId)
   const { data: activityData } = usePageActivity(caseId, pageId, 20)
+
+  // Combine page blocks with separately fetched blocks
+  const blocks = useMemo(() => {
+    // Prefer blocks from page if they exist, otherwise use separately fetched blocks
+    if (page?.blocks && page.blocks.length > 0) {
+      return page.blocks
+    }
+    return blocksData || []
+  }, [page?.blocks, blocksData])
+
+  const isLoading = pageLoading || blocksLoading
+  const isError = pageError
 
   // Mutations
   const updatePage = useUpdateCaseNotionPage()
@@ -480,7 +496,7 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
           <BlockEditor
             caseId={caseId}
             pageId={pageId}
-            blocks={page.blocks || []}
+            blocks={blocks}
             onBlocksChange={handleBlocksChange}
           />
         </div>
