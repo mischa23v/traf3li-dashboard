@@ -123,12 +123,14 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
         } catch (error) {
           console.error('Failed to update block position:', error)
           toast.error(t('whiteboard.moveError', 'Failed to move block'))
+          // FIX: Revert optimistic update by refetching data
+          queryClient.invalidateQueries({ queryKey: caseNotionKeys.blocks(caseId, pageId) })
         }
       }, 300)
 
       pendingMoveUpdates.current.set(blockId, { x, y, timeout })
     },
-    [caseId, pageId, updateBlock, t]
+    [caseId, pageId, updateBlock, queryClient, t]
   )
 
   // Handle block resize - DEBOUNCED to prevent continuous API calls during drag
@@ -163,12 +165,14 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
         } catch (error) {
           console.error('Failed to update block size:', error)
           toast.error(t('whiteboard.resizeError', 'Failed to resize block'))
+          // FIX: Revert optimistic update by refetching data
+          queryClient.invalidateQueries({ queryKey: caseNotionKeys.blocks(caseId, pageId) })
         }
       }, 300)
 
       pendingResizeUpdates.current.set(blockId, { width, height, timeout })
     },
-    [caseId, pageId, updateBlock, t]
+    [caseId, pageId, updateBlock, queryClient, t]
   )
 
   // Handle block creation - FIX: Send canvas positions at TOP LEVEL, not in properties
@@ -215,6 +219,18 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
   // Handle block deletion
   const handleBlockDelete = useCallback(
     async (blockId: string) => {
+      // FIX: Clear any pending move/resize updates for this block
+      const pendingMove = pendingMoveUpdates.current.get(blockId)
+      const pendingResize = pendingResizeUpdates.current.get(blockId)
+      if (pendingMove) {
+        clearTimeout(pendingMove.timeout)
+        pendingMoveUpdates.current.delete(blockId)
+      }
+      if (pendingResize) {
+        clearTimeout(pendingResize.timeout)
+        pendingResizeUpdates.current.delete(blockId)
+      }
+
       try {
         await deleteBlock.mutateAsync({
           caseId,
@@ -278,7 +294,6 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
           caseId,
           pageId,
           data: {
-            // @ts-ignore - connections field exists but may not be typed
             connections: [...currentConnections, newConnection],
           },
         })
@@ -307,7 +322,6 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
           caseId,
           pageId,
           data: {
-            // @ts-ignore
             connections: currentConnections.filter((c) => c._id !== connectionId),
           },
         })
@@ -330,7 +344,6 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
           caseId,
           pageId,
           data: {
-            // @ts-ignore
             whiteboardConfig: {
               ...page?.whiteboardConfig,
               ...config,

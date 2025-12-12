@@ -127,6 +127,9 @@ export function WhiteboardCanvas({
       const newZoom = Math.min(Math.max(zoom + delta, 0.1), 3)
 
       // Zoom towards center point if provided
+      let finalPanX = panX
+      let finalPanY = panY
+
       if (centerX !== undefined && centerY !== undefined) {
         const container = containerRef.current
         if (container) {
@@ -136,16 +139,17 @@ export function WhiteboardCanvas({
 
           // Calculate new pan to keep mouse position fixed
           const scale = newZoom / zoom
-          const newPanX = mouseX - (mouseX - panX) * scale
-          const newPanY = mouseY - (mouseY - panY) * scale
+          finalPanX = mouseX - (mouseX - panX) * scale
+          finalPanY = mouseY - (mouseY - panY) * scale
 
-          setPanX(newPanX)
-          setPanY(newPanY)
+          setPanX(finalPanX)
+          setPanY(finalPanY)
         }
       }
 
       setZoom(newZoom)
-      onConfigChange({ zoom: newZoom, panX, panY })
+      // FIX: Use the calculated pan values, not stale closure values
+      onConfigChange({ zoom: newZoom, panX: finalPanX, panY: finalPanY })
     },
     [zoom, panX, panY, onConfigChange]
   )
@@ -558,7 +562,11 @@ export function WhiteboardCanvas({
                     const container = containerRef.current
                     if (container) {
                       const rect = container.getBoundingClientRect()
-                      const { x, y } = screenToCanvas(rect.width / 2, rect.height / 2)
+                      // FIX: Convert container center to screen coordinates first
+                      // screenToCanvas expects clientX/clientY (screen coords), not dimensions
+                      const screenX = rect.left + rect.width / 2
+                      const screenY = rect.top + rect.height / 2
+                      const { x, y } = screenToCanvas(screenX, screenY)
                       onBlockCreate(snapToGrid(x), snapToGrid(y))
                     }
                   }}
