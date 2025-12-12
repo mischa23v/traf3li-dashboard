@@ -20,6 +20,7 @@ interface BlockConnectionsProps {
   drawingStart: string | null
   drawingEnd: { x: number; y: number } | null
   onConnectionDelete: (connectionId: string) => void
+  onConnectionUpdate?: (connectionId: string, updates: Partial<BlockConnection>) => void
   selectedConnectionId?: string
   onConnectionSelect?: (connection: BlockConnection | null) => void
   readOnly?: boolean
@@ -130,12 +131,15 @@ export function BlockConnections({
   drawingStart,
   drawingEnd,
   onConnectionDelete,
+  onConnectionUpdate,
   selectedConnectionId,
   onConnectionSelect,
   readOnly,
 }: BlockConnectionsProps) {
   const { t } = useTranslation()
   const [hoveredConnectionId, setHoveredConnectionId] = useState<string | null>(null)
+  const [editingConnectionId, setEditingConnectionId] = useState<string | null>(null)
+  const [editingLabel, setEditingLabel] = useState('')
 
   // Create a map of blocks by ID for quick lookup
   const blocksMap = useMemo(() => {
@@ -285,7 +289,7 @@ export function BlockConnections({
           connection.connectionType === 'bidirectional' ? 'url(#arrowhead-start)' : ''
 
         return (
-          <g key={connection._id}>
+          <g key={connection._id} className="group">
             {/* Invisible wider path for easier hover/click */}
             <path
               d={path}
@@ -309,9 +313,47 @@ export function BlockConnections({
               markerStart={markerStart}
             />
 
-            {/* Connection label - FIX: Use direct SVG attributes instead of Tailwind classes */}
-            {connection.label && (
-              <g transform={`translate(${midX}, ${midY})`}>
+            {/* Connection label or edit UI */}
+            {editingConnectionId === connection._id ? (
+              /* Editing mode - show input field */
+              <foreignObject x={midX - 60} y={midY - 12} width={120} height={24}>
+                <input
+                  autoFocus
+                  value={editingLabel}
+                  onChange={(e) => setEditingLabel(e.target.value)}
+                  onBlur={() => {
+                    onConnectionUpdate?.(connection._id, {
+                      label: editingLabel.trim() || undefined
+                    })
+                    setEditingConnectionId(null)
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      onConnectionUpdate?.(connection._id, {
+                        label: editingLabel.trim() || undefined
+                      })
+                      setEditingConnectionId(null)
+                    }
+                    if (e.key === 'Escape') {
+                      setEditingConnectionId(null)
+                    }
+                  }}
+                  className="w-full px-2 py-1 text-xs border rounded text-center"
+                  style={{ fontSize: '12px' }}
+                />
+              </foreignObject>
+            ) : connection.label ? (
+              /* Label exists - show label with double-click to edit */
+              <g
+                transform={`translate(${midX}, ${midY})`}
+                style={{ cursor: readOnly ? 'default' : 'pointer', pointerEvents: 'auto' }}
+                onDoubleClick={() => {
+                  if (!readOnly) {
+                    setEditingConnectionId(connection._id)
+                    setEditingLabel(connection.label || '')
+                  }
+                }}
+              >
                 <rect
                   x="-30"
                   y="-10"
@@ -332,6 +374,25 @@ export function BlockConnections({
                   {connection.label}
                 </text>
               </g>
+            ) : (
+              /* No label - show "+" button on hover */
+              !readOnly && isHovered && (
+                <g
+                  transform={`translate(${midX}, ${midY})`}
+                  style={{ cursor: 'pointer', pointerEvents: 'auto' }}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setEditingConnectionId(connection._id)
+                    setEditingLabel('')
+                  }}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <circle r="10" fill="white" stroke="#d1d5db" strokeWidth="1" />
+                  <text textAnchor="middle" dominantBaseline="middle" fontSize="14" fill="#6b7280">
+                    +
+                  </text>
+                </g>
+              )
             )}
 
             {/* Delete button on hover - FIX: Use native SVG instead of React component */}

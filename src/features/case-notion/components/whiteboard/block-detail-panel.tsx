@@ -69,10 +69,12 @@ import {
 
 interface BlockDetailPanelProps {
   block: Block | null
+  selectedBlockIds?: Set<string>
+  blocks?: Block[]
   isOpen: boolean
   onClose: () => void
   onSave: (blockId: string, updates: Partial<Block>) => void
-  onDelete: (blockId: string) => void
+  onDelete: (blockId?: string) => void
   onLinkEvent?: (blockId: string, eventId: string) => void
   onLinkTask?: (blockId: string, taskId: string) => void
   onLinkHearing?: (blockId: string, hearingId: string) => void
@@ -89,6 +91,8 @@ interface BlockDetailPanelProps {
 
 export function BlockDetailPanel({
   block,
+  selectedBlockIds,
+  blocks,
   isOpen,
   onClose,
   onSave,
@@ -173,11 +177,16 @@ export function BlockDetailPanel({
 
   // Handle delete
   const handleDelete = useCallback(() => {
-    if (!block) return
-    onDelete(block._id)
+    if (selectedBlockIds && selectedBlockIds.size > 1) {
+      // Batch delete - don't pass blockId
+      onDelete()
+    } else if (block) {
+      // Single delete
+      onDelete(block._id)
+    }
     setShowDeleteDialog(false)
     onClose()
-  }, [block, onDelete, onClose])
+  }, [block, selectedBlockIds, onDelete, onClose])
 
   // Handle link selection
   const handleLink = useCallback(
@@ -243,27 +252,55 @@ export function BlockDetailPanel({
         {/* Content */}
         <ScrollArea className="h-[calc(100%-57px)]">
           <div className="p-4 space-y-6">
-            {/* Content textarea */}
-            <div className="space-y-2">
-              <Label>{t('whiteboard.content', 'Content')}</Label>
-              <Textarea
-                value={content}
-                onChange={(e) => {
-                  setContent(e.target.value)
-                  setHasChanges(true)
-                }}
-                placeholder={t('whiteboard.enterContent', 'Enter your notes here...')}
-                className="min-h-[150px] resize-none"
-                disabled={readOnly}
-              />
-            </div>
+            {/* Multi-select info */}
+            {selectedBlockIds && selectedBlockIds.size > 1 ? (
+              <div className="space-y-4">
+                <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-4 text-center">
+                  <h4 className="font-medium text-slate-900 dark:text-white mb-2">
+                    {t('whiteboard.multipleSelected', `${selectedBlockIds.size} items selected`)}
+                  </h4>
+                  <p className="text-sm text-slate-500 mb-4">
+                    {t(
+                      'whiteboard.multipleSelectedDescription',
+                      'You can delete all selected blocks at once'
+                    )}
+                  </p>
+                  {!readOnly && (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => setShowDeleteDialog(true)}
+                      className="w-full"
+                    >
+                      <Trash2 size={14} className="me-2" />
+                      {t('whiteboard.deleteSelected', 'Delete Selected')}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Content textarea */}
+                <div className="space-y-2">
+                  <Label>{t('whiteboard.content', 'Content')}</Label>
+                  <Textarea
+                    value={content}
+                    onChange={(e) => {
+                      setContent(e.target.value)
+                      setHasChanges(true)
+                    }}
+                    placeholder={t('whiteboard.enterContent', 'Enter your notes here...')}
+                    className="min-h-[150px] resize-none"
+                    disabled={readOnly}
+                  />
+                </div>
 
-            <Separator />
+                <Separator />
 
-            {/* Block type */}
-            <div className="space-y-2">
-              <Label>{t('whiteboard.blockType', 'Block Type')}</Label>
-              <Select
+                {/* Block type */}
+                <div className="space-y-2">
+                  <Label>{t('whiteboard.blockType', 'Block Type')}</Label>
+                  <Select
                 value={blockType}
                 onValueChange={(value: BlockType) => {
                   setBlockType(value)
@@ -638,6 +675,8 @@ export function BlockDetailPanel({
                 </Button>
               </>
             )}
+              </>
+            )}
           </div>
         </ScrollArea>
       </div>
@@ -646,12 +685,21 @@ export function BlockDetailPanel({
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t('whiteboard.deleteBlockConfirm', 'Delete Block?')}</DialogTitle>
+            <DialogTitle>
+              {selectedBlockIds && selectedBlockIds.size > 1
+                ? t('whiteboard.deleteBlocksConfirm', `Delete ${selectedBlockIds.size} Blocks?`)
+                : t('whiteboard.deleteBlockConfirm', 'Delete Block?')}
+            </DialogTitle>
             <DialogDescription>
-              {t(
-                'whiteboard.deleteBlockDescription',
-                'This action cannot be undone. The block and all its content will be permanently deleted.'
-              )}
+              {selectedBlockIds && selectedBlockIds.size > 1
+                ? t(
+                    'whiteboard.deleteBlocksDescription',
+                    'This action cannot be undone. All selected blocks and their content will be permanently deleted.'
+                  )
+                : t(
+                    'whiteboard.deleteBlockDescription',
+                    'This action cannot be undone. The block and all its content will be permanently deleted.'
+                  )}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

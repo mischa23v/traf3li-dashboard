@@ -22,9 +22,11 @@ import {
   caseNotionKeys,
 } from '@/hooks/useCaseNotion'
 import { useCase } from '@/hooks/useCasesAndClients'
+import { caseNotionService } from '@/services/caseNotionService'
 import { WhiteboardCanvas } from './whiteboard-canvas'
 import { BlockDetailPanel } from './block-detail-panel'
 import { CaseInfoSidebar } from './case-info-sidebar'
+import { useWhiteboardHistory } from '../../stores/whiteboard-history'
 import type { Block, BlockConnection, WhiteboardConfig, RichTextItem } from '../../data/schema'
 
 interface WhiteboardViewProps {
@@ -38,8 +40,18 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
   const isArabic = i18n.language === 'ar'
   const queryClient = useQueryClient()
 
+  // History store for undo/redo
+  const {
+    pushSnapshot,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    clear: clearHistory,
+  } = useWhiteboardHistory()
+
   // State
-  const [selectedBlock, setSelectedBlock] = useState<Block | null>(null)
+  const [selectedBlockIds, setSelectedBlockIds] = useState<Set<string>>(new Set())
   const [showDetailPanel, setShowDetailPanel] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [localBlocks, setLocalBlocks] = useState<Block[]>([])
@@ -49,6 +61,7 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
   const pendingMoveUpdates = useRef<Map<string, { x: number; y: number; timeout: NodeJS.Timeout }>>(new Map())
   const pendingResizeUpdates = useRef<Map<string, { width: number; height: number; timeout: NodeJS.Timeout }>>(new Map())
   const connectionsRef = useRef<BlockConnection[]>([])
+  const isUndoRedoAction = useRef(false)
 
   // Keep connectionsRef in sync
   useEffect(() => {
@@ -81,19 +94,66 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
       : (blocksData || [])
     setLocalBlocks(blocks)
     setLocalConnections(page?.connections || [])
-  }, [page?.blocks, blocksData, page?.connections])
 
-  // Handle block selection
-  const handleBlockSelect = useCallback((block: Block | null) => {
-    setSelectedBlock(block)
-    if (block) {
+    // Initialize history with first snapshot (only when data first loads)
+    if (blocks.length > 0 && !isUndoRedoAction.current) {
+      pushSnapshot(blocks, page?.connections || [])
+    }
+  }, [page?.blocks, blocksData, page?.connections, pushSnapshot])
+
+  // Handle blocks selection
+  const handleBlocksSelect = useCallback((blockIds: Set<string>) => {
+    setSelectedBlockIds(blockIds)
+    if (blockIds.size > 0) {
       setShowDetailPanel(true)
+    } else {
+      setShowDetailPanel(false)
     }
   }, [])
+
+  // Handle undo
+  const handleUndo = useCallback(() => {
+    if (!canUndo()) return
+
+    isUndoRedoAction.current = true
+    const snapshot = undo()
+    if (snapshot) {
+      setLocalBlocks(snapshot.blocks)
+      setLocalConnections(snapshot.connections)
+      toast.success(t('whiteboard.undone', 'Undone'))
+    }
+    // Reset flag after a short delay to allow state to settle
+    setTimeout(() => {
+      isUndoRedoAction.current = false
+    }, 100)
+  }, [canUndo, undo, t])
+
+  // Handle redo
+  const handleRedo = useCallback(() => {
+    if (!canRedo()) return
+
+    isUndoRedoAction.current = true
+    const snapshot = redo()
+    if (snapshot) {
+      setLocalBlocks(snapshot.blocks)
+      setLocalConnections(snapshot.connections)
+      toast.success(t('whiteboard.redone', 'Redone'))
+    }
+    // Reset flag after a short delay to allow state to settle
+    setTimeout(() => {
+      isUndoRedoAction.current = false
+    }, 100)
+  }, [canRedo, redo, t])
 
   // Handle block move - DEBOUNCED to prevent continuous API calls during drag
   const handleBlockMove = useCallback(
     (blockId: string, x: number, y: number) => {
+      // Save snapshot before first move (only once per drag operation)
+      const pending = pendingMoveUpdates.current.get(blockId)
+      if (!pending && !isUndoRedoAction.current) {
+        pushSnapshot(localBlocks, localConnections)
+      }
+
       // Optimistic update (immediate)
       setLocalBlocks((prev) =>
         prev.map((block) =>
@@ -102,7 +162,6 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
       )
 
       // Clear any pending update for this block
-      const pending = pendingMoveUpdates.current.get(blockId)
       if (pending) {
         clearTimeout(pending.timeout)
       }
@@ -130,12 +189,18 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
 
       pendingMoveUpdates.current.set(blockId, { x, y, timeout })
     },
-    [caseId, pageId, updateBlock, queryClient, t]
+    [caseId, pageId, updateBlock, queryClient, t, pushSnapshot, localBlocks, localConnections]
   )
 
   // Handle block resize - DEBOUNCED to prevent continuous API calls during drag
   const handleBlockResize = useCallback(
     (blockId: string, width: number, height: number) => {
+      // Save snapshot before first resize (only once per resize operation)
+      const pending = pendingResizeUpdates.current.get(blockId)
+      if (!pending && !isUndoRedoAction.current) {
+        pushSnapshot(localBlocks, localConnections)
+      }
+
       // Optimistic update (immediate)
       setLocalBlocks((prev) =>
         prev.map((block) =>
@@ -144,7 +209,6 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
       )
 
       // Clear any pending update for this block
-      const pending = pendingResizeUpdates.current.get(blockId)
       if (pending) {
         clearTimeout(pending.timeout)
       }
@@ -172,12 +236,12 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
 
       pendingResizeUpdates.current.set(blockId, { width, height, timeout })
     },
-    [caseId, pageId, updateBlock, queryClient, t]
+    [caseId, pageId, updateBlock, queryClient, t, pushSnapshot, localBlocks, localConnections]
   )
 
   // Handle block creation - FIX: Send canvas positions at TOP LEVEL, not in properties
   const handleBlockCreate = useCallback(
-    async (x: number, y: number) => {
+    async (x: number, y: number, shapeType?: Block['shapeType']) => {
       try {
         const newBlock = await createBlock.mutateAsync({
           caseId,
@@ -191,6 +255,8 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
             canvasY: y,
             canvasWidth: 200,
             canvasHeight: 150,
+            // Shape properties if provided
+            ...(shapeType && { shapeType }),
           },
         })
 
@@ -202,6 +268,7 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
             canvasY: y,
             canvasWidth: 200,
             canvasHeight: 150,
+            ...(shapeType && { shapeType }),
           },
         ])
 
@@ -245,9 +312,13 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
           )
         )
 
-        if (selectedBlock?._id === blockId) {
-          setSelectedBlock(null)
-          setShowDetailPanel(false)
+        if (selectedBlockIds.has(blockId)) {
+          const newSelection = new Set(selectedBlockIds)
+          newSelection.delete(blockId)
+          setSelectedBlockIds(newSelection)
+          if (newSelection.size === 0) {
+            setShowDetailPanel(false)
+          }
         }
 
         toast.success(t('whiteboard.blockDeleted', 'Block deleted'))
@@ -256,8 +327,64 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
         toast.error(t('whiteboard.deleteError', 'Failed to delete block'))
       }
     },
-    [caseId, pageId, deleteBlock, selectedBlock, t]
+    [caseId, pageId, deleteBlock, selectedBlockIds, t]
   )
+
+  // Handle batch deletion of selected blocks
+  const handleBatchDelete = useCallback(async () => {
+    if (selectedBlockIds.size === 0) return
+
+    const blockIdsToDelete = Array.from(selectedBlockIds)
+
+    // Clear any pending updates for these blocks
+    blockIdsToDelete.forEach((blockId) => {
+      const pendingMove = pendingMoveUpdates.current.get(blockId)
+      const pendingResize = pendingResizeUpdates.current.get(blockId)
+      if (pendingMove) {
+        clearTimeout(pendingMove.timeout)
+        pendingMoveUpdates.current.delete(blockId)
+      }
+      if (pendingResize) {
+        clearTimeout(pendingResize.timeout)
+        pendingResizeUpdates.current.delete(blockId)
+      }
+    })
+
+    try {
+      // Delete all selected blocks
+      await Promise.all(
+        blockIdsToDelete.map((blockId) =>
+          deleteBlock.mutateAsync({
+            caseId,
+            pageId,
+            blockId,
+          })
+        )
+      )
+
+      setLocalBlocks((prev) => prev.filter((block) => !selectedBlockIds.has(block._id)))
+      setLocalConnections((prev) =>
+        prev.filter(
+          (conn) =>
+            !selectedBlockIds.has(conn.sourceBlockId) &&
+            !selectedBlockIds.has(conn.targetBlockId)
+        )
+      )
+
+      setSelectedBlockIds(new Set())
+      setShowDetailPanel(false)
+
+      toast.success(
+        t(
+          'whiteboard.blocksDeleted',
+          `${selectedBlockIds.size} block${selectedBlockIds.size > 1 ? 's' : ''} deleted`
+        )
+      )
+    } catch (error) {
+      console.error('Failed to delete blocks:', error)
+      toast.error(t('whiteboard.deleteError', 'Failed to delete blocks'))
+    }
+  }, [caseId, pageId, deleteBlock, selectedBlockIds, t])
 
   // Handle connection creation - FIXED: Uses ref to avoid stale closure
   const handleConnectionCreate = useCallback(
@@ -336,6 +463,40 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
     [caseId, pageId, updatePage, queryClient, t]
   )
 
+  // Handle connection update (label editing)
+  const handleConnectionUpdate = useCallback(
+    async (connectionId: string, updates: Partial<BlockConnection>) => {
+      // Use ref for current connections to avoid stale closure
+      const currentConnections = connectionsRef.current
+
+      // Find the connection to update
+      const updatedConnections = currentConnections.map((conn) =>
+        conn._id === connectionId ? { ...conn, ...updates } : conn
+      )
+
+      // Optimistic update
+      setLocalConnections(updatedConnections)
+
+      // Update page
+      try {
+        await updatePage.mutateAsync({
+          caseId,
+          pageId,
+          data: {
+            connections: updatedConnections,
+          },
+        })
+        toast.success(t('whiteboard.connectionUpdated', 'Connection updated'))
+      } catch (error) {
+        console.error('Failed to update connection:', error)
+        toast.error(t('whiteboard.updateConnectionError', 'Failed to update connection'))
+        // Revert optimistic update
+        queryClient.invalidateQueries({ queryKey: caseNotionKeys.page(caseId, pageId) })
+      }
+    },
+    [caseId, pageId, updatePage, queryClient, t]
+  )
+
   // Handle whiteboard config change
   const handleConfigChange = useCallback(
     async (config: Partial<WhiteboardConfig>) => {
@@ -365,10 +526,6 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
         prev.map((block) => (block._id === blockId ? { ...block, ...updates } : block))
       )
 
-      if (selectedBlock?._id === blockId) {
-        setSelectedBlock((prev) => (prev ? { ...prev, ...updates } : prev))
-      }
-
       try {
         await updateBlock.mutateAsync({
           caseId,
@@ -397,7 +554,7 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
         queryClient.invalidateQueries({ queryKey: caseNotionKeys.blocks(caseId, pageId) })
       }
     },
-    [caseId, pageId, selectedBlock, updateBlock, queryClient, t]
+    [caseId, pageId, updateBlock, queryClient, t]
   )
 
   // Handle creating block from case entity
@@ -467,6 +624,139 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
     [caseId, pageId, localBlocks, createBlock, isArabic, t]
   )
 
+  // Handle z-index change
+  const handleZIndex = useCallback(
+    async (blockId: string, action: 'front' | 'back' | 'forward' | 'backward') => {
+      try {
+        // Call the backend API
+        await caseNotionService.updateBlockZIndex(caseId, blockId, action)
+
+        // Optimistically update local state by refetching
+        queryClient.invalidateQueries({ queryKey: caseNotionKeys.blocks(caseId, pageId) })
+
+        toast.success(t('whiteboard.zIndexUpdated', 'Layer order updated'))
+      } catch (error) {
+        console.error('Failed to update z-index:', error)
+        toast.error(t('whiteboard.zIndexError', 'Failed to update layer order'))
+      }
+    },
+    [caseId, pageId, queryClient, t]
+  )
+
+  // Handle frame creation
+  const handleCreateFrame = useCallback(
+    async (selectedBlockIds: string[]) => {
+      if (selectedBlockIds.length === 0) {
+        toast.error(t('whiteboard.selectBlocksForFrame', 'Please select blocks to frame'))
+        return
+      }
+
+      try {
+        // Calculate bounding box of selected blocks with padding
+        const selectedBlocksData = localBlocks.filter((b) => selectedBlockIds.includes(b._id))
+        if (selectedBlocksData.length === 0) return
+
+        const padding = 30
+        let minX = Infinity,
+          minY = Infinity,
+          maxX = -Infinity,
+          maxY = -Infinity
+
+        selectedBlocksData.forEach((block) => {
+          const x = block.canvasX || 0
+          const y = block.canvasY || 0
+          const width = block.canvasWidth || 200
+          const height = block.canvasHeight || 150
+
+          minX = Math.min(minX, x)
+          minY = Math.min(minY, y)
+          maxX = Math.max(maxX, x + width)
+          maxY = Math.max(maxY, y + height)
+        })
+
+        const frameX = minX - padding
+        const frameY = minY - padding
+        const frameWidth = maxX - minX + padding * 2
+        const frameHeight = maxY - minY + padding * 2
+
+        // Save snapshot for undo
+        pushSnapshot(localBlocks, localConnections)
+
+        // Create frame via API
+        const frame = await caseNotionService.createFrame(caseId, pageId, {
+          frameName: t('whiteboard.newFrame', 'New Frame'),
+          canvasX: frameX,
+          canvasY: frameY,
+          canvasWidth: frameWidth,
+          canvasHeight: frameHeight,
+          frameBackgroundColor: 'default',
+          blockIds: selectedBlockIds,
+        })
+
+        // Update local state
+        setLocalBlocks((prev) => [...prev, frame])
+
+        toast.success(t('whiteboard.frameCreated', 'Frame created'))
+      } catch (error) {
+        console.error('Failed to create frame:', error)
+        toast.error(t('whiteboard.createFrameError', 'Failed to create frame'))
+      }
+    },
+    [caseId, pageId, localBlocks, localConnections, pushSnapshot, t]
+  )
+
+  // Handle frame move (moves frame and all children)
+  const handleFrameMove = useCallback(
+    async (frameId: string, newX: number, newY: number) => {
+      // Find the frame
+      const frame = localBlocks.find((b) => b._id === frameId && b.isFrame)
+      if (!frame) return
+
+      const oldX = frame.canvasX || 0
+      const oldY = frame.canvasY || 0
+      const deltaX = newX - oldX
+      const deltaY = newY - oldY
+
+      // Optimistic update
+      setLocalBlocks((prev) =>
+        prev.map((block) => {
+          if (block._id === frameId) {
+            return { ...block, canvasX: newX, canvasY: newY }
+          }
+          // Move children with frame
+          if (frame.frameChildren?.includes(block._id)) {
+            return {
+              ...block,
+              canvasX: (block.canvasX || 0) + deltaX,
+              canvasY: (block.canvasY || 0) + deltaY,
+            }
+          }
+          return block
+        })
+      )
+
+      // Debounce server update
+      const pending = pendingMoveUpdates.current.get(frameId)
+      if (pending) {
+        clearTimeout(pending.timeout)
+      }
+
+      const timeout = setTimeout(async () => {
+        pendingMoveUpdates.current.delete(frameId)
+        try {
+          await caseNotionService.moveFrame(caseId, frameId, deltaX, deltaY)
+        } catch (error) {
+          console.error('Failed to move frame:', error)
+          toast.error(t('whiteboard.moveFrameError', 'Failed to move frame'))
+          queryClient.invalidateQueries({ queryKey: caseNotionKeys.blocks(caseId, pageId) })
+        }
+      }, 300)
+
+      pendingMoveUpdates.current.set(frameId, { x: newX, y: newY, timeout })
+    },
+    [caseId, pageId, localBlocks, queryClient, t]
+  )
+
   const isLoading = pageLoading || blocksLoading
 
   if (isLoading) {
@@ -501,28 +791,39 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
         blocks={localBlocks}
         connections={localConnections}
         config={page?.whiteboardConfig}
-        selectedBlockId={selectedBlock?._id}
-        onBlockSelect={handleBlockSelect}
+        selectedBlockIds={selectedBlockIds}
+        onBlocksSelect={handleBlocksSelect}
         onBlockMove={handleBlockMove}
         onBlockResize={handleBlockResize}
         onBlockCreate={handleBlockCreate}
         onBlockDelete={handleBlockDelete}
+        onBatchDelete={handleBatchDelete}
         onConnectionCreate={handleConnectionCreate}
         onConnectionDelete={handleConnectionDelete}
+        onConnectionUpdate={handleConnectionUpdate}
         onConfigChange={handleConfigChange}
+        onZIndexChange={handleZIndex}
+        onCreateFrame={handleCreateFrame}
+        onFrameMove={handleFrameMove}
         readOnly={readOnly}
       />
 
       {/* Block Detail Panel (right) */}
       <BlockDetailPanel
-        block={selectedBlock}
+        block={
+          selectedBlockIds.size === 1
+            ? localBlocks.find((b) => b._id === Array.from(selectedBlockIds)[0]) || null
+            : null
+        }
+        selectedBlockIds={selectedBlockIds}
+        blocks={localBlocks}
         isOpen={showDetailPanel}
         onClose={() => {
           setShowDetailPanel(false)
-          setSelectedBlock(null)
+          setSelectedBlockIds(new Set())
         }}
         onSave={handleBlockSave}
-        onDelete={handleBlockDelete}
+        onDelete={selectedBlockIds.size === 1 ? handleBlockDelete : handleBatchDelete}
         availableEvents={caseEvents}
         availableTasks={caseTasks}
         availableHearings={caseHearings}

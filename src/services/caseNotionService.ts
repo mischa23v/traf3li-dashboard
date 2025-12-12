@@ -771,6 +771,148 @@ export const caseNotionService = {
       throw new Error(handleApiError(error))
     }
   },
+
+  /**
+   * Update block z-index
+   * PATCH /api/cases/:caseId/notion/blocks/:blockId/z-index
+   */
+  updateBlockZIndex: async (
+    caseId: string,
+    blockId: string,
+    action: 'front' | 'back' | 'forward' | 'backward'
+  ): Promise<Block> => {
+    try {
+      const response = await apiClient.patch<BlockResponse>(
+        `/cases/${caseId}/notion/blocks/${blockId}/z-index`,
+        { action }
+      )
+      return response.data.data || response.data.block!
+    } catch (error) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // FRAME OPERATIONS
+  // ═══════════════════════════════════════════════════════════════
+
+  /**
+   * Create a frame around selected blocks
+   * POST /api/cases/:caseId/notion/pages/:pageId/frames
+   */
+  createFrame: async (
+    caseId: string,
+    pageId: string,
+    data: {
+      frameName?: string
+      canvasX: number
+      canvasY: number
+      canvasWidth: number
+      canvasHeight: number
+      frameBackgroundColor?: string
+      blockIds?: string[]
+    }
+  ): Promise<Block> => {
+    try {
+      const response = await apiClient.post<BlockResponse>(
+        `/cases/${caseId}/notion/pages/${pageId}/frames`,
+        data
+      )
+      return response.data.data || response.data.block!
+    } catch (error) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get frame children
+   * GET /api/cases/:caseId/notion/frames/:frameId/children
+   */
+  getFrameChildren: async (caseId: string, frameId: string): Promise<Block[]> => {
+    try {
+      const response = await apiClient.get<BlocksResponse>(
+        `/cases/${caseId}/notion/frames/${frameId}/children`
+      )
+      return response.data.data || response.data.blocks || []
+    } catch (error) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Add blocks to a frame
+   * POST /api/cases/:caseId/notion/frames/:frameId/children
+   */
+  addBlocksToFrame: async (
+    caseId: string,
+    frameId: string,
+    blockIds: string[]
+  ): Promise<Block> => {
+    try {
+      const response = await apiClient.post<BlockResponse>(
+        `/cases/${caseId}/notion/frames/${frameId}/children`,
+        { blockIds }
+      )
+      return response.data.data || response.data.block!
+    } catch (error) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Remove a block from a frame
+   * DELETE /api/cases/:caseId/notion/frames/:frameId/children/:elementId
+   */
+  removeBlockFromFrame: async (
+    caseId: string,
+    frameId: string,
+    elementId: string
+  ): Promise<Block> => {
+    try {
+      const response = await apiClient.delete<BlockResponse>(
+        `/cases/${caseId}/notion/frames/${frameId}/children/${elementId}`
+      )
+      return response.data.data || response.data.block!
+    } catch (error) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Auto-detect and add blocks within frame bounds
+   * POST /api/cases/:caseId/notion/frames/:frameId/auto-detect
+   */
+  autoDetectFrameChildren: async (caseId: string, frameId: string): Promise<Block> => {
+    try {
+      const response = await apiClient.post<BlockResponse>(
+        `/cases/${caseId}/notion/frames/${frameId}/auto-detect`
+      )
+      return response.data.data || response.data.block!
+    } catch (error) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Move frame and all its children
+   * PATCH /api/cases/:caseId/notion/frames/:frameId/move
+   */
+  moveFrame: async (
+    caseId: string,
+    frameId: string,
+    deltaX: number,
+    deltaY: number
+  ): Promise<Block> => {
+    try {
+      const response = await apiClient.patch<BlockResponse>(
+        `/cases/${caseId}/notion/frames/${frameId}/move`,
+        { deltaX, deltaY }
+      )
+      return response.data.data || response.data.block!
+    } catch (error) {
+      throw new Error(handleApiError(error))
+    }
+  },
 }
 
 export default caseNotionService

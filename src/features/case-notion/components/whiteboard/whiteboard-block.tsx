@@ -27,6 +27,10 @@ import {
   Flag,
   ExternalLink,
   MessageCircle,
+  ArrowUpToLine,
+  ArrowUp,
+  ArrowDown,
+  ArrowDownToLine,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -56,6 +60,7 @@ interface WhiteboardBlockProps {
   onPriorityChange?: (priority: Block['priority']) => void
   onDelete?: () => void
   onDuplicate?: () => void
+  onZIndexChange?: (action: 'front' | 'back' | 'forward' | 'backward') => void
   readOnly?: boolean
 }
 
@@ -76,6 +81,7 @@ export function WhiteboardBlock({
   onPriorityChange,
   onDelete,
   onDuplicate,
+  onZIndexChange,
   readOnly,
 }: WhiteboardBlockProps) {
   const { t, i18n } = useTranslation()
@@ -289,6 +295,34 @@ export function WhiteboardBlock({
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => onPriorityChange?.(undefined)}>
                       {t('common.none', 'None')}
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+
+                <DropdownMenuSeparator />
+
+                {/* Z-Index submenu */}
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <ArrowUp size={14} className="me-2" />
+                    {t('whiteboard.arrange', 'Arrange')}
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuItem onClick={() => onZIndexChange?.('front')}>
+                      <ArrowUpToLine size={14} className="me-2" />
+                      {t('whiteboard.bringToFront', 'Bring to Front')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onZIndexChange?.('forward')}>
+                      <ArrowUp size={14} className="me-2" />
+                      {t('whiteboard.bringForward', 'Bring Forward')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onZIndexChange?.('backward')}>
+                      <ArrowDown size={14} className="me-2" />
+                      {t('whiteboard.sendBackward', 'Send Backward')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onZIndexChange?.('back')}>
+                      <ArrowDownToLine size={14} className="me-2" />
+                      {t('whiteboard.sendToBack', 'Send to Back')}
                     </DropdownMenuItem>
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
