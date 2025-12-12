@@ -11,12 +11,14 @@ import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import {
-  Search, Bell, ArrowRight, Phone, MessageSquare, Send,
-  Loader2, FileText, User, Clock
+  Search, Bell, ArrowRight, Users, Send,
+  Loader2, FileText, Calendar, Clock, CheckCircle2,
+  Megaphone, Target, BarChart3
 } from 'lucide-react'
 import {
   Select,
@@ -27,7 +29,7 @@ import {
 } from '@/components/ui/select'
 import {
   useWhatsAppTemplates,
-  useSendWhatsAppMessage,
+  useCreateWhatsAppBroadcast,
 } from '@/hooks/useCrmAdvanced'
 import { useLeads } from '@/hooks/useCrm'
 import { toast } from 'sonner'
@@ -39,67 +41,98 @@ export function WhatsAppNewConversation() {
   const isRTL = i18n.language === 'ar'
 
   // Form state
-  const [phoneNumber, setPhoneNumber] = useState('')
-  const [messageType, setMessageType] = useState<'text' | 'template'>('text')
-  const [messageText, setMessageText] = useState('')
+  const [broadcastName, setBroadcastName] = useState('')
   const [selectedTemplate, setSelectedTemplate] = useState('')
-  const [selectedLead, setSelectedLead] = useState('')
+  const [selectedRecipients, setSelectedRecipients] = useState<string[]>([])
+  const [scheduleType, setScheduleType] = useState<'now' | 'scheduled'>('now')
+  const [scheduledDate, setScheduledDate] = useState('')
+  const [scheduledTime, setScheduledTime] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
 
   // Fetch data
   const { data: templatesData } = useWhatsAppTemplates()
   const { data: leadsData } = useLeads({})
-  const sendMessageMutation = useSendWhatsAppMessage()
+  const createBroadcastMutation = useCreateWhatsAppBroadcast()
 
   const templates = templatesData || []
   const leads = leadsData?.data || []
 
-  // Handle lead selection
-  const handleLeadSelect = (leadId: string) => {
-    setSelectedLead(leadId)
-    const lead = leads.find((l: any) => l._id === leadId)
-    if (lead?.phone) {
-      setPhoneNumber(lead.phone)
-    }
+  // Filter leads with phone numbers
+  const leadsWithPhone = useMemo(() => {
+    return leads.filter((lead: any) => lead.phone)
+  }, [leads])
+
+  // Search filter
+  const filteredLeads = useMemo(() => {
+    if (!searchQuery) return leadsWithPhone
+    const query = searchQuery.toLowerCase()
+    return leadsWithPhone.filter((lead: any) =>
+      (lead.name?.toLowerCase().includes(query)) ||
+      (lead.email?.toLowerCase().includes(query)) ||
+      (lead.phone?.includes(query))
+    )
+  }, [leadsWithPhone, searchQuery])
+
+  // Toggle recipient selection
+  const toggleRecipient = (leadId: string) => {
+    setSelectedRecipients(prev =>
+      prev.includes(leadId)
+        ? prev.filter(id => id !== leadId)
+        : [...prev, leadId]
+    )
   }
 
-  // Handle send message
-  const handleSendMessage = async () => {
-    if (!phoneNumber.trim()) {
-      toast.error('الرجاء إدخال رقم الهاتف')
+  // Select all filtered leads
+  const selectAll = () => {
+    const allIds = filteredLeads.map((lead: any) => lead._id)
+    setSelectedRecipients(prev => {
+      const newSelection = new Set([...prev, ...allIds])
+      return Array.from(newSelection)
+    })
+  }
+
+  // Clear selection
+  const clearSelection = () => {
+    setSelectedRecipients([])
+  }
+
+  // Handle create broadcast
+  const handleCreateBroadcast = async () => {
+    if (selectedRecipients.length === 0) {
+      toast.error('الرجاء اختيار مستلم واحد على الأقل')
       return
     }
 
-    if (messageType === 'text' && !messageText.trim()) {
-      toast.error('الرجاء إدخال نص الرسالة')
-      return
-    }
-
-    if (messageType === 'template' && !selectedTemplate) {
+    if (!selectedTemplate) {
       toast.error('الرجاء اختيار قالب')
       return
     }
 
-    const messageData: any = {
-      phoneNumber: phoneNumber.replace(/\s/g, ''),
-      type: messageType,
+    const broadcastData: any = {
+      name: broadcastName || `بث ${new Date().toLocaleDateString('ar-SA')}`,
+      templateId: selectedTemplate,
+      recipients: selectedRecipients,
     }
 
-    if (messageType === 'text') {
-      messageData.message = messageText
-    } else {
-      messageData.templateName = selectedTemplate
+    if (scheduleType === 'scheduled' && scheduledDate && scheduledTime) {
+      broadcastData.scheduledAt = new Date(`${scheduledDate}T${scheduledTime}`)
     }
 
-    sendMessageMutation.mutate(messageData, {
+    createBroadcastMutation.mutate(broadcastData, {
       onSuccess: () => {
-        toast.success('تم إرسال الرسالة بنجاح')
+        toast.success('تم إنشاء حملة البث بنجاح')
         navigate({ to: '/dashboard/crm/whatsapp' })
       },
       onError: (error: any) => {
-        toast.error(error.message || 'فشل في إرسال الرسالة')
+        toast.error(error.message || 'فشل في إنشاء حملة البث')
       },
     })
   }
+
+  // Get selected template details
+  const selectedTemplateData = useMemo(() => {
+    return templates.find((t: any) => (t._id || t.id) === selectedTemplate)
+  }, [templates, selectedTemplate])
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
@@ -163,186 +196,286 @@ export function WhatsAppNewConversation() {
         {/* Page Title */}
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-            <MessageSquare className="w-7 h-7 text-white" aria-hidden="true" />
+            <Megaphone className="w-7 h-7 text-white" aria-hidden="true" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-navy">محادثة جديدة</h1>
-            <p className="text-slate-500 text-sm">ابدأ محادثة واتساب جديدة مع عميل</p>
+            <h1 className="text-2xl font-bold text-navy">حملة بث واتساب</h1>
+            <p className="text-slate-500 text-sm">إنشاء حملة تسويقية جديدة عبر واتساب</p>
           </div>
         </div>
 
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Form Area */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
+            {/* Campaign Details */}
             <Card className="rounded-3xl border-slate-100 shadow-sm">
-              <CardContent className="p-6 space-y-6">
-                {/* Select from Leads */}
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                  <Target className="h-5 w-5 text-emerald-500" />
+                  تفاصيل الحملة
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Broadcast Name */}
                 <div className="space-y-2">
-                  <Label className="text-sm font-bold text-navy">اختيار من العملاء المحتملين</Label>
-                  <Select value={selectedLead} onValueChange={handleLeadSelect}>
+                  <Label className="text-sm font-bold text-navy">اسم الحملة</Label>
+                  <Input
+                    value={broadcastName}
+                    onChange={(e) => setBroadcastName(e.target.value)}
+                    placeholder="مثال: حملة العيد الوطني"
+                    className="h-14 rounded-2xl bg-slate-50 border-0 hover:bg-slate-100 focus:ring-4 focus:ring-emerald-500/10"
+                  />
+                </div>
+
+                {/* Template Selection */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-bold text-navy">القالب المعتمد *</Label>
+                  <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
                     <SelectTrigger className="h-14 rounded-2xl bg-slate-50 border-0 hover:bg-slate-100 focus:ring-4 focus:ring-emerald-500/10">
-                      <User className="h-5 w-5 ms-2 text-slate-400" aria-hidden="true" />
-                      <SelectValue placeholder="اختر عميل محتمل (اختياري)" />
+                      <FileText className="h-5 w-5 ms-2 text-slate-400" aria-hidden="true" />
+                      <SelectValue placeholder="اختر قالب معتمد من واتساب" />
                     </SelectTrigger>
                     <SelectContent>
-                      {leads.map((lead: any) => (
-                        <SelectItem key={lead._id} value={lead._id}>
+                      {templates.map((template: any) => (
+                        <SelectItem key={template._id || template.id} value={template._id || template.id}>
                           <div className="flex items-center gap-2">
-                            <span className="font-medium">{lead.name || lead.email}</span>
-                            {lead.phone && (
-                              <span className="text-xs text-slate-500" dir="ltr">{lead.phone}</span>
-                            )}
+                            <span className="font-medium">{template.name}</span>
+                            <Badge className={`text-xs ${
+                              template.status === 'approved'
+                                ? 'bg-emerald-100 text-emerald-700'
+                                : 'bg-amber-100 text-amber-700'
+                            }`}>
+                              {template.status === 'approved' ? 'معتمد' : template.status}
+                            </Badge>
                           </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                  {templates.length === 0 && (
+                    <p className="text-xs text-amber-600">لا توجد قوالب متاحة. يرجى إنشاء قالب أولاً.</p>
+                  )}
+                  {selectedTemplateData && (
+                    <div className="p-4 bg-slate-50 rounded-xl mt-2">
+                      <p className="text-sm text-slate-600 whitespace-pre-wrap">
+                        {selectedTemplateData.content || selectedTemplateData.body || 'معاينة غير متاحة'}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex items-center gap-4">
-                  <div className="flex-1 h-px bg-slate-200"></div>
-                  <span className="text-xs text-slate-400 font-medium">أو أدخل الرقم يدوياً</span>
-                  <div className="flex-1 h-px bg-slate-200"></div>
-                </div>
-
-                {/* Phone Number */}
+                {/* Schedule */}
                 <div className="space-y-2">
-                  <Label className="text-sm font-bold text-navy">رقم الهاتف *</Label>
-                  <div className="relative">
-                    <Phone className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" aria-hidden="true" />
-                    <Input
-                      type="tel"
-                      dir="ltr"
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      placeholder="966XXXXXXXXX"
-                      className="h-14 ps-12 rounded-2xl bg-slate-50 border-0 hover:bg-slate-100 focus:ring-4 focus:ring-emerald-500/10 text-left"
-                    />
-                  </div>
-                  <p className="text-xs text-slate-500">أدخل الرقم مع رمز الدولة (مثال: 966501234567)</p>
-                </div>
-
-                {/* Message Type */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-bold text-navy">نوع الرسالة</Label>
+                  <Label className="text-sm font-bold text-navy">موعد الإرسال</Label>
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       type="button"
-                      onClick={() => setMessageType('text')}
+                      onClick={() => setScheduleType('now')}
                       className={`p-4 rounded-2xl border-2 transition-all text-start ${
-                        messageType === 'text'
+                        scheduleType === 'now'
                           ? 'border-emerald-500 bg-emerald-50'
                           : 'border-slate-200 hover:border-emerald-200 bg-white'
                       }`}
                     >
-                      <MessageSquare className={`h-6 w-6 mb-2 ${
-                        messageType === 'text' ? 'text-emerald-600' : 'text-slate-400'
+                      <Send className={`h-6 w-6 mb-2 ${
+                        scheduleType === 'now' ? 'text-emerald-600' : 'text-slate-400'
                       }`} />
-                      <p className={`font-bold ${messageType === 'text' ? 'text-emerald-700' : 'text-slate-700'}`}>
-                        رسالة نصية
+                      <p className={`font-bold ${scheduleType === 'now' ? 'text-emerald-700' : 'text-slate-700'}`}>
+                        إرسال الآن
                       </p>
-                      <p className="text-xs text-slate-500 mt-1">إرسال رسالة نصية مخصصة</p>
+                      <p className="text-xs text-slate-500 mt-1">سيتم إرسال الحملة فوراً</p>
                     </button>
                     <button
                       type="button"
-                      onClick={() => setMessageType('template')}
+                      onClick={() => setScheduleType('scheduled')}
                       className={`p-4 rounded-2xl border-2 transition-all text-start ${
-                        messageType === 'template'
+                        scheduleType === 'scheduled'
                           ? 'border-emerald-500 bg-emerald-50'
                           : 'border-slate-200 hover:border-emerald-200 bg-white'
                       }`}
                     >
-                      <FileText className={`h-6 w-6 mb-2 ${
-                        messageType === 'template' ? 'text-emerald-600' : 'text-slate-400'
+                      <Calendar className={`h-6 w-6 mb-2 ${
+                        scheduleType === 'scheduled' ? 'text-emerald-600' : 'text-slate-400'
                       }`} />
-                      <p className={`font-bold ${messageType === 'template' ? 'text-emerald-700' : 'text-slate-700'}`}>
-                        قالب معتمد
+                      <p className={`font-bold ${scheduleType === 'scheduled' ? 'text-emerald-700' : 'text-slate-700'}`}>
+                        جدولة الإرسال
                       </p>
-                      <p className="text-xs text-slate-500 mt-1">استخدام قالب واتساب معتمد</p>
+                      <p className="text-xs text-slate-500 mt-1">اختر موعد إرسال الحملة</p>
                     </button>
                   </div>
                 </div>
 
-                {/* Text Message */}
-                {messageType === 'text' && (
-                  <div className="space-y-2">
-                    <Label className="text-sm font-bold text-navy">نص الرسالة *</Label>
-                    <Textarea
-                      value={messageText}
-                      onChange={(e) => setMessageText(e.target.value)}
-                      placeholder="اكتب رسالتك هنا..."
-                      className="min-h-[150px] rounded-2xl bg-slate-50 border-0 hover:bg-slate-100 focus:ring-4 focus:ring-emerald-500/10 resize-none"
-                    />
-                    <div className="flex justify-between text-xs text-slate-500">
-                      <span>الحد الأقصى: 1024 حرف</span>
-                      <span>{messageText.length}/1024</span>
+                {/* Scheduled Date/Time */}
+                {scheduleType === 'scheduled' && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-bold text-navy">التاريخ</Label>
+                      <Input
+                        type="date"
+                        value={scheduledDate}
+                        onChange={(e) => setScheduledDate(e.target.value)}
+                        min={new Date().toISOString().split('T')[0]}
+                        className="h-14 rounded-2xl bg-slate-50 border-0 hover:bg-slate-100 focus:ring-4 focus:ring-emerald-500/10"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-bold text-navy">الوقت</Label>
+                      <Input
+                        type="time"
+                        value={scheduledTime}
+                        onChange={(e) => setScheduledTime(e.target.value)}
+                        className="h-14 rounded-2xl bg-slate-50 border-0 hover:bg-slate-100 focus:ring-4 focus:ring-emerald-500/10"
+                      />
                     </div>
                   </div>
                 )}
-
-                {/* Template Selection */}
-                {messageType === 'template' && (
-                  <div className="space-y-2">
-                    <Label className="text-sm font-bold text-navy">اختر القالب *</Label>
-                    <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
-                      <SelectTrigger className="h-14 rounded-2xl bg-slate-50 border-0 hover:bg-slate-100 focus:ring-4 focus:ring-emerald-500/10">
-                        <FileText className="h-5 w-5 ms-2 text-slate-400" aria-hidden="true" />
-                        <SelectValue placeholder="اختر قالب" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {templates.map((template: any) => (
-                          <SelectItem key={template._id || template.id} value={template.name}>
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium">{template.name}</span>
-                              <Badge className={`text-xs ${
-                                template.status === 'approved'
-                                  ? 'bg-emerald-100 text-emerald-700'
-                                  : 'bg-amber-100 text-amber-700'
-                              }`}>
-                                {template.status === 'approved' ? 'معتمد' : template.status}
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {templates.length === 0 && (
-                      <p className="text-xs text-amber-600">لا توجد قوالب متاحة. يرجى إنشاء قالب أولاً.</p>
-                    )}
-                  </div>
-                )}
-
-                {/* Actions */}
-                <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-                  <Button
-                    variant="outline"
-                    onClick={() => navigate({ to: '/dashboard/crm/whatsapp' })}
-                    className="h-12 px-6 rounded-xl"
-                  >
-                    إلغاء
-                  </Button>
-                  <Button
-                    onClick={handleSendMessage}
-                    disabled={sendMessageMutation.isPending}
-                    className="h-12 px-8 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.02]"
-                  >
-                    {sendMessageMutation.isPending ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      <>
-                        <Send className="h-5 w-5 ms-2 rtl:-scale-x-100" aria-hidden="true" />
-                        إرسال الرسالة
-                      </>
-                    )}
-                  </Button>
-                </div>
               </CardContent>
             </Card>
+
+            {/* Recipients Selection */}
+            <Card className="rounded-3xl border-slate-100 shadow-sm">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                    <Users className="h-5 w-5 text-emerald-500" />
+                    المستلمين ({selectedRecipients.length} مختار)
+                  </CardTitle>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={selectAll}
+                      className="text-xs rounded-lg"
+                    >
+                      تحديد الكل
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={clearSelection}
+                      className="text-xs rounded-lg"
+                    >
+                      إلغاء التحديد
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Search */}
+                <div className="relative">
+                  <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" aria-hidden="true" />
+                  <Input
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="البحث عن عميل..."
+                    className="h-12 ps-12 rounded-xl bg-slate-50 border-0 hover:bg-slate-100 focus:ring-4 focus:ring-emerald-500/10"
+                  />
+                </div>
+
+                {/* Recipients List */}
+                <ScrollArea className="h-[300px] rounded-xl border border-slate-100">
+                  <div className="p-2 space-y-1">
+                    {filteredLeads.length === 0 ? (
+                      <div className="text-center py-8 text-slate-500">
+                        <Users className="h-10 w-10 mx-auto mb-2 text-slate-300" />
+                        <p>لا يوجد عملاء بأرقام هاتف</p>
+                      </div>
+                    ) : (
+                      filteredLeads.map((lead: any) => (
+                        <label
+                          key={lead._id}
+                          className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${
+                            selectedRecipients.includes(lead._id)
+                              ? 'bg-emerald-50 border border-emerald-200'
+                              : 'hover:bg-slate-50'
+                          }`}
+                        >
+                          <Checkbox
+                            checked={selectedRecipients.includes(lead._id)}
+                            onCheckedChange={() => toggleRecipient(lead._id)}
+                            className="data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
+                          />
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white font-bold text-sm">
+                            {(lead.name || lead.email || 'U').charAt(0).toUpperCase()}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-navy text-sm truncate">{lead.name || lead.email}</p>
+                            <p className="text-xs text-slate-500" dir="ltr">{lead.phone}</p>
+                          </div>
+                          {selectedRecipients.includes(lead._id) && (
+                            <CheckCircle2 className="h-5 w-5 text-emerald-500 flex-shrink-0" />
+                          )}
+                        </label>
+                      ))
+                    )}
+                  </div>
+                </ScrollArea>
+
+                <p className="text-xs text-slate-500">
+                  يتم عرض العملاء الذين لديهم أرقام هواتف فقط ({leadsWithPhone.length} عميل متاح)
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Actions */}
+            <div className="flex items-center justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => navigate({ to: '/dashboard/crm/whatsapp' })}
+                className="h-12 px-6 rounded-xl"
+              >
+                إلغاء
+              </Button>
+              <Button
+                onClick={handleCreateBroadcast}
+                disabled={createBroadcastMutation.isPending}
+                className="h-12 px-8 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.02]"
+              >
+                {createBroadcastMutation.isPending ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <>
+                    <Megaphone className="h-5 w-5 ms-2" aria-hidden="true" />
+                    {scheduleType === 'now' ? 'إرسال الحملة' : 'جدولة الحملة'}
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Campaign Summary */}
+            <Card className="rounded-2xl border-slate-100 shadow-sm bg-gradient-to-br from-emerald-500 to-emerald-600 text-white">
+              <CardContent className="p-6 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                    <BarChart3 className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <p className="text-emerald-100 text-sm">ملخص الحملة</p>
+                    <p className="font-bold text-xl">{selectedRecipients.length} مستلم</p>
+                  </div>
+                </div>
+                <div className="h-px bg-white/20"></div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-emerald-100">القالب</span>
+                    <span className="font-medium truncate max-w-[150px]">
+                      {selectedTemplateData?.name || 'لم يتم الاختيار'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-emerald-100">الجدولة</span>
+                    <span className="font-medium">
+                      {scheduleType === 'now' ? 'فوري' : scheduledDate || 'لم يحدد'}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Tips Card */}
             <Card className="rounded-2xl border-slate-100 shadow-sm">
               <CardHeader className="pb-2">
@@ -350,61 +483,32 @@ export function WhatsAppNewConversation() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex gap-3 p-3 bg-blue-50 rounded-xl">
-                  <Clock className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                  <FileText className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
                   <div>
-                    <p className="text-sm font-medium text-blue-800">نافذة الـ 24 ساعة</p>
+                    <p className="text-sm font-medium text-blue-800">القوالب المعتمدة</p>
                     <p className="text-xs text-blue-600 mt-0.5">
-                      يمكنك إرسال رسائل نصية فقط خلال 24 ساعة من آخر رسالة من العميل
+                      يجب استخدام قوالب معتمدة من واتساب للحملات التسويقية
                     </p>
                   </div>
                 </div>
                 <div className="flex gap-3 p-3 bg-emerald-50 rounded-xl">
-                  <FileText className="h-5 w-5 text-emerald-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                  <Target className="h-5 w-5 text-emerald-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
                   <div>
-                    <p className="text-sm font-medium text-emerald-800">القوالب المعتمدة</p>
+                    <p className="text-sm font-medium text-emerald-800">استهداف دقيق</p>
                     <p className="text-xs text-emerald-600 mt-0.5">
-                      استخدم القوالب المعتمدة للتواصل مع العملاء الجدد
+                      اختر العملاء المهتمين لتحقيق أعلى معدل تفاعل
                     </p>
                   </div>
                 </div>
                 <div className="flex gap-3 p-3 bg-amber-50 rounded-xl">
-                  <Phone className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                  <Clock className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
                   <div>
-                    <p className="text-sm font-medium text-amber-800">صيغة الرقم</p>
+                    <p className="text-sm font-medium text-amber-800">أفضل الأوقات</p>
                     <p className="text-xs text-amber-600 mt-0.5">
-                      تأكد من إدخال الرقم بصيغة دولية (مثل: 966501234567)
+                      أفضل أوقات الإرسال: 9-11 صباحاً و 7-9 مساءً
                     </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Recent Contacts */}
-            <Card className="rounded-2xl border-slate-100 shadow-sm">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base font-bold text-navy">آخر العملاء</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {leads.slice(0, 5).map((lead: any) => (
-                  <button
-                    key={lead._id}
-                    onClick={() => handleLeadSelect(lead._id)}
-                    className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 rounded-xl transition-colors text-start"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white font-bold text-sm">
-                      {(lead.name || lead.email || 'U').charAt(0).toUpperCase()}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-navy text-sm truncate">{lead.name || lead.email}</p>
-                      {lead.phone && (
-                        <p className="text-xs text-slate-500" dir="ltr">{lead.phone}</p>
-                      )}
-                    </div>
-                  </button>
-                ))}
-                {leads.length === 0 && (
-                  <p className="text-sm text-slate-500 text-center py-4">لا يوجد عملاء محتملين</p>
-                )}
               </CardContent>
             </Card>
           </div>
