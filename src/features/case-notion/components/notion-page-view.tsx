@@ -237,6 +237,11 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
   }
 
   if (isError) {
+    // Get error details from the query
+    const queryError = (page as any)?.error || pageError
+    const errorStatus = (queryError as any)?.status
+    const is403 = errorStatus === 403
+
     return (
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="text-center max-w-md">
@@ -244,10 +249,14 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
             <AlertCircle className="w-8 h-8 text-red-500" />
           </div>
           <h3 className="font-bold text-lg text-slate-700 mb-2">
-            {t('caseNotion.pageLoadError', 'تعذر تحميل الصفحة')}
+            {is403
+              ? t('caseNotion.accessDenied', 'غير مصرح بالوصول')
+              : t('caseNotion.pageLoadError', 'تعذر تحميل الصفحة')}
           </h3>
           <p className="text-sm text-slate-500 mb-6">
-            {t('caseNotion.pageLoadErrorDescription', 'حدث خطأ أثناء تحميل الصفحة. يرجى المحاولة مرة أخرى.')}
+            {is403
+              ? t('caseNotion.accessDeniedDescription', 'ليس لديك صلاحية الوصول لهذه الصفحة. قد تكون محذوفة أو ليس لديك الإذن اللازم.')
+              : t('caseNotion.pageLoadErrorDescription', 'حدث خطأ أثناء تحميل الصفحة. يرجى المحاولة مرة أخرى.')}
           </p>
           <div className="flex gap-3 justify-center flex-wrap">
             <Button

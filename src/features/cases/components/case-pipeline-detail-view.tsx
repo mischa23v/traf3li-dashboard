@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useParams, useNavigate } from '@tanstack/react-router'
 import {
   Scale,
@@ -30,6 +30,7 @@ import {
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCase, useUpdateCase } from '@/hooks/useCasesAndClients'
+import { clearCache } from '@/lib/api'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -108,6 +109,13 @@ export function CasePipelineDetailView() {
   const [endReason, setEndReason] = useState<string>('')
   const [endNotes, setEndNotes] = useState<string>('')
   const [finalAmount, setFinalAmount] = useState<string>('')
+
+  // Clear cache for this specific case when component mounts to ensure fresh data
+  useEffect(() => {
+    if (caseId) {
+      clearCache(`/cases/${caseId}`)
+    }
+  }, [caseId])
 
   // Fetch case data
   const { data: selectedCase, isLoading, isError, error, refetch, isFetching } = useCase(caseId)
@@ -305,10 +313,14 @@ export function CasePipelineDetailView() {
                     </div>
                   </div>
                   <h3 className="text-lg font-bold text-slate-900 mb-2">
-                    {t('casePipeline.errorLoading', 'حدث خطأ أثناء التحميل')}
+                    {(error as any)?.status === 403
+                      ? t('casePipeline.accessDenied', 'غير مصرح بالوصول')
+                      : t('casePipeline.errorLoading', 'حدث خطأ أثناء التحميل')}
                   </h3>
                   <p className="text-slate-500 mb-4">
-                    {error?.message || t('casePipeline.connectionError', 'تعذر الاتصال بالخادم')}
+                    {(error as any)?.status === 403
+                      ? t('casePipeline.accessDeniedDescription', 'ليس لديك صلاحية الوصول لهذه القضية. قد تكون محذوفة أو ليس لديك الإذن اللازم.')
+                      : error?.message || t('casePipeline.connectionError', 'تعذر الاتصال بالخادم')}
                   </p>
                   <div className="flex gap-3 justify-center flex-wrap">
                     <Button
