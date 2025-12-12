@@ -25,6 +25,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ListChecks,
+  RefreshCw,
+  Loader2,
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCase, useUpdateCase } from '@/hooks/useCasesAndClients'
@@ -89,6 +91,35 @@ import {
   caseEndReasons,
 } from '../data/case-pipeline-schema'
 
+// Demo case data for fallback when API fails
+const DEMO_CASE = {
+  _id: 'demo-case-001',
+  title: 'قضية عمالية - نموذج تجريبي',
+  titleEn: 'Labor Case - Demo',
+  caseNumber: 'DEMO-2024-001',
+  category: 'labor',
+  status: 'active',
+  priority: 'high',
+  currentStage: 'hearing',
+  pipelineStage: 'hearing',
+  stageEnteredAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+  plaintiffName: 'أحمد محمد',
+  defendantName: 'شركة النور للتجارة',
+  court: 'محكمة العمل بالرياض',
+  claimAmount: 150000,
+  nextHearing: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+  createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+  updatedAt: new Date().toISOString(),
+  tasksCount: 5,
+  notionPagesCount: 3,
+  eventsCount: 2,
+  notes: [{ _id: '1', content: 'ملاحظة تجريبية' }],
+  laborCaseDetails: {
+    plaintiff: { name: 'أحمد محمد' },
+    company: { name: 'شركة النور للتجارة' },
+  },
+}
+
 // Main Pipeline Detail View Component
 export function CasePipelineDetailView() {
   const { t, i18n } = useTranslation()
@@ -106,10 +137,19 @@ export function CasePipelineDetailView() {
   const [endReason, setEndReason] = useState<string>('')
   const [endNotes, setEndNotes] = useState<string>('')
   const [finalAmount, setFinalAmount] = useState<string>('')
+  const [useDemoData, setUseDemoData] = useState(false)
 
   // Fetch case data
-  const { data: selectedCase, isLoading, isError, error, refetch } = useCase(caseId)
+  const { data: fetchedCase, isLoading, isError, error, refetch, isFetching } = useCase(caseId)
   const { mutate: updateCase, isPending: isUpdatingCase } = useUpdateCase()
+
+  // Use demo data if API fails or demo mode is enabled
+  const selectedCase = useMemo(() => {
+    if (useDemoData || (isError && !fetchedCase)) {
+      return DEMO_CASE as any
+    }
+    return fetchedCase
+  }, [fetchedCase, isError, useDemoData])
 
   // Get current pipeline configuration
   const currentPipeline = useMemo(() => {
@@ -129,7 +169,7 @@ export function CasePipelineDetailView() {
 
   // Handle moving case to a stage
   const handleMoveToStage = (stageId: string) => {
-    if (!caseId) return
+    if (!caseId || useDemoData) return
 
     updateCase({
       id: caseId,
@@ -162,13 +202,13 @@ export function CasePipelineDetailView() {
 
   // Handle end case
   const handleOpenEndCase = () => {
-    if (caseId) {
+    if (caseId && !useDemoData) {
       setEndCaseDialogOpen(true)
     }
   }
 
   const handleEndCase = () => {
-    if (!caseId) return
+    if (!caseId || useDemoData) return
 
     updateCase({
       id: caseId,
@@ -271,6 +311,13 @@ export function CasePipelineDetailView() {
             {isRTL ? <ChevronRight className="h-4 w-4 ms-1" /> : <ChevronLeft className="h-4 w-4 me-1" />}
             {t('casePipeline.backToList', 'العودة للقائمة')}
           </Button>
+
+          {/* Demo mode badge */}
+          {useDemoData && (
+            <Badge className="bg-amber-100 text-amber-800 border-amber-300">
+              {t('casePipeline.demoMode', 'وضع العرض التجريبي')}
+            </Badge>
+          )}
         </div>
 
         {/* Header */}
@@ -281,7 +328,7 @@ export function CasePipelineDetailView() {
           {/* MAIN CONTENT */}
           <div className="lg:col-span-2 space-y-6">
             {/* Loading State */}
-            {isLoading ? (
+            {isLoading && !useDemoData ? (
               <Card className="border-0 shadow-sm">
                 <CardContent className="p-6">
                   <div className="space-y-4">
@@ -294,7 +341,7 @@ export function CasePipelineDetailView() {
                   </div>
                 </CardContent>
               </Card>
-            ) : isError ? (
+            ) : isError && !useDemoData ? (
               <Card className="border-0 shadow-sm">
                 <CardContent className="p-12 text-center">
                   <div className="flex justify-center mb-4">
@@ -308,9 +355,24 @@ export function CasePipelineDetailView() {
                   <p className="text-slate-500 mb-4">
                     {error?.message || t('casePipeline.connectionError', 'تعذر الاتصال بالخادم')}
                   </p>
-                  <div className="flex gap-3 justify-center">
-                    <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600">
+                  <div className="flex gap-3 justify-center flex-wrap">
+                    <Button
+                      onClick={() => refetch()}
+                      className="bg-emerald-500 hover:bg-emerald-600"
+                      disabled={isFetching}
+                    >
+                      {isFetching ? (
+                        <Loader2 className="h-4 w-4 me-2 animate-spin" />
+                      ) : (
+                        <RefreshCw className="h-4 w-4 me-2" />
+                      )}
                       {t('casePipeline.retry', 'إعادة المحاولة')}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setUseDemoData(true)}
+                    >
+                      {t('casePipeline.viewDemo', 'عرض بيانات تجريبية')}
                     </Button>
                     <Button variant="outline" onClick={handleBackToList}>
                       {t('casePipeline.backToList', 'العودة للقائمة')}
@@ -364,7 +426,7 @@ export function CasePipelineDetailView() {
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={handleOpenEndCase}>
+                            <DropdownMenuItem onClick={handleOpenEndCase} disabled={useDemoData}>
                               <CheckCircle className="h-4 w-4 ms-2 text-purple-500" />
                               {t('casePipeline.endCase', 'إنهاء القضية')}
                             </DropdownMenuItem>
@@ -477,12 +539,13 @@ export function CasePipelineDetailView() {
                               {/* Stage Circle */}
                               <button
                                 onClick={() => handleMoveToStage(stage.id)}
-                                disabled={isUpdatingCase}
+                                disabled={isUpdatingCase || useDemoData}
                                 className={cn(
                                   "w-16 h-16 rounded-full flex items-center justify-center border-4 transition-all relative z-10",
                                   isCompleted && "bg-emerald-500 border-emerald-500 text-white",
                                   isCurrent && "bg-white border-emerald-500 text-emerald-600 ring-4 ring-emerald-100",
-                                  isFuture && "bg-white border-slate-300 text-slate-400 hover:border-emerald-300 hover:text-emerald-500"
+                                  isFuture && "bg-white border-slate-300 text-slate-400 hover:border-emerald-300 hover:text-emerald-500",
+                                  useDemoData && "cursor-default"
                                 )}
                               >
                                 {isCompleted ? (
@@ -534,7 +597,7 @@ export function CasePipelineDetailView() {
                       <Button
                         variant="outline"
                         onClick={handleMovePrevious}
-                        disabled={currentStageIndex === 0 || isUpdatingCase}
+                        disabled={currentStageIndex === 0 || isUpdatingCase || useDemoData}
                         className="rounded-xl gap-2"
                       >
                         {isRTL ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
@@ -545,6 +608,7 @@ export function CasePipelineDetailView() {
                         onClick={handleOpenEndCase}
                         variant="outline"
                         className="rounded-xl gap-2 border-purple-300 text-purple-600 hover:bg-purple-50"
+                        disabled={useDemoData}
                       >
                         <CheckCircle className="h-4 w-4" />
                         {t('casePipeline.endCase', 'إنهاء القضية')}
@@ -552,7 +616,7 @@ export function CasePipelineDetailView() {
 
                       <Button
                         onClick={handleMoveNext}
-                        disabled={currentStageIndex === currentPipeline.stages.length - 1 || isUpdatingCase}
+                        disabled={currentStageIndex === currentPipeline.stages.length - 1 || isUpdatingCase || useDemoData}
                         className="rounded-xl gap-2 bg-emerald-500 hover:bg-emerald-600"
                       >
                         {t('casePipeline.nextStage', 'المرحلة التالية')}
@@ -661,6 +725,19 @@ export function CasePipelineDetailView() {
                       {t('casePipeline.viewAllPipelines', 'جميع القضايا')}
                     </Link>
                   </Button>
+                  {useDemoData && (
+                    <Button
+                      variant="outline"
+                      className="rounded-xl border-amber-300 text-amber-600"
+                      onClick={() => {
+                        setUseDemoData(false)
+                        refetch()
+                      }}
+                    >
+                      <RefreshCw className="h-4 w-4 ms-2" />
+                      {t('casePipeline.exitDemo', 'الخروج من الوضع التجريبي')}
+                    </Button>
+                  )}
                 </div>
               </>
             ) : null}
