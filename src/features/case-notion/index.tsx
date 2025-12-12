@@ -41,8 +41,27 @@ export default function CaseNotion({ caseId: propsCaseId, pageId: propsPageId }:
   const [selectedPageId, setSelectedPageId] = useState<string | undefined>(propsPageId)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
+  // DEBUG: Log component mount
+  console.log('[CaseNotion] 🔍 Component render:', {
+    propsCaseId,
+    paramsCaseId: (params as { caseId?: string }).caseId,
+    finalCaseId: caseId,
+    url: window.location.href,
+    pathname: window.location.pathname,
+    timestamp: new Date().toISOString(),
+  })
+
   // Fetch case data
-  const { data: caseData, isLoading: caseLoading } = useCase(caseId)
+  const { data: caseData, isLoading: caseLoading, isError: caseError, error: caseErrorObj } = useCase(caseId)
+
+  // DEBUG: Log fetch state
+  console.log('[CaseNotion] 📊 useCase state:', {
+    caseId,
+    isLoading: caseLoading,
+    isError: caseError,
+    hasData: !!caseData,
+    error: caseErrorObj ? { message: (caseErrorObj as any)?.message, status: (caseErrorObj as any)?.status } : null,
+  })
 
   const topNav = [
     { title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },
