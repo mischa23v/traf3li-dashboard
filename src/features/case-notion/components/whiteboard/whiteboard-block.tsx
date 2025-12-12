@@ -102,32 +102,32 @@ export function WhiteboardBlock({
   // Get block type label
   const typeLabel = isArabic ? blockTypeLabels[block.type]?.ar : blockTypeLabels[block.type]?.en
 
-  // Handle resize start
+  // Handle resize start - FIXED: Using closure capture instead of stale state
   const handleResizeStart = useCallback(
     (e: ReactMouseEvent, corner: string) => {
       e.stopPropagation()
       e.preventDefault()
 
       setIsResizing(true)
-      setResizeStart({
-        x: e.clientX,
-        y: e.clientY,
-        width,
-        height,
-      })
+
+      // Capture values in closure to avoid stale state issues
+      const startX = e.clientX
+      const startY = e.clientY
+      const startWidth = width
+      const startHeight = height
 
       const handleResizeMove = (moveEvent: MouseEvent) => {
-        const dx = moveEvent.clientX - e.clientX
-        const dy = moveEvent.clientY - e.clientY
+        const dx = moveEvent.clientX - startX
+        const dy = moveEvent.clientY - startY
 
-        let newWidth = width
-        let newHeight = height
+        let newWidth = startWidth
+        let newHeight = startHeight
 
         if (corner.includes('e')) {
-          newWidth = Math.max(MIN_WIDTH, resizeStart.width + dx)
+          newWidth = Math.max(MIN_WIDTH, startWidth + dx)
         }
         if (corner.includes('s')) {
-          newHeight = Math.max(MIN_HEIGHT, resizeStart.height + dy)
+          newHeight = Math.max(MIN_HEIGHT, startHeight + dy)
         }
 
         onResize(newWidth, newHeight)
@@ -142,7 +142,7 @@ export function WhiteboardBlock({
       document.addEventListener('mousemove', handleResizeMove)
       document.addEventListener('mouseup', handleResizeEnd)
     },
-    [width, height, resizeStart, onResize]
+    [width, height, onResize]
   )
 
   // Check if block has linked entities
@@ -157,12 +157,12 @@ export function WhiteboardBlock({
       ref={blockRef}
       data-block-id={block._id}
       className={cn(
-        'absolute rounded-lg border-2 shadow-md transition-shadow cursor-pointer select-none',
+        'absolute rounded-lg border-2 shadow-md transition-shadow cursor-pointer select-none group',
         colorConfig.bg,
         colorConfig.border,
         colorConfig.text,
         isSelected && 'ring-2 ring-emerald-500 ring-offset-2 shadow-lg',
-        isDragging && 'opacity-75 shadow-xl',
+        isDragging && 'opacity-75 shadow-xl z-50',
         isResizing && 'pointer-events-none'
       )}
       style={{
@@ -182,13 +182,16 @@ export function WhiteboardBlock({
         onDoubleClick?.()
       }}
     >
-      {/* Header with drag handle */}
+      {/* Header with drag handle - CRITICAL: stopPropagation prevents canvas events */}
       <div
         className={cn(
           'flex items-center justify-between px-2 py-1.5 border-b cursor-grab active:cursor-grabbing',
           colorConfig.border.replace('border-', 'border-b-')
         )}
-        onMouseDown={onDragStart}
+        onMouseDown={(e) => {
+          e.stopPropagation()
+          onDragStart(e)
+        }}
       >
         <div className="flex items-center gap-1 min-w-0">
           <GripVertical size={14} className="text-slate-400 shrink-0" />
