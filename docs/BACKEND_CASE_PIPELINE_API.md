@@ -3,8 +3,22 @@
 ## Overview
 
 This document provides complete backend API specifications for:
-1. **Case Pipeline** - Kanban board for tracking case stages
+1. **Case Pipeline** - Visual tracker for individual case progression through legal stages
 2. **Case Notion** - Case brainstorming and documentation (already partially implemented)
+
+### How Case Pipeline Works (Frontend)
+
+The Case Pipeline view allows lawyers to:
+1. **Select Case Type** (Labor, Commercial, Civil, Family, Criminal, Administrative)
+2. **Select a Specific Case** from a dropdown filtered by type
+3. **View the case's journey** through legal stages as a visual timeline
+4. **Move the case** to the next/previous stage or click on any stage to jump to it
+5. **End the case** with outcome (Won/Lost/Settled) and reason
+
+The pipeline stages are specific to Saudi Arabian legal procedures:
+- **Labor Cases**: Filing → Friendly Settlement (2 sessions) → Labor Court → Appeal → Execution
+- **Commercial Cases**: Filing → Mediation → Commercial Court → Appeal → Supreme → Execution
+- **Administrative Cases**: Grievance (mandatory) → Admin Court → Admin Appeal → High Admin Court → Execution
 
 ---
 
