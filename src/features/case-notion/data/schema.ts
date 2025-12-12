@@ -146,6 +146,13 @@ export const blockSchema: z.ZodType<Block> = z.lazy(() => z.object({
   blockColor: z.enum(['default', 'red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'gray']).optional(),
   priority: z.enum(['low', 'medium', 'high', 'urgent']).optional(),
 
+  // Shape properties for whiteboard
+  shapeType: z.enum(['rectangle', 'ellipse', 'diamond', 'triangle', 'hexagon', 'star', 'sticky', 'text_shape', 'arrow', 'frame']).optional(),
+  strokeColor: z.string().optional(),
+  strokeWidth: z.number().optional(),
+  angle: z.number().optional(),
+  opacity: z.number().optional(),
+
   // Links to case entities
   linkedEventId: z.string().optional(),
   linkedTaskId: z.string().optional(),
@@ -155,6 +162,12 @@ export const blockSchema: z.ZodType<Block> = z.lazy(() => z.object({
   // Block grouping for whiteboard
   groupId: z.string().optional(),
   groupName: z.string().optional(),
+
+  // Frame support for whiteboard
+  isFrame: z.boolean().default(false),
+  frameName: z.string().optional(),
+  frameChildren: z.array(z.string()).default([]),
+  frameBackgroundColor: z.string().optional(),
 
   // Collaboration
   lockedBy: z.string().optional(),
@@ -232,6 +245,13 @@ export interface Block {
   blockColor?: 'default' | 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'purple' | 'pink' | 'gray'
   priority?: 'low' | 'medium' | 'high' | 'urgent'
 
+  // Shape properties for whiteboard
+  shapeType?: 'rectangle' | 'ellipse' | 'diamond' | 'triangle' | 'hexagon' | 'star' | 'sticky' | 'text_shape' | 'arrow' | 'frame'
+  strokeColor?: string
+  strokeWidth?: number
+  angle?: number
+  opacity?: number
+
   // Links to case entities
   linkedEventId?: string
   linkedTaskId?: string
@@ -241,6 +261,12 @@ export interface Block {
   // Block grouping
   groupId?: string
   groupName?: string
+
+  // Frame support for whiteboard
+  isFrame?: boolean
+  frameName?: string
+  frameChildren?: string[]
+  frameBackgroundColor?: string
 
   // Collaboration
   lockedBy?: string
@@ -587,6 +613,12 @@ export const createBlockInputSchema = z.object({
   // Visual styling
   blockColor: z.enum(['default', 'red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'gray']).optional(),
   priority: z.enum(['low', 'medium', 'high', 'urgent']).optional(),
+  // Shape properties
+  shapeType: z.enum(['rectangle', 'ellipse', 'diamond', 'triangle', 'hexagon', 'star', 'sticky', 'text_shape', 'arrow', 'frame']).optional(),
+  strokeColor: z.string().optional(),
+  strokeWidth: z.number().optional(),
+  angle: z.number().optional(),
+  opacity: z.number().optional(),
   // Links to case entities
   linkedEventId: z.string().optional(),
   linkedTaskId: z.string().optional(),
@@ -610,6 +642,12 @@ export const updateBlockInputSchema = z.object({
   // Visual styling
   blockColor: z.enum(['default', 'red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'gray']).optional(),
   priority: z.enum(['low', 'medium', 'high', 'urgent']).optional(),
+  // Shape properties
+  shapeType: z.enum(['rectangle', 'ellipse', 'diamond', 'triangle', 'hexagon', 'star', 'sticky', 'text_shape', 'arrow', 'frame']).optional(),
+  strokeColor: z.string().optional(),
+  strokeWidth: z.number().optional(),
+  angle: z.number().optional(),
+  opacity: z.number().optional(),
   // Links to case entities
   linkedEventId: z.string().optional(),
   linkedTaskId: z.string().optional(),
