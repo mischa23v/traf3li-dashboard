@@ -1008,20 +1008,33 @@ export const whatsAppService = {
    */
   sendMessage: async (data: SendMessageData): Promise<WhatsAppMessage> => {
     try {
-      // Normalize the data for the API
+      // Build request with multiple field name options for backend compatibility
+      const messageContent = data.message || data.content || ''
+      const phoneNum = data.phoneNumber || ''
+
       const normalizedData = {
-        // Use conversationId if provided, otherwise phoneNumber
+        // Phone number - try multiple field names
         ...(data.conversationId && { conversationId: data.conversationId }),
-        ...(data.phoneNumber && { phoneNumber: data.phoneNumber }),
-        // Normalize message content field
-        text: data.message || data.content || '',
-        // Normalize message type
+        ...(phoneNum && {
+          phoneNumber: phoneNum,
+          to: phoneNum,  // Alternative field name
+        }),
+        // Message content - try multiple field names
+        text: messageContent,
+        message: messageContent,  // Alternative field name
+        body: messageContent,     // Alternative field name
+        // Message type
         type: data.type || data.messageType || 'text',
         ...(data.mediaUrl && { mediaUrl: data.mediaUrl }),
       }
+
+      console.log('[WhatsApp] sendMessage request:', JSON.stringify(normalizedData, null, 2))
+
       const response = await apiClient.post('/whatsapp/messages/send', normalizedData)
+      console.log('[WhatsApp] sendMessage response:', JSON.stringify(response.data, null, 2))
       return response.data.data || response.data
     } catch (error: any) {
+      console.error('[WhatsApp] sendMessage error:', error.response?.data || error.message)
       throw new Error(handleApiError(error))
     }
   },
