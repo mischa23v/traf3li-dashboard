@@ -26,6 +26,12 @@ import casesService, {
   CaseOutcome,
   Case,
   AuditLogEntry,
+  CaseCategory,
+  PipelineStage,
+  CasePipelineCard,
+  PipelineStatistics,
+  MoveCaseToStageData,
+  EndCaseData,
 } from '@/services/casesService'
 import clientsService, {
   ClientFilters,
@@ -934,4 +940,94 @@ export const useCasesAndClients = () => {
     isError: casesQuery.isError || clientsQuery.isError,
     error: casesQuery.error || clientsQuery.error,
   }
+}
+
+// ==================== PIPELINE ====================
+
+/**
+ * Fetch pipeline cases for a specific category
+ * GET /api/cases/pipeline?category=:category
+ */
+export const usePipelineCases = (category: CaseCategory) => {
+  return useQuery({
+    queryKey: ['cases', 'pipeline', category],
+    queryFn: () => casesService.getPipelineCases(category),
+    enabled: !!category,
+    staleTime: 2 * 60 * 1000,
+  })
+}
+
+/**
+ * Fetch pipeline statistics
+ * GET /api/cases/pipeline/statistics
+ */
+export const usePipelineStatistics = (category?: CaseCategory) => {
+  return useQuery({
+    queryKey: ['cases', 'pipeline', 'statistics', category],
+    queryFn: () => casesService.getPipelineStatistics(category),
+    staleTime: 2 * 60 * 1000,
+  })
+}
+
+/**
+ * Fetch valid pipeline stages for a category
+ * GET /api/cases/pipeline/stages?category=:category
+ */
+export const usePipelineStages = (category: CaseCategory) => {
+  return useQuery({
+    queryKey: ['cases', 'pipeline', 'stages', category],
+    queryFn: () => casesService.getPipelineStages(category),
+    enabled: !!category,
+    staleTime: 10 * 60 * 1000, // Stages don't change often
+  })
+}
+
+/**
+ * Move case to a new pipeline stage
+ * PATCH /api/cases/:id/stage
+ */
+export const useMoveCaseToStage = () => {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ caseId, data }: { caseId: string; data: MoveCaseToStageData }) =>
+      casesService.moveCaseToStage(caseId, data),
+    onSuccess: () => {
+      toast.success(t('cases.stageUpdateSuccess', 'تم نقل القضية للمرحلة الجديدة بنجاح'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t('cases.stageUpdateError', 'فشل نقل القضية'))
+    },
+    onSettled: async (_, __, { caseId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['cases', 'pipeline'] })
+      await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      return await queryClient.invalidateQueries({ queryKey: ['cases'] })
+    },
+  })
+}
+
+/**
+ * End a case (mark as won/lost/settled)
+ * POST /api/cases/:id/end
+ */
+export const useEndCase = () => {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ caseId, data }: { caseId: string; data: EndCaseData }) =>
+      casesService.endCase(caseId, data),
+    onSuccess: () => {
+      toast.success(t('cases.endCaseSuccess', 'تم إنهاء القضية بنجاح'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t('cases.endCaseError', 'فشل إنهاء القضية'))
+    },
+    onSettled: async (_, __, { caseId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['cases', 'pipeline'] })
+      await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      return await queryClient.invalidateQueries({ queryKey: ['cases'] })
+    },
+  })
 }
