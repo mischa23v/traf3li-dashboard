@@ -60,6 +60,7 @@
       "businessGroup": "الأعمال",
       "business": "الأعمال",
       "cases": "القضايا",
+      "caseNotion": "العصف الذهني",
       "documents": "المستندات",
       "myServices": "خدماتي",
       "browseJobs": "تصفح الوظائف",
@@ -1676,6 +1677,68 @@
       "physical": "دليل مادي",
       "digital": "دليل رقمي",
       "expert_opinion": "رأي خبير"
+    },
+    "nav": {
+      "overview": "نظرة عامة",
+      "tasks": "المهام",
+      "cases": "القضايا",
+      "brainstorm": "العصف الذهني"
+    },
+    "hero": {
+      "badge": "العصف الذهني",
+      "title": "مساحة العمل التعاونية"
+    },
+    "status": {
+      "active": "نشط",
+      "pending": "قيد الانتظار",
+      "closed": "مغلق"
+    },
+    "list": {
+      "search": "البحث...",
+      "searchPlaceholder": "ابحث عن قضية...",
+      "status": "الحالة",
+      "allStatuses": "جميع الحالات",
+      "sortBy": "الترتيب",
+      "lastUpdated": "آخر تحديث",
+      "createdAt": "تاريخ الإنشاء",
+      "name": "الاسم",
+      "clearFilters": "مسح الفلاتر",
+      "casesWithNotion": "القضايا ومساحات العمل",
+      "caseCount": "{{count}} قضية",
+      "notSet": "غير محدد",
+      "untitled": "بدون عنوان",
+      "noClient": "بدون عميل",
+      "errorLoading": "حدث خطأ في التحميل",
+      "connectionError": "تعذر الاتصال بالخادم",
+      "retry": "إعادة المحاولة",
+      "noCases": "لا توجد قضايا",
+      "noCasesDescription": "أنشئ قضية جديدة لبدء العصف الذهني",
+      "newCase": "قضية جديدة",
+      "pages": "الصفحات",
+      "openBrainstorm": "فتح العصف الذهني",
+      "viewCase": "عرض القضية",
+      "editCase": "تعديل القضية",
+      "openWorkspace": "فتح مساحة العمل",
+      "viewAllCases": "عرض جميع القضايا",
+      "deleteNotImplemented": "حذف صفحات العصف الذهني قيد التطوير"
+    },
+    "sidebar": {
+      "quickActions": "إجراءات سريعة",
+      "viewCase": "عرض القضية",
+      "newPage": "صفحة جديدة",
+      "delete": "حذف",
+      "viewAll": "عرض الكل",
+      "viewCases": "عرض القضايا",
+      "cancel": "إلغاء",
+      "select": "تحديد",
+      "knowledgeBase": "قاعدة المعرفة",
+      "calendar": "التقويم",
+      "notifications": "التنبيهات",
+      "noEvents": "لا توجد أحداث لهذا اليوم",
+      "noReminders": "لا توجد تنبيهات قادمة",
+      "overdue": "متأخر",
+      "viewFullSchedule": "عرض الجدول الكامل",
+      "viewAllReminders": "عرض كل التنبيهات"
     }
   },
   "hrAnalytics": {

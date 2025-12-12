@@ -4,10 +4,11 @@ This document provides detailed backend implementation instructions for the Case
 
 ## Table of Contents
 1. [Overview](#overview)
-2. [Database Schemas](#database-schemas)
-3. [API Endpoints](#api-endpoints)
-4. [Real-time Features](#real-time-features)
-5. [Security Considerations](#security-considerations)
+2. [List Page API](#list-page-api)
+3. [Database Schemas](#database-schemas)
+4. [API Endpoints](#api-endpoints)
+5. [Real-time Features](#real-time-features)
+6. [Security Considerations](#security-considerations)
 
 ---
 
@@ -21,6 +22,270 @@ CaseNotion provides lawyers with a wiki-style documentation system for cases, fe
 - Comments and collaboration
 - Templates for common case documentation
 - Export to PDF/Markdown
+
+---
+
+## List Page API
+
+The CaseNotion List Page (`/dashboard/notion`) shows all cases with their notion pages count. This requires an additional API endpoint and modification to the Cases API.
+
+### 1. Add notionPagesCount to Case Model
+
+```javascript
+// In Case model or as virtual field
+// Option 1: Virtual field (computed on-the-fly)
+caseSchema.virtual('notionPagesCount', {
+  ref: 'CaseNotionPage',
+  localField: '_id',
+  foreignField: 'caseId',
+  count: true,
+  match: { deletedAt: null, archivedAt: null }
+});
+
+// Make sure virtuals are included in JSON
+caseSchema.set('toJSON', { virtuals: true });
+caseSchema.set('toObject', { virtuals: true });
+```
+
+### 2. Update Cases List API
+
+```javascript
+// controllers/casesController.js
+exports.listCases = async (req, res) => {
+  try {
+    const { search, status, sortBy = 'updatedAt', sortOrder = 'desc', page = 1, limit = 20 } = req.query;
+
+    const query = {
+      firmId: req.user.firmId,
+      deletedAt: null
+    };
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { caseNumber: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    if (status && status !== 'all') {
+      query.status = status;
+    }
+
+    // Sort options
+    const sortOptions = {};
+    sortOptions[sortBy] = sortOrder === 'asc' ? 1 : -1;
+
+    const cases = await Case.find(query)
+      .sort(sortOptions)
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit))
+      .populate('clientId', 'name')
+      .populate('assignedTo', 'firstName lastName')
+      .lean();
+
+    // Get notion pages count for each case
+    const caseIds = cases.map(c => c._id);
+    const notionCounts = await CaseNotionPage.aggregate([
+      {
+        $match: {
+          caseId: { $in: caseIds },
+          deletedAt: null,
+          archivedAt: null
+        }
+      },
+      {
+        $group: {
+          _id: '$caseId',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    // Map counts to cases
+    const countsMap = {};
+    notionCounts.forEach(n => {
+      countsMap[n._id.toString()] = n.count;
+    });
+
+    const casesWithNotionCount = cases.map(c => ({
+      ...c,
+      notionPagesCount: countsMap[c._id.toString()] || 0
+    }));
+
+    const total = await Case.countDocuments(query);
+
+    res.json({
+      success: true,
+      data: {
+        cases: casesWithNotionCount,
+        total,
+        page: parseInt(page),
+        totalPages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+```
+
+### 3. Alternative: Dedicated Endpoint for CaseNotion List
+
+```javascript
+// routes/caseNotion.js
+// Add new route for listing all cases with notion stats
+router.get('/notion/cases', auth, caseNotionController.listCasesWithNotion);
+
+// controllers/caseNotionController.js
+exports.listCasesWithNotion = async (req, res) => {
+  try {
+    const { search, status, sortBy = 'updatedAt', page = 1, limit = 20 } = req.query;
+
+    const matchStage = {
+      firmId: new mongoose.Types.ObjectId(req.user.firmId),
+      deletedAt: null
+    };
+
+    if (search) {
+      matchStage.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { caseNumber: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    if (status && status !== 'all') {
+      matchStage.status = status;
+    }
+
+    const sortStage = {};
+    sortStage[sortBy] = sortBy === 'title' ? 1 : -1;
+
+    const cases = await Case.aggregate([
+      { $match: matchStage },
+      { $sort: sortStage },
+      { $skip: (page - 1) * limit },
+      { $limit: parseInt(limit) },
+      {
+        $lookup: {
+          from: 'clients',
+          localField: 'clientId',
+          foreignField: '_id',
+          as: 'client'
+        }
+      },
+      { $unwind: { path: '$client', preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: 'casenotionpages',
+          let: { caseId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$caseId', '$$caseId'] },
+                deletedAt: null,
+                archivedAt: null
+              }
+            },
+            { $count: 'count' }
+          ],
+          as: 'notionStats'
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          caseNumber: 1,
+          status: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          'clientId._id': '$client._id',
+          'clientId.name': '$client.name',
+          notionPagesCount: {
+            $ifNull: [{ $arrayElemAt: ['$notionStats.count', 0] }, 0]
+          }
+        }
+      }
+    ]);
+
+    const total = await Case.countDocuments(matchStage);
+
+    res.json({
+      success: true,
+      data: {
+        cases,
+        total,
+        page: parseInt(page),
+        totalPages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+```
+
+### 4. Frontend Service Update
+
+```typescript
+// services/caseNotionService.ts - Add this method
+export const listCasesWithNotion = async (params?: {
+  search?: string
+  status?: string
+  sortBy?: string
+  page?: number
+  limit?: number
+}): Promise<{
+  cases: Array<{
+    _id: string
+    title: string
+    caseNumber: string
+    status: string
+    clientId: { _id: string; name: string }
+    notionPagesCount: number
+    createdAt: string
+    updatedAt: string
+  }>
+  total: number
+  page: number
+  totalPages: number
+}> => {
+  const queryParams = new URLSearchParams()
+  if (params?.search) queryParams.append('search', params.search)
+  if (params?.status) queryParams.append('status', params.status)
+  if (params?.sortBy) queryParams.append('sortBy', params.sortBy)
+  if (params?.page) queryParams.append('page', params.page.toString())
+  if (params?.limit) queryParams.append('limit', params.limit.toString())
+
+  const response = await apiClient.get(`/notion/cases?${queryParams}`)
+  return response.data.data
+}
+```
+
+### 5. React Query Hook
+
+```typescript
+// hooks/useCaseNotion.ts - Add this hook
+export const useCasesWithNotion = (params?: {
+  search?: string
+  status?: string
+  sortBy?: string
+  page?: number
+  limit?: number
+}) => {
+  return useQuery({
+    queryKey: caseNotionKeys.casesWithNotion(params),
+    queryFn: () => caseNotionService.listCasesWithNotion(params),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+}
+
+// Add to query keys
+export const caseNotionKeys = {
+  // ... existing keys
+  casesWithNotion: (params?: object) => ['caseNotion', 'cases', params] as const,
+}
+```
 
 ---
 

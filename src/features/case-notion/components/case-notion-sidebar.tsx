@@ -1,0 +1,457 @@
+import { useState, useMemo } from 'react'
+import {
+    Clock, Bell, MapPin, Calendar as CalendarIcon,
+    Plus, Trash2, List, X, ChevronRight, Loader2, AlertCircle,
+    Eye, Lightbulb, FileText, BookOpen, FolderOpen
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Link } from '@tanstack/react-router'
+import { cn } from '@/lib/utils'
+import { useCalendar } from '@/hooks/useCalendar'
+import { useUpcomingReminders } from '@/hooks/useRemindersAndEvents'
+import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
+import { arSA } from 'date-fns/locale'
+import { useTranslation } from 'react-i18next'
+
+interface CaseNotionSidebarProps {
+    context?: 'list' | 'details'
+    isSelectionMode?: boolean
+    onToggleSelectionMode?: () => void
+    selectedCount?: number
+    onDeleteSelected?: () => void
+    caseId?: string
+    pageId?: string
+    onDeletePage?: () => void
+    isDeletePending?: boolean
+}
+
+export function CaseNotionSidebar({
+    context = 'list',
+    isSelectionMode = false,
+    onToggleSelectionMode,
+    selectedCount = 0,
+    onDeleteSelected,
+    caseId,
+    pageId,
+    onDeletePage,
+    isDeletePending = false
+}: CaseNotionSidebarProps) {
+    const { t } = useTranslation()
+    const [activeTab, setActiveTab] = useState<'calendar' | 'notifications'>('calendar')
+    const [selectedDate, setSelectedDate] = useState(new Date())
+
+    // Calculate date range for the strip (Today + 4 days)
+    const today = useMemo(() => new Date(), [])
+    const startDate = useMemo(() => startOfDay(today).toISOString(), [today])
+    const endDate = useMemo(() => endOfDay(addDays(today, 4)).toISOString(), [today])
+
+    // Fetch calendar data for the calendar tab
+    const { data: calendarData, isLoading: isCalendarLoading } = useCalendar({
+        startDate,
+        endDate
+    })
+
+    // Fetch upcoming reminders for the notifications tab
+    const { data: upcomingRemindersData, isLoading: isRemindersLoading } = useUpcomingReminders(7)
+
+    // Filter events for the selected date
+    const selectedDateEvents = useMemo(() => {
+        if (!calendarData?.data?.combined) return []
+        return calendarData.data.combined.filter(event =>
+            isSameDay(new Date(event.startDate), selectedDate)
+        ).sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+    }, [calendarData, selectedDate])
+
+    // Get upcoming reminders (limit to 5)
+    const upcomingReminders = useMemo(() => {
+        if (!upcomingRemindersData?.data) return []
+        return upcomingRemindersData.data.slice(0, 5)
+    }, [upcomingRemindersData])
+
+    // Generate 5 days for the strip
+    const calendarStripDays = useMemo(() => {
+        return Array.from({ length: 5 }).map((_, i) => {
+            const date = addDays(today, i)
+            return {
+                date,
+                dayName: format(date, 'EEEE', { locale: arSA }),
+                dayNumber: format(date, 'd')
+            }
+        })
+    }, [today])
+
+    // Get color based on event type
+    const getEventColor = (event: { type?: string; isOverdue?: boolean }) => {
+        if (event.isOverdue) return 'red'
+        if (event.type === 'event') return 'blue'
+        if (event.type === 'task') return 'amber'
+        return 'emerald'
+    }
+
+    // Static color class mappings for events
+    const eventTextColorClasses: Record<string, string> = {
+        red: 'group-hover:text-red-600',
+        blue: 'group-hover:text-blue-600',
+        amber: 'group-hover:text-amber-600',
+        emerald: 'group-hover:text-emerald-600'
+    }
+
+    const eventBgColorClasses: Record<string, string> = {
+        red: 'bg-red-500',
+        blue: 'bg-blue-500',
+        amber: 'bg-amber-500',
+        emerald: 'bg-emerald-500'
+    }
+
+    const eventBorderColorClasses: Record<string, string> = {
+        red: 'border-e-4 border-red-500',
+        blue: 'border-e-4 border-blue-500',
+        amber: 'border-e-4 border-amber-500',
+        emerald: 'border-e-4 border-emerald-500'
+    }
+
+    // Get priority color for reminders
+    const getPriorityColor = (priority?: string) => {
+        switch (priority) {
+            case 'critical': return 'red'
+            case 'high': return 'orange'
+            case 'medium': return 'blue'
+            default: return 'blue'
+        }
+    }
+
+    // Static color class mappings for priorities
+    const priorityBadgeClasses: Record<string, string> = {
+        red: 'bg-red-50 text-red-500 group-hover:bg-red-500 group-hover:text-white',
+        orange: 'bg-orange-50 text-orange-500 group-hover:bg-orange-500 group-hover:text-white',
+        blue: 'bg-blue-50 text-blue-500 group-hover:bg-blue-500 group-hover:text-white'
+    }
+
+    const priorityTextColorClasses: Record<string, string> = {
+        red: 'group-hover:text-red-600',
+        orange: 'group-hover:text-orange-600',
+        blue: 'group-hover:text-blue-600'
+    }
+
+    // Format reminder time
+    const formatReminderTime = (dateString?: string) => {
+        if (!dateString) return ''
+        const date = new Date(dateString)
+        return format(date, 'h:mm a', { locale: arSA })
+    }
+
+    return (
+        <div className="space-y-8 lg:col-span-1">
+
+            {/* QUICK ACTIONS WIDGET */}
+            <div className="bg-gradient-to-br from-emerald-900 to-slate-900 rounded-3xl p-6 shadow-xl shadow-emerald-900/20 ring-1 ring-white/10 relative overflow-hidden">
+                {/* Background Glow */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -me-32 -mt-32 pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -ms-32 -mb-32 pointer-events-none"></div>
+
+                {/* Header */}
+                <div className="flex items-center justify-between mb-6 relative z-10">
+                    <h3 className="font-bold text-lg text-white">{t('caseNotion.sidebar.quickActions', 'إجراءات سريعة')}</h3>
+                </div>
+
+                {/* Content */}
+                <div className="relative z-10 grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    {context === 'details' && caseId ? (
+                        // Details View - Show specific page actions
+                        <>
+                            {/* View Case Button */}
+                            <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
+                                <Link to={`/dashboard/cases/${caseId}`}>
+                                    <FolderOpen className="h-7 w-7" aria-hidden="true" />
+                                    <span className="text-sm font-bold">{t('caseNotion.sidebar.viewCase', 'عرض القضية')}</span>
+                                </Link>
+                            </Button>
+
+                            {/* New Page Button */}
+                            <Button asChild className="bg-white hover:bg-blue-50 text-blue-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
+                                <Link to={`/dashboard/cases/${caseId}/notion`}>
+                                    <Plus className="h-7 w-7" aria-hidden="true" />
+                                    <span className="text-sm font-bold">{t('caseNotion.sidebar.newPage', 'صفحة جديدة')}</span>
+                                </Link>
+                            </Button>
+
+                            {/* Delete Button */}
+                            {pageId && (
+                                <Button
+                                    variant="ghost"
+                                    className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
+                                    onClick={onDeletePage}
+                                    disabled={isDeletePending}
+                                >
+                                    {isDeletePending ? (
+                                        <Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" />
+                                    ) : (
+                                        <Trash2 className="h-6 w-6" aria-hidden="true" />
+                                    )}
+                                    <span className="text-sm font-bold">{t('caseNotion.sidebar.delete', 'حذف')}</span>
+                                </Button>
+                            )}
+
+                            {/* View All Button */}
+                            <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
+                                <Link to="/dashboard/notion">
+                                    <List className="h-6 w-6" aria-hidden="true" />
+                                    <span className="text-sm font-bold">{t('caseNotion.sidebar.viewAll', 'عرض الكل')}</span>
+                                </Link>
+                            </Button>
+                        </>
+                    ) : (
+                        // List View - Show Create, Select, Delete, View Cases
+                        <>
+                            {/* View Cases Button - Navigate to cases to create notion pages */}
+                            <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
+                                <Link to="/dashboard/cases">
+                                    <FolderOpen className="h-7 w-7" aria-hidden="true" />
+                                    <span className="text-sm font-bold">{t('caseNotion.sidebar.viewCases', 'عرض القضايا')}</span>
+                                </Link>
+                            </Button>
+
+                            {/* Select Button */}
+                            <Button
+                                variant="ghost"
+                                className={cn(
+                                    "h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg",
+                                    isSelectionMode
+                                        ? "bg-emerald-100 text-emerald-800 ring-2 ring-emerald-400 shadow-emerald-500/20"
+                                        : "bg-white hover:bg-slate-50 text-emerald-950 shadow-white/10"
+                                )}
+                                onClick={onToggleSelectionMode}
+                            >
+                                {isSelectionMode ? <X className="h-6 w-6" aria-hidden="true" /> : <FileText className="h-6 w-6" aria-hidden="true" />}
+                                <span className="text-sm font-bold">{isSelectionMode ? t('caseNotion.sidebar.cancel', 'إلغاء') : t('caseNotion.sidebar.select', 'تحديد')}</span>
+                            </Button>
+
+                            {/* Delete Button */}
+                            <Button
+                                variant="ghost"
+                                className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
+                                onClick={onDeleteSelected}
+                                disabled={!isSelectionMode || selectedCount === 0}
+                            >
+                                <Trash2 className="h-6 w-6" aria-hidden="true" />
+                                <span className="text-sm font-bold">
+                                    {selectedCount > 0 ? `${t('caseNotion.sidebar.delete', 'حذف')} (${selectedCount})` : t('caseNotion.sidebar.delete', 'حذف')}
+                                </span>
+                            </Button>
+
+                            {/* Knowledge Base Button */}
+                            <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
+                                <Link to="/dashboard/knowledge/laws">
+                                    <BookOpen className="h-6 w-6" aria-hidden="true" />
+                                    <span className="text-sm font-bold">{t('caseNotion.sidebar.knowledgeBase', 'قاعدة المعرفة')}</span>
+                                </Link>
+                            </Button>
+                        </>
+                    )}
+                </div>
+            </div>
+
+            {/* MERGED CALENDAR & AGENDA WIDGET */}
+            <div className="bg-[#022c22] rounded-3xl p-6 shadow-lg shadow-emerald-900/20 group hover:shadow-xl transition-all duration-300 relative overflow-hidden">
+                {/* Background Pattern */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -me-32 -mt-32 pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -ms-32 -mb-32 pointer-events-none"></div>
+
+                {/* Decorative Lines */}
+                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent"></div>
+
+                <div className="flex justify-between items-center mb-6 relative z-10">
+                    <div className="flex bg-[#033a2d] p-1 rounded-xl">
+                        <button
+                            onClick={() => setActiveTab('calendar')}
+                            aria-label={t('caseNotion.sidebar.calendar', 'التقويم')}
+                            className={cn(
+                                "px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200",
+                                activeTab === 'calendar'
+                                    ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                    : "text-emerald-200 hover:text-white hover:bg-emerald-500/10"
+                            )}
+                        >
+                            {t('caseNotion.sidebar.calendar', 'التقويم')}
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('notifications')}
+                            aria-label={t('caseNotion.sidebar.notifications', 'التنبيهات')}
+                            className={cn(
+                                "px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200",
+                                activeTab === 'notifications'
+                                    ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                    : "text-emerald-200 hover:text-white hover:bg-emerald-500/10"
+                            )}
+                        >
+                            {t('caseNotion.sidebar.notifications', 'التنبيهات')}
+                        </button>
+                    </div>
+                    {activeTab === 'calendar' && (
+                        <Badge className="bg-emerald-500/20 text-emerald-100 border-0 rounded-full px-3 hover:bg-emerald-500/30">
+                            {format(new Date(), 'MMMM', { locale: arSA })}
+                        </Badge>
+                    )}
+                    {activeTab === 'notifications' && upcomingReminders.length > 0 && (
+                        <Badge className="bg-emerald-500/20 text-emerald-100 border-0 rounded-full px-3 hover:bg-emerald-500/30">
+                            {upcomingReminders.length}
+                        </Badge>
+                    )}
+                </div>
+
+                {/* Inner White Container */}
+                <div className="bg-[#f8fafc] rounded-2xl p-4 relative z-10 min-h-[300px] border border-white/5 shadow-inner">
+                    {activeTab === 'calendar' ? (
+                        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            {/* Calendar Strip */}
+                            <div className="grid grid-cols-5 gap-2 text-center mb-8">
+                                {calendarStripDays.map((day, i) => {
+                                    const isSelected = isSameDay(day.date, selectedDate)
+                                    return (
+                                        <div
+                                            key={i}
+                                            onClick={() => setSelectedDate(day.date)}
+                                            className={cn(
+                                                "rounded-xl p-2 transition-all duration-200 cursor-pointer",
+                                                isSelected
+                                                    ? "bg-[#022c22] text-white shadow-lg shadow-emerald-900/20 scale-105"
+                                                    : "hover:bg-white text-slate-500"
+                                            )}
+                                        >
+                                            <div className={cn("text-[10px] mb-1", isSelected && "text-emerald-200")}>{day.dayName}</div>
+                                            <div className="font-bold text-lg">{day.dayNumber}</div>
+                                            {isSelected && <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full mx-auto mt-1"></div>}
+                                        </div>
+                                    )
+                                })}
+                            </div>
+
+                            {/* Timeline / Agenda */}
+                            <div className="space-y-6 relative min-h-[200px]">
+                                {isCalendarLoading ? (
+                                    <div className="flex items-center justify-center h-full py-12">
+                                        <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+                                    </div>
+                                ) : selectedDateEvents.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center py-8 text-slate-500">
+                                        <CalendarIcon className="h-10 w-10 mb-2 opacity-20" />
+                                        <p className="text-xs font-medium">{t('caseNotion.sidebar.noEvents', 'لا توجد أحداث لهذا اليوم')}</p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {/* Vertical Line */}
+                                        <div className="absolute top-2 bottom-2 right-[3.5rem] w-[2px] bg-slate-200"></div>
+
+                                        {selectedDateEvents.map((event) => {
+                                            const eventDate = event.startDate ? new Date(event.startDate) : null
+                                            const eventTime = eventDate ? eventDate.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', hour12: false }) : 'غير محدد'
+                                            const timePeriod = eventDate ? (eventDate.getHours() < 12 ? 'صباحاً' : 'مساءً') : ''
+                                            const colorClass = getEventColor(event)
+
+                                            return (
+                                                <div key={event.id} className="flex gap-4 relative group">
+                                                    <div className="w-14 text-center shrink-0 pt-1">
+                                                        <div className={cn("text-sm font-bold text-slate-700 transition-colors", eventTextColorClasses[colorClass] || eventTextColorClasses.emerald)}>
+                                                            {eventTime}
+                                                        </div>
+                                                        <div className="text-[10px] text-slate-500">{timePeriod}</div>
+                                                    </div>
+                                                    <div className={cn("absolute right-[3.25rem] top-2 w-3 h-3 rounded-full border-2 border-white shadow-sm z-10", eventBgColorClasses[colorClass] || eventBgColorClasses.emerald)}></div>
+                                                    <div className={cn("flex-1 bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition-all", eventBorderColorClasses[colorClass] || eventBorderColorClasses.emerald)}>
+                                                        <div className="font-bold text-slate-800 text-sm mb-1">{event.title}</div>
+                                                        {event.location && (
+                                                            <div className="text-xs text-slate-500 flex items-center gap-1">
+                                                                <MapPin className="h-3 w-3" aria-hidden="true" />
+                                                                {typeof event.location === 'string' ? event.location : (event.location?.name || event.location?.address || 'عن بعد')}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )
+                                        })}
+                                    </>
+                                )}
+                            </div>
+
+                            <Button asChild variant="ghost" className="w-full mt-6 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 group cursor-pointer">
+                                <Link to="/dashboard/calendar">
+                                    <span>{t('caseNotion.sidebar.viewFullSchedule', 'عرض الجدول الكامل')}</span>
+                                    <ChevronRight className="w-4 h-4 me-2 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1 rtl:rotate-180" aria-hidden="true" />
+                                </Link>
+                            </Button>
+                        </div>
+                    ) : (
+                        <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300 min-h-[200px]">
+                            {isRemindersLoading ? (
+                                <div className="flex items-center justify-center h-full py-12">
+                                    <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+                                </div>
+                            ) : upcomingReminders.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-8 text-slate-500">
+                                    <Bell className="h-10 w-10 mb-2 opacity-20" />
+                                    <p className="text-xs font-medium">{t('caseNotion.sidebar.noReminders', 'لا توجد تنبيهات قادمة')}</p>
+                                </div>
+                            ) : (
+                                <>
+                                    {upcomingReminders.map((reminder) => {
+                                        const priorityColor = getPriorityColor(reminder.priority)
+                                        const reminderDate = reminder.reminderDateTime || reminder.reminderDate
+                                        const isOverdue = reminderDate && new Date(reminderDate) < new Date()
+
+                                        return (
+                                            <Link
+                                                key={reminder._id}
+                                                to={`/dashboard/tasks/reminders/${reminder._id}`}
+                                                className="flex gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:shadow-md transition-all cursor-pointer group"
+                                            >
+                                                <div className={cn(
+                                                    "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors",
+                                                    isOverdue
+                                                        ? "bg-red-50 text-red-500 group-hover:bg-red-500 group-hover:text-white"
+                                                        : (priorityBadgeClasses[priorityColor] || priorityBadgeClasses.blue)
+                                                )}>
+                                                    {isOverdue ? <AlertCircle className="w-5 h-5" aria-hidden="true" /> : <Bell className="w-5 h-5" />}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className={cn(
+                                                        "text-sm font-bold text-slate-800 transition-colors truncate",
+                                                        isOverdue ? "group-hover:text-red-600" : (priorityTextColorClasses[priorityColor] || priorityTextColorClasses.blue)
+                                                    )}>
+                                                        {reminder.title}
+                                                    </p>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        {reminderDate && (
+                                                            <p className="text-xs text-slate-500">
+                                                                {format(new Date(reminderDate), 'dd MMM', { locale: arSA })}
+                                                                {' - '}
+                                                                {formatReminderTime(reminderDate)}
+                                                            </p>
+                                                        )}
+                                                        {isOverdue && (
+                                                            <Badge variant="destructive" className="text-[10px] px-1.5 py-0">
+                                                                {t('caseNotion.sidebar.overdue', 'متأخر')}
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        )
+                                    })}
+                                </>
+                            )}
+                            <Button asChild variant="ghost" className="w-full text-xs text-slate-500 hover:text-emerald-600 hover:bg-emerald-50">
+                                <Link to="/dashboard/tasks/reminders">
+                                    {t('caseNotion.sidebar.viewAllReminders', 'عرض كل التنبيهات')}
+                                </Link>
+                            </Button>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+
+        </div>
+    )
+}

@@ -60,6 +60,7 @@
       "businessGroup": "Business",
       "business": "Business",
       "cases": "Cases",
+      "caseNotion": "Case Brainstorm",
       "documents": "Documents",
       "myServices": "My Services",
       "browseJobs": "Browse Jobs",
@@ -1594,6 +1595,68 @@
       "physical": "Physical",
       "digital": "Digital",
       "expert_opinion": "Expert Opinion"
+    },
+    "nav": {
+      "overview": "Overview",
+      "tasks": "Tasks",
+      "cases": "Cases",
+      "brainstorm": "Case Brainstorm"
+    },
+    "hero": {
+      "badge": "Case Brainstorm",
+      "title": "Collaborative Workspace"
+    },
+    "status": {
+      "active": "Active",
+      "pending": "Pending",
+      "closed": "Closed"
+    },
+    "list": {
+      "search": "Search...",
+      "searchPlaceholder": "Search for a case...",
+      "status": "Status",
+      "allStatuses": "All Statuses",
+      "sortBy": "Sort By",
+      "lastUpdated": "Last Updated",
+      "createdAt": "Created At",
+      "name": "Name",
+      "clearFilters": "Clear Filters",
+      "casesWithNotion": "Cases & Workspaces",
+      "caseCount": "{{count}} case(s)",
+      "notSet": "Not Set",
+      "untitled": "Untitled",
+      "noClient": "No Client",
+      "errorLoading": "Error Loading",
+      "connectionError": "Could not connect to server",
+      "retry": "Retry",
+      "noCases": "No Cases",
+      "noCasesDescription": "Create a new case to start brainstorming",
+      "newCase": "New Case",
+      "pages": "Pages",
+      "openBrainstorm": "Open Brainstorm",
+      "viewCase": "View Case",
+      "editCase": "Edit Case",
+      "openWorkspace": "Open Workspace",
+      "viewAllCases": "View All Cases",
+      "deleteNotImplemented": "Delete brainstorm pages is under development"
+    },
+    "sidebar": {
+      "quickActions": "Quick Actions",
+      "viewCase": "View Case",
+      "newPage": "New Page",
+      "delete": "Delete",
+      "viewAll": "View All",
+      "viewCases": "View Cases",
+      "cancel": "Cancel",
+      "select": "Select",
+      "knowledgeBase": "Knowledge Base",
+      "calendar": "Calendar",
+      "notifications": "Notifications",
+      "noEvents": "No events for this day",
+      "noReminders": "No upcoming reminders",
+      "overdue": "Overdue",
+      "viewFullSchedule": "View Full Schedule",
+      "viewAllReminders": "View All Reminders"
     }
   },
   "hrAnalytics": {
