@@ -264,6 +264,7 @@ import { Route as AuthenticatedDashboardCrmEmailMarketingNewRouteImport } from '
 import { Route as AuthenticatedDashboardCrmEmailMarketingCampaignIdRouteImport } from './routes/_authenticated/dashboard.crm.email-marketing.$campaignId'
 import { Route as AuthenticatedDashboardCrmActivitiesNewRouteImport } from './routes/_authenticated/dashboard.crm.activities.new'
 import { Route as AuthenticatedDashboardCrmActivitiesActivityIdRouteImport } from './routes/_authenticated/dashboard.crm.activities.$activityId'
+import { Route as AuthenticatedDashboardCasesPipelineBoardRouteImport } from './routes/_authenticated/dashboard.cases.pipeline.board'
 import { Route as AuthenticatedDashboardCasesCaseIdPipelineRouteImport } from './routes/_authenticated/dashboard.cases.$caseId.pipeline'
 import { Route as AuthenticatedDashboardCasesCaseIdNotionRouteImport } from './routes/_authenticated/dashboard.cases.$caseId.notion'
 import { Route as AuthenticatedDashboardHrRecruitmentJobsIndexRouteImport } from './routes/_authenticated/dashboard.hr.recruitment.jobs.index'
@@ -1769,6 +1770,12 @@ const AuthenticatedDashboardCrmActivitiesActivityIdRoute =
     path: '/dashboard/crm/activities/$activityId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardCasesPipelineBoardRoute =
+  AuthenticatedDashboardCasesPipelineBoardRouteImport.update({
+    id: '/board',
+    path: '/board',
+    getParentRoute: () => AuthenticatedDashboardCasesPipelineRoute,
+  } as any)
 const AuthenticatedDashboardCasesCaseIdPipelineRoute =
   AuthenticatedDashboardCasesCaseIdPipelineRouteImport.update({
     id: '/pipeline',
@@ -1945,7 +1952,7 @@ export interface FileRoutesByFullPath {
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
   '/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
-  '/dashboard/cases/pipeline': typeof AuthenticatedDashboardCasesPipelineRoute
+  '/dashboard/cases/pipeline': typeof AuthenticatedDashboardCasesPipelineRouteWithChildren
   '/dashboard/clients/$clientId': typeof AuthenticatedDashboardClientsClientIdRoute
   '/dashboard/clients/new': typeof AuthenticatedDashboardClientsNewRoute
   '/dashboard/contacts/$contactId': typeof AuthenticatedDashboardContactsContactIdRoute
@@ -1992,6 +1999,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/tags': typeof AuthenticatedDashboardTagsIndexRoute
   '/dashboard/cases/$caseId/notion': typeof AuthenticatedDashboardCasesCaseIdNotionRouteWithChildren
   '/dashboard/cases/$caseId/pipeline': typeof AuthenticatedDashboardCasesCaseIdPipelineRoute
+  '/dashboard/cases/pipeline/board': typeof AuthenticatedDashboardCasesPipelineBoardRoute
   '/dashboard/crm/activities/$activityId': typeof AuthenticatedDashboardCrmActivitiesActivityIdRoute
   '/dashboard/crm/activities/new': typeof AuthenticatedDashboardCrmActivitiesNewRoute
   '/dashboard/crm/email-marketing/$campaignId': typeof AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute
@@ -2218,7 +2226,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
   '/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
-  '/dashboard/cases/pipeline': typeof AuthenticatedDashboardCasesPipelineRoute
+  '/dashboard/cases/pipeline': typeof AuthenticatedDashboardCasesPipelineRouteWithChildren
   '/dashboard/clients/$clientId': typeof AuthenticatedDashboardClientsClientIdRoute
   '/dashboard/clients/new': typeof AuthenticatedDashboardClientsNewRoute
   '/dashboard/contacts/$contactId': typeof AuthenticatedDashboardContactsContactIdRoute
@@ -2265,6 +2273,7 @@ export interface FileRoutesByTo {
   '/dashboard/tags': typeof AuthenticatedDashboardTagsIndexRoute
   '/dashboard/cases/$caseId/notion': typeof AuthenticatedDashboardCasesCaseIdNotionRouteWithChildren
   '/dashboard/cases/$caseId/pipeline': typeof AuthenticatedDashboardCasesCaseIdPipelineRoute
+  '/dashboard/cases/pipeline/board': typeof AuthenticatedDashboardCasesPipelineBoardRoute
   '/dashboard/crm/activities/$activityId': typeof AuthenticatedDashboardCrmActivitiesActivityIdRoute
   '/dashboard/crm/activities/new': typeof AuthenticatedDashboardCrmActivitiesNewRoute
   '/dashboard/crm/email-marketing/$campaignId': typeof AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute
@@ -2496,7 +2505,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
   '/_authenticated/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
-  '/_authenticated/dashboard/cases/pipeline': typeof AuthenticatedDashboardCasesPipelineRoute
+  '/_authenticated/dashboard/cases/pipeline': typeof AuthenticatedDashboardCasesPipelineRouteWithChildren
   '/_authenticated/dashboard/clients/$clientId': typeof AuthenticatedDashboardClientsClientIdRoute
   '/_authenticated/dashboard/clients/new': typeof AuthenticatedDashboardClientsNewRoute
   '/_authenticated/dashboard/contacts/$contactId': typeof AuthenticatedDashboardContactsContactIdRoute
@@ -2543,6 +2552,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/tags/': typeof AuthenticatedDashboardTagsIndexRoute
   '/_authenticated/dashboard/cases/$caseId/notion': typeof AuthenticatedDashboardCasesCaseIdNotionRouteWithChildren
   '/_authenticated/dashboard/cases/$caseId/pipeline': typeof AuthenticatedDashboardCasesCaseIdPipelineRoute
+  '/_authenticated/dashboard/cases/pipeline/board': typeof AuthenticatedDashboardCasesPipelineBoardRoute
   '/_authenticated/dashboard/crm/activities/$activityId': typeof AuthenticatedDashboardCrmActivitiesActivityIdRoute
   '/_authenticated/dashboard/crm/activities/new': typeof AuthenticatedDashboardCrmActivitiesNewRoute
   '/_authenticated/dashboard/crm/email-marketing/$campaignId': typeof AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute
@@ -2819,6 +2829,7 @@ export interface FileRouteTypes {
     | '/dashboard/tags'
     | '/dashboard/cases/$caseId/notion'
     | '/dashboard/cases/$caseId/pipeline'
+    | '/dashboard/cases/pipeline/board'
     | '/dashboard/crm/activities/$activityId'
     | '/dashboard/crm/activities/new'
     | '/dashboard/crm/email-marketing/$campaignId'
@@ -3092,6 +3103,7 @@ export interface FileRouteTypes {
     | '/dashboard/tags'
     | '/dashboard/cases/$caseId/notion'
     | '/dashboard/cases/$caseId/pipeline'
+    | '/dashboard/cases/pipeline/board'
     | '/dashboard/crm/activities/$activityId'
     | '/dashboard/crm/activities/new'
     | '/dashboard/crm/email-marketing/$campaignId'
@@ -3369,6 +3381,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/tags/'
     | '/_authenticated/dashboard/cases/$caseId/notion'
     | '/_authenticated/dashboard/cases/$caseId/pipeline'
+    | '/_authenticated/dashboard/cases/pipeline/board'
     | '/_authenticated/dashboard/crm/activities/$activityId'
     | '/_authenticated/dashboard/crm/activities/new'
     | '/_authenticated/dashboard/crm/email-marketing/$campaignId'
@@ -5368,6 +5381,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCrmActivitiesActivityIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/cases/pipeline/board': {
+      id: '/_authenticated/dashboard/cases/pipeline/board'
+      path: '/board'
+      fullPath: '/dashboard/cases/pipeline/board'
+      preLoaderRoute: typeof AuthenticatedDashboardCasesPipelineBoardRouteImport
+      parentRoute: typeof AuthenticatedDashboardCasesPipelineRoute
+    }
     '/_authenticated/dashboard/cases/$caseId/pipeline': {
       id: '/_authenticated/dashboard/cases/$caseId/pipeline'
       path: '/pipeline'
@@ -5567,6 +5587,21 @@ const AuthenticatedDashboardCasesCaseIdRouteWithChildren =
     AuthenticatedDashboardCasesCaseIdRouteChildren,
   )
 
+interface AuthenticatedDashboardCasesPipelineRouteChildren {
+  AuthenticatedDashboardCasesPipelineBoardRoute: typeof AuthenticatedDashboardCasesPipelineBoardRoute
+}
+
+const AuthenticatedDashboardCasesPipelineRouteChildren: AuthenticatedDashboardCasesPipelineRouteChildren =
+  {
+    AuthenticatedDashboardCasesPipelineBoardRoute:
+      AuthenticatedDashboardCasesPipelineBoardRoute,
+  }
+
+const AuthenticatedDashboardCasesPipelineRouteWithChildren =
+  AuthenticatedDashboardCasesPipelineRoute._addFileChildren(
+    AuthenticatedDashboardCasesPipelineRouteChildren,
+  )
+
 interface AuthenticatedDashboardFinanceActivityActivityIdRouteChildren {
   AuthenticatedDashboardFinanceActivityActivityIdEditRoute: typeof AuthenticatedDashboardFinanceActivityActivityIdEditRoute
 }
@@ -5684,7 +5719,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
   AuthenticatedDashboardCasesCaseIdRoute: typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
-  AuthenticatedDashboardCasesPipelineRoute: typeof AuthenticatedDashboardCasesPipelineRoute
+  AuthenticatedDashboardCasesPipelineRoute: typeof AuthenticatedDashboardCasesPipelineRouteWithChildren
   AuthenticatedDashboardClientsClientIdRoute: typeof AuthenticatedDashboardClientsClientIdRoute
   AuthenticatedDashboardClientsNewRoute: typeof AuthenticatedDashboardClientsNewRoute
   AuthenticatedDashboardContactsContactIdRoute: typeof AuthenticatedDashboardContactsContactIdRoute
@@ -5909,7 +5944,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardCasesCaseIdRoute:
     AuthenticatedDashboardCasesCaseIdRouteWithChildren,
   AuthenticatedDashboardCasesPipelineRoute:
-    AuthenticatedDashboardCasesPipelineRoute,
+    AuthenticatedDashboardCasesPipelineRouteWithChildren,
   AuthenticatedDashboardClientsClientIdRoute:
     AuthenticatedDashboardClientsClientIdRoute,
   AuthenticatedDashboardClientsNewRoute: AuthenticatedDashboardClientsNewRoute,
