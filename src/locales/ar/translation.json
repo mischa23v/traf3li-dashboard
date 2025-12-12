@@ -1808,8 +1808,55 @@
       "overview": "نظرة عامة",
       "cases": "القضايا",
       "pipeline": "مسار القضايا",
-      "brainstorm": "العصف الذهني"
+      "brainstorm": "العصف الذهني",
+      "tasks": "المهام"
     },
+    "hero": {
+      "badge": "مسار القضايا",
+      "title": "تتبع تقدم القضايا"
+    },
+    "list": {
+      "search": "البحث...",
+      "searchPlaceholder": "ابحث عن قضية...",
+      "caseType": "نوع القضية",
+      "allTypes": "جميع الأنواع",
+      "status": "الحالة",
+      "allStatuses": "جميع الحالات",
+      "sortBy": "الترتيب",
+      "lastUpdated": "آخر تحديث",
+      "createdAt": "تاريخ الإنشاء",
+      "name": "الاسم",
+      "claimAmount": "مبلغ المطالبة",
+      "clearFilters": "مسح الفلاتر",
+      "casesTitle": "القضايا ومسارها",
+      "caseCount": "{{count}} قضية",
+      "errorLoading": "حدث خطأ في التحميل",
+      "connectionError": "تعذر الاتصال بالخادم",
+      "retry": "إعادة المحاولة",
+      "noCases": "لا توجد قضايا",
+      "noCasesDescription": "أنشئ قضية جديدة لتتبع مسارها",
+      "newCase": "قضية جديدة",
+      "progress": "التقدم",
+      "viewPipeline": "عرض المسار",
+      "viewCase": "عرض القضية",
+      "editCase": "تعديل القضية",
+      "viewAllCases": "عرض جميع القضايا",
+      "notSet": "غير محدد",
+      "untitled": "بدون عنوان",
+      "noClient": "بدون عميل"
+    },
+    "outcome": {
+      "won": "كسب",
+      "lost": "خسارة",
+      "settled": "تسوية"
+    },
+    "status": {
+      "active": "نشط",
+      "closed": "منتهي",
+      "pending": "قيد الانتظار"
+    },
+    "backToList": "العودة للقائمة",
+    "viewAllPipelines": "جميع القضايا",
     "sidebar": {
       "quickActions": "إجراءات سريعة",
       "newCase": "قضية جديدة",
