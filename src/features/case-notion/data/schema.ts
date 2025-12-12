@@ -132,6 +132,30 @@ export const blockSchema: z.ZodType<Block> = z.lazy(() => z.object({
   eventDate: z.string().optional(),
   eventType: z.string().optional(),
 
+  // ═══════════════════════════════════════════════════════════════
+  // WHITEBOARD/CANVAS POSITIONING (for brainstorm view)
+  // ═══════════════════════════════════════════════════════════════
+
+  // Canvas position for whiteboard view
+  canvasX: z.number().optional(),
+  canvasY: z.number().optional(),
+  canvasWidth: z.number().optional(),
+  canvasHeight: z.number().optional(),
+
+  // Visual styling for whiteboard blocks
+  blockColor: z.enum(['default', 'red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'gray']).optional(),
+  priority: z.enum(['low', 'medium', 'high', 'urgent']).optional(),
+
+  // Links to case entities
+  linkedEventId: z.string().optional(),
+  linkedTaskId: z.string().optional(),
+  linkedHearingId: z.string().optional(),
+  linkedDocumentId: z.string().optional(),
+
+  // Block grouping for whiteboard
+  groupId: z.string().optional(),
+  groupName: z.string().optional(),
+
   // Collaboration
   lockedBy: z.string().optional(),
   lockedAt: z.string().optional(),
@@ -198,6 +222,26 @@ export interface Block {
   eventDate?: string
   eventType?: string
 
+  // Whiteboard/Canvas positioning
+  canvasX?: number
+  canvasY?: number
+  canvasWidth?: number
+  canvasHeight?: number
+
+  // Visual styling for whiteboard
+  blockColor?: 'default' | 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'purple' | 'pink' | 'gray'
+  priority?: 'low' | 'medium' | 'high' | 'urgent'
+
+  // Links to case entities
+  linkedEventId?: string
+  linkedTaskId?: string
+  linkedHearingId?: string
+  linkedDocumentId?: string
+
+  // Block grouping
+  groupId?: string
+  groupName?: string
+
   // Collaboration
   lockedBy?: string
   lockedAt?: string
@@ -207,6 +251,24 @@ export interface Block {
   createdAt?: string
   updatedAt?: string
 }
+
+// ═══════════════════════════════════════════════════════════════
+// BLOCK CONNECTION SCHEMA (for whiteboard links)
+// ═══════════════════════════════════════════════════════════════
+
+export const blockConnectionSchema = z.object({
+  _id: z.string(),
+  pageId: z.string(),
+  sourceBlockId: z.string(),
+  targetBlockId: z.string(),
+  connectionType: z.enum(['arrow', 'line', 'dashed', 'bidirectional']).default('arrow'),
+  label: z.string().optional(),
+  color: z.string().optional(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+})
+
+export type BlockConnection = z.infer<typeof blockConnectionSchema>
 
 // ═══════════════════════════════════════════════════════════════
 // PAGE SCHEMA
@@ -306,6 +368,28 @@ export const caseNotionPageSchema = z.object({
   version: z.number().default(1),
   lastVersionAt: z.string().optional(),
 
+  // ═══════════════════════════════════════════════════════════════
+  // WHITEBOARD/BRAINSTORM VIEW SETTINGS
+  // ═══════════════════════════════════════════════════════════════
+
+  // View mode: document (default) or whiteboard/canvas
+  viewMode: z.enum(['document', 'whiteboard']).default('document'),
+
+  // Whiteboard canvas settings
+  whiteboardConfig: z.object({
+    canvasWidth: z.number().default(5000),
+    canvasHeight: z.number().default(5000),
+    zoom: z.number().default(1),
+    panX: z.number().default(0),
+    panY: z.number().default(0),
+    gridEnabled: z.boolean().default(true),
+    snapToGrid: z.boolean().default(true),
+    gridSize: z.number().default(20),
+  }).optional(),
+
+  // Block connections for whiteboard view
+  connections: z.array(blockConnectionSchema).default([]),
+
   // Metadata
   createdBy: z.string(),
   lastEditedBy: z.string().optional(),
@@ -316,6 +400,8 @@ export const caseNotionPageSchema = z.object({
 })
 
 export type CaseNotionPage = z.infer<typeof caseNotionPageSchema>
+
+export type WhiteboardConfig = NonNullable<CaseNotionPage['whiteboardConfig']>
 
 // ═══════════════════════════════════════════════════════════════
 // SYNCED BLOCK SCHEMA
@@ -582,4 +668,34 @@ export const templateCategoryLabels = {
   case_timeline: { ar: 'الجدول الزمني للقضية', en: 'Case Timeline' },
   brainstorming: { ar: 'العصف الذهني', en: 'Brainstorming' },
   custom: { ar: 'مخصص', en: 'Custom' },
+} as const
+
+// ═══════════════════════════════════════════════════════════════
+// WHITEBOARD LABELS & COLORS
+// ═══════════════════════════════════════════════════════════════
+
+export const blockColorLabels = {
+  default: { ar: 'افتراضي', en: 'Default', bg: 'bg-white', border: 'border-slate-200', text: 'text-slate-900' },
+  red: { ar: 'أحمر', en: 'Red', bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-900' },
+  orange: { ar: 'برتقالي', en: 'Orange', bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-900' },
+  yellow: { ar: 'أصفر', en: 'Yellow', bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-900' },
+  green: { ar: 'أخضر', en: 'Green', bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-900' },
+  blue: { ar: 'أزرق', en: 'Blue', bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-900' },
+  purple: { ar: 'بنفسجي', en: 'Purple', bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-900' },
+  pink: { ar: 'وردي', en: 'Pink', bg: 'bg-pink-50', border: 'border-pink-200', text: 'text-pink-900' },
+  gray: { ar: 'رمادي', en: 'Gray', bg: 'bg-slate-100', border: 'border-slate-300', text: 'text-slate-900' },
+} as const
+
+export const blockPriorityLabels = {
+  low: { ar: 'منخفض', en: 'Low', color: 'text-slate-500', bg: 'bg-slate-100' },
+  medium: { ar: 'متوسط', en: 'Medium', color: 'text-blue-600', bg: 'bg-blue-100' },
+  high: { ar: 'عالي', en: 'High', color: 'text-orange-600', bg: 'bg-orange-100' },
+  urgent: { ar: 'عاجل', en: 'Urgent', color: 'text-red-600', bg: 'bg-red-100' },
+} as const
+
+export const connectionTypeLabels = {
+  arrow: { ar: 'سهم', en: 'Arrow' },
+  line: { ar: 'خط', en: 'Line' },
+  dashed: { ar: 'متقطع', en: 'Dashed' },
+  bidirectional: { ar: 'ثنائي الاتجاه', en: 'Bidirectional' },
 } as const

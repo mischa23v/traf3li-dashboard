@@ -29,6 +29,8 @@ import {
   FolderOpen,
   RefreshCw,
   AlertCircle,
+  LayoutGrid,
+  FileTextIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -70,8 +72,11 @@ import {
   useExportPageMarkdown,
 } from '@/hooks/useCaseNotion'
 import { BlockEditor } from './block-editor'
+import { WhiteboardView } from './whiteboard'
 import type { CaseNotionPage, Block } from '../data/schema'
 import { pageTypeLabels } from '../data/schema'
+
+type ViewMode = 'document' | 'whiteboard'
 
 // Page type icons
 const pageTypeIcons = {
@@ -104,6 +109,7 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
   const [titleValue, setTitleValue] = useState('')
   const [showActivityDialog, setShowActivityDialog] = useState(false)
   const [showExportDialog, setShowExportDialog] = useState(false)
+  const [viewMode, setViewMode] = useState<ViewMode>('document')
 
   // Fetch page data
   const { data: page, isLoading: pageLoading, isError: pageError, refetch: refetchPage, isFetching } = useCaseNotionPage(caseId, pageId)
@@ -133,10 +139,14 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
   const exportPdf = useExportPagePdf()
   const exportMarkdown = useExportPageMarkdown()
 
-  // Set initial title value when page loads
+  // Set initial values when page loads
   useEffect(() => {
     if (page) {
       setTitleValue(isArabic ? page.titleAr || page.title : page.title)
+      // Set view mode from page data or default to document
+      if (page.viewMode) {
+        setViewMode(page.viewMode)
+      }
     }
   }, [page, isArabic])
 
@@ -220,6 +230,25 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
 
   const handleBlocksChange = (blocks: Block[]) => {
     // Blocks are saved individually in BlockEditor
+  }
+
+  const handleViewModeToggle = async () => {
+    const newMode = viewMode === 'document' ? 'whiteboard' : 'document'
+    setViewMode(newMode)
+
+    // Save the view mode preference to the server
+    try {
+      await updatePage.mutateAsync({
+        caseId,
+        pageId,
+        data: {
+          // @ts-ignore - viewMode field exists in schema
+          viewMode: newMode,
+        },
+      })
+    } catch (error) {
+      console.error('Failed to save view mode:', error)
+    }
   }
 
   if (isLoading) {
@@ -418,6 +447,40 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
             </Tooltip>
           </TooltipProvider>
 
+          {/* View Mode Toggle */}
+          <div className="flex items-center border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={viewMode === 'document' ? 'secondary' : 'ghost'}
+                    size="icon"
+                    className="h-8 w-8 rounded-none"
+                    onClick={() => viewMode !== 'document' && handleViewModeToggle()}
+                  >
+                    <FileTextIcon size={16} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{t('caseNotion.documentView', 'Document View')}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={viewMode === 'whiteboard' ? 'secondary' : 'ghost'}
+                    size="icon"
+                    className="h-8 w-8 rounded-none"
+                    onClick={() => viewMode !== 'whiteboard' && handleViewModeToggle()}
+                  >
+                    <LayoutGrid size={16} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{t('caseNotion.whiteboardView', 'Whiteboard View')}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+
           {/* More actions */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -457,97 +520,106 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
       </div>
 
       {/* Page content */}
-      <ScrollArea className="flex-1">
-        <div className="max-w-4xl mx-auto px-8 py-12">
-          {/* Page icon and title */}
-          <div className="flex items-start gap-4 mb-8">
-            {/* Icon */}
-            <div
-              className={cn(
-                'shrink-0 w-16 h-16 rounded-xl flex items-center justify-center text-3xl',
-                !page.icon && 'bg-slate-100 dark:bg-slate-800'
-              )}
-            >
-              {page.icon?.emoji ? (
-                page.icon.emoji
-              ) : (
-                <PageIcon className="w-8 h-8 text-slate-400" />
-              )}
-            </div>
-
-            {/* Title */}
-            <div className="flex-1 min-w-0">
-              {isEditingTitle ? (
-                <div className="flex items-center gap-2">
-                  <Input
-                    value={titleValue}
-                    onChange={(e) => setTitleValue(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleTitleSave()
-                      if (e.key === 'Escape') setIsEditingTitle(false)
-                    }}
-                    className="text-3xl font-bold h-auto py-1 border-0 border-b-2 border-emerald-500 rounded-none focus:ring-0"
-                    autoFocus
-                  />
-                  <Button
-                    size="sm"
-                    onClick={handleTitleSave}
-                    disabled={updatePage.isPending}
-                  >
-                    {updatePage.isPending ? (
-                      <Loader2 size={14} className="animate-spin" />
-                    ) : (
-                      t('common.save')
-                    )}
-                  </Button>
-                </div>
-              ) : (
-                <h1
-                  className="text-3xl font-bold text-slate-900 dark:text-white rounded-lg px-2 py-1 -mx-2 transition-colors cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800"
-                  onClick={() => setIsEditingTitle(true)}
-                >
-                  {isArabic ? page.titleAr || page.title : page.title}
-                </h1>
-              )}
-
-              {/* Page metadata */}
-              <div className="flex items-center gap-4 mt-2 text-sm text-slate-500">
-                <div className="flex items-center gap-1">
-                  <Clock size={14} />
-                  <span>
-                    {new Date(page.updatedAt).toLocaleDateString(
-                      isArabic ? 'ar-SA' : 'en-US',
-                      { year: 'numeric', month: 'short', day: 'numeric' }
-                    )}
-                  </span>
-                </div>
-                {page.lastEditedBy && (
-                  <div className="flex items-center gap-1">
-                    <Edit3 size={14} />
-                    <span>{t('caseNotion.lastEditedBy', { name: page.lastEditedBy })}</span>
-                  </div>
+      {viewMode === 'whiteboard' ? (
+        /* Whiteboard View */
+        <WhiteboardView
+          caseId={caseId}
+          pageId={pageId}
+        />
+      ) : (
+        /* Document View */
+        <ScrollArea className="flex-1">
+          <div className="max-w-4xl mx-auto px-8 py-12">
+            {/* Page icon and title */}
+            <div className="flex items-start gap-4 mb-8">
+              {/* Icon */}
+              <div
+                className={cn(
+                  'shrink-0 w-16 h-16 rounded-xl flex items-center justify-center text-3xl',
+                  !page.icon && 'bg-slate-100 dark:bg-slate-800'
                 )}
-                {page.backlinks && page.backlinks.length > 0 && (
-                  <div className="flex items-center gap-1">
-                    <Link2 size={14} />
-                    <span>
-                      {t('caseNotion.backlinks', { count: page.backlinks.length })}
-                    </span>
-                  </div>
+              >
+                {page.icon?.emoji ? (
+                  page.icon.emoji
+                ) : (
+                  <PageIcon className="w-8 h-8 text-slate-400" />
                 )}
               </div>
-            </div>
-          </div>
 
-          {/* Block editor */}
-          <BlockEditor
-            caseId={caseId}
-            pageId={pageId}
-            blocks={blocks}
-            onBlocksChange={handleBlocksChange}
-          />
-        </div>
-      </ScrollArea>
+              {/* Title */}
+              <div className="flex-1 min-w-0">
+                {isEditingTitle ? (
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={titleValue}
+                      onChange={(e) => setTitleValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleTitleSave()
+                        if (e.key === 'Escape') setIsEditingTitle(false)
+                      }}
+                      className="text-3xl font-bold h-auto py-1 border-0 border-b-2 border-emerald-500 rounded-none focus:ring-0"
+                      autoFocus
+                    />
+                    <Button
+                      size="sm"
+                      onClick={handleTitleSave}
+                      disabled={updatePage.isPending}
+                    >
+                      {updatePage.isPending ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : (
+                        t('common.save')
+                      )}
+                    </Button>
+                  </div>
+                ) : (
+                  <h1
+                    className="text-3xl font-bold text-slate-900 dark:text-white rounded-lg px-2 py-1 -mx-2 transition-colors cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800"
+                    onClick={() => setIsEditingTitle(true)}
+                  >
+                    {isArabic ? page.titleAr || page.title : page.title}
+                  </h1>
+                )}
+
+                {/* Page metadata */}
+                <div className="flex items-center gap-4 mt-2 text-sm text-slate-500">
+                  <div className="flex items-center gap-1">
+                    <Clock size={14} />
+                    <span>
+                      {new Date(page.updatedAt).toLocaleDateString(
+                        isArabic ? 'ar-SA' : 'en-US',
+                        { year: 'numeric', month: 'short', day: 'numeric' }
+                      )}
+                    </span>
+                  </div>
+                  {page.lastEditedBy && (
+                    <div className="flex items-center gap-1">
+                      <Edit3 size={14} />
+                      <span>{t('caseNotion.lastEditedBy', { name: page.lastEditedBy })}</span>
+                    </div>
+                  )}
+                  {page.backlinks && page.backlinks.length > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Link2 size={14} />
+                      <span>
+                        {t('caseNotion.backlinks', { count: page.backlinks.length })}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Block editor */}
+            <BlockEditor
+              caseId={caseId}
+              pageId={pageId}
+              blocks={blocks}
+              onBlocksChange={handleBlocksChange}
+            />
+          </div>
+        </ScrollArea>
+      )}
 
       {/* Activity Dialog */}
       <Dialog open={showActivityDialog} onOpenChange={setShowActivityDialog}>
