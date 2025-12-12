@@ -269,6 +269,11 @@ export function useSidebarData(): SidebarData {
               module: 'cases',
             },
             {
+              title: 'sidebar.nav.casePipeline',
+              url: '/dashboard/cases/pipeline',
+              module: 'cases',
+            },
+            {
               title: 'sidebar.nav.documents',
               url: '/dashboard/documents',
               module: 'documents',
