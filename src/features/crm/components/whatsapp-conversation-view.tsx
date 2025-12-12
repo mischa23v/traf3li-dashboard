@@ -155,7 +155,7 @@ export function WhatsAppConversationView() {
   const conversation = conversationData?.conversation
   const messages: Message[] = conversationData?.messages || []
   const contact = conversation?.contact
-  const templates = templatesData?.templates?.slice(0, 5) || []
+  const templates = templatesData?.slice(0, 5) || []
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },

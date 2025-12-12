@@ -103,9 +103,9 @@ export function WhatsAppListView() {
 
     // Transform API data
     const conversations = useMemo(() => {
-        if (!conversationsData?.conversations) return []
+        if (!conversationsData?.data) return []
 
-        return conversationsData.conversations.map((conversation: any) => ({
+        return conversationsData.data.map((conversation: any) => ({
             id: conversation._id,
             clientName: conversation.contact?.name || conversation.phoneNumber || 'غير محدد',
             phoneNumber: conversation.phoneNumber,
@@ -121,8 +121,8 @@ export function WhatsAppListView() {
 
     // Transform templates data
     const templates = useMemo(() => {
-        if (!templatesData?.templates) return []
-        return templatesData.templates.slice(0, 5).map((template: any) => ({
+        if (!templatesData) return []
+        return templatesData.slice(0, 5).map((template: any) => ({
             id: template._id,
             name: template.name,
             category: template.category,
@@ -194,16 +194,16 @@ export function WhatsAppListView() {
     // Stats for hero
     const heroStats = useMemo(() => {
         if (!conversationsData) return undefined
-        const total = conversationsData.total || 0
+        const total = conversationsData.pagination?.total || conversationsData.data?.length || 0
         const unread = conversations.filter(c => c.unreadCount > 0).length
         const open = conversations.filter(c => c.status === 'open').length
-        const templates = templatesData?.templates?.length || 0
+        const templatesCount = templatesData?.length || 0
 
         return [
             { label: 'إجمالي المحادثات', value: total, icon: MessageSquare, status: 'normal' as const },
             { label: 'غير مقروءة', value: unread, icon: MessageCircle, status: unread > 0 ? 'attention' as const : 'zero' as const },
             { label: 'مفتوحة', value: open, icon: Clock, status: 'normal' as const },
-            { label: 'القوالب', value: templates, icon: MessageSquare, status: 'normal' as const },
+            { label: 'القوالب', value: templatesCount, icon: MessageSquare, status: 'normal' as const },
         ]
     }, [conversationsData, conversations, templatesData])
 

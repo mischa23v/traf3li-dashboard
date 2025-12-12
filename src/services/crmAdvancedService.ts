@@ -940,7 +940,12 @@ export const whatsAppService = {
   ): Promise<{ data: WhatsAppConversation[]; pagination: any }> => {
     try {
       const response = await apiClient.get('/whatsapp/conversations', { params: filters })
-      return response.data
+      // Normalize response - handle different API response structures
+      const responseData = response.data
+      return {
+        data: responseData.data || responseData.conversations || [],
+        pagination: responseData.pagination || { total: responseData.total || 0 }
+      }
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -1028,7 +1033,9 @@ export const whatsAppService = {
   getTemplates: async (): Promise<WhatsAppTemplate[]> => {
     try {
       const response = await apiClient.get('/whatsapp/templates')
-      return response.data.data
+      // Normalize response - handle different API response structures
+      const responseData = response.data
+      return responseData.data || responseData.templates || []
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
