@@ -29,7 +29,7 @@ import {
   useWhatsAppTemplates,
   useSendWhatsAppMessage,
 } from '@/hooks/useCrmAdvanced'
-import { useLeads } from '@/hooks/useLeads'
+import { useLeads } from '@/hooks/useCrm'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 
