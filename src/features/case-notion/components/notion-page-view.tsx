@@ -90,91 +90,6 @@ const pageTypeIcons = {
   brainstorm: Lightbulb,
 }
 
-// Demo page data for fallback when API fails
-const DEMO_PAGE: CaseNotionPage = {
-  _id: 'demo-page-001',
-  caseId: 'demo-case-001',
-  title: 'خطة القضية - نموذج تجريبي',
-  titleAr: 'خطة القضية - نموذج تجريبي',
-  pageType: 'strategy',
-  icon: { type: 'emoji', emoji: '⚖️' },
-  cover: { type: 'gradient', gradient: 'bg-gradient-to-r from-emerald-500 to-teal-600' },
-  isFavorite: true,
-  isPinned: false,
-  createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-  updatedAt: new Date().toISOString(),
-  lastEditedBy: 'مستخدم تجريبي',
-  blocks: [],
-  backlinks: [],
-}
-
-// Demo blocks for fallback
-const DEMO_BLOCKS: Block[] = [
-  {
-    _id: 'demo-block-001',
-    pageId: 'demo-page-001',
-    type: 'heading_1',
-    content: { text: 'استراتيجية القضية', level: 1 },
-    order: 0,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    _id: 'demo-block-002',
-    pageId: 'demo-page-001',
-    type: 'paragraph',
-    content: { text: 'هذه صفحة تجريبية لعرض إمكانيات نظام العصف الذهني للقضايا. يمكنك إنشاء صفحات متعددة لتنظيم أفكارك واستراتيجياتك القانونية.' },
-    order: 1,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    _id: 'demo-block-003',
-    pageId: 'demo-page-001',
-    type: 'heading_2',
-    content: { text: 'النقاط الرئيسية', level: 2 },
-    order: 2,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    _id: 'demo-block-004',
-    pageId: 'demo-page-001',
-    type: 'bulleted_list',
-    content: { text: 'تحليل الأدلة المتاحة' },
-    order: 3,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    _id: 'demo-block-005',
-    pageId: 'demo-page-001',
-    type: 'bulleted_list',
-    content: { text: 'مراجعة السوابق القضائية' },
-    order: 4,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    _id: 'demo-block-006',
-    pageId: 'demo-page-001',
-    type: 'bulleted_list',
-    content: { text: 'تحضير الحجج القانونية' },
-    order: 5,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    _id: 'demo-block-007',
-    pageId: 'demo-page-001',
-    type: 'callout',
-    content: { text: 'ملاحظة: هذه بيانات تجريبية. الوظائف الكاملة متاحة عند الاتصال بالخادم.', emoji: '💡' },
-    order: 6,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-]
-
 interface NotionPageViewProps {
   caseId: string
   pageId: string
@@ -189,37 +104,25 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
   const [titleValue, setTitleValue] = useState('')
   const [showActivityDialog, setShowActivityDialog] = useState(false)
   const [showExportDialog, setShowExportDialog] = useState(false)
-  const [useDemoData, setUseDemoData] = useState(false)
 
   // Fetch page data
-  const { data: fetchedPage, isLoading: pageLoading, isError: pageError, refetch: refetchPage, isFetching } = useCaseNotionPage(caseId, pageId)
+  const { data: page, isLoading: pageLoading, isError: pageError, refetch: refetchPage, isFetching } = useCaseNotionPage(caseId, pageId)
 
   // Fetch blocks separately (in case they're not included in page response)
   const { data: blocksData, isLoading: blocksLoading } = useCaseNotionBlocks(caseId, pageId)
   const { data: activityData } = usePageActivity(caseId, pageId, 20)
 
-  // Use demo data if API fails or demo mode is enabled
-  const page = useMemo(() => {
-    if (useDemoData || (pageError && !fetchedPage)) {
-      return DEMO_PAGE
-    }
-    return fetchedPage
-  }, [fetchedPage, pageError, useDemoData])
-
   // Combine page blocks with separately fetched blocks
   const blocks = useMemo(() => {
-    if (useDemoData) {
-      return DEMO_BLOCKS
-    }
     // Prefer blocks from page if they exist, otherwise use separately fetched blocks
     if (page?.blocks && page.blocks.length > 0) {
       return page.blocks
     }
     return blocksData || []
-  }, [page?.blocks, blocksData, useDemoData])
+  }, [page?.blocks, blocksData])
 
-  const isLoading = (pageLoading || blocksLoading) && !useDemoData
-  const isError = pageError && !useDemoData
+  const isLoading = pageLoading || blocksLoading
+  const isError = pageError
 
   // Mutations
   const updatePage = useUpdateCaseNotionPage()
@@ -238,7 +141,7 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
   }, [page, isArabic])
 
   const handleTitleSave = async () => {
-    if (!titleValue.trim() || !page || useDemoData) return
+    if (!titleValue.trim() || !page) return
 
     try {
       await updatePage.mutateAsync({
@@ -253,7 +156,6 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
   }
 
   const handleToggleFavorite = async () => {
-    if (useDemoData) return
     try {
       await toggleFavorite.mutateAsync({ caseId, pageId })
     } catch (error) {
@@ -262,7 +164,6 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
   }
 
   const handleDuplicate = async () => {
-    if (useDemoData) return
     try {
       await duplicatePage.mutateAsync({ caseId, pageId })
     } catch (error) {
@@ -271,7 +172,6 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
   }
 
   const handleArchive = async () => {
-    if (useDemoData) return
     try {
       await archivePage.mutateAsync({ caseId, pageId })
       onBack?.()
@@ -281,7 +181,6 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
   }
 
   const handleDelete = async () => {
-    if (useDemoData) return
     try {
       await deletePage.mutateAsync({ caseId, pageId })
       onBack?.()
@@ -291,7 +190,6 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
   }
 
   const handleExportPdf = async () => {
-    if (useDemoData) return
     try {
       const blob = await exportPdf.mutateAsync({ caseId, pageId })
       const url = URL.createObjectURL(blob)
@@ -306,7 +204,6 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
   }
 
   const handleExportMarkdown = async () => {
-    if (useDemoData) return
     try {
       const markdown = await exportMarkdown.mutateAsync({ caseId, pageId })
       const blob = new Blob([markdown], { type: 'text/markdown' })
@@ -339,7 +236,7 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
     )
   }
 
-  if (isError && !useDemoData) {
+  if (isError) {
     return (
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="text-center max-w-md">
@@ -364,12 +261,6 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
                 <RefreshCw size={14} className="me-2" />
               )}
               {t('common.retry', 'إعادة المحاولة')}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setUseDemoData(true)}
-            >
-              {t('caseNotion.viewDemo', 'عرض صفحة تجريبية')}
             </Button>
             {onBack && (
               <Button variant="outline" onClick={onBack}>
@@ -410,27 +301,6 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
 
   return (
     <div className="flex-1 flex flex-col h-full bg-white dark:bg-slate-900">
-      {/* Demo mode banner */}
-      {useDemoData && (
-        <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 flex items-center justify-between">
-          <span className="text-sm text-amber-700">
-            {t('caseNotion.demoModeActive', 'أنت في وضع العرض التجريبي - البيانات غير حقيقية')}
-          </span>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-amber-700 hover:text-amber-900"
-            onClick={() => {
-              setUseDemoData(false)
-              refetchPage()
-            }}
-          >
-            <RefreshCw size={14} className="me-1" />
-            {t('caseNotion.exitDemo', 'الخروج من الوضع التجريبي')}
-          </Button>
-        </div>
-      )}
-
       {/* Cover image (if any) */}
       {page.cover && (
         <div
@@ -483,7 +353,6 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
                     page.isFavorite && 'text-amber-500'
                   )}
                   onClick={handleToggleFavorite}
-                  disabled={useDemoData}
                 >
                   <Star
                     size={16}
@@ -503,7 +372,7 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8" disabled={useDemoData}>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
                   <Share2 size={16} />
                 </Button>
               </TooltipTrigger>
@@ -520,7 +389,6 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
                   size="icon"
                   className="h-8 w-8"
                   onClick={() => setShowActivityDialog(true)}
-                  disabled={useDemoData}
                 >
                   <History size={16} />
                 </Button>
@@ -533,7 +401,7 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8" disabled={useDemoData}>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
                   <MessageSquare size={16} />
                 </Button>
               </TooltipTrigger>
@@ -549,28 +417,27 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem onClick={handleDuplicate} disabled={useDemoData}>
+              <DropdownMenuItem onClick={handleDuplicate}>
                 <Copy size={14} className="me-2" />
                 {t('caseNotion.duplicate')}
               </DropdownMenuItem>
-              <DropdownMenuItem disabled={useDemoData}>
+              <DropdownMenuItem>
                 <Link2 size={14} className="me-2" />
                 {t('caseNotion.copyLink')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setShowExportDialog(true)} disabled={useDemoData}>
+              <DropdownMenuItem onClick={() => setShowExportDialog(true)}>
                 <Download size={14} className="me-2" />
                 {t('caseNotion.export')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleArchive} disabled={useDemoData}>
+              <DropdownMenuItem onClick={handleArchive}>
                 <Archive size={14} className="me-2" />
                 {t('caseNotion.archive')}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={handleDelete}
                 className="text-red-600 focus:text-red-600"
-                disabled={useDemoData}
               >
                 <Trash2 size={14} className="me-2" />
                 {t('common.delete')}
@@ -601,7 +468,7 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
 
             {/* Title */}
             <div className="flex-1 min-w-0">
-              {isEditingTitle && !useDemoData ? (
+              {isEditingTitle ? (
                 <div className="flex items-center gap-2">
                   <Input
                     value={titleValue}
@@ -627,11 +494,8 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
                 </div>
               ) : (
                 <h1
-                  className={cn(
-                    "text-3xl font-bold text-slate-900 dark:text-white rounded-lg px-2 py-1 -mx-2 transition-colors",
-                    !useDemoData && "cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800"
-                  )}
-                  onClick={() => !useDemoData && setIsEditingTitle(true)}
+                  className="text-3xl font-bold text-slate-900 dark:text-white rounded-lg px-2 py-1 -mx-2 transition-colors cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800"
+                  onClick={() => setIsEditingTitle(true)}
                 >
                   {isArabic ? page.titleAr || page.title : page.title}
                 </h1>
@@ -672,7 +536,6 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
             pageId={pageId}
             blocks={blocks}
             onBlocksChange={handleBlocksChange}
-            readOnly={useDemoData}
           />
         </div>
       </ScrollArea>
@@ -736,7 +599,7 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
               variant="outline"
               className="justify-start h-12"
               onClick={handleExportPdf}
-              disabled={exportPdf.isPending || useDemoData}
+              disabled={exportPdf.isPending}
             >
               {exportPdf.isPending ? (
                 <Loader2 size={16} className="me-3 animate-spin" />
@@ -754,7 +617,7 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
               variant="outline"
               className="justify-start h-12"
               onClick={handleExportMarkdown}
-              disabled={exportMarkdown.isPending || useDemoData}
+              disabled={exportMarkdown.isPending}
             >
               {exportMarkdown.isPending ? (
                 <Loader2 size={16} className="me-3 animate-spin" />
