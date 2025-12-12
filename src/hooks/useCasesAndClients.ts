@@ -59,12 +59,15 @@ export const useCases = (filters?: CaseFilters) => {
 
 /**
  * Fetch single case by ID
+ * retry: false prevents the "freeze" effect when 403/404 occurs
  */
 export const useCase = (id: string) => {
   return useQuery({
     queryKey: ['cases', id],
     queryFn: () => casesService.getCase(id),
     enabled: !!id,
+    retry: false, // Don't retry on 403/404 - prevents page freeze
+    staleTime: 2 * 60 * 1000,
   })
 }
 
@@ -395,6 +398,8 @@ export const useClient = (id: string) => {
     queryKey: ['clients', id],
     queryFn: () => clientsService.getClient(id),
     enabled: !!id,
+    retry: false, // Don't retry on 403/404 - prevents page freeze
+    staleTime: 2 * 60 * 1000,
   })
 }
 
