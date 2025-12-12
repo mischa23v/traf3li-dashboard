@@ -98,10 +98,23 @@ export function WhatsAppNewConversation() {
 
   // Handle create broadcast
   const handleCreateBroadcast = async () => {
+    // Get template details
+    const template = selectedTemplateData
+    const templateName = template?.name || selectedTemplate || 'test-template'
+    const language = template?.language || 'ar'
+
     const broadcastData: any = {
       name: broadcastName || `بث ${new Date().toLocaleDateString('ar-SA')}`,
-      templateId: selectedTemplate || 'test-template',
-      recipients: selectedRecipients.length > 0 ? selectedRecipients : ['test-recipient'],
+      type: 'template',
+      template: {
+        templateId: template?._id || template?.id,
+        templateName: templateName,
+        language: language,
+        variables: [
+          { position: 1, type: 'dynamic', fieldName: 'firstName' }
+        ],
+      },
+      audienceType: 'custom',
     }
 
     if (scheduleType === 'scheduled' && scheduledDate && scheduledTime) {

@@ -150,11 +150,11 @@ export function WhatsAppListView() {
         if (!broadcastsData) return []
         return broadcastsData.map((broadcast: any) => ({
             id: broadcast._id,
+            broadcastId: broadcast.broadcastId,
             name: broadcast.name,
-            templateId: broadcast.templateId,
-            recipientsCount: broadcast.recipients?.length || 0,
+            type: broadcast.type,
             status: broadcast.status,
-            stats: broadcast.stats || { total: 0, sent: 0, delivered: 0, read: 0, failed: 0 },
+            stats: broadcast.stats || { totalRecipients: 0, pending: 0, sent: 0, delivered: 0, read: 0, failed: 0, skipped: 0 },
             scheduledAt: broadcast.scheduledAt,
             startedAt: broadcast.startedAt,
             completedAt: broadcast.completedAt,
@@ -167,14 +167,20 @@ export function WhatsAppListView() {
         switch (status) {
             case 'draft':
                 return <Badge className="bg-slate-100 text-slate-600 border-0 rounded-lg px-2 py-0.5 text-xs font-bold">مسودة</Badge>
+            case 'scheduled':
+                return <Badge className="bg-purple-100 text-purple-700 border-0 rounded-lg px-2 py-0.5 text-xs font-bold">مجدول</Badge>
             case 'sending':
                 return <Badge className="bg-blue-100 text-blue-700 border-0 rounded-lg px-2 py-0.5 text-xs font-bold">جاري الإرسال</Badge>
+            case 'paused':
+                return <Badge className="bg-amber-100 text-amber-700 border-0 rounded-lg px-2 py-0.5 text-xs font-bold">متوقف</Badge>
             case 'completed':
                 return <Badge className="bg-emerald-100 text-emerald-700 border-0 rounded-lg px-2 py-0.5 text-xs font-bold">مكتمل</Badge>
+            case 'cancelled':
+                return <Badge className="bg-slate-100 text-slate-600 border-0 rounded-lg px-2 py-0.5 text-xs font-bold">ملغي</Badge>
             case 'failed':
                 return <Badge className="bg-red-100 text-red-700 border-0 rounded-lg px-2 py-0.5 text-xs font-bold">فشل</Badge>
             default:
-                return <Badge className="bg-amber-100 text-amber-700 border-0 rounded-lg px-2 py-0.5 text-xs font-bold">قيد الانتظار</Badge>
+                return <Badge className="bg-slate-100 text-slate-600 border-0 rounded-lg px-2 py-0.5 text-xs font-bold">{status}</Badge>
         }
     }
 
@@ -429,7 +435,7 @@ export function WhatsAppListView() {
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد محادثات</h3>
                                         <p className="text-slate-500 mb-4">ابدأ محادثة جديدة مع عميل عبر واتساب</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/20">
-                                            <Link to="/dashboard/crm/whatsapp/new">
+                                            <Link to="/dashboard/crm/whatsapp/start">
                                                 <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 محادثة جديدة
                                             </Link>
@@ -640,7 +646,7 @@ export function WhatsAppListView() {
                                                         <h4 className="font-bold text-navy text-sm">{broadcast.name}</h4>
                                                         <p className="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
                                                             <Users className="h-3 w-3" aria-hidden="true" />
-                                                            {broadcast.recipientsCount} مستلم
+                                                            {broadcast.stats?.totalRecipients || 0} مستلم
                                                         </p>
                                                     </div>
                                                 </div>

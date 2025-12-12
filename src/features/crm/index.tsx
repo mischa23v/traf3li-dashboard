@@ -23,6 +23,7 @@ export { CreateActivityView } from './components/create-activity-view'
 export { WhatsAppListView } from './components/whatsapp-list-view'
 export { WhatsAppConversationView } from './components/whatsapp-conversation-view'
 export { WhatsAppNewConversation } from './components/whatsapp-new-conversation'
+export { WhatsAppStartConversation } from './components/whatsapp-start-conversation'
 
 // Email Marketing
 export { EmailMarketingListView } from './components/email-marketing-list-view'
