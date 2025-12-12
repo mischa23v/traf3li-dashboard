@@ -36,6 +36,7 @@ import {
   FilePlus,
   FileX,
   Settings,
+  Lightbulb,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -850,6 +851,14 @@ export function CaseDetailsView() {
                         </div>
                       </DialogContent>
                     </Dialog>
+
+                    {/* CaseNotion - Case Brainstorm */}
+                    <Link to={`/dashboard/cases/${caseId}/notion`}>
+                      <Button variant="outline" className="w-full justify-start bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200 hover:border-emerald-300 hover:from-emerald-100 hover:to-teal-100">
+                        <Lightbulb className="h-4 w-4 ms-2 text-emerald-600" />
+                        <span className="text-emerald-700">{t('cases.caseNotion', 'العصف الذهني')}</span>
+                      </Button>
+                    </Link>
                   </CardContent>
                 </Card>
               </div>
