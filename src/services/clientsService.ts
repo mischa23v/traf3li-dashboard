@@ -1,35 +1,112 @@
 /**
  * Clients Service
  * Handles all client-related API calls
+ * Includes Najiz (Ministry of Justice) integration fields
  */
 
 import apiClient, { handleApiError } from '@/lib/api'
+import type {
+  ArabicName,
+  NationalAddress,
+  NajizIdentityType,
+  GCCCountry,
+  Gender,
+  MaritalStatus,
+  Sponsor,
+  POBox,
+} from '@/types/najiz'
 
 /**
- * Client Interface - matches backend API response
+ * Client Interface - matches backend API response with Najiz integration
  */
 export interface Client {
   _id: string
   clientNumber?: string
   clientType?: 'individual' | 'company'
   lawyerId?: string
-  // Name fields - individual clients
+
+  // ─── Name Fields (Individual) ───
   fullNameArabic?: string
   fullNameEnglish?: string
   firstName?: string
+  middleName?: string
   lastName?: string
-  // Company fields
+  preferredName?: string
+  salutation?: string
+  suffix?: string
+
+  // ─── Arabic Name (الاسم الرباعي) - Najiz ───
+  arabicName?: ArabicName
+  salutationAr?: string
+
+  // ─── Company Fields ───
   companyName?: string
   companyNameEnglish?: string
+  companyNameAr?: string
   crNumber?: string
-  // Contact info
+  unifiedNumber?: string
+  vatNumber?: string
+  municipalityLicense?: string
+  chamberNumber?: string
+  legalForm?: string
+  legalFormAr?: string
+  capital?: number
+  capitalCurrency?: string
+  establishmentDate?: string
+  crExpiryDate?: string
+
+  // ─── Authorized Person (Company) ───
+  authorizedPerson?: string
+  authorizedPersonAr?: string
+  authorizedPersonTitle?: string
+  authorizedPersonIdentityType?: NajizIdentityType
+  authorizedPersonIdentityNumber?: string
+
+  // ─── Contact Info ───
   email?: string
   phone?: string
   alternatePhone?: string
   whatsapp?: string
-  // Identification
+  fax?: string
+  website?: string
+
+  // ─── Identity Information (Najiz) ───
+  identityType?: NajizIdentityType
   nationalId?: string
-  // Address
+  iqamaNumber?: string
+  gccId?: string
+  gccCountry?: GCCCountry
+  borderNumber?: string
+  visitorId?: string
+  passportNumber?: string
+  passportCountry?: string
+  passportIssueDate?: string
+  passportExpiryDate?: string
+  passportIssuePlace?: string
+  identityIssueDate?: string
+  identityExpiryDate?: string
+  identityIssuePlace?: string
+
+  // ─── Personal Details (Najiz) ───
+  dateOfBirth?: string
+  dateOfBirthHijri?: string
+  placeOfBirth?: string
+  gender?: Gender
+  maritalStatus?: MaritalStatus
+  nationality?: string
+  nationalityCode?: string
+
+  // ─── Sponsor (for Iqama holders) ───
+  sponsor?: Sponsor
+
+  // ─── National Address (العنوان الوطني) - Najiz ───
+  nationalAddress?: NationalAddress
+  workAddress?: NationalAddress
+  poBox?: POBox
+  headquartersAddress?: NationalAddress
+  branchAddresses?: NationalAddress[]
+
+  // ─── Legacy Address Fields ───
   address?: string | {
     city?: string
     district?: string
@@ -37,45 +114,153 @@ export interface Client {
     postalCode?: string
   }
   city?: string
+  district?: string
+  province?: string
+  region?: string
+  postalCode?: string
   country?: string
-  // Preferences
+
+  // ─── Preferences ───
   notes?: string
   generalNotes?: string
   preferredContact?: 'email' | 'phone' | 'sms' | 'whatsapp'
   preferredContactMethod?: 'email' | 'phone' | 'sms' | 'whatsapp'
   preferredLanguage?: string
   language?: string
+  bestTimeToContact?: string
+  doNotContact?: boolean
+  doNotEmail?: boolean
+  doNotCall?: boolean
+  doNotSMS?: boolean
+
+  // ─── Status & Classification ───
   status?: 'active' | 'inactive' | 'archived' | 'pending'
-  // Billing & Balance
+  priority?: 'low' | 'normal' | 'high' | 'vip'
+  vipStatus?: boolean
+  tags?: string[]
+  practiceAreas?: string[]
+
+  // ─── Risk & Conflict ───
+  riskLevel?: 'low' | 'medium' | 'high'
+  isBlacklisted?: boolean
+  blacklistReason?: string
+  conflictCheckStatus?: 'not_checked' | 'clear' | 'potential_conflict' | 'confirmed_conflict'
+  conflictNotes?: string
+  conflictCheckDate?: string
+  conflictCheckedBy?: string
+
+  // ─── Billing & Balance ───
   billing?: {
     creditBalance: number
     currency?: string
   }
   totalPaid?: number
   totalOutstanding?: number
-  // Conversion tracking
+  defaultBillingRate?: number
+  billingCurrency?: string
+  paymentTerms?: string
+
+  // ─── Conversion Tracking ───
   convertedFromLead?: boolean
   convertedAt?: string
+  leadId?: string
+
+  // ─── Verification Status (Wathq/MOJ) ───
+  isVerified?: boolean
+  verificationSource?: string
+  verifiedAt?: string
+  verificationData?: any
+
+  // ─── Timestamps ───
+  createdBy?: string
+  updatedBy?: string
   createdAt?: string
   updatedAt?: string
 }
 
 /**
- * Create Client Data - matches backend API
+ * Create Client Data - matches backend API with Najiz integration
  */
 export interface CreateClientData {
   clientType?: 'individual' | 'company'
+
+  // Individual fields
   fullNameArabic?: string
   fullNameEnglish?: string
   firstName?: string
+  middleName?: string
   lastName?: string
+  preferredName?: string
+  salutation?: string
+  salutationAr?: string
+  arabicName?: ArabicName
+
+  // Company fields
+  companyName?: string
+  companyNameEnglish?: string
+  companyNameAr?: string
+  crNumber?: string
+  unifiedNumber?: string
+  vatNumber?: string
+  municipalityLicense?: string
+  chamberNumber?: string
+  legalForm?: string
+  legalFormAr?: string
+  capital?: number
+  capitalCurrency?: string
+  establishmentDate?: string
+  crExpiryDate?: string
+  authorizedPerson?: string
+  authorizedPersonAr?: string
+  authorizedPersonTitle?: string
+  authorizedPersonIdentityType?: NajizIdentityType
+  authorizedPersonIdentityNumber?: string
+
+  // Contact
   email?: string
   phone?: string
   alternatePhone?: string
+  whatsapp?: string
+  fax?: string
+  website?: string
+
+  // Identity (Najiz)
+  identityType?: NajizIdentityType
   nationalId?: string
-  companyName?: string
-  companyNameEnglish?: string
-  crNumber?: string
+  iqamaNumber?: string
+  gccId?: string
+  gccCountry?: GCCCountry
+  borderNumber?: string
+  visitorId?: string
+  passportNumber?: string
+  passportCountry?: string
+  passportIssueDate?: string
+  passportExpiryDate?: string
+  passportIssuePlace?: string
+  identityIssueDate?: string
+  identityExpiryDate?: string
+  identityIssuePlace?: string
+
+  // Personal details
+  dateOfBirth?: string
+  dateOfBirthHijri?: string
+  placeOfBirth?: string
+  gender?: Gender
+  maritalStatus?: MaritalStatus
+  nationality?: string
+  nationalityCode?: string
+
+  // Sponsor
+  sponsor?: Sponsor
+
+  // Addresses (Najiz)
+  nationalAddress?: NationalAddress
+  workAddress?: NationalAddress
+  headquartersAddress?: NationalAddress
+  branchAddresses?: NationalAddress[]
+  poBox?: POBox
+
+  // Legacy address
   address?: string | {
     city?: string
     district?: string
@@ -83,13 +268,29 @@ export interface CreateClientData {
     postalCode?: string
   }
   city?: string
+  district?: string
+  province?: string
+  region?: string
+  postalCode?: string
   country?: string
+
+  // Preferences
   notes?: string
   generalNotes?: string
   preferredContact?: 'email' | 'phone' | 'sms' | 'whatsapp'
   preferredLanguage?: string
   language?: string
+  bestTimeToContact?: string
+  doNotContact?: boolean
+  doNotEmail?: boolean
+  doNotCall?: boolean
+  doNotSMS?: boolean
+
+  // Status
   status?: 'active' | 'inactive' | 'archived' | 'pending'
+  priority?: 'low' | 'normal' | 'high' | 'vip'
+  tags?: string[]
+  practiceAreas?: string[]
 }
 
 /**
@@ -97,11 +298,20 @@ export interface CreateClientData {
  */
 export interface ClientFilters {
   status?: string
+  clientType?: 'individual' | 'company'
   search?: string
   city?: string
+  region?: string
+  regionCode?: string
+  identityType?: NajizIdentityType
+  nationality?: string
   country?: string
+  priority?: string
+  tags?: string[]
   page?: number
   limit?: number
+  sortBy?: string
+  sortOrder?: 'asc' | 'desc'
 }
 
 /**
@@ -343,6 +553,32 @@ const clientsService = {
   },
 
   /**
+   * Verify identity with Absher/NIC (National ID verification)
+   * POST /api/clients/:id/verify/absher
+   */
+  verifyWithAbsher: async (id: string, data?: { nationalId?: string }): Promise<{ verified: boolean; data?: any }> => {
+    try {
+      const response = await apiClient.post(`/clients/${id}/verify/absher`, data)
+      return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Verify national address with Saudi Post
+   * POST /api/clients/:id/verify/address
+   */
+  verifyNationalAddress: async (id: string, address?: NationalAddress): Promise<{ verified: boolean; data?: any }> => {
+    try {
+      const response = await apiClient.post(`/clients/${id}/verify/address`, address)
+      return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
    * Upload attachments for a client
    * POST /api/clients/:id/attachments
    */
@@ -409,6 +645,19 @@ const clientsService = {
     try {
       const response = await apiClient.patch(`/clients/${id}/flags`, flags)
       return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get Saudi regions with cities
+   * GET /api/clients/regions
+   */
+  getSaudiRegions: async (): Promise<any[]> => {
+    try {
+      const response = await apiClient.get('/clients/regions')
+      return response.data.data || response.data.regions || []
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

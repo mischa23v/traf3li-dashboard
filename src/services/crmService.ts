@@ -1,6 +1,7 @@
 /**
  * CRM Service
  * Handles all CRM-related API calls (Leads, Pipelines, Referrals, Activities)
+ * Includes Najiz (Ministry of Justice) integration support
  */
 
 import apiClient, { handleApiError } from '@/lib/api'
@@ -35,6 +36,7 @@ import type {
   LogMeetingData,
   AddNoteData,
 } from '@/types/crm'
+import type { NationalAddress } from '@/types/najiz'
 
 /**
  * Map frontend source types to backend format
@@ -282,6 +284,62 @@ export const leadService = {
       const response = await apiClient.post(`/leads/${id}/follow-up`, data)
       // Backend returns: { success, message, data: lead }
       return response.data.data || response.data.lead
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // NAJIZ VERIFICATION ENDPOINTS
+  // ═══════════════════════════════════════════════════════════════
+
+  /**
+   * Verify company with Wathq API (Saudi CR verification)
+   * POST /api/leads/:id/verify/wathq
+   */
+  verifyWithWathq: async (id: string, data?: any): Promise<{ verified: boolean; data?: any }> => {
+    try {
+      const response = await apiClient.post(`/leads/${id}/verify/wathq`, data)
+      return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Verify identity with Absher/NIC (National ID verification)
+   * POST /api/leads/:id/verify/absher
+   */
+  verifyWithAbsher: async (id: string, data?: { nationalId?: string }): Promise<{ verified: boolean; data?: any }> => {
+    try {
+      const response = await apiClient.post(`/leads/${id}/verify/absher`, data)
+      return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Verify national address with Saudi Post
+   * POST /api/leads/:id/verify/address
+   */
+  verifyNationalAddress: async (id: string, address?: NationalAddress): Promise<{ verified: boolean; data?: any }> => {
+    try {
+      const response = await apiClient.post(`/leads/${id}/verify/address`, address)
+      return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Run conflict check for a lead
+   * POST /api/leads/:id/conflict-check
+   */
+  runConflictCheck: async (id: string, data: any): Promise<any> => {
+    try {
+      const response = await apiClient.post(`/leads/${id}/conflict-check`, data)
+      return response.data.data || response.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
