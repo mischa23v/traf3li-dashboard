@@ -547,8 +547,12 @@ export const useSendWhatsAppMessage = () => {
   return useMutation({
     mutationFn: (data: SendMessageData) => whatsAppService.sendMessage(data),
     onSuccess: () => {
+      // Invalidate all whatsapp queries to ensure list updates
       queryClient.invalidateQueries({ queryKey: ['whatsapp-conversations'] })
       queryClient.invalidateQueries({ queryKey: ['whatsapp-conversation'] })
+      // Also refetch to force immediate update
+      queryClient.refetchQueries({ queryKey: ['whatsapp-conversations'] })
+      toast.success('تم إرسال الرسالة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إرسال الرسالة')
