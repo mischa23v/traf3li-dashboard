@@ -44,11 +44,8 @@ export function WhatsAppStartConversation() {
       },
       {
         onSuccess: () => {
-          toast.success('تم إرسال الرسالة بنجاح')
+          // Toast is shown in hook, just navigate
           navigate({ to: '/dashboard/crm/whatsapp' })
-        },
-        onError: (error: any) => {
-          toast.error(error.message || 'فشل في إرسال الرسالة')
         },
       }
     )
