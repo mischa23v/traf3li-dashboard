@@ -12,6 +12,7 @@ import {
   TrendingUp,
   UserCog,
   UserPlus,
+  Lightbulb,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 import { usePermissionsStore } from '@/stores/permissions-store'
@@ -260,6 +261,11 @@ export function useSidebarData(): SidebarData {
             {
               title: 'sidebar.nav.cases',
               url: '/dashboard/cases',
+              module: 'cases',
+            },
+            {
+              title: 'sidebar.nav.caseNotion',
+              url: '/dashboard/notion',
               module: 'cases',
             },
             {
