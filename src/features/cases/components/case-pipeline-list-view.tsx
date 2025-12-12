@@ -381,7 +381,7 @@ export function CasePipelineListView() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => navigate({ to: '/dashboard/cases/pipeline/board' as any })}
+                    onClick={() => navigate({ to: '/dashboard/cases/pipeline' })}
                     className="rounded-lg px-3"
                   >
                     <Kanban className="h-4 w-4 ms-2" />
