@@ -1719,8 +1719,55 @@
       "overview": "Overview",
       "cases": "Cases",
       "pipeline": "Pipeline",
-      "brainstorm": "Brainstorm"
+      "brainstorm": "Brainstorm",
+      "tasks": "Tasks"
     },
+    "hero": {
+      "badge": "Case Pipeline",
+      "title": "Track Case Progress"
+    },
+    "list": {
+      "search": "Search...",
+      "searchPlaceholder": "Search for a case...",
+      "caseType": "Case Type",
+      "allTypes": "All Types",
+      "status": "Status",
+      "allStatuses": "All Statuses",
+      "sortBy": "Sort By",
+      "lastUpdated": "Last Updated",
+      "createdAt": "Created Date",
+      "name": "Name",
+      "claimAmount": "Claim Amount",
+      "clearFilters": "Clear Filters",
+      "casesTitle": "Cases & Pipeline",
+      "caseCount": "{{count}} cases",
+      "errorLoading": "Error Loading",
+      "connectionError": "Could not connect to server",
+      "retry": "Retry",
+      "noCases": "No Cases",
+      "noCasesDescription": "Create a new case to track its pipeline",
+      "newCase": "New Case",
+      "progress": "Progress",
+      "viewPipeline": "View Pipeline",
+      "viewCase": "View Case",
+      "editCase": "Edit Case",
+      "viewAllCases": "View All Cases",
+      "notSet": "Not set",
+      "untitled": "Untitled",
+      "noClient": "No client"
+    },
+    "outcome": {
+      "won": "Won",
+      "lost": "Lost",
+      "settled": "Settled"
+    },
+    "status": {
+      "active": "Active",
+      "closed": "Closed",
+      "pending": "Pending"
+    },
+    "backToList": "Back to List",
+    "viewAllPipelines": "All Cases",
     "sidebar": {
       "quickActions": "Quick Actions",
       "newCase": "New Case",
