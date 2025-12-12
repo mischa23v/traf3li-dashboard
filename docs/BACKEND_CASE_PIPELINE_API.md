@@ -1,5 +1,87 @@
 # Case Pipeline - Backend API Requirements
 
+---
+
+## 🚨 CRITICAL BUG: 403 Error on GET /api/v1/cases/:id
+
+**Date:** 2024-02-10
+**Status:** BLOCKING - Both CaseNotion and CasePipeline detail views are broken
+
+### The Problem
+
+When users click "Details" on any case (in CaseNotion or CasePipeline), they get a **403 Forbidden** error.
+
+### What Works vs. What Doesn't
+
+| Endpoint | Method | Status | Notes |
+|----------|--------|--------|-------|
+| `/api/v1/cases` | GET | ✅ Works | List all cases |
+| `/api/v1/cases/:id` | GET | ❌ 403 | **Single case - BROKEN** |
+| `/api/v1/cases/:id` | PATCH | ❓ Untested | (blocked by GET issue) |
+
+### Frontend Investigation Results
+
+1. **Same API client** - Both endpoints use identical `apiClient` with `withCredentials: true`
+2. **Same cookies** - Auth cookies are sent correctly to both endpoints
+3. **Same user session** - User is authenticated (list endpoint works)
+4. **No code changes** - Frontend code is identical to when it worked before
+
+### Frontend Code (Unchanged)
+
+```typescript
+// src/services/casesService.ts - Line 35-42
+getCase: async (id: string): Promise<Case> => {
+  try {
+    const response = await apiClient.get<CaseResponse>(`/cases/${id}`)
+    return response.data.case
+  } catch (error: any) {
+    throw new Error(handleApiError(error))
+  }
+},
+```
+
+### Most Likely Backend Causes
+
+1. **ObjectId vs String comparison bug**
+   ```javascript
+   // WRONG - will fail if firmId is ObjectId and user.firmId is string
+   if (case.firmId !== req.user.firmId) return 403
+
+   // CORRECT - convert both to string
+   if (case.firmId.toString() !== req.user.firmId.toString()) return 403
+   ```
+
+2. **Different middleware on single-case route**
+   - List route might have permissive middleware
+   - Single case route might have stricter middleware added recently
+
+3. **Population issue**
+   - If `Case.findById(id).populate(...)` returns `null` for populated fields
+   - Then permission check fails because `case.firmId` is undefined
+
+### How to Debug (Backend)
+
+```javascript
+// Add this to your GET /cases/:id controller temporarily
+console.log('=== DEBUG GET CASE ===');
+console.log('Requested ID:', req.params.id);
+console.log('User firmId:', req.user.firmId, typeof req.user.firmId);
+
+const caseDoc = await Case.findById(req.params.id);
+console.log('Case firmId:', caseDoc?.firmId, typeof caseDoc?.firmId);
+console.log('Case lawyerId:', caseDoc?.lawyerId);
+console.log('Case teamMembers:', caseDoc?.teamMembers);
+
+// Check if ObjectId comparison is the issue
+console.log('String comparison:', caseDoc?.firmId?.toString() === req.user.firmId?.toString());
+```
+
+### Required Fix
+
+Ensure `GET /api/v1/cases/:id` uses the same permission logic as `GET /api/v1/cases` - if a user can see a case in the list, they should be able to fetch its details.
+
+---
+
 ## ⚠️ CRITICAL: What the Frontend Needs
 
 The Case Pipeline feature has TWO views:
