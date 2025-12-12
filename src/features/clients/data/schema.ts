@@ -4,8 +4,6 @@ import {
   nationalAddressSchema,
   sponsorSchema,
   poBoxSchema,
-  najizPersonFieldsSchema,
-  najizCompanyFieldsSchema,
 } from '@/types/najiz'
 
 // ═══════════════════════════════════════════════════════════════
