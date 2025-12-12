@@ -418,6 +418,88 @@ export interface CaseStatistics {
   avgProgress: number
 }
 
+// ==================== PIPELINE TYPES ====================
+
+/**
+ * Pipeline Stage
+ */
+export interface PipelineStage {
+  id: string
+  name: string
+  nameAr: string
+  order: number
+  isMandatory?: boolean
+  canEnd?: boolean
+  isFinal?: boolean
+  maxDurationDays?: number
+}
+
+/**
+ * Case Pipeline Card (for pipeline view)
+ */
+export interface CasePipelineCard {
+  _id: string
+  caseNumber?: string
+  title: string
+  category: CaseCategory
+  status: CaseStatus
+  priority: CasePriority
+  currentStage: string
+  stageEnteredAt: string
+  plaintiffName?: string
+  defendantName?: string
+  court?: string
+  judge?: string
+  nextHearing?: string
+  claimAmount: number
+  expectedWinAmount: number
+  outcome?: CaseOutcome
+  tasksCount: number
+  notionPagesCount: number
+  remindersCount: number
+  eventsCount: number
+  notesCount: number
+  daysInCurrentStage: number
+  latestNote?: {
+    text: string
+    date: string
+  }
+  createdAt: string
+  updatedAt: string
+}
+
+/**
+ * Pipeline Statistics
+ */
+export interface PipelineStatistics {
+  totalCases: number
+  activeCases: number
+  byCategory: Record<string, number>
+  byStage: Record<string, number>
+  avgDaysInStage: number
+  casesOverdue: number
+  successRate: number
+}
+
+/**
+ * Move to Stage Data
+ */
+export interface MoveCaseToStageData {
+  newStage: string
+  notes?: string
+}
+
+/**
+ * End Case Data
+ */
+export interface EndCaseData {
+  outcome: 'won' | 'lost' | 'settled'
+  endReason: string
+  finalAmount?: number
+  notes?: string
+  endDate?: string
+}
+
 // ==================== API RESPONSES ====================
 
 interface CasesResponse {
@@ -463,6 +545,33 @@ interface StatisticsResponse {
     successRate?: number
     totalWonAmount?: number
   }
+}
+
+interface PipelineCasesResponse {
+  error: boolean
+  data?: {
+    cases: CasePipelineCard[]
+    count: number
+    pagination?: PaginationInfo
+  }
+  cases?: CasePipelineCard[]
+  count?: number
+  pagination?: PaginationInfo
+}
+
+interface PipelineStatisticsResponse {
+  error: boolean
+  data?: PipelineStatistics
+  statistics?: PipelineStatistics
+}
+
+interface PipelineStagesResponse {
+  error: boolean
+  data?: {
+    category: string
+    stages: PipelineStage[]
+  }
+  stages?: PipelineStage[]
 }
 
 // ==================== SERVICE ====================
@@ -1087,6 +1196,95 @@ const casesService = {
     try {
       const response = await apiClient.get(`/cases/${caseId}/rich-documents/${docId}/preview`)
       return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ==================== PIPELINE ====================
+
+  /**
+   * Get cases for pipeline view
+   * GET /api/cases/pipeline
+   */
+  getPipelineCases: async (filters?: {
+    category?: CaseCategory
+    status?: CaseStatus
+    stage?: string
+    lawyerId?: string
+    page?: number
+    limit?: number
+  }): Promise<{ cases: CasePipelineCard[]; count: number; pagination?: PaginationInfo }> => {
+    try {
+      const params = new URLSearchParams()
+      if (filters?.category) params.append('category', filters.category)
+      if (filters?.status) params.append('status', filters.status)
+      if (filters?.stage) params.append('stage', filters.stage)
+      if (filters?.lawyerId) params.append('lawyerId', filters.lawyerId)
+      if (filters?.page) params.append('page', filters.page.toString())
+      if (filters?.limit) params.append('limit', filters.limit.toString())
+
+      const queryString = params.toString()
+      const url = queryString ? `/cases/pipeline?${queryString}` : '/cases/pipeline'
+
+      const response = await apiClient.get<PipelineCasesResponse>(url)
+      const cases = response.data.data?.cases || response.data.cases || []
+      const count = response.data.data?.count || response.data.count || cases.length
+      const pagination = response.data.data?.pagination || response.data.pagination
+
+      return { cases, count, pagination }
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get pipeline statistics
+   * GET /api/cases/pipeline/statistics
+   */
+  getPipelineStatistics: async (): Promise<PipelineStatistics> => {
+    try {
+      const response = await apiClient.get<PipelineStatisticsResponse>('/cases/pipeline/statistics')
+      return response.data.data || response.data.statistics!
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get valid stages for a case category
+   * GET /api/cases/pipeline/stages/:category
+   */
+  getPipelineStages: async (category: CaseCategory): Promise<PipelineStage[]> => {
+    try {
+      const response = await apiClient.get<PipelineStagesResponse>(`/cases/pipeline/stages/${category}`)
+      return response.data.data?.stages || response.data.stages || []
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Move case to a new stage
+   * PATCH /api/cases/:id/stage
+   */
+  moveCaseToStage: async (caseId: string, data: MoveCaseToStageData): Promise<Case> => {
+    try {
+      const response = await apiClient.patch<CaseResponse>(`/cases/${caseId}/stage`, data)
+      return response.data.case
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * End case with outcome
+   * PATCH /api/cases/:id/end
+   */
+  endCase: async (caseId: string, data: EndCaseData): Promise<Case> => {
+    try {
+      const response = await apiClient.patch<CaseResponse>(`/cases/${caseId}/end`, data)
+      return response.data.case
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

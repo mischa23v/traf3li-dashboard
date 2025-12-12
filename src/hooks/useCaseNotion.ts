@@ -184,6 +184,22 @@ export function useToggleFavoritePage() {
   })
 }
 
+/**
+ * Toggle pin status
+ */
+export function useTogglePinPage() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ caseId, pageId }: { caseId: string; pageId: string }) =>
+      caseNotionService.togglePin(caseId, pageId),
+    onSuccess: (_, { caseId, pageId }) => {
+      queryClient.invalidateQueries({ queryKey: caseNotionKeys.page(caseId, pageId) })
+      queryClient.invalidateQueries({ queryKey: caseNotionKeys.pages(caseId) })
+    },
+  })
+}
+
 // ═══════════════════════════════════════════════════════════════
 // BLOCK HOOKS
 // ═══════════════════════════════════════════════════════════════

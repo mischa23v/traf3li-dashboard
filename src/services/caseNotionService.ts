@@ -272,6 +272,21 @@ export const caseNotionService = {
     }
   },
 
+  /**
+   * Toggle pin status
+   * POST /api/cases/:caseId/notion/pages/:pageId/pin
+   */
+  togglePin: async (caseId: string, pageId: string): Promise<CaseNotionPage> => {
+    try {
+      const response = await apiClient.post<PageResponse>(
+        `/cases/${caseId}/notion/pages/${pageId}/pin`
+      )
+      return response.data.data || response.data.page!
+    } catch (error) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
   // ═══════════════════════════════════════════════════════════════
   // BLOCK OPERATIONS
   // ═══════════════════════════════════════════════════════════════
