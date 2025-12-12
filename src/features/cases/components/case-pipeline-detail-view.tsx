@@ -643,6 +643,52 @@ export function CasePipelineDetailView() {
                   </CardContent>
                 </Card>
 
+                {/* Case Notes - PROMINENT DISPLAY */}
+                {selectedCase.notes && selectedCase.notes.length > 0 && (
+                  <Card className="border-0 shadow-sm border-l-4 border-l-amber-400">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <FileText className="h-5 w-5 text-amber-500" />
+                        {t('casePipeline.caseNotes', 'ملاحظات القضية')}
+                        <Badge className="bg-amber-100 text-amber-700 border-0">
+                          {selectedCase.notes.length}
+                        </Badge>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {selectedCase.notes.slice(0, 5).map((note: any, index: number) => (
+                        <div
+                          key={index}
+                          className="p-4 bg-amber-50 rounded-xl border border-amber-200"
+                        >
+                          <p className="text-slate-800 leading-relaxed">{note.text}</p>
+                          <div className="mt-2 flex items-center gap-3 text-xs text-slate-500">
+                            {note.date && (
+                              <span className="flex items-center gap-1">
+                                <Calendar className="h-3 w-3" />
+                                {format(new Date(note.date), 'dd MMM yyyy', { locale })}
+                              </span>
+                            )}
+                            {note.createdBy && (
+                              <span className="flex items-center gap-1">
+                                <User className="h-3 w-3" />
+                                {typeof note.createdBy === 'object' ? note.createdBy.name : note.createdBy}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                      {selectedCase.notes.length > 5 && (
+                        <Button asChild variant="ghost" className="w-full text-amber-600 hover:text-amber-700 hover:bg-amber-50">
+                          <Link to={`/dashboard/cases/${selectedCase._id}`}>
+                            {t('casePipeline.viewAllNotes', 'عرض جميع الملاحظات')} ({selectedCase.notes.length})
+                          </Link>
+                        </Button>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
                 {/* Linked Items */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <Card className="border-0 shadow-sm">

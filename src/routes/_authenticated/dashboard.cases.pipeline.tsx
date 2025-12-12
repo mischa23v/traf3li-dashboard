@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { CasePipelineBoardView } from '@/features/cases/components/case-pipeline-board-view'
+import { CasePipelineListView } from '@/features/cases/components/case-pipeline-list-view'
 
-// Use board view as default (like CRM pipeline) for better visibility
+// List view to select a case, then open its pipeline detail
 export const Route = createFileRoute('/_authenticated/dashboard/cases/pipeline')({
-  component: CasePipelineBoardView,
+  component: CasePipelineListView,
 })
