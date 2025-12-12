@@ -18,7 +18,8 @@ import {
   Search, Bell, AlertCircle, MoreHorizontal, ChevronLeft,
   Eye, Edit3, SortAsc, X, Scale, MapPin,
   FileText, User, Calendar, Building2, DollarSign,
-  CheckCircle, Clock, AlertTriangle, Play, Gavel
+  CheckCircle, Clock, AlertTriangle, Play, Gavel,
+  Kanban, List, StickyNote, Lightbulb
 } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { format } from 'date-fns'
@@ -146,6 +147,8 @@ export function CasePipelineListView() {
         createdAt: caseItem.createdAt,
         updatedAtFormatted: formatDualDate(caseItem.updatedAt),
         createdAtFormatted: formatDualDate(caseItem.createdAt),
+        notes: caseItem.notes,
+        latestNote: caseItem.notes?.[0]?.text || caseItem.notes?.[caseItem.notes?.length - 1]?.text,
       }
     })
   }, [casesData, searchQuery, categoryFilter, statusFilter, sortBy, t])
@@ -364,6 +367,27 @@ export function CasePipelineListView() {
                     {t('casePipeline.list.clearFilters', 'مسح الفلاتر')}
                   </Button>
                 )}
+
+                {/* View Mode Toggle */}
+                <div className="flex bg-slate-100 rounded-xl p-1 ms-auto">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="rounded-lg px-3 bg-white shadow-sm"
+                  >
+                    <List className="h-4 w-4 ms-2" />
+                    {t('casePipeline.list.listView', 'قائمة')}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate({ to: '/dashboard/cases/pipeline/board' as any })}
+                    className="rounded-lg px-3"
+                  >
+                    <Kanban className="h-4 w-4 ms-2" />
+                    {t('casePipeline.list.boardView', 'لوحة')}
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -484,6 +508,10 @@ export function CasePipelineListView() {
                             <Eye className="h-4 w-4 ms-2" />
                             {t('casePipeline.list.viewCase', 'عرض القضية')}
                           </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/cases/${caseItem.id}/notion` as any })}>
+                            <Lightbulb className="h-4 w-4 ms-2 text-emerald-500" />
+                            {t('casePipeline.list.brainstorm', 'العصف الذهني')}
+                          </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/cases/${caseItem.id}/edit` as any })}>
                             <Edit3 className="h-4 w-4 ms-2 text-blue-500" />
@@ -556,6 +584,19 @@ export function CasePipelineListView() {
                         <span className="text-sm font-medium">
                           {t('casePipeline.nextHearing', 'الجلسة القادمة')}: {format(new Date(caseItem.nextHearing), 'dd MMMM yyyy', { locale: isRTL ? arSA : enUS })}
                         </span>
+                      </div>
+                    )}
+
+                    {/* Latest Note */}
+                    {caseItem.latestNote && (
+                      <div className="mb-4 p-3 bg-amber-50 rounded-xl border border-amber-100">
+                        <div className="flex items-center gap-2 text-amber-700 mb-1">
+                          <StickyNote className="h-4 w-4" />
+                          <span className="text-xs font-bold">{t('casePipeline.list.lastNote', 'آخر ملاحظة')}</span>
+                        </div>
+                        <p className="text-sm text-amber-800 line-clamp-2">
+                          {caseItem.latestNote}
+                        </p>
                       </div>
                     )}
 

@@ -101,13 +101,14 @@ export const caseEndReasons = [
 ] as const
 
 // ==================== LABOR CASE PIPELINE ====================
-// Based on Saudi Labor Law and MHRSD procedures
-// Friendly settlement is MANDATORY before court filing
+// Based on Saudi Labor Law, MHRSD procedures, and Najiz platform
+// Source: hrsd.gov.sa, moj.gov.sa/labor, najiz.sa
+// Friendly settlement is MANDATORY before court filing (21 working days)
 export const laborCasePipeline: CasePipelineConfig = {
   caseType: 'labor',
   caseTypeAr: 'قضايا عمالية',
-  notes: 'Friendly settlement is mandatory. Must exhaust within 21 working days before court filing.',
-  notesAr: 'التسوية الودية إلزامية. يجب استنفادها خلال 21 يوم عمل قبل رفع الدعوى',
+  notes: 'Friendly settlement is mandatory. First hearing within 10 working days. Total settlement period: 21 working days. Court hearing scheduled 4 days after filing.',
+  notesAr: 'التسوية الودية إلزامية. أول جلسة خلال 10 أيام عمل. المدة الإجمالية: 21 يوم عمل. جلسة المحكمة تُحدد بعد 4 أيام من رفع الدعوى',
   stages: [
     {
       id: 'filing',
@@ -115,33 +116,33 @@ export const laborCasePipeline: CasePipelineConfig = {
       nameAr: 'تقديم الدعوى',
       color: '#6366F1', // Indigo
       order: 1,
-      description: 'Initial complaint filed via MHRSD portal',
-      descriptionAr: 'تقديم الشكوى عبر بوابة وزارة الموارد البشرية',
-      canEnd: true,
+      description: 'Initial complaint filed via MHRSD portal (hrsd.gov.sa)',
+      descriptionAr: 'تقديم الشكوى عبر بوابة وزارة الموارد البشرية (hrsd.gov.sa)',
+      canEnd: false,
     },
     {
       id: 'friendly_settlement_1',
-      name: 'Friendly Settlement - First Session',
+      name: 'Friendly Settlement - Session 1',
       nameAr: 'التسوية الودية - الجلسة الأولى',
       color: '#8B5CF6', // Purple
       order: 2,
-      description: 'First amicable settlement hearing (MANDATORY)',
-      descriptionAr: 'الجلسة الأولى للتسوية الودية (إلزامي)',
+      description: 'First amicable settlement hearing within 10 working days (MANDATORY)',
+      descriptionAr: 'الجلسة الأولى للتسوية الودية خلال 10 أيام عمل (إلزامي)',
       canEnd: true,
       isMandatory: true,
-      maxDurationDays: 7,
+      maxDurationDays: 10,
     },
     {
       id: 'friendly_settlement_2',
-      name: 'Friendly Settlement - Second Session',
+      name: 'Friendly Settlement - Session 2',
       nameAr: 'التسوية الودية - الجلسة الثانية',
       color: '#A855F7', // Violet
       order: 3,
-      description: 'Second amicable settlement hearing within 21 days',
-      descriptionAr: 'الجلسة الثانية للتسوية الودية خلال 21 يوم',
+      description: 'Second hearing. Total 21 working days to reach settlement (MANDATORY)',
+      descriptionAr: 'الجلسة الثانية. إجمالي 21 يوم عمل للوصول لتسوية (إلزامي)',
       canEnd: true,
       isMandatory: true,
-      maxDurationDays: 14,
+      maxDurationDays: 11,
     },
     {
       id: 'labor_court',
@@ -149,29 +150,39 @@ export const laborCasePipeline: CasePipelineConfig = {
       nameAr: 'المحكمة العمالية',
       color: '#F59E0B', // Amber
       order: 4,
-      description: 'Labor court first instance hearing',
-      descriptionAr: 'المحكمة العمالية الابتدائية',
+      description: 'Labor court first instance. Hearing scheduled 4 days after filing. Simple cases: 1 hearing.',
+      descriptionAr: 'المحكمة العمالية الابتدائية. الجلسة بعد 4 أيام من الرفع. القضايا اليسيرة: جلسة واحدة',
       canEnd: true,
     },
     {
       id: 'appeal',
-      name: 'Appeal Court',
+      name: 'Labor Appeals Court',
       nameAr: 'محكمة الاستئناف العمالية',
       color: '#EF4444', // Red
       order: 5,
-      description: 'Appeal within 30 days of judgment',
-      descriptionAr: 'الاستئناف خلال 30 يوم من الحكم',
+      description: 'Appeal within 30 days. Review: 20 days (10 for urgent). Can be تدقيقاً or مرافعة.',
+      descriptionAr: 'الاستئناف خلال 30 يوم. المراجعة: 20 يوم (10 للمستعجل). يمكن تدقيقاً أو مرافعة',
       canEnd: true,
       maxDurationDays: 30,
+    },
+    {
+      id: 'supreme',
+      name: 'Supreme Court',
+      nameAr: 'المحكمة العليا',
+      color: '#DC2626', // Dark Red
+      order: 6,
+      description: 'Supreme court review on legal matters only. Final judgment.',
+      descriptionAr: 'مراجعة المحكمة العليا للمسائل القانونية فقط. حكم نهائي',
+      canEnd: true,
     },
     {
       id: 'execution',
       name: 'Execution',
       nameAr: 'التنفيذ',
       color: '#10B981', // Emerald
-      order: 6,
-      description: 'Enforcement of judgment via Najiz',
-      descriptionAr: 'تنفيذ الحكم عبر ناجز',
+      order: 7,
+      description: 'Enforcement of judgment via Najiz execution court',
+      descriptionAr: 'تنفيذ الحكم عبر محكمة التنفيذ في ناجز',
       isFinal: true,
       canEnd: true,
     },
