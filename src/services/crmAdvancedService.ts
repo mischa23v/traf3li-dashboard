@@ -940,7 +940,12 @@ export const whatsAppService = {
   ): Promise<{ data: WhatsAppConversation[]; pagination: any }> => {
     try {
       const response = await apiClient.get('/whatsapp/conversations', { params: filters })
-      return response.data
+      // Normalize response - handle different API response structures
+      const responseData = response.data
+      return {
+        data: responseData.data || responseData.conversations || [],
+        pagination: responseData.pagination || { total: responseData.total || 0 }
+      }
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -963,11 +968,23 @@ export const whatsAppService = {
 
   /**
    * Send message
+   * Supports both phoneNumber-based and conversationId-based messaging
    */
   sendMessage: async (data: SendMessageData): Promise<WhatsAppMessage> => {
     try {
-      const response = await apiClient.post('/whatsapp/messages/send', data)
-      return response.data.data
+      // Normalize the data for the API
+      const normalizedData = {
+        // Use conversationId if provided, otherwise phoneNumber
+        ...(data.conversationId && { conversationId: data.conversationId }),
+        ...(data.phoneNumber && { phoneNumber: data.phoneNumber }),
+        // Normalize message content field
+        text: data.message || data.content || '',
+        // Normalize message type
+        type: data.type || data.messageType || 'text',
+        ...(data.mediaUrl && { mediaUrl: data.mediaUrl }),
+      }
+      const response = await apiClient.post('/whatsapp/messages/send', normalizedData)
+      return response.data.data || response.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -1028,7 +1045,9 @@ export const whatsAppService = {
   getTemplates: async (): Promise<WhatsAppTemplate[]> => {
     try {
       const response = await apiClient.get('/whatsapp/templates')
-      return response.data.data
+      // Normalize response - handle different API response structures
+      const responseData = response.data
+      return responseData.data || responseData.templates || []
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

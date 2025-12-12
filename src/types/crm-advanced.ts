@@ -440,9 +440,15 @@ export interface CreateTemplateData {
 }
 
 export interface SendMessageData {
-  phoneNumber: string
-  messageType: WhatsAppMessageType
-  content: string
+  // Either phoneNumber OR conversationId should be provided
+  phoneNumber?: string
+  conversationId?: string
+  // Message content
+  message?: string
+  content?: string
+  // Message type
+  type?: 'text' | 'image' | 'document' | 'audio' | 'video'
+  messageType?: WhatsAppMessageType
   mediaUrl?: string
 }
 

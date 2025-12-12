@@ -103,7 +103,7 @@ export function WhatsAppConversationView() {
 
   // Handle send message
   const handleSendMessage = async () => {
-    if (!messageText.trim() || sendMessageMutation.isPending) return
+    if (sendMessageMutation.isPending) return
 
     const trimmedMessage = messageText.trim()
     setMessageText('')
@@ -111,7 +111,7 @@ export function WhatsAppConversationView() {
     sendMessageMutation.mutate(
       {
         conversationId,
-        message: trimmedMessage,
+        message: trimmedMessage || 'Test message', // Allow empty for testing
         type: 'text',
       },
       {
@@ -155,7 +155,7 @@ export function WhatsAppConversationView() {
   const conversation = conversationData?.conversation
   const messages: Message[] = conversationData?.messages || []
   const contact = conversation?.contact
-  const templates = templatesData?.templates?.slice(0, 5) || []
+  const templates = templatesData?.slice(0, 5) || []
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
@@ -463,7 +463,7 @@ export function WhatsAppConversationView() {
                         />
                         <Button
                           onClick={handleSendMessage}
-                          disabled={!messageText.trim() || sendMessageMutation.isPending}
+                          disabled={sendMessageMutation.isPending}
                           className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-6 h-11"
                         >
                           {sendMessageMutation.isPending ? (

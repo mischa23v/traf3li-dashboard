@@ -103,9 +103,9 @@ export function WhatsAppListView() {
 
     // Transform API data
     const conversations = useMemo(() => {
-        if (!conversationsData?.conversations) return []
+        if (!conversationsData?.data) return []
 
-        return conversationsData.conversations.map((conversation: any) => ({
+        return conversationsData.data.map((conversation: any) => ({
             id: conversation._id,
             clientName: conversation.contact?.name || conversation.phoneNumber || 'غير محدد',
             phoneNumber: conversation.phoneNumber,
@@ -121,8 +121,8 @@ export function WhatsAppListView() {
 
     // Transform templates data
     const templates = useMemo(() => {
-        if (!templatesData?.templates) return []
-        return templatesData.templates.slice(0, 5).map((template: any) => ({
+        if (!templatesData) return []
+        return templatesData.slice(0, 5).map((template: any) => ({
             id: template._id,
             name: template.name,
             category: template.category,
@@ -194,16 +194,16 @@ export function WhatsAppListView() {
     // Stats for hero
     const heroStats = useMemo(() => {
         if (!conversationsData) return undefined
-        const total = conversationsData.total || 0
+        const total = conversationsData.pagination?.total || conversationsData.data?.length || 0
         const unread = conversations.filter(c => c.unreadCount > 0).length
         const open = conversations.filter(c => c.status === 'open').length
-        const templates = templatesData?.templates?.length || 0
+        const templatesCount = templatesData?.length || 0
 
         return [
             { label: 'إجمالي المحادثات', value: total, icon: MessageSquare, status: 'normal' as const },
             { label: 'غير مقروءة', value: unread, icon: MessageCircle, status: unread > 0 ? 'attention' as const : 'zero' as const },
             { label: 'مفتوحة', value: open, icon: Clock, status: 'normal' as const },
-            { label: 'القوالب', value: templates, icon: MessageSquare, status: 'normal' as const },
+            { label: 'القوالب', value: templatesCount, icon: MessageSquare, status: 'normal' as const },
         ]
     }, [conversationsData, conversations, templatesData])
 
@@ -383,11 +383,9 @@ export function WhatsAppListView() {
                                         </div>
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد محادثات</h3>
                                         <p className="text-slate-500 mb-4">ابدأ محادثة جديدة مع عميل</p>
-                                        <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                                            <Link to="/dashboard/crm/whatsapp/new">
-                                                <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
-                                                محادثة جديدة
-                                            </Link>
+                                        <Button className="bg-emerald-500 hover:bg-emerald-600" disabled>
+                                            <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
+                                            محادثة جديدة (قريباً)
                                         </Button>
                                     </div>
                                 )}
@@ -509,11 +507,9 @@ export function WhatsAppListView() {
                                 </div>
 
                                 <div className="p-4 pt-0 text-center">
-                                    <Button asChild variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-4">
-                                        <Link to="/dashboard/crm/whatsapp/templates">
-                                            عرض جميع القوالب
-                                            <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
-                                        </Link>
+                                    <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-4" disabled>
+                                        عرض جميع القوالب (قريباً)
+                                        <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
                                     </Button>
                                 </div>
                             </div>
