@@ -264,7 +264,6 @@ import { Route as AuthenticatedDashboardCrmEmailMarketingNewRouteImport } from '
 import { Route as AuthenticatedDashboardCrmEmailMarketingCampaignIdRouteImport } from './routes/_authenticated/dashboard.crm.email-marketing.$campaignId'
 import { Route as AuthenticatedDashboardCrmActivitiesNewRouteImport } from './routes/_authenticated/dashboard.crm.activities.new'
 import { Route as AuthenticatedDashboardCrmActivitiesActivityIdRouteImport } from './routes/_authenticated/dashboard.crm.activities.$activityId'
-import { Route as AuthenticatedDashboardCasesPipelineListRouteImport } from './routes/_authenticated/dashboard.cases.pipeline.list'
 import { Route as AuthenticatedDashboardCasesPipelineBoardRouteImport } from './routes/_authenticated/dashboard.cases.pipeline.board'
 import { Route as AuthenticatedDashboardCasesCaseIdPipelineRouteImport } from './routes/_authenticated/dashboard.cases.$caseId.pipeline'
 import { Route as AuthenticatedDashboardCasesCaseIdNotionRouteImport } from './routes/_authenticated/dashboard.cases.$caseId.notion'
@@ -1771,12 +1770,6 @@ const AuthenticatedDashboardCrmActivitiesActivityIdRoute =
     path: '/dashboard/crm/activities/$activityId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedDashboardCasesPipelineListRoute =
-  AuthenticatedDashboardCasesPipelineListRouteImport.update({
-    id: '/list',
-    path: '/list',
-    getParentRoute: () => AuthenticatedDashboardCasesPipelineRoute,
-  } as any)
 const AuthenticatedDashboardCasesPipelineBoardRoute =
   AuthenticatedDashboardCasesPipelineBoardRouteImport.update({
     id: '/board',
@@ -2007,7 +2000,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/cases/$caseId/notion': typeof AuthenticatedDashboardCasesCaseIdNotionRouteWithChildren
   '/dashboard/cases/$caseId/pipeline': typeof AuthenticatedDashboardCasesCaseIdPipelineRoute
   '/dashboard/cases/pipeline/board': typeof AuthenticatedDashboardCasesPipelineBoardRoute
-  '/dashboard/cases/pipeline/list': typeof AuthenticatedDashboardCasesPipelineListRoute
   '/dashboard/crm/activities/$activityId': typeof AuthenticatedDashboardCrmActivitiesActivityIdRoute
   '/dashboard/crm/activities/new': typeof AuthenticatedDashboardCrmActivitiesNewRoute
   '/dashboard/crm/email-marketing/$campaignId': typeof AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute
@@ -2282,7 +2274,6 @@ export interface FileRoutesByTo {
   '/dashboard/cases/$caseId/notion': typeof AuthenticatedDashboardCasesCaseIdNotionRouteWithChildren
   '/dashboard/cases/$caseId/pipeline': typeof AuthenticatedDashboardCasesCaseIdPipelineRoute
   '/dashboard/cases/pipeline/board': typeof AuthenticatedDashboardCasesPipelineBoardRoute
-  '/dashboard/cases/pipeline/list': typeof AuthenticatedDashboardCasesPipelineListRoute
   '/dashboard/crm/activities/$activityId': typeof AuthenticatedDashboardCrmActivitiesActivityIdRoute
   '/dashboard/crm/activities/new': typeof AuthenticatedDashboardCrmActivitiesNewRoute
   '/dashboard/crm/email-marketing/$campaignId': typeof AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute
@@ -2562,7 +2553,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/cases/$caseId/notion': typeof AuthenticatedDashboardCasesCaseIdNotionRouteWithChildren
   '/_authenticated/dashboard/cases/$caseId/pipeline': typeof AuthenticatedDashboardCasesCaseIdPipelineRoute
   '/_authenticated/dashboard/cases/pipeline/board': typeof AuthenticatedDashboardCasesPipelineBoardRoute
-  '/_authenticated/dashboard/cases/pipeline/list': typeof AuthenticatedDashboardCasesPipelineListRoute
   '/_authenticated/dashboard/crm/activities/$activityId': typeof AuthenticatedDashboardCrmActivitiesActivityIdRoute
   '/_authenticated/dashboard/crm/activities/new': typeof AuthenticatedDashboardCrmActivitiesNewRoute
   '/_authenticated/dashboard/crm/email-marketing/$campaignId': typeof AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute
@@ -2840,7 +2830,6 @@ export interface FileRouteTypes {
     | '/dashboard/cases/$caseId/notion'
     | '/dashboard/cases/$caseId/pipeline'
     | '/dashboard/cases/pipeline/board'
-    | '/dashboard/cases/pipeline/list'
     | '/dashboard/crm/activities/$activityId'
     | '/dashboard/crm/activities/new'
     | '/dashboard/crm/email-marketing/$campaignId'
@@ -3115,7 +3104,6 @@ export interface FileRouteTypes {
     | '/dashboard/cases/$caseId/notion'
     | '/dashboard/cases/$caseId/pipeline'
     | '/dashboard/cases/pipeline/board'
-    | '/dashboard/cases/pipeline/list'
     | '/dashboard/crm/activities/$activityId'
     | '/dashboard/crm/activities/new'
     | '/dashboard/crm/email-marketing/$campaignId'
@@ -3394,7 +3382,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/cases/$caseId/notion'
     | '/_authenticated/dashboard/cases/$caseId/pipeline'
     | '/_authenticated/dashboard/cases/pipeline/board'
-    | '/_authenticated/dashboard/cases/pipeline/list'
     | '/_authenticated/dashboard/crm/activities/$activityId'
     | '/_authenticated/dashboard/crm/activities/new'
     | '/_authenticated/dashboard/crm/email-marketing/$campaignId'
@@ -5394,13 +5381,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCrmActivitiesActivityIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/dashboard/cases/pipeline/list': {
-      id: '/_authenticated/dashboard/cases/pipeline/list'
-      path: '/list'
-      fullPath: '/dashboard/cases/pipeline/list'
-      preLoaderRoute: typeof AuthenticatedDashboardCasesPipelineListRouteImport
-      parentRoute: typeof AuthenticatedDashboardCasesPipelineRoute
-    }
     '/_authenticated/dashboard/cases/pipeline/board': {
       id: '/_authenticated/dashboard/cases/pipeline/board'
       path: '/board'
@@ -5609,15 +5589,12 @@ const AuthenticatedDashboardCasesCaseIdRouteWithChildren =
 
 interface AuthenticatedDashboardCasesPipelineRouteChildren {
   AuthenticatedDashboardCasesPipelineBoardRoute: typeof AuthenticatedDashboardCasesPipelineBoardRoute
-  AuthenticatedDashboardCasesPipelineListRoute: typeof AuthenticatedDashboardCasesPipelineListRoute
 }
 
 const AuthenticatedDashboardCasesPipelineRouteChildren: AuthenticatedDashboardCasesPipelineRouteChildren =
   {
     AuthenticatedDashboardCasesPipelineBoardRoute:
       AuthenticatedDashboardCasesPipelineBoardRoute,
-    AuthenticatedDashboardCasesPipelineListRoute:
-      AuthenticatedDashboardCasesPipelineListRoute,
   }
 
 const AuthenticatedDashboardCasesPipelineRouteWithChildren =
