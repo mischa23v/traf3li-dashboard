@@ -7,11 +7,8 @@ import {
     Bell, ArrowRight, Sparkles, Clock, Briefcase, AlertCircle, Users, CheckSquare
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
-import { Label } from '@/components/ui/label'
 import {
     Select,
     SelectContent,
@@ -19,6 +16,16 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+// Gosi Design System Components
+import {
+    GosiCard,
+    GosiInput,
+    GosiTextarea,
+    GosiLabel,
+    GosiSelect,
+    GosiSelectItem,
+    GosiButton,
+} from '@/components/ui/gosi-ui'
 import {
     Collapsible,
     CollapsibleContent,
@@ -286,28 +293,20 @@ export function CreateTaskView() {
                             <span className="text-base font-medium text-slate-700 group-hover:text-emerald-700 transition-colors">العودة لقائمة المهام</span>
                         </Link>
 
-                        {/* Form Card */}
-                        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                        {/* Form Card - Gosi Premium Design */}
+                        <GosiCard className="p-0">
                             <form onSubmit={handleSubmit}>
-                                {/* Header */}
-                                <div className="px-8 pt-8 pb-6 border-b border-slate-100">
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                                            <CheckSquare className="w-6 h-6 text-emerald-500 fill-emerald-500/20" />
-                                        </div>
-                                        <div>
-                                            <h1 className="text-2xl font-bold text-slate-900">مهمة جديدة</h1>
-                                            <p className="text-base text-slate-500">للحفظ السريع اضغط كنترول + إنتر</p>
-                                        </div>
-                                    </div>
-
-                                    {/* Title input with label */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-600">عنوان المهمة</label>
-                                        <Input
+                                {/* NO HEADER - Start directly with Title (Gosi Pattern) */}
+                                <div className="px-8 pt-8 pb-6">
+                                    {/* Title input - Large & Prominent */}
+                                    <div className="space-y-3">
+                                        <GosiLabel icon={<CheckSquare className="w-4 h-4" />}>
+                                            عنوان المهمة
+                                        </GosiLabel>
+                                        <GosiInput
                                             ref={titleInputRef}
                                             placeholder="اكتب عنوان المهمة هنا..."
-                                            className="text-lg font-semibold border border-slate-200 focus:border-emerald-500 rounded-xl shadow-none focus-visible:ring-0 px-4 h-12 placeholder:text-slate-400 placeholder:font-normal bg-slate-50/50"
+                                            className="text-lg font-semibold"
                                             value={formData.title}
                                             onChange={(e) => handleChange('title', e.target.value)}
                                             autoComplete="off"
@@ -315,135 +314,130 @@ export function CreateTaskView() {
                                     </div>
                                 </div>
 
-                                {/* Basic Info */}
-                                <div className="px-8 py-6 space-y-6">
+                                {/* Basic Info - Gosi Premium Fields */}
+                                <div className="px-8 py-6 space-y-6 border-t border-slate-100/50">
+                                    {/* Row 1: Status & Priority */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <AlertCircle className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                        <div className="space-y-3">
+                                            <GosiLabel icon={<AlertCircle className="w-4 h-4" />}>
                                                 الحالة
-                                            </label>
-                                            <Select value={formData.status} onValueChange={(value) => handleChange('status', value)}>
-                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                    <SelectValue placeholder="اختر الحالة" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {ACTIVE_STATUS_OPTIONS.map(option => (
-                                                        <SelectItem key={option.value} value={option.value}>
-                                                            <div className="flex items-center gap-2">
-                                                                <span className={cn("w-2 h-2 rounded-full", option.bgColor)} />
-                                                                {option.label}
-                                                            </div>
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
+                                            </GosiLabel>
+                                            <GosiSelect
+                                                value={formData.status}
+                                                onValueChange={(value) => handleChange('status', value)}
+                                                placeholder="اختر الحالة"
+                                            >
+                                                {ACTIVE_STATUS_OPTIONS.map(option => (
+                                                    <GosiSelectItem key={option.value} value={option.value}>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className={cn("w-2 h-2 rounded-full", option.bgColor)} />
+                                                            {option.label}
+                                                        </div>
+                                                    </GosiSelectItem>
+                                                ))}
+                                            </GosiSelect>
                                         </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Flag className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                        <div className="space-y-3">
+                                            <GosiLabel icon={<Flag className="w-4 h-4" />}>
                                                 الأولوية
-                                            </label>
-                                            <Select value={formData.priority} onValueChange={(value) => handleChange('priority', value)}>
-                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                    <SelectValue placeholder="اختر الأولوية" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {MAIN_PRIORITY_OPTIONS.map(option => (
-                                                        <SelectItem key={option.value} value={option.value}>
-                                                            <div className="flex items-center gap-2">
-                                                                <span className={cn("w-2 h-2 rounded-full", option.dotColor)} />
-                                                                {option.label}
-                                                            </div>
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
+                                            </GosiLabel>
+                                            <GosiSelect
+                                                value={formData.priority}
+                                                onValueChange={(value) => handleChange('priority', value)}
+                                                placeholder="اختر الأولوية"
+                                            >
+                                                {MAIN_PRIORITY_OPTIONS.map(option => (
+                                                    <GosiSelectItem key={option.value} value={option.value}>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className={cn("w-2 h-2 rounded-full", option.dotColor)} />
+                                                            {option.label}
+                                                        </div>
+                                                    </GosiSelectItem>
+                                                ))}
+                                            </GosiSelect>
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                تاريخ الاستحقاق
-                                            </label>
-                                            <Input
+                                    {/* Row 2: COMPACT DATE ROW (Critical Gosi Pattern!) */}
+                                    {/* Date: 180px fixed, Time: 130px fixed, Assignee: flex-1 */}
+                                    <div className="flex flex-col md:flex-row gap-6">
+                                        <div className="space-y-3 w-full md:w-auto">
+                                            <GosiLabel icon={<Calendar className="w-4 h-4" />}>
+                                                التاريخ
+                                            </GosiLabel>
+                                            <GosiInput
                                                 type="date"
-                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                variant="compact"
+                                                className="w-full md:w-[180px] text-center text-sm font-bold"
                                                 value={formData.dueDate}
                                                 onChange={(e) => handleChange('dueDate', e.target.value)}
                                             />
                                         </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Clock className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                        <div className="space-y-3 w-full md:w-auto">
+                                            <GosiLabel icon={<Clock className="w-4 h-4" />}>
                                                 الوقت
-                                            </label>
-                                            <Input
+                                            </GosiLabel>
+                                            <GosiInput
                                                 type="time"
-                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                variant="compact"
+                                                className="w-full md:w-[130px] text-center text-sm font-bold"
                                                 value={formData.dueTime}
                                                 onChange={(e) => handleChange('dueTime', e.target.value)}
                                             />
                                         </div>
+                                        <div className="space-y-3 flex-1">
+                                            <GosiLabel icon={<Users className="w-4 h-4" />}>
+                                                تعيين إلى
+                                            </GosiLabel>
+                                            <GosiSelect
+                                                value={formData.assignedTo}
+                                                onValueChange={(value) => handleChange('assignedTo', value)}
+                                                placeholder="اختر المسؤول (اختياري)"
+                                            >
+                                                {teamLoading ? (
+                                                    <div className="flex items-center justify-center py-4">
+                                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                                    </div>
+                                                ) : teamMembers && teamMembers.length > 0 ? (
+                                                    teamMembers.map((member) => (
+                                                        <GosiSelectItem key={member._id} value={member._id}>
+                                                            {member.firstName} {member.lastName}
+                                                        </GosiSelectItem>
+                                                    ))
+                                                ) : (
+                                                    <div className="text-center py-4 text-slate-500 text-sm">لا يوجد أعضاء فريق</div>
+                                                )}
+                                            </GosiSelect>
+                                        </div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Users className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                تعيين إلى
-                                            </label>
-                                            <Select value={formData.assignedTo} onValueChange={(value) => handleChange('assignedTo', value)}>
-                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                    <SelectValue placeholder="اختر المسؤول (اختياري)" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {teamLoading ? (
-                                                        <div className="flex items-center justify-center py-4">
-                                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                                        </div>
-                                                    ) : teamMembers && teamMembers.length > 0 ? (
-                                                        teamMembers.map((member) => (
-                                                            <SelectItem key={member._id} value={member._id}>
-                                                                {member.firstName} {member.lastName}
-                                                            </SelectItem>
-                                                        ))
-                                                    ) : (
-                                                        <div className="text-center py-4 text-slate-500 text-sm">لا يوجد أعضاء فريق</div>
-                                                    )}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Briefcase className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                التصنيف
-                                            </label>
-                                            <Select value={formData.label} onValueChange={(value) => handleChange('label', value)}>
-                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                    <SelectValue placeholder="اختر التصنيف (اختياري)" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {CATEGORY_OPTIONS.map(option => (
-                                                        <SelectItem key={option.value} value={option.value}>
-                                                            <Badge variant="secondary" className={cn("text-xs", option.bgColor, option.color)}>
-                                                                {option.label}
-                                                            </Badge>
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
+                                    {/* Row 3: Category */}
+                                    <div className="space-y-3">
+                                        <GosiLabel icon={<Briefcase className="w-4 h-4" />}>
+                                            التصنيف
+                                        </GosiLabel>
+                                        <GosiSelect
+                                            value={formData.label}
+                                            onValueChange={(value) => handleChange('label', value)}
+                                            placeholder="اختر التصنيف (اختياري)"
+                                            className="max-w-md"
+                                        >
+                                            {CATEGORY_OPTIONS.map(option => (
+                                                <GosiSelectItem key={option.value} value={option.value}>
+                                                    <Badge variant="secondary" className={cn("text-xs", option.bgColor, option.color)}>
+                                                        {option.label}
+                                                    </Badge>
+                                                </GosiSelectItem>
+                                            ))}
+                                        </GosiSelect>
                                     </div>
 
                                     {/* Tags */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-700">الوسوم</label>
+                                    <div className="space-y-3">
+                                        <GosiLabel>الوسوم</GosiLabel>
                                         <div className="flex flex-wrap gap-2 mb-2">
                                             {formData.tags.map(tag => (
-                                                <Badge key={tag} variant="secondary" className="gap-1">
+                                                <Badge key={tag} variant="secondary" className="gap-1 rounded-full px-3 py-1">
                                                     {tag}
                                                     <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500">
                                                         <X className="w-3 h-3" aria-hidden="true" />
@@ -452,9 +446,10 @@ export function CreateTaskView() {
                                             ))}
                                         </div>
                                         <div className="flex gap-2">
-                                            <Input
+                                            <GosiInput
                                                 placeholder="أضف وسم..."
-                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 flex-1"
+                                                variant="compact"
+                                                className="flex-1"
                                                 value={tagInput}
                                                 onChange={(e) => setTagInput(e.target.value)}
                                                 onKeyDown={(e) => {
@@ -464,20 +459,19 @@ export function CreateTaskView() {
                                                     }
                                                 }}
                                             />
-                                            <Button type="button" variant="outline" onClick={addTag} className="rounded-xl">
+                                            <GosiButton type="button" variant="secondary" size="sm" onClick={addTag}>
                                                 <Plus className="w-4 h-4" aria-hidden="true" />
-                                            </Button>
+                                            </GosiButton>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                    {/* Description */}
+                                    <div className="space-y-3">
+                                        <GosiLabel icon={<FileText className="w-4 h-4" />}>
                                             الوصف
-                                        </label>
-                                        <Textarea
+                                        </GosiLabel>
+                                        <GosiTextarea
                                             placeholder="أدخل وصف المهمة..."
-                                            className="min-h-[120px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
                                             value={formData.description}
                                             onChange={(e) => handleChange('description', e.target.value)}
                                         />
@@ -824,52 +818,25 @@ export function CreateTaskView() {
                                     </div>
                                 </Collapsible>
 
-                                {/* Footer / Actions */}
-                                <div className="px-8 py-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-4">
-                                    {/* Templates */}
-                                    {templates && templates.length > 0 && (
-                                        <Select onValueChange={(value) => handleUseTemplate(value)}>
-                                            <SelectTrigger className="w-auto rounded-xl border-slate-200 text-slate-500">
-                                                <Sparkles className="w-4 h-4 ms-2" />
-                                                <SelectValue placeholder="استخدم قالب" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {templates.slice(0, 5).map((template) => (
-                                                    <SelectItem key={template._id} value={template._id}>
-                                                        {template.title}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    )}
-
-                                    <div className="flex items-center gap-3 ms-auto">
-                                        <Link to="/dashboard/tasks/list">
-                                            <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-700 h-11 px-6">
-                                                إلغاء
-                                            </Button>
-                                        </Link>
-                                        <Button
-                                            type="submit"
-                                            className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20 h-11 px-8 font-medium"
-                                            disabled={createTaskMutation.isPending}
-                                        >
-                                            {createTaskMutation.isPending ? (
-                                                <span className="flex items-center gap-2">
-                                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                                    جاري الحفظ...
-                                                </span>
-                                            ) : (
-                                                <span className="flex items-center gap-2">
-                                                    <Save className="w-4 h-4" aria-hidden="true" />
-                                                    حفظ المهمة
-                                                </span>
-                                            )}
-                                        </Button>
-                                    </div>
+                                {/* Footer / Actions - Gosi Pattern: justify-end, only Cancel/Save */}
+                                <div className="px-8 py-6 bg-slate-50/50 border-t border-slate-100/50 flex items-center justify-end gap-3">
+                                    <Link to="/dashboard/tasks/list">
+                                        <GosiButton type="button" variant="ghost">
+                                            إلغاء
+                                        </GosiButton>
+                                    </Link>
+                                    <GosiButton
+                                        type="submit"
+                                        variant="primary"
+                                        size="md"
+                                        isLoading={createTaskMutation.isPending}
+                                    >
+                                        <Save className="w-4 h-4" aria-hidden="true" />
+                                        حفظ المهمة
+                                    </GosiButton>
                                 </div>
                             </form>
-                        </div>
+                        </GosiCard>
                     </div>
 
                     {/* Sidebar Widgets - Hidden on mobile */}

@@ -108,6 +108,7 @@
     "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.64.0",
     "react-i18next": "^16.2.4",
+    "react-is": "^19.2.3",
     "react-leaflet": "^5.0.0",
     "react-top-loading-bar": "^3.0.2",
     "react-window": "^2.2.3",
