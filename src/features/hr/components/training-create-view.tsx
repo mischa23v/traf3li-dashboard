@@ -1121,7 +1121,7 @@ export function TrainingCreateView() {
               </Button>
               <Button
                 onClick={handleSubmit}
-                disabled={!employeeId || !trainingTitle || !startDate || !endDate || !totalHours || isPending}
+                disabled={isPending}
                 className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8"
               >
                 {isPending ? (

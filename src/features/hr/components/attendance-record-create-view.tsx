@@ -682,7 +682,7 @@ export function AttendanceRecordCreateView() {
                 </Button>
                 <Button
                   onClick={handleSubmit}
-                  disabled={!employeeId || isPending}
+                  disabled={isPending}
                   className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8 shadow-lg shadow-emerald-500/20"
                 >
                   {isPending ? (

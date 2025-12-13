@@ -767,7 +767,7 @@ const getBgClasses = (color: string) => {
               </Button>
               <Button
                 onClick={handleSubmit}
-                disabled={!employeeId || advanceAmount <= 0 || !startDate || isPending}
+                disabled={isPending}
                 className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8"
               >
                 {isPending ? (

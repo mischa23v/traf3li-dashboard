@@ -1134,7 +1134,7 @@ export function JobPositionsCreateView() {
               </Button>
               <Button
                 onClick={handleSubmit}
-                disabled={!jobTitle || !jobTitleAr || !jobGrade || !salaryGrade || isPending}
+                disabled={isPending}
                 className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8"
               >
                 {isPending ? (

@@ -1107,7 +1107,7 @@ export function JobPostingCreateView() {
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!jobTitle || !jobTitleAr || !department || !location || !jobSummary || createMutation.isPending}
+            disabled={createMutation.isPending}
             className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8"
           >
             {createMutation.isPending ? (
