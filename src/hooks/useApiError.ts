@@ -127,9 +127,21 @@ export const useApiError = () => {
    * Sets state for validation errors (400) and other errors
    */
   const handleApiError = useCallback((error: unknown) => {
+    console.log('========== USE API ERROR HOOK DEBUG ==========')
+    console.log('[useApiError] handleApiError called')
+    console.log('[useApiError] Error received:', error)
+    console.log('[useApiError] Error type:', typeof error)
+    console.log('[useApiError] Timestamp:', new Date().toISOString())
+
     const errorInfo = extractErrorInfo(error)
+    console.log('[useApiError] Extracted error info:', errorInfo)
+
     const status = errorInfo.status
     const message = errorInfo.message || 'حدث خطأ غير متوقع'
+    console.log('[useApiError] Status:', status)
+    console.log('[useApiError] Message:', message)
+    console.log('[useApiError] Validation errors:', errorInfo.validationErrors)
+    console.log('[useApiError] Request ID:', errorInfo.requestId)
 
     // Handle 429 Rate Limiting - Show toast
     if (status === 429) {

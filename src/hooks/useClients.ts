@@ -26,14 +26,39 @@ export const useCreateClient = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: CreateClientData) => clientsService.createClient(data),
-    onSuccess: () => {
+    mutationFn: (data: CreateClientData) => {
+      console.log('========== USE CREATE CLIENT HOOK DEBUG ==========')
+      console.log('[useCreateClient] mutationFn called')
+      console.log('[useCreateClient] Input data:', JSON.stringify(data, null, 2))
+      console.log('[useCreateClient] Timestamp:', new Date().toISOString())
+      return clientsService.createClient(data)
+    },
+    onMutate: (variables) => {
+      console.log('[useCreateClient] onMutate - Starting mutation')
+      console.log('[useCreateClient] Variables:', JSON.stringify(variables, null, 2))
+    },
+    onSuccess: (data, variables, context) => {
+      console.log('[useCreateClient] ✅ onSuccess - Mutation succeeded!')
+      console.log('[useCreateClient] Response data:', data)
+      console.log('[useCreateClient] Variables:', variables)
+      console.log('[useCreateClient] Context:', context)
       toast.success('تم إنشاء العميل بنجاح')
     },
-    onError: (error: Error) => {
+    onError: (error: Error, variables, context) => {
+      console.log('[useCreateClient] ❌ onError - Mutation failed!')
+      console.log('[useCreateClient] Error type:', typeof error)
+      console.log('[useCreateClient] Error message:', error?.message)
+      console.log('[useCreateClient] Error stack:', error?.stack)
+      console.log('[useCreateClient] Error name:', error?.name)
+      console.log('[useCreateClient] Full error:', error)
+      console.log('[useCreateClient] Variables at error:', variables)
+      console.log('[useCreateClient] Context at error:', context)
       toast.error(error.message || 'فشل إنشاء العميل')
     },
-    onSettled: async () => {
+    onSettled: async (data, error, variables, context) => {
+      console.log('[useCreateClient] onSettled - Mutation completed')
+      console.log('[useCreateClient] Final data:', data)
+      console.log('[useCreateClient] Final error:', error)
       return await queryClient.invalidateQueries({ queryKey: ['clients'] })
     },
   })

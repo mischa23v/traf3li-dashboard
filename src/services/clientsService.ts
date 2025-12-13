@@ -389,11 +389,34 @@ const clientsService = {
    * Create client
    */
   createClient: async (data: CreateClientData): Promise<Client> => {
+    console.log('========== CLIENTS SERVICE DEBUG ==========')
+    console.log('[ClientsService.createClient] Starting API call')
+    console.log('[ClientsService.createClient] Request data:', JSON.stringify(data, null, 2))
+    console.log('[ClientsService.createClient] Timestamp:', new Date().toISOString())
+
     try {
+      console.log('[ClientsService.createClient] 📡 Calling POST /clients...')
       const response = await apiClient.post('/clients', data)
+      console.log('[ClientsService.createClient] ✅ API Response received!')
+      console.log('[ClientsService.createClient] Response status:', response.status)
+      console.log('[ClientsService.createClient] Response headers:', response.headers)
+      console.log('[ClientsService.createClient] Response data:', JSON.stringify(response.data, null, 2))
       return response.data.client || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      console.log('[ClientsService.createClient] ❌ API Error caught!')
+      console.log('[ClientsService.createClient] Error type:', typeof error)
+      console.log('[ClientsService.createClient] Error constructor:', error?.constructor?.name)
+      console.log('[ClientsService.createClient] Error message:', error?.message)
+      console.log('[ClientsService.createClient] Error status:', error?.status)
+      console.log('[ClientsService.createClient] Error response:', error?.response)
+      console.log('[ClientsService.createClient] Error response data:', error?.response?.data)
+      console.log('[ClientsService.createClient] Error requestId:', error?.requestId)
+      console.log('[ClientsService.createClient] Error errors array:', error?.errors)
+      console.log('[ClientsService.createClient] Full error object:', JSON.stringify(error, Object.getOwnPropertyNames(error || {}), 2))
+
+      const errorMessage = handleApiError(error)
+      console.log('[ClientsService.createClient] Handled error message:', errorMessage)
+      throw new Error(errorMessage)
     }
   },
 
