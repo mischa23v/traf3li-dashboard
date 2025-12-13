@@ -6,6 +6,14 @@ import {
     Timer, Play, Pause, AlertTriangle, Target, TrendingUp
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
+// Gosi Design System Components
+import {
+    GosiCard,
+    GosiInput,
+    GosiTextarea,
+    GosiButton,
+    GosiIconBox,
+} from '@/components/ui/gosi-ui'
 import { Input } from '@/components/ui/input'
 import { useQueryClient } from '@tanstack/react-query'
 import {
@@ -590,20 +598,22 @@ export function TaskDetailsView() {
 
                             {/* RIGHT COLUMN (Main Content) */}
                             <div className="lg:col-span-2 space-y-8">
-                                    <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden min-h-[600px]">
+                                    {/* Main Content Card - Gosi Premium Design */}
+                                    <GosiCard className="min-h-[600px] p-0">
                                         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                                            <div className="border-b border-slate-100 px-4 sm:px-6 py-4">
-                                                <TabsList className="inline-flex h-10 items-center justify-center rounded-lg bg-slate-100 p-1 text-slate-500 w-full sm:w-auto">
+                                            {/* Gosi Premium Tabs Header */}
+                                            <div className="border-b border-slate-100/50 px-4 sm:px-6 py-4">
+                                                <TabsList className="inline-flex h-12 items-center justify-center rounded-2xl bg-slate-100/80 p-1.5 text-slate-500 w-full sm:w-auto gap-1">
                                                     {['overview', 'files', 'comments'].map((tab) => (
                                                         <TabsTrigger
                                                             key={tab}
                                                             value={tab}
                                                             className="
-                                                                inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 sm:px-4 py-2 text-sm font-medium ring-offset-white transition-all
+                                                                inline-flex items-center justify-center whitespace-nowrap rounded-xl px-4 sm:px-6 py-2.5 text-sm font-semibold ring-offset-white transition-all duration-200
                                                                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2
                                                                 disabled:pointer-events-none disabled:opacity-50
-                                                                data-[state=active]:bg-emerald-950 data-[state=active]:text-white data-[state=active]:shadow-sm
-                                                                data-[state=inactive]:hover:bg-slate-200
+                                                                data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600 data-[state=active]:to-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-500/20
+                                                                data-[state=inactive]:hover:bg-white data-[state=inactive]:hover:text-slate-900
                                                                 flex-1 sm:flex-initial
                                                             "
                                                         >
@@ -1161,7 +1171,7 @@ export function TaskDetailsView() {
                                                 </TabsContent>
                                             </div>
                                         </Tabs>
-                                    </Card>
+                                    </GosiCard>
                             </div>
 
                             {/* LEFT SIDEBAR - Quick Actions & Calendar */}
@@ -1179,46 +1189,41 @@ export function TaskDetailsView() {
                 )}
             </Main>
 
-            {/* Delete Confirmation Dialog */}
+            {/* Delete Confirmation Dialog - Gosi Premium Design */}
             {showDeleteConfirm && task && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
-                        <div className="flex justify-center mb-4">
-                            <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                                <AlertTriangle className="w-8 h-8 text-red-500" aria-hidden="true" />
-                            </div>
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <GosiCard className="p-8 max-w-md w-full">
+                        <div className="flex justify-center mb-6">
+                            <GosiIconBox variant="soft" size="lg" className="bg-red-50 text-red-500">
+                                <AlertTriangle className="w-8 h-8" aria-hidden="true" />
+                            </GosiIconBox>
                         </div>
-                        <h3 className="text-lg font-bold text-slate-900 text-center mb-2">
+                        <h3 className="text-xl font-bold text-slate-900 text-center mb-2">
                             هل أنت متأكد من حذف هذه المهمة؟
                         </h3>
-                        <p className="text-slate-500 text-center mb-6">
+                        <p className="text-slate-500 text-center mb-8">
                             سيتم حذف المهمة "{task.title}" نهائياً ولا يمكن استرجاعها.
                         </p>
                         <div className="flex gap-3 justify-center">
-                            <Button
-                                variant="outline"
+                            <GosiButton
+                                variant="ghost"
                                 onClick={() => setShowDeleteConfirm(false)}
-                                className="px-6 rounded-xl"
                             >
                                 إلغاء
-                            </Button>
-                            <Button
+                            </GosiButton>
+                            <GosiButton
+                                variant="danger"
                                 onClick={() => {
                                     setShowDeleteConfirm(false)
                                     handleDelete()
                                 }}
-                                disabled={deleteTaskMutation.isPending}
-                                className="px-6 rounded-xl bg-red-500 hover:bg-red-600 text-white"
+                                isLoading={deleteTaskMutation.isPending}
                             >
-                                {deleteTaskMutation.isPending ? (
-                                    <Loader2 className="h-4 w-4 animate-spin ms-2" />
-                                ) : (
-                                    <Trash2 className="h-4 w-4 ms-2" />
-                                )}
+                                <Trash2 className="h-4 w-4" />
                                 حذف المهمة
-                            </Button>
+                            </GosiButton>
                         </div>
-                    </div>
+                    </GosiCard>
                 </div>
             )}
 
