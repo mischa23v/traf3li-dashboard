@@ -303,10 +303,10 @@ export function CreateEventView() {
             return
         }
 
-        // Combine date and time into ISO 8601 datetime (default to now if not provided for API compatibility)
+        // Combine date and time into ISO 8601 datetime
         const startDateTime = formData.startDate && formData.startTime
             ? new Date(`${formData.startDate}T${formData.startTime}:00`).toISOString()
-            : new Date().toISOString()
+            : undefined
 
         const endDateTime = (formData.endDate || formData.startDate) && formData.endTime
             ? new Date(`${formData.endDate || formData.startDate}T${formData.endTime}:00`).toISOString()
@@ -335,14 +335,12 @@ export function CreateEventView() {
         }))
 
         const eventData = {
-            // Required API fields with defaults for testing
-            title: formData.title || 'حدث جديد',
-            type: formData.type || 'meeting',
-            startDateTime,
-            // Optional fields
+            title: formData.title,
             description: formData.description,
+            type: formData.type,
             priority: formData.priority,
             color: formData.color,
+            startDateTime,
             endDateTime,
             location: locationType === 'physical' ? {
                 name: locationData.room || locationData.building || 'Office',
