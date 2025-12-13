@@ -521,7 +521,7 @@ export function OnboardingCreateView() {
               </Button>
               <Button
                 onClick={handleSubmit}
-                disabled={!employeeId || !managerId || !startDate || isPending}
+                disabled={isPending}
                 className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8"
               >
                 {isPending ? (

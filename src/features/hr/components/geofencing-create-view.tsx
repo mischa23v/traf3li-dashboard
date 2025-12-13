@@ -531,7 +531,7 @@ export function GeofencingCreateView() {
                                 </Button>
                                 <Button
                                     type="submit"
-                                    disabled={isPending || (type === 'polygon' && coordinates.length < 3)}
+                                    disabled={isPending}
                                     className="h-12 px-8 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
                                 >
                                     {isPending ? (
