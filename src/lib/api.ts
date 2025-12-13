@@ -84,11 +84,17 @@ apiClientNoVersion.interceptors.response.use(
     // DON'T auto-redirect on 401 for auth routes
     // Let the auth service decide what to do based on the specific endpoint
     // This prevents logout on temporary errors or non-auth 401s
+    // Support both nested error object (error.error.message) and root-level message
+    const errorObj = error.response?.data?.error
+    const errorMessage = errorObj?.messageAr || errorObj?.message || error.response?.data?.message || 'حدث خطأ غير متوقع'
+    const errorCode = errorObj?.code || error.response?.data?.code
+
     return Promise.reject({
       status: error.response?.status || 500,
-      message: error.response?.data?.message || 'حدث خطأ غير متوقع',
+      message: errorMessage,
+      code: errorCode,
       error: true,
-      requestId: error.response?.data?.requestId,
+      requestId: error.response?.data?.meta?.requestId || error.response?.data?.requestId,
       errors: error.response?.data?.errors,
     })
   }
@@ -304,7 +310,9 @@ apiClient.interceptors.response.use(
     // Handle 400 Bad Request - Validation errors
     if (error.response?.status === 400) {
       const errors = error.response?.data?.errors
-      const message = error.response?.data?.message
+      // Support both nested error object and root-level message
+      const errorObj = error.response?.data?.error
+      const message = errorObj?.messageAr || errorObj?.message || error.response?.data?.message
 
       // Show validation errors as toast messages
       if (errors && Array.isArray(errors)) {
@@ -336,11 +344,17 @@ apiClient.interceptors.response.use(
     }
 
     // Return formatted error with requestId and validation errors
+    // Support both nested error object (error.error.message) and root-level message
+    const errorObj = error.response?.data?.error
+    const errorMessage = errorObj?.messageAr || errorObj?.message || error.response?.data?.message || 'حدث خطأ غير متوقع'
+    const errorCode = errorObj?.code || error.response?.data?.code
+
     const formattedError = {
       status: error.response?.status || 500,
-      message: error.response?.data?.message || 'حدث خطأ غير متوقع',
+      message: errorMessage,
+      code: errorCode,
       error: true,
-      requestId: error.response?.data?.requestId,
+      requestId: error.response?.data?.meta?.requestId || error.response?.data?.requestId,
       errors: error.response?.data?.errors, // Validation errors array
     }
     console.log('[API Response] 📤 Rejecting with formatted error:', JSON.stringify(formattedError, null, 2))
@@ -354,6 +368,7 @@ apiClient.interceptors.response.use(
 export interface ApiError {
   status: number
   message: string
+  code?: string
   error: boolean
   requestId?: string
   errors?: Array<{ field: string; message: string }>
