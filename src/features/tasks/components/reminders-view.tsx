@@ -4,7 +4,7 @@ import { TasksSidebar } from './tasks-sidebar'
 import {
     Clock, MoreHorizontal, Plus,
     Calendar as CalendarIcon, Search, AlertCircle, ChevronLeft, Bell,
-    Eye, Trash2, CheckCircle, XCircle, UserPlus, Loader2, SortAsc, X
+    Eye, Trash2, CheckCircle, XCircle, UserPlus, Loader2, SortAsc, X, ArrowRight
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -44,6 +44,17 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
+import {
+    GosiCard,
+    GosiCardContent,
+    GosiInput,
+    GosiSelect,
+    GosiSelectContent,
+    GosiSelectItem,
+    GosiSelectTrigger,
+    GosiSelectValue,
+    GosiButton
+} from '@/components/ui/gosi-ui'
 import {
     Select,
     SelectContent,
@@ -296,290 +307,270 @@ export function RemindersView() {
                     {/* RIGHT COLUMN (Main Content) */}
                     <div className="lg:col-span-2 space-y-6">
 
-                        {/* FILTERS BAR */}
-                        <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
-                            <div className="flex flex-wrap items-center gap-3">
+                        {/* FILTERS BAR - Responsive Flex Wrap */}
+                        <GosiCard className="p-4 md:p-6 rounded-[2rem]">
+                            <div className="flex flex-wrap items-center gap-3 transition-all duration-300 ease-in-out">
                                 {/* Search Input */}
-                                <div className="relative flex-1 min-w-[200px] max-w-md">
-                                    <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
-                                    <Input
+                                <div className="relative flex-1 min-w-[200px]">
+                                    <Search className="absolute end-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" aria-hidden="true" />
+                                    <GosiInput
                                         type="text"
                                         placeholder={t('reminders.list.searchPlaceholder')}
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="pe-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
+                                        className="pe-12 h-14 w-full text-base"
                                     />
                                 </div>
 
-                                {/* Status Filter */}
-                                <Select value={activeTab} onValueChange={setActiveTab}>
-                                    <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
-                                        <SelectValue placeholder={t('reminders.list.status')} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="upcoming">{t('reminders.list.upcoming')}</SelectItem>
-                                        <SelectItem value="past">{t('reminders.list.past')}</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                {/* Status Filter (Tab Switcher) */}
+                                <div className="flex-1 min-w-[150px]">
+                                    <GosiSelect value={activeTab} onValueChange={setActiveTab}>
+                                        <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                                            <div className="flex items-center gap-2 truncate">
+                                                <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('reminders.list.status')}:</span>
+                                                <GosiSelectValue />
+                                            </div>
+                                        </GosiSelectTrigger>
+                                        <GosiSelectContent>
+                                            <GosiSelectItem value="upcoming">{t('reminders.list.upcoming')}</GosiSelectItem>
+                                            <GosiSelectItem value="past">{t('reminders.list.past')}</GosiSelectItem>
+                                        </GosiSelectContent>
+                                    </GosiSelect>
+                                </div>
 
                                 {/* Priority Filter */}
-                                <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                                    <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
-                                        <SelectValue placeholder={t('reminders.list.priority')} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">{t('reminders.list.allPriorities')}</SelectItem>
-                                        <SelectItem value="critical">{t('reminders.list.critical')}</SelectItem>
-                                        <SelectItem value="high">{t('reminders.list.high')}</SelectItem>
-                                        <SelectItem value="medium">{t('reminders.list.medium')}</SelectItem>
-                                        <SelectItem value="low">{t('reminders.list.low')}</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <div className="flex-1 min-w-[150px]">
+                                    <GosiSelect value={priorityFilter} onValueChange={setPriorityFilter}>
+                                        <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                                            <div className="flex items-center gap-2 truncate">
+                                                <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('reminders.list.priority')}:</span>
+                                                <GosiSelectValue />
+                                            </div>
+                                        </GosiSelectTrigger>
+                                        <GosiSelectContent>
+                                            <GosiSelectItem value="all">{t('reminders.list.allPriorities')}</GosiSelectItem>
+                                            <GosiSelectItem value="critical">{t('reminders.list.critical')}</GosiSelectItem>
+                                            <GosiSelectItem value="high">{t('reminders.list.high')}</GosiSelectItem>
+                                            <GosiSelectItem value="medium">{t('reminders.list.medium')}</GosiSelectItem>
+                                            <GosiSelectItem value="low">{t('reminders.list.low')}</GosiSelectItem>
+                                        </GosiSelectContent>
+                                    </GosiSelect>
+                                </div>
 
                                 {/* Type Filter */}
-                                <Select value={typeFilter} onValueChange={setTypeFilter}>
-                                    <SelectTrigger className="w-[150px] h-10 rounded-xl border-slate-200">
-                                        <SelectValue placeholder={t('reminders.list.type')} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">{t('reminders.list.allTypes')}</SelectItem>
-                                        <SelectItem value="general">{t('reminders.list.general')}</SelectItem>
-                                        <SelectItem value="court_hearing">{t('reminders.list.courtHearing')}</SelectItem>
-                                        <SelectItem value="filing_deadline">{t('reminders.list.filingDeadline')}</SelectItem>
-                                        <SelectItem value="payment_due">{t('reminders.list.paymentDue')}</SelectItem>
-                                        <SelectItem value="follow_up">{t('reminders.list.followUp')}</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <div className="flex-1 min-w-[180px]">
+                                    <GosiSelect value={typeFilter} onValueChange={setTypeFilter}>
+                                        <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                                            <div className="flex items-center gap-2 truncate">
+                                                <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('reminders.list.type')}:</span>
+                                                <GosiSelectValue />
+                                            </div>
+                                        </GosiSelectTrigger>
+                                        <GosiSelectContent>
+                                            <GosiSelectItem value="all">{t('reminders.list.allTypes')}</GosiSelectItem>
+                                            <GosiSelectItem value="general">{t('reminders.list.general')}</GosiSelectItem>
+                                            <GosiSelectItem value="court_hearing">{t('reminders.list.courtHearing')}</GosiSelectItem>
+                                            <GosiSelectItem value="filing_deadline">{t('reminders.list.filingDeadline')}</GosiSelectItem>
+                                            <GosiSelectItem value="payment_due">{t('reminders.list.paymentDue')}</GosiSelectItem>
+                                            <GosiSelectItem value="follow_up">{t('reminders.list.followUp')}</GosiSelectItem>
+                                        </GosiSelectContent>
+                                    </GosiSelect>
+                                </div>
 
                                 {/* Sort By */}
-                                <Select value={sortBy} onValueChange={setSortBy}>
-                                    <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
-                                        <SortAsc className="h-4 w-4 ms-2 text-slate-500" />
-                                        <SelectValue placeholder={t('reminders.list.sortBy')} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="reminderDateTime">{t('reminders.list.reminderDate')}</SelectItem>
-                                        <SelectItem value="priority">{t('reminders.list.priority')}</SelectItem>
-                                        <SelectItem value="createdAt">{t('reminders.list.creationDate')}</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <div className="flex-[0.5] min-w-[160px]">
+                                    <GosiSelect value={sortBy} onValueChange={setSortBy}>
+                                        <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                                            <div className="flex items-center gap-2 truncate">
+                                                <SortAsc className="h-4 w-4 text-emerald-500" />
+                                                <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('reminders.list.sortBy')}:</span>
+                                                <GosiSelectValue />
+                                            </div>
+                                        </GosiSelectTrigger>
+                                        <GosiSelectContent>
+                                            <GosiSelectItem value="reminderDateTime">{t('reminders.list.reminderDate')}</GosiSelectItem>
+                                            <GosiSelectItem value="priority">{t('reminders.list.priority')}</GosiSelectItem>
+                                            <GosiSelectItem value="createdAt">{t('reminders.list.creationDate')}</GosiSelectItem>
+                                        </GosiSelectContent>
+                                    </GosiSelect>
+                                </div>
 
                                 {/* Clear Filters Button */}
                                 {hasActiveFilters && (
-                                    <Button
+                                    <GosiButton
                                         variant="ghost"
-                                        size="sm"
                                         onClick={clearFilters}
-                                        className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
+                                        className="h-14 w-full md:w-auto text-red-500 hover:text-red-600 hover:bg-red-50 rounded-2xl border border-dashed border-red-200 px-6 hover:shadow-lg hover:shadow-red-500/10 transition-all"
                                     >
-                                        <X className="h-4 w-4 ms-2" aria-hidden="true" />
+                                        <X className="h-5 w-5 ms-2" aria-hidden="true" />
                                         {t('reminders.list.clearFilters')}
-                                    </Button>
+                                    </GosiButton>
                                 )}
                             </div>
-                        </div>
+                        </GosiCard>
 
-                        {/* MAIN REMINDERS LIST */}
-                        <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
-                            <div className="p-6 pb-2 flex justify-between items-center">
-                                <h3 className="font-bold text-navy text-xl">
-                                    {activeTab === 'upcoming' ? t('reminders.list.upcomingReminders') : t('reminders.list.pastReminders')}
-                                </h3>
-                                <Badge className="bg-slate-100 text-slate-600 border-0 rounded-full px-4 py-1">
-                                    {t('reminders.list.reminderCount', { count: reminders.length })}
-                                </Badge>
-                            </div>
+                        {/* REMINDERS LIST */}
+                        <div className="flex flex-col gap-4">
+                            {/* Loading State */}
+                            {isLoading && (
+                                <div className="space-y-4">
+                                    {[1, 2, 3].map((i) => (
+                                        <Skeleton key={i} className="h-40 w-full rounded-[2rem] bg-slate-100" />
+                                    ))}
+                                </div>
+                            )}
 
-                            <div className="p-4 space-y-4">
-                                {/* Loading State */}
-                                {isLoading && (
-                                    <>
-                                        {[1, 2, 3].map((i) => (
-                                            <div key={i} className="bg-[#F8F9FA] rounded-2xl p-6 border border-slate-100">
-                                                <div className="flex gap-4 mb-4">
-                                                    <Skeleton className="w-12 h-12 rounded-xl" />
-                                                    <div className="flex-1 space-y-2">
-                                                        <Skeleton className="h-6 w-3/4" />
-                                                        <Skeleton className="h-4 w-1/2" />
-                                                    </div>
-                                                </div>
-                                                <Skeleton className="h-16 w-full" />
-                                            </div>
-                                        ))}
-                                    </>
-                                )}
-
-                                {/* Error State */}
-                                {isError && (
-                                    <Alert className="border-red-200 bg-red-50">
-                                        <AlertCircle className="h-4 w-4 text-red-600" aria-hidden="true" />
-                                        <AlertDescription className="text-red-800">
-                                            <div className="flex items-center justify-between">
-                                                <span>حدث خطأ أثناء تحميل التذكيرات: {error?.message || 'خطأ غير معروف'}</span>
-                                                <Button onClick={() => refetch()} variant="outline" size="sm" className="border-red-300 text-red-700 hover:bg-red-100">
-                                                    إعادة المحاولة
-                                                </Button>
-                                            </div>
-                                        </AlertDescription>
-                                    </Alert>
-                                )}
-
-                                {/* Empty State */}
-                                {!isLoading && !isError && reminders.length === 0 && (
-                                    <div className="text-center py-12">
-                                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-50 mb-4">
-                                            <Bell className="h-8 w-8 text-emerald-500" />
+                            {/* Error State */}
+                            {isError && (
+                                <div className="bg-red-50 rounded-[2rem] p-12 text-center border border-red-100">
+                                    <div className="flex justify-center mb-4">
+                                        <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+                                            <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                                         </div>
-                                        <h4 className="text-lg font-bold text-navy mb-2">لا توجد تذكيرات</h4>
-                                        <p className="text-slate-500 mb-4">أنت جاهز تماماً! لا توجد تذكيرات في الوقت الحالي.</p>
-                                        <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
-                                            <Link to="/dashboard/tasks/reminders/new">
-                                                <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
-                                                إضافة تذكير جديد
-                                            </Link>
-                                        </Button>
                                     </div>
-                                )}
+                                    <h3 className="text-lg font-bold text-slate-900 mb-2">خطأ في التحميل</h3>
+                                    <p className="text-slate-500 mb-4">{error?.message || 'تعذر تحميل التذكيرات'}</p>
+                                    <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600">
+                                        إعادة المحاولة
+                                    </Button>
+                                </div>
+                            )}
 
-                                {/* Success State */}
-                                {!isLoading && !isError && reminders.map((reminder) => (
-                                    <div key={reminder.id} className={`bg-[#F8F9FA] rounded-2xl p-6 border transition-all group ${selectedReminderIds.includes(reminder.id) ? 'border-emerald-500 bg-emerald-50/30' : 'border-slate-100 hover:border-emerald-200'}`}>
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div className="flex gap-4 items-center">
-                                                {isSelectionMode && (
+                            {/* Empty State */}
+                            {!isLoading && !isError && reminders.length === 0 && (
+                                <div className="bg-white rounded-[2rem] p-12 border border-slate-100 text-center">
+                                    <div className="flex justify-center mb-4">
+                                        <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
+                                            <Bell className="w-8 h-8 text-emerald-500" />
+                                        </div>
+                                    </div>
+                                    <h3 className="text-lg font-bold text-slate-900 mb-2">{t('reminders.list.noReminders', 'لا توجد تذكيرات')}</h3>
+                                    <p className="text-slate-500 mb-4">{t('reminders.list.noRemindersDesc', 'أنت جاهز تماماً! لا توجد تذكيرات في الوقت الحالي.')}</p>
+                                    <GosiButton asChild className="bg-emerald-500 hover:bg-emerald-600">
+                                        <Link to="/dashboard/tasks/reminders/new">
+                                            <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
+                                            {t('reminders.list.newReminder', 'إضافة تذكير')}
+                                        </Link>
+                                    </GosiButton>
+                                </div>
+                            )}
+
+                            {/* Success State */}
+                            {!isLoading && !isError && reminders.map((reminder, index) => (
+                                <div
+                                    key={reminder.id}
+                                    style={{ animationDelay: `${index * 50}ms` }}
+                                    onClick={() => handleViewReminder(reminder.id)}
+                                    className={`
+                                        animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-backwards
+                                        bg-white rounded-[2rem] p-5 md:p-7
+                                        border-0 ring-1 ring-black/[0.03] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)]
+                                        transition-all duration-300 group 
+                                        hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1),0_8px_24px_-8px_rgba(0,0,0,0.04)] hover:-translate-y-1.5 
+                                        cursor-pointer relative overflow-hidden flex flex-col
+                                        ${selectedReminderIds.includes(reminder.id) ? 'ring-2 ring-emerald-500 bg-emerald-50/20' : ''}
+                                    `}
+                                >
+                                    {/* Status Strip Indicator */}
+                                    <div className={`absolute start-0 top-0 bottom-0 w-1.5 ${reminder.priority === 'critical' ? 'bg-red-500' :
+                                        reminder.priority === 'high' ? 'bg-orange-500' :
+                                            reminder.priority === 'medium' ? 'bg-amber-400' :
+                                                'bg-emerald-400'
+                                        } opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+
+                                    <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-4 ps-2">
+                                        {/* LEFT SIDE: Checkbox + Icon + Info */}
+                                        <div className="flex gap-5 items-start w-full md:w-auto">
+                                            {isSelectionMode && (
+                                                <div onClick={(e) => e.stopPropagation()}>
                                                     <Checkbox
                                                         checked={selectedReminderIds.includes(reminder.id)}
                                                         onCheckedChange={() => handleSelectReminder(reminder.id)}
-                                                        className="h-6 w-6 rounded-md border-slate-300 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
+                                                        className="h-6 w-6 mt-1 rounded-md border-slate-300 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500 flex-shrink-0 transition-all duration-200"
                                                     />
-                                                )}
-                                                <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-sm text-emerald-600">
-                                                    <Bell className="h-6 w-6" />
                                                 </div>
-                                                <div>
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <h4 className="font-bold text-navy text-lg">{reminder.title}</h4>
-                                                    </div>
-                                                    <p className="text-slate-500 text-sm flex items-center gap-2">
-                                                        <Clock className="h-3 w-3" aria-hidden="true" />
+                                            )}
+                                            {/* Clean Slate Icon Box */}
+                                            <div className="w-14 h-14 md:w-16 md:h-16 rounded-[1.2rem] bg-slate-50 flex items-center justify-center shadow-inner text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-600 group-hover:scale-105 transition-all duration-300 flex-shrink-0 border border-slate-100 group-hover:border-emerald-100">
+                                                <Bell className="h-7 w-7 md:h-8 md:w-8" strokeWidth={1.5} />
+                                            </div>
+                                            <div className="min-w-0 flex-1 space-y-1.5">
+                                                <div className="flex flex-wrap items-center gap-3 mb-1">
+                                                    <h4 className="font-bold text-slate-800 text-lg md:text-xl group-hover:text-emerald-800 transition-colors truncate leading-tight tracking-tight">{reminder.title}</h4>
+
+                                                    {reminder.priority === 'critical' && (
+                                                        <div className="flex items-center gap-1.5 bg-red-50 text-red-700 border border-red-100 rounded-full px-3 py-1 text-[11px] font-bold shadow-sm">
+                                                            <AlertCircle className="w-3 h-3" />
+                                                            {t('reminders.list.critical')}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-wrap items-center gap-4 text-slate-500 text-sm font-medium">
+                                                    <span className="flex items-center gap-2">
+                                                        <Clock className="w-4 h-4 text-emerald-500" />
                                                         {reminder.time}
-                                                    </p>
+                                                    </span>
+                                                    <span className="flex items-center gap-2">
+                                                        <CalendarIcon className="w-4 h-4 text-emerald-500" />
+                                                        {reminder.reminderDateFormatted.arabic}
+                                                    </span>
                                                 </div>
                                             </div>
+
+                                            {/* Mobile Chevron Indicator - Animated */}
+                                            <div className="md:hidden ms-auto text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-[-4px] transition-all duration-300 rtl:rotate-180 self-center">
+                                                <ChevronLeft className="h-6 w-6 rtl:rotate-0 ltr:rotate-180" />
+                                            </div>
+                                        </div>
+
+                                        {/* RIGHT SIDE: Action Menu (More actions) */}
+                                        <div className="absolute end-4 top-4" onClick={(e) => e.stopPropagation()}>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy">
-                                                        <MoreHorizontal className="h-5 w-5" />
+                                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy hover:bg-slate-100 rounded-xl">
+                                                        <MoreHorizontal className="h-6 w-6" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-48">
-                                                    <DropdownMenuItem onClick={() => handleViewReminder(reminder.id)}>
+                                                <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-xl border-0 ring-1 ring-black/5">
+                                                    <DropdownMenuItem onClick={() => handleViewReminder(reminder.id)} className="rounded-lg py-2.5 cursor-pointer">
                                                         <Eye className="h-4 w-4 ms-2" />
-                                                        عرض التفاصيل
+                                                        {t('reminders.list.viewDetails', 'عرض التفاصيل')}
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     {reminder.status !== 'completed' && (
-                                                        <DropdownMenuItem onClick={() => handleCompleteReminder(reminder.id)}>
-                                                            <CheckCircle className="h-4 w-4 ms-2" />
-                                                            إكمال
+                                                        <DropdownMenuItem onClick={() => handleCompleteReminder(reminder.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                            <CheckCircle className="h-4 w-4 ms-2 text-emerald-500" />
+                                                            {t('reminders.list.complete', 'إكمال')}
                                                         </DropdownMenuItem>
                                                     )}
-                                                    {reminder.status !== 'dismissed' && (
-                                                        <DropdownMenuItem onClick={() => handleDismissReminder(reminder.id)}>
-                                                            <XCircle className="h-4 w-4 ms-2" />
-                                                            تجاهل
-                                                        </DropdownMenuItem>
-                                                    )}
-                                                    {reminder.status !== 'completed' && reminder.status !== 'dismissed' && (
-                                                        <DropdownMenuSub>
-                                                            <DropdownMenuSubTrigger>
-                                                                <Clock className="h-4 w-4 ms-2" aria-hidden="true" />
-                                                                تأجيل
-                                                            </DropdownMenuSubTrigger>
-                                                            <DropdownMenuSubContent>
-                                                                {SNOOZE_OPTIONS.map((option) => (
-                                                                    <DropdownMenuItem
-                                                                        key={option.value}
-                                                                        onClick={() => handleSnoozeReminder(reminder.id, option.value)}
-                                                                    >
-                                                                        {option.label}
-                                                                    </DropdownMenuItem>
-                                                                ))}
-                                                            </DropdownMenuSubContent>
-                                                        </DropdownMenuSub>
-                                                    )}
-                                                    {reminder.status !== 'completed' && reminder.status !== 'dismissed' && (
-                                                        <DropdownMenuItem onClick={() => setDelegateReminderId(reminder.id)}>
-                                                            <UserPlus className="h-4 w-4 ms-2" />
-                                                            تفويض
-                                                        </DropdownMenuItem>
-                                                    )}
-                                                    <DropdownMenuSeparator />
                                                     <DropdownMenuItem
                                                         onClick={() => handleDeleteReminder(reminder.id)}
-                                                        className="text-red-600 focus:text-red-600"
+                                                        className="text-red-600 focus:text-red-600 rounded-lg py-2.5 cursor-pointer bg-red-50/50 hover:bg-red-50"
                                                     >
                                                         <Trash2 className="h-4 w-4 ms-2" />
-                                                        حذف
+                                                        {t('reminders.list.delete', 'حذف')}
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </div>
 
-                                        <div className="flex items-center justify-between pt-4 border-t border-slate-200/50">
-                                            <div className="flex items-center gap-4">
-                                                {/* Priority Dropdown */}
-                                                <div>
-                                                    <div className="text-xs text-slate-500 mb-1">الأولوية</div>
-                                                    <Select
-                                                        value={reminder.priority}
-                                                        onValueChange={(value) => handlePriorityChange(reminder.id, value)}
-                                                    >
-                                                        <SelectTrigger className={`w-[100px] h-8 text-xs font-bold rounded-lg border-0 ${
-                                                            reminder.priority === 'critical' ? 'bg-red-100 text-red-700' :
-                                                            reminder.priority === 'high' ? 'bg-orange-100 text-orange-700' :
-                                                            reminder.priority === 'medium' ? 'bg-amber-100 text-amber-700' :
-                                                            'bg-green-100 text-green-700'
-                                                        }`}>
-                                                            <SelectValue />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectItem value="critical">عاجلة جداً</SelectItem>
-                                                            <SelectItem value="high">عالية</SelectItem>
-                                                            <SelectItem value="medium">متوسطة</SelectItem>
-                                                            <SelectItem value="low">منخفضة</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
-                                                {/* Reminder Date - Dual Language */}
-                                                <div className="text-center">
-                                                    <div className="text-xs text-slate-500 mb-1">موعد التذكير</div>
-                                                    <div className="font-bold text-navy text-sm">{reminder.reminderDateFormatted.arabic}</div>
-                                                    <div className="text-xs text-slate-500">{reminder.reminderDateFormatted.english}</div>
-                                                </div>
-                                                {/* Creation Date - Dual Language */}
-                                                <div className="text-center">
-                                                    <div className="text-xs text-slate-500 mb-1">تاريخ الإنشاء</div>
-                                                    <div className="font-bold text-slate-600 text-sm">{reminder.createdAtFormatted.arabic}</div>
-                                                    <div className="text-xs text-slate-500">{reminder.createdAtFormatted.english}</div>
-                                                </div>
-                                            </div>
-                                            <Link to={`/dashboard/tasks/reminders/${reminder.id}` as any}>
-                                                <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
-                                                    عرض التفاصيل
-                                                </Button>
-                                            </Link>
+                                        {/* Desktop Action Button */}
+                                        <div className="hidden sm:inline-flex w-auto mt-auto self-center" onClick={(e) => e.stopPropagation()}>
+                                            <GosiButton onClick={() => handleViewReminder(reminder.id)} className="bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white border border-emerald-100 hover:border-emerald-500 rounded-xl px-6 h-10 shadow-sm hover:shadow-lg hover:shadow-emerald-500/20 w-auto transition-all duration-300 hover:scale-105 active:scale-95 group/btn">
+                                                {t('reminders.list.viewDetails', 'عرض التفاصيل')}
+                                                <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180 transition-transform group-hover/btn:translate-x-1 rtl:group-hover/btn:-translate-x-1" />
+                                            </GosiButton>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
+                                </div>
+                            ))}
+                        </div>
 
-                            <div className="p-4 pt-0 text-center">
-                                <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
-                                    عرض جميع التذكيرات
-                                    <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
-                                </Button>
-                            </div>
+                        <div className="p-4 pt-0 text-center">
+                            <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-2xl py-6 border border-dashed border-emerald-200 hover:border-emerald-300">
+                                {t('reminders.list.viewAllReminders', 'عرض جميع التذكيرات')}
+                                <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
+                            </Button>
                         </div>
                     </div>
 
