@@ -17,18 +17,23 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
-import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, CheckCircle, XCircle, Edit3, Calendar, SortAsc, Filter, X } from 'lucide-react'
+import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, CheckCircle, XCircle, Edit3, Calendar, SortAsc, Filter, X, ArrowRight } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { useDeleteTask, useCompleteTask, useReopenTask, useUpdateTask } from '@/hooks/useTasks'
 import { format } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
+import { Input } from '@/components/ui/input' // Keep for types if needed, but prefer GosiInput
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select'
+    GosiCard,
+    GosiCardContent,
+    GosiInput,
+    GosiSelect,
+    GosiSelectContent,
+    GosiSelectItem,
+    GosiSelectTrigger,
+    GosiSelectValue,
+    GosiButton
+} from '@/components/ui/gosi-ui'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -38,23 +43,13 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useCases } from '@/hooks/useCasesAndClients'
 import { useTeamMembers } from '@/hooks/useStaff'
-// Gosi Design System Components
-import {
-    GosiCard,
-    GosiInput,
-    GosiTaskCard,
-    GosiFilterBar,
-    GosiFilterSelect,
-    GosiIconBox,
-    GosiButton,
-    GosiPriorityBadge,
-} from '@/components/ui/gosi-ui'
 
 export function TasksListView() {
     const { t, i18n } = useTranslation()
     const navigate = useNavigate()
     const [activeStatusTab, setActiveStatusTab] = useState('active')
     const [isSelectionMode, setIsSelectionMode] = useState(false)
+    const [showFilters, setShowFilters] = useState(false) // New state for mobile filters
     const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([])
 
     // Filter states
@@ -215,20 +210,11 @@ export function TasksListView() {
     const handleDeleteSelected = () => {
         if (selectedTaskIds.length === 0) return
 
-        // DEBUG: Log task IDs being deleted
-        console.log('🗑️ Attempting to delete tasks:', selectedTaskIds)
-        console.log('📋 Current tasks in view:', tasks.map(t => ({ id: t.id, title: t.title })))
-
         if (confirm(t('tasks.list.deleteMultipleConfirm', { count: selectedTaskIds.length }))) {
             bulkDeleteTasks(selectedTaskIds, {
-                onSuccess: (result) => {
-                    console.log('✅ Bulk delete success:', result)
+                onSuccess: () => {
                     setIsSelectionMode(false)
                     setSelectedTaskIds([])
-                },
-                onError: (error: any) => {
-                    console.error('❌ Bulk delete failed:', error)
-                    console.error('Failed task IDs:', error?.failedIds)
                 }
             })
         }
@@ -240,7 +226,7 @@ export function TasksListView() {
     }
 
     const handleEditTask = (taskId: string) => {
-        navigate({ to: '/dashboard/tasks/create', search: { editId: taskId } })
+        navigate({ to: '/dashboard/tasks/create', search: { editId: taskId } } as any)
     }
 
     const handleDeleteTask = (taskId: string) => {
@@ -254,11 +240,11 @@ export function TasksListView() {
     }
 
     const handleReopenTask = (taskId: string) => {
-        reopenTaskMutation.mutate({ id: taskId })
+        reopenTaskMutation.mutate(taskId)
     }
 
     const handlePriorityChange = (taskId: string, priority: string) => {
-        updateTaskMutation.mutate({ id: taskId, data: { priority: priority as 'low' | 'medium' | 'high' | 'urgent' } })
+        updateTaskMutation.mutate({ id: taskId, data: { priority: priority as any } })
     }
 
     const topNav = [
@@ -300,7 +286,7 @@ export function TasksListView() {
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
                 {/* HERO CARD & STATS */}
-                <ProductivityHero badge={t('tasks.management')} title={t('tasks.title')} type="tasks" />
+                <ProductivityHero badge={t('tasks.management') + " (V2)"} title={t('tasks.title')} type="tasks" />
 
                 {/* MAIN GRID LAYOUT */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -308,271 +294,333 @@ export function TasksListView() {
                     {/* RIGHT COLUMN (Main Content) */}
                     <div className="lg:col-span-2 space-y-6">
 
-                        {/* FILTERS BAR - Gemini Spec: bg-white rounded-[2rem] p-4 md:p-6 shadow-sm */}
-                        <GosiCard className="p-4 md:p-6 shadow-sm">
-                            <GosiFilterBar className="gap-4">
-                                {/* Search Input - h-14 to match filters */}
-                                <div className="relative flex-1 min-w-[220px] max-w-md">
-                                    <Search className="absolute end-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" aria-hidden="true" />
-                                    <GosiInput
-                                        type="text"
-                                        placeholder={t('tasks.list.searchPlaceholder')}
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="pe-12 h-14"
-                                    />
+                        {/* FILTERS BAR - Responsive Collapsible Grid */}
+                        <GosiCard className="p-4 md:p-6 rounded-[2rem]">
+                            <div className="space-y-4">
+                                {/* Top Row: Search + Mobile Filter Toggle */}
+                                <div className="flex flex-col lg:flex-row gap-3">
+                                    <div className="relative w-full">
+                                        <Search className="absolute end-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" aria-hidden="true" />
+                                        <GosiInput
+                                            type="text"
+                                            placeholder={t('tasks.list.searchPlaceholder')}
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            className="pe-12 h-14 w-full text-base"
+                                        />
+                                    </div>
+
+                                    {/* Mobile/Tablet Filter Toggle Button */}
+                                    <GosiButton
+                                        variant={showFilters || hasActiveFilters ? "default" : "outline"}
+                                        onClick={() => setShowFilters(!showFilters)}
+                                        className={`lg:hidden h-14 w-full sm:w-auto px-6 whitespace-nowrap transition-all ${showFilters || hasActiveFilters ? 'bg-navy text-white border-navy' : ''}`}
+                                    >
+                                        <Filter className="h-5 w-5 ms-2" />
+                                        {t('tasks.list.filters', 'تصفية')}
+                                        {hasActiveFilters && (
+                                            <span className="ms-2 bg-emerald-500 text-white text-[10px] px-2 py-0.5 rounded-full">
+                                                !
+                                            </span>
+                                        )}
+                                    </GosiButton>
+
+                                    {/* Clear All Button (Desktop) - Optional placement, but kept in grid for now */}
                                 </div>
 
-                                {/* Status Filter - min-w-[220px] */}
-                                <GosiFilterSelect
-                                    value={activeStatusTab}
-                                    onValueChange={setActiveStatusTab}
-                                    placeholder={t('tasks.list.status')}
-                                >
-                                    <SelectItem value="active">{t('tasks.list.active')}</SelectItem>
-                                    <SelectItem value="completed">{t('tasks.list.completed')}</SelectItem>
-                                </GosiFilterSelect>
+                                {/* filters container - Responsive Flex Wrap for Best Text Fit */}
+                                <div className={`${showFilters ? 'flex' : 'hidden'} lg:flex flex-wrap gap-4 transition-all duration-300 ease-in-out`}>
 
-                                {/* Priority Filter - Gemini Spec: min-w-[240px] for Arabic */}
-                                <GosiFilterSelect
-                                    value={priorityFilter}
-                                    onValueChange={setPriorityFilter}
-                                    placeholder={t('tasks.list.priorityLabel')}
-                                    minWidth="240px"
-                                >
-                                    <SelectItem value="all">{t('tasks.list.allPriorities')}</SelectItem>
-                                    <SelectItem value="urgent">{t('tasks.priorities.urgent')}</SelectItem>
-                                    <SelectItem value="high">{t('tasks.priorities.high')}</SelectItem>
-                                    <SelectItem value="medium">{t('tasks.priorities.medium')}</SelectItem>
-                                    <SelectItem value="low">{t('tasks.priorities.low')}</SelectItem>
-                                </GosiFilterSelect>
+                                    {/* Status */}
+                                    <div className="flex-1 min-w-[220px]">
+                                        <GosiSelect value={activeStatusTab} onValueChange={setActiveStatusTab}>
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                                                <div className="flex items-center gap-2 truncate">
+                                                    <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('tasks.list.status')}:</span>
+                                                    <GosiSelectValue />
+                                                </div>
+                                            </GosiSelectTrigger>
+                                            <GosiSelectContent>
+                                                <GosiSelectItem value="active">{t('tasks.list.active')}</GosiSelectItem>
+                                                <GosiSelectItem value="completed">{t('tasks.list.completed')}</GosiSelectItem>
+                                            </GosiSelectContent>
+                                        </GosiSelect>
+                                    </div>
 
-                                {/* Assigned To Filter - min-w-[220px] */}
-                                <GosiFilterSelect
-                                    value={assignedFilter}
-                                    onValueChange={setAssignedFilter}
-                                    placeholder={t('tasks.list.responsible')}
-                                >
-                                    <SelectItem value="all">{t('tasks.list.all')}</SelectItem>
-                                    <SelectItem value="me">{t('tasks.list.myTasks')}</SelectItem>
-                                    <SelectItem value="unassigned">{t('tasks.list.unassigned')}</SelectItem>
-                                    {teamMembers?.map((member: any) => (
-                                        <SelectItem key={member._id} value={member._id}>
-                                            {member.name || member.email}
-                                        </SelectItem>
-                                    ))}
-                                </GosiFilterSelect>
+                                    {/* Priority - Extra Wide for Arabic */}
+                                    <div className="flex-1 min-w-[240px]">
+                                        <GosiSelect value={priorityFilter} onValueChange={setPriorityFilter}>
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                                                <div className="flex items-center gap-2 truncate">
+                                                    <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('tasks.list.priorityLabel')}:</span>
+                                                    <GosiSelectValue />
+                                                </div>
+                                            </GosiSelectTrigger>
+                                            <GosiSelectContent>
+                                                <GosiSelectItem value="all">{t('tasks.list.allPriorities')}</GosiSelectItem>
+                                                <GosiSelectItem value="urgent">{t('tasks.priorities.urgent')}</GosiSelectItem>
+                                                <GosiSelectItem value="high">{t('tasks.priorities.high')}</GosiSelectItem>
+                                                <GosiSelectItem value="medium">{t('tasks.priorities.medium')}</GosiSelectItem>
+                                                <GosiSelectItem value="low">{t('tasks.priorities.low')}</GosiSelectItem>
+                                            </GosiSelectContent>
+                                        </GosiSelect>
+                                    </div>
 
-                                {/* Due Date Filter - min-w-[220px] */}
-                                <GosiFilterSelect
-                                    value={dueDateFilter}
-                                    onValueChange={setDueDateFilter}
-                                    placeholder={t('tasks.list.dueDate')}
-                                    icon={<Calendar className="h-4 w-4" />}
-                                >
-                                    <SelectItem value="all">{t('tasks.list.allDates')}</SelectItem>
-                                    <SelectItem value="today">{t('tasks.list.today')}</SelectItem>
-                                    <SelectItem value="thisWeek">{t('tasks.list.thisWeek')}</SelectItem>
-                                    <SelectItem value="thisMonth">{t('tasks.list.thisMonth')}</SelectItem>
-                                    <SelectItem value="overdue">{t('tasks.list.overdue')}</SelectItem>
-                                    <SelectItem value="noDueDate">{t('tasks.list.noDueDate')}</SelectItem>
-                                </GosiFilterSelect>
+                                    {/* Assigned To */}
+                                    <div className="flex-1 min-w-[220px]">
+                                        <GosiSelect value={assignedFilter} onValueChange={setAssignedFilter}>
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                                                <div className="flex items-center gap-2 truncate">
+                                                    <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('tasks.list.responsible')}:</span>
+                                                    <GosiSelectValue />
+                                                </div>
+                                            </GosiSelectTrigger>
+                                            <GosiSelectContent>
+                                                <GosiSelectItem value="all">{t('tasks.list.all')}</GosiSelectItem>
+                                                <GosiSelectItem value="me">{t('tasks.list.myTasks')}</GosiSelectItem>
+                                                <GosiSelectItem value="unassigned">{t('tasks.list.unassigned')}</GosiSelectItem>
+                                                {teamMembers?.map((member: any) => (
+                                                    <GosiSelectItem key={member._id} value={member._id}>
+                                                        {member.name || member.email}
+                                                    </GosiSelectItem>
+                                                ))}
+                                            </GosiSelectContent>
+                                        </GosiSelect>
+                                    </div>
 
-                                {/* Case Filter - min-w-[220px] */}
-                                <GosiFilterSelect
-                                    value={caseFilter}
-                                    onValueChange={setCaseFilter}
-                                    placeholder={t('tasks.list.case')}
-                                    icon={<Briefcase className="h-4 w-4" />}
-                                >
-                                    <SelectItem value="all">{t('tasks.list.allCases')}</SelectItem>
-                                    {casesData?.cases?.map((caseItem: any) => (
-                                        <SelectItem key={caseItem._id} value={caseItem._id}>
-                                            {caseItem.title || caseItem.caseNumber}
-                                        </SelectItem>
-                                    ))}
-                                </GosiFilterSelect>
+                                    {/* Due Date */}
+                                    <div className="flex-1 min-w-[220px]">
+                                        <GosiSelect value={dueDateFilter} onValueChange={setDueDateFilter}>
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                                                <div className="flex items-center gap-2 truncate">
+                                                    <Calendar className="h-4 w-4 text-emerald-500" aria-hidden="true" />
+                                                    <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('tasks.list.dueDate')}:</span>
+                                                    <GosiSelectValue />
+                                                </div>
+                                            </GosiSelectTrigger>
+                                            <GosiSelectContent>
+                                                <GosiSelectItem value="all">{t('tasks.list.allDates')}</GosiSelectItem>
+                                                <GosiSelectItem value="today">{t('tasks.list.today')}</GosiSelectItem>
+                                                <GosiSelectItem value="thisWeek">{t('tasks.list.thisWeek')}</GosiSelectItem>
+                                                <GosiSelectItem value="thisMonth">{t('tasks.list.thisMonth')}</GosiSelectItem>
+                                                <GosiSelectItem value="overdue">{t('tasks.list.overdue')}</GosiSelectItem>
+                                                <GosiSelectItem value="noDueDate">{t('tasks.list.noDueDate')}</GosiSelectItem>
+                                            </GosiSelectContent>
+                                        </GosiSelect>
+                                    </div>
 
-                                {/* Sort By - min-w-[220px] */}
-                                <GosiFilterSelect
-                                    value={sortBy}
-                                    onValueChange={setSortBy}
-                                    placeholder={t('tasks.list.sortBy')}
-                                    icon={<SortAsc className="h-4 w-4" />}
-                                >
-                                    <SelectItem value="dueDate">{t('tasks.list.dueDate')}</SelectItem>
-                                    <SelectItem value="priority">{t('tasks.list.priorityLabel')}</SelectItem>
-                                    <SelectItem value="createdAt">{t('tasks.list.creationDate')}</SelectItem>
-                                    <SelectItem value="title">{t('tasks.list.name')}</SelectItem>
-                                </GosiFilterSelect>
+                                    {/* Case Filter */}
+                                    <div className="flex-1 min-w-[220px]">
+                                        <GosiSelect value={caseFilter} onValueChange={setCaseFilter}>
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                                                <div className="flex items-center gap-2 truncate">
+                                                    <Briefcase className="h-4 w-4 text-emerald-500" />
+                                                    <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('tasks.list.case')}:</span>
+                                                    <GosiSelectValue />
+                                                </div>
+                                            </GosiSelectTrigger>
+                                            <GosiSelectContent>
+                                                <GosiSelectItem value="all">{t('tasks.list.allCases')}</GosiSelectItem>
+                                                {casesData?.cases?.map((caseItem: any) => (
+                                                    <GosiSelectItem key={caseItem._id} value={caseItem._id}>
+                                                        {caseItem.title || caseItem.caseNumber}
+                                                    </GosiSelectItem>
+                                                ))}
+                                            </GosiSelectContent>
+                                        </GosiSelect>
+                                    </div>
 
-                                {/* Clear Filters Button */}
-                                {hasActiveFilters && (
-                                    <GosiButton
-                                        variant="danger"
-                                        size="sm"
-                                        onClick={clearFilters}
-                                    >
-                                        <X className="h-4 w-4" aria-hidden="true" />
-                                        {t('tasks.list.clearFilters')}
-                                    </GosiButton>
-                                )}
-                            </GosiFilterBar>
+                                    {/* Sort By */}
+                                    <div className="flex-[0.5] min-w-[180px]">
+                                        <GosiSelect value={sortBy} onValueChange={setSortBy}>
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                                                <div className="flex items-center gap-2 truncate">
+                                                    <SortAsc className="h-4 w-4 text-emerald-500" />
+                                                    <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('tasks.list.sortBy')}:</span>
+                                                    <GosiSelectValue />
+                                                </div>
+                                            </GosiSelectTrigger>
+                                            <GosiSelectContent>
+                                                <GosiSelectItem value="dueDate">{t('tasks.list.dueDate')}</GosiSelectItem>
+                                                <GosiSelectItem value="priority">{t('tasks.list.priorityLabel')}</GosiSelectItem>
+                                                <GosiSelectItem value="createdAt">{t('tasks.list.creationDate')}</GosiSelectItem>
+                                                <GosiSelectItem value="title">{t('tasks.list.name')}</GosiSelectItem>
+                                            </GosiSelectContent>
+                                        </GosiSelect>
+                                    </div>
+
+                                    {/* Clear Filters */}
+                                    {hasActiveFilters && (
+                                        <div className="flex items-center">
+                                            <GosiButton
+                                                variant="ghost"
+                                                onClick={clearFilters}
+                                                className="h-14 w-full md:w-auto text-red-500 hover:text-red-600 hover:bg-red-50 rounded-2xl border border-dashed border-red-200 px-6 hover:shadow-lg hover:shadow-red-500/10 transition-all"
+                                            >
+                                                <X className="h-5 w-5 ms-2" aria-hidden="true" />
+                                                {t('tasks.list.clearFilters')}
+                                            </GosiButton>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </GosiCard>
 
-                        {/* MAIN TASKS LIST - Clean Slate Pattern (Unboxed Floating Cards) */}
-                        <div className="space-y-4">
-                            {/* Header */}
-                            <div className="flex justify-between items-center px-2">
-                                <h3 className="font-bold text-slate-900 text-xl">
-                                    {activeStatusTab === 'active' ? t('tasks.list.activeTasks') : t('tasks.list.completedTasks')}
-                                </h3>
-                                <Badge className="bg-emerald-50 text-emerald-700 border-emerald-100 border rounded-full px-4 py-1.5 font-semibold">
-                                    {t('tasks.list.taskCount', { count: tasks.length })}
-                                </Badge>
-                            </div>
+                        {/* LIST OF TASKS - REDESIGNED "10/10" */}
+                        <div className="flex flex-col gap-4">
+                            {isLoading && (
+                                <div className="space-y-4">
+                                    {[1, 2, 3].map((i) => (
+                                        <Skeleton key={i} className="h-48 w-full rounded-[2rem] bg-slate-100" />
+                                    ))}
+                                </div>
+                            )}
 
-                            {/* Task Cards - Floating Islands */}
-                            <div className="space-y-4">
-                                {/* Loading State */}
-                                {isLoading && (
-                                    <>
-                                        {[1, 2, 3].map((i) => (
-                                            <div key={i} className="bg-[#F8F9FA] rounded-2xl p-6 border border-slate-100">
-                                                <div className="flex gap-4 mb-4">
-                                                    <Skeleton className="w-12 h-12 rounded-xl" />
-                                                    <div className="flex-1 space-y-2">
-                                                        <Skeleton className="h-6 w-3/4" />
-                                                        <Skeleton className="h-4 w-1/2" />
-                                                    </div>
-                                                </div>
-                                                <Skeleton className="h-20 w-full" />
-                                            </div>
-                                        ))}
-                                    </>
-                                )}
-
-                                {/* Error State */}
-                                {isError && (
-                                    <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
-                                        <div className="flex justify-center mb-4">
-                                            <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                                                <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
-                                            </div>
+                            {isError && (
+                                <div className="bg-red-50 rounded-[2rem] p-12 text-center border border-red-100">
+                                    <div className="flex justify-center mb-4">
+                                        <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+                                            <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                                         </div>
-                                        <h3 className="text-lg font-bold text-slate-900 mb-2">{t('tasks.list.errorLoading')}</h3>
-                                        <p className="text-slate-500 mb-4">{error?.message || t('tasks.list.connectionError')}</p>
-                                        <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600">
-                                            {t('tasks.list.retry')}
-                                        </Button>
                                     </div>
-                                )}
+                                    <h3 className="text-lg font-bold text-slate-900 mb-2">{t('tasks.list.errorLoading')}</h3>
+                                    <p className="text-slate-500 mb-4">{error?.message || t('tasks.list.connectionError')}</p>
+                                    <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600">
+                                        {t('tasks.list.retry')}
+                                    </Button>
+                                </div>
+                            )}
 
-                                {/* Empty State */}
-                                {!isLoading && !isError && tasks.length === 0 && (
-                                    <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
-                                        <div className="flex justify-center mb-4">
-                                            <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
-                                                <Briefcase className="w-8 h-8 text-emerald-500" />
-                                            </div>
+                            {/* Empty State */}
+                            {!isLoading && !isError && tasks.length === 0 && (
+                                <div className="bg-white rounded-[2rem] p-12 border border-slate-100 text-center">
+                                    <div className="flex justify-center mb-4">
+                                        <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
+                                            <Briefcase className="w-8 h-8 text-emerald-500" />
                                         </div>
-                                        <h3 className="text-lg font-bold text-slate-900 mb-2">{t('tasks.list.noTasks')}</h3>
-                                        <p className="text-slate-500 mb-4">{t('tasks.list.noTasksDescription')}</p>
-                                        <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                                            <Link to="/dashboard/tasks/new">
-                                                <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
-                                                {t('tasks.list.newTask')}
-                                            </Link>
-                                        </Button>
                                     </div>
-                                )}
+                                    <h3 className="text-lg font-bold text-slate-900 mb-2">{t('tasks.list.noTasks')}</h3>
+                                    <p className="text-slate-500 mb-4">{t('tasks.list.noTasksDescription')}</p>
+                                    <GosiButton asChild className="bg-emerald-500 hover:bg-emerald-600">
+                                        <Link to="/dashboard/tasks/new">
+                                            <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
+                                            {t('tasks.list.newTask')}
+                                        </Link>
+                                    </GosiButton>
+                                </div>
+                            )}
 
-                                {/* Success State - Tasks List with Gosi Clean Slate Pattern */}
-                                {!isLoading && !isError && tasks.map((task, index) => (
-                                    <GosiTaskCard
-                                        key={task.id}
-                                        priority={task.priority as 'urgent' | 'high' | 'medium' | 'low'}
-                                        isSelected={selectedTaskIds.includes(task.id)}
-                                        animationDelay={index * 50}
-                                        className="p-6 cursor-pointer"
-                                        onClick={() => handleViewTask(task.id)}
-                                    >
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div className="flex gap-4 items-center">
-                                                {isSelectionMode && (
+                            {/* Success State - Tasks List */}
+                            {!isLoading && !isError && tasks.map((task, index) => (
+                                <div
+                                    key={task.id}
+                                    onClick={() => navigate({ to: '/dashboard/tasks/$taskId', params: { taskId: task.id } })}
+                                    style={{ animationDelay: `${index * 50}ms` }}
+                                    className={`
+                                        animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-backwards
+                                        bg-white rounded-[2rem] p-5 md:p-7
+                                        border-0 ring-1 ring-black/[0.03] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)]
+                                        transition-all duration-300 group 
+                                        hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1),0_8px_24px_-8px_rgba(0,0,0,0.04)] hover:-translate-y-1.5 
+                                        cursor-pointer relative overflow-hidden
+                                        ${selectedTaskIds.includes(task.id) ? 'ring-2 ring-emerald-500 bg-emerald-50/20' : ''}
+                                    `}
+                                >
+                                    {/* Status Strip Indicator */}
+                                    <div className={`absolute start-0 top-0 bottom-0 w-1.5 ${task.priority === 'urgent' ? 'bg-red-500' :
+                                        task.priority === 'high' ? 'bg-orange-500' :
+                                            task.priority === 'medium' ? 'bg-amber-400' :
+                                                'bg-emerald-400'
+                                        } opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+
+                                    <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-4 ps-2">
+                                        {/* LEFT SIDE: Checkbox + Icon + Info */}
+                                        <div className="flex gap-5 items-start w-full md:w-auto">
+                                            {isSelectionMode && (
+                                                <div onClick={(e) => e.stopPropagation()}>
                                                     <Checkbox
                                                         checked={selectedTaskIds.includes(task.id)}
-                                                        onCheckedChange={(e) => {
-                                                            e.preventDefault?.()
-                                                            handleSelectTask(task.id)
-                                                        }}
-                                                        onClick={(e) => e.stopPropagation()}
-                                                        className="h-6 w-6 rounded-md border-slate-300 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
+                                                        onCheckedChange={() => handleSelectTask(task.id)}
+                                                        className="h-6 w-6 mt-1 rounded-md border-slate-300 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500 flex-shrink-0 transition-all duration-200"
                                                     />
-                                                )}
-                                                {/* Gemini Spec: Icon Box - w-14 h-14 (Mobile) / w-16 h-16 (Desktop) */}
-                                                <GosiIconBox variant="soft" size="md" className="sm:w-16 sm:h-16">
-                                                    <Briefcase className="h-6 w-6 sm:h-7 sm:w-7" />
-                                                </GosiIconBox>
-                                                <div>
-                                                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                                        <h4 className="font-bold text-slate-900 text-lg">{task.title}</h4>
+                                                </div>
+                                            )}
+                                            {/* Reverted to Clean Slate/Emerald Look */}
+                                            <div className="w-14 h-14 md:w-16 md:h-16 rounded-[1.2rem] bg-slate-50 flex items-center justify-center shadow-inner text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-600 group-hover:scale-105 transition-all duration-300 flex-shrink-0 border border-slate-100 group-hover:border-emerald-100">
+                                                <Briefcase className="h-7 w-7 md:h-8 md:w-8" strokeWidth={1.5} />
+                                            </div>
+                                            <div className="min-w-0 flex-1 space-y-1.5">
+                                                <div className="flex flex-wrap items-center gap-3 mb-1">
+                                                    <h4 className="font-bold text-slate-800 text-lg md:text-xl group-hover:text-emerald-800 transition-colors truncate leading-tight tracking-tight">{task.title}</h4>
+
+                                                    <div className="flex items-center gap-2">
                                                         {task.status === 'active' && (
-                                                            <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border-0 rounded-full px-2.5 py-0.5 text-xs">{t('tasks.list.active')}</Badge>
+                                                            <div className="flex items-center gap-1.5 bg-blue-50/80 text-blue-700 border border-blue-100 rounded-full px-3 py-1 text-[11px] font-bold shadow-sm">
+                                                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                                                                {t('tasks.list.active')}
+                                                            </div>
                                                         )}
                                                         {/* Task ↔ Event Sync Badge */}
                                                         {(task.linkedEventId || task.eventId) && (
-                                                            <Badge
-                                                                className="bg-purple-100 text-purple-700 hover:bg-purple-200 border-0 rounded-full px-2.5 py-0.5 text-xs flex items-center gap-1 cursor-pointer transition-all"
+                                                            <div
+                                                                className="bg-purple-50/80 text-purple-700 hover:bg-purple-100 border border-purple-100 rounded-full px-3 py-1 flex items-center gap-1.5 cursor-pointer transition-all text-[11px] font-bold shadow-sm"
                                                                 onClick={(e) => {
                                                                     e.stopPropagation()
-                                                                    navigate({ to: '/dashboard/tasks/events/$eventId', params: { eventId: task.linkedEventId || task.eventId } })
+                                                                    navigate({ to: '/dashboard/tasks/events/$eventId', params: { eventId: task.linkedEventId || task.eventId } } as any)
                                                                 }}
                                                             >
                                                                 <Calendar className="h-3 w-3" />
                                                                 {t('tasks.list.linkedEvent', 'مرتبط بحدث')}
-                                                            </Badge>
+                                                            </div>
                                                         )}
                                                     </div>
-                                                    <p className="text-slate-500 text-sm">{t('tasks.list.taskClient', { name: task.client })}</p>
                                                 </div>
+                                                <p className="text-slate-500 text-sm font-medium flex items-center gap-2">
+                                                    <span className="text-slate-400">@</span>
+                                                    {t('tasks.list.taskClient', { name: task.client })}
+                                                </p>
                                             </div>
+
+                                            {/* Mobile Chevron Indicator - Animated */}
+                                            <div className="md:hidden ms-auto text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-[-4px] transition-all duration-300 rtl:rotate-180 self-center">
+                                                <ChevronLeft className="h-6 w-6 rtl:rotate-0 ltr:rotate-180" />
+                                            </div>
+                                        </div>
+
+                                        {/* RIGHT SIDE: Action Menu (Absolute on mobile top-right, or just stacked) */}
+                                        <div className="flex md:hidden absolute end-4 top-4 pt-1" onClick={(e) => e.stopPropagation()}>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl"
-                                                        onClick={(e) => e.stopPropagation()}
-                                                    >
-                                                        <MoreHorizontal className="h-5 w-5" />
+                                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy hover:bg-slate-100 rounded-xl">
+                                                        <MoreHorizontal className="h-6 w-6" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-48 rounded-xl">
-                                                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditTask(task.id) }}>
+                                                <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-xl border-0 ring-1 ring-black/5">
+                                                    <DropdownMenuItem onClick={() => handleEditTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
                                                         <Edit3 className="h-4 w-4 ms-2 text-blue-500" aria-hidden="true" />
                                                         {t('tasks.list.editTask')}
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleViewTask(task.id) }}>
+                                                    {/* View Details is now the card click, but keep in menu for accessibility */}
+                                                    <DropdownMenuItem onClick={() => handleViewTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
                                                         <Eye className="h-4 w-4 ms-2" />
                                                         {t('tasks.list.viewDetails')}
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     {task.status !== 'done' ? (
-                                                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleCompleteTask(task.id) }}>
+                                                        <DropdownMenuItem onClick={() => handleCompleteTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
                                                             <CheckCircle className="h-4 w-4 ms-2 text-emerald-500" />
                                                             {t('tasks.list.completeTask')}
                                                         </DropdownMenuItem>
                                                     ) : (
-                                                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleReopenTask(task.id) }}>
+                                                        <DropdownMenuItem onClick={() => handleReopenTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
                                                             <XCircle className="h-4 w-4 ms-2 text-amber-500" />
                                                             {t('tasks.list.reopenTask')}
                                                         </DropdownMenuItem>
                                                     )}
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem
-                                                        onClick={(e) => { e.stopPropagation(); handleDeleteTask(task.id) }}
-                                                        className="text-red-600 focus:text-red-600"
+                                                        onClick={() => handleDeleteTask(task.id)}
+                                                        className="text-red-600 focus:text-red-600 rounded-lg py-2.5 cursor-pointer bg-red-50/50 hover:bg-red-50"
                                                     >
                                                         <Trash2 className="h-4 w-4 ms-2" />
                                                         {t('tasks.list.deleteTask')}
@@ -581,63 +629,99 @@ export function TasksListView() {
                                             </DropdownMenu>
                                         </div>
 
-                                        <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                                            <div className="flex items-center gap-4 flex-wrap">
-                                                {/* Priority Badge - w-[140px] for Arabic */}
-                                                <div onClick={(e) => e.stopPropagation()}>
-                                                    <div className="text-xs text-slate-500 mb-1">{t('tasks.list.priorityLabel')}</div>
-                                                    <Select
-                                                        value={task.priority}
-                                                        onValueChange={(value) => handlePriorityChange(task.id, value)}
+                                        {/* DESKTOP Action Menu */}
+                                        <div className="hidden md:flex" onClick={(e) => e.stopPropagation()}>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy hover:bg-slate-100 rounded-xl">
+                                                        <MoreHorizontal className="h-6 w-6" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-xl border-0 ring-1 ring-black/5">
+                                                    <DropdownMenuItem onClick={() => handleEditTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                        <Edit3 className="h-4 w-4 ms-2 text-blue-500" aria-hidden="true" />
+                                                        {t('tasks.list.editTask')}
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleViewTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                        <Eye className="h-4 w-4 ms-2" />
+                                                        {t('tasks.list.viewDetails')}
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                    {task.status !== 'done' ? (
+                                                        <DropdownMenuItem onClick={() => handleCompleteTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                            <CheckCircle className="h-4 w-4 ms-2 text-emerald-500" />
+                                                            {t('tasks.list.completeTask')}
+                                                        </DropdownMenuItem>
+                                                    ) : (
+                                                        <DropdownMenuItem onClick={() => handleReopenTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                            <XCircle className="h-4 w-4 ms-2 text-amber-500" />
+                                                            {t('tasks.list.reopenTask')}
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem
+                                                        onClick={() => handleDeleteTask(task.id)}
+                                                        className="text-red-600 focus:text-red-600 rounded-lg py-2.5 cursor-pointer bg-red-50/50 hover:bg-red-50"
                                                     >
-                                                        <SelectTrigger className={`w-[140px] h-8 text-xs font-bold rounded-xl border-0 ${
-                                                            task.priority === 'urgent' ? 'bg-red-100 text-red-700' :
-                                                            task.priority === 'high' ? 'bg-orange-100 text-orange-700' :
-                                                            task.priority === 'medium' ? 'bg-amber-100 text-amber-700' :
-                                                            'bg-green-100 text-green-700'
-                                                        }`}>
-                                                            <SelectValue />
-                                                        </SelectTrigger>
-                                                        <SelectContent className="rounded-xl">
-                                                            <SelectItem value="urgent">{t('tasks.priorities.urgent')}</SelectItem>
-                                                            <SelectItem value="high">{t('tasks.priorities.high')}</SelectItem>
-                                                            <SelectItem value="medium">{t('tasks.priorities.medium')}</SelectItem>
-                                                            <SelectItem value="low">{t('tasks.priorities.low')}</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
+                                                        <Trash2 className="h-4 w-4 ms-2" />
+                                                        {t('tasks.list.deleteTask')}
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-5 mt-3 border-t border-slate-50 gap-4 ps-2">
+                                        <div className="flex flex-wrap items-center gap-4 sm:gap-8 w-full sm:w-auto" onClick={(e) => e.stopPropagation()}>
+                                            {/* Priority Dropdown - WIDENED to 140px */}
+                                            <div>
+                                                <div className="text-[10px] uppercase tracking-wider text-slate-400 mb-1.5 font-bold flex items-center gap-1">
+                                                    {t('tasks.list.priorityLabel')}
                                                 </div>
-                                                {/* Due Date - Dual Language */}
-                                                <div className="text-center">
-                                                    <div className="text-xs text-slate-500 mb-1">{t('tasks.list.dueDate')}</div>
-                                                    <div className="font-bold text-slate-800 text-sm">{task.dueDateFormatted.arabic}</div>
-                                                    <div className="text-xs text-slate-400">{task.dueDateFormatted.english}</div>
-                                                </div>
-                                                {/* Creation Date - Dual Language (Hidden on mobile) */}
-                                                <div className="text-center hidden sm:block">
-                                                    <div className="text-xs text-slate-500 mb-1">{t('tasks.list.createdAt')}</div>
-                                                    <div className="font-bold text-slate-600 text-sm">{task.createdAtFormatted.arabic}</div>
-                                                    <div className="text-xs text-slate-400">{task.createdAtFormatted.english}</div>
-                                                </div>
-                                            </div>
-                                            {/* View Details - Soft Button (Desktop) / Chevron (Mobile) */}
-                                            <div className="hidden sm:block" onClick={(e) => e.stopPropagation()}>
-                                                <GosiButton
-                                                    variant="soft"
-                                                    size="sm"
-                                                    onClick={() => handleViewTask(task.id)}
+                                                <GosiSelect
+                                                    value={task.priority}
+                                                    onValueChange={(value) => handlePriorityChange(task.id, value)}
                                                 >
-                                                    {t('tasks.list.viewDetails')}
-                                                </GosiButton>
+                                                    <GosiSelectTrigger className={`w-[140px] h-10 text-xs font-bold rounded-xl border-0 shadow-sm transition-all hover:scale-105 active:scale-95 ${task.priority === 'urgent' ? 'bg-red-50 text-red-700 ring-1 ring-red-200' :
+                                                        task.priority === 'high' ? 'bg-orange-50 text-orange-700 ring-1 ring-orange-200' :
+                                                            task.priority === 'medium' ? 'bg-amber-50 text-amber-700 ring-1 ring-amber-200' :
+                                                                'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
+                                                        }`}>
+                                                        <GosiSelectValue />
+                                                    </GosiSelectTrigger>
+                                                    <GosiSelectContent>
+                                                        <GosiSelectItem value="urgent" className="text-red-700 focus:bg-red-50">{t('tasks.priorities.urgent')}</GosiSelectItem>
+                                                        <GosiSelectItem value="high" className="text-orange-700 focus:bg-orange-50">{t('tasks.priorities.high')}</GosiSelectItem>
+                                                        <GosiSelectItem value="medium" className="text-amber-700 focus:bg-amber-50">{t('tasks.priorities.medium')}</GosiSelectItem>
+                                                        <GosiSelectItem value="low" className="text-emerald-700 focus:bg-emerald-50">{t('tasks.priorities.low')}</GosiSelectItem>
+                                                    </GosiSelectContent>
+                                                </GosiSelect>
                                             </div>
-                                            {/* Mobile Chevron Indicator */}
-                                            <div className="sm:hidden text-slate-400">
-                                                <ChevronLeft className="h-5 w-5" />
+                                            {/* Due Date - Dual Language */}
+                                            <div className="text-center">
+                                                <div className="text-[10px] uppercase tracking-wider text-slate-400 mb-1.5 font-bold">{t('tasks.list.dueDate')}</div>
+                                                <div className="font-bold text-slate-700 text-sm bg-slate-50 px-4 py-2 rounded-xl border border-slate-100 shadow-sm flex items-center gap-2 h-10">
+                                                    <Calendar className="w-4 h-4 text-slate-400" />
+                                                    {task.dueDateFormatted.arabic}
+                                                </div>
+                                            </div>
+                                            {/* Creation Date - Dual Language */}
+                                            <div className="text-center hidden sm:block">
+                                                <div className="text-[10px] uppercase tracking-wider text-slate-400 mb-1.5 font-bold">{t('tasks.list.createdAt')}</div>
+                                                <div className="font-medium text-slate-400 text-sm px-2 py-2 h-10 flex items-center">{task.createdAtFormatted.arabic}</div>
                                             </div>
                                         </div>
-                                    </GosiTaskCard>
-                                ))}
-                            </div>
+                                        <Link to={`/dashboard/tasks/${task.id}` as any} className="hidden sm:inline-flex w-auto" onClick={(e) => e.stopPropagation()}>
+                                            <GosiButton className="bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white border border-emerald-100 hover:border-emerald-500 rounded-xl px-6 h-10 shadow-sm hover:shadow-lg hover:shadow-emerald-500/20 w-auto transition-all duration-300 hover:scale-105 active:scale-95 group/btn">
+                                                {t('tasks.list.viewDetails')}
+                                                <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180 transition-transform group-hover/btn:translate-x-1 rtl:group-hover/btn:-translate-x-1" />
+                                            </GosiButton>
+                                        </Link>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
+
                     </div>
 
                     {/* LEFT COLUMN (Widgets) */}
@@ -648,8 +732,8 @@ export function TasksListView() {
                         selectedCount={selectedTaskIds.length}
                         onDeleteSelected={handleDeleteSelected}
                     />
-                </div>
-            </Main>
+                </div >
+            </Main >
         </>
     )
 }
