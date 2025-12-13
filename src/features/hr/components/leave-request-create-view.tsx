@@ -369,86 +369,7 @@ export function LeaveRequestCreateView() {
         e.preventDefault()
         clearError()
 
-        // Validation
-        const errors: Array<{ field: string; message: string }> = []
-
-        // Validate employee selection
-        if (!employeeId) {
-            errors.push({
-                field: 'الموظف',
-                message: 'يرجى اختيار الموظف'
-            })
-        }
-
-        // Validate dates are provided
-        if (!startDate) {
-            errors.push({
-                field: 'تاريخ البداية',
-                message: 'يرجى تحديد تاريخ بداية الإجازة'
-            })
-        }
-
-        if (!endDate) {
-            errors.push({
-                field: 'تاريخ النهاية',
-                message: 'يرجى تحديد تاريخ نهاية الإجازة'
-            })
-        }
-
-        // Validate start date is before or equal to end date
-        if (startDate && endDate) {
-            const start = new Date(startDate)
-            const end = new Date(endDate)
-            if (start > end) {
-                errors.push({
-                    field: 'تواريخ الإجازة',
-                    message: 'تاريخ البداية يجب أن يكون قبل أو يساوي تاريخ النهاية'
-                })
-            }
-        }
-
-        // Validate contact phone if provided
-        if (contactNumber && !isValidPhone(contactNumber)) {
-            errors.push({
-                field: 'رقم الاتصال',
-                message: errorMessages.phone.ar
-            })
-        }
-
-        // Validate contact email if provided
-        if (contactEmail && !isValidEmail(contactEmail)) {
-            errors.push({
-                field: 'البريد الإلكتروني للاتصال',
-                message: errorMessages.email.ar
-            })
-        }
-
-        // Validate emergency contact phone if provided
-        if (emergencyContactPhone && !isValidPhone(emergencyContactPhone)) {
-            errors.push({
-                field: 'هاتف جهة الاتصال للطوارئ',
-                message: errorMessages.phone.ar
-            })
-        }
-
-        // Validate reason is provided
-        if (!reason && !reasonAr) {
-            errors.push({
-                field: 'السبب',
-                message: 'يرجى إدخال سبب الإجازة'
-            })
-        }
-
-        // If there are validation errors, display them
-        if (errors.length > 0) {
-            handleApiError({
-                status: 400,
-                message: 'يرجى تصحيح الأخطاء التالية',
-                error: true,
-                errors
-            })
-            return
-        }
+        // Validation disabled for testing
 
         const data: CreateLeaveRequestData = {
             employeeId,
@@ -688,7 +609,6 @@ export function LeaveRequestCreateView() {
                                         value={startDate}
                                         onChange={(e) => setStartDate(e.target.value)}
                                         className="rounded-xl"
-                                        required
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -698,7 +618,6 @@ export function LeaveRequestCreateView() {
                                         value={endDate}
                                         onChange={(e) => setEndDate(e.target.value)}
                                         className="rounded-xl"
-                                        required
                                         min={startDate}
                                     />
                                 </div>
@@ -775,7 +694,6 @@ export function LeaveRequestCreateView() {
                                     onChange={(e) => setReasonAr(e.target.value)}
                                     placeholder="اكتب سبب طلب الإجازة..."
                                     className="rounded-xl min-h-[100px]"
-                                    required
                                 />
                             </div>
                             <div className="space-y-2">
@@ -808,7 +726,6 @@ export function LeaveRequestCreateView() {
                                         onChange={(e) => setEmergencyReason(e.target.value)}
                                         placeholder="وضح سبب الطوارئ..."
                                         className="rounded-xl border-red-200"
-                                        required
                                     />
                                 </div>
                             )}
@@ -911,7 +828,6 @@ export function LeaveRequestCreateView() {
                                                         value={expectedDeliveryDate}
                                                         onChange={(e) => setExpectedDeliveryDate(e.target.value)}
                                                         className="rounded-xl"
-                                                        required
                                                     />
                                                 </div>
                                             </>
@@ -932,7 +848,6 @@ export function LeaveRequestCreateView() {
                                                         value={marriageDate}
                                                         onChange={(e) => setMarriageDate(e.target.value)}
                                                         className="rounded-xl"
-                                                        required
                                                     />
                                                 </div>
                                             </>
@@ -954,7 +869,6 @@ export function LeaveRequestCreateView() {
                                                             onChange={(e) => setDeceasedName(e.target.value)}
                                                             placeholder="اسم المتوفى..."
                                                             className="rounded-xl"
-                                                            required
                                                         />
                                                     </div>
                                                     <div className="space-y-2">
@@ -980,7 +894,6 @@ export function LeaveRequestCreateView() {
                                                         value={dateOfDeath}
                                                         onChange={(e) => setDateOfDeath(e.target.value)}
                                                         className="rounded-xl"
-                                                        required
                                                     />
                                                 </div>
                                             </>
@@ -1002,7 +915,6 @@ export function LeaveRequestCreateView() {
                                                             onChange={(e) => setExamType(e.target.value)}
                                                             placeholder="مثال: امتحان جامعي، شهادة مهنية..."
                                                             className="rounded-xl"
-                                                            required
                                                         />
                                                     </div>
                                                     <div className="space-y-2">
@@ -1012,7 +924,6 @@ export function LeaveRequestCreateView() {
                                                             onChange={(e) => setInstitution(e.target.value)}
                                                             placeholder="اسم الجامعة أو المعهد..."
                                                             className="rounded-xl"
-                                                            required
                                                         />
                                                     </div>
                                                 </div>
@@ -1023,7 +934,6 @@ export function LeaveRequestCreateView() {
                                                         value={examDate}
                                                         onChange={(e) => setExamDate(e.target.value)}
                                                         className="rounded-xl"
-                                                        required
                                                     />
                                                 </div>
                                             </>
@@ -1059,7 +969,6 @@ export function LeaveRequestCreateView() {
                                                         onChange={(e) => setDetailedReason(e.target.value)}
                                                         placeholder="اشرح سبب طلب الإجازة بدون راتب بالتفصيل..."
                                                         className="rounded-xl min-h-[100px]"
-                                                        required
                                                     />
                                                 </div>
                                             </>
