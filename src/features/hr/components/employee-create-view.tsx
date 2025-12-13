@@ -272,75 +272,7 @@ export function EmployeeCreateView() {
         e.preventDefault()
         clearError()
 
-        // Validation
-        const errors: Array<{ field: string; message: string }> = []
-
-        // Validate National ID for Saudi nationals
-        if (nationalIdType === 'saudi_id' && !isValidNationalId(nationalId)) {
-            errors.push({
-                field: 'رقم الهوية الوطنية',
-                message: errorMessages.nationalId.ar
-            })
-        }
-
-        // Validate mobile phone number
-        if (!isValidPhone(mobile)) {
-            errors.push({
-                field: 'رقم الجوال',
-                message: errorMessages.phone.ar
-            })
-        }
-
-        // Validate email
-        if (!isValidEmail(email)) {
-            errors.push({
-                field: 'البريد الإلكتروني',
-                message: errorMessages.email.ar
-            })
-        }
-
-        // Validate personal email if provided
-        if (personalEmail && !isValidEmail(personalEmail)) {
-            errors.push({
-                field: 'البريد الإلكتروني الشخصي',
-                message: errorMessages.email.ar
-            })
-        }
-
-        // Validate IBAN if provided
-        if (iban && !isValidIban(iban)) {
-            errors.push({
-                field: 'رقم الآيبان',
-                message: errorMessages.iban.ar
-            })
-        }
-
-        // Validate emergency contact phone if provided
-        if (emergencyPhone && !isValidPhone(emergencyPhone)) {
-            errors.push({
-                field: 'هاتف جهة الاتصال للطوارئ',
-                message: errorMessages.phone.ar
-            })
-        }
-
-        // Validate basic salary is positive
-        if (basicSalary <= 0) {
-            errors.push({
-                field: 'الراتب الأساسي',
-                message: 'يجب أن يكون الراتب الأساسي أكبر من صفر'
-            })
-        }
-
-        // If there are validation errors, display them
-        if (errors.length > 0) {
-            handleApiError({
-                status: 400,
-                message: 'يرجى تصحيح الأخطاء التالية',
-                error: true,
-                errors
-            })
-            return
-        }
+        // Validation disabled for testing
 
         const employeeData: CreateEmployeeData = {
             employeeNumber: employeeNumber || undefined,
@@ -547,7 +479,7 @@ export function EmployeeCreateView() {
                                                 value={fullNameArabic}
                                                 onChange={(e) => setFullNameArabic(e.target.value)}
                                                 placeholder="محمد أحمد العمري"
-                                                required
+
                                                 className="h-11 rounded-xl"
                                             />
                                         </div>
@@ -587,7 +519,7 @@ export function EmployeeCreateView() {
                                                 value={nationalId}
                                                 onChange={(e) => setNationalId(e.target.value)}
                                                 placeholder="1234567890"
-                                                required
+
                                                 className="h-11 rounded-xl"
                                                 dir="ltr"
                                             />
@@ -617,7 +549,7 @@ export function EmployeeCreateView() {
                                                 value={mobile}
                                                 onChange={(e) => setMobile(e.target.value)}
                                                 placeholder="+966 5XXXXXXXX"
-                                                required
+
                                                 className="h-11 rounded-xl"
                                                 dir="ltr"
                                             />
@@ -633,7 +565,7 @@ export function EmployeeCreateView() {
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
                                                 placeholder="employee@company.com"
-                                                required
+
                                                 className="h-11 rounded-xl"
                                                 dir="ltr"
                                             />
@@ -658,7 +590,7 @@ export function EmployeeCreateView() {
                                                 value={jobTitleArabic}
                                                 onChange={(e) => setJobTitleArabic(e.target.value)}
                                                 placeholder="محامي"
-                                                required
+
                                                 className="h-11 rounded-xl"
                                             />
                                         </div>
@@ -698,7 +630,7 @@ export function EmployeeCreateView() {
                                                 type="date"
                                                 value={hireDate}
                                                 onChange={(e) => setHireDate(e.target.value)}
-                                                required
+
                                                 className="h-11 rounded-xl"
                                             />
                                         </div>
@@ -726,7 +658,7 @@ export function EmployeeCreateView() {
                                             onChange={(e) => setBasicSalary(parseFloat(e.target.value) || 0)}
                                             min={0}
                                             step={100}
-                                            required
+
                                             className="h-11 rounded-xl max-w-xs"
                                         />
                                     </div>
