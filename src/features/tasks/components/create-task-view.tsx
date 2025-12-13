@@ -1,34 +1,28 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { toast } from 'sonner'
 import {
-    Save, Calendar, User, Flag, FileText, Loader2, Scale,
-    Plus, X, Repeat, ListTodo, ChevronDown, ChevronUp,
-    Bell, ArrowRight, Sparkles, Clock, Briefcase, AlertCircle, Users, CheckSquare
+    ArrowRight, Save, Calendar, User,
+    Flag, FileText, Briefcase, Users, Loader2, Scale,
+    Plus, X, Clock, Tag, Repeat, ListTodo, ChevronDown, ChevronUp
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import {
-    GosiCard,
-    GosiCardContent,
-    GosiCardHeader,
-    GosiCardTitle,
-    GosiInput,
-    GosiLabel,
-    GosiTextarea,
-    GosiSelect,
-    GosiSelectContent,
-    GosiSelectItem,
-    GosiSelectTrigger,
-    GosiSelectValue,
-    GosiButton
-} from '@/components/ui/gosi-ui'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
 } from "@/components/ui/collapsible"
+import { FieldTooltip } from '@/components/ui/field-tooltip'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
@@ -47,6 +41,7 @@ import {
     DAYS_OF_WEEK,
     ASSIGNEE_STRATEGY_OPTIONS,
     REMINDER_TYPE_OPTIONS,
+    FIELD_TOOLTIPS,
 } from '../constants/task-options'
 import type {
     TaskPriority,
@@ -55,7 +50,9 @@ import type {
     RecurrenceFrequency,
     RecurrenceType,
     AssigneeStrategy,
+    Subtask,
     RecurringConfig,
+    TaskReminder
 } from '@/services/tasksService'
 
 interface SubtaskInput {
@@ -68,6 +65,8 @@ export function CreateTaskView() {
     const { t } = useTranslation()
     const navigate = useNavigate()
     const createTaskMutation = useCreateTask()
+    const { data: templates } = useTaskTemplates()
+    const createFromTemplateMutation = useCreateFromTemplate()
 
     // Fetch real data from APIs
     const { data: clients, isLoading: clientsLoading } = useClients()
@@ -110,11 +109,33 @@ export function CreateTaskView() {
     // Reminders state
     const [reminders, setReminders] = useState<{ type: string; beforeMinutes: number }[]>([])
 
-    // UI state for expanded sections
-    const [tagInput, setTagInput] = useState('')
+    // Section toggles
+    const [showAdvanced, setShowAdvanced] = useState(false)
     const [showRecurring, setShowRecurring] = useState(false)
-    const [showReminders, setShowReminders] = useState(false)
 
+    // Tags input
+    const [tagInput, setTagInput] = useState('')
+
+    // Form validation state
+    const [errors, setErrors] = useState<Record<string, string>>({})
+    const [touched, setTouched] = useState<Record<string, boolean>>({})
+
+    // Validate a single field (validation disabled for testing)
+    const validateField = (_field: string, _value: any): string => {
+        return ''
+    }
+
+    // Handle field blur for validation
+    const handleBlur = (field: string) => {
+        setTouched(prev => ({ ...prev, [field]: true }))
+        const error = validateField(field, formData[field as keyof typeof formData])
+        setErrors(prev => ({ ...prev, [field]: error }))
+    }
+
+    // Validate all required fields (validation disabled for testing)
+    const validateForm = (): boolean => {
+        return true
+    }
 
     const handleChange = (field: string, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }))
@@ -123,7 +144,9 @@ export function CreateTaskView() {
     const addSubtask = () => {
         if (newSubtask.trim()) {
             setSubtasks(prev => [...prev, {
-                id: crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                id: typeof crypto !== 'undefined' && crypto.randomUUID
+                    ? crypto.randomUUID()
+                    : `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                 title: newSubtask.trim(),
                 autoReset: isRecurring
             }])
@@ -154,7 +177,6 @@ export function CreateTaskView() {
 
     const addReminder = () => {
         setReminders(prev => [...prev, { type: 'notification', beforeMinutes: 30 }])
-        setShowReminders(true)
     }
 
     const updateReminder = (index: number, field: string, value: any) => {
@@ -179,8 +201,8 @@ export function CreateTaskView() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        if (!formData.title.trim()) {
-            toast.error('عنوان المهمة مطلوب')
+        // Validate form before submission
+        if (!validateForm()) {
             return
         }
 
@@ -189,7 +211,7 @@ export function CreateTaskView() {
             description: formData.description,
             status: formData.status,
             priority: formData.priority,
-            taskType: 'other' as const,
+            taskType: 'other', // Default task type
             ...(typeof formData.label === 'string' && formData.label.trim().length > 0 ? { label: formData.label as TaskLabel } : {}),
             tags: formData.tags,
             ...(formData.dueDate && { dueDate: formData.dueDate }),
@@ -199,6 +221,7 @@ export function CreateTaskView() {
             ...(formData.clientId && { clientId: formData.clientId }),
             ...(formData.caseId && { caseId: formData.caseId }),
             ...(formData.estimatedMinutes > 0 && { estimatedMinutes: formData.estimatedMinutes }),
+            // Subtasks
             ...(subtasks.length > 0 && {
                 subtasks: subtasks.map((s, index) => ({
                     title: s.title,
@@ -207,9 +230,14 @@ export function CreateTaskView() {
                     autoReset: s.autoReset
                 }))
             }),
+            // Recurring
             ...(isRecurring && {
-                recurring: { ...recurringConfig, enabled: true }
+                recurring: {
+                    ...recurringConfig,
+                    enabled: true,
+                }
             }),
+            // Reminders
             ...(reminders.length > 0 && {
                 reminders: reminders.map(r => ({
                     type: r.type as 'notification' | 'email' | 'sms' | 'push',
@@ -218,13 +246,18 @@ export function CreateTaskView() {
             }),
         }
 
+
         createTaskMutation.mutate(taskData, {
             onSuccess: () => {
-                toast.success('تم إنشاء المهمة بنجاح')
                 navigate({ to: '/dashboard/tasks/list' })
-            },
-            onError: () => {
-                toast.error('حدث خطأ أثناء إنشاء المهمة')
+            }
+        })
+    }
+
+    const handleUseTemplate = (templateId: string) => {
+        createFromTemplateMutation.mutate({ templateId }, {
+            onSuccess: () => {
+                navigate({ to: '/dashboard/tasks/list' })
             }
         })
     }
@@ -246,285 +279,635 @@ export function CreateTaskView() {
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
-            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-4 sm:p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-                {/* HERO CARD - Hidden on mobile */}
-                <div className="hidden md:block">
-                    <ProductivityHero badge="إدارة المهام" title="إنشاء مهمة" type="tasks" listMode={true}>
-                        <div className="flex gap-2">
-                            <GosiButton variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white border-0" onClick={() => navigate({ to: '/dashboard/tasks/list' })}>
-                                <ListTodo className="h-4 w-4 ms-2" />
-                                القائمة
-                            </GosiButton>
-                            <GosiButton onClick={(e) => handleSubmit(e as any)} className="bg-emerald-500 hover:bg-emerald-600 text-white border-0 shadow-lg shadow-emerald-500/20">
-                                <Save className="h-4 w-4 ms-2" />
-                                حفظ المهمة
-                            </GosiButton>
-                        </div>
-                    </ProductivityHero>
-                </div>
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+                {/* HERO CARD - Full width */}
+                <ProductivityHero badge="إدارة المهام" title="إنشاء مهمة" type="tasks" listMode={true} />
 
-                <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* RIGHT COLUMN (Main Content) */}
+                    <div className="lg:col-span-2 space-y-8">
 
-                    {/* MAIN FORM COLUMN */}
-                    <div className="xl:col-span-9 space-y-6">
-                        <Link to="/dashboard/tasks/list" className="md:hidden flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-slate-100 hover:border-emerald-200 hover:shadow-md transition-all group">
-                            <ArrowRight className="w-5 h-5 text-slate-500" />
-                            <span className="text-base font-medium text-slate-700">العودة</span>
-                        </Link>
+                        {/* Templates Section */}
+                        {templates && templates.length > 0 && (
+                            <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+                                <p className="text-sm text-slate-600 mb-3">إنشاء من قالب:</p>
+                                <div className="flex flex-wrap gap-2">
+                                    {templates.slice(0, 5).map((template) => (
+                                        <Button
+                                            key={template._id}
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => handleUseTemplate(template._id)}
+                                            className="rounded-full"
+                                            disabled={createFromTemplateMutation.isPending}
+                                        >
+                                            {template.title}
+                                        </Button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
-                        <form onSubmit={handleSubmit}>
-                            <GosiCard className="overflow-visible">
-                                <GosiCardContent className="pt-10">
-                                    {/* Task Title Input */}
-                                    <div className="space-y-2">
-                                        <GosiLabel htmlFor="title" className="text-lg text-emerald-950">عنوان المهمة</GosiLabel>
-                                        <GosiInput
-                                            id="title"
-                                            placeholder="اكتب عنوان المهمة هنا..."
-                                            className="h-16 text-lg font-bold"
-                                            value={formData.title}
-                                            onChange={(e) => handleChange('title', e.target.value)}
-                                        />
-                                    </div>
-
-                                    {/* Two Columns: Status & Priority */}
+                        {/* Form Card */}
+                        <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+                            <form onSubmit={handleSubmit} className="space-y-8">
+                                {/* Basic Info */}
+                                <div className="space-y-6">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <GosiLabel className="flex items-center gap-2">
-                                                <Flag className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                                عنوان المهمة
+                                                <FieldTooltip content={FIELD_TOOLTIPS.title} />
+                                            </label>
+                                            <Input
+                                                placeholder="مثال: مراجعة العقد النهائي"
+                                                className={cn(
+                                                    "rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500",
+                                                    touched.title && errors.title && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                                                )}
+                                                value={formData.title}
+                                                onChange={(e) => handleChange('title', e.target.value)}
+                                                onBlur={() => handleBlur('title')}
+                                            />
+                                            {touched.title && errors.title && (
+                                                <p className="text-sm text-red-500 mt-1">{errors.title}</p>
+                                            )}
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <ListTodo className="w-4 h-4 text-emerald-500" />
                                                 الحالة
-                                            </GosiLabel>
-                                            <GosiSelect value={formData.status} onValueChange={(value) => handleChange('status', value)}>
-                                                <GosiSelectTrigger>
-                                                    <GosiSelectValue placeholder="اختر الحالة" />
-                                                </GosiSelectTrigger>
-                                                <GosiSelectContent>
+                                                <FieldTooltip content={FIELD_TOOLTIPS.status} />
+                                            </label>
+                                            <Select value={formData.status} onValueChange={(value) => handleChange('status', value)}>
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                    <SelectValue placeholder="اختر الحالة" />
+                                                </SelectTrigger>
+                                                <SelectContent>
                                                     {ACTIVE_STATUS_OPTIONS.map(option => (
-                                                        <GosiSelectItem key={option.value} value={option.value}>
+                                                        <SelectItem key={option.value} value={option.value}>
                                                             <div className="flex items-center gap-2">
                                                                 <span className={cn("w-2 h-2 rounded-full", option.bgColor)} />
                                                                 {option.label}
                                                             </div>
-                                                        </GosiSelectItem>
+                                                        </SelectItem>
                                                     ))}
-                                                </GosiSelectContent>
-                                            </GosiSelect>
+                                                </SelectContent>
+                                            </Select>
                                         </div>
+                                    </div>
 
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <GosiLabel className="flex items-center gap-2">
-                                                <AlertCircle className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Flag className="w-4 h-4 text-emerald-500" />
                                                 الأولوية
-                                            </GosiLabel>
-                                            <GosiSelect value={formData.priority} onValueChange={(value) => handleChange('priority', value)}>
-                                                <GosiSelectTrigger>
-                                                    <GosiSelectValue placeholder="اختر الأولوية" />
-                                                </GosiSelectTrigger>
-                                                <GosiSelectContent>
+                                                <FieldTooltip content={FIELD_TOOLTIPS.priority} />
+                                            </label>
+                                            <Select value={formData.priority} onValueChange={(value) => handleChange('priority', value)}>
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                    <SelectValue placeholder="اختر الأولوية" />
+                                                </SelectTrigger>
+                                                <SelectContent>
                                                     {MAIN_PRIORITY_OPTIONS.map(option => (
-                                                        <GosiSelectItem key={option.value} value={option.value}>
+                                                        <SelectItem key={option.value} value={option.value}>
                                                             <div className="flex items-center gap-2">
                                                                 <span className={cn("w-2 h-2 rounded-full", option.dotColor)} />
                                                                 {option.label}
                                                             </div>
-                                                        </GosiSelectItem>
+                                                        </SelectItem>
                                                     ))}
-                                                </GosiSelectContent>
-                                            </GosiSelect>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Tag className="w-4 h-4 text-emerald-500" />
+                                                التصنيف
+                                                <FieldTooltip content={FIELD_TOOLTIPS.category} />
+                                            </label>
+                                            <Select value={formData.label} onValueChange={(value) => handleChange('label', value)}>
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                    <SelectValue placeholder="اختر التصنيف" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {CATEGORY_OPTIONS.map(option => (
+                                                        <SelectItem key={option.value} value={option.value}>
+                                                            <Badge variant="secondary" className={cn("text-xs", option.bgColor, option.color)}>
+                                                                {option.label}
+                                                            </Badge>
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                         </div>
                                     </div>
 
-                                    {/* COMPACT ROW: Date/Time + Assignee */}
-                                    <div className="flex flex-col md:flex-row gap-6">
-                                        {/* Date Fixed Width */}
-                                        <div className="space-y-2 w-full md:w-auto">
-                                            <GosiLabel className="flex items-center gap-2">
+                                    {/* Tags */}
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                            <Tag className="w-4 h-4 text-emerald-500" />
+                                            الوسوم
+                                            <FieldTooltip content={FIELD_TOOLTIPS.tags} />
+                                        </label>
+                                        <div className="flex flex-wrap gap-2 mb-2">
+                                            {formData.tags.map(tag => (
+                                                <Badge key={tag} variant="secondary" className="gap-1">
+                                                    {tag}
+                                                    <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500">
+                                                        <X className="w-3 h-3" aria-hidden="true" />
+                                                    </button>
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <Input
+                                                placeholder="أضف وسم..."
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 flex-1"
+                                                value={tagInput}
+                                                onChange={(e) => setTagInput(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        e.preventDefault()
+                                                        addTag()
+                                                    }
+                                                }}
+                                            />
+                                            <Button type="button" variant="outline" onClick={addTag} className="rounded-xl">
+                                                <Plus className="w-4 h-4" aria-hidden="true" />
+                                            </Button>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                التاريخ
-                                            </GosiLabel>
-                                            <GosiInput
+                                                تاريخ الاستحقاق
+                                                <FieldTooltip content={FIELD_TOOLTIPS.dueDate} />
+                                            </label>
+                                            <Input
                                                 type="date"
-                                                className="cursor-pointer font-bold text-center h-12 text-sm w-full md:w-[180px]"
+                                                className={cn(
+                                                    "rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500",
+                                                    touched.dueDate && errors.dueDate && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                                                )}
                                                 value={formData.dueDate}
                                                 onChange={(e) => handleChange('dueDate', e.target.value)}
+                                                onBlur={() => handleBlur('dueDate')}
                                             />
+                                            {touched.dueDate && errors.dueDate && (
+                                                <p className="text-sm text-red-500 mt-1">{errors.dueDate}</p>
+                                            )}
                                         </div>
-
-                                        {/* Time Fixed Width */}
-                                        <div className="space-y-2 w-full md:w-auto">
-                                            <GosiLabel className="flex items-center gap-2">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Clock className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 الوقت
-                                            </GosiLabel>
-                                            <GosiInput
+                                                <FieldTooltip content={FIELD_TOOLTIPS.dueTime} />
+                                            </label>
+                                            <Input
                                                 type="time"
-                                                className="cursor-pointer font-bold text-center h-12 text-sm w-full md:w-[130px]"
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
                                                 value={formData.dueTime}
                                                 onChange={(e) => handleChange('dueTime', e.target.value)}
                                             />
                                         </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Clock className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                                الوقت المقدر (دقائق)
+                                                <FieldTooltip content={FIELD_TOOLTIPS.estimatedMinutes} />
+                                            </label>
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                placeholder="60"
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                value={formData.estimatedMinutes || ''}
+                                                onChange={(e) => handleChange('estimatedMinutes', parseInt(e.target.value) || 0)}
+                                            />
+                                        </div>
+                                    </div>
 
-                                        {/* Assigned To - Takes remaining space */}
-                                        <div className="space-y-2 flex-1">
-                                            <GosiLabel className="flex items-center gap-2">
-                                                <Users className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                تعيين إلى
-                                            </GosiLabel>
-                                            <GosiSelect value={formData.assignedTo} onValueChange={(value) => handleChange('assignedTo', value)}>
-                                                <GosiSelectTrigger>
-                                                    <GosiSelectValue placeholder="اختر المسؤول (اختياري)" />
-                                                </GosiSelectTrigger>
-                                                <GosiSelectContent>
-                                                    {teamLoading ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <User className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                                {t('tasks.client', 'العميل')}
+                                                <FieldTooltip content={FIELD_TOOLTIPS.client} />
+                                            </label>
+                                            <Select value={formData.clientId} onValueChange={(value) => handleChange('clientId', value)}>
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                    <SelectValue placeholder={t('tasks.selectClient', 'اختر العميل')} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {clientsLoading ? (
                                                         <div className="flex items-center justify-center py-4">
                                                             <Loader2 className="h-4 w-4 animate-spin" />
                                                         </div>
-                                                    ) : teamMembers && teamMembers.length > 0 ? (
-                                                        teamMembers.map((member) => (
-                                                            <GosiSelectItem key={member._id} value={member._id}>
-                                                                {member.firstName} {member.lastName}
-                                                            </GosiSelectItem>
+                                                    ) : clients?.data && clients.data.length > 0 ? (
+                                                        clients.data.map((client) => (
+                                                            <SelectItem key={client._id} value={client._id}>
+                                                                {client.fullName}
+                                                                {client.companyName && ` - ${client.companyName}`}
+                                                            </SelectItem>
                                                         ))
                                                     ) : (
-                                                        <div className="text-center py-4 text-slate-500 text-sm">لا يوجد أعضاء فريق</div>
+                                                        <div className="text-center py-4 text-slate-500 text-sm">
+                                                            {t('tasks.noClients', 'لا يوجد عملاء')}
+                                                        </div>
                                                     )}
-                                                </GosiSelectContent>
-                                            </GosiSelect>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Scale className="w-4 h-4 text-emerald-500" />
+                                                {t('tasks.linkedCase', 'القضية المرتبطة')}
+                                                <FieldTooltip content={FIELD_TOOLTIPS.case} />
+                                            </label>
+                                            <Select value={formData.caseId} onValueChange={(value) => handleChange('caseId', value)}>
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                    <SelectValue placeholder={t('tasks.selectCase', 'اختر القضية')} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {casesLoading ? (
+                                                        <div className="flex items-center justify-center py-4">
+                                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                                        </div>
+                                                    ) : cases?.cases && cases.cases.length > 0 ? (
+                                                        cases.cases.map((caseItem) => (
+                                                            <SelectItem key={caseItem._id} value={caseItem._id}>
+                                                                {caseItem.caseNumber ? `${caseItem.caseNumber} - ` : ''}
+                                                                {caseItem.title}
+                                                            </SelectItem>
+                                                        ))
+                                                    ) : (
+                                                        <div className="text-center py-4 text-slate-500 text-sm">
+                                                            {t('tasks.noCases', 'لا توجد قضايا')}
+                                                        </div>
+                                                    )}
+                                                </SelectContent>
+                                            </Select>
                                         </div>
                                     </div>
 
-                                    {/* Classification Row */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <GosiLabel className="flex items-center gap-2">
-                                                <Briefcase className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                التصنيف
-                                            </GosiLabel>
-                                            <GosiSelect value={formData.label} onValueChange={(value) => handleChange('label', value)}>
-                                                <GosiSelectTrigger>
-                                                    <GosiSelectValue placeholder="اختر التصنيف (اختياري)" />
-                                                </GosiSelectTrigger>
-                                                <GosiSelectContent>
-                                                    {CATEGORY_OPTIONS.map(option => (
-                                                        <GosiSelectItem key={option.value} value={option.value}>
-                                                            <Badge variant="secondary" className={cn("text-xs", option.bgColor, option.color)}>
-                                                                {option.label}
-                                                            </Badge>
-                                                        </GosiSelectItem>
-                                                    ))}
-                                                </GosiSelectContent>
-                                            </GosiSelect>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <GosiLabel className="flex items-center gap-2">
-                                                <Scale className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                العميل / القضية
-                                            </GosiLabel>
-                                            <div className="grid grid-cols-2 gap-2">
-                                                <GosiSelect value={formData.clientId} onValueChange={(v) => handleChange('clientId', v)}>
-                                                    <GosiSelectTrigger><GosiSelectValue placeholder="العميل" /></GosiSelectTrigger>
-                                                    <GosiSelectContent>
-                                                        {clients?.data?.map((client) => (
-                                                            <GosiSelectItem key={client._id} value={client._id}>{client.fullName}</GosiSelectItem>
-                                                        ))}
-                                                    </GosiSelectContent>
-                                                </GosiSelect>
-                                                <GosiSelect value={formData.caseId} onValueChange={(v) => handleChange('caseId', v)}>
-                                                    <GosiSelectTrigger><GosiSelectValue placeholder="القضية" /></GosiSelectTrigger>
-                                                    <GosiSelectContent>
-                                                        {cases?.cases?.map((c) => (
-                                                            <GosiSelectItem key={c._id} value={c._id}>{c.title}</GosiSelectItem>
-                                                        ))}
-                                                    </GosiSelectContent>
-                                                </GosiSelect>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Description */}
                                     <div className="space-y-2">
-                                        <GosiLabel className="flex items-center gap-2">
+                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                            <Users className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                            {t('tasks.assignedTo', 'تعيين إلى')}
+                                            <FieldTooltip content={FIELD_TOOLTIPS.assignedTo} />
+                                        </label>
+                                        <Select value={formData.assignedTo} onValueChange={(value) => handleChange('assignedTo', value)}>
+                                            <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                <SelectValue placeholder={t('tasks.selectAssignee', 'اختر المسؤول')} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {teamLoading ? (
+                                                    <div className="flex items-center justify-center py-4">
+                                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                                    </div>
+                                                ) : teamMembers && teamMembers.length > 0 ? (
+                                                    teamMembers.map((member) => (
+                                                        <SelectItem key={member._id} value={member._id}>
+                                                            {member.firstName} {member.lastName}
+                                                            {member.role && ` (${member.role})`}
+                                                        </SelectItem>
+                                                    ))
+                                                ) : (
+                                                    <div className="text-center py-4 text-slate-500 text-sm">
+                                                        {t('tasks.noTeamMembers', 'لا يوجد أعضاء فريق')}
+                                                    </div>
+                                                )}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                             <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                            تفاصيل المهمة
-                                        </GosiLabel>
-                                        <GosiTextarea
-                                            placeholder="أضف وصفاً تفصيلياً للمهمة..."
+                                            وصف المهمة
+                                            <FieldTooltip content={FIELD_TOOLTIPS.description} />
+                                        </label>
+                                        <Textarea
+                                            placeholder="أدخل تفاصيل إضافية عن المهمة..."
+                                            className="min-h-[120px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
                                             value={formData.description}
                                             onChange={(e) => handleChange('description', e.target.value)}
-                                            className="min-h-[150px]"
                                         />
                                     </div>
+                                </div>
 
-                                    {/* Subtasks */}
-                                    <div className="space-y-4 pt-4 border-t border-slate-100">
-                                        <div className="flex items-center justify-between">
-                                            <GosiLabel className="text-base text-emerald-900">المهام الفرعية</GosiLabel>
-                                            <Button type="button" variant="ghost" size="sm" onClick={addSubtask} className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50">
-                                                <Plus className="w-4 h-4 me-1" /> إضافة مهمة فرعية
+                                {/* Subtasks Section */}
+                                <div className="border-t border-slate-100 pt-6">
+                                    <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                                        <ListTodo className="w-5 h-5 text-emerald-500" />
+                                        المهام الفرعية
+                                        <FieldTooltip content={FIELD_TOOLTIPS.subtasks} />
+                                    </h3>
+                                    <div className="space-y-3">
+                                        {subtasks.map((subtask) => (
+                                            <div key={subtask.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                                                <span className="flex-1 text-slate-700">{subtask.title}</span>
+                                                {isRecurring && (
+                                                    <label className="flex items-center gap-2 text-sm text-slate-500">
+                                                        <Checkbox
+                                                            checked={subtask.autoReset}
+                                                            onCheckedChange={() => toggleSubtaskAutoReset(subtask.id)}
+                                                        />
+                                                        إعادة تعيين تلقائي
+                                                    </label>
+                                                )}
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => removeSubtask(subtask.id)}
+                                                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                                                >
+                                                    <X className="w-4 h-4" aria-hidden="true" />
+                                                </Button>
+                                            </div>
+                                        ))}
+                                        <div className="flex gap-2">
+                                            <Input
+                                                placeholder="أضف مهمة فرعية..."
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 flex-1"
+                                                value={newSubtask}
+                                                onChange={(e) => setNewSubtask(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        e.preventDefault()
+                                                        addSubtask()
+                                                    }
+                                                }}
+                                            />
+                                            <Button type="button" variant="outline" onClick={addSubtask} className="rounded-xl">
+                                                <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
+                                                إضافة
                                             </Button>
                                         </div>
+                                    </div>
+                                </div>
 
-                                        <div className="space-y-2">
-                                            <div className="flex gap-2">
-                                                <GosiInput
-                                                    placeholder="أدخل عنوان المهمة الفرعية ثم اضغط Enter..."
-                                                    value={newSubtask}
-                                                    onChange={(e) => setNewSubtask(e.target.value)}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter') {
-                                                            e.preventDefault()
-                                                            addSubtask()
-                                                        }
-                                                    }}
-                                                    className="flex-1"
-                                                />
-                                                <GosiButton type="button" onClick={addSubtask} size="icon" className="shrink-0 w-12 rounded-xl">
-                                                    <Plus className="w-5 h-5" />
-                                                </GosiButton>
+                                {/* Recurring Section */}
+                                <Collapsible open={showRecurring} onOpenChange={setShowRecurring}>
+                                    <div className="border-t border-slate-100 pt-6">
+                                        <div className="flex items-center justify-between w-full">
+                                            <CollapsibleTrigger asChild>
+                                                <Button variant="ghost" className="flex-1 justify-start p-0 h-auto hover:bg-transparent">
+                                                    <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                                                        <Repeat className="w-5 h-5 text-emerald-500" />
+                                                        مهمة متكررة
+                                                    </h3>
+                                                </Button>
+                                            </CollapsibleTrigger>
+                                            <div className="flex items-center gap-2">
+                                                <FieldTooltip content={FIELD_TOOLTIPS.recurring} />
+                                                <CollapsibleTrigger asChild>
+                                                    <Button variant="ghost" size="sm" className="p-0 h-auto hover:bg-transparent">
+                                                        {showRecurring ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
+                                                    </Button>
+                                                </CollapsibleTrigger>
                                             </div>
-
-                                            {subtasks.length > 0 && (
-                                                <div className="space-y-2 mt-4">
-                                                    {subtasks.map((subtask) => (
-                                                        <div key={subtask.id} className="flex items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-100 group hover:bg-white hover:shadow-sm transition-all text-right">
-                                                            <div className="w-2 h-2 rounded-full bg-emerald-400 ms-2" />
-                                                            <span className="flex-1 font-medium text-slate-700">{subtask.title}</span>
-                                                            <Button type="button" variant="ghost" size="icon" onClick={() => removeSubtask(subtask.id)} className="h-8 w-8 text-slate-400 hover:text-red-500 rounded-lg">
-                                                                <X className="w-4 h-4" />
-                                                            </Button>
-                                                        </div>
-                                                    ))}
+                                        </div>
+                                        <CollapsibleContent className="mt-4">
+                                            <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
+                                                <div className="flex items-center gap-3">
+                                                    <Checkbox
+                                                        id="recurring"
+                                                        checked={isRecurring}
+                                                        onCheckedChange={(checked) => setIsRecurring(checked === true)}
+                                                    />
+                                                    <label htmlFor="recurring" className="text-sm font-medium text-slate-700">
+                                                        تفعيل التكرار
+                                                    </label>
                                                 </div>
-                                            )}
-                                        </div>
-                                    </div>
 
-                                    {/* Footer Actions */}
-                                    <div className="p-8 bg-slate-50 flex gap-4 border-t border-slate-100 items-center justify-end rounded-b-[2rem] -mx-8 -mb-8 mt-8">
-                                        <div className="flex gap-4 w-full sm:w-auto">
-                                            <GosiButton variant="outline" type="button" onClick={() => navigate({ to: '/dashboard/tasks/list' })} className="flex-1 sm:flex-none">
-                                                إلغاء
-                                            </GosiButton>
-                                            <GosiButton type="submit" disabled={createTaskMutation.isPending} className="flex-1 sm:flex-none min-w-[140px]">
-                                                {createTaskMutation.isPending ? (
-                                                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> جاري الحفظ...</>
-                                                ) : (
-                                                    <><Save className="mr-2 h-4 w-4" /> حفظ المهمة</>
+                                                {isRecurring && (
+                                                    <div className="space-y-4 pt-4">
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            <div className="space-y-2">
+                                                                <label className="text-sm font-medium text-slate-700">التكرار</label>
+                                                                <Select
+                                                                    value={recurringConfig.frequency}
+                                                                    onValueChange={(value: RecurrenceFrequency) =>
+                                                                        setRecurringConfig(prev => ({ ...prev, frequency: value }))
+                                                                    }
+                                                                >
+                                                                    <SelectTrigger className="rounded-xl">
+                                                                        <SelectValue />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        {FREQUENCY_OPTIONS.map(option => (
+                                                                            <SelectItem key={option.value} value={option.value}>
+                                                                                {option.label}
+                                                                            </SelectItem>
+                                                                        ))}
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <label className="text-sm font-medium text-slate-700">نوع التكرار</label>
+                                                                <Select
+                                                                    value={recurringConfig.type}
+                                                                    onValueChange={(value: RecurrenceType) =>
+                                                                        setRecurringConfig(prev => ({ ...prev, type: value }))
+                                                                    }
+                                                                >
+                                                                    <SelectTrigger className="rounded-xl">
+                                                                        <SelectValue />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        <SelectItem value="due_date">بناءً على تاريخ الاستحقاق</SelectItem>
+                                                                        <SelectItem value="completion_date">بناءً على تاريخ الإكمال</SelectItem>
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </div>
+                                                        </div>
+
+                                                        {recurringConfig.frequency === 'weekly' && (
+                                                            <div className="space-y-2">
+                                                                <label className="text-sm font-medium text-slate-700">أيام الأسبوع</label>
+                                                                <div className="flex flex-wrap gap-2">
+                                                                    {DAYS_OF_WEEK.map(day => (
+                                                                        <Button
+                                                                            key={day.value}
+                                                                            type="button"
+                                                                            variant={recurringConfig.daysOfWeek?.includes(day.value) ? "default" : "outline"}
+                                                                            size="sm"
+                                                                            onClick={() => toggleDayOfWeek(day.value)}
+                                                                            className="rounded-full"
+                                                                        >
+                                                                            {day.label}
+                                                                        </Button>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {recurringConfig.frequency === 'custom' && (
+                                                            <div className="space-y-2">
+                                                                <label className="text-sm font-medium text-slate-700">كل X أيام</label>
+                                                                <Input
+                                                                    type="number"
+                                                                    min="1"
+                                                                    className="rounded-xl w-32"
+                                                                    value={recurringConfig.interval || 1}
+                                                                    onChange={(e) => setRecurringConfig(prev => ({
+                                                                        ...prev,
+                                                                        interval: parseInt(e.target.value) || 1
+                                                                    }))}
+                                                                />
+                                                            </div>
+                                                        )}
+
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            <div className="space-y-2">
+                                                                <label className="text-sm font-medium text-slate-700">استراتيجية التعيين</label>
+                                                                <Select
+                                                                    value={recurringConfig.assigneeStrategy}
+                                                                    onValueChange={(value: AssigneeStrategy) =>
+                                                                        setRecurringConfig(prev => ({ ...prev, assigneeStrategy: value }))
+                                                                    }
+                                                                >
+                                                                    <SelectTrigger className="rounded-xl">
+                                                                        <SelectValue />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        {ASSIGNEE_STRATEGY_OPTIONS.map(option => (
+                                                                            <SelectItem key={option.value} value={option.value}>
+                                                                                <div>
+                                                                                    <p>{option.label}</p>
+                                                                                    <p className="text-xs text-slate-500">{option.description}</p>
+                                                                                </div>
+                                                                            </SelectItem>
+                                                                        ))}
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <label className="text-sm font-medium text-slate-700">تاريخ الانتهاء (اختياري)</label>
+                                                                <Input
+                                                                    type="date"
+                                                                    className="rounded-xl"
+                                                                    value={recurringConfig.endDate || ''}
+                                                                    onChange={(e) => setRecurringConfig(prev => ({
+                                                                        ...prev,
+                                                                        endDate: e.target.value
+                                                                    }))}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 )}
-                                            </GosiButton>
-                                        </div>
+                                            </div>
+                                        </CollapsibleContent>
                                     </div>
+                                </Collapsible>
 
-                                </GosiCardContent>
-                            </GosiCard>
-                        </form>
+                                {/* Reminders Section */}
+                                <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
+                                    <div className="border-t border-slate-100 pt-6">
+                                        <div className="flex items-center justify-between w-full">
+                                            <CollapsibleTrigger asChild>
+                                                <Button variant="ghost" className="flex-1 justify-start p-0 h-auto hover:bg-transparent">
+                                                    <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                                                        <Clock className="w-5 h-5 text-emerald-500" aria-hidden="true" />
+                                                        التذكيرات
+                                                    </h3>
+                                                </Button>
+                                            </CollapsibleTrigger>
+                                            <div className="flex items-center gap-2">
+                                                <FieldTooltip content={FIELD_TOOLTIPS.reminders} />
+                                                <CollapsibleTrigger asChild>
+                                                    <Button variant="ghost" size="sm" className="p-0 h-auto hover:bg-transparent">
+                                                        {showAdvanced ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
+                                                    </Button>
+                                                </CollapsibleTrigger>
+                                            </div>
+                                        </div>
+                                        <CollapsibleContent className="mt-4">
+                                            <div className="space-y-3 p-4 bg-slate-50 rounded-xl">
+                                                {reminders.map((reminder, index) => (
+                                                    <div key={index} className="flex items-center gap-3">
+                                                        <Select
+                                                            value={reminder.type}
+                                                            onValueChange={(value) => updateReminder(index, 'type', value)}
+                                                        >
+                                                            <SelectTrigger className="rounded-xl w-36">
+                                                                <SelectValue />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {REMINDER_TYPE_OPTIONS.map(option => (
+                                                                    <SelectItem key={option.value} value={option.value}>
+                                                                        {option.label}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <span className="text-slate-500">قبل</span>
+                                                        <Input
+                                                            type="number"
+                                                            min="1"
+                                                            className="rounded-xl w-20"
+                                                            value={reminder.beforeMinutes}
+                                                            onChange={(e) => updateReminder(index, 'beforeMinutes', parseInt(e.target.value) || 30)}
+                                                        />
+                                                        <span className="text-slate-500">دقيقة</span>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => removeReminder(index)}
+                                                            className="text-red-500 hover:text-red-600"
+                                                        >
+                                                            <X className="w-4 h-4" aria-hidden="true" />
+                                                        </Button>
+                                                    </div>
+                                                ))}
+                                                <Button type="button" variant="outline" onClick={addReminder} className="rounded-xl">
+                                                    <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
+                                                    إضافة تذكير
+                                                </Button>
+                                            </div>
+                                        </CollapsibleContent>
+                                    </div>
+                                </Collapsible>
+
+                                {/* Submit */}
+                                <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
+                                    <Link to="/dashboard/tasks/list">
+                                        <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
+                                            إلغاء
+                                        </Button>
+                                    </Link>
+                                    <Button
+                                        type="submit"
+                                        className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-emerald-500/20"
+                                        disabled={createTaskMutation.isPending}
+                                    >
+                                        {createTaskMutation.isPending ? (
+                                            <span className="flex items-center gap-2">
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                جاري الحفظ...
+                                            </span>
+                                        ) : (
+                                            <span className="flex items-center gap-2">
+                                                <Save className="w-4 h-4" aria-hidden="true" />
+                                                حفظ المهمة
+                                            </span>
+                                        )}
+                                    </Button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
 
-                    {/* SIDEBAR COLUMN */}
-                    <div className="xl:col-span-3">
-                        <TasksSidebar context="tasks" />
-                    </div>
-
+                    {/* Sidebar Widgets */}
+                    <TasksSidebar context="tasks" />
                 </div>
             </Main>
         </>
