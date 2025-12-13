@@ -65,6 +65,37 @@ export const GosiCard = React.forwardRef<HTMLDivElement, GosiCardProps>(
 )
 GosiCard.displayName = 'GosiCard'
 
+// Card Content
+export const GosiCardContent = React.forwardRef<
+    HTMLDivElement,
+    React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+    <div ref={ref} className={cn('p-8 space-y-6', className)} {...props} />
+))
+GosiCardContent.displayName = 'GosiCardContent'
+
+// Card Header
+export const GosiCardHeader = React.forwardRef<
+    HTMLDivElement,
+    React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+    <div ref={ref} className={cn('p-6 pb-0', className)} {...props} />
+))
+GosiCardHeader.displayName = 'GosiCardHeader'
+
+// Card Title
+export const GosiCardTitle = React.forwardRef<
+    HTMLParagraphElement,
+    React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => (
+    <h3
+        ref={ref}
+        className={cn('text-xl font-bold text-slate-900', className)}
+        {...props}
+    />
+))
+GosiCardTitle.displayName = 'GosiCardTitle'
+
 // ============================================================================
 // GOSI INPUT
 // ============================================================================
@@ -223,8 +254,13 @@ export const GosiSelect = ({
     )
 }
 
-// Re-export SelectItem for convenience
-export { SelectItem as GosiSelectItem } from '@/components/ui/select'
+// Re-export Select components for convenience
+export {
+    SelectItem as GosiSelectItem,
+    SelectContent as GosiSelectContent,
+    SelectTrigger as GosiSelectTrigger,
+    SelectValue as GosiSelectValue,
+} from '@/components/ui/select'
 
 // ============================================================================
 // GOSI BUTTON
