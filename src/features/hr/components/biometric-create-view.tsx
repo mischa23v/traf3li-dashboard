@@ -138,7 +138,6 @@ export function BiometricCreateView() {
                                                 value={deviceNameAr}
                                                 onChange={(e) => setDeviceNameAr(e.target.value)}
                                                 placeholder="جهاز البصمة - المدخل الرئيسي"
-                                                required
                                                 className="h-11 rounded-xl"
                                             />
                                         </div>
@@ -177,7 +176,6 @@ export function BiometricCreateView() {
                                                 value={serialNumber}
                                                 onChange={(e) => setSerialNumber(e.target.value)}
                                                 placeholder="SN123456789"
-                                                required
                                                 className="h-11 rounded-xl"
                                                 dir="ltr"
                                             />
@@ -242,7 +240,6 @@ export function BiometricCreateView() {
                                                 value={locationAr}
                                                 onChange={(e) => setLocationAr(e.target.value)}
                                                 placeholder="المدخل الرئيسي - الطابق الأول"
-                                                required
                                                 className="h-11 rounded-xl"
                                             />
                                         </div>
@@ -278,7 +275,6 @@ export function BiometricCreateView() {
                                                 value={ipAddress}
                                                 onChange={(e) => setIpAddress(e.target.value)}
                                                 placeholder="192.168.1.100"
-                                                required
                                                 className="h-11 rounded-xl"
                                                 dir="ltr"
                                             />

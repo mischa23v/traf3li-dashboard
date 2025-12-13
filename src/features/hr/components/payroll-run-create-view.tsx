@@ -412,7 +412,6 @@ export function PayrollRunCreateView() {
                                         onChange={(e) => setRunNameAr(e.target.value)}
                                         placeholder="رواتب يناير 2025"
                                         className="rounded-xl"
-                                        required
                                     />
                                 </div>
                                 <div className="space-y-2">
