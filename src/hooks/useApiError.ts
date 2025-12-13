@@ -31,6 +31,38 @@ const initialErrorState: ErrorState = {
 }
 
 /**
+ * ErrorDisplay Component - Renders validation errors inline
+ */
+function ErrorDisplayComponent({
+  error,
+  validationErrors
+}: {
+  error: string
+  validationErrors: ValidationError[]
+}) {
+  if (!error && validationErrors.length === 0) {
+    return null
+  }
+
+  return (
+    <div className="rounded-lg border border-red-200 bg-red-50 p-4 mb-4">
+      {error && (
+        <p className="text-sm font-medium text-red-800 mb-2">{error}</p>
+      )}
+      {validationErrors.length > 0 && (
+        <ul className="list-disc list-inside space-y-1">
+          {validationErrors.map((err, index) => (
+            <li key={index} className="text-sm text-red-700">
+              <span className="font-medium">{err.field}:</span> {err.message}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
+/**
  * Custom hook for handling API errors consistently
  * @returns Object containing error state and handlers
  *
@@ -214,6 +246,14 @@ export const useApiError = () => {
     }))
   }, [])
 
+  // Create ErrorDisplay component bound to current state
+  const ErrorDisplay = useCallback(() => (
+    <ErrorDisplayComponent
+      error={errorState.message}
+      validationErrors={errorState.validationErrors}
+    />
+  ), [errorState.message, errorState.validationErrors])
+
   return {
     // Error state
     error: errorState.message,
@@ -221,6 +261,9 @@ export const useApiError = () => {
     requestId: errorState.requestId,
     showErrorModal: errorState.showErrorModal,
     status: errorState.status,
+
+    // Components
+    ErrorDisplay,
 
     // Handlers
     handleApiError,
