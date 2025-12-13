@@ -329,12 +329,12 @@ export const GosiTaskCard = React.forwardRef<HTMLDivElement, GosiTaskCardProps>(
                 className={cn(
                     // Base - Floating Card
                     'relative bg-white rounded-[2rem]',
-                    // Shadow - Deep depth
-                    'shadow-[0_4px_20px_-2px_rgba(0,0,0,0.06),0_2px_8px_-2px_rgba(0,0,0,0.04)]',
-                    // Hover - Lift & Glow
-                    'hover:shadow-[0_20px_40px_-5px_rgba(0,0,0,0.1),0_8px_20px_-6px_rgba(0,0,0,0.06)]',
+                    // Gemini Spec: Resting shadow
+                    'shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)]',
+                    // Gemini Spec: Hover shadow + lift
+                    'hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1),0_8px_24px_-8px_rgba(0,0,0,0.04)]',
                     'hover:-translate-y-1.5',
-                    // Animation
+                    // Animation - Staggered fade-in
                     'animate-in fade-in slide-in-from-bottom-4 duration-300',
                     // Selection
                     isSelected && 'ring-2 ring-emerald-500 bg-emerald-50/30',
@@ -346,7 +346,7 @@ export const GosiTaskCard = React.forwardRef<HTMLDivElement, GosiTaskCardProps>(
                 )}
                 {...props}
             >
-                {/* Status Strip - 6px colored bar on left */}
+                {/* Gemini Spec: Status Strip - absolute, w-1.5, left edge */}
                 <div className={cn('absolute top-0 bottom-0 start-0 w-1.5', priorityColors[priority])} />
 
                 {/* Content with padding for strip */}
@@ -406,17 +406,18 @@ export const GosiFilterSelect = ({
     icon,
     children,
     className,
-    minWidth = '150px',
+    minWidth = '220px',
 }: GosiFilterSelectProps) => {
     return (
         <Select value={value} onValueChange={onValueChange}>
             <SelectTrigger
                 className={cn(
-                    // Smart width - grows with content
-                    'h-10 rounded-xl',
-                    'bg-white border-slate-200',
-                    'hover:border-emerald-300',
-                    'focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500',
+                    // Gemini Spec: h-14 (56px) height, rounded-2xl
+                    'h-14 rounded-2xl',
+                    'bg-slate-50 border-slate-200/50',
+                    'hover:bg-slate-100 hover:border-emerald-300',
+                    'focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500/50',
+                    'font-medium text-slate-900',
                     'transition-all duration-200',
                     className
                 )}
@@ -448,10 +449,11 @@ export const GosiIconBox = React.forwardRef<HTMLDivElement, GosiIconBoxProps>(
             navy: 'bg-slate-900 text-white',
         }
 
+        // Gemini Spec: w-14 h-14 (Mobile) / w-16 h-16 (Desktop), rounded-[1.2rem]
         const sizes = {
-            sm: 'w-10 h-10 rounded-lg',
-            md: 'w-12 h-12 rounded-xl',
-            lg: 'w-14 h-14 rounded-2xl',
+            sm: 'w-12 h-12 rounded-xl',
+            md: 'w-14 h-14 rounded-[1.2rem]',
+            lg: 'w-16 h-16 rounded-[1.2rem]',
         }
 
         return (

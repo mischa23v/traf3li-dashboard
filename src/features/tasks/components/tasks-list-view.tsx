@@ -308,39 +308,37 @@ export function TasksListView() {
                     {/* RIGHT COLUMN (Main Content) */}
                     <div className="lg:col-span-2 space-y-6">
 
-                        {/* FILTERS BAR - Gosi Smart Flexbox Wrap Pattern */}
-                        <GosiCard className="p-4">
+                        {/* FILTERS BAR - Gemini Spec: bg-white rounded-[2rem] p-4 md:p-6 shadow-sm */}
+                        <GosiCard className="p-4 md:p-6 shadow-sm">
                             <GosiFilterBar className="gap-4">
-                                {/* Search Input */}
-                                <div className="relative flex-1 min-w-[200px] max-w-md">
-                                    <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+                                {/* Search Input - h-14 to match filters */}
+                                <div className="relative flex-1 min-w-[220px] max-w-md">
+                                    <Search className="absolute end-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" aria-hidden="true" />
                                     <GosiInput
                                         type="text"
                                         placeholder={t('tasks.list.searchPlaceholder')}
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        variant="compact"
-                                        className="pe-10"
+                                        className="pe-12 h-14"
                                     />
                                 </div>
 
-                                {/* Status Filter */}
+                                {/* Status Filter - min-w-[220px] */}
                                 <GosiFilterSelect
                                     value={activeStatusTab}
                                     onValueChange={setActiveStatusTab}
                                     placeholder={t('tasks.list.status')}
-                                    minWidth="140px"
                                 >
                                     <SelectItem value="active">{t('tasks.list.active')}</SelectItem>
                                     <SelectItem value="completed">{t('tasks.list.completed')}</SelectItem>
                                 </GosiFilterSelect>
 
-                                {/* Priority Filter - Smart Width for Arabic */}
+                                {/* Priority Filter - Gemini Spec: min-w-[240px] for Arabic */}
                                 <GosiFilterSelect
                                     value={priorityFilter}
                                     onValueChange={setPriorityFilter}
                                     placeholder={t('tasks.list.priorityLabel')}
-                                    minWidth="160px"
+                                    minWidth="240px"
                                 >
                                     <SelectItem value="all">{t('tasks.list.allPriorities')}</SelectItem>
                                     <SelectItem value="urgent">{t('tasks.priorities.urgent')}</SelectItem>
@@ -349,12 +347,11 @@ export function TasksListView() {
                                     <SelectItem value="low">{t('tasks.priorities.low')}</SelectItem>
                                 </GosiFilterSelect>
 
-                                {/* Assigned To Filter */}
+                                {/* Assigned To Filter - min-w-[220px] */}
                                 <GosiFilterSelect
                                     value={assignedFilter}
                                     onValueChange={setAssignedFilter}
                                     placeholder={t('tasks.list.responsible')}
-                                    minWidth="160px"
                                 >
                                     <SelectItem value="all">{t('tasks.list.all')}</SelectItem>
                                     <SelectItem value="me">{t('tasks.list.myTasks')}</SelectItem>
@@ -366,13 +363,12 @@ export function TasksListView() {
                                     ))}
                                 </GosiFilterSelect>
 
-                                {/* Due Date Filter */}
+                                {/* Due Date Filter - min-w-[220px] */}
                                 <GosiFilterSelect
                                     value={dueDateFilter}
                                     onValueChange={setDueDateFilter}
                                     placeholder={t('tasks.list.dueDate')}
                                     icon={<Calendar className="h-4 w-4" />}
-                                    minWidth="160px"
                                 >
                                     <SelectItem value="all">{t('tasks.list.allDates')}</SelectItem>
                                     <SelectItem value="today">{t('tasks.list.today')}</SelectItem>
@@ -382,13 +378,12 @@ export function TasksListView() {
                                     <SelectItem value="noDueDate">{t('tasks.list.noDueDate')}</SelectItem>
                                 </GosiFilterSelect>
 
-                                {/* Case Filter */}
+                                {/* Case Filter - min-w-[220px] */}
                                 <GosiFilterSelect
                                     value={caseFilter}
                                     onValueChange={setCaseFilter}
                                     placeholder={t('tasks.list.case')}
                                     icon={<Briefcase className="h-4 w-4" />}
-                                    minWidth="180px"
                                 >
                                     <SelectItem value="all">{t('tasks.list.allCases')}</SelectItem>
                                     {casesData?.cases?.map((caseItem: any) => (
@@ -398,13 +393,12 @@ export function TasksListView() {
                                     ))}
                                 </GosiFilterSelect>
 
-                                {/* Sort By */}
+                                {/* Sort By - min-w-[220px] */}
                                 <GosiFilterSelect
                                     value={sortBy}
                                     onValueChange={setSortBy}
                                     placeholder={t('tasks.list.sortBy')}
                                     icon={<SortAsc className="h-4 w-4" />}
-                                    minWidth="160px"
                                 >
                                     <SelectItem value="dueDate">{t('tasks.list.dueDate')}</SelectItem>
                                     <SelectItem value="priority">{t('tasks.list.priorityLabel')}</SelectItem>
@@ -516,9 +510,9 @@ export function TasksListView() {
                                                         className="h-6 w-6 rounded-md border-slate-300 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
                                                     />
                                                 )}
-                                                {/* Icon Box - Soft Slate (Gosi Pattern) */}
-                                                <GosiIconBox variant="soft" size="md">
-                                                    <Briefcase className="h-6 w-6" />
+                                                {/* Gemini Spec: Icon Box - w-14 h-14 (Mobile) / w-16 h-16 (Desktop) */}
+                                                <GosiIconBox variant="soft" size="md" className="sm:w-16 sm:h-16">
+                                                    <Briefcase className="h-6 w-6 sm:h-7 sm:w-7" />
                                                 </GosiIconBox>
                                                 <div>
                                                     <div className="flex items-center gap-2 mb-1 flex-wrap">
