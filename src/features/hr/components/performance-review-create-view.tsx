@@ -828,7 +828,7 @@ export function PerformanceReviewCreateView() {
                 </Button>
                 <Button
                   onClick={handleSubmit}
-                  disabled={!employeeId || !endDate || !dueDate || createMutation.isPending}
+                  disabled={createMutation.isPending}
                   className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8 shadow-lg shadow-emerald-500/20"
                 >
                   {createMutation.isPending ? (

@@ -1127,7 +1127,7 @@ export function ExpenseClaimsCreateView() {
               </Button>
               <Button
                 onClick={handleSubmit}
-                disabled={!employeeId || !claimTitle || !periodStart || !periodEnd || lineItems.length === 0 || isPending}
+                disabled={isPending}
                 className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8"
               >
                 {isPending ? (

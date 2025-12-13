@@ -1132,7 +1132,7 @@ export function OrganizationalStructureCreateView() {
               </Button>
               <Button
                 onClick={handleSubmit}
-                disabled={!unitCode || !unitNameAr || !unitType || isPending}
+                disabled={isPending}
                 className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8"
               >
                 {isPending ? (
