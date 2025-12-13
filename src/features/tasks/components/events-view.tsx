@@ -5,7 +5,7 @@ import {
     Calendar as CalendarIcon, MoreHorizontal, Plus,
     MapPin, Clock, Search, AlertCircle, ChevronLeft, Bell, Users,
     CalendarCheck, CalendarPlus, CalendarRange, Eye, Trash2, CheckCircle, XCircle, CalendarClock,
-    SortAsc, X, CheckSquare
+    SortAsc, X, CheckSquare, ArrowRight
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -37,6 +37,17 @@ import { StatCard } from '@/components/stat-card'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+    GosiCard,
+    GosiCardContent,
+    GosiInput,
+    GosiSelect,
+    GosiSelectContent,
+    GosiSelectItem,
+    GosiSelectTrigger,
+    GosiSelectValue,
+    GosiButton
+} from '@/components/ui/gosi-ui'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -279,224 +290,253 @@ export function EventsView() {
                     {/* RIGHT COLUMN (Main Content) */}
                     <div className="lg:col-span-2 space-y-6">
 
-                        {/* FILTERS BAR */}
-                        <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
-                            <div className="flex flex-wrap items-center gap-3">
+                        {/* FILTERS BAR - Responsive Flex Wrap */}
+                        <GosiCard className="p-4 md:p-6 rounded-[2rem]">
+                            <div className="flex flex-wrap items-center gap-3 transition-all duration-300 ease-in-out">
                                 {/* Search Input */}
-                                <div className="relative flex-1 min-w-[200px] max-w-md">
-                                    <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
-                                    <Input
+                                <div className="relative flex-1 min-w-[200px]">
+                                    <Search className="absolute end-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" aria-hidden="true" />
+                                    <GosiInput
                                         type="text"
                                         placeholder={t('events.list.searchPlaceholder')}
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="pe-10 h-10 rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500/20"
+                                        className="pe-12 h-14 w-full text-base"
                                     />
                                 </div>
 
-                                {/* Status Filter */}
-                                <Select value={activeTab} onValueChange={setActiveTab}>
-                                    <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
-                                        <SelectValue placeholder={t('events.list.status')} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="upcoming">{t('events.list.upcoming')}</SelectItem>
-                                        <SelectItem value="past">{t('events.list.past')}</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                {/* Status Filter (Tab Switcher) */}
+                                <div className="flex-1 min-w-[150px]">
+                                    <GosiSelect value={activeTab} onValueChange={setActiveTab}>
+                                        <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-blue-500/20 transition-all">
+                                            <div className="flex items-center gap-2 truncate">
+                                                <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('events.list.status')}:</span>
+                                                <GosiSelectValue />
+                                            </div>
+                                        </GosiSelectTrigger>
+                                        <GosiSelectContent>
+                                            <GosiSelectItem value="upcoming">{t('events.list.upcoming')}</GosiSelectItem>
+                                            <GosiSelectItem value="past">{t('events.list.past')}</GosiSelectItem>
+                                        </GosiSelectContent>
+                                    </GosiSelect>
+                                </div>
 
                                 {/* Type Filter */}
-                                <Select value={typeFilter} onValueChange={setTypeFilter}>
-                                    <SelectTrigger className="w-[150px] h-10 rounded-xl border-slate-200">
-                                        <SelectValue placeholder={t('events.list.type')} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">{t('events.list.allTypes')}</SelectItem>
-                                        <SelectItem value="meeting">{t('events.list.meeting')}</SelectItem>
-                                        <SelectItem value="court_hearing">{t('events.list.courtHearing')}</SelectItem>
-                                        <SelectItem value="conference">{t('events.list.conference')}</SelectItem>
-                                        <SelectItem value="webinar">{t('events.list.webinar')}</SelectItem>
-                                        <SelectItem value="workshop">{t('events.list.workshop')}</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <div className="flex-1 min-w-[180px]">
+                                    <GosiSelect value={typeFilter} onValueChange={setTypeFilter}>
+                                        <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-blue-500/20 transition-all">
+                                            <div className="flex items-center gap-2 truncate">
+                                                <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('events.list.type')}:</span>
+                                                <GosiSelectValue />
+                                            </div>
+                                        </GosiSelectTrigger>
+                                        <GosiSelectContent>
+                                            <GosiSelectItem value="all">{t('events.list.allTypes')}</GosiSelectItem>
+                                            <GosiSelectItem value="meeting">{t('events.list.meeting')}</GosiSelectItem>
+                                            <GosiSelectItem value="court_hearing">{t('events.list.courtHearing')}</GosiSelectItem>
+                                            <GosiSelectItem value="conference">{t('events.list.conference')}</GosiSelectItem>
+                                            <GosiSelectItem value="webinar">{t('events.list.webinar')}</GosiSelectItem>
+                                            <GosiSelectItem value="workshop">{t('events.list.workshop')}</GosiSelectItem>
+                                        </GosiSelectContent>
+                                    </GosiSelect>
+                                </div>
 
                                 {/* Sort By */}
-                                <Select value={sortBy} onValueChange={setSortBy}>
-                                    <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
-                                        <SortAsc className="h-4 w-4 ms-2 text-slate-500" />
-                                        <SelectValue placeholder={t('events.list.sortBy')} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="startDate">{t('events.list.eventDate')}</SelectItem>
-                                        <SelectItem value="createdAt">{t('events.list.creationDate')}</SelectItem>
-                                        <SelectItem value="title">{t('events.list.name')}</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <div className="flex-[0.5] min-w-[160px]">
+                                    <GosiSelect value={sortBy} onValueChange={setSortBy}>
+                                        <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-blue-500/20 transition-all">
+                                            <div className="flex items-center gap-2 truncate">
+                                                <SortAsc className="h-4 w-4 text-blue-500" />
+                                                <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('events.list.sortBy')}:</span>
+                                                <GosiSelectValue />
+                                            </div>
+                                        </GosiSelectTrigger>
+                                        <GosiSelectContent>
+                                            <GosiSelectItem value="startDate">{t('events.list.eventDate')}</GosiSelectItem>
+                                            <GosiSelectItem value="createdAt">{t('events.list.creationDate')}</GosiSelectItem>
+                                            <GosiSelectItem value="title">{t('events.list.name')}</GosiSelectItem>
+                                        </GosiSelectContent>
+                                    </GosiSelect>
+                                </div>
 
                                 {/* Clear Filters Button */}
                                 {hasActiveFilters && (
-                                    <Button
+                                    <GosiButton
                                         variant="ghost"
-                                        size="sm"
                                         onClick={clearFilters}
-                                        className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
+                                        className="h-14 w-full md:w-auto text-red-500 hover:text-red-600 hover:bg-red-50 rounded-2xl border border-dashed border-red-200 px-6 hover:shadow-lg hover:shadow-red-500/10 transition-all"
                                     >
-                                        <X className="h-4 w-4 ms-2" aria-hidden="true" />
+                                        <X className="h-5 w-5 ms-2" aria-hidden="true" />
                                         {t('events.list.clearFilters')}
-                                    </Button>
+                                    </GosiButton>
                                 )}
                             </div>
-                        </div>
+                        </GosiCard>
 
                         {/* MAIN EVENTS LIST */}
-                        <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
-                            <div className="p-6 pb-2 flex justify-between items-center">
-                                <h3 className="font-bold text-navy text-xl">
-                                    {activeTab === 'upcoming' ? t('events.list.upcomingEvents') : t('events.list.pastEvents')}
-                                </h3>
-                                <Badge className="bg-slate-100 text-slate-600 border-0 rounded-full px-4 py-1">
-                                    {t('events.list.eventCount', { count: events.length })}
-                                </Badge>
-                            </div>
+                        <div className="flex flex-col gap-4">
+                            {/* Loading State */}
+                            {isLoading && (
+                                <div className="space-y-4">
+                                    {[1, 2, 3].map((i) => (
+                                        <Skeleton key={i} className="h-40 w-full rounded-[2rem] bg-slate-100" />
+                                    ))}
+                                </div>
+                            )}
 
-                            <div className="p-4 space-y-4">
-                                {/* Loading State */}
-                                {isLoading && (
-                                    <>
-                                        {[1, 2, 3].map((i) => (
-                                            <div key={i} className="bg-[#F8F9FA] rounded-2xl p-6 border border-slate-100">
-                                                <div className="flex gap-4 mb-4">
-                                                    <Skeleton className="w-12 h-12 rounded-xl" />
-                                                    <div className="flex-1 space-y-2">
-                                                        <Skeleton className="h-6 w-3/4" />
-                                                        <Skeleton className="h-4 w-1/2" />
-                                                    </div>
-                                                </div>
-                                                <Skeleton className="h-16 w-full" />
-                                            </div>
-                                        ))}
-                                    </>
-                                )}
+                            {/* Error State */}
+                            {isError && (
+                                <div className="bg-red-50 rounded-[2rem] p-12 text-center border border-red-100">
+                                    <div className="flex justify-center mb-4">
+                                        <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+                                            <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
+                                        </div>
+                                    </div>
+                                    <h3 className="text-lg font-bold text-slate-900 mb-2">{t('events.list.errorLoading')}</h3>
+                                    <p className="text-slate-500 mb-4">{error?.message || t('events.list.unknownError')}</p>
+                                    <Button onClick={() => refetch()} className="bg-blue-500 hover:bg-blue-600">
+                                        {t('events.list.retry')}
+                                    </Button>
+                                </div>
+                            )}
 
-                                {/* Error State */}
-                                {isError && (
-                                    <Alert className="border-red-200 bg-red-50">
-                                        <AlertCircle className="h-4 w-4 text-red-600" aria-hidden="true" />
-                                        <AlertDescription className="text-red-800">
-                                            <div className="flex items-center justify-between">
-                                                <span>{t('events.list.errorLoading')}: {error?.message || t('events.list.unknownError')}</span>
-                                                <Button onClick={() => refetch()} variant="outline" size="sm" className="border-red-300 text-red-700 hover:bg-red-100">
-                                                    {t('events.list.retry')}
-                                                </Button>
-                                            </div>
-                                        </AlertDescription>
-                                    </Alert>
-                                )}
-
-                                {/* Empty State */}
-                                {!isLoading && !isError && events.length === 0 && (
-                                    <div className="text-center py-12">
-                                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
+                            {/* Empty State */}
+                            {!isLoading && !isError && events.length === 0 && (
+                                <div className="bg-white rounded-[2rem] p-12 border border-slate-100 text-center">
+                                    <div className="flex justify-center mb-4">
+                                        <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
                                             <CalendarIcon className="h-8 w-8 text-blue-500" />
                                         </div>
-                                        <h4 className="text-lg font-bold text-navy mb-2">لا توجد فعاليات</h4>
-                                        <p className="text-slate-500 mb-4">جدولك خالٍ حالياً. ابدأ بإضافة أحداث جديدة.</p>
-                                        <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl">
-                                            <Link to="/dashboard/tasks/events/new">
-                                                <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
-                                                إضافة حدث جديد
-                                            </Link>
-                                        </Button>
                                     </div>
-                                )}
+                                    <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد فعاليات</h3>
+                                    <p className="text-slate-500 mb-4">جدولك خالٍ حالياً. ابدأ بإضافة أحداث جديدة.</p>
+                                    <GosiButton asChild className="bg-blue-500 hover:bg-blue-600">
+                                        <Link to="/dashboard/tasks/events/new">
+                                            <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
+                                            إضافة حدث جديد
+                                        </Link>
+                                    </GosiButton>
+                                </div>
+                            )}
 
-                                {/* Success State */}
-                                {!isLoading && !isError && events.map((event) => (
-                                    <div key={event.id} className={`bg-[#F8F9FA] rounded-2xl p-6 border transition-all group ${selectedEventIds.includes(event.id) ? 'border-blue-500 bg-blue-50/30' : 'border-slate-100 hover:border-blue-200'}`}>
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div className="flex gap-4 items-center">
-                                                {isSelectionMode && (
+                            {/* Success State */}
+                            {!isLoading && !isError && events.map((event, index) => (
+                                <div
+                                    key={event.id}
+                                    style={{ animationDelay: `${index * 50}ms` }}
+                                    onClick={() => handleViewEvent(event.id)}
+                                    className={`
+                                        animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-backwards
+                                        bg-white rounded-[2rem] p-5 md:p-7
+                                        border-0 ring-1 ring-black/[0.03] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)]
+                                        transition-all duration-300 group 
+                                        hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1),0_8px_24px_-8px_rgba(0,0,0,0.04)] hover:-translate-y-1.5 
+                                        cursor-pointer relative overflow-hidden flex flex-col
+                                        ${selectedEventIds.includes(event.id) ? 'ring-2 ring-blue-500 bg-blue-50/20' : ''}
+                                    `}
+                                >
+                                    {/* Status Strip Indicator (Blue/Red based on urgency or type could be nice, for now consistent Blue) */}
+                                    <div className={`absolute start-0 top-0 bottom-0 w-1.5 bg-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+
+                                    <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-4 ps-2">
+                                        {/* LEFT SIDE: Checkbox + DateBox + Info */}
+                                        <div className="flex gap-5 items-start w-full md:w-auto">
+                                            {isSelectionMode && (
+                                                <div onClick={(e) => e.stopPropagation()}>
                                                     <Checkbox
                                                         checked={selectedEventIds.includes(event.id)}
                                                         onCheckedChange={() => handleSelectEvent(event.id)}
-                                                        className="h-6 w-6 rounded-md border-slate-300 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
+                                                        className="h-6 w-6 mt-1 rounded-md border-slate-300 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500 flex-shrink-0 transition-all duration-200"
                                                     />
-                                                )}
-                                                <div className="w-16 h-16 rounded-2xl bg-white flex flex-col items-center justify-center shadow-sm border border-slate-100 text-center overflow-hidden">
-                                                    <div className="bg-blue-500 text-white text-[10px] w-full py-0.5 font-bold">
-                                                        {event.date && !isNaN(new Date(event.date).getTime()) ? new Date(event.date).toLocaleDateString('ar-SA', { month: 'short' }) : 'غير محدد'}
-                                                    </div>
-                                                    <div className="text-xl font-bold text-navy pt-1">
-                                                        {event.date && !isNaN(new Date(event.date).getTime()) ? new Date(event.date).toLocaleDateString('en-US', { day: 'numeric' }) : '-'}
-                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <h4 className="font-bold text-navy text-lg">{event.title}</h4>
-                                                        <Badge variant="outline" className="bg-slate-100 text-slate-600 border-slate-200">
-                                                            {event.type}
-                                                        </Badge>
-                                                        {/* Event ↔ Task Sync Badge */}
-                                                        {event.taskId && (
-                                                            <Badge
-                                                                className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-0 rounded-md px-2 flex items-center gap-1 cursor-pointer transition-all"
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation()
-                                                                    const taskId = typeof event.taskId === 'string' ? event.taskId : event.taskId._id
-                                                                    navigate({ to: '/dashboard/tasks/$taskId', params: { taskId } })
-                                                                }}
-                                                            >
-                                                                <CheckSquare className="h-3 w-3" />
-                                                                مرتبط بمهمة
-                                                            </Badge>
-                                                        )}
-                                                    </div>
-                                                    <div className="flex items-center gap-4 text-slate-500 text-sm">
-                                                        <span className="flex items-center gap-1">
-                                                            <Clock className="h-3 w-3" aria-hidden="true" />
-                                                            {event.time}
-                                                        </span>
-                                                        <span className="flex items-center gap-1">
-                                                            <MapPin className="h-3 w-3" aria-hidden="true" />
-                                                            {event.location}
-                                                        </span>
-                                                    </div>
+                                            )}
+
+                                            {/* Date Box (Replaces Icon Box for Events) */}
+                                            <div className="w-14 h-14 md:w-16 md:h-16 rounded-[1.2rem] bg-white flex flex-col items-center justify-center shadow-inner border border-slate-100 text-center overflow-hidden group-hover:scale-105 transition-all duration-300">
+                                                <div className="bg-blue-500 text-white text-[10px] w-full py-0.5 font-bold tracking-wider">
+                                                    {event.date && !isNaN(new Date(event.date).getTime()) ? new Date(event.date).toLocaleDateString('ar-SA', { month: 'short' }) : 'NA'}
+                                                </div>
+                                                <div className="text-xl font-bold text-slate-800 pt-1 group-hover:text-blue-600">
+                                                    {event.date && !isNaN(new Date(event.date).getTime()) ? new Date(event.date).toLocaleDateString('en-US', { day: 'numeric' }) : '-'}
                                                 </div>
                                             </div>
+
+                                            <div className="min-w-0 flex-1 space-y-1.5">
+                                                <div className="flex flex-wrap items-center gap-3 mb-1">
+                                                    <h4 className="font-bold text-slate-800 text-lg md:text-xl group-hover:text-blue-800 transition-colors truncate leading-tight tracking-tight">{event.title}</h4>
+
+                                                    <Badge variant="outline" className="bg-slate-50 text-slate-500 border-slate-200 rounded-lg px-2 text-[11px]">
+                                                        {event.type}
+                                                    </Badge>
+
+                                                    {event.taskId && (
+                                                        <Badge
+                                                            className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-100 rounded-lg px-2 flex items-center gap-1 cursor-pointer transition-all text-[11px]"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                const taskId = typeof event.taskId === 'string' ? event.taskId : event.taskId._id
+                                                                navigate({ to: '/dashboard/tasks/$taskId', params: { taskId } })
+                                                            }}
+                                                        >
+                                                            <CheckSquare className="h-3 w-3" />
+                                                            مرتبط بمهمة
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-wrap items-center gap-4 text-slate-500 text-sm font-medium">
+                                                    <span className="flex items-center gap-2">
+                                                        <Clock className="w-4 h-4 text-blue-500" />
+                                                        {event.time}
+                                                    </span>
+                                                    <span className="flex items-center gap-2">
+                                                        <MapPin className="w-4 h-4 text-blue-500" />
+                                                        {event.location}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            {/* Mobile Chevron */}
+                                            <div className="md:hidden ms-auto text-slate-300 group-hover:text-blue-500 group-hover:translate-x-[-4px] transition-all duration-300 rtl:rotate-180 self-center">
+                                                <ChevronLeft className="h-6 w-6 rtl:rotate-0 ltr:rotate-180" />
+                                            </div>
+                                        </div>
+
+                                        {/* RIGHT SIDE: Action Menu */}
+                                        <div className="absolute end-4 top-4" onClick={(e) => e.stopPropagation()}>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy">
-                                                        <MoreHorizontal className="h-5 w-5" />
+                                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy hover:bg-slate-100 rounded-xl">
+                                                        <MoreHorizontal className="h-6 w-6" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-48">
-                                                    <DropdownMenuItem onClick={() => handleViewEvent(event.id)}>
+                                                <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-xl border-0 ring-1 ring-black/5">
+                                                    <DropdownMenuItem onClick={() => handleViewEvent(event.id)} className="rounded-lg py-2.5 cursor-pointer">
                                                         <Eye className="h-4 w-4 ms-2" />
                                                         عرض التفاصيل
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     {event.status !== 'completed' && (
-                                                        <DropdownMenuItem onClick={() => handleCompleteEvent(event.id)}>
-                                                            <CheckCircle className="h-4 w-4 ms-2" />
+                                                        <DropdownMenuItem onClick={() => handleCompleteEvent(event.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                            <CheckCircle className="h-4 w-4 ms-2 text-emerald-500" />
                                                             إكمال
                                                         </DropdownMenuItem>
                                                     )}
                                                     {event.status !== 'cancelled' && (
-                                                        <DropdownMenuItem onClick={() => handleCancelEvent(event.id)}>
-                                                            <XCircle className="h-4 w-4 ms-2" />
+                                                        <DropdownMenuItem onClick={() => handleCancelEvent(event.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                            <XCircle className="h-4 w-4 ms-2 text-orange-500" />
                                                             إلغاء
                                                         </DropdownMenuItem>
                                                     )}
                                                     {event.status !== 'completed' && event.status !== 'cancelled' && (
-                                                        <DropdownMenuItem onClick={() => setPostponeEventId(event.id)}>
-                                                            <CalendarClock className="h-4 w-4 ms-2" />
+                                                        <DropdownMenuItem onClick={() => setPostponeEventId(event.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                            <CalendarClock className="h-4 w-4 ms-2 text-blue-500" />
                                                             تأجيل
                                                         </DropdownMenuItem>
                                                     )}
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem
                                                         onClick={() => handleDeleteEvent(event.id)}
-                                                        className="text-red-600 focus:text-red-600"
+                                                        className="text-red-600 focus:text-red-600 rounded-lg py-2.5 cursor-pointer bg-red-50/50 hover:bg-red-50"
                                                     >
                                                         <Trash2 className="h-4 w-4 ms-2" />
                                                         حذف
@@ -505,60 +545,70 @@ export function EventsView() {
                                             </DropdownMenu>
                                         </div>
 
-                                        <div className="flex items-center justify-between pt-4 border-t border-slate-200/50">
-                                            <div className="flex items-center gap-4">
-                                                {/* Attendees */}
-                                                <div className="flex items-center gap-2">
-                                                    <div className="flex -gap-2">
-                                                        {[...Array(Math.min(3, event.attendees))].map((_, i) => (
-                                                            <div key={i} className="w-8 h-8 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-xs font-bold text-slate-500">
-                                                                <Users className="w-4 h-4" aria-hidden="true" />
-                                                            </div>
-                                                        ))}
-                                                        {event.attendees > 3 && (
-                                                            <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-xs font-bold text-slate-500">
-                                                                +{event.attendees - 3}
-                                                            </div>
-                                                        )}
-                                                    </div>
+                                        {/* Desktop Action Buttons */}
+                                        <div className="hidden sm:inline-flex items-center gap-2 mt-auto self-center" onClick={(e) => e.stopPropagation()}>
+                                            {/* RSVP Buttons */}
+                                            {event.status === 'scheduled' && (
+                                                <div className="flex gap-2 me-2">
+                                                    <GosiButton
+                                                        variant="ghost"
+                                                        onClick={() => handleRSVP(event.id, 'declined')}
+                                                        className="text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl px-4 h-10 w-auto"
+                                                    >
+                                                        اعتذار
+                                                    </GosiButton>
+                                                    <GosiButton
+                                                        onClick={() => handleRSVP(event.id, 'accepted')}
+                                                        className="bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white border border-blue-100 hover:border-blue-500 rounded-xl px-4 h-10 w-auto shadow-sm hover:shadow-lg transition-all"
+                                                    >
+                                                        تأكيد
+                                                    </GosiButton>
                                                 </div>
-                                                {/* Event Date - Dual Language */}
-                                                <div className="text-center">
-                                                    <div className="text-xs text-slate-500 mb-1">موعد الحدث</div>
-                                                    <div className="font-bold text-navy text-sm">{event.eventDateFormatted.arabic}</div>
-                                                    <div className="text-xs text-slate-500">{event.eventDateFormatted.english}</div>
-                                                </div>
-                                                {/* Creation Date - Dual Language */}
-                                                <div className="text-center">
-                                                    <div className="text-xs text-slate-500 mb-1">تاريخ الإنشاء</div>
-                                                    <div className="font-bold text-slate-600 text-sm">{event.createdAtFormatted.arabic}</div>
-                                                    <div className="text-xs text-slate-500">{event.createdAtFormatted.english}</div>
-                                                </div>
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <Button variant="outline" size="sm" onClick={() => handleRSVP(event.id, 'declined')} className="text-red-600 hover:bg-red-50 border-red-200">
-                                                    اعتذار
-                                                </Button>
-                                                <Button size="sm" onClick={() => handleRSVP(event.id, 'accepted')} className="bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-500/20">
-                                                    تأكيد الحضور
-                                                </Button>
-                                                <Link to={`/dashboard/tasks/events/${event.id}` as any}>
-                                                    <Button className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-6 shadow-lg shadow-blue-500/20">
-                                                        عرض التفاصيل
-                                                    </Button>
-                                                </Link>
-                                            </div>
+                                            )}
+
+                                            {/* View Details Button */}
+                                            <GosiButton onClick={() => handleViewEvent(event.id)} className="bg-slate-50 text-slate-600 hover:bg-slate-800 hover:text-white border border-slate-100 hover:border-slate-800 rounded-xl px-6 h-10 shadow-sm hover:shadow-lg w-auto transition-all duration-300 hover:scale-105 active:scale-95 group/btn">
+                                                {t('events.list.viewDetails', 'التفاصيل')}
+                                                <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180 transition-transform group-hover/btn:translate-x-1 rtl:group-hover/btn:-translate-x-1" />
+                                            </GosiButton>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
 
-                            <div className="p-4 pt-0 text-center">
-                                <Button variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 w-full rounded-xl py-6">
-                                    عرض جميع الفعاليات
-                                    <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
-                                </Button>
-                            </div>
+                                    {/* Footer Info (Attendees, Creation Date) */}
+                                    <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between text-xs text-slate-400">
+                                        <div className="flex items-center gap-4">
+                                            {/* Attendees Avatars */}
+                                            <div className="flex items-center gap-2">
+                                                <div className="flex -space-x-2 rtl:space-x-reverse">
+                                                    {[...Array(Math.min(3, event.attendees))].map((_, i) => (
+                                                        <div key={i} className="w-6 h-6 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[9px] font-bold text-slate-500">
+                                                            <Users className="w-3 h-3" />
+                                                        </div>
+                                                    ))}
+                                                    {event.attendees > 3 && (
+                                                        <div className="w-6 h-6 rounded-full bg-slate-50 border-2 border-white flex items-center justify-center text-[9px] font-bold text-slate-400">
+                                                            +{event.attendees - 3}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                {event.attendees > 0 && <span>{event.attendees} حضور</span>}
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-1">
+                                            <span>تم الإنشاء:</span>
+                                            <span className="font-medium text-slate-500">{event.createdAtFormatted.arabic}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="p-4 pt-0 text-center">
+                            <Button variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 w-full rounded-2xl py-6 border border-dashed border-blue-200 hover:border-blue-300">
+                                عرض جميع الفعاليات
+                                <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
+                            </Button>
                         </div>
                     </div>
 
