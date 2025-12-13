@@ -7,50 +7,115 @@ const CustomException = require('../utils/CustomException');
  * POST /api/clients
  */
 const createClient = asyncHandler(async (req, res) => {
+    console.log('========== BACKEND CREATE CLIENT DEBUG ==========');
+    console.log('[CreateClient] Request received');
+    console.log('[CreateClient] Timestamp:', new Date().toISOString());
+    console.log('[CreateClient] Request body:', JSON.stringify(req.body, null, 2));
+    console.log('[CreateClient] Request headers:', JSON.stringify(req.headers, null, 2));
+    console.log('[CreateClient] User ID from auth:', req.userID);
+    console.log('[CreateClient] Request method:', req.method);
+    console.log('[CreateClient] Request URL:', req.originalUrl);
+
     const {
         fullName,
+        fullNameArabic,
+        fullNameEnglish,
+        firstName,
+        lastName,
         email,
         phone,
         alternatePhone,
         nationalId,
         companyName,
+        companyNameEnglish,
+        crNumber,
         companyRegistration,
         address,
         city,
         country = 'Saudi Arabia',
         notes,
         preferredContactMethod = 'email',
+        preferredContact,
         language = 'ar',
-        status = 'active'
+        status = 'active',
+        clientType = 'individual',
+        gender,
+        nationality,
+        legalRepresentative
     } = req.body;
 
     const lawyerId = req.userID;
 
+    console.log('[CreateClient] Parsed fields:');
+    console.log('  - lawyerId:', lawyerId);
+    console.log('  - fullName:', fullName);
+    console.log('  - fullNameArabic:', fullNameArabic);
+    console.log('  - firstName:', firstName);
+    console.log('  - lastName:', lastName);
+    console.log('  - email:', email);
+    console.log('  - phone:', phone);
+    console.log('  - nationalId:', nationalId);
+    console.log('  - clientType:', clientType);
+    console.log('  - companyName:', companyName);
+    console.log('  - crNumber:', crNumber);
+
     // All fields optional for Playwright testing - no validation required
 
-    const client = await Client.create({
-        lawyerId,
-        fullName,
-        email,
-        phone,
-        alternatePhone,
-        nationalId,
-        companyName,
-        companyRegistration,
-        address,
-        city,
-        country,
-        notes,
-        preferredContactMethod,
-        language,
-        status
-    });
+    // Build the computed fullName from various sources
+    const computedFullName = fullName || fullNameArabic ||
+        [firstName, lastName].filter(Boolean).join(' ') ||
+        companyName || 'عميل جديد';
 
-    res.status(201).json({
-        success: true,
-        message: 'تم إنشاء العميل بنجاح',
-        client
-    });
+    console.log('[CreateClient] Computed fullName:', computedFullName);
+
+    try {
+        console.log('[CreateClient] Creating client in database...');
+        const client = await Client.create({
+            lawyerId,
+            fullName: computedFullName,
+            fullNameArabic,
+            fullNameEnglish,
+            firstName,
+            lastName,
+            email,
+            phone,
+            alternatePhone,
+            nationalId,
+            companyName,
+            companyNameEnglish,
+            crNumber,
+            companyRegistration,
+            address,
+            city,
+            country,
+            notes,
+            preferredContactMethod: preferredContactMethod || preferredContact,
+            language,
+            status,
+            clientType,
+            gender,
+            nationality,
+            legalRepresentative
+        });
+
+        console.log('[CreateClient] ✅ Client created successfully!');
+        console.log('[CreateClient] Created client:', JSON.stringify(client, null, 2));
+
+        res.status(201).json({
+            success: true,
+            message: 'تم إنشاء العميل بنجاح',
+            client
+        });
+    } catch (dbError) {
+        console.log('[CreateClient] ❌ Database error!');
+        console.log('[CreateClient] Error type:', dbError.constructor.name);
+        console.log('[CreateClient] Error message:', dbError.message);
+        console.log('[CreateClient] Error stack:', dbError.stack);
+        console.log('[CreateClient] Error name:', dbError.name);
+        if (dbError.code) console.log('[CreateClient] Error code:', dbError.code);
+        if (dbError.errors) console.log('[CreateClient] Validation errors:', JSON.stringify(dbError.errors, null, 2));
+        throw dbError;
+    }
 });
 
 /**

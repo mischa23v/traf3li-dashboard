@@ -399,6 +399,12 @@ export function CreateClientView() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
+        console.log('========== CLIENT CREATION DEBUG ==========')
+        console.log('[CreateClient] Form submission started')
+        console.log('[CreateClient] Client type:', clientType)
+        console.log('[CreateClient] Name entry mode:', nameEntryMode)
+        console.log('[CreateClient] Timestamp:', new Date().toISOString())
+
         // Clear previous errors
         setClientValidationErrors([])
         clearError()
@@ -515,11 +521,14 @@ export function CreateClientView() {
 
         // If there are validation errors, show them and stop submission
         if (errors.length > 0) {
+            console.log('[CreateClient] ❌ Client-side validation failed')
+            console.log('[CreateClient] Validation errors:', errors)
             setClientValidationErrors(errors)
             // Scroll to top to show errors
             window.scrollTo({ top: 0, behavior: 'smooth' })
             return
         }
+        console.log('[CreateClient] ✅ Client-side validation passed')
 
         // Build fullNameArabic based on name entry mode
         let fullNameArabic_computed = ''
@@ -565,11 +574,23 @@ export function CreateClientView() {
             } : undefined,
         }
 
+        console.log('[CreateClient] 📤 Sending client data to API:')
+        console.log('[CreateClient] Client data:', JSON.stringify(clientData, null, 2))
+        console.log('[CreateClient] isPending before call:', isPending)
+
         createClient(clientData as any, {
-            onSuccess: () => {
+            onSuccess: (data) => {
+                console.log('[CreateClient] ✅ API SUCCESS!')
+                console.log('[CreateClient] Response data:', data)
                 navigate({ to: '/dashboard/clients' })
             },
             onError: (error) => {
+                console.log('[CreateClient] ❌ API ERROR!')
+                console.log('[CreateClient] Error type:', typeof error)
+                console.log('[CreateClient] Error object:', error)
+                console.log('[CreateClient] Error message:', error?.message)
+                console.log('[CreateClient] Error stack:', error instanceof Error ? error.stack : 'N/A')
+                console.log('[CreateClient] Full error JSON:', JSON.stringify(error, Object.getOwnPropertyNames(error || {}), 2))
                 handleApiError(error)
             },
         })

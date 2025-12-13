@@ -100,10 +100,20 @@ apiClientNoVersion.interceptors.response.use(
  */
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    // DEBUG: Log all outgoing requests
+    console.log('========== API REQUEST INTERCEPTOR DEBUG ==========')
+    console.log('[API Request] Method:', config.method?.toUpperCase())
+    console.log('[API Request] URL:', config.baseURL + config.url)
+    console.log('[API Request] Headers:', JSON.stringify(config.headers, null, 2))
+    console.log('[API Request] Data:', config.data ? JSON.stringify(config.data, null, 2) : 'No data')
+    console.log('[API Request] Params:', config.params ? JSON.stringify(config.params, null, 2) : 'No params')
+    console.log('[API Request] Timestamp:', new Date().toISOString())
+
     // Add CSRF token to mutating requests
     const method = config.method?.toLowerCase()
     if (method && ['post', 'put', 'patch', 'delete'].includes(method)) {
       const csrfToken = getCsrfToken()
+      console.log('[API Request] CSRF Token:', csrfToken ? 'Present' : 'Missing')
       if (csrfToken) {
         config.headers.set('X-CSRF-Token', csrfToken)
       }
@@ -116,8 +126,7 @@ apiClient.interceptors.request.use(
 
       if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
         // Return cached data
-        if (import.meta.env.DEV) {
-        }
+        console.log('[API Request] Using cached response')
         // Abort request and use cached data
         config.adapter = () => Promise.resolve({
           data: cached.data,
@@ -129,12 +138,10 @@ apiClient.interceptors.request.use(
       }
     }
 
-    // Log requests in development
-    if (import.meta.env.DEV) {
-    }
     return config
   },
   (error: AxiosError) => {
+    console.log('[API Request] ❌ Request interceptor error:', error)
     return Promise.reject(error)
   }
 )
@@ -145,6 +152,15 @@ apiClient.interceptors.request.use(
  */
 apiClient.interceptors.response.use(
   (response) => {
+    // DEBUG: Log all successful responses
+    console.log('========== API RESPONSE INTERCEPTOR DEBUG (SUCCESS) ==========')
+    console.log('[API Response] ✅ Status:', response.status)
+    console.log('[API Response] URL:', response.config.url)
+    console.log('[API Response] Method:', response.config.method?.toUpperCase())
+    console.log('[API Response] Data:', JSON.stringify(response.data, null, 2))
+    console.log('[API Response] Headers:', JSON.stringify(response.headers, null, 2))
+    console.log('[API Response] Timestamp:', new Date().toISOString())
+
     // Cache GET responses
     if (response.config.method === 'get' && response.config.url) {
       const cacheKey = `${response.config.url}${JSON.stringify(response.config.params || {})}`
@@ -154,12 +170,22 @@ apiClient.interceptors.response.use(
       })
     }
 
-    // Log successful responses in development
-    if (import.meta.env.DEV) {
-    }
     return response
   },
   async (error: AxiosError<any>) => {
+    // DEBUG: Log all error responses
+    console.log('========== API RESPONSE INTERCEPTOR DEBUG (ERROR) ==========')
+    console.log('[API Response] ❌ Error intercepted!')
+    console.log('[API Response] Error message:', error.message)
+    console.log('[API Response] Error code:', error.code)
+    console.log('[API Response] Error status:', error.response?.status)
+    console.log('[API Response] Error statusText:', error.response?.statusText)
+    console.log('[API Response] Error URL:', error.config?.url)
+    console.log('[API Response] Error method:', error.config?.method?.toUpperCase())
+    console.log('[API Response] Error response data:', error.response?.data ? JSON.stringify(error.response.data, null, 2) : 'No response data')
+    console.log('[API Response] Error response headers:', error.response?.headers ? JSON.stringify(error.response.headers, null, 2) : 'No headers')
+    console.log('[API Response] Request data sent:', error.config?.data)
+    console.log('[API Response] Timestamp:', new Date().toISOString())
     const originalRequest = error.config as any
 
     // Error handling is done by the calling code
@@ -301,6 +327,7 @@ apiClient.interceptors.response.use(
 
     // Handle CORS errors specifically
     if (error.message === 'Network Error' || error.code === 'ERR_NETWORK') {
+      console.log('[API Response] 🌐 Network/CORS error detected - rejecting with network error')
       return Promise.reject({
         status: 0,
         message: 'لا يمكن الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت.',
@@ -309,13 +336,15 @@ apiClient.interceptors.response.use(
     }
 
     // Return formatted error with requestId and validation errors
-    return Promise.reject({
+    const formattedError = {
       status: error.response?.status || 500,
       message: error.response?.data?.message || 'حدث خطأ غير متوقع',
       error: true,
       requestId: error.response?.data?.requestId,
       errors: error.response?.data?.errors, // Validation errors array
-    })
+    }
+    console.log('[API Response] 📤 Rejecting with formatted error:', JSON.stringify(formattedError, null, 2))
+    return Promise.reject(formattedError)
   }
 )
 
