@@ -190,12 +190,89 @@ export function Dashboard() {
       {/* ===== Main ===== */}
       <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden">
 
-        {/* Dashboard Title & Download Button */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-navy">{t('dashboard.title', 'لوحة التحكم')}</h1>
-          <Button variant="outline" className="rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50">
-            {t('dashboard.download', 'تحميل')}
-          </Button>
+        {/* HERO BANNER - Visible on all tabs */}
+        <div className="bg-[#022c22] rounded-3xl p-6 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20">
+          {/* Background Effects */}
+          <div className="absolute inset-0 z-0">
+            <img
+              src="/images/hero-wave.png"
+              alt=""
+              className="w-full h-full object-cover opacity-40 mix-blend-overlay"
+            />
+          </div>
+          <div className="absolute top-0 end-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl -me-48 -mt-48 pointer-events-none"></div>
+          <div className="absolute bottom-0 start-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -ms-48 -mb-48 pointer-events-none"></div>
+
+          <div className="relative z-10">
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-center">
+              {/* Left Side: Title & Actions */}
+              <div className="xl:col-span-4 space-y-6">
+                <div className="space-y-2">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-blue-400 text-xs font-medium">
+                    <ListTodo className="w-3 h-3" />
+                    <span className="text-white">{t('dashboard.hero.badge', 'لوحة التحكم')}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-white/10 rounded-xl">
+                      <CheckSquare className="w-6 h-6 text-emerald-400 fill-emerald-400/20" />
+                    </div>
+                    <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">
+                      {t('dashboard.hero.greeting', { greeting: getTimeBasedGreeting(), name: getUserDisplayName() })}
+                    </h1>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm">
+                    <Link to="/dashboard/cases/new">
+                      <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
+                      {t('dashboard.hero.newCase', 'قضية جديدة')}
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" className="h-10 px-5 rounded-xl font-bold border-white/10 text-white hover:bg-white/10 hover:text-white bg-transparent text-sm">
+                    <Link to="/dashboard/tasks/new">
+                      <ListTodo className="ms-2 h-4 w-4" />
+                      {t('dashboard.hero.newTask', 'مهمة جديدة')}
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+
+              {/* Right Side: Stats Grid */}
+              <div className="xl:col-span-8">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <StatCard
+                    label={t('dashboard.hero.stats.cases', 'القضايا')}
+                    value={activeCasesCount}
+                    icon={Scale}
+                    status="normal"
+                    className="py-3 px-4"
+                  />
+                  <StatCard
+                    label={t('dashboard.hero.stats.tasks', 'المهام')}
+                    value={activeTasksCount}
+                    icon={ListTodo}
+                    status="normal"
+                    className="py-3 px-4"
+                  />
+                  <StatCard
+                    label={t('dashboard.hero.stats.messages', 'الرسائل')}
+                    value={unreadMessagesCount}
+                    icon={MessageSquare}
+                    status={unreadMessagesCount > 0 ? "attention" : "zero"}
+                    className="py-3 px-4"
+                  />
+                  <StatCard
+                    label={t('dashboard.hero.stats.reminders', 'التذكيرات')}
+                    value={pendingRemindersCount}
+                    icon={Bell}
+                    status="normal"
+                    className="py-3 px-4"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Tab Navigation */}
@@ -219,12 +296,6 @@ export function Dashboard() {
         {activeTab === 'overview' && (
           <OverviewTab
             t={t}
-            getUserDisplayName={getUserDisplayName}
-            getTimeBasedGreeting={getTimeBasedGreeting}
-            activeCasesCount={activeCasesCount}
-            activeTasksCount={activeTasksCount}
-            unreadMessagesCount={unreadMessagesCount}
-            pendingRemindersCount={pendingRemindersCount}
             todayEvents={todayEvents}
             eventsLoading={eventsLoading}
             financialSummary={financialSummary}
@@ -271,12 +342,6 @@ export function Dashboard() {
 // ==================== OVERVIEW TAB ====================
 interface OverviewTabProps {
   t: (key: string, options?: any) => string
-  getUserDisplayName: () => string
-  getTimeBasedGreeting: () => string
-  activeCasesCount: number
-  activeTasksCount: number
-  unreadMessagesCount: number
-  pendingRemindersCount: number
   todayEvents: any
   eventsLoading: boolean
   financialSummary: any
@@ -287,12 +352,6 @@ interface OverviewTabProps {
 
 function OverviewTab({
   t,
-  getUserDisplayName,
-  getTimeBasedGreeting,
-  activeCasesCount,
-  activeTasksCount,
-  unreadMessagesCount,
-  pendingRemindersCount,
   todayEvents,
   eventsLoading,
   financialSummary,
@@ -302,91 +361,6 @@ function OverviewTab({
 }: OverviewTabProps) {
   return (
     <>
-      {/* HERO BANNER - ProductivityHero Style */}
-      <div className="bg-[#022c22] rounded-3xl p-6 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20">
-        {/* Background Effects */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src="/images/hero-wave.png"
-            alt=""
-            className="w-full h-full object-cover opacity-40 mix-blend-overlay"
-          />
-        </div>
-        <div className="absolute top-0 end-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl -me-48 -mt-48 pointer-events-none"></div>
-        <div className="absolute bottom-0 start-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -ms-48 -mb-48 pointer-events-none"></div>
-
-        <div className="relative z-10">
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-center">
-            {/* Left Side: Title & Actions */}
-            <div className="xl:col-span-4 space-y-6">
-              <div className="space-y-2">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-blue-400 text-xs font-medium">
-                  <ListTodo className="w-3 h-3" />
-                  <span className="text-white">{t('dashboard.hero.badge', 'لوحة التحكم')}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white/10 rounded-xl">
-                    <CheckSquare className="w-6 h-6 text-emerald-400 fill-emerald-400/20" />
-                  </div>
-                  <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">
-                    {t('dashboard.hero.greeting', { greeting: getTimeBasedGreeting(), name: getUserDisplayName() })}
-                  </h1>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-3">
-                <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm">
-                  <Link to="/dashboard/cases/new">
-                    <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
-                    {t('dashboard.hero.newCase', 'قضية جديدة')}
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" className="h-10 px-5 rounded-xl font-bold border-white/10 text-white hover:bg-white/10 hover:text-white bg-transparent text-sm">
-                  <Link to="/dashboard/tasks/new">
-                    <ListTodo className="ms-2 h-4 w-4" />
-                    {t('dashboard.hero.newTask', 'مهمة جديدة')}
-                  </Link>
-                </Button>
-              </div>
-            </div>
-
-            {/* Right Side: Stats Grid */}
-            <div className="xl:col-span-8">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <StatCard
-                  label={t('dashboard.hero.stats.cases', 'القضايا')}
-                  value={activeCasesCount}
-                  icon={Scale}
-                  status="normal"
-                  className="py-3 px-4"
-                />
-                <StatCard
-                  label={t('dashboard.hero.stats.tasks', 'المهام')}
-                  value={activeTasksCount}
-                  icon={ListTodo}
-                  status="normal"
-                  className="py-3 px-4"
-                />
-                <StatCard
-                  label={t('dashboard.hero.stats.messages', 'الرسائل')}
-                  value={unreadMessagesCount}
-                  icon={MessageSquare}
-                  status={unreadMessagesCount > 0 ? "attention" : "zero"}
-                  className="py-3 px-4"
-                />
-                <StatCard
-                  label={t('dashboard.hero.stats.reminders', 'التذكيرات')}
-                  value={pendingRemindersCount}
-                  icon={Bell}
-                  status="normal"
-                  className="py-3 px-4"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* MAIN GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
