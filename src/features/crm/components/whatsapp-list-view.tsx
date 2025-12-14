@@ -39,6 +39,17 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+    GosiCard,
+    GosiInput,
+    GosiSelect,
+    GosiSelectTrigger,
+    GosiSelectContent,
+    GosiSelectItem,
+    GosiSelectValue,
+    GosiButton,
+} from '@/components/ui/gosi-ui'
+import { ArrowRight, ArrowUp, ArrowDown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 export function WhatsAppListView() {
@@ -323,73 +334,79 @@ export function WhatsAppListView() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* RIGHT COLUMN (Main Content) */}
                     <div className="lg:col-span-2 space-y-6">
-                        {/* FILTERS BAR */}
-                        <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
-                            <div className="flex flex-wrap items-center gap-3">
-                                {/* Search Input */}
-                                <div className="relative flex-1 min-w-[200px] max-w-md">
-                                    <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
-                                    <Input
-                                        type="text"
+                        {/* FILTERS BAR - Responsive Collapsible Grid */}
+                        <GosiCard className="p-4 md:p-6 rounded-[2rem]">
+                            <div className="space-y-4">
+                                {/* Top Row: Search */}
+                                <div className="relative w-full">
+                                    <Search className="absolute end-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" aria-hidden="true" />
+                                    <GosiInput
                                         placeholder="بحث في المحادثات..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="pe-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
+                                        className="pe-12 h-14 w-full text-base"
                                     />
                                 </div>
 
-                                {/* Status Filter */}
-                                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                                    <SelectTrigger className="w-[140px] h-10 rounded-xl border-slate-200">
-                                        <Filter className="h-4 w-4 ms-2 text-slate-500" aria-hidden="true" />
-                                        <SelectValue placeholder="الحالة" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">جميع الحالات</SelectItem>
-                                        <SelectItem value="open">مفتوحة</SelectItem>
-                                        <SelectItem value="pending">قيد الانتظار</SelectItem>
-                                        <SelectItem value="closed">مغلقة</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                {/* Filters Container */}
+                                <div className="flex flex-wrap gap-4">
+                                    {/* Status Filter */}
+                                    <div className="flex-1 min-w-[200px]">
+                                        <GosiSelect value={statusFilter} onValueChange={setStatusFilter}>
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all text-xs font-bold text-slate-950">
+                                                <div className="flex items-center gap-2 truncate">
+                                                    <Filter className="h-4 w-4 text-emerald-600" aria-hidden="true" />
+                                                    <span className="text-slate-600 font-bold text-xs uppercase tracking-wider">الحالة:</span>
+                                                    <GosiSelectValue />
+                                                </div>
+                                            </GosiSelectTrigger>
+                                            <GosiSelectContent>
+                                                <GosiSelectItem value="all" className="font-bold">جميع الحالات</GosiSelectItem>
+                                                <GosiSelectItem value="open" className="font-bold">مفتوحة</GosiSelectItem>
+                                                <GosiSelectItem value="pending" className="font-bold">قيد الانتظار</GosiSelectItem>
+                                                <GosiSelectItem value="closed" className="font-bold">مغلقة</GosiSelectItem>
+                                            </GosiSelectContent>
+                                        </GosiSelect>
+                                    </div>
 
-                                {/* Sort By */}
-                                <Select value={sortBy} onValueChange={setSortBy}>
-                                    <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
-                                        <SortAsc className="h-4 w-4 ms-2 text-slate-500" aria-hidden="true" />
-                                        <SelectValue placeholder="ترتيب حسب" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="lastMessage">آخر رسالة</SelectItem>
-                                        <SelectItem value="unread">غير مقروءة</SelectItem>
-                                        <SelectItem value="name">الاسم</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                    {/* Sort By */}
+                                    <div className="flex-1 min-w-[200px]">
+                                        <GosiSelect value={sortBy} onValueChange={setSortBy}>
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all text-xs font-bold text-slate-950">
+                                                <div className="flex items-center gap-2 truncate">
+                                                    <SortAsc className="h-4 w-4 text-emerald-600" aria-hidden="true" />
+                                                    <span className="text-slate-600 font-bold text-xs uppercase tracking-wider">ترتيب حسب:</span>
+                                                    <GosiSelectValue />
+                                                </div>
+                                            </GosiSelectTrigger>
+                                            <GosiSelectContent>
+                                                <GosiSelectItem value="lastMessage" className="font-bold">آخر رسالة</GosiSelectItem>
+                                                <GosiSelectItem value="unread" className="font-bold">غير مقروءة</GosiSelectItem>
+                                                <GosiSelectItem value="name" className="font-bold">الاسم</GosiSelectItem>
+                                            </GosiSelectContent>
+                                        </GosiSelect>
+                                    </div>
 
-                                {/* Clear Filters */}
-                                {hasActiveFilters && (
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={clearFilters}
-                                        className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
-                                    >
-                                        <X className="h-4 w-4 ms-2" aria-hidden="true" />
-                                        مسح الفلاتر
-                                    </Button>
-                                )}
+                                    {/* Clear Filters */}
+                                    {hasActiveFilters && (
+                                        <div className="flex items-center">
+                                            <GosiButton
+                                                variant="ghost"
+                                                onClick={clearFilters}
+                                                className="h-14 w-full md:w-auto text-red-500 hover:text-red-600 hover:bg-red-50 rounded-2xl border border-dashed border-red-200 px-6 hover:shadow-lg hover:shadow-red-500/10 transition-all"
+                                            >
+                                                <X className="h-5 w-5 ms-2" aria-hidden="true" />
+                                                مسح الفلاتر
+                                            </GosiButton>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
+                        </GosiCard>
 
                         {/* CONVERSATIONS LIST */}
-                        <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
-                            <div className="p-6 pb-2 flex justify-between items-center">
-                                <h3 className="font-bold text-navy text-xl">المحادثات</h3>
-                                <Badge className="bg-slate-100 text-slate-600 border-0 rounded-full px-4 py-1">
-                                    {conversations.length} محادثة
-                                </Badge>
-                            </div>
-
-                            <div className="p-4 space-y-4">
+                        <div className="flex flex-col gap-4">
+                            <div className="space-y-4">
                                 {/* Loading State */}
                                 {isLoading && (
                                     <>
@@ -449,139 +466,136 @@ export function WhatsAppListView() {
                                         key={conversation.id}
                                         style={{ animationDelay: `${index * 50}ms` }}
                                         className={`
-                                            bg-[#F8F9FA] rounded-2xl p-5 border transition-all duration-200 group cursor-pointer
-                                            animate-in fade-in slide-in-from-bottom-2
-                                            hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/5
-                                            ${selectedIds.includes(conversation.id)
-                                                ? 'border-emerald-500 bg-emerald-50/30 ring-2 ring-emerald-500/20'
-                                                : 'border-slate-100 hover:border-emerald-200'
-                                            }
+                                            animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-backwards
+                                            bg-white rounded-[2rem] p-5 md:p-7
+                                            border-0 ring-1 ring-black/[0.03] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)]
+                                            transition-all duration-300 group
+                                            hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1),0_8px_24px_-8px_rgba(0,0,0,0.04)] hover:-translate-y-1.5
+                                            cursor-pointer relative overflow-hidden
+                                            ${selectedIds.includes(conversation.id) ? 'ring-2 ring-emerald-500 bg-emerald-50/20' : ''}
                                         `}
                                         onClick={() => !isSelectionMode && handleViewConversation(conversation.id)}
                                     >
                                         {/* Status Strip */}
-                                        <div className={`absolute top-0 bottom-0 start-0 w-1.5 rounded-s-2xl ${
-                                            conversation.unreadCount > 0 ? 'bg-emerald-500' :
-                                            conversation.status === 'pending' ? 'bg-amber-500' :
-                                            conversation.status === 'closed' ? 'bg-slate-400' :
-                                            'bg-blue-500'
-                                        }`} />
+                                        <div className={`absolute start-0 top-0 bottom-0 w-1.5 ${conversation.unreadCount > 0 ? 'bg-emerald-500' :
+                                                conversation.status === 'pending' ? 'bg-amber-500' :
+                                                    conversation.status === 'closed' ? 'bg-slate-400' :
+                                                        'bg-blue-500'
+                                            }`} />
 
-                                        <div className="flex justify-between items-start mb-3">
-                                            <div className="flex gap-4 items-center">
-                                                {isSelectionMode && (
-                                                    <Checkbox
-                                                        checked={selectedIds.includes(conversation.id)}
-                                                        onCheckedChange={() => handleSelectConversation(conversation.id)}
-                                                        onClick={(e) => e.stopPropagation()}
-                                                        className="h-6 w-6 rounded-md border-slate-300 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
-                                                    />
-                                                )}
-                                                {/* Avatar */}
-                                                <div className="relative">
-                                                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-white font-bold text-lg">
-                                                        {conversation.clientName.charAt(0)}
-                                                    </div>
-                                                    {conversation.unreadCount > 0 && (
-                                                        <div className="absolute -top-1 -end-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-white">
-                                                            {conversation.unreadCount > 9 ? '9+' : conversation.unreadCount}
-                                                        </div>
+                                        <div className="flex flex-col gap-6 ps-2">
+                                            <div className="flex justify-between items-start">
+                                                <div className="flex gap-5 items-start">
+                                                    {isSelectionMode && (
+                                                        <Checkbox
+                                                            checked={selectedIds.includes(conversation.id)}
+                                                            onCheckedChange={() => handleSelectConversation(conversation.id)}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                            className="mt-1 h-5 w-5 rounded-md border-slate-300 data-[state=checked]:bg-emerald-500"
+                                                        />
                                                     )}
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <h4 className="font-bold text-navy text-lg truncate">{conversation.clientName}</h4>
-                                                        {getStatusBadge(conversation.status)}
-                                                    </div>
-                                                    <p className="text-slate-500 text-sm flex items-center gap-1.5">
-                                                        <Phone className="h-3.5 w-3.5" aria-hidden="true" />
-                                                        {conversation.phoneNumber}
-                                                    </p>
-                                                </div>
-                                            </div>
 
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-xs text-slate-400 font-medium">{conversation.relativeTime}</span>
+                                                    {/* Avatar / Icon Box */}
+                                                    <div className="relative">
+                                                        <div className="w-14 h-14 md:w-16 md:h-16 rounded-[1.2rem] bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg text-white font-bold text-2xl group-hover:scale-105 transition-all duration-300 flex-shrink-0">
+                                                            {conversation.clientName.charAt(0)}
+                                                        </div>
+                                                        {conversation.unreadCount > 0 && (
+                                                            <div className="absolute -top-1 -end-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-white">
+                                                                {conversation.unreadCount > 9 ? '9+' : conversation.unreadCount}
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                                                            <h4 className="font-bold text-slate-950 text-base md:text-lg group-hover:text-emerald-900 transition-colors truncate">
+                                                                {conversation.clientName}
+                                                            </h4>
+                                                            {getStatusBadge(conversation.status)}
+                                                        </div>
+                                                        <p className="text-slate-500 text-sm flex items-center gap-1.5 mb-1">
+                                                            <Phone className="h-3.5 w-3.5" aria-hidden="true" />
+                                                            {conversation.phoneNumber}
+                                                        </p>
+                                                        <span className="text-xs text-slate-400 font-medium">{conversation.relativeTime}</span>
+                                                    </div>
+                                                </div>
+
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-navy opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy hover:bg-slate-100 rounded-xl">
+                                                            <MoreHorizontal className="h-5 w-5" />
                                                         </Button>
                                                     </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end" className="w-48">
-                                                        <DropdownMenuItem onClick={() => handleViewConversation(conversation.id)}>
+                                                    <DropdownMenuContent align="end" className="w-48 rounded-xl border-slate-100 shadow-xl shadow-slate-200/50">
+                                                        <DropdownMenuItem onClick={() => handleViewConversation(conversation.id)} className="rounded-lg p-2.5">
                                                             <Eye className="h-4 w-4 ms-2" aria-hidden="true" />
                                                             فتح المحادثة
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem>
+                                                        <DropdownMenuItem className="rounded-lg p-2.5">
                                                             <User className="h-4 w-4 ms-2" aria-hidden="true" />
                                                             عرض بيانات العميل
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem>
+                                                        <DropdownMenuItem className="rounded-lg p-2.5">
                                                             <Tag className="h-4 w-4 ms-2" aria-hidden="true" />
                                                             إضافة وسم
                                                         </DropdownMenuItem>
                                                         <DropdownMenuSeparator />
-                                                        <DropdownMenuItem>
+                                                        <DropdownMenuItem className="rounded-lg p-2.5">
                                                             <Archive className="h-4 w-4 ms-2 text-amber-500" aria-hidden="true" />
                                                             أرشفة المحادثة
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem className="text-red-600 focus:text-red-600">
+                                                        <DropdownMenuItem className="text-red-600 focus:text-red-600 rounded-lg p-2.5">
                                                             <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />
                                                             حذف المحادثة
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </div>
-                                        </div>
 
-                                        {/* Last Message Preview */}
-                                        <div className="bg-white rounded-xl p-3 border border-slate-100">
-                                            <p className="text-slate-600 text-sm line-clamp-2 leading-relaxed">
-                                                {conversation.lastMessage}
-                                            </p>
-                                        </div>
-
-                                        {/* Footer */}
-                                        <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
-                                            <div className="flex items-center gap-3">
-                                                {conversation.assignedTo && (
-                                                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                                                        <User className="h-3.5 w-3.5" aria-hidden="true" />
-                                                        <span>{conversation.assignedTo}</span>
-                                                    </div>
-                                                )}
-                                                {conversation.tags.length > 0 && (
-                                                    <div className="flex gap-1">
-                                                        {conversation.tags.slice(0, 2).map((tag: string, i: number) => (
-                                                            <Badge key={i} variant="secondary" className="text-xs px-2 py-0 bg-slate-100 text-slate-600 rounded-md">
-                                                                {tag}
-                                                            </Badge>
-                                                        ))}
-                                                        {conversation.tags.length > 2 && (
-                                                            <Badge variant="secondary" className="text-xs px-2 py-0 bg-slate-100 text-slate-600 rounded-md">
-                                                                +{conversation.tags.length - 2}
-                                                            </Badge>
-                                                        )}
-                                                    </div>
-                                                )}
+                                            {/* Last Message Preview */}
+                                            <div className="bg-slate-50/50 rounded-xl p-4 border border-slate-100/50 ms-2">
+                                                <p className="text-slate-600 text-sm line-clamp-2 leading-relaxed italic">
+                                                    "{conversation.lastMessage}"
+                                                </p>
                                             </div>
 
-                                            {/* View Button - Desktop */}
-                                            <Button
-                                                size="sm"
-                                                className="hidden sm:flex bg-emerald-50 hover:bg-emerald-500 text-emerald-600 hover:text-white rounded-lg px-4 h-8 transition-all shadow-none hover:shadow-lg hover:shadow-emerald-500/20"
-                                                onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    handleViewConversation(conversation.id)
-                                                }}
-                                            >
-                                                <Eye className="h-4 w-4 ms-1.5" aria-hidden="true" />
-                                                فتح
-                                            </Button>
+                                            {/* Footer Info Grid - Flex Style */}
+                                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-5 mt-3 border-t border-slate-50 gap-4 ps-2">
+                                                <div className="flex flex-wrap items-center gap-4">
+                                                    {conversation.assignedTo && (
+                                                        <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
+                                                            <User className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
+                                                            <span>مسندة إلى: <span className="font-bold text-slate-700">{conversation.assignedTo}</span></span>
+                                                        </div>
+                                                    )}
+                                                    {conversation.tags.length > 0 && (
+                                                        <div className="flex gap-1">
+                                                            {conversation.tags.slice(0, 3).map((tag: string, i: number) => (
+                                                                <Badge key={i} variant="secondary" className="text-[10px] px-2 py-0.5 bg-slate-100 text-slate-600 border border-slate-200/60 rounded-md font-medium">
+                                                                    {tag}
+                                                                </Badge>
+                                                            ))}
+                                                            {conversation.tags.length > 3 && (
+                                                                <Badge variant="secondary" className="text-[10px] px-2 py-0.5 bg-slate-100 text-slate-600 border border-slate-200/60 rounded-md font-medium">
+                                                                    +{conversation.tags.length - 3}
+                                                                </Badge>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
 
-                                            {/* Chevron - Mobile */}
-                                            <ChevronLeft className="h-5 w-5 text-slate-400 sm:hidden rtl:rotate-180" aria-hidden="true" />
+                                                {/* View Details Button */}
+                                                <div onClick={(e) => e.stopPropagation()}>
+                                                    <Link to={`/dashboard/crm/whatsapp/${conversation.id}`} className="hidden sm:inline-flex w-auto">
+                                                        <GosiButton className="bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white border border-emerald-100 hover:border-emerald-500 rounded-xl px-6 h-10 shadow-sm hover:shadow-lg hover:shadow-emerald-500/20 w-auto transition-all duration-300 hover:scale-105 active:scale-95 group/btn">
+                                                            فتح المحادثة
+                                                            <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180 transition-transform group-hover/btn:translate-x-1 rtl:group-hover/btn:-translate-x-1" />
+                                                        </GosiButton>
+                                                    </Link>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -597,156 +611,156 @@ export function WhatsAppListView() {
                                 </div>
                             )}
                         </div>
+                    </div>
 
-                        {/* BROADCAST CAMPAIGNS */}
-                        <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
-                            <div className="p-6 pb-2 flex justify-between items-center">
-                                <h3 className="font-bold text-navy text-lg flex items-center gap-2">
-                                    <Megaphone className="h-5 w-5 text-emerald-500" aria-hidden="true" />
-                                    حملات البث
-                                </h3>
-                                <div className="flex items-center gap-2">
-                                    <Badge className="bg-blue-100 text-blue-700 border-0 rounded-full px-3 py-0.5 text-xs">
-                                        {broadcasts.length} حملة
-                                    </Badge>
-                                    <Button asChild size="sm" className="bg-emerald-500 hover:bg-emerald-600 rounded-lg h-8 px-3 text-xs">
-                                        <Link to="/dashboard/crm/whatsapp/new">
-                                            <Plus className="h-3.5 w-3.5 ms-1" aria-hidden="true" />
-                                            حملة جديدة
-                                        </Link>
-                                    </Button>
-                                </div>
-                            </div>
-
-                            <div className="p-4 space-y-3">
-                                {broadcasts.length === 0 ? (
-                                    <div className="text-center py-8 bg-[#F8F9FA] rounded-xl border border-slate-100">
-                                        <Megaphone className="h-10 w-10 mx-auto mb-3 text-slate-300" aria-hidden="true" />
-                                        <p className="text-slate-500 text-sm mb-2">لا توجد حملات بث</p>
-                                        <p className="text-slate-400 text-xs mb-4">أنشئ حملة بث جديدة للتواصل مع عملائك</p>
-                                        <Button asChild size="sm" className="bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/20">
-                                            <Link to="/dashboard/crm/whatsapp/new">
-                                                <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
-                                                إنشاء حملة
-                                            </Link>
-                                        </Button>
-                                    </div>
-                                ) : (
-                                    broadcasts.map((broadcast) => (
-                                        <div
-                                            key={broadcast.id}
-                                            className="bg-[#F8F9FA] rounded-xl p-4 border border-slate-100 hover:border-emerald-200 transition-all"
-                                        >
-                                            <div className="flex items-start justify-between mb-3">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                                                        <Megaphone className="h-5 w-5 text-white" aria-hidden="true" />
-                                                    </div>
-                                                    <div>
-                                                        <h4 className="font-bold text-navy text-sm">{broadcast.name}</h4>
-                                                        <p className="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
-                                                            <Users className="h-3 w-3" aria-hidden="true" />
-                                                            {broadcast.stats?.totalRecipients || 0} مستلم
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                {getBroadcastStatusBadge(broadcast.status)}
-                                            </div>
-
-                                            {/* Stats */}
-                                            {broadcast.stats && broadcast.status !== 'draft' && (
-                                                <div className="grid grid-cols-4 gap-2 mb-3">
-                                                    <div className="text-center p-2 bg-white rounded-lg">
-                                                        <p className="text-sm font-bold text-navy">{broadcast.stats.sent}</p>
-                                                        <p className="text-[10px] text-slate-500">مرسل</p>
-                                                    </div>
-                                                    <div className="text-center p-2 bg-white rounded-lg">
-                                                        <p className="text-sm font-bold text-emerald-600">{broadcast.stats.delivered}</p>
-                                                        <p className="text-[10px] text-slate-500">تم التسليم</p>
-                                                    </div>
-                                                    <div className="text-center p-2 bg-white rounded-lg">
-                                                        <p className="text-sm font-bold text-blue-600">{broadcast.stats.read}</p>
-                                                        <p className="text-[10px] text-slate-500">مقروء</p>
-                                                    </div>
-                                                    <div className="text-center p-2 bg-white rounded-lg">
-                                                        <p className="text-sm font-bold text-red-500">{broadcast.stats.failed}</p>
-                                                        <p className="text-[10px] text-slate-500">فشل</p>
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {/* Footer */}
-                                            <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-                                                <div className="flex items-center gap-2 text-xs text-slate-500">
-                                                    {broadcast.scheduledAt ? (
-                                                        <>
-                                                            <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
-                                                            <span>مجدول: {format(new Date(broadcast.scheduledAt), 'd MMM yyyy', { locale: isRTL ? arSA : enUS })}</span>
-                                                        </>
-                                                    ) : broadcast.createdAt ? (
-                                                        <>
-                                                            <Clock className="h-3.5 w-3.5" aria-hidden="true" />
-                                                            <span>{format(new Date(broadcast.createdAt), 'd MMM yyyy', { locale: isRTL ? arSA : enUS })}</span>
-                                                        </>
-                                                    ) : null}
-                                                </div>
-                                                {broadcast.status === 'draft' && (
-                                                    <Button size="sm" className="h-7 text-xs bg-emerald-50 hover:bg-emerald-500 text-emerald-600 hover:text-white rounded-lg">
-                                                        <Send className="h-3 w-3 ms-1" aria-hidden="true" />
-                                                        إرسال
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
+                    {/* BROADCAST CAMPAIGNS */}
+                    <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
+                        <div className="p-6 pb-2 flex justify-between items-center">
+                            <h3 className="font-bold text-navy text-lg flex items-center gap-2">
+                                <Megaphone className="h-5 w-5 text-emerald-500" aria-hidden="true" />
+                                حملات البث
+                            </h3>
+                            <div className="flex items-center gap-2">
+                                <Badge className="bg-blue-100 text-blue-700 border-0 rounded-full px-3 py-0.5 text-xs">
+                                    {broadcasts.length} حملة
+                                </Badge>
+                                <Button asChild size="sm" className="bg-emerald-500 hover:bg-emerald-600 rounded-lg h-8 px-3 text-xs">
+                                    <Link to="/dashboard/crm/whatsapp/new">
+                                        <Plus className="h-3.5 w-3.5 ms-1" aria-hidden="true" />
+                                        حملة جديدة
+                                    </Link>
+                                </Button>
                             </div>
                         </div>
 
-                        {/* TEMPLATES QUICK ACCESS */}
-                        {templates.length > 0 && (
-                            <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
-                                <div className="p-6 pb-2 flex justify-between items-center">
-                                    <h3 className="font-bold text-navy text-lg">القوالب السريعة</h3>
-                                    <Badge className="bg-emerald-100 text-emerald-700 border-0 rounded-full px-3 py-0.5 text-xs">
-                                        {templates.length} قالب
-                                    </Badge>
+                        <div className="p-4 space-y-3">
+                            {broadcasts.length === 0 ? (
+                                <div className="text-center py-8 bg-[#F8F9FA] rounded-xl border border-slate-100">
+                                    <Megaphone className="h-10 w-10 mx-auto mb-3 text-slate-300" aria-hidden="true" />
+                                    <p className="text-slate-500 text-sm mb-2">لا توجد حملات بث</p>
+                                    <p className="text-slate-400 text-xs mb-4">أنشئ حملة بث جديدة للتواصل مع عملائك</p>
+                                    <Button asChild size="sm" className="bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/20">
+                                        <Link to="/dashboard/crm/whatsapp/new">
+                                            <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
+                                            إنشاء حملة
+                                        </Link>
+                                    </Button>
                                 </div>
-
-                                <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    {templates.map((template) => (
-                                        <div
-                                            key={template.id}
-                                            className="bg-[#F8F9FA] rounded-xl p-4 border border-slate-100 hover:border-emerald-200 transition-all cursor-pointer group"
-                                        >
-                                            <div className="flex items-start justify-between">
-                                                <div>
-                                                    <h4 className="font-bold text-navy text-sm mb-1">{template.name}</h4>
-                                                    <p className="text-xs text-slate-500">{template.category}</p>
+                            ) : (
+                                broadcasts.map((broadcast) => (
+                                    <div
+                                        key={broadcast.id}
+                                        className="bg-[#F8F9FA] rounded-xl p-4 border border-slate-100 hover:border-emerald-200 transition-all"
+                                    >
+                                        <div className="flex items-start justify-between mb-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                                                    <Megaphone className="h-5 w-5 text-white" aria-hidden="true" />
                                                 </div>
-                                                <Badge className={`text-xs rounded-md ${
-                                                    template.status === 'approved'
-                                                        ? 'bg-emerald-100 text-emerald-700'
-                                                        : 'bg-amber-100 text-amber-700'
-                                                }`}>
-                                                    {template.status === 'approved' ? 'موافق عليه' : template.status}
-                                                </Badge>
+                                                <div>
+                                                    <h4 className="font-bold text-navy text-sm">{broadcast.name}</h4>
+                                                    <p className="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
+                                                        <Users className="h-3 w-3" aria-hidden="true" />
+                                                        {broadcast.stats?.totalRecipients || 0} مستلم
+                                                    </p>
+                                                </div>
                                             </div>
+                                            {getBroadcastStatusBadge(broadcast.status)}
                                         </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+
+                                        {/* Stats */}
+                                        {broadcast.stats && broadcast.status !== 'draft' && (
+                                            <div className="grid grid-cols-4 gap-2 mb-3">
+                                                <div className="text-center p-2 bg-white rounded-lg">
+                                                    <p className="text-sm font-bold text-navy">{broadcast.stats.sent}</p>
+                                                    <p className="text-[10px] text-slate-500">مرسل</p>
+                                                </div>
+                                                <div className="text-center p-2 bg-white rounded-lg">
+                                                    <p className="text-sm font-bold text-emerald-600">{broadcast.stats.delivered}</p>
+                                                    <p className="text-[10px] text-slate-500">تم التسليم</p>
+                                                </div>
+                                                <div className="text-center p-2 bg-white rounded-lg">
+                                                    <p className="text-sm font-bold text-blue-600">{broadcast.stats.read}</p>
+                                                    <p className="text-[10px] text-slate-500">مقروء</p>
+                                                </div>
+                                                <div className="text-center p-2 bg-white rounded-lg">
+                                                    <p className="text-sm font-bold text-red-500">{broadcast.stats.failed}</p>
+                                                    <p className="text-[10px] text-slate-500">فشل</p>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Footer */}
+                                        <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                                            <div className="flex items-center gap-2 text-xs text-slate-500">
+                                                {broadcast.scheduledAt ? (
+                                                    <>
+                                                        <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
+                                                        <span>مجدول: {format(new Date(broadcast.scheduledAt), 'd MMM yyyy', { locale: isRTL ? arSA : enUS })}</span>
+                                                    </>
+                                                ) : broadcast.createdAt ? (
+                                                    <>
+                                                        <Clock className="h-3.5 w-3.5" aria-hidden="true" />
+                                                        <span>{format(new Date(broadcast.createdAt), 'd MMM yyyy', { locale: isRTL ? arSA : enUS })}</span>
+                                                    </>
+                                                ) : null}
+                                            </div>
+                                            {broadcast.status === 'draft' && (
+                                                <Button size="sm" className="h-7 text-xs bg-emerald-50 hover:bg-emerald-500 text-emerald-600 hover:text-white rounded-lg">
+                                                    <Send className="h-3 w-3 ms-1" aria-hidden="true" />
+                                                    إرسال
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
                     </div>
 
-                    {/* LEFT COLUMN (Sidebar) */}
-                    <SalesSidebar
-                        context="whatsapp"
-                        isSelectionMode={isSelectionMode}
-                        onToggleSelectionMode={handleToggleSelectionMode}
-                        selectedCount={selectedIds.length}
-                        onDeleteSelected={handleDeleteSelected}
-                    />
+                    {/* TEMPLATES QUICK ACCESS */}
+                    {templates.length > 0 && (
+                        <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
+                            <div className="p-6 pb-2 flex justify-between items-center">
+                                <h3 className="font-bold text-navy text-lg">القوالب السريعة</h3>
+                                <Badge className="bg-emerald-100 text-emerald-700 border-0 rounded-full px-3 py-0.5 text-xs">
+                                    {templates.length} قالب
+                                </Badge>
+                            </div>
+
+                            <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {templates.map((template) => (
+                                    <div
+                                        key={template.id}
+                                        className="bg-[#F8F9FA] rounded-xl p-4 border border-slate-100 hover:border-emerald-200 transition-all cursor-pointer group"
+                                    >
+                                        <div className="flex items-start justify-between">
+                                            <div>
+                                                <h4 className="font-bold text-navy text-sm mb-1">{template.name}</h4>
+                                                <p className="text-xs text-slate-500">{template.category}</p>
+                                            </div>
+                                            <Badge className={`text-xs rounded-md ${template.status === 'approved'
+                                                    ? 'bg-emerald-100 text-emerald-700'
+                                                    : 'bg-amber-100 text-amber-700'
+                                                }`}>
+                                                {template.status === 'approved' ? 'موافق عليه' : template.status}
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* LEFT COLUMN (Sidebar) */}
+                <SalesSidebar
+                    context="whatsapp"
+                    isSelectionMode={isSelectionMode}
+                    onToggleSelectionMode={handleToggleSelectionMode}
+                    selectedCount={selectedIds.length}
+                    onDeleteSelected={handleDeleteSelected}
+                />
                 </div>
             </Main>
         </>
