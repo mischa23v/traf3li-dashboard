@@ -47,7 +47,7 @@ const FIELD_TOOLTIPS = {
     filingDate: 'تاريخ تقديم صحيفة الدعوى للمحكمة',
     caseNumber: 'رقم القضية المسجل في ناجز',
     internalReference: 'رقم مرجعي داخلي للمكتب يتم توليده تلقائياً',
-    entityType: 'اختر محكمة أو لجنة حسب اختصاص القضية',
+    entityType: 'اختر محكمة أو لجنة أو مركز تحكيم حسب اختصاص القضية',
     region: 'المنطقة الإدارية التي تقع فيها المحكمة',
     plaintiff: 'الطرف الذي يرفع الدعوى',
     defendant: 'الطرف المرفوعة عليه الدعوى',
@@ -60,29 +60,46 @@ const FIELD_TOOLTIPS = {
 
 // ==================== CONSTANTS ====================
 
-// Saudi Courts
+// Saudi Courts (محاكم الدرجة الأولى ومحاكم الاستئناف والمحكمة العليا)
 const COURTS = [
+    // محاكم الدرجة الأولى
     { value: 'general', label: 'المحكمة العامة' },
     { value: 'criminal', label: 'المحكمة الجزائية' },
     { value: 'commercial', label: 'المحكمة التجارية' },
     { value: 'labor', label: 'المحكمة العمالية' },
     { value: 'family', label: 'محكمة الأحوال الشخصية' },
+    { value: 'execution', label: 'محكمة التنفيذ' },
+    // ديوان المظالم (القضاء الإداري)
     { value: 'administrative', label: 'المحكمة الإدارية (ديوان المظالم)' },
+    { value: 'administrative_appeal', label: 'محكمة الاستئناف الإدارية' },
+    // محاكم الاستئناف والمحكمة العليا
     { value: 'appeal', label: 'محكمة الاستئناف' },
     { value: 'supreme', label: 'المحكمة العليا' },
 ]
 
-// Committees
+// Committees (اللجان شبه القضائية)
 const COMMITTEES = [
     { value: 'banking', label: 'لجنة المنازعات المصرفية' },
     { value: 'securities', label: 'لجنة الفصل في منازعات الأوراق المالية' },
     { value: 'insurance', label: 'لجنة الفصل في المنازعات والمخالفات التأمينية' },
     { value: 'customs', label: 'لجنة الفصل في المخالفات والمنازعات الجمركية' },
     { value: 'tax', label: 'لجنة الفصل في المخالفات والمنازعات الضريبية' },
-    { value: 'labor_primary', label: 'الهيئة الابتدائية لتسوية الخلافات العمالية' },
-    { value: 'labor_supreme', label: 'الهيئة العليا لتسوية الخلافات العمالية' },
+    { value: 'zakat', label: 'لجنة الفصل في المخالفات والمنازعات الزكوية' },
     { value: 'real_estate', label: 'لجنة النزاعات العقارية' },
     { value: 'competition', label: 'لجنة الفصل في مخالفات نظام المنافسة' },
+    { value: 'capital_market', label: 'لجنة الفصل في منازعات هيئة السوق المالية' },
+    { value: 'intellectual_property', label: 'لجنة النظر في مخالفات الملكية الفكرية' },
+]
+
+// Arbitration Centers (مراكز التحكيم المرخصة)
+const ARBITRATION_CENTERS = [
+    { value: 'scca', label: 'المركز السعودي للتحكيم التجاري (SCCA)' },
+    { value: 'sba_arbitration', label: 'مركز هيئة المحامين للتسوية والتحكيم' },
+    { value: 'riyadh_chamber', label: 'مركز تحكيم الغرفة التجارية بالرياض' },
+    { value: 'jeddah_chamber', label: 'مركز تحكيم الغرفة التجارية بجدة' },
+    { value: 'eastern_chamber', label: 'مركز تحكيم الغرفة التجارية بالشرقية' },
+    { value: 'gcc_commercial', label: 'مركز التحكيم التجاري لدول الخليج' },
+    { value: 'other', label: 'مركز تحكيم آخر' },
 ]
 
 // Saudi Regions
@@ -240,10 +257,11 @@ const createCaseSchema = z.object({
     internalReference: z.string().optional(),
     filingDate: z.string().optional(),
 
-    // Court/Committee
-    entityType: z.enum(['court', 'committee']).optional(),
+    // Court/Committee/Arbitration
+    entityType: z.enum(['court', 'committee', 'arbitration']).optional(),
     court: z.string().optional(),
     committee: z.string().optional(),
+    arbitrationCenter: z.string().optional(),
     region: z.string().optional(),
     city: z.string().optional(),
 
@@ -638,7 +656,7 @@ export function CreateCaseView() {
 
                 <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
                     {/* Entity Type Selection */}
-                    <div className="flex gap-6">
+                    <div className="flex flex-wrap gap-6">
                         <label className="flex items-center gap-2 cursor-pointer">
                             <input
                                 type="radio"
@@ -659,11 +677,21 @@ export function CreateCaseView() {
                             />
                             <span className="text-sm font-medium text-slate-700">لجنة</span>
                         </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="radio"
+                                value="arbitration"
+                                checked={entityType === 'arbitration'}
+                                onChange={() => setValue('entityType', 'arbitration')}
+                                className="w-4 h-4 text-emerald-600 border-slate-300 focus:ring-emerald-500"
+                            />
+                            <span className="text-sm font-medium text-slate-700">تحكيم</span>
+                        </label>
                     </div>
 
-                    {/* Court/Committee Selection */}
+                    {/* Court/Committee/Arbitration Selection */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {entityType === 'court' ? (
+                        {entityType === 'court' && (
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-slate-700">المحكمة</label>
                                 <Select value={watch('court')} onValueChange={(v) => setValue('court', v)}>
@@ -679,7 +707,9 @@ export function CreateCaseView() {
                                     </SelectContent>
                                 </Select>
                             </div>
-                        ) : (
+                        )}
+
+                        {entityType === 'committee' && (
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-slate-700">اللجنة</label>
                                 <Select value={watch('committee')} onValueChange={(v) => setValue('committee', v)}>
@@ -690,6 +720,24 @@ export function CreateCaseView() {
                                         {COMMITTEES.map(committee => (
                                             <SelectItem key={committee.value} value={committee.value}>
                                                 {committee.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
+
+                        {entityType === 'arbitration' && (
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700">مركز التحكيم</label>
+                                <Select value={watch('arbitrationCenter')} onValueChange={(v) => setValue('arbitrationCenter', v)}>
+                                    <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-11 bg-white">
+                                        <SelectValue placeholder="اختر مركز التحكيم" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {ARBITRATION_CENTERS.map(center => (
+                                            <SelectItem key={center.value} value={center.value}>
+                                                {center.label}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
