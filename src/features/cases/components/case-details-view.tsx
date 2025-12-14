@@ -961,11 +961,27 @@ export function CaseDetailsView() {
                         </div>
                       </div>
 
-                      {/* Description */}
-                      {caseData.description && (
-                        <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
-                          <h4 className="font-bold text-navy mb-3">{t('cases.description', 'وصف القضية')}</h4>
-                          <p className="text-slate-600 leading-relaxed">{caseData.description}</p>
+                      {/* Description & Case Subject */}
+                      {(caseData.description || caseData.caseSubject) && (
+                        <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 space-y-4">
+                          {caseData.caseSubject && (
+                            <div>
+                              <h4 className="font-bold text-navy mb-2">{t('cases.caseSubject', 'موضوع الدعوى')}</h4>
+                              <p className="text-slate-600 leading-relaxed">{caseData.caseSubject}</p>
+                            </div>
+                          )}
+                          {caseData.description && (
+                            <div>
+                              <h4 className="font-bold text-navy mb-2">{t('cases.description', 'وصف القضية')}</h4>
+                              <p className="text-slate-600 leading-relaxed">{caseData.description}</p>
+                            </div>
+                          )}
+                          {caseData.legalBasis && (
+                            <div>
+                              <h4 className="font-bold text-navy mb-2">{t('cases.legalBasis', 'السند النظامي')}</h4>
+                              <p className="text-slate-600 leading-relaxed">{caseData.legalBasis}</p>
+                            </div>
+                          )}
                         </div>
                       )}
 
@@ -978,19 +994,168 @@ export function CaseDetailsView() {
                             <div className="font-bold text-navy">{caseData.caseNumber || t('cases.notSpecified', 'غير محدد')}</div>
                           </div>
                           <div>
-                            <div className="text-sm text-slate-500 mb-1">{t('cases.court', 'المحكمة')}</div>
-                            <div className="font-bold text-navy">{caseData.court || t('cases.notSpecified', 'غير محدد')}</div>
+                            <div className="text-sm text-slate-500 mb-1">{t('cases.internalReference', 'الرقم المرجعي')}</div>
+                            <div className="font-bold text-navy">{caseData.internalReference || t('cases.notSpecified', 'غير محدد')}</div>
                           </div>
                           <div>
-                            <div className="text-sm text-slate-500 mb-1">{t('cases.judge', 'القاضي')}</div>
-                            <div className="font-bold text-navy">{caseData.judge || t('cases.notSpecified', 'غير محدد')}</div>
+                            <div className="text-sm text-slate-500 mb-1">{t('cases.filingDate', 'تاريخ الرفع')}</div>
+                            <div className="font-bold text-navy">{caseData.filingDate ? formatDate(caseData.filingDate) : t('cases.notSpecified', 'غير محدد')}</div>
                           </div>
                           <div>
-                            <div className="text-sm text-slate-500 mb-1">{t('cases.lawyer', 'المحامي')}</div>
-                            <div className="font-bold text-navy">{getLawyerName(caseData)}</div>
+                            <div className="text-sm text-slate-500 mb-1">{t('cases.subCategory', 'التصنيف الفرعي')}</div>
+                            <div className="font-bold text-navy">{caseData.subCategory || t('cases.notSpecified', 'غير محدد')}</div>
                           </div>
                         </div>
                       </div>
+
+                      {/* Court/Committee Info */}
+                      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+                        <h3 className="font-bold text-lg text-navy mb-4 flex items-center gap-2">
+                          <Gavel className="h-5 w-5 text-purple-600" />
+                          {t('cases.courtInfo', 'بيانات المحكمة')}
+                        </h3>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div>
+                            <div className="text-sm text-slate-500 mb-1">{t('cases.court', 'المحكمة / اللجنة')}</div>
+                            <div className="font-bold text-navy">{caseData.courtDetails?.court || caseData.courtDetails?.committee || caseData.court || t('cases.notSpecified', 'غير محدد')}</div>
+                          </div>
+                          <div>
+                            <div className="text-sm text-slate-500 mb-1">{t('cases.region', 'المنطقة')}</div>
+                            <div className="font-bold text-navy">{caseData.courtDetails?.region || t('cases.notSpecified', 'غير محدد')}</div>
+                          </div>
+                          <div>
+                            <div className="text-sm text-slate-500 mb-1">{t('cases.city', 'المدينة')}</div>
+                            <div className="font-bold text-navy">{caseData.courtDetails?.city || t('cases.notSpecified', 'غير محدد')}</div>
+                          </div>
+                          <div>
+                            <div className="text-sm text-slate-500 mb-1">{t('cases.circuitNumber', 'رقم الدائرة')}</div>
+                            <div className="font-bold text-navy">{caseData.courtDetails?.circuitNumber || t('cases.notSpecified', 'غير محدد')}</div>
+                          </div>
+                          <div>
+                            <div className="text-sm text-slate-500 mb-1">{t('cases.judge', 'القاضي')}</div>
+                            <div className="font-bold text-navy">{caseData.courtDetails?.judgeName || caseData.judge || t('cases.notSpecified', 'غير محدد')}</div>
+                          </div>
+                          <div>
+                            <div className="text-sm text-slate-500 mb-1">{t('cases.courtRoom', 'القاعة')}</div>
+                            <div className="font-bold text-navy">{caseData.courtDetails?.courtRoom || t('cases.notSpecified', 'غير محدد')}</div>
+                          </div>
+                          <div>
+                            <div className="text-sm text-slate-500 mb-1">{t('cases.lawyer', 'المحامي المسؤول')}</div>
+                            <div className="font-bold text-navy">{caseData.team?.assignedLawyer || getLawyerName(caseData)}</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Power of Attorney */}
+                      {caseData.powerOfAttorney && (caseData.powerOfAttorney.poaNumber || caseData.powerOfAttorney.poaDate) && (
+                        <div className="bg-amber-50 rounded-2xl border border-amber-100 shadow-sm p-6">
+                          <h3 className="font-bold text-lg text-navy mb-4 flex items-center gap-2">
+                            <FileText className="h-5 w-5 text-amber-600" />
+                            {t('cases.powerOfAttorney', 'الوكالة الشرعية')}
+                          </h3>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div>
+                              <div className="text-sm text-slate-500 mb-1">{t('cases.poaNumber', 'رقم الوكالة')}</div>
+                              <div className="font-bold text-navy">{caseData.powerOfAttorney.poaNumber || t('cases.notSpecified', 'غير محدد')}</div>
+                            </div>
+                            <div>
+                              <div className="text-sm text-slate-500 mb-1">{t('cases.poaDate', 'تاريخ الوكالة')}</div>
+                              <div className="font-bold text-navy">{caseData.powerOfAttorney.poaDate ? formatDate(caseData.powerOfAttorney.poaDate) : t('cases.notSpecified', 'غير محدد')}</div>
+                            </div>
+                            <div>
+                              <div className="text-sm text-slate-500 mb-1">{t('cases.poaExpiry', 'تاريخ الانتهاء')}</div>
+                              <div className="font-bold text-navy">{caseData.powerOfAttorney.poaExpiry ? formatDate(caseData.powerOfAttorney.poaExpiry) : t('cases.notSpecified', 'غير محدد')}</div>
+                            </div>
+                            <div>
+                              <div className="text-sm text-slate-500 mb-1">{t('cases.poaScope', 'نطاق الوكالة')}</div>
+                              <div className="font-bold text-navy">
+                                {caseData.powerOfAttorney.poaScope === 'general' ? t('cases.poaGeneral', 'وكالة عامة') :
+                                 caseData.powerOfAttorney.poaScope === 'specific' ? t('cases.poaSpecific', 'وكالة خاصة') :
+                                 caseData.powerOfAttorney.poaScope === 'litigation' ? t('cases.poaLitigation', 'وكالة خصومة') :
+                                 t('cases.notSpecified', 'غير محدد')}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Labor Case Details */}
+                      {caseData.category === 'labor' && (caseData.laborCaseSpecific || caseData.laborCaseDetails) && (
+                        <div className="bg-blue-50 rounded-2xl border border-blue-100 shadow-sm p-6">
+                          <h3 className="font-bold text-lg text-navy mb-4 flex items-center gap-2">
+                            <Briefcase className="h-5 w-5 text-blue-600" />
+                            {t('cases.laborDetails', 'بيانات العلاقة العمالية')}
+                          </h3>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div>
+                              <div className="text-sm text-slate-500 mb-1">{t('cases.jobTitle', 'المسمى الوظيفي')}</div>
+                              <div className="font-bold text-navy">{caseData.laborCaseSpecific?.jobTitle || t('cases.notSpecified', 'غير محدد')}</div>
+                            </div>
+                            <div>
+                              <div className="text-sm text-slate-500 mb-1">{t('cases.monthlySalary', 'الراتب الشهري')}</div>
+                              <div className="font-bold text-navy">{caseData.laborCaseSpecific?.monthlySalary ? `${formatCurrency(caseData.laborCaseSpecific.monthlySalary)} ر.س` : t('cases.notSpecified', 'غير محدد')}</div>
+                            </div>
+                            <div>
+                              <div className="text-sm text-slate-500 mb-1">{t('cases.employmentStartDate', 'تاريخ بداية العمل')}</div>
+                              <div className="font-bold text-navy">{caseData.laborCaseSpecific?.employmentStartDate ? formatDate(caseData.laborCaseSpecific.employmentStartDate) : t('cases.notSpecified', 'غير محدد')}</div>
+                            </div>
+                            <div>
+                              <div className="text-sm text-slate-500 mb-1">{t('cases.employmentEndDate', 'تاريخ نهاية العمل')}</div>
+                              <div className="font-bold text-navy">{caseData.laborCaseSpecific?.employmentEndDate ? formatDate(caseData.laborCaseSpecific.employmentEndDate) : t('cases.notSpecified', 'غير محدد')}</div>
+                            </div>
+                            {caseData.laborCaseSpecific?.terminationReason && (
+                              <div className="col-span-2 md:col-span-4">
+                                <div className="text-sm text-slate-500 mb-1">{t('cases.terminationReason', 'سبب إنهاء العلاقة')}</div>
+                                <div className="font-bold text-navy">{caseData.laborCaseSpecific.terminationReason}</div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Personal Status Case Details */}
+                      {caseData.category === 'family' && caseData.personalStatusDetails && (
+                        <div className="bg-pink-50 rounded-2xl border border-pink-100 shadow-sm p-6">
+                          <h3 className="font-bold text-lg text-navy mb-4 flex items-center gap-2">
+                            <User className="h-5 w-5 text-pink-600" />
+                            {t('cases.personalStatusDetails', 'بيانات الأحوال الشخصية')}
+                          </h3>
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div>
+                              <div className="text-sm text-slate-500 mb-1">{t('cases.marriageDate', 'تاريخ الزواج')}</div>
+                              <div className="font-bold text-navy">{caseData.personalStatusDetails.marriageDate ? formatDate(caseData.personalStatusDetails.marriageDate) : t('cases.notSpecified', 'غير محدد')}</div>
+                            </div>
+                            <div>
+                              <div className="text-sm text-slate-500 mb-1">{t('cases.marriageCity', 'مدينة عقد الزواج')}</div>
+                              <div className="font-bold text-navy">{caseData.personalStatusDetails.marriageCity || t('cases.notSpecified', 'غير محدد')}</div>
+                            </div>
+                            <div>
+                              <div className="text-sm text-slate-500 mb-1">{t('cases.childrenCount', 'عدد الأطفال')}</div>
+                              <div className="font-bold text-navy">{caseData.personalStatusDetails.childrenCount ?? t('cases.notSpecified', 'غير محدد')}</div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Commercial Case Details */}
+                      {caseData.category === 'commercial' && caseData.commercialDetails && (
+                        <div className="bg-emerald-50 rounded-2xl border border-emerald-100 shadow-sm p-6">
+                          <h3 className="font-bold text-lg text-navy mb-4 flex items-center gap-2">
+                            <Building className="h-5 w-5 text-emerald-600" />
+                            {t('cases.commercialDetails', 'بيانات العقد التجاري')}
+                          </h3>
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div>
+                              <div className="text-sm text-slate-500 mb-1">{t('cases.contractDate', 'تاريخ العقد')}</div>
+                              <div className="font-bold text-navy">{caseData.commercialDetails.contractDate ? formatDate(caseData.commercialDetails.contractDate) : t('cases.notSpecified', 'غير محدد')}</div>
+                            </div>
+                            <div>
+                              <div className="text-sm text-slate-500 mb-1">{t('cases.contractValue', 'قيمة العقد')}</div>
+                              <div className="font-bold text-navy">{caseData.commercialDetails.contractValue ? `${formatCurrency(caseData.commercialDetails.contractValue)} ر.س` : t('cases.notSpecified', 'غير محدد')}</div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 

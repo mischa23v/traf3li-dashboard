@@ -8,7 +8,57 @@ import apiClient, { handleApiError } from '@/lib/api'
 // ==================== TYPES ====================
 
 /**
- * Plaintiff (Labor Case)
+ * Party Type - Individual, Company, or Government
+ */
+export type PartyType = 'individual' | 'company' | 'government'
+
+/**
+ * Entity Type - Court or Committee
+ */
+export type EntityType = 'court' | 'committee'
+
+/**
+ * Individual Party Details
+ */
+export interface IndividualParty {
+  type: 'individual'
+  name?: string
+  nationalId?: string  // Saudi National ID (starts with 1) or Iqama (starts with 2)
+  phone?: string
+  email?: string
+  address?: string
+  city?: string
+}
+
+/**
+ * Company Party Details
+ */
+export interface CompanyParty {
+  type: 'company'
+  companyName?: string
+  crNumber?: string  // Commercial Registration Number (10 digits)
+  address?: string
+  city?: string
+  representativeName?: string
+  representativePosition?: string
+}
+
+/**
+ * Government Party Details
+ */
+export interface GovernmentParty {
+  type: 'government'
+  entityName?: string
+  representative?: string
+}
+
+/**
+ * Party (Union type for Plaintiff/Defendant)
+ */
+export type Party = IndividualParty | CompanyParty | GovernmentParty
+
+/**
+ * Plaintiff (Labor Case) - Legacy support
  */
 export interface Plaintiff {
   name?: string
@@ -19,7 +69,7 @@ export interface Plaintiff {
 }
 
 /**
- * Company (Labor Case)
+ * Company (Labor Case) - Legacy support
  */
 export interface Company {
   name?: string
@@ -29,11 +79,87 @@ export interface Company {
 }
 
 /**
- * Labor Case Details
+ * Labor Case Specific Details
+ */
+export interface LaborCaseSpecificDetails {
+  jobTitle?: string
+  employmentStartDate?: string
+  employmentEndDate?: string
+  monthlySalary?: number
+  terminationReason?: string
+}
+
+/**
+ * Personal Status (Family) Case Specific Details
+ */
+export interface PersonalStatusCaseDetails {
+  marriageDate?: string
+  marriageCity?: string
+  childrenCount?: number
+  children?: Array<{
+    name: string
+    birthDate?: string
+    gender?: 'male' | 'female'
+  }>
+}
+
+/**
+ * Commercial Case Specific Details
+ */
+export interface CommercialCaseDetails {
+  contractDate?: string
+  contractValue?: number
+  commercialPapers?: Array<{
+    type: 'cheque' | 'promissory_note' | 'bill_of_exchange'
+    number: string
+    amount: number
+    date?: string
+    bankName?: string
+    status?: 'pending' | 'bounced' | 'paid'
+  }>
+}
+
+/**
+ * Power of Attorney Details
+ */
+export interface PowerOfAttorneyDetails {
+  poaNumber?: string
+  poaDate?: string
+  poaExpiry?: string
+  poaScope?: 'general' | 'specific' | 'litigation'
+  poaIssuer?: string  // كاتب العدل
+}
+
+/**
+ * Team Assignment
+ */
+export interface TeamAssignment {
+  assignedLawyer?: string
+  assistants?: string[]
+}
+
+/**
+ * Court Details
+ */
+export interface CourtDetails {
+  entityType?: EntityType
+  court?: string
+  committee?: string
+  region?: string
+  city?: string
+  circuitNumber?: string
+  judgeName?: string
+  courtRoom?: string
+}
+
+/**
+ * Labor Case Details (Extended)
  */
 export interface LaborCaseDetails {
   plaintiff?: Plaintiff
   company?: Company
+  // Extended labor case fields
+  laborSpecific?: LaborCaseSpecificDetails
 }
 
 /**
@@ -150,8 +276,11 @@ export interface Case {
   title: string
   description?: string
   category: CaseCategory
+  subCategory?: string
   startDate?: string
   endDate?: string
+  filingDate?: string
+  internalReference?: string
 
   // Parties
   lawyerId: LawyerRef | string
@@ -160,14 +289,38 @@ export interface Case {
   clientPhone?: string
   contractId?: string
 
-  // Labor Case Details
+  // Plaintiff Details (New comprehensive structure)
+  plaintiff?: Party
+  plaintiffType?: PartyType
+
+  // Defendant Details (New comprehensive structure)
+  defendant?: Party
+  defendantType?: PartyType
+
+  // Legacy Labor Case Details (for backward compatibility)
   laborCaseDetails?: LaborCaseDetails
 
-  // Court Info
+  // Case-Specific Details
+  laborCaseSpecific?: LaborCaseSpecificDetails
+  personalStatusDetails?: PersonalStatusCaseDetails
+  commercialDetails?: CommercialCaseDetails
+
+  // Court/Committee Info (Extended)
+  courtDetails?: CourtDetails
   caseNumber?: string
   court?: string
   judge?: string
   nextHearing?: string
+
+  // Power of Attorney
+  powerOfAttorney?: PowerOfAttorneyDetails
+
+  // Team Assignment
+  team?: TeamAssignment
+
+  // Case Subject & Legal Basis
+  caseSubject?: string
+  legalBasis?: string
 
   // Status & Progress
   status: CaseStatus
@@ -196,16 +349,54 @@ export interface Case {
  * Create Case Data - For External Clients
  */
 export interface CreateCaseData {
+  // Basic Info
   title: string
   category: CaseCategory
+  subCategory?: string
   description?: string
-  clientName?: string
-  clientPhone?: string
-  laborCaseDetails?: LaborCaseDetails
-  caseNumber?: string
-  court?: string
-  startDate?: string
   priority?: CasePriority
+  filingDate?: string
+  caseNumber?: string
+  internalReference?: string
+  startDate?: string
+
+  // Court/Committee
+  courtDetails?: CourtDetails
+  court?: string  // Legacy support
+
+  // Plaintiff
+  plaintiff?: Party
+  plaintiffType?: PartyType
+  clientName?: string  // Legacy support
+  clientPhone?: string  // Legacy support
+
+  // Defendant
+  defendant?: Party
+  defendantType?: PartyType
+
+  // Case Details
+  caseSubject?: string
+  legalBasis?: string
+
+  // Claims
+  claims?: Array<{
+    type: string
+    amount: number
+    period?: string
+    description?: string
+  }>
+
+  // Case-Specific Details
+  laborCaseDetails?: LaborCaseDetails  // Legacy support
+  laborCaseSpecific?: LaborCaseSpecificDetails
+  personalStatusDetails?: PersonalStatusCaseDetails
+  commercialDetails?: CommercialCaseDetails
+
+  // Power of Attorney
+  powerOfAttorney?: PowerOfAttorneyDetails
+
+  // Team Assignment
+  team?: TeamAssignment
 }
 
 /**
@@ -222,19 +413,49 @@ export interface CreateCaseFromContractData {
  * Update Case Data
  */
 export interface UpdateCaseData {
+  // Basic Info
   title?: string
   description?: string
   category?: CaseCategory
+  subCategory?: string
   status?: CaseStatus
   priority?: CasePriority
   progress?: number
-  claimAmount?: number
-  expectedWinAmount?: number
+  filingDate?: string
+  internalReference?: string
+
+  // Court Info
+  courtDetails?: CourtDetails
   caseNumber?: string
   court?: string
   judge?: string
   nextHearing?: string
+
+  // Financial
+  claimAmount?: number
+  expectedWinAmount?: number
+
+  // Parties
+  plaintiff?: Party
+  plaintiffType?: PartyType
+  defendant?: Party
+  defendantType?: PartyType
+
+  // Case Details
+  caseSubject?: string
+  legalBasis?: string
+
+  // Case-Specific Details
   laborCaseDetails?: LaborCaseDetails
+  laborCaseSpecific?: LaborCaseSpecificDetails
+  personalStatusDetails?: PersonalStatusCaseDetails
+  commercialDetails?: CommercialCaseDetails
+
+  // Power of Attorney
+  powerOfAttorney?: PowerOfAttorneyDetails
+
+  // Team Assignment
+  team?: TeamAssignment
 }
 
 /**
