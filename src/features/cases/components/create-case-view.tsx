@@ -432,23 +432,128 @@ export function CreateCaseView() {
     }
 
     const onSubmit = async (data: CreateCaseFormData) => {
-        // Build the request payload
+        // Build the request payload with all fields
         const payload: CreateCaseData = {
+            // Basic Info
             title: data.title || '',
             category: data.category as CaseCategory,
+            subCategory: data.subCategory,
             description: data.description,
+            priority: data.priority as CasePriority,
+            filingDate: data.filingDate,
+            caseNumber: data.caseNumber,
+            internalReference: data.internalReference,
+            startDate: data.startDate || data.filingDate,
+
+            // Legacy client fields
             clientName: data.clientName || data.plaintiffName,
             clientPhone: data.clientPhone || data.plaintiffPhone,
-            caseNumber: data.caseNumber,
-            court: data.court,
-            startDate: data.startDate || data.filingDate,
-            priority: data.priority as CasePriority,
+
+            // Court Details
+            courtDetails: {
+                entityType: data.entityType,
+                court: data.court,
+                committee: data.committee,
+                arbitrationCenter: data.arbitrationCenter,
+                region: data.region,
+                city: data.city,
+                circuitNumber: data.circuitNumber,
+                judgeName: data.judgeName,
+            },
+            court: data.court, // Legacy support
+
+            // Case Subject & Legal Basis
+            caseSubject: data.caseSubject,
+            legalBasis: data.legalBasis,
+
+            // Claims
+            claims: data.claims?.filter(c => c.type && c.amount) || [],
+
+            // Power of Attorney
+            powerOfAttorney: (data.poaNumber || data.poaDate) ? {
+                poaNumber: data.poaNumber,
+                poaDate: data.poaDate,
+                poaExpiry: data.poaExpiry,
+                poaScope: data.poaScope as 'general' | 'specific' | 'litigation' | undefined,
+            } : undefined,
+
+            // Team Assignment
+            team: data.assignedLawyer ? {
+                assignedLawyer: data.assignedLawyer,
+                assistants: data.assistants,
+            } : undefined,
         }
 
-        // Add labor case details if it's a labor case
-        if (data.category === 'labor') {
-            const laborCaseDetails: LaborCaseDetails = {}
+        // Build Plaintiff Party based on type
+        if (data.plaintiffType === 'individual') {
+            payload.plaintiff = {
+                type: 'individual',
+                name: data.plaintiffName,
+                nationalId: data.plaintiffNationalId,
+                phone: data.plaintiffPhone,
+                email: data.plaintiffEmail,
+                address: data.plaintiffAddress,
+                city: data.plaintiffCity,
+            }
+            payload.plaintiffType = 'individual'
+        } else if (data.plaintiffType === 'company') {
+            payload.plaintiff = {
+                type: 'company',
+                companyName: data.plaintiffCompanyName,
+                crNumber: data.plaintiffCrNumber,
+                address: data.plaintiffCompanyAddress,
+                city: data.plaintiffCity,
+                representativeName: data.plaintiffRepresentativeName,
+                representativePosition: data.plaintiffRepresentativePosition,
+            }
+            payload.plaintiffType = 'company'
+            payload.plaintiffUnifiedNumber = data.plaintiffUnifiedNumber
+        } else if (data.plaintiffType === 'government') {
+            payload.plaintiff = {
+                type: 'government',
+                entityName: data.plaintiffGovEntity,
+                representative: data.plaintiffGovRepresentative,
+            }
+            payload.plaintiffType = 'government'
+        }
 
+        // Build Defendant Party based on type
+        if (data.defendantType === 'individual') {
+            payload.defendant = {
+                type: 'individual',
+                name: data.defendantName,
+                nationalId: data.defendantNationalId,
+                phone: data.defendantPhone,
+                email: data.defendantEmail,
+                address: data.defendantAddress,
+                city: data.defendantCity,
+            }
+            payload.defendantType = 'individual'
+        } else if (data.defendantType === 'company') {
+            payload.defendant = {
+                type: 'company',
+                companyName: data.defendantCompanyName,
+                crNumber: data.defendantCrNumber,
+                address: data.defendantCompanyAddress,
+                city: data.defendantCity,
+                representativeName: data.defendantRepresentativeName,
+                representativePosition: data.defendantRepresentativePosition,
+            }
+            payload.defendantType = 'company'
+            payload.defendantUnifiedNumber = data.defendantUnifiedNumber
+        } else if (data.defendantType === 'government') {
+            payload.defendant = {
+                type: 'government',
+                entityName: data.defendantGovEntity,
+                representative: data.defendantGovRepresentative,
+            }
+            payload.defendantType = 'government'
+        }
+
+        // Add labor case details (legacy + specific)
+        if (data.category === 'labor') {
+            // Legacy laborCaseDetails for backward compatibility
+            const laborCaseDetails: LaborCaseDetails = {}
             if (data.plaintiffName || data.plaintiffNationalId || data.plaintiffPhone || data.plaintiffAddress || data.plaintiffCity) {
                 laborCaseDetails.plaintiff = {
                     name: data.plaintiffName,
@@ -458,7 +563,6 @@ export function CreateCaseView() {
                     city: data.plaintiffCity,
                 }
             }
-
             if (data.defendantCompanyName || data.defendantCrNumber || data.defendantCompanyAddress || data.defendantCity) {
                 laborCaseDetails.company = {
                     name: data.defendantCompanyName,
@@ -467,9 +571,40 @@ export function CreateCaseView() {
                     city: data.defendantCity,
                 }
             }
-
             if (Object.keys(laborCaseDetails).length > 0) {
                 payload.laborCaseDetails = laborCaseDetails
+            }
+
+            // New laborCaseSpecific fields
+            if (data.jobTitle || data.monthlySalary || data.employmentStartDate || data.employmentEndDate || data.terminationReason) {
+                payload.laborCaseSpecific = {
+                    jobTitle: data.jobTitle,
+                    monthlySalary: data.monthlySalary,
+                    employmentStartDate: data.employmentStartDate,
+                    employmentEndDate: data.employmentEndDate,
+                    terminationReason: data.terminationReason,
+                }
+            }
+        }
+
+        // Add personal status details for family cases
+        if (data.category === 'family') {
+            if (data.marriageDate || data.marriageCity || data.childrenCount !== undefined) {
+                payload.personalStatusDetails = {
+                    marriageDate: data.marriageDate,
+                    marriageCity: data.marriageCity,
+                    childrenCount: data.childrenCount,
+                }
+            }
+        }
+
+        // Add commercial details for commercial cases
+        if (data.category === 'commercial') {
+            if (data.contractDate || data.contractValue) {
+                payload.commercialDetails = {
+                    contractDate: data.contractDate,
+                    contractValue: data.contractValue,
+                }
             }
         }
 
@@ -850,9 +985,13 @@ export function CreateCaseView() {
                                 <label className="text-sm font-medium text-slate-700">البريد الإلكتروني</label>
                                 <Input type="email" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffEmail')} />
                             </div>
-                            <div className="md:col-span-2 space-y-2">
+                            <div className="space-y-2">
                                 <label className="text-sm font-medium text-slate-700">العنوان</label>
                                 <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffAddress')} />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700">المدينة</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffCity')} />
                             </div>
                         </div>
                     )}
@@ -882,9 +1021,13 @@ export function CreateCaseView() {
                                 <label className="text-sm font-medium text-slate-700">صفته</label>
                                 <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffRepresentativePosition')} />
                             </div>
-                            <div className="md:col-span-2 space-y-2">
+                            <div className="space-y-2">
                                 <label className="text-sm font-medium text-slate-700">العنوان</label>
                                 <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffCompanyAddress')} />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700">المدينة</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffCity')} />
                             </div>
                         </div>
                     )}
@@ -951,9 +1094,13 @@ export function CreateCaseView() {
                                 <label className="text-sm font-medium text-slate-700">البريد الإلكتروني</label>
                                 <Input type="email" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantEmail')} />
                             </div>
-                            <div className="md:col-span-2 space-y-2">
+                            <div className="space-y-2">
                                 <label className="text-sm font-medium text-slate-700">العنوان</label>
                                 <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantAddress')} />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700">المدينة</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantCity')} />
                             </div>
                         </div>
                     )}
@@ -983,9 +1130,13 @@ export function CreateCaseView() {
                                 <label className="text-sm font-medium text-slate-700">صفته</label>
                                 <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantRepresentativePosition')} />
                             </div>
-                            <div className="md:col-span-2 space-y-2">
+                            <div className="space-y-2">
                                 <label className="text-sm font-medium text-slate-700">العنوان</label>
                                 <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantCompanyAddress')} />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700">المدينة</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantCity')} />
                             </div>
                         </div>
                     )}

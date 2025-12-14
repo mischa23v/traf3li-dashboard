@@ -96,7 +96,21 @@ const getEntityDisplay = (c: Case): string => {
 
 // Helper functions
 const getClientName = (c: Case): string => {
+  // Check new Party structure first
+  if (c.plaintiff) {
+    if (c.plaintiff.type === 'individual' && 'name' in c.plaintiff && c.plaintiff.name) {
+      return c.plaintiff.name
+    }
+    if (c.plaintiff.type === 'company' && 'companyName' in c.plaintiff && c.plaintiff.companyName) {
+      return c.plaintiff.companyName
+    }
+    if (c.plaintiff.type === 'government' && 'entityName' in c.plaintiff && c.plaintiff.entityName) {
+      return c.plaintiff.entityName
+    }
+  }
+  // Fall back to legacy fields
   if (c.clientName) return c.clientName
+  if (c.laborCaseDetails?.plaintiff?.name) return c.laborCaseDetails.plaintiff.name
   if (c.clientId && typeof c.clientId === 'object') {
     const client = c.clientId as ClientRef
     return client.name || client.firstName || client.username || 'غير محدد'
@@ -105,6 +119,8 @@ const getClientName = (c: Case): string => {
 }
 
 const getLawyerName = (c: Case): string => {
+  // Check team assignment first
+  if (c.team?.assignedLawyer) return c.team.assignedLawyer
   if (c.lawyerId && typeof c.lawyerId === 'object') {
     const lawyer = c.lawyerId as LawyerRef
     if (lawyer.firstName && lawyer.lastName) {
@@ -116,6 +132,19 @@ const getLawyerName = (c: Case): string => {
 }
 
 const getDefendantName = (c: Case): string => {
+  // Check new Party structure first
+  if (c.defendant) {
+    if (c.defendant.type === 'individual' && 'name' in c.defendant && c.defendant.name) {
+      return c.defendant.name
+    }
+    if (c.defendant.type === 'company' && 'companyName' in c.defendant && c.defendant.companyName) {
+      return c.defendant.companyName
+    }
+    if (c.defendant.type === 'government' && 'entityName' in c.defendant && c.defendant.entityName) {
+      return c.defendant.entityName
+    }
+  }
+  // Fall back to legacy fields
   if (c.laborCaseDetails?.company?.name) return c.laborCaseDetails.company.name
   return 'غير محدد'
 }
