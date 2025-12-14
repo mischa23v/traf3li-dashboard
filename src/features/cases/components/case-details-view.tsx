@@ -206,6 +206,36 @@ const getPartyTypeLabel = (value?: string): string => {
   }
 }
 
+const getPriorityLabel = (value?: string): string => {
+  switch (value) {
+    case 'low':
+      return 'منخفضة'
+    case 'medium':
+      return 'متوسطة'
+    case 'high':
+      return 'عالية'
+    case 'critical':
+      return 'عاجلة'
+    default:
+      return 'غير محدد'
+  }
+}
+
+const getPriorityColor = (value?: string): string => {
+  switch (value) {
+    case 'low':
+      return 'bg-slate-100 text-slate-600'
+    case 'medium':
+      return 'bg-blue-100 text-blue-600'
+    case 'high':
+      return 'bg-orange-100 text-orange-600'
+    case 'critical':
+      return 'bg-red-100 text-red-600'
+    default:
+      return 'bg-slate-100 text-slate-500'
+  }
+}
+
 // Helper to get plaintiff name from new Party structure or legacy fields
 const getPlaintiffDisplayName = (c: Case): string => {
   // Check new Party structure first
@@ -959,6 +989,29 @@ export function CaseDetailsView() {
                             ممثل الجهة: {caseData.plaintiff.representative}
                           </div>
                         )}
+                        {/* Email */}
+                        {caseData.plaintiff?.type === 'individual' && 'email' in caseData.plaintiff && caseData.plaintiff.email && (
+                          <div className="flex items-center gap-1 text-slate-500">
+                            <FileText className="h-3 w-3" aria-hidden="true" />
+                            {caseData.plaintiff.email}
+                          </div>
+                        )}
+                        {/* Address */}
+                        {caseData.plaintiff?.type === 'individual' && 'address' in caseData.plaintiff && caseData.plaintiff.address && (
+                          <div className="flex items-center gap-1 text-slate-500 col-span-2">
+                            <MapPin className="h-3 w-3" aria-hidden="true" />
+                            {caseData.plaintiff.address}
+                            {caseData.plaintiff.city && ` - ${caseData.plaintiff.city}`}
+                          </div>
+                        )}
+                        {/* Company Address */}
+                        {caseData.plaintiff?.type === 'company' && 'address' in caseData.plaintiff && caseData.plaintiff.address && (
+                          <div className="flex items-center gap-1 text-slate-500 col-span-2">
+                            <MapPin className="h-3 w-3" aria-hidden="true" />
+                            {caseData.plaintiff.address}
+                            {'city' in caseData.plaintiff && caseData.plaintiff.city && ` - ${caseData.plaintiff.city}`}
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -1030,6 +1083,29 @@ export function CaseDetailsView() {
                             <div className="flex items-center gap-1 text-slate-500 col-span-2">
                               <User className="h-3 w-3" aria-hidden="true" />
                               ممثل الجهة: {caseData.defendant.representative}
+                            </div>
+                          )}
+                          {/* Email */}
+                          {caseData.defendant?.type === 'individual' && 'email' in caseData.defendant && caseData.defendant.email && (
+                            <div className="flex items-center gap-1 text-slate-500">
+                              <FileText className="h-3 w-3" aria-hidden="true" />
+                              {caseData.defendant.email}
+                            </div>
+                          )}
+                          {/* Address */}
+                          {caseData.defendant?.type === 'individual' && 'address' in caseData.defendant && caseData.defendant.address && (
+                            <div className="flex items-center gap-1 text-slate-500 col-span-2">
+                              <MapPin className="h-3 w-3" aria-hidden="true" />
+                              {caseData.defendant.address}
+                              {caseData.defendant.city && ` - ${caseData.defendant.city}`}
+                            </div>
+                          )}
+                          {/* Company Address */}
+                          {caseData.defendant?.type === 'company' && 'address' in caseData.defendant && caseData.defendant.address && (
+                            <div className="flex items-center gap-1 text-slate-500 col-span-2">
+                              <MapPin className="h-3 w-3" aria-hidden="true" />
+                              {caseData.defendant.address}
+                              {'city' in caseData.defendant && caseData.defendant.city && ` - ${caseData.defendant.city}`}
                             </div>
                           )}
                         </div>
@@ -1231,6 +1307,12 @@ export function CaseDetailsView() {
                             <div className="text-sm text-slate-500 mb-1">{t('cases.subCategory', 'التصنيف الفرعي')}</div>
                             <div className="font-bold text-navy">{caseData.subCategory || t('cases.notSpecified', 'غير محدد')}</div>
                           </div>
+                          <div>
+                            <div className="text-sm text-slate-500 mb-1">{t('cases.priority', 'الأولوية')}</div>
+                            <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium ${getPriorityColor(caseData.priority)}`}>
+                              {getPriorityLabel(caseData.priority)}
+                            </div>
+                          </div>
                         </div>
                       </div>
 
@@ -1287,6 +1369,18 @@ export function CaseDetailsView() {
                             <div className="text-sm text-slate-500 mb-1">{t('cases.lawyer', 'المحامي المسؤول')}</div>
                             <div className="font-bold text-navy">{caseData.team?.assignedLawyer || getLawyerName(caseData)}</div>
                           </div>
+                          {caseData.team?.assistants && caseData.team.assistants.length > 0 && (
+                            <div className="col-span-2 md:col-span-4">
+                              <div className="text-sm text-slate-500 mb-1">{t('cases.assistants', 'فريق المساعدين')}</div>
+                              <div className="flex flex-wrap gap-2">
+                                {caseData.team.assistants.map((assistant, idx) => (
+                                  <span key={idx} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
+                                    {assistant}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
 
