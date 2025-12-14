@@ -75,6 +75,16 @@ export interface DashboardRecentMessage {
 }
 
 /**
+ * Message Stats Interface (from /api/messages/stats)
+ */
+export interface MessageStats {
+  unreadMessages: number
+  unreadConversations: number
+  totalConversations: number
+  totalMessages: number
+}
+
+/**
  * Get Dashboard Statistics (uses hero-stats endpoint)
  */
 export const getDashboardStats = async (): Promise<DashboardStats> => {
@@ -172,6 +182,19 @@ export const getDetailedDashboardStats = async (): Promise<any> => {
   }
 }
 
+/**
+ * Get Message Statistics
+ * GET /messages/stats
+ */
+export const getMessageStats = async (): Promise<MessageStats> => {
+  try {
+    const response = await apiClient.get('/messages/stats')
+    return response.data.data
+  } catch (error) {
+    throw handleApiError(error)
+  }
+}
+
 const dashboardService = {
   getDashboardStats,
   getDashboardHeroStats,
@@ -180,6 +203,7 @@ const dashboardService = {
   getRecentMessages,
   getActivityOverview,
   getDetailedDashboardStats,
+  getMessageStats,
 }
 
 export default dashboardService

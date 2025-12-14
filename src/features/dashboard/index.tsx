@@ -16,6 +16,9 @@ import {
   TrendingUp,
   Loader2,
   AlertCircle,
+  ListTodo,
+  CheckSquare,
+  Calendar as CalendarIcon,
 } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
@@ -35,13 +38,18 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { DynamicIsland } from '@/components/dynamic-island'
+import { StatCard } from '@/components/stat-card'
 import {
   useDashboardStats,
   useDashboardHeroStats,
   useTodayEvents,
   useFinancialSummary,
   useRecentMessages,
+  useMessageStats,
 } from '@/hooks/useDashboard'
+import { useTaskStats } from '@/hooks/useTasks'
+import { useReminderStats } from '@/hooks/useRemindersAndEvents'
+import { useCaseStatisticsFromAPI } from '@/hooks/useCasesAndClients'
 
 export function Dashboard() {
   const { t } = useTranslation()
@@ -52,6 +60,18 @@ export function Dashboard() {
   const { data: todayEvents, isLoading: eventsLoading } = useTodayEvents()
   const { data: financialSummary, isLoading: financialLoading } = useFinancialSummary()
   const { data: recentMessages, isLoading: messagesLoading } = useRecentMessages(3)
+
+  // Fetch stats for hero card
+  const { data: caseStats } = useCaseStatisticsFromAPI()
+  const { data: taskStats } = useTaskStats()
+  const { data: messageStats } = useMessageStats()
+  const { data: reminderStats } = useReminderStats()
+
+  // Calculate counts for hero stat cards
+  const activeCasesCount = caseStats?.active || stats?.cases?.active || 0
+  const activeTasksCount = taskStats?.byStatus?.todo + taskStats?.byStatus?.in_progress || stats?.tasks?.active || 0
+  const unreadMessagesCount = messageStats?.unreadMessages || 0
+  const pendingRemindersCount = reminderStats?.byStatus?.pending || 0
 
   const topNav = [
     {
@@ -115,36 +135,87 @@ export function Dashboard() {
       {/* ===== Main ===== */}
       <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden">
 
-        {/* HERO BANNER */}
-        <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 group">
-          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="space-y-2 text-center md:text-start">
-              <h1 className="text-3xl font-bold leading-tight">{t('dashboard.hero.greeting')}</h1>
-              {heroLoading ? (
-                <div className="flex items-center justify-center md:justify-start gap-2 text-slate-300">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>{t('common.loading')}</span>
+        {/* HERO BANNER - ProductivityHero Style */}
+        <div className="bg-[#022c22] rounded-3xl p-6 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20">
+          {/* Background Effects */}
+          <div className="absolute inset-0 z-0">
+            <img
+              src="/images/hero-wave.png"
+              alt=""
+              className="w-full h-full object-cover opacity-40 mix-blend-overlay"
+            />
+          </div>
+          <div className="absolute top-0 end-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl -me-48 -mt-48 pointer-events-none"></div>
+          <div className="absolute bottom-0 start-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -ms-48 -mb-48 pointer-events-none"></div>
+
+          <div className="relative z-10">
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-center">
+              {/* Left Side: Title & Actions */}
+              <div className="xl:col-span-4 space-y-6">
+                <div className="space-y-2">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-blue-400 text-xs font-medium">
+                    <ListTodo className="w-3 h-3" />
+                    <span className="text-white">{t('dashboard.hero.badge', 'لوحة التحكم')}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-white/10 rounded-xl">
+                      <CheckSquare className="w-6 h-6 text-emerald-400 fill-emerald-400/20" />
+                    </div>
+                    <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">
+                      {t('dashboard.hero.greeting')}
+                    </h1>
+                  </div>
                 </div>
-              ) : (
-                <p className="text-slate-300 text-lg">
-                  {t('dashboard.hero.summary', {
-                    sessions: heroStats?.upcomingSessions || 0,
-                    tasks: heroStats?.urgentTasks || 0,
-                    messages: heroStats?.newMessages || 0
-                  })}
-                </p>
-              )}
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Button className="bg-brand-blue hover:bg-blue-600 text-white rounded-xl h-11 px-6 font-bold shadow-lg shadow-blue-600/30 hover:scale-105 transition-all duration-300 border-0">
-                <Plus className="ms-2 h-5 w-5" aria-hidden="true" />
-                {t('dashboard.hero.newCase')}
-              </Button>
-              <Button className="bg-white/10 hover:bg-white/20 text-white rounded-xl h-11 px-6 font-bold backdrop-blur-md border border-white/10 transition-all duration-300">
-                <FileText className="ms-2 h-5 w-5" aria-hidden="true" />
-                {t('dashboard.hero.newInvoice')}
-              </Button>
+
+                <div className="flex flex-wrap gap-3">
+                  <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm">
+                    <Link to="/dashboard/cases/new">
+                      <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
+                      {t('dashboard.hero.newCase', 'قضية جديدة')}
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" className="h-10 px-5 rounded-xl font-bold border-white/10 text-white hover:bg-white/10 hover:text-white bg-transparent text-sm">
+                    <Link to="/dashboard/tasks/new">
+                      <ListTodo className="ms-2 h-4 w-4" />
+                      {t('dashboard.hero.newTask', 'مهمة جديدة')}
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+
+              {/* Right Side: Stats Grid */}
+              <div className="xl:col-span-8">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <StatCard
+                    label={t('dashboard.hero.stats.cases', 'القضايا')}
+                    value={activeCasesCount}
+                    icon={Scale}
+                    status="normal"
+                    className="py-3 px-4"
+                  />
+                  <StatCard
+                    label={t('dashboard.hero.stats.tasks', 'المهام')}
+                    value={activeTasksCount}
+                    icon={ListTodo}
+                    status="normal"
+                    className="py-3 px-4"
+                  />
+                  <StatCard
+                    label={t('dashboard.hero.stats.messages', 'الرسائل')}
+                    value={unreadMessagesCount}
+                    icon={MessageSquare}
+                    status={unreadMessagesCount > 0 ? "attention" : "zero"}
+                    className="py-3 px-4"
+                  />
+                  <StatCard
+                    label={t('dashboard.hero.stats.reminders', 'التذكيرات')}
+                    value={pendingRemindersCount}
+                    icon={Bell}
+                    status="normal"
+                    className="py-3 px-4"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -71,3 +71,15 @@ export const useRecentMessages = (limit = 5) => {
     retry: 1, // Reduce retries to minimize 401 spam
   })
 }
+
+export const useMessageStats = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  return useQuery({
+    queryKey: ['messages', 'stats'],
+    queryFn: () => dashboardService.getMessageStats(),
+    staleTime: 1 * 60 * 1000, // 1 minute
+    enabled: isAuthenticated, // Only fetch when authenticated
+    retry: 1, // Reduce retries to minimize 401 spam
+  })
+}
