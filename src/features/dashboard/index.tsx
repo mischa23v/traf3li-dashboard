@@ -10,7 +10,6 @@ import {
   Plus,
   ArrowUpRight,
   ChevronLeft,
-  GraduationCap,
   TrendingUp,
   Loader2,
   ListTodo,
@@ -19,14 +18,18 @@ import {
   UserCheck,
   Target,
   Percent,
-  Building2,
   Clock,
-  CalendarOff,
   Wallet,
   Receipt,
   PiggyBank,
   BarChart3,
   Activity,
+  Gavel,
+  AlertTriangle,
+  Timer,
+  FileText,
+  CalendarClock,
+  AlertCircle,
 } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
@@ -53,11 +56,14 @@ import {
   useRecentMessages,
   useMessageStats,
   useCRMStats,
-  useHRStats,
   useFinanceStats,
   useCasesChart,
   useRevenueChart,
   useTasksChart,
+  useUpcomingHearings,
+  useUpcomingDeadlines,
+  useTimeEntrySummary,
+  usePendingDocuments,
 } from '@/hooks/useDashboard'
 import { useTaskStats } from '@/hooks/useTasks'
 import { useReminderStats } from '@/hooks/useRemindersAndEvents'
@@ -107,13 +113,18 @@ export function Dashboard() {
 
   // Fetch analytics data
   const { data: crmStats, isLoading: crmLoading } = useCRMStats()
-  const { data: hrStats, isLoading: hrLoading } = useHRStats()
   const { data: financeStats, isLoading: financeStatsLoading } = useFinanceStats()
 
   // Fetch chart data
   const { data: casesChart, isLoading: casesChartLoading } = useCasesChart(12)
   const { data: revenueChart, isLoading: revenueChartLoading } = useRevenueChart(12)
   const { data: tasksChart, isLoading: tasksChartLoading } = useTasksChart(12)
+
+  // Fetch lawyer-focused data
+  const { data: upcomingHearings, isLoading: hearingsLoading } = useUpcomingHearings(7)
+  const { data: upcomingDeadlines, isLoading: deadlinesLoading } = useUpcomingDeadlines(14)
+  const { data: timeEntrySummary, isLoading: timeEntryLoading } = useTimeEntrySummary()
+  const { data: pendingDocuments, isLoading: documentsLoading } = usePendingDocuments()
 
   // Calculate counts for hero stat cards
   const activeCasesCount = caseStats?.active || 0
@@ -302,6 +313,10 @@ export function Dashboard() {
             financialLoading={financialLoading}
             recentMessages={recentMessages}
             messagesLoading={messagesLoading}
+            upcomingHearings={upcomingHearings}
+            hearingsLoading={hearingsLoading}
+            upcomingDeadlines={upcomingDeadlines}
+            deadlinesLoading={deadlinesLoading}
           />
         )}
 
@@ -310,11 +325,13 @@ export function Dashboard() {
             t={t}
             crmStats={crmStats}
             crmLoading={crmLoading}
-            hrStats={hrStats}
-            hrLoading={hrLoading}
             financeStats={financeStats}
             financeStatsLoading={financeStatsLoading}
             caseStats={caseStats}
+            timeEntrySummary={timeEntrySummary}
+            timeEntryLoading={timeEntryLoading}
+            pendingDocuments={pendingDocuments}
+            documentsLoading={documentsLoading}
           />
         )}
 
@@ -348,6 +365,10 @@ interface OverviewTabProps {
   financialLoading: boolean
   recentMessages: any
   messagesLoading: boolean
+  upcomingHearings: any
+  hearingsLoading: boolean
+  upcomingDeadlines: any
+  deadlinesLoading: boolean
 }
 
 function OverviewTab({
@@ -358,6 +379,10 @@ function OverviewTab({
   financialLoading,
   recentMessages,
   messagesLoading,
+  upcomingHearings,
+  hearingsLoading,
+  upcomingDeadlines,
+  deadlinesLoading,
 }: OverviewTabProps) {
   return (
     <>
@@ -427,54 +452,115 @@ function OverviewTab({
             </CardContent>
           </Card>
 
-          {/* Jobs & Opportunities */}
+          {/* Upcoming Hearings & Deadlines */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all group cursor-pointer">
-              <CardHeader>
+            {/* Upcoming Hearings Card */}
+            <Card className="rounded-3xl border-slate-100 shadow-sm">
+              <CardHeader className="pb-2">
                 <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                  <Briefcase className="h-5 w-5 text-brand-blue" />
-                  {t('dashboard.jobs.title')}
+                  <Gavel className="h-5 w-5 text-blue-600" />
+                  {t('dashboard.hearings.title', 'الجلسات القادمة')}
                 </CardTitle>
+                <CardDescription>{t('dashboard.hearings.next7Days', 'خلال 7 أيام')}</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="font-bold text-navy">{t('dashboard.jobs.sampleJob.title')}</h4>
-                        <p className="text-xs text-slate-500 mt-1">{t('dashboard.jobs.sampleJob.company')}</p>
-                      </div>
-                      <span className="bg-white text-blue-600 text-xs font-bold px-2 py-1 rounded-lg shadow-sm">{t('dashboard.jobs.new')}</span>
-                    </div>
-                    <div className="mt-3 flex items-center gap-2">
-                      <span className="text-xs font-bold text-slate-600 bg-white px-2 py-1 rounded-lg">{t('dashboard.jobs.partTime')}</span>
-                      <span className="text-xs font-bold text-slate-600 bg-white px-2 py-1 rounded-lg">{t('dashboard.jobs.remote')}</span>
-                    </div>
+                {hearingsLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-navy" />
                   </div>
-                  <Button variant="ghost" className="w-full text-brand-blue hover:bg-blue-50 rounded-xl">{t('dashboard.jobs.browseAll')}</Button>
-                </div>
+                ) : !upcomingHearings?.hearings || upcomingHearings.hearings.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-8 text-slate-500">
+                    <Gavel className="h-10 w-10 mb-2 opacity-30" />
+                    <p className="text-sm font-medium">{t('dashboard.hearings.noHearings', 'لا توجد جلسات قادمة')}</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {upcomingHearings.hearings.slice(0, 3).map((hearing: any) => {
+                      const hearingDate = new Date(hearing.date)
+                      const isToday = hearingDate.toDateString() === new Date().toDateString()
+                      const isTomorrow = hearingDate.toDateString() === new Date(Date.now() + 86400000).toDateString()
+                      return (
+                        <div key={hearing._id} className={`p-3 rounded-xl border ${isToday ? 'bg-red-50 border-red-200' : isTomorrow ? 'bg-amber-50 border-amber-200' : 'bg-blue-50 border-blue-100'}`}>
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <h4 className="font-bold text-navy text-sm truncate">{hearing.caseName || hearing.caseNumber}</h4>
+                              <p className="text-xs text-slate-500 mt-1">{hearing.court}</p>
+                            </div>
+                            <span className={`text-xs font-bold px-2 py-1 rounded-lg ${isToday ? 'bg-red-100 text-red-700' : isTomorrow ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}`}>
+                              {isToday ? t('dashboard.hearings.today', 'اليوم') : isTomorrow ? t('dashboard.hearings.tomorrow', 'غداً') : hearingDate.toLocaleDateString('ar-SA', { month: 'short', day: 'numeric' })}
+                            </span>
+                          </div>
+                          <div className="mt-2 flex items-center gap-2 text-xs text-slate-600">
+                            <CalendarClock className="h-3 w-3" />
+                            <span>{hearingDate.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}</span>
+                            {hearing.courtRoom && <span>• {hearing.courtRoom}</span>}
+                          </div>
+                        </div>
+                      )
+                    })}
+                    {upcomingHearings.total > 3 && (
+                      <Button variant="ghost" className="w-full text-blue-600 hover:bg-blue-50 rounded-xl text-sm">
+                        {t('dashboard.hearings.viewAll', 'عرض الكل')} ({upcomingHearings.total})
+                      </Button>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
 
-            <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all group cursor-pointer">
-              <CardHeader>
+            {/* Upcoming Deadlines Card */}
+            <Card className="rounded-3xl border-slate-100 shadow-sm">
+              <CardHeader className="pb-2">
                 <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                  <GraduationCap className="h-5 w-5 text-purple-600" />
-                  {t('dashboard.training.title')}
+                  <AlertTriangle className="h-5 w-5 text-amber-600" />
+                  {t('dashboard.deadlines.title', 'المواعيد النهائية')}
                 </CardTitle>
+                <CardDescription>{t('dashboard.deadlines.next14Days', 'خلال 14 يوم')}</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="bg-purple-50 p-4 rounded-2xl border border-purple-100">
-                    <h4 className="font-bold text-navy">{t('dashboard.training.sampleCourse.title')}</h4>
-                    <p className="text-xs text-slate-500 mt-1">{t('dashboard.training.sampleCourse.provider')}</p>
-                    <div className="mt-3 w-full bg-white rounded-full h-2 overflow-hidden">
-                      <div className="bg-purple-500 h-full w-3/4"></div>
-                    </div>
-                    <p className="text-xs text-purple-600 font-bold mt-2 text-start">{t('dashboard.training.progress', { percent: 75 })}</p>
+                {deadlinesLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-navy" />
                   </div>
-                  <Button variant="ghost" className="w-full text-purple-600 hover:bg-purple-50 rounded-xl">{t('dashboard.training.continue')}</Button>
-                </div>
+                ) : !upcomingDeadlines?.deadlines || upcomingDeadlines.deadlines.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-8 text-slate-500">
+                    <AlertTriangle className="h-10 w-10 mb-2 opacity-30" />
+                    <p className="text-sm font-medium">{t('dashboard.deadlines.noDeadlines', 'لا توجد مواعيد نهائية')}</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {upcomingDeadlines.deadlines.slice(0, 3).map((deadline: any) => {
+                      const isUrgent = deadline.daysRemaining <= 3
+                      const isWarning = deadline.daysRemaining <= 7 && deadline.daysRemaining > 3
+                      return (
+                        <div key={deadline._id} className={`p-3 rounded-xl border ${isUrgent ? 'bg-red-50 border-red-200' : isWarning ? 'bg-amber-50 border-amber-200' : 'bg-slate-50 border-slate-200'}`}>
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <h4 className="font-bold text-navy text-sm truncate">{deadline.title}</h4>
+                              <p className="text-xs text-slate-500 mt-1">{deadline.caseName}</p>
+                            </div>
+                            <span className={`text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1 ${isUrgent ? 'bg-red-100 text-red-700' : isWarning ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-700'}`}>
+                              {isUrgent && <AlertCircle className="h-3 w-3" />}
+                              {deadline.daysRemaining === 0 ? t('dashboard.deadlines.today', 'اليوم') :
+                               deadline.daysRemaining === 1 ? t('dashboard.deadlines.tomorrow', 'غداً') :
+                               t('dashboard.deadlines.daysLeft', '{{days}} يوم', { days: deadline.daysRemaining })}
+                            </span>
+                          </div>
+                          <div className="mt-2 flex items-center gap-2">
+                            <span className={`text-xs px-2 py-0.5 rounded ${deadline.priority === 'high' ? 'bg-red-100 text-red-700' : deadline.priority === 'medium' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}`}>
+                              {deadline.priority === 'high' ? t('dashboard.deadlines.highPriority', 'عالية') : deadline.priority === 'medium' ? t('dashboard.deadlines.mediumPriority', 'متوسطة') : t('dashboard.deadlines.lowPriority', 'منخفضة')}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                    {upcomingDeadlines.total > 3 && (
+                      <Button variant="ghost" className="w-full text-amber-600 hover:bg-amber-50 rounded-xl text-sm">
+                        {t('dashboard.deadlines.viewAll', 'عرض الكل')} ({upcomingDeadlines.total})
+                      </Button>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -599,22 +685,26 @@ interface AnalyticsTabProps {
   t: (key: string, options?: any) => string
   crmStats: any
   crmLoading: boolean
-  hrStats: any
-  hrLoading: boolean
   financeStats: any
   financeStatsLoading: boolean
   caseStats: any
+  timeEntrySummary: any
+  timeEntryLoading: boolean
+  pendingDocuments: any
+  documentsLoading: boolean
 }
 
 function AnalyticsTab({
   t,
   crmStats,
   crmLoading,
-  hrStats,
-  hrLoading,
   financeStats,
   financeStatsLoading,
   caseStats,
+  timeEntrySummary,
+  timeEntryLoading,
+  pendingDocuments,
+  documentsLoading,
 }: AnalyticsTabProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -666,48 +756,48 @@ function AnalyticsTab({
         </CardContent>
       </Card>
 
-      {/* HR Card */}
+      {/* Billable Hours Card */}
       <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-purple-500" />
-            {t('dashboard.analytics.hr', 'الموارد البشرية')}
+            <Timer className="h-5 w-5 text-purple-500" />
+            {t('dashboard.analytics.billableHours', 'ساعات العمل')}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {hrLoading ? (
+          {timeEntryLoading ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-navy" />
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-purple-50 rounded-xl">
+              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-xl">
                 <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-purple-500" />
-                  <span className="text-xs font-medium text-slate-600">{t('dashboard.analytics.totalEmployees', 'إجمالي الموظفين')}</span>
+                  <Clock className="h-4 w-4 text-blue-500" />
+                  <span className="text-xs font-medium text-slate-600">{t('dashboard.analytics.today', 'اليوم')}</span>
                 </div>
-                <span className="font-bold text-navy">{hrStats?.totalEmployees || 0}</span>
+                <span className="font-bold text-navy">{timeEntrySummary?.today?.hours || 0} {t('dashboard.analytics.hours', 'ساعة')}</span>
               </div>
               <div className="flex items-center justify-between p-3 bg-green-50 rounded-xl">
                 <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-green-500" />
-                  <span className="text-xs font-medium text-slate-600">{t('dashboard.analytics.attendanceRate', 'نسبة الحضور')}</span>
+                  <Timer className="h-4 w-4 text-green-500" />
+                  <span className="text-xs font-medium text-slate-600">{t('dashboard.analytics.thisWeek', 'هذا الأسبوع')}</span>
                 </div>
-                <span className="font-bold text-green-600">{hrStats?.attendanceRate || 0}%</span>
+                <span className="font-bold text-green-600">{timeEntrySummary?.thisWeek?.hours || 0} {t('dashboard.analytics.hours', 'ساعة')}</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-purple-50 rounded-xl">
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4 text-purple-500" />
+                  <span className="text-xs font-medium text-slate-600">{t('dashboard.analytics.thisMonth', 'هذا الشهر')}</span>
+                </div>
+                <span className="font-bold text-purple-600">{timeEntrySummary?.thisMonth?.hours || 0} {t('dashboard.analytics.hours', 'ساعة')}</span>
               </div>
               <div className="flex items-center justify-between p-3 bg-amber-50 rounded-xl">
                 <div className="flex items-center gap-2">
-                  <CalendarOff className="h-4 w-4 text-amber-500" />
-                  <span className="text-xs font-medium text-slate-600">{t('dashboard.analytics.pendingLeaves', 'إجازات معلقة')}</span>
+                  <Receipt className="h-4 w-4 text-amber-500" />
+                  <span className="text-xs font-medium text-slate-600">{t('dashboard.analytics.unbilled', 'غير مفوترة')}</span>
                 </div>
-                <span className="font-bold text-amber-600">{hrStats?.pendingLeaves || 0}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-xl">
-                <div className="flex items-center gap-2">
-                  <Briefcase className="h-4 w-4 text-blue-500" />
-                  <span className="text-xs font-medium text-slate-600">{t('dashboard.analytics.openPositions', 'وظائف شاغرة')}</span>
-                </div>
-                <span className="font-bold text-blue-600">{hrStats?.openPositions || 0}</span>
+                <span className="font-bold text-amber-600">{timeEntrySummary?.unbilled?.hours || 0} {t('dashboard.analytics.hours', 'ساعة')}</span>
               </div>
             </div>
           )}
