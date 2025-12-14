@@ -83,3 +83,79 @@ export const useMessageStats = () => {
     retry: 1, // Reduce retries to minimize 401 spam
   })
 }
+
+// ==================== ANALYTICS TAB STATS ====================
+
+export const useCRMStats = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  return useQuery({
+    queryKey: ['dashboard', 'crm-stats'],
+    queryFn: () => dashboardService.getCRMStats(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: isAuthenticated,
+    retry: 1,
+  })
+}
+
+export const useHRStats = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  return useQuery({
+    queryKey: ['dashboard', 'hr-stats'],
+    queryFn: () => dashboardService.getHRStats(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: isAuthenticated,
+    retry: 1,
+  })
+}
+
+export const useFinanceStats = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  return useQuery({
+    queryKey: ['dashboard', 'finance-stats'],
+    queryFn: () => dashboardService.getFinanceStats(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: isAuthenticated,
+    retry: 1,
+  })
+}
+
+// ==================== REPORTS TAB CHARTS ====================
+
+export const useCasesChart = (months = 12) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  return useQuery({
+    queryKey: ['reports', 'cases-chart', months],
+    queryFn: () => dashboardService.getCasesChart(months),
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    enabled: isAuthenticated,
+    retry: 1,
+  })
+}
+
+export const useRevenueChart = (months = 12) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  return useQuery({
+    queryKey: ['reports', 'revenue-chart', months],
+    queryFn: () => dashboardService.getRevenueChart(months),
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    enabled: isAuthenticated,
+    retry: 1,
+  })
+}
+
+export const useTasksChart = (months = 12) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  return useQuery({
+    queryKey: ['reports', 'tasks-chart', months],
+    queryFn: () => dashboardService.getTasksChart(months),
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    enabled: isAuthenticated,
+    retry: 1,
+  })
+}

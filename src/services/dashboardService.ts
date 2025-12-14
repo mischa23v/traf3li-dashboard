@@ -85,6 +85,96 @@ export interface MessageStats {
 }
 
 /**
+ * CRM Stats Interface (from /api/dashboard/crm-stats)
+ */
+export interface CRMStats {
+  totalClients: number
+  newClientsThisMonth: number
+  activeLeads: number
+  conversionRate: number
+  clientsByStatus: { active: number; inactive: number }
+  leadsByStatus: { new: number; qualified: number; converted: number }
+}
+
+/**
+ * HR Stats Interface (from /api/dashboard/hr-stats)
+ */
+export interface HRStats {
+  totalEmployees: number
+  attendanceRate: number
+  pendingLeaves: number
+  openPositions: number
+  activeEmployees: number
+  presentToday: number
+}
+
+/**
+ * Finance Stats Interface (from /api/dashboard/finance-stats)
+ */
+export interface FinanceStats {
+  totalRevenue: number
+  expenses: number
+  profitMargin: number
+  pendingInvoices: number
+  pendingInvoicesCount: number
+  paidInvoicesCount: number
+  netProfit: number
+}
+
+/**
+ * Chart Data Point Interface
+ */
+export interface ChartDataPoint {
+  month: string
+  label: string
+}
+
+/**
+ * Cases Chart Data Interface
+ */
+export interface CasesChartData extends ChartDataPoint {
+  total: number
+  opened: number
+  closed: number
+  pending: number
+}
+
+/**
+ * Revenue Chart Data Interface
+ */
+export interface RevenueChartData extends ChartDataPoint {
+  revenue: number
+  collected: number
+  expenses: number
+  profit: number
+  invoiceCount: number
+  collectionRate: number
+}
+
+/**
+ * Tasks Chart Data Interface
+ */
+export interface TasksChartData extends ChartDataPoint {
+  total: number
+  completed: number
+  inProgress: number
+  pending: number
+  overdue: number
+  completionRate: number
+}
+
+/**
+ * Chart Response Interface
+ */
+export interface ChartResponse<T> {
+  success: boolean
+  report: string
+  period: { months: number; startDate: string }
+  data: T[]
+  summary?: Record<string, number>
+}
+
+/**
  * Get Dashboard Statistics (uses hero-stats endpoint)
  */
 export const getDashboardStats = async (): Promise<DashboardStats> => {
@@ -195,6 +285,84 @@ export const getMessageStats = async (): Promise<MessageStats> => {
   }
 }
 
+/**
+ * Get CRM Statistics
+ * GET /dashboard/crm-stats
+ */
+export const getCRMStats = async (): Promise<CRMStats> => {
+  try {
+    const response = await apiClient.get('/dashboard/crm-stats')
+    return response.data.stats
+  } catch (error) {
+    throw handleApiError(error)
+  }
+}
+
+/**
+ * Get HR Statistics
+ * GET /dashboard/hr-stats
+ */
+export const getHRStats = async (): Promise<HRStats> => {
+  try {
+    const response = await apiClient.get('/dashboard/hr-stats')
+    return response.data.stats
+  } catch (error) {
+    throw handleApiError(error)
+  }
+}
+
+/**
+ * Get Finance Statistics
+ * GET /dashboard/finance-stats
+ */
+export const getFinanceStats = async (): Promise<FinanceStats> => {
+  try {
+    const response = await apiClient.get('/dashboard/finance-stats')
+    return response.data.stats
+  } catch (error) {
+    throw handleApiError(error)
+  }
+}
+
+/**
+ * Get Cases Chart Data
+ * GET /reports/cases-chart
+ */
+export const getCasesChart = async (months = 12): Promise<ChartResponse<CasesChartData>> => {
+  try {
+    const response = await apiClient.get('/reports/cases-chart', { params: { months } })
+    return response.data
+  } catch (error) {
+    throw handleApiError(error)
+  }
+}
+
+/**
+ * Get Revenue Chart Data
+ * GET /reports/revenue-chart
+ */
+export const getRevenueChart = async (months = 12): Promise<ChartResponse<RevenueChartData>> => {
+  try {
+    const response = await apiClient.get('/reports/revenue-chart', { params: { months } })
+    return response.data
+  } catch (error) {
+    throw handleApiError(error)
+  }
+}
+
+/**
+ * Get Tasks Chart Data
+ * GET /reports/tasks-chart
+ */
+export const getTasksChart = async (months = 12): Promise<ChartResponse<TasksChartData>> => {
+  try {
+    const response = await apiClient.get('/reports/tasks-chart', { params: { months } })
+    return response.data
+  } catch (error) {
+    throw handleApiError(error)
+  }
+}
+
 const dashboardService = {
   getDashboardStats,
   getDashboardHeroStats,
@@ -204,6 +372,12 @@ const dashboardService = {
   getActivityOverview,
   getDetailedDashboardStats,
   getMessageStats,
+  getCRMStats,
+  getHRStats,
+  getFinanceStats,
+  getCasesChart,
+  getRevenueChart,
+  getTasksChart,
 }
 
 export default dashboardService
