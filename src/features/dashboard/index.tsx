@@ -50,9 +50,34 @@ import {
 import { useTaskStats } from '@/hooks/useTasks'
 import { useReminderStats } from '@/hooks/useRemindersAndEvents'
 import { useCaseStatisticsFromAPI } from '@/hooks/useCasesAndClients'
+import { useAuthStore } from '@/stores/auth-store'
 
 export function Dashboard() {
   const { t } = useTranslation()
+  const user = useAuthStore((state) => state.user)
+
+  // Get user's display name
+  const getUserDisplayName = () => {
+    if (user?.firstName) {
+      return user.firstName
+    }
+    if (user?.username) {
+      return user.username
+    }
+    return t('common.user', 'مستخدم')
+  }
+
+  // Get time-based greeting
+  const getTimeBasedGreeting = () => {
+    const hour = new Date().getHours()
+    if (hour >= 5 && hour < 12) {
+      return t('dashboard.hero.greetingMorning', 'صباح الخير')
+    } else if (hour >= 12 && hour < 17) {
+      return t('dashboard.hero.greetingAfternoon', 'مساء الخير')
+    } else {
+      return t('dashboard.hero.greetingEvening', 'مساء الخير')
+    }
+  }
 
   // Fetch dashboard data
   const { data: stats, isLoading: statsLoading, error: statsError } = useDashboardStats()
@@ -162,7 +187,7 @@ export function Dashboard() {
                       <CheckSquare className="w-6 h-6 text-emerald-400 fill-emerald-400/20" />
                     </div>
                     <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">
-                      {t('dashboard.hero.greeting')}
+                      {t('dashboard.hero.greeting', { greeting: getTimeBasedGreeting(), name: getUserDisplayName() })}
                     </h1>
                   </div>
                 </div>
