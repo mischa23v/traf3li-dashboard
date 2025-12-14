@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -6,15 +6,14 @@ import { z } from 'zod'
 import { Link, useNavigate } from '@tanstack/react-router'
 import {
     Loader2, User, Building, FileText, Calendar, ChevronDown, ChevronUp,
-    Scale, Flag, Briefcase, Hash, Sparkles, Save, ArrowRight, ArrowLeft,
+    Scale, Flag, Briefcase, Hash, Save, ArrowRight, ArrowLeft,
     Plus, Trash2, Users, Gavel, ScrollText, Building2, Baby, CreditCard,
-    CheckCircle2, Landmark, Tag
+    CheckCircle2, Landmark, Tag, Paperclip, Upload
 } from 'lucide-react'
 import { saudiNationalIdSchemaOptional, saudiCrNumberSchemaOptional } from '@/lib/zod-validators'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import {
     Select,
@@ -45,17 +44,18 @@ const FIELD_TOOLTIPS = {
     category: 'تصنيف القضية يساعد في تحديد الإجراءات والنماذج المطلوبة',
     subCategory: 'التصنيف الفرعي يحدد نوع القضية بشكل أدق',
     priority: 'تحديد أولوية القضية يساعد في ترتيب العمل',
-    filingDate: 'تاريخ تقديم الدعوى للمحكمة',
-    caseNumber: 'رقم القضية المسجل في المحكمة',
-    internalReference: 'رقم مرجعي داخلي للمكتب',
+    filingDate: 'تاريخ تقديم صحيفة الدعوى للمحكمة',
+    caseNumber: 'رقم القضية المسجل في ناجز',
+    internalReference: 'رقم مرجعي داخلي للمكتب يتم توليده تلقائياً',
     entityType: 'اختر محكمة أو لجنة حسب اختصاص القضية',
     region: 'المنطقة الإدارية التي تقع فيها المحكمة',
     plaintiff: 'الطرف الذي يرفع الدعوى',
     defendant: 'الطرف المرفوعة عليه الدعوى',
-    claims: 'المطالبات المالية وغيرها المطلوبة في الدعوى',
+    claims: 'الطلبات والمطالبات المالية المطلوبة في صحيفة الدعوى',
     laborDetails: 'بيانات العلاقة العمالية المطلوبة للقضايا العمالية',
     powerOfAttorney: 'بيانات الوكالة الشرعية للتمثيل أمام المحكمة',
     team: 'فريق العمل المسؤول عن متابعة القضية',
+    attachments: 'المستندات والوثائق المرفقة مع صحيفة الدعوى',
 }
 
 // ==================== CONSTANTS ====================
@@ -191,12 +191,21 @@ const PRIORITY_OPTIONS = [
     { value: 'critical', label: 'عاجلة', dotColor: 'bg-red-500' },
 ]
 
-// Party types
+// Party types (per Najiz)
 const PARTY_TYPES = [
-    { value: 'individual', label: 'فرد' },
-    { value: 'company', label: 'شركة / مؤسسة' },
+    { value: 'individual', label: 'شخص طبيعي' },
+    { value: 'company', label: 'شخص اعتباري (شركة / مؤسسة)' },
     { value: 'government', label: 'جهة حكومية' },
 ]
+
+// Generate internal reference number
+const generateInternalReference = () => {
+    const year = new Date().getFullYear()
+    const storedCount = localStorage.getItem('caseReferenceCount') || '0'
+    const count = parseInt(storedCount, 10) + 1
+    localStorage.setItem('caseReferenceCount', count.toString())
+    return `${year}/${count.toString().padStart(4, '0')}`
+}
 
 // Claim types
 const CLAIM_TYPES = [
@@ -248,6 +257,7 @@ const createCaseSchema = z.object({
     plaintiffCity: z.string().optional(),
     // Company plaintiff
     plaintiffCompanyName: z.string().optional(),
+    plaintiffUnifiedNumber: z.string().regex(/^7\d{9}$/, 'الرقم الوطني الموحد يبدأ بـ 7 ويتكون من 10 أرقام').optional().or(z.literal('')),
     plaintiffCrNumber: saudiCrNumberSchemaOptional,
     plaintiffCompanyAddress: z.string().optional(),
     plaintiffRepresentativeName: z.string().optional(),
@@ -266,6 +276,7 @@ const createCaseSchema = z.object({
     defendantCity: z.string().optional(),
     // Company defendant
     defendantCompanyName: z.string().optional(),
+    defendantUnifiedNumber: z.string().regex(/^7\d{9}$/, 'الرقم الوطني الموحد يبدأ بـ 7 ويتكون من 10 أرقام').optional().or(z.literal('')),
     defendantCrNumber: saudiCrNumberSchemaOptional,
     defendantCompanyAddress: z.string().optional(),
     defendantRepresentativeName: z.string().optional(),
@@ -306,7 +317,6 @@ const createCaseSchema = z.object({
     // Step 4: Court & Team
     circuitNumber: z.string().optional(),
     judgeName: z.string().optional(),
-    courtRoom: z.string().optional(),
 
     // Team
     assignedLawyer: z.string().optional(),
@@ -360,6 +370,12 @@ export function CreateCaseView() {
         control,
         name: 'claims',
     })
+
+    // Auto-generate internal reference on mount
+    useEffect(() => {
+        const generatedRef = generateInternalReference()
+        setValue('internalReference', generatedRef)
+    }, [setValue])
 
     const selectedCategory = watch('category')
     const selectedPriority = watch('priority')
@@ -476,11 +492,10 @@ export function CreateCaseView() {
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                         <Scale className="w-4 h-4 text-emerald-500" />
-                        {t('cases.caseTitle', 'عنوان القضية')}
+                        عنوان القضية
                         <FieldTooltip content={FIELD_TOOLTIPS.title} />
                     </label>
                     <Input
-                        placeholder={t('cases.titlePlaceholder', 'مثال: دعوى مطالبة بأجور متأخرة')}
                         className={cn(
                             "rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-12 text-lg",
                             errors.title && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
@@ -488,13 +503,8 @@ export function CreateCaseView() {
                         {...register('title')}
                         autoComplete="off"
                     />
-                    {errors.title ? (
+                    {errors.title && (
                         <p className="text-sm text-red-500">{errors.title.message}</p>
-                    ) : (
-                        <p className="text-xs text-slate-400 flex items-center gap-1">
-                            <Sparkles className="w-3 h-3" />
-                            {t('cases.titleHint', 'عنوان واضح يسهل البحث عن القضية')}
-                        </p>
                     )}
                 </div>
             </div>
@@ -504,12 +514,12 @@ export function CreateCaseView() {
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                         <Tag className="w-4 h-4 text-emerald-500" />
-                        {t('cases.caseType', 'التصنيف الرئيسي')}
+                        التصنيف الرئيسي
                         <FieldTooltip content={FIELD_TOOLTIPS.category} />
                     </label>
                     <Select value={selectedCategory} onValueChange={handleCategoryChange}>
                         <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-11">
-                            <SelectValue placeholder={t('cases.selectType', 'اختر نوع القضية')} />
+                            <SelectValue placeholder="اختر تصنيف الدعوى" />
                         </SelectTrigger>
                         <SelectContent>
                             {CASE_CATEGORIES.map(option => (
@@ -526,7 +536,7 @@ export function CreateCaseView() {
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                         <ScrollText className="w-4 h-4 text-emerald-500" />
-                        {t('cases.subCategory', 'التصنيف الفرعي')}
+                        التصنيف الفرعي
                         <FieldTooltip content={FIELD_TOOLTIPS.subCategory} />
                     </label>
                     <Select
@@ -535,7 +545,7 @@ export function CreateCaseView() {
                         disabled={!selectedCategory}
                     >
                         <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-11">
-                            <SelectValue placeholder={t('cases.selectSubCategory', 'اختر التصنيف الفرعي')} />
+                            <SelectValue placeholder="اختر التصنيف الفرعي" />
                         </SelectTrigger>
                         <SelectContent>
                             {getSubCategories(selectedCategory || '').map(option => (
@@ -553,7 +563,7 @@ export function CreateCaseView() {
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                         <Flag className="w-4 h-4 text-emerald-500" />
-                        {t('cases.priority', 'الأولوية')}
+                        الأولوية
                         <FieldTooltip content={FIELD_TOOLTIPS.priority} />
                     </label>
                     <Select
@@ -561,7 +571,7 @@ export function CreateCaseView() {
                         onValueChange={(v) => setValue('priority', v as CasePriority)}
                     >
                         <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-11">
-                            <SelectValue placeholder={t('cases.selectPriority', 'اختر الأولوية')} />
+                            <SelectValue placeholder="اختر الأولوية" />
                         </SelectTrigger>
                         <SelectContent>
                             {PRIORITY_OPTIONS.map(option => (
@@ -579,7 +589,7 @@ export function CreateCaseView() {
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-emerald-500" />
-                        {t('cases.filingDate', 'تاريخ رفع الدعوى')}
+                        تاريخ تقديم صحيفة الدعوى
                         <FieldTooltip content={FIELD_TOOLTIPS.filingDate} />
                     </label>
                     <Input
@@ -595,11 +605,10 @@ export function CreateCaseView() {
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                         <Hash className="w-4 h-4 text-emerald-500" />
-                        {t('cases.caseNumber', 'رقم القضية (المحكمة)')}
+                        رقم القضية (ناجز)
                         <FieldTooltip content={FIELD_TOOLTIPS.caseNumber} />
                     </label>
                     <Input
-                        placeholder="12345/1445"
                         className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11"
                         {...register('caseNumber')}
                     />
@@ -608,13 +617,13 @@ export function CreateCaseView() {
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                         <Hash className="w-4 h-4 text-emerald-500" />
-                        {t('cases.internalReference', 'الرقم المرجعي الداخلي')}
+                        الرقم المرجعي الداخلي
                         <FieldTooltip content={FIELD_TOOLTIPS.internalReference} />
                     </label>
                     <Input
-                        placeholder="CASE-2024-001"
-                        className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11"
+                        className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-slate-50"
                         {...register('internalReference')}
+                        readOnly
                     />
                 </div>
             </div>
@@ -623,7 +632,7 @@ export function CreateCaseView() {
             <div className="border-t border-slate-100 pt-6">
                 <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
                     <Landmark className="w-5 h-5 text-emerald-500" />
-                    {t('cases.courtCommittee', 'المحكمة / اللجنة')}
+                    الجهة القضائية
                     <FieldTooltip content={FIELD_TOOLTIPS.entityType} />
                 </h3>
 
@@ -638,7 +647,7 @@ export function CreateCaseView() {
                                 onChange={() => setValue('entityType', 'court')}
                                 className="w-4 h-4 text-emerald-600 border-slate-300 focus:ring-emerald-500"
                             />
-                            <span className="text-sm font-medium text-slate-700">{t('cases.court', 'محكمة')}</span>
+                            <span className="text-sm font-medium text-slate-700">محكمة</span>
                         </label>
                         <label className="flex items-center gap-2 cursor-pointer">
                             <input
@@ -648,7 +657,7 @@ export function CreateCaseView() {
                                 onChange={() => setValue('entityType', 'committee')}
                                 className="w-4 h-4 text-emerald-600 border-slate-300 focus:ring-emerald-500"
                             />
-                            <span className="text-sm font-medium text-slate-700">{t('cases.committee', 'لجنة')}</span>
+                            <span className="text-sm font-medium text-slate-700">لجنة</span>
                         </label>
                     </div>
 
@@ -656,10 +665,10 @@ export function CreateCaseView() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {entityType === 'court' ? (
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.selectCourt', 'اختر المحكمة')}</label>
+                                <label className="text-sm font-medium text-slate-700">المحكمة</label>
                                 <Select value={watch('court')} onValueChange={(v) => setValue('court', v)}>
                                     <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-11 bg-white">
-                                        <SelectValue placeholder={t('cases.selectCourt', 'اختر المحكمة')} />
+                                        <SelectValue placeholder="اختر المحكمة" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {COURTS.map(court => (
@@ -672,10 +681,10 @@ export function CreateCaseView() {
                             </div>
                         ) : (
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.selectCommittee', 'اختر اللجنة')}</label>
+                                <label className="text-sm font-medium text-slate-700">اللجنة</label>
                                 <Select value={watch('committee')} onValueChange={(v) => setValue('committee', v)}>
                                     <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-11 bg-white">
-                                        <SelectValue placeholder={t('cases.selectCommittee', 'اختر اللجنة')} />
+                                        <SelectValue placeholder="اختر اللجنة" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {COMMITTEES.map(committee => (
@@ -691,12 +700,12 @@ export function CreateCaseView() {
                         {/* Region */}
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                {t('cases.region', 'المنطقة')}
+                                المنطقة الإدارية
                                 <FieldTooltip content={FIELD_TOOLTIPS.region} />
                             </label>
                             <Select value={selectedRegion} onValueChange={(v) => { setValue('region', v); setValue('city', undefined) }}>
                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-11 bg-white">
-                                    <SelectValue placeholder={t('cases.selectRegion', 'اختر المنطقة')} />
+                                    <SelectValue placeholder="اختر المنطقة" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {REGIONS.map(region => (
@@ -712,10 +721,10 @@ export function CreateCaseView() {
                     {/* City */}
                     {selectedRegion && (
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">{t('cases.city', 'المدينة')}</label>
+                            <label className="text-sm font-medium text-slate-700">المدينة</label>
                             <Select value={watch('city')} onValueChange={(v) => setValue('city', v)}>
                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-11 bg-white">
-                                    <SelectValue placeholder={t('cases.selectCity', 'اختر المدينة')} />
+                                    <SelectValue placeholder="اختر المدينة" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {getCitiesForRegion(selectedRegion).map(city => (
@@ -734,10 +743,9 @@ export function CreateCaseView() {
             <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                     <FileText className="w-4 h-4 text-emerald-500" />
-                    {t('cases.description', 'وصف القضية')}
+                    ملخص القضية
                 </label>
                 <Textarea
-                    placeholder={t('cases.descriptionPlaceholder', 'أدخل وصفاً مختصراً للقضية...')}
                     className="min-h-[120px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
                     {...register('description')}
                 />
@@ -752,14 +760,14 @@ export function CreateCaseView() {
             <div className="border-t border-slate-100 pt-6 first:border-t-0 first:pt-0">
                 <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
                     <User className="w-5 h-5 text-emerald-500" />
-                    {t('cases.plaintiff', 'المدعي')}
+                    المدعي
                     <FieldTooltip content={FIELD_TOOLTIPS.plaintiff} />
                 </h3>
 
                 <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
                     {/* Party Type Selection */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-700">{t('cases.partyType', 'نوع الطرف')}</label>
+                        <label className="text-sm font-medium text-slate-700">نوع الطرف</label>
                         <Select value={plaintiffType} onValueChange={(v) => setValue('plaintiffType', v as any)}>
                             <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-11 bg-white">
                                 <SelectValue />
@@ -778,24 +786,24 @@ export function CreateCaseView() {
                     {plaintiffType === 'individual' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.fullName', 'الاسم الكامل')}</label>
+                                <label className="text-sm font-medium text-slate-700">الاسم الكامل</label>
                                 <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffName')} />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.nationalId', 'رقم الهوية / الإقامة')}</label>
-                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffNationalId')} placeholder="1234567890" />
+                                <label className="text-sm font-medium text-slate-700">رقم الهوية / الإقامة</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffNationalId')} />
                                 {errors.plaintiffNationalId && <p className="text-sm text-red-500 mt-1">{errors.plaintiffNationalId.message}</p>}
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.phone', 'رقم الجوال')}</label>
-                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffPhone')} placeholder="+966501234567" />
+                                <label className="text-sm font-medium text-slate-700">رقم الجوال</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffPhone')} />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.email', 'البريد الإلكتروني')}</label>
+                                <label className="text-sm font-medium text-slate-700">البريد الإلكتروني</label>
                                 <Input type="email" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffEmail')} />
                             </div>
                             <div className="md:col-span-2 space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.address', 'العنوان')}</label>
+                                <label className="text-sm font-medium text-slate-700">العنوان</label>
                                 <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffAddress')} />
                             </div>
                         </div>
@@ -805,24 +813,29 @@ export function CreateCaseView() {
                     {plaintiffType === 'company' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.companyName', 'اسم الشركة / المؤسسة')}</label>
+                                <label className="text-sm font-medium text-slate-700">اسم الشركة / المؤسسة</label>
                                 <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffCompanyName')} />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.crNumber', 'رقم السجل التجاري')}</label>
-                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffCrNumber')} placeholder="1234567890" />
+                                <label className="text-sm font-medium text-slate-700">الرقم الوطني الموحد للمنشأة</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffUnifiedNumber')} dir="ltr" />
+                                {errors.plaintiffUnifiedNumber && <p className="text-sm text-red-500 mt-1">{errors.plaintiffUnifiedNumber.message}</p>}
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700">رقم السجل التجاري</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffCrNumber')} dir="ltr" />
                                 {errors.plaintiffCrNumber && <p className="text-sm text-red-500 mt-1">{errors.plaintiffCrNumber.message}</p>}
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.representativeName', 'اسم الممثل النظامي')}</label>
+                                <label className="text-sm font-medium text-slate-700">اسم الممثل النظامي</label>
                                 <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffRepresentativeName')} />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.representativePosition', 'صفته')}</label>
-                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffRepresentativePosition')} placeholder="مدير عام" />
+                                <label className="text-sm font-medium text-slate-700">صفته</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffRepresentativePosition')} />
                             </div>
                             <div className="md:col-span-2 space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.address', 'العنوان')}</label>
+                                <label className="text-sm font-medium text-slate-700">العنوان</label>
                                 <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffCompanyAddress')} />
                             </div>
                         </div>
@@ -832,11 +845,11 @@ export function CreateCaseView() {
                     {plaintiffType === 'government' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.govEntity', 'الجهة الحكومية')}</label>
-                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffGovEntity')} placeholder="وزارة / هيئة / مؤسسة" />
+                                <label className="text-sm font-medium text-slate-700">الجهة الحكومية</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffGovEntity')} />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.govRepresentative', 'ممثل الجهة')}</label>
+                                <label className="text-sm font-medium text-slate-700">ممثل الجهة</label>
                                 <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffGovRepresentative')} />
                             </div>
                         </div>
@@ -848,14 +861,14 @@ export function CreateCaseView() {
             <div className="border-t border-slate-100 pt-6">
                 <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
                     <Building className="w-5 h-5 text-emerald-500" />
-                    {t('cases.defendant', 'المدعى عليه')}
+                    المدعى عليه
                     <FieldTooltip content={FIELD_TOOLTIPS.defendant} />
                 </h3>
 
                 <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
                     {/* Party Type Selection */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-700">{t('cases.partyType', 'نوع الطرف')}</label>
+                        <label className="text-sm font-medium text-slate-700">نوع الطرف</label>
                         <Select value={defendantType} onValueChange={(v) => setValue('defendantType', v as any)}>
                             <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-11 bg-white">
                                 <SelectValue />
@@ -874,24 +887,24 @@ export function CreateCaseView() {
                     {defendantType === 'individual' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.fullName', 'الاسم الكامل')}</label>
+                                <label className="text-sm font-medium text-slate-700">الاسم الكامل</label>
                                 <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantName')} />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.nationalId', 'رقم الهوية / الإقامة')}</label>
-                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantNationalId')} placeholder="1234567890" />
+                                <label className="text-sm font-medium text-slate-700">رقم الهوية / الإقامة</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantNationalId')} />
                                 {errors.defendantNationalId && <p className="text-sm text-red-500 mt-1">{errors.defendantNationalId.message}</p>}
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.phone', 'رقم الجوال')}</label>
-                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantPhone')} placeholder="+966501234567" />
+                                <label className="text-sm font-medium text-slate-700">رقم الجوال</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantPhone')} />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.email', 'البريد الإلكتروني')}</label>
+                                <label className="text-sm font-medium text-slate-700">البريد الإلكتروني</label>
                                 <Input type="email" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantEmail')} />
                             </div>
                             <div className="md:col-span-2 space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.address', 'العنوان')}</label>
+                                <label className="text-sm font-medium text-slate-700">العنوان</label>
                                 <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantAddress')} />
                             </div>
                         </div>
@@ -901,24 +914,29 @@ export function CreateCaseView() {
                     {defendantType === 'company' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.companyName', 'اسم الشركة / المؤسسة')}</label>
+                                <label className="text-sm font-medium text-slate-700">اسم الشركة / المؤسسة</label>
                                 <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantCompanyName')} />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.crNumber', 'رقم السجل التجاري')}</label>
-                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantCrNumber')} placeholder="1234567890" />
+                                <label className="text-sm font-medium text-slate-700">الرقم الوطني الموحد للمنشأة</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantUnifiedNumber')} dir="ltr" />
+                                {errors.defendantUnifiedNumber && <p className="text-sm text-red-500 mt-1">{errors.defendantUnifiedNumber.message}</p>}
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700">رقم السجل التجاري</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantCrNumber')} dir="ltr" />
                                 {errors.defendantCrNumber && <p className="text-sm text-red-500 mt-1">{errors.defendantCrNumber.message}</p>}
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.representativeName', 'اسم الممثل النظامي')}</label>
+                                <label className="text-sm font-medium text-slate-700">اسم الممثل النظامي</label>
                                 <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantRepresentativeName')} />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.representativePosition', 'صفته')}</label>
-                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantRepresentativePosition')} placeholder="مدير عام" />
+                                <label className="text-sm font-medium text-slate-700">صفته</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantRepresentativePosition')} />
                             </div>
                             <div className="md:col-span-2 space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.address', 'العنوان')}</label>
+                                <label className="text-sm font-medium text-slate-700">العنوان</label>
                                 <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantCompanyAddress')} />
                             </div>
                         </div>
@@ -928,11 +946,11 @@ export function CreateCaseView() {
                     {defendantType === 'government' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.govEntity', 'الجهة الحكومية')}</label>
-                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantGovEntity')} placeholder="وزارة / هيئة / مؤسسة" />
+                                <label className="text-sm font-medium text-slate-700">الجهة الحكومية</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantGovEntity')} />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">{t('cases.govRepresentative', 'ممثل الجهة')}</label>
+                                <label className="text-sm font-medium text-slate-700">ممثل الجهة</label>
                                 <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantGovRepresentative')} />
                             </div>
                         </div>
@@ -950,11 +968,10 @@ export function CreateCaseView() {
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                         <ScrollText className="w-4 h-4 text-emerald-500" />
-                        {t('cases.caseSubject', 'موضوع الدعوى')}
+                        موضوع الدعوى
                     </label>
                     <Textarea
                         className="min-h-[100px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
-                        placeholder={t('cases.caseSubjectPlaceholder', 'ملخص موضوع الدعوى...')}
                         {...register('caseSubject')}
                     />
                 </div>
@@ -962,11 +979,10 @@ export function CreateCaseView() {
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                         <FileText className="w-4 h-4 text-emerald-500" />
-                        {t('cases.legalBasis', 'السند النظامي')}
+                        السند النظامي
                     </label>
                     <Textarea
                         className="min-h-[100px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
-                        placeholder={t('cases.legalBasisPlaceholder', 'المواد القانونية والأنظمة المستند إليها...')}
                         {...register('legalBasis')}
                     />
                 </div>
@@ -977,7 +993,7 @@ export function CreateCaseView() {
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
                         <CreditCard className="w-5 h-5 text-emerald-500" />
-                        {t('cases.claims', 'المطالبات')}
+                        المطالبات
                         <FieldTooltip content={FIELD_TOOLTIPS.claims} />
                     </h3>
                     <Button
@@ -988,7 +1004,7 @@ export function CreateCaseView() {
                         className="rounded-xl"
                     >
                         <Plus className="w-4 h-4 ms-2" />
-                        {t('cases.addClaim', 'إضافة مطالبة')}
+                        إضافة مطالبة
                     </Button>
                 </div>
 
@@ -1001,7 +1017,7 @@ export function CreateCaseView() {
                                     onValueChange={(v) => setValue(`claims.${index}.type`, v)}
                                 >
                                     <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-10 bg-white">
-                                        <SelectValue placeholder={t('cases.selectClaimType', 'نوع المطالبة')} />
+                                        <SelectValue placeholder="نوع المطالبة" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {CLAIM_TYPES.map(type => (
@@ -1013,12 +1029,10 @@ export function CreateCaseView() {
                                 </Select>
                                 <Input
                                     type="number"
-                                    placeholder={t('cases.claimAmount', 'المبلغ (ر.س)')}
                                     className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-10 bg-white"
                                     {...register(`claims.${index}.amount`, { valueAsNumber: true })}
                                 />
                                 <Input
-                                    placeholder={t('cases.claimPeriod', 'الفترة (من - إلى)')}
                                     className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-10 bg-white"
                                     {...register(`claims.${index}.period`)}
                                 />
@@ -1038,7 +1052,7 @@ export function CreateCaseView() {
                     {claimFields.length === 0 && (
                         <div className="p-6 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
                             <CreditCard className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                            <p className="text-sm text-slate-500">{t('cases.noClaims', 'لم يتم إضافة مطالبات بعد')}</p>
+                            <p className="text-sm text-slate-500">لم يتم إضافة مطالبات بعد</p>
                         </div>
                     )}
                 </div>
@@ -1046,7 +1060,7 @@ export function CreateCaseView() {
                 {/* Total Claim Amount */}
                 {claimFields.length > 0 && (
                     <div className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl mt-4">
-                        <span className="font-medium text-emerald-700">{t('cases.totalClaims', 'إجمالي المطالبات')}</span>
+                        <span className="font-medium text-emerald-700">إجمالي المطالبات</span>
                         <span className="text-lg font-bold text-emerald-700">
                             {(watch('claims') || []).reduce((sum, claim) => sum + (claim?.amount || 0), 0).toLocaleString('ar-SA')} ر.س
                         </span>
@@ -1063,7 +1077,7 @@ export function CreateCaseView() {
                                 <Button variant="ghost" className="flex-1 justify-start p-0 h-auto hover:bg-transparent">
                                     <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
                                         <Briefcase className="w-5 h-5 text-emerald-500" />
-                                        {t('cases.laborDetails', 'بيانات العلاقة العمالية')}
+                                        بيانات العلاقة العمالية
                                     </h3>
                                 </Button>
                             </CollapsibleTrigger>
@@ -1080,24 +1094,24 @@ export function CreateCaseView() {
                             <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-700">{t('cases.jobTitle', 'المسمى الوظيفي')}</label>
+                                        <label className="text-sm font-medium text-slate-700">المسمى الوظيفي</label>
                                         <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('jobTitle')} />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-700">{t('cases.monthlySalary', 'الراتب الشهري (ر.س)')}</label>
+                                        <label className="text-sm font-medium text-slate-700">الراتب الشهري (ر.س)</label>
                                         <Input type="number" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('monthlySalary', { valueAsNumber: true })} />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-700">{t('cases.employmentStartDate', 'تاريخ بداية العمل')}</label>
+                                        <label className="text-sm font-medium text-slate-700">تاريخ بداية العمل</label>
                                         <Input type="date" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('employmentStartDate')} />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-700">{t('cases.employmentEndDate', 'تاريخ نهاية العمل')}</label>
+                                        <label className="text-sm font-medium text-slate-700">تاريخ نهاية العمل</label>
                                         <Input type="date" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('employmentEndDate')} />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700">{t('cases.terminationReason', 'سبب إنهاء العلاقة العمالية')}</label>
+                                    <label className="text-sm font-medium text-slate-700">سبب إنهاء العلاقة العمالية</label>
                                     <Textarea className="min-h-[80px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 bg-white" {...register('terminationReason')} />
                                 </div>
                             </div>
@@ -1114,7 +1128,7 @@ export function CreateCaseView() {
                                 <Button variant="ghost" className="flex-1 justify-start p-0 h-auto hover:bg-transparent">
                                     <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
                                         <Baby className="w-5 h-5 text-emerald-500" />
-                                        {t('cases.personalStatusDetails', 'بيانات الأحوال الشخصية')}
+                                        بيانات الأحوال الشخصية
                                     </h3>
                                 </Button>
                             </CollapsibleTrigger>
@@ -1128,15 +1142,15 @@ export function CreateCaseView() {
                             <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-700">{t('cases.marriageDate', 'تاريخ الزواج')}</label>
+                                        <label className="text-sm font-medium text-slate-700">تاريخ الزواج</label>
                                         <Input type="date" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('marriageDate')} />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-700">{t('cases.marriageCity', 'مدينة عقد الزواج')}</label>
+                                        <label className="text-sm font-medium text-slate-700">مدينة عقد الزواج</label>
                                         <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('marriageCity')} />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-700">{t('cases.childrenCount', 'عدد الأطفال')}</label>
+                                        <label className="text-sm font-medium text-slate-700">عدد الأطفال</label>
                                         <Input type="number" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('childrenCount', { valueAsNumber: true })} />
                                     </div>
                                 </div>
@@ -1154,7 +1168,7 @@ export function CreateCaseView() {
                                 <Button variant="ghost" className="flex-1 justify-start p-0 h-auto hover:bg-transparent">
                                     <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
                                         <Building2 className="w-5 h-5 text-emerald-500" />
-                                        {t('cases.commercialDetails', 'بيانات العقد التجاري')}
+                                        بيانات العقد التجاري
                                     </h3>
                                 </Button>
                             </CollapsibleTrigger>
@@ -1168,11 +1182,11 @@ export function CreateCaseView() {
                             <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-700">{t('cases.contractDate', 'تاريخ العقد')}</label>
+                                        <label className="text-sm font-medium text-slate-700">تاريخ العقد</label>
                                         <Input type="date" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('contractDate')} />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-700">{t('cases.contractValue', 'قيمة العقد (ر.س)')}</label>
+                                        <label className="text-sm font-medium text-slate-700">قيمة العقد (ر.س)</label>
                                         <Input type="number" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('contractValue', { valueAsNumber: true })} />
                                     </div>
                                 </div>
@@ -1191,22 +1205,18 @@ export function CreateCaseView() {
             <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
                     <Gavel className="w-5 h-5 text-emerald-500" />
-                    {t('cases.courtDetails', 'بيانات المحكمة')}
+                    بيانات المحكمة
                 </h3>
 
                 <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">{t('cases.circuitNumber', 'رقم الدائرة')}</label>
-                            <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('circuitNumber')} placeholder="الدائرة الأولى" />
+                            <label className="text-sm font-medium text-slate-700">رقم الدائرة</label>
+                            <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('circuitNumber')} />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">{t('cases.judgeName', 'اسم القاضي')}</label>
+                            <label className="text-sm font-medium text-slate-700">اسم القاضي</label>
                             <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('judgeName')} />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">{t('cases.courtRoom', 'قاعة المحكمة')}</label>
-                            <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('courtRoom')} placeholder="قاعة 5" />
                         </div>
                     </div>
                 </div>
@@ -1216,37 +1226,63 @@ export function CreateCaseView() {
             <div className="border-t border-slate-100 pt-6">
                 <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
                     <ScrollText className="w-5 h-5 text-emerald-500" />
-                    {t('cases.powerOfAttorney', 'الوكالة الشرعية')}
+                    الوكالة الشرعية
                     <FieldTooltip content={FIELD_TOOLTIPS.powerOfAttorney} />
                 </h3>
 
                 <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">{t('cases.poaNumber', 'رقم الوكالة')}</label>
+                            <label className="text-sm font-medium text-slate-700">رقم الوكالة</label>
                             <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('poaNumber')} />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">{t('cases.poaDate', 'تاريخ الوكالة')}</label>
+                            <label className="text-sm font-medium text-slate-700">تاريخ الوكالة</label>
                             <Input type="date" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('poaDate')} />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">{t('cases.poaExpiry', 'تاريخ انتهاء الوكالة')}</label>
+                            <label className="text-sm font-medium text-slate-700">تاريخ انتهاء الوكالة</label>
                             <Input type="date" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('poaExpiry')} />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">{t('cases.poaScope', 'نطاق الوكالة')}</label>
+                            <label className="text-sm font-medium text-slate-700">نطاق الوكالة</label>
                             <Select value={watch('poaScope')} onValueChange={(v) => setValue('poaScope', v)}>
                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-11 bg-white">
-                                    <SelectValue placeholder={t('cases.selectPoaScope', 'اختر نطاق الوكالة')} />
+                                    <SelectValue placeholder="اختر نطاق الوكالة" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="general">{t('cases.poaGeneral', 'وكالة عامة')}</SelectItem>
-                                    <SelectItem value="specific">{t('cases.poaSpecific', 'وكالة خاصة')}</SelectItem>
-                                    <SelectItem value="litigation">{t('cases.poaLitigation', 'وكالة خصومة')}</SelectItem>
+                                    <SelectItem value="general">وكالة عامة</SelectItem>
+                                    <SelectItem value="specific">وكالة خاصة</SelectItem>
+                                    <SelectItem value="litigation">وكالة خصومة</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Attachments - المشفوعات */}
+            <div className="border-t border-slate-100 pt-6">
+                <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                    <Paperclip className="w-5 h-5 text-emerald-500" />
+                    المشفوعات
+                    <FieldTooltip content={FIELD_TOOLTIPS.attachments} />
+                </h3>
+
+                <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
+                    <div className="p-6 text-center border-2 border-dashed border-slate-300 rounded-xl hover:border-emerald-400 transition-colors cursor-pointer">
+                        <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                        <p className="text-sm text-slate-600 font-medium">اضغط لرفع الملفات أو اسحبها هنا</p>
+                        <p className="text-xs text-slate-400 mt-1">PDF, Word, صور (حد أقصى 10 ميجابايت)</p>
+                    </div>
+                    <div className="text-xs text-slate-500">
+                        <p className="font-medium mb-2">المستندات المطلوبة عادةً:</p>
+                        <ul className="list-disc list-inside space-y-1 text-slate-400">
+                            <li>صورة الهوية الوطنية / الإقامة</li>
+                            <li>صورة الوكالة الشرعية</li>
+                            <li>المستندات الداعمة للدعوى</li>
+                            <li>العقود ذات الصلة</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -1255,14 +1291,14 @@ export function CreateCaseView() {
             <div className="border-t border-slate-100 pt-6">
                 <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
                     <Users className="w-5 h-5 text-emerald-500" />
-                    {t('cases.teamAssignment', 'فريق العمل')}
+                    فريق العمل
                     <FieldTooltip content={FIELD_TOOLTIPS.team} />
                 </h3>
 
                 <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-700">{t('cases.assignedLawyer', 'المحامي المسؤول')}</label>
-                        <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('assignedLawyer')} placeholder={t('cases.lawyerName', 'اسم المحامي')} />
+                        <label className="text-sm font-medium text-slate-700">المحامي المسؤول</label>
+                        <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('assignedLawyer')} />
                     </div>
                 </div>
             </div>
@@ -1340,7 +1376,7 @@ export function CreateCaseView() {
                                 <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
                                     <Link to="/dashboard/cases">
                                         <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
-                                            {t('common.cancel', 'إلغاء')}
+                                            إلغاء
                                         </Button>
                                     </Link>
 
@@ -1352,7 +1388,7 @@ export function CreateCaseView() {
                                             className="rounded-xl"
                                         >
                                             <ArrowRight className="ms-2 h-4 w-4" />
-                                            {t('common.previous', 'السابق')}
+                                            السابق
                                         </Button>
                                     )}
 
@@ -1362,7 +1398,7 @@ export function CreateCaseView() {
                                             onClick={nextStep}
                                             className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-emerald-500/20"
                                         >
-                                            {t('common.next', 'التالي')}
+                                            التالي
                                             <ArrowLeft className="me-2 h-4 w-4" />
                                         </Button>
                                     ) : (
@@ -1374,12 +1410,12 @@ export function CreateCaseView() {
                                             {(isSubmitting || createCaseMutation.isPending) ? (
                                                 <span className="flex items-center gap-2">
                                                     <Loader2 className="w-4 h-4 animate-spin" />
-                                                    {t('common.creating', 'جاري الإنشاء...')}
+                                                    جاري الإنشاء...
                                                 </span>
                                             ) : (
                                                 <span className="flex items-center gap-2">
                                                     <Save className="w-4 h-4" />
-                                                    {t('cases.createCase', 'حفظ القضية')}
+                                                    حفظ القضية
                                                 </span>
                                             )}
                                         </Button>
