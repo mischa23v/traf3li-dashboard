@@ -363,6 +363,149 @@ export const getTasksChart = async (months = 12): Promise<ChartResponse<TasksCha
   }
 }
 
+// ==================== LAWYER-FOCUSED ENDPOINTS ====================
+
+/**
+ * Upcoming Hearing Interface
+ */
+export interface UpcomingHearing {
+  _id: string
+  caseId: string
+  caseName: string
+  caseNumber: string
+  court: string
+  courtRoom?: string
+  date: string
+  type: string
+  notes?: string
+  status: string
+  source: 'case' | 'event'
+}
+
+/**
+ * Upcoming Hearings Response
+ */
+export interface UpcomingHearingsResponse {
+  hearings: UpcomingHearing[]
+  total: number
+}
+
+/**
+ * Deadline Interface
+ */
+export interface Deadline {
+  _id: string
+  caseId: string
+  caseName: string
+  caseNumber: string
+  title: string
+  description?: string
+  dueDate: string
+  type: string
+  priority: 'high' | 'medium' | 'low'
+  daysRemaining: number
+  status: string
+}
+
+/**
+ * Deadlines Response
+ */
+export interface DeadlinesResponse {
+  deadlines: Deadline[]
+  total: number
+}
+
+/**
+ * Time Entry Summary Interface
+ */
+export interface TimeEntrySummary {
+  today: { hours: number; amount: number }
+  thisWeek: { hours: number; amount: number }
+  thisMonth: { hours: number; amount: number }
+  unbilled: { hours: number; amount: number }
+  hourlyRate: number
+}
+
+/**
+ * Pending Document Interface
+ */
+export interface PendingDocument {
+  _id: string
+  name: string
+  caseId?: string
+  caseName?: string
+  clientName?: string
+  category: string
+  status: 'awaiting_signature' | 'awaiting_review' | 'awaiting_client'
+  createdAt: string
+  daysWaiting: number
+}
+
+/**
+ * Pending Documents Response
+ */
+export interface PendingDocumentsResponse {
+  documents: PendingDocument[]
+  counts: {
+    awaitingSignature: number
+    awaitingReview: number
+    awaitingClient: number
+  }
+  total: number
+}
+
+/**
+ * Get Upcoming Hearings
+ * GET /dashboard/hearings/upcoming
+ */
+export const getUpcomingHearings = async (days = 7): Promise<UpcomingHearingsResponse> => {
+  try {
+    const response = await apiClient.get('/dashboard/hearings/upcoming', { params: { days } })
+    return response.data
+  } catch (error) {
+    throw handleApiError(error)
+  }
+}
+
+/**
+ * Get Upcoming Deadlines
+ * GET /dashboard/deadlines/upcoming
+ */
+export const getUpcomingDeadlines = async (days = 14): Promise<DeadlinesResponse> => {
+  try {
+    const response = await apiClient.get('/dashboard/deadlines/upcoming', { params: { days } })
+    return response.data
+  } catch (error) {
+    throw handleApiError(error)
+  }
+}
+
+/**
+ * Get Time Entry Summary (Billable Hours)
+ * GET /dashboard/time-entries/summary
+ */
+export const getTimeEntrySummary = async (): Promise<TimeEntrySummary> => {
+  try {
+    const response = await apiClient.get('/dashboard/time-entries/summary')
+    return response.data.summary
+  } catch (error) {
+    throw handleApiError(error)
+  }
+}
+
+/**
+ * Get Pending Documents
+ * GET /dashboard/documents/pending
+ */
+export const getPendingDocuments = async (): Promise<PendingDocumentsResponse> => {
+  try {
+    const response = await apiClient.get('/dashboard/documents/pending')
+    return response.data
+  } catch (error) {
+    throw handleApiError(error)
+  }
+}
+
 const dashboardService = {
   getDashboardStats,
   getDashboardHeroStats,
@@ -378,6 +521,10 @@ const dashboardService = {
   getCasesChart,
   getRevenueChart,
   getTasksChart,
+  getUpcomingHearings,
+  getUpcomingDeadlines,
+  getTimeEntrySummary,
+  getPendingDocuments,
 }
 
 export default dashboardService

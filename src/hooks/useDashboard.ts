@@ -159,3 +159,53 @@ export const useTasksChart = (months = 12) => {
     retry: 1,
   })
 }
+
+// ==================== LAWYER-FOCUSED HOOKS ====================
+
+export const useUpcomingHearings = (days = 7) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  return useQuery({
+    queryKey: ['dashboard', 'hearings', 'upcoming', days],
+    queryFn: () => dashboardService.getUpcomingHearings(days),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: isAuthenticated,
+    retry: 1,
+  })
+}
+
+export const useUpcomingDeadlines = (days = 14) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  return useQuery({
+    queryKey: ['dashboard', 'deadlines', 'upcoming', days],
+    queryFn: () => dashboardService.getUpcomingDeadlines(days),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: isAuthenticated,
+    retry: 1,
+  })
+}
+
+export const useTimeEntrySummary = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  return useQuery({
+    queryKey: ['dashboard', 'time-entries', 'summary'],
+    queryFn: () => dashboardService.getTimeEntrySummary(),
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    enabled: isAuthenticated,
+    retry: 1,
+  })
+}
+
+export const usePendingDocuments = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  return useQuery({
+    queryKey: ['dashboard', 'documents', 'pending'],
+    queryFn: () => dashboardService.getPendingDocuments(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: isAuthenticated,
+    retry: 1,
+  })
+}
