@@ -320,7 +320,8 @@ const hrService = {
 
   createEmployee: async (data: CreateEmployeeData): Promise<Employee> => {
     const response = await apiClient.post('/hr/employees', data)
-    return response.data
+    // Handle different response structures: direct employee, { employee: ... }, or { data: ... }
+    return response.data?.employee || response.data?.data || response.data
   },
 
   updateEmployee: async (id: string, data: UpdateEmployeeData): Promise<Employee> => {
