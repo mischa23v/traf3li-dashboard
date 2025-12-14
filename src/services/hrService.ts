@@ -1,4 +1,5 @@
 import { apiClient } from '@/lib/api'
+import { isValidObjectId } from '@/utils/validation-patterns'
 
 // ==================== ENUMS & TYPES ====================
 
@@ -314,6 +315,9 @@ const hrService = {
   },
 
   getEmployee: async (id: string): Promise<Employee> => {
+    if (!isValidObjectId(id)) {
+      throw new Error('معرّف الموظف غير صالح / Invalid employee ID')
+    }
     const response = await apiClient.get(`/hr/employees/${id}`)
     return response.data
   },
@@ -325,11 +329,17 @@ const hrService = {
   },
 
   updateEmployee: async (id: string, data: UpdateEmployeeData): Promise<Employee> => {
+    if (!isValidObjectId(id)) {
+      throw new Error('معرّف الموظف غير صالح / Invalid employee ID')
+    }
     const response = await apiClient.put(`/hr/employees/${id}`, data)
     return response.data
   },
 
   deleteEmployee: async (id: string): Promise<void> => {
+    if (!isValidObjectId(id)) {
+      throw new Error('معرّف الموظف غير صالح / Invalid employee ID')
+    }
     await apiClient.delete(`/hr/employees/${id}`)
   },
 
@@ -352,11 +362,17 @@ const hrService = {
   // ==================== ALLOWANCES ====================
 
   addAllowance: async (id: string, data: Allowance): Promise<Employee> => {
+    if (!isValidObjectId(id)) {
+      throw new Error('معرّف الموظف غير صالح / Invalid employee ID')
+    }
     const response = await apiClient.post(`/hr/employees/${id}/allowances`, data)
     return response.data
   },
 
   removeAllowance: async (id: string, allowanceId: string): Promise<Employee> => {
+    if (!isValidObjectId(id)) {
+      throw new Error('معرّف الموظف غير صالح / Invalid employee ID')
+    }
     const response = await apiClient.delete(`/hr/employees/${id}/allowances/${allowanceId}`)
     return response.data
   },
@@ -364,6 +380,9 @@ const hrService = {
   // ==================== DOCUMENTS ====================
 
   uploadDocument: async (employeeId: string, file: File, documentType: DocumentType): Promise<EmployeeDocument> => {
+    if (!isValidObjectId(employeeId)) {
+      throw new Error('معرّف الموظف غير صالح / Invalid employee ID')
+    }
     const formData = new FormData()
     formData.append('file', file)
     formData.append('documentType', documentType)
@@ -374,10 +393,16 @@ const hrService = {
   },
 
   deleteDocument: async (employeeId: string, documentId: string): Promise<void> => {
+    if (!isValidObjectId(employeeId)) {
+      throw new Error('معرّف الموظف غير صالح / Invalid employee ID')
+    }
     await apiClient.delete(`/hr/employees/${employeeId}/documents/${documentId}`)
   },
 
   verifyDocument: async (employeeId: string, documentId: string): Promise<EmployeeDocument> => {
+    if (!isValidObjectId(employeeId)) {
+      throw new Error('معرّف الموظف غير صالح / Invalid employee ID')
+    }
     const response = await apiClient.patch(`/hr/employees/${employeeId}/documents/${documentId}/verify`)
     return response.data
   },

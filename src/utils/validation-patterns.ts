@@ -35,6 +35,9 @@ export type ErrorMessages = {
 // ============================================================================
 
 export const validationPatterns = {
+  // MongoDB ObjectId (24 hexadecimal characters)
+  objectId: /^[0-9a-fA-F]{24}$/,
+
   // Saudi National ID (starts with 1 or 2, 10 digits)
   nationalId: /^[12]\d{9}$/,
 
@@ -181,6 +184,16 @@ export const isValidEmail = (value: string): boolean => {
 export const isValidVatNumber = (value: string): boolean => {
   if (!value) return false;
   return validationPatterns.vatNumber.test(value.trim());
+};
+
+/**
+ * Validates a MongoDB ObjectId
+ * @param value - The ID to validate
+ * @returns true if valid 24-character hex string, false otherwise
+ */
+export const isValidObjectId = (value: string | undefined | null): boolean => {
+  if (!value || typeof value !== 'string') return false;
+  return validationPatterns.objectId.test(value.trim());
 };
 
 // Map of validator functions
@@ -353,4 +366,5 @@ export default {
   isValidOtp,
   isValidEmail,
   isValidVatNumber,
+  isValidObjectId,
 };
