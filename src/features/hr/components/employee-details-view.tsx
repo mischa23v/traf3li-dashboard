@@ -19,7 +19,7 @@ import { useEmployee, useDeleteEmployee } from '@/hooks/useHR'
 import {
     Search, Bell, AlertCircle, User, Phone, Mail, MapPin, Briefcase, Calendar,
     CreditCard, Wallet, FileText, AlertTriangle, Trash2, Loader2, Building2,
-    Clock, DollarSign, Shield, Heart, UserCog
+    Clock, DollarSign, Shield, Heart, UserCog, Lock
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { arSA } from 'date-fns/locale'
