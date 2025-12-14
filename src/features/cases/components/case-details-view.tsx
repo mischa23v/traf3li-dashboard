@@ -125,6 +125,74 @@ import type {
 } from '@/services/casesService'
 import { ProductivityHero } from '@/components/productivity-hero'
 
+// Constants for courts, committees, and arbitration centers
+const COURTS = [
+  { value: 'general', label: 'المحكمة العامة' },
+  { value: 'criminal', label: 'المحكمة الجزائية' },
+  { value: 'commercial', label: 'المحكمة التجارية' },
+  { value: 'labor', label: 'المحكمة العمالية' },
+  { value: 'family', label: 'محكمة الأحوال الشخصية' },
+  { value: 'execution', label: 'محكمة التنفيذ' },
+  { value: 'administrative', label: 'المحكمة الإدارية (ديوان المظالم)' },
+  { value: 'administrative_appeal', label: 'محكمة الاستئناف الإدارية' },
+  { value: 'appeal', label: 'محكمة الاستئناف' },
+  { value: 'supreme', label: 'المحكمة العليا' },
+]
+
+const COMMITTEES = [
+  { value: 'banking_disputes', label: 'لجنة المنازعات المصرفية' },
+  { value: 'insurance_disputes', label: 'لجنة الفصل في المنازعات والمخالفات التأمينية' },
+  { value: 'securities_disputes', label: 'لجنة الفصل في منازعات الأوراق المالية' },
+  { value: 'customs_violations', label: 'لجنة الفصل في المخالفات والمنازعات الجمركية' },
+  { value: 'tax_violations', label: 'لجان الفصل في المخالفات والمنازعات الضريبية' },
+  { value: 'competition_protection', label: 'لجنة النظر في مخالفات نظام حماية المنافسة' },
+  { value: 'anti_concealment', label: 'لجنة مكافحة التستر' },
+  { value: 'labor_commission', label: 'الهيئات العمالية الابتدائية' },
+  { value: 'labor_appeal', label: 'الهيئة العليا لتسوية الخلافات العمالية' },
+]
+
+const ARBITRATION_CENTERS = [
+  { value: 'scca', label: 'المركز السعودي للتحكيم التجاري (SCCA)' },
+  { value: 'sba_arbitration', label: 'مركز هيئة المحامين للتسوية والتحكيم' },
+  { value: 'riyadh_chamber', label: 'مركز تحكيم الغرفة التجارية بالرياض' },
+  { value: 'jeddah_chamber', label: 'مركز تحكيم الغرفة التجارية بجدة' },
+  { value: 'eastern_chamber', label: 'مركز تحكيم الغرفة التجارية بالشرقية' },
+  { value: 'gcc_commercial', label: 'مركز التحكيم التجاري لدول الخليج' },
+  { value: 'other', label: 'مركز تحكيم آخر' },
+]
+
+// Helper functions for labels
+const getCourtLabel = (value?: string): string => {
+  if (!value) return 'غير محدد'
+  const court = COURTS.find((c) => c.value === value)
+  return court?.label || value
+}
+
+const getCommitteeLabel = (value?: string): string => {
+  if (!value) return 'غير محدد'
+  const committee = COMMITTEES.find((c) => c.value === value)
+  return committee?.label || value
+}
+
+const getArbitrationCenterLabel = (value?: string): string => {
+  if (!value) return 'غير محدد'
+  const center = ARBITRATION_CENTERS.find((c) => c.value === value)
+  return center?.label || value
+}
+
+const getEntityTypeLabel = (value?: string): string => {
+  switch (value) {
+    case 'court':
+      return 'محكمة'
+    case 'committee':
+      return 'لجنة شبه قضائية'
+    case 'arbitration':
+      return 'تحكيم'
+    default:
+      return 'غير محدد'
+  }
+}
+
 // Helper functions
 const getClientName = (c: Case): string => {
   if (c.clientName) return c.clientName
@@ -788,6 +856,12 @@ export function CaseDetailsView() {
                             {caseData.clientPhone}
                           </div>
                         )}
+                        {caseData.plaintiffUnifiedNumber && (
+                          <div className="flex items-center gap-1 text-xs text-slate-500 mt-1">
+                            <Building className="h-3 w-3" aria-hidden="true" />
+                            الرقم الوطني الموحد: {caseData.plaintiffUnifiedNumber}
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -804,6 +878,12 @@ export function CaseDetailsView() {
                             <div className="flex items-center gap-1 text-xs text-slate-500 mt-1">
                               <Building className="h-3 w-3" aria-hidden="true" />
                               {t('cases.crNumber', 'س.ت')}: {caseData.laborCaseDetails.company.registrationNumber}
+                            </div>
+                          )}
+                          {caseData.defendantUnifiedNumber && (
+                            <div className="flex items-center gap-1 text-xs text-slate-500 mt-1">
+                              <Building className="h-3 w-3" aria-hidden="true" />
+                              الرقم الوطني الموحد: {caseData.defendantUnifiedNumber}
                             </div>
                           )}
                         </div>
@@ -1008,16 +1088,36 @@ export function CaseDetailsView() {
                         </div>
                       </div>
 
-                      {/* Court/Committee Info */}
+                      {/* Court/Committee/Arbitration Info */}
                       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
                         <h3 className="font-bold text-lg text-navy mb-4 flex items-center gap-2">
                           <Gavel className="h-5 w-5 text-purple-600" />
-                          {t('cases.courtInfo', 'بيانات المحكمة')}
+                          {caseData.courtDetails?.entityType === 'arbitration'
+                            ? 'بيانات التحكيم'
+                            : caseData.courtDetails?.entityType === 'committee'
+                              ? 'بيانات اللجنة'
+                              : 'بيانات المحكمة'}
                         </h3>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           <div>
-                            <div className="text-sm text-slate-500 mb-1">{t('cases.court', 'المحكمة / اللجنة')}</div>
-                            <div className="font-bold text-navy">{caseData.courtDetails?.court || caseData.courtDetails?.committee || caseData.court || t('cases.notSpecified', 'غير محدد')}</div>
+                            <div className="text-sm text-slate-500 mb-1">نوع الجهة</div>
+                            <div className="font-bold text-navy">{getEntityTypeLabel(caseData.courtDetails?.entityType)}</div>
+                          </div>
+                          <div>
+                            <div className="text-sm text-slate-500 mb-1">
+                              {caseData.courtDetails?.entityType === 'arbitration'
+                                ? 'مركز التحكيم'
+                                : caseData.courtDetails?.entityType === 'committee'
+                                  ? 'اللجنة'
+                                  : 'المحكمة'}
+                            </div>
+                            <div className="font-bold text-navy">
+                              {caseData.courtDetails?.entityType === 'arbitration'
+                                ? getArbitrationCenterLabel(caseData.courtDetails?.arbitrationCenter)
+                                : caseData.courtDetails?.entityType === 'committee'
+                                  ? getCommitteeLabel(caseData.courtDetails?.committee)
+                                  : getCourtLabel(caseData.courtDetails?.court) || caseData.court || 'غير محدد'}
+                            </div>
                           </div>
                           <div>
                             <div className="text-sm text-slate-500 mb-1">{t('cases.region', 'المنطقة')}</div>
@@ -1032,12 +1132,10 @@ export function CaseDetailsView() {
                             <div className="font-bold text-navy">{caseData.courtDetails?.circuitNumber || t('cases.notSpecified', 'غير محدد')}</div>
                           </div>
                           <div>
-                            <div className="text-sm text-slate-500 mb-1">{t('cases.judge', 'القاضي')}</div>
+                            <div className="text-sm text-slate-500 mb-1">
+                              {caseData.courtDetails?.entityType === 'arbitration' ? 'المحكم' : t('cases.judge', 'القاضي')}
+                            </div>
                             <div className="font-bold text-navy">{caseData.courtDetails?.judgeName || caseData.judge || t('cases.notSpecified', 'غير محدد')}</div>
-                          </div>
-                          <div>
-                            <div className="text-sm text-slate-500 mb-1">{t('cases.courtRoom', 'القاعة')}</div>
-                            <div className="font-bold text-navy">{caseData.courtDetails?.courtRoom || t('cases.notSpecified', 'غير محدد')}</div>
                           </div>
                           <div>
                             <div className="text-sm text-slate-500 mb-1">{t('cases.lawyer', 'المحامي المسؤول')}</div>
