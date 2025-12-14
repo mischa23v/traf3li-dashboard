@@ -17,7 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
-import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, CheckCircle, XCircle, Edit3, Calendar, SortAsc, Filter, X, ArrowRight } from 'lucide-react'
+import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, CheckCircle, XCircle, Edit3, Calendar, SortAsc, Filter, X, ArrowRight, ArrowUpDown } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { useDeleteTask, useCompleteTask, useReopenTask, useUpdateTask } from '@/hooks/useTasks'
 import { format } from 'date-fns'
@@ -286,7 +286,7 @@ export function TasksListView() {
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
                 {/* HERO CARD & STATS */}
-                <ProductivityHero badge={t('tasks.management') + " (V2)"} title={t('tasks.title')} type="tasks" />
+                <ProductivityHero badge={t('tasks.management')} title={t('tasks.title')} type="tasks" />
 
                 {/* MAIN GRID LAYOUT */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -334,15 +334,15 @@ export function TasksListView() {
                                     {/* Status */}
                                     <div className="flex-1 min-w-[220px]">
                                         <GosiSelect value={activeStatusTab} onValueChange={setActiveStatusTab}>
-                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all text-xs font-bold text-slate-950">
                                                 <div className="flex items-center gap-2 truncate">
-                                                    <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('tasks.list.status')}:</span>
+                                                    <span className="text-slate-600 font-bold text-xs uppercase tracking-wider">{t('tasks.list.status')}:</span>
                                                     <GosiSelectValue />
                                                 </div>
                                             </GosiSelectTrigger>
                                             <GosiSelectContent>
-                                                <GosiSelectItem value="active">{t('tasks.list.active')}</GosiSelectItem>
-                                                <GosiSelectItem value="completed">{t('tasks.list.completed')}</GosiSelectItem>
+                                                <GosiSelectItem value="active" className="font-bold">{t('tasks.list.active')}</GosiSelectItem>
+                                                <GosiSelectItem value="completed" className="font-bold">{t('tasks.list.completed')}</GosiSelectItem>
                                             </GosiSelectContent>
                                         </GosiSelect>
                                     </div>
@@ -350,18 +350,18 @@ export function TasksListView() {
                                     {/* Priority - Extra Wide for Arabic */}
                                     <div className="flex-1 min-w-[240px]">
                                         <GosiSelect value={priorityFilter} onValueChange={setPriorityFilter}>
-                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all text-xs font-bold text-slate-950">
                                                 <div className="flex items-center gap-2 truncate">
-                                                    <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('tasks.list.priorityLabel')}:</span>
+                                                    <span className="text-slate-600 font-bold text-xs uppercase tracking-wider">{t('tasks.list.priorityLabel')}:</span>
                                                     <GosiSelectValue />
                                                 </div>
                                             </GosiSelectTrigger>
                                             <GosiSelectContent>
-                                                <GosiSelectItem value="all">{t('tasks.list.allPriorities')}</GosiSelectItem>
-                                                <GosiSelectItem value="urgent">{t('tasks.priorities.urgent')}</GosiSelectItem>
-                                                <GosiSelectItem value="high">{t('tasks.priorities.high')}</GosiSelectItem>
-                                                <GosiSelectItem value="medium">{t('tasks.priorities.medium')}</GosiSelectItem>
-                                                <GosiSelectItem value="low">{t('tasks.priorities.low')}</GosiSelectItem>
+                                                <GosiSelectItem value="all" className="font-bold">{t('tasks.list.allPriorities')}</GosiSelectItem>
+                                                <GosiSelectItem value="urgent" className="font-bold">{t('tasks.priorities.urgent')}</GosiSelectItem>
+                                                <GosiSelectItem value="high" className="font-bold">{t('tasks.priorities.high')}</GosiSelectItem>
+                                                <GosiSelectItem value="medium" className="font-bold">{t('tasks.priorities.medium')}</GosiSelectItem>
+                                                <GosiSelectItem value="low" className="font-bold">{t('tasks.priorities.low')}</GosiSelectItem>
                                             </GosiSelectContent>
                                         </GosiSelect>
                                     </div>
@@ -369,18 +369,18 @@ export function TasksListView() {
                                     {/* Assigned To */}
                                     <div className="flex-1 min-w-[220px]">
                                         <GosiSelect value={assignedFilter} onValueChange={setAssignedFilter}>
-                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all text-xs font-bold text-slate-950">
                                                 <div className="flex items-center gap-2 truncate">
-                                                    <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('tasks.list.responsible')}:</span>
+                                                    <span className="text-slate-600 font-bold text-xs uppercase tracking-wider">{t('tasks.list.responsible')}:</span>
                                                     <GosiSelectValue />
                                                 </div>
                                             </GosiSelectTrigger>
                                             <GosiSelectContent>
-                                                <GosiSelectItem value="all">{t('tasks.list.all')}</GosiSelectItem>
-                                                <GosiSelectItem value="me">{t('tasks.list.myTasks')}</GosiSelectItem>
-                                                <GosiSelectItem value="unassigned">{t('tasks.list.unassigned')}</GosiSelectItem>
+                                                <GosiSelectItem value="all" className="font-bold">{t('tasks.list.all')}</GosiSelectItem>
+                                                <GosiSelectItem value="me" className="font-bold">{t('tasks.list.myTasks')}</GosiSelectItem>
+                                                <GosiSelectItem value="unassigned" className="font-bold">{t('tasks.list.unassigned')}</GosiSelectItem>
                                                 {teamMembers?.map((member: any) => (
-                                                    <GosiSelectItem key={member._id} value={member._id}>
+                                                    <GosiSelectItem key={member._id} value={member._id} className="font-bold">
                                                         {member.name || member.email}
                                                     </GosiSelectItem>
                                                 ))}
@@ -391,20 +391,20 @@ export function TasksListView() {
                                     {/* Due Date */}
                                     <div className="flex-1 min-w-[220px]">
                                         <GosiSelect value={dueDateFilter} onValueChange={setDueDateFilter}>
-                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all text-xs font-bold text-slate-950">
                                                 <div className="flex items-center gap-2 truncate">
-                                                    <Calendar className="h-4 w-4 text-emerald-500" aria-hidden="true" />
-                                                    <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('tasks.list.dueDate')}:</span>
+                                                    <Calendar className="h-4 w-4 text-emerald-600" aria-hidden="true" />
+                                                    <span className="text-slate-600 font-bold text-xs uppercase tracking-wider">{t('tasks.list.dueDate')}:</span>
                                                     <GosiSelectValue />
                                                 </div>
                                             </GosiSelectTrigger>
                                             <GosiSelectContent>
-                                                <GosiSelectItem value="all">{t('tasks.list.allDates')}</GosiSelectItem>
-                                                <GosiSelectItem value="today">{t('tasks.list.today')}</GosiSelectItem>
-                                                <GosiSelectItem value="thisWeek">{t('tasks.list.thisWeek')}</GosiSelectItem>
-                                                <GosiSelectItem value="thisMonth">{t('tasks.list.thisMonth')}</GosiSelectItem>
-                                                <GosiSelectItem value="overdue">{t('tasks.list.overdue')}</GosiSelectItem>
-                                                <GosiSelectItem value="noDueDate">{t('tasks.list.noDueDate')}</GosiSelectItem>
+                                                <GosiSelectItem value="all" className="font-bold">{t('tasks.list.allDates')}</GosiSelectItem>
+                                                <GosiSelectItem value="today" className="font-bold">{t('tasks.list.today')}</GosiSelectItem>
+                                                <GosiSelectItem value="thisWeek" className="font-bold">{t('tasks.list.thisWeek')}</GosiSelectItem>
+                                                <GosiSelectItem value="thisMonth" className="font-bold">{t('tasks.list.thisMonth')}</GosiSelectItem>
+                                                <GosiSelectItem value="overdue" className="font-bold">{t('tasks.list.overdue')}</GosiSelectItem>
+                                                <GosiSelectItem value="noDueDate" className="font-bold">{t('tasks.list.noDueDate')}</GosiSelectItem>
                                             </GosiSelectContent>
                                         </GosiSelect>
                                     </div>
@@ -412,17 +412,17 @@ export function TasksListView() {
                                     {/* Case Filter */}
                                     <div className="flex-1 min-w-[220px]">
                                         <GosiSelect value={caseFilter} onValueChange={setCaseFilter}>
-                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all text-xs font-bold text-slate-950">
                                                 <div className="flex items-center gap-2 truncate">
-                                                    <Briefcase className="h-4 w-4 text-emerald-500" />
-                                                    <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('tasks.list.case')}:</span>
+                                                    <Briefcase className="h-4 w-4 text-emerald-600" />
+                                                    <span className="text-slate-600 font-bold text-xs uppercase tracking-wider">{t('tasks.list.case')}:</span>
                                                     <GosiSelectValue />
                                                 </div>
                                             </GosiSelectTrigger>
                                             <GosiSelectContent>
-                                                <GosiSelectItem value="all">{t('tasks.list.allCases')}</GosiSelectItem>
+                                                <GosiSelectItem value="all" className="font-bold">{t('tasks.list.allCases')}</GosiSelectItem>
                                                 {casesData?.cases?.map((caseItem: any) => (
-                                                    <GosiSelectItem key={caseItem._id} value={caseItem._id}>
+                                                    <GosiSelectItem key={caseItem._id} value={caseItem._id} className="font-bold">
                                                         {caseItem.title || caseItem.caseNumber}
                                                     </GosiSelectItem>
                                                 ))}
@@ -431,20 +431,19 @@ export function TasksListView() {
                                     </div>
 
                                     {/* Sort By */}
-                                    <div className="flex-[0.5] min-w-[180px]">
+                                    <div className="flex-1 min-w-[220px]">
                                         <GosiSelect value={sortBy} onValueChange={setSortBy}>
-                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all text-xs font-bold text-slate-950">
                                                 <div className="flex items-center gap-2 truncate">
-                                                    <SortAsc className="h-4 w-4 text-emerald-500" />
-                                                    <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('tasks.list.sortBy')}:</span>
+                                                    <ArrowUpDown className="h-4 w-4 text-emerald-600" aria-hidden="true" />
+                                                    <span className="text-slate-600 font-bold text-xs uppercase tracking-wider">{t('tasks.list.sortBy')}:</span>
                                                     <GosiSelectValue />
                                                 </div>
                                             </GosiSelectTrigger>
                                             <GosiSelectContent>
-                                                <GosiSelectItem value="dueDate">{t('tasks.list.dueDate')}</GosiSelectItem>
-                                                <GosiSelectItem value="priority">{t('tasks.list.priorityLabel')}</GosiSelectItem>
-                                                <GosiSelectItem value="createdAt">{t('tasks.list.creationDate')}</GosiSelectItem>
-                                                <GosiSelectItem value="title">{t('tasks.list.name')}</GosiSelectItem>
+                                                <GosiSelectItem value="dueDate" className="font-bold">{t('tasks.list.dueDate')}</GosiSelectItem>
+                                                <GosiSelectItem value="createdAt" className="font-bold">{t('tasks.list.creationDate')}</GosiSelectItem>
+                                                <GosiSelectItem value="priority" className="font-bold">{t('tasks.list.priorityLabel')}</GosiSelectItem>
                                             </GosiSelectContent>
                                         </GosiSelect>
                                     </div>
@@ -546,24 +545,27 @@ export function TasksListView() {
                                                 </div>
                                             )}
                                             {/* Reverted to Clean Slate/Emerald Look */}
-                                            <div className="w-14 h-14 md:w-16 md:h-16 rounded-[1.2rem] bg-slate-50 flex items-center justify-center shadow-inner text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-600 group-hover:scale-105 transition-all duration-300 flex-shrink-0 border border-slate-100 group-hover:border-emerald-100">
+                                            <div className="w-14 h-14 md:w-16 md:h-16 rounded-[1.2rem] bg-slate-50 flex items-center justify-center shadow-inner text-slate-600 group-hover:bg-emerald-50 group-hover:text-emerald-700 group-hover:scale-105 transition-all duration-300 flex-shrink-0 border border-slate-100 group-hover:border-emerald-100">
                                                 <Briefcase className="h-7 w-7 md:h-8 md:w-8" strokeWidth={1.5} />
                                             </div>
                                             <div className="min-w-0 flex-1 space-y-1.5">
                                                 <div className="flex flex-wrap items-center gap-3 mb-1">
-                                                    <h4 className="font-bold text-slate-800 text-lg md:text-xl group-hover:text-emerald-800 transition-colors truncate leading-tight tracking-tight">{task.title}</h4>
+                                                    {/* Typography Fix: Reduced from text-xl to text-lg (18px) for balanced readability */}
+                                                    <h4 className="font-bold text-slate-950 text-base md:text-lg group-hover:text-emerald-900 transition-colors truncate leading-tight tracking-tight max-w-full">
+                                                        {task.title}
+                                                    </h4>
 
                                                     <div className="flex items-center gap-2">
                                                         {task.status === 'active' && (
-                                                            <div className="flex items-center gap-1.5 bg-blue-50/80 text-blue-700 border border-blue-100 rounded-full px-3 py-1 text-[11px] font-bold shadow-sm">
-                                                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                                                            <div className="flex items-center gap-1 bg-blue-50/80 text-blue-800 border border-blue-200 rounded-full px-2.5 py-0.5 text-[10px] font-bold shadow-sm">
+                                                                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>
                                                                 {t('tasks.list.active')}
                                                             </div>
                                                         )}
                                                         {/* Task ↔ Event Sync Badge */}
                                                         {(task.linkedEventId || task.eventId) && (
                                                             <div
-                                                                className="bg-purple-50/80 text-purple-700 hover:bg-purple-100 border border-purple-100 rounded-full px-3 py-1 flex items-center gap-1.5 cursor-pointer transition-all text-[11px] font-bold shadow-sm"
+                                                                className="bg-purple-50/80 text-purple-700 hover:bg-purple-100 border border-purple-100 rounded-full px-2.5 py-0.5 flex items-center gap-1 cursor-pointer transition-all text-[10px] font-bold shadow-sm"
                                                                 onClick={(e) => {
                                                                     e.stopPropagation()
                                                                     navigate({ to: '/dashboard/tasks/events/$eventId', params: { eventId: task.linkedEventId || task.eventId } } as any)
@@ -575,14 +577,14 @@ export function TasksListView() {
                                                         )}
                                                     </div>
                                                 </div>
-                                                <p className="text-slate-500 text-sm font-medium flex items-center gap-2">
-                                                    <span className="text-slate-400">@</span>
+                                                <p className="text-slate-700 text-xs md:text-sm font-bold flex items-center gap-2">
+                                                    <span className="text-slate-500">@</span>
                                                     {t('tasks.list.taskClient', { name: task.client })}
                                                 </p>
                                             </div>
 
                                             {/* Mobile Chevron Indicator - Animated */}
-                                            <div className="md:hidden ms-auto text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-[-4px] transition-all duration-300 rtl:rotate-180 self-center">
+                                            <div className="md:hidden ms-auto text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-[-4px] transition-all duration-300 rtl:rotate-180 self-center">
                                                 <ChevronLeft className="h-6 w-6 rtl:rotate-0 ltr:rotate-180" />
                                             </div>
                                         </div>
@@ -675,7 +677,8 @@ export function TasksListView() {
                                         <div className="flex flex-wrap items-center gap-4 sm:gap-8 w-full sm:w-auto" onClick={(e) => e.stopPropagation()}>
                                             {/* Priority Dropdown - WIDENED to 140px */}
                                             <div>
-                                                <div className="text-[10px] uppercase tracking-wider text-slate-400 mb-1.5 font-bold flex items-center gap-1">
+                                                {/* Typography Fix: Increased label from text-[10px] to text-xs (12px) for better readability */}
+                                                <div className="text-xs uppercase tracking-wider text-slate-600 mb-1.5 font-bold flex items-center gap-1">
                                                     {t('tasks.list.priorityLabel')}
                                                 </div>
                                                 <GosiSelect
@@ -699,16 +702,18 @@ export function TasksListView() {
                                             </div>
                                             {/* Due Date - Dual Language */}
                                             <div className="text-center">
-                                                <div className="text-[10px] uppercase tracking-wider text-slate-400 mb-1.5 font-bold">{t('tasks.list.dueDate')}</div>
-                                                <div className="font-bold text-slate-700 text-sm bg-slate-50 px-4 py-2 rounded-xl border border-slate-100 shadow-sm flex items-center gap-2 h-10">
-                                                    <Calendar className="w-4 h-4 text-slate-400" />
+                                                {/* Typography Fix: Increased label from text-[10px] to text-xs (12px) */}
+                                                <div className="text-xs uppercase tracking-wider text-slate-600 mb-1.5 font-bold">{t('tasks.list.dueDate')}</div>
+                                                <div className="font-bold text-slate-800 text-sm bg-slate-50 px-4 py-2 rounded-xl border border-slate-100 shadow-sm flex items-center gap-2 h-10">
+                                                    <Calendar className="w-4 h-4 text-slate-500" />
                                                     {task.dueDateFormatted.arabic}
                                                 </div>
                                             </div>
                                             {/* Creation Date - Dual Language */}
                                             <div className="text-center hidden sm:block">
-                                                <div className="text-[10px] uppercase tracking-wider text-slate-400 mb-1.5 font-bold">{t('tasks.list.createdAt')}</div>
-                                                <div className="font-medium text-slate-400 text-sm px-2 py-2 h-10 flex items-center">{task.createdAtFormatted.arabic}</div>
+                                                {/* Typography Fix: Increased label from text-[10px] to text-xs (12px) */}
+                                                <div className="text-xs uppercase tracking-wider text-slate-600 mb-1.5 font-bold">{t('tasks.list.createdAt')}</div>
+                                                <div className="font-bold text-slate-500 text-sm px-2 py-2 h-10 flex items-center">{task.createdAtFormatted.arabic}</div>
                                             </div>
                                         </div>
                                         <Link to={`/dashboard/tasks/${task.id}` as any} className="hidden sm:inline-flex w-auto" onClick={(e) => e.stopPropagation()}>

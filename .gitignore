@@ -11,3 +11,6 @@ dist/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Claude Code local settings
+.claude/settings.local.json
