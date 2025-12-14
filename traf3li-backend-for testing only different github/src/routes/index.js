@@ -41,6 +41,9 @@ const benefitRoute = require('./benefit.route');
 // PDFMe Routes
 const pdfmeRoute = require('./pdfme.route');
 
+// Reference Data Routes
+const referenceRoute = require('./reference.route');
+
 module.exports = {
     // Marketplace
     gigRoute,
@@ -83,5 +86,8 @@ module.exports = {
     benefitRoute,
 
     // PDFMe
-    pdfmeRoute
+    pdfmeRoute,
+
+    // Reference Data
+    referenceRoute
 };
