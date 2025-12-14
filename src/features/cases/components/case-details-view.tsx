@@ -1009,6 +1009,7 @@ export function CaseDetailsView() {
                           <div className="flex items-center gap-1 text-slate-500 col-span-2">
                             <MapPin className="h-3 w-3" aria-hidden="true" />
                             {caseData.plaintiff.address}
+                            {'city' in caseData.plaintiff && caseData.plaintiff.city && ` - ${caseData.plaintiff.city}`}
                           </div>
                         )}
                       </div>
@@ -1104,6 +1105,7 @@ export function CaseDetailsView() {
                             <div className="flex items-center gap-1 text-slate-500 col-span-2">
                               <MapPin className="h-3 w-3" aria-hidden="true" />
                               {caseData.defendant.address}
+                              {'city' in caseData.defendant && caseData.defendant.city && ` - ${caseData.defendant.city}`}
                             </div>
                           )}
                         </div>
