@@ -3,12 +3,10 @@ import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Briefcase,
-  Filter,
   Plus,
   Search,
   Scale,
   MoreHorizontal,
-  CheckCircle2,
   AlertCircle,
   Bell,
   Users,
@@ -16,18 +14,8 @@ import {
   User,
   Eye,
   ChevronLeft,
-  TrendingUp,
-  Clock,
-  Gavel,
-  XCircle,
-  PauseCircle,
-  Trophy,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Progress } from '@/components/ui/progress'
 import { Input } from '@/components/ui/input'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
@@ -47,15 +35,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import { CreateCaseForm } from './create-case-form'
 import type { Case, CaseStatus, CaseCategory, CasePriority, ClientRef, LawyerRef } from '@/services/casesService'
 import { PracticeSidebar } from './practice-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
@@ -91,7 +70,6 @@ export function CasesListView() {
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState('')
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
 
   const filters = useMemo(() => {
     const f: any = {}
@@ -251,23 +229,12 @@ export function CasesListView() {
         {/* HERO BANNER */}
         <ProductivityHero badge="القضايا" title="القضايا" type="cases" hideButtons={true}>
           <div className="flex gap-3">
-            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-10 px-5 font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm">
-                  <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
-                  {t('cases.newCase', 'قضية جديدة')}
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>{t('cases.createNewCase', 'إنشاء قضية جديدة')}</DialogTitle>
-                  <DialogDescription>
-                    {t('cases.createDescription', 'أدخل بيانات القضية الجديدة')}
-                  </DialogDescription>
-                </DialogHeader>
-                <CreateCaseForm onSuccess={() => setIsCreateDialogOpen(false)} />
-              </DialogContent>
-            </Dialog>
+            <Link to="/dashboard/cases/new">
+              <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-10 px-5 font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm">
+                <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
+                {t('cases.newCase', 'قضية جديدة')}
+              </Button>
+            </Link>
           </div>
         </ProductivityHero>
 
@@ -371,13 +338,12 @@ export function CasesListView() {
                   </div>
                   <h4 className="text-lg font-bold text-navy mb-2">{t('cases.noCases', 'لا توجد قضايا')}</h4>
                   <p className="text-slate-500 mb-4">{t('cases.noCasesDescription', 'لم يتم العثور على قضايا')}</p>
-                  <Button
-                    onClick={() => setIsCreateDialogOpen(true)}
-                    className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl"
-                  >
-                    <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
-                    {t('cases.createNewCase', 'إنشاء قضية جديدة')}
-                  </Button>
+                  <Link to="/dashboard/cases/new">
+                    <Button className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl">
+                      <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
+                      {t('cases.createNewCase', 'إنشاء قضية جديدة')}
+                    </Button>
+                  </Link>
                 </div>
               )}
 

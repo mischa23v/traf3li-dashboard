@@ -109,6 +109,7 @@ import { Route as AuthenticatedDashboardContactsContactIdRouteImport } from './r
 import { Route as AuthenticatedDashboardClientsNewRouteImport } from './routes/_authenticated/dashboard.clients.new'
 import { Route as AuthenticatedDashboardClientsClientIdRouteImport } from './routes/_authenticated/dashboard.clients.$clientId'
 import { Route as AuthenticatedDashboardCasesPipelineRouteImport } from './routes/_authenticated/dashboard.cases.pipeline'
+import { Route as AuthenticatedDashboardCasesNewRouteImport } from './routes/_authenticated/dashboard.cases.new'
 import { Route as AuthenticatedDashboardCasesCaseIdRouteImport } from './routes/_authenticated/dashboard.cases.$caseId'
 import { Route as AuthenticatedDashboardTasksReportsIndexRouteImport } from './routes/_authenticated/dashboard.tasks.reports.index'
 import { Route as AuthenticatedDashboardTasksRemindersIndexRouteImport } from './routes/_authenticated/dashboard.tasks.reminders.index'
@@ -838,6 +839,12 @@ const AuthenticatedDashboardCasesPipelineRoute =
   AuthenticatedDashboardCasesPipelineRouteImport.update({
     id: '/dashboard/cases/pipeline',
     path: '/dashboard/cases/pipeline',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardCasesNewRoute =
+  AuthenticatedDashboardCasesNewRouteImport.update({
+    id: '/dashboard/cases/new',
+    path: '/dashboard/cases/new',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardCasesCaseIdRoute =
@@ -1952,6 +1959,7 @@ export interface FileRoutesByFullPath {
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
   '/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
+  '/dashboard/cases/new': typeof AuthenticatedDashboardCasesNewRoute
   '/dashboard/cases/pipeline': typeof AuthenticatedDashboardCasesPipelineRouteWithChildren
   '/dashboard/clients/$clientId': typeof AuthenticatedDashboardClientsClientIdRoute
   '/dashboard/clients/new': typeof AuthenticatedDashboardClientsNewRoute
@@ -2226,6 +2234,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
   '/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
+  '/dashboard/cases/new': typeof AuthenticatedDashboardCasesNewRoute
   '/dashboard/cases/pipeline': typeof AuthenticatedDashboardCasesPipelineRouteWithChildren
   '/dashboard/clients/$clientId': typeof AuthenticatedDashboardClientsClientIdRoute
   '/dashboard/clients/new': typeof AuthenticatedDashboardClientsNewRoute
@@ -2505,6 +2514,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
   '/_authenticated/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
+  '/_authenticated/dashboard/cases/new': typeof AuthenticatedDashboardCasesNewRoute
   '/_authenticated/dashboard/cases/pipeline': typeof AuthenticatedDashboardCasesPipelineRouteWithChildren
   '/_authenticated/dashboard/clients/$clientId': typeof AuthenticatedDashboardClientsClientIdRoute
   '/_authenticated/dashboard/clients/new': typeof AuthenticatedDashboardClientsNewRoute
@@ -2782,6 +2792,7 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/users'
     | '/dashboard/cases/$caseId'
+    | '/dashboard/cases/new'
     | '/dashboard/cases/pipeline'
     | '/dashboard/clients/$clientId'
     | '/dashboard/clients/new'
@@ -3056,6 +3067,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/users'
     | '/dashboard/cases/$caseId'
+    | '/dashboard/cases/new'
     | '/dashboard/cases/pipeline'
     | '/dashboard/clients/$clientId'
     | '/dashboard/clients/new'
@@ -3334,6 +3346,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/'
     | '/_authenticated/users/'
     | '/_authenticated/dashboard/cases/$caseId'
+    | '/_authenticated/dashboard/cases/new'
     | '/_authenticated/dashboard/cases/pipeline'
     | '/_authenticated/dashboard/clients/$clientId'
     | '/_authenticated/dashboard/clients/new'
@@ -4294,6 +4307,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/cases/pipeline'
       fullPath: '/dashboard/cases/pipeline'
       preLoaderRoute: typeof AuthenticatedDashboardCasesPipelineRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/cases/new': {
+      id: '/_authenticated/dashboard/cases/new'
+      path: '/dashboard/cases/new'
+      fullPath: '/dashboard/cases/new'
+      preLoaderRoute: typeof AuthenticatedDashboardCasesNewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/cases/$caseId': {
@@ -5719,6 +5739,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
   AuthenticatedDashboardCasesCaseIdRoute: typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
+  AuthenticatedDashboardCasesNewRoute: typeof AuthenticatedDashboardCasesNewRoute
   AuthenticatedDashboardCasesPipelineRoute: typeof AuthenticatedDashboardCasesPipelineRouteWithChildren
   AuthenticatedDashboardClientsClientIdRoute: typeof AuthenticatedDashboardClientsClientIdRoute
   AuthenticatedDashboardClientsNewRoute: typeof AuthenticatedDashboardClientsNewRoute
@@ -5943,6 +5964,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
   AuthenticatedDashboardCasesCaseIdRoute:
     AuthenticatedDashboardCasesCaseIdRouteWithChildren,
+  AuthenticatedDashboardCasesNewRoute: AuthenticatedDashboardCasesNewRoute,
   AuthenticatedDashboardCasesPipelineRoute:
     AuthenticatedDashboardCasesPipelineRouteWithChildren,
   AuthenticatedDashboardClientsClientIdRoute:
