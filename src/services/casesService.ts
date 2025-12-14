@@ -13,9 +13,9 @@ import apiClient, { handleApiError } from '@/lib/api'
 export type PartyType = 'individual' | 'company' | 'government'
 
 /**
- * Entity Type - Court or Committee
+ * Entity Type - Court, Committee, or Arbitration
  */
-export type EntityType = 'court' | 'committee'
+export type EntityType = 'court' | 'committee' | 'arbitration'
 
 /**
  * Individual Party Details
@@ -145,11 +145,11 @@ export interface CourtDetails {
   entityType?: EntityType
   court?: string
   committee?: string
+  arbitrationCenter?: string  // مركز التحكيم
   region?: string
   city?: string
   circuitNumber?: string
   judgeName?: string
-  courtRoom?: string
 }
 
 /**
@@ -297,6 +297,10 @@ export interface Case {
   defendant?: Party
   defendantType?: PartyType
 
+  // Unified National Numbers (الرقم الوطني الموحد للمنشأة)
+  plaintiffUnifiedNumber?: string
+  defendantUnifiedNumber?: string
+
   // Legacy Labor Case Details (for backward compatibility)
   laborCaseDetails?: LaborCaseDetails
 
@@ -373,6 +377,10 @@ export interface CreateCaseData {
   // Defendant
   defendant?: Party
   defendantType?: PartyType
+
+  // Unified National Numbers (الرقم الوطني الموحد للمنشأة)
+  plaintiffUnifiedNumber?: string
+  defendantUnifiedNumber?: string
 
   // Case Details
   caseSubject?: string
