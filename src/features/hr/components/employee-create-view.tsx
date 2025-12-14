@@ -368,15 +368,9 @@ export function EmployeeCreateView() {
             )
         } else {
             createMutation.mutate(employeeData, {
-                onSuccess: (response: any) => {
-                    // Handle different response structures from backend
-                    const employeeId = response?._id || response?.employee?._id || response?.data?._id
-                    if (employeeId) {
-                        navigate({ to: '/dashboard/hr/employees/$employeeId', params: { employeeId } })
-                    } else {
-                        // Fallback to employees list if no ID returned
-                        navigate({ to: '/dashboard/hr/employees' })
-                    }
+                onSuccess: () => {
+                    // Navigate back to employees list after successful creation
+                    navigate({ to: '/dashboard/hr/employees' })
                 },
                 onError: (error) => {
                     handleApiError(error)
