@@ -2,23 +2,18 @@ import { useTranslation } from 'react-i18next'
 import {
   MessageSquare,
   Briefcase,
-  Users,
   Scale,
   DollarSign,
   Bell,
   Search,
   Plus,
   ArrowUpRight,
-  ArrowDownRight,
-  FileText,
   ChevronLeft,
   GraduationCap,
   TrendingUp,
   Loader2,
-  AlertCircle,
   ListTodo,
   CheckSquare,
-  Calendar as CalendarIcon,
 } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
@@ -40,8 +35,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { StatCard } from '@/components/stat-card'
 import {
-  useDashboardStats,
-  useDashboardHeroStats,
   useTodayEvents,
   useFinancialSummary,
   useRecentMessages,
@@ -80,8 +73,6 @@ export function Dashboard() {
   }
 
   // Fetch dashboard data
-  const { data: stats, isLoading: statsLoading, error: statsError } = useDashboardStats()
-  const { data: heroStats, isLoading: heroLoading } = useDashboardHeroStats()
   const { data: todayEvents, isLoading: eventsLoading } = useTodayEvents()
   const { data: financialSummary, isLoading: financialLoading } = useFinancialSummary()
   const { data: recentMessages, isLoading: messagesLoading } = useRecentMessages(3)
@@ -93,8 +84,8 @@ export function Dashboard() {
   const { data: reminderStats } = useReminderStats()
 
   // Calculate counts for hero stat cards
-  const activeCasesCount = caseStats?.active || stats?.cases?.active || 0
-  const activeTasksCount = taskStats?.byStatus?.todo + taskStats?.byStatus?.in_progress || stats?.tasks?.active || 0
+  const activeCasesCount = caseStats?.active || 0
+  const activeTasksCount = (taskStats?.byStatus?.todo || 0) + (taskStats?.byStatus?.in_progress || 0)
   const unreadMessagesCount = messageStats?.unreadMessages || 0
   const pendingRemindersCount = reminderStats?.byStatus?.pending || 0
 
@@ -243,97 +234,6 @@ export function Dashboard() {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* STATS ROW */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {statsLoading ? (
-            <div className="col-span-full flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-navy" />
-            </div>
-          ) : statsError ? (
-            <div className="col-span-full flex flex-col items-center justify-center py-12 text-slate-500">
-              <AlertCircle className="h-10 w-10 mb-3 text-slate-300" aria-hidden="true" />
-              <span className="text-sm font-medium">{t('dashboard.stats.noDataAvailable')}</span>
-              <span className="text-xs text-slate-500 mt-1">
-                {(statsError as any)?.status === 404
-                  ? t('dashboard.stats.statsNotFound')
-                  : (statsError as any)?.message || t('dashboard.stats.tryLater')}
-              </span>
-            </div>
-          ) : !stats ? (
-            <div className="col-span-full flex flex-col items-center justify-center py-12 text-slate-500">
-              <AlertCircle className="h-10 w-10 mb-3 text-slate-300" aria-hidden="true" />
-              <span className="text-sm font-medium">{t('dashboard.stats.noData')}</span>
-            </div>
-          ) : (
-            <>
-              {/* Cases */}
-              <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-bold text-slate-500">{t('dashboard.stats.cases.title')}</CardTitle>
-                  <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
-                    <Scale className="h-5 w-5 text-brand-blue" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-navy">{stats?.cases?.total || 0} {t('dashboard.stats.cases.unit')}</div>
-                  <p className="text-xs text-slate-500 mt-1 font-medium">
-                    {stats?.cases?.active || 0} {t('dashboard.stats.active')} · {stats?.cases?.closed || 0} {t('dashboard.stats.closed')}
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Tasks */}
-              <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-bold text-slate-500">{t('dashboard.stats.tasks.title')}</CardTitle>
-                  <div className="h-10 w-10 rounded-xl bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition-colors">
-                    <Users className="h-5 w-5 text-purple-600" aria-hidden="true" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-navy">{stats?.tasks?.total || 0} {t('dashboard.stats.tasks.unit')}</div>
-                  <p className="text-xs text-purple-600 flex items-center mt-1 font-bold">
-                    <ArrowUpRight className="h-3 w-3 ms-1" />
-                    {stats?.tasks?.active || 0} {t('dashboard.stats.active')}
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Invoices */}
-              <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-bold text-slate-500">{t('dashboard.stats.invoices.title')}</CardTitle>
-                  <div className="h-10 w-10 rounded-xl bg-green-50 flex items-center justify-center group-hover:bg-green-100 transition-colors">
-                    <DollarSign className="h-5 w-5 text-green-600" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-navy">{stats?.invoices?.total || 0} {t('dashboard.stats.invoices.unit')}</div>
-                  <p className="text-xs text-slate-500 mt-1 font-medium">
-                    {stats?.invoices?.paid || 0} {t('dashboard.stats.paid')} · {stats?.invoices?.pending || 0} {t('dashboard.stats.pending')}
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Orders */}
-              <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-bold text-slate-500">{t('dashboard.stats.orders.title')}</CardTitle>
-                  <div className="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center group-hover:bg-amber-100 transition-colors">
-                    <MessageSquare className="h-5 w-5 text-amber-600" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-navy">{stats?.orders?.total || 0} {t('dashboard.stats.orders.unit')}</div>
-                  <p className="text-xs text-slate-500 mt-1 font-medium">
-                    {stats?.orders?.completed || 0} {t('dashboard.stats.completed')} · {stats?.orders?.active || 0} {t('dashboard.stats.active')}
-                  </p>
-                </CardContent>
-              </Card>
-            </>
-          )}
         </div>
 
         {/* MAIN GRID */}
