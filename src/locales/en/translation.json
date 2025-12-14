@@ -1118,6 +1118,7 @@
     "filter": "Filter",
     "sort": "Sort",
     "actions": "Actions",
+    "currency": "SAR",
     "sar": "SAR",
     "retry": "Retry",
     "unknownError": "Unknown error",
