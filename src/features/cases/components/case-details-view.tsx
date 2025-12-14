@@ -193,6 +193,61 @@ const getEntityTypeLabel = (value?: string): string => {
   }
 }
 
+const getPartyTypeLabel = (value?: string): string => {
+  switch (value) {
+    case 'individual':
+      return 'شخص طبيعي'
+    case 'company':
+      return 'شخص اعتباري'
+    case 'government':
+      return 'جهة حكومية'
+    default:
+      return ''
+  }
+}
+
+// Helper to get plaintiff name from new Party structure or legacy fields
+const getPlaintiffDisplayName = (c: Case): string => {
+  // Check new Party structure first
+  if (c.plaintiff) {
+    if (c.plaintiff.type === 'individual' && 'name' in c.plaintiff) {
+      return c.plaintiff.name || 'غير محدد'
+    }
+    if (c.plaintiff.type === 'company' && 'companyName' in c.plaintiff) {
+      return c.plaintiff.companyName || 'غير محدد'
+    }
+    if (c.plaintiff.type === 'government' && 'entityName' in c.plaintiff) {
+      return c.plaintiff.entityName || 'غير محدد'
+    }
+  }
+  // Fall back to legacy fields
+  if (c.clientName) return c.clientName
+  if (c.clientId && typeof c.clientId === 'object') {
+    const client = c.clientId as ClientRef
+    return client.name || client.firstName || client.username || 'غير محدد'
+  }
+  return 'غير محدد'
+}
+
+// Helper to get defendant name from new Party structure or legacy fields
+const getDefendantDisplayName = (c: Case): string => {
+  // Check new Party structure first
+  if (c.defendant) {
+    if (c.defendant.type === 'individual' && 'name' in c.defendant) {
+      return c.defendant.name || 'غير محدد'
+    }
+    if (c.defendant.type === 'company' && 'companyName' in c.defendant) {
+      return c.defendant.companyName || 'غير محدد'
+    }
+    if (c.defendant.type === 'government' && 'entityName' in c.defendant) {
+      return c.defendant.entityName || 'غير محدد'
+    }
+  }
+  // Fall back to legacy labor case fields
+  if (c.laborCaseDetails?.company?.name) return c.laborCaseDetails.company.name
+  return 'غير محدد'
+}
+
 // Helper functions
 const getClientName = (c: Case): string => {
   if (c.clientName) return c.clientName
