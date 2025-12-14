@@ -252,11 +252,25 @@ export interface EmployeesResponse {
   totalPages: number
 }
 
+// Compensation data for create/update - allowances as array (backend API format)
+export interface CompensationInput {
+  basicSalary?: number
+  currency?: string
+  allowances?: Allowance[] // Backend expects array format
+  totalAllowances?: number
+  grossSalary?: number
+  paymentFrequency?: PaymentFrequency
+  paymentMethod?: PaymentMethod
+  paymentDay?: number
+  bankDetails?: Partial<BankDetails>
+  wps?: Partial<WPS>
+}
+
 export interface CreateEmployeeData {
   employeeNumber?: string
   personalInfo: Partial<PersonalInfo>
   employment: Partial<Employment>
-  compensation?: Partial<Compensation>
+  compensation?: CompensationInput
   leave?: Partial<Leave>
   gosi?: Partial<GOSI>
 }

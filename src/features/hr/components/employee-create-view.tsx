@@ -325,20 +325,16 @@ export function EmployeeCreateView() {
             compensation: {
                 basicSalary,
                 currency: 'SAR',
-                allowances: {
-                    housingAllowance: allowances.find(a => a.name === 'Housing Allowance')?.amount || 0,
-                    transportationAllowance: allowances.find(a => a.name === 'Transportation Allowance')?.amount || 0,
-                    foodAllowance: allowances.find(a => a.name === 'Food Allowance')?.amount || 0,
-                    otherAllowances: allowances.filter(a => !['Housing Allowance', 'Transportation Allowance', 'Food Allowance'].includes(a.name)).map(a => ({
-                        allowanceName: a.name,
-                        allowanceNameAr: a.nameAr,
-                        amount: a.amount,
-                        taxable: true,
-                        includedInEOSB: true,
-                        includedInGOSI: false,
-                    })),
-                    totalAllowances,
-                },
+                // Transform allowances from object format to array format for backend API
+                allowances: allowances.map(a => ({
+                    allowanceName: a.name,
+                    allowanceNameAr: a.nameAr,
+                    amount: a.amount,
+                    taxable: true,
+                    includedInEOSB: true,
+                    includedInGOSI: false,
+                })),
+                totalAllowances,
                 grossSalary,
                 paymentFrequency,
                 paymentMethod,
