@@ -5,16 +5,17 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Link, useNavigate } from '@tanstack/react-router'
 import {
-    Loader2, User, Building, Phone, MapPin, FileText, Calendar, ChevronDown,
+    Loader2, User, Building, FileText, Calendar, ChevronDown, ChevronUp,
     Scale, Flag, Briefcase, Hash, Sparkles, Save, ArrowRight, ArrowLeft,
     Plus, Trash2, Users, Gavel, ScrollText, Building2, Baby, CreditCard,
-    Clock, CheckCircle2, Circle, UserCircle, Landmark
+    CheckCircle2, Landmark, Tag
 } from 'lucide-react'
 import { saudiNationalIdSchemaOptional, saudiCrNumberSchemaOptional } from '@/lib/zod-validators'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
 import {
     Select,
     SelectContent,
@@ -27,6 +28,7 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from '@/components/ui/collapsible'
+import { FieldTooltip } from '@/components/ui/field-tooltip'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
@@ -36,6 +38,25 @@ import { PracticeSidebar } from './practice-sidebar'
 import { useCreateCase } from '@/hooks/useCasesAndClients'
 import { cn } from '@/lib/utils'
 import type { CaseCategory, CasePriority, CreateCaseData, LaborCaseDetails } from '@/services/casesService'
+
+// Field Tooltips
+const FIELD_TOOLTIPS = {
+    title: 'عنوان واضح ومختصر للقضية يسهل تحديدها لاحقاً',
+    category: 'تصنيف القضية يساعد في تحديد الإجراءات والنماذج المطلوبة',
+    subCategory: 'التصنيف الفرعي يحدد نوع القضية بشكل أدق',
+    priority: 'تحديد أولوية القضية يساعد في ترتيب العمل',
+    filingDate: 'تاريخ تقديم الدعوى للمحكمة',
+    caseNumber: 'رقم القضية المسجل في المحكمة',
+    internalReference: 'رقم مرجعي داخلي للمكتب',
+    entityType: 'اختر محكمة أو لجنة حسب اختصاص القضية',
+    region: 'المنطقة الإدارية التي تقع فيها المحكمة',
+    plaintiff: 'الطرف الذي يرفع الدعوى',
+    defendant: 'الطرف المرفوعة عليه الدعوى',
+    claims: 'المطالبات المالية وغيرها المطلوبة في الدعوى',
+    laborDetails: 'بيانات العلاقة العمالية المطلوبة للقضايا العمالية',
+    powerOfAttorney: 'بيانات الوكالة الشرعية للتمثيل أمام المحكمة',
+    team: 'فريق العمل المسؤول عن متابعة القضية',
+}
 
 // ==================== CONSTANTS ====================
 
@@ -449,56 +470,53 @@ export function CreateCaseView() {
 
     // Step 1: Basic Information
     const renderStep1 = () => (
-        <div className="space-y-6">
+        <div className="space-y-8">
             {/* Case Title */}
-            <div className="pb-6 border-b border-slate-100">
-                <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                        <Scale className="w-4 h-4 text-blue-600" />
-                    </div>
-                    <span className="text-sm font-medium text-slate-500">{t('cases.basicInfo', 'المعلومات الأساسية')}</span>
-                </div>
-
+            <div className="space-y-4">
                 <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        <Scale className="w-4 h-4 text-emerald-500" />
+                        {t('cases.caseTitle', 'عنوان القضية')}
+                        <FieldTooltip content={FIELD_TOOLTIPS.title} />
+                    </label>
                     <Input
-                        placeholder={t('cases.titlePlaceholder', 'عنوان القضية')}
+                        placeholder={t('cases.titlePlaceholder', 'مثال: دعوى مطالبة بأجور متأخرة')}
                         className={cn(
-                            "text-xl sm:text-2xl font-bold border-0 border-b-2 border-slate-100 focus:border-blue-500 rounded-none shadow-none focus-visible:ring-0 px-0 h-auto py-4 placeholder:text-slate-300 placeholder:font-normal bg-transparent transition-all",
-                            errors.title && "border-red-300 focus:border-red-500"
+                            "rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-12 text-lg",
+                            errors.title && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
                         )}
                         {...register('title')}
                         autoComplete="off"
                     />
                     {errors.title ? (
-                        <p className="text-xs text-red-500">{errors.title.message}</p>
+                        <p className="text-sm text-red-500">{errors.title.message}</p>
                     ) : (
                         <p className="text-xs text-slate-400 flex items-center gap-1">
                             <Sparkles className="w-3 h-3" />
-                            {t('cases.titleHint', 'مثال: دعوى مطالبة بأجور متأخرة، قضية تجارية ضد شركة...')}
+                            {t('cases.titleHint', 'عنوان واضح يسهل البحث عن القضية')}
                         </p>
                     )}
                 </div>
             </div>
 
             {/* Category & Sub-category */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                    <Label className="text-sm font-medium text-slate-600 flex items-center gap-1">
-                        <Briefcase className="w-3.5 h-3.5 text-slate-400" />
+                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        <Tag className="w-4 h-4 text-emerald-500" />
                         {t('cases.caseType', 'التصنيف الرئيسي')}
-                    </Label>
+                        <FieldTooltip content={FIELD_TOOLTIPS.category} />
+                    </label>
                     <Select value={selectedCategory} onValueChange={handleCategoryChange}>
-                        <SelectTrigger className="rounded-xl border-slate-200 h-12 bg-white">
+                        <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-11">
                             <SelectValue placeholder={t('cases.selectType', 'اختر نوع القضية')} />
                         </SelectTrigger>
                         <SelectContent>
                             {CASE_CATEGORIES.map(option => (
                                 <SelectItem key={option.value} value={option.value}>
-                                    <div className="flex items-center gap-2">
-                                        <span className={cn("px-2 py-0.5 rounded-full text-xs font-medium", option.color)}>
-                                            {option.label}
-                                        </span>
-                                    </div>
+                                    <Badge variant="secondary" className={cn("text-xs", option.color)}>
+                                        {option.label}
+                                    </Badge>
                                 </SelectItem>
                             ))}
                         </SelectContent>
@@ -506,16 +524,17 @@ export function CreateCaseView() {
                 </div>
 
                 <div className="space-y-2">
-                    <Label className="text-sm font-medium text-slate-600 flex items-center gap-1">
-                        <ScrollText className="w-3.5 h-3.5 text-slate-400" />
+                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        <ScrollText className="w-4 h-4 text-emerald-500" />
                         {t('cases.subCategory', 'التصنيف الفرعي')}
-                    </Label>
+                        <FieldTooltip content={FIELD_TOOLTIPS.subCategory} />
+                    </label>
                     <Select
                         value={watch('subCategory')}
                         onValueChange={(v) => setValue('subCategory', v)}
                         disabled={!selectedCategory}
                     >
-                        <SelectTrigger className="rounded-xl border-slate-200 h-12 bg-white">
+                        <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-11">
                             <SelectValue placeholder={t('cases.selectSubCategory', 'اختر التصنيف الفرعي')} />
                         </SelectTrigger>
                         <SelectContent>
@@ -530,17 +549,18 @@ export function CreateCaseView() {
             </div>
 
             {/* Priority & Filing Date */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                    <Label className="text-sm font-medium text-slate-600 flex items-center gap-1">
-                        <Flag className="w-3.5 h-3.5 text-slate-400" />
+                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        <Flag className="w-4 h-4 text-emerald-500" />
                         {t('cases.priority', 'الأولوية')}
-                    </Label>
+                        <FieldTooltip content={FIELD_TOOLTIPS.priority} />
+                    </label>
                     <Select
                         value={selectedPriority}
                         onValueChange={(v) => setValue('priority', v as CasePriority)}
                     >
-                        <SelectTrigger className="rounded-xl border-slate-200 h-12 bg-white">
+                        <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-11">
                             <SelectValue placeholder={t('cases.selectPriority', 'اختر الأولوية')} />
                         </SelectTrigger>
                         <SelectContent>
@@ -557,40 +577,43 @@ export function CreateCaseView() {
                 </div>
 
                 <div className="space-y-2">
-                    <Label className="text-sm font-medium text-slate-600 flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-emerald-500" />
                         {t('cases.filingDate', 'تاريخ رفع الدعوى')}
-                    </Label>
+                        <FieldTooltip content={FIELD_TOOLTIPS.filingDate} />
+                    </label>
                     <Input
                         type="date"
-                        className="rounded-xl border-slate-200 h-12 bg-white"
+                        className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11"
                         {...register('filingDate')}
                     />
                 </div>
             </div>
 
             {/* Case Numbers */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                    <Label className="text-sm font-medium text-slate-600 flex items-center gap-1">
-                        <Hash className="w-3.5 h-3.5 text-slate-400" />
+                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        <Hash className="w-4 h-4 text-emerald-500" />
                         {t('cases.caseNumber', 'رقم القضية (المحكمة)')}
-                    </Label>
+                        <FieldTooltip content={FIELD_TOOLTIPS.caseNumber} />
+                    </label>
                     <Input
                         placeholder="12345/1445"
-                        className="rounded-xl border-slate-200 h-12 bg-white"
+                        className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11"
                         {...register('caseNumber')}
                     />
                 </div>
 
                 <div className="space-y-2">
-                    <Label className="text-sm font-medium text-slate-600 flex items-center gap-1">
-                        <Hash className="w-3.5 h-3.5 text-slate-400" />
+                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        <Hash className="w-4 h-4 text-emerald-500" />
                         {t('cases.internalReference', 'الرقم المرجعي الداخلي')}
-                    </Label>
+                        <FieldTooltip content={FIELD_TOOLTIPS.internalReference} />
+                    </label>
                     <Input
                         placeholder="CASE-2024-001"
-                        className="rounded-xl border-slate-200 h-12 bg-white"
+                        className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11"
                         {...register('internalReference')}
                     />
                 </div>
@@ -598,25 +621,24 @@ export function CreateCaseView() {
 
             {/* Entity Type (Court/Committee) */}
             <div className="border-t border-slate-100 pt-6">
-                <div className="flex items-center gap-3 mb-4">
-                    <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
-                        <Landmark className="w-4 h-4 text-purple-600" />
-                    </div>
-                    <span className="text-sm font-medium text-slate-600">{t('cases.courtCommittee', 'المحكمة / اللجنة')}</span>
-                </div>
+                <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                    <Landmark className="w-5 h-5 text-emerald-500" />
+                    {t('cases.courtCommittee', 'المحكمة / اللجنة')}
+                    <FieldTooltip content={FIELD_TOOLTIPS.entityType} />
+                </h3>
 
-                <div className="space-y-4 p-5 bg-slate-50 rounded-2xl border border-slate-100">
+                <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
                     {/* Entity Type Selection */}
-                    <div className="flex gap-4">
+                    <div className="flex gap-6">
                         <label className="flex items-center gap-2 cursor-pointer">
                             <input
                                 type="radio"
                                 value="court"
                                 checked={entityType === 'court'}
                                 onChange={() => setValue('entityType', 'court')}
-                                className="w-4 h-4 text-blue-600"
+                                className="w-4 h-4 text-emerald-600 border-slate-300 focus:ring-emerald-500"
                             />
-                            <span className="text-sm font-medium">{t('cases.court', 'محكمة')}</span>
+                            <span className="text-sm font-medium text-slate-700">{t('cases.court', 'محكمة')}</span>
                         </label>
                         <label className="flex items-center gap-2 cursor-pointer">
                             <input
@@ -624,19 +646,19 @@ export function CreateCaseView() {
                                 value="committee"
                                 checked={entityType === 'committee'}
                                 onChange={() => setValue('entityType', 'committee')}
-                                className="w-4 h-4 text-blue-600"
+                                className="w-4 h-4 text-emerald-600 border-slate-300 focus:ring-emerald-500"
                             />
-                            <span className="text-sm font-medium">{t('cases.committee', 'لجنة')}</span>
+                            <span className="text-sm font-medium text-slate-700">{t('cases.committee', 'لجنة')}</span>
                         </label>
                     </div>
 
                     {/* Court/Committee Selection */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {entityType === 'court' ? (
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.selectCourt', 'اختر المحكمة')}</Label>
+                                <label className="text-sm font-medium text-slate-700">{t('cases.selectCourt', 'اختر المحكمة')}</label>
                                 <Select value={watch('court')} onValueChange={(v) => setValue('court', v)}>
-                                    <SelectTrigger className="rounded-xl border-slate-200 h-12 bg-white">
+                                    <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-11 bg-white">
                                         <SelectValue placeholder={t('cases.selectCourt', 'اختر المحكمة')} />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -650,9 +672,9 @@ export function CreateCaseView() {
                             </div>
                         ) : (
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.selectCommittee', 'اختر اللجنة')}</Label>
+                                <label className="text-sm font-medium text-slate-700">{t('cases.selectCommittee', 'اختر اللجنة')}</label>
                                 <Select value={watch('committee')} onValueChange={(v) => setValue('committee', v)}>
-                                    <SelectTrigger className="rounded-xl border-slate-200 h-12 bg-white">
+                                    <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-11 bg-white">
                                         <SelectValue placeholder={t('cases.selectCommittee', 'اختر اللجنة')} />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -668,9 +690,12 @@ export function CreateCaseView() {
 
                         {/* Region */}
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium text-slate-600">{t('cases.region', 'المنطقة')}</Label>
+                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                {t('cases.region', 'المنطقة')}
+                                <FieldTooltip content={FIELD_TOOLTIPS.region} />
+                            </label>
                             <Select value={selectedRegion} onValueChange={(v) => { setValue('region', v); setValue('city', undefined) }}>
-                                <SelectTrigger className="rounded-xl border-slate-200 h-12 bg-white">
+                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-11 bg-white">
                                     <SelectValue placeholder={t('cases.selectRegion', 'اختر المنطقة')} />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -687,9 +712,9 @@ export function CreateCaseView() {
                     {/* City */}
                     {selectedRegion && (
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium text-slate-600">{t('cases.city', 'المدينة')}</Label>
+                            <label className="text-sm font-medium text-slate-700">{t('cases.city', 'المدينة')}</label>
                             <Select value={watch('city')} onValueChange={(v) => setValue('city', v)}>
-                                <SelectTrigger className="rounded-xl border-slate-200 h-12 bg-white">
+                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-11 bg-white">
                                     <SelectValue placeholder={t('cases.selectCity', 'اختر المدينة')} />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -707,13 +732,13 @@ export function CreateCaseView() {
 
             {/* Description */}
             <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-600 flex items-center gap-1">
-                    <FileText className="w-3.5 h-3.5 text-slate-400" />
+                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-emerald-500" />
                     {t('cases.description', 'وصف القضية')}
-                </Label>
+                </label>
                 <Textarea
                     placeholder={t('cases.descriptionPlaceholder', 'أدخل وصفاً مختصراً للقضية...')}
-                    className="min-h-[100px] rounded-xl border-slate-200 resize-none focus:border-blue-500 text-base bg-white"
+                    className="min-h-[120px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
                     {...register('description')}
                 />
             </div>
@@ -724,20 +749,19 @@ export function CreateCaseView() {
     const renderStep2 = () => (
         <div className="space-y-8">
             {/* Plaintiff Section */}
-            <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                        <User className="w-4 h-4 text-blue-600" />
-                    </div>
-                    <span className="text-sm font-medium text-slate-600">{t('cases.plaintiff', 'المدعي')}</span>
-                </div>
+            <div className="border-t border-slate-100 pt-6 first:border-t-0 first:pt-0">
+                <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                    <User className="w-5 h-5 text-emerald-500" />
+                    {t('cases.plaintiff', 'المدعي')}
+                    <FieldTooltip content={FIELD_TOOLTIPS.plaintiff} />
+                </h3>
 
-                <div className="p-5 bg-blue-50/50 rounded-2xl border border-blue-100 space-y-4">
+                <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
                     {/* Party Type Selection */}
                     <div className="space-y-2">
-                        <Label className="text-sm font-medium text-slate-600">{t('cases.partyType', 'نوع الطرف')}</Label>
+                        <label className="text-sm font-medium text-slate-700">{t('cases.partyType', 'نوع الطرف')}</label>
                         <Select value={plaintiffType} onValueChange={(v) => setValue('plaintiffType', v as any)}>
-                            <SelectTrigger className="rounded-xl border-slate-200 h-12 bg-white">
+                            <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-11 bg-white">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -752,68 +776,68 @@ export function CreateCaseView() {
 
                     {/* Individual Fields */}
                     {plaintiffType === 'individual' && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.fullName', 'الاسم الكامل')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('plaintiffName')} />
+                                <label className="text-sm font-medium text-slate-700">{t('cases.fullName', 'الاسم الكامل')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffName')} />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.nationalId', 'رقم الهوية / الإقامة')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('plaintiffNationalId')} placeholder="1234567890" />
-                                {errors.plaintiffNationalId && <p className="text-xs text-red-500">{errors.plaintiffNationalId.message}</p>}
+                                <label className="text-sm font-medium text-slate-700">{t('cases.nationalId', 'رقم الهوية / الإقامة')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffNationalId')} placeholder="1234567890" />
+                                {errors.plaintiffNationalId && <p className="text-sm text-red-500 mt-1">{errors.plaintiffNationalId.message}</p>}
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.phone', 'رقم الجوال')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('plaintiffPhone')} placeholder="+966501234567" />
+                                <label className="text-sm font-medium text-slate-700">{t('cases.phone', 'رقم الجوال')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffPhone')} placeholder="+966501234567" />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.email', 'البريد الإلكتروني')}</Label>
-                                <Input type="email" className="rounded-xl border-slate-200 h-12 bg-white" {...register('plaintiffEmail')} />
+                                <label className="text-sm font-medium text-slate-700">{t('cases.email', 'البريد الإلكتروني')}</label>
+                                <Input type="email" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffEmail')} />
                             </div>
-                            <div className="sm:col-span-2 space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.address', 'العنوان')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('plaintiffAddress')} />
+                            <div className="md:col-span-2 space-y-2">
+                                <label className="text-sm font-medium text-slate-700">{t('cases.address', 'العنوان')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffAddress')} />
                             </div>
                         </div>
                     )}
 
                     {/* Company Fields */}
                     {plaintiffType === 'company' && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.companyName', 'اسم الشركة / المؤسسة')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('plaintiffCompanyName')} />
+                                <label className="text-sm font-medium text-slate-700">{t('cases.companyName', 'اسم الشركة / المؤسسة')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffCompanyName')} />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.crNumber', 'رقم السجل التجاري')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('plaintiffCrNumber')} placeholder="1234567890" />
-                                {errors.plaintiffCrNumber && <p className="text-xs text-red-500">{errors.plaintiffCrNumber.message}</p>}
+                                <label className="text-sm font-medium text-slate-700">{t('cases.crNumber', 'رقم السجل التجاري')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffCrNumber')} placeholder="1234567890" />
+                                {errors.plaintiffCrNumber && <p className="text-sm text-red-500 mt-1">{errors.plaintiffCrNumber.message}</p>}
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.representativeName', 'اسم الممثل النظامي')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('plaintiffRepresentativeName')} />
+                                <label className="text-sm font-medium text-slate-700">{t('cases.representativeName', 'اسم الممثل النظامي')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffRepresentativeName')} />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.representativePosition', 'صفته')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('plaintiffRepresentativePosition')} placeholder="مدير عام" />
+                                <label className="text-sm font-medium text-slate-700">{t('cases.representativePosition', 'صفته')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffRepresentativePosition')} placeholder="مدير عام" />
                             </div>
-                            <div className="sm:col-span-2 space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.address', 'العنوان')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('plaintiffCompanyAddress')} />
+                            <div className="md:col-span-2 space-y-2">
+                                <label className="text-sm font-medium text-slate-700">{t('cases.address', 'العنوان')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffCompanyAddress')} />
                             </div>
                         </div>
                     )}
 
                     {/* Government Fields */}
                     {plaintiffType === 'government' && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.govEntity', 'الجهة الحكومية')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('plaintiffGovEntity')} placeholder="وزارة / هيئة / مؤسسة" />
+                                <label className="text-sm font-medium text-slate-700">{t('cases.govEntity', 'الجهة الحكومية')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffGovEntity')} placeholder="وزارة / هيئة / مؤسسة" />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.govRepresentative', 'ممثل الجهة')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('plaintiffGovRepresentative')} />
+                                <label className="text-sm font-medium text-slate-700">{t('cases.govRepresentative', 'ممثل الجهة')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('plaintiffGovRepresentative')} />
                             </div>
                         </div>
                     )}
@@ -821,20 +845,19 @@ export function CreateCaseView() {
             </div>
 
             {/* Defendant Section */}
-            <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
-                        <Building className="w-4 h-4 text-amber-600" />
-                    </div>
-                    <span className="text-sm font-medium text-slate-600">{t('cases.defendant', 'المدعى عليه')}</span>
-                </div>
+            <div className="border-t border-slate-100 pt-6">
+                <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                    <Building className="w-5 h-5 text-emerald-500" />
+                    {t('cases.defendant', 'المدعى عليه')}
+                    <FieldTooltip content={FIELD_TOOLTIPS.defendant} />
+                </h3>
 
-                <div className="p-5 bg-amber-50/50 rounded-2xl border border-amber-100 space-y-4">
+                <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
                     {/* Party Type Selection */}
                     <div className="space-y-2">
-                        <Label className="text-sm font-medium text-slate-600">{t('cases.partyType', 'نوع الطرف')}</Label>
+                        <label className="text-sm font-medium text-slate-700">{t('cases.partyType', 'نوع الطرف')}</label>
                         <Select value={defendantType} onValueChange={(v) => setValue('defendantType', v as any)}>
-                            <SelectTrigger className="rounded-xl border-slate-200 h-12 bg-white">
+                            <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-11 bg-white">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -849,68 +872,68 @@ export function CreateCaseView() {
 
                     {/* Individual Fields */}
                     {defendantType === 'individual' && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.fullName', 'الاسم الكامل')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('defendantName')} />
+                                <label className="text-sm font-medium text-slate-700">{t('cases.fullName', 'الاسم الكامل')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantName')} />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.nationalId', 'رقم الهوية / الإقامة')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('defendantNationalId')} placeholder="1234567890" />
-                                {errors.defendantNationalId && <p className="text-xs text-red-500">{errors.defendantNationalId.message}</p>}
+                                <label className="text-sm font-medium text-slate-700">{t('cases.nationalId', 'رقم الهوية / الإقامة')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantNationalId')} placeholder="1234567890" />
+                                {errors.defendantNationalId && <p className="text-sm text-red-500 mt-1">{errors.defendantNationalId.message}</p>}
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.phone', 'رقم الجوال')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('defendantPhone')} placeholder="+966501234567" />
+                                <label className="text-sm font-medium text-slate-700">{t('cases.phone', 'رقم الجوال')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantPhone')} placeholder="+966501234567" />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.email', 'البريد الإلكتروني')}</Label>
-                                <Input type="email" className="rounded-xl border-slate-200 h-12 bg-white" {...register('defendantEmail')} />
+                                <label className="text-sm font-medium text-slate-700">{t('cases.email', 'البريد الإلكتروني')}</label>
+                                <Input type="email" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantEmail')} />
                             </div>
-                            <div className="sm:col-span-2 space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.address', 'العنوان')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('defendantAddress')} />
+                            <div className="md:col-span-2 space-y-2">
+                                <label className="text-sm font-medium text-slate-700">{t('cases.address', 'العنوان')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantAddress')} />
                             </div>
                         </div>
                     )}
 
                     {/* Company Fields */}
                     {defendantType === 'company' && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.companyName', 'اسم الشركة / المؤسسة')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('defendantCompanyName')} />
+                                <label className="text-sm font-medium text-slate-700">{t('cases.companyName', 'اسم الشركة / المؤسسة')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantCompanyName')} />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.crNumber', 'رقم السجل التجاري')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('defendantCrNumber')} placeholder="1234567890" />
-                                {errors.defendantCrNumber && <p className="text-xs text-red-500">{errors.defendantCrNumber.message}</p>}
+                                <label className="text-sm font-medium text-slate-700">{t('cases.crNumber', 'رقم السجل التجاري')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantCrNumber')} placeholder="1234567890" />
+                                {errors.defendantCrNumber && <p className="text-sm text-red-500 mt-1">{errors.defendantCrNumber.message}</p>}
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.representativeName', 'اسم الممثل النظامي')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('defendantRepresentativeName')} />
+                                <label className="text-sm font-medium text-slate-700">{t('cases.representativeName', 'اسم الممثل النظامي')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantRepresentativeName')} />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.representativePosition', 'صفته')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('defendantRepresentativePosition')} placeholder="مدير عام" />
+                                <label className="text-sm font-medium text-slate-700">{t('cases.representativePosition', 'صفته')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantRepresentativePosition')} placeholder="مدير عام" />
                             </div>
-                            <div className="sm:col-span-2 space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.address', 'العنوان')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('defendantCompanyAddress')} />
+                            <div className="md:col-span-2 space-y-2">
+                                <label className="text-sm font-medium text-slate-700">{t('cases.address', 'العنوان')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantCompanyAddress')} />
                             </div>
                         </div>
                     )}
 
                     {/* Government Fields */}
                     {defendantType === 'government' && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.govEntity', 'الجهة الحكومية')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('defendantGovEntity')} placeholder="وزارة / هيئة / مؤسسة" />
+                                <label className="text-sm font-medium text-slate-700">{t('cases.govEntity', 'الجهة الحكومية')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantGovEntity')} placeholder="وزارة / هيئة / مؤسسة" />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.govRepresentative', 'ممثل الجهة')}</Label>
-                                <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('defendantGovRepresentative')} />
+                                <label className="text-sm font-medium text-slate-700">{t('cases.govRepresentative', 'ممثل الجهة')}</label>
+                                <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('defendantGovRepresentative')} />
                             </div>
                         </div>
                     )}
@@ -923,112 +946,97 @@ export function CreateCaseView() {
     const renderStep3 = () => (
         <div className="space-y-8">
             {/* Case Subject & Legal Basis */}
-            <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
-                        <ScrollText className="w-4 h-4 text-purple-600" />
-                    </div>
-                    <span className="text-sm font-medium text-slate-600">{t('cases.caseDetails', 'تفاصيل الدعوى')}</span>
+            <div className="space-y-6">
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        <ScrollText className="w-4 h-4 text-emerald-500" />
+                        {t('cases.caseSubject', 'موضوع الدعوى')}
+                    </label>
+                    <Textarea
+                        className="min-h-[100px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                        placeholder={t('cases.caseSubjectPlaceholder', 'ملخص موضوع الدعوى...')}
+                        {...register('caseSubject')}
+                    />
                 </div>
 
-                <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-medium text-slate-600">{t('cases.caseSubject', 'موضوع الدعوى')}</Label>
-                        <Textarea
-                            className="min-h-[80px] rounded-xl border-slate-200 resize-none bg-white"
-                            placeholder={t('cases.caseSubjectPlaceholder', 'ملخص موضوع الدعوى...')}
-                            {...register('caseSubject')}
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label className="text-sm font-medium text-slate-600">{t('cases.legalBasis', 'السند النظامي')}</Label>
-                        <Textarea
-                            className="min-h-[80px] rounded-xl border-slate-200 resize-none bg-white"
-                            placeholder={t('cases.legalBasisPlaceholder', 'المواد القانونية والأنظمة المستند إليها...')}
-                            {...register('legalBasis')}
-                        />
-                    </div>
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-emerald-500" />
+                        {t('cases.legalBasis', 'السند النظامي')}
+                    </label>
+                    <Textarea
+                        className="min-h-[100px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                        placeholder={t('cases.legalBasisPlaceholder', 'المواد القانونية والأنظمة المستند إليها...')}
+                        {...register('legalBasis')}
+                    />
                 </div>
             </div>
 
             {/* Claims Section */}
-            <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
-                            <CreditCard className="w-4 h-4 text-emerald-600" />
-                        </div>
-                        <span className="text-sm font-medium text-slate-600">{t('cases.claims', 'المطالبات')}</span>
-                    </div>
+            <div className="border-t border-slate-100 pt-6">
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                        <CreditCard className="w-5 h-5 text-emerald-500" />
+                        {t('cases.claims', 'المطالبات')}
+                        <FieldTooltip content={FIELD_TOOLTIPS.claims} />
+                    </h3>
                     <Button
                         type="button"
                         variant="outline"
                         size="sm"
                         onClick={() => appendClaim({ type: '', amount: 0, period: '', description: '' })}
-                        className="rounded-lg"
+                        className="rounded-xl"
                     >
-                        <Plus className="w-4 h-4 ms-1" />
+                        <Plus className="w-4 h-4 ms-2" />
                         {t('cases.addClaim', 'إضافة مطالبة')}
                     </Button>
                 </div>
 
                 <div className="space-y-3">
                     {claimFields.map((field, index) => (
-                        <div key={field.id} className="p-4 bg-emerald-50/50 rounded-xl border border-emerald-100">
-                            <div className="flex items-center justify-between mb-3">
-                                <span className="text-sm font-medium text-emerald-700">{t('cases.claim', 'مطالبة')} {index + 1}</span>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => removeClaim(index)}
-                                    className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                        <div key={field.id} className="p-3 bg-slate-50 rounded-xl flex items-center gap-3">
+                            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <Select
+                                    value={watch(`claims.${index}.type`)}
+                                    onValueChange={(v) => setValue(`claims.${index}.type`, v)}
                                 >
-                                    <Trash2 className="w-4 h-4" />
-                                </Button>
+                                    <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-10 bg-white">
+                                        <SelectValue placeholder={t('cases.selectClaimType', 'نوع المطالبة')} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {CLAIM_TYPES.map(type => (
+                                            <SelectItem key={type.value} value={type.value}>
+                                                {type.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <Input
+                                    type="number"
+                                    placeholder={t('cases.claimAmount', 'المبلغ (ر.س)')}
+                                    className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-10 bg-white"
+                                    {...register(`claims.${index}.amount`, { valueAsNumber: true })}
+                                />
+                                <Input
+                                    placeholder={t('cases.claimPeriod', 'الفترة (من - إلى)')}
+                                    className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-10 bg-white"
+                                    {...register(`claims.${index}.period`)}
+                                />
                             </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                <div className="space-y-2">
-                                    <Label className="text-xs font-medium text-slate-600">{t('cases.claimType', 'نوع المطالبة')}</Label>
-                                    <Select
-                                        value={watch(`claims.${index}.type`)}
-                                        onValueChange={(v) => setValue(`claims.${index}.type`, v)}
-                                    >
-                                        <SelectTrigger className="rounded-lg border-slate-200 h-10 bg-white">
-                                            <SelectValue placeholder={t('cases.selectClaimType', 'اختر النوع')} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {CLAIM_TYPES.map(type => (
-                                                <SelectItem key={type.value} value={type.value}>
-                                                    {type.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-xs font-medium text-slate-600">{t('cases.claimAmount', 'المبلغ (ر.س)')}</Label>
-                                    <Input
-                                        type="number"
-                                        className="rounded-lg border-slate-200 h-10 bg-white"
-                                        {...register(`claims.${index}.amount`, { valueAsNumber: true })}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-xs font-medium text-slate-600">{t('cases.claimPeriod', 'الفترة')}</Label>
-                                    <Input
-                                        className="rounded-lg border-slate-200 h-10 bg-white"
-                                        placeholder="من - إلى"
-                                        {...register(`claims.${index}.period`)}
-                                    />
-                                </div>
-                            </div>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => removeClaim(index)}
+                                className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </Button>
                         </div>
                     ))}
 
                     {claimFields.length === 0 && (
-                        <div className="p-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                        <div className="p-6 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
                             <CreditCard className="w-8 h-8 text-slate-300 mx-auto mb-2" />
                             <p className="text-sm text-slate-500">{t('cases.noClaims', 'لم يتم إضافة مطالبات بعد')}</p>
                         </div>
@@ -1036,112 +1044,141 @@ export function CreateCaseView() {
                 </div>
 
                 {/* Total Claim Amount */}
-                <div className="flex items-center justify-between p-4 bg-emerald-100 rounded-xl">
-                    <span className="font-medium text-emerald-800">{t('cases.totalClaims', 'إجمالي المطالبات')}</span>
-                    <span className="text-lg font-bold text-emerald-800">
-                        {(watch('claims') || []).reduce((sum, claim) => sum + (claim?.amount || 0), 0).toLocaleString('ar-SA')} ر.س
-                    </span>
-                </div>
+                {claimFields.length > 0 && (
+                    <div className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl mt-4">
+                        <span className="font-medium text-emerald-700">{t('cases.totalClaims', 'إجمالي المطالبات')}</span>
+                        <span className="text-lg font-bold text-emerald-700">
+                            {(watch('claims') || []).reduce((sum, claim) => sum + (claim?.amount || 0), 0).toLocaleString('ar-SA')} ر.س
+                        </span>
+                    </div>
+                )}
             </div>
 
             {/* Conditional Fields based on Category */}
             {selectedCategory === 'labor' && (
                 <Collapsible open={laborDetailsOpen} onOpenChange={setLaborDetailsOpen}>
-                    <CollapsibleTrigger asChild>
-                        <button type="button" className="flex items-center justify-between w-full text-sm group p-4 bg-blue-50 rounded-xl border border-blue-100 hover:bg-blue-100 transition-colors">
-                            <div className="flex items-center gap-3">
-                                <Briefcase className="w-5 h-5 text-blue-600" />
-                                <span className="font-medium text-blue-700">{t('cases.laborDetails', 'بيانات العلاقة العمالية')}</span>
-                            </div>
-                            <ChevronDown className={cn("w-5 h-5 text-blue-600 transition-transform", laborDetailsOpen && "rotate-180")} />
-                        </button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="mt-3">
-                        <div className="p-5 bg-blue-50/50 rounded-xl border border-blue-100 space-y-4">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label className="text-sm font-medium text-slate-600">{t('cases.jobTitle', 'المسمى الوظيفي')}</Label>
-                                    <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('jobTitle')} />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-sm font-medium text-slate-600">{t('cases.monthlySalary', 'الراتب الشهري (ر.س)')}</Label>
-                                    <Input type="number" className="rounded-xl border-slate-200 h-12 bg-white" {...register('monthlySalary', { valueAsNumber: true })} />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-sm font-medium text-slate-600">{t('cases.employmentStartDate', 'تاريخ بداية العمل')}</Label>
-                                    <Input type="date" className="rounded-xl border-slate-200 h-12 bg-white" {...register('employmentStartDate')} />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-sm font-medium text-slate-600">{t('cases.employmentEndDate', 'تاريخ نهاية العمل')}</Label>
-                                    <Input type="date" className="rounded-xl border-slate-200 h-12 bg-white" {...register('employmentEndDate')} />
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <Label className="text-sm font-medium text-slate-600">{t('cases.terminationReason', 'سبب إنهاء العلاقة العمالية')}</Label>
-                                <Textarea className="min-h-[80px] rounded-xl border-slate-200 resize-none bg-white" {...register('terminationReason')} />
+                    <div className="border-t border-slate-100 pt-6">
+                        <div className="flex items-center justify-between w-full">
+                            <CollapsibleTrigger asChild>
+                                <Button variant="ghost" className="flex-1 justify-start p-0 h-auto hover:bg-transparent">
+                                    <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                                        <Briefcase className="w-5 h-5 text-emerald-500" />
+                                        {t('cases.laborDetails', 'بيانات العلاقة العمالية')}
+                                    </h3>
+                                </Button>
+                            </CollapsibleTrigger>
+                            <div className="flex items-center gap-2">
+                                <FieldTooltip content={FIELD_TOOLTIPS.laborDetails} />
+                                <CollapsibleTrigger asChild>
+                                    <Button variant="ghost" size="sm" className="p-0 h-auto hover:bg-transparent">
+                                        {laborDetailsOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                    </Button>
+                                </CollapsibleTrigger>
                             </div>
                         </div>
-                    </CollapsibleContent>
+                        <CollapsibleContent className="mt-4">
+                            <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700">{t('cases.jobTitle', 'المسمى الوظيفي')}</label>
+                                        <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('jobTitle')} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700">{t('cases.monthlySalary', 'الراتب الشهري (ر.س)')}</label>
+                                        <Input type="number" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('monthlySalary', { valueAsNumber: true })} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700">{t('cases.employmentStartDate', 'تاريخ بداية العمل')}</label>
+                                        <Input type="date" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('employmentStartDate')} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700">{t('cases.employmentEndDate', 'تاريخ نهاية العمل')}</label>
+                                        <Input type="date" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('employmentEndDate')} />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-slate-700">{t('cases.terminationReason', 'سبب إنهاء العلاقة العمالية')}</label>
+                                    <Textarea className="min-h-[80px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 bg-white" {...register('terminationReason')} />
+                                </div>
+                            </div>
+                        </CollapsibleContent>
+                    </div>
                 </Collapsible>
             )}
 
             {selectedCategory === 'family' && (
                 <Collapsible open={personalStatusOpen} onOpenChange={setPersonalStatusOpen}>
-                    <CollapsibleTrigger asChild>
-                        <button type="button" className="flex items-center justify-between w-full text-sm group p-4 bg-pink-50 rounded-xl border border-pink-100 hover:bg-pink-100 transition-colors">
-                            <div className="flex items-center gap-3">
-                                <Baby className="w-5 h-5 text-pink-600" />
-                                <span className="font-medium text-pink-700">{t('cases.personalStatusDetails', 'بيانات الأحوال الشخصية')}</span>
-                            </div>
-                            <ChevronDown className={cn("w-5 h-5 text-pink-600 transition-transform", personalStatusOpen && "rotate-180")} />
-                        </button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="mt-3">
-                        <div className="p-5 bg-pink-50/50 rounded-xl border border-pink-100 space-y-4">
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                <div className="space-y-2">
-                                    <Label className="text-sm font-medium text-slate-600">{t('cases.marriageDate', 'تاريخ الزواج')}</Label>
-                                    <Input type="date" className="rounded-xl border-slate-200 h-12 bg-white" {...register('marriageDate')} />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-sm font-medium text-slate-600">{t('cases.marriageCity', 'مدينة عقد الزواج')}</Label>
-                                    <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('marriageCity')} />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-sm font-medium text-slate-600">{t('cases.childrenCount', 'عدد الأطفال')}</Label>
-                                    <Input type="number" className="rounded-xl border-slate-200 h-12 bg-white" {...register('childrenCount', { valueAsNumber: true })} />
-                                </div>
-                            </div>
+                    <div className="border-t border-slate-100 pt-6">
+                        <div className="flex items-center justify-between w-full">
+                            <CollapsibleTrigger asChild>
+                                <Button variant="ghost" className="flex-1 justify-start p-0 h-auto hover:bg-transparent">
+                                    <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                                        <Baby className="w-5 h-5 text-emerald-500" />
+                                        {t('cases.personalStatusDetails', 'بيانات الأحوال الشخصية')}
+                                    </h3>
+                                </Button>
+                            </CollapsibleTrigger>
+                            <CollapsibleTrigger asChild>
+                                <Button variant="ghost" size="sm" className="p-0 h-auto hover:bg-transparent">
+                                    {personalStatusOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                </Button>
+                            </CollapsibleTrigger>
                         </div>
-                    </CollapsibleContent>
+                        <CollapsibleContent className="mt-4">
+                            <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700">{t('cases.marriageDate', 'تاريخ الزواج')}</label>
+                                        <Input type="date" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('marriageDate')} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700">{t('cases.marriageCity', 'مدينة عقد الزواج')}</label>
+                                        <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('marriageCity')} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700">{t('cases.childrenCount', 'عدد الأطفال')}</label>
+                                        <Input type="number" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('childrenCount', { valueAsNumber: true })} />
+                                    </div>
+                                </div>
+                            </div>
+                        </CollapsibleContent>
+                    </div>
                 </Collapsible>
             )}
 
             {selectedCategory === 'commercial' && (
                 <Collapsible open={commercialOpen} onOpenChange={setCommercialOpen}>
-                    <CollapsibleTrigger asChild>
-                        <button type="button" className="flex items-center justify-between w-full text-sm group p-4 bg-emerald-50 rounded-xl border border-emerald-100 hover:bg-emerald-100 transition-colors">
-                            <div className="flex items-center gap-3">
-                                <Building2 className="w-5 h-5 text-emerald-600" />
-                                <span className="font-medium text-emerald-700">{t('cases.commercialDetails', 'بيانات العقد التجاري')}</span>
-                            </div>
-                            <ChevronDown className={cn("w-5 h-5 text-emerald-600 transition-transform", commercialOpen && "rotate-180")} />
-                        </button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="mt-3">
-                        <div className="p-5 bg-emerald-50/50 rounded-xl border border-emerald-100 space-y-4">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label className="text-sm font-medium text-slate-600">{t('cases.contractDate', 'تاريخ العقد')}</Label>
-                                    <Input type="date" className="rounded-xl border-slate-200 h-12 bg-white" {...register('contractDate')} />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-sm font-medium text-slate-600">{t('cases.contractValue', 'قيمة العقد (ر.س)')}</Label>
-                                    <Input type="number" className="rounded-xl border-slate-200 h-12 bg-white" {...register('contractValue', { valueAsNumber: true })} />
-                                </div>
-                            </div>
+                    <div className="border-t border-slate-100 pt-6">
+                        <div className="flex items-center justify-between w-full">
+                            <CollapsibleTrigger asChild>
+                                <Button variant="ghost" className="flex-1 justify-start p-0 h-auto hover:bg-transparent">
+                                    <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                                        <Building2 className="w-5 h-5 text-emerald-500" />
+                                        {t('cases.commercialDetails', 'بيانات العقد التجاري')}
+                                    </h3>
+                                </Button>
+                            </CollapsibleTrigger>
+                            <CollapsibleTrigger asChild>
+                                <Button variant="ghost" size="sm" className="p-0 h-auto hover:bg-transparent">
+                                    {commercialOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                </Button>
+                            </CollapsibleTrigger>
                         </div>
-                    </CollapsibleContent>
+                        <CollapsibleContent className="mt-4">
+                            <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700">{t('cases.contractDate', 'تاريخ العقد')}</label>
+                                        <Input type="date" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('contractDate')} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700">{t('cases.contractValue', 'قيمة العقد (ر.س)')}</label>
+                                        <Input type="number" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('contractValue', { valueAsNumber: true })} />
+                                    </div>
+                                </div>
+                            </div>
+                        </CollapsibleContent>
+                    </div>
                 </Collapsible>
             )}
         </div>
@@ -1152,58 +1189,55 @@ export function CreateCaseView() {
         <div className="space-y-8">
             {/* Court Details */}
             <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
-                        <Gavel className="w-4 h-4 text-purple-600" />
-                    </div>
-                    <span className="text-sm font-medium text-slate-600">{t('cases.courtDetails', 'بيانات المحكمة')}</span>
-                </div>
+                <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                    <Gavel className="w-5 h-5 text-emerald-500" />
+                    {t('cases.courtDetails', 'بيانات المحكمة')}
+                </h3>
 
-                <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium text-slate-600">{t('cases.circuitNumber', 'رقم الدائرة')}</Label>
-                            <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('circuitNumber')} placeholder="الدائرة الأولى" />
+                            <label className="text-sm font-medium text-slate-700">{t('cases.circuitNumber', 'رقم الدائرة')}</label>
+                            <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('circuitNumber')} placeholder="الدائرة الأولى" />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium text-slate-600">{t('cases.judgeName', 'اسم القاضي')}</Label>
-                            <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('judgeName')} />
+                            <label className="text-sm font-medium text-slate-700">{t('cases.judgeName', 'اسم القاضي')}</label>
+                            <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('judgeName')} />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium text-slate-600">{t('cases.courtRoom', 'قاعة المحكمة')}</Label>
-                            <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('courtRoom')} placeholder="قاعة 5" />
+                            <label className="text-sm font-medium text-slate-700">{t('cases.courtRoom', 'قاعة المحكمة')}</label>
+                            <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('courtRoom')} placeholder="قاعة 5" />
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Power of Attorney */}
-            <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
-                        <ScrollText className="w-4 h-4 text-amber-600" />
-                    </div>
-                    <span className="text-sm font-medium text-slate-600">{t('cases.powerOfAttorney', 'الوكالة الشرعية')}</span>
-                </div>
+            <div className="border-t border-slate-100 pt-6">
+                <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                    <ScrollText className="w-5 h-5 text-emerald-500" />
+                    {t('cases.powerOfAttorney', 'الوكالة الشرعية')}
+                    <FieldTooltip content={FIELD_TOOLTIPS.powerOfAttorney} />
+                </h3>
 
-                <div className="p-5 bg-amber-50/50 rounded-2xl border border-amber-100 space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium text-slate-600">{t('cases.poaNumber', 'رقم الوكالة')}</Label>
-                            <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('poaNumber')} />
+                            <label className="text-sm font-medium text-slate-700">{t('cases.poaNumber', 'رقم الوكالة')}</label>
+                            <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('poaNumber')} />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium text-slate-600">{t('cases.poaDate', 'تاريخ الوكالة')}</Label>
-                            <Input type="date" className="rounded-xl border-slate-200 h-12 bg-white" {...register('poaDate')} />
+                            <label className="text-sm font-medium text-slate-700">{t('cases.poaDate', 'تاريخ الوكالة')}</label>
+                            <Input type="date" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('poaDate')} />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium text-slate-600">{t('cases.poaExpiry', 'تاريخ انتهاء الوكالة')}</Label>
-                            <Input type="date" className="rounded-xl border-slate-200 h-12 bg-white" {...register('poaExpiry')} />
+                            <label className="text-sm font-medium text-slate-700">{t('cases.poaExpiry', 'تاريخ انتهاء الوكالة')}</label>
+                            <Input type="date" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('poaExpiry')} />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium text-slate-600">{t('cases.poaScope', 'نطاق الوكالة')}</Label>
+                            <label className="text-sm font-medium text-slate-700">{t('cases.poaScope', 'نطاق الوكالة')}</label>
                             <Select value={watch('poaScope')} onValueChange={(v) => setValue('poaScope', v)}>
-                                <SelectTrigger className="rounded-xl border-slate-200 h-12 bg-white">
+                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 h-11 bg-white">
                                     <SelectValue placeholder={t('cases.selectPoaScope', 'اختر نطاق الوكالة')} />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1218,20 +1252,17 @@ export function CreateCaseView() {
             </div>
 
             {/* Team Assignment */}
-            <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                        <Users className="w-4 h-4 text-blue-600" />
-                    </div>
-                    <span className="text-sm font-medium text-slate-600">{t('cases.teamAssignment', 'فريق العمل')}</span>
-                </div>
+            <div className="border-t border-slate-100 pt-6">
+                <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                    <Users className="w-5 h-5 text-emerald-500" />
+                    {t('cases.teamAssignment', 'فريق العمل')}
+                    <FieldTooltip content={FIELD_TOOLTIPS.team} />
+                </h3>
 
-                <div className="p-5 bg-blue-50/50 rounded-2xl border border-blue-100 space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label className="text-sm font-medium text-slate-600">{t('cases.assignedLawyer', 'المحامي المسؤول')}</Label>
-                            <Input className="rounded-xl border-slate-200 h-12 bg-white" {...register('assignedLawyer')} placeholder={t('cases.lawyerName', 'اسم المحامي')} />
-                        </div>
+                <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">{t('cases.assignedLawyer', 'المحامي المسؤول')}</label>
+                        <Input className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-11 bg-white" {...register('assignedLawyer')} placeholder={t('cases.lawyerName', 'اسم المحامي')} />
                     </div>
                 </div>
             </div>
@@ -1266,16 +1297,16 @@ export function CreateCaseView() {
                                             className={cn(
                                                 "flex items-center gap-2 px-3 py-2 rounded-xl transition-all",
                                                 currentStep === step.id
-                                                    ? "bg-blue-100 text-blue-700"
+                                                    ? "bg-emerald-50 text-emerald-700"
                                                     : currentStep > step.id
                                                     ? "bg-emerald-100 text-emerald-700"
-                                                    : "bg-slate-50 text-slate-400"
+                                                    : "bg-slate-50 text-slate-400 hover:bg-slate-100"
                                             )}
                                         >
                                             <div className={cn(
-                                                "w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium",
+                                                "w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium transition-all",
                                                 currentStep === step.id
-                                                    ? "bg-blue-600 text-white"
+                                                    ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30"
                                                     : currentStep > step.id
                                                     ? "bg-emerald-600 text-white"
                                                     : "bg-slate-200 text-slate-500"
@@ -1290,8 +1321,8 @@ export function CreateCaseView() {
                                         </button>
                                         {index < WIZARD_STEPS.length - 1 && (
                                             <div className={cn(
-                                                "w-8 lg:w-16 h-0.5 mx-2",
-                                                currentStep > step.id ? "bg-emerald-300" : "bg-slate-200"
+                                                "w-8 lg:w-16 h-0.5 mx-2 transition-colors",
+                                                currentStep > step.id ? "bg-emerald-400" : "bg-slate-200"
                                             )} />
                                         )}
                                     </div>
@@ -1306,67 +1337,54 @@ export function CreateCaseView() {
                                 {renderStepContent()}
 
                                 {/* Navigation Footer */}
-                                <div className="flex items-center justify-between pt-6 border-t border-slate-100">
-                                    <div>
-                                        {currentStep > 1 && (
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                onClick={prevStep}
-                                                className="text-slate-500 hover:text-slate-700 rounded-xl h-11 px-5"
-                                            >
-                                                <ArrowRight className="ms-2 h-4 w-4" />
-                                                {t('common.previous', 'السابق')}
-                                            </Button>
-                                        )}
-                                    </div>
+                                <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
+                                    <Link to="/dashboard/cases">
+                                        <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
+                                            {t('common.cancel', 'إلغاء')}
+                                        </Button>
+                                    </Link>
 
-                                    <div className="flex items-center gap-3">
-                                        <Link to="/dashboard/cases">
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                className="text-slate-500 hover:text-slate-700 rounded-xl h-11 px-5"
-                                            >
-                                                {t('common.cancel', 'إلغاء')}
-                                            </Button>
-                                        </Link>
+                                    {currentStep > 1 && (
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={prevStep}
+                                            className="rounded-xl"
+                                        >
+                                            <ArrowRight className="ms-2 h-4 w-4" />
+                                            {t('common.previous', 'السابق')}
+                                        </Button>
+                                    )}
 
-                                        {currentStep < WIZARD_STEPS.length ? (
-                                            <Button
-                                                type="button"
-                                                onClick={nextStep}
-                                                className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl h-11 px-8 shadow-lg shadow-blue-500/20 font-medium"
-                                            >
-                                                {t('common.next', 'التالي')}
-                                                <ArrowLeft className="me-2 h-4 w-4" />
-                                            </Button>
-                                        ) : (
-                                            <Button
-                                                type="submit"
-                                                disabled={isSubmitting || createCaseMutation.isPending}
-                                                className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl h-11 px-8 shadow-lg shadow-emerald-500/20 font-medium min-w-[140px]"
-                                            >
-                                                {(isSubmitting || createCaseMutation.isPending) ? (
-                                                    <>
-                                                        <Loader2 className="ms-2 h-4 w-4 animate-spin" />
-                                                        {t('common.creating', 'جاري الإنشاء')}
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Save className="ms-2 h-4 w-4" />
-                                                        {t('cases.createCase', 'إنشاء القضية')}
-                                                    </>
-                                                )}
-                                            </Button>
-                                        )}
-                                    </div>
+                                    {currentStep < WIZARD_STEPS.length ? (
+                                        <Button
+                                            type="button"
+                                            onClick={nextStep}
+                                            className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-emerald-500/20"
+                                        >
+                                            {t('common.next', 'التالي')}
+                                            <ArrowLeft className="me-2 h-4 w-4" />
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            type="submit"
+                                            disabled={isSubmitting || createCaseMutation.isPending}
+                                            className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-emerald-500/20"
+                                        >
+                                            {(isSubmitting || createCaseMutation.isPending) ? (
+                                                <span className="flex items-center gap-2">
+                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                    {t('common.creating', 'جاري الإنشاء...')}
+                                                </span>
+                                            ) : (
+                                                <span className="flex items-center gap-2">
+                                                    <Save className="w-4 h-4" />
+                                                    {t('cases.createCase', 'حفظ القضية')}
+                                                </span>
+                                            )}
+                                        </Button>
+                                    )}
                                 </div>
-
-                                {/* Step indicator */}
-                                <p className="text-xs text-slate-400 text-center">
-                                    {t('cases.step', 'الخطوة')} {currentStep} {t('cases.of', 'من')} {WIZARD_STEPS.length}
-                                </p>
                             </form>
                         </div>
                     </div>
