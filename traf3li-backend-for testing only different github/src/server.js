@@ -49,7 +49,10 @@ const {
     benefitRoute,
 
     // PDFMe
-    pdfmeRoute
+    pdfmeRoute,
+
+    // Reference Data
+    referenceRoute
 } = require('./routes');
 
 const app = express();
@@ -199,6 +202,9 @@ app.use('/api/benefits', benefitRoute);
 
 // PDFMe Routes
 app.use('/api/pdfme', pdfmeRoute);
+
+// Reference Data Routes
+app.use('/api/reference', referenceRoute);
 
 // Health check endpoint (useful for monitoring)
 app.get('/health', (req, res) => {
