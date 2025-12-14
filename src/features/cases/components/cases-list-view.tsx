@@ -39,6 +39,61 @@ import type { Case, CaseStatus, CaseCategory, CasePriority, ClientRef, LawyerRef
 import { PracticeSidebar } from './practice-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 
+// Constants for courts, committees, and arbitration centers
+const COURTS = [
+  { value: 'general', label: 'المحكمة العامة' },
+  { value: 'criminal', label: 'المحكمة الجزائية' },
+  { value: 'commercial', label: 'المحكمة التجارية' },
+  { value: 'labor', label: 'المحكمة العمالية' },
+  { value: 'family', label: 'محكمة الأحوال الشخصية' },
+  { value: 'execution', label: 'محكمة التنفيذ' },
+  { value: 'administrative', label: 'المحكمة الإدارية' },
+  { value: 'administrative_appeal', label: 'محكمة الاستئناف الإدارية' },
+  { value: 'appeal', label: 'محكمة الاستئناف' },
+  { value: 'supreme', label: 'المحكمة العليا' },
+]
+
+const COMMITTEES = [
+  { value: 'banking_disputes', label: 'لجنة المنازعات المصرفية' },
+  { value: 'insurance_disputes', label: 'لجنة المنازعات التأمينية' },
+  { value: 'securities_disputes', label: 'لجنة منازعات الأوراق المالية' },
+  { value: 'customs_violations', label: 'لجنة المنازعات الجمركية' },
+  { value: 'tax_violations', label: 'لجنة المنازعات الضريبية' },
+]
+
+const ARBITRATION_CENTERS = [
+  { value: 'scca', label: 'المركز السعودي للتحكيم التجاري' },
+  { value: 'sba_arbitration', label: 'مركز هيئة المحامين للتحكيم' },
+  { value: 'riyadh_chamber', label: 'مركز تحكيم غرفة الرياض' },
+  { value: 'jeddah_chamber', label: 'مركز تحكيم غرفة جدة' },
+  { value: 'eastern_chamber', label: 'مركز تحكيم غرفة الشرقية' },
+  { value: 'gcc_commercial', label: 'مركز التحكيم الخليجي' },
+  { value: 'other', label: 'مركز تحكيم آخر' },
+]
+
+// Helper to get entity display (court/committee/arbitration)
+const getEntityDisplay = (c: Case): string => {
+  const entityType = c.courtDetails?.entityType
+
+  if (entityType === 'arbitration' && c.courtDetails?.arbitrationCenter) {
+    const center = ARBITRATION_CENTERS.find(a => a.value === c.courtDetails?.arbitrationCenter)
+    return center?.label || c.courtDetails.arbitrationCenter
+  }
+
+  if (entityType === 'committee' && c.courtDetails?.committee) {
+    const committee = COMMITTEES.find(co => co.value === c.courtDetails?.committee)
+    return committee?.label || c.courtDetails.committee
+  }
+
+  if (c.courtDetails?.court) {
+    const court = COURTS.find(co => co.value === c.courtDetails?.court)
+    return court?.label || c.courtDetails.court
+  }
+
+  // Fallback to legacy court field
+  return c.court || 'غير محدد'
+}
+
 // Helper functions
 const getClientName = (c: Case): string => {
   if (c.clientName) return c.clientName
@@ -403,10 +458,10 @@ export function CasesListView() {
                               </div>
                             )}
                             <div className="flex items-center gap-4 flex-wrap">
-                              {caseItem.court && (
+                              {(caseItem.courtDetails || caseItem.court) && (
                                 <div className="flex items-center gap-2 text-slate-600">
                                   <MapPin className="h-4 w-4 text-slate-500" aria-hidden="true" />
-                                  <span>{caseItem.court}</span>
+                                  <span>{getEntityDisplay(caseItem)}</span>
                                 </div>
                               )}
                               <div className="flex items-center gap-2 text-slate-600">

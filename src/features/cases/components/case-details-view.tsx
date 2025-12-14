@@ -193,6 +193,61 @@ const getEntityTypeLabel = (value?: string): string => {
   }
 }
 
+const getPartyTypeLabel = (value?: string): string => {
+  switch (value) {
+    case 'individual':
+      return 'شخص طبيعي'
+    case 'company':
+      return 'شخص اعتباري'
+    case 'government':
+      return 'جهة حكومية'
+    default:
+      return ''
+  }
+}
+
+// Helper to get plaintiff name from new Party structure or legacy fields
+const getPlaintiffDisplayName = (c: Case): string => {
+  // Check new Party structure first
+  if (c.plaintiff) {
+    if (c.plaintiff.type === 'individual' && 'name' in c.plaintiff) {
+      return c.plaintiff.name || 'غير محدد'
+    }
+    if (c.plaintiff.type === 'company' && 'companyName' in c.plaintiff) {
+      return c.plaintiff.companyName || 'غير محدد'
+    }
+    if (c.plaintiff.type === 'government' && 'entityName' in c.plaintiff) {
+      return c.plaintiff.entityName || 'غير محدد'
+    }
+  }
+  // Fall back to legacy fields
+  if (c.clientName) return c.clientName
+  if (c.clientId && typeof c.clientId === 'object') {
+    const client = c.clientId as ClientRef
+    return client.name || client.firstName || client.username || 'غير محدد'
+  }
+  return 'غير محدد'
+}
+
+// Helper to get defendant name from new Party structure or legacy fields
+const getDefendantDisplayName = (c: Case): string => {
+  // Check new Party structure first
+  if (c.defendant) {
+    if (c.defendant.type === 'individual' && 'name' in c.defendant) {
+      return c.defendant.name || 'غير محدد'
+    }
+    if (c.defendant.type === 'company' && 'companyName' in c.defendant) {
+      return c.defendant.companyName || 'غير محدد'
+    }
+    if (c.defendant.type === 'government' && 'entityName' in c.defendant) {
+      return c.defendant.entityName || 'غير محدد'
+    }
+  }
+  // Fall back to legacy labor case fields
+  if (c.laborCaseDetails?.company?.name) return c.laborCaseDetails.company.name
+  return 'غير محدد'
+}
+
 // Helper functions
 const getClientName = (c: Case): string => {
   if (c.clientName) return c.clientName
@@ -843,47 +898,138 @@ export function CaseDetailsView() {
                   </CardHeader>
                   <CardContent className="space-y-4 pt-4">
                     {/* Plaintiff */}
-                    <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                      <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold">
-                        {getClientName(caseData).charAt(0)}
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold">
+                          {getPlaintiffDisplayName(caseData).charAt(0)}
+                        </div>
+                        <div className="flex-1">
+                          <div className="text-sm font-bold text-navy">{getPlaintiffDisplayName(caseData)}</div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-green-600 font-medium">{t('cases.plaintiff', 'المدعي')} ({t('cases.ourClient', 'موكلنا')})</span>
+                            {caseData.plaintiffType && (
+                              <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                                {getPartyTypeLabel(caseData.plaintiffType)}
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <div className="text-sm font-bold text-navy">{getClientName(caseData)}</div>
-                        <div className="text-xs text-green-600 font-medium">{t('cases.plaintiff', 'المدعي')} ({t('cases.ourClient', 'موكلنا')})</div>
-                        {caseData.clientPhone && (
-                          <div className="flex items-center gap-1 text-xs text-slate-500 mt-1">
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        {/* Phone */}
+                        {(caseData.clientPhone || (caseData.plaintiff?.type === 'individual' && 'phone' in caseData.plaintiff && caseData.plaintiff.phone)) && (
+                          <div className="flex items-center gap-1 text-slate-500">
                             <Phone className="h-3 w-3" aria-hidden="true" />
-                            {caseData.clientPhone}
+                            {caseData.clientPhone || (caseData.plaintiff?.type === 'individual' && 'phone' in caseData.plaintiff ? caseData.plaintiff.phone : '')}
                           </div>
                         )}
+                        {/* National ID */}
+                        {caseData.plaintiff?.type === 'individual' && 'nationalId' in caseData.plaintiff && caseData.plaintiff.nationalId && (
+                          <div className="flex items-center gap-1 text-slate-500">
+                            <User className="h-3 w-3" aria-hidden="true" />
+                            رقم الهوية: {caseData.plaintiff.nationalId}
+                          </div>
+                        )}
+                        {/* Unified National Number */}
                         {caseData.plaintiffUnifiedNumber && (
-                          <div className="flex items-center gap-1 text-xs text-slate-500 mt-1">
+                          <div className="flex items-center gap-1 text-slate-500">
                             <Building className="h-3 w-3" aria-hidden="true" />
                             الرقم الوطني الموحد: {caseData.plaintiffUnifiedNumber}
+                          </div>
+                        )}
+                        {/* CR Number */}
+                        {caseData.plaintiff?.type === 'company' && 'crNumber' in caseData.plaintiff && caseData.plaintiff.crNumber && (
+                          <div className="flex items-center gap-1 text-slate-500">
+                            <Building className="h-3 w-3" aria-hidden="true" />
+                            س.ت: {caseData.plaintiff.crNumber}
+                          </div>
+                        )}
+                        {/* Representative */}
+                        {caseData.plaintiff?.type === 'company' && 'representativeName' in caseData.plaintiff && caseData.plaintiff.representativeName && (
+                          <div className="flex items-center gap-1 text-slate-500 col-span-2">
+                            <User className="h-3 w-3" aria-hidden="true" />
+                            الممثل النظامي: {caseData.plaintiff.representativeName}
+                            {caseData.plaintiff.representativePosition && ` (${caseData.plaintiff.representativePosition})`}
+                          </div>
+                        )}
+                        {/* Government Representative */}
+                        {caseData.plaintiff?.type === 'government' && 'representative' in caseData.plaintiff && caseData.plaintiff.representative && (
+                          <div className="flex items-center gap-1 text-slate-500 col-span-2">
+                            <User className="h-3 w-3" aria-hidden="true" />
+                            ممثل الجهة: {caseData.plaintiff.representative}
                           </div>
                         )}
                       </div>
                     </div>
 
                     {/* Defendant */}
-                    {(caseData.laborCaseDetails?.company || getDefendantName(caseData) !== 'غير محدد') && (
-                      <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-bold">
-                          {getDefendantName(caseData).charAt(0)}
+                    {(caseData.defendant || caseData.laborCaseDetails?.company || getDefendantDisplayName(caseData) !== 'غير محدد') && (
+                      <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-bold">
+                            {getDefendantDisplayName(caseData).charAt(0)}
+                          </div>
+                          <div className="flex-1">
+                            <div className="text-sm font-bold text-navy">{getDefendantDisplayName(caseData)}</div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-amber-600 font-medium">{t('cases.defendant', 'المدعى عليه')}</span>
+                              {caseData.defendantType && (
+                                <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
+                                  {getPartyTypeLabel(caseData.defendantType)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex-1">
-                          <div className="text-sm font-bold text-navy">{getDefendantName(caseData)}</div>
-                          <div className="text-xs text-amber-600 font-medium">{t('cases.defendant', 'المدعى عليه')}</div>
-                          {caseData.laborCaseDetails?.company?.registrationNumber && (
-                            <div className="flex items-center gap-1 text-xs text-slate-500 mt-1">
-                              <Building className="h-3 w-3" aria-hidden="true" />
-                              {t('cases.crNumber', 'س.ت')}: {caseData.laborCaseDetails.company.registrationNumber}
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          {/* Phone */}
+                          {caseData.defendant?.type === 'individual' && 'phone' in caseData.defendant && caseData.defendant.phone && (
+                            <div className="flex items-center gap-1 text-slate-500">
+                              <Phone className="h-3 w-3" aria-hidden="true" />
+                              {caseData.defendant.phone}
                             </div>
                           )}
+                          {/* National ID */}
+                          {caseData.defendant?.type === 'individual' && 'nationalId' in caseData.defendant && caseData.defendant.nationalId && (
+                            <div className="flex items-center gap-1 text-slate-500">
+                              <User className="h-3 w-3" aria-hidden="true" />
+                              رقم الهوية: {caseData.defendant.nationalId}
+                            </div>
+                          )}
+                          {/* Unified National Number */}
                           {caseData.defendantUnifiedNumber && (
-                            <div className="flex items-center gap-1 text-xs text-slate-500 mt-1">
+                            <div className="flex items-center gap-1 text-slate-500">
                               <Building className="h-3 w-3" aria-hidden="true" />
                               الرقم الوطني الموحد: {caseData.defendantUnifiedNumber}
+                            </div>
+                          )}
+                          {/* Legacy CR Number */}
+                          {caseData.laborCaseDetails?.company?.registrationNumber && (
+                            <div className="flex items-center gap-1 text-slate-500">
+                              <Building className="h-3 w-3" aria-hidden="true" />
+                              س.ت: {caseData.laborCaseDetails.company.registrationNumber}
+                            </div>
+                          )}
+                          {/* New CR Number */}
+                          {caseData.defendant?.type === 'company' && 'crNumber' in caseData.defendant && caseData.defendant.crNumber && (
+                            <div className="flex items-center gap-1 text-slate-500">
+                              <Building className="h-3 w-3" aria-hidden="true" />
+                              س.ت: {caseData.defendant.crNumber}
+                            </div>
+                          )}
+                          {/* Representative */}
+                          {caseData.defendant?.type === 'company' && 'representativeName' in caseData.defendant && caseData.defendant.representativeName && (
+                            <div className="flex items-center gap-1 text-slate-500 col-span-2">
+                              <User className="h-3 w-3" aria-hidden="true" />
+                              الممثل النظامي: {caseData.defendant.representativeName}
+                              {caseData.defendant.representativePosition && ` (${caseData.defendant.representativePosition})`}
+                            </div>
+                          )}
+                          {/* Government Representative */}
+                          {caseData.defendant?.type === 'government' && 'representative' in caseData.defendant && caseData.defendant.representative && (
+                            <div className="flex items-center gap-1 text-slate-500 col-span-2">
+                              <User className="h-3 w-3" aria-hidden="true" />
+                              ممثل الجهة: {caseData.defendant.representative}
                             </div>
                           )}
                         </div>
