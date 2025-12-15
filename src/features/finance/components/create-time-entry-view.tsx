@@ -247,6 +247,14 @@ export function CreateTimeEntryView() {
         costingAmount: 0, // Calculated costing amount
         isBillableOverride: false, // Override billable hours
 
+        // Sales Invoice reference (ERPNext parity)
+        salesInvoiceRef: '',  // Reference to invoice when billed
+        isBilled: false,      // Whether this entry has been invoiced
+        billedDate: '',       // Date when invoiced
+
+        // Completion status (ERPNext parity)
+        isCompleted: false,   // Mark entry as completed
+
         // Notes
         notes: '',
 
@@ -397,6 +405,22 @@ export function CreateTimeEntryView() {
             ...(formData.endTime && { endTime: formData.endTime }),
             ...(formData.departmentId && { departmentId: formData.departmentId }),
             ...(formData.practiceArea && { practiceArea: formData.practiceArea }),
+            // ERPNext parity - Billing hours override
+            ...(formData.isBillableOverride && {
+                billingHours: formData.billingHours,
+                billingMinutes: formData.billingMinutes,
+            }),
+            ...(formData.expectedHours || formData.expectedMinutes ? {
+                expectedHours: formData.expectedHours,
+                expectedMinutes: formData.expectedMinutes,
+            } : {}),
+            ...(formData.costingRate && { costingRate: formData.costingRate }),
+            // Sales Invoice reference (ERPNext parity)
+            ...(formData.salesInvoiceRef && { salesInvoiceRef: formData.salesInvoiceRef }),
+            isBilled: formData.isBilled,
+            ...(formData.billedDate && { billedDate: formData.billedDate }),
+            // Completion status (ERPNext parity)
+            isCompleted: formData.isCompleted,
         }
 
         createTimeEntryMutation.mutate(timeEntryData, {
@@ -1069,6 +1093,66 @@ export function CreateTimeEntryView() {
                                                         </p>
                                                     </div>
                                                 </div>
+                                            </div>
+
+                                            <Separator />
+
+                                            {/* Completion Status (ERPNext parity) */}
+                                            <div className="flex items-center justify-between p-4 bg-green-50 rounded-xl border border-green-200">
+                                                <div className="flex items-center gap-3">
+                                                    <CheckCircle className="h-5 w-5 text-green-600" />
+                                                    <div>
+                                                        <Label className="font-semibold text-green-800">اكتمل العمل</Label>
+                                                        <p className="text-xs text-green-600 mt-0.5">حدد إذا تم إنجاز المهمة المرتبطة بهذا الوقت</p>
+                                                    </div>
+                                                </div>
+                                                <Switch
+                                                    checked={formData.isCompleted}
+                                                    onCheckedChange={(checked) => setFormData({ ...formData, isCompleted: checked })}
+                                                />
+                                            </div>
+
+                                            {/* Sales Invoice Reference (ERPNext parity) */}
+                                            <div className="space-y-4 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                                                <div className="flex items-center gap-2">
+                                                    <FileText className="h-4 w-4 text-blue-600" />
+                                                    <Label className="font-semibold text-blue-800">ربط بالفاتورة</Label>
+                                                </div>
+
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <Label className="text-sm text-blue-700">تم فوترة هذا الوقت؟</Label>
+                                                        <p className="text-xs text-blue-500 mt-0.5">حدد إذا تم تضمين هذا الوقت في فاتورة</p>
+                                                    </div>
+                                                    <Switch
+                                                        checked={formData.isBilled}
+                                                        onCheckedChange={(checked) => setFormData({ ...formData, isBilled: checked })}
+                                                    />
+                                                </div>
+
+                                                {formData.isBilled && (
+                                                    <div className="grid grid-cols-2 gap-4 pt-2">
+                                                        <div className="space-y-2">
+                                                            <Label className="text-sm text-blue-700">رقم الفاتورة</Label>
+                                                            <Input
+                                                                value={formData.salesInvoiceRef}
+                                                                onChange={(e) => setFormData({ ...formData, salesInvoiceRef: e.target.value })}
+                                                                placeholder="INV-2024XX-XXXX"
+                                                                className="rounded-xl border-blue-200 bg-white"
+                                                                dir="ltr"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label className="text-sm text-blue-700">تاريخ الفوترة</Label>
+                                                            <Input
+                                                                type="date"
+                                                                value={formData.billedDate}
+                                                                onChange={(e) => setFormData({ ...formData, billedDate: e.target.value })}
+                                                                className="rounded-xl border-blue-200 bg-white"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
 
                                             <Separator />

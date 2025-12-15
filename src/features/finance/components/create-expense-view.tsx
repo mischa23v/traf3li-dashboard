@@ -201,6 +201,20 @@ export function CreateExpenseView() {
     // Receipt image state
     const [receiptImage, setReceiptImage] = useState<string | null>(null)
 
+    // Employee Advance allocation (ERPNext parity)
+    interface EmployeeAdvance {
+        id: string
+        advanceId: string
+        advanceRef: string
+        advanceDate: string
+        totalAmount: number
+        unclaimedAmount: number
+        allocatedAmount: number
+        returnAmount: number
+    }
+    const [employeeAdvances, setEmployeeAdvances] = useState<EmployeeAdvance[]>([])
+    const [showAdvanceAllocation, setShowAdvanceAllocation] = useState(false)
+
     // Get selected client
     const selectedClient = useMemo(() => {
         if (!formData.clientId || !clientsData?.data) return null
@@ -332,6 +346,17 @@ export function CreateExpenseView() {
             isPaid: formData.isPaid,
             ...(formData.isPaid && formData.modeOfPayment && { modeOfPayment: formData.modeOfPayment }),
             ...(formData.isPaid && formData.clearanceDate && { clearanceDate: formData.clearanceDate }),
+            // Employee Advance allocation (ERPNext parity)
+            ...(employeeAdvances.length > 0 && {
+                advances: employeeAdvances.filter(a => a.allocatedAmount > 0).map(a => ({
+                    advanceId: a.advanceId,
+                    advanceRef: a.advanceRef,
+                    allocatedAmount: a.allocatedAmount,
+                    returnAmount: a.returnAmount,
+                })),
+                totalAdvanceAllocated: employeeAdvances.reduce((sum, a) => sum + a.allocatedAmount, 0),
+                totalReturnAmount: employeeAdvances.reduce((sum, a) => sum + a.returnAmount, 0),
+            }),
         }
 
         createExpenseMutation.mutate(expenseData, {
@@ -1372,6 +1397,178 @@ export function CreateExpenseView() {
                                             </div>
                                         </AccordionContent>
                                     </AccordionItem>
+
+                                    {/* Employee Advance Allocation (ERPNext parity) */}
+                                    {formData.expenseType === 'reimbursable' && (
+                                        <AccordionItem value="advances" className="border rounded-xl overflow-hidden">
+                                            <AccordionTrigger className="px-4 hover:no-underline hover:bg-slate-50">
+                                                <div className="flex items-center gap-2">
+                                                    <Wallet className="h-4 w-4 text-purple-500" />
+                                                    <span className="font-medium">تخصيص من العهد المسبقة</span>
+                                                    {employeeAdvances.length > 0 && (
+                                                        <Badge className="bg-purple-100 text-purple-700 ms-2">
+                                                            {employeeAdvances.filter(a => a.allocatedAmount > 0).length}
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                            </AccordionTrigger>
+
+                                            <AccordionContent className="px-4 pb-4">
+                                                <div className="space-y-4">
+                                                    <div className="p-4 bg-purple-50 border border-purple-200 rounded-xl">
+                                                        <div className="flex items-start gap-3">
+                                                            <Info className="h-5 w-5 text-purple-500 mt-0.5" aria-hidden="true" />
+                                                            <div>
+                                                                <p className="text-sm font-medium text-purple-800">تخصيص من عهدة الموظف</p>
+                                                                <p className="text-xs text-purple-600 mt-1">
+                                                                    إذا كان الموظف قد استلم عهدة مسبقة، يمكنك تخصيص جزء منها لهذا المصروف
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Add/Load Advances Button */}
+                                                    {employeeAdvances.length === 0 ? (
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            className="w-full rounded-xl border-purple-200 text-purple-700 hover:bg-purple-50"
+                                                            onClick={() => {
+                                                                // Mock data - would fetch from API
+                                                                setEmployeeAdvances([
+                                                                    {
+                                                                        id: '1',
+                                                                        advanceId: 'ADV-2024-001',
+                                                                        advanceRef: 'ADV-2024-001',
+                                                                        advanceDate: '2024-01-15',
+                                                                        totalAmount: 5000,
+                                                                        unclaimedAmount: 3500,
+                                                                        allocatedAmount: 0,
+                                                                        returnAmount: 0,
+                                                                    },
+                                                                    {
+                                                                        id: '2',
+                                                                        advanceId: 'ADV-2024-002',
+                                                                        advanceRef: 'ADV-2024-002',
+                                                                        advanceDate: '2024-02-01',
+                                                                        totalAmount: 2000,
+                                                                        unclaimedAmount: 2000,
+                                                                        allocatedAmount: 0,
+                                                                        returnAmount: 0,
+                                                                    },
+                                                                ])
+                                                            }}
+                                                        >
+                                                            <Wallet className="ms-2 h-4 w-4" />
+                                                            تحميل العهد المتاحة للموظف
+                                                        </Button>
+                                                    ) : (
+                                                        <div className="space-y-3">
+                                                            <div className="overflow-x-auto">
+                                                                <table className="w-full text-sm">
+                                                                    <thead className="bg-slate-50">
+                                                                        <tr>
+                                                                            <th className="px-3 py-2 text-start font-medium text-slate-600">المرجع</th>
+                                                                            <th className="px-3 py-2 text-start font-medium text-slate-600">التاريخ</th>
+                                                                            <th className="px-3 py-2 text-start font-medium text-slate-600">المبلغ الكلي</th>
+                                                                            <th className="px-3 py-2 text-start font-medium text-slate-600">المتبقي</th>
+                                                                            <th className="px-3 py-2 text-start font-medium text-slate-600">المخصص</th>
+                                                                            <th className="px-3 py-2 text-start font-medium text-slate-600">المرتجع</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody className="divide-y">
+                                                                        {employeeAdvances.map((advance) => (
+                                                                            <tr key={advance.id}>
+                                                                                <td className="px-3 py-2 font-mono text-xs">{advance.advanceRef}</td>
+                                                                                <td className="px-3 py-2 text-slate-600">{advance.advanceDate}</td>
+                                                                                <td className="px-3 py-2 font-medium">{formatCurrency(advance.totalAmount)}</td>
+                                                                                <td className="px-3 py-2 text-purple-600">{formatCurrency(advance.unclaimedAmount)}</td>
+                                                                                <td className="px-3 py-2">
+                                                                                    <Input
+                                                                                        type="number"
+                                                                                        value={advance.allocatedAmount || ''}
+                                                                                        onChange={(e) => {
+                                                                                            const value = Number(e.target.value) || 0
+                                                                                            setEmployeeAdvances(prev => prev.map(a =>
+                                                                                                a.id === advance.id
+                                                                                                    ? { ...a, allocatedAmount: Math.min(value, a.unclaimedAmount) }
+                                                                                                    : a
+                                                                                            ))
+                                                                                        }}
+                                                                                        max={advance.unclaimedAmount}
+                                                                                        min={0}
+                                                                                        step="0.01"
+                                                                                        className="w-24 h-8 rounded-lg text-xs"
+                                                                                    />
+                                                                                </td>
+                                                                                <td className="px-3 py-2">
+                                                                                    <Input
+                                                                                        type="number"
+                                                                                        value={advance.returnAmount || ''}
+                                                                                        onChange={(e) => {
+                                                                                            const value = Number(e.target.value) || 0
+                                                                                            setEmployeeAdvances(prev => prev.map(a =>
+                                                                                                a.id === advance.id
+                                                                                                    ? { ...a, returnAmount: value }
+                                                                                                    : a
+                                                                                            ))
+                                                                                        }}
+                                                                                        min={0}
+                                                                                        step="0.01"
+                                                                                        className="w-24 h-8 rounded-lg text-xs"
+                                                                                        placeholder="0.00"
+                                                                                    />
+                                                                                </td>
+                                                                            </tr>
+                                                                        ))}
+                                                                    </tbody>
+                                                                    <tfoot className="bg-purple-50">
+                                                                        <tr>
+                                                                            <td colSpan={4} className="px-3 py-2 font-semibold text-purple-800">
+                                                                                الإجمالي
+                                                                            </td>
+                                                                            <td className="px-3 py-2 font-bold text-purple-700">
+                                                                                {formatCurrency(employeeAdvances.reduce((sum, a) => sum + a.allocatedAmount, 0))}
+                                                                            </td>
+                                                                            <td className="px-3 py-2 font-bold text-orange-600">
+                                                                                {formatCurrency(employeeAdvances.reduce((sum, a) => sum + a.returnAmount, 0))}
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tfoot>
+                                                                </table>
+                                                            </div>
+
+                                                            {/* Summary */}
+                                                            {employeeAdvances.some(a => a.allocatedAmount > 0 || a.returnAmount > 0) && (
+                                                                <div className="p-3 bg-green-50 border border-green-200 rounded-xl">
+                                                                    <div className="flex items-center justify-between text-sm">
+                                                                        <span className="text-green-700">صافي المطالبة بعد التخصيص:</span>
+                                                                        <span className="font-bold text-green-800">
+                                                                            {formatCurrency(
+                                                                                calculations.totalAmount -
+                                                                                employeeAdvances.reduce((sum, a) => sum + a.allocatedAmount, 0)
+                                                                            )}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                className="text-slate-500"
+                                                                onClick={() => setEmployeeAdvances([])}
+                                                            >
+                                                                <X className="ms-1 h-4 w-4" />
+                                                                مسح التخصيصات
+                                                            </Button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    )}
 
                                     {/* Additional Attachments */}
                                     <AccordionItem value="attachments" className="border rounded-xl overflow-hidden">
