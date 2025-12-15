@@ -263,6 +263,248 @@ async function applyAdvancePayments(invoice) {
 
 ---
 
+### 1.5 Credit Note / Return (ERPNext parity)
+
+**Schema Addition:**
+```javascript
+// models/Invoice.js
+const invoiceSchema = new Schema({
+  // ... existing fields ...
+
+  // Credit Note / Return (ERPNext: is_return, return_against, is_debit_note)
+  isReturn: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
+  returnAgainst: {
+    type: Schema.Types.ObjectId,
+    ref: 'Invoice',
+    // Reference to original invoice being returned/credited
+    validate: {
+      validator: async function(v) {
+        if (!v) return true;
+        const original = await mongoose.model('Invoice').findById(v);
+        return !!original;
+      },
+      message: 'Original invoice not found'
+    }
+  },
+  returnAgainstNumber: {
+    type: String,
+    // Stored for quick reference without population
+  },
+  isDebitNote: {
+    type: Boolean,
+    default: false
+    // True when this is a rate adjustment (Debit Note) vs a full return (Credit Note)
+  },
+  returnReason: {
+    type: String,
+    maxlength: 1000,
+    trim: true
+  },
+});
+
+// Indexes for credit note queries
+invoiceSchema.index({ isReturn: 1, returnAgainst: 1 });
+```
+
+**Business Logic:**
+```javascript
+// services/invoiceService.js
+
+/**
+ * Create a credit note against an existing invoice
+ */
+async function createCreditNote(originalInvoiceId, creditNoteData) {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // 1. Get original invoice
+    const originalInvoice = await Invoice.findById(originalInvoiceId).session(session);
+    if (!originalInvoice) {
+      throw new Error('Original invoice not found');
+    }
+
+    // 2. Validate credit note amount doesn't exceed original
+    const existingCredits = await Invoice.aggregate([
+      { $match: { returnAgainst: originalInvoice._id, isReturn: true } },
+      { $group: { _id: null, total: { $sum: '$totalAmount' } } }
+    ]).session(session);
+
+    const totalCredited = existingCredits[0]?.total || 0;
+    const remainingCreditable = originalInvoice.totalAmount - totalCredited;
+
+    if (creditNoteData.totalAmount > remainingCreditable) {
+      throw new Error(`Credit amount exceeds remaining creditable amount (${remainingCreditable})`);
+    }
+
+    // 3. Create credit note with negative amounts
+    const creditNote = await Invoice.create([{
+      ...creditNoteData,
+      isReturn: true,
+      returnAgainst: originalInvoice._id,
+      returnAgainstNumber: originalInvoice.invoiceNumber,
+      invoiceNumber: await generateCreditNoteNumber(), // CN-YYYYMM-XXXX
+      // Amounts stored as negative for accounting
+      totalAmount: -Math.abs(creditNoteData.totalAmount),
+      vatAmount: -Math.abs(creditNoteData.vatAmount || 0),
+      items: creditNoteData.items.map(item => ({
+        ...item,
+        lineTotal: -Math.abs(item.lineTotal),
+        quantity: -Math.abs(item.quantity)
+      }))
+    }], { session });
+
+    // 4. Update original invoice outstanding amount
+    originalInvoice.outstandingAmount = (originalInvoice.outstandingAmount || originalInvoice.totalAmount)
+      - Math.abs(creditNoteData.totalAmount);
+    await originalInvoice.save({ session });
+
+    // 5. Create journal entry for credit note
+    await createCreditNoteJournalEntry(creditNote[0], originalInvoice, session);
+
+    await session.commitTransaction();
+    return creditNote[0];
+
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
+  }
+}
+
+/**
+ * Create journal entry for credit note
+ */
+async function createCreditNoteJournalEntry(creditNote, originalInvoice, session) {
+  const settings = await FinanceSettings.findOne();
+
+  const entries = [
+    // Debit: Income account (reverse the original income)
+    {
+      accountCode: settings.defaultIncomeAccount,
+      debit: Math.abs(creditNote.totalAmount - creditNote.vatAmount),
+      credit: 0,
+      description: `Credit Note ${creditNote.invoiceNumber} against ${originalInvoice.invoiceNumber}`
+    },
+    // Debit: VAT (if applicable)
+    ...(creditNote.vatAmount ? [{
+      accountCode: settings.vatPayableAccount,
+      debit: Math.abs(creditNote.vatAmount),
+      credit: 0,
+      description: `VAT reversal for ${creditNote.invoiceNumber}`
+    }] : []),
+    // Credit: Receivables (reduce customer balance)
+    {
+      accountCode: settings.defaultReceivablesAccount,
+      debit: 0,
+      credit: Math.abs(creditNote.totalAmount),
+      description: `Credit Note ${creditNote.invoiceNumber}`
+    }
+  ];
+
+  return JournalEntry.create([{
+    entryNumber: await generateJournalNumber(),
+    date: creditNote.issueDate,
+    reference: creditNote.invoiceNumber,
+    referenceType: 'CreditNote',
+    referenceId: creditNote._id,
+    entries,
+    status: 'posted'
+  }], { session });
+}
+
+/**
+ * Generate credit note number
+ */
+async function generateCreditNoteNumber() {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+
+  const lastCN = await Invoice.findOne({
+    isReturn: true,
+    invoiceNumber: { $regex: `^CN-${year}${month}` }
+  }).sort({ invoiceNumber: -1 });
+
+  const lastNum = lastCN
+    ? parseInt(lastCN.invoiceNumber.split('-')[2]) || 0
+    : 0;
+
+  return `CN-${year}${month}-${String(lastNum + 1).padStart(4, '0')}`;
+}
+```
+
+**API Endpoints:**
+```javascript
+// routes/invoices.js
+
+// Create credit note
+router.post('/credit-note', authenticateToken, async (req, res) => {
+  const { originalInvoiceId, ...creditNoteData } = req.body;
+
+  if (!originalInvoiceId) {
+    return res.status(400).json({ error: 'Original invoice ID is required' });
+  }
+
+  const creditNote = await createCreditNote(originalInvoiceId, creditNoteData);
+  res.status(201).json({ data: creditNote });
+});
+
+// Get credit notes for an invoice
+router.get('/:id/credit-notes', authenticateToken, async (req, res) => {
+  const creditNotes = await Invoice.find({
+    returnAgainst: req.params.id,
+    isReturn: true
+  }).sort({ createdAt: -1 });
+
+  res.json({ data: creditNotes });
+});
+
+// Get all credit notes
+router.get('/credit-notes', authenticateToken, async (req, res) => {
+  const { page = 1, limit = 20, clientId } = req.query;
+
+  const query = { isReturn: true };
+  if (clientId) query.clientId = clientId;
+
+  const creditNotes = await Invoice.find(query)
+    .populate('returnAgainst', 'invoiceNumber totalAmount')
+    .populate('clientId', 'name')
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  const total = await Invoice.countDocuments(query);
+
+  res.json({
+    data: creditNotes,
+    pagination: { page, limit, total, pages: Math.ceil(total / limit) }
+  });
+});
+```
+
+**ZATCA Compliance (Saudi Arabia):**
+```javascript
+// For ZATCA Phase 2 compliance, credit notes must:
+// 1. Reference the original invoice number
+// 2. Include reason for credit
+// 3. Have proper invoice type code (381 for Credit Note, 383 for Debit Note)
+
+function getZatcaInvoiceTypeCode(invoice) {
+  if (invoice.isReturn) {
+    return invoice.isDebitNote ? '383' : '381';
+  }
+  return '388'; // Standard tax invoice
+}
+```
+
+---
+
 ## 2. Payment Fields
 
 ### 2.1 GL Accounts (Paid From/To)
@@ -687,6 +929,348 @@ function getExpenseAccountByCategory(category) {
 
 ---
 
+### 3.3 Employee Advance Allocation (ERPNext parity)
+
+**Schema Addition:**
+```javascript
+// models/Expense.js
+const advanceAllocationSchema = new Schema({
+  advanceId: {
+    type: Schema.Types.ObjectId,
+    ref: 'EmployeeAdvance',
+    required: true
+  },
+  advanceRef: {
+    type: String,
+    required: true
+  },
+  advanceDate: {
+    type: Date
+  },
+  totalAmount: {
+    type: Number,
+    min: 0
+  },
+  unclaimedAmount: {
+    type: Number,
+    min: 0
+  },
+  allocatedAmount: {
+    type: Number,
+    min: 0,
+    required: true
+  },
+  returnAmount: {
+    type: Number,
+    min: 0,
+    default: 0
+    // Amount to be returned to company (if advance > expenses)
+  }
+}, { _id: false });
+
+const expenseSchema = new Schema({
+  // ... existing fields ...
+
+  // Employee Advance Allocation (ERPNext: advances child table)
+  advances: {
+    type: [advanceAllocationSchema],
+    default: []
+  },
+  totalAdvanceAllocated: {
+    type: Number,
+    min: 0,
+    default: 0
+  },
+  totalReturnAmount: {
+    type: Number,
+    min: 0,
+    default: 0
+  },
+  netClaimAmount: {
+    type: Number,
+    // Calculated: totalAmount - totalAdvanceAllocated
+  },
+});
+```
+
+**Employee Advance Schema:**
+```javascript
+// models/EmployeeAdvance.js
+const employeeAdvanceSchema = new Schema({
+  advanceNumber: {
+    type: String,
+    required: true,
+    unique: true
+    // Format: ADV-YYYY-XXXX
+  },
+  employeeId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    index: true
+  },
+  companyId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Company',
+    required: true
+  },
+  advanceDate: {
+    type: Date,
+    required: true
+  },
+  purpose: {
+    type: String,
+    maxlength: 500
+  },
+  amount: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  allocatedAmount: {
+    type: Number,
+    default: 0,
+    min: 0
+    // Total allocated to expense claims
+  },
+  returnedAmount: {
+    type: Number,
+    default: 0,
+    min: 0
+    // Amount returned by employee
+  },
+  status: {
+    type: String,
+    enum: ['draft', 'pending_approval', 'approved', 'paid', 'claimed', 'returned', 'cancelled'],
+    default: 'draft',
+    index: true
+  },
+  // Payment details
+  paidDate: Date,
+  paidBy: { type: Schema.Types.ObjectId, ref: 'User' },
+  paymentMethod: String,
+  paymentReference: String,
+  // Approval
+  approverId: { type: Schema.Types.ObjectId, ref: 'User' },
+  approvedDate: Date,
+}, { timestamps: true });
+
+// Virtual for unclaimed amount
+employeeAdvanceSchema.virtual('unclaimedAmount').get(function() {
+  return this.amount - this.allocatedAmount - this.returnedAmount;
+});
+```
+
+**API Endpoints:**
+```javascript
+// routes/employeeAdvances.js
+
+// Get available advances for an employee
+router.get('/available/:employeeId', authenticateToken, async (req, res) => {
+  const { employeeId } = req.params;
+
+  const advances = await EmployeeAdvance.find({
+    employeeId,
+    status: 'paid',
+    $expr: {
+      $gt: [
+        '$amount',
+        { $add: ['$allocatedAmount', '$returnedAmount'] }
+      ]
+    }
+  }).sort({ advanceDate: -1 });
+
+  const available = advances.map(adv => ({
+    id: adv._id,
+    advanceId: adv._id,
+    advanceRef: adv.advanceNumber,
+    advanceDate: adv.advanceDate,
+    totalAmount: adv.amount,
+    unclaimedAmount: adv.amount - adv.allocatedAmount - adv.returnedAmount,
+    allocatedAmount: 0,
+    returnAmount: 0
+  }));
+
+  res.json({ data: available });
+});
+
+// Create employee advance
+router.post('/', authenticateToken, async (req, res) => {
+  const advanceNumber = await generateAdvanceNumber();
+
+  const advance = await EmployeeAdvance.create({
+    ...req.body,
+    advanceNumber,
+    status: 'pending_approval'
+  });
+
+  res.status(201).json({ data: advance });
+});
+
+// Approve advance
+router.post('/:id/approve', authenticateToken, async (req, res) => {
+  const advance = await EmployeeAdvance.findByIdAndUpdate(
+    req.params.id,
+    {
+      status: 'approved',
+      approverId: req.user._id,
+      approvedDate: new Date()
+    },
+    { new: true }
+  );
+
+  res.json({ data: advance });
+});
+
+// Mark advance as paid
+router.post('/:id/pay', authenticateToken, async (req, res) => {
+  const { paymentMethod, paymentReference } = req.body;
+
+  const advance = await EmployeeAdvance.findByIdAndUpdate(
+    req.params.id,
+    {
+      status: 'paid',
+      paidDate: new Date(),
+      paidBy: req.user._id,
+      paymentMethod,
+      paymentReference
+    },
+    { new: true }
+  );
+
+  res.json({ data: advance });
+});
+```
+
+**Business Logic - Apply Advances to Expense:**
+```javascript
+// services/expenseService.js
+
+async function applyAdvancesToExpense(expense) {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    let totalAllocated = 0;
+    let totalReturn = 0;
+
+    for (const allocation of expense.advances) {
+      // Get the advance
+      const advance = await EmployeeAdvance.findById(allocation.advanceId).session(session);
+
+      if (!advance) {
+        throw new Error(`Advance ${allocation.advanceRef} not found`);
+      }
+
+      // Check available amount
+      const available = advance.amount - advance.allocatedAmount - advance.returnedAmount;
+      if (allocation.allocatedAmount > available) {
+        throw new Error(`Cannot allocate ${allocation.allocatedAmount} from ${allocation.advanceRef}. Only ${available} available.`);
+      }
+
+      // Update advance allocated amount
+      advance.allocatedAmount += allocation.allocatedAmount;
+
+      // Handle return amount
+      if (allocation.returnAmount > 0) {
+        advance.returnedAmount += allocation.returnAmount;
+      }
+
+      // Update status if fully utilized
+      if (advance.unclaimedAmount <= 0) {
+        advance.status = 'claimed';
+      }
+
+      await advance.save({ session });
+
+      totalAllocated += allocation.allocatedAmount;
+      totalReturn += allocation.returnAmount;
+    }
+
+    // Update expense totals
+    expense.totalAdvanceAllocated = totalAllocated;
+    expense.totalReturnAmount = totalReturn;
+    expense.netClaimAmount = (expense.amount + (expense.taxAmount || 0)) - totalAllocated;
+
+    await expense.save({ session });
+
+    await session.commitTransaction();
+    return expense;
+
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
+  }
+}
+
+/**
+ * Create journal entry for advance allocation
+ */
+async function createAdvanceAllocationJournalEntry(expense) {
+  if (!expense.advances || expense.advances.length === 0) return null;
+
+  const settings = await FinanceSettings.findOne();
+
+  const entries = [];
+
+  // For each advance allocation
+  for (const allocation of expense.advances) {
+    if (allocation.allocatedAmount > 0) {
+      // Debit: Expense account
+      entries.push({
+        accountCode: getExpenseAccountByCategory(expense.category),
+        debit: allocation.allocatedAmount,
+        credit: 0,
+        description: `Expense from advance ${allocation.advanceRef}`
+      });
+
+      // Credit: Employee Advance account
+      entries.push({
+        accountCode: settings.employeeAdvanceAccount, // e.g., '1350'
+        debit: 0,
+        credit: allocation.allocatedAmount,
+        description: `Clear advance ${allocation.advanceRef}`
+      });
+    }
+
+    // Handle return amount
+    if (allocation.returnAmount > 0) {
+      // Debit: Cash/Bank (employee returns cash)
+      entries.push({
+        accountCode: settings.defaultCashAccount,
+        debit: allocation.returnAmount,
+        credit: 0,
+        description: `Return from advance ${allocation.advanceRef}`
+      });
+
+      // Credit: Employee Advance account
+      entries.push({
+        accountCode: settings.employeeAdvanceAccount,
+        debit: 0,
+        credit: allocation.returnAmount,
+        description: `Clear advance return ${allocation.advanceRef}`
+      });
+    }
+  }
+
+  if (entries.length === 0) return null;
+
+  return JournalEntry.create({
+    entryNumber: await generateJournalNumber(),
+    date: expense.date,
+    reference: `EXP-${expense._id}`,
+    referenceType: 'ExpenseAdvanceAllocation',
+    referenceId: expense._id,
+    entries,
+    status: 'posted'
+  });
+}
+```
+
+---
+
 ## 4. Time Entry Fields
 
 ### 4.1 Billing Hours Override
@@ -857,6 +1441,313 @@ function calculateProgress(entry) {
     varianceHours: Math.round(variance / 60 * 10) / 10
   };
 }
+```
+
+---
+
+### 4.4 Sales Invoice Reference (ERPNext parity)
+
+**Schema Addition:**
+```javascript
+// models/TimeEntry.js
+const timeEntrySchema = new Schema({
+  // ... existing fields ...
+
+  // Sales Invoice Reference (ERPNext: sales_invoice)
+  salesInvoiceRef: {
+    type: String,
+    trim: true,
+    index: true
+    // Stores invoice number for quick reference
+  },
+  salesInvoiceId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Invoice'
+  },
+  isBilled: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
+  billedDate: {
+    type: Date
+  },
+  billedAmount: {
+    type: Number,
+    min: 0
+    // Amount included in invoice (may differ from billingAmount due to discounts)
+  },
+});
+
+// Compound index for billing queries
+timeEntrySchema.index({ isBilled: 1, caseId: 1, date: -1 });
+```
+
+**Business Logic:**
+```javascript
+// services/timeEntryService.js
+
+/**
+ * Get unbilled time entries for invoicing
+ */
+async function getUnbilledTimeEntries(caseId, clientId) {
+  const query = {
+    isBilled: false,
+    isBillable: true,
+    billStatus: { $ne: 'written_off' }
+  };
+
+  if (caseId) query.caseId = caseId;
+  if (clientId) query.clientId = clientId;
+
+  const entries = await TimeEntry.find(query)
+    .populate('attorneyId', 'firstName lastName hourlyRate')
+    .sort({ date: -1 });
+
+  return entries;
+}
+
+/**
+ * Mark time entries as billed when invoice is created
+ */
+async function markTimeEntriesAsBilled(timeEntryIds, invoiceId, invoiceNumber, session) {
+  const updateResult = await TimeEntry.updateMany(
+    { _id: { $in: timeEntryIds } },
+    {
+      $set: {
+        isBilled: true,
+        salesInvoiceId: invoiceId,
+        salesInvoiceRef: invoiceNumber,
+        billedDate: new Date(),
+        billStatus: 'billed'
+      }
+    },
+    { session }
+  );
+
+  return updateResult;
+}
+
+/**
+ * Reverse billing when invoice is cancelled/voided
+ */
+async function unmarkTimeEntriesBilled(invoiceId, session) {
+  await TimeEntry.updateMany(
+    { salesInvoiceId: invoiceId },
+    {
+      $set: {
+        isBilled: false,
+        billStatus: 'unbilled'
+      },
+      $unset: {
+        salesInvoiceId: '',
+        salesInvoiceRef: '',
+        billedDate: '',
+        billedAmount: ''
+      }
+    },
+    { session }
+  );
+}
+```
+
+**API Endpoints:**
+```javascript
+// routes/timeEntries.js
+
+// Get unbilled entries for invoice creation
+router.get('/unbilled', authenticateToken, async (req, res) => {
+  const { caseId, clientId } = req.query;
+
+  const entries = await getUnbilledTimeEntries(caseId, clientId);
+
+  // Group by case for easier selection
+  const grouped = entries.reduce((acc, entry) => {
+    const key = entry.caseId?.toString() || 'no-case';
+    if (!acc[key]) {
+      acc[key] = {
+        caseId: entry.caseId,
+        caseName: entry.caseName,
+        entries: [],
+        totalAmount: 0,
+        totalHours: 0
+      };
+    }
+    acc[key].entries.push(entry);
+    acc[key].totalAmount += entry.billingAmount || 0;
+    acc[key].totalHours += (entry.actualHours || 0) + (entry.actualMinutes || 0) / 60;
+    return acc;
+  }, {});
+
+  res.json({ data: Object.values(grouped) });
+});
+
+// Get billing history for a time entry
+router.get('/:id/billing-history', authenticateToken, async (req, res) => {
+  const entry = await TimeEntry.findById(req.params.id)
+    .populate('salesInvoiceId', 'invoiceNumber issueDate status totalAmount');
+
+  if (!entry) {
+    return res.status(404).json({ error: 'Time entry not found' });
+  }
+
+  res.json({
+    data: {
+      isBilled: entry.isBilled,
+      billedDate: entry.billedDate,
+      salesInvoiceRef: entry.salesInvoiceRef,
+      invoice: entry.salesInvoiceId
+    }
+  });
+});
+```
+
+---
+
+### 4.5 Completion Status (ERPNext parity)
+
+**Schema Addition:**
+```javascript
+// models/TimeEntry.js
+const timeEntrySchema = new Schema({
+  // ... existing fields ...
+
+  // Completion Status (ERPNext: completed)
+  isCompleted: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
+  completedAt: {
+    type: Date
+  },
+  completedBy: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  },
+});
+```
+
+**Business Logic:**
+```javascript
+// services/timeEntryService.js
+
+/**
+ * Mark time entry as completed
+ */
+async function markAsCompleted(timeEntryId, userId) {
+  const entry = await TimeEntry.findByIdAndUpdate(
+    timeEntryId,
+    {
+      isCompleted: true,
+      completedAt: new Date(),
+      completedBy: userId
+    },
+    { new: true }
+  );
+
+  // Update related task progress if linked
+  if (entry.taskId) {
+    await updateTaskProgress(entry.taskId);
+  }
+
+  return entry;
+}
+
+/**
+ * Bulk mark entries as completed
+ */
+async function bulkMarkCompleted(timeEntryIds, userId) {
+  await TimeEntry.updateMany(
+    { _id: { $in: timeEntryIds } },
+    {
+      $set: {
+        isCompleted: true,
+        completedAt: new Date(),
+        completedBy: userId
+      }
+    }
+  );
+}
+
+/**
+ * Get completion statistics for a case
+ */
+async function getCaseCompletionStats(caseId) {
+  const stats = await TimeEntry.aggregate([
+    { $match: { caseId: mongoose.Types.ObjectId(caseId) } },
+    {
+      $group: {
+        _id: null,
+        totalEntries: { $sum: 1 },
+        completedEntries: { $sum: { $cond: ['$isCompleted', 1, 0] } },
+        totalHours: { $sum: { $add: ['$actualHours', { $divide: ['$actualMinutes', 60] }] } },
+        completedHours: {
+          $sum: {
+            $cond: [
+              '$isCompleted',
+              { $add: ['$actualHours', { $divide: ['$actualMinutes', 60] }] },
+              0
+            ]
+          }
+        }
+      }
+    }
+  ]);
+
+  if (!stats.length) return null;
+
+  const result = stats[0];
+  return {
+    totalEntries: result.totalEntries,
+    completedEntries: result.completedEntries,
+    completionPercentage: Math.round((result.completedEntries / result.totalEntries) * 100),
+    totalHours: Math.round(result.totalHours * 10) / 10,
+    completedHours: Math.round(result.completedHours * 10) / 10
+  };
+}
+```
+
+**API Endpoints:**
+```javascript
+// routes/timeEntries.js
+
+// Mark entry as completed
+router.post('/:id/complete', authenticateToken, async (req, res) => {
+  const entry = await markAsCompleted(req.params.id, req.user._id);
+  res.json({ data: entry });
+});
+
+// Mark entry as incomplete
+router.post('/:id/incomplete', authenticateToken, async (req, res) => {
+  const entry = await TimeEntry.findByIdAndUpdate(
+    req.params.id,
+    {
+      $set: { isCompleted: false },
+      $unset: { completedAt: '', completedBy: '' }
+    },
+    { new: true }
+  );
+  res.json({ data: entry });
+});
+
+// Bulk complete
+router.post('/bulk-complete', authenticateToken, async (req, res) => {
+  const { ids } = req.body;
+
+  if (!ids || !Array.isArray(ids)) {
+    return res.status(400).json({ error: 'ids array is required' });
+  }
+
+  await bulkMarkCompleted(ids, req.user._id);
+  res.json({ success: true, count: ids.length });
+});
+
+// Get case completion stats
+router.get('/case/:caseId/completion-stats', authenticateToken, async (req, res) => {
+  const stats = await getCaseCompletionStats(req.params.caseId);
+  res.json({ data: stats });
+});
 ```
 
 ---
@@ -1175,6 +2066,9 @@ node scripts/run-migration.js add-erpnext-parity-fields
 | **Invoices** |
 | GET | `/api/payments/advances/available/:clientId` | Get available advance payments |
 | POST | `/api/invoices` | Create invoice (with new fields) |
+| POST | `/api/invoices/credit-note` | **Create credit note** |
+| GET | `/api/invoices/:id/credit-notes` | **Get credit notes for invoice** |
+| GET | `/api/invoices/credit-notes` | **List all credit notes** |
 | **Payments** |
 | GET | `/api/accounts/chart` | Get chart of accounts for GL selection |
 | GET | `/api/deduction-accounts` | Get standard deduction accounts |
@@ -1184,9 +2078,20 @@ node scripts/run-migration.js add-erpnext-parity-fields
 | POST | `/api/expenses/:id/approve` | Approve expense |
 | POST | `/api/expenses/:id/reject` | Reject expense |
 | POST | `/api/expenses/:id/pay` | Mark expense as paid |
+| **Employee Advances** |
+| GET | `/api/employee-advances/available/:employeeId` | **Get available advances for employee** |
+| POST | `/api/employee-advances` | **Create employee advance** |
+| POST | `/api/employee-advances/:id/approve` | **Approve advance** |
+| POST | `/api/employee-advances/:id/pay` | **Mark advance as paid** |
 | **Time Entries** |
 | POST | `/api/time-entries` | Create time entry (with new fields) |
 | GET | `/api/time-entries/summary` | Get time summary with costing |
+| GET | `/api/time-entries/unbilled` | **Get unbilled entries for invoicing** |
+| GET | `/api/time-entries/:id/billing-history` | **Get billing history** |
+| POST | `/api/time-entries/:id/complete` | **Mark entry as completed** |
+| POST | `/api/time-entries/:id/incomplete` | **Mark entry as incomplete** |
+| POST | `/api/time-entries/bulk-complete` | **Bulk mark as completed** |
+| GET | `/api/time-entries/case/:caseId/completion-stats` | **Get case completion stats** |
 | **Finance Setup** |
 | GET | `/api/finance/setup/status` | Get wizard completion status |
 | POST | `/api/finance/setup/save-progress` | Save wizard progress |
@@ -1212,16 +2117,43 @@ node scripts/run-migration.js add-erpnext-parity-fields
 
 ## Testing Checklist
 
+### Invoice
 - [ ] Invoice with contact person creates successfully
 - [ ] Shipping address saved when enabled
 - [ ] Sales commission calculates correctly
 - [ ] Advance payments reduce balance due
+- [ ] **Credit note creates with correct negative amounts**
+- [ ] **Credit note references original invoice**
+- [ ] **Debit note (rate adjustment) creates correctly**
+- [ ] **Credit note reduces outstanding on original invoice**
+- [ ] **ZATCA type code correct (381/383/388)**
+
+### Payment
 - [ ] Payment deductions create proper JE
+- [ ] GL accounts auto-assign based on payment type
+- [ ] Tax withholding deductions save correctly
+
+### Expense
 - [ ] Expense approval workflow functions
 - [ ] Sanctioned amount can differ from claimed
 - [ ] Journal entries created on expense approval
+- [ ] **Employee advance allocation works**
+- [ ] **Allocated amount updates advance record**
+- [ ] **Return amount creates proper JE**
+- [ ] **Net claim amount calculates correctly**
+
+### Time Entry
 - [ ] Billing hours override calculates correctly
 - [ ] Costing margin shows accurately
 - [ ] Expected hours progress indicator works
+- [ ] **Sales invoice reference saves correctly**
+- [ ] **isBilled flag updates when invoiced**
+- [ ] **Unbilled entries API returns correct data**
+- [ ] **isCompleted flag saves correctly**
+- [ ] **Bulk complete updates all entries**
+- [ ] **Case completion stats aggregate correctly**
+
+### Finance Setup
 - [ ] Finance wizard redirects first-time users
 - [ ] Wizard progress saves and resumes
+- [ ] All wizard steps complete successfully
