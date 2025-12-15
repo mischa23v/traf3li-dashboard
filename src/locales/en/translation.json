@@ -854,7 +854,10 @@
       "settings": "Settings"
     },
     "hero": {
-      "greeting": "Good evening, Welcome!",
+      "greeting": "{{greeting}}, {{name}}",
+      "greetingMorning": "Good morning",
+      "greetingAfternoon": "Good afternoon",
+      "greetingEvening": "Good evening",
       "summary": "You have <1>{{sessions}} sessions</1>, <1>{{tasks}} urgent tasks</1>, and <1>{{messages}} new messages</1>.",
       "newCase": "New Case",
       "newInvoice": "New Invoice",

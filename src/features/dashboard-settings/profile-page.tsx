@@ -48,6 +48,8 @@ const NATIONALITIES = ['سعودي', 'إماراتي', 'كويتي', 'قطري',
 const profileFormSchema = z.object({
   firstName: z.string().min(2, 'الاسم الأول مطلوب'),
   lastName: z.string().min(2, 'الاسم الأخير مطلوب'),
+  firstNameAr: z.string().optional(),
+  lastNameAr: z.string().optional(),
   email: z.string().email('البريد الإلكتروني غير صالح'),
   phone: z.string().optional(),
   nationality: z.string().optional(),
@@ -70,6 +72,8 @@ export function ProfilePage() {
     defaultValues: {
       firstName: '',
       lastName: '',
+      firstNameAr: '',
+      lastNameAr: '',
       email: '',
       phone: '',
       nationality: '',
@@ -86,6 +90,8 @@ export function ProfilePage() {
       form.reset({
         firstName: user.firstName || '',
         lastName: user.lastName || '',
+        firstNameAr: user.firstNameAr || '',
+        lastNameAr: user.lastNameAr || '',
         email: user.email || '',
         phone: user.phone || '',
         nationality: '',
@@ -183,9 +189,9 @@ export function ProfilePage() {
                       name="firstName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{isRTL ? 'الاسم الأول' : 'First Name'}</FormLabel>
+                          <FormLabel>{isRTL ? 'الاسم الأول (بالإنجليزية)' : 'First Name (English)'}</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} dir="ltr" className="text-start" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -196,10 +202,45 @@ export function ProfilePage() {
                       name="lastName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{isRTL ? 'الاسم الأخير' : 'Last Name'}</FormLabel>
+                          <FormLabel>{isRTL ? 'الاسم الأخير (بالإنجليزية)' : 'Last Name (English)'}</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} dir="ltr" className="text-start" />
                           </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="firstNameAr"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{isRTL ? 'الاسم الأول (بالعربية)' : 'First Name (Arabic)'}</FormLabel>
+                          <FormControl>
+                            <Input {...field} dir="rtl" className="text-end" placeholder={isRTL ? 'مثال: محمد' : 'e.g., محمد'} />
+                          </FormControl>
+                          <FormDescription>
+                            {isRTL ? 'اختياري - سيظهر عند استخدام اللغة العربية' : 'Optional - displayed when using Arabic'}
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="lastNameAr"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{isRTL ? 'الاسم الأخير (بالعربية)' : 'Last Name (Arabic)'}</FormLabel>
+                          <FormControl>
+                            <Input {...field} dir="rtl" className="text-end" placeholder={isRTL ? 'مثال: الأحمد' : 'e.g., الأحمد'} />
+                          </FormControl>
+                          <FormDescription>
+                            {isRTL ? 'اختياري - سيظهر عند استخدام اللغة العربية' : 'Optional - displayed when using Arabic'}
+                          </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}

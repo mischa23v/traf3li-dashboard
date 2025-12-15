@@ -854,7 +854,7 @@
       "settings": "الإعدادات"
     },
     "hero": {
-      "greeting": "{{greeting}}، {{name}} 👋",
+      "greeting": "{{greeting}}، {{name}}",
       "greetingMorning": "صباح الخير",
       "greetingAfternoon": "مساء الخير",
       "greetingEvening": "مساء الخير",

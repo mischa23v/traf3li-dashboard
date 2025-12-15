@@ -62,18 +62,22 @@ import { useTaskStats } from '@/hooks/useTasks'
 import { useReminderStats } from '@/hooks/useRemindersAndEvents'
 import { useCaseStatisticsFromAPI } from '@/hooks/useCasesAndClients'
 import { useAuthStore } from '@/stores/auth-store'
+import { getLocalizedFirstName } from '@/lib/arabic-names'
 
 type TabType = 'overview' | 'analytics' | 'reports' | 'notifications'
 
 export function Dashboard() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const user = useAuthStore((state) => state.user)
   const [activeTab, setActiveTab] = useState<TabType>('overview')
 
-  // Get user's display name
+  // Get user's display name based on current locale
   const getUserDisplayName = () => {
-    if (user?.firstName) {
-      return user.firstName
+    const locale = i18n.language
+    // Use localized name (Arabic name if in Arabic locale, with fallback to lookup table)
+    const localizedName = getLocalizedFirstName(user?.firstName, user?.firstNameAr, locale)
+    if (localizedName) {
+      return localizedName
     }
     if (user?.username) {
       return user.username

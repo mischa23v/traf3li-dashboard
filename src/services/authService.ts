@@ -75,6 +75,8 @@ export interface User {
   username: string
   firstName?: string
   lastName?: string
+  firstNameAr?: string
+  lastNameAr?: string
   email: string
   role: 'client' | 'lawyer' | 'admin'
   image?: string
