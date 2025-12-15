@@ -5,7 +5,8 @@ import {
     Receipt, CreditCard, Clock, DollarSign, PieChart, BarChart3, Users,
     ChevronLeft, ChevronRight, Search, Bell, Filter, Loader2, CheckCircle,
     AlertCircle, Wallet, FileSpreadsheet, Scale, Target, Truck, UserCheck,
-    Briefcase, LineChart, Layers
+    Briefcase, LineChart, Layers, Megaphone, Zap, Timer, UserCog, XCircle,
+    GitBranch, Hourglass
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -60,6 +61,13 @@ type ReportType =
     | 'expense-summary'
     | 'timesheet-summary'
     | 'vat-report'
+    | 'campaign-efficiency'
+    | 'lead-owner-efficiency'
+    | 'first-response-time'
+    | 'lost-opportunity-analysis'
+    | 'sales-pipeline-analytics'
+    | 'prospects-engaged-not-converted'
+    | 'lead-conversion-time'
 
 interface ReportConfig {
     id: ReportType
@@ -70,7 +78,7 @@ interface ReportConfig {
     icon: React.ReactNode
     color: string
     bgColor: string
-    category: 'core' | 'invoices' | 'payables' | 'expenses' | 'time' | 'tax' | 'analytics'
+    category: 'core' | 'invoices' | 'payables' | 'expenses' | 'time' | 'tax' | 'analytics' | 'crm'
 }
 
 const reportConfigs: ReportConfig[] = [
@@ -229,6 +237,84 @@ const reportConfigs: ReportConfig[] = [
         bgColor: 'bg-stone-50',
         category: 'payables'
     },
+    // CRM Reports
+    {
+        id: 'campaign-efficiency',
+        nameAr: 'تقرير كفاءة الحملات',
+        nameEn: 'Campaign Efficiency Report',
+        descriptionAr: 'تحليل أداء الحملات التسويقية ومعدل التحويل',
+        descriptionEn: 'Analyze marketing campaign performance and conversion rates',
+        icon: <Megaphone className="w-5 h-5" aria-hidden="true" />,
+        color: 'text-pink-600',
+        bgColor: 'bg-pink-50',
+        category: 'crm'
+    },
+    {
+        id: 'lead-owner-efficiency',
+        nameAr: 'تقرير كفاءة مسؤول العملاء المحتملين',
+        nameEn: 'Lead Owner Efficiency Report',
+        descriptionAr: 'تقييم أداء مسؤولي المبيعات في إدارة العملاء المحتملين',
+        descriptionEn: 'Evaluate sales team performance in managing leads',
+        icon: <UserCog className="w-5 h-5" aria-hidden="true" />,
+        color: 'text-blue-600',
+        bgColor: 'bg-blue-50',
+        category: 'crm'
+    },
+    {
+        id: 'first-response-time',
+        nameAr: 'تقرير وقت الاستجابة الأول',
+        nameEn: 'First Response Time Report',
+        descriptionAr: 'قياس سرعة الاستجابة الأولى للعملاء المحتملين',
+        descriptionEn: 'Measure first response time to leads',
+        icon: <Timer className="w-5 h-5" aria-hidden="true" />,
+        color: 'text-cyan-600',
+        bgColor: 'bg-cyan-50',
+        category: 'crm'
+    },
+    {
+        id: 'lost-opportunity-analysis',
+        nameAr: 'تقرير تحليل الفرص الضائعة',
+        nameEn: 'Lost Opportunity Analysis Report',
+        descriptionAr: 'تحليل أسباب خسارة الفرص البيعية',
+        descriptionEn: 'Analyze reasons for lost sales opportunities',
+        icon: <XCircle className="w-5 h-5" aria-hidden="true" />,
+        color: 'text-red-600',
+        bgColor: 'bg-red-50',
+        category: 'crm'
+    },
+    {
+        id: 'sales-pipeline-analytics',
+        nameAr: 'تقرير تحليل مسار المبيعات',
+        nameEn: 'Sales Pipeline Analytics Report',
+        descriptionAr: 'تحليل شامل لمراحل مسار المبيعات ومعدلات التحويل',
+        descriptionEn: 'Comprehensive analysis of sales pipeline stages and conversion rates',
+        icon: <GitBranch className="w-5 h-5" aria-hidden="true" />,
+        color: 'text-purple-600',
+        bgColor: 'bg-purple-50',
+        category: 'crm'
+    },
+    {
+        id: 'prospects-engaged-not-converted',
+        nameAr: 'تقرير العملاء المحتملين المتفاعلين غير المحولين',
+        nameEn: 'Prospects Engaged Not Converted Report',
+        descriptionAr: 'تتبع العملاء المحتملين الذين تفاعلوا لكن لم يتحولوا',
+        descriptionEn: 'Track engaged prospects who have not converted',
+        icon: <Users className="w-5 h-5" aria-hidden="true" />,
+        color: 'text-amber-600',
+        bgColor: 'bg-amber-50',
+        category: 'crm'
+    },
+    {
+        id: 'lead-conversion-time',
+        nameAr: 'تقرير وقت تحويل العملاء المحتملين',
+        nameEn: 'Lead Conversion Time Report',
+        descriptionAr: 'قياس المدة الزمنية من العميل المحتمل إلى العميل الفعلي',
+        descriptionEn: 'Measure time taken from lead to customer conversion',
+        icon: <Hourglass className="w-5 h-5" aria-hidden="true" />,
+        color: 'text-green-600',
+        bgColor: 'bg-green-50',
+        category: 'crm'
+    },
 ]
 
 type PeriodType = 'this-month' | 'last-month' | 'this-quarter' | 'this-year' | 'custom'
@@ -320,6 +406,7 @@ export function FullReportsView() {
             expenses: filteredReports.filter(r => r.category === 'expenses'),
             time: filteredReports.filter(r => r.category === 'time'),
             tax: filteredReports.filter(r => r.category === 'tax'),
+            crm: filteredReports.filter(r => r.category === 'crm'),
         }
     }, [filteredReports])
 
@@ -900,6 +987,42 @@ export function FullReportsView() {
                                         </div>
                                     </div>
                                 )}
+
+                                {/* CRM Reports */}
+                                {reportsByCategory.crm.length > 0 && (
+                                    <div className="space-y-4">
+                                        <h2 className="text-lg font-bold text-navy flex items-center gap-2">
+                                            <Megaphone className="w-5 h-5 text-pink-600" aria-hidden="true" />
+                                            {isRTL ? 'تقارير إدارة علاقات العملاء' : 'CRM Reports'}
+                                        </h2>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {reportsByCategory.crm.map((report) => (
+                                                <Card
+                                                    key={report.id}
+                                                    className={`border-0 shadow-sm rounded-3xl overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 ${report.bgColor} group`}
+                                                    onClick={() => setSelectedReport(report.id)}
+                                                >
+                                                    <CardContent className="p-6">
+                                                        <div className="flex items-start gap-4">
+                                                            <div className={`p-3 rounded-2xl bg-white/80 ${report.color} group-hover:scale-110 transition-transform`}>
+                                                                {report.icon}
+                                                            </div>
+                                                            <div className="flex-1">
+                                                                <h3 className="font-bold text-navy text-lg mb-1 group-hover:text-emerald-700 transition-colors">
+                                                                    {isRTL ? report.nameAr : report.nameEn}
+                                                                </h3>
+                                                                <p className="text-sm text-slate-600">
+                                                                    {isRTL ? report.descriptionAr : report.descriptionEn}
+                                                                </p>
+                                                            </div>
+                                                            <ChevronLeft className={`w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors ${isRTL ? '' : 'rotate-180'}`} aria-hidden="true" />
+                                                        </div>
+                                                    </CardContent>
+                                                </Card>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </>
                         ) : (
                             /* Report View */
@@ -982,7 +1105,11 @@ export function FullReportsView() {
                                                   selectedReport === 'timesheet-summary' || selectedReport === 'vat-report' ||
                                                   selectedReport === 'budget-variance' || selectedReport === 'gross-profit' ||
                                                   selectedReport === 'cost-center' || selectedReport === 'client-statement' ||
-                                                  selectedReport === 'ap-aging' || selectedReport === 'vendor-ledger') && (
+                                                  selectedReport === 'ap-aging' || selectedReport === 'vendor-ledger' ||
+                                                  selectedReport === 'campaign-efficiency' || selectedReport === 'lead-owner-efficiency' ||
+                                                  selectedReport === 'first-response-time' || selectedReport === 'lost-opportunity-analysis' ||
+                                                  selectedReport === 'sales-pipeline-analytics' || selectedReport === 'prospects-engaged-not-converted' ||
+                                                  selectedReport === 'lead-conversion-time') && (
                                                     <PlaceholderContent reportName={isRTL ? selectedReportConfig?.nameAr || '' : selectedReportConfig?.nameEn || ''} isRTL={isRTL} />
                                                 )}
                                             </div>
