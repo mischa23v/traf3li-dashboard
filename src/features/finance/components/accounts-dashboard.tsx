@@ -1,10 +1,11 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect, useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import {
     TrendingUp, TrendingDown, FileText, Receipt, AlertCircle,
     ArrowUpRight, ArrowDownRight,
     PieChart, Download, Plus, Search,
     Wallet,
-    CreditCard, ArrowLeftRight, Landmark, Bell
+    CreditCard, ArrowLeftRight, Landmark, Bell, Sparkles
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAccountBalance, useTransactionSummary, useTransactions, useInvoices } from '@/hooks/useFinance'
@@ -22,12 +23,53 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { FinanceSidebar } from './finance-sidebar'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Link } from '@tanstack/react-router'
+
+const WIZARD_STORAGE_KEY = 'finance-setup-wizard-progress'
 
 interface AccountsDashboardProps {
     defaultTab?: string
 }
 
 export default function AccountsDashboard({ }: AccountsDashboardProps) {
+    const navigate = useNavigate()
+    const [showWizardPrompt, setShowWizardPrompt] = useState(false)
+    const [dismissedWizard, setDismissedWizard] = useState(false)
+
+    // Check if finance setup wizard has been completed
+    useEffect(() => {
+        const wizardProgress = localStorage.getItem(WIZARD_STORAGE_KEY)
+        const wizardDismissed = localStorage.getItem('finance-setup-wizard-dismissed')
+
+        if (wizardDismissed) {
+            setDismissedWizard(true)
+            return
+        }
+
+        if (!wizardProgress) {
+            // No wizard progress at all - first time user, redirect to wizard
+            navigate({ to: '/dashboard/finance/setup-wizard' })
+            return
+        }
+
+        try {
+            const progress = JSON.parse(wizardProgress)
+            if (!progress.completed) {
+                // Wizard started but not completed - show prompt
+                setShowWizardPrompt(true)
+            }
+        } catch {
+            // Invalid data, show prompt
+            setShowWizardPrompt(true)
+        }
+    }, [navigate])
+
+    const handleDismissWizard = () => {
+        localStorage.setItem('finance-setup-wizard-dismissed', 'true')
+        setShowWizardPrompt(false)
+        setDismissedWizard(true)
+    }
     // Fetch financial data
     const { data: balanceData, isLoading: isLoadingBalance } = useAccountBalance()
     const { data: summaryData, isLoading: isLoadingSummary } = useTransactionSummary()
@@ -145,6 +187,34 @@ export default function AccountsDashboard({ }: AccountsDashboardProps) {
             </Header>
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+                {/* Finance Setup Wizard Prompt */}
+                {showWizardPrompt && !dismissedWizard && (
+                    <Alert className="bg-gradient-to-r from-emerald-50 to-cyan-50 border-emerald-200 shadow-lg rounded-2xl mb-4">
+                        <Sparkles className="h-5 w-5 text-emerald-600" />
+                        <AlertTitle className="text-lg font-bold text-emerald-800">أكمل إعداد المالية</AlertTitle>
+                        <AlertDescription className="mt-2">
+                            <p className="text-emerald-700 mb-4">
+                                لم تكتمل عملية إعداد النظام المالي بعد. أكمل المعالج لتفعيل جميع المميزات المالية.
+                            </p>
+                            <div className="flex gap-3">
+                                <Link to="/dashboard/finance/setup-wizard">
+                                    <Button className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl">
+                                        <Sparkles className="w-4 h-4 ms-2" />
+                                        أكمل الإعداد الآن
+                                    </Button>
+                                </Link>
+                                <Button
+                                    variant="outline"
+                                    onClick={handleDismissWizard}
+                                    className="rounded-xl border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                                >
+                                    لاحقاً
+                                </Button>
+                            </div>
+                        </AlertDescription>
+                    </Alert>
+                )}
+
                 {/* Loading State */}
                 {isLoading ? (
                     <div className="max-w-[1600px] mx-auto space-y-8">

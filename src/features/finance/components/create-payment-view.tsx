@@ -207,6 +207,21 @@ export function CreatePaymentView() {
     const [reconciledBy, setReconciledBy] = useState('')
     const [bankStatementRef, setBankStatementRef] = useState('')
 
+    // GL Accounts (ERPNext parity)
+    const [paidFromAccount, setPaidFromAccount] = useState('')
+    const [paidToAccount, setPaidToAccount] = useState('')
+    const [partyType, setPartyType] = useState<'customer' | 'supplier' | 'employee'>('customer')
+
+    // Deductions Table (ERPNext parity - for tax withholding)
+    interface Deduction {
+        id: string
+        accountId: string
+        accountName: string
+        amount: number
+        description: string
+    }
+    const [deductions, setDeductions] = useState<Deduction[]>([])
+
     // Advanced - Organization
     const [departmentId, setDepartmentId] = useState('')
     const [locationId, setLocationId] = useState('')
@@ -416,6 +431,21 @@ export function CreatePaymentView() {
                     reconciledBy,
                     bankStatementRef,
                 },
+            }),
+            // GL Accounts (ERPNext parity)
+            ...(paidFromAccount && { paidFromAccount }),
+            ...(paidToAccount && { paidToAccount }),
+            partyType,
+            // Deductions (ERPNext parity)
+            ...(deductions.length > 0 && {
+                deductions: deductions.filter(d => d.accountId && d.amount > 0).map(d => ({
+                    accountId: d.accountId,
+                    accountName: d.accountName,
+                    amount: d.amount,
+                    description: d.description,
+                })),
+                totalDeductions: deductions.reduce((sum, d) => sum + d.amount, 0),
+                netAmountAfterDeductions: amount - deductions.reduce((sum, d) => sum + d.amount, 0),
             }),
             // Organization
             departmentId,
@@ -1175,6 +1205,288 @@ export function CreatePaymentView() {
 
                             {/* ADVANCED SECTION */}
                             <Accordion type="multiple" className="space-y-4">
+
+                                {/* GL Accounts (ERPNext parity) */}
+                                <AccordionItem value="gl-accounts" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
+                                    <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
+                                        <div className="flex items-center gap-2">
+                                            <Landmark className="h-5 w-5 text-indigo-500" />
+                                            <span className="font-bold text-slate-800">حسابات دفتر الأستاذ</span>
+                                        </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="px-6 pb-6">
+                                        <Alert className="mb-4 rounded-xl">
+                                            <Info className="h-4 w-4" aria-hidden="true" />
+                                            <AlertDescription>
+                                                حدد حسابات دفتر الأستاذ للقيود المحاسبية التلقائية
+                                            </AlertDescription>
+                                        </Alert>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                    <ArrowLeftRight className="w-4 h-4 text-red-500" />
+                                                    الحساب المدفوع منه (Paid From)
+                                                </Label>
+                                                <Select value={paidFromAccount} onValueChange={setPaidFromAccount}>
+                                                    <SelectTrigger className="rounded-xl border-slate-200">
+                                                        <SelectValue placeholder="اختر الحساب" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="1100">1100 - النقدية</SelectItem>
+                                                        <SelectItem value="1110">1110 - البنك الأهلي - جاري</SelectItem>
+                                                        <SelectItem value="1120">1120 - مصرف الراجحي - جاري</SelectItem>
+                                                        <SelectItem value="1130">1130 - بنك الرياض - جاري</SelectItem>
+                                                        <SelectItem value="1200">1200 - ذمم العملاء</SelectItem>
+                                                        <SelectItem value="2100">2100 - ذمم الموردين</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                <p className="text-xs text-slate-500">
+                                                    الحساب الذي سيُخصم منه المبلغ
+                                                </p>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                    <ArrowLeftRight className="w-4 h-4 text-green-500" />
+                                                    الحساب المدفوع إليه (Paid To)
+                                                </Label>
+                                                <Select value={paidToAccount} onValueChange={setPaidToAccount}>
+                                                    <SelectTrigger className="rounded-xl border-slate-200">
+                                                        <SelectValue placeholder="اختر الحساب" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="1100">1100 - النقدية</SelectItem>
+                                                        <SelectItem value="1110">1110 - البنك الأهلي - جاري</SelectItem>
+                                                        <SelectItem value="1120">1120 - مصرف الراجحي - جاري</SelectItem>
+                                                        <SelectItem value="1130">1130 - بنك الرياض - جاري</SelectItem>
+                                                        <SelectItem value="1200">1200 - ذمم العملاء</SelectItem>
+                                                        <SelectItem value="2100">2100 - ذمم الموردين</SelectItem>
+                                                        <SelectItem value="4100">4100 - إيرادات الخدمات</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                <p className="text-xs text-slate-500">
+                                                    الحساب الذي سيُضاف إليه المبلغ
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="mt-4 space-y-2">
+                                            <Label className="text-sm font-medium text-slate-700">نوع الطرف</Label>
+                                            <div className="flex gap-3">
+                                                {[
+                                                    { value: 'customer', label: 'عميل', icon: User },
+                                                    { value: 'supplier', label: 'مورد', icon: Building2 },
+                                                    { value: 'employee', label: 'موظف', icon: Users },
+                                                ].map((type) => (
+                                                    <button
+                                                        key={type.value}
+                                                        type="button"
+                                                        onClick={() => setPartyType(type.value as typeof partyType)}
+                                                        className={cn(
+                                                            "px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2",
+                                                            partyType === type.value
+                                                                ? "bg-indigo-500 text-white"
+                                                                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                                        )}
+                                                    >
+                                                        <type.icon className="w-4 h-4" />
+                                                        {type.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+
+                                {/* Deductions Table (ERPNext parity - Tax Withholding) */}
+                                <AccordionItem value="deductions" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
+                                    <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
+                                        <div className="flex items-center gap-2">
+                                            <BadgePercent className="h-5 w-5 text-amber-500" />
+                                            <span className="font-bold text-slate-800">الاستقطاعات والضرائب المحتجزة</span>
+                                            {deductions.length > 0 && (
+                                                <Badge className="rounded-full bg-amber-100 text-amber-700">
+                                                    {deductions.length} استقطاع
+                                                </Badge>
+                                            )}
+                                        </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="px-6 pb-6">
+                                        <Alert className="mb-4 rounded-xl">
+                                            <Info className="h-4 w-4" aria-hidden="true" />
+                                            <AlertDescription>
+                                                أضف استقطاعات ضريبية أو رسوم يتم خصمها من الدفعة (مثل: ضريبة الاستقطاع 5%)
+                                            </AlertDescription>
+                                        </Alert>
+
+                                        {deductions.length > 0 && (
+                                            <div className="border rounded-xl overflow-hidden mb-4">
+                                                <Table>
+                                                    <TableHeader>
+                                                        <TableRow className="bg-slate-50">
+                                                            <TableHead className="text-start">الحساب</TableHead>
+                                                            <TableHead className="text-start">الوصف</TableHead>
+                                                            <TableHead className="text-start">المبلغ</TableHead>
+                                                            <TableHead className="w-12"></TableHead>
+                                                        </TableRow>
+                                                    </TableHeader>
+                                                    <TableBody>
+                                                        {deductions.map((deduction) => (
+                                                            <TableRow key={deduction.id}>
+                                                                <TableCell>
+                                                                    <Select
+                                                                        value={deduction.accountId}
+                                                                        onValueChange={(value) => {
+                                                                            setDeductions(prev =>
+                                                                                prev.map(d =>
+                                                                                    d.id === deduction.id
+                                                                                        ? { ...d, accountId: value, accountName: value }
+                                                                                        : d
+                                                                                )
+                                                                            )
+                                                                        }}
+                                                                    >
+                                                                        <SelectTrigger className="rounded-lg h-8 text-xs">
+                                                                            <SelectValue placeholder="اختر" />
+                                                                        </SelectTrigger>
+                                                                        <SelectContent>
+                                                                            <SelectItem value="2210">2210 - ضريبة الاستقطاع المستحقة</SelectItem>
+                                                                            <SelectItem value="2220">2220 - ضريبة القيمة المضافة</SelectItem>
+                                                                            <SelectItem value="2230">2230 - التأمينات الاجتماعية</SelectItem>
+                                                                            <SelectItem value="2240">2240 - رسوم إدارية</SelectItem>
+                                                                            <SelectItem value="2250">2250 - استقطاعات أخرى</SelectItem>
+                                                                        </SelectContent>
+                                                                    </Select>
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <Input
+                                                                        value={deduction.description}
+                                                                        onChange={(e) => {
+                                                                            setDeductions(prev =>
+                                                                                prev.map(d =>
+                                                                                    d.id === deduction.id
+                                                                                        ? { ...d, description: e.target.value }
+                                                                                        : d
+                                                                                )
+                                                                            )
+                                                                        }}
+                                                                        placeholder="وصف الاستقطاع"
+                                                                        className="rounded-lg h-8 text-xs"
+                                                                    />
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <Input
+                                                                        type="number"
+                                                                        min="0"
+                                                                        step="0.01"
+                                                                        value={deduction.amount}
+                                                                        onChange={(e) => {
+                                                                            setDeductions(prev =>
+                                                                                prev.map(d =>
+                                                                                    d.id === deduction.id
+                                                                                        ? { ...d, amount: parseFloat(e.target.value) || 0 }
+                                                                                        : d
+                                                                                )
+                                                                            )
+                                                                        }}
+                                                                        className="w-28 rounded-lg h-8 text-xs"
+                                                                    />
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        onClick={() => {
+                                                                            setDeductions(prev => prev.filter(d => d.id !== deduction.id))
+                                                                        }}
+                                                                        className="text-red-500 hover:text-red-700 h-8 w-8 p-0"
+                                                                    >
+                                                                        <Trash2 className="w-4 h-4" aria-hidden="true" />
+                                                                    </Button>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ))}
+                                                    </TableBody>
+                                                    <tfoot className="bg-amber-50">
+                                                        <tr>
+                                                            <td colSpan={2} className="px-4 py-2 font-semibold text-amber-800">
+                                                                إجمالي الاستقطاعات
+                                                            </td>
+                                                            <td colSpan={2} className="px-4 py-2 font-bold text-amber-700">
+                                                                {formatCurrency(deductions.reduce((sum, d) => sum + d.amount, 0))}
+                                                            </td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </Table>
+                                            </div>
+                                        )}
+
+                                        <div className="flex gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => {
+                                                    setDeductions(prev => [
+                                                        ...prev,
+                                                        {
+                                                            id: Date.now().toString(),
+                                                            accountId: '',
+                                                            accountName: '',
+                                                            amount: 0,
+                                                            description: '',
+                                                        }
+                                                    ])
+                                                }}
+                                                className="rounded-xl"
+                                            >
+                                                <Plus className="w-4 h-4 ms-2" />
+                                                إضافة استقطاع
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => {
+                                                    // Quick add 5% withholding tax
+                                                    setDeductions(prev => [
+                                                        ...prev,
+                                                        {
+                                                            id: Date.now().toString(),
+                                                            accountId: '2210',
+                                                            accountName: 'ضريبة الاستقطاع المستحقة',
+                                                            amount: amount * 0.05,
+                                                            description: 'ضريبة استقطاع 5%',
+                                                        }
+                                                    ])
+                                                }}
+                                                className="rounded-xl text-amber-600 border-amber-200 hover:bg-amber-50"
+                                            >
+                                                <BadgePercent className="w-4 h-4 ms-2" />
+                                                ضريبة استقطاع 5%
+                                            </Button>
+                                        </div>
+
+                                        {deductions.length > 0 && (
+                                            <div className="mt-4 p-4 bg-slate-50 rounded-xl space-y-2">
+                                                <div className="flex justify-between text-sm">
+                                                    <span className="text-slate-600">المبلغ الإجمالي:</span>
+                                                    <span className="font-medium">{formatCurrency(amount)}</span>
+                                                </div>
+                                                <div className="flex justify-between text-sm text-amber-600">
+                                                    <span>الاستقطاعات:</span>
+                                                    <span>-{formatCurrency(deductions.reduce((sum, d) => sum + d.amount, 0))}</span>
+                                                </div>
+                                                <Separator />
+                                                <div className="flex justify-between text-sm font-bold">
+                                                    <span>صافي المبلغ المستلم:</span>
+                                                    <span className="text-emerald-600">
+                                                        {formatCurrency(amount - deductions.reduce((sum, d) => sum + d.amount, 0))}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </AccordionContent>
+                                </AccordionItem>
 
                                 {/* Fees */}
                                 <AccordionItem value="fees" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
