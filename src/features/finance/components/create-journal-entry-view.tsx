@@ -226,7 +226,7 @@ export default function CreateJournalEntryView() {
           </div>
         </TopNav>
       </Header>
-      <FinanceSidebar />
+      <FinanceSidebar context="journal-entries" />
       <Main>
         <div className={cn('container mx-auto p-6 space-y-6', isRTL && 'rtl')}>
           {/* Header */}

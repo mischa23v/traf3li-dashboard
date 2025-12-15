@@ -23,9 +23,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { ArrowRight, Save, Trash2, Copy, Clock } from 'lucide-react'
+import { ArrowRight, Save, Trash2, Copy, Clock, Lock, AlertTriangle } from 'lucide-react'
 import { useTimeEntry, useUpdateTimeEntry, useDeleteTimeEntry, useCreateTimeEntry } from '@/hooks/useFinance'
 import { useCasesAndClients } from '@/hooks/useCasesAndClients'
+import { LOCK_REASON_LABELS, LOCK_REASON_DESCRIPTIONS } from '@/features/finance/types/time-entry-lock-types'
+import { toast } from 'sonner'
 
 const billableRates = [
   { value: '500', label: '500 ر.س/ساعة' },
@@ -138,10 +140,87 @@ export function EditTimeEntryView() {
     return (hours * formData.hourlyRate).toLocaleString('ar-SA')
   }
 
+  // Check if entry is locked
+  const isLocked = entry?.data?.isLocked || false
+  const lockReason = entry?.data?.lockReason
+
+  useEffect(() => {
+    if (isLocked) {
+      toast.error('هذا السجل مقفل ولا يمكن تعديله')
+    }
+  }, [isLocked])
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
+
+  // Show locked entry warning
+  if (isLocked) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm text-foreground/70">
+            <span>المالية</span>
+            <ArrowRight className="h-4 w-4 rotate-180" />
+            <span>تتبع الوقت</span>
+            <ArrowRight className="h-4 w-4 rotate-180" />
+            <span className="text-foreground">سجل مقفل</span>
+          </div>
+        </div>
+
+        <Card className="border-red-200 bg-red-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-red-900">
+              <Lock className="h-6 w-6" />
+              سجل مقفل - لا يمكن التعديل
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="bg-red-100 p-2 rounded-lg">
+                <AlertTriangle className="h-6 w-6 text-red-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-red-900 font-medium mb-2">
+                  هذا السجل مقفل ولا يمكن تعديله
+                </p>
+                {lockReason && (
+                  <>
+                    <div className="text-sm text-red-700 mb-2">
+                      <span className="font-medium">سبب القفل: </span>
+                      {LOCK_REASON_LABELS[lockReason]}
+                    </div>
+                    <div className="text-sm text-red-600 mb-3">
+                      {LOCK_REASON_DESCRIPTIONS[lockReason]}
+                    </div>
+                  </>
+                )}
+                <p className="text-sm text-red-700">
+                  السجلات المقفلة لا يمكن تعديلها أو حذفها. إذا كنت بحاجة لتعديل هذا السجل، يرجى الاتصال بالمسؤول لإلغاء القفل.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-4 border-t border-red-200">
+              <Button
+                onClick={() => navigate({ to: '/dashboard/finance/time-tracking/$entryId', params: { entryId } })}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                عرض التفاصيل
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => navigate({ to: '/dashboard/finance/time-tracking' })}
+              >
+                العودة للقائمة
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }

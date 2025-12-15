@@ -3,10 +3,10 @@ import {
     FileText, Calendar, CheckSquare, Clock, MoreHorizontal, Plus, Upload,
     User, ArrowLeft, Briefcase,
     History, Link as LinkIcon, Flag, Send, Eye, Download, Search, Bell,
-    CreditCard, DollarSign, CheckCircle2, AlertCircle, Timer
+    CreditCard, DollarSign, CheckCircle2, AlertCircle, Timer, Lock, Unlock, ShieldCheck, Edit
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useTimeEntry } from '@/hooks/useFinance'
+import { useTimeEntry, useUnlockTimeEntry } from '@/hooks/useFinance'
 import { useParams } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -15,6 +15,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Textarea } from '@/components/ui/textarea'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
 import { Link } from '@tanstack/react-router'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
@@ -24,12 +32,16 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { LOCK_REASON_LABELS, LOCK_REASON_DESCRIPTIONS } from '@/features/finance/types/time-entry-lock-types'
 
 export function TimeEntryDetailsView() {
     const { entryId } = useParams({ strict: false }) as { entryId: string }
+    const [unlockDialogOpen, setUnlockDialogOpen] = useState(false)
+    const [unlockReason, setUnlockReason] = useState('')
 
     // Fetch time entry data
     const { data: entryData, isLoading, isError, error, refetch } = useTimeEntry(entryId)
+    const unlockMutation = useUnlockTimeEntry()
 
     // Transform API data
     const entry = useMemo(() => {
@@ -52,6 +64,13 @@ export function TimeEntryDetailsView() {
             ? e.userId
             : `${e.userId.firstName || ''} ${e.userId.lastName || ''}`.trim() || 'غير محدد'
 
+        // Lock information
+        const lockedByName = !e.lockedBy
+            ? null
+            : typeof e.lockedBy === 'string'
+            ? e.lockedBy
+            : `${e.lockedBy.firstName || ''} ${e.lockedBy.lastName || ''}`.trim() || 'غير محدد'
+
         return {
             id: e._id,
             task: e.description || 'مهمة غير محددة',
@@ -68,9 +87,30 @@ export function TimeEntryDetailsView() {
             billable: e.isBillable,
             status: e.isBilled ? 'billed' : 'unbilled',
             description: e.notes || e.description || 'لا توجد ملاحظات',
-            history: e.history || []
+            history: e.history || [],
+            // Lock information
+            isLocked: e.isLocked || false,
+            lockReason: e.lockReason,
+            lockedAt: e.lockedAt ? new Date(e.lockedAt).toLocaleString('ar-SA') : null,
+            lockedBy: lockedByName,
+            unlockHistory: e.unlockHistory || []
         }
     }, [entryData])
+
+    const handleUnlock = () => {
+        if (entry && unlockReason.trim()) {
+            unlockMutation.mutate(
+                { id: entry.id, reason: unlockReason },
+                {
+                    onSuccess: () => {
+                        setUnlockDialogOpen(false)
+                        setUnlockReason('')
+                        refetch()
+                    }
+                }
+            )
+        }
+    }
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
@@ -174,7 +214,7 @@ export function TimeEntryDetailsView() {
 
                     <div className="relative z-10 flex flex-col lg:flex-row gap-8 items-start justify-between text-white">
                         <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-4">
+                            <div className="flex items-center gap-3 mb-4 flex-wrap">
                                 <div className="bg-white/10 p-2 rounded-xl backdrop-blur-md border border-white/10 text-emerald-400">
                                     <Timer className="h-6 w-6" />
                                 </div>
@@ -183,6 +223,20 @@ export function TimeEntryDetailsView() {
                                 <Badge variant="outline" className="me-2 border-emerald-500/30 text-emerald-300 bg-emerald-500/10">
                                     {entry.status === 'billed' ? 'تمت الفوترة' : 'غير مفوتر'}
                                 </Badge>
+                                {entry.isLocked && (
+                                    <>
+                                        <span className="text-white/20">•</span>
+                                        <Badge variant="outline" className="border-red-500/30 text-red-300 bg-red-500/10 flex items-center gap-1">
+                                            <Lock className="h-3 w-3" />
+                                            مقفل
+                                        </Badge>
+                                        {entry.lockReason && (
+                                            <Badge variant="secondary" className="text-xs">
+                                                {LOCK_REASON_LABELS[entry.lockReason]}
+                                            </Badge>
+                                        )}
+                                    </>
+                                )}
                             </div>
                             <h1 className="text-3xl font-bold mb-4 leading-tight text-white">
                                 {entry.task}
@@ -212,10 +266,58 @@ export function TimeEntryDetailsView() {
                     <div className="grid grid-cols-12 gap-6">
                         <div className="col-span-12 lg:col-span-8 space-y-6">
                             <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
-                                <CardHeader className="bg-white border-b border-slate-50 pb-4">
+                                <CardHeader className="bg-white border-b border-slate-50 pb-4 flex flex-row items-center justify-between">
                                     <CardTitle className="text-lg font-bold text-navy">تفاصيل العمل</CardTitle>
+                                    <div className="flex gap-2">
+                                        {!entry.isLocked && (
+                                            <Button asChild size="sm" className="bg-brand-blue hover:bg-blue-700">
+                                                <Link to={`/dashboard/finance/time-tracking/${entry.id}/edit`}>
+                                                    <Edit className="h-4 w-4 ms-2" />
+                                                    تعديل
+                                                </Link>
+                                            </Button>
+                                        )}
+                                        {entry.isLocked && (
+                                            <Button size="sm" variant="outline" onClick={() => setUnlockDialogOpen(true)}>
+                                                <Unlock className="h-4 w-4 ms-2" />
+                                                إلغاء القفل
+                                            </Button>
+                                        )}
+                                    </div>
                                 </CardHeader>
                                 <CardContent className="p-6 space-y-6">
+                                    {entry.isLocked && (
+                                        <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
+                                            <div className="flex items-start gap-3">
+                                                <div className="bg-red-100 p-2 rounded-lg">
+                                                    <Lock className="h-5 w-5 text-red-600" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <h4 className="font-bold text-red-900 mb-1">سجل مقفل</h4>
+                                                    <p className="text-sm text-red-700 mb-2">
+                                                        {entry.lockReason && LOCK_REASON_DESCRIPTIONS[entry.lockReason]}
+                                                    </p>
+                                                    <div className="text-xs text-red-600 space-y-1">
+                                                        {entry.lockedBy && (
+                                                            <div className="flex items-center gap-2">
+                                                                <User className="h-3 w-3" />
+                                                                قام بالقفل: {entry.lockedBy}
+                                                            </div>
+                                                        )}
+                                                        {entry.lockedAt && (
+                                                            <div className="flex items-center gap-2">
+                                                                <Clock className="h-3 w-3" />
+                                                                تاريخ القفل: {entry.lockedAt}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <p className="text-xs text-red-600 mt-2 font-medium">
+                                                        لا يمكن تعديل السجلات المقفلة. اتصل بالمسؤول لإلغاء القفل.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
                                             <label className="text-sm text-slate-500 block mb-2">التاريخ</label>
@@ -275,6 +377,54 @@ export function TimeEntryDetailsView() {
                     </>
                 )}
             </Main>
+
+            {/* Unlock Dialog */}
+            <Dialog open={unlockDialogOpen} onOpenChange={setUnlockDialogOpen}>
+                <DialogContent className="sm:max-w-[500px]">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Unlock className="h-5 w-5" />
+                            إلغاء قفل سجل الوقت
+                        </DialogTitle>
+                        <DialogDescription>
+                            يرجى تقديم سبب إلغاء القفل. سيتم تسجيل هذا الإجراء في سجل التدقيق.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">السبب *</label>
+                            <Textarea
+                                placeholder="اكتب سبب إلغاء القفل..."
+                                value={unlockReason}
+                                onChange={(e) => setUnlockReason(e.target.value)}
+                                rows={4}
+                                className="resize-none"
+                            />
+                        </div>
+                        {entry?.lockReason && (
+                            <div className="bg-slate-50 p-3 rounded-lg text-sm">
+                                <div className="font-medium text-slate-700 mb-1">سبب القفل الأصلي:</div>
+                                <div className="text-slate-600">{LOCK_REASON_DESCRIPTIONS[entry.lockReason]}</div>
+                            </div>
+                        )}
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => {
+                            setUnlockDialogOpen(false)
+                            setUnlockReason('')
+                        }}>
+                            إلغاء
+                        </Button>
+                        <Button
+                            onClick={handleUnlock}
+                            disabled={!unlockReason.trim() || unlockMutation.isPending}
+                            className="bg-emerald-600 hover:bg-emerald-700"
+                        >
+                            {unlockMutation.isPending ? 'جاري إلغاء القفل...' : 'إلغاء القفل'}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     )
 }

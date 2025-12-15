@@ -259,6 +259,18 @@ export interface TimeEntry {
   wasTimerBased: boolean
   timerStartedAt?: string
 
+  // Lock & Security
+  isLocked: boolean
+  lockedAt?: string
+  lockedBy?: string | { firstName: string; lastName: string; _id: string }
+  lockReason?: 'approved' | 'billed' | 'period_closed' | 'manual'
+  unlockHistory?: Array<{
+    unlockedAt: string
+    unlockedBy: string
+    reason: string
+    relockedAt?: string
+  }>
+
   // Status & Audit
   status: string
   notes?: string
@@ -1479,6 +1491,87 @@ const financeService = {
         reason
       })
       return response.data.timeEntry || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Lock time entry
+   * POST /api/time-tracking/entries/:id/lock
+   */
+  lockTimeEntry: async (id: string, reason: 'approved' | 'billed' | 'period_closed' | 'manual'): Promise<TimeEntry> => {
+    try {
+      const response = await apiClient.post(`/time-tracking/entries/${id}/lock`, {
+        reason
+      })
+      return response.data.timeEntry || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Unlock time entry (admin only)
+   * POST /api/time-tracking/entries/:id/unlock
+   */
+  unlockTimeEntry: async (id: string, reason: string): Promise<TimeEntry> => {
+    try {
+      const response = await apiClient.post(`/time-tracking/entries/${id}/unlock`, {
+        reason
+      })
+      return response.data.timeEntry || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Bulk lock time entries
+   * POST /api/time-tracking/entries/bulk-lock
+   */
+  bulkLockTimeEntries: async (data: {
+    entryIds: string[]
+    reason: 'approved' | 'billed' | 'period_closed' | 'manual'
+  }): Promise<{ locked: number; failed: number; results: any[] }> => {
+    try {
+      const response = await apiClient.post('/time-tracking/entries/bulk-lock', data)
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Check if time entry is locked
+   * GET /api/time-tracking/entries/:id/lock-status
+   */
+  isTimeEntryLocked: async (id: string): Promise<{
+    isLocked: boolean
+    lockReason?: string
+    lockedAt?: string
+    lockedBy?: string
+  }> => {
+    try {
+      const response = await apiClient.get(`/time-tracking/entries/${id}/lock-status`)
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Lock entries by date range (for period close)
+   * POST /api/time-tracking/entries/lock-by-date-range
+   */
+  lockTimeEntriesByDateRange: async (data: {
+    startDate: string
+    endDate: string
+    reason: 'period_closed' | 'manual'
+  }): Promise<{ locked: number; failed: number; results: any[] }> => {
+    try {
+      const response = await apiClient.post('/time-tracking/entries/lock-by-date-range', data)
+      return response.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

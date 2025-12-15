@@ -45,6 +45,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { FinanceSidebar } from './finance-sidebar'
 import { toast } from 'sonner'
+import { useLockTimeEntry } from '@/hooks/useFinance'
 
 // Mock hook - will be replaced with real implementation
 const usePendingTimeEntries = () => {
@@ -59,6 +60,10 @@ const usePendingTimeEntries = () => {
 
 const useApproveTimeEntry = () => ({
     mutate: (id: string) => toast.success('تمت الموافقة على السجل'),
+    mutateAsync: async (id: string) => {
+        toast.success('تمت الموافقة على السجل')
+        return { _id: id }
+    },
     isPending: false
 })
 
@@ -69,6 +74,10 @@ const useRejectTimeEntry = () => ({
 
 const useBulkApproveTimeEntries = () => ({
     mutate: (ids: string[]) => toast.success(`تمت الموافقة على ${ids.length} سجل`),
+    mutateAsync: async (ids: string[]) => {
+        toast.success(`تمت الموافقة على ${ids.length} سجل`)
+        return ids
+    },
     isPending: false
 })
 
@@ -101,6 +110,7 @@ export default function TimeEntryApprovalsView() {
     const bulkApproveMutation = useBulkApproveTimeEntries()
     const bulkRejectMutation = useBulkRejectTimeEntries()
     const requestChangesMutation = useRequestTimeEntryChanges()
+    const lockEntryMutation = useLockTimeEntry()
 
     // Transform API data
     const pendingEntries = useMemo(() => {
@@ -187,9 +197,29 @@ export default function TimeEntryApprovalsView() {
     }, [])
 
     // Action handlers
-    const handleApprove = useCallback((id: string) => {
-        approveEntryMutation.mutate(id)
-    }, [approveEntryMutation])
+    const handleApprove = useCallback(async (id: string) => {
+        try {
+            // First approve the entry
+            if (approveEntryMutation.mutateAsync) {
+                await approveEntryMutation.mutateAsync(id)
+            } else {
+                approveEntryMutation.mutate(id)
+            }
+
+            // Then auto-lock it with reason 'approved'
+            lockEntryMutation.mutate(
+                { id, reason: 'approved' },
+                {
+                    onSuccess: () => {
+                        toast.success('تم قفل السجل تلقائياً بعد الموافقة')
+                        refetch()
+                    }
+                }
+            )
+        } catch (error) {
+            console.error('Error approving entry:', error)
+        }
+    }, [approveEntryMutation, lockEntryMutation, refetch])
 
     const handleReject = useCallback(() => {
         if (selectedEntryForAction && actionReason.trim()) {
@@ -215,12 +245,37 @@ export default function TimeEntryApprovalsView() {
         }
     }, [selectedEntryForAction, actionReason, requestChangesMutation])
 
-    const handleBulkApprove = useCallback(() => {
+    const handleBulkApprove = useCallback(async () => {
         if (selectedEntries.size > 0) {
-            bulkApproveMutation.mutate(Array.from(selectedEntries))
-            setSelectedEntries(new Set())
+            const entryIds = Array.from(selectedEntries)
+            try {
+                // First approve all entries
+                if (bulkApproveMutation.mutateAsync) {
+                    await bulkApproveMutation.mutateAsync(entryIds)
+                } else {
+                    bulkApproveMutation.mutate(entryIds)
+                }
+
+                // Then auto-lock them all with reason 'approved'
+                for (const id of entryIds) {
+                    lockEntryMutation.mutate(
+                        { id, reason: 'approved' },
+                        {
+                            onSuccess: () => {
+                                // Silent success, will show summary
+                            }
+                        }
+                    )
+                }
+
+                toast.success(`تمت الموافقة وقفل ${entryIds.length} سجل`)
+                setSelectedEntries(new Set())
+                refetch()
+            } catch (error) {
+                console.error('Error bulk approving entries:', error)
+            }
         }
-    }, [selectedEntries, bulkApproveMutation])
+    }, [selectedEntries, bulkApproveMutation, lockEntryMutation, refetch])
 
     const handleBulkReject = useCallback(() => {
         if (selectedEntries.size > 0 && actionReason.trim()) {

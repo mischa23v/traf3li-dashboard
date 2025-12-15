@@ -587,6 +587,106 @@ export const useTimeStats = (filters?: {
   })
 }
 
+// ==================== TIME ENTRY LOCKING ====================
+
+export const useLockTimeEntry = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason: 'approved' | 'billed' | 'period_closed' | 'manual' }) =>
+      financeService.lockTimeEntry(id, reason),
+    onSuccess: () => {
+      toast.success('تم قفل سجل الوقت بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل قفل سجل الوقت')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
+      return await queryClient.invalidateQueries({ queryKey: ['timeEntries', id] })
+    },
+  })
+}
+
+export const useUnlockTimeEntry = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason: string }) =>
+      financeService.unlockTimeEntry(id, reason),
+    onSuccess: () => {
+      toast.success('تم إلغاء قفل سجل الوقت بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إلغاء قفل سجل الوقت')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
+      return await queryClient.invalidateQueries({ queryKey: ['timeEntries', id] })
+    },
+  })
+}
+
+export const useBulkLockTimeEntries = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: {
+      entryIds: string[]
+      reason: 'approved' | 'billed' | 'period_closed' | 'manual'
+    }) => financeService.bulkLockTimeEntries(data),
+    onSuccess: (result) => {
+      if (result.locked > 0) {
+        toast.success(`تم قفل ${result.locked} سجل بنجاح`)
+      }
+      if (result.failed > 0) {
+        toast.error(`فشل قفل ${result.failed} سجل`)
+      }
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل عملية القفل الجماعية')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
+    },
+  })
+}
+
+export const useCheckTimeEntryLock = (id: string) => {
+  return useQuery({
+    queryKey: ['timeEntries', id, 'lockStatus'],
+    queryFn: () => financeService.isTimeEntryLocked(id),
+    enabled: !!id,
+    staleTime: 1 * 60 * 1000, // 1 minute
+  })
+}
+
+export const useLockTimeEntriesByDateRange = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: {
+      startDate: string
+      endDate: string
+      reason: 'period_closed' | 'manual'
+    }) => financeService.lockTimeEntriesByDateRange(data),
+    onSuccess: (result) => {
+      if (result.locked > 0) {
+        toast.success(`تم قفل ${result.locked} سجل للفترة المحددة`)
+      }
+      if (result.failed > 0) {
+        toast.error(`فشل قفل ${result.failed} سجل`)
+      }
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل قفل السجلات حسب الفترة')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
+    },
+  })
+}
+
 // ==================== PAYMENTS ====================
 
 export const usePayments = (filters?: any) => {
