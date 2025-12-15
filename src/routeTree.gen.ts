@@ -112,7 +112,12 @@ import { Route as AuthenticatedDashboardFinanceOpeningBalancesRouteImport } from
 import { Route as AuthenticatedDashboardFinanceGeneralLedgerRouteImport } from './routes/_authenticated/dashboard.finance.general-ledger'
 import { Route as AuthenticatedDashboardFinanceCorporateCardsRouteImport } from './routes/_authenticated/dashboard.finance.corporate-cards'
 import { Route as AuthenticatedDashboardFinanceChartOfAccountsRouteImport } from './routes/_authenticated/dashboard.finance.chart-of-accounts'
+import { Route as AuthenticatedDashboardCrmTerritoriesRouteImport } from './routes/_authenticated/dashboard.crm.territories'
+import { Route as AuthenticatedDashboardCrmSetupWizardRouteImport } from './routes/_authenticated/dashboard.crm.setup-wizard'
+import { Route as AuthenticatedDashboardCrmSalesPersonsRouteImport } from './routes/_authenticated/dashboard.crm.sales-persons'
 import { Route as AuthenticatedDashboardCrmPipelineRouteImport } from './routes/_authenticated/dashboard.crm.pipeline'
+import { Route as AuthenticatedDashboardCrmCrmReportsRouteImport } from './routes/_authenticated/dashboard.crm.crm-reports'
+import { Route as AuthenticatedDashboardCrmAppointmentsRouteImport } from './routes/_authenticated/dashboard.crm.appointments'
 import { Route as AuthenticatedDashboardContactsNewRouteImport } from './routes/_authenticated/dashboard.contacts.new'
 import { Route as AuthenticatedDashboardContactsContactIdRouteImport } from './routes/_authenticated/dashboard.contacts.$contactId'
 import { Route as AuthenticatedDashboardClientsNewRouteImport } from './routes/_authenticated/dashboard.clients.new'
@@ -882,10 +887,40 @@ const AuthenticatedDashboardFinanceChartOfAccountsRoute =
     path: '/dashboard/finance/chart-of-accounts',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardCrmTerritoriesRoute =
+  AuthenticatedDashboardCrmTerritoriesRouteImport.update({
+    id: '/dashboard/crm/territories',
+    path: '/dashboard/crm/territories',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardCrmSetupWizardRoute =
+  AuthenticatedDashboardCrmSetupWizardRouteImport.update({
+    id: '/dashboard/crm/setup-wizard',
+    path: '/dashboard/crm/setup-wizard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardCrmSalesPersonsRoute =
+  AuthenticatedDashboardCrmSalesPersonsRouteImport.update({
+    id: '/dashboard/crm/sales-persons',
+    path: '/dashboard/crm/sales-persons',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardCrmPipelineRoute =
   AuthenticatedDashboardCrmPipelineRouteImport.update({
     id: '/dashboard/crm/pipeline',
     path: '/dashboard/crm/pipeline',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardCrmCrmReportsRoute =
+  AuthenticatedDashboardCrmCrmReportsRouteImport.update({
+    id: '/dashboard/crm/crm-reports',
+    path: '/dashboard/crm/crm-reports',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardCrmAppointmentsRoute =
+  AuthenticatedDashboardCrmAppointmentsRouteImport.update({
+    id: '/dashboard/crm/appointments',
+    path: '/dashboard/crm/appointments',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardContactsNewRoute =
@@ -2126,7 +2161,12 @@ export interface FileRoutesByFullPath {
   '/dashboard/clients/new': typeof AuthenticatedDashboardClientsNewRoute
   '/dashboard/contacts/$contactId': typeof AuthenticatedDashboardContactsContactIdRoute
   '/dashboard/contacts/new': typeof AuthenticatedDashboardContactsNewRoute
+  '/dashboard/crm/appointments': typeof AuthenticatedDashboardCrmAppointmentsRoute
+  '/dashboard/crm/crm-reports': typeof AuthenticatedDashboardCrmCrmReportsRoute
   '/dashboard/crm/pipeline': typeof AuthenticatedDashboardCrmPipelineRoute
+  '/dashboard/crm/sales-persons': typeof AuthenticatedDashboardCrmSalesPersonsRoute
+  '/dashboard/crm/setup-wizard': typeof AuthenticatedDashboardCrmSetupWizardRoute
+  '/dashboard/crm/territories': typeof AuthenticatedDashboardCrmTerritoriesRoute
   '/dashboard/finance/chart-of-accounts': typeof AuthenticatedDashboardFinanceChartOfAccountsRoute
   '/dashboard/finance/corporate-cards': typeof AuthenticatedDashboardFinanceCorporateCardsRouteWithChildren
   '/dashboard/finance/general-ledger': typeof AuthenticatedDashboardFinanceGeneralLedgerRoute
@@ -2424,7 +2464,12 @@ export interface FileRoutesByTo {
   '/dashboard/clients/new': typeof AuthenticatedDashboardClientsNewRoute
   '/dashboard/contacts/$contactId': typeof AuthenticatedDashboardContactsContactIdRoute
   '/dashboard/contacts/new': typeof AuthenticatedDashboardContactsNewRoute
+  '/dashboard/crm/appointments': typeof AuthenticatedDashboardCrmAppointmentsRoute
+  '/dashboard/crm/crm-reports': typeof AuthenticatedDashboardCrmCrmReportsRoute
   '/dashboard/crm/pipeline': typeof AuthenticatedDashboardCrmPipelineRoute
+  '/dashboard/crm/sales-persons': typeof AuthenticatedDashboardCrmSalesPersonsRoute
+  '/dashboard/crm/setup-wizard': typeof AuthenticatedDashboardCrmSetupWizardRoute
+  '/dashboard/crm/territories': typeof AuthenticatedDashboardCrmTerritoriesRoute
   '/dashboard/finance/chart-of-accounts': typeof AuthenticatedDashboardFinanceChartOfAccountsRoute
   '/dashboard/finance/corporate-cards': typeof AuthenticatedDashboardFinanceCorporateCardsRouteWithChildren
   '/dashboard/finance/general-ledger': typeof AuthenticatedDashboardFinanceGeneralLedgerRoute
@@ -2727,7 +2772,12 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/clients/new': typeof AuthenticatedDashboardClientsNewRoute
   '/_authenticated/dashboard/contacts/$contactId': typeof AuthenticatedDashboardContactsContactIdRoute
   '/_authenticated/dashboard/contacts/new': typeof AuthenticatedDashboardContactsNewRoute
+  '/_authenticated/dashboard/crm/appointments': typeof AuthenticatedDashboardCrmAppointmentsRoute
+  '/_authenticated/dashboard/crm/crm-reports': typeof AuthenticatedDashboardCrmCrmReportsRoute
   '/_authenticated/dashboard/crm/pipeline': typeof AuthenticatedDashboardCrmPipelineRoute
+  '/_authenticated/dashboard/crm/sales-persons': typeof AuthenticatedDashboardCrmSalesPersonsRoute
+  '/_authenticated/dashboard/crm/setup-wizard': typeof AuthenticatedDashboardCrmSetupWizardRoute
+  '/_authenticated/dashboard/crm/territories': typeof AuthenticatedDashboardCrmTerritoriesRoute
   '/_authenticated/dashboard/finance/chart-of-accounts': typeof AuthenticatedDashboardFinanceChartOfAccountsRoute
   '/_authenticated/dashboard/finance/corporate-cards': typeof AuthenticatedDashboardFinanceCorporateCardsRouteWithChildren
   '/_authenticated/dashboard/finance/general-ledger': typeof AuthenticatedDashboardFinanceGeneralLedgerRoute
@@ -3028,7 +3078,12 @@ export interface FileRouteTypes {
     | '/dashboard/clients/new'
     | '/dashboard/contacts/$contactId'
     | '/dashboard/contacts/new'
+    | '/dashboard/crm/appointments'
+    | '/dashboard/crm/crm-reports'
     | '/dashboard/crm/pipeline'
+    | '/dashboard/crm/sales-persons'
+    | '/dashboard/crm/setup-wizard'
+    | '/dashboard/crm/territories'
     | '/dashboard/finance/chart-of-accounts'
     | '/dashboard/finance/corporate-cards'
     | '/dashboard/finance/general-ledger'
@@ -3326,7 +3381,12 @@ export interface FileRouteTypes {
     | '/dashboard/clients/new'
     | '/dashboard/contacts/$contactId'
     | '/dashboard/contacts/new'
+    | '/dashboard/crm/appointments'
+    | '/dashboard/crm/crm-reports'
     | '/dashboard/crm/pipeline'
+    | '/dashboard/crm/sales-persons'
+    | '/dashboard/crm/setup-wizard'
+    | '/dashboard/crm/territories'
     | '/dashboard/finance/chart-of-accounts'
     | '/dashboard/finance/corporate-cards'
     | '/dashboard/finance/general-ledger'
@@ -3628,7 +3688,12 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/clients/new'
     | '/_authenticated/dashboard/contacts/$contactId'
     | '/_authenticated/dashboard/contacts/new'
+    | '/_authenticated/dashboard/crm/appointments'
+    | '/_authenticated/dashboard/crm/crm-reports'
     | '/_authenticated/dashboard/crm/pipeline'
+    | '/_authenticated/dashboard/crm/sales-persons'
+    | '/_authenticated/dashboard/crm/setup-wizard'
+    | '/_authenticated/dashboard/crm/territories'
     | '/_authenticated/dashboard/finance/chart-of-accounts'
     | '/_authenticated/dashboard/finance/corporate-cards'
     | '/_authenticated/dashboard/finance/general-ledger'
@@ -4629,11 +4694,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardFinanceChartOfAccountsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/crm/territories': {
+      id: '/_authenticated/dashboard/crm/territories'
+      path: '/dashboard/crm/territories'
+      fullPath: '/dashboard/crm/territories'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmTerritoriesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/crm/setup-wizard': {
+      id: '/_authenticated/dashboard/crm/setup-wizard'
+      path: '/dashboard/crm/setup-wizard'
+      fullPath: '/dashboard/crm/setup-wizard'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmSetupWizardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/crm/sales-persons': {
+      id: '/_authenticated/dashboard/crm/sales-persons'
+      path: '/dashboard/crm/sales-persons'
+      fullPath: '/dashboard/crm/sales-persons'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmSalesPersonsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/crm/pipeline': {
       id: '/_authenticated/dashboard/crm/pipeline'
       path: '/dashboard/crm/pipeline'
       fullPath: '/dashboard/crm/pipeline'
       preLoaderRoute: typeof AuthenticatedDashboardCrmPipelineRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/crm/crm-reports': {
+      id: '/_authenticated/dashboard/crm/crm-reports'
+      path: '/dashboard/crm/crm-reports'
+      fullPath: '/dashboard/crm/crm-reports'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmCrmReportsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/crm/appointments': {
+      id: '/_authenticated/dashboard/crm/appointments'
+      path: '/dashboard/crm/appointments'
+      fullPath: '/dashboard/crm/appointments'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmAppointmentsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/contacts/new': {
@@ -6235,7 +6335,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardClientsNewRoute: typeof AuthenticatedDashboardClientsNewRoute
   AuthenticatedDashboardContactsContactIdRoute: typeof AuthenticatedDashboardContactsContactIdRoute
   AuthenticatedDashboardContactsNewRoute: typeof AuthenticatedDashboardContactsNewRoute
+  AuthenticatedDashboardCrmAppointmentsRoute: typeof AuthenticatedDashboardCrmAppointmentsRoute
+  AuthenticatedDashboardCrmCrmReportsRoute: typeof AuthenticatedDashboardCrmCrmReportsRoute
   AuthenticatedDashboardCrmPipelineRoute: typeof AuthenticatedDashboardCrmPipelineRoute
+  AuthenticatedDashboardCrmSalesPersonsRoute: typeof AuthenticatedDashboardCrmSalesPersonsRoute
+  AuthenticatedDashboardCrmSetupWizardRoute: typeof AuthenticatedDashboardCrmSetupWizardRoute
+  AuthenticatedDashboardCrmTerritoriesRoute: typeof AuthenticatedDashboardCrmTerritoriesRoute
   AuthenticatedDashboardFinanceChartOfAccountsRoute: typeof AuthenticatedDashboardFinanceChartOfAccountsRoute
   AuthenticatedDashboardFinanceCorporateCardsRoute: typeof AuthenticatedDashboardFinanceCorporateCardsRouteWithChildren
   AuthenticatedDashboardFinanceGeneralLedgerRoute: typeof AuthenticatedDashboardFinanceGeneralLedgerRoute
@@ -6485,8 +6590,18 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardContactsContactIdRoute,
   AuthenticatedDashboardContactsNewRoute:
     AuthenticatedDashboardContactsNewRoute,
+  AuthenticatedDashboardCrmAppointmentsRoute:
+    AuthenticatedDashboardCrmAppointmentsRoute,
+  AuthenticatedDashboardCrmCrmReportsRoute:
+    AuthenticatedDashboardCrmCrmReportsRoute,
   AuthenticatedDashboardCrmPipelineRoute:
     AuthenticatedDashboardCrmPipelineRoute,
+  AuthenticatedDashboardCrmSalesPersonsRoute:
+    AuthenticatedDashboardCrmSalesPersonsRoute,
+  AuthenticatedDashboardCrmSetupWizardRoute:
+    AuthenticatedDashboardCrmSetupWizardRoute,
+  AuthenticatedDashboardCrmTerritoriesRoute:
+    AuthenticatedDashboardCrmTerritoriesRoute,
   AuthenticatedDashboardFinanceChartOfAccountsRoute:
     AuthenticatedDashboardFinanceChartOfAccountsRoute,
   AuthenticatedDashboardFinanceCorporateCardsRoute:
