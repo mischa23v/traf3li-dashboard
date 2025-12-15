@@ -4,7 +4,8 @@ import {
     FileText, Download, Printer, Calendar, Building2, TrendingUp, TrendingDown,
     Receipt, CreditCard, Clock, DollarSign, PieChart, BarChart3, Users,
     ChevronLeft, ChevronRight, Search, Bell, Filter, Loader2, CheckCircle,
-    AlertCircle, Wallet, FileSpreadsheet, Scale
+    AlertCircle, Wallet, FileSpreadsheet, Scale, Target, Truck, UserCheck,
+    Briefcase, LineChart, Layers
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -48,8 +49,14 @@ type ReportType =
     | 'balance-sheet'
     | 'cash-flow'
     | 'trial-balance'
+    | 'budget-variance'
+    | 'gross-profit'
+    | 'cost-center'
     | 'aged-receivables'
+    | 'client-statement'
     | 'invoice-summary'
+    | 'ap-aging'
+    | 'vendor-ledger'
     | 'expense-summary'
     | 'timesheet-summary'
     | 'vat-report'
@@ -63,7 +70,7 @@ interface ReportConfig {
     icon: React.ReactNode
     color: string
     bgColor: string
-    category: 'core' | 'invoices' | 'expenses' | 'time' | 'tax'
+    category: 'core' | 'invoices' | 'payables' | 'expenses' | 'time' | 'tax' | 'analytics'
 }
 
 const reportConfigs: ReportConfig[] = [
@@ -155,6 +162,73 @@ const reportConfigs: ReportConfig[] = [
         bgColor: 'bg-orange-50',
         category: 'tax'
     },
+    // New ERPNext-equivalent reports
+    {
+        id: 'budget-variance',
+        nameAr: 'تحليل انحراف الميزانية',
+        nameEn: 'Budget Variance',
+        descriptionAr: 'مقارنة المبالغ المدرجة في الميزانية مع الفعلية',
+        descriptionEn: 'Compare budgeted vs actual amounts',
+        icon: <Target className="w-5 h-5" aria-hidden="true" />,
+        color: 'text-violet-600',
+        bgColor: 'bg-violet-50',
+        category: 'analytics'
+    },
+    {
+        id: 'gross-profit',
+        nameAr: 'إجمالي الربح',
+        nameEn: 'Gross Profit',
+        descriptionAr: 'تحليل الربحية حسب العميل أو القضية أو الشهر',
+        descriptionEn: 'Profitability analysis by client, case, or month',
+        icon: <LineChart className="w-5 h-5" aria-hidden="true" />,
+        color: 'text-teal-600',
+        bgColor: 'bg-teal-50',
+        category: 'analytics'
+    },
+    {
+        id: 'cost-center',
+        nameAr: 'مراكز التكلفة',
+        nameEn: 'Cost Center',
+        descriptionAr: 'قائمة الدخل حسب القسم أو القضية',
+        descriptionEn: 'P&L by department or case',
+        icon: <Layers className="w-5 h-5" aria-hidden="true" />,
+        color: 'text-sky-600',
+        bgColor: 'bg-sky-50',
+        category: 'analytics'
+    },
+    {
+        id: 'client-statement',
+        nameAr: 'كشف حساب العميل',
+        nameEn: 'Client Statement',
+        descriptionAr: 'دفتر أستاذ العميل / كشف الحساب',
+        descriptionEn: 'Customer ledger / Statement of account',
+        icon: <UserCheck className="w-5 h-5" aria-hidden="true" />,
+        color: 'text-fuchsia-600',
+        bgColor: 'bg-fuchsia-50',
+        category: 'invoices'
+    },
+    {
+        id: 'ap-aging',
+        nameAr: 'تقادم الذمم الدائنة',
+        nameEn: 'AP Aging',
+        descriptionAr: 'تحليل المستحقات للموردين حسب فترات التأخير',
+        descriptionEn: 'Accounts Payable aging analysis',
+        icon: <Truck className="w-5 h-5" aria-hidden="true" />,
+        color: 'text-lime-600',
+        bgColor: 'bg-lime-50',
+        category: 'payables'
+    },
+    {
+        id: 'vendor-ledger',
+        nameAr: 'دفتر أستاذ المورد',
+        nameEn: 'Vendor Ledger',
+        descriptionAr: 'كشف حساب المورد / دفتر الأستاذ',
+        descriptionEn: 'Supplier statement / ledger',
+        icon: <Briefcase className="w-5 h-5" aria-hidden="true" />,
+        color: 'text-stone-600',
+        bgColor: 'bg-stone-50',
+        category: 'payables'
+    },
 ]
 
 type PeriodType = 'this-month' | 'last-month' | 'this-quarter' | 'this-year' | 'custom'
@@ -240,7 +314,9 @@ export function FullReportsView() {
     const reportsByCategory = useMemo(() => {
         return {
             core: filteredReports.filter(r => r.category === 'core'),
+            analytics: filteredReports.filter(r => r.category === 'analytics'),
             invoices: filteredReports.filter(r => r.category === 'invoices'),
+            payables: filteredReports.filter(r => r.category === 'payables'),
             expenses: filteredReports.filter(r => r.category === 'expenses'),
             time: filteredReports.filter(r => r.category === 'time'),
             tax: filteredReports.filter(r => r.category === 'tax'),
@@ -609,15 +685,87 @@ export function FullReportsView() {
                                     </div>
                                 )}
 
+                                {/* Analytics Reports */}
+                                {reportsByCategory.analytics.length > 0 && (
+                                    <div className="space-y-4">
+                                        <h2 className="text-lg font-bold text-navy flex items-center gap-2">
+                                            <LineChart className="w-5 h-5 text-violet-600" aria-hidden="true" />
+                                            {isRTL ? 'تقارير التحليلات' : 'Analytics Reports'}
+                                        </h2>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {reportsByCategory.analytics.map((report) => (
+                                                <Card
+                                                    key={report.id}
+                                                    className={`border-0 shadow-sm rounded-3xl overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 ${report.bgColor} group`}
+                                                    onClick={() => setSelectedReport(report.id)}
+                                                >
+                                                    <CardContent className="p-6">
+                                                        <div className="flex items-start gap-4">
+                                                            <div className={`p-3 rounded-2xl bg-white/80 ${report.color} group-hover:scale-110 transition-transform`}>
+                                                                {report.icon}
+                                                            </div>
+                                                            <div className="flex-1">
+                                                                <h3 className="font-bold text-navy text-lg mb-1 group-hover:text-emerald-700 transition-colors">
+                                                                    {isRTL ? report.nameAr : report.nameEn}
+                                                                </h3>
+                                                                <p className="text-sm text-slate-600">
+                                                                    {isRTL ? report.descriptionAr : report.descriptionEn}
+                                                                </p>
+                                                            </div>
+                                                            <ChevronLeft className={`w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors ${isRTL ? '' : 'rotate-180'}`} aria-hidden="true" />
+                                                        </div>
+                                                    </CardContent>
+                                                </Card>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
                                 {/* Invoice Reports */}
                                 {reportsByCategory.invoices.length > 0 && (
                                     <div className="space-y-4">
                                         <h2 className="text-lg font-bold text-navy flex items-center gap-2">
                                             <Receipt className="w-5 h-5 text-indigo-600" aria-hidden="true" />
-                                            {isRTL ? 'تقارير الفواتير' : 'Invoice Reports'}
+                                            {isRTL ? 'تقارير الفواتير والذمم المدينة' : 'Receivables Reports'}
                                         </h2>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             {reportsByCategory.invoices.map((report) => (
+                                                <Card
+                                                    key={report.id}
+                                                    className={`border-0 shadow-sm rounded-3xl overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 ${report.bgColor} group`}
+                                                    onClick={() => setSelectedReport(report.id)}
+                                                >
+                                                    <CardContent className="p-6">
+                                                        <div className="flex items-start gap-4">
+                                                            <div className={`p-3 rounded-2xl bg-white/80 ${report.color} group-hover:scale-110 transition-transform`}>
+                                                                {report.icon}
+                                                            </div>
+                                                            <div className="flex-1">
+                                                                <h3 className="font-bold text-navy text-lg mb-1 group-hover:text-emerald-700 transition-colors">
+                                                                    {isRTL ? report.nameAr : report.nameEn}
+                                                                </h3>
+                                                                <p className="text-sm text-slate-600">
+                                                                    {isRTL ? report.descriptionAr : report.descriptionEn}
+                                                                </p>
+                                                            </div>
+                                                            <ChevronLeft className={`w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors ${isRTL ? '' : 'rotate-180'}`} aria-hidden="true" />
+                                                        </div>
+                                                    </CardContent>
+                                                </Card>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Payables Reports */}
+                                {reportsByCategory.payables.length > 0 && (
+                                    <div className="space-y-4">
+                                        <h2 className="text-lg font-bold text-navy flex items-center gap-2">
+                                            <Truck className="w-5 h-5 text-lime-600" aria-hidden="true" />
+                                            {isRTL ? 'تقارير الذمم الدائنة' : 'Payables Reports'}
+                                        </h2>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {reportsByCategory.payables.map((report) => (
                                                 <Card
                                                     key={report.id}
                                                     className={`border-0 shadow-sm rounded-3xl overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 ${report.bgColor} group`}
@@ -831,8 +979,11 @@ export function FullReportsView() {
                                                     <AgedReceivablesContent data={arAgingData} isRTL={isRTL} formatCurrency={formatCurrency} />
                                                 )}
                                                 {(selectedReport === 'invoice-summary' || selectedReport === 'expense-summary' ||
-                                                  selectedReport === 'timesheet-summary' || selectedReport === 'vat-report') && (
-                                                    <PlaceholderContent reportName={selectedReportConfig?.nameAr || ''} isRTL={isRTL} />
+                                                  selectedReport === 'timesheet-summary' || selectedReport === 'vat-report' ||
+                                                  selectedReport === 'budget-variance' || selectedReport === 'gross-profit' ||
+                                                  selectedReport === 'cost-center' || selectedReport === 'client-statement' ||
+                                                  selectedReport === 'ap-aging' || selectedReport === 'vendor-ledger') && (
+                                                    <PlaceholderContent reportName={isRTL ? selectedReportConfig?.nameAr || '' : selectedReportConfig?.nameEn || ''} isRTL={isRTL} />
                                                 )}
                                             </div>
 

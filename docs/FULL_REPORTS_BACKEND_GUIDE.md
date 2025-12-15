@@ -33,16 +33,22 @@ The Full Reports module provides professional financial reports with:
 
 ## 2. Report Types
 
-| Report | Description | Data Sources |
-|--------|-------------|--------------|
-| **Profit & Loss** | Income, expenses, net profit for period | GL entries, income/expense accounts |
-| **Balance Sheet** | Assets, liabilities, equity at date | GL entries, all account types |
-| **Trial Balance** | All accounts with debit/credit balances | GL entries |
-| **Aged Receivables** | Client balances by aging buckets | Invoices, payments |
-| **Invoice Summary** | Invoice totals, collection stats | Invoices |
-| **Expense Summary** | Expenses by category | Expenses |
-| **Timesheet Summary** | Hours, billing, utilization | Time entries |
-| **VAT Report** | VAT collected/paid for period | Invoices, expenses |
+| Report | Category | Description | Data Sources |
+|--------|----------|-------------|--------------|
+| **Profit & Loss** | Core | Income, expenses, net profit for period | GL entries, income/expense accounts |
+| **Balance Sheet** | Core | Assets, liabilities, equity at date | GL entries, all account types |
+| **Trial Balance** | Core | All accounts with debit/credit balances | GL entries |
+| **Budget Variance** | Analytics | Budget vs actual comparison | Budgets, GL entries |
+| **Gross Profit** | Analytics | Revenue vs COGS by item/project | Invoices, expenses, COGS accounts |
+| **Cost Center** | Analytics | P&L breakdown by cost center | GL entries with cost center tags |
+| **Aged Receivables** | Invoices | Client balances by aging buckets | Invoices, payments |
+| **Client Statement** | Invoices | Transaction history per client | Invoices, payments, credit notes |
+| **Invoice Summary** | Invoices | Invoice totals, collection stats | Invoices |
+| **AP Aging** | Payables | Vendor balances by aging buckets | Expenses, bills, payments |
+| **Vendor Ledger** | Payables | Transaction history per vendor | Expenses, bills, payments |
+| **Expense Summary** | Expenses | Expenses by category | Expenses |
+| **Timesheet Summary** | Time | Hours, billing, utilization | Time entries |
+| **VAT Report** | Tax | VAT collected/paid for period | Invoices, expenses |
 
 ---
 
@@ -535,6 +541,298 @@ interface AccountBalance {
     vatPayable: boolean      // true if netVAT > 0
     invoiceCount: number
     expenseCount: number
+    generatedAt: string
+  }
+  company: CompanySettings
+}
+```
+
+---
+
+### 4.9 Budget Variance Report
+
+**Endpoint:** `GET /api/reports/budget-variance`
+
+**Query Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| startDate | string | Yes | Start date (YYYY-MM-DD) |
+| endDate | string | Yes | End date (YYYY-MM-DD) |
+| budgetId | string | No | Specific budget ID to compare against |
+
+**Response:**
+```typescript
+{
+  data: {
+    period: { startDate: string; endDate: string }
+    budgetName: string
+    summary: {
+      totalBudget: number
+      totalActual: number
+      variance: number           // budget - actual
+      variancePercent: number    // (variance / budget) * 100
+    }
+    categories: Array<{
+      category: string
+      categoryAr: string
+      accountCode: string
+      budget: number
+      actual: number
+      variance: number
+      variancePercent: number
+      status: 'under' | 'over' | 'on-track'  // over = exceeded budget
+    }>
+    generatedAt: string
+  }
+  company: CompanySettings
+}
+```
+
+---
+
+### 4.10 AP Aging Report (Accounts Payable Aging)
+
+**Endpoint:** `GET /api/reports/ap-aging`
+
+**Query Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| asOfDate | string | No | As of date (YYYY-MM-DD), defaults to today |
+
+**Response:**
+```typescript
+{
+  data: {
+    asOfDate: string
+    summary: {
+      current: number      // Not yet due
+      days1to30: number    // 1-30 days overdue
+      days31to60: number   // 31-60 days overdue
+      days61to90: number   // 61-90 days overdue
+      over90: number       // 90+ days overdue
+      total: number
+    }
+    vendors: Array<{
+      vendorId: string
+      vendorName: string
+      vendorNameAr: string
+      current: number
+      days1to30: number
+      days31to60: number
+      days61to90: number
+      over90: number
+      total: number
+    }>
+    generatedAt: string
+  }
+  company: CompanySettings
+}
+```
+
+---
+
+### 4.11 Client Statement Report
+
+**Endpoint:** `GET /api/reports/client-statement`
+
+**Query Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| clientId | string | Yes | Client ID |
+| startDate | string | No | Start date (YYYY-MM-DD) |
+| endDate | string | No | End date (YYYY-MM-DD) |
+
+**Response:**
+```typescript
+{
+  data: {
+    client: {
+      id: string
+      name: string
+      nameAr: string
+      email: string
+      phone: string
+      address: string
+    }
+    period: {
+      startDate: string
+      endDate: string
+    }
+    openingBalance: number
+    transactions: Array<{
+      date: string
+      type: 'invoice' | 'payment' | 'credit_note' | 'adjustment'
+      reference: string        // e.g., 'INV-2024-0001'
+      description: string
+      descriptionAr: string
+      debit: number           // Charges (invoices)
+      credit: number          // Credits (payments, credit notes)
+      balance: number         // Running balance
+    }>
+    closingBalance: number
+    totalDebits: number
+    totalCredits: number
+    generatedAt: string
+  }
+  company: CompanySettings
+}
+```
+
+---
+
+### 4.12 Vendor Ledger Report
+
+**Endpoint:** `GET /api/reports/vendor-ledger`
+
+**Query Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| vendorId | string | Yes | Vendor ID |
+| startDate | string | No | Start date (YYYY-MM-DD) |
+| endDate | string | No | End date (YYYY-MM-DD) |
+
+**Response:**
+```typescript
+{
+  data: {
+    vendor: {
+      id: string
+      name: string
+      nameAr: string
+      email: string
+      phone: string
+      vatNumber: string
+    }
+    period: {
+      startDate: string
+      endDate: string
+    }
+    openingBalance: number
+    transactions: Array<{
+      date: string
+      type: 'bill' | 'expense' | 'payment' | 'debit_note' | 'adjustment'
+      reference: string        // e.g., 'BILL-2024-0001'
+      description: string
+      descriptionAr: string
+      debit: number           // Credits to vendor (payments)
+      credit: number          // Debits (bills, expenses)
+      balance: number         // Running balance (amount owed)
+    }>
+    closingBalance: number
+    totalDebits: number
+    totalCredits: number
+    generatedAt: string
+  }
+  company: CompanySettings
+}
+```
+
+---
+
+### 4.13 Gross Profit Report
+
+**Endpoint:** `GET /api/reports/gross-profit`
+
+**Query Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| startDate | string | Yes | Start date (YYYY-MM-DD) |
+| endDate | string | Yes | End date (YYYY-MM-DD) |
+| groupBy | string | No | 'item', 'project', 'client' (default: 'item') |
+
+**Response:**
+```typescript
+{
+  data: {
+    period: { startDate: string; endDate: string }
+    summary: {
+      totalRevenue: number
+      totalCOGS: number
+      grossProfit: number
+      grossMargin: number      // (grossProfit / totalRevenue) * 100
+    }
+    items: Array<{
+      id: string
+      name: string
+      nameAr: string
+      revenue: number
+      cogs: number             // Cost of Goods Sold
+      grossProfit: number
+      grossMargin: number
+      quantity: number         // Units sold (if applicable)
+    }>
+    byProject?: Array<{
+      projectId: string
+      projectName: string
+      revenue: number
+      cogs: number
+      grossProfit: number
+      grossMargin: number
+    }>
+    byClient?: Array<{
+      clientId: string
+      clientName: string
+      revenue: number
+      cogs: number
+      grossProfit: number
+      grossMargin: number
+    }>
+    generatedAt: string
+  }
+  company: CompanySettings
+}
+```
+
+---
+
+### 4.14 Cost Center Report
+
+**Endpoint:** `GET /api/reports/cost-center`
+
+**Query Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| startDate | string | Yes | Start date (YYYY-MM-DD) |
+| endDate | string | Yes | End date (YYYY-MM-DD) |
+| costCenterId | string | No | Filter by specific cost center |
+
+**Response:**
+```typescript
+{
+  data: {
+    period: { startDate: string; endDate: string }
+    summary: {
+      totalIncome: number
+      totalExpenses: number
+      netIncome: number
+    }
+    costCenters: Array<{
+      id: string
+      name: string
+      nameAr: string
+      parentId: string | null
+      level: number              // Hierarchy level (0 = root)
+      income: {
+        items: Array<{
+          accountCode: string
+          account: string
+          accountAr: string
+          amount: number
+        }>
+        total: number
+      }
+      expenses: {
+        items: Array<{
+          accountCode: string
+          account: string
+          accountAr: string
+          amount: number
+        }>
+        total: number
+      }
+      netIncome: number
+      percentage: number        // % of company total
+    }>
     generatedAt: string
   }
   company: CompanySettings
@@ -1201,6 +1499,796 @@ function groupEntriesByAttorney(entries, standardHours) {
 
 ---
 
+### 5.7 Budget Variance Report Service
+
+```javascript
+// services/reportService.js
+
+const Budget = require('../models/Budget');
+
+async function getBudgetVarianceReport(startDate, endDate, companyId, budgetId = null) {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  end.setHours(23, 59, 59, 999);
+
+  // Get budget (active budget for period or specific one)
+  const budgetQuery = {
+    companyId,
+    isActive: true,
+    startDate: { $lte: end },
+    endDate: { $gte: start }
+  };
+
+  if (budgetId) {
+    budgetQuery._id = mongoose.Types.ObjectId(budgetId);
+  }
+
+  const budget = await Budget.findOne(budgetQuery);
+
+  if (!budget) {
+    return {
+      period: { startDate, endDate },
+      budgetName: 'No Active Budget',
+      summary: { totalBudget: 0, totalActual: 0, variance: 0, variancePercent: 0 },
+      categories: [],
+      generatedAt: new Date().toISOString()
+    };
+  }
+
+  // Get actual amounts from GL entries for budget categories
+  const actualsByAccount = await GLEntry.aggregate([
+    {
+      $match: {
+        companyId: mongoose.Types.ObjectId(companyId),
+        date: { $gte: start, $lte: end },
+        status: 'posted'
+      }
+    },
+    {
+      $group: {
+        _id: '$accountCode',
+        debit: { $sum: '$debit' },
+        credit: { $sum: '$credit' }
+      }
+    }
+  ]);
+
+  const actualsMap = new Map();
+  actualsByAccount.forEach(a => actualsMap.set(a._id, a));
+
+  // Compare budget vs actual for each category
+  const categories = [];
+  let totalBudget = 0;
+  let totalActual = 0;
+
+  for (const item of budget.lineItems) {
+    const actual = actualsMap.get(item.accountCode);
+    // Expenses: debit - credit, Income: credit - debit
+    const actualAmount = actual
+      ? (item.type === 'expense' ? actual.debit - actual.credit : actual.credit - actual.debit)
+      : 0;
+
+    const variance = item.amount - actualAmount;
+    const variancePercent = item.amount > 0 ? (variance / item.amount) * 100 : 0;
+
+    categories.push({
+      category: item.name,
+      categoryAr: item.nameAr,
+      accountCode: item.accountCode,
+      budget: item.amount,
+      actual: actualAmount,
+      variance,
+      variancePercent: Math.round(variancePercent * 10) / 10,
+      status: variancePercent < -5 ? 'over' : variancePercent > 5 ? 'under' : 'on-track'
+    });
+
+    totalBudget += item.amount;
+    totalActual += actualAmount;
+  }
+
+  const totalVariance = totalBudget - totalActual;
+
+  return {
+    period: { startDate, endDate },
+    budgetName: budget.name,
+    summary: {
+      totalBudget,
+      totalActual,
+      variance: totalVariance,
+      variancePercent: totalBudget > 0 ? Math.round((totalVariance / totalBudget) * 1000) / 10 : 0
+    },
+    categories: categories.sort((a, b) => a.variancePercent - b.variancePercent),
+    generatedAt: new Date().toISOString()
+  };
+}
+```
+
+---
+
+### 5.8 AP Aging Report Service
+
+```javascript
+// services/reportService.js
+
+const Expense = require('../models/Expense');
+const Vendor = require('../models/Vendor');
+
+async function getAPAgingReport(asOfDate, companyId) {
+  const today = new Date(asOfDate || new Date());
+  today.setHours(0, 0, 0, 0);
+
+  // Get all unpaid expenses/bills
+  const expenses = await Expense.find({
+    companyId,
+    paymentStatus: { $in: ['unpaid', 'partial'] },
+    approvalStatus: 'approved'
+  }).populate('vendorId', 'name nameAr');
+
+  // Calculate aging for each expense
+  const vendorAging = new Map();
+
+  for (const expense of expenses) {
+    const dueDate = new Date(expense.dueDate || expense.date);
+    const daysOverdue = Math.floor((today - dueDate) / (1000 * 60 * 60 * 24));
+    const balance = expense.amount - (expense.paidAmount || 0);
+
+    const vendorKey = expense.vendorId?._id?.toString() || 'unknown';
+
+    if (!vendorAging.has(vendorKey)) {
+      vendorAging.set(vendorKey, {
+        vendorId: vendorKey,
+        vendorName: expense.vendorId?.name || expense.vendor || 'Unknown Vendor',
+        vendorNameAr: expense.vendorId?.nameAr || '',
+        current: 0,
+        days1to30: 0,
+        days31to60: 0,
+        days61to90: 0,
+        over90: 0,
+        total: 0
+      });
+    }
+
+    const vendor = vendorAging.get(vendorKey);
+
+    if (daysOverdue <= 0) {
+      vendor.current += balance;
+    } else if (daysOverdue <= 30) {
+      vendor.days1to30 += balance;
+    } else if (daysOverdue <= 60) {
+      vendor.days31to60 += balance;
+    } else if (daysOverdue <= 90) {
+      vendor.days61to90 += balance;
+    } else {
+      vendor.over90 += balance;
+    }
+    vendor.total += balance;
+  }
+
+  const vendors = Array.from(vendorAging.values())
+    .sort((a, b) => b.total - a.total);
+
+  const summary = {
+    current: vendors.reduce((s, v) => s + v.current, 0),
+    days1to30: vendors.reduce((s, v) => s + v.days1to30, 0),
+    days31to60: vendors.reduce((s, v) => s + v.days31to60, 0),
+    days61to90: vendors.reduce((s, v) => s + v.days61to90, 0),
+    over90: vendors.reduce((s, v) => s + v.over90, 0),
+    total: vendors.reduce((s, v) => s + v.total, 0)
+  };
+
+  return {
+    asOfDate: asOfDate || new Date().toISOString().split('T')[0],
+    summary,
+    vendors,
+    generatedAt: new Date().toISOString()
+  };
+}
+```
+
+---
+
+### 5.9 Client Statement Report Service
+
+```javascript
+// services/reportService.js
+
+const Client = require('../models/Client');
+const Invoice = require('../models/Invoice');
+const Payment = require('../models/Payment');
+const CreditNote = require('../models/CreditNote');
+
+async function getClientStatementReport(clientId, startDate, endDate, companyId) {
+  const client = await Client.findOne({ _id: clientId, companyId });
+
+  if (!client) {
+    throw new Error('Client not found');
+  }
+
+  const start = startDate ? new Date(startDate) : new Date(0);
+  const end = endDate ? new Date(endDate) : new Date();
+  end.setHours(23, 59, 59, 999);
+
+  // Calculate opening balance (transactions before start date)
+  const openingBalance = await calculateClientBalance(clientId, companyId, start);
+
+  // Get all transactions in period
+  const transactions = [];
+
+  // Get invoices
+  const invoices = await Invoice.find({
+    clientId,
+    companyId,
+    issueDate: { $gte: start, $lte: end },
+    status: { $nin: ['draft', 'cancelled'] }
+  }).sort({ issueDate: 1 });
+
+  invoices.forEach(inv => {
+    transactions.push({
+      date: inv.issueDate.toISOString().split('T')[0],
+      type: 'invoice',
+      reference: inv.invoiceNumber,
+      description: `Invoice ${inv.invoiceNumber}`,
+      descriptionAr: `فاتورة ${inv.invoiceNumber}`,
+      debit: inv.totalAmount,
+      credit: 0,
+      sortDate: inv.issueDate
+    });
+  });
+
+  // Get payments
+  const payments = await Payment.find({
+    clientId,
+    companyId,
+    paymentDate: { $gte: start, $lte: end },
+    status: { $ne: 'cancelled' }
+  }).sort({ paymentDate: 1 });
+
+  payments.forEach(pmt => {
+    transactions.push({
+      date: pmt.paymentDate.toISOString().split('T')[0],
+      type: 'payment',
+      reference: pmt.paymentNumber || pmt.reference,
+      description: `Payment received - ${pmt.paymentMethod}`,
+      descriptionAr: `دفعة مستلمة - ${pmt.paymentMethod}`,
+      debit: 0,
+      credit: pmt.amount,
+      sortDate: pmt.paymentDate
+    });
+  });
+
+  // Get credit notes
+  const creditNotes = await CreditNote.find({
+    clientId,
+    companyId,
+    issueDate: { $gte: start, $lte: end },
+    status: { $nin: ['draft', 'cancelled'] }
+  }).sort({ issueDate: 1 });
+
+  creditNotes.forEach(cn => {
+    transactions.push({
+      date: cn.issueDate.toISOString().split('T')[0],
+      type: 'credit_note',
+      reference: cn.creditNoteNumber,
+      description: `Credit Note ${cn.creditNoteNumber}`,
+      descriptionAr: `إشعار دائن ${cn.creditNoteNumber}`,
+      debit: 0,
+      credit: cn.totalAmount,
+      sortDate: cn.issueDate
+    });
+  });
+
+  // Sort by date and calculate running balance
+  transactions.sort((a, b) => a.sortDate - b.sortDate);
+
+  let runningBalance = openingBalance;
+  const transactionsWithBalance = transactions.map(t => {
+    runningBalance += t.debit - t.credit;
+    return {
+      date: t.date,
+      type: t.type,
+      reference: t.reference,
+      description: t.description,
+      descriptionAr: t.descriptionAr,
+      debit: t.debit,
+      credit: t.credit,
+      balance: runningBalance
+    };
+  });
+
+  const totalDebits = transactions.reduce((s, t) => s + t.debit, 0);
+  const totalCredits = transactions.reduce((s, t) => s + t.credit, 0);
+
+  return {
+    client: {
+      id: client._id.toString(),
+      name: client.name,
+      nameAr: client.nameAr,
+      email: client.email,
+      phone: client.phone,
+      address: client.address
+    },
+    period: {
+      startDate: start.toISOString().split('T')[0],
+      endDate: end.toISOString().split('T')[0]
+    },
+    openingBalance,
+    transactions: transactionsWithBalance,
+    closingBalance: runningBalance,
+    totalDebits,
+    totalCredits,
+    generatedAt: new Date().toISOString()
+  };
+}
+
+async function calculateClientBalance(clientId, companyId, beforeDate) {
+  const invoiceTotal = await Invoice.aggregate([
+    {
+      $match: {
+        clientId: mongoose.Types.ObjectId(clientId),
+        companyId: mongoose.Types.ObjectId(companyId),
+        issueDate: { $lt: beforeDate },
+        status: { $nin: ['draft', 'cancelled'] }
+      }
+    },
+    { $group: { _id: null, total: { $sum: '$totalAmount' } } }
+  ]);
+
+  const paymentTotal = await Payment.aggregate([
+    {
+      $match: {
+        clientId: mongoose.Types.ObjectId(clientId),
+        companyId: mongoose.Types.ObjectId(companyId),
+        paymentDate: { $lt: beforeDate },
+        status: { $ne: 'cancelled' }
+      }
+    },
+    { $group: { _id: null, total: { $sum: '$amount' } } }
+  ]);
+
+  const creditNoteTotal = await CreditNote.aggregate([
+    {
+      $match: {
+        clientId: mongoose.Types.ObjectId(clientId),
+        companyId: mongoose.Types.ObjectId(companyId),
+        issueDate: { $lt: beforeDate },
+        status: { $nin: ['draft', 'cancelled'] }
+      }
+    },
+    { $group: { _id: null, total: { $sum: '$totalAmount' } } }
+  ]);
+
+  const invoices = invoiceTotal[0]?.total || 0;
+  const payments = paymentTotal[0]?.total || 0;
+  const credits = creditNoteTotal[0]?.total || 0;
+
+  return invoices - payments - credits;
+}
+```
+
+---
+
+### 5.10 Vendor Ledger Report Service
+
+```javascript
+// services/reportService.js
+
+async function getVendorLedgerReport(vendorId, startDate, endDate, companyId) {
+  const vendor = await Vendor.findOne({ _id: vendorId, companyId });
+
+  if (!vendor) {
+    throw new Error('Vendor not found');
+  }
+
+  const start = startDate ? new Date(startDate) : new Date(0);
+  const end = endDate ? new Date(endDate) : new Date();
+  end.setHours(23, 59, 59, 999);
+
+  // Calculate opening balance (transactions before start date)
+  const openingBalance = await calculateVendorBalance(vendorId, companyId, start);
+
+  const transactions = [];
+
+  // Get expenses/bills
+  const expenses = await Expense.find({
+    vendorId,
+    companyId,
+    date: { $gte: start, $lte: end },
+    approvalStatus: 'approved'
+  }).sort({ date: 1 });
+
+  expenses.forEach(exp => {
+    transactions.push({
+      date: exp.date.toISOString().split('T')[0],
+      type: exp.billNumber ? 'bill' : 'expense',
+      reference: exp.billNumber || exp.expenseNumber || exp.reference,
+      description: exp.description || exp.category,
+      descriptionAr: exp.descriptionAr || exp.categoryAr || '',
+      debit: 0,
+      credit: exp.amount,
+      sortDate: exp.date
+    });
+  });
+
+  // Get payments to vendor
+  const vendorPayments = await VendorPayment.find({
+    vendorId,
+    companyId,
+    paymentDate: { $gte: start, $lte: end },
+    status: { $ne: 'cancelled' }
+  }).sort({ paymentDate: 1 });
+
+  vendorPayments.forEach(pmt => {
+    transactions.push({
+      date: pmt.paymentDate.toISOString().split('T')[0],
+      type: 'payment',
+      reference: pmt.paymentNumber || pmt.reference,
+      description: `Payment to vendor - ${pmt.paymentMethod}`,
+      descriptionAr: `دفعة للمورد - ${pmt.paymentMethod}`,
+      debit: pmt.amount,
+      credit: 0,
+      sortDate: pmt.paymentDate
+    });
+  });
+
+  // Sort by date and calculate running balance
+  transactions.sort((a, b) => a.sortDate - b.sortDate);
+
+  let runningBalance = openingBalance;
+  const transactionsWithBalance = transactions.map(t => {
+    runningBalance += t.credit - t.debit;  // Credit increases what we owe
+    return {
+      date: t.date,
+      type: t.type,
+      reference: t.reference,
+      description: t.description,
+      descriptionAr: t.descriptionAr,
+      debit: t.debit,
+      credit: t.credit,
+      balance: runningBalance
+    };
+  });
+
+  const totalDebits = transactions.reduce((s, t) => s + t.debit, 0);
+  const totalCredits = transactions.reduce((s, t) => s + t.credit, 0);
+
+  return {
+    vendor: {
+      id: vendor._id.toString(),
+      name: vendor.name,
+      nameAr: vendor.nameAr,
+      email: vendor.email,
+      phone: vendor.phone,
+      vatNumber: vendor.vatNumber
+    },
+    period: {
+      startDate: start.toISOString().split('T')[0],
+      endDate: end.toISOString().split('T')[0]
+    },
+    openingBalance,
+    transactions: transactionsWithBalance,
+    closingBalance: runningBalance,
+    totalDebits,
+    totalCredits,
+    generatedAt: new Date().toISOString()
+  };
+}
+
+async function calculateVendorBalance(vendorId, companyId, beforeDate) {
+  const expenseTotal = await Expense.aggregate([
+    {
+      $match: {
+        vendorId: mongoose.Types.ObjectId(vendorId),
+        companyId: mongoose.Types.ObjectId(companyId),
+        date: { $lt: beforeDate },
+        approvalStatus: 'approved'
+      }
+    },
+    { $group: { _id: null, total: { $sum: '$amount' } } }
+  ]);
+
+  const paymentTotal = await VendorPayment.aggregate([
+    {
+      $match: {
+        vendorId: mongoose.Types.ObjectId(vendorId),
+        companyId: mongoose.Types.ObjectId(companyId),
+        paymentDate: { $lt: beforeDate },
+        status: { $ne: 'cancelled' }
+      }
+    },
+    { $group: { _id: null, total: { $sum: '$amount' } } }
+  ]);
+
+  const expenses = expenseTotal[0]?.total || 0;
+  const payments = paymentTotal[0]?.total || 0;
+
+  return expenses - payments;  // What we owe
+}
+```
+
+---
+
+### 5.11 Gross Profit Report Service
+
+```javascript
+// services/reportService.js
+
+async function getGrossProfitReport(startDate, endDate, companyId, groupBy = 'item') {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  end.setHours(23, 59, 59, 999);
+
+  // Get invoices with line items
+  const invoices = await Invoice.find({
+    companyId,
+    issueDate: { $gte: start, $lte: end },
+    status: { $nin: ['draft', 'cancelled'] },
+    isReturn: { $ne: true }
+  });
+
+  // Get COGS entries from GL
+  const cogsAccounts = await Account.find({
+    companyId,
+    accountType: 'cost_of_goods_sold',
+    isActive: true
+  });
+  const cogsAccountCodes = cogsAccounts.map(a => a.accountCode);
+
+  const cogsEntries = await GLEntry.aggregate([
+    {
+      $match: {
+        companyId: mongoose.Types.ObjectId(companyId),
+        accountCode: { $in: cogsAccountCodes },
+        date: { $gte: start, $lte: end },
+        status: 'posted'
+      }
+    },
+    {
+      $group: {
+        _id: '$reference',
+        cogs: { $sum: { $subtract: ['$debit', '$credit'] } }
+      }
+    }
+  ]);
+
+  const cogsMap = new Map();
+  cogsEntries.forEach(e => cogsMap.set(e._id, e.cogs));
+
+  // Aggregate by groupBy parameter
+  const itemMap = new Map();
+
+  invoices.forEach(inv => {
+    const invCogs = cogsMap.get(inv.invoiceNumber) || 0;
+    const cogsPerItem = inv.lineItems?.length ? invCogs / inv.lineItems.length : invCogs;
+
+    if (inv.lineItems && inv.lineItems.length > 0) {
+      inv.lineItems.forEach(item => {
+        let key, name, nameAr;
+
+        if (groupBy === 'client') {
+          key = inv.clientId?.toString() || 'unknown';
+          name = inv.clientName || 'Unknown Client';
+          nameAr = inv.clientNameAr || '';
+        } else if (groupBy === 'project') {
+          key = item.projectId?.toString() || inv.projectId?.toString() || 'no-project';
+          name = item.projectName || inv.projectName || 'No Project';
+          nameAr = item.projectNameAr || inv.projectNameAr || '';
+        } else {
+          key = item.itemCode || item.description?.slice(0, 50) || 'unknown';
+          name = item.description || 'Unknown Item';
+          nameAr = item.descriptionAr || '';
+        }
+
+        if (!itemMap.has(key)) {
+          itemMap.set(key, {
+            id: key,
+            name,
+            nameAr,
+            revenue: 0,
+            cogs: 0,
+            quantity: 0
+          });
+        }
+
+        const entry = itemMap.get(key);
+        entry.revenue += item.amount || 0;
+        entry.cogs += cogsPerItem;
+        entry.quantity += item.quantity || 1;
+      });
+    } else {
+      // Invoice without line items
+      const key = groupBy === 'client'
+        ? (inv.clientId?.toString() || 'unknown')
+        : (inv.projectId?.toString() || 'no-project');
+
+      if (!itemMap.has(key)) {
+        itemMap.set(key, {
+          id: key,
+          name: inv.clientName || inv.projectName || 'Unknown',
+          nameAr: inv.clientNameAr || inv.projectNameAr || '',
+          revenue: 0,
+          cogs: 0,
+          quantity: 0
+        });
+      }
+
+      const entry = itemMap.get(key);
+      entry.revenue += inv.subtotal || inv.totalAmount || 0;
+      entry.cogs += invCogs;
+      entry.quantity += 1;
+    }
+  });
+
+  // Calculate gross profit for each item
+  const items = Array.from(itemMap.values()).map(item => ({
+    ...item,
+    grossProfit: item.revenue - item.cogs,
+    grossMargin: item.revenue > 0
+      ? Math.round((item.revenue - item.cogs) / item.revenue * 1000) / 10
+      : 0
+  })).sort((a, b) => b.grossProfit - a.grossProfit);
+
+  const totalRevenue = items.reduce((s, i) => s + i.revenue, 0);
+  const totalCOGS = items.reduce((s, i) => s + i.cogs, 0);
+  const grossProfit = totalRevenue - totalCOGS;
+
+  return {
+    period: { startDate, endDate },
+    summary: {
+      totalRevenue,
+      totalCOGS,
+      grossProfit,
+      grossMargin: totalRevenue > 0
+        ? Math.round(grossProfit / totalRevenue * 1000) / 10
+        : 0
+    },
+    items,
+    generatedAt: new Date().toISOString()
+  };
+}
+```
+
+---
+
+### 5.12 Cost Center Report Service
+
+```javascript
+// services/reportService.js
+
+const CostCenter = require('../models/CostCenter');
+
+async function getCostCenterReport(startDate, endDate, companyId, costCenterId = null) {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  end.setHours(23, 59, 59, 999);
+
+  // Get all cost centers (or specific one)
+  const costCenterQuery = { companyId, isActive: true };
+  if (costCenterId) {
+    costCenterQuery._id = mongoose.Types.ObjectId(costCenterId);
+  }
+
+  const costCenters = await CostCenter.find(costCenterQuery).sort({ code: 1 });
+
+  // Get GL entries grouped by cost center
+  const glEntries = await GLEntry.aggregate([
+    {
+      $match: {
+        companyId: mongoose.Types.ObjectId(companyId),
+        date: { $gte: start, $lte: end },
+        status: 'posted',
+        costCenterId: { $exists: true, $ne: null }
+      }
+    },
+    {
+      $group: {
+        _id: {
+          costCenterId: '$costCenterId',
+          accountCode: '$accountCode'
+        },
+        debit: { $sum: '$debit' },
+        credit: { $sum: '$credit' }
+      }
+    }
+  ]);
+
+  // Get accounts for name lookup
+  const accounts = await Account.find({ companyId, isActive: true });
+  const accountMap = new Map();
+  accounts.forEach(a => accountMap.set(a.accountCode, a));
+
+  // Build entries map by cost center
+  const entriesByCC = new Map();
+  glEntries.forEach(e => {
+    const ccId = e._id.costCenterId.toString();
+    if (!entriesByCC.has(ccId)) {
+      entriesByCC.set(ccId, []);
+    }
+    entriesByCC.get(ccId).push({
+      accountCode: e._id.accountCode,
+      debit: e.debit,
+      credit: e.credit
+    });
+  });
+
+  // Calculate P&L for each cost center
+  let totalIncome = 0;
+  let totalExpenses = 0;
+
+  const costCenterData = costCenters.map(cc => {
+    const entries = entriesByCC.get(cc._id.toString()) || [];
+
+    const incomeItems = [];
+    const expenseItems = [];
+    let ccIncome = 0;
+    let ccExpenses = 0;
+
+    entries.forEach(e => {
+      const account = accountMap.get(e.accountCode);
+      if (!account) return;
+
+      const item = {
+        accountCode: e.accountCode,
+        account: account.accountName,
+        accountAr: account.accountNameAr || ''
+      };
+
+      if (['income', 'revenue'].includes(account.accountType)) {
+        item.amount = e.credit - e.debit;
+        incomeItems.push(item);
+        ccIncome += item.amount;
+      } else if (['expense', 'cost_of_goods_sold'].includes(account.accountType)) {
+        item.amount = e.debit - e.credit;
+        expenseItems.push(item);
+        ccExpenses += item.amount;
+      }
+    });
+
+    totalIncome += ccIncome;
+    totalExpenses += ccExpenses;
+
+    return {
+      id: cc._id.toString(),
+      name: cc.name,
+      nameAr: cc.nameAr || '',
+      parentId: cc.parentId?.toString() || null,
+      level: cc.level || 0,
+      income: {
+        items: incomeItems.sort((a, b) => b.amount - a.amount),
+        total: ccIncome
+      },
+      expenses: {
+        items: expenseItems.sort((a, b) => b.amount - a.amount),
+        total: ccExpenses
+      },
+      netIncome: ccIncome - ccExpenses
+    };
+  });
+
+  const companyNetIncome = totalIncome - totalExpenses;
+
+  // Add percentage of company total
+  const costCentersWithPercent = costCenterData.map(cc => ({
+    ...cc,
+    percentage: companyNetIncome !== 0
+      ? Math.round(cc.netIncome / companyNetIncome * 1000) / 10
+      : 0
+  }));
+
+  return {
+    period: { startDate, endDate },
+    summary: {
+      totalIncome,
+      totalExpenses,
+      netIncome: companyNetIncome
+    },
+    costCenters: costCentersWithPercent,
+    generatedAt: new Date().toISOString()
+  };
+}
+```
+
+---
+
 ## 6. Company Settings Integration
 
 ### 6.1 Company Settings Endpoint
@@ -1498,7 +2586,54 @@ router.get('/:type/export', authenticateToken, addCompanyData, async (req, res) 
 - [ ] Net VAT = Output - Input
 - [ ] ZATCA compliance requirements met
 
-### 8.9 General
+### 8.9 Budget Variance Report
+- [ ] Budget amounts loaded correctly
+- [ ] Actual amounts from GL aggregated correctly
+- [ ] Variance calculated as budget - actual
+- [ ] Variance percentage calculated correctly
+- [ ] Status flags (under/over/on-track) accurate
+- [ ] Empty budget returns appropriate response
+
+### 8.10 AP Aging Report
+- [ ] Only unpaid/partial expenses included
+- [ ] Aging buckets calculated from due date
+- [ ] Vendor grouping works correctly
+- [ ] Summary totals match vendor totals
+- [ ] Arabic vendor names populated
+
+### 8.11 Client Statement Report
+- [ ] Opening balance calculated correctly (pre-period)
+- [ ] Invoices, payments, credit notes all included
+- [ ] Transactions sorted by date
+- [ ] Running balance calculated correctly
+- [ ] Closing balance = Opening + Debits - Credits
+- [ ] Client details included in response
+
+### 8.12 Vendor Ledger Report
+- [ ] Opening balance calculated correctly
+- [ ] Bills, expenses, payments all included
+- [ ] Transactions sorted by date
+- [ ] Running balance shows amount owed
+- [ ] Closing balance accurate
+- [ ] Vendor details included in response
+
+### 8.13 Gross Profit Report
+- [ ] Revenue from invoices aggregated correctly
+- [ ] COGS from GL entries aggregated correctly
+- [ ] Gross profit = Revenue - COGS
+- [ ] Gross margin percentage calculated correctly
+- [ ] groupBy parameter works (item/project/client)
+- [ ] Items sorted by gross profit descending
+
+### 8.14 Cost Center Report
+- [ ] Income and expenses grouped by cost center
+- [ ] Net income per cost center calculated
+- [ ] Percentage of company total accurate
+- [ ] Hierarchical cost centers handled correctly
+- [ ] costCenterId filter works
+- [ ] Only entries with cost center tags included
+
+### 8.15 General
 - [ ] Company settings included in all responses
 - [ ] Arabic names (accountAr) populated
 - [ ] PDF export generates correctly
