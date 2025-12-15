@@ -164,6 +164,7 @@ import { Route as AuthenticatedDashboardFinanceQuotesIndexRouteImport } from './
 import { Route as AuthenticatedDashboardFinancePaymentsIndexRouteImport } from './routes/_authenticated/dashboard.finance.payments.index'
 import { Route as AuthenticatedDashboardFinanceJournalEntriesIndexRouteImport } from './routes/_authenticated/dashboard.finance.journal-entries.index'
 import { Route as AuthenticatedDashboardFinanceInvoicesIndexRouteImport } from './routes/_authenticated/dashboard.finance.invoices.index'
+import { Route as AuthenticatedDashboardFinanceFullReportsIndexRouteImport } from './routes/_authenticated/dashboard.finance.full-reports.index'
 import { Route as AuthenticatedDashboardFinanceFiscalPeriodsIndexRouteImport } from './routes/_authenticated/dashboard.finance.fiscal-periods.index'
 import { Route as AuthenticatedDashboardFinanceExpensesIndexRouteImport } from './routes/_authenticated/dashboard.finance.expenses.index'
 import { Route as AuthenticatedDashboardFinanceCurrencyIndexRouteImport } from './routes/_authenticated/dashboard.finance.currency.index'
@@ -1191,6 +1192,12 @@ const AuthenticatedDashboardFinanceInvoicesIndexRoute =
   AuthenticatedDashboardFinanceInvoicesIndexRouteImport.update({
     id: '/dashboard/finance/invoices/',
     path: '/dashboard/finance/invoices/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceFullReportsIndexRoute =
+  AuthenticatedDashboardFinanceFullReportsIndexRouteImport.update({
+    id: '/dashboard/finance/full-reports/',
+    path: '/dashboard/finance/full-reports/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute =
@@ -2292,6 +2299,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/finance/currency': typeof AuthenticatedDashboardFinanceCurrencyIndexRoute
   '/dashboard/finance/expenses': typeof AuthenticatedDashboardFinanceExpensesIndexRoute
   '/dashboard/finance/fiscal-periods': typeof AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute
+  '/dashboard/finance/full-reports': typeof AuthenticatedDashboardFinanceFullReportsIndexRoute
   '/dashboard/finance/invoices': typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
   '/dashboard/finance/journal-entries': typeof AuthenticatedDashboardFinanceJournalEntriesIndexRoute
   '/dashboard/finance/payments': typeof AuthenticatedDashboardFinancePaymentsIndexRoute
@@ -2589,6 +2597,7 @@ export interface FileRoutesByTo {
   '/dashboard/finance/currency': typeof AuthenticatedDashboardFinanceCurrencyIndexRoute
   '/dashboard/finance/expenses': typeof AuthenticatedDashboardFinanceExpensesIndexRoute
   '/dashboard/finance/fiscal-periods': typeof AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute
+  '/dashboard/finance/full-reports': typeof AuthenticatedDashboardFinanceFullReportsIndexRoute
   '/dashboard/finance/invoices': typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
   '/dashboard/finance/journal-entries': typeof AuthenticatedDashboardFinanceJournalEntriesIndexRoute
   '/dashboard/finance/payments': typeof AuthenticatedDashboardFinancePaymentsIndexRoute
@@ -2891,6 +2900,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/finance/currency/': typeof AuthenticatedDashboardFinanceCurrencyIndexRoute
   '/_authenticated/dashboard/finance/expenses/': typeof AuthenticatedDashboardFinanceExpensesIndexRoute
   '/_authenticated/dashboard/finance/fiscal-periods/': typeof AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute
+  '/_authenticated/dashboard/finance/full-reports/': typeof AuthenticatedDashboardFinanceFullReportsIndexRoute
   '/_authenticated/dashboard/finance/invoices/': typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
   '/_authenticated/dashboard/finance/journal-entries/': typeof AuthenticatedDashboardFinanceJournalEntriesIndexRoute
   '/_authenticated/dashboard/finance/payments/': typeof AuthenticatedDashboardFinancePaymentsIndexRoute
@@ -3191,6 +3201,7 @@ export interface FileRouteTypes {
     | '/dashboard/finance/currency'
     | '/dashboard/finance/expenses'
     | '/dashboard/finance/fiscal-periods'
+    | '/dashboard/finance/full-reports'
     | '/dashboard/finance/invoices'
     | '/dashboard/finance/journal-entries'
     | '/dashboard/finance/payments'
@@ -3488,6 +3499,7 @@ export interface FileRouteTypes {
     | '/dashboard/finance/currency'
     | '/dashboard/finance/expenses'
     | '/dashboard/finance/fiscal-periods'
+    | '/dashboard/finance/full-reports'
     | '/dashboard/finance/invoices'
     | '/dashboard/finance/journal-entries'
     | '/dashboard/finance/payments'
@@ -3789,6 +3801,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/finance/currency/'
     | '/_authenticated/dashboard/finance/expenses/'
     | '/_authenticated/dashboard/finance/fiscal-periods/'
+    | '/_authenticated/dashboard/finance/full-reports/'
     | '/_authenticated/dashboard/finance/invoices/'
     | '/_authenticated/dashboard/finance/journal-entries/'
     | '/_authenticated/dashboard/finance/payments/'
@@ -4978,6 +4991,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/finance/invoices'
       fullPath: '/dashboard/finance/invoices'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceInvoicesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/full-reports/': {
+      id: '/_authenticated/dashboard/finance/full-reports/'
+      path: '/dashboard/finance/full-reports'
+      fullPath: '/dashboard/finance/full-reports'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceFullReportsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/finance/fiscal-periods/': {
@@ -6385,6 +6405,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardFinanceCurrencyIndexRoute: typeof AuthenticatedDashboardFinanceCurrencyIndexRoute
   AuthenticatedDashboardFinanceExpensesIndexRoute: typeof AuthenticatedDashboardFinanceExpensesIndexRoute
   AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute: typeof AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute
+  AuthenticatedDashboardFinanceFullReportsIndexRoute: typeof AuthenticatedDashboardFinanceFullReportsIndexRoute
   AuthenticatedDashboardFinanceInvoicesIndexRoute: typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
   AuthenticatedDashboardFinanceJournalEntriesIndexRoute: typeof AuthenticatedDashboardFinanceJournalEntriesIndexRoute
   AuthenticatedDashboardFinancePaymentsIndexRoute: typeof AuthenticatedDashboardFinancePaymentsIndexRoute
@@ -6793,6 +6814,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardFinanceExpensesIndexRoute,
   AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute:
     AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute,
+  AuthenticatedDashboardFinanceFullReportsIndexRoute:
+    AuthenticatedDashboardFinanceFullReportsIndexRoute,
   AuthenticatedDashboardFinanceInvoicesIndexRoute:
     AuthenticatedDashboardFinanceInvoicesIndexRoute,
   AuthenticatedDashboardFinanceJournalEntriesIndexRoute:
