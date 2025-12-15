@@ -362,6 +362,83 @@ export interface BillFilters {
   limit?: number
 }
 
+// ==================== DEBIT NOTES ====================
+
+export type DebitNoteStatus = 'draft' | 'pending' | 'approved' | 'applied' | 'cancelled'
+export type DebitNoteReasonType = 'goods_returned' | 'damaged_goods' | 'pricing_error' | 'quality_issue' | 'overcharge' | 'other'
+
+export interface DebitNote {
+  _id: string
+  debitNoteNumber: string
+  billId: string | {
+    _id: string
+    billNumber: string
+    vendorId: string | { _id: string; name: string; nameAr?: string }
+  }
+  vendorId: string | { _id: string; name: string; nameAr?: string; email?: string; phone?: string }
+  debitNoteDate: string
+  reason: string
+  reasonType: DebitNoteReasonType
+  items: DebitNoteItem[]
+  subtotal: number
+  taxAmount: number
+  totalAmount: number
+  status: DebitNoteStatus
+  isPartial: boolean
+  notes?: string
+  attachments?: string[]
+  glEntryId?: string
+  isPostedToGL: boolean
+  appliedAt?: string
+  appliedBy?: string
+  approvedBy?: string
+  approvedAt?: string
+  cancelledAt?: string
+  cancelledBy?: string
+  cancellationReason?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface DebitNoteItem {
+  _id?: string
+  billItemId?: string
+  description: string
+  quantity: number
+  unitPrice: number
+  amount: number
+  taxRate?: number
+  taxAmount?: number
+}
+
+export interface CreateDebitNoteData {
+  billId: string
+  debitNoteDate: string
+  reason: string
+  reasonType: DebitNoteReasonType
+  items: DebitNoteItem[]
+  subtotal: number
+  taxAmount?: number
+  totalAmount: number
+  isPartial: boolean
+  notes?: string
+}
+
+export interface DebitNoteFilters {
+  status?: DebitNoteStatus
+  vendorId?: string
+  billId?: string
+  startDate?: string
+  endDate?: string
+  minAmount?: number
+  maxAmount?: number
+  page?: number
+  limit?: number
+  search?: string
+  sortBy?: string
+  order?: 'asc' | 'desc'
+}
+
 // ==================== VENDORS ====================
 
 export interface Vendor {
@@ -1043,6 +1120,60 @@ export const accountingService = {
   exportBills: async (format: 'csv' | 'xlsx', filters?: BillFilters): Promise<Blob> => {
     const response = await apiClient.get('/bills/export', {
       params: { format, ...filters },
+      responseType: 'blob'
+    })
+    return response.data
+  },
+
+  // ========== DEBIT NOTES ==========
+
+  getDebitNotes: async (filters?: DebitNoteFilters): Promise<{ debitNotes: DebitNote[]; total: number }> => {
+    const response = await apiClient.get('/debit-notes', { params: filters })
+    return response.data.data
+  },
+
+  getDebitNote: async (id: string): Promise<DebitNote> => {
+    const response = await apiClient.get(`/debit-notes/${id}`)
+    return response.data.data
+  },
+
+  getBillDebitNotes: async (billId: string): Promise<DebitNote[]> => {
+    const response = await apiClient.get(`/bills/${billId}/debit-notes`)
+    return response.data.data
+  },
+
+  createDebitNote: async (data: CreateDebitNoteData): Promise<DebitNote> => {
+    const response = await apiClient.post('/debit-notes', data)
+    return response.data.data
+  },
+
+  updateDebitNote: async (id: string, data: Partial<CreateDebitNoteData>): Promise<DebitNote> => {
+    const response = await apiClient.put(`/debit-notes/${id}`, data)
+    return response.data.data
+  },
+
+  approveDebitNote: async (id: string, notes?: string): Promise<DebitNote> => {
+    const response = await apiClient.post(`/debit-notes/${id}/approve`, { notes })
+    return response.data.data
+  },
+
+  applyDebitNote: async (id: string): Promise<DebitNote> => {
+    const response = await apiClient.post(`/debit-notes/${id}/apply`)
+    return response.data.data
+  },
+
+  cancelDebitNote: async (id: string, data: { reason: string }): Promise<DebitNote> => {
+    const response = await apiClient.post(`/debit-notes/${id}/cancel`, data)
+    return response.data.data
+  },
+
+  deleteDebitNote: async (id: string): Promise<void> => {
+    await apiClient.delete(`/debit-notes/${id}`)
+  },
+
+  exportDebitNotes: async (filters?: DebitNoteFilters & { format?: 'csv' | 'xlsx' | 'pdf' }): Promise<Blob> => {
+    const response = await apiClient.get('/debit-notes/export', {
+      params: filters,
       responseType: 'blob'
     })
     return response.data

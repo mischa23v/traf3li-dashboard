@@ -173,6 +173,92 @@ export interface AgingReport {
 }
 
 /**
+ * ==================== DEBIT NOTE TYPES ====================
+ */
+
+export interface DebitNote {
+  _id: string
+  debitNoteNumber: string
+  billId: string | {
+    _id: string
+    billNumber: string
+    vendorId: string | {
+      _id: string
+      name: string
+      nameAr?: string
+    }
+  }
+  vendorId: string | {
+    _id: string
+    name: string
+    nameAr?: string
+    email?: string
+    phone?: string
+  }
+  debitNoteDate: string
+  reason: string
+  reasonType: 'goods_returned' | 'damaged_goods' | 'pricing_error' | 'quality_issue' | 'overcharge' | 'other'
+  items: DebitNoteItem[]
+  subtotal: number
+  taxAmount: number
+  totalAmount: number
+  status: 'draft' | 'pending' | 'approved' | 'applied' | 'cancelled'
+  isPartial: boolean
+  notes?: string
+  attachments?: BillAttachment[]
+  appliedAt?: string
+  appliedBy?: string
+  createdBy: string
+  approvedBy?: string
+  approvedAt?: string
+  cancelledAt?: string
+  cancelledBy?: string
+  cancellationReason?: string
+  history?: BillHistory[]
+  createdAt: string
+  updatedAt: string
+}
+
+export interface DebitNoteItem {
+  _id?: string
+  billItemId?: string
+  description: string
+  quantity: number
+  unitPrice: number
+  amount: number
+  taxRate?: number
+  taxAmount?: number
+}
+
+export interface CreateDebitNoteData {
+  billId: string
+  debitNoteDate: string
+  reason: string
+  reasonType: 'goods_returned' | 'damaged_goods' | 'pricing_error' | 'quality_issue' | 'overcharge' | 'other'
+  items: DebitNoteItem[]
+  subtotal: number
+  taxAmount?: number
+  totalAmount: number
+  isPartial: boolean
+  notes?: string
+}
+
+export interface DebitNoteFilters {
+  status?: string
+  vendorId?: string
+  billId?: string
+  startDate?: string
+  endDate?: string
+  minAmount?: number
+  maxAmount?: number
+  page?: number
+  limit?: number
+  search?: string
+  sortBy?: string
+  order?: 'asc' | 'desc'
+}
+
+/**
  * Bill Service Object
  */
 const billService = {
@@ -451,6 +537,145 @@ const billService = {
     try {
       const response = await apiClient.post(`/bills/${id}/post-to-gl`, data)
       return response.data.bill || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * ==================== DEBIT NOTE METHODS ====================
+   */
+
+  /**
+   * Create debit note
+   * POST /api/debit-notes
+   */
+  createDebitNote: async (data: CreateDebitNoteData): Promise<DebitNote> => {
+    try {
+      const response = await apiClient.post('/debit-notes', data)
+      return response.data.debitNote || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get all debit notes
+   * GET /api/debit-notes
+   */
+  getDebitNotes: async (filters?: DebitNoteFilters): Promise<{ debitNotes: DebitNote[]; total: number }> => {
+    try {
+      const response = await apiClient.get('/debit-notes', { params: filters })
+      return {
+        debitNotes: response.data.debitNotes || response.data.data || [],
+        total: response.data.total || 0,
+      }
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get single debit note
+   * GET /api/debit-notes/:id
+   */
+  getDebitNote: async (id: string): Promise<DebitNote> => {
+    try {
+      const response = await apiClient.get(`/debit-notes/${id}`)
+      return response.data.debitNote || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get debit notes for a specific bill
+   * GET /api/bills/:billId/debit-notes
+   */
+  getBillDebitNotes: async (billId: string): Promise<DebitNote[]> => {
+    try {
+      const response = await apiClient.get(`/bills/${billId}/debit-notes`)
+      return response.data.debitNotes || response.data.data || []
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update debit note
+   * PUT /api/debit-notes/:id
+   */
+  updateDebitNote: async (id: string, data: Partial<CreateDebitNoteData>): Promise<DebitNote> => {
+    try {
+      const response = await apiClient.put(`/debit-notes/${id}`, data)
+      return response.data.debitNote || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Approve debit note
+   * POST /api/debit-notes/:id/approve
+   */
+  approveDebitNote: async (id: string, notes?: string): Promise<DebitNote> => {
+    try {
+      const response = await apiClient.post(`/debit-notes/${id}/approve`, { notes })
+      return response.data.debitNote || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Apply debit note (update bill and vendor balances)
+   * POST /api/debit-notes/:id/apply
+   */
+  applyDebitNote: async (id: string): Promise<DebitNote> => {
+    try {
+      const response = await apiClient.post(`/debit-notes/${id}/apply`)
+      return response.data.debitNote || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Cancel debit note
+   * POST /api/debit-notes/:id/cancel
+   */
+  cancelDebitNote: async (id: string, data: { reason: string }): Promise<DebitNote> => {
+    try {
+      const response = await apiClient.post(`/debit-notes/${id}/cancel`, data)
+      return response.data.debitNote || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Delete debit note
+   * DELETE /api/debit-notes/:id
+   */
+  deleteDebitNote: async (id: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/debit-notes/${id}`)
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Export debit notes
+   * GET /api/debit-notes/export
+   */
+  exportDebitNotes: async (filters?: DebitNoteFilters & { format?: 'csv' | 'xlsx' | 'pdf' }): Promise<Blob> => {
+    try {
+      const response = await apiClient.get('/debit-notes/export', {
+        params: filters,
+        responseType: 'blob'
+      })
+      return response.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

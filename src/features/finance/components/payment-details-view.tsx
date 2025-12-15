@@ -1,8 +1,9 @@
+import { useState } from 'react'
 import {
     ArrowRight, Edit, Download, Printer,
     Calendar, User, CreditCard, Receipt,
     AlertCircle, CheckCircle, Clock, Loader2,
-    Mail, FileText, DollarSign
+    Mail, FileText, DollarSign, Eye, Send
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -19,6 +20,26 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { usePayment } from '@/hooks/useFinance'
 import { ProductivityHero } from '@/components/productivity-hero'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
+import { PaymentReceiptTemplate, useReceiptTemplate } from './payment-receipt-template'
+import { toast } from 'sonner'
+import financeService from '@/services/financeService'
 
 const statusConfig: Record<string, { label: string; color: string; icon: React.ElementType }> = {
     pending: { label: 'معلق', color: 'bg-amber-100 text-amber-700', icon: Clock },
@@ -31,8 +52,87 @@ export default function PaymentDetailsView() {
     const { paymentId } = useParams({ from: '/_authenticated/dashboard/finance/payments/$paymentId' })
 
     const { data: paymentData, isLoading, isError, error } = usePayment(paymentId)
+    const { receiptRef, print: printReceipt } = useReceiptTemplate()
 
     const payment = paymentData?.payment
+
+    // Receipt modals state
+    const [showReceiptPreview, setShowReceiptPreview] = useState(false)
+    const [showSendReceiptDialog, setShowSendReceiptDialog] = useState(false)
+    const [isGeneratingReceipt, setIsGeneratingReceipt] = useState(false)
+    const [isSendingReceipt, setIsSendingReceipt] = useState(false)
+    const [isDownloadingReceipt, setIsDownloadingReceipt] = useState(false)
+
+    // Receipt send form
+    const [receiptEmail, setReceiptEmail] = useState('')
+    const [receiptLanguage, setReceiptLanguage] = useState<'ar' | 'en' | 'both'>('ar')
+    const [receiptMessage, setReceiptMessage] = useState('')
+
+    // Receipt handlers
+    const handleGenerateReceipt = async () => {
+        try {
+            setIsGeneratingReceipt(true)
+            await financeService.generateReceipt(paymentId)
+            toast.success('تم إنشاء الإيصال بنجاح')
+            setShowReceiptPreview(true)
+        } catch (error: any) {
+            toast.error(error.message || 'فشل إنشاء الإيصال')
+        } finally {
+            setIsGeneratingReceipt(false)
+        }
+    }
+
+    const handleViewReceipt = () => {
+        setShowReceiptPreview(true)
+    }
+
+    const handlePrintReceipt = () => {
+        printReceipt()
+    }
+
+    const handleDownloadReceipt = async () => {
+        try {
+            setIsDownloadingReceipt(true)
+            const blob = await financeService.downloadReceipt(paymentId, receiptLanguage)
+            const url = window.URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = `receipt-${payment?.paymentNumber || paymentId}.pdf`
+            document.body.appendChild(a)
+            a.click()
+            window.URL.revokeObjectURL(url)
+            document.body.removeChild(a)
+            toast.success('تم تحميل الإيصال بنجاح')
+        } catch (error: any) {
+            toast.error(error.message || 'فشل تحميل الإيصال')
+        } finally {
+            setIsDownloadingReceipt(false)
+        }
+    }
+
+    const handleSendReceipt = async () => {
+        if (!receiptEmail) {
+            toast.error('يرجى إدخال البريد الإلكتروني')
+            return
+        }
+
+        try {
+            setIsSendingReceipt(true)
+            await financeService.sendReceipt(paymentId, {
+                email: receiptEmail,
+                language: receiptLanguage,
+                message: receiptMessage
+            })
+            toast.success('تم إرسال الإيصال بنجاح')
+            setShowSendReceiptDialog(false)
+            setReceiptEmail('')
+            setReceiptMessage('')
+        } catch (error: any) {
+            toast.error(error.message || 'فشل إرسال الإيصال')
+        } finally {
+            setIsSendingReceipt(false)
+        }
+    }
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
@@ -145,16 +245,37 @@ export default function PaymentDetailsView() {
                             </Link>
                         </Button>
                         <div className="flex gap-2">
-                            <Button variant="outline">
-                                <Download className="h-4 w-4 ms-2" aria-hidden="true" />
-                                تحميل الإيصال
+                            <Button
+                                variant="outline"
+                                onClick={handleViewReceipt}
+                            >
+                                <Eye className="h-4 w-4 ms-2" aria-hidden="true" />
+                                عرض الإيصال
                             </Button>
-                            <Button variant="outline">
+                            <Button
+                                variant="outline"
+                                onClick={handleDownloadReceipt}
+                                disabled={isDownloadingReceipt}
+                            >
+                                {isDownloadingReceipt ? (
+                                    <Loader2 className="h-4 w-4 ms-2 animate-spin" aria-hidden="true" />
+                                ) : (
+                                    <Download className="h-4 w-4 ms-2" aria-hidden="true" />
+                                )}
+                                تحميل PDF
+                            </Button>
+                            <Button
+                                variant="outline"
+                                onClick={handlePrintReceipt}
+                            >
                                 <Printer className="h-4 w-4 ms-2" aria-hidden="true" />
                                 طباعة
                             </Button>
-                            <Button variant="outline">
-                                <Mail className="h-4 w-4 ms-2" aria-hidden="true" />
+                            <Button
+                                variant="outline"
+                                onClick={() => setShowSendReceiptDialog(true)}
+                            >
+                                <Send className="h-4 w-4 ms-2" aria-hidden="true" />
                                 إرسال للعميل
                             </Button>
                         </div>
@@ -297,19 +418,163 @@ export default function PaymentDetailsView() {
                                     <CardTitle className="text-lg font-bold text-navy">إجراءات سريعة</CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-6 space-y-3">
-                                    <Button variant="outline" className="w-full justify-start">
-                                        <Mail className="h-4 w-4 ms-2" aria-hidden="true" />
+                                    <Button
+                                        variant="outline"
+                                        className="w-full justify-start"
+                                        onClick={handleViewReceipt}
+                                    >
+                                        <Eye className="h-4 w-4 ms-2" aria-hidden="true" />
+                                        عرض الإيصال
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        className="w-full justify-start"
+                                        onClick={() => setShowSendReceiptDialog(true)}
+                                    >
+                                        <Send className="h-4 w-4 ms-2" aria-hidden="true" />
                                         إرسال الإيصال بالبريد
                                     </Button>
-                                    <Button variant="outline" className="w-full justify-start">
-                                        <Receipt className="h-4 w-4 ms-2" aria-hidden="true" />
+                                    <Button
+                                        variant="outline"
+                                        className="w-full justify-start"
+                                        onClick={handleDownloadReceipt}
+                                        disabled={isDownloadingReceipt}
+                                    >
+                                        {isDownloadingReceipt ? (
+                                            <Loader2 className="h-4 w-4 ms-2 animate-spin" aria-hidden="true" />
+                                        ) : (
+                                            <Download className="h-4 w-4 ms-2" aria-hidden="true" />
+                                        )}
                                         تحميل إيصال PDF
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        className="w-full justify-start"
+                                        onClick={handlePrintReceipt}
+                                    >
+                                        <Printer className="h-4 w-4 ms-2" aria-hidden="true" />
+                                        طباعة الإيصال
                                     </Button>
                                 </CardContent>
                             </Card>
                         </div>
                     </div>
                 </div>
+
+                {/* Receipt Preview Modal */}
+                <Dialog open={showReceiptPreview} onOpenChange={setShowReceiptPreview}>
+                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                            <DialogTitle>معاينة الإيصال</DialogTitle>
+                            <DialogDescription>
+                                يمكنك طباعة أو تحميل الإيصال من هنا
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4">
+                            {payment && (
+                                <PaymentReceiptTemplate
+                                    ref={receiptRef}
+                                    payment={payment}
+                                    language="both"
+                                    receiptSettings={{
+                                        receiptPrefix: 'REC',
+                                        includeQRCode: true,
+                                        footerText: 'Thank you for your business',
+                                        footerTextAr: 'شكراً لتعاملكم معنا',
+                                        termsAndConditions: 'This is an official receipt.',
+                                        termsAndConditionsAr: 'هذا إيصال رسمي.',
+                                    }}
+                                />
+                            )}
+                        </div>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setShowReceiptPreview(false)}>
+                                إغلاق
+                            </Button>
+                            <Button variant="outline" onClick={handlePrintReceipt}>
+                                <Printer className="h-4 w-4 ms-2" />
+                                طباعة
+                            </Button>
+                            <Button onClick={handleDownloadReceipt} disabled={isDownloadingReceipt}>
+                                {isDownloadingReceipt ? (
+                                    <Loader2 className="h-4 w-4 ms-2 animate-spin" />
+                                ) : (
+                                    <Download className="h-4 w-4 ms-2" />
+                                )}
+                                تحميل PDF
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+
+                {/* Send Receipt Dialog */}
+                <Dialog open={showSendReceiptDialog} onOpenChange={setShowSendReceiptDialog}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>إرسال الإيصال</DialogTitle>
+                            <DialogDescription>
+                                أدخل البريد الإلكتروني لإرسال الإيصال
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="receipt-email">البريد الإلكتروني</Label>
+                                <Input
+                                    id="receipt-email"
+                                    type="email"
+                                    placeholder="client@example.com"
+                                    value={receiptEmail}
+                                    onChange={(e) => setReceiptEmail(e.target.value)}
+                                    dir="ltr"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="receipt-language">اللغة</Label>
+                                <Select value={receiptLanguage} onValueChange={(value: 'ar' | 'en' | 'both') => setReceiptLanguage(value)}>
+                                    <SelectTrigger id="receipt-language">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="ar">عربي</SelectItem>
+                                        <SelectItem value="en">English</SelectItem>
+                                        <SelectItem value="both">ثنائي اللغة / Bilingual</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="receipt-message">رسالة إضافية (اختياري)</Label>
+                                <Input
+                                    id="receipt-message"
+                                    placeholder="رسالة قصيرة للعميل..."
+                                    value={receiptMessage}
+                                    onChange={(e) => setReceiptMessage(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button
+                                variant="outline"
+                                onClick={() => setShowSendReceiptDialog(false)}
+                                disabled={isSendingReceipt}
+                            >
+                                إلغاء
+                            </Button>
+                            <Button onClick={handleSendReceipt} disabled={isSendingReceipt}>
+                                {isSendingReceipt ? (
+                                    <>
+                                        <Loader2 className="h-4 w-4 ms-2 animate-spin" />
+                                        جاري الإرسال...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Send className="h-4 w-4 ms-2" />
+                                        إرسال
+                                    </>
+                                )}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </Main>
         </>
     )

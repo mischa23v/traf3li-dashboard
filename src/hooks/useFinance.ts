@@ -15,6 +15,8 @@ import financeService, {
   CreatePaymentData,
   CreateTransactionData,
   CreateTransactionPayload,
+  CreditNoteFilters,
+  CreateCreditNoteData,
 } from '@/services/financeService'
 
 // ==================== INVOICES ====================
@@ -115,6 +117,216 @@ export const useOverdueInvoices = () => {
     queryKey: ['invoices', 'overdue'],
     queryFn: () => financeService.getOverdueInvoices(),
     staleTime: 2 * 60 * 1000,
+  })
+}
+
+// ==================== CREDIT NOTES ====================
+
+export const useCreditNotes = (filters?: CreditNoteFilters) => {
+  return useQuery({
+    queryKey: ['creditNotes', filters],
+    queryFn: () => financeService.getCreditNotes(filters),
+    staleTime: 2 * 60 * 1000,
+  })
+}
+
+export const useCreditNote = (id: string) => {
+  return useQuery({
+    queryKey: ['creditNotes', id],
+    queryFn: () => financeService.getCreditNote(id),
+    enabled: !!id,
+  })
+}
+
+export const useCreateCreditNote = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: CreateCreditNoteData) =>
+      financeService.createCreditNote(data),
+    onSuccess: (data) => {
+      toast.success('تم إنشاء إشعار الدائن بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['creditNotes'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { creditNotes: [...] } structure
+        if (old.creditNotes && Array.isArray(old.creditNotes)) {
+          return {
+            ...old,
+            creditNotes: [data, ...old.creditNotes],
+            total: (old.total || old.creditNotes.length) + 1
+          }
+        }
+
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إنشاء إشعار الدائن')
+    },
+    onSettled: async () => {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['creditNotes'], refetchType: 'all' })
+      return await queryClient.invalidateQueries({ queryKey: ['invoices'], refetchType: 'all' })
+    },
+  })
+}
+
+export const useUpdateCreditNote = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateCreditNoteData> }) =>
+      financeService.updateCreditNote(id, data),
+    onSuccess: () => {
+      toast.success('تم تحديث إشعار الدائن بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث إشعار الدائن')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['creditNotes'] })
+      return await queryClient.invalidateQueries({ queryKey: ['creditNotes', id] })
+    },
+  })
+}
+
+export const useDeleteCreditNote = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => financeService.deleteCreditNote(id),
+    onSuccess: (_, id) => {
+      toast.success('تم حذف إشعار الدائن بنجاح')
+
+      queryClient.setQueriesData({ queryKey: ['creditNotes'] }, (old: any) => {
+        if (!old) return old
+
+        if (old.creditNotes && Array.isArray(old.creditNotes)) {
+          return {
+            ...old,
+            creditNotes: old.creditNotes.filter((item: any) => item._id !== id),
+            total: Math.max(0, (old.total || old.creditNotes.length) - 1)
+          }
+        }
+
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== id)
+        return old
+      })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل حذف إشعار الدائن')
+    },
+    onSettled: async () => {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['creditNotes'], refetchType: 'all' })
+    },
+  })
+}
+
+export const useIssueCreditNote = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => financeService.issueCreditNote(id),
+    onSuccess: () => {
+      toast.success('تم إصدار إشعار الدائن بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إصدار إشعار الدائن')
+    },
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: ['creditNotes'] })
+      return await queryClient.invalidateQueries({ queryKey: ['creditNotes', id] })
+    },
+  })
+}
+
+export const useApplyCreditNote = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => financeService.applyCreditNote(id),
+    onSuccess: () => {
+      toast.success('تم تطبيق إشعار الدائن بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تطبيق إشعار الدائن')
+    },
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: ['creditNotes'] })
+      await queryClient.invalidateQueries({ queryKey: ['creditNotes', id] })
+      return await queryClient.invalidateQueries({ queryKey: ['invoices'] })
+    },
+  })
+}
+
+export const useVoidCreditNote = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason?: string }) =>
+      financeService.voidCreditNote(id, reason),
+    onSuccess: () => {
+      toast.success('تم إلغاء إشعار الدائن بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إلغاء إشعار الدائن')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['creditNotes'] })
+      return await queryClient.invalidateQueries({ queryKey: ['creditNotes', id] })
+    },
+  })
+}
+
+export const useCreditNotesForInvoice = (invoiceId: string) => {
+  return useQuery({
+    queryKey: ['creditNotes', 'invoice', invoiceId],
+    queryFn: () => financeService.getCreditNotesForInvoice(invoiceId),
+    enabled: !!invoiceId,
+    staleTime: 2 * 60 * 1000,
+  })
+}
+
+export const useSubmitCreditNoteToZATCA = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => financeService.submitCreditNoteToZATCA(id),
+    onSuccess: () => {
+      toast.success('تم إرسال إشعار الدائن إلى هيئة الزكاة والضريبة والجمارك')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إرسال إشعار الدائن إلى هيئة الزكاة والضريبة والجمارك')
+    },
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: ['creditNotes'] })
+      return await queryClient.invalidateQueries({ queryKey: ['creditNotes', id] })
+    },
+  })
+}
+
+export const useExportCreditNotePdf = () => {
+  return useMutation({
+    mutationFn: (id: string) => financeService.exportCreditNotePdf(id),
+    onSuccess: (blob, id) => {
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `credit-note-${id}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(url)
+      toast.success('تم تحميل إشعار الدائن بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحميل إشعار الدائن')
+    },
   })
 }
 
@@ -372,6 +584,106 @@ export const useTimeStats = (filters?: {
     queryKey: ['timeEntries', 'stats', filters],
     queryFn: () => financeService.getTimeStats(filters),
     staleTime: 5 * 60 * 1000,
+  })
+}
+
+// ==================== TIME ENTRY LOCKING ====================
+
+export const useLockTimeEntry = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason: 'approved' | 'billed' | 'period_closed' | 'manual' }) =>
+      financeService.lockTimeEntry(id, reason),
+    onSuccess: () => {
+      toast.success('تم قفل سجل الوقت بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل قفل سجل الوقت')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
+      return await queryClient.invalidateQueries({ queryKey: ['timeEntries', id] })
+    },
+  })
+}
+
+export const useUnlockTimeEntry = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason: string }) =>
+      financeService.unlockTimeEntry(id, reason),
+    onSuccess: () => {
+      toast.success('تم إلغاء قفل سجل الوقت بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إلغاء قفل سجل الوقت')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
+      return await queryClient.invalidateQueries({ queryKey: ['timeEntries', id] })
+    },
+  })
+}
+
+export const useBulkLockTimeEntries = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: {
+      entryIds: string[]
+      reason: 'approved' | 'billed' | 'period_closed' | 'manual'
+    }) => financeService.bulkLockTimeEntries(data),
+    onSuccess: (result) => {
+      if (result.locked > 0) {
+        toast.success(`تم قفل ${result.locked} سجل بنجاح`)
+      }
+      if (result.failed > 0) {
+        toast.error(`فشل قفل ${result.failed} سجل`)
+      }
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل عملية القفل الجماعية')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
+    },
+  })
+}
+
+export const useCheckTimeEntryLock = (id: string) => {
+  return useQuery({
+    queryKey: ['timeEntries', id, 'lockStatus'],
+    queryFn: () => financeService.isTimeEntryLocked(id),
+    enabled: !!id,
+    staleTime: 1 * 60 * 1000, // 1 minute
+  })
+}
+
+export const useLockTimeEntriesByDateRange = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: {
+      startDate: string
+      endDate: string
+      reason: 'period_closed' | 'manual'
+    }) => financeService.lockTimeEntriesByDateRange(data),
+    onSuccess: (result) => {
+      if (result.locked > 0) {
+        toast.success(`تم قفل ${result.locked} سجل للفترة المحددة`)
+      }
+      if (result.failed > 0) {
+        toast.error(`فشل قفل ${result.failed} سجل`)
+      }
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل قفل السجلات حسب الفترة')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
+    },
   })
 }
 
@@ -969,6 +1281,414 @@ export const useDeleteAccountActivity = () => {
     },
     onSettled: async () => {
       return await queryClient.invalidateQueries({ queryKey: ['activities'] })
+    },
+  })
+}
+
+// ==================== INVOICE APPROVAL WORKFLOW ====================
+
+export const useInvoicesPendingApproval = (filters?: {
+  status?: 'pending' | 'approved' | 'rejected'
+  clientId?: string
+  minAmount?: number
+  maxAmount?: number
+  startDate?: string
+  endDate?: string
+  approverId?: string
+  level?: number
+}) => {
+  return useQuery({
+    queryKey: ['invoices', 'pending-approval', filters],
+    queryFn: () => financeService.getInvoicesPendingApproval(filters),
+    staleTime: 1 * 60 * 1000, // 1 minute
+  })
+}
+
+export const useSubmitInvoiceForApproval = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ invoiceId, comments }: { invoiceId: string; comments?: string }) =>
+      financeService.submitInvoiceForApproval(invoiceId, { comments }),
+    onSuccess: () => {
+      toast.success('تم إرسال الفاتورة للموافقة بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إرسال الفاتورة للموافقة')
+    },
+    onSettled: async (_, __, { invoiceId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      await queryClient.invalidateQueries({ queryKey: ['invoices', 'pending-approval'] })
+      return await queryClient.invalidateQueries({ queryKey: ['invoices', invoiceId] })
+    },
+  })
+}
+
+export const useApproveInvoice = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ invoiceId, comments, approverLevel }: { invoiceId: string; comments?: string; approverLevel: number }) =>
+      financeService.approveInvoice(invoiceId, { comments, approverLevel }),
+    onSuccess: () => {
+      toast.success('تم اعتماد الفاتورة بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل اعتماد الفاتورة')
+    },
+    onSettled: async (_, __, { invoiceId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      await queryClient.invalidateQueries({ queryKey: ['invoices', 'pending-approval'] })
+      await queryClient.invalidateQueries({ queryKey: ['invoices', 'pending-approvals-count'] })
+      return await queryClient.invalidateQueries({ queryKey: ['invoices', invoiceId] })
+    },
+  })
+}
+
+export const useRejectInvoice = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ invoiceId, reason, comments }: { invoiceId: string; reason: string; comments?: string }) =>
+      financeService.rejectInvoice(invoiceId, { reason, comments }),
+    onSuccess: () => {
+      toast.success('تم رفض الفاتورة')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل رفض الفاتورة')
+    },
+    onSettled: async (_, __, { invoiceId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      await queryClient.invalidateQueries({ queryKey: ['invoices', 'pending-approval'] })
+      await queryClient.invalidateQueries({ queryKey: ['invoices', 'pending-approvals-count'] })
+      return await queryClient.invalidateQueries({ queryKey: ['invoices', invoiceId] })
+    },
+  })
+}
+
+export const useRequestInvoiceChanges = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ invoiceId, requestedChanges, comments }: { invoiceId: string; requestedChanges: string; comments?: string }) =>
+      financeService.requestInvoiceChanges(invoiceId, { requestedChanges, comments }),
+    onSuccess: () => {
+      toast.success('تم إرسال طلب التعديلات بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إرسال طلب التعديلات')
+    },
+    onSettled: async (_, __, { invoiceId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      await queryClient.invalidateQueries({ queryKey: ['invoices', 'pending-approval'] })
+      return await queryClient.invalidateQueries({ queryKey: ['invoices', invoiceId] })
+    },
+  })
+}
+
+export const useEscalateInvoiceApproval = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ invoiceId, reason, comments }: { invoiceId: string; reason: string; comments?: string }) =>
+      financeService.escalateInvoiceApproval(invoiceId, { reason, comments }),
+    onSuccess: () => {
+      toast.success('تم رفع الفاتورة للمستوى التالي')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل رفع الفاتورة')
+    },
+    onSettled: async (_, __, { invoiceId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      await queryClient.invalidateQueries({ queryKey: ['invoices', 'pending-approval'] })
+      return await queryClient.invalidateQueries({ queryKey: ['invoices', invoiceId] })
+    },
+  })
+}
+
+export const useBulkApproveInvoices = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ invoiceIds, comments }: { invoiceIds: string[]; comments?: string }) =>
+      financeService.bulkApproveInvoices({ invoiceIds, comments }),
+    onSuccess: (data) => {
+      toast.success(`تم اعتماد ${data.approved} فاتورة بنجاح`)
+      if (data.failed > 0) {
+        toast.error(`فشل اعتماد ${data.failed} فاتورة`)
+      }
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل اعتماد الفواتير')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      await queryClient.invalidateQueries({ queryKey: ['invoices', 'pending-approval'] })
+      return await queryClient.invalidateQueries({ queryKey: ['invoices', 'pending-approvals-count'] })
+    },
+  })
+}
+
+export const useApprovalWorkflowConfig = () => {
+  return useQuery({
+    queryKey: ['invoices', 'approval-config'],
+    queryFn: () => financeService.getApprovalWorkflowConfig(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+}
+
+export const useUpdateApprovalWorkflowConfig = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (config: any) => financeService.updateApprovalWorkflowConfig(config),
+    onSuccess: () => {
+      toast.success('تم تحديث إعدادات الموافقات بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث إعدادات الموافقات')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['invoices', 'approval-config'] })
+    },
+  })
+}
+
+export const usePendingApprovalsCount = () => {
+  return useQuery({
+    queryKey: ['invoices', 'pending-approvals-count'],
+    queryFn: () => financeService.getPendingApprovalsCount(),
+    refetchInterval: 30 * 1000, // Refetch every 30 seconds
+    staleTime: 15 * 1000, // 15 seconds
+  })
+}
+
+// ==================== RECURRING INVOICES ====================
+
+import recurringInvoiceService, {
+  RecurringInvoiceFilters,
+  CreateRecurringInvoiceData,
+  UpdateRecurringInvoiceData,
+} from '@/services/recurringInvoiceService'
+
+export const useRecurringInvoices = (filters?: RecurringInvoiceFilters) => {
+  return useQuery({
+    queryKey: ['recurringInvoices', filters],
+    queryFn: () => recurringInvoiceService.getAll(filters),
+    staleTime: 2 * 60 * 1000,
+  })
+}
+
+export const useRecurringInvoice = (id: string) => {
+  return useQuery({
+    queryKey: ['recurringInvoices', id],
+    queryFn: () => recurringInvoiceService.getById(id),
+    enabled: !!id,
+  })
+}
+
+export const useCreateRecurringInvoice = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: CreateRecurringInvoiceData) =>
+      recurringInvoiceService.create(data),
+    onSuccess: (data) => {
+      toast.success('تم إنشاء الفاتورة المتكررة بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['recurringInvoices'] }, (old: any) => {
+        if (!old) return old
+
+        if (old.data && Array.isArray(old.data)) {
+          return {
+            ...old,
+            data: [data, ...old.data],
+            total: (old.total || old.data.length) + 1
+          }
+        }
+
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إنشاء الفاتورة المتكررة')
+    },
+    onSettled: async () => {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['recurringInvoices'], refetchType: 'all' })
+    },
+  })
+}
+
+export const useUpdateRecurringInvoice = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateRecurringInvoiceData }) =>
+      recurringInvoiceService.update(id, data),
+    onSuccess: () => {
+      toast.success('تم تحديث الفاتورة المتكررة بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث الفاتورة المتكررة')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['recurringInvoices'] })
+      return await queryClient.invalidateQueries({ queryKey: ['recurringInvoices', id] })
+    },
+  })
+}
+
+export const useDeleteRecurringInvoice = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => recurringInvoiceService.delete(id),
+    onSuccess: (_, id) => {
+      toast.success('تم حذف الفاتورة المتكررة بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['recurringInvoices'] }, (old: any) => {
+        if (!old) return old
+
+        if (old.data && Array.isArray(old.data)) {
+          return {
+            ...old,
+            data: old.data.filter((item: any) => item._id !== id),
+            total: Math.max(0, (old.total || old.data.length) - 1)
+          }
+        }
+
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== id)
+        return old
+      })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل حذف الفاتورة المتكررة')
+    },
+    onSettled: async () => {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['recurringInvoices'], refetchType: 'all' })
+    },
+  })
+}
+
+export const usePauseRecurringInvoice = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => recurringInvoiceService.pause(id),
+    onSuccess: () => {
+      toast.success('تم إيقاف الفاتورة المتكررة مؤقتاً')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إيقاف الفاتورة المتكررة')
+    },
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: ['recurringInvoices'] })
+      return await queryClient.invalidateQueries({ queryKey: ['recurringInvoices', id] })
+    },
+  })
+}
+
+export const useResumeRecurringInvoice = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => recurringInvoiceService.resume(id),
+    onSuccess: () => {
+      toast.success('تم استئناف الفاتورة المتكررة')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل استئناف الفاتورة المتكررة')
+    },
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: ['recurringInvoices'] })
+      return await queryClient.invalidateQueries({ queryKey: ['recurringInvoices', id] })
+    },
+  })
+}
+
+export const useCancelRecurringInvoice = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => recurringInvoiceService.cancel(id),
+    onSuccess: () => {
+      toast.success('تم إلغاء الفاتورة المتكررة')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إلغاء الفاتورة المتكررة')
+    },
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: ['recurringInvoices'] })
+      return await queryClient.invalidateQueries({ queryKey: ['recurringInvoices', id] })
+    },
+  })
+}
+
+export const useGenerateFromRecurring = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => recurringInvoiceService.generateNext(id),
+    onSuccess: () => {
+      toast.success('تم إنشاء الفاتورة بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إنشاء الفاتورة')
+    },
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      await queryClient.invalidateQueries({ queryKey: ['recurringInvoices'] })
+      return await queryClient.invalidateQueries({ queryKey: ['recurringInvoices', id] })
+    },
+  })
+}
+
+export const useRecurringInvoiceStats = () => {
+  return useQuery({
+    queryKey: ['recurringInvoices', 'stats'],
+    queryFn: () => recurringInvoiceService.getStats(),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+export const useRecurringInvoiceHistory = (id: string) => {
+  return useQuery({
+    queryKey: ['recurringInvoices', id, 'history'],
+    queryFn: () => recurringInvoiceService.getHistory(id),
+    enabled: !!id,
+    staleTime: 2 * 60 * 1000,
+  })
+}
+
+export const usePreviewNextInvoice = (id: string) => {
+  return useQuery({
+    queryKey: ['recurringInvoices', id, 'preview'],
+    queryFn: () => recurringInvoiceService.previewNext(id),
+    enabled: !!id,
+    staleTime: 1 * 60 * 1000,
+  })
+}
+
+export const useDuplicateRecurringInvoice = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, name, nameAr }: { id: string; name: string; nameAr?: string }) =>
+      recurringInvoiceService.duplicate(id, name, nameAr),
+    onSuccess: () => {
+      toast.success('تم نسخ الفاتورة المتكررة بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل نسخ الفاتورة المتكررة')
+    },
+    onSettled: async () => {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['recurringInvoices'], refetchType: 'all' })
     },
   })
 }

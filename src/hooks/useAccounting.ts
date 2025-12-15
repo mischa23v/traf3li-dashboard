@@ -27,6 +27,9 @@ import {
   Bill,
   BillFilters,
   CreateBillData,
+  DebitNote,
+  DebitNoteFilters,
+  CreateDebitNoteData,
   Vendor,
   VendorFilters,
   CreateVendorData,
@@ -82,6 +85,11 @@ export const accountingKeys = {
   bills: () => [...accountingKeys.all, 'bills'] as const,
   billsList: (filters?: BillFilters) => [...accountingKeys.bills(), 'list', filters] as const,
   bill: (id: string) => [...accountingKeys.bills(), id] as const,
+  // Debit Notes
+  debitNotes: () => [...accountingKeys.all, 'debit-notes'] as const,
+  debitNotesList: (filters?: DebitNoteFilters) => [...accountingKeys.debitNotes(), 'list', filters] as const,
+  debitNote: (id: string) => [...accountingKeys.debitNotes(), id] as const,
+  billDebitNotes: (billId: string) => [...accountingKeys.bills(), billId, 'debit-notes'] as const,
   // Vendors
   vendors: () => [...accountingKeys.all, 'vendors'] as const,
   vendorsList: (filters?: VendorFilters) => [...accountingKeys.vendors(), 'list', filters] as const,
@@ -716,6 +724,143 @@ export const useDeleteBill = () => {
     },
     onError: () => {
       toast.error('فشل في حذف الفاتورة')
+    },
+  })
+}
+
+// ==================== DEBIT NOTES HOOKS ====================
+
+export const useDebitNotes = (filters?: DebitNoteFilters) => {
+  return useQuery({
+    queryKey: accountingKeys.debitNotesList(filters),
+    queryFn: () => accountingService.getDebitNotes(filters),
+  })
+}
+
+export const useDebitNote = (id: string) => {
+  return useQuery({
+    queryKey: accountingKeys.debitNote(id),
+    queryFn: () => accountingService.getDebitNote(id),
+    enabled: !!id,
+  })
+}
+
+export const useBillDebitNotes = (billId: string) => {
+  return useQuery({
+    queryKey: accountingKeys.billDebitNotes(billId),
+    queryFn: () => accountingService.getBillDebitNotes(billId),
+    enabled: !!billId,
+  })
+}
+
+export const useCreateDebitNote = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: CreateDebitNoteData) => accountingService.createDebitNote(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: accountingKeys.debitNotes() })
+      queryClient.invalidateQueries({ queryKey: accountingKeys.bills() })
+      toast.success('تم إنشاء إشعار الخصم بنجاح')
+    },
+    onError: () => {
+      toast.error('فشل في إنشاء إشعار الخصم')
+    },
+  })
+}
+
+export const useUpdateDebitNote = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateDebitNoteData> }) =>
+      accountingService.updateDebitNote(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: accountingKeys.debitNotes() })
+      toast.success('تم تحديث إشعار الخصم')
+    },
+    onError: () => {
+      toast.error('فشل في تحديث إشعار الخصم')
+    },
+  })
+}
+
+export const useApproveDebitNote = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, notes }: { id: string; notes?: string }) =>
+      accountingService.approveDebitNote(id, notes),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: accountingKeys.debitNotes() })
+      toast.success('تم اعتماد إشعار الخصم')
+    },
+    onError: () => {
+      toast.error('فشل في اعتماد إشعار الخصم')
+    },
+  })
+}
+
+export const useApplyDebitNote = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => accountingService.applyDebitNote(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: accountingKeys.debitNotes() })
+      queryClient.invalidateQueries({ queryKey: accountingKeys.bills() })
+      queryClient.invalidateQueries({ queryKey: accountingKeys.vendors() })
+      queryClient.invalidateQueries({ queryKey: accountingKeys.glEntries() })
+      toast.success('تم تطبيق إشعار الخصم')
+    },
+    onError: () => {
+      toast.error('فشل في تطبيق إشعار الخصم')
+    },
+  })
+}
+
+export const useCancelDebitNote = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason: string }) =>
+      accountingService.cancelDebitNote(id, { reason }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: accountingKeys.debitNotes() })
+      toast.success('تم إلغاء إشعار الخصم')
+    },
+    onError: () => {
+      toast.error('فشل في إلغاء إشعار الخصم')
+    },
+  })
+}
+
+export const useDeleteDebitNote = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => accountingService.deleteDebitNote(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: accountingKeys.debitNotes() })
+      toast.success('تم حذف إشعار الخصم')
+    },
+    onError: () => {
+      toast.error('فشل في حذف إشعار الخصم')
+    },
+  })
+}
+
+export const useExportDebitNotes = () => {
+  return useMutation({
+    mutationFn: (filters?: DebitNoteFilters & { format?: 'csv' | 'xlsx' | 'pdf' }) =>
+      accountingService.exportDebitNotes(filters),
+    onSuccess: (blob, { format = 'pdf' }) => {
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `debit-notes.${format}`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(url)
+      toast.success('تم تصدير إشعارات الخصم بنجاح')
+    },
+    onError: () => {
+      toast.error('فشل في تصدير إشعارات الخصم')
     },
   })
 }

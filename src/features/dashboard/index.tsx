@@ -43,6 +43,7 @@ import { TopNav } from '@/components/layout/top-nav'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { LanguageSwitcher } from '@/components/language-switcher'
+import { NotificationDropdown } from '@/components/notifications'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { StatCard } from '@/components/stat-card'
@@ -174,11 +175,10 @@ export function Dashboard() {
             <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input type="text" placeholder={t('common.search')} className="h-9 w-32 md:w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          {/* Bell - Hidden on mobile */}
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white hidden md:flex">
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
-          </Button>
+          {/* Notification Bell - Hidden on mobile */}
+          <div className="hidden md:block">
+            <NotificationDropdown className="rounded-full text-slate-300 hover:bg-white/10 hover:text-white" />
+          </div>
           {/* Language Switcher - Always visible */}
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
           {/* Theme Switch - Hidden on mobile */}

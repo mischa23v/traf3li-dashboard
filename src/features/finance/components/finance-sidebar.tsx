@@ -14,7 +14,7 @@ import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
 
 interface FinanceSidebarProps {
-    context?: 'invoices' | 'quotes' | 'payments' | 'expenses' | 'statements' | 'transactions' | 'activity' | 'time-tracking' | 'bills' | 'vendors' | 'retainers' | 'recurring' | 'reports' | 'fiscal-periods' | 'reconciliation' | 'currency'
+    context?: 'invoices' | 'quotes' | 'payments' | 'expenses' | 'statements' | 'transactions' | 'activity' | 'time-tracking' | 'bills' | 'vendors' | 'retainers' | 'recurring' | 'reports' | 'fiscal-periods' | 'reconciliation' | 'currency' | 'chart-of-accounts' | 'credit-notes' | 'journal-entries' | 'general-ledger'
     isSelectionMode?: boolean
     onToggleSelectionMode?: () => void
     selectedCount?: number
@@ -68,6 +68,10 @@ export function FinanceSidebar({
             create: '/dashboard/finance/invoices/new',
             viewAll: '/dashboard/finance/invoices'
         },
+        'credit-notes': {
+            create: '/dashboard/finance/credit-notes/new',
+            viewAll: '/dashboard/finance/credit-notes'
+        },
         quotes: {
             create: '/dashboard/finance/quotes/new',
             viewAll: '/dashboard/finance/quotes'
@@ -109,8 +113,8 @@ export function FinanceSidebar({
             viewAll: '/dashboard/finance/retainers'
         },
         recurring: {
-            create: '/dashboard/finance/recurring/new',
-            viewAll: '/dashboard/finance/recurring'
+            create: '/dashboard/finance/recurring-invoices/new',
+            viewAll: '/dashboard/finance/recurring-invoices'
         },
         reports: {
             create: '/dashboard/finance/reports/new',
@@ -127,13 +131,25 @@ export function FinanceSidebar({
         'currency': {
             create: '/dashboard/finance/currency/new',
             viewAll: '/dashboard/finance/currency'
+        },
+        'chart-of-accounts': {
+            create: '',
+            viewAll: '/dashboard/finance/chart-of-accounts'
+        },
+        'journal-entries': {
+            create: '/dashboard/finance/journal-entries/new',
+            viewAll: '/dashboard/finance/journal-entries'
+        },
+        'general-ledger': {
+            create: '',
+            viewAll: '/dashboard/finance/general-ledger'
         }
     }
 
     const currentLinks = links[context] || links.invoices
 
-    // Transactions are read-only - no create action
-    const isReadOnlyContext = context === 'transactions'
+    // Transactions, chart-of-accounts, and general-ledger are read-only - no create action in sidebar
+    const isReadOnlyContext = context === 'transactions' || context === 'chart-of-accounts' || context === 'general-ledger'
 
     // Generate 5 days for the strip
     const calendarStripDays = useMemo(() => {
