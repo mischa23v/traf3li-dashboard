@@ -238,6 +238,15 @@ export function CreateTimeEntryView() {
         writeDownAmount: 0,
         writeDownReason: '',
 
+        // ERPNext parity fields
+        billingHours: 0,  // Hours billed (may differ from actual)
+        billingMinutes: 0,
+        expectedHours: 0, // Expected/estimated hours
+        expectedMinutes: 0,
+        costingRate: 30000, // Internal cost rate (In halalas)
+        costingAmount: 0, // Calculated costing amount
+        isBillableOverride: false, // Override billable hours
+
         // Notes
         notes: '',
 
@@ -973,6 +982,148 @@ export function CreateTimeEntryView() {
                                                     )}
                                                 </>
                                             )}
+
+                                            <Separator />
+
+                                            {/* Billing Hours Override (ERPNext parity) */}
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <Label className="font-semibold">ساعات الفوترة المختلفة</Label>
+                                                    <p className="text-xs text-slate-500">فوترة عدد ساعات مختلف عن الفعلي</p>
+                                                </div>
+                                                <Switch
+                                                    checked={formData.isBillableOverride}
+                                                    onCheckedChange={(checked) => setFormData({ ...formData, isBillableOverride: checked })}
+                                                />
+                                            </div>
+
+                                            {formData.isBillableOverride && (
+                                                <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl space-y-4">
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div className="space-y-2">
+                                                            <Label className="text-sm text-amber-800">ساعات الفوترة</Label>
+                                                            <div className="flex gap-2">
+                                                                <Input
+                                                                    type="number"
+                                                                    placeholder="ساعات"
+                                                                    value={formData.billingHours || ''}
+                                                                    onChange={(e) => setFormData({ ...formData, billingHours: parseInt(e.target.value) || 0 })}
+                                                                    min="0"
+                                                                    className="rounded-xl border-amber-200 bg-white"
+                                                                />
+                                                                <Input
+                                                                    type="number"
+                                                                    placeholder="دقائق"
+                                                                    value={formData.billingMinutes || ''}
+                                                                    onChange={(e) => setFormData({ ...formData, billingMinutes: parseInt(e.target.value) || 0 })}
+                                                                    min="0"
+                                                                    max="59"
+                                                                    className="rounded-xl border-amber-200 bg-white"
+                                                                />
+                                                            </div>
+                                                            <p className="text-xs text-amber-600">
+                                                                الساعات الفعلية: {formatDuration(totalMinutes)}
+                                                            </p>
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label className="text-sm text-amber-800">مبلغ الفوترة المعدّل</Label>
+                                                            <div className="h-10 px-3 py-2 rounded-xl bg-white border border-amber-200 flex items-center">
+                                                                <span className="font-bold text-amber-700">
+                                                                    {formatCurrency(((formData.billingHours * 60 + formData.billingMinutes) / 60) * formData.hourlyRate)}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            <Separator />
+
+                                            {/* Costing Rate (ERPNext parity) */}
+                                            <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
+                                                <div className="flex items-center gap-2">
+                                                    <Calculator className="h-4 w-4 text-slate-600" />
+                                                    <Label className="font-semibold text-slate-700">التكلفة الداخلية</Label>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label className="text-sm text-slate-600">سعر التكلفة بالساعة (ر.س)</Label>
+                                                        <Input
+                                                            type="number"
+                                                            value={formData.costingRate / 100}
+                                                            onChange={(e) => setFormData({ ...formData, costingRate: parseFloat(e.target.value) * 100 || 0 })}
+                                                            step="0.01"
+                                                            className="rounded-xl border-slate-200 bg-white"
+                                                        />
+                                                        <p className="text-xs text-slate-500">تكلفة الساعة على المكتب</p>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-sm text-slate-600">إجمالي التكلفة</Label>
+                                                        <div className="h-10 px-3 py-2 rounded-xl bg-white border border-slate-200 flex items-center">
+                                                            <span className="font-medium text-slate-700">
+                                                                {formatCurrency((totalMinutes / 60) * formData.costingRate)}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-xs text-slate-500">
+                                                            الهامش: {formatCurrency(billableAmount - (totalMinutes / 60) * formData.costingRate)}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <Separator />
+
+                                            {/* Expected Hours (ERPNext parity) */}
+                                            <div className="space-y-4">
+                                                <div className="flex items-center gap-2">
+                                                    <Clock className="h-4 w-4 text-indigo-600" />
+                                                    <Label className="font-semibold text-slate-700">الساعات المتوقعة</Label>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label className="text-sm text-slate-600">الوقت المقدّر</Label>
+                                                        <div className="flex gap-2">
+                                                            <Input
+                                                                type="number"
+                                                                placeholder="ساعات"
+                                                                value={formData.expectedHours || ''}
+                                                                onChange={(e) => setFormData({ ...formData, expectedHours: parseInt(e.target.value) || 0 })}
+                                                                min="0"
+                                                                className="rounded-xl border-slate-200"
+                                                            />
+                                                            <Input
+                                                                type="number"
+                                                                placeholder="دقائق"
+                                                                value={formData.expectedMinutes || ''}
+                                                                onChange={(e) => setFormData({ ...formData, expectedMinutes: parseInt(e.target.value) || 0 })}
+                                                                min="0"
+                                                                max="59"
+                                                                className="rounded-xl border-slate-200"
+                                                            />
+                                                        </div>
+                                                        <p className="text-xs text-slate-500">تقدير وقت المهمة المسبق</p>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-sm text-slate-600">نسبة الإنجاز</Label>
+                                                        {(formData.expectedHours > 0 || formData.expectedMinutes > 0) ? (
+                                                            <>
+                                                                <Progress
+                                                                    value={Math.min(100, (totalMinutes / (formData.expectedHours * 60 + formData.expectedMinutes)) * 100)}
+                                                                    className="h-2"
+                                                                />
+                                                                <p className="text-xs text-slate-500">
+                                                                    {Math.round((totalMinutes / (formData.expectedHours * 60 + formData.expectedMinutes)) * 100)}% من الوقت المقدّر
+                                                                    {totalMinutes > (formData.expectedHours * 60 + formData.expectedMinutes) && (
+                                                                        <span className="text-red-500 ms-1">(تجاوز التقدير!)</span>
+                                                                    )}
+                                                                </p>
+                                                            </>
+                                                        ) : (
+                                                            <p className="text-xs text-slate-400">حدد وقتاً متوقعاً للمقارنة</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </CardContent>
                                     )}
                                 </Card>

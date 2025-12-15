@@ -147,6 +147,33 @@ export function CreateInvoiceView() {
     const [customerPONumber, setCustomerPONumber] = useState('')
     const [matterNumber, setMatterNumber] = useState('')
 
+    // Contact & Address fields (ERPNext parity)
+    const [contactPersonName, setContactPersonName] = useState('')
+    const [contactEmail, setContactEmail] = useState('')
+    const [contactMobile, setContactMobile] = useState('')
+    const [useShippingAddress, setUseShippingAddress] = useState(false)
+    const [shippingAddressLine1, setShippingAddressLine1] = useState('')
+    const [shippingAddressLine2, setShippingAddressLine2] = useState('')
+    const [shippingCity, setShippingCity] = useState('')
+    const [shippingPostalCode, setShippingPostalCode] = useState('')
+    const [shippingCountry, setShippingCountry] = useState('SA')
+
+    // Sales Person / Commission tracking (ERPNext parity)
+    const [salesPersonId, setSalesPersonId] = useState('')
+    const [commissionRate, setCommissionRate] = useState(0)
+    const [commissionAmount, setCommissionAmount] = useState(0)
+
+    // Advance Payments (ERPNext parity)
+    interface AdvancePayment {
+        id: string
+        referenceNumber: string
+        paymentDate: string
+        amount: number
+        allocatedAmount: number
+    }
+    const [advancePayments, setAdvancePayments] = useState<AdvancePayment[]>([])
+    const [showAdvancePayments, setShowAdvancePayments] = useState(false)
+
     // Line items
     const [lineItems, setLineItems] = useState<LineItem[]>([
         {
@@ -390,6 +417,36 @@ export function CreateInvoiceView() {
             dueDate,
             paymentTerms,
             currency,
+            // Contact Person (ERPNext parity)
+            ...(contactPersonName && { contactPersonName }),
+            ...(contactEmail && { contactEmail }),
+            ...(contactMobile && { contactMobile }),
+            // Shipping Address (ERPNext parity)
+            ...(useShippingAddress && {
+                shippingAddress: {
+                    line1: shippingAddressLine1,
+                    line2: shippingAddressLine2,
+                    city: shippingCity,
+                    postalCode: shippingPostalCode,
+                    country: shippingCountry,
+                },
+            }),
+            // Sales Person & Commission (ERPNext parity)
+            ...(salesPersonId && {
+                salesTeam: [{
+                    salesPersonId,
+                    commissionRate,
+                    commissionAmount: calculations.total * commissionRate / 100,
+                }],
+            }),
+            // Advance Payments (ERPNext parity)
+            ...(advancePayments.length > 0 && {
+                advances: advancePayments.filter(p => p.allocatedAmount > 0).map(p => ({
+                    referenceNumber: p.referenceNumber,
+                    allocatedAmount: p.allocatedAmount,
+                })),
+                totalAdvanceAllocated: advancePayments.reduce((sum, p) => sum + p.allocatedAmount, 0),
+            }),
             // Organization fields
             ...(firmSize !== 'solo' && {
                 departmentId,
@@ -656,6 +713,50 @@ export function CreateInvoiceView() {
                                                     {type.label}
                                                 </button>
                                             ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Contact Person (ERPNext parity) */}
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-slate-100">
+                                        <div className="space-y-2">
+                                            <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <User className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                                جهة الاتصال
+                                            </Label>
+                                            <Input
+                                                value={contactPersonName}
+                                                onChange={(e) => setContactPersonName(e.target.value)}
+                                                placeholder="اسم جهة الاتصال"
+                                                className="rounded-xl border-slate-200"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Mail className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                                البريد الإلكتروني
+                                            </Label>
+                                            <Input
+                                                type="email"
+                                                value={contactEmail}
+                                                onChange={(e) => setContactEmail(e.target.value)}
+                                                placeholder="contact@example.com"
+                                                className="rounded-xl border-slate-200"
+                                                dir="ltr"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Hash className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                                رقم الجوال
+                                            </Label>
+                                            <Input
+                                                type="tel"
+                                                value={contactMobile}
+                                                onChange={(e) => setContactMobile(e.target.value)}
+                                                placeholder="+966 5X XXX XXXX"
+                                                className="rounded-xl border-slate-200"
+                                                dir="ltr"
+                                            />
                                         </div>
                                     </div>
 
@@ -1170,6 +1271,258 @@ export function CreateInvoiceView() {
 
                             {/* ADVANCED SECTION */}
                             <Accordion type="multiple" className="space-y-4">
+
+                                {/* Shipping Address (ERPNext parity) */}
+                                <AccordionItem value="shipping" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
+                                    <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
+                                        <div className="flex items-center gap-2">
+                                            <Building2 className="h-5 w-5 text-cyan-500" aria-hidden="true" />
+                                            <span className="font-bold text-slate-800">عنوان الشحن</span>
+                                            {useShippingAddress && (
+                                                <Badge className="rounded-full bg-cyan-100 text-cyan-700">مفعّل</Badge>
+                                            )}
+                                        </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="px-6 pb-6">
+                                        <div className="space-y-4">
+                                            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                                                <div>
+                                                    <Label>استخدام عنوان شحن مختلف</Label>
+                                                    <p className="text-xs text-slate-500">عنوان مختلف عن عنوان الفوترة</p>
+                                                </div>
+                                                <Switch
+                                                    checked={useShippingAddress}
+                                                    onCheckedChange={setUseShippingAddress}
+                                                />
+                                            </div>
+
+                                            {useShippingAddress && (
+                                                <div className="space-y-4 pt-4 border-t border-slate-100">
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <div className="space-y-2">
+                                                            <Label className="text-sm text-slate-600">العنوان - السطر 1</Label>
+                                                            <Input
+                                                                value={shippingAddressLine1}
+                                                                onChange={(e) => setShippingAddressLine1(e.target.value)}
+                                                                placeholder="الشارع، رقم المبنى"
+                                                                className="rounded-xl border-slate-200"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label className="text-sm text-slate-600">العنوان - السطر 2</Label>
+                                                            <Input
+                                                                value={shippingAddressLine2}
+                                                                onChange={(e) => setShippingAddressLine2(e.target.value)}
+                                                                placeholder="الحي، المعلم القريب"
+                                                                className="rounded-xl border-slate-200"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                        <div className="space-y-2">
+                                                            <Label className="text-sm text-slate-600">المدينة</Label>
+                                                            <Select value={shippingCity} onValueChange={setShippingCity}>
+                                                                <SelectTrigger className="rounded-xl border-slate-200">
+                                                                    <SelectValue placeholder="اختر المدينة" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="riyadh">الرياض</SelectItem>
+                                                                    <SelectItem value="jeddah">جدة</SelectItem>
+                                                                    <SelectItem value="dammam">الدمام</SelectItem>
+                                                                    <SelectItem value="makkah">مكة المكرمة</SelectItem>
+                                                                    <SelectItem value="madinah">المدينة المنورة</SelectItem>
+                                                                    <SelectItem value="khobar">الخبر</SelectItem>
+                                                                    <SelectItem value="tabuk">تبوك</SelectItem>
+                                                                    <SelectItem value="abha">أبها</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label className="text-sm text-slate-600">الرمز البريدي</Label>
+                                                            <Input
+                                                                value={shippingPostalCode}
+                                                                onChange={(e) => setShippingPostalCode(e.target.value)}
+                                                                placeholder="12345"
+                                                                className="rounded-xl border-slate-200"
+                                                                dir="ltr"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label className="text-sm text-slate-600">الدولة</Label>
+                                                            <Select value={shippingCountry} onValueChange={setShippingCountry}>
+                                                                <SelectTrigger className="rounded-xl border-slate-200">
+                                                                    <SelectValue />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="SA">المملكة العربية السعودية</SelectItem>
+                                                                    <SelectItem value="AE">الإمارات العربية المتحدة</SelectItem>
+                                                                    <SelectItem value="KW">الكويت</SelectItem>
+                                                                    <SelectItem value="BH">البحرين</SelectItem>
+                                                                    <SelectItem value="QA">قطر</SelectItem>
+                                                                    <SelectItem value="OM">عُمان</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+
+                                {/* Sales Person & Commission (ERPNext parity) */}
+                                <AccordionItem value="sales-person" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
+                                    <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
+                                        <div className="flex items-center gap-2">
+                                            <UserCheck className="h-5 w-5 text-orange-500" aria-hidden="true" />
+                                            <span className="font-bold text-slate-800">مندوب المبيعات والعمولة</span>
+                                        </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="px-6 pb-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div className="space-y-2">
+                                                <Label className="text-sm font-medium text-slate-700">مندوب المبيعات</Label>
+                                                <Select value={salesPersonId} onValueChange={setSalesPersonId} disabled={loadingLawyers}>
+                                                    <SelectTrigger className="rounded-xl border-slate-200">
+                                                        <SelectValue placeholder="اختر المندوب" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {lawyers.map((lawyer: any) => (
+                                                            <SelectItem key={lawyer._id} value={lawyer._id}>
+                                                                {lawyer.firstName} {lawyer.lastName}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label className="text-sm font-medium text-slate-700">نسبة العمولة (%)</Label>
+                                                <Input
+                                                    type="number"
+                                                    min="0"
+                                                    max="100"
+                                                    step="0.5"
+                                                    value={commissionRate}
+                                                    onChange={(e) => {
+                                                        const rate = parseFloat(e.target.value) || 0
+                                                        setCommissionRate(rate)
+                                                        setCommissionAmount(calculations.total * rate / 100)
+                                                    }}
+                                                    className="rounded-xl border-slate-200"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label className="text-sm font-medium text-slate-700">مبلغ العمولة</Label>
+                                                <div className="h-10 flex items-center px-3 bg-orange-50 rounded-xl border border-orange-200 text-sm font-medium text-orange-700">
+                                                    {formatCurrency(calculations.total * commissionRate / 100)}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p className="text-xs text-slate-500 mt-3">
+                                            العمولة محسوبة تلقائياً بناءً على إجمالي الفاتورة
+                                        </p>
+                                    </AccordionContent>
+                                </AccordionItem>
+
+                                {/* Advance Payments (ERPNext parity) */}
+                                <AccordionItem value="advances" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
+                                    <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
+                                        <div className="flex items-center gap-2">
+                                            <DollarSign className="h-5 w-5 text-green-500" aria-hidden="true" />
+                                            <span className="font-bold text-slate-800">الدفعات المقدمة</span>
+                                            {advancePayments.length > 0 && (
+                                                <Badge className="rounded-full bg-green-100 text-green-700">
+                                                    {advancePayments.length} دفعة
+                                                </Badge>
+                                            )}
+                                        </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="px-6 pb-6">
+                                        <div className="space-y-4">
+                                            <Alert className="rounded-xl">
+                                                <AlertCircle className="h-4 w-4" aria-hidden="true" />
+                                                <AlertDescription>
+                                                    الدفعات المقدمة المستلمة من العميل والتي يمكن تطبيقها على هذه الفاتورة
+                                                </AlertDescription>
+                                            </Alert>
+
+                                            {advancePayments.length === 0 ? (
+                                                <div className="text-center py-8 text-slate-500">
+                                                    <DollarSign className="h-12 w-12 mx-auto mb-3 text-slate-300" />
+                                                    <p>لا توجد دفعات مقدمة متاحة لهذا العميل</p>
+                                                    <p className="text-xs mt-1">سيتم عرض الدفعات المقدمة المتاحة بعد اختيار العميل</p>
+                                                </div>
+                                            ) : (
+                                                <div className="border rounded-xl overflow-hidden">
+                                                    <table className="w-full text-sm">
+                                                        <thead className="bg-slate-50">
+                                                            <tr>
+                                                                <th className="px-4 py-2 text-start">المرجع</th>
+                                                                <th className="px-4 py-2 text-start">التاريخ</th>
+                                                                <th className="px-4 py-2 text-start">المبلغ</th>
+                                                                <th className="px-4 py-2 text-start">المخصص</th>
+                                                                <th className="px-4 py-2 text-center">الإجراء</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {advancePayments.map((payment) => (
+                                                                <tr key={payment.id} className="border-t">
+                                                                    <td className="px-4 py-2 font-mono text-xs">{payment.referenceNumber}</td>
+                                                                    <td className="px-4 py-2">{payment.paymentDate}</td>
+                                                                    <td className="px-4 py-2 font-medium">{formatCurrency(payment.amount)}</td>
+                                                                    <td className="px-4 py-2">
+                                                                        <Input
+                                                                            type="number"
+                                                                            min="0"
+                                                                            max={payment.amount}
+                                                                            value={payment.allocatedAmount}
+                                                                            onChange={(e) => {
+                                                                                const value = Math.min(parseFloat(e.target.value) || 0, payment.amount)
+                                                                                setAdvancePayments(prev =>
+                                                                                    prev.map(p =>
+                                                                                        p.id === payment.id ? { ...p, allocatedAmount: value } : p
+                                                                                    )
+                                                                                )
+                                                                            }}
+                                                                            className="w-28 rounded-lg h-8 text-sm"
+                                                                        />
+                                                                    </td>
+                                                                    <td className="px-4 py-2 text-center">
+                                                                        <Button
+                                                                            type="button"
+                                                                            variant="ghost"
+                                                                            size="sm"
+                                                                            onClick={() => {
+                                                                                setAdvancePayments(prev =>
+                                                                                    prev.map(p =>
+                                                                                        p.id === payment.id ? { ...p, allocatedAmount: payment.amount } : p
+                                                                                    )
+                                                                                )
+                                                                            }}
+                                                                            className="text-xs text-emerald-600 hover:text-emerald-700"
+                                                                        >
+                                                                            تطبيق الكل
+                                                                        </Button>
+                                                                    </td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                        <tfoot className="bg-emerald-50">
+                                                            <tr>
+                                                                <td colSpan={3} className="px-4 py-2 font-semibold text-emerald-800">
+                                                                    إجمالي المخصص
+                                                                </td>
+                                                                <td colSpan={2} className="px-4 py-2 font-bold text-emerald-700">
+                                                                    {formatCurrency(advancePayments.reduce((sum, p) => sum + p.allocatedAmount, 0))}
+                                                                </td>
+                                                            </tr>
+                                                        </tfoot>
+                                                    </table>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
 
                                 {/* ZATCA Compliance */}
                                 <AccordionItem value="zatca" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">

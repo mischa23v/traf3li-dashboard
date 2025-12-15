@@ -177,6 +177,17 @@ export function CreateExpenseView() {
         locationId: '',
         projectId: '',
         costCenterId: '',
+        // Approval Workflow (ERPNext parity)
+        expenseApproverId: '',
+        approvalStatus: 'pending' as 'pending' | 'approved' | 'rejected',
+        sanctionedAmount: '',  // Approved amount (may differ from claimed)
+        rejectionReason: '',
+        // Accounting (ERPNext parity)
+        payableAccount: '',
+        journalEntryRef: '',
+        isPaid: false,
+        modeOfPayment: '',
+        clearanceDate: '',
     })
 
     // Attachments state
@@ -310,6 +321,17 @@ export function CreateExpenseView() {
                 markupType: 'percentage',
                 markupValue: Number(formData.markup)
             }),
+            // Approval Workflow (ERPNext parity)
+            ...(formData.expenseApproverId && { expenseApproverId: formData.expenseApproverId }),
+            approvalStatus: formData.approvalStatus,
+            ...(formData.sanctionedAmount && { sanctionedAmount: Number(formData.sanctionedAmount) }),
+            ...(formData.rejectionReason && { rejectionReason: formData.rejectionReason }),
+            // Accounting (ERPNext parity)
+            ...(formData.payableAccount && { payableAccount: formData.payableAccount }),
+            ...(formData.journalEntryRef && { journalEntryRef: formData.journalEntryRef }),
+            isPaid: formData.isPaid,
+            ...(formData.isPaid && formData.modeOfPayment && { modeOfPayment: formData.modeOfPayment }),
+            ...(formData.isPaid && formData.clearanceDate && { clearanceDate: formData.clearanceDate }),
         }
 
         createExpenseMutation.mutate(expenseData, {
@@ -1161,6 +1183,192 @@ export function CreateExpenseView() {
                                                         </SelectContent>
                                                     </Select>
                                                 </div>
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+
+                                    {/* Approval Workflow (ERPNext parity) */}
+                                    <AccordionItem value="approval" className="border rounded-xl overflow-hidden">
+                                        <AccordionTrigger className="px-4 hover:no-underline hover:bg-slate-50">
+                                            <div className="flex items-center gap-2">
+                                                <UserCheck className="h-4 w-4 text-orange-500" aria-hidden="true" />
+                                                <span className="font-medium">سير الموافقات</span>
+                                                {formData.approvalStatus === 'approved' && (
+                                                    <Badge className="bg-green-100 text-green-700 ms-2">معتمد</Badge>
+                                                )}
+                                                {formData.approvalStatus === 'rejected' && (
+                                                    <Badge className="bg-red-100 text-red-700 ms-2">مرفوض</Badge>
+                                                )}
+                                            </div>
+                                        </AccordionTrigger>
+
+                                        <AccordionContent className="px-4 pb-4">
+                                            <div className="space-y-4">
+                                                <div className="p-4 bg-orange-50 border border-orange-200 rounded-xl">
+                                                    <div className="flex items-start gap-3">
+                                                        <Info className="h-5 w-5 text-orange-500 mt-0.5" aria-hidden="true" />
+                                                        <div>
+                                                            <p className="text-sm font-medium text-orange-800">سير عمل الموافقة</p>
+                                                            <p className="text-xs text-orange-600 mt-1">
+                                                                المصروفات تتطلب موافقة المسؤول المعتمد قبل الصرف
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <Label className="text-sm font-medium text-slate-700">المعتمد</Label>
+                                                    <Select value={formData.expenseApproverId} onValueChange={(value) => updateField('expenseApproverId', value)}>
+                                                        <SelectTrigger className="rounded-xl border-slate-200">
+                                                            <SelectValue placeholder="اختر المعتمد..." />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="manager1">أحمد المدير - مدير القسم</SelectItem>
+                                                            <SelectItem value="manager2">خالد العتيبي - المدير المالي</SelectItem>
+                                                            <SelectItem value="manager3">سارة الفهد - مدير العمليات</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <p className="text-xs text-slate-500">المسؤول عن اعتماد هذا المصروف</p>
+                                                </div>
+
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label className="text-sm font-medium text-slate-700">المبلغ المطالب به</Label>
+                                                        <div className="h-10 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 flex items-center">
+                                                            <span className="text-slate-700 font-medium">{formatCurrency(calculations.totalAmount)}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-sm font-medium text-slate-700">المبلغ المعتمد</Label>
+                                                        <Input
+                                                            type="number"
+                                                            step="0.01"
+                                                            value={formData.sanctionedAmount}
+                                                            onChange={(e) => updateField('sanctionedAmount', e.target.value)}
+                                                            placeholder={calculations.totalAmount.toString()}
+                                                            className="rounded-xl border-slate-200"
+                                                        />
+                                                        <p className="text-xs text-slate-500">قد يختلف عن المبلغ المطالب به</p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <Label className="text-sm font-medium text-slate-700">حالة الاعتماد</Label>
+                                                    <div className="flex gap-3">
+                                                        {[
+                                                            { value: 'pending', label: 'قيد المراجعة', icon: Clock, color: 'text-amber-600 bg-amber-50 border-amber-200' },
+                                                            { value: 'approved', label: 'معتمد', icon: CheckCircle, color: 'text-green-600 bg-green-50 border-green-200' },
+                                                            { value: 'rejected', label: 'مرفوض', icon: XCircle, color: 'text-red-600 bg-red-50 border-red-200' },
+                                                        ].map((status) => (
+                                                            <button
+                                                                key={status.value}
+                                                                type="button"
+                                                                onClick={() => updateField('approvalStatus', status.value)}
+                                                                className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${
+                                                                    formData.approvalStatus === status.value
+                                                                        ? status.color + ' font-medium'
+                                                                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                                                                }`}
+                                                            >
+                                                                <status.icon className="w-4 h-4" />
+                                                                {status.label}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                {formData.approvalStatus === 'rejected' && (
+                                                    <div className="space-y-2">
+                                                        <Label className="text-sm font-medium text-slate-700">سبب الرفض</Label>
+                                                        <Textarea
+                                                            value={formData.rejectionReason}
+                                                            onChange={(e) => updateField('rejectionReason', e.target.value)}
+                                                            placeholder="اكتب سبب رفض المصروف..."
+                                                            className="rounded-xl border-slate-200 min-h-[80px]"
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+
+                                    {/* Accounting (ERPNext parity) */}
+                                    <AccordionItem value="accounting" className="border rounded-xl overflow-hidden">
+                                        <AccordionTrigger className="px-4 hover:no-underline hover:bg-slate-50">
+                                            <div className="flex items-center gap-2">
+                                                <Calculator className="h-4 w-4 text-blue-500" aria-hidden="true" />
+                                                <span className="font-medium">المحاسبة والصرف</span>
+                                            </div>
+                                        </AccordionTrigger>
+
+                                        <AccordionContent className="px-4 pb-4">
+                                            <div className="space-y-4">
+                                                <div className="space-y-2">
+                                                    <Label className="text-sm font-medium text-slate-700">الحساب المستحق (Payable Account)</Label>
+                                                    <Select value={formData.payableAccount} onValueChange={(value) => updateField('payableAccount', value)}>
+                                                        <SelectTrigger className="rounded-xl border-slate-200">
+                                                            <SelectValue placeholder="اختر الحساب..." />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="2100">2100 - الذمم الدائنة</SelectItem>
+                                                            <SelectItem value="2110">2110 - مصروفات مستحقة الدفع</SelectItem>
+                                                            <SelectItem value="2120">2120 - ذمم الموظفين</SelectItem>
+                                                            <SelectItem value="2130">2130 - العهد المستحقة</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <p className="text-xs text-slate-500">الحساب الذي سيُقيد فيه المصروف كمستحق</p>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <Label className="text-sm font-medium text-slate-700">مرجع قيد اليومية</Label>
+                                                    <Input
+                                                        value={formData.journalEntryRef}
+                                                        onChange={(e) => updateField('journalEntryRef', e.target.value)}
+                                                        placeholder="JV-2024-0001"
+                                                        className="rounded-xl border-slate-200 font-mono"
+                                                        dir="ltr"
+                                                    />
+                                                    <p className="text-xs text-slate-500">رقم قيد اليومية المرتبط (يُنشأ تلقائياً)</p>
+                                                </div>
+
+                                                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                                                    <div>
+                                                        <Label className="font-medium">تم الدفع</Label>
+                                                        <p className="text-xs text-slate-500 mt-1">هل تم صرف المبلغ؟</p>
+                                                    </div>
+                                                    <Switch
+                                                        checked={formData.isPaid}
+                                                        onCheckedChange={(checked) => updateField('isPaid', checked)}
+                                                    />
+                                                </div>
+
+                                                {formData.isPaid && (
+                                                    <div className="grid grid-cols-2 gap-4 p-4 bg-green-50 border border-green-200 rounded-xl">
+                                                        <div className="space-y-2">
+                                                            <Label className="text-sm font-medium text-slate-700">طريقة الدفع</Label>
+                                                            <Select value={formData.modeOfPayment} onValueChange={(value) => updateField('modeOfPayment', value)}>
+                                                                <SelectTrigger className="rounded-xl border-slate-200 bg-white">
+                                                                    <SelectValue placeholder="اختر..." />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="bank_transfer">تحويل بنكي</SelectItem>
+                                                                    <SelectItem value="cash">نقداً</SelectItem>
+                                                                    <SelectItem value="check">شيك</SelectItem>
+                                                                    <SelectItem value="payroll">مع الراتب</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label className="text-sm font-medium text-slate-700">تاريخ الدفع</Label>
+                                                            <Input
+                                                                type="date"
+                                                                value={formData.clearanceDate}
+                                                                onChange={(e) => updateField('clearanceDate', e.target.value)}
+                                                                className="rounded-xl border-slate-200 bg-white"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
                                         </AccordionContent>
                                     </AccordionItem>
