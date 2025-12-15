@@ -495,7 +495,7 @@ export default function JournalEntriesDashboard() {
                   rows={4}
                 />
               </div>
-            </DialogContent>
+            </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsVoidDialogOpen(false)}>
                 {t('common.cancel', 'Cancel')}

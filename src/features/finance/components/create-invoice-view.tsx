@@ -239,6 +239,12 @@ export function CreateInvoiceView() {
     // Send options
     const [sendAfterCreate, setSendAfterCreate] = useState(false)
 
+    // Credit Note / Return fields (ERPNext parity)
+    const [isReturn, setIsReturn] = useState(false)
+    const [returnAgainst, setReturnAgainst] = useState('')  // Original invoice ID
+    const [isDebitNote, setIsDebitNote] = useState(false)   // Rate adjustment entry
+    const [returnReason, setReturnReason] = useState('')
+
     // Lawyers list
     const lawyers = useMemo(() => {
         if (!lawyersData) return []
@@ -498,6 +504,11 @@ export function CreateInvoiceView() {
             paymentInstructions,
             enableOnlinePayment,
             ...(requiresApproval && { requiresApproval }),
+            // Credit Note / Return (ERPNext parity)
+            isReturn,
+            ...(isReturn && returnAgainst && { returnAgainst }),
+            ...(isDebitNote && { isDebitNote }),
+            ...(returnReason && { returnReason }),
         }
 
         createInvoiceMutation.mutate(invoiceData, {
@@ -1519,6 +1530,92 @@ export function CreateInvoiceView() {
                                                         </tfoot>
                                                     </table>
                                                 </div>
+                                            )}
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+
+                                {/* Credit Note / Return (ERPNext parity) */}
+                                <AccordionItem value="credit-note" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
+                                    <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
+                                        <div className="flex items-center gap-2">
+                                            <Receipt className="h-5 w-5 text-red-500" />
+                                            <span className="font-bold text-slate-800">إشعار دائن / مرتجع</span>
+                                            {isReturn && (
+                                                <Badge className="bg-red-100 text-red-700 rounded-full">إشعار دائن</Badge>
+                                            )}
+                                        </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="px-6 pb-6">
+                                        <Alert className="mb-4 rounded-xl border-red-200 bg-red-50">
+                                            <AlertCircle className="h-4 w-4 text-red-600" aria-hidden="true" />
+                                            <AlertDescription className="text-red-700">
+                                                استخدم هذا القسم لإنشاء إشعار دائن (Credit Note) مقابل فاتورة سابقة
+                                            </AlertDescription>
+                                        </Alert>
+
+                                        <div className="space-y-4">
+                                            {/* Is Return Toggle */}
+                                            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                                                <div>
+                                                    <Label className="font-semibold">إشعار دائن (Credit Note)</Label>
+                                                    <p className="text-xs text-slate-500 mt-1">هل هذه الفاتورة إشعار دائن لفاتورة سابقة؟</p>
+                                                </div>
+                                                <Switch
+                                                    checked={isReturn}
+                                                    onCheckedChange={setIsReturn}
+                                                />
+                                            </div>
+
+                                            {isReturn && (
+                                                <>
+                                                    {/* Original Invoice Reference */}
+                                                    <div className="space-y-2">
+                                                        <Label className="text-sm font-medium text-slate-700">
+                                                            الفاتورة الأصلية <span className="text-red-500">*</span>
+                                                        </Label>
+                                                        <Input
+                                                            value={returnAgainst}
+                                                            onChange={(e) => setReturnAgainst(e.target.value)}
+                                                            placeholder="رقم الفاتورة الأصلية (INV-2024XX-XXXX)"
+                                                            className="rounded-xl border-slate-200"
+                                                            dir="ltr"
+                                                        />
+                                                        <p className="text-xs text-slate-500">أدخل رقم الفاتورة التي تم إرجاعها أو تعديلها</p>
+                                                    </div>
+
+                                                    {/* Is Debit Note (Rate Adjustment) */}
+                                                    <div className="flex items-center justify-between p-4 bg-amber-50 rounded-xl border border-amber-200">
+                                                        <div>
+                                                            <Label className="font-semibold text-amber-800">تعديل سعر (Debit Note)</Label>
+                                                            <p className="text-xs text-amber-600 mt-1">هل هذا تعديل على سعر الفاتورة الأصلية؟</p>
+                                                        </div>
+                                                        <Switch
+                                                            checked={isDebitNote}
+                                                            onCheckedChange={setIsDebitNote}
+                                                        />
+                                                    </div>
+
+                                                    {/* Return Reason */}
+                                                    <div className="space-y-2">
+                                                        <Label className="text-sm font-medium text-slate-700">سبب المرتجع / التعديل</Label>
+                                                        <Textarea
+                                                            value={returnReason}
+                                                            onChange={(e) => setReturnReason(e.target.value)}
+                                                            placeholder="اشرح سبب إصدار إشعار الدائن..."
+                                                            className="rounded-xl border-slate-200 min-h-[80px]"
+                                                        />
+                                                    </div>
+
+                                                    {/* Info about Credit Note amounts */}
+                                                    <Alert className="rounded-xl border-blue-200 bg-blue-50">
+                                                        <AlertCircle className="h-4 w-4 text-blue-600" aria-hidden="true" />
+                                                        <AlertDescription className="text-blue-700 text-sm">
+                                                            <strong>ملاحظة:</strong> المبالغ في إشعار الدائن ستكون بالسالب وستخصم من رصيد العميل.
+                                                            تأكد من إدخال المبالغ كقيم موجبة وسيتم عكسها تلقائياً.
+                                                        </AlertDescription>
+                                                    </Alert>
+                                                </>
                                             )}
                                         </div>
                                     </AccordionContent>
