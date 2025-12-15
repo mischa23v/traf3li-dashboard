@@ -357,6 +357,12 @@ export function useSidebarData(): SidebarData {
               url: '/dashboard/finance/fiscal-periods',
               module: 'payments',
             },
+            // Full Reports
+            {
+              title: 'sidebar.nav.fullReports',
+              url: '/dashboard/finance/full-reports',
+              module: 'reports',
+            },
           ],
         },
       ],
