@@ -71,6 +71,80 @@ export interface InvoiceFilters {
 }
 
 /**
+ * ==================== CREDIT NOTES ====================
+ */
+
+export interface CreditNote {
+  _id: string
+  creditNoteNumber: string
+  originalInvoiceId: string | Invoice
+  caseId?: string
+  lawyerId: string | { firstName: string; lastName: string; name?: string }
+  clientId: string | { firstName: string; lastName: string; name?: string }
+  items: CreditNoteItem[]
+  subtotal: number
+  vatRate: number
+  vatAmount: number
+  totalAmount: number
+  creditType: 'full' | 'partial'
+  reason: string
+  reasonCategory: 'error' | 'discount' | 'return' | 'cancellation' | 'adjustment' | 'other'
+  status: 'draft' | 'issued' | 'applied' | 'void'
+  issueDate: string
+  appliedDate?: string
+  notes?: string
+  pdfUrl?: string
+  zatcaStatus?: 'pending' | 'submitted' | 'approved' | 'rejected'
+  zatcaSubmissionDate?: string
+  zatcaUUID?: string
+  history?: CreditNoteHistory[]
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreditNoteItem {
+  originalItemId?: string
+  description: string
+  quantity: number
+  unitPrice: number
+  total: number
+}
+
+export interface CreditNoteHistory {
+  action: string
+  performedBy: string
+  timestamp: string
+  details?: any
+}
+
+export interface CreateCreditNoteData {
+  originalInvoiceId: string
+  clientId: string
+  caseId?: string
+  items: CreditNoteItem[]
+  subtotal: number
+  vatRate: number
+  vatAmount: number
+  totalAmount: number
+  creditType: 'full' | 'partial'
+  reason: string
+  reasonCategory: 'error' | 'discount' | 'return' | 'cancellation' | 'adjustment' | 'other'
+  issueDate?: string
+  notes?: string
+}
+
+export interface CreditNoteFilters {
+  status?: string
+  clientId?: string
+  originalInvoiceId?: string
+  startDate?: string
+  endDate?: string
+  reasonCategory?: string
+  page?: number
+  limit?: number
+}
+
+/**
  * ==================== EXPENSES ====================
  */
 
@@ -741,6 +815,183 @@ const financeService = {
   exportInvoicePdf: async (id: string): Promise<Blob> => {
     try {
       const response = await apiClient.get(`/invoices/${id}/pdf`, {
+        responseType: 'blob'
+      })
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ==================== CREDIT NOTES ====================
+
+  /**
+   * Get all credit notes
+   * GET /api/credit-notes
+   */
+  getCreditNotes: async (filters?: CreditNoteFilters): Promise<{ creditNotes: CreditNote[]; total: number }> => {
+    try {
+      const response = await apiClient.get('/credit-notes', { params: filters })
+      return {
+        creditNotes: response.data.creditNotes || response.data.data || [],
+        total: response.data.total || 0,
+      }
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get single credit note
+   * GET /api/credit-notes/:id
+   */
+  getCreditNote: async (id: string): Promise<CreditNote> => {
+    try {
+      const response = await apiClient.get(`/credit-notes/${id}`)
+      return response.data.creditNote || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Create credit note
+   * POST /api/credit-notes
+   */
+  createCreditNote: async (data: CreateCreditNoteData): Promise<CreditNote> => {
+    try {
+      const response = await apiClient.post('/credit-notes', data)
+      return response.data.creditNote || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update credit note
+   * PATCH /api/credit-notes/:id
+   */
+  updateCreditNote: async (id: string, data: Partial<CreateCreditNoteData>): Promise<CreditNote> => {
+    try {
+      const response = await apiClient.patch(`/credit-notes/${id}`, data)
+      return response.data.creditNote || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Delete credit note
+   * DELETE /api/credit-notes/:id
+   */
+  deleteCreditNote: async (id: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/credit-notes/${id}`)
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Issue credit note (change status from draft to issued)
+   * POST /api/credit-notes/:id/issue
+   */
+  issueCreditNote: async (id: string): Promise<CreditNote> => {
+    try {
+      const response = await apiClient.post(`/credit-notes/${id}/issue`)
+      return response.data.creditNote || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Apply credit note to invoice
+   * POST /api/credit-notes/:id/apply
+   */
+  applyCreditNote: async (id: string): Promise<CreditNote> => {
+    try {
+      const response = await apiClient.post(`/credit-notes/${id}/apply`)
+      return response.data.creditNote || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Void credit note
+   * POST /api/credit-notes/:id/void
+   */
+  voidCreditNote: async (id: string, reason?: string): Promise<CreditNote> => {
+    try {
+      const response = await apiClient.post(`/credit-notes/${id}/void`, { reason })
+      return response.data.creditNote || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get credit notes for an invoice
+   * GET /api/credit-notes/invoice/:invoiceId
+   */
+  getCreditNotesForInvoice: async (invoiceId: string): Promise<CreditNote[]> => {
+    try {
+      const response = await apiClient.get(`/credit-notes/invoice/${invoiceId}`)
+      return response.data.creditNotes || response.data.data || []
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Submit credit note to ZATCA
+   * POST /api/credit-notes/:id/zatca/submit
+   */
+  submitCreditNoteToZATCA: async (id: string): Promise<any> => {
+    try {
+      const response = await apiClient.post(`/credit-notes/${id}/zatca/submit`)
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get credit note ZATCA status
+   * GET /api/credit-notes/:id/zatca/status
+   */
+  getCreditNoteZATCAStatus: async (id: string): Promise<any> => {
+    try {
+      const response = await apiClient.get(`/credit-notes/${id}/zatca/status`)
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Export credit note to PDF
+   * GET /api/credit-notes/:id/pdf
+   */
+  exportCreditNotePdf: async (id: string): Promise<Blob> => {
+    try {
+      const response = await apiClient.get(`/credit-notes/${id}/pdf`, {
+        responseType: 'blob'
+      })
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Export credit note to XML (UBL 2.1 format for ZATCA)
+   * GET /api/credit-notes/:id/xml
+   */
+  exportCreditNoteXml: async (id: string): Promise<Blob> => {
+    try {
+      const response = await apiClient.get(`/credit-notes/${id}/xml`, {
         responseType: 'blob'
       })
       return response.data
@@ -1487,6 +1738,65 @@ const financeService = {
     }
   },
 
+  /**
+   * Generate payment receipt
+   * POST /api/payments/:id/generate-receipt
+   */
+  generateReceipt: async (id: string, options?: { language?: 'ar' | 'en' | 'both' }): Promise<{ receipt: any }> => {
+    try {
+      const response = await apiClient.post(`/payments/${id}/generate-receipt`, options)
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Download payment receipt as PDF
+   * GET /api/payments/:id/receipt/download
+   */
+  downloadReceipt: async (id: string, language: 'ar' | 'en' = 'ar'): Promise<Blob> => {
+    try {
+      const response = await apiClient.get(`/payments/${id}/receipt/download`, {
+        params: { language },
+        responseType: 'blob'
+      })
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get receipt data (for preview)
+   * GET /api/payments/:id/receipt
+   */
+  getReceipt: async (id: string): Promise<{ receipt: any }> => {
+    try {
+      const response = await apiClient.get(`/payments/${id}/receipt`)
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Send receipt via email
+   * POST /api/payments/:id/receipt/send
+   */
+  sendReceipt: async (id: string, data: {
+    email: string
+    language?: 'ar' | 'en' | 'both'
+    message?: string
+  }): Promise<{ success: boolean }> => {
+    try {
+      const response = await apiClient.post(`/payments/${id}/receipt/send`, data)
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
   // ==================== TRANSACTIONS ====================
 
   /**
@@ -1798,6 +2108,167 @@ const financeService = {
     try {
       const response = await apiClient.get('/time-tracking/weekly', { params: { weekStartDate } })
       return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ==================== INVOICE APPROVAL WORKFLOW ====================
+
+  /**
+   * Get invoices pending approval
+   * GET /api/invoices/pending-approval
+   */
+  getInvoicesPendingApproval: async (filters?: {
+    status?: 'pending' | 'approved' | 'rejected'
+    clientId?: string
+    minAmount?: number
+    maxAmount?: number
+    startDate?: string
+    endDate?: string
+    approverId?: string
+    level?: number
+  }): Promise<{ invoices: Invoice[]; total: number }> => {
+    try {
+      const response = await apiClient.get('/invoices/pending-approval', { params: filters })
+      return {
+        invoices: response.data.invoices || response.data.data || [],
+        total: response.data.total || 0,
+      }
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Submit invoice for approval
+   * POST /api/invoices/:id/submit-for-approval
+   */
+  submitInvoiceForApproval: async (invoiceId: string, data?: { comments?: string }): Promise<Invoice> => {
+    try {
+      const response = await apiClient.post(`/invoices/${invoiceId}/submit-for-approval`, data)
+      return response.data.invoice || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Approve invoice
+   * POST /api/invoices/:id/approve
+   */
+  approveInvoice: async (invoiceId: string, data: {
+    comments?: string
+    approverLevel: number
+  }): Promise<Invoice> => {
+    try {
+      const response = await apiClient.post(`/invoices/${invoiceId}/approve`, data)
+      return response.data.invoice || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Reject invoice
+   * POST /api/invoices/:id/reject
+   */
+  rejectInvoice: async (invoiceId: string, data: {
+    reason: string
+    comments?: string
+  }): Promise<Invoice> => {
+    try {
+      const response = await apiClient.post(`/invoices/${invoiceId}/reject`, data)
+      return response.data.invoice || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Request changes to invoice
+   * POST /api/invoices/:id/request-changes
+   */
+  requestInvoiceChanges: async (invoiceId: string, data: {
+    requestedChanges: string
+    comments?: string
+  }): Promise<Invoice> => {
+    try {
+      const response = await apiClient.post(`/invoices/${invoiceId}/request-changes`, data)
+      return response.data.invoice || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Escalate invoice approval to next level
+   * POST /api/invoices/:id/escalate
+   */
+  escalateInvoiceApproval: async (invoiceId: string, data: {
+    reason: string
+    comments?: string
+  }): Promise<Invoice> => {
+    try {
+      const response = await apiClient.post(`/invoices/${invoiceId}/escalate`, data)
+      return response.data.invoice || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Bulk approve invoices
+   * POST /api/invoices/bulk-approve
+   */
+  bulkApproveInvoices: async (data: {
+    invoiceIds: string[]
+    comments?: string
+  }): Promise<{ approved: number; failed: number; results: any[] }> => {
+    try {
+      const response = await apiClient.post('/invoices/bulk-approve', data)
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get approval workflow configuration
+   * GET /api/invoices/approval-config
+   */
+  getApprovalWorkflowConfig: async (): Promise<any> => {
+    try {
+      const response = await apiClient.get('/invoices/approval-config')
+      return response.data.config || response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update approval workflow configuration
+   * PUT /api/invoices/approval-config
+   */
+  updateApprovalWorkflowConfig: async (config: any): Promise<any> => {
+    try {
+      const response = await apiClient.put('/invoices/approval-config', config)
+      return response.data.config || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get pending approvals count (for notification badge)
+   * GET /api/invoices/pending-approvals-count
+   */
+  getPendingApprovalsCount: async (): Promise<{ count: number }> => {
+    try {
+      const response = await apiClient.get('/invoices/pending-approvals-count')
+      return {
+        count: response.data.count || 0
+      }
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
