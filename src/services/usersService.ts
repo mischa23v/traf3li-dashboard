@@ -70,6 +70,8 @@ export interface TeamMember {
 export interface UpdateUserProfileData {
   firstName?: string
   lastName?: string
+  firstNameAr?: string
+  lastNameAr?: string
   phone?: string
   country?: string
   description?: string
