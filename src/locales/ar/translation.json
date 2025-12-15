@@ -112,6 +112,11 @@
       "emailMarketing": "التسويق عبر البريد",
       "leadScoring": "تقييم العملاء المحتملين",
       "whatsapp": "تكامل واتساب",
+      "appointments": "المواعيد",
+      "territories": "المناطق الجغرافية",
+      "salesPersons": "فريق المبيعات",
+      "crmReports": "تقارير CRM",
+      "crmSetup": "معالج إعداد CRM",
       "gantt": "مخطط جانت",
       "libraryGroup": "المكتبة",
       "library": "المكتبة",
@@ -130,7 +135,8 @@
       "apps": "التطبيقات",
       "importExport": "استيراد/تصدير",
       "helpCenter": "مركز المساعدة",
-      "pdfTemplates": "قوالب PDF"
+      "pdfTemplates": "قوالب PDF",
+      "crmSettings": "إعدادات CRM"
     },
     "general": "عام",
     "dashboard": "لوحة التحكم",

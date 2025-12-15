@@ -112,6 +112,11 @@
       "emailMarketing": "Email Marketing",
       "leadScoring": "Lead Scoring",
       "whatsapp": "WhatsApp Integration",
+      "appointments": "Appointments",
+      "territories": "Territories",
+      "salesPersons": "Sales Team",
+      "crmReports": "CRM Reports",
+      "crmSetup": "CRM Setup Wizard",
       "gantt": "Gantt Chart",
       "libraryGroup": "Library",
       "library": "Library",
@@ -130,7 +135,8 @@
       "apps": "Applications",
       "importExport": "Import/Export",
       "helpCenter": "Help Center",
-      "pdfTemplates": "PDF Templates"
+      "pdfTemplates": "PDF Templates",
+      "crmSettings": "CRM Settings"
     },
     "general": "General",
     "dashboard": "Dashboard",

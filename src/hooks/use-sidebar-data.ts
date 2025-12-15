@@ -247,6 +247,36 @@ export function useSidebarData(): SidebarData {
               url: '/dashboard/crm/whatsapp',
               module: 'leads',
             },
+            // Appointments
+            {
+              title: 'sidebar.nav.appointments',
+              url: '/dashboard/crm/appointments',
+              module: 'leads',
+            },
+            // Territories
+            {
+              title: 'sidebar.nav.territories',
+              url: '/dashboard/crm/territories',
+              module: 'leads',
+            },
+            // Sales Persons
+            {
+              title: 'sidebar.nav.salesPersons',
+              url: '/dashboard/crm/sales-persons',
+              module: 'leads',
+            },
+            // CRM Reports
+            {
+              title: 'sidebar.nav.crmReports',
+              url: '/dashboard/crm/crm-reports',
+              module: 'leads',
+            },
+            // CRM Setup Wizard
+            {
+              title: 'sidebar.nav.crmSetup',
+              url: '/dashboard/crm/setup-wizard',
+              module: 'leads',
+            },
           ],
         },
       ],
@@ -594,6 +624,12 @@ export function useSidebarData(): SidebarData {
             {
               title: 'sidebar.nav.helpCenter',
               url: '/dashboard/help',
+            },
+            // CRM Settings
+            {
+              title: 'sidebar.nav.crmSettings',
+              url: '/dashboard/settings/crm',
+              module: 'leads',
             },
           ],
         },
