@@ -37,6 +37,8 @@ This plan outlines the comprehensive enhancement of the Traf3li CRM module to ac
 
 ## New CRM Flow Architecture
 
+### Complete Flow: Lead → Case → Quotation/Contract → Sales Order → Client
+
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                              LEAD PIPELINE                                   │
@@ -47,10 +49,10 @@ This plan outlines the comprehensive enhancement of the Traf3li CRM module to ac
      │            │             │                  │                 │
      │            │             │                  ▼                 │
      │            │             │         ┌───────────────┐          │
-     │            │             └────────►│  CREATE CASE  │          │
-     │            │                       └───────┬───────┘          │
-     │            │                               │                  │
-     ▼            ▼                               ▼                  ▼
+     │            │             └────────►│  CREATE CASE  │◄─────────┘
+     │            │                       └───────┬───────┘
+     │            │                               │
+     ▼            ▼                               ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                              CASE PIPELINE                                   │
 ├──────────┬────────────┬───────────┬────────────┬────────────┬──────────────┤
@@ -59,23 +61,40 @@ This plan outlines the comprehensive enhancement of the Traf3li CRM module to ac
 └────┬─────┴──────┬─────┴─────┬─────┴──────┬─────┴──────┬─────┴───────┬──────┘
      │            │           │            │            │             │
      │            │           │            ▼            │             │
-     │            │           │    ┌──────────────┐     │             │
-     │            │           └───►│  QUOTATION   │     │             │
-     │            │                │  (Existing)  │     │             │
-     │            │                └──────┬───────┘     │             │
+     │            │           │   ┌────────────────┐    │             │
+     │            │           └──►│  QUOTATION/    │    │             │
+     │            │               │  CONTRACT      │    │             │
+     │            │               └───────┬────────┘    │             │
      │            │                       │             │             │
-     │            │                       ▼             │             ▼
-     │            │                Sent → Accepted      │      ┌────────────┐
-     │            │                       │             └─────►│   CLIENT   │
-     │            │                       └────────────────────│  + CASE    │
-     │            │                                            └────────────┘
-     │            │                                                   │
-     │            │                                                   ▼
+     │            │                       ▼             │             │
+     │            │               ┌────────────────┐    │             │
+     │            │               │  SALES ORDER   │    │             │
+     │            │               │ (Finance Link) │    │             │
+     │            │               └───────┬────────┘    │             │
+     │            │                       │             │             ▼
+     │            │                       ▼             │      ┌────────────┐
+     │            │                   Accepted          └─────►│   CLIENT   │
+     │            │                       │                    │ (Created)  │
+     │            │                       └───────────────────►│ + CASE     │
+     │            │                                            │ + LEAD     │
+     │            │                                            └─────┬──────┘
+     │            │                                                  │
+     │            │                                                  ▼
      │            │                                            ┌────────────┐
      │            │                                            │  INVOICE   │
-     │            │                                            │ (Existing) │
+     │            │                                            │ (Finance)  │
      │            │                                            └────────────┘
 ```
+
+### Key Conversion Points
+
+1. **Lead → Case**: When consultation is done, create case (opportunity)
+2. **Case → Quotation/Contract**: When qualified, send proposal
+3. **Quotation → Sales Order**: When accepted, create sales order in finance
+4. **Sales Order → Client**: When processed, create client record linked to:
+   - Original Lead (person record)
+   - Case (matter record)
+   - All financial records
 
 ---
 
@@ -432,83 +451,220 @@ interface CRMSettings {
   _id: string
   officeId: string
 
-  // Lead Settings
+  // ═══════════════════════════════════════════════════════════════════════════
+  // LEAD SETTINGS (ERPNext: CRM Settings > Lead Settings)
+  // ═══════════════════════════════════════════════════════════════════════════
   leadSettings: {
-    allowDuplicateEmails: boolean
-    autoCreateContact: boolean
+    // Allow Lead Duplication - Permit duplicate emails/phones
+    allowDuplicateEmails: boolean       // ✅ ERPNext: Allow Lead Duplication
+    allowDuplicatePhones: boolean
+
+    // Auto Creation of Contact - Create contact from lead automatically
+    autoCreateContact: boolean          // ✅ ERPNext: Auto Creation of Contact
+
+    // Default assignments
     defaultLeadSource?: string
     defaultAssignee?: string
+
+    // Lead scoring
     leadScoringEnabled: boolean
+
+    // Auto-assignment rules
     autoAssignmentEnabled: boolean
     autoAssignmentRule?: 'round_robin' | 'load_balance' | 'territory'
+
+    // First response tracking
+    trackFirstResponseTime: boolean
   }
 
-  // Case/Opportunity Settings
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CASE/OPPORTUNITY SETTINGS (ERPNext: CRM Settings > Opportunity Settings)
+  // ═══════════════════════════════════════════════════════════════════════════
   caseSettings: {
-    autoCloseAfterDays: number          // Auto-close stale cases
+    // Close Opportunity After Days - Auto-close stale cases
+    autoCloseAfterDays: number          // ✅ ERPNext: Close Opportunity After Days
+    autoCloseEnabled: boolean
+
+    // Conflict check requirements
     requireConflictCheck: boolean
-    conflictCheckBeforeStage?: string   // Stage ID
+    conflictCheckBeforeStage?: string
+
+    // Default pipeline settings
     defaultPipeline?: string
     defaultSalesStage?: string
+
+    // Auto-create quote when qualified
+    autoCreateQuoteOnQualified: boolean
   }
 
-  // Quote Settings
+  // ═══════════════════════════════════════════════════════════════════════════
+  // QUOTE/PROPOSAL SETTINGS (ERPNext: CRM Settings > Quotation Settings)
+  // ═══════════════════════════════════════════════════════════════════════════
   quoteSettings: {
-    defaultValidDays: number
+    // Default Quotation Valid Till - Default validity period
+    defaultValidDays: number            // ✅ ERPNext: Default Quotation Valid Till
+
+    // Reminders
     autoSendReminder: boolean
     reminderDaysBefore: number
+
+    // Approval workflow
     requireApproval: boolean
-    approvalThreshold?: number
+    approvalThreshold?: number          // Amount above which approval needed
+    approvers?: string[]                // User IDs who can approve
   }
 
-  // Communication Settings
+  // ═══════════════════════════════════════════════════════════════════════════
+  // COMMUNICATION SETTINGS (ERPNext: CRM Settings > Communication)
+  // ═══════════════════════════════════════════════════════════════════════════
   communicationSettings: {
-    carryForwardCommunication: boolean  // Copy emails across pipeline
-    updateTimestampOnCommunication: boolean
-    autoLogEmails: boolean
-    autoLogCalls: boolean
+    // Carry Forward Communication - Copy emails across pipeline stages
+    carryForwardCommunication: boolean  // ✅ ERPNext: Carry Forward Communication
+
+    // Update Timestamp on Communication - Track activity timestamps
+    updateTimestampOnCommunication: boolean // ✅ ERPNext: Update Timestamp on Communication
+
+    // Auto-logging
+    autoLogEmails: boolean              // Auto-log incoming/outgoing emails
+    autoLogCalls: boolean               // Auto-log phone calls
+    autoLogWhatsApp: boolean            // Auto-log WhatsApp messages
+
+    // Communication templates
+    defaultEmailTemplateId?: string
+    defaultSMSTemplateId?: string
   }
 
-  // Appointment Settings
+  // ═══════════════════════════════════════════════════════════════════════════
+  // APPOINTMENT SETTINGS (ERPNext: CRM Settings > Appointment Booking)
+  // ═══════════════════════════════════════════════════════════════════════════
   appointmentSettings: {
-    enabled: boolean
-    defaultDuration: number             // Minutes
-    advanceBookingDays: number
-    bufferBetweenAppointments: number   // Minutes
+    // Enable Scheduling - Toggle appointment booking
+    enabled: boolean                    // ✅ ERPNext: Enable Scheduling
+
+    // Appointment Duration - Default slot length in minutes
+    defaultDuration: number             // ✅ ERPNext: Appointment Duration (15/30/45/60)
+    allowedDurations: number[]          // [15, 30, 45, 60]
+
+    // Advance Booking Days - How far ahead to book
+    advanceBookingDays: number          // ✅ ERPNext: Advance Booking Days
+    minAdvanceBookingHours: number      // Minimum hours before appointment
+
+    // Agent List - Available staff for appointments
+    agentList: string[]                 // ✅ ERPNext: Agent List (User IDs)
+
+    // Holiday List - Block unavailable dates
+    holidayListId?: string              // ✅ ERPNext: Holiday List
+
+    // Buffer between appointments
+    bufferBetweenAppointments: number   // Minutes between slots
+
+    // Working hours per day
     workingHours: {
-      [day: string]: { start: string, end: string }[]
+      sunday: { enabled: boolean, start: string, end: string }
+      monday: { enabled: boolean, start: string, end: string }
+      tuesday: { enabled: boolean, start: string, end: string }
+      wednesday: { enabled: boolean, start: string, end: string }
+      thursday: { enabled: boolean, start: string, end: string }
+      friday: { enabled: boolean, start: string, end: string }
+      saturday: { enabled: boolean, start: string, end: string }
     }
-    holidayListId?: string
+
+    // Reminders
     sendReminders: boolean
-    reminderHoursBefore: number
+    reminderHoursBefore: number[]       // [24, 1] = 24hrs and 1hr before
+
+    // Self-service booking
+    publicBookingEnabled: boolean       // Allow public booking page
+    publicBookingUrl?: string
+    requirePhoneVerification: boolean
   }
 
-  // Naming Settings
+  // ═══════════════════════════════════════════════════════════════════════════
+  // NAMING/NUMBERING SETTINGS (ERPNext: CRM Settings > Naming)
+  // ═══════════════════════════════════════════════════════════════════════════
   namingSettings: {
+    // Campaign Naming By - Auto-name campaigns
+    campaignNamingBy: 'name' | 'series' // ✅ ERPNext: Campaign Naming By
+
+    // Prefixes for auto-numbering
     leadPrefix: string                  // e.g., "LEAD-"
     casePrefix: string                  // e.g., "CASE-"
     quotePrefix: string                 // e.g., "QT-"
-    campaignNamingBy: 'name' | 'series'
+    contractPrefix: string              // e.g., "CTR-"
+    appointmentPrefix: string           // e.g., "APT-"
+
+    // Number format
+    numberFormat: 'YYYY-####' | 'YYMM-####' | '####'
+    resetNumberingYearly: boolean
   }
 
-  // Territory Settings
+  // ═══════════════════════════════════════════════════════════════════════════
+  // TERRITORY SETTINGS
+  // ═══════════════════════════════════════════════════════════════════════════
   territorySettings: {
     enabled: boolean
     defaultTerritory?: string
     autoAssignByTerritory: boolean
+    requireTerritoryOnLead: boolean
+    requireTerritoryOnCase: boolean
   }
 
-  // Sales Person Settings
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SALES PERSON SETTINGS
+  // ═══════════════════════════════════════════════════════════════════════════
   salesPersonSettings: {
     hierarchyEnabled: boolean
     commissionTrackingEnabled: boolean
     targetTrackingEnabled: boolean
+    requireSalesPersonOnCase: boolean
+    defaultCommissionRate: number       // Default percentage
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CONVERSION SETTINGS
+  // ═══════════════════════════════════════════════════════════════════════════
+  conversionSettings: {
+    // Lead → Case conversion
+    autoCreateCaseOnConsultation: boolean
+    requireBANTBeforeCase: boolean
+
+    // Case → Quote conversion
+    autoCreateQuoteOnQualified: boolean
+
+    // Quote → Sales Order conversion
+    autoCreateSalesOrderOnAccept: boolean
+    linkSalesOrderToFinance: boolean    // Link to Finance module
+
+    // Sales Order → Client conversion
+    autoCreateClientOnSalesOrder: boolean
+    clientCreationTrigger: 'sales_order' | 'payment_received' | 'manual'
+
+    // Data to copy during conversion
+    copyNotesToCase: boolean
+    copyActivityHistory: boolean
+    copyDocuments: boolean
   }
 
   createdAt: Date
   updatedAt: Date
 }
 ```
+
+### 3.2 CRM Settings UI Sections
+
+The CRM Settings page should have these tabs/sections:
+
+| Section | Settings Included | Icon |
+|---------|------------------|------|
+| **Lead Settings** | Duplication, Auto-contact, Assignment | Users |
+| **Case/Opportunity** | Auto-close, Conflict check, Pipeline defaults | Briefcase |
+| **Quotation** | Validity, Reminders, Approval | FileText |
+| **Communication** | Carry forward, Timestamps, Auto-logging | Mail |
+| **Appointments** | Scheduling, Duration, Working hours | Calendar |
+| **Naming** | Prefixes, Numbering format | Hash |
+| **Territory** | Enable, Defaults, Auto-assign | MapPin |
+| **Sales Team** | Hierarchy, Commission, Targets | UserCheck |
+| **Conversion** | Auto-create rules, Data copying | ArrowRight |
 
 ### 3.2 CRM Settings Page
 
@@ -530,7 +686,19 @@ Structure (following finance-settings pattern):
 
 ## Phase 4: CRM Setup Wizard
 
-### 4.1 Wizard Structure
+### 4.1 Overview
+
+Following ERPNext's modular onboarding system, the CRM Setup Wizard guides users through a complete CRM configuration with these onboarding steps:
+
+**ERPNext CRM Onboarding Steps (Reference):**
+1. Create Lead Source - Set up where leads come from
+2. Create Sales Stage - Define pipeline stages
+3. Create Territory - Set up geographical regions
+4. Create Customer Group - Segment customers
+5. Create First Lead - Guided lead creation
+6. Create First Opportunity - Convert lead to case
+
+### 4.2 Wizard Structure
 
 **New Route:** `src/routes/_authenticated/dashboard.crm.setup-wizard.tsx`
 
@@ -538,190 +706,564 @@ Structure (following finance-settings pattern):
 
 ```typescript
 interface CRMSetupWizardData {
-  // Step 1: Basic Configuration
+  // Step 1: Welcome & Basic Configuration
   crmEnabled: boolean
   industry?: string
+  companySize?: '1-10' | '11-50' | '51-200' | '201-500' | '500+'
 
-  // Step 2: Lead Sources
+  // Step 2: Lead Sources (ERPNext: Create Lead Source)
   leadSources: Array<{
     name: string
     nameAr: string
+    utmSource?: string
+    utmMedium?: string
+    enabled: boolean
   }>
 
-  // Step 3: Sales Stages
+  // Step 3: Sales Stages (ERPNext: Create Sales Stage)
   salesStages: Array<{
     name: string
     nameAr: string
+    order: number
     probability: number
     color: string
+    type: 'open' | 'won' | 'lost'
+    requiresConflictCheck?: boolean
+    requiresQualification?: boolean
   }>
 
   // Step 4: Lost Reasons
   lostReasons: Array<{
     reason: string
     reasonAr: string
-    category: string
+    category: 'price' | 'competitor' | 'timing' | 'scope' | 'relationship' | 'internal' | 'other'
   }>
 
-  // Step 5: Territory Setup
+  // Step 5: Territory Setup (ERPNext: Create Territory)
   territoryEnabled: boolean
   territories: Array<{
     name: string
     nameAr: string
     parentId?: string
+    isGroup: boolean
+    level: number
   }>
 
-  // Step 6: Sales Team
+  // Step 6: Customer Groups (ERPNext: Create Customer Group)
+  customerGroups: Array<{
+    name: string
+    nameAr: string
+    parentId?: string
+  }>
+
+  // Step 7: Sales Team
   salesTeamEnabled: boolean
   salesPersons: Array<{
     name: string
     employeeId?: string
+    userId?: string
     commissionRate: number
     territoryIds: string[]
+    parentSalesPersonId?: string
   }>
 
-  // Step 7: Appointment Settings
+  // Step 8: Appointment Settings
   appointmentEnabled: boolean
-  appointmentDuration: number
+  appointmentDuration: number              // Default duration in minutes
+  allowedDurations: number[]               // [15, 30, 45, 60]
   advanceBookingDays: number
-  workingHours: object
+  workingHours: {
+    [day: string]: { enabled: boolean, start: string, end: string }
+  }
+  agentList: string[]                       // User IDs available for appointments
 
-  // Step 8: Communication Settings
+  // Step 9: Communication Settings
   autoLogEmails: boolean
   autoLogCalls: boolean
+  autoLogWhatsApp: boolean
   carryForwardCommunication: boolean
+  updateTimestampOnCommunication: boolean
 
-  // Step 9: Naming Convention
-  leadPrefix: string
-  casePrefix: string
-  quotePrefix: string
+  // Step 10: Naming Convention
+  leadPrefix: string                        // e.g., "LEAD-"
+  casePrefix: string                        // e.g., "CASE-"
+  quotePrefix: string                       // e.g., "QT-"
+  campaignNamingBy: 'name' | 'series'
 
-  // Step 10: Review & Complete
+  // Step 11: Create First Lead (ERPNext: Create First Lead)
+  firstLead?: {
+    firstName: string
+    lastName: string
+    email: string
+    phone: string
+    companyName?: string
+    sourceId?: string
+  }
+
+  // Step 12: Create First Case (ERPNext: Create First Opportunity)
+  firstCase?: {
+    leadId: string                          // Link to first lead
+    title: string
+    caseType: string
+    description?: string
+    estimatedValue?: number
+    salesStageId: string
+  }
+
+  // Completion
   completed: boolean
+  completedAt?: Date
 }
 ```
 
-### 4.2 Wizard Steps
+### 4.3 Wizard Steps
 
-| Step | Title | Title (Arabic) | Icon | Description |
-|------|-------|----------------|------|-------------|
-| 1 | Basic Configuration | الإعدادات الأساسية | Settings | Enable CRM, select industry |
-| 2 | Lead Sources | مصادر العملاء المحتملين | Users | Where do your leads come from? |
-| 3 | Sales Stages | مراحل المبيعات | GitBranch | Define your sales pipeline |
-| 4 | Lost Reasons | أسباب الخسارة | XCircle | Track why you lose deals |
-| 5 | Territory Setup | إعداد المناطق | Map | Geographic organization |
-| 6 | Sales Team | فريق المبيعات | UserCheck | Team hierarchy & commissions |
-| 7 | Appointments | المواعيد | Calendar | Booking settings |
-| 8 | Communication | التواصل | Mail | Email & call logging |
-| 9 | Naming Convention | تسمية المستندات | Hash | Prefixes and numbering |
-| 10 | Review & Complete | المراجعة والإكمال | CheckCircle | Summary and finish |
+| Step | Title | Title (Arabic) | Icon | Description | ERPNext Equivalent |
+|------|-------|----------------|------|-------------|-------------------|
+| 1 | Welcome | مرحباً | Sparkles | Introduction, enable CRM | - |
+| 2 | Lead Sources | مصادر العملاء المحتملين | Target | Where do leads come from? | Create Lead Source |
+| 3 | Sales Pipeline | مراحل المبيعات | GitBranch | Define pipeline stages | Create Sales Stage |
+| 4 | Lost Reasons | أسباب الخسارة | XCircle | Track why deals are lost | - |
+| 5 | Territories | المناطق الجغرافية | MapPin | Geographic organization | Create Territory |
+| 6 | Customer Groups | مجموعات العملاء | Users | Segment customers | Create Customer Group |
+| 7 | Sales Team | فريق المبيعات | UserCheck | Team hierarchy & commissions | - |
+| 8 | Appointments | المواعيد | Calendar | Booking settings | - |
+| 9 | Communication | التواصل | Mail | Email & call logging | - |
+| 10 | Naming | تسمية المستندات | Hash | Prefixes and numbering | - |
+| 11 | First Lead | أول عميل محتمل | UserPlus | Create guided first lead | Create First Lead |
+| 12 | First Case | أول قضية | Briefcase | Convert lead to case | Create First Opportunity |
+| 13 | Review | المراجعة | CheckCircle | Summary and finish | - |
+
+### 4.4 Default Values by Step
+
+**Step 2: Default Lead Sources**
+```typescript
+const DEFAULT_LEAD_SOURCES = [
+  { name: 'Website', nameAr: 'الموقع الإلكتروني', utmSource: 'website' },
+  { name: 'Referral', nameAr: 'إحالة', utmSource: 'referral' },
+  { name: 'Social Media', nameAr: 'وسائل التواصل الاجتماعي', utmSource: 'social' },
+  { name: 'Advertisement', nameAr: 'إعلان', utmSource: 'ads' },
+  { name: 'Walk-in', nameAr: 'زيارة مباشرة', utmSource: 'walkin' },
+  { name: 'Phone Call', nameAr: 'مكالمة هاتفية', utmSource: 'phone' },
+  { name: 'Email Campaign', nameAr: 'حملة بريد إلكتروني', utmSource: 'email' },
+  { name: 'Event', nameAr: 'فعالية', utmSource: 'event' },
+]
+```
+
+**Step 3: Default Sales Stages**
+```typescript
+const DEFAULT_SALES_STAGES = [
+  { name: 'Intake', nameAr: 'الاستقبال', order: 1, probability: 10, color: '#6B7280', type: 'open' },
+  { name: 'Conflict Check', nameAr: 'فحص التعارض', order: 2, probability: 20, color: '#F59E0B', type: 'open', requiresConflictCheck: true },
+  { name: 'Qualified', nameAr: 'مؤهل', order: 3, probability: 40, color: '#3B82F6', type: 'open', requiresQualification: true },
+  { name: 'Proposal Sent', nameAr: 'تم إرسال العرض', order: 4, probability: 60, color: '#8B5CF6', type: 'open' },
+  { name: 'Negotiation', nameAr: 'التفاوض', order: 5, probability: 80, color: '#EC4899', type: 'open' },
+  { name: 'Won', nameAr: 'تم الفوز', order: 6, probability: 100, color: '#10B981', type: 'won' },
+  { name: 'Lost', nameAr: 'خسارة', order: 7, probability: 0, color: '#EF4444', type: 'lost' },
+]
+```
+
+**Step 4: Default Lost Reasons**
+```typescript
+const DEFAULT_LOST_REASONS = [
+  { reason: 'Price too high', reasonAr: 'السعر مرتفع جداً', category: 'price' },
+  { reason: 'Chose competitor', reasonAr: 'اختار منافساً', category: 'competitor' },
+  { reason: 'Budget constraints', reasonAr: 'قيود الميزانية', category: 'price' },
+  { reason: 'Timing not right', reasonAr: 'التوقيت غير مناسب', category: 'timing' },
+  { reason: 'Scope mismatch', reasonAr: 'عدم تطابق النطاق', category: 'scope' },
+  { reason: 'No response', reasonAr: 'لا يوجد رد', category: 'relationship' },
+  { reason: 'Internal decision', reasonAr: 'قرار داخلي', category: 'internal' },
+  { reason: 'Other', reasonAr: 'أخرى', category: 'other' },
+]
+```
+
+**Step 5: Default Territories (Saudi Arabia)**
+```typescript
+const DEFAULT_TERRITORIES_SA = [
+  { name: 'Saudi Arabia', nameAr: 'المملكة العربية السعودية', isGroup: true, level: 0 },
+  { name: 'Riyadh Region', nameAr: 'منطقة الرياض', isGroup: true, level: 1, parentName: 'Saudi Arabia' },
+  { name: 'Makkah Region', nameAr: 'منطقة مكة المكرمة', isGroup: true, level: 1, parentName: 'Saudi Arabia' },
+  { name: 'Eastern Region', nameAr: 'المنطقة الشرقية', isGroup: true, level: 1, parentName: 'Saudi Arabia' },
+  { name: 'Madinah Region', nameAr: 'منطقة المدينة المنورة', isGroup: true, level: 1, parentName: 'Saudi Arabia' },
+  { name: 'Riyadh City', nameAr: 'مدينة الرياض', isGroup: false, level: 2, parentName: 'Riyadh Region' },
+  { name: 'Jeddah', nameAr: 'جدة', isGroup: false, level: 2, parentName: 'Makkah Region' },
+  { name: 'Dammam', nameAr: 'الدمام', isGroup: false, level: 2, parentName: 'Eastern Region' },
+]
+```
+
+**Step 6: Default Customer Groups**
+```typescript
+const DEFAULT_CUSTOMER_GROUPS = [
+  { name: 'Individual', nameAr: 'فرد' },
+  { name: 'Commercial', nameAr: 'تجاري' },
+  { name: 'Government', nameAr: 'حكومي' },
+  { name: 'Non-Profit', nameAr: 'غير ربحي' },
+  { name: 'VIP', nameAr: 'كبار العملاء' },
+]
+```
+
+**Step 8: Default Appointment Settings**
+```typescript
+const DEFAULT_APPOINTMENT_SETTINGS = {
+  enabled: true,
+  defaultDuration: 30,
+  allowedDurations: [15, 30, 45, 60],
+  advanceBookingDays: 30,
+  workingHours: {
+    sunday: { enabled: true, start: '09:00', end: '17:00' },
+    monday: { enabled: true, start: '09:00', end: '17:00' },
+    tuesday: { enabled: true, start: '09:00', end: '17:00' },
+    wednesday: { enabled: true, start: '09:00', end: '17:00' },
+    thursday: { enabled: true, start: '09:00', end: '17:00' },
+    friday: { enabled: false, start: '09:00', end: '17:00' },  // Weekend in KSA
+    saturday: { enabled: false, start: '09:00', end: '17:00' }, // Weekend in KSA
+  }
+}
+```
 
 ---
 
-## Phase 5: New Reports
+## Phase 5: New CRM Reports
 
-### 5.1 Campaign Efficiency Report
+### Priority Overview
 
-**Purpose:** Track marketing campaign ROI through the funnel
+| Report | Purpose | Priority |
+|--------|---------|----------|
+| Campaign Efficiency | UTM tracking, funnel conversion | **HIGH** |
+| Lead Owner Efficiency | Per-person performance | **HIGH** |
+| First Response Time | Response speed analytics | **HIGH** |
+| Lost Opportunity Analysis | Loss reasons breakdown | **HIGH** |
+| Sales Pipeline Analytics | Pipeline by stage/owner | **HIGH** |
+| Prospects Engaged Not Converted | Re-engagement targets | MEDIUM |
+| Lead Conversion Time | Days to convert | MEDIUM |
 
-**Metrics:**
-- UTM Campaign name
-- Lead Count
-- Case Count (opportunities)
-- Quote Count
-- Won Count
-- Won Value
-- Lead → Case %
-- Case → Quote %
-- Quote → Won %
+---
+
+### 5.1 Campaign Efficiency Report (HIGH PRIORITY)
+
+**Purpose:** Track marketing campaign ROI through the complete funnel (UTM tracking)
+
+**Route:** `/dashboard/crm/reports/campaign-efficiency`
+**API:** `GET /api/reports/crm/campaign-efficiency`
+
+**Columns:**
+| Column | Description | Type |
+|--------|-------------|------|
+| Campaign | UTM Campaign name | string |
+| Source | UTM Source | string |
+| Medium | UTM Medium | string |
+| Lead Count | Total leads from campaign | number |
+| Case Count | Leads that became cases | number |
+| Quote Count | Cases with quotes sent | number |
+| Won Count | Cases won | number |
+| Won Value | Total value of won cases | currency |
+| Cost | Campaign cost (if tracked) | currency |
+| ROI | (Won Value - Cost) / Cost * 100 | percentage |
+| Lead → Case % | Conversion rate | percentage |
+| Case → Quote % | Conversion rate | percentage |
+| Quote → Won % | Conversion rate | percentage |
+
+**Filters:**
+- Date range
+- Campaign
+- Source
+- Medium
+- Sales Person
+
+**Charts:**
+- Funnel visualization
+- ROI by campaign bar chart
+- Conversion rates trend line
 
 **File:** `src/features/crm/components/reports/campaign-efficiency-report.tsx`
 
-### 5.2 Lead Owner Efficiency Report
+---
 
-**Purpose:** Measure individual sales performance
+### 5.2 Lead Owner Efficiency Report (HIGH PRIORITY)
 
-**Metrics:**
-- Lead Owner (Sales Person)
-- Lead Count
-- Case Count
-- Quote Count
-- Won Count
-- Won Value
-- Conversion rates at each stage
+**Purpose:** Measure individual sales person performance
+
+**Route:** `/dashboard/crm/reports/lead-owner-efficiency`
+**API:** `GET /api/reports/crm/lead-owner-efficiency`
+
+**Columns:**
+| Column | Description | Type |
+|--------|-------------|------|
+| Sales Person | Lead owner name | string |
+| Lead Count | Total leads assigned | number |
+| Case Count | Leads converted to cases | number |
+| Quote Count | Cases with quotes | number |
+| Won Count | Cases won | number |
+| Won Value | Total value won | currency |
+| Lost Count | Cases lost | number |
+| Lost Value | Total value lost | currency |
+| Lead → Case % | Conversion rate | percentage |
+| Case → Won % | Win rate | percentage |
+| Avg Deal Size | Won Value / Won Count | currency |
+| Target Achievement | Actual vs Target | percentage |
+
+**Filters:**
+- Date range
+- Sales Person
+- Territory
+- Lead Source
+
+**Charts:**
+- Leaderboard ranking
+- Conversion funnel per person
+- Target vs Actual bar chart
+- Performance trend over time
 
 **File:** `src/features/crm/components/reports/lead-owner-efficiency-report.tsx`
 
-### 5.3 First Response Time Report
+---
 
-**Purpose:** Track response speed
+### 5.3 First Response Time Report (HIGH PRIORITY)
 
-**Metrics:**
-- Date
-- Average First Response Time
-- Median Response Time
-- Response by Sales Person
+**Purpose:** Track response speed to new leads (critical for conversion)
+
+**Route:** `/dashboard/crm/reports/first-response-time`
+**API:** `GET /api/reports/crm/first-response-time`
+
+**Columns:**
+| Column | Description | Type |
+|--------|-------------|------|
+| Date | Day/Week/Month | date |
+| Avg First Response | Average time to first contact | duration |
+| Median Response | Median time to first contact | duration |
+| Min Response | Fastest response | duration |
+| Max Response | Slowest response | duration |
+| Within 1 Hour | % of leads contacted within 1hr | percentage |
+| Within 24 Hours | % contacted within 24hrs | percentage |
+| Lead Count | Total leads in period | number |
+
+**By Sales Person View:**
+| Column | Description | Type |
+|--------|-------------|------|
+| Sales Person | Name | string |
+| Avg Response Time | Average | duration |
+| Leads Assigned | Total leads | number |
+| Leads Responded | Leads contacted | number |
+| Response Rate | % contacted | percentage |
+
+**Filters:**
+- Date range
+- Sales Person
+- Lead Source
+- Territory
+
+**Charts:**
+- Response time distribution histogram
+- Trend line over time
+- Comparison by Sales Person
+- Correlation: Response Time vs Conversion Rate
 
 **File:** `src/features/crm/components/reports/first-response-time-report.tsx`
 
-### 5.4 Prospects Engaged Not Converted Report
+---
 
-**Purpose:** Re-engagement targets
+### 5.4 Lost Opportunity Analysis Report (HIGH PRIORITY)
 
-**Metrics:**
-- Lead name
-- Organization
-- Last activity type
-- Last activity date
-- Days since contact
-- Engagement count
+**Purpose:** Understand why deals are lost to improve win rate
 
-**Filters:**
-- Days since last contact (default: 60)
-- Minimum interactions
+**Route:** `/dashboard/crm/reports/lost-opportunity`
+**API:** `GET /api/reports/crm/lost-opportunity`
 
-**File:** `src/features/crm/components/reports/prospects-engaged-report.tsx`
+**Columns:**
+| Column | Description | Type |
+|--------|-------------|------|
+| Case Number | Case reference | string |
+| Lead/Client | Party name | string |
+| Case Type | Type of case | string |
+| Lost Reason | Primary reason for loss | string |
+| Lost Reason Category | price/competitor/timing/etc | string |
+| Lost Reason Detail | Additional notes | string |
+| Competitor | If lost to competitor | string |
+| Stage When Lost | Pipeline stage at loss | string |
+| Estimated Value | Value of lost deal | currency |
+| Days in Pipeline | Time from intake to loss | number |
+| Sales Person | Assigned sales person | string |
+| Lost Date | When marked lost | date |
 
-### 5.5 Lead Conversion Time Report
+**Summary View:**
+| Metric | Description |
+|--------|-------------|
+| Total Lost | Count of lost opportunities |
+| Total Value Lost | Sum of estimated values |
+| Top Lost Reason | Most common reason |
+| Top Competitor | Most frequent competitor |
+| Avg Days to Loss | Average time before losing |
 
-**Purpose:** Measure sales cycle
-
-**Metrics:**
-- Client name
-- Days to convert
-- Number of interactions
-- Number of cases
-- Total value
-
-**File:** `src/features/crm/components/reports/lead-conversion-time-report.tsx`
-
-### 5.6 Lost Opportunity Analysis Report
-
-**Purpose:** Understand why deals are lost
-
-**Metrics:**
-- Case/Opportunity
-- Client/Lead name
-- Lost reason
-- Lost reason detail
-- Competitor
-- Stage when lost
-- Estimated value lost
+**Charts:**
+- Lost reasons pie chart
+- Lost value by reason bar chart
+- Lost by stage breakdown
+- Competitor win/loss comparison
+- Monthly lost trend
 
 **File:** `src/features/crm/components/reports/lost-opportunity-report.tsx`
 
-### 5.7 Sales Pipeline Analytics Report
+---
 
-**Purpose:** Pipeline health by stage/owner
+### 5.5 Sales Pipeline Analytics Report (HIGH PRIORITY)
 
-**Metrics:**
-- Count by stage
-- Value by stage
-- Count by owner
-- Value by owner
-- Monthly/Quarterly breakdown
+**Purpose:** Pipeline health by stage/owner - understand deal flow
+
+**Route:** `/dashboard/crm/reports/sales-pipeline`
+**API:** `GET /api/reports/crm/sales-pipeline`
+
+**By Stage View:**
+| Column | Description | Type |
+|--------|-------------|------|
+| Stage | Pipeline stage name | string |
+| Count | Number of cases | number |
+| Value | Total estimated value | currency |
+| Weighted Value | Value × Probability | currency |
+| Avg Age | Average days in stage | number |
+| Stuck Count | Cases > threshold days | number |
+
+**By Owner View:**
+| Column | Description | Type |
+|--------|-------------|------|
+| Sales Person | Owner name | string |
+| Intake | Count in Intake | number |
+| Qualified | Count in Qualified | number |
+| Proposal | Count in Proposal Sent | number |
+| Negotiation | Count in Negotiation | number |
+| Total Value | Sum of all values | currency |
+| Weighted Pipeline | Sum of weighted values | currency |
+
+**Monthly/Quarterly View:**
+| Column | Description | Type |
+|--------|-------------|------|
+| Period | Month/Quarter | string |
+| New Cases | Cases created | number |
+| Won Cases | Cases won | number |
+| Lost Cases | Cases lost | number |
+| Win Rate | Won / (Won + Lost) | percentage |
+| New Value | Value of new cases | currency |
+| Won Value | Value of won cases | currency |
+
+**Charts:**
+- Pipeline funnel visualization
+- Stacked bar chart by stage
+- Pipeline value trend over time
+- Stage conversion waterfall
+- Deal age distribution
 
 **File:** `src/features/crm/components/reports/sales-pipeline-analytics-report.tsx`
+
+---
+
+### 5.6 Prospects Engaged Not Converted Report (MEDIUM PRIORITY)
+
+**Purpose:** Identify re-engagement targets - warm leads that went cold
+
+**Route:** `/dashboard/crm/reports/prospects-engaged`
+**API:** `GET /api/reports/crm/prospects-engaged`
+
+**Columns:**
+| Column | Description | Type |
+|--------|-------------|------|
+| Lead Name | Lead display name | string |
+| Company | Organization name | string |
+| Email | Contact email | string |
+| Phone | Contact phone | string |
+| Lead Source | How they found you | string |
+| Last Activity Type | email/call/meeting/etc | string |
+| Last Activity Date | When last contacted | date |
+| Days Since Contact | Days since last activity | number |
+| Total Interactions | Count of all activities | number |
+| Lead Score | Current lead score | number |
+| Assigned To | Sales Person | string |
+| Status | Current lead status | string |
+
+**Filters:**
+- Days since last contact (default: 60)
+- Minimum interactions (default: 2)
+- Lead Source
+- Sales Person
+- Lead Score range
+
+**Actions:**
+- Bulk assign to Sales Person
+- Add to campaign
+- Schedule follow-up
+- Mark as disqualified
+
+**File:** `src/features/crm/components/reports/prospects-engaged-report.tsx`
+
+---
+
+### 5.7 Lead Conversion Time Report (MEDIUM PRIORITY)
+
+**Purpose:** Measure sales cycle length - how long to convert leads
+
+**Route:** `/dashboard/crm/reports/lead-conversion-time`
+**API:** `GET /api/reports/crm/lead-conversion-time`
+
+**Columns:**
+| Column | Description | Type |
+|--------|-------------|------|
+| Client Name | Converted client name | string |
+| Original Lead | Source lead | string |
+| Lead Created | When lead was created | date |
+| Case Created | When case was created | date |
+| Won Date | When case was won | date |
+| Days: Lead → Case | Time to create case | number |
+| Days: Case → Won | Time to win case | number |
+| Total Days | Lead to Won | number |
+| Interactions | Total touchpoints | number |
+| Case Type | Type of won case | string |
+| Won Value | Value of won case | currency |
+| Sales Person | Who won the deal | string |
+
+**Summary View:**
+| Metric | Description |
+|--------|-------------|
+| Avg Lead → Case | Average days |
+| Avg Case → Won | Average days |
+| Avg Total Cycle | Average total days |
+| Fastest Conversion | Minimum days |
+| Slowest Conversion | Maximum days |
+
+**Charts:**
+- Conversion time distribution
+- Trend over time
+- By case type comparison
+- By Sales Person comparison
+- Correlation: Time vs Value
+
+**File:** `src/features/crm/components/reports/lead-conversion-time-report.tsx`
+
+---
+
+### 5.8 Reports Summary
+
+**Total New Reports:** 7
+
+**Frontend Files:**
+```
+src/features/crm/components/reports/
+├── campaign-efficiency-report.tsx
+├── lead-owner-efficiency-report.tsx
+├── first-response-time-report.tsx
+├── lost-opportunity-report.tsx
+├── sales-pipeline-analytics-report.tsx
+├── prospects-engaged-report.tsx
+└── lead-conversion-time-report.tsx
+```
+
+**API Endpoints:**
+```
+GET /api/reports/crm/campaign-efficiency
+GET /api/reports/crm/lead-owner-efficiency
+GET /api/reports/crm/first-response-time
+GET /api/reports/crm/lost-opportunity
+GET /api/reports/crm/sales-pipeline
+GET /api/reports/crm/prospects-engaged
+GET /api/reports/crm/lead-conversion-time
+```
 
 ---
 
@@ -1035,23 +1577,80 @@ src/routes/_authenticated/
 
 ## Summary
 
-This plan adds **ERPNext CRM feature parity** while maintaining your law firm-specific features:
+This plan adds **ERPNext CRM feature parity** while maintaining your law firm-specific features.
 
-| New Feature | ERPNext Equivalent | Status |
-|-------------|-------------------|--------|
-| Lead → Case flow | Lead → Opportunity | To implement |
-| CRM Settings | CRM Settings | To implement |
-| CRM Setup Wizard | Module Onboarding | To implement |
-| Territory Management | Territory | To implement |
-| Sales Person Hierarchy | Sales Person | To implement |
-| 7 New Reports | CRM Reports | To implement |
-| Appointment Booking | Appointment | To implement |
-| Contract Fulfillment | Contract | To enhance |
-| Lost Reason tracking | Opportunity Lost Reason | To implement |
-| Competitor tracking | Competitor | To implement |
+### Complete CRM Flow
+```
+Lead → Case → Quotation/Contract → Sales Order → Client
+                                        ↓
+                              (Finance Integration)
+                                        ↓
+                                    Invoice
+```
 
-**Total new components:** ~40
-**Total new routes:** ~20
-**Total new API endpoints:** ~35
+### New Features by Priority
+
+| Feature | ERPNext Equivalent | Priority | Status |
+|---------|-------------------|----------|--------|
+| Lead → Case → Client flow | Lead → Opportunity → Customer | **HIGH** | To implement |
+| CRM Settings Page | CRM Settings | **HIGH** | To implement |
+| CRM Setup Wizard (13 steps) | Module Onboarding | **HIGH** | To implement |
+| Sales Stage Master | Sales Stage | **HIGH** | To implement |
+| Lost Opportunity Analysis Report | Opportunity Lost Reason | **HIGH** | To implement |
+| Campaign Efficiency Report | UTM Analytics | **HIGH** | To implement |
+| Lead Owner Efficiency Report | Sales Person Performance | **HIGH** | To implement |
+| First Response Time Report | Response Analytics | **HIGH** | To implement |
+| Sales Pipeline Analytics | Pipeline Reports | **HIGH** | To implement |
+| Contract Management | Contract | **HIGH** | To enhance |
+| Territory Management | Territory | MEDIUM | To implement |
+| Sales Person Hierarchy | Sales Person | MEDIUM | To implement |
+| Appointment Booking | Appointment | MEDIUM | To implement |
+| Prospects Engaged Report | Re-engagement | MEDIUM | To implement |
+| Lead Conversion Time Report | Conversion Analytics | MEDIUM | To implement |
+| Competitor tracking | Competitor | MEDIUM | To implement |
+
+### ERPNext Settings Parity
+
+| ERPNext Setting | Our Implementation | Status |
+|-----------------|-------------------|--------|
+| Allow Lead Duplication | `leadSettings.allowDuplicateEmails` | ✅ Planned |
+| Auto Creation of Contact | `leadSettings.autoCreateContact` | ✅ Planned |
+| Close Opportunity After Days | `caseSettings.autoCloseAfterDays` | ✅ Planned |
+| Default Quotation Valid Till | `quoteSettings.defaultValidDays` | ✅ Planned |
+| Carry Forward Communication | `communicationSettings.carryForwardCommunication` | ✅ Planned |
+| Update Timestamp on Communication | `communicationSettings.updateTimestampOnCommunication` | ✅ Planned |
+| Campaign Naming By | `namingSettings.campaignNamingBy` | ✅ Planned |
+| Enable Scheduling | `appointmentSettings.enabled` | ✅ Planned |
+| Appointment Duration | `appointmentSettings.defaultDuration` | ✅ Planned |
+| Advance Booking Days | `appointmentSettings.advanceBookingDays` | ✅ Planned |
+| Agent List | `appointmentSettings.agentList` | ✅ Planned |
+| Holiday List | `appointmentSettings.holidayListId` | ✅ Planned |
+
+### Implementation Totals
+
+| Category | Count |
+|----------|-------|
+| New Models/Types | 10 |
+| New Components | ~45 |
+| New Routes | ~25 |
+| New API Endpoints | ~40 |
+| New Reports | 7 |
+| CRM Wizard Steps | 13 |
+| CRM Settings Sections | 9 |
+
+### Unique Saudi/Law Firm Features (Preserved)
+
+These features make your CRM unique compared to ERPNext:
+
+- NAJIZ Integration
+- National ID / Iqama / CR validation
+- Arabic Quaternary Name support
+- Saudi National Address
+- Conflict Check per Case
+- BANT Qualification per Case
+- VIP Status
+- WhatsApp Integration
+- Lead Scoring
+- Referral System
 
 Ready to implement when you give the go-ahead!
