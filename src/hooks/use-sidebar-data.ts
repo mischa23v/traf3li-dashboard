@@ -351,6 +351,12 @@ export function useSidebarData(): SidebarData {
               url: '/dashboard/finance/saudi-banking',
               module: 'payments',
             },
+            // Fiscal Periods
+            {
+              title: 'sidebar.nav.fiscalPeriods',
+              url: '/dashboard/finance/fiscal-periods',
+              module: 'payments',
+            },
           ],
         },
       ],

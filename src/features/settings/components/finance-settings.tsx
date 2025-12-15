@@ -80,6 +80,7 @@ export default function FinanceSettings() {
         invoicePrefix: 'INV-',
         quotePrefix: 'QOT-',
         paymentPrefix: 'PAY-',
+        receiptPrefix: 'REC-',
         lastInvoiceNumber: 1,
         lastQuoteNumber: 1,
         lastPaymentNumber: 1,
@@ -94,6 +95,12 @@ export default function FinanceSettings() {
         quoteFooterTextAr: '',
         invoiceTerms: '',
         invoiceTermsAr: '',
+        receiptFooterText: '',
+        receiptFooterTextAr: '',
+        receiptTerms: '',
+        receiptTermsAr: '',
+        autoSendReceiptOnPayment: false,
+        includeQRCodeInReceipt: true,
         showProductTax: true,
         includeYearInNumber: true,
     })
@@ -104,6 +111,7 @@ export default function FinanceSettings() {
                 invoicePrefix: settingsData.invoicePrefix || 'INV-',
                 quotePrefix: settingsData.quotePrefix || 'QOT-',
                 paymentPrefix: settingsData.paymentPrefix || 'PAY-',
+                receiptPrefix: settingsData.receiptPrefix || 'REC-',
                 lastInvoiceNumber: settingsData.lastInvoiceNumber || 1,
                 lastQuoteNumber: settingsData.lastQuoteNumber || 1,
                 lastPaymentNumber: settingsData.lastPaymentNumber || 1,
@@ -118,6 +126,12 @@ export default function FinanceSettings() {
                 quoteFooterTextAr: settingsData.quoteFooterTextAr || '',
                 invoiceTerms: settingsData.invoiceTerms || '',
                 invoiceTermsAr: settingsData.invoiceTermsAr || '',
+                receiptFooterText: settingsData.receiptFooterText || '',
+                receiptFooterTextAr: settingsData.receiptFooterTextAr || '',
+                receiptTerms: settingsData.receiptTerms || '',
+                receiptTermsAr: settingsData.receiptTermsAr || '',
+                autoSendReceiptOnPayment: settingsData.autoSendReceiptOnPayment ?? false,
+                includeQRCodeInReceipt: settingsData.includeQRCodeInReceipt ?? true,
                 showProductTax: settingsData.showProductTax ?? true,
                 includeYearInNumber: settingsData.includeYearInNumber ?? true,
             })
@@ -399,6 +413,126 @@ export default function FinanceSettings() {
                                         checked={formData.showProductTax}
                                         onCheckedChange={(checked) => handleSwitchChange('showProductTax', checked)}
                                     />
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Receipt Settings */}
+                        <Card className="border-0 shadow-sm rounded-3xl">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Receipt className="h-5 w-5 text-brand-blue" aria-hidden="true" />
+                                    إعدادات إيصالات الدفع
+                                </CardTitle>
+                                <CardDescription>
+                                    تخصيص إيصالات الدفع والخيارات التلقائية
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                {/* Receipt Prefix */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="receiptPrefix">بادئة الإيصال</Label>
+                                        <Input
+                                            id="receiptPrefix"
+                                            name="receiptPrefix"
+                                            value={formData.receiptPrefix}
+                                            onChange={handleChange}
+                                            placeholder="REC-"
+                                            dir="ltr"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>مثال الإيصال التالي</Label>
+                                        <div className="h-10 px-3 py-2 bg-white rounded-md border text-sm flex items-center font-mono" dir="ltr">
+                                            {formData.receiptPrefix}{formData.includeYearInNumber ? new Date().getFullYear() + '-' : ''}0001
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Auto-send Options */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                                        <div>
+                                            <Label>إرسال الإيصال تلقائياً عند الدفع</Label>
+                                            <p className="text-sm text-slate-500">سيتم إرسال إيصال للعميل تلقائياً عند تسجيل دفعة</p>
+                                        </div>
+                                        <Switch
+                                            checked={formData.autoSendReceiptOnPayment}
+                                            onCheckedChange={(checked) => handleSwitchChange('autoSendReceiptOnPayment', checked)}
+                                        />
+                                    </div>
+
+                                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                                        <div>
+                                            <Label>تضمين رمز QR في الإيصال</Label>
+                                            <p className="text-sm text-slate-500">إضافة رمز QR للتحقق من صحة الإيصال</p>
+                                        </div>
+                                        <Switch
+                                            checked={formData.includeQRCodeInReceipt}
+                                            onCheckedChange={(checked) => handleSwitchChange('includeQRCodeInReceipt', checked)}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Receipt Footer */}
+                                <div>
+                                    <Label className="mb-3 block">رسالة شكر في الإيصال</Label>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="receiptFooterTextAr" className="text-sm">عربي</Label>
+                                            <Textarea
+                                                id="receiptFooterTextAr"
+                                                name="receiptFooterTextAr"
+                                                value={formData.receiptFooterTextAr}
+                                                onChange={handleChange}
+                                                placeholder="شكراً لتعاملكم معنا"
+                                                rows={2}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="receiptFooterText" className="text-sm">English</Label>
+                                            <Textarea
+                                                id="receiptFooterText"
+                                                name="receiptFooterText"
+                                                value={formData.receiptFooterText}
+                                                onChange={handleChange}
+                                                placeholder="Thank you for your business"
+                                                dir="ltr"
+                                                rows={2}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Receipt Terms */}
+                                <div>
+                                    <Label className="mb-3 block">شروط وأحكام الإيصال</Label>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="receiptTermsAr" className="text-sm">عربي</Label>
+                                            <Textarea
+                                                id="receiptTermsAr"
+                                                name="receiptTermsAr"
+                                                value={formData.receiptTermsAr}
+                                                onChange={handleChange}
+                                                placeholder="هذا إيصال رسمي لدفعة مستلمة..."
+                                                rows={3}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="receiptTerms" className="text-sm">English</Label>
+                                            <Textarea
+                                                id="receiptTerms"
+                                                name="receiptTerms"
+                                                value={formData.receiptTerms}
+                                                onChange={handleChange}
+                                                placeholder="This is an official receipt for payment received..."
+                                                dir="ltr"
+                                                rows={3}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>

@@ -11,6 +11,10 @@ import billingSettingsService, {
   CreatePaymentModeData,
   UpdateFinanceSettingsData,
 } from '@/services/billingSettingsService'
+import paymentTermsService, {
+  CreatePaymentTermsData,
+  UpdatePaymentTermsData,
+} from '@/services/paymentTermsService'
 
 // ==================== COMPANY SETTINGS ====================
 
@@ -308,6 +312,144 @@ export const useUpdateFinanceSettings = () => {
     },
     onSettled: async () => {
       await queryClient.invalidateQueries({ queryKey: ['finance-settings'] })
+    },
+  })
+}
+
+// ==================== PAYMENT TERMS ====================
+
+export const usePaymentTerms = () => {
+  return useQuery({
+    queryKey: ['payment-terms'],
+    queryFn: () => paymentTermsService.getPaymentTerms(),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+export const usePaymentTerm = (id: string) => {
+  return useQuery({
+    queryKey: ['payment-terms', id],
+    queryFn: () => paymentTermsService.getPaymentTerm(id),
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+export const useCreatePaymentTerms = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: CreatePaymentTermsData) =>
+      paymentTermsService.createPaymentTerms(data),
+    onSuccess: (data) => {
+      toast.success('تم إنشاء شروط الدفع بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['payment-terms'] }, (old: any) => {
+        if (!old) return old
+        // Handle { paymentTerms: [...] } structure
+        if (old.paymentTerms && Array.isArray(old.paymentTerms)) {
+          return {
+            ...old,
+            paymentTerms: [data, ...old.paymentTerms]
+          }
+        }
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إنشاء شروط الدفع')
+    },
+    onSettled: async () => {
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['payment-terms'], refetchType: 'all' })
+    },
+  })
+}
+
+export const useUpdatePaymentTerms = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdatePaymentTermsData }) =>
+      paymentTermsService.updatePaymentTerms(id, data),
+    onSuccess: () => {
+      toast.success('تم تحديث شروط الدفع بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث شروط الدفع')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['payment-terms'] })
+    },
+  })
+}
+
+export const useDeletePaymentTerms = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => paymentTermsService.deletePaymentTerms(id),
+    onSuccess: (_, id) => {
+      toast.success('تم حذف شروط الدفع بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['payment-terms'] }, (old: any) => {
+        if (!old) return old
+        // Handle { paymentTerms: [...] } structure
+        if (old.paymentTerms && Array.isArray(old.paymentTerms)) {
+          return {
+            ...old,
+            paymentTerms: old.paymentTerms.filter((item: any) => item._id !== id)
+          }
+        }
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== id)
+        return old
+      })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل حذف شروط الدفع')
+    },
+    onSettled: async () => {
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['payment-terms'], refetchType: 'all' })
+    },
+  })
+}
+
+export const useSetDefaultPaymentTerms = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => paymentTermsService.setDefaultPaymentTerms(id),
+    onSuccess: () => {
+      toast.success('تم تعيين شروط الدفع الافتراضية بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تعيين شروط الدفع الافتراضية')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['payment-terms'] })
+    },
+  })
+}
+
+export const useInitializePaymentTermsTemplates = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => paymentTermsService.initializeTemplates(),
+    onSuccess: () => {
+      toast.success('تم تهيئة القوالب الافتراضية بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تهيئة القوالب')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['payment-terms'] })
     },
   })
 }
