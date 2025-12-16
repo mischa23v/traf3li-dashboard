@@ -38,6 +38,7 @@ import {
   Calendar, Clock, MapPin, Monitor, Globe,
   Award, BookOpen, Scale, FileText, DollarSign, AlertTriangle
 } from 'lucide-react'
+import { isValidEmail, errorMessages } from '@/utils/validation-patterns'
 import {
   TRAINING_TYPE_LABELS,
   TRAINING_CATEGORY_LABELS,
@@ -126,6 +127,9 @@ export function TrainingCreateView() {
   const [providerNameAr, setProviderNameAr] = useState('')
   const [contactEmail, setContactEmail] = useState('')
   const [platformName, setPlatformName] = useState('')
+
+  // Validation errors
+  const [contactEmailError, setContactEmailError] = useState('')
 
   // CLE (Continuing Legal Education) - Attorney Training
   const [isCLE, setIsCLE] = useState(false)
@@ -223,6 +227,15 @@ export function TrainingCreateView() {
 
   // Handle submit
   const handleSubmit = async () => {
+    // Clear previous errors
+    setContactEmailError('')
+
+    // Validate email if provided
+    if (contactEmail && !isValidEmail(contactEmail)) {
+      setContactEmailError(errorMessages.email.ar)
+      return
+    }
+
     const data: CreateTrainingData = {
       employeeId,
       employeeName,
@@ -812,11 +825,17 @@ export function TrainingCreateView() {
                         <Input
                           type="email"
                           value={contactEmail}
-                          onChange={(e) => setContactEmail(e.target.value)}
+                          onChange={(e) => {
+                            setContactEmail(e.target.value)
+                            setContactEmailError('')
+                          }}
                           placeholder="email@provider.com"
-                          className="h-11 rounded-xl"
+                          className={`h-11 rounded-xl ${contactEmailError ? 'border-red-500' : ''}`}
                           dir="ltr"
                         />
+                        {contactEmailError && (
+                          <p className="text-sm text-red-500">{contactEmailError}</p>
+                        )}
                       </div>
                       {providerType === 'online_platform' && (
                         <div className="space-y-2">

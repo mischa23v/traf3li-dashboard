@@ -48,6 +48,9 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { useFinanceSettings, useUpdateFinanceSettings } from '@/hooks/useBillingSettings'
+import { usePermissions } from '@/hooks/use-permissions'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { ShieldAlert } from 'lucide-react'
 import {
     useAccounts,
     useAccountTypes,
@@ -75,6 +78,10 @@ const currencies = [
 export default function FinanceSettings() {
     const { data: settingsData, isLoading } = useFinanceSettings()
     const updateSettingsMutation = useUpdateFinanceSettings()
+    const { canViewFinances, isAdminOrOwner, isLoading: permissionsLoading } = usePermissions()
+
+    // Check if user has permission to access finance settings
+    const hasAccess = canViewFinances() || isAdminOrOwner()
 
     const [formData, setFormData] = useState({
         invoicePrefix: 'INV-',
@@ -164,7 +171,7 @@ export default function FinanceSettings() {
         return `${prefix}${year}${String(lastNumber).padStart(4, '0')}`
     }
 
-    if (isLoading) {
+    if (isLoading || permissionsLoading) {
         return (
             <>
                 <Header>
@@ -178,6 +185,35 @@ export default function FinanceSettings() {
                     <div className="max-w-4xl mx-auto space-y-6">
                         <Skeleton className="h-12 w-64" />
                         <Skeleton className="h-[600px] w-full rounded-3xl" />
+                    </div>
+                </Main>
+            </>
+        )
+    }
+
+    // Show access denied message if user doesn't have permission
+    if (!hasAccess) {
+        return (
+            <>
+                <Header>
+                    <div className='ms-auto flex items-center gap-4'>
+                        <LanguageSwitcher />
+                        <ThemeSwitch />
+                        <ProfileDropdown />
+                    </div>
+                </Header>
+                <Main className="p-6 lg:p-8 bg-[#f8f9fa]">
+                    <div className="max-w-4xl mx-auto space-y-6">
+                        <div className="mb-6">
+                            <h1 className="text-2xl font-bold text-navy">إعدادات الفواتير والمالية</h1>
+                            <p className="text-slate-500">تخصيص أرقام الفواتير والعملات والإعدادات المالية</p>
+                        </div>
+                        <Alert variant="destructive">
+                            <ShieldAlert className="h-4 w-4" />
+                            <AlertDescription>
+                                ليس لديك صلاحية الوصول إلى الإعدادات المالية. يرجى التواصل مع المسؤول.
+                            </AlertDescription>
+                        </Alert>
                     </div>
                 </Main>
             </>

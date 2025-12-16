@@ -26,6 +26,7 @@ import { SelectDropdown } from '@/components/select-dropdown'
 import { type Vendor } from '@/services/accountingService'
 import { useCreateVendor, useUpdateVendor } from '@/hooks/useAccounting'
 import { Lock } from 'lucide-react'
+import { isValidIban, isValidVatNumber, errorMessages } from '@/utils/validation-patterns'
 
 const vendorCategories = [
   { value: 'consultants', label: 'استشاريون', labelEn: 'Consultants' },
@@ -43,10 +44,16 @@ const formSchema = z.object({
   address: z.string().optional(),
   city: z.string().optional(),
   country: z.string().default('SA'),
-  taxNumber: z.string().optional(),
+  taxNumber: z.string().optional().refine(
+    (val) => !val || val === '' || isValidVatNumber(val),
+    { message: errorMessages.vatNumber.ar }
+  ),
   bankName: z.string().optional(),
   bankAccountNumber: z.string().optional(),
-  iban: z.string().optional(),
+  iban: z.string().optional().refine(
+    (val) => !val || val === '' || isValidIban(val),
+    { message: errorMessages.iban.ar }
+  ),
   category: z.string().optional(),
   notes: z.string().optional(),
 })

@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import {
   useCompensatoryLeaveRequests,
   useCompensatoryLeaveStats,
@@ -133,6 +134,9 @@ const STATUS_CONFIG: Record<
 }
 
 export default function CompensatoryLeave() {
+  const { t, i18n } = useTranslation()
+  const isArabic = i18n.language === 'ar'
+  const isRTL = i18n.language === 'ar'
   const navigate = useNavigate()
   const { toast } = useToast()
 
@@ -247,15 +251,21 @@ export default function CompensatoryLeave() {
     try {
       await deleteRequestMutation.mutateAsync(requestToDelete)
       toast({
-        title: 'نجح الحذف',
-        description: 'تم حذف طلب الإجازة التعويضية بنجاح',
+        title: isArabic ? 'نجح الحذف' : 'Delete Successful',
+        description: isArabic
+          ? 'تم حذف طلب الإجازة التعويضية بنجاح'
+          : 'Compensatory leave request deleted successfully',
       })
       setDeleteDialogOpen(false)
       setRequestToDelete(null)
     } catch (error: any) {
       toast({
-        title: 'فشل الحذف',
-        description: error.message || 'فشل حذف طلب الإجازة التعويضية',
+        title: isArabic ? 'فشل الحذف' : 'Delete Failed',
+        description:
+          error.message ||
+          (isArabic
+            ? 'فشل حذف طلب الإجازة التعويضية'
+            : 'Failed to delete compensatory leave request'),
         variant: 'destructive',
       })
     }
@@ -266,36 +276,46 @@ export default function CompensatoryLeave() {
     try {
       await bulkApproveMutation.mutateAsync({ ids: selectedIds })
       toast({
-        title: 'نجحت الموافقة',
-        description: `تمت الموافقة على ${selectedIds.length} طلب`,
+        title: isArabic ? 'نجحت الموافقة' : 'Approval Successful',
+        description: isArabic
+          ? `تمت الموافقة على ${selectedIds.length} طلب`
+          : `${selectedIds.length} request(s) approved`,
       })
       setSelectedIds([])
       setIsSelectionMode(false)
     } catch (error: any) {
       toast({
-        title: 'فشلت الموافقة',
-        description: error.message || 'فشلت الموافقة على الطلبات',
+        title: isArabic ? 'فشلت الموافقة' : 'Approval Failed',
+        description:
+          error.message ||
+          (isArabic ? 'فشلت الموافقة على الطلبات' : 'Failed to approve requests'),
         variant: 'destructive',
       })
     }
   }
 
   const handleBulkReject = async () => {
-    const reason = prompt('أدخل سبب الرفض:')
+    const reason = prompt(
+      isArabic ? 'أدخل سبب الرفض:' : 'Enter rejection reason:'
+    )
     if (!reason) return
 
     try {
       await bulkRejectMutation.mutateAsync({ ids: selectedIds, reason })
       toast({
-        title: 'نجح الرفض',
-        description: `تم رفض ${selectedIds.length} طلب`,
+        title: isArabic ? 'نجح الرفض' : 'Rejection Successful',
+        description: isArabic
+          ? `تم رفض ${selectedIds.length} طلب`
+          : `${selectedIds.length} request(s) rejected`,
       })
       setSelectedIds([])
       setIsSelectionMode(false)
     } catch (error: any) {
       toast({
-        title: 'فشل الرفض',
-        description: error.message || 'فشل رفض الطلبات',
+        title: isArabic ? 'فشل الرفض' : 'Rejection Failed',
+        description:
+          error.message ||
+          (isArabic ? 'فشل رفض الطلبات' : 'Failed to reject requests'),
         variant: 'destructive',
       })
     }
@@ -314,13 +334,16 @@ export default function CompensatoryLeave() {
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
       toast({
-        title: 'نجح التصدير',
-        description: 'تم تصدير البيانات بنجاح',
+        title: isArabic ? 'نجح التصدير' : 'Export Successful',
+        description: isArabic
+          ? 'تم تصدير البيانات بنجاح'
+          : 'Data exported successfully',
       })
     } catch (error: any) {
       toast({
-        title: 'فشل التصدير',
-        description: error.message || 'فشل تصدير البيانات',
+        title: isArabic ? 'فشل التصدير' : 'Export Failed',
+        description:
+          error.message || (isArabic ? 'فشل تصدير البيانات' : 'Failed to export data'),
         variant: 'destructive',
       })
     }
@@ -344,21 +367,23 @@ export default function CompensatoryLeave() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">الإجازات التعويضية</h1>
+          <h1 className="text-3xl font-bold">
+            {isArabic ? 'الإجازات التعويضية' : 'Compensatory Leave'}
+          </h1>
           <p className="text-muted-foreground mt-1">
-            إدارة طلبات الإجازات التعويضية للعمل الإضافي والعطل
+            {isArabic
+              ? 'إدارة طلبات الإجازات التعويضية للعمل الإضافي والعطل'
+              : 'Manage compensatory leave requests for overtime and holiday work'}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={handleExport} disabled={exportMutation.isPending}>
-            <FileDown className="h-4 w-4 ml-2" />
-            تصدير
+            <FileDown className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+            {isArabic ? 'تصدير' : 'Export'}
           </Button>
-          <Button
-            onClick={() => navigate({ to: '/dashboard/hr/leave/compensatory/new' })}
-          >
-            <Plus className="h-4 w-4 ml-2" />
-            طلب إجازة تعويضية
+          <Button onClick={() => navigate({ to: '/dashboard/hr/leave/compensatory/new' })}>
+            <Plus className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+            {isArabic ? 'طلب إجازة تعويضية' : 'New Request'}
           </Button>
         </div>
       </div>
@@ -368,49 +393,59 @@ export default function CompensatoryLeave() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">إجمالي الطلبات</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                {isArabic ? 'إجمالي الطلبات' : 'Total Requests'}
+              </CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalRequests}</div>
               <p className="text-xs text-muted-foreground mt-1">
-                {stats.pendingApproval} قيد الموافقة
+                {stats.pendingApproval}{' '}
+                {isArabic ? 'قيد الموافقة' : 'pending approval'}
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">الأيام المكتسبة</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                {isArabic ? 'الأيام المكتسبة' : 'Days Earned'}
+              </CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalDaysEarned}</div>
               <p className="text-xs text-muted-foreground mt-1">
-                {stats.totalDaysUsed} مستخدم
+                {stats.totalDaysUsed} {isArabic ? 'مستخدم' : 'used'}
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">الرصيد المتبقي</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                {isArabic ? 'الرصيد المتبقي' : 'Remaining Balance'}
+              </CardTitle>
               <CalendarClock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalDaysRemaining}</div>
               <p className="text-xs text-muted-foreground mt-1">
-                {((stats.utilizationRate || 0) * 100).toFixed(0)}% نسبة الاستخدام
+                {((stats.utilizationRate || 0) * 100).toFixed(0)}%{' '}
+                {isArabic ? 'نسبة الاستخدام' : 'utilization rate'}
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">ينتهي قريباً</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                {isArabic ? 'ينتهي قريباً' : 'Expiring Soon'}
+              </CardTitle>
               <AlertTriangle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.expiringInNext30Days}</div>
               <p className="text-xs text-muted-foreground mt-1">
-                خلال 30 يوم
+                {isArabic ? 'خلال 30 يوم' : 'within 30 days'}
               </p>
             </CardContent>
           </Card>
@@ -421,11 +456,11 @@ export default function CompensatoryLeave() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>البحث والتصفية</CardTitle>
+            <CardTitle>{isArabic ? 'البحث والتصفية' : 'Search & Filter'}</CardTitle>
             {hasActiveFilters && (
               <Button variant="ghost" size="sm" onClick={clearFilters}>
-                <X className="h-4 w-4 ml-2" />
-                مسح الفلاتر
+                <X className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                {isArabic ? 'مسح الفلاتر' : 'Clear Filters'}
               </Button>
             )}
           </div>
@@ -433,46 +468,56 @@ export default function CompensatoryLeave() {
         <CardContent>
           <div className="grid gap-4 md:grid-cols-5">
             <div className="relative">
-              <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Search
+                className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-3 h-4 w-4 text-muted-foreground`}
+              />
               <Input
-                placeholder="البحث بالموظف أو الرقم..."
+                placeholder={
+                  isArabic ? 'البحث بالموظف أو الرقم...' : 'Search by employee or number...'
+                }
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pr-9"
+                className={isRTL ? 'pr-9' : 'pl-9'}
               />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger>
-                <SelectValue placeholder="الحالة" />
+                <SelectValue placeholder={isArabic ? 'الحالة' : 'Status'} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">جميع الحالات</SelectItem>
+                <SelectItem value="all">
+                  {isArabic ? 'جميع الحالات' : 'All Statuses'}
+                </SelectItem>
                 {Object.entries(COMPENSATORY_STATUS_LABELS).map(([status, label]) => (
                   <SelectItem key={status} value={status}>
-                    {label.ar}
+                    {isArabic ? label.ar : label.en}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <Select value={reasonFilter} onValueChange={setReasonFilter}>
               <SelectTrigger>
-                <SelectValue placeholder="السبب" />
+                <SelectValue placeholder={isArabic ? 'السبب' : 'Reason'} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">جميع الأسباب</SelectItem>
+                <SelectItem value="all">
+                  {isArabic ? 'جميع الأسباب' : 'All Reasons'}
+                </SelectItem>
                 {Object.entries(WORK_REASON_LABELS).map(([reason, label]) => (
                   <SelectItem key={reason} value={reason}>
-                    {label.ar}
+                    {isArabic ? label.ar : label.en}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <Select value={yearFilter} onValueChange={setYearFilter}>
               <SelectTrigger>
-                <SelectValue placeholder="السنة" />
+                <SelectValue placeholder={isArabic ? 'السنة' : 'Year'} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">جميع السنوات</SelectItem>
+                <SelectItem value="all">
+                  {isArabic ? 'جميع السنوات' : 'All Years'}
+                </SelectItem>
                 {yearOptions.map((year) => (
                   <SelectItem key={year} value={year.toString()}>
                     {year}
@@ -482,14 +527,24 @@ export default function CompensatoryLeave() {
             </Select>
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger>
-                <SelectValue placeholder="الترتيب حسب" />
+                <SelectValue placeholder={isArabic ? 'الترتيب حسب' : 'Sort By'} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="workFromDate">تاريخ العمل</SelectItem>
-                <SelectItem value="leaveDaysEarned">الأيام المكتسبة</SelectItem>
-                <SelectItem value="validUntil">تاريخ الانتهاء</SelectItem>
-                <SelectItem value="createdAt">تاريخ الطلب</SelectItem>
-                <SelectItem value="employeeName">اسم الموظف</SelectItem>
+                <SelectItem value="workFromDate">
+                  {isArabic ? 'تاريخ العمل' : 'Work Date'}
+                </SelectItem>
+                <SelectItem value="leaveDaysEarned">
+                  {isArabic ? 'الأيام المكتسبة' : 'Days Earned'}
+                </SelectItem>
+                <SelectItem value="validUntil">
+                  {isArabic ? 'تاريخ الانتهاء' : 'Expiry Date'}
+                </SelectItem>
+                <SelectItem value="createdAt">
+                  {isArabic ? 'تاريخ الطلب' : 'Request Date'}
+                </SelectItem>
+                <SelectItem value="employeeName">
+                  {isArabic ? 'اسم الموظف' : 'Employee Name'}
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -501,19 +556,21 @@ export default function CompensatoryLeave() {
         <Card className="bg-muted">
           <CardContent className="flex items-center justify-between py-4">
             <div className="flex items-center gap-2">
-              <span className="font-medium">{selectedIds.length} محدد</span>
+              <span className="font-medium">
+                {selectedIds.length} {isArabic ? 'محدد' : 'selected'}
+              </span>
               <Button variant="ghost" size="sm" onClick={() => setIsSelectionMode(false)}>
-                إلغاء التحديد
+                {isArabic ? 'إلغاء التحديد' : 'Cancel Selection'}
               </Button>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="default" size="sm" onClick={handleBulkApprove}>
-                <CheckCircle className="h-4 w-4 ml-2" />
-                موافقة
+                <CheckCircle className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                {isArabic ? 'موافقة' : 'Approve'}
               </Button>
               <Button variant="destructive" size="sm" onClick={handleBulkReject}>
-                <XCircle className="h-4 w-4 ml-2" />
-                رفض
+                <XCircle className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                {isArabic ? 'رفض' : 'Reject'}
               </Button>
             </div>
           </CardContent>
@@ -531,18 +588,22 @@ export default function CompensatoryLeave() {
             </div>
           ) : isError ? (
             <div className="p-8 text-center text-destructive">
-              <p>حدث خطأ في تحميل البيانات</p>
+              <p>{isArabic ? 'حدث خطأ في تحميل البيانات' : 'Error loading data'}</p>
               <Button variant="outline" className="mt-4" onClick={() => refetch()}>
-                إعادة المحاولة
+                {isArabic ? 'إعادة المحاولة' : 'Retry'}
               </Button>
             </div>
           ) : requests.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
               <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>لا توجد طلبات إجازة تعويضية</p>
+              <p>
+                {isArabic
+                  ? 'لا توجد طلبات إجازة تعويضية'
+                  : 'No compensatory leave requests'}
+              </p>
               {hasActiveFilters && (
                 <Button variant="outline" className="mt-4" onClick={clearFilters}>
-                  مسح الفلاتر
+                  {isArabic ? 'مسح الفلاتر' : 'Clear Filters'}
                 </Button>
               )}
             </div>
@@ -555,20 +616,20 @@ export default function CompensatoryLeave() {
                       <Checkbox
                         checked={isAllSelected}
                         onCheckedChange={handleSelectAll}
-                        aria-label="تحديد الكل"
+                        aria-label={isArabic ? 'تحديد الكل' : 'Select All'}
                       />
                     </TableHead>
                   )}
-                  <TableHead>رقم الطلب</TableHead>
-                  <TableHead>الموظف</TableHead>
-                  <TableHead>القسم</TableHead>
-                  <TableHead>السبب</TableHead>
-                  <TableHead>تاريخ العمل</TableHead>
-                  <TableHead>الساعات</TableHead>
-                  <TableHead>الأيام المكتسبة</TableHead>
-                  <TableHead>الرصيد</TableHead>
-                  <TableHead>صلاحية حتى</TableHead>
-                  <TableHead>الحالة</TableHead>
+                  <TableHead>{isArabic ? 'رقم الطلب' : 'Request ID'}</TableHead>
+                  <TableHead>{isArabic ? 'الموظف' : 'Employee'}</TableHead>
+                  <TableHead>{isArabic ? 'القسم' : 'Department'}</TableHead>
+                  <TableHead>{isArabic ? 'السبب' : 'Reason'}</TableHead>
+                  <TableHead>{isArabic ? 'تاريخ العمل' : 'Work Date'}</TableHead>
+                  <TableHead>{isArabic ? 'الساعات' : 'Hours'}</TableHead>
+                  <TableHead>{isArabic ? 'الأيام المكتسبة' : 'Days Earned'}</TableHead>
+                  <TableHead>{isArabic ? 'الرصيد' : 'Balance'}</TableHead>
+                  <TableHead>{isArabic ? 'صلاحية حتى' : 'Valid Until'}</TableHead>
+                  <TableHead>{isArabic ? 'الحالة' : 'Status'}</TableHead>
                   <TableHead className="w-12"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -596,39 +657,49 @@ export default function CompensatoryLeave() {
                       <TableCell className="font-medium">{request.requestId}</TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-medium">{request.employeeNameAr}</div>
+                          <div className="font-medium">
+                            {isArabic ? request.employeeNameAr : request.employeeName}
+                          </div>
                           <div className="text-sm text-muted-foreground">
                             {request.employeeNumber}
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        {request.departmentNameAr || request.departmentName}
+                        {isArabic
+                          ? request.departmentNameAr || request.departmentName
+                          : request.departmentName || request.departmentNameAr}
                       </TableCell>
                       <TableCell>
-                        {WORK_REASON_LABELS[request.reason]?.ar || request.reason}
+                        {isArabic
+                          ? WORK_REASON_LABELS[request.reason]?.ar || request.reason
+                          : WORK_REASON_LABELS[request.reason]?.en || request.reason}
                       </TableCell>
                       <TableCell>
                         {format(new Date(request.workFromDate), 'dd/MM/yyyy')}
                       </TableCell>
-                      <TableCell>{request.hoursWorked} ساعة</TableCell>
+                      <TableCell>
+                        {request.hoursWorked} {isArabic ? 'ساعة' : 'hours'}
+                      </TableCell>
                       <TableCell className="font-medium">
-                        {request.leaveDaysEarned} يوم
+                        {request.leaveDaysEarned} {isArabic ? 'يوم' : 'days'}
                       </TableCell>
                       <TableCell>
-                        {request.daysRemaining} يوم
+                        {request.daysRemaining} {isArabic ? 'يوم' : 'days'}
                       </TableCell>
                       <TableCell>
                         <Badge variant={getExpiryBadgeVariant(request.validUntil)}>
                           {daysUntilExpiry < 0
-                            ? 'منتهي'
-                            : `${daysUntilExpiry} يوم`}
+                            ? isArabic
+                              ? 'منتهي'
+                              : 'Expired'
+                            : `${daysUntilExpiry} ${isArabic ? 'يوم' : 'days'}`}
                         </Badge>
                       </TableCell>
                       <TableCell>
                         <Badge variant={statusConfig.variant as any}>
-                          <StatusIcon className="h-3 w-3 ml-1" />
-                          {statusConfig.labelAr}
+                          <StatusIcon className={`h-3 w-3 ${isRTL ? 'ml-1' : 'mr-1'}`} />
+                          {isArabic ? statusConfig.labelAr : statusConfig.label}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -646,8 +717,8 @@ export default function CompensatoryLeave() {
                                 })
                               }
                             >
-                              <Eye className="h-4 w-4 ml-2" />
-                              عرض التفاصيل
+                              <Eye className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                              {isArabic ? 'عرض التفاصيل' : 'View Details'}
                             </DropdownMenuItem>
                             {request.status === 'draft' && (
                               <>
@@ -658,8 +729,8 @@ export default function CompensatoryLeave() {
                                     })
                                   }
                                 >
-                                  <Edit3 className="h-4 w-4 ml-2" />
-                                  تعديل
+                                  <Edit3 className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                                  {isArabic ? 'تعديل' : 'Edit'}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
@@ -669,8 +740,8 @@ export default function CompensatoryLeave() {
                                     setDeleteDialogOpen(true)
                                   }}
                                 >
-                                  <Trash2 className="h-4 w-4 ml-2" />
-                                  حذف
+                                  <Trash2 className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                                  {isArabic ? 'حذف' : 'Delete'}
                                 </DropdownMenuItem>
                               </>
                             )}
@@ -690,7 +761,9 @@ export default function CompensatoryLeave() {
       {requestsData?.pagination && requestsData.pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            عرض {requests.length} من {requestsData.pagination.total} نتيجة
+            {isArabic
+              ? `عرض ${requests.length} من ${requestsData.pagination.total} نتيجة`
+              : `Showing ${requests.length} of ${requestsData.pagination.total} results`}
           </div>
           <div className="flex items-center gap-2">
             {/* Pagination buttons would go here */}
@@ -702,19 +775,22 @@ export default function CompensatoryLeave() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+            <AlertDialogTitle>
+              {isArabic ? 'تأكيد الحذف' : 'Confirm Deletion'}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              هل أنت متأكد من حذف طلب الإجازة التعويضية هذا؟ لا يمكن التراجع عن هذا
-              الإجراء.
+              {isArabic
+                ? 'هل أنت متأكد من حذف طلب الإجازة التعويضية هذا؟ لا يمكن التراجع عن هذا الإجراء.'
+                : 'Are you sure you want to delete this compensatory leave request? This action cannot be undone.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogCancel>{isArabic ? 'إلغاء' : 'Cancel'}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground"
             >
-              حذف
+              {isArabic ? 'حذف' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

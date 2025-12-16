@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate } from '@tanstack/react-router'
 import {
   ArrowLeft,
   Plus,
@@ -88,7 +88,7 @@ export default function StaffingPlanDetailPage() {
 
   // Handlers
   const handleBack = () => {
-    navigate('/dashboard/hr/recruitment/staffing-plans')
+    navigate({ to: '/dashboard/hr/recruitment/staffing-plans' })
   }
 
   const handleAddDetail = () => {

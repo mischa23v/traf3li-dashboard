@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
+import { validationPatterns, getErrorMessage } from '@/utils/validation-patterns'
 import {
   Dialog,
   DialogContent,
@@ -31,12 +32,38 @@ import { useTranslation } from 'react-i18next'
 
 const formSchema = z.object({
   fullNameArabic: z.string().min(2, 'الاسم مطلوب ويجب أن يكون حرفين على الأقل'),
-  email: z.string().email('البريد الإلكتروني غير صالح').optional().or(z.literal('')),
-  phone: z.string().min(9, 'رقم الهاتف مطلوب'),
-  alternatePhone: z.string().optional(),
-  nationalId: z.string().optional(),
+  email: z.string()
+    .optional()
+    .or(z.literal(''))
+    .refine(
+      (val) => !val || val === '' || validationPatterns.email.test(val),
+      { message: getErrorMessage('email', 'ar') }
+    ),
+  phone: z.string()
+    .min(1, 'رقم الهاتف مطلوب')
+    .refine(
+      (val) => !val || validationPatterns.phone.test(val),
+      { message: getErrorMessage('phone', 'ar') }
+    ),
+  alternatePhone: z.string()
+    .optional()
+    .refine(
+      (val) => !val || validationPatterns.phone.test(val),
+      { message: getErrorMessage('phone', 'ar') }
+    ),
+  nationalId: z.string()
+    .optional()
+    .refine(
+      (val) => !val || validationPatterns.nationalId.test(val),
+      { message: getErrorMessage('nationalId', 'ar') }
+    ),
   companyName: z.string().optional(),
-  crNumber: z.string().optional(),
+  crNumber: z.string()
+    .optional()
+    .refine(
+      (val) => !val || validationPatterns.crNumber.test(val),
+      { message: getErrorMessage('crNumber', 'ar') }
+    ),
   address: z.string().optional(),
   city: z.string().optional(),
   country: z.string().default('SA'),

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from '@tanstack/react-router'
 import {
   useLeaveEncashments,
@@ -115,6 +116,8 @@ const STATUS_CONFIG: Record<EncashmentStatus, { label: string; labelAr: string; 
 }
 
 export default function LeaveEncashments() {
+  const { t, i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
   const navigate = useNavigate()
   const { toast } = useToast()
 
@@ -216,15 +219,15 @@ export default function LeaveEncashments() {
     try {
       await deleteEncashmentMutation.mutateAsync(encashmentToDelete)
       toast({
-        title: 'نجح الحذف',
-        description: 'تم حذف طلب الصرف بنجاح',
+        title: isRTL ? 'نجح الحذف' : 'Delete Successful',
+        description: isRTL ? 'تم حذف طلب الصرف بنجاح' : 'Encashment request deleted successfully',
       })
       setDeleteDialogOpen(false)
       setEncashmentToDelete(null)
     } catch (error: any) {
       toast({
-        title: 'فشل الحذف',
-        description: error.message || 'فشل حذف طلب الصرف',
+        title: isRTL ? 'فشل الحذف' : 'Delete Failed',
+        description: error.message || (isRTL ? 'فشل حذف طلب الصرف' : 'Failed to delete encashment request'),
         variant: 'destructive',
       })
     }
@@ -235,36 +238,36 @@ export default function LeaveEncashments() {
     try {
       await bulkApproveMutation.mutateAsync(selectedIds)
       toast({
-        title: 'نجحت الموافقة',
-        description: `تمت الموافقة على ${selectedIds.length} طلب صرف`,
+        title: isRTL ? 'نجحت الموافقة' : 'Approval Successful',
+        description: isRTL ? `تمت الموافقة على ${selectedIds.length} طلب صرف` : `${selectedIds.length} encashment request(s) approved`,
       })
       setSelectedIds([])
       setIsSelectionMode(false)
     } catch (error: any) {
       toast({
-        title: 'فشلت الموافقة',
-        description: error.message || 'فشلت الموافقة على الطلبات',
+        title: isRTL ? 'فشلت الموافقة' : 'Approval Failed',
+        description: error.message || (isRTL ? 'فشلت الموافقة على الطلبات' : 'Failed to approve requests'),
         variant: 'destructive',
       })
     }
   }
 
   const handleBulkReject = async () => {
-    const reason = prompt('أدخل سبب الرفض:')
+    const reason = prompt(isRTL ? 'أدخل سبب الرفض:' : 'Enter rejection reason:')
     if (!reason) return
 
     try {
       await bulkRejectMutation.mutateAsync({ ids: selectedIds, reason })
       toast({
-        title: 'نجح الرفض',
-        description: `تم رفض ${selectedIds.length} طلب صرف`,
+        title: isRTL ? 'نجح الرفض' : 'Rejection Successful',
+        description: isRTL ? `تم رفض ${selectedIds.length} طلب صرف` : `${selectedIds.length} encashment request(s) rejected`,
       })
       setSelectedIds([])
       setIsSelectionMode(false)
     } catch (error: any) {
       toast({
-        title: 'فشل الرفض',
-        description: error.message || 'فشل رفض الطلبات',
+        title: isRTL ? 'فشل الرفض' : 'Rejection Failed',
+        description: error.message || (isRTL ? 'فشل رفض الطلبات' : 'Failed to reject requests'),
         variant: 'destructive',
       })
     }
@@ -283,13 +286,13 @@ export default function LeaveEncashments() {
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
       toast({
-        title: 'نجح التصدير',
-        description: 'تم تصدير البيانات بنجاح',
+        title: isRTL ? 'نجح التصدير' : 'Export Successful',
+        description: isRTL ? 'تم تصدير البيانات بنجاح' : 'Data exported successfully',
       })
     } catch (error: any) {
       toast({
-        title: 'فشل التصدير',
-        description: error.message || 'فشل تصدير البيانات',
+        title: isRTL ? 'فشل التصدير' : 'Export Failed',
+        description: error.message || (isRTL ? 'فشل تصدير البيانات' : 'Failed to export data'),
         variant: 'destructive',
       })
     }
@@ -297,7 +300,7 @@ export default function LeaveEncashments() {
 
   // Format currency
   const formatCurrency = (amount: number, currency = 'SAR') => {
-    return new Intl.NumberFormat('ar-SA', {
+    return new Intl.NumberFormat(isRTL ? 'ar-SA' : 'en-US', {
       style: 'currency',
       currency: currency,
     }).format(amount)
@@ -312,17 +315,17 @@ export default function LeaveEncashments() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">صرف الإجازات</h1>
-          <p className="text-muted-foreground mt-1">إدارة طلبات صرف الإجازات</p>
+          <h1 className="text-3xl font-bold">{isRTL ? 'صرف الإجازات' : 'Leave Encashments'}</h1>
+          <p className="text-muted-foreground mt-1">{isRTL ? 'إدارة طلبات صرف الإجازات' : 'Manage leave encashment requests'}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={handleExport} disabled={exportMutation.isPending}>
-            <FileDown className="h-4 w-4 ml-2" />
-            تصدير
+            <FileDown className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+            {isRTL ? 'تصدير' : 'Export'}
           </Button>
           <Button onClick={() => navigate({ to: '/dashboard/hr/leave/encashments/new' })}>
-            <Plus className="h-4 w-4 ml-2" />
-            طلب صرف جديد
+            <Plus className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+            {isRTL ? 'طلب صرف جديد' : 'New Encashment Request'}
           </Button>
         </div>
       </div>
@@ -332,7 +335,7 @@ export default function LeaveEncashments() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">إجمالي الطلبات</CardTitle>
+              <CardTitle className="text-sm font-medium">{isRTL ? 'إجمالي الطلبات' : 'Total Requests'}</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -341,7 +344,7 @@ export default function LeaveEncashments() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">قيد الموافقة</CardTitle>
+              <CardTitle className="text-sm font-medium">{isRTL ? 'قيد الموافقة' : 'Pending Approval'}</CardTitle>
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -350,7 +353,7 @@ export default function LeaveEncashments() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">المبلغ الإجمالي</CardTitle>
+              <CardTitle className="text-sm font-medium">{isRTL ? 'المبلغ الإجمالي' : 'Total Amount'}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -359,7 +362,7 @@ export default function LeaveEncashments() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">متوسط الأيام</CardTitle>
+              <CardTitle className="text-sm font-medium">{isRTL ? 'متوسط الأيام' : 'Average Days'}</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -373,11 +376,11 @@ export default function LeaveEncashments() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>البحث والتصفية</CardTitle>
+            <CardTitle>{isRTL ? 'البحث والتصفية' : 'Search & Filter'}</CardTitle>
             {hasActiveFilters && (
               <Button variant="ghost" size="sm" onClick={clearFilters}>
-                <X className="h-4 w-4 ml-2" />
-                مسح الفلاتر
+                <X className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                {isRTL ? 'مسح الفلاتر' : 'Clear Filters'}
               </Button>
             )}
           </div>
@@ -385,33 +388,33 @@ export default function LeaveEncashments() {
         <CardContent>
           <div className="grid gap-4 md:grid-cols-4">
             <div className="relative">
-              <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-3 h-4 w-4 text-muted-foreground`} />
               <Input
-                placeholder="البحث بالموظف أو الرقم..."
+                placeholder={isRTL ? 'البحث بالموظف أو الرقم...' : 'Search by employee or ID...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pr-9"
+                className={isRTL ? 'pr-9' : 'pl-9'}
               />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger>
-                <SelectValue placeholder="الحالة" />
+                <SelectValue placeholder={isRTL ? 'الحالة' : 'Status'} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">جميع الحالات</SelectItem>
+                <SelectItem value="all">{isRTL ? 'جميع الحالات' : 'All Statuses'}</SelectItem>
                 {Object.entries(STATUS_CONFIG).map(([status, config]) => (
                   <SelectItem key={status} value={status}>
-                    {config.labelAr}
+                    {isRTL ? config.labelAr : config.label}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <Select value={yearFilter} onValueChange={setYearFilter}>
               <SelectTrigger>
-                <SelectValue placeholder="السنة" />
+                <SelectValue placeholder={isRTL ? 'السنة' : 'Year'} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">جميع السنوات</SelectItem>
+                <SelectItem value="all">{isRTL ? 'جميع السنوات' : 'All Years'}</SelectItem>
                 {yearOptions.map((year) => (
                   <SelectItem key={year} value={year.toString()}>
                     {year}
@@ -421,13 +424,13 @@ export default function LeaveEncashments() {
             </Select>
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger>
-                <SelectValue placeholder="الترتيب حسب" />
+                <SelectValue placeholder={isRTL ? 'الترتيب حسب' : 'Sort By'} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="requestedAt">تاريخ الطلب</SelectItem>
-                <SelectItem value="encashmentAmount">المبلغ</SelectItem>
-                <SelectItem value="encashmentDays">عدد الأيام</SelectItem>
-                <SelectItem value="employeeName">اسم الموظف</SelectItem>
+                <SelectItem value="requestedAt">{isRTL ? 'تاريخ الطلب' : 'Request Date'}</SelectItem>
+                <SelectItem value="encashmentAmount">{isRTL ? 'المبلغ' : 'Amount'}</SelectItem>
+                <SelectItem value="encashmentDays">{isRTL ? 'عدد الأيام' : 'Days Count'}</SelectItem>
+                <SelectItem value="employeeName">{isRTL ? 'اسم الموظف' : 'Employee Name'}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -439,19 +442,19 @@ export default function LeaveEncashments() {
         <Card className="bg-muted">
           <CardContent className="flex items-center justify-between py-4">
             <div className="flex items-center gap-2">
-              <span className="font-medium">{selectedIds.length} محدد</span>
+              <span className="font-medium">{selectedIds.length} {isRTL ? 'محدد' : 'selected'}</span>
               <Button variant="ghost" size="sm" onClick={() => setIsSelectionMode(false)}>
-                إلغاء التحديد
+                {isRTL ? 'إلغاء التحديد' : 'Cancel Selection'}
               </Button>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="default" size="sm" onClick={handleBulkApprove}>
-                <CheckCircle className="h-4 w-4 ml-2" />
-                موافقة
+                <CheckCircle className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                {isRTL ? 'موافقة' : 'Approve'}
               </Button>
               <Button variant="destructive" size="sm" onClick={handleBulkReject}>
-                <XCircle className="h-4 w-4 ml-2" />
-                رفض
+                <XCircle className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                {isRTL ? 'رفض' : 'Reject'}
               </Button>
             </div>
           </CardContent>
@@ -469,18 +472,18 @@ export default function LeaveEncashments() {
             </div>
           ) : isError ? (
             <div className="p-8 text-center text-destructive">
-              <p>حدث خطأ في تحميل البيانات</p>
+              <p>{isRTL ? 'حدث خطأ في تحميل البيانات' : 'Error loading data'}</p>
               <Button variant="outline" className="mt-4" onClick={() => refetch()}>
-                إعادة المحاولة
+                {isRTL ? 'إعادة المحاولة' : 'Retry'}
               </Button>
             </div>
           ) : encashments.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
               <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>لا توجد طلبات صرف</p>
+              <p>{isRTL ? 'لا توجد طلبات صرف' : 'No encashment requests'}</p>
               {hasActiveFilters && (
                 <Button variant="outline" className="mt-4" onClick={clearFilters}>
-                  مسح الفلاتر
+                  {isRTL ? 'مسح الفلاتر' : 'Clear Filters'}
                 </Button>
               )}
             </div>
@@ -493,18 +496,18 @@ export default function LeaveEncashments() {
                       <Checkbox
                         checked={isAllSelected}
                         onCheckedChange={handleSelectAll}
-                        aria-label="تحديد الكل"
+                        aria-label={isRTL ? 'تحديد الكل' : 'Select All'}
                       />
                     </TableHead>
                   )}
-                  <TableHead>رقم الطلب</TableHead>
-                  <TableHead>الموظف</TableHead>
-                  <TableHead>القسم</TableHead>
-                  <TableHead>نوع الإجازة</TableHead>
-                  <TableHead>الأيام</TableHead>
-                  <TableHead>المبلغ</TableHead>
-                  <TableHead>الحالة</TableHead>
-                  <TableHead>تاريخ الطلب</TableHead>
+                  <TableHead>{isRTL ? 'رقم الطلب' : 'Request ID'}</TableHead>
+                  <TableHead>{isRTL ? 'الموظف' : 'Employee'}</TableHead>
+                  <TableHead>{isRTL ? 'القسم' : 'Department'}</TableHead>
+                  <TableHead>{isRTL ? 'نوع الإجازة' : 'Leave Type'}</TableHead>
+                  <TableHead>{isRTL ? 'الأيام' : 'Days'}</TableHead>
+                  <TableHead>{isRTL ? 'المبلغ' : 'Amount'}</TableHead>
+                  <TableHead>{isRTL ? 'الحالة' : 'Status'}</TableHead>
+                  <TableHead>{isRTL ? 'تاريخ الطلب' : 'Request Date'}</TableHead>
                   <TableHead className="w-12"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -526,24 +529,24 @@ export default function LeaveEncashments() {
                       <TableCell className="font-medium">{encashment.encashmentId}</TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-medium">{encashment.employeeNameAr}</div>
+                          <div className="font-medium">{isRTL ? encashment.employeeNameAr : encashment.employeeName}</div>
                           <div className="text-sm text-muted-foreground">{encashment.employeeNumber}</div>
                         </div>
                       </TableCell>
-                      <TableCell>{encashment.departmentNameAr || encashment.departmentName}</TableCell>
-                      <TableCell>{encashment.leaveTypeNameAr || encashment.leaveTypeName}</TableCell>
-                      <TableCell>{encashment.encashmentDays} يوم</TableCell>
+                      <TableCell>{isRTL ? (encashment.departmentNameAr || encashment.departmentName) : encashment.departmentName}</TableCell>
+                      <TableCell>{isRTL ? (encashment.leaveTypeNameAr || encashment.leaveTypeName) : encashment.leaveTypeName}</TableCell>
+                      <TableCell>{encashment.encashmentDays} {isRTL ? 'يوم' : 'days'}</TableCell>
                       <TableCell className="font-medium">{formatCurrency(encashment.encashmentAmount, encashment.currency)}</TableCell>
                       <TableCell>
                         <Badge variant={statusConfig.variant as any}>
-                          <StatusIcon className="h-3 w-3 ml-1" />
-                          {statusConfig.labelAr}
+                          <StatusIcon className={`h-3 w-3 ${isRTL ? 'ml-1' : 'mr-1'}`} />
+                          {isRTL ? statusConfig.labelAr : statusConfig.label}
                         </Badge>
                       </TableCell>
                       <TableCell>
                         {formatDistanceToNow(new Date(encashment.requestedAt), {
                           addSuffix: true,
-                          locale: ar,
+                          locale: isRTL ? ar : undefined,
                         })}
                       </TableCell>
                       <TableCell>
@@ -557,16 +560,16 @@ export default function LeaveEncashments() {
                             <DropdownMenuItem
                               onClick={() => navigate({ to: `/dashboard/hr/leave/encashments/${encashment._id}` })}
                             >
-                              <Eye className="h-4 w-4 ml-2" />
-                              عرض التفاصيل
+                              <Eye className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                              {isRTL ? 'عرض التفاصيل' : 'View Details'}
                             </DropdownMenuItem>
                             {encashment.status === 'draft' && (
                               <>
                                 <DropdownMenuItem
                                   onClick={() => navigate({ to: `/dashboard/hr/leave/encashments/${encashment._id}/edit` })}
                                 >
-                                  <Edit3 className="h-4 w-4 ml-2" />
-                                  تعديل
+                                  <Edit3 className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                                  {isRTL ? 'تعديل' : 'Edit'}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
@@ -576,8 +579,8 @@ export default function LeaveEncashments() {
                                     setDeleteDialogOpen(true)
                                   }}
                                 >
-                                  <Trash2 className="h-4 w-4 ml-2" />
-                                  حذف
+                                  <Trash2 className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                                  {isRTL ? 'حذف' : 'Delete'}
                                 </DropdownMenuItem>
                               </>
                             )}
@@ -597,7 +600,10 @@ export default function LeaveEncashments() {
       {encashmentsData?.pagination && encashmentsData.pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            عرض {encashments.length} من {encashmentsData.pagination.total} نتيجة
+            {isRTL
+              ? `عرض ${encashments.length} من ${encashmentsData.pagination.total} نتيجة`
+              : `Showing ${encashments.length} of ${encashmentsData.pagination.total} results`
+            }
           </div>
           <div className="flex items-center gap-2">
             {/* Pagination buttons would go here */}
@@ -609,15 +615,18 @@ export default function LeaveEncashments() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+            <AlertDialogTitle>{isRTL ? 'تأكيد الحذف' : 'Confirm Deletion'}</AlertDialogTitle>
             <AlertDialogDescription>
-              هل أنت متأكد من حذف طلب الصرف هذا؟ لا يمكن التراجع عن هذا الإجراء.
+              {isRTL
+                ? 'هل أنت متأكد من حذف طلب الصرف هذا؟ لا يمكن التراجع عن هذا الإجراء.'
+                : 'Are you sure you want to delete this encashment request? This action cannot be undone.'
+              }
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogCancel>{isRTL ? 'إلغاء' : 'Cancel'}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-              حذف
+              {isRTL ? 'حذف' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

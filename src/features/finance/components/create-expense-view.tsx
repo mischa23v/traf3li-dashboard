@@ -6,6 +6,7 @@ import {
     Shield, Info, UserCheck, Clock, CheckCircle, XCircle, X, Send,
     GraduationCap, Presentation, Users, MapPin
 } from 'lucide-react'
+import { isValidVatNumber, errorMessages } from '@/utils/validation-patterns'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -214,6 +215,7 @@ export function CreateExpenseView() {
     }
     const [employeeAdvances, setEmployeeAdvances] = useState<EmployeeAdvance[]>([])
     const [showAdvanceAllocation, setShowAdvanceAllocation] = useState(false)
+    const [taxNumberError, setTaxNumberError] = useState<string>('')
 
     // Get selected client
     const selectedClient = useMemo(() => {
@@ -1111,12 +1113,26 @@ export function CreateExpenseView() {
                                                     <Label className="text-sm font-medium text-slate-700">الرقم الضريبي للمورد</Label>
                                                     <Input
                                                         value={formData.vendorTaxNumber}
-                                                        onChange={(e) => updateField('vendorTaxNumber', e.target.value)}
-                                                        pattern="[0-9]{15}"
+                                                        onChange={(e) => {
+                                                            updateField('vendorTaxNumber', e.target.value)
+                                                            // Clear error when user types
+                                                            if (taxNumberError) setTaxNumberError('')
+                                                        }}
+                                                        onBlur={(e) => {
+                                                            // Validate on blur if field has value
+                                                            const value = e.target.value
+                                                            if (value && !isValidVatNumber(value)) {
+                                                                setTaxNumberError(errorMessages.vatNumber.ar)
+                                                            }
+                                                        }}
                                                         placeholder="300000000000003"
-                                                        className="rounded-xl border-slate-200 font-mono"
+                                                        className={`rounded-xl border-slate-200 font-mono ${taxNumberError ? 'border-red-500' : ''}`}
                                                     />
-                                                    <p className="text-xs text-slate-500">15 رقم - مطلوب لاسترداد الضريبة</p>
+                                                    {taxNumberError ? (
+                                                        <p className="text-xs text-red-600">{taxNumberError}</p>
+                                                    ) : (
+                                                        <p className="text-xs text-slate-500">15 رقم - مطلوب لاسترداد الضريبة</p>
+                                                    )}
                                                 </div>
 
                                                 <div className="grid grid-cols-2 gap-4">

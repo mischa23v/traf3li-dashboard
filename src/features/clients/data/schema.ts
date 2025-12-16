@@ -5,6 +5,10 @@ import {
   sponsorSchema,
   poBoxSchema,
 } from '@/types/najiz'
+import {
+  validationPatterns,
+  getErrorMessage,
+} from '@/utils/validation-patterns'
 
 // ═══════════════════════════════════════════════════════════════
 // ENUMS & STATUS TYPES
@@ -245,9 +249,19 @@ export const createClientSchema = z.object({
   companyName: z.string().optional(),
   companyNameEnglish: z.string().optional(),
   companyNameAr: z.string().optional(),
-  crNumber: z.string().optional(),
+  crNumber: z.string()
+    .optional()
+    .refine(
+      (val) => !val || validationPatterns.crNumber.test(val),
+      { message: getErrorMessage('crNumber', 'en') }
+    ),
   unifiedNumber: z.string().optional(),
-  vatNumber: z.string().optional(),
+  vatNumber: z.string()
+    .optional()
+    .refine(
+      (val) => !val || validationPatterns.vatNumber.test(val),
+      { message: getErrorMessage('vatNumber', 'en') }
+    ),
   legalForm: z.string().optional(),
   legalFormAr: z.string().optional(),
   authorizedPerson: z.string().optional(),
@@ -257,14 +271,40 @@ export const createClientSchema = z.object({
   authorizedPersonIdentityNumber: z.string().optional(),
 
   // Contact
-  email: z.string().email().optional().or(z.literal('')),
-  phone: z.string().optional(),
-  alternatePhone: z.string().optional(),
-  whatsapp: z.string().optional(),
+  email: z.string()
+    .optional()
+    .or(z.literal(''))
+    .refine(
+      (val) => !val || val === '' || validationPatterns.email.test(val),
+      { message: getErrorMessage('email', 'en') }
+    ),
+  phone: z.string()
+    .optional()
+    .refine(
+      (val) => !val || validationPatterns.phone.test(val),
+      { message: getErrorMessage('phone', 'en') }
+    ),
+  alternatePhone: z.string()
+    .optional()
+    .refine(
+      (val) => !val || validationPatterns.phone.test(val),
+      { message: getErrorMessage('phone', 'en') }
+    ),
+  whatsapp: z.string()
+    .optional()
+    .refine(
+      (val) => !val || validationPatterns.phone.test(val),
+      { message: getErrorMessage('phone', 'en') }
+    ),
 
   // Identity (Najiz)
   identityType: identityTypeSchema,
-  nationalId: z.string().optional(),
+  nationalId: z.string()
+    .optional()
+    .refine(
+      (val) => !val || validationPatterns.nationalId.test(val),
+      { message: getErrorMessage('nationalId', 'en') }
+    ),
   iqamaNumber: z.string().optional(),
   gccId: z.string().optional(),
   gccCountry: gccCountrySchema,

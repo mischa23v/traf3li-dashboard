@@ -18,6 +18,7 @@ import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Switch } from '@/components/ui/switch'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Select,
   SelectContent,
@@ -40,6 +41,7 @@ import {
   EDUCATION_LABELS,
   SOURCE_LABELS,
 } from '@/services/recruitmentService'
+import { isValidEmail, isValidPhone, errorMessages } from '@/utils/validation-patterns'
 
 // Office types
 const OFFICE_TYPES = [
@@ -81,7 +83,7 @@ export function ApplicantCreateView() {
   const navigate = useNavigate()
   const searchParams = useSearch({ strict: false }) as { jobId?: string }
   const createMutation = useCreateApplicant()
-  const { data: jobsData } = useJobPostings({ status: 'published' })
+  const { data: jobsData, isLoading: isLoadingJobs } = useJobPostings({ status: 'published' })
 
   // Form state
   const [officeType, setOfficeType] = useState<string>('medium')
@@ -144,6 +146,10 @@ export function ApplicantCreateView() {
   const [isCompensationOpen, setIsCompensationOpen] = useState(false)
   const [isAttorneyOpen, setIsAttorneyOpen] = useState(false)
 
+  // Validation errors
+  const [emailError, setEmailError] = useState('')
+  const [phoneError, setPhoneError] = useState('')
+
   const selectedOffice = OFFICE_TYPES.find((o) => o.id === officeType)
   const hasField = (field: string) => selectedOffice?.fields.includes(field)
 
@@ -175,6 +181,22 @@ export function ApplicantCreateView() {
 
   // Handle submit
   const handleSubmit = async () => {
+    // Clear previous errors
+    setEmailError('')
+    setPhoneError('')
+
+    // Validate email
+    if (!isValidEmail(email)) {
+      setEmailError(errorMessages.email.ar)
+      return
+    }
+
+    // Validate phone
+    if (!isValidPhone(phone)) {
+      setPhoneError(errorMessages.phone.ar)
+      return
+    }
+
     try {
       const applicantData: Partial<Applicant> = {
         personalInfo: {
@@ -275,6 +297,74 @@ export function ApplicantCreateView() {
     { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
     { title: 'التوظيف', href: '/dashboard/hr/recruitment/applicants', isActive: true },
   ]
+
+  // Loading state
+  if (isLoadingJobs) {
+    return (
+      <>
+        <Header className="bg-navy shadow-none relative">
+          <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+            <DynamicIsland />
+          </div>
+          <div className='ms-auto flex items-center gap-4'>
+            <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+            <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+            <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+            <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+          </div>
+        </Header>
+        <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden">
+          {/* ProductivityHero Skeleton */}
+          <Skeleton className="h-24 w-full rounded-2xl" />
+
+          {/* 3-Column Grid Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main Content - 2 columns */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Page Header Skeleton */}
+              <div className="flex items-center gap-4">
+                <Skeleton className="h-10 w-10 rounded-xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-8 w-48" />
+                  <Skeleton className="h-4 w-64" />
+                </div>
+              </div>
+
+              {/* Office Type Selector Skeleton */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <Skeleton key={i} className="h-32 rounded-2xl" />
+                ))}
+              </div>
+
+              {/* Job Selection Skeleton */}
+              <Skeleton className="h-48 rounded-2xl" />
+
+              {/* Personal Information Skeleton */}
+              <Skeleton className="h-96 rounded-2xl" />
+
+              {/* Additional Sections Skeleton */}
+              <Skeleton className="h-64 rounded-2xl" />
+              <Skeleton className="h-64 rounded-2xl" />
+
+              {/* Submit Button Skeleton */}
+              <div className="flex items-center justify-end gap-4">
+                <Skeleton className="h-12 w-24 rounded-xl" />
+                <Skeleton className="h-12 w-32 rounded-xl" />
+              </div>
+            </div>
+
+            {/* RIGHT COLUMN (Widgets) Skeleton */}
+            <div className="space-y-6">
+              <Skeleton className="h-64 rounded-2xl" />
+              <Skeleton className="h-64 rounded-2xl" />
+            </div>
+          </div>
+        </Main>
+      </>
+    )
+  }
 
   return (
     <>
@@ -456,11 +546,17 @@ export function ApplicantCreateView() {
                     id="email"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value)
+                      setEmailError('')
+                    }}
                     placeholder="email@example.com"
-                    className="rounded-xl pe-10"
+                    className={`rounded-xl pe-10 ${emailError ? 'border-red-500' : ''}`}
                   />
                 </div>
+                {emailError && (
+                  <p className="text-sm text-red-500">{emailError}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">رقم الهاتف *<Lock className="h-3 w-3 text-slate-500 inline ms-1" /></Label>
@@ -470,11 +566,18 @@ export function ApplicantCreateView() {
                     id="phone"
                     type="tel"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => {
+                      setPhone(e.target.value)
+                      setPhoneError('')
+                    }}
                     placeholder="+966 5X XXX XXXX"
-                    className="rounded-xl pe-10"
+                    className={`rounded-xl pe-10 ${phoneError ? 'border-red-500' : ''}`}
+                    dir="ltr"
                   />
                 </div>
+                {phoneError && (
+                  <p className="text-sm text-red-500">{phoneError}</p>
+                )}
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

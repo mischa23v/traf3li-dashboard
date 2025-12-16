@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useParams } from 'react-router-dom'
+import { useParams } from '@tanstack/react-router'
 import {
   Plus,
   Award,
@@ -55,7 +55,7 @@ import { format } from 'date-fns'
 import { ar } from 'date-fns/locale'
 
 export default function EmployeeSkillsPage() {
-  const { employeeId } = useParams<{ employeeId: string }>()
+  const { employeeId } = useParams({ strict: false })
   const { t, i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
 

@@ -24,6 +24,7 @@ import fiscalPeriodService from '@/services/fiscalPeriodService'
 import currencyService from '@/services/currencyService'
 import bankAccountService from '@/services/bankAccountService'
 import { toast } from 'sonner'
+import { isValidIban, isValidVatNumber, isValidCrNumber, errorMessages } from '@/utils/validation-patterns'
 
 // Types for wizard data
 interface WizardData {
@@ -131,8 +132,40 @@ export function FinanceSetupWizard() {
   const [wizardData, setWizardData] = useState<WizardData>(defaultWizardData)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
 
   const totalSteps = 10
+
+  // Validation function for step 1 (Company Info)
+  const validateStep1 = (): boolean => {
+    const errors: Record<string, string> = {}
+
+    // Validate CR Number if provided
+    if (wizardData.crNumber && !isValidCrNumber(wizardData.crNumber)) {
+      errors.crNumber = errorMessages.crNumber.ar
+    }
+
+    // Validate VAT Number if provided
+    if (wizardData.vatNumber && !isValidVatNumber(wizardData.vatNumber)) {
+      errors.vatNumber = errorMessages.vatNumber.ar
+    }
+
+    setValidationErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
+  // Validation function for step 6 (Bank Accounts)
+  const validateStep6 = (): boolean => {
+    const errors: Record<string, string> = {}
+
+    // Validate IBAN if provided
+    if (wizardData.iban && !isValidIban(wizardData.iban)) {
+      errors.iban = errorMessages.iban.ar
+    }
+
+    setValidationErrors(errors)
+    return Object.keys(errors).length === 0
+  }
 
   // Load saved progress from localStorage
   useEffect(() => {
@@ -160,6 +193,14 @@ export function FinanceSetupWizard() {
 
   const handleInputChange = (field: keyof WizardData, value: any) => {
     setWizardData(prev => ({ ...prev, [field]: value }))
+    // Clear validation error for this field when user types
+    if (validationErrors[field]) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[field]
+        return newErrors
+      })
+    }
   }
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -175,6 +216,16 @@ export function FinanceSetupWizard() {
   }
 
   const nextStep = () => {
+    // Validate current step before proceeding
+    if (currentStep === 1 && !validateStep1()) {
+      toast.error('يرجى تصحيح الأخطاء قبل المتابعة')
+      return
+    }
+    if (currentStep === 6 && !validateStep6()) {
+      toast.error('يرجى تصحيح الأخطاء قبل المتابعة')
+      return
+    }
+
     if (currentStep < totalSteps) {
       setCurrentStep(prev => prev + 1)
       window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -353,9 +404,12 @@ export function FinanceSetupWizard() {
                   placeholder="1010123456"
                   value={wizardData.crNumber}
                   onChange={(e) => handleInputChange('crNumber', e.target.value)}
-                  className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                  className={`rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 ${validationErrors.crNumber ? 'border-red-500' : ''}`}
                   required
                 />
+                {validationErrors.crNumber && (
+                  <p className="text-xs text-red-600">{validationErrors.crNumber}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -367,9 +421,12 @@ export function FinanceSetupWizard() {
                   placeholder="300000000000003"
                   value={wizardData.vatNumber}
                   onChange={(e) => handleInputChange('vatNumber', e.target.value)}
-                  className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                  className={`rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 ${validationErrors.vatNumber ? 'border-red-500' : ''}`}
                   required
                 />
+                {validationErrors.vatNumber && (
+                  <p className="text-xs text-red-600">{validationErrors.vatNumber}</p>
+                )}
               </div>
 
               <div className="space-y-2 col-span-2">
@@ -842,8 +899,11 @@ export function FinanceSetupWizard() {
                   placeholder="SA00 0000 0000 0000 0000 0000"
                   value={wizardData.iban}
                   onChange={(e) => handleInputChange('iban', e.target.value)}
-                  className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                  className={`rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 ${validationErrors.iban ? 'border-red-500' : ''}`}
                 />
+                {validationErrors.iban && (
+                  <p className="text-xs text-red-600">{validationErrors.iban}</p>
+                )}
               </div>
 
               <div className="flex items-center justify-between bg-slate-50 rounded-xl p-4">

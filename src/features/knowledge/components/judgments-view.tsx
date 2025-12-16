@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Gavel, Search, Download, ExternalLink,
@@ -7,6 +7,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Card,
   CardContent,
@@ -117,6 +118,15 @@ export function JudgmentsView() {
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [courtFilter, setCourtFilter] = useState('all')
   const [bookmarkedJudgments, setBookmarkedJudgments] = useState<string[]>(['1', '3'])
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Simulate data fetching
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 800)
+    return () => clearTimeout(timer)
+  }, [])
 
   const topNav = [
     { title: isRTL ? 'القوانين' : 'Laws', href: '/dashboard/knowledge/laws', isActive: false },
@@ -248,7 +258,58 @@ export function JudgmentsView() {
 
             {/* Judgments List */}
             <div className="space-y-4">
-              {filteredJudgments.map((judgment) => (
+              {/* Loading State */}
+              {isLoading && (
+                <>
+                  {[1, 2, 3].map((i) => (
+                    <Card key={i} className="border-slate-100">
+                      <CardContent className="p-6">
+                        <div className="flex flex-col md:flex-row md:items-start gap-4">
+                          {/* Icon Skeleton */}
+                          <Skeleton className="h-14 w-14 rounded-2xl shrink-0" />
+
+                          {/* Content Skeleton */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-4 mb-4">
+                              <div className="flex-1 space-y-2">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <Skeleton className="h-6 w-64" />
+                                  <Skeleton className="h-6 w-20 rounded-full" />
+                                </div>
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-3/4" />
+                              </div>
+                              <Skeleton className="h-10 w-10 rounded-lg" />
+                            </div>
+
+                            {/* Meta Info Skeleton */}
+                            <div className="flex flex-wrap items-center gap-4 mb-4">
+                              <Skeleton className="h-6 w-32 rounded-lg" />
+                              <Skeleton className="h-6 w-40 rounded-lg" />
+                              <Skeleton className="h-6 w-24 rounded-lg" />
+                            </div>
+
+                            {/* Actions Skeleton */}
+                            <div className="flex items-center justify-between pt-4 border-t border-slate-50">
+                              <div className="flex items-center gap-4">
+                                <Skeleton className="h-4 w-16" />
+                                <Skeleton className="h-4 w-16" />
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Skeleton className="h-9 w-24 rounded-lg" />
+                                <Skeleton className="h-9 w-20 rounded-lg" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </>
+              )}
+
+              {/* Judgments Data */}
+              {!isLoading && filteredJudgments.map((judgment) => (
                 <Card key={judgment.id} className="hover:shadow-lg transition-all duration-300 group border-slate-100">
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row md:items-start gap-4">
@@ -325,7 +386,7 @@ export function JudgmentsView() {
               ))}
             </div>
 
-            {filteredJudgments.length === 0 && (
+            {!isLoading && filteredJudgments.length === 0 && (
               <Card className="border-dashed border-2 border-slate-200 bg-slate-50/50">
                 <CardContent className="p-12 text-center">
                   <div className="h-16 w-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
