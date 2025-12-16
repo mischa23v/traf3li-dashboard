@@ -22,18 +22,25 @@ interface ChatRequest {
 
 // Available models on Workers AI
 const MODELS = {
-  // Meta Llama models (recommended)
-  'llama-3.1-8b': '@cf/meta/llama-3.1-8b-instruct',
+  // Budget-friendly (cheapest)
+  'llama-3.2-1b': '@cf/meta/llama-3.2-1b-instruct',
   'llama-3.2-3b': '@cf/meta/llama-3.2-3b-instruct',
-  'llama-3.3-70b': '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
 
-  // Mistral models
+  // Best value (recommended for general use)
+  'llama-3.1-8b': '@cf/meta/llama-3.1-8b-instruct',
   'mistral-7b': '@cf/mistral/mistral-7b-instruct-v0.1',
 
-  // Qwen models
+  // Premium models
+  'llama-3.3-70b': '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
+
+  // DeepSeek (best for reasoning/code)
+  'deepseek-r1-32b': '@cf/deepseek-ai/deepseek-r1-distill-qwen-32b',
+  'deepseek-coder': '@hf/thebloke/deepseek-coder-6.7b-instruct-awq',
+
+  // Qwen models (good multilingual/Arabic)
   'qwen-1.5-7b': '@cf/qwen/qwen1.5-7b-chat-awq',
 
-  // Default
+  // Default - best balance of cost/quality
   default: '@cf/meta/llama-3.1-8b-instruct',
 } as const;
 
