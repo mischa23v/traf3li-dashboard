@@ -256,7 +256,7 @@ const defaultWizardData: WizardData = {
   completed: false,
 }
 
-export function CRMSetupWizard() {
+export default function CRMSetupWizard() {
   const navigate = useNavigate()
   const [currentStep, setCurrentStep] = useState(1)
   const [wizardData, setWizardData] = useState<WizardData>(defaultWizardData)

@@ -2247,38 +2247,6 @@ const financeService = {
   },
 
   /**
-   * Approve invoice
-   * POST /api/invoices/:id/approve
-   */
-  approveInvoice: async (invoiceId: string, data: {
-    comments?: string
-    approverLevel: number
-  }): Promise<Invoice> => {
-    try {
-      const response = await apiClient.post(`/invoices/${invoiceId}/approve`, data)
-      return response.data.invoice || response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
-  },
-
-  /**
-   * Reject invoice
-   * POST /api/invoices/:id/reject
-   */
-  rejectInvoice: async (invoiceId: string, data: {
-    reason: string
-    comments?: string
-  }): Promise<Invoice> => {
-    try {
-      const response = await apiClient.post(`/invoices/${invoiceId}/reject`, data)
-      return response.data.invoice || response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
-  },
-
-  /**
    * Request changes to invoice
    * POST /api/invoices/:id/request-changes
    */
