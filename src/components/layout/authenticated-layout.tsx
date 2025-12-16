@@ -7,7 +7,6 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/layout/app-sidebar'
 import { SkipToMain } from '@/components/skip-to-main'
 import { OfflineIndicator } from '@/components/offline-indicator'
-import { useSessionTimeout } from '@/hooks/useSessionTimeout'
 
 type AuthenticatedLayoutProps = {
   children?: React.ReactNode
@@ -15,9 +14,6 @@ type AuthenticatedLayoutProps = {
 
 export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   const defaultOpen = getCookie('sidebar_state') !== 'false'
-
-  // Initialize session timeout monitoring
-  useSessionTimeout()
 
   return (
     <SearchProvider>
