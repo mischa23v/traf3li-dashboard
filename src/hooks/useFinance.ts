@@ -5,6 +5,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { Analytics } from '@/lib/analytics'
 import financeService, {
   InvoiceFilters,
   ExpenseFilters,
@@ -46,6 +47,9 @@ export const useCreateInvoice = () => {
     // Update cache on success (Stable & Correct)
     onSuccess: (data) => {
       toast.success('تم إنشاء الفاتورة بنجاح')
+
+      // Track analytics event
+      Analytics.invoiceCreated(data.total || data.amount || 0, data.currency || 'SAR')
 
       // Manually update the cache
       queryClient.setQueriesData({ queryKey: ['invoices'] }, (old: any) => {
@@ -99,8 +103,11 @@ export const useSendInvoice = () => {
 
   return useMutation({
     mutationFn: (id: string) => financeService.sendInvoice(id),
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success('تم إرسال الفاتورة بنجاح')
+
+      // Track analytics event
+      Analytics.invoiceSent(data?.total || data?.amount || 0)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إرسال الفاتورة')
@@ -703,8 +710,11 @@ export const useCreatePayment = () => {
   return useMutation({
     mutationFn: (data: CreatePaymentData) =>
       financeService.createPayment(data),
-    onSuccess: () => {
+    onSuccess: (result, data) => {
       toast.success('تم إنشاء الدفعة بنجاح')
+
+      // Track analytics event
+      Analytics.paymentReceived(data.amount || result?.amount || 0, data.method || 'bank_transfer')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء الدفعة')

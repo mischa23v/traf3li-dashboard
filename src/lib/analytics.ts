@@ -154,36 +154,97 @@ export function clearUser(): void {
 
 // Pre-defined event helpers for common actions
 export const Analytics = {
-  // Authentication events
+  // ==================== AUTHENTICATION ====================
   login: (method: string) => trackEvent('login', { method }),
   logout: () => trackEvent('logout'),
-  signUp: (method: string) => trackEvent('sign_up', { method }),
+  signUp: (method: string, userType?: string) =>
+    trackEvent('sign_up', { method, user_type: userType }),
 
-  // Case management
-  caseCreated: (caseType: string) => trackEvent('case_created', { case_type: caseType }),
-  caseUpdated: (caseId: string) => trackEvent('case_updated', { case_id: caseId }),
-  caseClosed: (caseId: string) => trackEvent('case_closed', { case_id: caseId }),
+  // ==================== CASE MANAGEMENT (Key Metric: Case Throughput) ====================
+  caseCreated: (caseType: string, clientType?: string) =>
+    trackEvent('case_created', {
+      case_type: caseType,
+      client_type: clientType,
+      timestamp: Date.now()
+    }),
+  caseUpdated: (caseId: string, fieldsChanged?: string[]) =>
+    trackEvent('case_updated', {
+      case_id: caseId,
+      fields_changed: fieldsChanged?.join(',')
+    }),
+  caseClosed: (caseId: string, outcome?: string, daysOpen?: number) =>
+    trackEvent('case_closed', {
+      case_id: caseId,
+      outcome,
+      days_to_close: daysOpen, // KEY METRIC: Case cycle time
+      timestamp: Date.now()
+    }),
+  caseStatusChanged: (caseId: string, fromStatus: string, toStatus: string) =>
+    trackEvent('case_status_changed', {
+      case_id: caseId,
+      from_status: fromStatus,
+      to_status: toStatus
+    }),
 
-  // Finance events
-  invoiceCreated: (amount: number, currency: string) =>
-    trackEvent('invoice_created', { amount, currency }),
-  invoiceSent: (amount: number) => trackEvent('invoice_sent', { amount }),
-  paymentReceived: (amount: number, method: string) =>
-    trackEvent('payment_received', { amount, method }),
+  // ==================== FINANCE (Key Metric: Revenue Per Case) ====================
+  invoiceCreated: (amount: number, currency: string, caseId?: string) =>
+    trackEvent('invoice_created', {
+      amount,
+      currency,
+      case_id: caseId,
+      timestamp: Date.now()
+    }),
+  invoiceSent: (amount: number, invoiceId?: string) =>
+    trackEvent('invoice_sent', { amount, invoice_id: invoiceId }),
+  paymentReceived: (amount: number, method: string, invoiceId?: string) =>
+    trackEvent('payment_received', {
+      amount,
+      method,
+      invoice_id: invoiceId,
+      timestamp: Date.now()
+    }),
+  revenueByCase: (caseId: string, totalRevenue: number) =>
+    trackEvent('case_revenue', { case_id: caseId, total_revenue: totalRevenue }),
 
-  // Document events
-  documentUploaded: (fileType: string) => trackEvent('document_uploaded', { file_type: fileType }),
+  // ==================== USER ACTIVATION (Key Metric: Feature Adoption) ====================
+  // Core actions that indicate active usage
+  timeEntryLogged: (hours: number, caseId?: string) =>
+    trackEvent('time_entry_logged', { hours, case_id: caseId }),
+  documentUploaded: (fileType: string, caseId?: string) =>
+    trackEvent('document_uploaded', { file_type: fileType, case_id: caseId }),
   documentDownloaded: (fileType: string) =>
     trackEvent('document_downloaded', { file_type: fileType }),
+  clientMessageSent: (clientId: string) =>
+    trackEvent('client_message_sent', { client_id: clientId }),
+  hearingScheduled: (caseId: string) =>
+    trackEvent('hearing_scheduled', { case_id: caseId }),
+  taskCompleted: (taskId: string) =>
+    trackEvent('task_completed', { task_id: taskId }),
 
-  // Search events
-  search: (query: string, resultsCount: number) =>
-    trackEvent('search', { search_term: query, results_count: resultsCount }),
+  // ==================== FEATURE USAGE ====================
+  featureUsed: (featureName: string, module?: string) =>
+    trackEvent('feature_used', { feature_name: featureName, module }),
+  moduleVisited: (moduleName: string) =>
+    trackEvent('module_visited', { module_name: moduleName }),
+  reportGenerated: (reportType: string) =>
+    trackEvent('report_generated', { report_type: reportType }),
 
-  // Error tracking
-  error: (errorType: string, errorMessage: string) =>
-    trackEvent('error', { error_type: errorType, error_message: errorMessage }),
+  // ==================== CLIENT ENGAGEMENT ====================
+  clientCreated: (clientType: string) =>
+    trackEvent('client_created', { client_type: clientType }),
+  clientRetained: (clientId: string, casesCount: number) =>
+    trackEvent('client_retained', { client_id: clientId, cases_count: casesCount }),
 
-  // Feature usage
-  featureUsed: (featureName: string) => trackEvent('feature_used', { feature_name: featureName }),
+  // ==================== SEARCH & NAVIGATION ====================
+  search: (query: string, resultsCount: number, module?: string) =>
+    trackEvent('search', { search_term: query, results_count: resultsCount, module }),
+
+  // ==================== ERRORS & PERFORMANCE ====================
+  error: (errorType: string, errorMessage: string, context?: string) =>
+    trackEvent('error', { error_type: errorType, error_message: errorMessage, context }),
+
+  // ==================== CUSTOM METRICS ====================
+  // Track any custom business metric
+  trackMetric: (metricName: string, value: number, dimensions?: EventParams) =>
+    trackEvent(`metric_${metricName}`, { value, ...dimensions }),
 }
