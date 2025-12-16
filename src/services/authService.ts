@@ -96,6 +96,12 @@ export interface User {
   tenant?: UserTenant | null
   // Permissions returned directly from login (for solo lawyers)
   permissions?: UserPermissions | null
+  // Plan/Subscription fields
+  plan?: 'free' | 'starter' | 'professional' | 'enterprise'
+  planExpiresAt?: string | null
+  trialEndsAt?: string | null
+  maxUsers?: number
+  features?: string[]
   lawyerProfile?: {
     specialization: string[]
     licenseNumber?: string
@@ -784,6 +790,62 @@ const authService = {
       throw new Error(handleApiError(error))
     }
   },
+}
+
+/**
+ * Plan hierarchy helper
+ * Defines the order of plans from lowest to highest
+ */
+const PLAN_HIERARCHY: Record<'free' | 'starter' | 'professional' | 'enterprise', number> = {
+  free: 0,
+  starter: 1,
+  professional: 2,
+  enterprise: 3,
+}
+
+/**
+ * Check if user's plan meets or exceeds the required plan level
+ * Returns true if userPlan >= requiredPlan in the hierarchy
+ *
+ * @param userPlan - The user's current plan
+ * @param requiredPlan - The minimum required plan
+ * @returns boolean indicating if user's plan is at least the required level
+ *
+ * @example
+ * isPlanAtLeast('professional', 'starter') // true
+ * isPlanAtLeast('free', 'enterprise') // false
+ * isPlanAtLeast('professional', 'professional') // true
+ */
+export const isPlanAtLeast = (
+  userPlan: 'free' | 'starter' | 'professional' | 'enterprise' | undefined,
+  requiredPlan: 'free' | 'starter' | 'professional' | 'enterprise'
+): boolean => {
+  // If no plan is specified, default to 'free'
+  const currentPlan = userPlan || 'free'
+  return PLAN_HIERARCHY[currentPlan] >= PLAN_HIERARCHY[requiredPlan]
+}
+
+/**
+ * Get the plan level number for a given plan
+ * Useful for custom comparisons
+ *
+ * @param plan - The plan to get the level for
+ * @returns number representing the plan level (0-3)
+ */
+export const getPlanLevel = (plan: 'free' | 'starter' | 'professional' | 'enterprise' | undefined): number => {
+  return PLAN_HIERARCHY[plan || 'free']
+}
+
+/**
+ * Check if a user has access to a specific feature
+ *
+ * @param user - The user object
+ * @param featureName - The name of the feature to check
+ * @returns boolean indicating if user has access to the feature
+ */
+export const hasFeature = (user: User | null, featureName: string): boolean => {
+  if (!user) return false
+  return user.features?.includes(featureName) || false
 }
 
 export default authService

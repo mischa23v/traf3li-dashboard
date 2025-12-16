@@ -3974,8 +3974,7 @@
       "edit": "Edit",
       "designer": "Designer"
     }
-  }
-,
+  },
   "whiteboard": {
     "title": "Brainstorm",
     "emptyTitle": "Start Brainstorming",
@@ -4038,5 +4037,74 @@
     "linkHearing": "Link Hearing",
     "linkDocument": "Link Document",
     "selectEntityToLink": "Select an item to link to this block."
+  },
+  "pricing": {
+    "upgradeYourPlan": "Upgrade Your Plan",
+    "upgradeToAccess": "Upgrade to Access This Feature",
+    "upgradeMessage": "The feature \"{{feature}}\" requires a higher plan. Upgrade now to unlock it.",
+    "chooseThePlanThatFitsYourNeeds": "Choose the plan that fits your needs and scale as you grow",
+    "currentPlan": "Current Plan",
+    "upgrade": "Upgrade",
+    "downgrade": "Downgrade",
+    "contactSales": "Contact Sales",
+    "monthly": "Monthly",
+    "annual": "Annual",
+    "saveUpTo": "Save {{percent}}%",
+    "sar": "SAR",
+    "perMonth": "per month",
+    "perYear": "per year",
+    "custom": "Custom Pricing",
+    "recommended": "Recommended",
+    "popular": "Most Popular",
+    "unlimited": "Unlimited",
+    "basic": "Basic",
+    "advanced": "Advanced",
+    "community": "Community",
+    "email": "Email",
+    "priority": "Priority",
+    "dedicated": "Dedicated Account Manager",
+    "featuresIncluded": "Features Included",
+    "plans": {
+      "free": {
+        "name": "Free",
+        "description": "Perfect for getting started and exploring the platform"
+      },
+      "starter": {
+        "name": "Starter",
+        "description": "Ideal for solo practitioners and small law firms"
+      },
+      "professional": {
+        "name": "Professional",
+        "description": "Best for growing practices with advanced needs"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Custom solutions for large firms and enterprises"
+      }
+    },
+    "features": {
+      "cases": "Cases",
+      "clients": "Clients",
+      "storage": "Storage",
+      "users": "Team Members",
+      "invoicing": "Invoicing & Billing",
+      "timeTracking": "Time Tracking",
+      "reports": "Reports & Analytics",
+      "automation": "Workflow Automation",
+      "apiAccess": "API Access",
+      "whiteLabel": "White Label",
+      "support": "Support"
+    },
+    "startFreeTrial": "Start Your Free Trial",
+    "freeTrialDescription": "Try Professional plan free for 14 days. No credit card required. Cancel anytime.",
+    "start14DayTrial": "Start 14-Day Free Trial",
+    "moneyBackGuarantee": "30-Day Money Back Guarantee",
+    "moneyBackDescription": "Try risk-free with our money-back guarantee",
+    "support247": "24/7 Support",
+    "support247Description": "Get help whenever you need it",
+    "securePayment": "Secure Payment",
+    "securePaymentDescription": "Your data is protected with bank-level encryption",
+    "allPricesInSAR": "All prices are in Saudi Riyal (SAR) and exclude VAT",
+    "cancelAnytime": "Cancel anytime. No long-term contracts."
   }
 }
