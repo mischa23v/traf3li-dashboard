@@ -6,6 +6,7 @@ import documentsService, {
 } from '@/services/documentsService'
 import { toast } from '@/hooks/use-toast'
 import { useTranslation } from 'react-i18next'
+import { Analytics } from '@/lib/analytics'
 
 // Query keys
 export const documentsKeys = {
@@ -119,11 +120,15 @@ export const useUploadDocument = () => {
       onProgress?: (progress: number) => void
     }) => documentsService.uploadDocument(file, metadata, onProgress),
     // Update cache on success (Stable & Correct)
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       toast({
         title: t('status.success'),
         description: t('documents.uploadSuccess'),
       })
+
+      // Track analytics - USER ACTIVATION METRIC
+      const fileType = variables.file?.name?.split('.').pop() || 'unknown'
+      Analytics.documentUploaded(fileType, variables.metadata?.caseId)
 
       // Manually update the cache with the REAL document from server
       queryClient.setQueriesData({ queryKey: documentsKeys.all }, (old: any) => {

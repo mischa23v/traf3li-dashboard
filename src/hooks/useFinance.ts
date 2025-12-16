@@ -543,8 +543,11 @@ export const useCreateTimeEntry = () => {
     mutationFn: (data: CreateTimeEntryData) =>
       financeService.createTimeEntry(data),
     // Update cache on success (Stable & Correct)
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       toast.success('تم إنشاء إدخال الوقت بنجاح')
+
+      // Track analytics - KEY USER ACTIVATION METRIC
+      Analytics.timeEntryLogged(variables.hours || data.hours || 0, variables.caseId || data.caseId)
 
       // Manually update the cache
       queryClient.setQueriesData({ queryKey: ['timeEntries'] }, (old: any) => {

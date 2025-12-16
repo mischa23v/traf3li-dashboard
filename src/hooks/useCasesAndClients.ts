@@ -420,8 +420,11 @@ export const useCreateClient = () => {
   return useMutation({
     mutationFn: (data: CreateClientData) => clientsService.createClient(data),
     // Update cache on success (Stable & Correct)
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       toast.success(t('clients.createSuccess', 'تم إنشاء العميل بنجاح'))
+
+      // Track analytics - CLIENT ENGAGEMENT METRIC
+      Analytics.clientCreated(variables.type || data.type || 'individual')
 
       // Manually update the cache
       queryClient.setQueriesData({ queryKey: ['clients'] }, (old: any) => {
