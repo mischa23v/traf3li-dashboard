@@ -7,7 +7,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { setUser as setSentryUser } from '@/lib/sentry'
 import { Analytics, identifyUser, clearUser as clearAnalyticsUser } from '@/lib/analytics'
-import authService, { User, LoginCredentials } from '@/services/authService'
+import authService, { User, LoginCredentials, isPlanAtLeast, getPlanLevel, hasFeature } from '@/services/authService'
 import { usePermissionsStore } from './permissions-store'
 
 interface AuthState {
@@ -252,3 +252,28 @@ export const selectIsSoloLawyer = (state: AuthState) =>
   state.user?.isSoloLawyer === true
 export const selectLawyerWorkMode = (state: AuthState) =>
   state.user?.lawyerWorkMode
+
+/**
+ * Plan/Subscription selectors
+ */
+export const selectPlan = (state: AuthState) => state.user?.plan || 'free'
+export const selectPlanExpiresAt = (state: AuthState) => state.user?.planExpiresAt
+export const selectTrialEndsAt = (state: AuthState) => state.user?.trialEndsAt
+export const selectMaxUsers = (state: AuthState) => state.user?.maxUsers
+export const selectFeatures = (state: AuthState) => state.user?.features || []
+
+/**
+ * Plan comparison helper selectors
+ * Check if user's plan meets or exceeds a required plan level
+ */
+export const selectIsPlanAtLeast = (requiredPlan: 'free' | 'starter' | 'professional' | 'enterprise') =>
+  (state: AuthState) => isPlanAtLeast(state.user?.plan, requiredPlan)
+
+export const selectPlanLevel = (state: AuthState) => getPlanLevel(state.user?.plan)
+
+/**
+ * Feature access selector
+ * Check if user has access to a specific feature
+ */
+export const selectHasFeature = (featureName: string) =>
+  (state: AuthState) => hasFeature(state.user, featureName)

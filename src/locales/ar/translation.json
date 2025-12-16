@@ -889,10 +889,10 @@
       "newTask": "مهمة جديدة",
       "newInvoice": "فاتورة جديدة",
       "stats": {
-        "cases": "القضايا",
-        "tasks": "المهام",
-        "messages": "الرسائل",
-        "reminders": "التذكيرات"
+        "todaysTasks": "مهام اليوم",
+        "overdue": "متأخرة",
+        "upcomingEvents": "أحداث قادمة",
+        "reminders": "تذكيرات"
       },
       "productivity": "الإنتاجية",
       "calendar": "التقويم",
@@ -965,12 +965,6 @@
         "salesReports": "تقارير المبيعات",
         "campaigns": "الحملات",
         "biometric": "أجهزة البصمة"
-      },
-      "stats": {
-        "todaysTasks": "مهام اليوم",
-        "overdue": "متأخرة",
-        "upcomingEvents": "أحداث قادمة",
-        "reminders": "تذكيرات"
       }
     },
     "stats": {
@@ -3906,8 +3900,7 @@
       "edit": "تعديل",
       "designer": "المصمم"
     }
-  }
-,
+  },
   "whiteboard": {
     "title": "العصف الذهني",
     "emptyTitle": "ابدأ العصف الذهني",
@@ -4027,5 +4020,74 @@
     "saved": "تم الحفظ",
     "saveError": "فشل الحفظ",
     "user": "مستخدم"
+  },
+  "pricing": {
+    "upgradeYourPlan": "ترقية خطتك",
+    "upgradeToAccess": "قم بالترقية للوصول إلى هذه الميزة",
+    "upgradeMessage": "الميزة \"{{feature}}\" تتطلب خطة أعلى. قم بالترقية الآن لفتحها.",
+    "chooseThePlanThatFitsYourNeeds": "اختر الخطة التي تناسب احتياجاتك وتوسع مع نموك",
+    "currentPlan": "الخطة الحالية",
+    "upgrade": "ترقية",
+    "downgrade": "تخفيض",
+    "contactSales": "اتصل بالمبيعات",
+    "monthly": "شهري",
+    "annual": "سنوي",
+    "saveUpTo": "وفر {{percent}}%",
+    "sar": "ريال",
+    "perMonth": "شهرياً",
+    "perYear": "سنوياً",
+    "custom": "تسعير مخصص",
+    "recommended": "موصى به",
+    "popular": "الأكثر شعبية",
+    "unlimited": "غير محدود",
+    "basic": "أساسي",
+    "advanced": "متقدم",
+    "community": "المجتمع",
+    "email": "البريد الإلكتروني",
+    "priority": "أولوية",
+    "dedicated": "مدير حساب مخصص",
+    "featuresIncluded": "الميزات المضمنة",
+    "plans": {
+      "free": {
+        "name": "مجاني",
+        "description": "مثالي للبدء واستكشاف المنصة"
+      },
+      "starter": {
+        "name": "المبتدئ",
+        "description": "مثالي للممارسين المنفردين ومكاتب المحاماة الصغيرة"
+      },
+      "professional": {
+        "name": "المحترف",
+        "description": "الأفضل للممارسات المتنامية ذات الاحتياجات المتقدمة"
+      },
+      "enterprise": {
+        "name": "المؤسسات",
+        "description": "حلول مخصصة للشركات والمؤسسات الكبيرة"
+      }
+    },
+    "features": {
+      "cases": "القضايا",
+      "clients": "العملاء",
+      "storage": "مساحة التخزين",
+      "users": "أعضاء الفريق",
+      "invoicing": "الفواتير والمدفوعات",
+      "timeTracking": "تتبع الوقت",
+      "reports": "التقارير والتحليلات",
+      "automation": "أتمتة سير العمل",
+      "apiAccess": "الوصول إلى API",
+      "whiteLabel": "العلامة البيضاء",
+      "support": "الدعم"
+    },
+    "startFreeTrial": "ابدأ تجربتك المجانية",
+    "freeTrialDescription": "جرب الخطة الاحترافية مجاناً لمدة 14 يوماً. لا حاجة لبطاقة ائتمان. يمكنك الإلغاء في أي وقت.",
+    "start14DayTrial": "ابدأ تجربة 14 يوماً مجانية",
+    "moneyBackGuarantee": "ضمان استرداد الأموال لمدة 30 يوماً",
+    "moneyBackDescription": "جرب بدون مخاطر مع ضمان استرداد الأموال",
+    "support247": "دعم على مدار الساعة",
+    "support247Description": "احصل على المساعدة متى احتجت إليها",
+    "securePayment": "دفع آمن",
+    "securePaymentDescription": "بياناتك محمية بتشفير على مستوى البنوك",
+    "allPricesInSAR": "جميع الأسعار بالريال السعودي ولا تشمل ضريبة القيمة المضافة",
+    "cancelAnytime": "يمكنك الإلغاء في أي وقت. لا توجد عقود طويلة الأجل."
   }
 }
