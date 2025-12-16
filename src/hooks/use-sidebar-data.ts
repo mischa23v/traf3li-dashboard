@@ -428,8 +428,43 @@ export function useSidebarData(): SidebarData {
               module: 'hr',
             },
             {
+              title: 'sidebar.nav.shiftTypes',
+              url: '/dashboard/hr/settings/shift-types',
+              module: 'hr',
+            },
+            {
+              title: 'sidebar.nav.shiftAssignments',
+              url: '/dashboard/hr/shift-assignments',
+              module: 'hr',
+            },
+            {
               title: 'sidebar.nav.leave',
               url: '/dashboard/hr/leave',
+              module: 'hr',
+            },
+            {
+              title: 'sidebar.nav.leavePeriods',
+              url: '/dashboard/hr/leave/periods',
+              module: 'hr',
+            },
+            {
+              title: 'sidebar.nav.leavePolicies',
+              url: '/dashboard/hr/leave/policies',
+              module: 'hr',
+            },
+            {
+              title: 'sidebar.nav.leaveAllocations',
+              url: '/dashboard/hr/leave/allocations',
+              module: 'hr',
+            },
+            {
+              title: 'sidebar.nav.leaveEncashments',
+              url: '/dashboard/hr/leave/encashments',
+              module: 'hr',
+            },
+            {
+              title: 'sidebar.nav.compensatoryLeave',
+              url: '/dashboard/hr/leave/compensatory',
               module: 'hr',
             },
             // Payroll & Compensation
@@ -444,8 +479,23 @@ export function useSidebarData(): SidebarData {
               module: 'hr',
             },
             {
+              title: 'sidebar.nav.salaryComponents',
+              url: '/dashboard/hr/payroll/salary-components',
+              module: 'hr',
+            },
+            {
               title: 'sidebar.nav.compensation',
               url: '/dashboard/hr/compensation',
+              module: 'hr',
+            },
+            {
+              title: 'sidebar.nav.retentionBonuses',
+              url: '/dashboard/hr/compensation/retention-bonuses',
+              module: 'hr',
+            },
+            {
+              title: 'sidebar.nav.employeeIncentives',
+              url: '/dashboard/hr/compensation/incentives',
               module: 'hr',
             },
             {
@@ -497,6 +547,11 @@ export function useSidebarData(): SidebarData {
               module: 'hr',
             },
             {
+              title: 'sidebar.nav.staffingPlans',
+              url: '/dashboard/hr/recruitment/staffing-plans',
+              module: 'hr',
+            },
+            {
               title: 'sidebar.nav.onboarding',
               url: '/dashboard/hr/onboarding',
               module: 'hr',
@@ -506,10 +561,36 @@ export function useSidebarData(): SidebarData {
               url: '/dashboard/hr/offboarding',
               module: 'hr',
             },
-            // Assets
+            {
+              title: 'sidebar.nav.promotions',
+              url: '/dashboard/hr/promotions',
+              module: 'hr',
+            },
+            {
+              title: 'sidebar.nav.transfers',
+              url: '/dashboard/hr/employee-transfers',
+              module: 'hr',
+            },
+            // Assets & Vehicles
             {
               title: 'sidebar.nav.assetAssignment',
               url: '/dashboard/hr/asset-assignment',
+              module: 'hr',
+            },
+            {
+              title: 'sidebar.nav.vehicles',
+              url: '/dashboard/hr/vehicles',
+              module: 'hr',
+            },
+            // Skills
+            {
+              title: 'sidebar.nav.skills',
+              url: '/dashboard/hr/skills',
+              module: 'hr',
+            },
+            {
+              title: 'sidebar.nav.skillMatrix',
+              url: '/dashboard/hr/skills/matrix',
               module: 'hr',
             },
             // Grievances
@@ -544,6 +625,12 @@ export function useSidebarData(): SidebarData {
             {
               title: 'sidebar.nav.aiPredictions',
               url: '/dashboard/hr/predictions',
+              module: 'hr',
+            },
+            // HR Setup
+            {
+              title: 'sidebar.nav.hrSetupWizard',
+              url: '/dashboard/hr/setup-wizard',
               module: 'hr',
             },
           ],

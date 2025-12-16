@@ -3906,3 +3906,823 @@ GET/POST   /evaluations              - List/Create evaluations
 - ZATCA integration requires sandbox testing before production
 - **Saudi Government APIs require official registration and API keys from respective ministries**
 - **Always cache verification results (e.g., 24 hours) to reduce API calls and costs**
+
+---
+
+## New HR Module Features (ERPNext HRMS Parity)
+
+The following sections document the 18 new HR features added to achieve feature parity with ERPNext HRMS (Frappe HR). All features are Saudi Labor Law compliant.
+
+### 1. Shift Types
+
+**Model:** `ShiftType`
+
+```javascript
+const shiftTypeSchema = new mongoose.Schema({
+  shiftTypeId: { type: String, unique: true }, // ST-XXXX
+  name: { type: String, required: true },
+  nameAr: { type: String, required: true },
+
+  // Timing
+  startTime: { type: String, required: true }, // "08:00"
+  endTime: { type: String, required: true }, // "17:00"
+
+  // Auto attendance
+  enableAutoAttendance: { type: Boolean, default: false },
+  processAttendanceAfter: { type: Number, default: 30 },
+
+  // Grace periods (Saudi-specific)
+  beginCheckInBeforeShiftStart: { type: Number, default: 60 },
+  allowCheckOutAfterShiftEnd: { type: Number, default: 60 },
+  lateEntryGracePeriod: { type: Number, default: 15 },
+  earlyExitGracePeriod: { type: Number, default: 15 },
+
+  // Thresholds
+  workingHoursThresholdForHalfDay: { type: Number, default: 4 },
+  workingHoursThresholdForAbsent: { type: Number, default: 2 },
+
+  // Break
+  breakDuration: { type: Number, default: 60 },
+  breakType: { type: String, enum: ['paid', 'unpaid'], default: 'unpaid' },
+
+  // Overtime (Saudi Labor Law Article 107: 1.5x rate)
+  allowOvertime: { type: Boolean, default: true },
+  maxOvertimeHours: { type: Number, default: 2 },
+  overtimeMultiplier: { type: Number, default: 1.5 },
+
+  // Ramadan (reduced hours)
+  isRamadanShift: { type: Boolean, default: false },
+  ramadanStartTime: String,
+  ramadanEndTime: String,
+
+  applicableDays: [{ type: String, enum: ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] }],
+
+  isActive: { type: Boolean, default: true },
+  isDefault: { type: Boolean, default: false }
+}, { timestamps: true });
+```
+
+**Routes:**
+```
+GET    /hr/shift-types              - List shift types
+POST   /hr/shift-types              - Create shift type
+GET    /hr/shift-types/:id          - Get shift type
+PATCH  /hr/shift-types/:id          - Update shift type
+DELETE /hr/shift-types/:id          - Delete shift type
+POST   /hr/shift-types/:id/set-default
+POST   /hr/shift-types/:id/clone
+GET    /hr/shift-types/stats
+GET    /hr/shift-types/ramadan
+```
+
+### 2. Shift Assignments
+
+**Model:** `ShiftAssignment`
+
+```javascript
+const shiftAssignmentSchema = new mongoose.Schema({
+  assignmentId: { type: String, unique: true }, // SA-XXXX
+  employeeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee', required: true },
+  shiftTypeId: { type: mongoose.Schema.Types.ObjectId, ref: 'ShiftType', required: true },
+
+  startDate: { type: Date, required: true },
+  endDate: Date, // null for permanent
+
+  status: { type: String, enum: ['active', 'inactive', 'completed', 'cancelled'], default: 'active' },
+
+  isRotational: { type: Boolean, default: false },
+  rotationPattern: [{
+    shiftTypeId: mongoose.Schema.Types.ObjectId,
+    days: [String]
+  }]
+}, { timestamps: true });
+```
+
+**Routes:**
+```
+GET    /hr/shift-assignments                    - List assignments
+POST   /hr/shift-assignments                    - Create assignment
+POST   /hr/shift-assignments/bulk               - Bulk assign
+GET    /hr/shift-assignments/employee/:id       - Get employee shifts
+GET    /hr/shift-assignments/employee/:id/current
+```
+
+### 3. Leave Periods
+
+**Model:** `LeavePeriod`
+
+```javascript
+const leavePeriodSchema = new mongoose.Schema({
+  periodId: { type: String, unique: true }, // LP-XXXX
+  name: { type: String, required: true },
+  nameAr: String,
+
+  startDate: { type: Date, required: true },
+  endDate: { type: Date, required: true },
+
+  allowCarryForward: { type: Boolean, default: true },
+  carryForwardExpiryDate: Date,
+  maxCarryForwardDays: { type: Number, default: 10 },
+
+  isActive: { type: Boolean, default: true },
+  isCurrent: { type: Boolean, default: false },
+  isClosed: { type: Boolean, default: false }
+}, { timestamps: true });
+```
+
+**Routes:**
+```
+GET    /hr/leave-periods          - List periods
+POST   /hr/leave-periods          - Create period
+GET    /hr/leave-periods/current  - Get current period
+POST   /hr/leave-periods/:id/close
+```
+
+### 4. Leave Policies
+
+**Model:** `LeavePolicy`
+
+```javascript
+const leavePolicySchema = new mongoose.Schema({
+  policyId: { type: String, unique: true }, // LPO-XXXX
+  name: { type: String, required: true },
+  nameAr: String,
+
+  leavePolicyDetails: [{
+    leaveType: { type: mongoose.Schema.Types.ObjectId, ref: 'LeaveType' },
+    annualAllocation: { type: Number, required: true },
+    allowCarryForward: { type: Boolean, default: true },
+    maxCarryForwardDays: { type: Number, default: 10 },
+    allowEncashment: { type: Boolean, default: false },
+    maxEncashableDays: Number,
+    isEarnedLeave: { type: Boolean, default: false },
+    earnedLeaveFrequency: { type: String, enum: ['monthly', 'quarterly', 'yearly'] }
+  }],
+
+  applicableFor: { type: String, enum: ['all', 'department', 'designation', 'grade'], default: 'all' },
+  applicableValue: String,
+
+  isActive: { type: Boolean, default: true },
+  isDefault: { type: Boolean, default: false },
+  saudiLaborLawCompliant: { type: Boolean, default: true }
+}, { timestamps: true });
+```
+
+**Saudi Labor Law Compliance:**
+- Article 109: Minimum 21 days annual leave (30 after 5 years)
+- Article 111: Leave encashment on termination
+
+**Routes:**
+```
+GET    /hr/leave-policies              - List policies
+POST   /hr/leave-policies              - Create policy
+POST   /hr/leave-policies/:id/set-default
+POST   /hr/leave-policies/compare      - Compare multiple policies
+```
+
+### 5. Leave Allocations
+
+**Model:** `LeaveAllocation`
+
+```javascript
+const leaveAllocationSchema = new mongoose.Schema({
+  allocationId: { type: String, unique: true }, // LA-XXXX
+
+  employeeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee', required: true },
+  leaveTypeId: { type: mongoose.Schema.Types.ObjectId, ref: 'LeaveType', required: true },
+  leavePeriodId: { type: mongoose.Schema.Types.ObjectId, ref: 'LeavePeriod', required: true },
+
+  newLeavesAllocated: { type: Number, required: true },
+  carryForwardedLeaves: { type: Number, default: 0 },
+  totalLeavesAllocated: Number,
+  leavesUsed: { type: Number, default: 0 },
+  leavesBalance: Number,
+
+  fromDate: { type: Date, required: true },
+  toDate: { type: Date, required: true },
+
+  status: { type: String, enum: ['draft', 'submitted', 'approved', 'cancelled'], default: 'draft' }
+}, { timestamps: true });
+```
+
+**Routes:**
+```
+GET    /hr/leave-allocations                  - List allocations
+POST   /hr/leave-allocations                  - Create allocation
+POST   /hr/leave-allocations/bulk             - Bulk allocate
+POST   /hr/leave-allocations/carry-forward    - Process carry forward
+GET    /hr/leave-allocations/employee/:id/balance
+```
+
+### 6. Leave Encashments
+
+**Model:** `LeaveEncashment`
+
+Saudi Labor Law Article 111: Employees are entitled to payment for unused leave upon termination.
+
+```javascript
+const leaveEncashmentSchema = new mongoose.Schema({
+  encashmentId: { type: String, unique: true }, // LE-XXXX
+
+  employeeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee', required: true },
+  leaveTypeId: { type: mongoose.Schema.Types.ObjectId, ref: 'LeaveType', required: true },
+  leavePeriodId: { type: mongoose.Schema.Types.ObjectId, ref: 'LeavePeriod' },
+
+  encashmentDays: { type: Number, required: true },
+  dailyRate: { type: Number, required: true }, // (Basic + Housing) / 30
+  encashmentAmount: { type: Number, required: true },
+  currency: { type: String, default: 'SAR' },
+
+  leaveBalance: Number,
+  newLeaveBalance: Number,
+
+  status: { type: String, enum: ['draft', 'pending_approval', 'approved', 'paid', 'rejected', 'cancelled'], default: 'draft' },
+
+  requestedAt: { type: Date, default: Date.now },
+  approvedAt: Date,
+  approvedBy: mongoose.Schema.Types.ObjectId,
+  paidAt: Date,
+  rejectionReason: String
+}, { timestamps: true });
+```
+
+**Routes:**
+```
+GET    /hr/leave-encashments                  - List encashments
+POST   /hr/leave-encashments                  - Create encashment
+POST   /hr/leave-encashments/:id/approve
+POST   /hr/leave-encashments/:id/reject
+POST   /hr/leave-encashments/:id/pay
+POST   /hr/leave-encashments/bulk-approve
+GET    /hr/leave-encashments/calculate        - Calculate amount
+GET    /hr/leave-encashments/stats
+```
+
+### 7. Compensatory Leave
+
+**Model:** `CompensatoryLeave`
+
+```javascript
+const compensatoryLeaveSchema = new mongoose.Schema({
+  requestId: { type: String, unique: true }, // CL-XXXX
+
+  employeeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee', required: true },
+
+  workFromDate: { type: Date, required: true },
+  workEndDate: { type: Date, required: true },
+  totalHoursWorked: { type: Number, required: true },
+
+  leaveDaysAllocated: { type: Number, required: true },
+
+  reason: { type: String, enum: ['overtime', 'weekend_work', 'holiday_work', 'emergency', 'other'], required: true },
+
+  status: { type: String, enum: ['draft', 'pending_approval', 'approved', 'rejected', 'used', 'expired'], default: 'draft' },
+
+  expiryDate: { type: Date, required: true }
+}, { timestamps: true });
+```
+
+**Routes:**
+```
+GET    /hr/compensatory-leave              - List requests
+POST   /hr/compensatory-leave              - Create request
+POST   /hr/compensatory-leave/:id/approve
+POST   /hr/compensatory-leave/:id/reject
+```
+
+### 8. Salary Components
+
+**Model:** `SalaryComponent`
+
+```javascript
+const salaryComponentSchema = new mongoose.Schema({
+  componentId: { type: String, unique: true }, // SC-XXXX
+  name: { type: String, required: true },
+  nameAr: String,
+  abbr: { type: String, required: true }, // BASIC, HRA, TRANS
+
+  type: { type: String, enum: ['earning', 'deduction'], required: true },
+
+  amountBasedOnFormula: { type: Boolean, default: false },
+  formula: String, // e.g., "base * 0.25"
+  defaultAmount: Number,
+
+  // Saudi-specific
+  isGOSIApplicable: { type: Boolean, default: false }, // GOSI contribution
+  includeInWPS: { type: Boolean, default: true }, // Wage Protection System
+
+  isTaxApplicable: { type: Boolean, default: false },
+  dependsOnPaymentDays: { type: Boolean, default: true },
+
+  isActive: { type: Boolean, default: true }
+}, { timestamps: true });
+```
+
+**Saudi Salary Components:**
+- Basic Salary (min 60% for GOSI)
+- Housing Allowance (25% of basic)
+- Transportation Allowance (10% of basic)
+- GOSI Deduction (9.75% employee, 11.75% employer)
+
+**Routes:**
+```
+GET    /hr/salary-components              - List components
+POST   /hr/salary-components              - Create component
+GET    /hr/salary-components/by-type/:type
+GET    /hr/salary-components/gosi-applicable
+```
+
+### 9. Employee Promotions
+
+**Model:** `EmployeePromotion`
+
+```javascript
+const employeePromotionSchema = new mongoose.Schema({
+  promotionId: { type: String, unique: true }, // EP-XXXX
+
+  employeeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee', required: true },
+  promotionDate: { type: Date, required: true },
+
+  // Current
+  currentDepartment: mongoose.Schema.Types.ObjectId,
+  currentDesignation: String,
+  currentGrade: String,
+  currentSalary: Number,
+
+  // New
+  newDepartment: mongoose.Schema.Types.ObjectId,
+  newDesignation: String,
+  newGrade: String,
+  revisedSalary: Number,
+  salaryChangePercentage: Number,
+
+  status: { type: String, enum: ['draft', 'pending_approval', 'approved', 'rejected', 'cancelled'], default: 'draft' }
+}, { timestamps: true });
+```
+
+**Routes:**
+```
+GET    /hr/promotions              - List promotions
+POST   /hr/promotions              - Create promotion
+POST   /hr/promotions/:id/approve
+POST   /hr/promotions/:id/reject
+GET    /hr/promotions/employee/:id
+```
+
+### 10. Employee Transfers
+
+**Model:** `EmployeeTransfer`
+
+```javascript
+const employeeTransferSchema = new mongoose.Schema({
+  transferId: { type: String, unique: true }, // ET-XXXX
+
+  employeeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee', required: true },
+  transferDate: { type: Date, required: true },
+
+  // Current
+  currentDepartment: mongoose.Schema.Types.ObjectId,
+  currentBranch: String,
+  currentLocation: String,
+
+  // New
+  newDepartment: mongoose.Schema.Types.ObjectId,
+  newBranch: String,
+  newLocation: String,
+
+  transferType: { type: String, enum: ['internal', 'inter_branch', 'inter_company'], default: 'internal' },
+
+  status: { type: String, enum: ['draft', 'pending_approval', 'approved', 'rejected', 'completed', 'cancelled'], default: 'draft' },
+
+  handoverCompleted: { type: Boolean, default: false }
+}, { timestamps: true });
+```
+
+**Routes:**
+```
+GET    /hr/employee-transfers              - List transfers
+POST   /hr/employee-transfers              - Create transfer
+POST   /hr/employee-transfers/:id/approve
+POST   /hr/employee-transfers/:id/complete
+```
+
+### 11. Staffing Plans
+
+**Model:** `StaffingPlan`
+
+```javascript
+const staffingPlanSchema = new mongoose.Schema({
+  planId: { type: String, unique: true }, // SP-XXXX
+  name: { type: String, required: true },
+  nameAr: String,
+
+  fromDate: { type: Date, required: true },
+  toDate: { type: Date, required: true },
+
+  totalEstimatedBudget: Number,
+  currency: { type: String, default: 'SAR' },
+
+  staffingDetails: [{
+    department: mongoose.Schema.Types.ObjectId,
+    designation: String,
+    vacancies: Number,
+    currentCount: Number,
+    totalEstimatedCost: Number
+  }],
+
+  status: { type: String, enum: ['draft', 'submitted', 'approved', 'active', 'completed'], default: 'draft' }
+}, { timestamps: true });
+```
+
+**Routes:**
+```
+GET    /hr/staffing-plans              - List plans
+POST   /hr/staffing-plans              - Create plan
+POST   /hr/staffing-plans/:id/approve
+POST   /hr/staffing-plans/:id/activate
+```
+
+### 12. Retention Bonuses
+
+**Model:** `RetentionBonus`
+
+```javascript
+const retentionBonusSchema = new mongoose.Schema({
+  bonusId: { type: String, unique: true }, // RB-XXXX
+
+  employeeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee', required: true },
+
+  bonusAmount: { type: Number, required: true },
+  currency: { type: String, default: 'SAR' },
+
+  bonusPaymentDate: { type: Date, required: true },
+  retentionPeriodStartDate: { type: Date, required: true },
+  retentionPeriodEndDate: { type: Date, required: true },
+
+  vestingSchedule: [{
+    date: Date,
+    percentage: Number,
+    amount: Number,
+    status: { type: String, enum: ['pending', 'vested', 'forfeited'] }
+  }],
+
+  clawbackApplicable: { type: Boolean, default: true },
+  clawbackPercentage: Number,
+
+  status: { type: String, enum: ['draft', 'pending_approval', 'approved', 'active', 'paid', 'forfeited', 'cancelled'], default: 'draft' }
+}, { timestamps: true });
+```
+
+**Routes:**
+```
+GET    /hr/retention-bonuses              - List bonuses
+POST   /hr/retention-bonuses              - Create bonus
+POST   /hr/retention-bonuses/:id/approve
+POST   /hr/retention-bonuses/:id/pay
+POST   /hr/retention-bonuses/:id/forfeit
+```
+
+### 13. Employee Incentives
+
+**Model:** `EmployeeIncentive`
+
+```javascript
+const employeeIncentiveSchema = new mongoose.Schema({
+  incentiveId: { type: String, unique: true }, // EI-XXXX
+
+  employeeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee', required: true },
+
+  incentiveType: { type: String, enum: ['performance', 'spot', 'referral', 'sales', 'project', 'other'], required: true },
+  incentiveAmount: { type: Number, required: true },
+  currency: { type: String, default: 'SAR' },
+
+  payrollDate: { type: Date, required: true },
+
+  status: { type: String, enum: ['draft', 'pending_approval', 'approved', 'paid', 'rejected', 'cancelled'], default: 'draft' },
+
+  reason: String
+}, { timestamps: true });
+```
+
+**Routes:**
+```
+GET    /hr/employee-incentives              - List incentives
+POST   /hr/employee-incentives              - Create incentive
+POST   /hr/employee-incentives/bulk         - Bulk create
+POST   /hr/employee-incentives/:id/approve
+POST   /hr/employee-incentives/bulk-approve
+```
+
+### 14. Vehicles
+
+**Model:** `Vehicle`
+
+```javascript
+const vehicleSchema = new mongoose.Schema({
+  vehicleId: { type: String, unique: true }, // VH-XXXX
+
+  // Saudi format: أ ب ج 1234
+  licensePlate: { type: String, required: true, unique: true },
+  make: String,
+  model: String,
+  year: Number,
+
+  // Saudi registration
+  registrationNumber: String,
+  registrationExpiry: Date,
+  istimaraNumber: String, // Saudi vehicle registration card
+  istimaraExpiry: Date,
+
+  // Insurance (required in KSA)
+  insuranceProvider: String,
+  insurancePolicyNumber: String,
+  insuranceExpiry: Date,
+
+  // Ownership
+  ownershipType: { type: String, enum: ['company', 'leased', 'employee'], default: 'company' },
+
+  // Assignment
+  currentEmployeeId: mongoose.Schema.Types.ObjectId,
+  assignedSince: Date,
+
+  // Details
+  fuelType: { type: String, enum: ['petrol', 'diesel', 'hybrid', 'electric'] },
+  mileage: Number,
+
+  // GPS
+  gpsEnabled: { type: Boolean, default: false },
+
+  status: { type: String, enum: ['available', 'assigned', 'maintenance', 'retired'], default: 'available' }
+}, { timestamps: true });
+```
+
+**Routes:**
+```
+GET    /hr/vehicles              - List vehicles
+POST   /hr/vehicles              - Create vehicle
+POST   /hr/vehicles/:id/assign   - Assign to employee
+POST   /hr/vehicles/:id/unassign
+GET    /hr/vehicles/:id/logs
+POST   /hr/vehicles/:id/logs     - Add log entry
+GET    /hr/vehicles/maintenance-due
+GET    /hr/vehicles/expiring-documents
+```
+
+### 15. Skills
+
+**Model:** `Skill`
+
+```javascript
+const skillSchema = new mongoose.Schema({
+  skillId: { type: String, unique: true }, // SK-XXXX
+  name: { type: String, required: true },
+  nameAr: String,
+
+  category: { type: String, required: true }, // Technical, Soft Skills, Language
+  categoryAr: String,
+
+  proficiencyLevels: [{
+    level: Number, // 1-5
+    name: String,
+    nameAr: String,
+    description: String
+  }],
+
+  isActive: { type: Boolean, default: true }
+}, { timestamps: true });
+```
+
+**Routes:**
+```
+GET    /hr/skills              - List skills
+POST   /hr/skills              - Create skill
+GET    /hr/skills/by-category/:category
+GET    /hr/skills/categories
+```
+
+### 16. Employee Skill Map
+
+**Model:** `EmployeeSkillMap`
+
+```javascript
+const employeeSkillMapSchema = new mongoose.Schema({
+  mapId: { type: String, unique: true }, // ESM-XXXX
+
+  employeeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee', required: true },
+  skillId: { type: mongoose.Schema.Types.ObjectId, ref: 'Skill', required: true },
+
+  proficiencyLevel: { type: Number, min: 1, max: 5, required: true },
+
+  evaluationType: { type: String, enum: ['self', 'manager', 'peer', 'assessment', '360'] },
+  evaluatedBy: mongoose.Schema.Types.ObjectId,
+  evaluationDate: Date,
+
+  // Certification
+  certificationName: String,
+  certificationDate: Date,
+  certificationExpiry: Date,
+
+  // Gap analysis
+  requiredLevel: Number,
+  gapScore: Number
+}, { timestamps: true });
+```
+
+**Routes:**
+```
+GET    /hr/employee-skill-maps              - List mappings
+POST   /hr/employee-skill-maps              - Create mapping
+POST   /hr/employee-skill-maps/bulk         - Bulk create
+GET    /hr/employee-skill-maps/employee/:id
+GET    /hr/employee-skill-maps/skill/:id
+GET    /hr/employee-skill-maps/gap-analysis
+GET    /hr/employee-skill-maps/matrix
+```
+
+### 17. HR Settings
+
+**Model:** `HRSettings`
+
+```javascript
+const hrSettingsSchema = new mongoose.Schema({
+  // Employee numbering
+  employeeNumberSeries: { type: String, default: 'EMP-' },
+  employeeNumberDigits: { type: Number, default: 5 },
+
+  // Working hours (Saudi standard)
+  standardWorkingHoursPerDay: { type: Number, default: 8 },
+  standardWorkingDaysPerWeek: { type: Number, default: 5 },
+  weekStartDay: { type: String, default: 'sunday' },
+
+  // Leave
+  leaveApprovalRequired: { type: Boolean, default: true },
+
+  // Payroll
+  payrollCutoffDay: { type: Number, default: 25 },
+  paymentDay: { type: Number, default: 1 },
+  currency: { type: String, default: 'SAR' },
+
+  // GOSI (Saudi)
+  gosiEnabled: { type: Boolean, default: true },
+  gosiEmployeeContribution: { type: Number, default: 9.75 },
+  gosiEmployerContribution: { type: Number, default: 11.75 },
+
+  // WPS (Wage Protection System)
+  wpsEnabled: { type: Boolean, default: true },
+  wpsEmployerId: String,
+
+  // End of Service (Saudi Labor Law Articles 84-87)
+  eosCalculationMethod: { type: String, default: 'saudi_labor_law' },
+  eosFirstFiveYearsRate: { type: Number, default: 0.5 }, // half month
+  eosAfterFiveYearsRate: { type: Number, default: 1 }, // full month
+
+  // Probation
+  defaultProbationDays: { type: Number, default: 90 },
+
+  // Document alerts
+  iqamaExpiryAlertDays: { type: Number, default: 30 }
+}, { timestamps: true });
+```
+
+**Routes:**
+```
+GET    /hr/settings              - Get settings
+PATCH  /hr/settings              - Update settings
+GET    /hr/settings/gosi
+PATCH  /hr/settings/gosi
+GET    /hr/settings/wps
+PATCH  /hr/settings/wps
+```
+
+### 18. HR Setup Wizard
+
+**Model:** `HRSetupWizardState`
+
+```javascript
+const hrSetupWizardStateSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+
+  currentStep: { type: Number, default: 1 },
+  completedSteps: [Number],
+
+  // Step completion flags
+  companyInfoCompleted: { type: Boolean, default: false },
+  departmentsCompleted: { type: Boolean, default: false },
+  designationsCompleted: { type: Boolean, default: false },
+  leaveTypesCompleted: { type: Boolean, default: false },
+  shiftTypesCompleted: { type: Boolean, default: false },
+  salaryComponentsCompleted: { type: Boolean, default: false },
+  leavePolicyCompleted: { type: Boolean, default: false },
+  holidayCalendarCompleted: { type: Boolean, default: false },
+  hrSettingsCompleted: { type: Boolean, default: false },
+  firstEmployeeCompleted: { type: Boolean, default: false },
+
+  wizardCompleted: { type: Boolean, default: false },
+  completedAt: Date
+}, { timestamps: true });
+```
+
+**Routes:**
+```
+GET    /hr/setup-wizard              - Get state
+POST   /hr/setup-wizard/start        - Start wizard
+PATCH  /hr/setup-wizard/step/:step   - Update step
+POST   /hr/setup-wizard/complete-step/:step
+POST   /hr/setup-wizard/complete
+POST   /hr/setup-wizard/reset
+GET    /hr/setup-wizard/templates    - Get templates
+POST   /hr/setup-wizard/apply-template/:id
+```
+
+---
+
+## Saudi Compliance Summary
+
+### GOSI (General Organization for Social Insurance)
+
+| Contribution | Employee | Employer |
+|--------------|----------|----------|
+| Retirement | 9.75% | 9.75% |
+| Hazard | 0% | 2% |
+| **Total** | **9.75%** | **11.75%** |
+
+### WPS (Wage Protection System)
+
+All companies must register salaries through WPS. Include employee bank details, monthly salary, and allowances.
+
+### Key Labor Law Articles
+
+| Article | Topic | Implementation |
+|---------|-------|----------------|
+| 53 | Working Hours | Max 8 hrs/day, 48 hrs/week |
+| 84-87 | End of Service | EOS calculation |
+| 107 | Overtime | 1.5x rate |
+| 109 | Annual Leave | 21 days (30 after 5 years) |
+| 111 | Leave Encashment | Payment for unused leave |
+| 113 | Sick Leave | 120 days total |
+
+---
+
+## Database Indexes for New Features
+
+```javascript
+// Shift Types
+db.shiftTypes.createIndex({ shiftTypeId: 1 }, { unique: true });
+db.shiftTypes.createIndex({ isActive: 1, isDefault: 1 });
+
+// Shift Assignments
+db.shiftAssignments.createIndex({ assignmentId: 1 }, { unique: true });
+db.shiftAssignments.createIndex({ employeeId: 1, status: 1 });
+
+// Leave Periods
+db.leavePeriods.createIndex({ periodId: 1 }, { unique: true });
+db.leavePeriods.createIndex({ isCurrent: 1 });
+
+// Leave Policies
+db.leavePolicies.createIndex({ policyId: 1 }, { unique: true });
+
+// Leave Allocations
+db.leaveAllocations.createIndex({ allocationId: 1 }, { unique: true });
+db.leaveAllocations.createIndex({ employeeId: 1, leavePeriodId: 1 });
+
+// Leave Encashments
+db.leaveEncashments.createIndex({ encashmentId: 1 }, { unique: true });
+db.leaveEncashments.createIndex({ employeeId: 1, status: 1 });
+
+// Salary Components
+db.salaryComponents.createIndex({ componentId: 1 }, { unique: true });
+db.salaryComponents.createIndex({ type: 1, isActive: 1 });
+
+// Vehicles
+db.vehicles.createIndex({ vehicleId: 1 }, { unique: true });
+db.vehicles.createIndex({ licensePlate: 1 }, { unique: true });
+
+// Skills
+db.skills.createIndex({ skillId: 1 }, { unique: true });
+db.skills.createIndex({ category: 1 });
+
+// Employee Skill Maps
+db.employeeSkillMaps.createIndex({ employeeId: 1, skillId: 1 }, { unique: true });
+```
+
+---
+
+## Implementation Priority
+
+**Phase 1 (Critical):**
+1. Shift Types & Assignments
+2. Leave Policies & Allocations
+3. Salary Components
+4. HR Settings
+
+**Phase 2 (Important):**
+5. Leave Encashments
+6. Employee Promotions & Transfers
+7. Retention Bonuses & Incentives
+
+**Phase 3 (Enhancement):**
+8. Compensatory Leave
+9. Staffing Plans
+10. Vehicles
+11. Skills & Skill Map
+12. HR Setup Wizard

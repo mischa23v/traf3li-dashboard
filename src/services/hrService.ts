@@ -15,6 +15,8 @@ export type PaymentMethod = 'bank_transfer' | 'cash' | 'check'
 export type DocumentType = 'national_id' | 'iqama' | 'passport' | 'degree' | 'certificate' |
                           'contract' | 'bank_letter' | 'medical' | 'vaccine_certificate' |
                           'bar_admission' | 'driving_license' | 'other'
+export type EducationLevel = 'high_school' | 'diploma' | 'bachelors' | 'masters' | 'doctorate' | 'professional'
+export type ChangeType = 'joined' | 'promoted' | 'transferred' | 'redesignated' | 'demoted'
 
 // ==================== INTERFACES ====================
 
@@ -202,6 +204,58 @@ export interface EmployeeDocument {
   verifiedOn?: string
 }
 
+export interface Education {
+  educationId: string
+  schoolUniversity: string
+  schoolUniversityAr: string
+  qualification: string
+  qualificationAr: string
+  level: EducationLevel
+  fieldOfStudy: string
+  fieldOfStudyAr: string
+  yearOfPassing: number
+  classPercentage?: number
+  gpa?: number
+  gpaScale?: number
+  country: string
+  verified: boolean
+  verificationDate?: string
+  certificateAttachment?: string
+}
+
+export interface ExternalWorkHistory {
+  historyId: string
+  companyName: string
+  companyNameAr: string
+  designation: string
+  designationAr: string
+  fromDate: string
+  toDate: string
+  salary?: number
+  currency?: string
+  totalExperience: string
+  address?: string
+  contactPerson?: string
+  contactPhone?: string
+  reasonForLeaving?: string
+  verified: boolean
+  verificationDate?: string
+  referenceLetterAttachment?: string
+}
+
+export interface InternalWorkHistory {
+  historyId: string
+  branch: string
+  departmentId: string
+  departmentName: string
+  designation: string
+  designationAr: string
+  fromDate: string
+  toDate: string
+  changeType: ChangeType
+  remarks?: string
+}
+
 export interface Audit {
   createdAt: string
   createdBy: string
@@ -221,6 +275,13 @@ export interface Employee {
   leave: Leave
   gosi: GOSI
   documents: EmployeeDocument[]
+  education: Education[]
+  externalWorkHistory: ExternalWorkHistory[]
+  internalWorkHistory: InternalWorkHistory[]
+  familyBackground?: string
+  familyBackgroundAr?: string
+  healthDetails?: string
+  healthDetailsAr?: string
   isActive: boolean
   audit: Audit
 

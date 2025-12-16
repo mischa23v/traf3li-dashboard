@@ -19,11 +19,13 @@ import { useEmployee, useDeleteEmployee } from '@/hooks/useHR'
 import {
     Search, Bell, AlertCircle, User, Phone, Mail, MapPin, Briefcase, Calendar,
     CreditCard, Wallet, FileText, AlertTriangle, Trash2, Loader2, Building2,
-    Clock, DollarSign, Shield, Heart, UserCog, Lock
+    Clock, DollarSign, Shield, Heart, UserCog, Lock, GraduationCap
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 import type { EmploymentStatus, EmploymentType, ContractType } from '@/services/hrService'
+import { EducationSection } from '@/components/hr/employees/EducationSection'
+import { WorkHistorySection } from '@/components/hr/employees/WorkHistorySection'
 
 export function EmployeeDetailsView() {
     const { employeeId } = useParams({ strict: false }) as { employeeId: string }
@@ -206,24 +208,25 @@ export function EmployeeDetailsView() {
                                 <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden min-h-[600px]">
                                     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                                         <div className="border-b border-slate-100 px-4 sm:px-6 py-4">
-                                            <TabsList className="inline-flex h-10 items-center justify-center rounded-lg bg-slate-100 p-1 text-slate-500 w-full sm:w-auto">
-                                                {['overview', 'employment', 'compensation', 'leave', 'documents'].map((tab) => (
+                                            <TabsList className="inline-flex h-10 items-center justify-center rounded-lg bg-slate-100 p-1 text-slate-500 w-full flex-wrap">
+                                                {['overview', 'employment', 'compensation', 'leave', 'education', 'workHistory', 'documents'].map((tab) => (
                                                     <TabsTrigger
                                                         key={tab}
                                                         value={tab}
                                                         className="
-                                                            inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 sm:px-4 py-2 text-sm font-medium ring-offset-white transition-all
+                                                            inline-flex items-center justify-center whitespace-nowrap rounded-md px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium ring-offset-white transition-all
                                                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2
                                                             disabled:pointer-events-none disabled:opacity-50
                                                             data-[state=active]:bg-emerald-950 data-[state=active]:text-white data-[state=active]:shadow-sm
                                                             data-[state=inactive]:hover:bg-slate-200
-                                                            flex-1 sm:flex-initial
                                                         "
                                                     >
                                                         {tab === 'overview' ? 'نظرة عامة' :
                                                             tab === 'employment' ? 'التوظيف' :
                                                             tab === 'compensation' ? 'الراتب' :
-                                                            tab === 'leave' ? 'الإجازات' : 'المستندات'}
+                                                            tab === 'leave' ? 'الإجازات' :
+                                                            tab === 'education' ? 'التعليم' :
+                                                            tab === 'workHistory' ? 'الخبرات' : 'المستندات'}
                                                     </TabsTrigger>
                                                 ))}
                                             </TabsList>
@@ -717,6 +720,23 @@ export function EmployeeDetailsView() {
                                                         )}
                                                     </CardContent>
                                                 </Card>
+                                            </TabsContent>
+
+                                            {/* Education Tab */}
+                                            <TabsContent value="education" className="mt-0 space-y-6">
+                                                <EducationSection
+                                                    education={employee.education || []}
+                                                    readOnly={true}
+                                                />
+                                            </TabsContent>
+
+                                            {/* Work History Tab */}
+                                            <TabsContent value="workHistory" className="mt-0 space-y-6">
+                                                <WorkHistorySection
+                                                    externalWorkHistory={employee.externalWorkHistory || []}
+                                                    internalWorkHistory={employee.internalWorkHistory || []}
+                                                    readOnly={true}
+                                                />
                                             </TabsContent>
                                         </div>
                                     </Tabs>
