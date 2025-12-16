@@ -20,29 +20,8 @@ interface ChatRequest {
   stream?: boolean;
 }
 
-// Available models on Workers AI
-const MODELS = {
-  // Budget-friendly (cheapest)
-  'llama-3.2-1b': '@cf/meta/llama-3.2-1b-instruct',
-  'llama-3.2-3b': '@cf/meta/llama-3.2-3b-instruct',
-
-  // Best value (recommended for general use)
-  'llama-3.1-8b': '@cf/meta/llama-3.1-8b-instruct',
-  'mistral-7b': '@cf/mistral/mistral-7b-instruct-v0.1',
-
-  // Premium models
-  'llama-3.3-70b': '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
-
-  // DeepSeek (best for reasoning/code)
-  'deepseek-r1-32b': '@cf/deepseek-ai/deepseek-r1-distill-qwen-32b',
-  'deepseek-coder': '@hf/thebloke/deepseek-coder-6.7b-instruct-awq',
-
-  // Qwen models (good multilingual/Arabic)
-  'qwen-1.5-7b': '@cf/qwen/qwen1.5-7b-chat-awq',
-
-  // Default - best balance of cost/quality
-  default: '@cf/meta/llama-3.1-8b-instruct',
-} as const;
+// Model configuration - using Llama 3.1 8B for all requests
+const MODEL_ID = '@cf/meta/llama-3.1-8b-instruct';
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
@@ -56,7 +35,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   try {
     const body = (await request.json()) as ChatRequest;
-    const { messages, model = 'default', stream = false } = body;
+    const { messages, stream = false } = body;
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return new Response(
@@ -70,9 +49,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         }
       );
     }
-
-    // Get the model ID
-    const modelId = MODELS[model as keyof typeof MODELS] || MODELS.default;
 
     // Add system prompt for Arabic/English bilingual support
     const systemMessage: ChatMessage = {
@@ -92,7 +68,7 @@ Be concise, professional, and helpful.
 
     if (stream) {
       // Streaming response
-      const response = await env.AI.run(modelId, {
+      const response = await env.AI.run(MODEL_ID, {
         messages: fullMessages,
         stream: true,
       });
@@ -107,7 +83,7 @@ Be concise, professional, and helpful.
       });
     } else {
       // Non-streaming response
-      const response = await env.AI.run(modelId, {
+      const response = await env.AI.run(MODEL_ID, {
         messages: fullMessages,
       });
 
@@ -115,7 +91,7 @@ Be concise, professional, and helpful.
         JSON.stringify({
           success: true,
           response: (response as { response: string }).response,
-          model: modelId,
+          model: 'llama-3.1-8b',
         }),
         {
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
