@@ -2,6 +2,13 @@
  * Validation utility functions for form inputs
  */
 
+import {
+  validationPatterns,
+  isValidIbanWithChecksum,
+  formatSaudiIban,
+  errorMessages
+} from '@/utils/validation-patterns';
+
 /**
  * Validate amount (positive number with max 2 decimal places)
  */
@@ -28,63 +35,21 @@ export function validateAmount(value: number | string): { valid: boolean; error?
 /**
  * Validate Saudi IBAN format (SA followed by 22 digits)
  * Format: SA + 2 check digits + 22 account digits = 24 characters total
+ * Uses validation-patterns.ts for consistent validation across the app
  */
 export function validateSaudiIBAN(iban: string): { valid: boolean; error?: string } {
-  // Remove spaces and convert to uppercase
-  const cleanIBAN = iban.replace(/\s/g, '').toUpperCase()
-
-  // Check if it starts with SA
-  if (!cleanIBAN.startsWith('SA')) {
-    return { valid: false, error: 'رقم الآيبان يجب أن يبدأ بـ SA' }
+  if (!iban || !iban.trim()) {
+    return { valid: false, error: errorMessages.iban.ar }
   }
 
-  // Check length (SA + 22 digits = 24 characters)
-  if (cleanIBAN.length !== 24) {
-    return { valid: false, error: 'رقم الآيبان السعودي يجب أن يتكون من 24 حرفاً (SA + 22 رقماً)' }
-  }
+  // Use the centralized IBAN validation with checksum
+  const isValid = isValidIbanWithChecksum(iban, true)
 
-  // Check if the rest are digits
-  const digits = cleanIBAN.slice(2)
-  if (!/^\d{22}$/.test(digits)) {
-    return { valid: false, error: 'رقم الآيبان يجب أن يحتوي على أرقام فقط بعد SA' }
-  }
-
-  // Basic IBAN checksum validation
-  const isValidChecksum = validateIBANChecksum(cleanIBAN)
-  if (!isValidChecksum) {
-    return { valid: false, error: 'رقم الآيبان غير صحيح (فشل التحقق من checksum)' }
+  if (!isValid) {
+    return { valid: false, error: errorMessages.iban.ar }
   }
 
   return { valid: true }
-}
-
-/**
- * Validate IBAN checksum using mod-97 algorithm
- */
-function validateIBANChecksum(iban: string): boolean {
-  // Move first 4 characters to end
-  const rearranged = iban.slice(4) + iban.slice(0, 4)
-
-  // Replace letters with numbers (A=10, B=11, ..., Z=35)
-  const numericString = rearranged
-    .split('')
-    .map(char => {
-      const code = char.charCodeAt(0)
-      if (code >= 65 && code <= 90) {
-        // A-Z
-        return (code - 55).toString()
-      }
-      return char
-    })
-    .join('')
-
-  // Calculate mod 97
-  let remainder = 0
-  for (let i = 0; i < numericString.length; i++) {
-    remainder = (remainder * 10 + parseInt(numericString[i])) % 97
-  }
-
-  return remainder === 1
 }
 
 /**
@@ -109,8 +74,8 @@ export function validateReferenceNumber(refNumber: string): { valid: boolean; er
 
 /**
  * Format IBAN for display (adds spaces every 4 characters)
+ * Uses validation-patterns.ts for consistent formatting across the app
  */
 export function formatIBAN(iban: string): string {
-  const cleanIBAN = iban.replace(/\s/g, '').toUpperCase()
-  return cleanIBAN.replace(/(.{4})/g, '$1 ').trim()
+  return formatSaudiIban(iban)
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   FileText, Search, Download, ExternalLink, Calendar,
@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { TopNav } from '@/components/layout/top-nav'
@@ -141,6 +142,15 @@ export function FormsView() {
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [formatFilter, setFormatFilter] = useState('all')
   const [bookmarkedForms, setBookmarkedForms] = useState<string[]>(['1', '3'])
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Simulate initial loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 800)
+    return () => clearTimeout(timer)
+  }, [])
 
   const topNav = [
     { title: isRTL ? 'القوانين' : 'Laws', href: '/dashboard/knowledge/laws', isActive: false },
@@ -295,7 +305,45 @@ export function FormsView() {
 
             {/* Forms Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredForms.map((form) => (
+              {/* Loading State */}
+              {isLoading && (
+                <>
+                  {[1, 2, 3, 4].map((i) => (
+                    <Card key={i} className="border-slate-100">
+                      <CardContent className="p-6">
+                        <div className="flex items-start justify-between mb-4">
+                          <Skeleton className="h-12 w-12 rounded-xl" />
+                          <Skeleton className="h-5 w-5 rounded" />
+                        </div>
+
+                        <Skeleton className="h-6 w-3/4 mb-2" />
+                        <Skeleton className="h-4 w-full mb-1" />
+                        <Skeleton className="h-4 w-5/6 mb-4" />
+
+                        <div className="flex items-center gap-2 mb-4">
+                          <Skeleton className="h-6 w-20 rounded-md" />
+                          <Skeleton className="h-6 w-16 rounded-md" />
+                          <Skeleton className="h-6 w-14 rounded-md" />
+                        </div>
+
+                        <div className="flex items-center justify-between mb-4 pt-4 border-t border-slate-50">
+                          <Skeleton className="h-4 w-16" />
+                          <Skeleton className="h-4 w-16" />
+                          <Skeleton className="h-4 w-20" />
+                        </div>
+
+                        <div className="flex gap-2">
+                          <Skeleton className="h-9 flex-1 rounded-lg" />
+                          <Skeleton className="h-9 flex-1 rounded-lg" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </>
+              )}
+
+              {/* Forms List */}
+              {!isLoading && filteredForms.map((form) => (
                 <Card key={form.id} className="hover:shadow-lg transition-all duration-300 group border-slate-100">
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between mb-4">
@@ -355,7 +403,8 @@ export function FormsView() {
               ))}
             </div>
 
-            {filteredForms.length === 0 && (
+            {/* Empty State */}
+            {!isLoading && filteredForms.length === 0 && (
               <Card className="border-dashed border-2 border-slate-200 bg-slate-50/50">
                 <CardContent className="p-12 text-center">
                   <div className="h-16 w-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -367,7 +416,15 @@ export function FormsView() {
                   <p className="text-slate-500 mt-1 max-w-xs mx-auto">
                     {isRTL ? 'جرب تعديل معايير البحث' : 'Try adjusting your search criteria'}
                   </p>
-                  <Button variant="outline" className="mt-4 border-slate-200">
+                  <Button
+                    variant="outline"
+                    className="mt-4 border-slate-200"
+                    onClick={() => {
+                      setSearchQuery('')
+                      setCategoryFilter('all')
+                      setFormatFilter('all')
+                    }}
+                  >
                     {isRTL ? 'مسح الفلاتر' : 'Clear Filters'}
                   </Button>
                 </CardContent>

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { validationPatterns, getErrorMessage } from '@/utils/validation-patterns'
 
 // Contact type enum
 export const contactTypeSchema = z.enum([
@@ -111,9 +112,25 @@ export type Contact = z.infer<typeof contactSchema>
 export const createContactSchema = z.object({
   firstName: z.string().optional(),
   lastName: z.string().optional(),
-  email: z.string().email().optional().or(z.literal('')),
-  phone: z.string().optional(),
-  alternatePhone: z.string().optional(),
+  email: z.string()
+    .optional()
+    .or(z.literal(''))
+    .refine(
+      (val) => !val || val === '' || validationPatterns.email.test(val),
+      { message: getErrorMessage('email', 'en') }
+    ),
+  phone: z.string()
+    .optional()
+    .refine(
+      (val) => !val || validationPatterns.phone.test(val),
+      { message: getErrorMessage('phone', 'en') }
+    ),
+  alternatePhone: z.string()
+    .optional()
+    .refine(
+      (val) => !val || validationPatterns.phone.test(val),
+      { message: getErrorMessage('phone', 'en') }
+    ),
   title: z.string().optional(),
   company: z.string().optional(),
   type: contactTypeSchema.optional(),

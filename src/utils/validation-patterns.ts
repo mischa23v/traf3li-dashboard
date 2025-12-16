@@ -117,13 +117,68 @@ export const isValidNationalId = (value: string): boolean => {
 };
 
 /**
- * Validates a Saudi IBAN
+ * Validates IBAN checksum using mod-97 algorithm
+ * @param iban - The IBAN to validate (should be clean, uppercase)
+ * @returns true if checksum is valid, false otherwise
+ */
+const validateIBANChecksum = (iban: string): boolean => {
+  // Move first 4 characters to end
+  const rearranged = iban.slice(4) + iban.slice(0, 4);
+
+  // Replace letters with numbers (A=10, B=11, ..., Z=35)
+  const numericString = rearranged
+    .split('')
+    .map(char => {
+      const code = char.charCodeAt(0);
+      if (code >= 65 && code <= 90) {
+        // A-Z
+        return (code - 55).toString();
+      }
+      return char;
+    })
+    .join('');
+
+  // Calculate mod 97
+  let remainder = 0;
+  for (let i = 0; i < numericString.length; i++) {
+    remainder = (remainder * 10 + parseInt(numericString[i])) % 97;
+  }
+
+  return remainder === 1;
+};
+
+/**
+ * Validates a Saudi IBAN (basic format check only)
  * @param value - The IBAN to validate
- * @returns true if valid, false otherwise
+ * @returns true if valid format, false otherwise
  */
 export const isValidIban = (value: string): boolean => {
   if (!value) return false;
   return validationPatterns.iban.test(value.trim().toUpperCase());
+};
+
+/**
+ * Validates a Saudi IBAN with checksum verification
+ * @param value - The IBAN to validate
+ * @param checkChecksum - Whether to validate the checksum (default: true)
+ * @returns true if valid, false otherwise
+ */
+export const isValidIbanWithChecksum = (value: string, checkChecksum: boolean = true): boolean => {
+  if (!value) return false;
+
+  const cleanIBAN = value.replace(/\s/g, '').toUpperCase();
+
+  // First check the format
+  if (!validationPatterns.iban.test(cleanIBAN)) {
+    return false;
+  }
+
+  // Then check the checksum if requested
+  if (checkChecksum) {
+    return validateIBANChecksum(cleanIBAN);
+  }
+
+  return true;
 };
 
 /**
@@ -360,6 +415,7 @@ export default {
   // Individual validators
   isValidNationalId,
   isValidIban,
+  isValidIbanWithChecksum,
   isValidPhone,
   isValidCrNumber,
   isValidPassword,

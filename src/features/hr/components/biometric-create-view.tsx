@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
     Select,
     SelectContent,
@@ -26,12 +27,18 @@ import {
     Search, Bell, Fingerprint, MapPin, Network, CheckCircle,
     Loader2, Server, Settings
 } from 'lucide-react'
+import { useDevice, useCreateDevice, useUpdateDevice } from '@/hooks/useBiometric'
 
 export function BiometricCreateView() {
     const navigate = useNavigate()
     const searchParams = useSearch({ strict: false }) as { editId?: string }
     const editId = searchParams?.editId
     const isEditMode = !!editId
+
+    // Data fetching hooks
+    const { data: existingDevice, isLoading: isLoadingDevice } = useDevice(editId || '')
+    const createMutation = useCreateDevice()
+    const updateMutation = useUpdateDevice()
 
     // Form State
     const [deviceName, setDeviceName] = useState('')
@@ -48,13 +55,28 @@ export function BiometricCreateView() {
     const [isOnline, setIsOnline] = useState(true)
     const [notes, setNotes] = useState('')
 
-    const [isPending, setIsPending] = useState(false)
+    // Populate form when editing
+    useEffect(() => {
+        if (existingDevice && isEditMode) {
+            setDeviceName(existingDevice.deviceName || '')
+            setDeviceNameAr(existingDevice.deviceNameAr || '')
+            setDeviceType(existingDevice.deviceType || 'fingerprint')
+            setSerialNumber(existingDevice.serialNumber || '')
+            setManufacturer(existingDevice.manufacturer || '')
+            setModel(existingDevice.model || '')
+            setLocation(existingDevice.location?.name || '')
+            setLocationAr(existingDevice.location?.nameAr || '')
+            setIpAddress(existingDevice.networkConfig?.ipAddress || '')
+            setPort(existingDevice.networkConfig?.port?.toString() || '4370')
+            setStatus(existingDevice.status || 'active')
+            setIsOnline(existingDevice.isOnline || false)
+            setNotes(existingDevice.notes || '')
+        }
+    }, [existingDevice, isEditMode])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setIsPending(true)
 
-        // Placeholder: In real app, this would call the API
         const deviceData = {
             deviceName,
             deviceNameAr,
@@ -62,22 +84,38 @@ export function BiometricCreateView() {
             serialNumber,
             manufacturer,
             model,
-            location,
-            locationAr,
-            ipAddress,
-            port,
+            location: {
+                name: location,
+                nameAr: locationAr,
+            },
+            networkConfig: {
+                ipAddress,
+                port: parseInt(port) || 4370,
+            },
             status,
             isOnline,
             notes,
         }
 
-        // TODO: Replace with actual API call
-        // Simulate API call
-        setTimeout(() => {
-            setIsPending(false)
-            navigate({ to: '/dashboard/hr/biometric' })
-        }, 1000)
+        if (isEditMode && editId) {
+            updateMutation.mutate(
+                { id: editId, data: deviceData },
+                {
+                    onSuccess: () => {
+                        navigate({ to: '/dashboard/hr/biometric' })
+                    },
+                }
+            )
+        } else {
+            createMutation.mutate(deviceData, {
+                onSuccess: () => {
+                    navigate({ to: '/dashboard/hr/biometric' })
+                },
+            })
+        }
     }
+
+    const isPending = createMutation.isPending || updateMutation.isPending
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
@@ -118,7 +156,112 @@ export function BiometricCreateView() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-6">
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        {isLoadingDevice ? (
+                            /* Loading Skeleton */
+                            <>
+                                {/* Device Info Skeleton */}
+                                <Card className="rounded-3xl shadow-sm border-slate-100">
+                                    <CardHeader className="pb-4">
+                                        <Skeleton className="h-6 w-32" />
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <Skeleton className="h-4 w-24" />
+                                                <Skeleton className="h-11 w-full rounded-xl" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Skeleton className="h-4 w-24" />
+                                                <Skeleton className="h-11 w-full rounded-xl" />
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div className="space-y-2">
+                                                <Skeleton className="h-4 w-20" />
+                                                <Skeleton className="h-11 w-full rounded-xl" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Skeleton className="h-4 w-24" />
+                                                <Skeleton className="h-11 w-full rounded-xl" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Skeleton className="h-4 w-16" />
+                                                <Skeleton className="h-11 w-full rounded-xl" />
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <Skeleton className="h-4 w-28" />
+                                                <Skeleton className="h-11 w-full rounded-xl" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Skeleton className="h-4 w-20" />
+                                                <Skeleton className="h-11 w-full rounded-xl" />
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                {/* Location Skeleton */}
+                                <Card className="rounded-3xl shadow-sm border-slate-100">
+                                    <CardHeader className="pb-4">
+                                        <Skeleton className="h-6 w-24" />
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <Skeleton className="h-4 w-28" />
+                                                <Skeleton className="h-11 w-full rounded-xl" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Skeleton className="h-4 w-28" />
+                                                <Skeleton className="h-11 w-full rounded-xl" />
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                {/* Network Settings Skeleton */}
+                                <Card className="rounded-3xl shadow-sm border-slate-100">
+                                    <CardHeader className="pb-4">
+                                        <Skeleton className="h-6 w-32" />
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <Skeleton className="h-4 w-20" />
+                                                <Skeleton className="h-11 w-full rounded-xl" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Skeleton className="h-4 w-16" />
+                                                <Skeleton className="h-11 w-full rounded-xl" />
+                                            </div>
+                                        </div>
+                                        <Skeleton className="h-16 w-full rounded-xl" />
+                                    </CardContent>
+                                </Card>
+
+                                {/* Notes Skeleton */}
+                                <Card className="rounded-3xl shadow-sm border-slate-100">
+                                    <CardHeader className="pb-4">
+                                        <Skeleton className="h-6 w-32" />
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="space-y-2">
+                                            <Skeleton className="h-4 w-20" />
+                                            <Skeleton className="h-32 w-full rounded-xl" />
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                {/* Submit Buttons Skeleton */}
+                                <div className="flex justify-end gap-4 pt-4">
+                                    <Skeleton className="h-12 w-24 rounded-xl" />
+                                    <Skeleton className="h-12 w-32 rounded-xl" />
+                                </div>
+                            </>
+                        ) : (
+                            <form onSubmit={handleSubmit} className="space-y-6">
 
                             {/* DEVICE INFO - Basic */}
                             <Card className="rounded-3xl shadow-sm border-slate-100">
@@ -353,6 +496,7 @@ export function BiometricCreateView() {
                                 </Button>
                             </div>
                         </form>
+                        )}
                     </div>
 
                     <HRSidebar context="biometric" />

@@ -38,6 +38,7 @@ import {
   Calendar, Shield, Wallet, Home, Car, DollarSign,
   FileText, Phone
 } from 'lucide-react'
+import { isValidEmail, isValidPhone, errorMessages } from '@/utils/validation-patterns'
 import {
   BENEFIT_TYPE_LABELS,
   BENEFIT_CATEGORY_LABELS,
@@ -113,6 +114,10 @@ export function BenefitsCreateView() {
   const [providerNameAr, setProviderNameAr] = useState('')
   const [providerEmail, setProviderEmail] = useState('')
   const [providerPhone, setProviderPhone] = useState('')
+
+  // Validation errors
+  const [providerEmailError, setProviderEmailError] = useState('')
+  const [providerPhoneError, setProviderPhoneError] = useState('')
 
   // Costs
   const [employerCost, setEmployerCost] = useState<number>(0)
@@ -265,6 +270,22 @@ export function BenefitsCreateView() {
 
   // Handle submit
   const handleSubmit = async () => {
+    // Clear previous errors
+    setProviderEmailError('')
+    setProviderPhoneError('')
+
+    // Validate email if provided
+    if (providerEmail && !isValidEmail(providerEmail)) {
+      setProviderEmailError(errorMessages.email.ar)
+      return
+    }
+
+    // Validate phone if provided
+    if (providerPhone && !isValidPhone(providerPhone)) {
+      setProviderPhoneError(errorMessages.phone.ar)
+      return
+    }
+
     const data: CreateBenefitData = {
       employeeId,
       employeeName,
@@ -756,21 +777,33 @@ export function BenefitsCreateView() {
                         <Input
                           type="email"
                           value={providerEmail}
-                          onChange={(e) => setProviderEmail(e.target.value)}
+                          onChange={(e) => {
+                            setProviderEmail(e.target.value)
+                            setProviderEmailError('')
+                          }}
                           placeholder="provider@example.com"
-                          className="h-11 rounded-xl"
+                          className={`h-11 rounded-xl ${providerEmailError ? 'border-red-500' : ''}`}
                           dir="ltr"
                         />
+                        {providerEmailError && (
+                          <p className="text-sm text-red-500">{providerEmailError}</p>
+                        )}
                       </div>
                       <div className="space-y-2">
                         <Label className="text-navy font-medium">رقم الهاتف</Label>
                         <Input
                           value={providerPhone}
-                          onChange={(e) => setProviderPhone(e.target.value)}
+                          onChange={(e) => {
+                            setProviderPhone(e.target.value)
+                            setProviderPhoneError('')
+                          }}
                           placeholder="+966"
-                          className="h-11 rounded-xl"
+                          className={`h-11 rounded-xl ${providerPhoneError ? 'border-red-500' : ''}`}
                           dir="ltr"
                         />
+                        {providerPhoneError && (
+                          <p className="text-sm text-red-500">{providerPhoneError}</p>
+                        )}
                       </div>
                     </div>
                   </CardContent>

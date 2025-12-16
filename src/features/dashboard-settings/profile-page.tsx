@@ -41,6 +41,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { useAuthStore } from '@/stores/auth-store'
+import { Skeleton } from '@/components/ui/skeleton'
 
 const REGIONS = ['الرياض', 'مكة المكرمة', 'المدينة المنورة', 'القصيم', 'الشرقية', 'عسير', 'تبوك', 'حائل', 'الحدود الشمالية', 'جازان', 'نجران', 'الباحة', 'الجوف']
 const NATIONALITIES = ['سعودي', 'إماراتي', 'كويتي', 'قطري', 'بحريني', 'عماني', 'يمني', 'عراقي', 'سوري', 'لبناني', 'أردني', 'فلسطيني', 'مصري', 'سوداني', 'ليبي', 'تونسي', 'جزائري', 'مغربي', 'هندي', 'باكستاني', 'بنغلاديشي', 'فلبيني', 'إندونيسي', 'بريطاني', 'فرنسي', 'ألماني', 'أمريكي', 'كندي']
@@ -66,6 +67,7 @@ export function ProfilePage() {
   const { i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const user = useAuthStore((state) => state.user)
+  const isLoading = !user
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -111,6 +113,78 @@ export function ProfilePage() {
   ]
 
   function onSubmit(data: ProfileFormValues) {
+  }
+
+  if (isLoading) {
+    return (
+      <>
+        <Header className="bg-navy shadow-none relative">
+          <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+            <DynamicIsland />
+          </div>
+          <div className='ms-auto flex items-center gap-4'>
+            <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+            <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+            <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+            <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+        </Header>
+
+        <Main className="bg-slate-50">
+          <div className="max-w-4xl mx-auto space-y-6">
+            <div>
+              <Skeleton className="h-8 w-48" />
+              <Skeleton className="h-4 w-64 mt-2" />
+            </div>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-6">
+                  <Skeleton className="h-24 w-24 rounded-full" />
+                  <div className="space-y-2 flex-1">
+                    <Skeleton className="h-6 w-40" />
+                    <Skeleton className="h-4 w-56" />
+                    <Skeleton className="h-9 w-32 mt-2" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <Skeleton className="h-6 w-48" />
+                <Skeleton className="h-4 w-64 mt-2" />
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Skeleton className="h-20 w-full" />
+                    <Skeleton className="h-20 w-full" />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Skeleton className="h-20 w-full" />
+                    <Skeleton className="h-20 w-full" />
+                  </div>
+                  <Skeleton className="h-20 w-full" />
+                  <Skeleton className="h-20 w-full" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Skeleton className="h-20 w-full" />
+                    <Skeleton className="h-20 w-full" />
+                  </div>
+                  <Skeleton className="h-20 w-full" />
+                  <Skeleton className="h-32 w-full" />
+                  <div className="flex justify-end">
+                    <Skeleton className="h-10 w-32" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </Main>
+      </>
+    )
   }
 
   return (

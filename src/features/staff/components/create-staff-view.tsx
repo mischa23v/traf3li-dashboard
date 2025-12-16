@@ -50,6 +50,7 @@ import { ClientsSidebar } from '@/features/clients/components/clients-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useCreateStaff } from '@/hooks/useStaff'
 import { cn } from '@/lib/utils'
+import { usePermissions } from '@/hooks/use-permissions'
 
 // ==================== CONSTANTS ====================
 
@@ -141,6 +142,10 @@ export function CreateStaffView() {
     const isArabic = i18n.language === 'ar'
     const navigate = useNavigate()
     const { mutate: createStaff, isPending } = useCreateStaff()
+    const { isAdminOrOwner, canManageTeam } = usePermissions()
+
+    // Check if user can manage permissions (admin, owner, or team manager)
+    const canManagePermissions = isAdminOrOwner() || canManageTeam()
 
     // Form state
     const [formData, setFormData] = useState({
@@ -1013,46 +1018,48 @@ export function CreateStaffView() {
                                 </AccordionItem>
 
                                 {/* Permissions */}
-                                <AccordionItem value="permissions" className="border rounded-xl mb-2 px-4">
-                                    <AccordionTrigger className="hover:no-underline">
-                                        <div className="flex items-center gap-2">
-                                            <Shield className="h-4 w-4 text-slate-500" />
-                                            <span className="font-semibold">الصلاحيات</span>
-                                        </div>
-                                    </AccordionTrigger>
-                                    <AccordionContent className="space-y-4 pb-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="flex items-center gap-3">
-                                                <Switch
-                                                    checked={formData.canAccessAllCases}
-                                                    onCheckedChange={(v) => handleChange('canAccessAllCases', v)}
-                                                />
-                                                <Label>الوصول لجميع القضايا</Label>
+                                {canManagePermissions && (
+                                    <AccordionItem value="permissions" className="border rounded-xl mb-2 px-4">
+                                        <AccordionTrigger className="hover:no-underline">
+                                            <div className="flex items-center gap-2">
+                                                <Shield className="h-4 w-4 text-slate-500" />
+                                                <span className="font-semibold">الصلاحيات</span>
                                             </div>
-                                            <div className="flex items-center gap-3">
-                                                <Switch
-                                                    checked={formData.canAccessFinancials}
-                                                    onCheckedChange={(v) => handleChange('canAccessFinancials', v)}
-                                                />
-                                                <Label>الوصول للبيانات المالية</Label>
+                                        </AccordionTrigger>
+                                        <AccordionContent className="space-y-4 pb-4">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="flex items-center gap-3">
+                                                    <Switch
+                                                        checked={formData.canAccessAllCases}
+                                                        onCheckedChange={(v) => handleChange('canAccessAllCases', v)}
+                                                    />
+                                                    <Label>الوصول لجميع القضايا</Label>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <Switch
+                                                        checked={formData.canAccessFinancials}
+                                                        onCheckedChange={(v) => handleChange('canAccessFinancials', v)}
+                                                    />
+                                                    <Label>الوصول للبيانات المالية</Label>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <Switch
+                                                        checked={formData.canApproveTimeEntries}
+                                                        onCheckedChange={(v) => handleChange('canApproveTimeEntries', v)}
+                                                    />
+                                                    <Label>اعتماد إدخالات الوقت</Label>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <Switch
+                                                        checked={formData.canCreateInvoices}
+                                                        onCheckedChange={(v) => handleChange('canCreateInvoices', v)}
+                                                    />
+                                                    <Label>إنشاء الفواتير</Label>
+                                                </div>
                                             </div>
-                                            <div className="flex items-center gap-3">
-                                                <Switch
-                                                    checked={formData.canApproveTimeEntries}
-                                                    onCheckedChange={(v) => handleChange('canApproveTimeEntries', v)}
-                                                />
-                                                <Label>اعتماد إدخالات الوقت</Label>
-                                            </div>
-                                            <div className="flex items-center gap-3">
-                                                <Switch
-                                                    checked={formData.canCreateInvoices}
-                                                    onCheckedChange={(v) => handleChange('canCreateInvoices', v)}
-                                                />
-                                                <Label>إنشاء الفواتير</Label>
-                                            </div>
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                )}
                             </Accordion>
 
                             {/* STATUS & NOTES CARD */}
