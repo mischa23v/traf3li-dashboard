@@ -39,6 +39,16 @@ import {
 import { VehicleDialog } from '@/components/hr/vehicles/VehicleDialog'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 export function Vehicles() {
   const { t, i18n } = useTranslation()
@@ -60,6 +70,9 @@ export function Vehicles() {
   // Dialog state
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingVehicle, setEditingVehicle] = useState<any>(null)
+
+  // Delete confirmation dialog
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   // Build filters
   const filters = {
@@ -112,20 +125,19 @@ export function Vehicles() {
     }
   }
 
-  const handleBulkDelete = async () => {
+  const handleBulkDelete = () => {
     if (selectedVehicles.length === 0) return
+    setDeleteDialogOpen(true)
+  }
 
-    if (!confirm(isRTL
-      ? `هل أنت متأكد من حذف ${selectedVehicles.length} مركبة؟`
-      : `Are you sure you want to delete ${selectedVehicles.length} vehicle(s)?`
-    )) return
-
+  const confirmBulkDelete = async () => {
     try {
       await bulkDeleteMutation.mutateAsync(selectedVehicles)
-      toast.success(isRTL ? 'تم حذف المركبات بنجاح' : 'Vehicles deleted successfully')
+      toast.success(t('hr.vehicles.deleteSuccess', 'Vehicles deleted successfully'))
       setSelectedVehicles([])
+      setDeleteDialogOpen(false)
     } catch (error) {
-      toast.error(isRTL ? 'فشل حذف المركبات' : 'Failed to delete vehicles')
+      toast.error(t('hr.vehicles.deleteError', 'Failed to delete vehicles'))
     }
   }
 
@@ -166,10 +178,10 @@ export function Vehicles() {
             <Car className="h-6 w-6 text-muted-foreground" />
             <div>
               <h1 className="text-lg font-semibold">
-                {isRTL ? 'إدارة المركبات' : 'Vehicle Management'}
+                {t('hr.vehicles.title', 'Vehicle Management')}
               </h1>
               <p className="text-sm text-muted-foreground">
-                {isRTL ? 'إدارة أسطول المركبات والسجلات' : 'Manage fleet vehicles and logs'}
+                {t('hr.vehicles.subtitle', 'Manage fleet vehicles and logs')}
               </p>
             </div>
           </div>
@@ -182,12 +194,12 @@ export function Vehicles() {
                 disabled={bulkDeleteMutation.isPending}
               >
                 {bulkDeleteMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isRTL ? `حذف (${selectedVehicles.length})` : `Delete (${selectedVehicles.length})`}
+                {t('hr.vehicles.deleteSelected', 'Delete ({{count}})', { count: selectedVehicles.length })}
               </Button>
             )}
             <Button onClick={handleCreateVehicle}>
               <Plus className="mr-2 h-4 w-4" />
-              {isRTL ? 'إضافة مركبة' : 'Add Vehicle'}
+              {t('hr.vehicles.addVehicle', 'Add Vehicle')}
             </Button>
           </div>
         </div>
@@ -205,7 +217,7 @@ export function Vehicles() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">
-                      {isRTL ? 'إجمالي المركبات' : 'Total Vehicles'}
+                      {t('hr.vehicles.stats.totalVehicles', 'Total Vehicles')}
                     </p>
                     <p className="text-2xl font-bold">{stats.totalVehicles}</p>
                   </div>
@@ -221,7 +233,7 @@ export function Vehicles() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">
-                      {isRTL ? 'نشط' : 'Active'}
+                      {t('hr.vehicles.stats.active', 'Active')}
                     </p>
                     <p className="text-2xl font-bold">{stats.activeVehicles}</p>
                   </div>
@@ -237,7 +249,7 @@ export function Vehicles() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">
-                      {isRTL ? 'صيانة' : 'Maintenance'}
+                      {t('hr.vehicles.stats.maintenance', 'Maintenance')}
                     </p>
                     <p className="text-2xl font-bold">{stats.inMaintenance}</p>
                   </div>
@@ -253,7 +265,7 @@ export function Vehicles() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">
-                      {isRTL ? 'مُسند' : 'Assigned'}
+                      {t('hr.vehicles.stats.assigned', 'Assigned')}
                     </p>
                     <p className="text-2xl font-bold">{stats.assignedVehicles}</p>
                   </div>
@@ -269,7 +281,7 @@ export function Vehicles() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">
-                      {isRTL ? 'صيانة مستحقة' : 'Service Due'}
+                      {t('hr.vehicles.stats.serviceDue', 'Service Due')}
                     </p>
                     <p className="text-2xl font-bold">{stats.serviceDueThisMonth}</p>
                   </div>
@@ -285,7 +297,7 @@ export function Vehicles() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">
-                      {isRTL ? 'قيمة الأسطول' : 'Fleet Value'}
+                      {t('hr.vehicles.stats.fleetValue', 'Fleet Value')}
                     </p>
                     <p className="text-lg font-bold">{formatCurrency(stats.totalFleetValue)}</p>
                   </div>
@@ -303,7 +315,7 @@ export function Vehicles() {
             <div className="relative flex-1 min-w-[200px] max-w-md">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder={isRTL ? 'البحث عن مركبة...' : 'Search vehicles...'}
+                placeholder={t('hr.vehicles.searchPlaceholder', 'Search vehicles...')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-9"
@@ -312,10 +324,10 @@ export function Vehicles() {
 
             <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as any)}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={isRTL ? 'الحالة' : 'Status'} />
+                <SelectValue placeholder={t('hr.vehicles.filters.status', 'Status')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{isRTL ? 'جميع الحالات' : 'All Statuses'}</SelectItem>
+                <SelectItem value="all">{t('hr.vehicles.filters.allStatuses', 'All Statuses')}</SelectItem>
                 {Object.entries(VEHICLE_STATUS_LABELS).map(([key, label]) => (
                   <SelectItem key={key} value={key}>
                     {isRTL ? label.ar : label.en}
@@ -326,10 +338,10 @@ export function Vehicles() {
 
             <Select value={typeFilter} onValueChange={(value) => setTypeFilter(value as any)}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={isRTL ? 'النوع' : 'Type'} />
+                <SelectValue placeholder={t('hr.vehicles.filters.type', 'Type')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{isRTL ? 'جميع الأنواع' : 'All Types'}</SelectItem>
+                <SelectItem value="all">{t('hr.vehicles.filters.allTypes', 'All Types')}</SelectItem>
                 {Object.entries(VEHICLE_TYPE_LABELS).map(([key, label]) => (
                   <SelectItem key={key} value={key}>
                     {isRTL ? label.ar : label.en}
@@ -340,10 +352,10 @@ export function Vehicles() {
 
             <Select value={fuelFilter} onValueChange={(value) => setFuelFilter(value as any)}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={isRTL ? 'نوع الوقود' : 'Fuel Type'} />
+                <SelectValue placeholder={t('hr.vehicles.filters.fuelType', 'Fuel Type')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{isRTL ? 'جميع أنواع الوقود' : 'All Fuel Types'}</SelectItem>
+                <SelectItem value="all">{t('hr.vehicles.filters.allFuelTypes', 'All Fuel Types')}</SelectItem>
                 {Object.entries(FUEL_TYPE_LABELS).map(([key, label]) => (
                   <SelectItem key={key} value={key}>
                     {isRTL ? label.ar : label.en}
@@ -354,10 +366,10 @@ export function Vehicles() {
 
             <Select value={assignmentFilter} onValueChange={(value) => setAssignmentFilter(value as any)}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={isRTL ? 'نوع الإسناد' : 'Assignment'} />
+                <SelectValue placeholder={t('hr.vehicles.filters.assignment', 'Assignment')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{isRTL ? 'جميع الأنواع' : 'All Types'}</SelectItem>
+                <SelectItem value="all">{t('hr.vehicles.filters.allAssignments', 'All Types')}</SelectItem>
                 {Object.entries(ASSIGNMENT_TYPE_LABELS).map(([key, label]) => (
                   <SelectItem key={key} value={key}>
                     {isRTL ? label.ar : label.en}
@@ -379,18 +391,18 @@ export function Vehicles() {
           <div className="flex h-[400px] flex-col items-center justify-center gap-2">
             <AlertCircle className="h-8 w-8 text-destructive" />
             <p className="text-sm text-muted-foreground">
-              {isRTL ? 'فشل تحميل المركبات' : 'Failed to load vehicles'}
+              {t('hr.vehicles.errorLoading', 'Failed to load vehicles')}
             </p>
           </div>
         ) : vehicles.length === 0 ? (
           <div className="flex h-[400px] flex-col items-center justify-center gap-2">
             <Package className="h-12 w-12 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
-              {isRTL ? 'لا توجد مركبات' : 'No vehicles found'}
+              {t('hr.vehicles.noVehicles', 'No vehicles found')}
             </p>
             <Button onClick={handleCreateVehicle} variant="outline" size="sm">
               <Plus className="mr-2 h-4 w-4" />
-              {isRTL ? 'إضافة مركبة' : 'Add Vehicle'}
+              {t('hr.vehicles.addVehicle', 'Add Vehicle')}
             </Button>
           </div>
         ) : (
@@ -402,7 +414,7 @@ export function Vehicles() {
                 onCheckedChange={handleSelectAll}
               />
               <span className="text-sm text-muted-foreground">
-                {isRTL ? 'تحديد الكل' : 'Select All'}
+                {t('hr.vehicles.selectAll', 'Select All')}
               </span>
             </div>
 
@@ -439,16 +451,16 @@ export function Vehicles() {
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => handleViewVehicle(vehicle._id)}>
                               <Eye className="mr-2 h-4 w-4" />
-                              {isRTL ? 'عرض' : 'View'}
+                              {t('hr.vehicles.actions.view', 'View')}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleEditVehicle(vehicle)}>
                               <Edit className="mr-2 h-4 w-4" />
-                              {isRTL ? 'تعديل' : 'Edit'}
+                              {t('hr.vehicles.actions.edit', 'Edit')}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem className="text-destructive">
                               <Trash2 className="mr-2 h-4 w-4" />
-                              {isRTL ? 'حذف' : 'Delete'}
+                              {t('hr.vehicles.actions.delete', 'Delete')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -479,7 +491,7 @@ export function Vehicles() {
                     </div>
                     <div className="border-t bg-muted/50 px-4 py-2 flex items-center justify-between">
                       <span className="text-xs text-muted-foreground">
-                        {isRTL ? 'القيمة الحالية' : 'Current Value'}
+                        {t('hr.vehicles.currentValue', 'Current Value')}
                       </span>
                       <span className="text-sm font-semibold">{formatCurrency(vehicle.currentValue)}</span>
                     </div>
@@ -492,9 +504,10 @@ export function Vehicles() {
             {pagination && pagination.pages > 1 && (
               <div className="flex items-center justify-between border-t pt-4">
                 <p className="text-sm text-muted-foreground">
-                  {isRTL
-                    ? `عرض ${vehicles.length} من ${pagination.total} مركبة`
-                    : `Showing ${vehicles.length} of ${pagination.total} vehicles`}
+                  {t('hr.vehicles.pagination.showing', 'Showing {{count}} of {{total}} vehicles', {
+                    count: vehicles.length,
+                    total: pagination.total
+                  })}
                 </p>
                 <div className="flex items-center gap-2">
                   <Button
@@ -503,10 +516,13 @@ export function Vehicles() {
                     onClick={() => setPage(page - 1)}
                     disabled={page === 1}
                   >
-                    {isRTL ? 'السابق' : 'Previous'}
+                    {t('hr.vehicles.pagination.previous', 'Previous')}
                   </Button>
                   <span className="text-sm">
-                    {isRTL ? `صفحة ${page} من ${pagination.pages}` : `Page ${page} of ${pagination.pages}`}
+                    {t('hr.vehicles.pagination.pageInfo', 'Page {{current}} of {{total}}', {
+                      current: page,
+                      total: pagination.pages
+                    })}
                   </span>
                   <Button
                     variant="outline"
@@ -514,7 +530,7 @@ export function Vehicles() {
                     onClick={() => setPage(page + 1)}
                     disabled={page === pagination.pages}
                   >
-                    {isRTL ? 'التالي' : 'Next'}
+                    {t('hr.vehicles.pagination.next', 'Next')}
                   </Button>
                 </div>
               </div>
@@ -529,6 +545,34 @@ export function Vehicles() {
         onOpenChange={setIsDialogOpen}
         vehicle={editingVehicle}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t('hr.vehicles.confirmDelete.title', 'Confirm Deletion')}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('hr.vehicles.confirmDelete.description',
+                'Are you sure you want to delete {{count}} vehicle(s)? This action cannot be undone.',
+                { count: selectedVehicles.length }
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              {t('hr.vehicles.confirmDelete.cancel', 'Cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmBulkDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t('hr.vehicles.confirmDelete.confirm', 'Delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
