@@ -416,7 +416,7 @@ export const employeeIncentiveService = {
   /**
    * Get all incentives for a specific employee
    */
-  getEmployeeIncentives: async (
+  getIncentivesByEmployee: async (
     employeeId: string,
     filters?: Omit<EmployeeIncentiveFilters, 'employeeId'>
   ): Promise<EmployeeIncentivesResponse> => {

@@ -93,6 +93,7 @@ import { Route as AuthenticatedDashboardSettingsPaymentTermsRouteImport } from '
 import { Route as AuthenticatedDashboardSettingsPaymentModesRouteImport } from './routes/_authenticated/dashboard.settings.payment-modes'
 import { Route as AuthenticatedDashboardSettingsFinanceRouteImport } from './routes/_authenticated/dashboard.settings.finance'
 import { Route as AuthenticatedDashboardSettingsExpensePoliciesRouteImport } from './routes/_authenticated/dashboard.settings.expense-policies'
+import { Route as AuthenticatedDashboardSettingsCrmRouteImport } from './routes/_authenticated/dashboard.settings.crm'
 import { Route as AuthenticatedDashboardSettingsCompanyRouteImport } from './routes/_authenticated/dashboard.settings.company'
 import { Route as AuthenticatedDashboardReputationOverviewRouteImport } from './routes/_authenticated/dashboard.reputation.overview'
 import { Route as AuthenticatedDashboardReputationBadgesRouteImport } from './routes/_authenticated/dashboard.reputation.badges'
@@ -106,6 +107,7 @@ import { Route as AuthenticatedDashboardKnowledgeJudgmentsRouteImport } from './
 import { Route as AuthenticatedDashboardKnowledgeFormsRouteImport } from './routes/_authenticated/dashboard.knowledge.forms'
 import { Route as AuthenticatedDashboardJobsMyServicesRouteImport } from './routes/_authenticated/dashboard.jobs.my-services'
 import { Route as AuthenticatedDashboardJobsBrowseRouteImport } from './routes/_authenticated/dashboard.jobs.browse'
+import { Route as AuthenticatedDashboardHrSetupWizardRouteImport } from './routes/_authenticated/dashboard.hr.setup-wizard'
 import { Route as AuthenticatedDashboardFinanceSetupWizardRouteImport } from './routes/_authenticated/dashboard.finance.setup-wizard'
 import { Route as AuthenticatedDashboardFinanceOverviewRouteImport } from './routes/_authenticated/dashboard.finance.overview'
 import { Route as AuthenticatedDashboardFinanceOpeningBalancesRouteImport } from './routes/_authenticated/dashboard.finance.opening-balances'
@@ -130,9 +132,13 @@ import { Route as AuthenticatedDashboardTasksRemindersIndexRouteImport } from '.
 import { Route as AuthenticatedDashboardTasksEventsIndexRouteImport } from './routes/_authenticated/dashboard.tasks.events.index'
 import { Route as AuthenticatedDashboardSalesReportsIndexRouteImport } from './routes/_authenticated/dashboard.sales.reports.index'
 import { Route as AuthenticatedDashboardSalesLeadsIndexRouteImport } from './routes/_authenticated/dashboard.sales.leads.index'
+import { Route as AuthenticatedDashboardHrVehiclesIndexRouteImport } from './routes/_authenticated/dashboard.hr.vehicles.index'
 import { Route as AuthenticatedDashboardHrTrainingIndexRouteImport } from './routes/_authenticated/dashboard.hr.training.index'
 import { Route as AuthenticatedDashboardHrSuccessionPlanningIndexRouteImport } from './routes/_authenticated/dashboard.hr.succession-planning.index'
+import { Route as AuthenticatedDashboardHrSkillsIndexRouteImport } from './routes/_authenticated/dashboard.hr.skills.index'
+import { Route as AuthenticatedDashboardHrShiftAssignmentsIndexRouteImport } from './routes/_authenticated/dashboard.hr.shift-assignments.index'
 import { Route as AuthenticatedDashboardHrReportsIndexRouteImport } from './routes/_authenticated/dashboard.hr.reports.index'
+import { Route as AuthenticatedDashboardHrPromotionsIndexRouteImport } from './routes/_authenticated/dashboard.hr.promotions.index'
 import { Route as AuthenticatedDashboardHrPredictionsIndexRouteImport } from './routes/_authenticated/dashboard.hr.predictions.index'
 import { Route as AuthenticatedDashboardHrPerformanceIndexRouteImport } from './routes/_authenticated/dashboard.hr.performance.index'
 import { Route as AuthenticatedDashboardHrPayrollIndexRouteImport } from './routes/_authenticated/dashboard.hr.payroll.index'
@@ -147,6 +153,7 @@ import { Route as AuthenticatedDashboardHrGrievancesIndexRouteImport } from './r
 import { Route as AuthenticatedDashboardHrGeofencingIndexRouteImport } from './routes/_authenticated/dashboard.hr.geofencing.index'
 import { Route as AuthenticatedDashboardHrExpenseClaimsIndexRouteImport } from './routes/_authenticated/dashboard.hr.expense-claims.index'
 import { Route as AuthenticatedDashboardHrEmployeesIndexRouteImport } from './routes/_authenticated/dashboard.hr.employees.index'
+import { Route as AuthenticatedDashboardHrEmployeeTransfersIndexRouteImport } from './routes/_authenticated/dashboard.hr.employee-transfers.index'
 import { Route as AuthenticatedDashboardHrCompensationIndexRouteImport } from './routes/_authenticated/dashboard.hr.compensation.index'
 import { Route as AuthenticatedDashboardHrBiometricIndexRouteImport } from './routes/_authenticated/dashboard.hr.biometric.index'
 import { Route as AuthenticatedDashboardHrBenefitsIndexRouteImport } from './routes/_authenticated/dashboard.hr.benefits.index'
@@ -195,10 +202,16 @@ import { Route as AuthenticatedDashboardHrTrainingNewRouteImport } from './route
 import { Route as AuthenticatedDashboardHrTrainingTrainingIdRouteImport } from './routes/_authenticated/dashboard.hr.training.$trainingId'
 import { Route as AuthenticatedDashboardHrSuccessionPlanningNewRouteImport } from './routes/_authenticated/dashboard.hr.succession-planning.new'
 import { Route as AuthenticatedDashboardHrSuccessionPlanningPlanIdRouteImport } from './routes/_authenticated/dashboard.hr.succession-planning.$planId'
+import { Route as AuthenticatedDashboardHrSkillsMatrixRouteImport } from './routes/_authenticated/dashboard.hr.skills.matrix'
+import { Route as AuthenticatedDashboardHrShiftAssignmentsAssignmentIdRouteImport } from './routes/_authenticated/dashboard.hr.shift-assignments.$assignmentId'
 import { Route as AuthenticatedDashboardHrReportsNewRouteImport } from './routes/_authenticated/dashboard.hr.reports.new'
 import { Route as AuthenticatedDashboardHrReportsReportIdRouteImport } from './routes/_authenticated/dashboard.hr.reports.$reportId'
+import { Route as AuthenticatedDashboardHrRecruitmentStaffingPlansRouteImport } from './routes/_authenticated/dashboard.hr.recruitment.staffing-plans'
+import { Route as AuthenticatedDashboardHrPromotionsNewRouteImport } from './routes/_authenticated/dashboard.hr.promotions.new'
+import { Route as AuthenticatedDashboardHrPromotionsPromotionIdRouteImport } from './routes/_authenticated/dashboard.hr.promotions.$promotionId'
 import { Route as AuthenticatedDashboardHrPerformanceNewRouteImport } from './routes/_authenticated/dashboard.hr.performance.new'
 import { Route as AuthenticatedDashboardHrPerformanceReviewIdRouteImport } from './routes/_authenticated/dashboard.hr.performance.$reviewId'
+import { Route as AuthenticatedDashboardHrPayrollSalaryComponentsRouteImport } from './routes/_authenticated/dashboard.hr.payroll.salary-components'
 import { Route as AuthenticatedDashboardHrPayrollNewRouteImport } from './routes/_authenticated/dashboard.hr.payroll.new'
 import { Route as AuthenticatedDashboardHrPayrollSlipIdRouteImport } from './routes/_authenticated/dashboard.hr.payroll.$slipId'
 import { Route as AuthenticatedDashboardHrPayrollRunsNewRouteImport } from './routes/_authenticated/dashboard.hr.payroll-runs.new'
@@ -211,7 +224,12 @@ import { Route as AuthenticatedDashboardHrOffboardingNewRouteImport } from './ro
 import { Route as AuthenticatedDashboardHrOffboardingOffboardingIdRouteImport } from './routes/_authenticated/dashboard.hr.offboarding.$offboardingId'
 import { Route as AuthenticatedDashboardHrLoansNewRouteImport } from './routes/_authenticated/dashboard.hr.loans.new'
 import { Route as AuthenticatedDashboardHrLoansLoanIdRouteImport } from './routes/_authenticated/dashboard.hr.loans.$loanId'
+import { Route as AuthenticatedDashboardHrLeavePoliciesRouteImport } from './routes/_authenticated/dashboard.hr.leave.policies'
+import { Route as AuthenticatedDashboardHrLeavePeriodsRouteImport } from './routes/_authenticated/dashboard.hr.leave.periods'
 import { Route as AuthenticatedDashboardHrLeaveNewRouteImport } from './routes/_authenticated/dashboard.hr.leave.new'
+import { Route as AuthenticatedDashboardHrLeaveEncashmentsRouteImport } from './routes/_authenticated/dashboard.hr.leave.encashments'
+import { Route as AuthenticatedDashboardHrLeaveCompensatoryRouteImport } from './routes/_authenticated/dashboard.hr.leave.compensatory'
+import { Route as AuthenticatedDashboardHrLeaveAllocationsRouteImport } from './routes/_authenticated/dashboard.hr.leave.allocations'
 import { Route as AuthenticatedDashboardHrLeaveRequestIdRouteImport } from './routes/_authenticated/dashboard.hr.leave.$requestId'
 import { Route as AuthenticatedDashboardHrJobPositionsNewRouteImport } from './routes/_authenticated/dashboard.hr.job-positions.new'
 import { Route as AuthenticatedDashboardHrJobPositionsPositionIdRouteImport } from './routes/_authenticated/dashboard.hr.job-positions.$positionId'
@@ -223,7 +241,11 @@ import { Route as AuthenticatedDashboardHrExpenseClaimsNewRouteImport } from './
 import { Route as AuthenticatedDashboardHrExpenseClaimsClaimIdRouteImport } from './routes/_authenticated/dashboard.hr.expense-claims.$claimId'
 import { Route as AuthenticatedDashboardHrEmployeesNewRouteImport } from './routes/_authenticated/dashboard.hr.employees.new'
 import { Route as AuthenticatedDashboardHrEmployeesEmployeeIdRouteImport } from './routes/_authenticated/dashboard.hr.employees.$employeeId'
+import { Route as AuthenticatedDashboardHrEmployeeTransfersNewRouteImport } from './routes/_authenticated/dashboard.hr.employee-transfers.new'
+import { Route as AuthenticatedDashboardHrEmployeeTransfersTransferIdRouteImport } from './routes/_authenticated/dashboard.hr.employee-transfers.$transferId'
+import { Route as AuthenticatedDashboardHrCompensationRetentionBonusesRouteImport } from './routes/_authenticated/dashboard.hr.compensation.retention-bonuses'
 import { Route as AuthenticatedDashboardHrCompensationNewRouteImport } from './routes/_authenticated/dashboard.hr.compensation.new'
+import { Route as AuthenticatedDashboardHrCompensationIncentivesRouteImport } from './routes/_authenticated/dashboard.hr.compensation.incentives'
 import { Route as AuthenticatedDashboardHrCompensationCompensationIdRouteImport } from './routes/_authenticated/dashboard.hr.compensation.$compensationId'
 import { Route as AuthenticatedDashboardHrBiometricNewRouteImport } from './routes/_authenticated/dashboard.hr.biometric.new'
 import { Route as AuthenticatedDashboardHrBiometricDeviceIdRouteImport } from './routes/_authenticated/dashboard.hr.biometric.$deviceId'
@@ -294,6 +316,7 @@ import { Route as AuthenticatedDashboardCrmActivitiesActivityIdRouteImport } fro
 import { Route as AuthenticatedDashboardCasesPipelineBoardRouteImport } from './routes/_authenticated/dashboard.cases.pipeline.board'
 import { Route as AuthenticatedDashboardCasesCaseIdPipelineRouteImport } from './routes/_authenticated/dashboard.cases.$caseId.pipeline'
 import { Route as AuthenticatedDashboardCasesCaseIdNotionRouteImport } from './routes/_authenticated/dashboard.cases.$caseId.notion'
+import { Route as AuthenticatedDashboardHrSettingsShiftTypesIndexRouteImport } from './routes/_authenticated/dashboard.hr.settings.shift-types.index'
 import { Route as AuthenticatedDashboardHrRecruitmentJobsIndexRouteImport } from './routes/_authenticated/dashboard.hr.recruitment.jobs.index'
 import { Route as AuthenticatedDashboardHrRecruitmentApplicantsIndexRouteImport } from './routes/_authenticated/dashboard.hr.recruitment.applicants.index'
 import { Route as AuthenticatedDashboardFinanceSaudiBankingWpsIndexRouteImport } from './routes/_authenticated/dashboard.finance.saudi-banking.wps.index'
@@ -302,6 +325,7 @@ import { Route as AuthenticatedDashboardHrRecruitmentJobsNewRouteImport } from '
 import { Route as AuthenticatedDashboardHrRecruitmentJobsJobIdRouteImport } from './routes/_authenticated/dashboard.hr.recruitment.jobs.$jobId'
 import { Route as AuthenticatedDashboardHrRecruitmentApplicantsNewRouteImport } from './routes/_authenticated/dashboard.hr.recruitment.applicants.new'
 import { Route as AuthenticatedDashboardHrRecruitmentApplicantsApplicantIdRouteImport } from './routes/_authenticated/dashboard.hr.recruitment.applicants.$applicantId'
+import { Route as AuthenticatedDashboardHrPromotionsPromotionIdEditRouteImport } from './routes/_authenticated/dashboard.hr.promotions.$promotionId.edit'
 import { Route as AuthenticatedDashboardFinanceVendorsVendorIdEditRouteImport } from './routes/_authenticated/dashboard.finance.vendors.$vendorId.edit'
 import { Route as AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRouteImport } from './routes/_authenticated/dashboard.finance.time-tracking.$entryId.edit'
 import { Route as AuthenticatedDashboardFinanceStatementsStatementIdEditRouteImport } from './routes/_authenticated/dashboard.finance.statements.$statementId.edit'
@@ -773,6 +797,12 @@ const AuthenticatedDashboardSettingsExpensePoliciesRoute =
     path: '/dashboard/settings/expense-policies',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardSettingsCrmRoute =
+  AuthenticatedDashboardSettingsCrmRouteImport.update({
+    id: '/dashboard/settings/crm',
+    path: '/dashboard/settings/crm',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardSettingsCompanyRoute =
   AuthenticatedDashboardSettingsCompanyRouteImport.update({
     id: '/dashboard/settings/company',
@@ -849,6 +879,12 @@ const AuthenticatedDashboardJobsBrowseRoute =
   AuthenticatedDashboardJobsBrowseRouteImport.update({
     id: '/dashboard/jobs/browse',
     path: '/dashboard/jobs/browse',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrSetupWizardRoute =
+  AuthenticatedDashboardHrSetupWizardRouteImport.update({
+    id: '/dashboard/hr/setup-wizard',
+    path: '/dashboard/hr/setup-wizard',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardFinanceSetupWizardRoute =
@@ -995,6 +1031,12 @@ const AuthenticatedDashboardSalesLeadsIndexRoute =
     path: '/dashboard/sales/leads/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardHrVehiclesIndexRoute =
+  AuthenticatedDashboardHrVehiclesIndexRouteImport.update({
+    id: '/dashboard/hr/vehicles/',
+    path: '/dashboard/hr/vehicles/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardHrTrainingIndexRoute =
   AuthenticatedDashboardHrTrainingIndexRouteImport.update({
     id: '/dashboard/hr/training/',
@@ -1007,10 +1049,28 @@ const AuthenticatedDashboardHrSuccessionPlanningIndexRoute =
     path: '/dashboard/hr/succession-planning/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardHrSkillsIndexRoute =
+  AuthenticatedDashboardHrSkillsIndexRouteImport.update({
+    id: '/dashboard/hr/skills/',
+    path: '/dashboard/hr/skills/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrShiftAssignmentsIndexRoute =
+  AuthenticatedDashboardHrShiftAssignmentsIndexRouteImport.update({
+    id: '/dashboard/hr/shift-assignments/',
+    path: '/dashboard/hr/shift-assignments/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardHrReportsIndexRoute =
   AuthenticatedDashboardHrReportsIndexRouteImport.update({
     id: '/dashboard/hr/reports/',
     path: '/dashboard/hr/reports/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrPromotionsIndexRoute =
+  AuthenticatedDashboardHrPromotionsIndexRouteImport.update({
+    id: '/dashboard/hr/promotions/',
+    path: '/dashboard/hr/promotions/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardHrPredictionsIndexRoute =
@@ -1095,6 +1155,12 @@ const AuthenticatedDashboardHrEmployeesIndexRoute =
   AuthenticatedDashboardHrEmployeesIndexRouteImport.update({
     id: '/dashboard/hr/employees/',
     path: '/dashboard/hr/employees/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrEmployeeTransfersIndexRoute =
+  AuthenticatedDashboardHrEmployeeTransfersIndexRouteImport.update({
+    id: '/dashboard/hr/employee-transfers/',
+    path: '/dashboard/hr/employee-transfers/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardHrCompensationIndexRoute =
@@ -1385,6 +1451,18 @@ const AuthenticatedDashboardHrSuccessionPlanningPlanIdRoute =
     path: '/dashboard/hr/succession-planning/$planId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardHrSkillsMatrixRoute =
+  AuthenticatedDashboardHrSkillsMatrixRouteImport.update({
+    id: '/dashboard/hr/skills/matrix',
+    path: '/dashboard/hr/skills/matrix',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrShiftAssignmentsAssignmentIdRoute =
+  AuthenticatedDashboardHrShiftAssignmentsAssignmentIdRouteImport.update({
+    id: '/dashboard/hr/shift-assignments/$assignmentId',
+    path: '/dashboard/hr/shift-assignments/$assignmentId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardHrReportsNewRoute =
   AuthenticatedDashboardHrReportsNewRouteImport.update({
     id: '/dashboard/hr/reports/new',
@@ -1397,6 +1475,24 @@ const AuthenticatedDashboardHrReportsReportIdRoute =
     path: '/dashboard/hr/reports/$reportId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardHrRecruitmentStaffingPlansRoute =
+  AuthenticatedDashboardHrRecruitmentStaffingPlansRouteImport.update({
+    id: '/dashboard/hr/recruitment/staffing-plans',
+    path: '/dashboard/hr/recruitment/staffing-plans',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrPromotionsNewRoute =
+  AuthenticatedDashboardHrPromotionsNewRouteImport.update({
+    id: '/dashboard/hr/promotions/new',
+    path: '/dashboard/hr/promotions/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrPromotionsPromotionIdRoute =
+  AuthenticatedDashboardHrPromotionsPromotionIdRouteImport.update({
+    id: '/dashboard/hr/promotions/$promotionId',
+    path: '/dashboard/hr/promotions/$promotionId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardHrPerformanceNewRoute =
   AuthenticatedDashboardHrPerformanceNewRouteImport.update({
     id: '/dashboard/hr/performance/new',
@@ -1407,6 +1503,12 @@ const AuthenticatedDashboardHrPerformanceReviewIdRoute =
   AuthenticatedDashboardHrPerformanceReviewIdRouteImport.update({
     id: '/dashboard/hr/performance/$reviewId',
     path: '/dashboard/hr/performance/$reviewId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrPayrollSalaryComponentsRoute =
+  AuthenticatedDashboardHrPayrollSalaryComponentsRouteImport.update({
+    id: '/dashboard/hr/payroll/salary-components',
+    path: '/dashboard/hr/payroll/salary-components',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardHrPayrollNewRoute =
@@ -1481,10 +1583,40 @@ const AuthenticatedDashboardHrLoansLoanIdRoute =
     path: '/dashboard/hr/loans/$loanId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardHrLeavePoliciesRoute =
+  AuthenticatedDashboardHrLeavePoliciesRouteImport.update({
+    id: '/dashboard/hr/leave/policies',
+    path: '/dashboard/hr/leave/policies',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrLeavePeriodsRoute =
+  AuthenticatedDashboardHrLeavePeriodsRouteImport.update({
+    id: '/dashboard/hr/leave/periods',
+    path: '/dashboard/hr/leave/periods',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardHrLeaveNewRoute =
   AuthenticatedDashboardHrLeaveNewRouteImport.update({
     id: '/dashboard/hr/leave/new',
     path: '/dashboard/hr/leave/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrLeaveEncashmentsRoute =
+  AuthenticatedDashboardHrLeaveEncashmentsRouteImport.update({
+    id: '/dashboard/hr/leave/encashments',
+    path: '/dashboard/hr/leave/encashments',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrLeaveCompensatoryRoute =
+  AuthenticatedDashboardHrLeaveCompensatoryRouteImport.update({
+    id: '/dashboard/hr/leave/compensatory',
+    path: '/dashboard/hr/leave/compensatory',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrLeaveAllocationsRoute =
+  AuthenticatedDashboardHrLeaveAllocationsRouteImport.update({
+    id: '/dashboard/hr/leave/allocations',
+    path: '/dashboard/hr/leave/allocations',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardHrLeaveRequestIdRoute =
@@ -1553,10 +1685,34 @@ const AuthenticatedDashboardHrEmployeesEmployeeIdRoute =
     path: '/dashboard/hr/employees/$employeeId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardHrEmployeeTransfersNewRoute =
+  AuthenticatedDashboardHrEmployeeTransfersNewRouteImport.update({
+    id: '/dashboard/hr/employee-transfers/new',
+    path: '/dashboard/hr/employee-transfers/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrEmployeeTransfersTransferIdRoute =
+  AuthenticatedDashboardHrEmployeeTransfersTransferIdRouteImport.update({
+    id: '/dashboard/hr/employee-transfers/$transferId',
+    path: '/dashboard/hr/employee-transfers/$transferId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrCompensationRetentionBonusesRoute =
+  AuthenticatedDashboardHrCompensationRetentionBonusesRouteImport.update({
+    id: '/dashboard/hr/compensation/retention-bonuses',
+    path: '/dashboard/hr/compensation/retention-bonuses',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardHrCompensationNewRoute =
   AuthenticatedDashboardHrCompensationNewRouteImport.update({
     id: '/dashboard/hr/compensation/new',
     path: '/dashboard/hr/compensation/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrCompensationIncentivesRoute =
+  AuthenticatedDashboardHrCompensationIncentivesRouteImport.update({
+    id: '/dashboard/hr/compensation/incentives',
+    path: '/dashboard/hr/compensation/incentives',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardHrCompensationCompensationIdRoute =
@@ -1979,6 +2135,12 @@ const AuthenticatedDashboardCasesCaseIdNotionRoute =
     path: '/notion',
     getParentRoute: () => AuthenticatedDashboardCasesCaseIdRoute,
   } as any)
+const AuthenticatedDashboardHrSettingsShiftTypesIndexRoute =
+  AuthenticatedDashboardHrSettingsShiftTypesIndexRouteImport.update({
+    id: '/dashboard/hr/settings/shift-types/',
+    path: '/dashboard/hr/settings/shift-types/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardHrRecruitmentJobsIndexRoute =
   AuthenticatedDashboardHrRecruitmentJobsIndexRouteImport.update({
     id: '/dashboard/hr/recruitment/jobs/',
@@ -2026,6 +2188,12 @@ const AuthenticatedDashboardHrRecruitmentApplicantsApplicantIdRoute =
     id: '/dashboard/hr/recruitment/applicants/$applicantId',
     path: '/dashboard/hr/recruitment/applicants/$applicantId',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrPromotionsPromotionIdEditRoute =
+  AuthenticatedDashboardHrPromotionsPromotionIdEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => AuthenticatedDashboardHrPromotionsPromotionIdRoute,
   } as any)
 const AuthenticatedDashboardFinanceVendorsVendorIdEditRoute =
   AuthenticatedDashboardFinanceVendorsVendorIdEditRouteImport.update({
@@ -2173,6 +2341,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/finance/opening-balances': typeof AuthenticatedDashboardFinanceOpeningBalancesRoute
   '/dashboard/finance/overview': typeof AuthenticatedDashboardFinanceOverviewRoute
   '/dashboard/finance/setup-wizard': typeof AuthenticatedDashboardFinanceSetupWizardRoute
+  '/dashboard/hr/setup-wizard': typeof AuthenticatedDashboardHrSetupWizardRoute
   '/dashboard/jobs/browse': typeof AuthenticatedDashboardJobsBrowseRoute
   '/dashboard/jobs/my-services': typeof AuthenticatedDashboardJobsMyServicesRoute
   '/dashboard/knowledge/forms': typeof AuthenticatedDashboardKnowledgeFormsRoute
@@ -2186,6 +2355,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/reputation/badges': typeof AuthenticatedDashboardReputationBadgesRoute
   '/dashboard/reputation/overview': typeof AuthenticatedDashboardReputationOverviewRoute
   '/dashboard/settings/company': typeof AuthenticatedDashboardSettingsCompanyRoute
+  '/dashboard/settings/crm': typeof AuthenticatedDashboardSettingsCrmRoute
   '/dashboard/settings/expense-policies': typeof AuthenticatedDashboardSettingsExpensePoliciesRoute
   '/dashboard/settings/finance': typeof AuthenticatedDashboardSettingsFinanceRoute
   '/dashboard/settings/payment-modes': typeof AuthenticatedDashboardSettingsPaymentModesRoute
@@ -2285,7 +2455,11 @@ export interface FileRoutesByFullPath {
   '/dashboard/hr/biometric/$deviceId': typeof AuthenticatedDashboardHrBiometricDeviceIdRoute
   '/dashboard/hr/biometric/new': typeof AuthenticatedDashboardHrBiometricNewRoute
   '/dashboard/hr/compensation/$compensationId': typeof AuthenticatedDashboardHrCompensationCompensationIdRoute
+  '/dashboard/hr/compensation/incentives': typeof AuthenticatedDashboardHrCompensationIncentivesRoute
   '/dashboard/hr/compensation/new': typeof AuthenticatedDashboardHrCompensationNewRoute
+  '/dashboard/hr/compensation/retention-bonuses': typeof AuthenticatedDashboardHrCompensationRetentionBonusesRoute
+  '/dashboard/hr/employee-transfers/$transferId': typeof AuthenticatedDashboardHrEmployeeTransfersTransferIdRoute
+  '/dashboard/hr/employee-transfers/new': typeof AuthenticatedDashboardHrEmployeeTransfersNewRoute
   '/dashboard/hr/employees/$employeeId': typeof AuthenticatedDashboardHrEmployeesEmployeeIdRoute
   '/dashboard/hr/employees/new': typeof AuthenticatedDashboardHrEmployeesNewRoute
   '/dashboard/hr/expense-claims/$claimId': typeof AuthenticatedDashboardHrExpenseClaimsClaimIdRoute
@@ -2297,7 +2471,12 @@ export interface FileRoutesByFullPath {
   '/dashboard/hr/job-positions/$positionId': typeof AuthenticatedDashboardHrJobPositionsPositionIdRoute
   '/dashboard/hr/job-positions/new': typeof AuthenticatedDashboardHrJobPositionsNewRoute
   '/dashboard/hr/leave/$requestId': typeof AuthenticatedDashboardHrLeaveRequestIdRoute
+  '/dashboard/hr/leave/allocations': typeof AuthenticatedDashboardHrLeaveAllocationsRoute
+  '/dashboard/hr/leave/compensatory': typeof AuthenticatedDashboardHrLeaveCompensatoryRoute
+  '/dashboard/hr/leave/encashments': typeof AuthenticatedDashboardHrLeaveEncashmentsRoute
   '/dashboard/hr/leave/new': typeof AuthenticatedDashboardHrLeaveNewRoute
+  '/dashboard/hr/leave/periods': typeof AuthenticatedDashboardHrLeavePeriodsRoute
+  '/dashboard/hr/leave/policies': typeof AuthenticatedDashboardHrLeavePoliciesRoute
   '/dashboard/hr/loans/$loanId': typeof AuthenticatedDashboardHrLoansLoanIdRoute
   '/dashboard/hr/loans/new': typeof AuthenticatedDashboardHrLoansNewRoute
   '/dashboard/hr/offboarding/$offboardingId': typeof AuthenticatedDashboardHrOffboardingOffboardingIdRoute
@@ -2310,10 +2489,16 @@ export interface FileRoutesByFullPath {
   '/dashboard/hr/payroll-runs/new': typeof AuthenticatedDashboardHrPayrollRunsNewRoute
   '/dashboard/hr/payroll/$slipId': typeof AuthenticatedDashboardHrPayrollSlipIdRoute
   '/dashboard/hr/payroll/new': typeof AuthenticatedDashboardHrPayrollNewRoute
+  '/dashboard/hr/payroll/salary-components': typeof AuthenticatedDashboardHrPayrollSalaryComponentsRoute
   '/dashboard/hr/performance/$reviewId': typeof AuthenticatedDashboardHrPerformanceReviewIdRoute
   '/dashboard/hr/performance/new': typeof AuthenticatedDashboardHrPerformanceNewRoute
+  '/dashboard/hr/promotions/$promotionId': typeof AuthenticatedDashboardHrPromotionsPromotionIdRouteWithChildren
+  '/dashboard/hr/promotions/new': typeof AuthenticatedDashboardHrPromotionsNewRoute
+  '/dashboard/hr/recruitment/staffing-plans': typeof AuthenticatedDashboardHrRecruitmentStaffingPlansRoute
   '/dashboard/hr/reports/$reportId': typeof AuthenticatedDashboardHrReportsReportIdRoute
   '/dashboard/hr/reports/new': typeof AuthenticatedDashboardHrReportsNewRoute
+  '/dashboard/hr/shift-assignments/$assignmentId': typeof AuthenticatedDashboardHrShiftAssignmentsAssignmentIdRoute
+  '/dashboard/hr/skills/matrix': typeof AuthenticatedDashboardHrSkillsMatrixRoute
   '/dashboard/hr/succession-planning/$planId': typeof AuthenticatedDashboardHrSuccessionPlanningPlanIdRoute
   '/dashboard/hr/succession-planning/new': typeof AuthenticatedDashboardHrSuccessionPlanningNewRoute
   '/dashboard/hr/training/$trainingId': typeof AuthenticatedDashboardHrTrainingTrainingIdRoute
@@ -2362,6 +2547,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/hr/benefits': typeof AuthenticatedDashboardHrBenefitsIndexRoute
   '/dashboard/hr/biometric': typeof AuthenticatedDashboardHrBiometricIndexRoute
   '/dashboard/hr/compensation': typeof AuthenticatedDashboardHrCompensationIndexRoute
+  '/dashboard/hr/employee-transfers': typeof AuthenticatedDashboardHrEmployeeTransfersIndexRoute
   '/dashboard/hr/employees': typeof AuthenticatedDashboardHrEmployeesIndexRoute
   '/dashboard/hr/expense-claims': typeof AuthenticatedDashboardHrExpenseClaimsIndexRoute
   '/dashboard/hr/geofencing': typeof AuthenticatedDashboardHrGeofencingIndexRoute
@@ -2376,9 +2562,13 @@ export interface FileRoutesByFullPath {
   '/dashboard/hr/payroll': typeof AuthenticatedDashboardHrPayrollIndexRoute
   '/dashboard/hr/performance': typeof AuthenticatedDashboardHrPerformanceIndexRoute
   '/dashboard/hr/predictions': typeof AuthenticatedDashboardHrPredictionsIndexRoute
+  '/dashboard/hr/promotions': typeof AuthenticatedDashboardHrPromotionsIndexRoute
   '/dashboard/hr/reports': typeof AuthenticatedDashboardHrReportsIndexRoute
+  '/dashboard/hr/shift-assignments': typeof AuthenticatedDashboardHrShiftAssignmentsIndexRoute
+  '/dashboard/hr/skills': typeof AuthenticatedDashboardHrSkillsIndexRoute
   '/dashboard/hr/succession-planning': typeof AuthenticatedDashboardHrSuccessionPlanningIndexRoute
   '/dashboard/hr/training': typeof AuthenticatedDashboardHrTrainingIndexRoute
+  '/dashboard/hr/vehicles': typeof AuthenticatedDashboardHrVehiclesIndexRoute
   '/dashboard/sales/leads': typeof AuthenticatedDashboardSalesLeadsIndexRoute
   '/dashboard/sales/reports': typeof AuthenticatedDashboardSalesReportsIndexRoute
   '/dashboard/tasks/events': typeof AuthenticatedDashboardTasksEventsIndexRoute
@@ -2396,6 +2586,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/finance/statements/$statementId/edit': typeof AuthenticatedDashboardFinanceStatementsStatementIdEditRoute
   '/dashboard/finance/time-tracking/$entryId/edit': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRoute
   '/dashboard/finance/vendors/$vendorId/edit': typeof AuthenticatedDashboardFinanceVendorsVendorIdEditRoute
+  '/dashboard/hr/promotions/$promotionId/edit': typeof AuthenticatedDashboardHrPromotionsPromotionIdEditRoute
   '/dashboard/hr/recruitment/applicants/$applicantId': typeof AuthenticatedDashboardHrRecruitmentApplicantsApplicantIdRoute
   '/dashboard/hr/recruitment/applicants/new': typeof AuthenticatedDashboardHrRecruitmentApplicantsNewRoute
   '/dashboard/hr/recruitment/jobs/$jobId': typeof AuthenticatedDashboardHrRecruitmentJobsJobIdRoute
@@ -2404,6 +2595,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/finance/saudi-banking/wps': typeof AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute
   '/dashboard/hr/recruitment/applicants': typeof AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute
   '/dashboard/hr/recruitment/jobs': typeof AuthenticatedDashboardHrRecruitmentJobsIndexRoute
+  '/dashboard/hr/settings/shift-types': typeof AuthenticatedDashboardHrSettingsShiftTypesIndexRoute
 }
 export interface FileRoutesByTo {
   '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
@@ -2476,6 +2668,7 @@ export interface FileRoutesByTo {
   '/dashboard/finance/opening-balances': typeof AuthenticatedDashboardFinanceOpeningBalancesRoute
   '/dashboard/finance/overview': typeof AuthenticatedDashboardFinanceOverviewRoute
   '/dashboard/finance/setup-wizard': typeof AuthenticatedDashboardFinanceSetupWizardRoute
+  '/dashboard/hr/setup-wizard': typeof AuthenticatedDashboardHrSetupWizardRoute
   '/dashboard/jobs/browse': typeof AuthenticatedDashboardJobsBrowseRoute
   '/dashboard/jobs/my-services': typeof AuthenticatedDashboardJobsMyServicesRoute
   '/dashboard/knowledge/forms': typeof AuthenticatedDashboardKnowledgeFormsRoute
@@ -2489,6 +2682,7 @@ export interface FileRoutesByTo {
   '/dashboard/reputation/badges': typeof AuthenticatedDashboardReputationBadgesRoute
   '/dashboard/reputation/overview': typeof AuthenticatedDashboardReputationOverviewRoute
   '/dashboard/settings/company': typeof AuthenticatedDashboardSettingsCompanyRoute
+  '/dashboard/settings/crm': typeof AuthenticatedDashboardSettingsCrmRoute
   '/dashboard/settings/expense-policies': typeof AuthenticatedDashboardSettingsExpensePoliciesRoute
   '/dashboard/settings/finance': typeof AuthenticatedDashboardSettingsFinanceRoute
   '/dashboard/settings/payment-modes': typeof AuthenticatedDashboardSettingsPaymentModesRoute
@@ -2588,7 +2782,11 @@ export interface FileRoutesByTo {
   '/dashboard/hr/biometric/$deviceId': typeof AuthenticatedDashboardHrBiometricDeviceIdRoute
   '/dashboard/hr/biometric/new': typeof AuthenticatedDashboardHrBiometricNewRoute
   '/dashboard/hr/compensation/$compensationId': typeof AuthenticatedDashboardHrCompensationCompensationIdRoute
+  '/dashboard/hr/compensation/incentives': typeof AuthenticatedDashboardHrCompensationIncentivesRoute
   '/dashboard/hr/compensation/new': typeof AuthenticatedDashboardHrCompensationNewRoute
+  '/dashboard/hr/compensation/retention-bonuses': typeof AuthenticatedDashboardHrCompensationRetentionBonusesRoute
+  '/dashboard/hr/employee-transfers/$transferId': typeof AuthenticatedDashboardHrEmployeeTransfersTransferIdRoute
+  '/dashboard/hr/employee-transfers/new': typeof AuthenticatedDashboardHrEmployeeTransfersNewRoute
   '/dashboard/hr/employees/$employeeId': typeof AuthenticatedDashboardHrEmployeesEmployeeIdRoute
   '/dashboard/hr/employees/new': typeof AuthenticatedDashboardHrEmployeesNewRoute
   '/dashboard/hr/expense-claims/$claimId': typeof AuthenticatedDashboardHrExpenseClaimsClaimIdRoute
@@ -2600,7 +2798,12 @@ export interface FileRoutesByTo {
   '/dashboard/hr/job-positions/$positionId': typeof AuthenticatedDashboardHrJobPositionsPositionIdRoute
   '/dashboard/hr/job-positions/new': typeof AuthenticatedDashboardHrJobPositionsNewRoute
   '/dashboard/hr/leave/$requestId': typeof AuthenticatedDashboardHrLeaveRequestIdRoute
+  '/dashboard/hr/leave/allocations': typeof AuthenticatedDashboardHrLeaveAllocationsRoute
+  '/dashboard/hr/leave/compensatory': typeof AuthenticatedDashboardHrLeaveCompensatoryRoute
+  '/dashboard/hr/leave/encashments': typeof AuthenticatedDashboardHrLeaveEncashmentsRoute
   '/dashboard/hr/leave/new': typeof AuthenticatedDashboardHrLeaveNewRoute
+  '/dashboard/hr/leave/periods': typeof AuthenticatedDashboardHrLeavePeriodsRoute
+  '/dashboard/hr/leave/policies': typeof AuthenticatedDashboardHrLeavePoliciesRoute
   '/dashboard/hr/loans/$loanId': typeof AuthenticatedDashboardHrLoansLoanIdRoute
   '/dashboard/hr/loans/new': typeof AuthenticatedDashboardHrLoansNewRoute
   '/dashboard/hr/offboarding/$offboardingId': typeof AuthenticatedDashboardHrOffboardingOffboardingIdRoute
@@ -2613,10 +2816,16 @@ export interface FileRoutesByTo {
   '/dashboard/hr/payroll-runs/new': typeof AuthenticatedDashboardHrPayrollRunsNewRoute
   '/dashboard/hr/payroll/$slipId': typeof AuthenticatedDashboardHrPayrollSlipIdRoute
   '/dashboard/hr/payroll/new': typeof AuthenticatedDashboardHrPayrollNewRoute
+  '/dashboard/hr/payroll/salary-components': typeof AuthenticatedDashboardHrPayrollSalaryComponentsRoute
   '/dashboard/hr/performance/$reviewId': typeof AuthenticatedDashboardHrPerformanceReviewIdRoute
   '/dashboard/hr/performance/new': typeof AuthenticatedDashboardHrPerformanceNewRoute
+  '/dashboard/hr/promotions/$promotionId': typeof AuthenticatedDashboardHrPromotionsPromotionIdRouteWithChildren
+  '/dashboard/hr/promotions/new': typeof AuthenticatedDashboardHrPromotionsNewRoute
+  '/dashboard/hr/recruitment/staffing-plans': typeof AuthenticatedDashboardHrRecruitmentStaffingPlansRoute
   '/dashboard/hr/reports/$reportId': typeof AuthenticatedDashboardHrReportsReportIdRoute
   '/dashboard/hr/reports/new': typeof AuthenticatedDashboardHrReportsNewRoute
+  '/dashboard/hr/shift-assignments/$assignmentId': typeof AuthenticatedDashboardHrShiftAssignmentsAssignmentIdRoute
+  '/dashboard/hr/skills/matrix': typeof AuthenticatedDashboardHrSkillsMatrixRoute
   '/dashboard/hr/succession-planning/$planId': typeof AuthenticatedDashboardHrSuccessionPlanningPlanIdRoute
   '/dashboard/hr/succession-planning/new': typeof AuthenticatedDashboardHrSuccessionPlanningNewRoute
   '/dashboard/hr/training/$trainingId': typeof AuthenticatedDashboardHrTrainingTrainingIdRoute
@@ -2665,6 +2874,7 @@ export interface FileRoutesByTo {
   '/dashboard/hr/benefits': typeof AuthenticatedDashboardHrBenefitsIndexRoute
   '/dashboard/hr/biometric': typeof AuthenticatedDashboardHrBiometricIndexRoute
   '/dashboard/hr/compensation': typeof AuthenticatedDashboardHrCompensationIndexRoute
+  '/dashboard/hr/employee-transfers': typeof AuthenticatedDashboardHrEmployeeTransfersIndexRoute
   '/dashboard/hr/employees': typeof AuthenticatedDashboardHrEmployeesIndexRoute
   '/dashboard/hr/expense-claims': typeof AuthenticatedDashboardHrExpenseClaimsIndexRoute
   '/dashboard/hr/geofencing': typeof AuthenticatedDashboardHrGeofencingIndexRoute
@@ -2679,9 +2889,13 @@ export interface FileRoutesByTo {
   '/dashboard/hr/payroll': typeof AuthenticatedDashboardHrPayrollIndexRoute
   '/dashboard/hr/performance': typeof AuthenticatedDashboardHrPerformanceIndexRoute
   '/dashboard/hr/predictions': typeof AuthenticatedDashboardHrPredictionsIndexRoute
+  '/dashboard/hr/promotions': typeof AuthenticatedDashboardHrPromotionsIndexRoute
   '/dashboard/hr/reports': typeof AuthenticatedDashboardHrReportsIndexRoute
+  '/dashboard/hr/shift-assignments': typeof AuthenticatedDashboardHrShiftAssignmentsIndexRoute
+  '/dashboard/hr/skills': typeof AuthenticatedDashboardHrSkillsIndexRoute
   '/dashboard/hr/succession-planning': typeof AuthenticatedDashboardHrSuccessionPlanningIndexRoute
   '/dashboard/hr/training': typeof AuthenticatedDashboardHrTrainingIndexRoute
+  '/dashboard/hr/vehicles': typeof AuthenticatedDashboardHrVehiclesIndexRoute
   '/dashboard/sales/leads': typeof AuthenticatedDashboardSalesLeadsIndexRoute
   '/dashboard/sales/reports': typeof AuthenticatedDashboardSalesReportsIndexRoute
   '/dashboard/tasks/events': typeof AuthenticatedDashboardTasksEventsIndexRoute
@@ -2699,6 +2913,7 @@ export interface FileRoutesByTo {
   '/dashboard/finance/statements/$statementId/edit': typeof AuthenticatedDashboardFinanceStatementsStatementIdEditRoute
   '/dashboard/finance/time-tracking/$entryId/edit': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRoute
   '/dashboard/finance/vendors/$vendorId/edit': typeof AuthenticatedDashboardFinanceVendorsVendorIdEditRoute
+  '/dashboard/hr/promotions/$promotionId/edit': typeof AuthenticatedDashboardHrPromotionsPromotionIdEditRoute
   '/dashboard/hr/recruitment/applicants/$applicantId': typeof AuthenticatedDashboardHrRecruitmentApplicantsApplicantIdRoute
   '/dashboard/hr/recruitment/applicants/new': typeof AuthenticatedDashboardHrRecruitmentApplicantsNewRoute
   '/dashboard/hr/recruitment/jobs/$jobId': typeof AuthenticatedDashboardHrRecruitmentJobsJobIdRoute
@@ -2707,6 +2922,7 @@ export interface FileRoutesByTo {
   '/dashboard/finance/saudi-banking/wps': typeof AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute
   '/dashboard/hr/recruitment/applicants': typeof AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute
   '/dashboard/hr/recruitment/jobs': typeof AuthenticatedDashboardHrRecruitmentJobsIndexRoute
+  '/dashboard/hr/settings/shift-types': typeof AuthenticatedDashboardHrSettingsShiftTypesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -2784,6 +3000,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/finance/opening-balances': typeof AuthenticatedDashboardFinanceOpeningBalancesRoute
   '/_authenticated/dashboard/finance/overview': typeof AuthenticatedDashboardFinanceOverviewRoute
   '/_authenticated/dashboard/finance/setup-wizard': typeof AuthenticatedDashboardFinanceSetupWizardRoute
+  '/_authenticated/dashboard/hr/setup-wizard': typeof AuthenticatedDashboardHrSetupWizardRoute
   '/_authenticated/dashboard/jobs/browse': typeof AuthenticatedDashboardJobsBrowseRoute
   '/_authenticated/dashboard/jobs/my-services': typeof AuthenticatedDashboardJobsMyServicesRoute
   '/_authenticated/dashboard/knowledge/forms': typeof AuthenticatedDashboardKnowledgeFormsRoute
@@ -2797,6 +3014,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/reputation/badges': typeof AuthenticatedDashboardReputationBadgesRoute
   '/_authenticated/dashboard/reputation/overview': typeof AuthenticatedDashboardReputationOverviewRoute
   '/_authenticated/dashboard/settings/company': typeof AuthenticatedDashboardSettingsCompanyRoute
+  '/_authenticated/dashboard/settings/crm': typeof AuthenticatedDashboardSettingsCrmRoute
   '/_authenticated/dashboard/settings/expense-policies': typeof AuthenticatedDashboardSettingsExpensePoliciesRoute
   '/_authenticated/dashboard/settings/finance': typeof AuthenticatedDashboardSettingsFinanceRoute
   '/_authenticated/dashboard/settings/payment-modes': typeof AuthenticatedDashboardSettingsPaymentModesRoute
@@ -2896,7 +3114,11 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/hr/biometric/$deviceId': typeof AuthenticatedDashboardHrBiometricDeviceIdRoute
   '/_authenticated/dashboard/hr/biometric/new': typeof AuthenticatedDashboardHrBiometricNewRoute
   '/_authenticated/dashboard/hr/compensation/$compensationId': typeof AuthenticatedDashboardHrCompensationCompensationIdRoute
+  '/_authenticated/dashboard/hr/compensation/incentives': typeof AuthenticatedDashboardHrCompensationIncentivesRoute
   '/_authenticated/dashboard/hr/compensation/new': typeof AuthenticatedDashboardHrCompensationNewRoute
+  '/_authenticated/dashboard/hr/compensation/retention-bonuses': typeof AuthenticatedDashboardHrCompensationRetentionBonusesRoute
+  '/_authenticated/dashboard/hr/employee-transfers/$transferId': typeof AuthenticatedDashboardHrEmployeeTransfersTransferIdRoute
+  '/_authenticated/dashboard/hr/employee-transfers/new': typeof AuthenticatedDashboardHrEmployeeTransfersNewRoute
   '/_authenticated/dashboard/hr/employees/$employeeId': typeof AuthenticatedDashboardHrEmployeesEmployeeIdRoute
   '/_authenticated/dashboard/hr/employees/new': typeof AuthenticatedDashboardHrEmployeesNewRoute
   '/_authenticated/dashboard/hr/expense-claims/$claimId': typeof AuthenticatedDashboardHrExpenseClaimsClaimIdRoute
@@ -2908,7 +3130,12 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/hr/job-positions/$positionId': typeof AuthenticatedDashboardHrJobPositionsPositionIdRoute
   '/_authenticated/dashboard/hr/job-positions/new': typeof AuthenticatedDashboardHrJobPositionsNewRoute
   '/_authenticated/dashboard/hr/leave/$requestId': typeof AuthenticatedDashboardHrLeaveRequestIdRoute
+  '/_authenticated/dashboard/hr/leave/allocations': typeof AuthenticatedDashboardHrLeaveAllocationsRoute
+  '/_authenticated/dashboard/hr/leave/compensatory': typeof AuthenticatedDashboardHrLeaveCompensatoryRoute
+  '/_authenticated/dashboard/hr/leave/encashments': typeof AuthenticatedDashboardHrLeaveEncashmentsRoute
   '/_authenticated/dashboard/hr/leave/new': typeof AuthenticatedDashboardHrLeaveNewRoute
+  '/_authenticated/dashboard/hr/leave/periods': typeof AuthenticatedDashboardHrLeavePeriodsRoute
+  '/_authenticated/dashboard/hr/leave/policies': typeof AuthenticatedDashboardHrLeavePoliciesRoute
   '/_authenticated/dashboard/hr/loans/$loanId': typeof AuthenticatedDashboardHrLoansLoanIdRoute
   '/_authenticated/dashboard/hr/loans/new': typeof AuthenticatedDashboardHrLoansNewRoute
   '/_authenticated/dashboard/hr/offboarding/$offboardingId': typeof AuthenticatedDashboardHrOffboardingOffboardingIdRoute
@@ -2921,10 +3148,16 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/hr/payroll-runs/new': typeof AuthenticatedDashboardHrPayrollRunsNewRoute
   '/_authenticated/dashboard/hr/payroll/$slipId': typeof AuthenticatedDashboardHrPayrollSlipIdRoute
   '/_authenticated/dashboard/hr/payroll/new': typeof AuthenticatedDashboardHrPayrollNewRoute
+  '/_authenticated/dashboard/hr/payroll/salary-components': typeof AuthenticatedDashboardHrPayrollSalaryComponentsRoute
   '/_authenticated/dashboard/hr/performance/$reviewId': typeof AuthenticatedDashboardHrPerformanceReviewIdRoute
   '/_authenticated/dashboard/hr/performance/new': typeof AuthenticatedDashboardHrPerformanceNewRoute
+  '/_authenticated/dashboard/hr/promotions/$promotionId': typeof AuthenticatedDashboardHrPromotionsPromotionIdRouteWithChildren
+  '/_authenticated/dashboard/hr/promotions/new': typeof AuthenticatedDashboardHrPromotionsNewRoute
+  '/_authenticated/dashboard/hr/recruitment/staffing-plans': typeof AuthenticatedDashboardHrRecruitmentStaffingPlansRoute
   '/_authenticated/dashboard/hr/reports/$reportId': typeof AuthenticatedDashboardHrReportsReportIdRoute
   '/_authenticated/dashboard/hr/reports/new': typeof AuthenticatedDashboardHrReportsNewRoute
+  '/_authenticated/dashboard/hr/shift-assignments/$assignmentId': typeof AuthenticatedDashboardHrShiftAssignmentsAssignmentIdRoute
+  '/_authenticated/dashboard/hr/skills/matrix': typeof AuthenticatedDashboardHrSkillsMatrixRoute
   '/_authenticated/dashboard/hr/succession-planning/$planId': typeof AuthenticatedDashboardHrSuccessionPlanningPlanIdRoute
   '/_authenticated/dashboard/hr/succession-planning/new': typeof AuthenticatedDashboardHrSuccessionPlanningNewRoute
   '/_authenticated/dashboard/hr/training/$trainingId': typeof AuthenticatedDashboardHrTrainingTrainingIdRoute
@@ -2973,6 +3206,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/hr/benefits/': typeof AuthenticatedDashboardHrBenefitsIndexRoute
   '/_authenticated/dashboard/hr/biometric/': typeof AuthenticatedDashboardHrBiometricIndexRoute
   '/_authenticated/dashboard/hr/compensation/': typeof AuthenticatedDashboardHrCompensationIndexRoute
+  '/_authenticated/dashboard/hr/employee-transfers/': typeof AuthenticatedDashboardHrEmployeeTransfersIndexRoute
   '/_authenticated/dashboard/hr/employees/': typeof AuthenticatedDashboardHrEmployeesIndexRoute
   '/_authenticated/dashboard/hr/expense-claims/': typeof AuthenticatedDashboardHrExpenseClaimsIndexRoute
   '/_authenticated/dashboard/hr/geofencing/': typeof AuthenticatedDashboardHrGeofencingIndexRoute
@@ -2987,9 +3221,13 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/hr/payroll/': typeof AuthenticatedDashboardHrPayrollIndexRoute
   '/_authenticated/dashboard/hr/performance/': typeof AuthenticatedDashboardHrPerformanceIndexRoute
   '/_authenticated/dashboard/hr/predictions/': typeof AuthenticatedDashboardHrPredictionsIndexRoute
+  '/_authenticated/dashboard/hr/promotions/': typeof AuthenticatedDashboardHrPromotionsIndexRoute
   '/_authenticated/dashboard/hr/reports/': typeof AuthenticatedDashboardHrReportsIndexRoute
+  '/_authenticated/dashboard/hr/shift-assignments/': typeof AuthenticatedDashboardHrShiftAssignmentsIndexRoute
+  '/_authenticated/dashboard/hr/skills/': typeof AuthenticatedDashboardHrSkillsIndexRoute
   '/_authenticated/dashboard/hr/succession-planning/': typeof AuthenticatedDashboardHrSuccessionPlanningIndexRoute
   '/_authenticated/dashboard/hr/training/': typeof AuthenticatedDashboardHrTrainingIndexRoute
+  '/_authenticated/dashboard/hr/vehicles/': typeof AuthenticatedDashboardHrVehiclesIndexRoute
   '/_authenticated/dashboard/sales/leads/': typeof AuthenticatedDashboardSalesLeadsIndexRoute
   '/_authenticated/dashboard/sales/reports/': typeof AuthenticatedDashboardSalesReportsIndexRoute
   '/_authenticated/dashboard/tasks/events/': typeof AuthenticatedDashboardTasksEventsIndexRoute
@@ -3007,6 +3245,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/finance/statements/$statementId/edit': typeof AuthenticatedDashboardFinanceStatementsStatementIdEditRoute
   '/_authenticated/dashboard/finance/time-tracking/$entryId/edit': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRoute
   '/_authenticated/dashboard/finance/vendors/$vendorId/edit': typeof AuthenticatedDashboardFinanceVendorsVendorIdEditRoute
+  '/_authenticated/dashboard/hr/promotions/$promotionId/edit': typeof AuthenticatedDashboardHrPromotionsPromotionIdEditRoute
   '/_authenticated/dashboard/hr/recruitment/applicants/$applicantId': typeof AuthenticatedDashboardHrRecruitmentApplicantsApplicantIdRoute
   '/_authenticated/dashboard/hr/recruitment/applicants/new': typeof AuthenticatedDashboardHrRecruitmentApplicantsNewRoute
   '/_authenticated/dashboard/hr/recruitment/jobs/$jobId': typeof AuthenticatedDashboardHrRecruitmentJobsJobIdRoute
@@ -3015,6 +3254,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/finance/saudi-banking/wps/': typeof AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute
   '/_authenticated/dashboard/hr/recruitment/applicants/': typeof AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute
   '/_authenticated/dashboard/hr/recruitment/jobs/': typeof AuthenticatedDashboardHrRecruitmentJobsIndexRoute
+  '/_authenticated/dashboard/hr/settings/shift-types/': typeof AuthenticatedDashboardHrSettingsShiftTypesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -3090,6 +3330,7 @@ export interface FileRouteTypes {
     | '/dashboard/finance/opening-balances'
     | '/dashboard/finance/overview'
     | '/dashboard/finance/setup-wizard'
+    | '/dashboard/hr/setup-wizard'
     | '/dashboard/jobs/browse'
     | '/dashboard/jobs/my-services'
     | '/dashboard/knowledge/forms'
@@ -3103,6 +3344,7 @@ export interface FileRouteTypes {
     | '/dashboard/reputation/badges'
     | '/dashboard/reputation/overview'
     | '/dashboard/settings/company'
+    | '/dashboard/settings/crm'
     | '/dashboard/settings/expense-policies'
     | '/dashboard/settings/finance'
     | '/dashboard/settings/payment-modes'
@@ -3202,7 +3444,11 @@ export interface FileRouteTypes {
     | '/dashboard/hr/biometric/$deviceId'
     | '/dashboard/hr/biometric/new'
     | '/dashboard/hr/compensation/$compensationId'
+    | '/dashboard/hr/compensation/incentives'
     | '/dashboard/hr/compensation/new'
+    | '/dashboard/hr/compensation/retention-bonuses'
+    | '/dashboard/hr/employee-transfers/$transferId'
+    | '/dashboard/hr/employee-transfers/new'
     | '/dashboard/hr/employees/$employeeId'
     | '/dashboard/hr/employees/new'
     | '/dashboard/hr/expense-claims/$claimId'
@@ -3214,7 +3460,12 @@ export interface FileRouteTypes {
     | '/dashboard/hr/job-positions/$positionId'
     | '/dashboard/hr/job-positions/new'
     | '/dashboard/hr/leave/$requestId'
+    | '/dashboard/hr/leave/allocations'
+    | '/dashboard/hr/leave/compensatory'
+    | '/dashboard/hr/leave/encashments'
     | '/dashboard/hr/leave/new'
+    | '/dashboard/hr/leave/periods'
+    | '/dashboard/hr/leave/policies'
     | '/dashboard/hr/loans/$loanId'
     | '/dashboard/hr/loans/new'
     | '/dashboard/hr/offboarding/$offboardingId'
@@ -3227,10 +3478,16 @@ export interface FileRouteTypes {
     | '/dashboard/hr/payroll-runs/new'
     | '/dashboard/hr/payroll/$slipId'
     | '/dashboard/hr/payroll/new'
+    | '/dashboard/hr/payroll/salary-components'
     | '/dashboard/hr/performance/$reviewId'
     | '/dashboard/hr/performance/new'
+    | '/dashboard/hr/promotions/$promotionId'
+    | '/dashboard/hr/promotions/new'
+    | '/dashboard/hr/recruitment/staffing-plans'
     | '/dashboard/hr/reports/$reportId'
     | '/dashboard/hr/reports/new'
+    | '/dashboard/hr/shift-assignments/$assignmentId'
+    | '/dashboard/hr/skills/matrix'
     | '/dashboard/hr/succession-planning/$planId'
     | '/dashboard/hr/succession-planning/new'
     | '/dashboard/hr/training/$trainingId'
@@ -3279,6 +3536,7 @@ export interface FileRouteTypes {
     | '/dashboard/hr/benefits'
     | '/dashboard/hr/biometric'
     | '/dashboard/hr/compensation'
+    | '/dashboard/hr/employee-transfers'
     | '/dashboard/hr/employees'
     | '/dashboard/hr/expense-claims'
     | '/dashboard/hr/geofencing'
@@ -3293,9 +3551,13 @@ export interface FileRouteTypes {
     | '/dashboard/hr/payroll'
     | '/dashboard/hr/performance'
     | '/dashboard/hr/predictions'
+    | '/dashboard/hr/promotions'
     | '/dashboard/hr/reports'
+    | '/dashboard/hr/shift-assignments'
+    | '/dashboard/hr/skills'
     | '/dashboard/hr/succession-planning'
     | '/dashboard/hr/training'
+    | '/dashboard/hr/vehicles'
     | '/dashboard/sales/leads'
     | '/dashboard/sales/reports'
     | '/dashboard/tasks/events'
@@ -3313,6 +3575,7 @@ export interface FileRouteTypes {
     | '/dashboard/finance/statements/$statementId/edit'
     | '/dashboard/finance/time-tracking/$entryId/edit'
     | '/dashboard/finance/vendors/$vendorId/edit'
+    | '/dashboard/hr/promotions/$promotionId/edit'
     | '/dashboard/hr/recruitment/applicants/$applicantId'
     | '/dashboard/hr/recruitment/applicants/new'
     | '/dashboard/hr/recruitment/jobs/$jobId'
@@ -3321,6 +3584,7 @@ export interface FileRouteTypes {
     | '/dashboard/finance/saudi-banking/wps'
     | '/dashboard/hr/recruitment/applicants'
     | '/dashboard/hr/recruitment/jobs'
+    | '/dashboard/hr/settings/shift-types'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/clerk'
@@ -3393,6 +3657,7 @@ export interface FileRouteTypes {
     | '/dashboard/finance/opening-balances'
     | '/dashboard/finance/overview'
     | '/dashboard/finance/setup-wizard'
+    | '/dashboard/hr/setup-wizard'
     | '/dashboard/jobs/browse'
     | '/dashboard/jobs/my-services'
     | '/dashboard/knowledge/forms'
@@ -3406,6 +3671,7 @@ export interface FileRouteTypes {
     | '/dashboard/reputation/badges'
     | '/dashboard/reputation/overview'
     | '/dashboard/settings/company'
+    | '/dashboard/settings/crm'
     | '/dashboard/settings/expense-policies'
     | '/dashboard/settings/finance'
     | '/dashboard/settings/payment-modes'
@@ -3505,7 +3771,11 @@ export interface FileRouteTypes {
     | '/dashboard/hr/biometric/$deviceId'
     | '/dashboard/hr/biometric/new'
     | '/dashboard/hr/compensation/$compensationId'
+    | '/dashboard/hr/compensation/incentives'
     | '/dashboard/hr/compensation/new'
+    | '/dashboard/hr/compensation/retention-bonuses'
+    | '/dashboard/hr/employee-transfers/$transferId'
+    | '/dashboard/hr/employee-transfers/new'
     | '/dashboard/hr/employees/$employeeId'
     | '/dashboard/hr/employees/new'
     | '/dashboard/hr/expense-claims/$claimId'
@@ -3517,7 +3787,12 @@ export interface FileRouteTypes {
     | '/dashboard/hr/job-positions/$positionId'
     | '/dashboard/hr/job-positions/new'
     | '/dashboard/hr/leave/$requestId'
+    | '/dashboard/hr/leave/allocations'
+    | '/dashboard/hr/leave/compensatory'
+    | '/dashboard/hr/leave/encashments'
     | '/dashboard/hr/leave/new'
+    | '/dashboard/hr/leave/periods'
+    | '/dashboard/hr/leave/policies'
     | '/dashboard/hr/loans/$loanId'
     | '/dashboard/hr/loans/new'
     | '/dashboard/hr/offboarding/$offboardingId'
@@ -3530,10 +3805,16 @@ export interface FileRouteTypes {
     | '/dashboard/hr/payroll-runs/new'
     | '/dashboard/hr/payroll/$slipId'
     | '/dashboard/hr/payroll/new'
+    | '/dashboard/hr/payroll/salary-components'
     | '/dashboard/hr/performance/$reviewId'
     | '/dashboard/hr/performance/new'
+    | '/dashboard/hr/promotions/$promotionId'
+    | '/dashboard/hr/promotions/new'
+    | '/dashboard/hr/recruitment/staffing-plans'
     | '/dashboard/hr/reports/$reportId'
     | '/dashboard/hr/reports/new'
+    | '/dashboard/hr/shift-assignments/$assignmentId'
+    | '/dashboard/hr/skills/matrix'
     | '/dashboard/hr/succession-planning/$planId'
     | '/dashboard/hr/succession-planning/new'
     | '/dashboard/hr/training/$trainingId'
@@ -3582,6 +3863,7 @@ export interface FileRouteTypes {
     | '/dashboard/hr/benefits'
     | '/dashboard/hr/biometric'
     | '/dashboard/hr/compensation'
+    | '/dashboard/hr/employee-transfers'
     | '/dashboard/hr/employees'
     | '/dashboard/hr/expense-claims'
     | '/dashboard/hr/geofencing'
@@ -3596,9 +3878,13 @@ export interface FileRouteTypes {
     | '/dashboard/hr/payroll'
     | '/dashboard/hr/performance'
     | '/dashboard/hr/predictions'
+    | '/dashboard/hr/promotions'
     | '/dashboard/hr/reports'
+    | '/dashboard/hr/shift-assignments'
+    | '/dashboard/hr/skills'
     | '/dashboard/hr/succession-planning'
     | '/dashboard/hr/training'
+    | '/dashboard/hr/vehicles'
     | '/dashboard/sales/leads'
     | '/dashboard/sales/reports'
     | '/dashboard/tasks/events'
@@ -3616,6 +3902,7 @@ export interface FileRouteTypes {
     | '/dashboard/finance/statements/$statementId/edit'
     | '/dashboard/finance/time-tracking/$entryId/edit'
     | '/dashboard/finance/vendors/$vendorId/edit'
+    | '/dashboard/hr/promotions/$promotionId/edit'
     | '/dashboard/hr/recruitment/applicants/$applicantId'
     | '/dashboard/hr/recruitment/applicants/new'
     | '/dashboard/hr/recruitment/jobs/$jobId'
@@ -3624,6 +3911,7 @@ export interface FileRouteTypes {
     | '/dashboard/finance/saudi-banking/wps'
     | '/dashboard/hr/recruitment/applicants'
     | '/dashboard/hr/recruitment/jobs'
+    | '/dashboard/hr/settings/shift-types'
   id:
     | '__root__'
     | '/_authenticated'
@@ -3700,6 +3988,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/finance/opening-balances'
     | '/_authenticated/dashboard/finance/overview'
     | '/_authenticated/dashboard/finance/setup-wizard'
+    | '/_authenticated/dashboard/hr/setup-wizard'
     | '/_authenticated/dashboard/jobs/browse'
     | '/_authenticated/dashboard/jobs/my-services'
     | '/_authenticated/dashboard/knowledge/forms'
@@ -3713,6 +4002,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/reputation/badges'
     | '/_authenticated/dashboard/reputation/overview'
     | '/_authenticated/dashboard/settings/company'
+    | '/_authenticated/dashboard/settings/crm'
     | '/_authenticated/dashboard/settings/expense-policies'
     | '/_authenticated/dashboard/settings/finance'
     | '/_authenticated/dashboard/settings/payment-modes'
@@ -3812,7 +4102,11 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/hr/biometric/$deviceId'
     | '/_authenticated/dashboard/hr/biometric/new'
     | '/_authenticated/dashboard/hr/compensation/$compensationId'
+    | '/_authenticated/dashboard/hr/compensation/incentives'
     | '/_authenticated/dashboard/hr/compensation/new'
+    | '/_authenticated/dashboard/hr/compensation/retention-bonuses'
+    | '/_authenticated/dashboard/hr/employee-transfers/$transferId'
+    | '/_authenticated/dashboard/hr/employee-transfers/new'
     | '/_authenticated/dashboard/hr/employees/$employeeId'
     | '/_authenticated/dashboard/hr/employees/new'
     | '/_authenticated/dashboard/hr/expense-claims/$claimId'
@@ -3824,7 +4118,12 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/hr/job-positions/$positionId'
     | '/_authenticated/dashboard/hr/job-positions/new'
     | '/_authenticated/dashboard/hr/leave/$requestId'
+    | '/_authenticated/dashboard/hr/leave/allocations'
+    | '/_authenticated/dashboard/hr/leave/compensatory'
+    | '/_authenticated/dashboard/hr/leave/encashments'
     | '/_authenticated/dashboard/hr/leave/new'
+    | '/_authenticated/dashboard/hr/leave/periods'
+    | '/_authenticated/dashboard/hr/leave/policies'
     | '/_authenticated/dashboard/hr/loans/$loanId'
     | '/_authenticated/dashboard/hr/loans/new'
     | '/_authenticated/dashboard/hr/offboarding/$offboardingId'
@@ -3837,10 +4136,16 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/hr/payroll-runs/new'
     | '/_authenticated/dashboard/hr/payroll/$slipId'
     | '/_authenticated/dashboard/hr/payroll/new'
+    | '/_authenticated/dashboard/hr/payroll/salary-components'
     | '/_authenticated/dashboard/hr/performance/$reviewId'
     | '/_authenticated/dashboard/hr/performance/new'
+    | '/_authenticated/dashboard/hr/promotions/$promotionId'
+    | '/_authenticated/dashboard/hr/promotions/new'
+    | '/_authenticated/dashboard/hr/recruitment/staffing-plans'
     | '/_authenticated/dashboard/hr/reports/$reportId'
     | '/_authenticated/dashboard/hr/reports/new'
+    | '/_authenticated/dashboard/hr/shift-assignments/$assignmentId'
+    | '/_authenticated/dashboard/hr/skills/matrix'
     | '/_authenticated/dashboard/hr/succession-planning/$planId'
     | '/_authenticated/dashboard/hr/succession-planning/new'
     | '/_authenticated/dashboard/hr/training/$trainingId'
@@ -3889,6 +4194,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/hr/benefits/'
     | '/_authenticated/dashboard/hr/biometric/'
     | '/_authenticated/dashboard/hr/compensation/'
+    | '/_authenticated/dashboard/hr/employee-transfers/'
     | '/_authenticated/dashboard/hr/employees/'
     | '/_authenticated/dashboard/hr/expense-claims/'
     | '/_authenticated/dashboard/hr/geofencing/'
@@ -3903,9 +4209,13 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/hr/payroll/'
     | '/_authenticated/dashboard/hr/performance/'
     | '/_authenticated/dashboard/hr/predictions/'
+    | '/_authenticated/dashboard/hr/promotions/'
     | '/_authenticated/dashboard/hr/reports/'
+    | '/_authenticated/dashboard/hr/shift-assignments/'
+    | '/_authenticated/dashboard/hr/skills/'
     | '/_authenticated/dashboard/hr/succession-planning/'
     | '/_authenticated/dashboard/hr/training/'
+    | '/_authenticated/dashboard/hr/vehicles/'
     | '/_authenticated/dashboard/sales/leads/'
     | '/_authenticated/dashboard/sales/reports/'
     | '/_authenticated/dashboard/tasks/events/'
@@ -3923,6 +4233,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/finance/statements/$statementId/edit'
     | '/_authenticated/dashboard/finance/time-tracking/$entryId/edit'
     | '/_authenticated/dashboard/finance/vendors/$vendorId/edit'
+    | '/_authenticated/dashboard/hr/promotions/$promotionId/edit'
     | '/_authenticated/dashboard/hr/recruitment/applicants/$applicantId'
     | '/_authenticated/dashboard/hr/recruitment/applicants/new'
     | '/_authenticated/dashboard/hr/recruitment/jobs/$jobId'
@@ -3931,6 +4242,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/finance/saudi-banking/wps/'
     | '/_authenticated/dashboard/hr/recruitment/applicants/'
     | '/_authenticated/dashboard/hr/recruitment/jobs/'
+    | '/_authenticated/dashboard/hr/settings/shift-types/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -4561,6 +4873,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardSettingsExpensePoliciesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/settings/crm': {
+      id: '/_authenticated/dashboard/settings/crm'
+      path: '/dashboard/settings/crm'
+      fullPath: '/dashboard/settings/crm'
+      preLoaderRoute: typeof AuthenticatedDashboardSettingsCrmRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/settings/company': {
       id: '/_authenticated/dashboard/settings/company'
       path: '/dashboard/settings/company'
@@ -4650,6 +4969,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/jobs/browse'
       fullPath: '/dashboard/jobs/browse'
       preLoaderRoute: typeof AuthenticatedDashboardJobsBrowseRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/setup-wizard': {
+      id: '/_authenticated/dashboard/hr/setup-wizard'
+      path: '/dashboard/hr/setup-wizard'
+      fullPath: '/dashboard/hr/setup-wizard'
+      preLoaderRoute: typeof AuthenticatedDashboardHrSetupWizardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/finance/setup-wizard': {
@@ -4820,6 +5146,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardSalesLeadsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/hr/vehicles/': {
+      id: '/_authenticated/dashboard/hr/vehicles/'
+      path: '/dashboard/hr/vehicles'
+      fullPath: '/dashboard/hr/vehicles'
+      preLoaderRoute: typeof AuthenticatedDashboardHrVehiclesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/hr/training/': {
       id: '/_authenticated/dashboard/hr/training/'
       path: '/dashboard/hr/training'
@@ -4834,11 +5167,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardHrSuccessionPlanningIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/hr/skills/': {
+      id: '/_authenticated/dashboard/hr/skills/'
+      path: '/dashboard/hr/skills'
+      fullPath: '/dashboard/hr/skills'
+      preLoaderRoute: typeof AuthenticatedDashboardHrSkillsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/shift-assignments/': {
+      id: '/_authenticated/dashboard/hr/shift-assignments/'
+      path: '/dashboard/hr/shift-assignments'
+      fullPath: '/dashboard/hr/shift-assignments'
+      preLoaderRoute: typeof AuthenticatedDashboardHrShiftAssignmentsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/hr/reports/': {
       id: '/_authenticated/dashboard/hr/reports/'
       path: '/dashboard/hr/reports'
       fullPath: '/dashboard/hr/reports'
       preLoaderRoute: typeof AuthenticatedDashboardHrReportsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/promotions/': {
+      id: '/_authenticated/dashboard/hr/promotions/'
+      path: '/dashboard/hr/promotions'
+      fullPath: '/dashboard/hr/promotions'
+      preLoaderRoute: typeof AuthenticatedDashboardHrPromotionsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/hr/predictions/': {
@@ -4937,6 +5291,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/hr/employees'
       fullPath: '/dashboard/hr/employees'
       preLoaderRoute: typeof AuthenticatedDashboardHrEmployeesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/employee-transfers/': {
+      id: '/_authenticated/dashboard/hr/employee-transfers/'
+      path: '/dashboard/hr/employee-transfers'
+      fullPath: '/dashboard/hr/employee-transfers'
+      preLoaderRoute: typeof AuthenticatedDashboardHrEmployeeTransfersIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/hr/compensation/': {
@@ -5275,6 +5636,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardHrSuccessionPlanningPlanIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/hr/skills/matrix': {
+      id: '/_authenticated/dashboard/hr/skills/matrix'
+      path: '/dashboard/hr/skills/matrix'
+      fullPath: '/dashboard/hr/skills/matrix'
+      preLoaderRoute: typeof AuthenticatedDashboardHrSkillsMatrixRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/shift-assignments/$assignmentId': {
+      id: '/_authenticated/dashboard/hr/shift-assignments/$assignmentId'
+      path: '/dashboard/hr/shift-assignments/$assignmentId'
+      fullPath: '/dashboard/hr/shift-assignments/$assignmentId'
+      preLoaderRoute: typeof AuthenticatedDashboardHrShiftAssignmentsAssignmentIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/hr/reports/new': {
       id: '/_authenticated/dashboard/hr/reports/new'
       path: '/dashboard/hr/reports/new'
@@ -5289,6 +5664,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardHrReportsReportIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/hr/recruitment/staffing-plans': {
+      id: '/_authenticated/dashboard/hr/recruitment/staffing-plans'
+      path: '/dashboard/hr/recruitment/staffing-plans'
+      fullPath: '/dashboard/hr/recruitment/staffing-plans'
+      preLoaderRoute: typeof AuthenticatedDashboardHrRecruitmentStaffingPlansRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/promotions/new': {
+      id: '/_authenticated/dashboard/hr/promotions/new'
+      path: '/dashboard/hr/promotions/new'
+      fullPath: '/dashboard/hr/promotions/new'
+      preLoaderRoute: typeof AuthenticatedDashboardHrPromotionsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/promotions/$promotionId': {
+      id: '/_authenticated/dashboard/hr/promotions/$promotionId'
+      path: '/dashboard/hr/promotions/$promotionId'
+      fullPath: '/dashboard/hr/promotions/$promotionId'
+      preLoaderRoute: typeof AuthenticatedDashboardHrPromotionsPromotionIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/hr/performance/new': {
       id: '/_authenticated/dashboard/hr/performance/new'
       path: '/dashboard/hr/performance/new'
@@ -5301,6 +5697,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/hr/performance/$reviewId'
       fullPath: '/dashboard/hr/performance/$reviewId'
       preLoaderRoute: typeof AuthenticatedDashboardHrPerformanceReviewIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/payroll/salary-components': {
+      id: '/_authenticated/dashboard/hr/payroll/salary-components'
+      path: '/dashboard/hr/payroll/salary-components'
+      fullPath: '/dashboard/hr/payroll/salary-components'
+      preLoaderRoute: typeof AuthenticatedDashboardHrPayrollSalaryComponentsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/hr/payroll/new': {
@@ -5387,11 +5790,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardHrLoansLoanIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/hr/leave/policies': {
+      id: '/_authenticated/dashboard/hr/leave/policies'
+      path: '/dashboard/hr/leave/policies'
+      fullPath: '/dashboard/hr/leave/policies'
+      preLoaderRoute: typeof AuthenticatedDashboardHrLeavePoliciesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/leave/periods': {
+      id: '/_authenticated/dashboard/hr/leave/periods'
+      path: '/dashboard/hr/leave/periods'
+      fullPath: '/dashboard/hr/leave/periods'
+      preLoaderRoute: typeof AuthenticatedDashboardHrLeavePeriodsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/hr/leave/new': {
       id: '/_authenticated/dashboard/hr/leave/new'
       path: '/dashboard/hr/leave/new'
       fullPath: '/dashboard/hr/leave/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrLeaveNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/leave/encashments': {
+      id: '/_authenticated/dashboard/hr/leave/encashments'
+      path: '/dashboard/hr/leave/encashments'
+      fullPath: '/dashboard/hr/leave/encashments'
+      preLoaderRoute: typeof AuthenticatedDashboardHrLeaveEncashmentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/leave/compensatory': {
+      id: '/_authenticated/dashboard/hr/leave/compensatory'
+      path: '/dashboard/hr/leave/compensatory'
+      fullPath: '/dashboard/hr/leave/compensatory'
+      preLoaderRoute: typeof AuthenticatedDashboardHrLeaveCompensatoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/leave/allocations': {
+      id: '/_authenticated/dashboard/hr/leave/allocations'
+      path: '/dashboard/hr/leave/allocations'
+      fullPath: '/dashboard/hr/leave/allocations'
+      preLoaderRoute: typeof AuthenticatedDashboardHrLeaveAllocationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/hr/leave/$requestId': {
@@ -5471,11 +5909,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardHrEmployeesEmployeeIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/hr/employee-transfers/new': {
+      id: '/_authenticated/dashboard/hr/employee-transfers/new'
+      path: '/dashboard/hr/employee-transfers/new'
+      fullPath: '/dashboard/hr/employee-transfers/new'
+      preLoaderRoute: typeof AuthenticatedDashboardHrEmployeeTransfersNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/employee-transfers/$transferId': {
+      id: '/_authenticated/dashboard/hr/employee-transfers/$transferId'
+      path: '/dashboard/hr/employee-transfers/$transferId'
+      fullPath: '/dashboard/hr/employee-transfers/$transferId'
+      preLoaderRoute: typeof AuthenticatedDashboardHrEmployeeTransfersTransferIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/compensation/retention-bonuses': {
+      id: '/_authenticated/dashboard/hr/compensation/retention-bonuses'
+      path: '/dashboard/hr/compensation/retention-bonuses'
+      fullPath: '/dashboard/hr/compensation/retention-bonuses'
+      preLoaderRoute: typeof AuthenticatedDashboardHrCompensationRetentionBonusesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/hr/compensation/new': {
       id: '/_authenticated/dashboard/hr/compensation/new'
       path: '/dashboard/hr/compensation/new'
       fullPath: '/dashboard/hr/compensation/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrCompensationNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/compensation/incentives': {
+      id: '/_authenticated/dashboard/hr/compensation/incentives'
+      path: '/dashboard/hr/compensation/incentives'
+      fullPath: '/dashboard/hr/compensation/incentives'
+      preLoaderRoute: typeof AuthenticatedDashboardHrCompensationIncentivesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/hr/compensation/$compensationId': {
@@ -5968,6 +6434,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCasesCaseIdNotionRouteImport
       parentRoute: typeof AuthenticatedDashboardCasesCaseIdRoute
     }
+    '/_authenticated/dashboard/hr/settings/shift-types/': {
+      id: '/_authenticated/dashboard/hr/settings/shift-types/'
+      path: '/dashboard/hr/settings/shift-types'
+      fullPath: '/dashboard/hr/settings/shift-types'
+      preLoaderRoute: typeof AuthenticatedDashboardHrSettingsShiftTypesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/hr/recruitment/jobs/': {
       id: '/_authenticated/dashboard/hr/recruitment/jobs/'
       path: '/dashboard/hr/recruitment/jobs'
@@ -6023,6 +6496,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/hr/recruitment/applicants/$applicantId'
       preLoaderRoute: typeof AuthenticatedDashboardHrRecruitmentApplicantsApplicantIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/promotions/$promotionId/edit': {
+      id: '/_authenticated/dashboard/hr/promotions/$promotionId/edit'
+      path: '/edit'
+      fullPath: '/dashboard/hr/promotions/$promotionId/edit'
+      preLoaderRoute: typeof AuthenticatedDashboardHrPromotionsPromotionIdEditRouteImport
+      parentRoute: typeof AuthenticatedDashboardHrPromotionsPromotionIdRoute
     }
     '/_authenticated/dashboard/finance/vendors/$vendorId/edit': {
       id: '/_authenticated/dashboard/finance/vendors/$vendorId/edit'
@@ -6317,6 +6797,21 @@ const AuthenticatedDashboardFinanceVendorsVendorIdRouteWithChildren =
     AuthenticatedDashboardFinanceVendorsVendorIdRouteChildren,
   )
 
+interface AuthenticatedDashboardHrPromotionsPromotionIdRouteChildren {
+  AuthenticatedDashboardHrPromotionsPromotionIdEditRoute: typeof AuthenticatedDashboardHrPromotionsPromotionIdEditRoute
+}
+
+const AuthenticatedDashboardHrPromotionsPromotionIdRouteChildren: AuthenticatedDashboardHrPromotionsPromotionIdRouteChildren =
+  {
+    AuthenticatedDashboardHrPromotionsPromotionIdEditRoute:
+      AuthenticatedDashboardHrPromotionsPromotionIdEditRoute,
+  }
+
+const AuthenticatedDashboardHrPromotionsPromotionIdRouteWithChildren =
+  AuthenticatedDashboardHrPromotionsPromotionIdRoute._addFileChildren(
+    AuthenticatedDashboardHrPromotionsPromotionIdRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
@@ -6347,6 +6842,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardFinanceOpeningBalancesRoute: typeof AuthenticatedDashboardFinanceOpeningBalancesRoute
   AuthenticatedDashboardFinanceOverviewRoute: typeof AuthenticatedDashboardFinanceOverviewRoute
   AuthenticatedDashboardFinanceSetupWizardRoute: typeof AuthenticatedDashboardFinanceSetupWizardRoute
+  AuthenticatedDashboardHrSetupWizardRoute: typeof AuthenticatedDashboardHrSetupWizardRoute
   AuthenticatedDashboardJobsBrowseRoute: typeof AuthenticatedDashboardJobsBrowseRoute
   AuthenticatedDashboardJobsMyServicesRoute: typeof AuthenticatedDashboardJobsMyServicesRoute
   AuthenticatedDashboardKnowledgeFormsRoute: typeof AuthenticatedDashboardKnowledgeFormsRoute
@@ -6360,6 +6856,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardReputationBadgesRoute: typeof AuthenticatedDashboardReputationBadgesRoute
   AuthenticatedDashboardReputationOverviewRoute: typeof AuthenticatedDashboardReputationOverviewRoute
   AuthenticatedDashboardSettingsCompanyRoute: typeof AuthenticatedDashboardSettingsCompanyRoute
+  AuthenticatedDashboardSettingsCrmRoute: typeof AuthenticatedDashboardSettingsCrmRoute
   AuthenticatedDashboardSettingsExpensePoliciesRoute: typeof AuthenticatedDashboardSettingsExpensePoliciesRoute
   AuthenticatedDashboardSettingsFinanceRoute: typeof AuthenticatedDashboardSettingsFinanceRoute
   AuthenticatedDashboardSettingsPaymentModesRoute: typeof AuthenticatedDashboardSettingsPaymentModesRoute
@@ -6456,7 +6953,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardHrBiometricDeviceIdRoute: typeof AuthenticatedDashboardHrBiometricDeviceIdRoute
   AuthenticatedDashboardHrBiometricNewRoute: typeof AuthenticatedDashboardHrBiometricNewRoute
   AuthenticatedDashboardHrCompensationCompensationIdRoute: typeof AuthenticatedDashboardHrCompensationCompensationIdRoute
+  AuthenticatedDashboardHrCompensationIncentivesRoute: typeof AuthenticatedDashboardHrCompensationIncentivesRoute
   AuthenticatedDashboardHrCompensationNewRoute: typeof AuthenticatedDashboardHrCompensationNewRoute
+  AuthenticatedDashboardHrCompensationRetentionBonusesRoute: typeof AuthenticatedDashboardHrCompensationRetentionBonusesRoute
+  AuthenticatedDashboardHrEmployeeTransfersTransferIdRoute: typeof AuthenticatedDashboardHrEmployeeTransfersTransferIdRoute
+  AuthenticatedDashboardHrEmployeeTransfersNewRoute: typeof AuthenticatedDashboardHrEmployeeTransfersNewRoute
   AuthenticatedDashboardHrEmployeesEmployeeIdRoute: typeof AuthenticatedDashboardHrEmployeesEmployeeIdRoute
   AuthenticatedDashboardHrEmployeesNewRoute: typeof AuthenticatedDashboardHrEmployeesNewRoute
   AuthenticatedDashboardHrExpenseClaimsClaimIdRoute: typeof AuthenticatedDashboardHrExpenseClaimsClaimIdRoute
@@ -6468,7 +6969,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardHrJobPositionsPositionIdRoute: typeof AuthenticatedDashboardHrJobPositionsPositionIdRoute
   AuthenticatedDashboardHrJobPositionsNewRoute: typeof AuthenticatedDashboardHrJobPositionsNewRoute
   AuthenticatedDashboardHrLeaveRequestIdRoute: typeof AuthenticatedDashboardHrLeaveRequestIdRoute
+  AuthenticatedDashboardHrLeaveAllocationsRoute: typeof AuthenticatedDashboardHrLeaveAllocationsRoute
+  AuthenticatedDashboardHrLeaveCompensatoryRoute: typeof AuthenticatedDashboardHrLeaveCompensatoryRoute
+  AuthenticatedDashboardHrLeaveEncashmentsRoute: typeof AuthenticatedDashboardHrLeaveEncashmentsRoute
   AuthenticatedDashboardHrLeaveNewRoute: typeof AuthenticatedDashboardHrLeaveNewRoute
+  AuthenticatedDashboardHrLeavePeriodsRoute: typeof AuthenticatedDashboardHrLeavePeriodsRoute
+  AuthenticatedDashboardHrLeavePoliciesRoute: typeof AuthenticatedDashboardHrLeavePoliciesRoute
   AuthenticatedDashboardHrLoansLoanIdRoute: typeof AuthenticatedDashboardHrLoansLoanIdRoute
   AuthenticatedDashboardHrLoansNewRoute: typeof AuthenticatedDashboardHrLoansNewRoute
   AuthenticatedDashboardHrOffboardingOffboardingIdRoute: typeof AuthenticatedDashboardHrOffboardingOffboardingIdRoute
@@ -6481,10 +6987,16 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardHrPayrollRunsNewRoute: typeof AuthenticatedDashboardHrPayrollRunsNewRoute
   AuthenticatedDashboardHrPayrollSlipIdRoute: typeof AuthenticatedDashboardHrPayrollSlipIdRoute
   AuthenticatedDashboardHrPayrollNewRoute: typeof AuthenticatedDashboardHrPayrollNewRoute
+  AuthenticatedDashboardHrPayrollSalaryComponentsRoute: typeof AuthenticatedDashboardHrPayrollSalaryComponentsRoute
   AuthenticatedDashboardHrPerformanceReviewIdRoute: typeof AuthenticatedDashboardHrPerformanceReviewIdRoute
   AuthenticatedDashboardHrPerformanceNewRoute: typeof AuthenticatedDashboardHrPerformanceNewRoute
+  AuthenticatedDashboardHrPromotionsPromotionIdRoute: typeof AuthenticatedDashboardHrPromotionsPromotionIdRouteWithChildren
+  AuthenticatedDashboardHrPromotionsNewRoute: typeof AuthenticatedDashboardHrPromotionsNewRoute
+  AuthenticatedDashboardHrRecruitmentStaffingPlansRoute: typeof AuthenticatedDashboardHrRecruitmentStaffingPlansRoute
   AuthenticatedDashboardHrReportsReportIdRoute: typeof AuthenticatedDashboardHrReportsReportIdRoute
   AuthenticatedDashboardHrReportsNewRoute: typeof AuthenticatedDashboardHrReportsNewRoute
+  AuthenticatedDashboardHrShiftAssignmentsAssignmentIdRoute: typeof AuthenticatedDashboardHrShiftAssignmentsAssignmentIdRoute
+  AuthenticatedDashboardHrSkillsMatrixRoute: typeof AuthenticatedDashboardHrSkillsMatrixRoute
   AuthenticatedDashboardHrSuccessionPlanningPlanIdRoute: typeof AuthenticatedDashboardHrSuccessionPlanningPlanIdRoute
   AuthenticatedDashboardHrSuccessionPlanningNewRoute: typeof AuthenticatedDashboardHrSuccessionPlanningNewRoute
   AuthenticatedDashboardHrTrainingTrainingIdRoute: typeof AuthenticatedDashboardHrTrainingTrainingIdRoute
@@ -6533,6 +7045,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardHrBenefitsIndexRoute: typeof AuthenticatedDashboardHrBenefitsIndexRoute
   AuthenticatedDashboardHrBiometricIndexRoute: typeof AuthenticatedDashboardHrBiometricIndexRoute
   AuthenticatedDashboardHrCompensationIndexRoute: typeof AuthenticatedDashboardHrCompensationIndexRoute
+  AuthenticatedDashboardHrEmployeeTransfersIndexRoute: typeof AuthenticatedDashboardHrEmployeeTransfersIndexRoute
   AuthenticatedDashboardHrEmployeesIndexRoute: typeof AuthenticatedDashboardHrEmployeesIndexRoute
   AuthenticatedDashboardHrExpenseClaimsIndexRoute: typeof AuthenticatedDashboardHrExpenseClaimsIndexRoute
   AuthenticatedDashboardHrGeofencingIndexRoute: typeof AuthenticatedDashboardHrGeofencingIndexRoute
@@ -6547,9 +7060,13 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardHrPayrollIndexRoute: typeof AuthenticatedDashboardHrPayrollIndexRoute
   AuthenticatedDashboardHrPerformanceIndexRoute: typeof AuthenticatedDashboardHrPerformanceIndexRoute
   AuthenticatedDashboardHrPredictionsIndexRoute: typeof AuthenticatedDashboardHrPredictionsIndexRoute
+  AuthenticatedDashboardHrPromotionsIndexRoute: typeof AuthenticatedDashboardHrPromotionsIndexRoute
   AuthenticatedDashboardHrReportsIndexRoute: typeof AuthenticatedDashboardHrReportsIndexRoute
+  AuthenticatedDashboardHrShiftAssignmentsIndexRoute: typeof AuthenticatedDashboardHrShiftAssignmentsIndexRoute
+  AuthenticatedDashboardHrSkillsIndexRoute: typeof AuthenticatedDashboardHrSkillsIndexRoute
   AuthenticatedDashboardHrSuccessionPlanningIndexRoute: typeof AuthenticatedDashboardHrSuccessionPlanningIndexRoute
   AuthenticatedDashboardHrTrainingIndexRoute: typeof AuthenticatedDashboardHrTrainingIndexRoute
+  AuthenticatedDashboardHrVehiclesIndexRoute: typeof AuthenticatedDashboardHrVehiclesIndexRoute
   AuthenticatedDashboardSalesLeadsIndexRoute: typeof AuthenticatedDashboardSalesLeadsIndexRoute
   AuthenticatedDashboardSalesReportsIndexRoute: typeof AuthenticatedDashboardSalesReportsIndexRoute
   AuthenticatedDashboardTasksEventsIndexRoute: typeof AuthenticatedDashboardTasksEventsIndexRoute
@@ -6565,6 +7082,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute: typeof AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute
   AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute: typeof AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute
   AuthenticatedDashboardHrRecruitmentJobsIndexRoute: typeof AuthenticatedDashboardHrRecruitmentJobsIndexRoute
+  AuthenticatedDashboardHrSettingsShiftTypesIndexRoute: typeof AuthenticatedDashboardHrSettingsShiftTypesIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -6614,6 +7132,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardFinanceOverviewRoute,
   AuthenticatedDashboardFinanceSetupWizardRoute:
     AuthenticatedDashboardFinanceSetupWizardRoute,
+  AuthenticatedDashboardHrSetupWizardRoute:
+    AuthenticatedDashboardHrSetupWizardRoute,
   AuthenticatedDashboardJobsBrowseRoute: AuthenticatedDashboardJobsBrowseRoute,
   AuthenticatedDashboardJobsMyServicesRoute:
     AuthenticatedDashboardJobsMyServicesRoute,
@@ -6639,6 +7159,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardReputationOverviewRoute,
   AuthenticatedDashboardSettingsCompanyRoute:
     AuthenticatedDashboardSettingsCompanyRoute,
+  AuthenticatedDashboardSettingsCrmRoute:
+    AuthenticatedDashboardSettingsCrmRoute,
   AuthenticatedDashboardSettingsExpensePoliciesRoute:
     AuthenticatedDashboardSettingsExpensePoliciesRoute,
   AuthenticatedDashboardSettingsFinanceRoute:
@@ -6823,8 +7345,16 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardHrBiometricNewRoute,
   AuthenticatedDashboardHrCompensationCompensationIdRoute:
     AuthenticatedDashboardHrCompensationCompensationIdRoute,
+  AuthenticatedDashboardHrCompensationIncentivesRoute:
+    AuthenticatedDashboardHrCompensationIncentivesRoute,
   AuthenticatedDashboardHrCompensationNewRoute:
     AuthenticatedDashboardHrCompensationNewRoute,
+  AuthenticatedDashboardHrCompensationRetentionBonusesRoute:
+    AuthenticatedDashboardHrCompensationRetentionBonusesRoute,
+  AuthenticatedDashboardHrEmployeeTransfersTransferIdRoute:
+    AuthenticatedDashboardHrEmployeeTransfersTransferIdRoute,
+  AuthenticatedDashboardHrEmployeeTransfersNewRoute:
+    AuthenticatedDashboardHrEmployeeTransfersNewRoute,
   AuthenticatedDashboardHrEmployeesEmployeeIdRoute:
     AuthenticatedDashboardHrEmployeesEmployeeIdRoute,
   AuthenticatedDashboardHrEmployeesNewRoute:
@@ -6847,7 +7377,17 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardHrJobPositionsNewRoute,
   AuthenticatedDashboardHrLeaveRequestIdRoute:
     AuthenticatedDashboardHrLeaveRequestIdRoute,
+  AuthenticatedDashboardHrLeaveAllocationsRoute:
+    AuthenticatedDashboardHrLeaveAllocationsRoute,
+  AuthenticatedDashboardHrLeaveCompensatoryRoute:
+    AuthenticatedDashboardHrLeaveCompensatoryRoute,
+  AuthenticatedDashboardHrLeaveEncashmentsRoute:
+    AuthenticatedDashboardHrLeaveEncashmentsRoute,
   AuthenticatedDashboardHrLeaveNewRoute: AuthenticatedDashboardHrLeaveNewRoute,
+  AuthenticatedDashboardHrLeavePeriodsRoute:
+    AuthenticatedDashboardHrLeavePeriodsRoute,
+  AuthenticatedDashboardHrLeavePoliciesRoute:
+    AuthenticatedDashboardHrLeavePoliciesRoute,
   AuthenticatedDashboardHrLoansLoanIdRoute:
     AuthenticatedDashboardHrLoansLoanIdRoute,
   AuthenticatedDashboardHrLoansNewRoute: AuthenticatedDashboardHrLoansNewRoute,
@@ -6871,14 +7411,26 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardHrPayrollSlipIdRoute,
   AuthenticatedDashboardHrPayrollNewRoute:
     AuthenticatedDashboardHrPayrollNewRoute,
+  AuthenticatedDashboardHrPayrollSalaryComponentsRoute:
+    AuthenticatedDashboardHrPayrollSalaryComponentsRoute,
   AuthenticatedDashboardHrPerformanceReviewIdRoute:
     AuthenticatedDashboardHrPerformanceReviewIdRoute,
   AuthenticatedDashboardHrPerformanceNewRoute:
     AuthenticatedDashboardHrPerformanceNewRoute,
+  AuthenticatedDashboardHrPromotionsPromotionIdRoute:
+    AuthenticatedDashboardHrPromotionsPromotionIdRouteWithChildren,
+  AuthenticatedDashboardHrPromotionsNewRoute:
+    AuthenticatedDashboardHrPromotionsNewRoute,
+  AuthenticatedDashboardHrRecruitmentStaffingPlansRoute:
+    AuthenticatedDashboardHrRecruitmentStaffingPlansRoute,
   AuthenticatedDashboardHrReportsReportIdRoute:
     AuthenticatedDashboardHrReportsReportIdRoute,
   AuthenticatedDashboardHrReportsNewRoute:
     AuthenticatedDashboardHrReportsNewRoute,
+  AuthenticatedDashboardHrShiftAssignmentsAssignmentIdRoute:
+    AuthenticatedDashboardHrShiftAssignmentsAssignmentIdRoute,
+  AuthenticatedDashboardHrSkillsMatrixRoute:
+    AuthenticatedDashboardHrSkillsMatrixRoute,
   AuthenticatedDashboardHrSuccessionPlanningPlanIdRoute:
     AuthenticatedDashboardHrSuccessionPlanningPlanIdRoute,
   AuthenticatedDashboardHrSuccessionPlanningNewRoute:
@@ -6975,6 +7527,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardHrBiometricIndexRoute,
   AuthenticatedDashboardHrCompensationIndexRoute:
     AuthenticatedDashboardHrCompensationIndexRoute,
+  AuthenticatedDashboardHrEmployeeTransfersIndexRoute:
+    AuthenticatedDashboardHrEmployeeTransfersIndexRoute,
   AuthenticatedDashboardHrEmployeesIndexRoute:
     AuthenticatedDashboardHrEmployeesIndexRoute,
   AuthenticatedDashboardHrExpenseClaimsIndexRoute:
@@ -7003,12 +7557,20 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardHrPerformanceIndexRoute,
   AuthenticatedDashboardHrPredictionsIndexRoute:
     AuthenticatedDashboardHrPredictionsIndexRoute,
+  AuthenticatedDashboardHrPromotionsIndexRoute:
+    AuthenticatedDashboardHrPromotionsIndexRoute,
   AuthenticatedDashboardHrReportsIndexRoute:
     AuthenticatedDashboardHrReportsIndexRoute,
+  AuthenticatedDashboardHrShiftAssignmentsIndexRoute:
+    AuthenticatedDashboardHrShiftAssignmentsIndexRoute,
+  AuthenticatedDashboardHrSkillsIndexRoute:
+    AuthenticatedDashboardHrSkillsIndexRoute,
   AuthenticatedDashboardHrSuccessionPlanningIndexRoute:
     AuthenticatedDashboardHrSuccessionPlanningIndexRoute,
   AuthenticatedDashboardHrTrainingIndexRoute:
     AuthenticatedDashboardHrTrainingIndexRoute,
+  AuthenticatedDashboardHrVehiclesIndexRoute:
+    AuthenticatedDashboardHrVehiclesIndexRoute,
   AuthenticatedDashboardSalesLeadsIndexRoute:
     AuthenticatedDashboardSalesLeadsIndexRoute,
   AuthenticatedDashboardSalesReportsIndexRoute:
@@ -7039,6 +7601,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute,
   AuthenticatedDashboardHrRecruitmentJobsIndexRoute:
     AuthenticatedDashboardHrRecruitmentJobsIndexRoute,
+  AuthenticatedDashboardHrSettingsShiftTypesIndexRoute:
+    AuthenticatedDashboardHrSettingsShiftTypesIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
