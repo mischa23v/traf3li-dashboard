@@ -7,6 +7,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
+import { Analytics } from '@/lib/analytics'
 import casesService, {
   CaseFilters,
   CreateCaseData,
@@ -105,6 +106,9 @@ export const useCreateCase = () => {
     onSuccess: (data) => {
       toast.success(t('cases.createSuccess', 'تم إنشاء القضية بنجاح'))
 
+      // Track analytics event
+      Analytics.caseCreated(data.caseType || data.type || 'general')
+
       // Manually update the cache
       queryClient.setQueriesData({ queryKey: ['cases'] }, (old: any) => {
         if (!old) return old
@@ -143,8 +147,14 @@ export const useUpdateCase = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateCaseData }) =>
       casesService.updateCase(id, data),
-    onSuccess: () => {
+    onSuccess: (_, { id, data }) => {
       toast.success(t('cases.updateSuccess', 'تم تحديث القضية بنجاح'))
+
+      // Track analytics - especially status changes
+      Analytics.caseUpdated(id)
+      if (data.status === 'closed' || data.status === 'completed') {
+        Analytics.caseClosed(id)
+      }
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.updateError', 'فشل تحديث القضية'))

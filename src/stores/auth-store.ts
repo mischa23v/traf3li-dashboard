@@ -6,6 +6,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { setUser as setSentryUser } from '@/lib/sentry'
+import { Analytics, identifyUser, clearUser as clearAnalyticsUser } from '@/lib/analytics'
 import authService, { User, LoginCredentials } from '@/services/authService'
 import { usePermissionsStore } from './permissions-store'
 
@@ -57,6 +58,14 @@ export const useAuthStore = create<AuthState>()(
             firmId: user.firmId,
           })
 
+          // Track analytics
+          Analytics.login(credentials.email ? 'email' : 'username')
+          identifyUser(user._id, {
+            role: user.role,
+            firm_id: user.firmId,
+            plan: user.plan || 'free',
+          })
+
           // Handle permissions based on user type
           if (user.role === 'lawyer') {
             if (user.firmId) {
@@ -102,6 +111,10 @@ export const useAuthStore = create<AuthState>()(
         })
         setSentryUser(null)
         usePermissionsStore.getState().clearPermissions()
+
+        // Track analytics
+        Analytics.logout()
+        clearAnalyticsUser()
       },
 
       /**
