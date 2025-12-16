@@ -53,6 +53,26 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Skeleton } from '@/components/ui/skeleton'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { EmployeeIncentiveDialog } from '@/components/hr/compensation/EmployeeIncentiveDialog'
 import { BulkIncentiveDialog } from '@/components/hr/compensation/BulkIncentiveDialog'
 import {
@@ -92,6 +112,16 @@ export default function EmployeeIncentivesPage() {
   >()
   const [selectedIncentives, setSelectedIncentives] = useState<string[]>([])
 
+  // Dialog states
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [approveDialogOpen, setApproveDialogOpen] = useState(false)
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false)
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false)
+  const [incentiveToDelete, setIncentiveToDelete] = useState<string | null>(null)
+  const [incentiveToApprove, setIncentiveToApprove] = useState<string | null>(null)
+  const [incentiveToReject, setIncentiveToReject] = useState<string | null>(null)
+  const [rejectionReason, setRejectionReason] = useState('')
+
   // Queries
   const { data: incentivesData, isLoading } = useEmployeeIncentives({
     search: searchQuery,
@@ -124,39 +154,62 @@ export default function EmployeeIncentivesPage() {
     setDialogOpen(true)
   }
 
-  const handleDelete = async (id: string) => {
-    if (
-      confirm(
-        isArabic
-          ? 'هل أنت متأكد من حذف هذا الحافز؟'
-          : 'Are you sure you want to delete this incentive?'
-      )
-    ) {
-      await deleteMutation.mutateAsync(id)
+  const handleDelete = (id: string) => {
+    setIncentiveToDelete(id)
+    setDeleteDialogOpen(true)
+  }
+
+  const confirmDelete = async () => {
+    if (!incentiveToDelete) return
+    try {
+      await deleteMutation.mutateAsync(incentiveToDelete)
+      toast.success(t('hr.incentives.deleteSuccess', 'Incentive deleted successfully'))
+      setDeleteDialogOpen(false)
+      setIncentiveToDelete(null)
+    } catch (error) {
+      toast.error(t('hr.incentives.deleteError', 'Failed to delete incentive'))
     }
   }
 
-  const handleApprove = async (id: string) => {
-    if (
-      confirm(
-        isArabic
-          ? 'هل تريد الموافقة على هذا الحافز؟'
-          : 'Do you want to approve this incentive?'
-      )
-    ) {
-      await approveMutation.mutateAsync({ id })
+  const handleApprove = (id: string) => {
+    setIncentiveToApprove(id)
+    setApproveDialogOpen(true)
+  }
+
+  const confirmApprove = async () => {
+    if (!incentiveToApprove) return
+    try {
+      await approveMutation.mutateAsync({ id: incentiveToApprove })
+      toast.success(t('hr.incentives.approveSuccess', 'Incentive approved successfully'))
+      setApproveDialogOpen(false)
+      setIncentiveToApprove(null)
+    } catch (error) {
+      toast.error(t('hr.incentives.approveError', 'Failed to approve incentive'))
     }
   }
 
-  const handleReject = async (id: string) => {
-    const reason = prompt(
-      isArabic ? 'الرجاء إدخال سبب الرفض:' : 'Please enter rejection reason:'
-    )
-    if (reason) {
+  const handleReject = (id: string) => {
+    setIncentiveToReject(id)
+    setRejectionReason('')
+    setRejectDialogOpen(true)
+  }
+
+  const confirmReject = async () => {
+    if (!incentiveToReject || !rejectionReason.trim()) {
+      toast.error(t('hr.incentives.reasonRequired', 'Rejection reason is required'))
+      return
+    }
+    try {
       await rejectMutation.mutateAsync({
-        id,
-        data: { reason, reasonAr: reason },
+        id: incentiveToReject,
+        data: { reason: rejectionReason, reasonAr: rejectionReason },
       })
+      toast.success(t('hr.incentives.rejectSuccess', 'Incentive rejected successfully'))
+      setRejectDialogOpen(false)
+      setIncentiveToReject(null)
+      setRejectionReason('')
+    } catch (error) {
+      toast.error(t('hr.incentives.rejectError', 'Failed to reject incentive'))
     }
   }
 
@@ -168,20 +221,24 @@ export default function EmployeeIncentivesPage() {
     })
   }
 
-  const handleBulkDelete = async () => {
+  const handleBulkDelete = () => {
     if (selectedIncentives.length === 0) {
-      toast.error(isArabic ? 'الرجاء اختيار حوافز' : 'Please select incentives')
+      toast.error(t('hr.incentives.selectIncentives', 'Please select incentives'))
       return
     }
-    if (
-      confirm(
-        isArabic
-          ? `هل تريد حذف ${selectedIncentives.length} حافز؟`
-          : `Do you want to delete ${selectedIncentives.length} incentives?`
-      )
-    ) {
+    setBulkDeleteDialogOpen(true)
+  }
+
+  const confirmBulkDelete = async () => {
+    try {
       await bulkDeleteMutation.mutateAsync(selectedIncentives)
+      toast.success(
+        t('hr.incentives.bulkDeleteSuccess', `${selectedIncentives.length} incentive(s) deleted successfully`)
+      )
       setSelectedIncentives([])
+      setBulkDeleteDialogOpen(false)
+    } catch (error) {
+      toast.error(t('hr.incentives.bulkDeleteError', 'Failed to delete incentives'))
     }
   }
 
@@ -239,26 +296,24 @@ export default function EmployeeIncentivesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            {isArabic ? 'حوافز الموظفين' : 'Employee Incentives'}
+            {t('hr.incentives.title', 'Employee Incentives')}
           </h1>
           <p className="text-muted-foreground">
-            {isArabic
-              ? 'إدارة المكافآت والحوافز للموظفين'
-              : 'Manage employee bonuses and incentives'}
+            {t('hr.incentives.subtitle', 'Manage employee bonuses and incentives')}
           </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleExport} disabled={exportMutation.isPending}>
             <Download className="mr-2 h-4 w-4" />
-            {isArabic ? 'تصدير' : 'Export'}
+            {t('hr.incentives.export', 'Export')}
           </Button>
           <Button variant="outline" onClick={handleBulkCreate}>
             <FileSpreadsheet className="mr-2 h-4 w-4" />
-            {isArabic ? 'إنشاء جماعي' : 'Bulk Create'}
+            {t('hr.incentives.bulkCreate', 'Bulk Create')}
           </Button>
           <Button onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" />
-            {isArabic ? 'حافز جديد' : 'New Incentive'}
+            {t('hr.incentives.newIncentive', 'New Incentive')}
           </Button>
         </div>
       </div>
@@ -268,15 +323,14 @@ export default function EmployeeIncentivesPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'إجمالي الحوافز' : 'Total Incentives'}
+              {t('hr.incentives.stats.total', 'Total Incentives')}
             </CardTitle>
             <Award className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.totalIncentives || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {isArabic ? 'إجمالي القيمة: ' : 'Total Value: '}
-              {formatCurrency(stats?.totalAmount || 0)}
+              {t('hr.incentives.stats.totalValue', 'Total Value')}: {formatCurrency(stats?.totalAmount || 0)}
             </p>
           </CardContent>
         </Card>
@@ -284,7 +338,7 @@ export default function EmployeeIncentivesPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'متوسط الحافز' : 'Average Incentive'}
+              {t('hr.incentives.stats.average', 'Average Incentive')}
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-green-600" />
           </CardHeader>
@@ -293,7 +347,7 @@ export default function EmployeeIncentivesPage() {
               {formatCurrency(stats?.averageAmount || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
-              {isArabic ? 'لكل موظف' : 'Per employee'}
+              {t('hr.incentives.stats.perEmployee', 'Per employee')}
             </p>
           </CardContent>
         </Card>
@@ -301,14 +355,14 @@ export default function EmployeeIncentivesPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'بانتظار الموافقة' : 'Pending Approval'}
+              {t('hr.incentives.stats.pending', 'Pending Approval')}
             </CardTitle>
             <Clock className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.pendingApprovals || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {isArabic ? 'يحتاج موافقة' : 'Needs approval'}
+              {t('hr.incentives.stats.needsApproval', 'Needs approval')}
             </p>
           </CardContent>
         </Card>
@@ -316,14 +370,14 @@ export default function EmployeeIncentivesPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'تمت المعالجة هذا الشهر' : 'Processed This Month'}
+              {t('hr.incentives.stats.processedMonth', 'Processed This Month')}
             </CardTitle>
             <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.processedThisMonth || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {isArabic ? 'في الرواتب' : 'In payroll'}
+              {t('hr.incentives.stats.inPayroll', 'In payroll')}
             </p>
           </CardContent>
         </Card>
@@ -337,7 +391,7 @@ export default function EmployeeIncentivesPage() {
               <div className="relative max-w-sm">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder={isArabic ? 'بحث...' : 'Search...'}
+                  placeholder={t('hr.incentives.search', 'Search...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9"
@@ -350,10 +404,10 @@ export default function EmployeeIncentivesPage() {
                 onValueChange={(v) => setSelectedType(v as IncentiveType | 'all')}
               >
                 <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder={isArabic ? 'نوع الحافز' : 'Incentive Type'} />
+                  <SelectValue placeholder={t('hr.incentives.incentiveType', 'Incentive Type')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{isArabic ? 'الكل' : 'All'}</SelectItem>
+                  <SelectItem value="all">{t('hr.incentives.all', 'All')}</SelectItem>
                   {Object.entries(incentiveTypeLabels).map(([value, label]) => (
                     <SelectItem key={value} value={value}>
                       {isArabic ? label.ar : label.en}
@@ -367,10 +421,10 @@ export default function EmployeeIncentivesPage() {
                 onValueChange={(v) => setSelectedStatus(v as IncentiveStatus | 'all')}
               >
                 <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder={isArabic ? 'الحالة' : 'Status'} />
+                  <SelectValue placeholder={t('hr.incentives.status', 'Status')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{isArabic ? 'الكل' : 'All'}</SelectItem>
+                  <SelectItem value="all">{t('hr.incentives.all', 'All')}</SelectItem>
                   {Object.entries(incentiveStatusLabels).map(([value, label]) => (
                     <SelectItem key={value} value={value}>
                       {isArabic ? label.ar : label.en}
@@ -383,12 +437,11 @@ export default function EmployeeIncentivesPage() {
           {selectedIncentives.length > 0 && (
             <div className="mt-4 flex items-center justify-between rounded-lg border bg-muted p-4">
               <span className="text-sm">
-                {isArabic ? 'تم اختيار' : 'Selected'} {selectedIncentives.length}{' '}
-                {isArabic ? 'حافز' : 'incentive(s)'}
+                {t('hr.incentives.selected', 'Selected')} {selectedIncentives.length} {t('hr.incentives.incentives', 'incentive(s)')}
               </span>
               <Button variant="destructive" size="sm" onClick={handleBulkDelete}>
                 <Trash2 className="mr-2 h-4 w-4" />
-                {isArabic ? 'حذف المحدد' : 'Delete Selected'}
+                {t('hr.incentives.deleteSelected', 'Delete Selected')}
               </Button>
             </div>
           )}
@@ -412,14 +465,14 @@ export default function EmployeeIncentivesPage() {
                       className="rounded"
                     />
                   </TableHead>
-                  <TableHead>{isArabic ? 'الموظف' : 'Employee'}</TableHead>
-                  <TableHead>{isArabic ? 'النوع' : 'Type'}</TableHead>
-                  <TableHead>{isArabic ? 'المبلغ' : 'Amount'}</TableHead>
-                  <TableHead>{isArabic ? 'السبب' : 'Reason'}</TableHead>
-                  <TableHead>{isArabic ? 'تاريخ الرواتب' : 'Payroll Date'}</TableHead>
-                  <TableHead>{isArabic ? 'الحالة' : 'Status'}</TableHead>
+                  <TableHead>{t('hr.incentives.table.employee', 'Employee')}</TableHead>
+                  <TableHead>{t('hr.incentives.table.type', 'Type')}</TableHead>
+                  <TableHead>{t('hr.incentives.table.amount', 'Amount')}</TableHead>
+                  <TableHead>{t('hr.incentives.table.reason', 'Reason')}</TableHead>
+                  <TableHead>{t('hr.incentives.table.payrollDate', 'Payroll Date')}</TableHead>
+                  <TableHead>{t('hr.incentives.table.status', 'Status')}</TableHead>
                   <TableHead className="text-right">
-                    {isArabic ? 'الإجراءات' : 'Actions'}
+                    {t('hr.incentives.table.actions', 'Actions')}
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -427,7 +480,7 @@ export default function EmployeeIncentivesPage() {
                 {incentives.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={8} className="text-center text-muted-foreground">
-                      {isArabic ? 'لا توجد حوافز' : 'No incentives found'}
+                      {t('hr.incentives.noIncentives', 'No incentives found')}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -483,14 +536,14 @@ export default function EmployeeIncentivesPage() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>
-                              {isArabic ? 'الإجراءات' : 'Actions'}
+                              {t('hr.incentives.actions', 'Actions')}
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             {incentive.status === 'draft' && (
                               <>
                                 <DropdownMenuItem onClick={() => handleEdit(incentive)}>
                                   <Edit className="mr-2 h-4 w-4" />
-                                  {isArabic ? 'تعديل' : 'Edit'}
+                                  {t('hr.incentives.edit', 'Edit')}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                               </>
@@ -501,14 +554,14 @@ export default function EmployeeIncentivesPage() {
                                   onClick={() => handleApprove(incentive._id)}
                                 >
                                   <CheckCircle className="mr-2 h-4 w-4" />
-                                  {isArabic ? 'موافقة' : 'Approve'}
+                                  {t('hr.incentives.approve', 'Approve')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={() => handleReject(incentive._id)}
                                   className="text-red-600"
                                 >
                                   <XCircle className="mr-2 h-4 w-4" />
-                                  {isArabic ? 'رفض' : 'Reject'}
+                                  {t('hr.incentives.reject', 'Reject')}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                               </>
@@ -518,7 +571,7 @@ export default function EmployeeIncentivesPage() {
                               className="text-red-600"
                             >
                               <Trash2 className="mr-2 h-4 w-4" />
-                              {isArabic ? 'حذف' : 'Delete'}
+                              {t('hr.incentives.delete', 'Delete')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -540,6 +593,128 @@ export default function EmployeeIncentivesPage() {
       />
 
       <BulkIncentiveDialog open={bulkDialogOpen} onOpenChange={setBulkDialogOpen} />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t('hr.incentives.confirmDelete', 'Delete Incentive')}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t(
+                'hr.incentives.confirmDeleteMessage',
+                'Are you sure you want to delete this incentive? This action cannot be undone.'
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('hr.incentives.cancel', 'Cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t('hr.incentives.delete', 'Delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Approve Confirmation Dialog */}
+      <AlertDialog open={approveDialogOpen} onOpenChange={setApproveDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t('hr.incentives.confirmApprove', 'Approve Incentive')}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t(
+                'hr.incentives.confirmApproveMessage',
+                'Are you sure you want to approve this incentive?'
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('hr.incentives.cancel', 'Cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmApprove}>
+              {t('hr.incentives.approve', 'Approve')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Reject Dialog with Reason Input */}
+      <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('hr.incentives.rejectIncentive', 'Reject Incentive')}</DialogTitle>
+            <DialogDescription>
+              {t('hr.incentives.rejectIncentiveMessage', 'Please provide a reason for rejection.')}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="rejection-reason">
+                {t('hr.incentives.rejectionReason', 'Rejection Reason')}
+              </Label>
+              <Textarea
+                id="rejection-reason"
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                placeholder={t(
+                  'hr.incentives.rejectionReasonPlaceholder',
+                  'Enter the reason for rejecting this incentive...'
+                )}
+                rows={4}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setRejectDialogOpen(false)
+                setRejectionReason('')
+              }}
+            >
+              {t('hr.incentives.cancel', 'Cancel')}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmReject}
+              disabled={!rejectionReason.trim()}
+            >
+              {t('hr.incentives.reject', 'Reject')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Delete Confirmation Dialog */}
+      <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t('hr.incentives.confirmBulkDelete', 'Delete Multiple Incentives')}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t(
+                'hr.incentives.confirmBulkDeleteMessage',
+                `Are you sure you want to delete ${selectedIncentives.length} incentive(s)? This action cannot be undone.`
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('hr.incentives.cancel', 'Cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmBulkDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t('hr.incentives.delete', 'Delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

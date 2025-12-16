@@ -76,50 +76,47 @@ import { formatDistanceToNow } from 'date-fns'
 import { ar } from 'date-fns/locale'
 
 // Status configuration
-const STATUS_CONFIG: Record<EncashmentStatus, { label: string; labelAr: string; variant: any; icon: any }> = {
+const getStatusConfig = (t: any): Record<EncashmentStatus, { label: string; variant: any; icon: any }> => ({
   draft: {
-    label: 'Draft',
-    labelAr: 'مسودة',
+    label: t('hr.leave.encashment.status.draft', 'Draft'),
     variant: 'secondary',
     icon: Edit3,
   },
   pending_approval: {
-    label: 'Pending Approval',
-    labelAr: 'قيد الموافقة',
+    label: t('hr.leave.encashment.status.pendingApproval', 'Pending Approval'),
     variant: 'warning',
     icon: Clock,
   },
   approved: {
-    label: 'Approved',
-    labelAr: 'موافق عليه',
+    label: t('hr.leave.encashment.status.approved', 'Approved'),
     variant: 'success',
     icon: CheckCircle,
   },
   paid: {
-    label: 'Paid',
-    labelAr: 'مدفوع',
+    label: t('hr.leave.encashment.status.paid', 'Paid'),
     variant: 'default',
     icon: DollarSign,
   },
   rejected: {
-    label: 'Rejected',
-    labelAr: 'مرفوض',
+    label: t('hr.leave.encashment.status.rejected', 'Rejected'),
     variant: 'destructive',
     icon: XCircle,
   },
   cancelled: {
-    label: 'Cancelled',
-    labelAr: 'ملغي',
+    label: t('hr.leave.encashment.status.cancelled', 'Cancelled'),
     variant: 'outline',
     icon: X,
   },
-}
+})
 
 export default function LeaveEncashments() {
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const navigate = useNavigate()
   const { toast } = useToast()
+
+  // Status configuration with translations
+  const STATUS_CONFIG = getStatusConfig(t)
 
   // State
   const [isSelectionMode, setIsSelectionMode] = useState(false)
@@ -219,15 +216,15 @@ export default function LeaveEncashments() {
     try {
       await deleteEncashmentMutation.mutateAsync(encashmentToDelete)
       toast({
-        title: isRTL ? 'نجح الحذف' : 'Delete Successful',
-        description: isRTL ? 'تم حذف طلب الصرف بنجاح' : 'Encashment request deleted successfully',
+        title: t('hr.leave.encashment.deleteSuccess', 'Delete Successful'),
+        description: t('hr.leave.encashment.deleteSuccessDesc', 'Encashment request deleted successfully'),
       })
       setDeleteDialogOpen(false)
       setEncashmentToDelete(null)
     } catch (error: any) {
       toast({
-        title: isRTL ? 'فشل الحذف' : 'Delete Failed',
-        description: error.message || (isRTL ? 'فشل حذف طلب الصرف' : 'Failed to delete encashment request'),
+        title: t('hr.leave.encashment.deleteFailed', 'Delete Failed'),
+        description: error.message || t('hr.leave.encashment.deleteFailedDesc', 'Failed to delete encashment request'),
         variant: 'destructive',
       })
     }
@@ -238,36 +235,37 @@ export default function LeaveEncashments() {
     try {
       await bulkApproveMutation.mutateAsync(selectedIds)
       toast({
-        title: isRTL ? 'نجحت الموافقة' : 'Approval Successful',
-        description: isRTL ? `تمت الموافقة على ${selectedIds.length} طلب صرف` : `${selectedIds.length} encashment request(s) approved`,
+        title: t('hr.leave.encashment.approvalSuccess', 'Approval Successful'),
+        description: t('hr.leave.encashment.approvalSuccessDesc', `${selectedIds.length} encashment request(s) approved`),
       })
       setSelectedIds([])
       setIsSelectionMode(false)
     } catch (error: any) {
       toast({
-        title: isRTL ? 'فشلت الموافقة' : 'Approval Failed',
-        description: error.message || (isRTL ? 'فشلت الموافقة على الطلبات' : 'Failed to approve requests'),
+        title: t('hr.leave.encashment.approvalFailed', 'Approval Failed'),
+        description: error.message || t('hr.leave.encashment.approvalFailedDesc', 'Failed to approve requests'),
         variant: 'destructive',
       })
     }
   }
 
   const handleBulkReject = async () => {
-    const reason = prompt(isRTL ? 'أدخل سبب الرفض:' : 'Enter rejection reason:')
+    // TODO: Replace with proper dialog component instead of browser prompt
+    const reason = prompt(t('hr.leave.encashment.enterRejectionReason', 'Enter rejection reason:'))
     if (!reason) return
 
     try {
       await bulkRejectMutation.mutateAsync({ ids: selectedIds, reason })
       toast({
-        title: isRTL ? 'نجح الرفض' : 'Rejection Successful',
-        description: isRTL ? `تم رفض ${selectedIds.length} طلب صرف` : `${selectedIds.length} encashment request(s) rejected`,
+        title: t('hr.leave.encashment.rejectionSuccess', 'Rejection Successful'),
+        description: t('hr.leave.encashment.rejectionSuccessDesc', `${selectedIds.length} encashment request(s) rejected`),
       })
       setSelectedIds([])
       setIsSelectionMode(false)
     } catch (error: any) {
       toast({
-        title: isRTL ? 'فشل الرفض' : 'Rejection Failed',
-        description: error.message || (isRTL ? 'فشل رفض الطلبات' : 'Failed to reject requests'),
+        title: t('hr.leave.encashment.rejectionFailed', 'Rejection Failed'),
+        description: error.message || t('hr.leave.encashment.rejectionFailedDesc', 'Failed to reject requests'),
         variant: 'destructive',
       })
     }
@@ -286,13 +284,13 @@ export default function LeaveEncashments() {
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
       toast({
-        title: isRTL ? 'نجح التصدير' : 'Export Successful',
-        description: isRTL ? 'تم تصدير البيانات بنجاح' : 'Data exported successfully',
+        title: t('hr.leave.encashment.exportSuccess', 'Export Successful'),
+        description: t('hr.leave.encashment.exportSuccessDesc', 'Data exported successfully'),
       })
     } catch (error: any) {
       toast({
-        title: isRTL ? 'فشل التصدير' : 'Export Failed',
-        description: error.message || (isRTL ? 'فشل تصدير البيانات' : 'Failed to export data'),
+        title: t('hr.leave.encashment.exportFailed', 'Export Failed'),
+        description: error.message || t('hr.leave.encashment.exportFailedDesc', 'Failed to export data'),
         variant: 'destructive',
       })
     }
@@ -315,17 +313,17 @@ export default function LeaveEncashments() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{isRTL ? 'صرف الإجازات' : 'Leave Encashments'}</h1>
-          <p className="text-muted-foreground mt-1">{isRTL ? 'إدارة طلبات صرف الإجازات' : 'Manage leave encashment requests'}</p>
+          <h1 className="text-3xl font-bold">{t('hr.leave.encashment.title', 'Leave Encashments')}</h1>
+          <p className="text-muted-foreground mt-1">{t('hr.leave.encashment.description', 'Manage leave encashment requests')}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={handleExport} disabled={exportMutation.isPending}>
             <FileDown className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-            {isRTL ? 'تصدير' : 'Export'}
+            {t('common.export', 'Export')}
           </Button>
           <Button onClick={() => navigate({ to: '/dashboard/hr/leave/encashments/new' })}>
             <Plus className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-            {isRTL ? 'طلب صرف جديد' : 'New Encashment Request'}
+            {t('hr.leave.encashment.newRequest', 'New Encashment Request')}
           </Button>
         </div>
       </div>
@@ -335,7 +333,7 @@ export default function LeaveEncashments() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{isRTL ? 'إجمالي الطلبات' : 'Total Requests'}</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('hr.leave.encashment.stats.totalRequests', 'Total Requests')}</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -344,7 +342,7 @@ export default function LeaveEncashments() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{isRTL ? 'قيد الموافقة' : 'Pending Approval'}</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('hr.leave.encashment.stats.pendingApproval', 'Pending Approval')}</CardTitle>
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -353,7 +351,7 @@ export default function LeaveEncashments() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{isRTL ? 'المبلغ الإجمالي' : 'Total Amount'}</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('hr.leave.encashment.stats.totalAmount', 'Total Amount')}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -362,7 +360,7 @@ export default function LeaveEncashments() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{isRTL ? 'متوسط الأيام' : 'Average Days'}</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('hr.leave.encashment.stats.averageDays', 'Average Days')}</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -376,11 +374,11 @@ export default function LeaveEncashments() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>{isRTL ? 'البحث والتصفية' : 'Search & Filter'}</CardTitle>
+            <CardTitle>{t('common.searchAndFilter', 'Search & Filter')}</CardTitle>
             {hasActiveFilters && (
               <Button variant="ghost" size="sm" onClick={clearFilters}>
                 <X className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                {isRTL ? 'مسح الفلاتر' : 'Clear Filters'}
+                {t('common.clearFilters', 'Clear Filters')}
               </Button>
             )}
           </div>
@@ -390,7 +388,7 @@ export default function LeaveEncashments() {
             <div className="relative">
               <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-3 h-4 w-4 text-muted-foreground`} />
               <Input
-                placeholder={isRTL ? 'البحث بالموظف أو الرقم...' : 'Search by employee or ID...'}
+                placeholder={t('hr.leave.encashment.searchPlaceholder', 'Search by employee or ID...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={isRTL ? 'pr-9' : 'pl-9'}
@@ -398,23 +396,23 @@ export default function LeaveEncashments() {
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger>
-                <SelectValue placeholder={isRTL ? 'الحالة' : 'Status'} />
+                <SelectValue placeholder={t('common.status', 'Status')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{isRTL ? 'جميع الحالات' : 'All Statuses'}</SelectItem>
+                <SelectItem value="all">{t('common.allStatuses', 'All Statuses')}</SelectItem>
                 {Object.entries(STATUS_CONFIG).map(([status, config]) => (
                   <SelectItem key={status} value={status}>
-                    {isRTL ? config.labelAr : config.label}
+                    {config.label}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <Select value={yearFilter} onValueChange={setYearFilter}>
               <SelectTrigger>
-                <SelectValue placeholder={isRTL ? 'السنة' : 'Year'} />
+                <SelectValue placeholder={t('common.year', 'Year')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{isRTL ? 'جميع السنوات' : 'All Years'}</SelectItem>
+                <SelectItem value="all">{t('common.allYears', 'All Years')}</SelectItem>
                 {yearOptions.map((year) => (
                   <SelectItem key={year} value={year.toString()}>
                     {year}
@@ -424,13 +422,13 @@ export default function LeaveEncashments() {
             </Select>
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger>
-                <SelectValue placeholder={isRTL ? 'الترتيب حسب' : 'Sort By'} />
+                <SelectValue placeholder={t('common.sortBy', 'Sort By')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="requestedAt">{isRTL ? 'تاريخ الطلب' : 'Request Date'}</SelectItem>
-                <SelectItem value="encashmentAmount">{isRTL ? 'المبلغ' : 'Amount'}</SelectItem>
-                <SelectItem value="encashmentDays">{isRTL ? 'عدد الأيام' : 'Days Count'}</SelectItem>
-                <SelectItem value="employeeName">{isRTL ? 'اسم الموظف' : 'Employee Name'}</SelectItem>
+                <SelectItem value="requestedAt">{t('hr.leave.encashment.requestDate', 'Request Date')}</SelectItem>
+                <SelectItem value="encashmentAmount">{t('hr.leave.encashment.amount', 'Amount')}</SelectItem>
+                <SelectItem value="encashmentDays">{t('hr.leave.encashment.daysCount', 'Days Count')}</SelectItem>
+                <SelectItem value="employeeName">{t('common.employeeName', 'Employee Name')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -442,19 +440,19 @@ export default function LeaveEncashments() {
         <Card className="bg-muted">
           <CardContent className="flex items-center justify-between py-4">
             <div className="flex items-center gap-2">
-              <span className="font-medium">{selectedIds.length} {isRTL ? 'محدد' : 'selected'}</span>
+              <span className="font-medium">{selectedIds.length} {t('common.selected', 'selected')}</span>
               <Button variant="ghost" size="sm" onClick={() => setIsSelectionMode(false)}>
-                {isRTL ? 'إلغاء التحديد' : 'Cancel Selection'}
+                {t('common.cancelSelection', 'Cancel Selection')}
               </Button>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="default" size="sm" onClick={handleBulkApprove}>
                 <CheckCircle className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                {isRTL ? 'موافقة' : 'Approve'}
+                {t('common.approve', 'Approve')}
               </Button>
               <Button variant="destructive" size="sm" onClick={handleBulkReject}>
                 <XCircle className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                {isRTL ? 'رفض' : 'Reject'}
+                {t('common.reject', 'Reject')}
               </Button>
             </div>
           </CardContent>
@@ -472,18 +470,18 @@ export default function LeaveEncashments() {
             </div>
           ) : isError ? (
             <div className="p-8 text-center text-destructive">
-              <p>{isRTL ? 'حدث خطأ في تحميل البيانات' : 'Error loading data'}</p>
+              <p>{t('common.errorLoadingData', 'Error loading data')}</p>
               <Button variant="outline" className="mt-4" onClick={() => refetch()}>
-                {isRTL ? 'إعادة المحاولة' : 'Retry'}
+                {t('common.retry', 'Retry')}
               </Button>
             </div>
           ) : encashments.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
               <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>{isRTL ? 'لا توجد طلبات صرف' : 'No encashment requests'}</p>
+              <p>{t('hr.leave.encashment.noRequests', 'No encashment requests')}</p>
               {hasActiveFilters && (
                 <Button variant="outline" className="mt-4" onClick={clearFilters}>
-                  {isRTL ? 'مسح الفلاتر' : 'Clear Filters'}
+                  {t('common.clearFilters', 'Clear Filters')}
                 </Button>
               )}
             </div>
@@ -496,18 +494,18 @@ export default function LeaveEncashments() {
                       <Checkbox
                         checked={isAllSelected}
                         onCheckedChange={handleSelectAll}
-                        aria-label={isRTL ? 'تحديد الكل' : 'Select All'}
+                        aria-label={t('common.selectAll', 'Select All')}
                       />
                     </TableHead>
                   )}
-                  <TableHead>{isRTL ? 'رقم الطلب' : 'Request ID'}</TableHead>
-                  <TableHead>{isRTL ? 'الموظف' : 'Employee'}</TableHead>
-                  <TableHead>{isRTL ? 'القسم' : 'Department'}</TableHead>
-                  <TableHead>{isRTL ? 'نوع الإجازة' : 'Leave Type'}</TableHead>
-                  <TableHead>{isRTL ? 'الأيام' : 'Days'}</TableHead>
-                  <TableHead>{isRTL ? 'المبلغ' : 'Amount'}</TableHead>
-                  <TableHead>{isRTL ? 'الحالة' : 'Status'}</TableHead>
-                  <TableHead>{isRTL ? 'تاريخ الطلب' : 'Request Date'}</TableHead>
+                  <TableHead>{t('hr.leave.encashment.requestId', 'Request ID')}</TableHead>
+                  <TableHead>{t('common.employee', 'Employee')}</TableHead>
+                  <TableHead>{t('common.department', 'Department')}</TableHead>
+                  <TableHead>{t('hr.leave.encashment.leaveType', 'Leave Type')}</TableHead>
+                  <TableHead>{t('hr.leave.encashment.days', 'Days')}</TableHead>
+                  <TableHead>{t('hr.leave.encashment.amount', 'Amount')}</TableHead>
+                  <TableHead>{t('common.status', 'Status')}</TableHead>
+                  <TableHead>{t('hr.leave.encashment.requestDate', 'Request Date')}</TableHead>
                   <TableHead className="w-12"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -535,12 +533,12 @@ export default function LeaveEncashments() {
                       </TableCell>
                       <TableCell>{isRTL ? (encashment.departmentNameAr || encashment.departmentName) : encashment.departmentName}</TableCell>
                       <TableCell>{isRTL ? (encashment.leaveTypeNameAr || encashment.leaveTypeName) : encashment.leaveTypeName}</TableCell>
-                      <TableCell>{encashment.encashmentDays} {isRTL ? 'يوم' : 'days'}</TableCell>
+                      <TableCell>{encashment.encashmentDays} {t('hr.leave.encashment.daysUnit', 'days')}</TableCell>
                       <TableCell className="font-medium">{formatCurrency(encashment.encashmentAmount, encashment.currency)}</TableCell>
                       <TableCell>
                         <Badge variant={statusConfig.variant as any}>
                           <StatusIcon className={`h-3 w-3 ${isRTL ? 'ml-1' : 'mr-1'}`} />
-                          {isRTL ? statusConfig.labelAr : statusConfig.label}
+                          {statusConfig.label}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -561,7 +559,7 @@ export default function LeaveEncashments() {
                               onClick={() => navigate({ to: `/dashboard/hr/leave/encashments/${encashment._id}` })}
                             >
                               <Eye className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                              {isRTL ? 'عرض التفاصيل' : 'View Details'}
+                              {t('common.viewDetails', 'View Details')}
                             </DropdownMenuItem>
                             {encashment.status === 'draft' && (
                               <>
@@ -569,7 +567,7 @@ export default function LeaveEncashments() {
                                   onClick={() => navigate({ to: `/dashboard/hr/leave/encashments/${encashment._id}/edit` })}
                                 >
                                   <Edit3 className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                                  {isRTL ? 'تعديل' : 'Edit'}
+                                  {t('common.edit', 'Edit')}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
@@ -580,7 +578,7 @@ export default function LeaveEncashments() {
                                   }}
                                 >
                                   <Trash2 className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                                  {isRTL ? 'حذف' : 'Delete'}
+                                  {t('common.delete', 'Delete')}
                                 </DropdownMenuItem>
                               </>
                             )}
@@ -600,10 +598,7 @@ export default function LeaveEncashments() {
       {encashmentsData?.pagination && encashmentsData.pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            {isRTL
-              ? `عرض ${encashments.length} من ${encashmentsData.pagination.total} نتيجة`
-              : `Showing ${encashments.length} of ${encashmentsData.pagination.total} results`
-            }
+            {t('common.showingResults', `Showing ${encashments.length} of ${encashmentsData.pagination.total} results`)}
           </div>
           <div className="flex items-center gap-2">
             {/* Pagination buttons would go here */}
@@ -615,18 +610,15 @@ export default function LeaveEncashments() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{isRTL ? 'تأكيد الحذف' : 'Confirm Deletion'}</AlertDialogTitle>
+            <AlertDialogTitle>{t('common.confirmDeletion', 'Confirm Deletion')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {isRTL
-                ? 'هل أنت متأكد من حذف طلب الصرف هذا؟ لا يمكن التراجع عن هذا الإجراء.'
-                : 'Are you sure you want to delete this encashment request? This action cannot be undone.'
-              }
+              {t('hr.leave.encashment.deleteConfirmMessage', 'Are you sure you want to delete this encashment request? This action cannot be undone.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{isRTL ? 'إلغاء' : 'Cancel'}</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-              {isRTL ? 'حذف' : 'Delete'}
+              {t('common.delete', 'Delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

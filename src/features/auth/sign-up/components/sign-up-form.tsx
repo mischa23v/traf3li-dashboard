@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { apiClientNoVersion } from '@/lib/api';
 
 // Auth routes are NOT versioned - they're at /api/auth/*, not /api/v1/auth/*
@@ -38,15 +39,201 @@ const Icons = {
   ChevronRight: () => (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>),
 };
 
-const REGIONS = ['الرياض', 'مكة المكرمة', 'المدينة المنورة', 'القصيم', 'الشرقية', 'عسير', 'تبوك', 'حائل', 'الحدود الشمالية', 'جازان', 'نجران', 'الباحة', 'الجوف'];
-const NATIONALITIES = ['سعودي', 'إماراتي', 'كويتي', 'قطري', 'بحريني', 'عماني', 'يمني', 'عراقي', 'سوري', 'لبناني', 'أردني', 'فلسطيني', 'مصري', 'سوداني', 'ليبي', 'تونسي', 'جزائري', 'مغربي', 'موريتاني', 'صومالي', 'جيبوتي', 'قمري', 'هندي', 'باكستاني', 'بنغلاديشي', 'سريلانكي', 'نيبالي', 'أفغاني', 'إيراني', 'تركي', 'صيني', 'ياباني', 'كوري جنوبي', 'كوري شمالي', 'فلبيني', 'إندونيسي', 'ماليزي', 'تايلاندي', 'فيتنامي', 'سنغافوري', 'بروناوي', 'ميانماري', 'كمبودي', 'لاوسي', 'منغولي', 'كازاخستاني', 'أوزبكستاني', 'تركمانستاني', 'طاجيكستاني', 'قيرغيزستاني', 'أذربيجاني', 'أرميني', 'جورجي', 'بريطاني', 'فرنسي', 'ألماني', 'إيطالي', 'إسباني', 'برتغالي', 'هولندي', 'بلجيكي', 'سويسري', 'نمساوي', 'سويدي', 'نرويجي', 'دنماركي', 'فنلندي', 'أيسلندي', 'أيرلندي', 'بولندي', 'تشيكي', 'سلوفاكي', 'مجري', 'روماني', 'بلغاري', 'يوناني', 'صربي', 'كرواتي', 'سلوفيني', 'بوسني', 'ألباني', 'مقدوني', 'أوكراني', 'روسي', 'بيلاروسي', 'ليتواني', 'لاتفي', 'إستوني', 'أمريكي', 'كندي', 'مكسيكي', 'برازيلي', 'أرجنتيني', 'تشيلي', 'كولومبي', 'بيروفي', 'فنزويلي', 'إكوادوري', 'بوليفي', 'باراغواي', 'أوروغواي', 'كوبي', 'جامايكي', 'نيجيري', 'إثيوبي', 'كيني', 'أوغندي', 'تنزاني', 'جنوب أفريقي', 'غاني', 'كاميروني', 'ساحل العاجي', 'سنغالي', 'مالي', 'نيجري', 'تشادي', 'إريتري', 'رواندي', 'أسترالي', 'نيوزيلندي', 'فيجي'];
-const COURTS = [{ id: 'general', name: 'المحكمة العامة' }, { id: 'criminal', name: 'المحكمة الجزائية' }, { id: 'personal', name: 'محكمة الأحوال الشخصية' }, { id: 'commercial', name: 'المحكمة التجارية' }, { id: 'labor', name: 'المحكمة العمالية' }, { id: 'admin', name: 'ديوان المظالم' }];
-const SPECIALIZATIONS = [{ id: 'labor', name: 'نظام العمل' }, { id: 'commercial', name: 'النظام التجاري' }, { id: 'companies', name: 'الشركات' }, { id: 'realestate', name: 'العقارات' }, { id: 'criminal', name: 'الجزائي' }, { id: 'family', name: 'الأحوال الشخصية' }, { id: 'admin', name: 'القضاء الإداري' }, { id: 'arbitration', name: 'التحكيم' }, { id: 'ip', name: 'الملكية الفكرية' }, { id: 'banking', name: 'المصرفي والتمويل' }];
-const LANGUAGES = ['العربية', 'الإنجليزية', 'الصينية', 'الهندية', 'الإسبانية', 'الفرنسية', 'البنغالية', 'البرتغالية', 'الروسية', 'اليابانية', 'الألمانية', 'الكورية', 'التركية', 'الإيطالية', 'الفارسية', 'الأردية'];
-const WORK_TYPES = ['مكتب محاماة', 'شركة / قطاع خاص', 'عمل حر', 'جهة حكومية', 'إدارة قانونية'];
+const REGIONS = [
+  { value: 'riyadh', labelAr: 'الرياض', labelEn: 'Riyadh' },
+  { value: 'makkah', labelAr: 'مكة المكرمة', labelEn: 'Makkah' },
+  { value: 'madinah', labelAr: 'المدينة المنورة', labelEn: 'Madinah' },
+  { value: 'qassim', labelAr: 'القصيم', labelEn: 'Qassim' },
+  { value: 'eastern', labelAr: 'الشرقية', labelEn: 'Eastern Province' },
+  { value: 'asir', labelAr: 'عسير', labelEn: 'Asir' },
+  { value: 'tabuk', labelAr: 'تبوك', labelEn: 'Tabuk' },
+  { value: 'hail', labelAr: 'حائل', labelEn: 'Hail' },
+  { value: 'northern', labelAr: 'الحدود الشمالية', labelEn: 'Northern Borders' },
+  { value: 'jazan', labelAr: 'جازان', labelEn: 'Jazan' },
+  { value: 'najran', labelAr: 'نجران', labelEn: 'Najran' },
+  { value: 'bahah', labelAr: 'الباحة', labelEn: 'Al-Bahah' },
+  { value: 'jouf', labelAr: 'الجوف', labelEn: 'Al-Jouf' }
+];
+
+const NATIONALITIES = [
+  { value: 'saudi', labelAr: 'سعودي', labelEn: 'Saudi' },
+  { value: 'emirati', labelAr: 'إماراتي', labelEn: 'Emirati' },
+  { value: 'kuwaiti', labelAr: 'كويتي', labelEn: 'Kuwaiti' },
+  { value: 'qatari', labelAr: 'قطري', labelEn: 'Qatari' },
+  { value: 'bahraini', labelAr: 'بحريني', labelEn: 'Bahraini' },
+  { value: 'omani', labelAr: 'عماني', labelEn: 'Omani' },
+  { value: 'yemeni', labelAr: 'يمني', labelEn: 'Yemeni' },
+  { value: 'iraqi', labelAr: 'عراقي', labelEn: 'Iraqi' },
+  { value: 'syrian', labelAr: 'سوري', labelEn: 'Syrian' },
+  { value: 'lebanese', labelAr: 'لبناني', labelEn: 'Lebanese' },
+  { value: 'jordanian', labelAr: 'أردني', labelEn: 'Jordanian' },
+  { value: 'palestinian', labelAr: 'فلسطيني', labelEn: 'Palestinian' },
+  { value: 'egyptian', labelAr: 'مصري', labelEn: 'Egyptian' },
+  { value: 'sudanese', labelAr: 'سوداني', labelEn: 'Sudanese' },
+  { value: 'libyan', labelAr: 'ليبي', labelEn: 'Libyan' },
+  { value: 'tunisian', labelAr: 'تونسي', labelEn: 'Tunisian' },
+  { value: 'algerian', labelAr: 'جزائري', labelEn: 'Algerian' },
+  { value: 'moroccan', labelAr: 'مغربي', labelEn: 'Moroccan' },
+  { value: 'mauritanian', labelAr: 'موريتاني', labelEn: 'Mauritanian' },
+  { value: 'somali', labelAr: 'صومالي', labelEn: 'Somali' },
+  { value: 'djiboutian', labelAr: 'جيبوتي', labelEn: 'Djiboutian' },
+  { value: 'comorian', labelAr: 'قمري', labelEn: 'Comorian' },
+  { value: 'indian', labelAr: 'هندي', labelEn: 'Indian' },
+  { value: 'pakistani', labelAr: 'باكستاني', labelEn: 'Pakistani' },
+  { value: 'bangladeshi', labelAr: 'بنغلاديشي', labelEn: 'Bangladeshi' },
+  { value: 'srilankan', labelAr: 'سريلانكي', labelEn: 'Sri Lankan' },
+  { value: 'nepali', labelAr: 'نيبالي', labelEn: 'Nepali' },
+  { value: 'afghan', labelAr: 'أفغاني', labelEn: 'Afghan' },
+  { value: 'iranian', labelAr: 'إيراني', labelEn: 'Iranian' },
+  { value: 'turkish', labelAr: 'تركي', labelEn: 'Turkish' },
+  { value: 'chinese', labelAr: 'صيني', labelEn: 'Chinese' },
+  { value: 'japanese', labelAr: 'ياباني', labelEn: 'Japanese' },
+  { value: 'south_korean', labelAr: 'كوري جنوبي', labelEn: 'South Korean' },
+  { value: 'north_korean', labelAr: 'كوري شمالي', labelEn: 'North Korean' },
+  { value: 'filipino', labelAr: 'فلبيني', labelEn: 'Filipino' },
+  { value: 'indonesian', labelAr: 'إندونيسي', labelEn: 'Indonesian' },
+  { value: 'malaysian', labelAr: 'ماليزي', labelEn: 'Malaysian' },
+  { value: 'thai', labelAr: 'تايلاندي', labelEn: 'Thai' },
+  { value: 'vietnamese', labelAr: 'فيتنامي', labelEn: 'Vietnamese' },
+  { value: 'singaporean', labelAr: 'سنغافوري', labelEn: 'Singaporean' },
+  { value: 'bruneian', labelAr: 'بروناوي', labelEn: 'Bruneian' },
+  { value: 'myanmar', labelAr: 'ميانماري', labelEn: 'Myanmar' },
+  { value: 'cambodian', labelAr: 'كمبودي', labelEn: 'Cambodian' },
+  { value: 'laotian', labelAr: 'لاوسي', labelEn: 'Laotian' },
+  { value: 'mongolian', labelAr: 'منغولي', labelEn: 'Mongolian' },
+  { value: 'kazakhstani', labelAr: 'كازاخستاني', labelEn: 'Kazakhstani' },
+  { value: 'uzbekistani', labelAr: 'أوزبكستاني', labelEn: 'Uzbekistani' },
+  { value: 'turkmen', labelAr: 'تركمانستاني', labelEn: 'Turkmen' },
+  { value: 'tajikistani', labelAr: 'طاجيكستاني', labelEn: 'Tajikistani' },
+  { value: 'kyrgyzstani', labelAr: 'قيرغيزستاني', labelEn: 'Kyrgyzstani' },
+  { value: 'azerbaijani', labelAr: 'أذربيجاني', labelEn: 'Azerbaijani' },
+  { value: 'armenian', labelAr: 'أرميني', labelEn: 'Armenian' },
+  { value: 'georgian', labelAr: 'جورجي', labelEn: 'Georgian' },
+  { value: 'british', labelAr: 'بريطاني', labelEn: 'British' },
+  { value: 'french', labelAr: 'فرنسي', labelEn: 'French' },
+  { value: 'german', labelAr: 'ألماني', labelEn: 'German' },
+  { value: 'italian', labelAr: 'إيطالي', labelEn: 'Italian' },
+  { value: 'spanish', labelAr: 'إسباني', labelEn: 'Spanish' },
+  { value: 'portuguese', labelAr: 'برتغالي', labelEn: 'Portuguese' },
+  { value: 'dutch', labelAr: 'هولندي', labelEn: 'Dutch' },
+  { value: 'belgian', labelAr: 'بلجيكي', labelEn: 'Belgian' },
+  { value: 'swiss', labelAr: 'سويسري', labelEn: 'Swiss' },
+  { value: 'austrian', labelAr: 'نمساوي', labelEn: 'Austrian' },
+  { value: 'swedish', labelAr: 'سويدي', labelEn: 'Swedish' },
+  { value: 'norwegian', labelAr: 'نرويجي', labelEn: 'Norwegian' },
+  { value: 'danish', labelAr: 'دنماركي', labelEn: 'Danish' },
+  { value: 'finnish', labelAr: 'فنلندي', labelEn: 'Finnish' },
+  { value: 'icelandic', labelAr: 'أيسلندي', labelEn: 'Icelandic' },
+  { value: 'irish', labelAr: 'أيرلندي', labelEn: 'Irish' },
+  { value: 'polish', labelAr: 'بولندي', labelEn: 'Polish' },
+  { value: 'czech', labelAr: 'تشيكي', labelEn: 'Czech' },
+  { value: 'slovak', labelAr: 'سلوفاكي', labelEn: 'Slovak' },
+  { value: 'hungarian', labelAr: 'مجري', labelEn: 'Hungarian' },
+  { value: 'romanian', labelAr: 'روماني', labelEn: 'Romanian' },
+  { value: 'bulgarian', labelAr: 'بلغاري', labelEn: 'Bulgarian' },
+  { value: 'greek', labelAr: 'يوناني', labelEn: 'Greek' },
+  { value: 'serbian', labelAr: 'صربي', labelEn: 'Serbian' },
+  { value: 'croatian', labelAr: 'كرواتي', labelEn: 'Croatian' },
+  { value: 'slovenian', labelAr: 'سلوفيني', labelEn: 'Slovenian' },
+  { value: 'bosnian', labelAr: 'بوسني', labelEn: 'Bosnian' },
+  { value: 'albanian', labelAr: 'ألباني', labelEn: 'Albanian' },
+  { value: 'macedonian', labelAr: 'مقدوني', labelEn: 'Macedonian' },
+  { value: 'ukrainian', labelAr: 'أوكراني', labelEn: 'Ukrainian' },
+  { value: 'russian', labelAr: 'روسي', labelEn: 'Russian' },
+  { value: 'belarusian', labelAr: 'بيلاروسي', labelEn: 'Belarusian' },
+  { value: 'lithuanian', labelAr: 'ليتواني', labelEn: 'Lithuanian' },
+  { value: 'latvian', labelAr: 'لاتفي', labelEn: 'Latvian' },
+  { value: 'estonian', labelAr: 'إستوني', labelEn: 'Estonian' },
+  { value: 'american', labelAr: 'أمريكي', labelEn: 'American' },
+  { value: 'canadian', labelAr: 'كندي', labelEn: 'Canadian' },
+  { value: 'mexican', labelAr: 'مكسيكي', labelEn: 'Mexican' },
+  { value: 'brazilian', labelAr: 'برازيلي', labelEn: 'Brazilian' },
+  { value: 'argentinian', labelAr: 'أرجنتيني', labelEn: 'Argentinian' },
+  { value: 'chilean', labelAr: 'تشيلي', labelEn: 'Chilean' },
+  { value: 'colombian', labelAr: 'كولومبي', labelEn: 'Colombian' },
+  { value: 'peruvian', labelAr: 'بيروفي', labelEn: 'Peruvian' },
+  { value: 'venezuelan', labelAr: 'فنزويلي', labelEn: 'Venezuelan' },
+  { value: 'ecuadorian', labelAr: 'إكوادوري', labelEn: 'Ecuadorian' },
+  { value: 'bolivian', labelAr: 'بوليفي', labelEn: 'Bolivian' },
+  { value: 'paraguayan', labelAr: 'باراغواي', labelEn: 'Paraguayan' },
+  { value: 'uruguayan', labelAr: 'أوروغواي', labelEn: 'Uruguayan' },
+  { value: 'cuban', labelAr: 'كوبي', labelEn: 'Cuban' },
+  { value: 'jamaican', labelAr: 'جامايكي', labelEn: 'Jamaican' },
+  { value: 'nigerian', labelAr: 'نيجيري', labelEn: 'Nigerian' },
+  { value: 'ethiopian', labelAr: 'إثيوبي', labelEn: 'Ethiopian' },
+  { value: 'kenyan', labelAr: 'كيني', labelEn: 'Kenyan' },
+  { value: 'ugandan', labelAr: 'أوغندي', labelEn: 'Ugandan' },
+  { value: 'tanzanian', labelAr: 'تنزاني', labelEn: 'Tanzanian' },
+  { value: 'south_african', labelAr: 'جنوب أفريقي', labelEn: 'South African' },
+  { value: 'ghanaian', labelAr: 'غاني', labelEn: 'Ghanaian' },
+  { value: 'cameroonian', labelAr: 'كاميروني', labelEn: 'Cameroonian' },
+  { value: 'ivorian', labelAr: 'ساحل العاجي', labelEn: 'Ivorian' },
+  { value: 'senegalese', labelAr: 'سنغالي', labelEn: 'Senegalese' },
+  { value: 'malian', labelAr: 'مالي', labelEn: 'Malian' },
+  { value: 'nigerien', labelAr: 'نيجري', labelEn: 'Nigerien' },
+  { value: 'chadian', labelAr: 'تشادي', labelEn: 'Chadian' },
+  { value: 'eritrean', labelAr: 'إريتري', labelEn: 'Eritrean' },
+  { value: 'rwandan', labelAr: 'رواندي', labelEn: 'Rwandan' },
+  { value: 'australian', labelAr: 'أسترالي', labelEn: 'Australian' },
+  { value: 'newzealander', labelAr: 'نيوزيلندي', labelEn: 'New Zealander' },
+  { value: 'fijian', labelAr: 'فيجي', labelEn: 'Fijian' }
+];
+
+const COURTS = [
+  { id: 'general', nameAr: 'المحكمة العامة', nameEn: 'General Court' },
+  { id: 'criminal', nameAr: 'المحكمة الجزائية', nameEn: 'Criminal Court' },
+  { id: 'personal', nameAr: 'محكمة الأحوال الشخصية', nameEn: 'Personal Status Court' },
+  { id: 'commercial', nameAr: 'المحكمة التجارية', nameEn: 'Commercial Court' },
+  { id: 'labor', nameAr: 'المحكمة العمالية', nameEn: 'Labor Court' },
+  { id: 'admin', nameAr: 'ديوان المظالم', nameEn: 'Board of Grievances' }
+];
+
+const SPECIALIZATIONS = [
+  { id: 'labor', nameAr: 'نظام العمل', nameEn: 'Labor Law' },
+  { id: 'commercial', nameAr: 'النظام التجاري', nameEn: 'Commercial Law' },
+  { id: 'companies', nameAr: 'الشركات', nameEn: 'Corporate Law' },
+  { id: 'realestate', nameAr: 'العقارات', nameEn: 'Real Estate Law' },
+  { id: 'criminal', nameAr: 'الجزائي', nameEn: 'Criminal Law' },
+  { id: 'family', nameAr: 'الأحوال الشخصية', nameEn: 'Family Law' },
+  { id: 'admin', nameAr: 'القضاء الإداري', nameEn: 'Administrative Law' },
+  { id: 'arbitration', nameAr: 'التحكيم', nameEn: 'Arbitration' },
+  { id: 'ip', nameAr: 'الملكية الفكرية', nameEn: 'Intellectual Property' },
+  { id: 'banking', nameAr: 'المصرفي والتمويل', nameEn: 'Banking & Finance' }
+];
+
+const LANGUAGES = [
+  { value: 'arabic', labelAr: 'العربية', labelEn: 'Arabic' },
+  { value: 'english', labelAr: 'الإنجليزية', labelEn: 'English' },
+  { value: 'chinese', labelAr: 'الصينية', labelEn: 'Chinese' },
+  { value: 'hindi', labelAr: 'الهندية', labelEn: 'Hindi' },
+  { value: 'spanish', labelAr: 'الإسبانية', labelEn: 'Spanish' },
+  { value: 'french', labelAr: 'الفرنسية', labelEn: 'French' },
+  { value: 'bengali', labelAr: 'البنغالية', labelEn: 'Bengali' },
+  { value: 'portuguese', labelAr: 'البرتغالية', labelEn: 'Portuguese' },
+  { value: 'russian', labelAr: 'الروسية', labelEn: 'Russian' },
+  { value: 'japanese', labelAr: 'اليابانية', labelEn: 'Japanese' },
+  { value: 'german', labelAr: 'الألمانية', labelEn: 'German' },
+  { value: 'korean', labelAr: 'الكورية', labelEn: 'Korean' },
+  { value: 'turkish', labelAr: 'التركية', labelEn: 'Turkish' },
+  { value: 'italian', labelAr: 'الإيطالية', labelEn: 'Italian' },
+  { value: 'persian', labelAr: 'الفارسية', labelEn: 'Persian' },
+  { value: 'urdu', labelAr: 'الأردية', labelEn: 'Urdu' }
+];
+
+const WORK_TYPES = [
+  { value: 'law_firm', labelAr: 'مكتب محاماة', labelEn: 'Law Firm' },
+  { value: 'private_company', labelAr: 'شركة / قطاع خاص', labelEn: 'Private Company' },
+  { value: 'freelance', labelAr: 'عمل حر', labelEn: 'Freelance' },
+  { value: 'government', labelAr: 'جهة حكومية', labelEn: 'Government Entity' },
+  { value: 'legal_dept', labelAr: 'إدارة قانونية', labelEn: 'Legal Department' }
+];
+
 const CASE_RANGES = ['1-10', '11-30', '31-50', '51-100', '+100'];
 
 export function SignUpForm() {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+
   const [currentStep, setCurrentStep] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -86,7 +273,7 @@ export function SignUpForm() {
     // Invitation code for join_firm mode
     invitationCode: '',
     specializations: [] as string[],
-    languages: ['العربية'] as string[],
+    languages: ['arabic'] as string[],
     bio: '',
     isRegisteredKhebra: null as boolean | null,
     serviceType: '',
@@ -139,9 +326,9 @@ export function SignUpForm() {
       // Set error if taken
       if (!isAvailable) {
         const errorMessages = {
-          email: 'البريد الإلكتروني مستخدم بالفعل',
-          username: 'اسم المستخدم مستخدم بالفعل',
-          phone: 'رقم الجوال مستخدم بالفعل'
+          email: t('auth.signUp.errors.emailTaken', 'Email is already taken'),
+          username: t('auth.signUp.errors.usernameTaken', 'Username is already taken'),
+          phone: t('auth.signUp.errors.phoneTaken', 'Phone number is already taken')
         };
         setErrors(prev => ({ ...prev, [field]: errorMessages[field] }));
       }
@@ -173,9 +360,9 @@ export function SignUpForm() {
   // Availability indicator component
   const AvailabilityIndicator = ({ status }: { status: AvailabilityStatus }) => {
     if (status === 'idle') return null;
-    if (status === 'checking') return <span className="text-xs text-slate-500 animate-pulse">جاري التحقق...</span>;
-    if (status === 'available') return <span className="text-xs text-green-600 flex items-center gap-1"><Icons.Check /> متاح</span>;
-    if (status === 'taken') return <span className="text-xs text-red-500">مستخدم بالفعل</span>;
+    if (status === 'checking') return <span className="text-xs text-slate-500 animate-pulse">{t('auth.signUp.checking', 'Checking...')}</span>;
+    if (status === 'available') return <span className="text-xs text-green-600 flex items-center gap-1"><Icons.Check /> {t('auth.signUp.available', 'Available')}</span>;
+    if (status === 'taken') return <span className="text-xs text-red-500">{t('auth.signUp.taken', 'Already taken')}</span>;
     return null;
   };
 
@@ -191,19 +378,19 @@ export function SignUpForm() {
     })); 
   };
   
-  const updateCourt = (courtId: string, field: string, value: any) => { 
-    const courtData = COURTS.find(c => c.id === courtId); 
-    setFormData(prev => ({ 
-      ...prev, 
-      courts: { 
-        ...prev.courts, 
-        [courtId]: { 
-          ...prev.courts[courtId], 
-          [field]: value, 
-          name: courtData?.name 
-        } 
-      } 
-    })); 
+  const updateCourt = (courtId: string, field: string, value: any) => {
+    const courtData = COURTS.find(c => c.id === courtId);
+    setFormData(prev => ({
+      ...prev,
+      courts: {
+        ...prev.courts,
+        [courtId]: {
+          ...prev.courts[courtId],
+          [field]: value,
+          name: courtData ? (isRTL ? courtData.nameAr : courtData.nameEn) : ''
+        }
+      }
+    }));
   };
 
   const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -214,44 +401,44 @@ export function SignUpForm() {
     
     // Step 1 - Basic Info (All)
     if (step === 1) {
-      if (!formData.firstName.trim()) newErrors.firstName = 'الحقل مطلوب';
-      if (!formData.lastName.trim()) newErrors.lastName = 'الحقل مطلوب';
-      if (!formData.username.trim()) newErrors.username = 'الحقل مطلوب';
-      else if (formData.username.length < 3) newErrors.username = 'يجب أن لا يقل عن 3 أحرف';
-      if (!formData.email.trim()) newErrors.email = 'الحقل مطلوب';
-      else if (!validateEmail(formData.email)) newErrors.email = 'البريد الإلكتروني غير صحيح';
+      if (!formData.firstName.trim()) newErrors.firstName = t('auth.signUp.errors.required', 'This field is required');
+      if (!formData.lastName.trim()) newErrors.lastName = t('auth.signUp.errors.required', 'This field is required');
+      if (!formData.username.trim()) newErrors.username = t('auth.signUp.errors.required', 'This field is required');
+      else if (formData.username.length < 3) newErrors.username = t('auth.signUp.errors.minLength3', 'Must be at least 3 characters');
+      if (!formData.email.trim()) newErrors.email = t('auth.signUp.errors.required', 'This field is required');
+      else if (!validateEmail(formData.email)) newErrors.email = t('auth.signUp.errors.invalidEmail', 'Invalid email address');
       // Phone validation for client and dashboard lawyer (moved from step 2)
       if (formData.userType === 'client' || formData.lawyerMode === 'dashboard') {
-        if (!formData.phone) newErrors.phone = 'الحقل مطلوب';
-        else if (!validatePhone(formData.phone)) newErrors.phone = 'رقم الجوال غير صحيح';
+        if (!formData.phone) newErrors.phone = t('auth.signUp.errors.required', 'This field is required');
+        else if (!validatePhone(formData.phone)) newErrors.phone = t('auth.signUp.errors.invalidPhone', 'Invalid phone number');
       }
       // Invitation code validation for join_firm mode
       if (formData.lawyerWorkMode === 'join_firm') {
-        if (!formData.invitationCode.trim()) newErrors.invitationCode = 'كود الدعوة مطلوب';
-        else if (formData.invitationCode.length < 4) newErrors.invitationCode = 'كود الدعوة غير صحيح';
+        if (!formData.invitationCode.trim()) newErrors.invitationCode = t('auth.signUp.errors.invitationCodeRequired', 'Invitation code is required');
+        else if (formData.invitationCode.length < 4) newErrors.invitationCode = t('auth.signUp.errors.invalidInvitationCode', 'Invalid invitation code');
       }
     }
     
     // Step 2 - Password + Location (Client & Dashboard Lawyer) - Phone moved to step 1
     if (step === 2 && (formData.userType === 'client' || formData.lawyerMode === 'dashboard')) {
-      if (!formData.password) newErrors.password = 'الحقل مطلوب';
-      else if (formData.password.length < 8) newErrors.password = 'يجب أن تكون مكونة من 8 خانات على الأقل';
-      if (!formData.confirmPassword) newErrors.confirmPassword = 'الحقل مطلوب';
-      else if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'كلمة المرور غير متطابقة';
-      if (!formData.nationality) newErrors.nationality = 'الحقل مطلوب';
-      if (!formData.region) newErrors.region = 'الحقل مطلوب';
-      if (!formData.city.trim()) newErrors.city = 'الحقل مطلوب';
+      if (!formData.password) newErrors.password = t('auth.signUp.errors.required', 'This field is required');
+      else if (formData.password.length < 8) newErrors.password = t('auth.signUp.errors.minLength8', 'Must be at least 8 characters');
+      if (!formData.confirmPassword) newErrors.confirmPassword = t('auth.signUp.errors.required', 'This field is required');
+      else if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = t('auth.signUp.errors.passwordMismatch', 'Passwords do not match');
+      if (!formData.nationality) newErrors.nationality = t('auth.signUp.errors.required', 'This field is required');
+      if (!formData.region) newErrors.region = t('auth.signUp.errors.required', 'This field is required');
+      if (!formData.city.trim()) newErrors.city = t('auth.signUp.errors.required', 'This field is required');
     }
 
     // Step 3 - Firm Data (create_firm mode only)
     if (step === 3 && formData.lawyerWorkMode === 'create_firm') {
-      if (!formData.firmName.trim()) newErrors.firmName = 'اسم المكتب مطلوب';
-      if (!formData.firmLicenseNumber.trim()) newErrors.firmLicenseNumber = 'رقم الترخيص مطلوب';
-      if (!formData.firmEmail.trim()) newErrors.firmEmail = 'البريد الإلكتروني مطلوب';
-      else if (!validateEmail(formData.firmEmail)) newErrors.firmEmail = 'البريد الإلكتروني غير صحيح';
-      if (!formData.firmPhone) newErrors.firmPhone = 'هاتف المكتب مطلوب';
-      else if (!validatePhone(formData.firmPhone)) newErrors.firmPhone = 'رقم الهاتف غير صحيح';
-      if (!formData.firmAddress.trim()) newErrors.firmAddress = 'عنوان المكتب مطلوب';
+      if (!formData.firmName.trim()) newErrors.firmName = t('auth.signUp.errors.firmNameRequired', 'Firm name is required');
+      if (!formData.firmLicenseNumber.trim()) newErrors.firmLicenseNumber = t('auth.signUp.errors.licenseNumberRequired', 'License number is required');
+      if (!formData.firmEmail.trim()) newErrors.firmEmail = t('auth.signUp.errors.required', 'This field is required');
+      else if (!validateEmail(formData.firmEmail)) newErrors.firmEmail = t('auth.signUp.errors.invalidEmail', 'Invalid email address');
+      if (!formData.firmPhone) newErrors.firmPhone = t('auth.signUp.errors.firmPhoneRequired', 'Firm phone is required');
+      else if (!validatePhone(formData.firmPhone)) newErrors.firmPhone = t('auth.signUp.errors.invalidPhone', 'Invalid phone number');
+      if (!formData.firmAddress.trim()) newErrors.firmAddress = t('auth.signUp.errors.firmAddressRequired', 'Firm address is required');
     }
 
     // Step 3/4 - Terms (Client & Dashboard Lawyer)
@@ -259,62 +446,62 @@ export function SignUpForm() {
     const isTermsStep = (step === 3 && (formData.userType === 'client' || (formData.lawyerMode === 'dashboard' && formData.lawyerWorkMode !== 'create_firm'))) ||
                         (step === 4 && formData.lawyerWorkMode === 'create_firm');
     if (isTermsStep) {
-      if (!formData.agreedTerms) newErrors.agreedTerms = 'يرجى الموافقة';
-      if (!formData.agreedPrivacy) newErrors.agreedPrivacy = 'يرجى الموافقة';
-      if (formData.userType === 'lawyer' && !formData.agreedConflict) newErrors.agreedConflict = 'يرجى الموافقة';
+      if (!formData.agreedTerms) newErrors.agreedTerms = t('auth.signUp.errors.pleaseAgree', 'Please agree');
+      if (!formData.agreedPrivacy) newErrors.agreedPrivacy = t('auth.signUp.errors.pleaseAgree', 'Please agree');
+      if (formData.userType === 'lawyer' && !formData.agreedConflict) newErrors.agreedConflict = t('auth.signUp.errors.pleaseAgree', 'Please agree');
     }
 
     // Marketplace Lawyer Steps
     if (formData.lawyerMode === 'marketplace') {
       // Step 2 - Password + Phone
       if (step === 2) {
-        if (!formData.password) newErrors.password = 'الحقل مطلوب';
-        else if (formData.password.length < 8) newErrors.password = 'يجب أن تكون مكونة من 8 خانات على الأقل';
-        if (!formData.confirmPassword) newErrors.confirmPassword = 'الحقل مطلوب';
-        else if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'كلمة المرور غير متطابقة';
-        if (!formData.phone) newErrors.phone = 'الحقل مطلوب';
-        else if (!validatePhone(formData.phone)) newErrors.phone = 'رقم الجوال غير صحيح';
+        if (!formData.password) newErrors.password = t('auth.signUp.errors.required', 'This field is required');
+        else if (formData.password.length < 8) newErrors.password = t('auth.signUp.errors.minLength8', 'Must be at least 8 characters');
+        if (!formData.confirmPassword) newErrors.confirmPassword = t('auth.signUp.errors.required', 'This field is required');
+        else if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = t('auth.signUp.errors.passwordMismatch', 'Passwords do not match');
+        if (!formData.phone) newErrors.phone = t('auth.signUp.errors.required', 'This field is required');
+        else if (!validatePhone(formData.phone)) newErrors.phone = t('auth.signUp.errors.invalidPhone', 'Invalid phone number');
       }
 
       // Step 3 - Location
       if (step === 3) {
-        if (!formData.nationality) newErrors.nationality = 'الحقل مطلوب';
-        if (!formData.region) newErrors.region = 'الحقل مطلوب';
-        if (!formData.city.trim()) newErrors.city = 'الحقل مطلوب';
+        if (!formData.nationality) newErrors.nationality = t('auth.signUp.errors.required', 'This field is required');
+        if (!formData.region) newErrors.region = t('auth.signUp.errors.required', 'This field is required');
+        if (!formData.city.trim()) newErrors.city = t('auth.signUp.errors.required', 'This field is required');
       }
 
       // Step 4 - License
-      if (step === 4 && formData.isLicensed === null) newErrors.isLicensed = 'يرجى الاختيار';
+      if (step === 4 && formData.isLicensed === null) newErrors.isLicensed = t('auth.signUp.errors.pleaseSelect', 'Please make a selection');
 
       // Step 5 - Courts
       if (step === 5) {
         const selectedCourts = Object.values(formData.courts).filter(c => c.selected);
-        if (selectedCourts.length === 0) newErrors.courts = 'يرجى اختيار محكمة واحدة على الأقل';
+        if (selectedCourts.length === 0) newErrors.courts = t('auth.signUp.errors.selectAtLeastOneCourt', 'Please select at least one court');
       }
 
       // Step 6 - Experience
       if (step === 6) {
-        if (!formData.yearsOfExperience) newErrors.yearsOfExperience = 'الحقل مطلوب';
-        if (!formData.workType) newErrors.workType = 'الحقل مطلوب';
-        if (formData.specializations.length === 0) newErrors.specializations = 'يرجى اختيار تخصص واحد على الأقل';
-        if (formData.languages.length === 0) newErrors.languages = 'يرجى اختيار لغة واحدة على الأقل';
+        if (!formData.yearsOfExperience) newErrors.yearsOfExperience = t('auth.signUp.errors.required', 'This field is required');
+        if (!formData.workType) newErrors.workType = t('auth.signUp.errors.required', 'This field is required');
+        if (formData.specializations.length === 0) newErrors.specializations = t('auth.signUp.errors.selectAtLeastOneSpecialization', 'Please select at least one specialization');
+        if (formData.languages.length === 0) newErrors.languages = t('auth.signUp.errors.selectAtLeastOneLanguage', 'Please select at least one language');
       }
 
       // Step 7 - Khebra
-      if (step === 7 && formData.isRegisteredKhebra === null) newErrors.isRegisteredKhebra = 'يرجى الاختيار';
+      if (step === 7 && formData.isRegisteredKhebra === null) newErrors.isRegisteredKhebra = t('auth.signUp.errors.pleaseSelect', 'Please make a selection');
 
       // Step 8 - Marketplace Settings
       if (step === 8) {
-        if (!formData.serviceType) newErrors.serviceType = 'الحقل مطلوب';
-        if (formData.pricingModel.length === 0) newErrors.pricingModel = 'يرجى اختيار نموذج واحد على الأقل';
-        if (!formData.acceptsRemote) newErrors.acceptsRemote = 'الحقل مطلوب';
+        if (!formData.serviceType) newErrors.serviceType = t('auth.signUp.errors.required', 'This field is required');
+        if (formData.pricingModel.length === 0) newErrors.pricingModel = t('auth.signUp.errors.selectAtLeastOnePricing', 'Please select at least one pricing model');
+        if (!formData.acceptsRemote) newErrors.acceptsRemote = t('auth.signUp.errors.required', 'This field is required');
       }
 
       // Step 9 - Terms
       if (step === 9) {
-        if (!formData.agreedTerms) newErrors.agreedTerms = 'يرجى الموافقة';
-        if (!formData.agreedPrivacy) newErrors.agreedPrivacy = 'يرجى الموافقة';
-        if (!formData.agreedConflict) newErrors.agreedConflict = 'يرجى الموافقة';
+        if (!formData.agreedTerms) newErrors.agreedTerms = t('auth.signUp.errors.pleaseAgree', 'Please agree');
+        if (!formData.agreedPrivacy) newErrors.agreedPrivacy = t('auth.signUp.errors.pleaseAgree', 'Please agree');
+        if (!formData.agreedConflict) newErrors.agreedConflict = t('auth.signUp.errors.pleaseAgree', 'Please agree');
       }
     }
 
@@ -416,7 +603,7 @@ export function SignUpForm() {
         const response = await authApi.post('/auth/register', payload);
         if (response.status === 201) setShowSuccess(true);
       } catch (error: any) {
-        alert(error.response?.data?.message || 'حدث خطأ ما، يرجى المحاولة مرة أخرى');
+        alert(error.response?.data?.message || t('auth.signUp.errors.generalError', 'An error occurred, please try again'));
       } finally {
         setLoading(false);
       }
@@ -425,20 +612,25 @@ export function SignUpForm() {
 
   if (showSuccess) {
     return (
-      <div className="min-h-screen bg-[#F8F9FA]" dir="rtl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      <div className="min-h-screen bg-[#F8F9FA]" dir={isRTL ? 'rtl' : 'ltr'} style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
         <div className="min-h-screen flex items-center justify-center p-6">
           <div className="w-full max-w-md text-center">
             <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-10">
               <div className="inline-flex items-center justify-center text-emerald-500 mb-6 animate-scaleIn"><Icons.CheckCircle /></div>
-              <h1 className="text-2xl font-bold text-[#0f172a] mb-3">تم إنشاء الحساب بنجاح</h1>
-              <p className="text-slate-500 mb-8">{formData.userType === 'lawyer' ? 'يمكنك الآن البدء في إدارة قضاياك واستقبال العملاء.' : 'يمكنك الآن البحث عن محامٍ مناسب لقضيتك.'}</p>
+              <h1 className="text-2xl font-bold text-[#0f172a] mb-3">{t('auth.signUp.success.title', 'Account Created Successfully')}</h1>
+              <p className="text-slate-500 mb-8">
+                {formData.userType === 'lawyer'
+                  ? t('auth.signUp.success.lawyerMessage', 'You can now start managing your cases and receiving clients.')
+                  : t('auth.signUp.success.clientMessage', 'You can now search for a suitable lawyer for your case.')
+                }
+              </p>
               <div className="bg-slate-50 rounded-2xl p-4 mb-6 text-center">
-                <p className="text-sm text-slate-600 mb-2">تم التسجيل باسم</p>
+                <p className="text-sm text-slate-600 mb-2">{t('auth.signUp.success.registeredAs', 'Registered as')}</p>
                 <p className="font-bold text-[#0f172a]">{formData.firstName} {formData.lastName}</p>
                 <p className="text-sm text-slate-500">{formData.email}</p>
               </div>
-              <a href="/sign-in" className="block w-full py-4 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20 text-center">تسجيل الدخول</a>
-              <p className="text-sm text-slate-500 mt-4">سيتم إرسال رسالة تأكيد على البريد الإلكتروني</p>
+              <a href="/sign-in" className="block w-full py-4 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20 text-center">{t('auth.signUp.success.signIn', 'Sign In')}</a>
+              <p className="text-sm text-slate-500 mt-4">{t('auth.signUp.success.emailConfirmation', 'A confirmation email will be sent')}</p>
             </div>
           </div>
         </div>
@@ -449,56 +641,56 @@ export function SignUpForm() {
 
   if (currentStep === 0) {
     return (
-      <div className="min-h-screen bg-[#F8F9FA]" dir="rtl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      <div className="min-h-screen bg-[#F8F9FA]" dir={isRTL ? 'rtl' : 'ltr'} style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
         <div className="min-h-screen flex items-center justify-center p-6">
           <div className="w-full max-w-xl">
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[#F8F9FA] text-[#0f172a] mb-6"><Icons.TrafliLogo /></div>
-              <h1 className="text-3xl font-bold text-[#0f172a] mb-2">إنشاء حساب جديد</h1>
-              <p className="text-slate-500 text-lg">اختر نوع الحساب</p>
+              <h1 className="text-3xl font-bold text-[#0f172a] mb-2">{t('auth.signUp.step0.title', 'Create New Account')}</h1>
+              <p className="text-slate-500 text-lg">{t('auth.signUp.step0.subtitle', 'Choose account type')}</p>
             </div>
             <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <button onClick={() => { updateField('userType', 'client'); setCurrentStep(1); }} className={`p-6 rounded-2xl border-2 transition-all text-center hover:shadow-md ${formData.userType === 'client' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
                   <div className="w-14 h-14 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 mx-auto mb-4"><Icons.Users /></div>
-                  <h3 className="font-bold text-[#0f172a] mb-1">عميل</h3>
-                  <p className="text-slate-500 text-sm">البحث عن محامٍ</p>
+                  <h3 className="font-bold text-[#0f172a] mb-1">{t('auth.signUp.step0.client', 'Client')}</h3>
+                  <p className="text-slate-500 text-sm">{t('auth.signUp.step0.clientDesc', 'Search for a lawyer')}</p>
                 </button>
                 <button onClick={() => updateField('userType', 'lawyer')} className={`p-6 rounded-2xl border-2 transition-all text-center hover:shadow-md ${formData.userType === 'lawyer' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
                   <div className="w-14 h-14 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 mx-auto mb-4"><Icons.TrafliLogo /></div>
-                  <h3 className="font-bold text-[#0f172a] mb-1">محامي</h3>
-                  <p className="text-slate-500 text-sm">تقديم الخدمات القانونية</p>
+                  <h3 className="font-bold text-[#0f172a] mb-1">{t('auth.signUp.step0.lawyer', 'Lawyer')}</h3>
+                  <p className="text-slate-500 text-sm">{t('auth.signUp.step0.lawyerDesc', 'Provide legal services')}</p>
                 </button>
               </div>
               {formData.userType === 'lawyer' && (
                 <div className="bg-[#F8F9FA] rounded-2xl p-5 border border-slate-100 animate-fadeIn">
-                  <h3 className="font-bold text-[#0f172a] mb-4">نوع الاستخدام</h3>
+                  <h3 className="font-bold text-[#0f172a] mb-4">{t('auth.signUp.step0.usageType', 'Usage Type')}</h3>
                   <div className="space-y-3">
-                    <button onClick={() => { updateField('lawyerMode', 'marketplace'); setCurrentStep(1); }} className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 text-end ${formData.lawyerMode === 'marketplace' ? 'border-emerald-500 bg-white' : 'border-slate-200 hover:border-slate-300 bg-white'}`}>
+                    <button onClick={() => { updateField('lawyerMode', 'marketplace'); setCurrentStep(1); }} className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 ${isRTL ? 'text-end' : 'text-start'} ${formData.lawyerMode === 'marketplace' ? 'border-emerald-500 bg-white' : 'border-slate-200 hover:border-slate-300 bg-white'}`}>
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${formData.lawyerMode === 'marketplace' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}><Icons.Store /></div>
-                      <div className="flex-1"><h4 className="font-bold text-[#0f172a] text-sm">السوق + لوحة التحكم</h4><p className="text-xs text-slate-500">استقبال عملاء جدد وإدارة القضايا</p></div>
+                      <div className="flex-1"><h4 className="font-bold text-[#0f172a] text-sm">{t('auth.signUp.step0.marketplaceDashboard', 'Marketplace + Dashboard')}</h4><p className="text-xs text-slate-500">{t('auth.signUp.step0.marketplaceDashboardDesc', 'Receive new clients and manage cases')}</p></div>
                     </button>
-                    <button onClick={() => updateField('lawyerMode', 'dashboard')} className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 text-end ${formData.lawyerMode === 'dashboard' ? 'border-emerald-500 bg-white' : 'border-slate-200 hover:border-slate-300 bg-white'}`}>
+                    <button onClick={() => updateField('lawyerMode', 'dashboard')} className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 ${isRTL ? 'text-end' : 'text-start'} ${formData.lawyerMode === 'dashboard' ? 'border-emerald-500 bg-white' : 'border-slate-200 hover:border-slate-300 bg-white'}`}>
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${formData.lawyerMode === 'dashboard' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}><Icons.Layout /></div>
-                      <div className="flex-1"><h4 className="font-bold text-[#0f172a] text-sm">لوحة التحكم فقط</h4><p className="text-xs text-slate-500">إدارة القضايا الحالية</p></div>
+                      <div className="flex-1"><h4 className="font-bold text-[#0f172a] text-sm">{t('auth.signUp.step0.dashboardOnly', 'Dashboard Only')}</h4><p className="text-xs text-slate-500">{t('auth.signUp.step0.dashboardOnlyDesc', 'Manage existing cases')}</p></div>
                     </button>
                   </div>
                   {/* Work Mode Selection for Dashboard Lawyers */}
                   {formData.lawyerMode === 'dashboard' && (
                     <div className="mt-4 pt-4 border-t border-slate-200 animate-fadeIn">
-                      <h4 className="font-bold text-[#0f172a] mb-3 text-sm">كيف تريد العمل؟</h4>
+                      <h4 className="font-bold text-[#0f172a] mb-3 text-sm">{t('auth.signUp.step0.howToWork', 'How do you want to work?')}</h4>
                       <div className="space-y-2">
-                        <button onClick={() => { updateField('lawyerWorkMode', 'solo'); setCurrentStep(1); }} className={`w-full p-3 rounded-xl border-2 transition-all flex items-center gap-3 text-end ${formData.lawyerWorkMode === 'solo' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                        <button onClick={() => { updateField('lawyerWorkMode', 'solo'); setCurrentStep(1); }} className={`w-full p-3 rounded-xl border-2 transition-all flex items-center gap-3 ${isRTL ? 'text-end' : 'text-start'} ${formData.lawyerWorkMode === 'solo' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
                           <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${formData.lawyerWorkMode === 'solo' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}><Icons.User /></div>
-                          <div className="flex-1"><h5 className="font-bold text-[#0f172a] text-xs">محامي مستقل</h5><p className="text-xs text-slate-500">العمل بشكل مستقل بدون مكتب</p></div>
+                          <div className="flex-1"><h5 className="font-bold text-[#0f172a] text-xs">{t('auth.signUp.step0.soloLawyer', 'Independent Lawyer')}</h5><p className="text-xs text-slate-500">{t('auth.signUp.step0.soloLawyerDesc', 'Work independently without a firm')}</p></div>
                         </button>
-                        <button onClick={() => { updateField('lawyerWorkMode', 'create_firm'); setCurrentStep(1); }} className={`w-full p-3 rounded-xl border-2 transition-all flex items-center gap-3 text-end ${formData.lawyerWorkMode === 'create_firm' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                        <button onClick={() => { updateField('lawyerWorkMode', 'create_firm'); setCurrentStep(1); }} className={`w-full p-3 rounded-xl border-2 transition-all flex items-center gap-3 ${isRTL ? 'text-end' : 'text-start'} ${formData.lawyerWorkMode === 'create_firm' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
                           <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${formData.lawyerWorkMode === 'create_firm' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}><Icons.Store /></div>
-                          <div className="flex-1"><h5 className="font-bold text-[#0f172a] text-xs">إنشاء مكتب جديد</h5><p className="text-xs text-slate-500">إنشاء مكتب محاماة وإدارة الفريق</p></div>
+                          <div className="flex-1"><h5 className="font-bold text-[#0f172a] text-xs">{t('auth.signUp.step0.createFirm', 'Create New Firm')}</h5><p className="text-xs text-slate-500">{t('auth.signUp.step0.createFirmDesc', 'Create a law firm and manage the team')}</p></div>
                         </button>
-                        <button onClick={() => { updateField('lawyerWorkMode', 'join_firm'); setCurrentStep(1); }} className={`w-full p-3 rounded-xl border-2 transition-all flex items-center gap-3 text-end ${formData.lawyerWorkMode === 'join_firm' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                        <button onClick={() => { updateField('lawyerWorkMode', 'join_firm'); setCurrentStep(1); }} className={`w-full p-3 rounded-xl border-2 transition-all flex items-center gap-3 ${isRTL ? 'text-end' : 'text-start'} ${formData.lawyerWorkMode === 'join_firm' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
                           <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${formData.lawyerWorkMode === 'join_firm' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}><Icons.Users /></div>
-                          <div className="flex-1"><h5 className="font-bold text-[#0f172a] text-xs">الانضمام لمكتب</h5><p className="text-xs text-slate-500">لدي كود دعوة للانضمام لمكتب</p></div>
+                          <div className="flex-1"><h5 className="font-bold text-[#0f172a] text-xs">{t('auth.signUp.step0.joinFirm', 'Join a Firm')}</h5><p className="text-xs text-slate-500">{t('auth.signUp.step0.joinFirmDesc', 'I have an invitation code to join a firm')}</p></div>
                         </button>
                       </div>
                     </div>
@@ -506,7 +698,7 @@ export function SignUpForm() {
                 </div>
               )}
             </div>
-            <p className="text-center text-slate-500 mt-6">لديك حساب بالفعل؟ <a href="/sign-in" className="text-emerald-600 hover:text-emerald-700 font-bold">تسجيل الدخول</a></p>
+            <p className="text-center text-slate-500 mt-6">{t('auth.signUp.step0.haveAccount', 'Already have an account?')} <a href="/sign-in" className="text-emerald-600 hover:text-emerald-700 font-bold">{t('auth.signUp.step0.signIn', 'Sign In')}</a></p>
           </div>
         </div>
         <style>{`@keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } } .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }`}</style>
@@ -588,19 +780,19 @@ export function SignUpForm() {
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-[#0f172a] mb-2">الاسم الأول <span className="text-red-500">*</span></label>
+                      <label className="block text-sm font-medium text-[#0f172a] mb-2">{t('auth.signUp.fields.firstName', 'First Name')} <span className="text-red-500">*</span></label>
                       <input type="text" value={formData.firstName} onChange={(e) => updateField('firstName', e.target.value)} className={`w-full h-12 px-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.firstName ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} />
                       {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-[#0f172a] mb-2">الاسم الأخير <span className="text-red-500">*</span></label>
+                      <label className="block text-sm font-medium text-[#0f172a] mb-2">{t('auth.signUp.fields.lastName', 'Last Name')} <span className="text-red-500">*</span></label>
                       <input type="text" value={formData.lastName} onChange={(e) => updateField('lastName', e.target.value)} className={`w-full h-12 px-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.lastName ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} />
                       {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
                     </div>
                   </div>
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <label className="block text-sm font-medium text-[#0f172a]">اسم المستخدم <span className="text-red-500">*</span></label>
+                      <label className="block text-sm font-medium text-[#0f172a]">{t('auth.signUp.fields.username', 'Username')} <span className="text-red-500">*</span></label>
                       <AvailabilityIndicator status={availability.username} />
                     </div>
                     <div className="relative">
@@ -611,7 +803,7 @@ export function SignUpForm() {
                   </div>
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <label className="block text-sm font-medium text-[#0f172a]">البريد الإلكتروني <span className="text-red-500">*</span></label>
+                      <label className="block text-sm font-medium text-[#0f172a]">{t('auth.signUp.fields.email', 'Email')} <span className="text-red-500">*</span></label>
                       <AvailabilityIndicator status={availability.email} />
                     </div>
                     <div className="relative">
@@ -624,7 +816,7 @@ export function SignUpForm() {
                   {(formData.userType === 'client' || formData.lawyerMode === 'dashboard') && (
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <label className="block text-sm font-medium text-[#0f172a]">رقم الجوال <span className="text-red-500">*</span></label>
+                        <label className="block text-sm font-medium text-[#0f172a]">{t('auth.signUp.fields.phone', 'Phone Number')} <span className="text-red-500">*</span></label>
                         <AvailabilityIndicator status={availability.phone} />
                       </div>
                       <div className="relative">
@@ -637,13 +829,13 @@ export function SignUpForm() {
                   {/* Invitation code field for join_firm mode */}
                   {formData.lawyerWorkMode === 'join_firm' && (
                     <div>
-                      <label className="block text-sm font-medium text-[#0f172a] mb-2">كود الدعوة <span className="text-red-500">*</span></label>
+                      <label className="block text-sm font-medium text-[#0f172a] mb-2">{t('auth.signUp.fields.invitationCode', 'Invitation Code')} <span className="text-red-500">*</span></label>
                       <div className="relative">
                         <div className="absolute end-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Award /></div>
-                        <input type="text" value={formData.invitationCode} onChange={(e) => updateField('invitationCode', e.target.value.toUpperCase())} className={`w-full h-12 pe-12 ps-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.invitationCode ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="أدخل كود الدعوة من المكتب" dir="ltr" style={{ textAlign: 'left' }} />
+                        <input type="text" value={formData.invitationCode} onChange={(e) => updateField('invitationCode', e.target.value.toUpperCase())} className={`w-full h-12 pe-12 ps-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.invitationCode ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder={t('auth.signUp.placeholders.invitationCode', 'Enter invitation code from firm')} dir="ltr" style={{ textAlign: 'left' }} />
                       </div>
                       {errors.invitationCode && <p className="text-red-500 text-xs mt-1">{errors.invitationCode}</p>}
-                      <p className="text-xs text-slate-500 mt-1">يمكنك الحصول على كود الدعوة من مدير المكتب</p>
+                      <p className="text-xs text-slate-500 mt-1">{t('auth.signUp.hints.invitationCode', 'You can get the invitation code from the firm manager')}</p>
                     </div>
                   )}
                 </>
@@ -653,42 +845,42 @@ export function SignUpForm() {
               {currentStep === 2 && (formData.userType === 'client' || formData.lawyerMode === 'dashboard') && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-[#0f172a] mb-2">كلمة المرور <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-medium text-[#0f172a] mb-2">{t('auth.signUp.fields.password', 'Password')} <span className="text-red-500">*</span></label>
                     <div className="relative">
                       <div className="absolute end-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Lock /></div>
                       <input type={showPassword ? 'text' : 'password'} value={formData.password} onChange={(e) => updateField('password', e.target.value)} className={`w-full h-12 pe-12 ps-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.password ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} dir="ltr" style={{ textAlign: 'left' }} />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute start-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600" aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}>{showPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute start-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600" aria-label={showPassword ? t('auth.signUp.hidePassword', 'Hide password') : t('auth.signUp.showPassword', 'Show password')}>{showPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
                     </div>
                     {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
                     <PasswordStrength password={formData.password} className="mt-3" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#0f172a] mb-2">تأكيد كلمة المرور <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-medium text-[#0f172a] mb-2">{t('auth.signUp.fields.confirmPassword', 'Confirm Password')} <span className="text-red-500">*</span></label>
                     <div className="relative">
                       <div className="absolute end-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Lock /></div>
                       <input type={showConfirmPassword ? 'text' : 'password'} value={formData.confirmPassword} onChange={(e) => updateField('confirmPassword', e.target.value)} className={`w-full h-12 pe-12 ps-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.confirmPassword ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} dir="ltr" style={{ textAlign: 'left' }} />
-                      <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute start-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600" aria-label={showConfirmPassword ? 'إخفاء تأكيد كلمة المرور' : 'إظهار تأكيد كلمة المرور'}>{showConfirmPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
+                      <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute start-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600" aria-label={showConfirmPassword ? t('auth.signUp.hideConfirmPassword', 'Hide confirm password') : t('auth.signUp.showConfirmPassword', 'Show confirm password')}>{showConfirmPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
                     </div>
                     {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#0f172a] mb-2">الجنسية <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-medium text-[#0f172a] mb-2">{t('auth.signUp.fields.nationality', 'Nationality')} <span className="text-red-500">*</span></label>
                     <select value={formData.nationality} onChange={(e) => updateField('nationality', e.target.value)} className={`w-full h-12 px-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none appearance-none ${errors.nationality ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}>
-                      <option value="">اختر</option>
-                      {NATIONALITIES.map(n => <option key={n} value={n}>{n}</option>)}
+                      <option value="">{t('auth.signUp.select', 'Select')}</option>
+                      {NATIONALITIES.map(n => <option key={n.value} value={n.value}>{isRTL ? n.labelAr : n.labelEn}</option>)}
                     </select>
                     {errors.nationality && <p className="text-red-500 text-xs mt-1">{errors.nationality}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#0f172a] mb-2">المنطقة <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-medium text-[#0f172a] mb-2">{t('auth.signUp.fields.region', 'Region')} <span className="text-red-500">*</span></label>
                     <select value={formData.region} onChange={(e) => updateField('region', e.target.value)} className={`w-full h-12 px-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none appearance-none ${errors.region ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}>
-                      <option value="">اختر</option>
-                      {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
+                      <option value="">{t('auth.signUp.select', 'Select')}</option>
+                      {REGIONS.map(r => <option key={r.value} value={r.value}>{isRTL ? r.labelAr : r.labelEn}</option>)}
                     </select>
                     {errors.region && <p className="text-red-500 text-xs mt-1">{errors.region}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#0f172a] mb-2">المدينة <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-medium text-[#0f172a] mb-2">{t('auth.signUp.fields.city', 'City')} <span className="text-red-500">*</span></label>
                     <input type="text" value={formData.city} onChange={(e) => updateField('city', e.target.value)} className={`w-full h-12 px-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none ${errors.city ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} />
                     {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
                   </div>
