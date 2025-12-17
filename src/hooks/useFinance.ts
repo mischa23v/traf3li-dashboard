@@ -6,7 +6,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Analytics } from '@/lib/analytics'
+import apiClient from '@/lib/api'
+import { useAuthStore } from '@/stores/auth-store'
 import financeService, {
+  Invoice,
   InvoiceFilters,
   ExpenseFilters,
   TimeEntryFilters,
@@ -131,6 +134,43 @@ export const useOverdueInvoices = () => {
     queryFn: () => financeService.getOverdueInvoices(),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
+  })
+}
+
+// ==================== AGGREGATED INVOICES WITH STATS ====================
+// Single API call for invoices list + overdue stats
+
+export interface InvoicesWithStats {
+  invoices: Invoice[]
+  stats: {
+    total: number
+    paid: number
+    pending: number
+    overdue: number
+    overdueAmount: number
+  }
+  pagination: {
+    page: number
+    limit: number
+    total: number
+  }
+}
+
+export const useInvoicesWithStats = (filters: InvoiceFilters = {}) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  return useQuery<InvoicesWithStats>({
+    queryKey: ['invoices', 'with-stats', filters],
+    queryFn: async () => {
+      const response = await apiClient.get('/invoices', {
+        params: { ...filters, includeStats: true }
+      })
+      return response.data
+    },
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+    enabled: isAuthenticated,
+    retry: false,
   })
 }
 
@@ -794,6 +834,69 @@ export const usePaymentsSummary = (filters?: any) => {
     queryFn: () => financeService.getPaymentsSummary(filters),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
+  })
+}
+
+// ==================== AGGREGATED PAYMENTS WITH SUMMARY ====================
+// Single API call for payments list + summary stats
+
+export interface PaymentsWithSummary {
+  payments: Payment[]
+  summary: {
+    totalReceived: number
+    totalPending: number
+    totalOverdue: number
+    countByStatus: {
+      completed: number
+      pending: number
+      failed: number
+    }
+  }
+  pagination: {
+    page: number
+    limit: number
+    total: number
+  }
+}
+
+export interface PaymentFilters {
+  page?: number
+  limit?: number
+  status?: string
+  startDate?: string
+  endDate?: string
+  clientId?: string
+  invoiceId?: string
+}
+
+export interface Payment {
+  _id: string
+  amount: number
+  method: string
+  status: string
+  date: string
+  invoiceId?: string
+  clientId?: string
+  notes?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export const usePaymentsWithSummary = (filters: PaymentFilters = {}) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  return useQuery<PaymentsWithSummary>({
+    queryKey: ['payments', 'with-summary', filters],
+    queryFn: async () => {
+      const response = await apiClient.get('/payments', {
+        params: { ...filters, includeSummary: true }
+      })
+      return response.data
+    },
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+    enabled: isAuthenticated,
+    retry: false,
   })
 }
 
@@ -1733,5 +1836,40 @@ export const useDuplicateRecurringInvoice = () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
       return await queryClient.invalidateQueries({ queryKey: ['recurringInvoices'], refetchType: 'all' })
     },
+  })
+}
+
+// ==================== AGGREGATED FINANCIAL OVERVIEW ====================
+// Single API call for accounts dashboard - replaces 4 separate calls
+
+export interface FinancialOverviewData {
+  accountBalance: {
+    total: number
+    available: number
+    pending: number
+  }
+  transactionSummary: {
+    income: number
+    expenses: number
+    net: number
+  }
+  recentTransactions: any[]
+  pendingInvoices: any[]
+}
+
+export const useFinancialOverview = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  return useQuery<FinancialOverviewData>({
+    queryKey: ['finance', 'overview'],
+    queryFn: async () => {
+      const response = await apiClient.get('/finance/overview')
+      return response.data
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    enabled: isAuthenticated,
+    retry: false,
+    refetchOnWindowFocus: false,
   })
 }

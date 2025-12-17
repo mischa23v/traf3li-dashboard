@@ -20,6 +20,8 @@ import tasksService, {
   TaskDocument,
   Attachment,
 } from '@/services/tasksService'
+import { apiClient } from '@/lib/api'
+import { useAuthStore } from '@/stores/auth'
 
 // ==================== Cache Configuration ====================
 // Cache data for 30 minutes to reduce API calls
@@ -1449,5 +1451,33 @@ export const useDeleteVoiceMemo = () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
       return await queryClient.invalidateQueries({ queryKey: ['tasks', taskId], refetchType: 'all' })
     },
+  })
+}
+
+// ==================== AGGREGATED TASK DETAILS ====================
+// Single API call for task + time tracking + documents
+
+export interface TaskWithRelated {
+  task: Task
+  timeTracking: {
+    totalHours: number
+    entries: any[]
+  }
+  documents: any[]
+}
+
+export const useTaskWithRelated = (taskId: string | null) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  return useQuery<TaskWithRelated>({
+    queryKey: ['tasks', 'full', taskId],
+    queryFn: async () => {
+      const response = await apiClient.get(`/tasks/${taskId}/full`)
+      return response.data
+    },
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+    enabled: isAuthenticated && !!taskId,
+    retry: false,
   })
 }

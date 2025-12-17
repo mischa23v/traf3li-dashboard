@@ -197,7 +197,7 @@ export function useLeanBanks() {
     },
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -211,7 +211,7 @@ export function useLeanCustomers() {
     },
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -226,7 +226,7 @@ export function useLeanCustomer(customerId: string) {
     enabled: !!customerId,
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -259,7 +259,7 @@ export function useLeanCustomerToken(customerId: string) {
     enabled: !!customerId,
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -274,7 +274,7 @@ export function useLeanEntities(customerId: string) {
     enabled: !!customerId,
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -289,7 +289,7 @@ export function useLeanTransactions(accountId: string, params?: { page?: number;
     enabled: !!accountId,
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -304,7 +304,7 @@ export function useLeanBalance(accountId: string) {
     enabled: !!accountId,
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -340,7 +340,7 @@ export function useWPSFiles(params?: { page?: number; limit?: number; status?: s
     },
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -355,7 +355,7 @@ export function useWPSFile(fileId: string) {
     enabled: !!fileId,
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -369,7 +369,7 @@ export function useSARIEBanks() {
     },
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -445,7 +445,7 @@ export function useSADADBillers(category?: string) {
     },
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -460,7 +460,7 @@ export function useSearchSADADBillers(query: string) {
     enabled: query.length > 2,
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -509,7 +509,7 @@ export function useSADADPayments(params?: { fromDate?: string; toDate?: string; 
     },
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -524,7 +524,7 @@ export function useSADADPayment(paymentId: string) {
     enabled: !!paymentId,
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -598,7 +598,7 @@ export function useMudadPayrolls(params?: { page?: number; limit?: number; month
     },
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -612,6 +612,6 @@ export function useMudadCompliance() {
     },
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }

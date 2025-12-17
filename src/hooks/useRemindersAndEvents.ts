@@ -8,11 +8,15 @@ import { toast } from 'sonner'
 import remindersService, {
   ReminderFilters,
   CreateReminderData,
+  Reminder,
 } from '@/services/remindersService'
 import eventsService, {
   EventFilters,
   CreateEventData,
+  Event,
 } from '@/services/eventsService'
+import { useAuthStore } from '@/stores/authStore'
+import { apiClient } from '@/lib/apiClient'
 
 // ==================== Cache Configuration ====================
 // Cache data for 30 minutes to reduce API calls
@@ -710,5 +714,73 @@ export const useBulkCancelEvents = () => {
       await queryClient.invalidateQueries({ queryKey: ['events'] })
       await queryClient.invalidateQueries({ queryKey: ['calendar'] })
     },
+  })
+}
+
+// ==================== AGGREGATED EVENTS WITH STATS ====================
+// Single API call for events list + stats
+
+export interface EventsWithStats {
+  events: Event[]
+  stats: {
+    total: number
+    upcoming: number
+    past: number
+    today: number
+    byType: {
+      meeting: number
+      session: number
+      deadline: number
+    }
+  }
+}
+
+export const useEventsWithStats = (filters: EventFilters = {}) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  return useQuery<EventsWithStats>({
+    queryKey: ['events', 'with-stats', filters],
+    queryFn: async () => {
+      const response = await apiClient.get('/events', {
+        params: { ...filters, includeStats: true }
+      })
+      return response.data
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    enabled: isAuthenticated,
+    retry: false,
+  })
+}
+
+// ==================== AGGREGATED REMINDERS WITH STATS ====================
+// Single API call for reminders list + stats
+
+export interface RemindersWithStats {
+  reminders: Reminder[]
+  stats: {
+    total: number
+    pending: number
+    completed: number
+    snoozed: number
+    overdue: number
+  }
+}
+
+export const useRemindersWithStats = (filters: ReminderFilters = {}) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  return useQuery<RemindersWithStats>({
+    queryKey: ['reminders', 'with-stats', filters],
+    queryFn: async () => {
+      const response = await apiClient.get('/reminders', {
+        params: { ...filters, includeStats: true }
+      })
+      return response.data
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    enabled: isAuthenticated,
+    retry: false,
   })
 }

@@ -24,6 +24,8 @@ import {
   type HiringNeedsForecastData,
   type PromotionReadinessData
 } from '@/services/hrAnalyticsService'
+import { useAuthStore } from '@/store/authStore'
+import { apiClient } from '@/lib/apiClient'
 
 // ═══════════════════════════════════════════════════════════════
 // WORKFORCE ANALYTICS HOOKS
@@ -449,5 +451,36 @@ export const useRecalculatePredictions = () => {
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إعادة الحساب')
     },
+  })
+}
+
+// ==================== AGGREGATED HR ANALYTICS DASHBOARD ====================
+// Single API call for all HR analytics - replaces 8 separate calls
+
+export interface HRAnalyticsDashboardData {
+  workforce: any
+  headcountTrends: any
+  departmentBreakdown: any
+  tenureDistribution: any
+  attendanceAnalytics: any
+  payrollAnalytics: any
+  performanceAnalytics: any
+  diversityAnalytics: any
+}
+
+export const useHRAnalyticsDashboard = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  return useQuery<HRAnalyticsDashboardData>({
+    queryKey: ['hr', 'analytics', 'dashboard'],
+    queryFn: async () => {
+      const response = await apiClient.get('/hr/analytics/dashboard')
+      return response.data
+    },
+    staleTime: 10 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    enabled: isAuthenticated,
+    retry: false,
+    refetchOnWindowFocus: false,
   })
 }

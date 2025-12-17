@@ -5,7 +5,10 @@
 
 import { useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
 import { useCallback } from 'react'
-import calendarService, { CalendarFilters, ListFilters } from '@/services/calendarService'
+import calendarService, { CalendarFilters, ListFilters, CalendarEvent } from '@/services/calendarService'
+import { Reminder } from '@/services/remindersService'
+import { apiClientNoVersion as apiClient } from '@/lib/api'
+import { useAuthStore } from '@/stores/auth-store'
 
 // ==================== Cache Configuration ====================
 // Cache data for 30 minutes to reduce API calls
@@ -23,7 +26,7 @@ export const useCalendar = (filters: CalendarFilters, enabled: boolean = true) =
     staleTime: CALENDAR_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
     enabled: enabled && !!(filters.startDate && filters.endDate),
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -37,7 +40,7 @@ export const useCalendarByDate = (date: string, enabled: boolean = true) => {
     staleTime: CALENDAR_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
     enabled: enabled && !!date,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -51,7 +54,7 @@ export const useCalendarByMonth = (year: number, month: number, enabled: boolean
     staleTime: CALENDAR_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
     enabled: enabled && !!(year && month),
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -65,7 +68,7 @@ export const useUpcomingCalendar = (days: number = 7, enabled: boolean = true) =
     staleTime: CALENDAR_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
     enabled,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -79,7 +82,7 @@ export const useOverdueCalendar = (enabled: boolean = true) => {
     staleTime: CALENDAR_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
     enabled,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -96,7 +99,7 @@ export const useCalendarStats = (filters?: {
     staleTime: CALENDAR_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
     enabled,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -172,7 +175,7 @@ export const useCalendarGridSummary = (
     staleTime: GRID_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
     enabled: enabled && !!(filters.startDate && filters.endDate),
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -190,7 +193,7 @@ export const useCalendarGridItems = (
     staleTime: GRID_ITEMS_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
     enabled: enabled && !!(filters.startDate && filters.endDate),
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -209,7 +212,7 @@ export const useCalendarItemDetails = (
     staleTime: ITEM_DETAILS_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
     enabled: enabled && !!type && !!id,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -231,7 +234,7 @@ export const useCalendarList = (
     staleTime: LIST_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
     enabled,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -291,4 +294,38 @@ export const usePrefetchAdjacentMonthsOptimized = (currentDate: Date) => {
   }, [currentDate, prefetchMonth])
 
   return { prefetchPrevMonth, prefetchNextMonth }
+}
+
+// ==================== Sidebar Data Hook ====================
+
+// Sidebar data - combines calendar and reminders for sidebar components
+export interface SidebarData {
+  calendarEvents: CalendarEvent[]
+  upcomingReminders: Reminder[]
+}
+
+export const useSidebarData = (isEnabled = true) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const today = new Date()
+  const endDate = new Date(today)
+  endDate.setDate(endDate.getDate() + 5)
+
+  return useQuery<SidebarData>({
+    queryKey: ['sidebar', 'data', today.toISOString().split('T')[0]],
+    queryFn: async () => {
+      const response = await apiClient.get('/calendar/sidebar-data', {
+        params: {
+          startDate: today.toISOString(),
+          endDate: endDate.toISOString(),
+          reminderDays: 7
+        }
+      })
+      return response.data
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    enabled: isAuthenticated && isEnabled,
+    retry: false,
+    refetchOnWindowFocus: false,
+  })
 }

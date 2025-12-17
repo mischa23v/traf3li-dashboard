@@ -537,7 +537,7 @@ export const useLeadScoringConfig = (enabled: boolean = true) => {
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
     enabled,
-    retry: 1,
+    retry: false,
   })
 }
 

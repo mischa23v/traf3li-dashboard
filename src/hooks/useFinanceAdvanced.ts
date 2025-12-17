@@ -38,7 +38,7 @@ export const useBankFeeds = (filters?: BankFeedFilters) => {
     queryFn: () => bankFeedService.getFeeds(filters),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -449,7 +449,7 @@ export const useCurrencySettings = () => {
     queryFn: () => currencyService.getSettings(),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 

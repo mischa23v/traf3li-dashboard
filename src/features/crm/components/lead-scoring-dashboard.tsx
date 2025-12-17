@@ -72,7 +72,7 @@ export function LeadScoringDashboard() {
     queryKey: ['lead-scores', filters],
     queryFn: () => leadScoringService.getScores(filters),
     staleTime: 2 * 60 * 1000,
-    retry: 1,
+    retry: false,
   })
 
   // Fetch distribution
@@ -80,7 +80,7 @@ export function LeadScoringDashboard() {
     queryKey: ['lead-score-distribution'],
     queryFn: () => leadScoringService.getDistribution(),
     staleTime: 5 * 60 * 1000,
-    retry: 1,
+    retry: false,
   })
 
   // Calculate all scores mutation
