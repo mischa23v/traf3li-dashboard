@@ -220,30 +220,55 @@ export function FullCalendarView() {
   // Prefetch adjacent months for smoother navigation (using optimized endpoints)
   const { prefetchPrevMonth, prefetchNextMonth } = usePrefetchAdjacentMonthsOptimized(currentDate)
 
-  // Attach hover listeners to navigation buttons for prefetching
+  // Store refs to avoid re-querying DOM and to have stable references for cleanup
+  const prevBtnRef = useRef<Element | null>(null)
+  const nextBtnRef = useRef<Element | null>(null)
+  const prefetchPrevRef = useRef(prefetchPrevMonth)
+  const prefetchNextRef = useRef(prefetchNextMonth)
+
+  // Update refs when prefetch functions change (without triggering DOM queries)
   useEffect(() => {
-    const wrapper = document.querySelector('.fullcalendar-wrapper')
-    if (!wrapper) return
+    prefetchPrevRef.current = prefetchPrevMonth
+    prefetchNextRef.current = prefetchNextMonth
+  }, [prefetchPrevMonth, prefetchNextMonth])
 
-    const prevBtn = wrapper.querySelector('.fc-prev-button')
-    const nextBtn = wrapper.querySelector('.fc-next-button')
+  // Attach hover listeners to navigation buttons for prefetching
+  // Use requestIdleCallback to avoid forced reflow during render
+  useEffect(() => {
+    const attachListeners = () => {
+      const wrapper = document.querySelector('.fullcalendar-wrapper')
+      if (!wrapper) return
 
-    if (prevBtn) {
-      prevBtn.addEventListener('mouseenter', prefetchPrevMonth)
+      const prevBtn = wrapper.querySelector('.fc-prev-button')
+      const nextBtn = wrapper.querySelector('.fc-next-button')
+
+      // Wrapper functions that use refs - stable references, always call current prefetch
+      const handlePrevHover = () => prefetchPrevRef.current()
+      const handleNextHover = () => prefetchNextRef.current()
+
+      if (prevBtn && prevBtn !== prevBtnRef.current) {
+        prevBtnRef.current = prevBtn
+        prevBtn.addEventListener('mouseenter', handlePrevHover)
+      }
+      if (nextBtn && nextBtn !== nextBtnRef.current) {
+        nextBtnRef.current = nextBtn
+        nextBtn.addEventListener('mouseenter', handleNextHover)
+      }
     }
-    if (nextBtn) {
-      nextBtn.addEventListener('mouseenter', prefetchNextMonth)
-    }
+
+    // Defer DOM queries to avoid forced reflow
+    const idleCallback = 'requestIdleCallback' in window
+      ? (window as any).requestIdleCallback(attachListeners, { timeout: 100 })
+      : setTimeout(attachListeners, 0)
 
     return () => {
-      if (prevBtn) {
-        prevBtn.removeEventListener('mouseenter', prefetchPrevMonth)
-      }
-      if (nextBtn) {
-        nextBtn.removeEventListener('mouseenter', prefetchNextMonth)
+      if ('cancelIdleCallback' in window) {
+        (window as any).cancelIdleCallback(idleCallback)
+      } else {
+        clearTimeout(idleCallback)
       }
     }
-  }, [prefetchPrevMonth, prefetchNextMonth])
+  }, []) // Empty deps - only run once, refs handle updates
 
   // Transform grid items to FullCalendar format
   // Much simpler now - backend returns minimal data with color already included
