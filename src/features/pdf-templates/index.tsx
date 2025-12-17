@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { Plus, Upload, Download, Search, Bell, FileText, Layers, CheckCircle2, Calendar } from 'lucide-react'
+import { Plus, Upload, Download, Search, Bell, FileText, Layers, CheckCircle2, Calendar, Loader2 } from 'lucide-react'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
@@ -19,9 +19,21 @@ import { usePdfmeTemplates } from '@/hooks/usePdfme'
 import { PdfTemplatesProvider, usePdfTemplatesContext } from './components/template-provider'
 import { PdfTemplatesTable } from './components/template-table'
 import { TemplateViewDialog, TemplateDeleteDialog, TemplateDuplicateDialog, TemplatePreviewDialog } from './components/template-dialogs'
-import { PdfDesigner } from './components/pdf-designer'
 import { SettingsSidebar } from '../settings/components/settings-sidebar'
 import type { PdfmeTemplateCategory } from '@/services/pdfmeService'
+
+// Lazy load the PDF Designer - it's ~6MB and only needed when user opens designer
+const PdfDesigner = lazy(() => import('./components/pdf-designer').then(mod => ({ default: mod.PdfDesigner })))
+
+// Loading fallback for the designer
+function DesignerLoadingFallback() {
+  return (
+    <div className="flex flex-col items-center justify-center h-full gap-4">
+      <Loader2 className="h-12 w-12 animate-spin text-brand-blue" />
+      <p className="text-lg text-slate-600">جاري تحميل محرر PDF...</p>
+    </div>
+  )
+}
 
 function PdfTemplatesContent() {
   const { t, i18n } = useTranslation()
@@ -286,18 +298,20 @@ function PdfTemplatesContent() {
       <TemplateDuplicateDialog />
       <TemplatePreviewDialog />
 
-      {/* PDF Designer Modal - Full Screen */}
+      {/* PDF Designer Modal - Full Screen (Lazy Loaded) */}
       <Dialog open={designerOpen} onOpenChange={setDesignerOpen}>
         <DialogContent className="max-w-[95vw] h-[95vh] p-0">
-          <PdfDesigner
-            template={currentTemplate ? {
-              basePdf: currentTemplate.basePdf,
-              schemas: currentTemplate.schemas,
-            } : undefined}
-            onSave={handleSaveTemplate}
-            onCancel={handleCloseDesigner}
-            lang={i18n.language === 'ar' ? 'ar' : 'en'}
-          />
+          <Suspense fallback={<DesignerLoadingFallback />}>
+            <PdfDesigner
+              template={currentTemplate ? {
+                basePdf: currentTemplate.basePdf,
+                schemas: currentTemplate.schemas,
+              } : undefined}
+              onSave={handleSaveTemplate}
+              onCancel={handleCloseDesigner}
+              lang={i18n.language === 'ar' ? 'ar' : 'en'}
+            />
+          </Suspense>
         </DialogContent>
       </Dialog>
     </>

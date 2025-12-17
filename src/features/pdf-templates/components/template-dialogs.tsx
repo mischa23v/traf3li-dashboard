@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { lazy, Suspense } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -38,10 +39,12 @@ import {
   useDeletePdfmeTemplate,
   useClonePdfmeTemplate,
 } from '@/hooks/usePdfme'
-import { PdfViewer } from './pdf-viewer'
 import { templateCategories, templateTypes } from '../data/data'
 import { useTranslation } from 'react-i18next'
-import { Check, X } from 'lucide-react'
+import { Check, X, Loader2 } from 'lucide-react'
+
+// Lazy load PdfViewer - it imports @pdfme/ui (~6MB)
+const PdfViewer = lazy(() => import('./pdf-viewer').then(mod => ({ default: mod.PdfViewer })))
 
 const duplicateFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -343,14 +346,21 @@ export function TemplatePreviewDialog() {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           ) : templateData ? (
-            <PdfViewer
-              template={{
-                basePdf: templateData.basePdf,
-                schemas: templateData.schemas,
-              }}
-              inputs={sampleInputs}
-              lang={isRTL ? 'ar' : 'en'}
-            />
+            <Suspense fallback={
+              <div className="flex flex-col items-center justify-center h-full gap-4">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <p className="text-muted-foreground">{t('pdfTemplates.loadingViewer', 'جاري تحميل العارض...')}</p>
+              </div>
+            }>
+              <PdfViewer
+                template={{
+                  basePdf: templateData.basePdf,
+                  schemas: templateData.schemas,
+                }}
+                inputs={sampleInputs}
+                lang={isRTL ? 'ar' : 'en'}
+              />
+            </Suspense>
           ) : (
             <div className="flex items-center justify-center h-full text-muted-foreground">
               {t('pdfTemplates.noPreviewAvailable')}
