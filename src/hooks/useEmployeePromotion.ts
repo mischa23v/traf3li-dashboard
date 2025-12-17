@@ -22,7 +22,7 @@ export const usePromotions = (filters?: PromotionFilters) => {
     queryFn: () => employeePromotionService.getPromotions(filters),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -36,7 +36,7 @@ export const usePromotion = (id: string) => {
     enabled: !!id,
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -53,7 +53,7 @@ export const usePromotionStats = (filters?: {
     queryFn: () => employeePromotionService.getPromotionStats(filters),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -66,7 +66,7 @@ export const usePendingPromotions = () => {
     queryFn: () => employeePromotionService.getPendingPromotions(),
     staleTime: 2 * 60 * 1000,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -79,7 +79,7 @@ export const usePromotionsAwaitingApplication = () => {
     queryFn: () => employeePromotionService.getPromotionsAwaitingApplication(),
     staleTime: 2 * 60 * 1000,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -93,7 +93,7 @@ export const usePromotionHistory = (employeeId: string) => {
     enabled: !!employeeId,
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -110,7 +110,7 @@ export const useEmployeePromotions = (
     enabled: !!employeeId,
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 

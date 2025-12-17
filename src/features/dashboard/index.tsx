@@ -51,6 +51,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { StatCard } from '@/components/stat-card'
 import {
+  useDashboardSummary,
   useTodayEvents,
   useFinancialSummary,
   useRecentMessages,
@@ -139,21 +140,39 @@ export function Dashboard() {
   const isAnalyticsTab = activeTab === 'analytics'
   const isReportsTab = activeTab === 'reports'
 
-  // Performance optimization: Defer secondary API calls
-  // Phase 1 (immediate): Hero stats (4 calls) - critical for above-fold content
-  // Phase 2 (deferred 150ms): Overview tab data (3 calls) - below-fold content
-  const shouldLoadOverviewData = isSecondaryDataReady && isOverviewTab
+  // ==================== GOLD STANDARD: Single API call for all dashboard data ====================
+  // This replaces 7 separate API calls with 1 aggregated call
+  // Falls back to individual hooks if the /dashboard/summary endpoint is not yet available
+  const { data: dashboardSummary, isLoading: summaryLoading, isError: summaryError } = useDashboardSummary()
 
-  // Fetch stats for hero card (IMMEDIATE - always needed for top stats)
-  const { data: caseStats, isFetching: caseStatsFetching } = useCaseStatisticsFromAPI()
-  const { data: taskStats, isFetching: taskStatsFetching } = useTaskStats()
-  const { data: messageStats, isFetching: messageStatsFetching } = useMessageStats()
-  const { data: reminderStats, isFetching: reminderStatsFetching } = useReminderStats()
+  // Use aggregated data if available, otherwise fall back to individual hooks
+  const useFallbackHooks = summaryError || !dashboardSummary
 
-  // Fetch overview tab data (DEFERRED - load after 150ms to prevent blocking)
-  const { data: todayEvents, isLoading: eventsLoading, isFetching: eventsFetching } = useTodayEvents(shouldLoadOverviewData)
-  const { data: financialSummary, isLoading: financialLoading, isFetching: financialFetching } = useFinancialSummary(shouldLoadOverviewData)
-  const { data: recentMessages, isLoading: messagesLoading, isFetching: messagesFetching } = useRecentMessages(3, shouldLoadOverviewData)
+  // Fallback hooks - only enabled if summary endpoint fails or returns no data
+  const { data: caseStatsFallback, isFetching: caseStatsFetching } = useCaseStatisticsFromAPI()
+  const { data: taskStatsFallback, isFetching: taskStatsFetching } = useTaskStats()
+  const { data: messageStatsFallback, isFetching: messageStatsFetching } = useMessageStats()
+  const { data: reminderStatsFallback, isFetching: reminderStatsFetching } = useReminderStats()
+
+  // Overview tab data - only fetch via fallback if summary not available
+  const shouldLoadOverviewData = useFallbackHooks && isSecondaryDataReady && isOverviewTab
+  const { data: todayEventsFallback, isLoading: eventsLoadingFallback, isFetching: eventsFetching } = useTodayEvents(shouldLoadOverviewData)
+  const { data: financialSummaryFallback, isLoading: financialLoadingFallback, isFetching: financialFetching } = useFinancialSummary(shouldLoadOverviewData)
+  const { data: recentMessagesFallback, isLoading: messagesLoadingFallback, isFetching: messagesFetching } = useRecentMessages(3, shouldLoadOverviewData)
+
+  // Resolve data: prefer summary, fallback to individual hooks
+  const caseStats = dashboardSummary?.caseStats || caseStatsFallback
+  const taskStats = dashboardSummary?.taskStats || taskStatsFallback
+  const messageStats = dashboardSummary?.messageStats || messageStatsFallback
+  const reminderStats = dashboardSummary?.reminderStats || reminderStatsFallback
+  const todayEvents = dashboardSummary?.todayEvents || todayEventsFallback
+  const financialSummary = dashboardSummary?.financialSummary || financialSummaryFallback
+  const recentMessages = dashboardSummary?.recentMessages || recentMessagesFallback
+
+  // Loading states
+  const eventsLoading = summaryLoading || eventsLoadingFallback
+  const financialLoading = summaryLoading || financialLoadingFallback
+  const messagesLoading = summaryLoading || messagesLoadingFallback
 
   // Fetch analytics data (only when analytics tab is active)
   const { data: crmStats, isLoading: crmLoading } = useCRMStats(isAnalyticsTab)
@@ -169,49 +188,47 @@ export function Dashboard() {
 
   // ==================== PERFORMANCE: Track API call completion ====================
   useEffect(() => {
-    if (caseStats) perfLog('API LOADED: caseStats', { count: caseStats?.active })
-  }, [caseStats])
+    if (dashboardSummary) {
+      perfLog('API LOADED: dashboardSummary (GOLD STANDARD - 1 call)', {
+        caseStats: dashboardSummary.caseStats?.active,
+        taskStats: dashboardSummary.taskStats?.total,
+        messageStats: dashboardSummary.messageStats?.unreadMessages,
+        reminderStats: dashboardSummary.reminderStats?.byStatus?.pending,
+        events: dashboardSummary.todayEvents?.length,
+        messages: dashboardSummary.recentMessages?.length,
+      })
+    }
+  }, [dashboardSummary])
+
+  // Fallback tracking (only logs if using fallback hooks)
+  useEffect(() => {
+    if (useFallbackHooks && caseStatsFallback) perfLog('FALLBACK API: caseStats', { count: caseStatsFallback?.active })
+  }, [useFallbackHooks, caseStatsFallback])
 
   useEffect(() => {
-    if (taskStats) perfLog('API LOADED: taskStats', { total: taskStats?.total })
-  }, [taskStats])
-
-  useEffect(() => {
-    if (messageStats) perfLog('API LOADED: messageStats', { unread: messageStats?.unreadMessages })
-  }, [messageStats])
-
-  useEffect(() => {
-    if (reminderStats) perfLog('API LOADED: reminderStats', { pending: reminderStats?.byStatus?.pending })
-  }, [reminderStats])
-
-  useEffect(() => {
-    if (todayEvents) perfLog('API LOADED: todayEvents (DEFERRED)', { count: todayEvents?.length })
-  }, [todayEvents])
-
-  useEffect(() => {
-    if (financialSummary) perfLog('API LOADED: financialSummary (DEFERRED)', financialSummary)
-  }, [financialSummary])
-
-  useEffect(() => {
-    if (recentMessages) perfLog('API LOADED: recentMessages (DEFERRED)', { count: recentMessages?.length })
-  }, [recentMessages])
+    if (useFallbackHooks && taskStatsFallback) perfLog('FALLBACK API: taskStats', { total: taskStatsFallback?.total })
+  }, [useFallbackHooks, taskStatsFallback])
 
   // Log current fetching status
   useEffect(() => {
-    const fetchingStatus = {
-      caseStats: caseStatsFetching,
-      taskStats: taskStatsFetching,
-      messageStats: messageStatsFetching,
-      reminderStats: reminderStatsFetching,
-      events: eventsFetching,
-      financial: financialFetching,
-      messages: messagesFetching,
+    if (summaryLoading) {
+      perfLog('FETCHING: dashboardSummary (single call)')
+    } else if (useFallbackHooks) {
+      const fetchingStatus = {
+        caseStats: caseStatsFetching,
+        taskStats: taskStatsFetching,
+        messageStats: messageStatsFetching,
+        reminderStats: reminderStatsFetching,
+        events: eventsFetching,
+        financial: financialFetching,
+        messages: messagesFetching,
+      }
+      const activeFetches = Object.entries(fetchingStatus).filter(([, v]) => v).map(([k]) => k)
+      if (activeFetches.length > 0) {
+        perfLog('FALLBACK FETCHING:', activeFetches)
+      }
     }
-    const activeFetches = Object.entries(fetchingStatus).filter(([, v]) => v).map(([k]) => k)
-    if (activeFetches.length > 0) {
-      perfLog('Currently FETCHING:', activeFetches)
-    }
-  }, [caseStatsFetching, taskStatsFetching, messageStatsFetching, reminderStatsFetching, eventsFetching, financialFetching, messagesFetching])
+  }, [summaryLoading, useFallbackHooks, caseStatsFetching, taskStatsFetching, messageStatsFetching, reminderStatsFetching, eventsFetching, financialFetching, messagesFetching])
   // ==================== END PERFORMANCE TRACKING ====================
 
   // Calculate counts for hero stat cards

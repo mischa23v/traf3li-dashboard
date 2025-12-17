@@ -7,6 +7,45 @@
 import apiClient, { handleApiError } from '@/lib/api'
 
 /**
+ * Dashboard Summary Interface - Aggregated dashboard data in ONE call
+ * This is the gold standard: 1 API call instead of 7
+ */
+export interface DashboardSummary {
+  caseStats: {
+    total: number
+    active: number
+    closed: number
+    pending: number
+  }
+  taskStats: {
+    total: number
+    byStatus: {
+      todo: number
+      in_progress: number
+      completed: number
+      cancelled: number
+    }
+  }
+  messageStats: {
+    unreadMessages: number
+    unreadConversations: number
+    totalConversations: number
+    totalMessages: number
+  }
+  reminderStats: {
+    total: number
+    byStatus: {
+      pending: number
+      completed: number
+      snoozed: number
+    }
+  }
+  todayEvents: DashboardEvent[]
+  financialSummary: DashboardFinancialSummary
+  recentMessages: DashboardRecentMessage[]
+}
+
+/**
  * Backend Hero Stats Response
  */
 export interface DashboardHeroStatsResponse {
@@ -201,6 +240,21 @@ export const getDashboardHeroStats = async (): Promise<DashboardHeroStats> => {
       urgentTasks: stats.tasks?.active || 0,
       newMessages: stats.orders?.active || 0,
     }
+  } catch (error) {
+    throw handleApiError(error)
+  }
+}
+
+/**
+ * Get Dashboard Summary - AGGREGATED ENDPOINT (Gold Standard)
+ * Single API call returns all dashboard data
+ * Replaces 7 separate API calls with 1
+ * GET /dashboard/summary
+ */
+export const getDashboardSummary = async (): Promise<DashboardSummary> => {
+  try {
+    const response = await apiClient.get('/dashboard/summary')
+    return response.data
   } catch (error) {
     throw handleApiError(error)
   }
@@ -509,6 +563,7 @@ export const getPendingDocuments = async (): Promise<PendingDocumentsResponse> =
 const dashboardService = {
   getDashboardStats,
   getDashboardHeroStats,
+  getDashboardSummary,
   getTodayEvents,
   getFinancialSummary,
   getRecentMessages,

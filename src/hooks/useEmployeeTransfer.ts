@@ -36,7 +36,7 @@ export const useEmployeeTransfers = (filters?: EmployeeTransferFilters) => {
     queryFn: () => employeeTransferService.getTransfers(filters),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -47,7 +47,7 @@ export const useEmployeeTransfer = (id: string) => {
     enabled: !!id,
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -57,7 +57,7 @@ export const useEmployeeTransferStats = () => {
     queryFn: () => employeeTransferService.getTransferStats(),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -68,7 +68,7 @@ export const useEmployeeTransferHistory = (employeeId: string) => {
     enabled: !!employeeId,
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -78,7 +78,7 @@ export const usePendingApprovals = (approverId?: string) => {
     queryFn: () => employeeTransferService.getPendingApprovals(approverId),
     staleTime: 2 * 60 * 1000,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -88,7 +88,7 @@ export const usePendingHandovers = () => {
     queryFn: () => employeeTransferService.getPendingHandovers(),
     staleTime: 2 * 60 * 1000,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 

@@ -6,6 +6,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import uiAccessService from '@/services/uiAccessService'
+import apiClient from '@/lib/api'
+import { useAuthStore } from '@/stores/auth-store'
 import type {
   SidebarItem,
   PageAccessRule,
@@ -263,5 +265,31 @@ export const useRemoveUserOverride = () => {
       queryClient.invalidateQueries({ queryKey: uiAccessKeys.config() })
       queryClient.invalidateQueries({ queryKey: uiAccessKeys.overrides() })
     },
+  })
+}
+
+// ==================== AGGREGATED ADMIN DASHBOARD ====================
+// Single API call for admin features - replaces 4 separate calls
+
+export interface AdminDashboardData {
+  accessMatrix: any
+  sidebarItems: any[]
+  pageAccess: any[]
+  uiAccessConfig: any
+}
+
+export const useAdminDashboardData = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  return useQuery<AdminDashboardData>({
+    queryKey: ['admin', 'dashboard'],
+    queryFn: async () => {
+      const response = await apiClient.get('/admin/dashboard')
+      return response.data
+    },
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+    enabled: isAuthenticated,
+    retry: false,
   })
 }

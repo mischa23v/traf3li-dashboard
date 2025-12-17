@@ -8,7 +8,25 @@
 
 import { useQuery } from '@tanstack/react-query'
 import dashboardService from '@/services/dashboardService'
+import type { DashboardSummary } from '@/services/dashboardService'
 import { useAuthStore } from '@/stores/auth-store'
+
+// ==================== DASHBOARD SUMMARY (GOLD STANDARD) ====================
+// Single API call for all dashboard data - replaces 7 separate calls
+
+export const useDashboardSummary = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  return useQuery<DashboardSummary>({
+    queryKey: ['dashboard', 'summary'],
+    queryFn: () => dashboardService.getDashboardSummary(),
+    staleTime: 5 * 60 * 1000, // 5 minutes - dashboard stats don't change frequently
+    gcTime: 10 * 60 * 1000,   // 10 minutes garbage collection
+    enabled: isAuthenticated,
+    retry: false, // NO retry on 429 - prevents rate limit cascade
+    refetchOnWindowFocus: false, // Don't refetch on tab focus
+  })
+}
 
 // ==================== DASHBOARD STATS ====================
 
@@ -20,7 +38,7 @@ export const useDashboardStats = () => {
     queryFn: () => dashboardService.getDashboardStats(),
     staleTime: 2 * 60 * 1000, // 2 minutes
     enabled: isAuthenticated, // Only fetch when authenticated
-    retry: 1, // Reduce retries to minimize 401 spam
+    retry: false, // NO retry on 429 - prevents rate limit cascade
   })
 }
 
@@ -32,7 +50,7 @@ export const useDashboardHeroStats = () => {
     queryFn: () => dashboardService.getDashboardHeroStats(),
     staleTime: 1 * 60 * 1000, // 1 minute
     enabled: isAuthenticated, // Only fetch when authenticated
-    retry: 1, // Reduce retries to minimize 401 spam
+    retry: false, // NO retry on 429 - prevents rate limit cascade
   })
 }
 
@@ -44,7 +62,7 @@ export const useTodayEvents = (isEnabled = true) => {
     queryFn: () => dashboardService.getTodayEvents(),
     staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: isAuthenticated && isEnabled, // Only fetch when authenticated and enabled
-    retry: 1, // Reduce retries to minimize 401 spam
+    retry: false, // NO retry on 429 - prevents rate limit cascade
   })
 }
 
@@ -56,7 +74,7 @@ export const useFinancialSummary = (isEnabled = true) => {
     queryFn: () => dashboardService.getFinancialSummary(),
     staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: isAuthenticated && isEnabled, // Only fetch when authenticated and enabled
-    retry: 1, // Reduce retries to minimize 401 spam
+    retry: false, // NO retry on 429 - prevents rate limit cascade
   })
 }
 
@@ -66,9 +84,9 @@ export const useRecentMessages = (limit = 5, isEnabled = true) => {
   return useQuery({
     queryKey: ['dashboard', 'recent-messages', limit],
     queryFn: () => dashboardService.getRecentMessages(limit),
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: 2 * 60 * 1000, // 2 minutes (increased from 30s)
     enabled: isAuthenticated && isEnabled, // Only fetch when authenticated and enabled
-    retry: 1, // Reduce retries to minimize 401 spam
+    retry: false, // NO retry on 429 - prevents rate limit cascade
   })
 }
 
@@ -78,9 +96,9 @@ export const useMessageStats = () => {
   return useQuery({
     queryKey: ['messages', 'stats'],
     queryFn: () => dashboardService.getMessageStats(),
-    staleTime: 1 * 60 * 1000, // 1 minute
+    staleTime: 2 * 60 * 1000, // 2 minutes (increased from 1min)
     enabled: isAuthenticated, // Only fetch when authenticated
-    retry: 1, // Reduce retries to minimize 401 spam
+    retry: false, // NO retry on 429 - prevents rate limit cascade
   })
 }
 
@@ -95,7 +113,7 @@ export const useCRMStats = (isTabActive = true) => {
     queryFn: () => dashboardService.getCRMStats(),
     staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: isAuthenticated && isTabActive,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -107,7 +125,7 @@ export const useHRStats = (isTabActive = true) => {
     queryFn: () => dashboardService.getHRStats(),
     staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: isAuthenticated && isTabActive,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -119,7 +137,7 @@ export const useFinanceStats = (isTabActive = true) => {
     queryFn: () => dashboardService.getFinanceStats(),
     staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: isAuthenticated && isTabActive,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -134,7 +152,7 @@ export const useCasesChart = (months = 12, isTabActive = true) => {
     queryFn: () => dashboardService.getCasesChart(months),
     staleTime: 10 * 60 * 1000, // 10 minutes
     enabled: isAuthenticated && isTabActive,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -146,7 +164,7 @@ export const useRevenueChart = (months = 12, isTabActive = true) => {
     queryFn: () => dashboardService.getRevenueChart(months),
     staleTime: 10 * 60 * 1000, // 10 minutes
     enabled: isAuthenticated && isTabActive,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -158,7 +176,7 @@ export const useTasksChart = (months = 12, isTabActive = true) => {
     queryFn: () => dashboardService.getTasksChart(months),
     staleTime: 10 * 60 * 1000, // 10 minutes
     enabled: isAuthenticated && isTabActive,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -172,7 +190,7 @@ export const useUpcomingHearings = (days = 7) => {
     queryFn: () => dashboardService.getUpcomingHearings(days),
     staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: isAuthenticated,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -184,7 +202,7 @@ export const useUpcomingDeadlines = (days = 14) => {
     queryFn: () => dashboardService.getUpcomingDeadlines(days),
     staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: isAuthenticated,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -196,7 +214,7 @@ export const useTimeEntrySummary = () => {
     queryFn: () => dashboardService.getTimeEntrySummary(),
     staleTime: 2 * 60 * 1000, // 2 minutes
     enabled: isAuthenticated,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -208,6 +226,6 @@ export const usePendingDocuments = (isTabActive = true) => {
     queryFn: () => dashboardService.getPendingDocuments(),
     staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: isAuthenticated && isTabActive,
-    retry: 1,
+    retry: false,
   })
 }

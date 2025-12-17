@@ -20,7 +20,7 @@ export const useEmployees = (filters?: EmployeeFilters) => {
     queryFn: () => hrService.getEmployees(filters),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -31,7 +31,7 @@ export const useEmployee = (id: string) => {
     enabled: !!id,
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 
@@ -41,7 +41,7 @@ export const useEmployeeStats = () => {
     queryFn: () => hrService.getEmployeeStats(),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    retry: 1,
+    retry: false,
   })
 }
 

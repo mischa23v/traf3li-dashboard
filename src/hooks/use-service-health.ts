@@ -62,7 +62,7 @@ export function useServiceHealth(options: UseServiceHealthOptions = {}) {
       return response.data
     },
     refetchInterval: enabled ? pollingInterval : false,
-    retry: 1,
+    retry: false,
     staleTime: pollingInterval / 2,
     enabled,
   })
@@ -113,7 +113,7 @@ export function useCacheStats(options: { enabled?: boolean; pollingInterval?: nu
       return response.data?.cache ?? response.data
     },
     refetchInterval: enabled ? pollingInterval : false,
-    retry: 1,
+    retry: false,
     staleTime: pollingInterval / 2,
     enabled,
   })
