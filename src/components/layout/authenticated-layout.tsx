@@ -7,6 +7,7 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/layout/app-sidebar'
 import { SkipToMain } from '@/components/skip-to-main'
 import { OfflineIndicator } from '@/components/offline-indicator'
+import { SessionExpiryWarning } from '@/components/session-expiry-warning'
 
 type AuthenticatedLayoutProps = {
   children?: React.ReactNode
@@ -20,6 +21,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
       <LayoutProvider>
         <SidebarProvider defaultOpen={defaultOpen}>
           <OfflineIndicator />
+          <SessionExpiryWarning />
           <SkipToMain />
           <AppSidebar />
           <SidebarInset
