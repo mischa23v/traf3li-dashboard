@@ -4,6 +4,10 @@
  */
 
 import apiClient, { handleApiError } from '@/lib/api'
+import axios from 'axios'
+
+// Request deduplication for team members - prevents parallel duplicate requests
+let pendingTeamMembersRequest: Promise<Lawyer[]> | null = null
 
 /**
  * Lawyer/Team Member Interface
@@ -77,15 +81,34 @@ const lawyersService = {
   /**
    * Get team members available for task assignment
    * GET /api/lawyers/team
+   * Uses request deduplication to prevent parallel duplicate requests
+   * Only falls back to /lawyers?status=active on 404 (endpoint not found)
    */
   getTeamMembers: async (): Promise<Lawyer[]> => {
-    try {
-      const response = await apiClient.get<LawyersResponse>('/lawyers/team')
-      return response.data.lawyers
-    } catch {
-      // Fallback to getAll if team endpoint doesn't exist
-      return lawyersService.getAll({ status: 'active' })
+    // Deduplicate parallel requests - return existing pending request if one exists
+    if (pendingTeamMembersRequest) {
+      return pendingTeamMembersRequest
     }
+
+    pendingTeamMembersRequest = (async () => {
+      try {
+        const response = await apiClient.get<LawyersResponse>('/lawyers/team')
+        return response.data.lawyers
+      } catch (error: any) {
+        // Only fallback to getAll if the team endpoint doesn't exist (404)
+        // Don't fallback on rate limiting (429) or other errors - let them propagate
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+          return lawyersService.getAll({ status: 'active' })
+        }
+        // Re-throw all other errors (including 429) so React Query can handle retries
+        throw new Error(handleApiError(error))
+      } finally {
+        // Clear the pending request so future calls can proceed
+        pendingTeamMembersRequest = null
+      }
+    })()
+
+    return pendingTeamMembersRequest
   },
 }
 
