@@ -24,8 +24,8 @@ import {
   type HiringNeedsForecastData,
   type PromotionReadinessData
 } from '@/services/hrAnalyticsService'
-import { useAuthStore } from '@/store/authStore'
-import { apiClient } from '@/lib/apiClient'
+import { useAuthStore } from '@/stores/auth-store'
+import apiClient from '@/lib/api'
 
 // ═══════════════════════════════════════════════════════════════
 // WORKFORCE ANALYTICS HOOKS
