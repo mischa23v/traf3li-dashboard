@@ -21,7 +21,7 @@ import tasksService, {
   Attachment,
 } from '@/services/tasksService'
 import { apiClient } from '@/lib/api'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth-store'
 
 // ==================== Cache Configuration ====================
 // Cache data for 30 minutes to reduce API calls
