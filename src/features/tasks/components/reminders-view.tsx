@@ -183,6 +183,9 @@ export function RemindersView() {
     const delegateReminderMutation = useDelegateReminder()
     const updateReminderMutation = useUpdateReminder()
 
+    // Team members for delegation (DEFERRED - only needed when delegate dialog opens)
+    const { data: teamMembers } = useTeamMembers(isDelegationDataReady)
+
     // Performance: Track API load completion
     useEffect(() => {
         if (remindersData) perfLog('API LOADED: reminders', { count: remindersData?.reminders?.length })
@@ -203,9 +206,6 @@ export function RemindersView() {
             perfLog('RemindersView FETCHING:', activeFetches)
         }
     }, [isFetching, statsFetching])
-
-    // Team members for delegation (DEFERRED - only needed when delegate dialog opens)
-    const { data: teamMembers } = useTeamMembers(isDelegationDataReady)
 
     // Delegate dialog state
     const [delegateReminderId, setDelegateReminderId] = useState<string | null>(null)

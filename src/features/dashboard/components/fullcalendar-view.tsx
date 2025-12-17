@@ -418,8 +418,30 @@ export function FullCalendarView() {
   }, [])
 
   // Memoized datesSet handler - prevents re-renders from inline function
+  // Only update currentDate if the month actually changed to prevent double API calls
   const handleDatesSet = useCallback((dateInfo: { start: Date }) => {
-    setCurrentDate(dateInfo.start)
+    setCurrentDate(prev => {
+      const newStart = dateInfo.start
+      // FullCalendar's view start can be in the previous month (week display)
+      // We need to find the "center" of the view to determine the actual month
+      const viewCenter = new Date(newStart)
+      viewCenter.setDate(viewCenter.getDate() + 15) // Move to middle of view
+
+      // Only update if we're viewing a different month
+      if (prev.getMonth() === viewCenter.getMonth() && prev.getFullYear() === viewCenter.getFullYear()) {
+        perfLog('Calendar datesSet SKIPPED - same month', {
+          prev: prev.toISOString().split('T')[0],
+          viewStart: newStart.toISOString().split('T')[0]
+        })
+        return prev // Keep same reference to prevent re-render
+      }
+
+      perfLog('Calendar datesSet UPDATING month', {
+        from: prev.toISOString().split('T')[0],
+        to: viewCenter.toISOString().split('T')[0]
+      })
+      return viewCenter
+    })
   }, [])
 
   // Date select handler (for creating new events) - use functional update to avoid dependency on createForm
