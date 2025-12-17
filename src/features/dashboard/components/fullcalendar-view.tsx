@@ -224,86 +224,105 @@ export function FullCalendarView() {
     }
   }, [prefetchPrevMonth, prefetchNextMonth])
 
+  // Memoize filter set for O(1) lookup instead of O(n) array.includes()
+  const filterTypesSet = useMemo(() => new Set(filterTypes), [filterTypes])
+
   // Transform API data to FullCalendar format
   const calendarEvents = useMemo<CalendarEvent[]>(() => {
     if (!calendarData?.data) return []
 
+    const { events: apiEvents, tasks, reminders } = calendarData.data
+
+    // Early return if no data at all
+    if (!apiEvents?.length && !tasks?.length && !reminders?.length) return []
+
+    // Pre-allocate array with estimated size for better performance
+    const totalEstimate = (apiEvents?.length || 0) + (tasks?.length || 0) + (reminders?.length || 0)
     const events: CalendarEvent[] = []
+    events.length = totalEstimate // Pre-allocate
+    let idx = 0
+
+    // Helper to check filter - O(1) with Set
+    const shouldInclude = (eventType: string) =>
+      filterTypesSet.size === 0 || filterTypesSet.has(eventType)
 
     // Map events
-    calendarData.data.events?.forEach((event: any) => {
-      const eventType = event.eventType || event.type || 'other'
-      const colors = EVENT_COLORS[eventType as keyof typeof EVENT_COLORS] || EVENT_COLORS.other
+    if (apiEvents) {
+      for (const event of apiEvents) {
+        const eventType = event.eventType || event.type || 'other'
+        if (!shouldInclude(eventType)) continue
 
-      events.push({
-        id: `event-${event.id}`,
-        title: event.title,
-        start: event.startDate,
-        end: event.endDate || event.startDate,
-        allDay: event.allDay || false,
-        extendedProps: {
-          type: 'event',
-          eventType,
-          description: event.description,
-          location: event.location,
-          caseId: event.caseId,
-          caseName: event.caseName,
-          caseNumber: event.caseNumber,
-          priority: event.priority,
-          status: event.status,
-          attendees: event.attendees,
-        },
-      })
-    })
-
-    // Map tasks
-    calendarData.data.tasks?.forEach((task: any) => {
-      events.push({
-        id: `task-${task.id}`,
-        title: task.title,
-        start: task.startDate || task.dueDate,
-        end: task.startDate || task.dueDate,
-        allDay: true,
-        extendedProps: {
-          type: 'task',
-          eventType: 'task',
-          description: task.description,
-          caseId: task.caseId,
-          caseName: task.caseName,
-          caseNumber: task.caseNumber,
-          priority: task.priority,
-          status: task.status,
-        },
-      })
-    })
-
-    // Map reminders
-    calendarData.data.reminders?.forEach((reminder: any) => {
-      events.push({
-        id: `reminder-${reminder.id}`,
-        title: reminder.title,
-        start: reminder.startDate || reminder.reminderDate,
-        end: reminder.startDate || reminder.reminderDate,
-        allDay: true,
-        extendedProps: {
-          type: 'reminder',
-          eventType: 'reminder',
-          description: reminder.description,
-          caseId: reminder.caseId,
-          caseName: reminder.caseName,
-          priority: reminder.priority,
-          status: reminder.status,
-        },
-      })
-    })
-
-    // Apply type filter
-    if (filterTypes.length > 0) {
-      return events.filter(e => filterTypes.includes(e.extendedProps.eventType || ''))
+        events[idx++] = {
+          id: `event-${event.id}`,
+          title: event.title,
+          start: event.startDate,
+          end: event.endDate || event.startDate,
+          allDay: event.allDay || false,
+          extendedProps: {
+            type: 'event',
+            eventType,
+            description: event.description,
+            location: event.location,
+            caseId: event.caseId,
+            caseName: event.caseName,
+            caseNumber: event.caseNumber,
+            priority: event.priority,
+            status: event.status,
+            attendees: event.attendees,
+          },
+        }
+      }
     }
 
+    // Map tasks
+    if (tasks && shouldInclude('task')) {
+      for (const task of tasks) {
+        events[idx++] = {
+          id: `task-${task.id}`,
+          title: task.title,
+          start: task.startDate || task.dueDate,
+          end: task.startDate || task.dueDate,
+          allDay: true,
+          extendedProps: {
+            type: 'task',
+            eventType: 'task',
+            description: task.description,
+            caseId: task.caseId,
+            caseName: task.caseName,
+            caseNumber: task.caseNumber,
+            priority: task.priority,
+            status: task.status,
+          },
+        }
+      }
+    }
+
+    // Map reminders
+    if (reminders && shouldInclude('reminder')) {
+      for (const reminder of reminders) {
+        events[idx++] = {
+          id: `reminder-${reminder.id}`,
+          title: reminder.title,
+          start: reminder.startDate || reminder.reminderDate,
+          end: reminder.startDate || reminder.reminderDate,
+          allDay: true,
+          extendedProps: {
+            type: 'reminder',
+            eventType: 'reminder',
+            description: reminder.description,
+            caseId: reminder.caseId,
+            caseName: reminder.caseName,
+            priority: reminder.priority,
+            status: reminder.status,
+          },
+        }
+      }
+    }
+
+    // Trim array to actual size
+    events.length = idx
     return events
-  }, [calendarData, filterTypes])
+  }, [calendarData, filterTypesSet])
 
   // Navigation links
   const topNav = [
