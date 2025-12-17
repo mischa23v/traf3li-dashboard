@@ -618,26 +618,26 @@ function OverviewTab({
                       </div>
                       <div>
                         <p className="text-xs text-slate-600 font-bold">{t('dashboard.finance.revenue')}</p>
-                        <p className="font-bold text-navy">{financialSummary.revenue?.toLocaleString('ar-SA') || 0} {t('common.currency')}</p>
+                        <p className="font-bold text-navy">{financialSummary.totalRevenue?.toLocaleString('ar-SA') || 0} {t('common.currency')}</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="p-3 bg-green-50 rounded-xl">
-                      <p className="text-xs text-slate-600 font-bold">{t('dashboard.finance.paid')}</p>
-                      <p className="font-bold text-green-600">{financialSummary.paidInvoices?.toLocaleString('ar-SA') || 0} {t('common.currency')}</p>
-                    </div>
                     <div className="p-3 bg-amber-50 rounded-xl">
                       <p className="text-xs text-slate-600 font-bold">{t('dashboard.finance.pending')}</p>
-                      <p className="font-bold text-amber-600">{financialSummary.pendingInvoices?.toLocaleString('ar-SA') || 0} {t('common.currency')}</p>
+                      <p className="font-bold text-amber-600">{financialSummary.pendingAmount?.toLocaleString('ar-SA') || 0} {t('common.currency')}</p>
+                    </div>
+                    <div className="p-3 bg-red-50 rounded-xl">
+                      <p className="text-xs text-slate-600 font-bold">{t('dashboard.finance.overdue', 'متأخرة')}</p>
+                      <p className="font-bold text-red-600">{financialSummary.overdueAmount?.toLocaleString('ar-SA') || 0} {t('common.currency')}</p>
                     </div>
                   </div>
 
                   <div className="p-4 bg-slate-50 rounded-2xl">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-bold text-slate-600">{t('dashboard.finance.netIncome')}</p>
-                      <p className="font-bold text-navy text-lg">{financialSummary.netIncome?.toLocaleString('ar-SA') || 0} {t('common.currency')}</p>
+                      <p className="text-sm font-bold text-slate-600">{t('dashboard.finance.expenses', 'المصروفات')}</p>
+                      <p className="font-bold text-navy text-lg">{financialSummary.totalExpenses?.toLocaleString('ar-SA') || 0} {t('common.currency')}</p>
                     </div>
                   </div>
 

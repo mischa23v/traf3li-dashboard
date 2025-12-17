@@ -86,15 +86,13 @@ export interface DashboardEvent {
 }
 
 /**
- * Dashboard Financial Summary Interface (from backend)
+ * Dashboard Financial Summary Interface (from backend /api/v1/dashboard/summary)
  */
 export interface DashboardFinancialSummary {
-  revenue: number
-  expenses: number
-  profit: number
-  pendingInvoices: number
-  paidInvoices: number
-  netIncome: number
+  totalRevenue: number
+  totalExpenses: number
+  pendingAmount: number
+  overdueAmount: number
 }
 
 /**
