@@ -943,9 +943,6 @@ export const whatsAppService = {
       // Normalize response - handle different API response structures
       const responseData = response.data
 
-      // Debug logging to understand API response structure
-      console.log('[WhatsApp] getConversations raw response:', JSON.stringify(responseData, null, 2))
-
       // Handle various API response formats:
       // Format 1: { data: [...], pagination: {...} }
       // Format 2: { conversations: [...], total: X }
@@ -978,11 +975,8 @@ export const whatsAppService = {
         pagination = responseData.pagination || { total: responseData.total || conversations.length }
       }
 
-      console.log('[WhatsApp] Normalized conversations count:', conversations.length)
-
       return { data: conversations, pagination }
     } catch (error: any) {
-      console.error('[WhatsApp] getConversations error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1028,13 +1022,9 @@ export const whatsAppService = {
         ...(data.mediaUrl && { mediaUrl: data.mediaUrl }),
       }
 
-      console.log('[WhatsApp] sendMessage request:', JSON.stringify(normalizedData, null, 2))
-
       const response = await apiClient.post('/whatsapp/messages/send', normalizedData)
-      console.log('[WhatsApp] sendMessage response:', JSON.stringify(response.data, null, 2))
       return response.data.data || response.data
     } catch (error: any) {
-      console.error('[WhatsApp] sendMessage error:', error.response?.data || error.message)
       throw new Error(handleApiError(error))
     }
   },

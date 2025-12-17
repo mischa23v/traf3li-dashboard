@@ -811,7 +811,6 @@ const casesService = {
    * GET /api/cases/
    */
   getCases: async (filters?: CaseFilters): Promise<{ cases: Case[]; total: number; pagination?: PaginationInfo }> => {
-    console.log('[casesService.getCases] 🔍 Fetching cases list:', { filters, timestamp: new Date().toISOString() })
     try {
       const params = new URLSearchParams()
       if (filters?.status) params.append('status', filters.status)
@@ -833,22 +832,12 @@ const casesService = {
 
       const response = await apiClient.get<CasesResponse>(url)
       const cases = response.data.cases || []
-      console.log('[casesService.getCases] ✅ Success:', {
-        totalCases: cases.length,
-        caseIds: cases.map((c: Case) => ({ id: c._id, title: c.title })),
-        pagination: response.data.pagination,
-      })
       return {
         cases,
         total: response.data.pagination?.total || cases.length || 0,
         pagination: response.data.pagination,
       }
     } catch (error: any) {
-      console.error('[casesService.getCases] ❌ ERROR:', {
-        status: error?.status || error?.response?.status,
-        message: error?.message,
-        fullError: error,
-      })
       throw new Error(handleApiError(error))
     }
   },
@@ -858,27 +847,10 @@ const casesService = {
    * GET /api/cases/:id
    */
   getCase: async (id: string): Promise<Case> => {
-    console.log('[casesService.getCase] 🔍 Requesting case:', {
-      caseId: id,
-      endpoint: `/cases/${id}`,
-      timestamp: new Date().toISOString(),
-    })
     try {
       const response = await apiClient.get<CaseResponse>(`/cases/${id}`)
-      console.log('[casesService.getCase] ✅ Success:', {
-        caseId: id,
-        caseTitle: response.data.case?.title,
-        hasData: !!response.data.case,
-      })
       return response.data.case
     } catch (error: any) {
-      console.error('[casesService.getCase] ❌ ERROR:', {
-        caseId: id,
-        status: error?.status || error?.response?.status,
-        message: error?.message || error?.response?.data?.message,
-        fullError: error,
-        responseData: error?.response?.data,
-      })
       throw new Error(handleApiError(error))
     }
   },
