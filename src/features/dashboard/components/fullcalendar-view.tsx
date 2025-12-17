@@ -333,6 +333,11 @@ export function FullCalendarView() {
     setIsEventDialogOpen(true)
   }, [])
 
+  // Memoized datesSet handler - prevents re-renders from inline function
+  const handleDatesSet = useCallback((dateInfo: { start: Date }) => {
+    setCurrentDate(dateInfo.start)
+  }, [])
+
   // Date select handler (for creating new events) - use functional update to avoid dependency on createForm
   const handleDateSelect = useCallback((info: DateSelectArg) => {
     setCreateForm(prev => ({
@@ -708,16 +713,16 @@ export function FullCalendarView() {
                 editable={true}
                 droppable={true}
                 eventContent={renderEventContent}
-                height="auto"
-                contentHeight={700}
+                height={700}
                 dayMaxEvents={4}
                 moreLinkText={(num) => `+${num} المزيد`}
                 nowIndicator={true}
                 weekNumbers={false}
                 firstDay={0}
-                datesSet={(dateInfo) => {
-                  setCurrentDate(dateInfo.start)
-                }}
+                handleWindowResize={false}
+                rerenderDelay={10}
+                progressiveEventRendering={true}
+                datesSet={handleDatesSet}
               />
             </div>
           </CardContent>
