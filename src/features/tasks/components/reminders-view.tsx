@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { TasksSidebar } from './tasks-sidebar'
 import {
@@ -69,6 +69,17 @@ import { arSA, enUS } from 'date-fns/locale'
 export function RemindersView() {
     const { t, i18n } = useTranslation()
     const navigate = useNavigate()
+
+    // Performance optimization: Defer team members loading
+    // Only needed when user opens the delegate dialog
+    const [isDelegationDataReady, setIsDelegationDataReady] = useState(false)
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsDelegationDataReady(true)
+        }, 250)
+        return () => clearTimeout(timer)
+    }, [])
 
     // Snooze options with translations
     const SNOOZE_OPTIONS = [
@@ -153,8 +164,8 @@ export function RemindersView() {
     const delegateReminderMutation = useDelegateReminder()
     const updateReminderMutation = useUpdateReminder()
 
-    // Team members for delegation
-    const { data: teamMembers } = useTeamMembers()
+    // Team members for delegation (DEFERRED - only needed when delegate dialog opens)
+    const { data: teamMembers } = useTeamMembers(isDelegationDataReady)
 
     // Delegate dialog state
     const [delegateReminderId, setDelegateReminderId] = useState<string | null>(null)

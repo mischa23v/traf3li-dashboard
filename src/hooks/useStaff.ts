@@ -113,11 +113,12 @@ export const useStaffMember = (staffId: string) => {
   })
 }
 
-export const useTeamMembers = () => {
+export const useTeamMembers = (isEnabled = true) => {
   return useQuery({
     queryKey: ['staff', 'team'],
     queryFn: () => lawyersService.getTeamMembers(),
     staleTime: 5 * 60 * 1000,
+    enabled: isEnabled, // Allow deferred loading for performance
   })
 }
 

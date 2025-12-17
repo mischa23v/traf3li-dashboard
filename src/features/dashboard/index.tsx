@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   MessageSquare,
@@ -72,6 +72,19 @@ export function Dashboard() {
   const user = useAuthStore((state) => state.user)
   const [activeTab, setActiveTab] = useState<TabType>('overview')
 
+  // Performance optimization: Defer secondary data loading to prevent blocking initial render
+  // This reduces the initial 7 parallel API calls to 4, then loads 3 more after 150ms
+  const [isSecondaryDataReady, setIsSecondaryDataReady] = useState(false)
+
+  useEffect(() => {
+    // Defer loading of overview tab data (events, financial, messages)
+    // to allow critical hero stats to load first
+    const timer = setTimeout(() => {
+      setIsSecondaryDataReady(true)
+    }, 150)
+    return () => clearTimeout(timer)
+  }, [])
+
   // Get user's display name based on current locale
   const getUserDisplayName = () => {
     const locale = i18n.language
@@ -103,16 +116,21 @@ export function Dashboard() {
   const isAnalyticsTab = activeTab === 'analytics'
   const isReportsTab = activeTab === 'reports'
 
-  // Fetch dashboard data (overview tab - always load for hero stats)
-  const { data: todayEvents, isLoading: eventsLoading } = useTodayEvents()
-  const { data: financialSummary, isLoading: financialLoading } = useFinancialSummary()
-  const { data: recentMessages, isLoading: messagesLoading } = useRecentMessages(3)
+  // Performance optimization: Defer secondary API calls
+  // Phase 1 (immediate): Hero stats (4 calls) - critical for above-fold content
+  // Phase 2 (deferred 150ms): Overview tab data (3 calls) - below-fold content
+  const shouldLoadOverviewData = isSecondaryDataReady && isOverviewTab
 
-  // Fetch stats for hero card (always needed for top stats)
+  // Fetch stats for hero card (IMMEDIATE - always needed for top stats)
   const { data: caseStats } = useCaseStatisticsFromAPI()
   const { data: taskStats } = useTaskStats()
   const { data: messageStats } = useMessageStats()
   const { data: reminderStats } = useReminderStats()
+
+  // Fetch overview tab data (DEFERRED - load after 150ms to prevent blocking)
+  const { data: todayEvents, isLoading: eventsLoading } = useTodayEvents(shouldLoadOverviewData)
+  const { data: financialSummary, isLoading: financialLoading } = useFinancialSummary(shouldLoadOverviewData)
+  const { data: recentMessages, isLoading: messagesLoading } = useRecentMessages(3, shouldLoadOverviewData)
 
   // Fetch analytics data (only when analytics tab is active)
   const { data: crmStats, isLoading: crmLoading } = useCRMStats(isAnalyticsTab)

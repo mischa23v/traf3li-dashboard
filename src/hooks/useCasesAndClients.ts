@@ -54,13 +54,16 @@ const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
 
 /**
  * Fetch all cases with optional filters
+ * @param filters - Optional case filters
+ * @param isEnabled - Optional flag to defer loading (defaults to true)
  */
-export const useCases = (filters?: CaseFilters) => {
+export const useCases = (filters?: CaseFilters, isEnabled = true) => {
   return useQuery({
     queryKey: ['cases', filters],
     queryFn: () => casesService.getCases(filters),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
+    enabled: isEnabled, // Allow deferred loading for performance
   })
 }
 
@@ -578,13 +581,15 @@ export const useLawyer = (id: string) => {
 
 /**
  * Get team members available for task assignment
+ * @param isEnabled - Optional flag to defer loading (defaults to true)
  */
-export const useTeamMembers = () => {
+export const useTeamMembers = (isEnabled = true) => {
   return useQuery({
     queryKey: ['lawyers', 'team'],
     queryFn: () => lawyersService.getTeamMembers(),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
+    enabled: isEnabled, // Allow deferred loading for performance
   })
 }
 

@@ -3,7 +3,7 @@
  * Handles all calendar-related API calls including unified calendar view
  */
 
-import apiClient, { handleApiError } from '@/lib/api'
+import { apiClientNoVersion as apiClient, handleApiError } from '@/lib/api'
 
 /**
  * Calendar Event Interface
