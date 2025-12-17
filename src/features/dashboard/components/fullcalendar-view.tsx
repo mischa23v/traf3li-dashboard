@@ -298,16 +298,16 @@ export function FullCalendarView() {
     setIsEventDialogOpen(true)
   }, [])
 
-  // Date select handler (for creating new events)
+  // Date select handler (for creating new events) - use functional update to avoid dependency on createForm
   const handleDateSelect = useCallback((info: DateSelectArg) => {
-    setCreateForm({
-      ...createForm,
+    setCreateForm(prev => ({
+      ...prev,
       startDate: info.startStr.split('T')[0],
       endDate: info.endStr.split('T')[0],
       allDay: info.allDay,
-    })
+    }))
     setIsCreateDialogOpen(true)
-  }, [createForm])
+  }, []) // Stable callback - no dependency on createForm
 
   // Event drop handler (drag and drop)
   const handleEventDrop = useCallback(async (info: EventDropArg) => {
@@ -396,8 +396,8 @@ export function FullCalendarView() {
     setIsEventDialogOpen(false)
   }
 
-  // Custom event rendering
-  const renderEventContent = (eventInfo: EventContentArg) => {
+  // Custom event rendering - memoized to prevent recreating function on every render
+  const renderEventContent = useCallback((eventInfo: EventContentArg) => {
     const { event } = eventInfo
     const eventType = event.extendedProps.eventType || 'other'
     const colors = EVENT_COLORS[eventType as keyof typeof EVENT_COLORS] || EVENT_COLORS.other
@@ -425,7 +425,7 @@ export function FullCalendarView() {
         </div>
       </div>
     )
-  }
+  }, []) // Empty deps - EVENT_COLORS is static, icons are stable
 
   // Loading state
   if (isLoading) {

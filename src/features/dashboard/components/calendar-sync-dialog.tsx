@@ -3,7 +3,7 @@
  * Allows users to connect and sync with external calendar providers
  */
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Calendar,
@@ -88,14 +88,29 @@ export function CalendarSyncDialog({ open, onOpenChange }: CalendarSyncDialogPro
   const [autoSync, setAutoSync] = useState(true)
   const [syncFrequency, setSyncFrequency] = useState('15')
 
+  // Refs for cleanup of timeouts to prevent memory leaks
+  const connectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (connectTimeoutRef.current) clearTimeout(connectTimeoutRef.current)
+      if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current)
+    }
+  }, [])
+
   // Connect to a calendar provider
   const handleConnect = async (providerId: string) => {
     try {
       // In production, this would redirect to OAuth flow
       toast.info('سيتم تحويلك إلى صفحة تسجيل الدخول...')
 
-      // Simulate connection for demo
-      setTimeout(() => {
+      // Clear any existing timeout
+      if (connectTimeoutRef.current) clearTimeout(connectTimeoutRef.current)
+
+      // Simulate connection for demo - with cleanup ref
+      connectTimeoutRef.current = setTimeout(() => {
         setProviders(prev =>
           prev.map(p =>
             p.id === providerId
@@ -128,8 +143,12 @@ export function CalendarSyncDialog({ open, onOpenChange }: CalendarSyncDialogPro
   const handleSync = async (providerId: string) => {
     try {
       toast.info('جاري المزامنة...')
-      // Simulate sync
-      setTimeout(() => {
+
+      // Clear any existing timeout
+      if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current)
+
+      // Simulate sync - with cleanup ref
+      syncTimeoutRef.current = setTimeout(() => {
         setProviders(prev =>
           prev.map(p =>
             p.id === providerId ? { ...p, lastSync: new Date().toISOString() } : p
@@ -156,16 +175,17 @@ export function CalendarSyncDialog({ open, onOpenChange }: CalendarSyncDialogPro
       // Create ICS content
       const icsContent = generateICSContent()
 
-      // Download file
+      // Download file - avoid forced reflow by not appending to DOM
       const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' })
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
       link.download = `traf3li-calendar-${new Date().toISOString().split('T')[0]}.ics`
-      document.body.appendChild(link)
+      // Modern browsers support click() without appendChild - avoids forced reflow
+      link.style.display = 'none'
       link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
+      // Cleanup URL after a short delay to ensure download starts
+      setTimeout(() => URL.revokeObjectURL(url), 100)
 
       toast.success('تم تصدير التقويم بنجاح')
     } catch (error) {
