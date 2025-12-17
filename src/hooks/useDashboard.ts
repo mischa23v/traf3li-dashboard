@@ -85,77 +85,79 @@ export const useMessageStats = () => {
 }
 
 // ==================== ANALYTICS TAB STATS ====================
+// These hooks accept an `isTabActive` parameter to only fetch when the analytics tab is visible
 
-export const useCRMStats = () => {
+export const useCRMStats = (isTabActive = true) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
     queryKey: ['dashboard', 'crm-stats'],
     queryFn: () => dashboardService.getCRMStats(),
     staleTime: 5 * 60 * 1000, // 5 minutes
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && isTabActive,
     retry: 1,
   })
 }
 
-export const useHRStats = () => {
+export const useHRStats = (isTabActive = true) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
     queryKey: ['dashboard', 'hr-stats'],
     queryFn: () => dashboardService.getHRStats(),
     staleTime: 5 * 60 * 1000, // 5 minutes
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && isTabActive,
     retry: 1,
   })
 }
 
-export const useFinanceStats = () => {
+export const useFinanceStats = (isTabActive = true) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
     queryKey: ['dashboard', 'finance-stats'],
     queryFn: () => dashboardService.getFinanceStats(),
     staleTime: 5 * 60 * 1000, // 5 minutes
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && isTabActive,
     retry: 1,
   })
 }
 
 // ==================== REPORTS TAB CHARTS ====================
+// These hooks accept an `isTabActive` parameter to only fetch when the reports tab is visible
 
-export const useCasesChart = (months = 12) => {
+export const useCasesChart = (months = 12, isTabActive = true) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
     queryKey: ['reports', 'cases-chart', months],
     queryFn: () => dashboardService.getCasesChart(months),
     staleTime: 10 * 60 * 1000, // 10 minutes
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && isTabActive,
     retry: 1,
   })
 }
 
-export const useRevenueChart = (months = 12) => {
+export const useRevenueChart = (months = 12, isTabActive = true) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
     queryKey: ['reports', 'revenue-chart', months],
     queryFn: () => dashboardService.getRevenueChart(months),
     staleTime: 10 * 60 * 1000, // 10 minutes
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && isTabActive,
     retry: 1,
   })
 }
 
-export const useTasksChart = (months = 12) => {
+export const useTasksChart = (months = 12, isTabActive = true) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
     queryKey: ['reports', 'tasks-chart', months],
     queryFn: () => dashboardService.getTasksChart(months),
     staleTime: 10 * 60 * 1000, // 10 minutes
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && isTabActive,
     retry: 1,
   })
 }
@@ -198,14 +200,14 @@ export const useTimeEntrySummary = () => {
   })
 }
 
-export const usePendingDocuments = () => {
+export const usePendingDocuments = (isTabActive = true) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
     queryKey: ['dashboard', 'documents', 'pending'],
     queryFn: () => dashboardService.getPendingDocuments(),
     staleTime: 5 * 60 * 1000, // 5 minutes
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && isTabActive,
     retry: 1,
   })
 }
