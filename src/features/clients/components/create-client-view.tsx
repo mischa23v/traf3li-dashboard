@@ -58,6 +58,7 @@ import { ProductivityHero } from '@/components/productivity-hero'
 import { useCreateClient } from '@/hooks/useClients'
 import { useLawyers } from '@/hooks/useCasesAndClients'
 import { cn } from '@/lib/utils'
+import { apiClientNoVersion } from '@/lib/api'
 import { ValidationErrors, type ValidationError } from '@/components/validation-errors'
 import { useApiError } from '@/hooks/useApiError'
 import {
@@ -314,8 +315,8 @@ export function CreateClientView() {
 
         setWathqStatus('loading')
         try {
-            const response = await fetch(`/api/companies/${crNumber}`)
-            const data = await response.json()
+            const response = await apiClientNoVersion.get(`/companies/${crNumber}`)
+            const data = response.data
 
             if (data.success || data.crNumber) {
                 const companyData = data.data || data
@@ -351,12 +352,8 @@ export function CreateClientView() {
 
         setMojStatus('loading')
         try {
-            const response = await fetch('/api/verify/moj', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ attorneyId })
-            })
-            const data = await response.json()
+            const response = await apiClientNoVersion.post('/verify/moj', { attorneyId })
+            const data = response.data
 
             if (data.success) {
                 setMojData(data.data)
