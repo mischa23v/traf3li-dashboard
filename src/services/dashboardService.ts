@@ -9,6 +9,9 @@ import apiClient, { handleApiError } from '@/lib/api'
 /**
  * Dashboard Summary Interface - Aggregated dashboard data in ONE call
  * This is the gold standard: 1 API call instead of 7
+ *
+ * PERFORMANCE: messageStats and recentMessages REMOVED to avoid slow $lookup queries
+ * If you need messages, fetch separately via /messages/stats or /dashboard/recent-messages
  */
 export interface DashboardSummary {
   caseStats: {
@@ -26,12 +29,6 @@ export interface DashboardSummary {
       cancelled: number
     }
   }
-  messageStats: {
-    unreadMessages: number
-    unreadConversations: number
-    totalConversations: number
-    totalMessages: number
-  }
   reminderStats: {
     total: number
     byStatus: {
@@ -42,7 +39,8 @@ export interface DashboardSummary {
   }
   todayEvents: DashboardEvent[]
   financialSummary: DashboardFinancialSummary
-  recentMessages: DashboardRecentMessage[]
+  // messageStats: REMOVED - fetch separately if needed via useMessageStats()
+  // recentMessages: REMOVED - fetch separately if needed via useRecentMessages()
 }
 
 /**

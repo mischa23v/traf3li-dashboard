@@ -47,15 +47,14 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { NotificationDropdown } from '@/components/notifications'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { StatCard } from '@/components/stat-card'
 import {
   useDashboardSummary,
   useTodayEvents,
   useFinancialSummary,
-  useRecentMessages,
-  useMessageStats,
+  // useRecentMessages, // REMOVED - messages no longer in dashboard summary for performance
+  // useMessageStats,   // REMOVED - messages no longer in dashboard summary for performance
   useCRMStats,
   useFinanceStats,
   useCasesChart,
@@ -151,28 +150,27 @@ export function Dashboard() {
   // Fallback hooks - only enabled if summary endpoint fails or returns no data
   const { data: caseStatsFallback, isFetching: caseStatsFetching } = useCaseStatisticsFromAPI()
   const { data: taskStatsFallback, isFetching: taskStatsFetching } = useTaskStats()
-  const { data: messageStatsFallback, isFetching: messageStatsFetching } = useMessageStats()
+  // messageStats REMOVED for performance - no longer fetched on dashboard load
   const { data: reminderStatsFallback, isFetching: reminderStatsFetching } = useReminderStats()
 
   // Overview tab data - only fetch via fallback if summary not available
   const shouldLoadOverviewData = useFallbackHooks && isSecondaryDataReady && isOverviewTab
   const { data: todayEventsFallback, isLoading: eventsLoadingFallback, isFetching: eventsFetching } = useTodayEvents(shouldLoadOverviewData)
   const { data: financialSummaryFallback, isLoading: financialLoadingFallback, isFetching: financialFetching } = useFinancialSummary(shouldLoadOverviewData)
-  const { data: recentMessagesFallback, isLoading: messagesLoadingFallback, isFetching: messagesFetching } = useRecentMessages(3, shouldLoadOverviewData)
+  // recentMessages REMOVED for performance - no longer fetched on dashboard load
 
   // Resolve data: prefer summary, fallback to individual hooks
   const caseStats = dashboardSummary?.caseStats || caseStatsFallback
   const taskStats = dashboardSummary?.taskStats || taskStatsFallback
-  const messageStats = dashboardSummary?.messageStats || messageStatsFallback
+  // messageStats REMOVED for performance
   const reminderStats = dashboardSummary?.reminderStats || reminderStatsFallback
   const todayEvents = dashboardSummary?.todayEvents || todayEventsFallback
   const financialSummary = dashboardSummary?.financialSummary || financialSummaryFallback
-  const recentMessages = dashboardSummary?.recentMessages || recentMessagesFallback
+  // recentMessages REMOVED for performance
 
   // Loading states
   const eventsLoading = summaryLoading || eventsLoadingFallback
   const financialLoading = summaryLoading || financialLoadingFallback
-  const messagesLoading = summaryLoading || messagesLoadingFallback
 
   // Fetch analytics data (only when analytics tab is active)
   const { data: crmStats, isLoading: crmLoading } = useCRMStats(isAnalyticsTab)
@@ -192,10 +190,9 @@ export function Dashboard() {
       perfLog('API LOADED: dashboardSummary (GOLD STANDARD - 1 call)', {
         caseStats: dashboardSummary.caseStats?.active,
         taskStats: dashboardSummary.taskStats?.total,
-        messageStats: dashboardSummary.messageStats?.unreadMessages,
         reminderStats: dashboardSummary.reminderStats?.byStatus?.pending,
         events: dashboardSummary.todayEvents?.length,
-        messages: dashboardSummary.recentMessages?.length,
+        // messageStats/recentMessages REMOVED for performance
       })
     }
   }, [dashboardSummary])
@@ -217,24 +214,24 @@ export function Dashboard() {
       const fetchingStatus = {
         caseStats: caseStatsFetching,
         taskStats: taskStatsFetching,
-        messageStats: messageStatsFetching,
         reminderStats: reminderStatsFetching,
         events: eventsFetching,
         financial: financialFetching,
-        messages: messagesFetching,
+        // messageStats/messages REMOVED for performance
       }
       const activeFetches = Object.entries(fetchingStatus).filter(([, v]) => v).map(([k]) => k)
       if (activeFetches.length > 0) {
         perfLog('FALLBACK FETCHING:', activeFetches)
       }
     }
-  }, [summaryLoading, useFallbackHooks, caseStatsFetching, taskStatsFetching, messageStatsFetching, reminderStatsFetching, eventsFetching, financialFetching, messagesFetching])
+  }, [summaryLoading, useFallbackHooks, caseStatsFetching, taskStatsFetching, reminderStatsFetching, eventsFetching, financialFetching])
   // ==================== END PERFORMANCE TRACKING ====================
 
   // Calculate counts for hero stat cards
   const activeCasesCount = caseStats?.active || 0
   const activeTasksCount = (taskStats?.byStatus?.todo || 0) + (taskStats?.byStatus?.in_progress || 0)
-  const unreadMessagesCount = messageStats?.unreadMessages || 0
+  // unreadMessagesCount: Now shows 0 - fetch separately via useMessageStats() if needed
+  const unreadMessagesCount = 0
   const pendingRemindersCount = reminderStats?.byStatus?.pending || 0
 
   const topNav = [
@@ -415,8 +412,6 @@ export function Dashboard() {
             eventsLoading={eventsLoading}
             financialSummary={financialSummary}
             financialLoading={financialLoading}
-            recentMessages={recentMessages}
-            messagesLoading={messagesLoading}
           />
         )}
 
@@ -461,8 +456,7 @@ interface OverviewTabProps {
   eventsLoading: boolean
   financialSummary: any
   financialLoading: boolean
-  recentMessages: any
-  messagesLoading: boolean
+  // recentMessages and messagesLoading REMOVED for performance
 }
 
 function OverviewTab({
@@ -471,8 +465,6 @@ function OverviewTab({
   eventsLoading,
   financialSummary,
   financialLoading,
-  recentMessages,
-  messagesLoading,
 }: OverviewTabProps) {
   return (
     <>
@@ -655,52 +647,9 @@ function OverviewTab({
             </CardContent>
           </Card>
 
-          {/* Recent Messages */}
-          <Card className="rounded-3xl border-slate-100 shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                <MessageSquare className="h-5 w-5 text-amber-500" />
-                {t('dashboard.messages.title')}
-              </CardTitle>
-              <Button variant="ghost" size="sm" className="text-xs text-blue-600">{t('dashboard.messages.viewAll')}</Button>
-            </CardHeader>
-            <CardContent>
-              {messagesLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin text-navy" />
-                </div>
-              ) : !recentMessages || recentMessages.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-8 text-slate-500">
-                  <MessageSquare className="h-12 w-12 mb-3 opacity-30" />
-                  <p className="text-sm font-medium">{t('dashboard.messages.noMessages')}</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {recentMessages.map((chat: any) => {
-                    const username = chat.userID?.username || t('dashboard.messages.defaultUser')
-                    const timestamp = new Date(chat.createdAt).toLocaleString('ar-SA', { hour: '2-digit', minute: '2-digit' })
-                    return (
-                      <div key={chat._id} className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer">
-                        <div className="relative">
-                          <Avatar className="h-10 w-10 border border-slate-100">
-                            <AvatarImage src={chat.userID?.image} />
-                            <AvatarFallback>{username[0]}</AvatarFallback>
-                          </Avatar>
-                        </div>
-                        <div className="flex-1 overflow-hidden">
-                          <div className="flex justify-between items-center">
-                            <h5 className="font-bold text-sm text-navy truncate">{username}</h5>
-                            <span className="text-[10px] text-slate-500">{timestamp}</span>
-                          </div>
-                          <p className="text-xs text-slate-500 truncate">{chat.text}</p>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          {/* Recent Messages - REMOVED FOR PERFORMANCE */}
+          {/* Messages widget removed to improve dashboard load time. */}
+          {/* If you need messages, navigate to the Messages page or use the conversations feature. */}
 
         </div>
 
