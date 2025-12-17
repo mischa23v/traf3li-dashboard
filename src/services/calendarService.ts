@@ -70,6 +70,95 @@ export interface CalendarFilters {
   caseId?: string
 }
 
+// ==================== New Optimized Types ====================
+
+/**
+ * Day summary for calendar grid badges
+ */
+export interface DaySummary {
+  date: string
+  total: number
+  events: number
+  tasks: number
+  reminders: number
+  caseDocuments: number
+  hasHighPriority: boolean
+  hasOverdue: boolean
+}
+
+/**
+ * Grid summary response
+ */
+export interface GridSummaryResponse {
+  success: boolean
+  data: {
+    days: DaySummary[]
+    totalDays: number
+    dateRange: { start: string; end: string }
+  }
+  cached?: boolean
+}
+
+/**
+ * Minimal calendar item for grid display
+ */
+export interface GridItem {
+  id: string
+  type: 'event' | 'task' | 'reminder' | 'case-document'
+  title: string
+  startDate: string
+  endDate?: string
+  allDay: boolean
+  eventType?: string
+  status: string
+  priority?: string
+  color: string
+}
+
+/**
+ * Grid items response
+ */
+export interface GridItemsResponse {
+  success: boolean
+  data: GridItem[]
+  count: number
+  dateRange: { start: string; end: string }
+}
+
+/**
+ * List view filters
+ */
+export interface ListFilters {
+  cursor?: string
+  limit?: number
+  types?: string
+  sortOrder?: 'asc' | 'desc'
+  priority?: string
+  status?: string
+  startDate?: string
+  endDate?: string
+}
+
+/**
+ * List view response with cursor pagination
+ */
+export interface ListResponse {
+  success: boolean
+  data: GridItem[]
+  pagination: {
+    cursor: string | null
+    hasMore: boolean
+    limit: number
+    count: number
+  }
+  filters: {
+    types: string[]
+    priority?: string
+    status?: string
+    dateRange?: { start: string; end: string }
+  }
+}
+
 /**
  * Calendar Service Object
  */
@@ -159,6 +248,76 @@ const calendarService = {
   }): Promise<any> => {
     try {
       const response = await apiClient.get('/calendar/stats', {
+        params: filters,
+      })
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ==================== Optimized Endpoints ====================
+
+  /**
+   * Get grid summary - counts per day for calendar badges
+   * Much lighter than full data - only counts and flags
+   */
+  getGridSummary: async (filters: {
+    startDate: string
+    endDate: string
+    types?: string
+  }): Promise<GridSummaryResponse> => {
+    try {
+      const response = await apiClient.get<GridSummaryResponse>('/calendar/grid-summary', {
+        params: filters,
+      })
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get grid items - minimal event data for calendar display
+   * ~150 bytes per item vs 2-5KB for full objects
+   */
+  getGridItems: async (filters: {
+    startDate: string
+    endDate: string
+    types?: string
+    caseId?: string
+  }): Promise<GridItemsResponse> => {
+    try {
+      const response = await apiClient.get<GridItemsResponse>('/calendar/grid-items', {
+        params: filters,
+      })
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get full item details - lazy loaded on click
+   * Fetches complete object with populated relations
+   */
+  getItemDetails: async (type: string, id: string): Promise<{ success: boolean; data: CalendarEvent }> => {
+    try {
+      const response = await apiClient.get<{ success: boolean; data: CalendarEvent }>(
+        `/calendar/item/${type}/${id}`
+      )
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get list view with cursor pagination - for virtualized infinite scroll
+   */
+  getList: async (filters: ListFilters): Promise<ListResponse> => {
+    try {
+      const response = await apiClient.get<ListResponse>('/calendar/list', {
         params: filters,
       })
       return response.data
