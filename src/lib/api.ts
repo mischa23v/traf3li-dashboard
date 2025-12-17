@@ -81,14 +81,13 @@ export const apiClientNoVersion = axios.create({
   timeout: API_CONFIG.timeout,
 })
 
-// Routes that should bypass circuit breaker (critical auth flows)
-const CIRCUIT_BREAKER_BYPASS_ROUTES = ['/auth/login', '/auth/logout', '/auth/me', '/auth/otp']
-
 /**
  * Check if a URL should bypass circuit breaker
+ * ALL auth routes bypass - users must always be able to authenticate
  */
 const shouldBypassCircuitBreaker = (url: string): boolean => {
-  return CIRCUIT_BREAKER_BYPASS_ROUTES.some(route => url.includes(route))
+  // All /auth/* routes bypass circuit breaker
+  return url.includes('/auth/')
 }
 
 // Apply same interceptors to non-versioned client (with gold standard protections)
