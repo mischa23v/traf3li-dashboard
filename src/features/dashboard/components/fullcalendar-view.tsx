@@ -86,6 +86,19 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
 import { CalendarSyncDialog } from './calendar-sync-dialog'
 
+// ==================== Module-level constants for performance ====================
+// Moving these outside the component prevents re-creation on every render
+
+// FullCalendar plugins array - must be stable reference
+const CALENDAR_PLUGINS = [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]
+
+// Navigation links - stable reference
+const TOP_NAV_LINKS = [
+  { title: 'الرئيسية', href: '/', isActive: false, disabled: false },
+  { title: 'التقويم', href: '/dashboard/calendar', isActive: true, disabled: false },
+  { title: 'المهام', href: '/dashboard/tasks', isActive: false, disabled: false },
+]
+
 // Event type colors
 const EVENT_COLORS = {
   hearing: { bg: '#ef4444', border: '#dc2626', text: '#ffffff' },
@@ -220,30 +233,55 @@ export function FullCalendarView() {
   // Prefetch adjacent months for smoother navigation (using optimized endpoints)
   const { prefetchPrevMonth, prefetchNextMonth } = usePrefetchAdjacentMonthsOptimized(currentDate)
 
-  // Attach hover listeners to navigation buttons for prefetching
+  // Store refs to avoid re-querying DOM and to have stable references for cleanup
+  const prevBtnRef = useRef<Element | null>(null)
+  const nextBtnRef = useRef<Element | null>(null)
+  const prefetchPrevRef = useRef(prefetchPrevMonth)
+  const prefetchNextRef = useRef(prefetchNextMonth)
+
+  // Update refs when prefetch functions change (without triggering DOM queries)
   useEffect(() => {
-    const wrapper = document.querySelector('.fullcalendar-wrapper')
-    if (!wrapper) return
+    prefetchPrevRef.current = prefetchPrevMonth
+    prefetchNextRef.current = prefetchNextMonth
+  }, [prefetchPrevMonth, prefetchNextMonth])
 
-    const prevBtn = wrapper.querySelector('.fc-prev-button')
-    const nextBtn = wrapper.querySelector('.fc-next-button')
+  // Attach hover listeners to navigation buttons for prefetching
+  // Use requestIdleCallback to avoid forced reflow during render
+  useEffect(() => {
+    const attachListeners = () => {
+      const wrapper = document.querySelector('.fullcalendar-wrapper')
+      if (!wrapper) return
 
-    if (prevBtn) {
-      prevBtn.addEventListener('mouseenter', prefetchPrevMonth)
+      const prevBtn = wrapper.querySelector('.fc-prev-button')
+      const nextBtn = wrapper.querySelector('.fc-next-button')
+
+      // Wrapper functions that use refs - stable references, always call current prefetch
+      const handlePrevHover = () => prefetchPrevRef.current()
+      const handleNextHover = () => prefetchNextRef.current()
+
+      if (prevBtn && prevBtn !== prevBtnRef.current) {
+        prevBtnRef.current = prevBtn
+        prevBtn.addEventListener('mouseenter', handlePrevHover)
+      }
+      if (nextBtn && nextBtn !== nextBtnRef.current) {
+        nextBtnRef.current = nextBtn
+        nextBtn.addEventListener('mouseenter', handleNextHover)
+      }
     }
-    if (nextBtn) {
-      nextBtn.addEventListener('mouseenter', prefetchNextMonth)
-    }
+
+    // Defer DOM queries to avoid forced reflow
+    const idleCallback = 'requestIdleCallback' in window
+      ? (window as any).requestIdleCallback(attachListeners, { timeout: 100 })
+      : setTimeout(attachListeners, 0)
 
     return () => {
-      if (prevBtn) {
-        prevBtn.removeEventListener('mouseenter', prefetchPrevMonth)
-      }
-      if (nextBtn) {
-        nextBtn.removeEventListener('mouseenter', prefetchNextMonth)
+      if ('cancelIdleCallback' in window) {
+        (window as any).cancelIdleCallback(idleCallback)
+      } else {
+        clearTimeout(idleCallback)
       }
     }
-  }, [prefetchPrevMonth, prefetchNextMonth])
+  }, []) // Empty deps - only run once, refs handle updates
 
   // Transform grid items to FullCalendar format
   // Much simpler now - backend returns minimal data with color already included
@@ -281,12 +319,27 @@ export function FullCalendarView() {
     )
   }, [summaryData])
 
-  // Navigation links
-  const topNav = [
-    { title: 'الرئيسية', href: '/', isActive: false, disabled: false },
-    { title: 'التقويم', href: '/dashboard/calendar', isActive: true, disabled: false },
-    { title: 'المهام', href: '/dashboard/tasks', isActive: false, disabled: false },
-  ]
+  // ==================== Memoized FullCalendar Props ====================
+  // These prevent unnecessary re-initialization of FullCalendar
+
+  // Header toolbar config - stable reference
+  const headerToolbar = useMemo(() => ({
+    start: 'prev,next today',
+    center: 'title',
+    end: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+  }), [])
+
+  // Button text - depends on language direction
+  const buttonText = useMemo(() => ({
+    today: isRTL ? 'اليوم' : 'Today',
+    month: isRTL ? 'شهر' : 'Month',
+    week: isRTL ? 'أسبوع' : 'Week',
+    day: isRTL ? 'يوم' : 'Day',
+    list: isRTL ? 'قائمة' : 'List',
+  }), [isRTL])
+
+  // More link text callback - stable reference
+  const moreLinkText = useCallback((num: number) => `+${num} المزيد`, [])
 
   // Event click handler - triggers lazy load for full details
   const handleEventClick = useCallback((info: EventClickArg) => {
@@ -306,6 +359,11 @@ export function FullCalendarView() {
     // Trigger lazy load for full details
     setSelectedItemForDetails({ type, id })
     setIsEventDialogOpen(true)
+  }, [])
+
+  // Memoized datesSet handler - prevents re-renders from inline function
+  const handleDatesSet = useCallback((dateInfo: { start: Date }) => {
+    setCurrentDate(dateInfo.start)
   }, [])
 
   // Date select handler (for creating new events) - use functional update to avoid dependency on createForm
@@ -446,7 +504,7 @@ export function FullCalendarView() {
     return (
       <>
         <Header className="bg-navy shadow-none relative">
-          <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+          <TopNav links={TOP_NAV_LINKS} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
             <DynamicIsland />
           </div>
@@ -473,7 +531,7 @@ export function FullCalendarView() {
     return (
       <>
         <Header className="bg-navy shadow-none relative">
-          <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+          <TopNav links={TOP_NAV_LINKS} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
             <DynamicIsland />
           </div>
@@ -505,7 +563,7 @@ export function FullCalendarView() {
   return (
     <>
       <Header className="bg-navy shadow-none relative">
-        <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+        <TopNav links={TOP_NAV_LINKS} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
@@ -659,22 +717,12 @@ export function FullCalendarView() {
             >
               <FullCalendar
                 ref={calendarRef}
-                plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
+                plugins={CALENDAR_PLUGINS}
                 initialView="dayGridMonth"
                 locale={isRTL ? 'ar' : 'en'}
                 direction={isRTL ? 'rtl' : 'ltr'}
-                headerToolbar={{
-                  start: 'prev,next today',
-                  center: 'title',
-                  end: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
-                }}
-                buttonText={{
-                  today: isRTL ? 'اليوم' : 'Today',
-                  month: isRTL ? 'شهر' : 'Month',
-                  week: isRTL ? 'أسبوع' : 'Week',
-                  day: isRTL ? 'يوم' : 'Day',
-                  list: isRTL ? 'قائمة' : 'List',
-                }}
+                headerToolbar={headerToolbar}
+                buttonText={buttonText}
                 events={calendarEvents}
                 eventClick={handleEventClick}
                 select={handleDateSelect}
@@ -683,16 +731,16 @@ export function FullCalendarView() {
                 editable={true}
                 droppable={true}
                 eventContent={renderEventContent}
-                height="auto"
-                contentHeight={700}
+                height={700}
                 dayMaxEvents={4}
-                moreLinkText={(num) => `+${num} المزيد`}
+                moreLinkText={moreLinkText}
                 nowIndicator={true}
                 weekNumbers={false}
                 firstDay={0}
-                datesSet={(dateInfo) => {
-                  setCurrentDate(dateInfo.start)
-                }}
+                handleWindowResize={false}
+                rerenderDelay={10}
+                progressiveEventRendering={true}
+                datesSet={handleDatesSet}
               />
             </div>
           </CardContent>
@@ -968,9 +1016,23 @@ export function FullCalendarView() {
         .fullcalendar-wrapper .fc {
           font-family: inherit;
         }
-        /* CSS containment for day cells - improves paint and layout performance */
+        /* CSS containment for performance - isolates paint/layout calculations */
         .fullcalendar-wrapper .fc-daygrid-day {
           contain: content;
+        }
+        .fullcalendar-wrapper .fc-timegrid-slot {
+          contain: content;
+          height: 3rem;
+        }
+        .fullcalendar-wrapper .fc-event {
+          contain: layout style;
+          cursor: pointer;
+          border: none;
+          border-radius: 0.375rem;
+          will-change: opacity;
+        }
+        .fullcalendar-wrapper .fc-event:hover {
+          opacity: 0.9;
         }
         .fullcalendar-wrapper .fc-toolbar-title {
           font-size: 1.5rem;
@@ -978,12 +1040,14 @@ export function FullCalendarView() {
           color: #1e293b;
         }
         .fullcalendar-wrapper .fc-button {
+          contain: layout style;
           background-color: #f1f5f9;
           border: 1px solid #e2e8f0;
           color: #475569;
           font-weight: 600;
           padding: 0.5rem 1rem;
           border-radius: 0.75rem;
+          will-change: background-color;
         }
         .fullcalendar-wrapper .fc-button:hover {
           background-color: #e2e8f0;
@@ -1005,14 +1069,6 @@ export function FullCalendarView() {
           color: #475569;
           padding: 0.75rem;
         }
-        .fullcalendar-wrapper .fc-event {
-          cursor: pointer;
-          border: none;
-          border-radius: 0.375rem;
-        }
-        .fullcalendar-wrapper .fc-event:hover {
-          opacity: 0.9;
-        }
         .fullcalendar-wrapper .fc-more-link {
           color: #3b82f6;
           font-weight: 600;
@@ -1021,9 +1077,6 @@ export function FullCalendarView() {
           border-radius: 1rem;
           border: none;
           box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-        }
-        .fullcalendar-wrapper .fc-timegrid-slot {
-          height: 3rem;
         }
         .fullcalendar-wrapper .fc-timegrid-axis {
           font-size: 0.75rem;
