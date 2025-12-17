@@ -15,6 +15,9 @@ export {
   shouldAddIdempotencyKey,
   generateIdempotencyKey,
   FINANCIAL_PATHS,
+  cancelAllRequests,
+  cancelNavigationRequests,
+  isAbortError,
   type ApiError,
   type RateLimitInfo,
 } from './api'
@@ -34,3 +37,12 @@ export {
   clearIdempotencyKey,
   clearAllIdempotencyKeys,
 } from './idempotency'
+
+// Re-export request cancellation utilities
+export {
+  getAbortController,
+  cancelRequest,
+  getActiveRequestCount,
+  createTimeoutSignal,
+  combineSignals,
+} from './request-cancellation'

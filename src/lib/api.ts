@@ -8,10 +8,13 @@
  * - Circuit breaker pattern (prevents cascading failures)
  * - Smart retry with exponential backoff + jitter
  * - Retry-After header support
+ * - Tiered timeouts (auth: 5s, normal: 10s, upload: 120s)
+ * - Request cancellation on navigation
+ * - Idempotency keys for financial operations
  */
 
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios'
-import { API_CONFIG, getApiUrl } from '@/config/api'
+import { API_CONFIG, getApiUrl, getTimeoutForUrl } from '@/config/api'
 import {
   generateRequestKey,
   getPendingRequest,
@@ -30,6 +33,13 @@ import {
   clearIdempotencyKey,
   clearAllIdempotencyKeys,
 } from './idempotency'
+import {
+  getAbortController,
+  removeAbortController,
+  cancelAllRequests,
+  cancelNavigationRequests,
+  isAbortError,
+} from './request-cancellation'
 
 // API Base URL - Change based on environment
 const API_BASE_URL = getApiUrl()
@@ -45,9 +55,7 @@ export const API_URL_NO_VERSION = API_BASE_URL_NO_VERSION
 // API_DOMAIN is used for direct links (e.g., file downloads) - always use full URL
 export const API_DOMAIN = API_CONFIG.useProxy ? 'https://api.traf3li.com' : API_CONFIG.baseUrl
 
-// Cache for GET requests (simple in-memory cache)
-const requestCache = new Map<string, { data: any; timestamp: number }>()
-const CACHE_DURATION = 2 * 60 * 1000 // 2 minutes
+// Note: No axios-level cache - TanStack Query handles caching with smarter stale-while-revalidate
 
 /**
  * Extract CSRF token from cookies
@@ -109,6 +117,17 @@ apiClientNoVersion.interceptors.request.use(
 
     const url = config.url || ''
 
+    // Apply tiered timeout based on URL pattern
+    if (!config.timeout || config.timeout === API_CONFIG.timeout) {
+      config.timeout = getTimeoutForUrl(url, method || 'GET')
+    }
+
+    // Add abort controller for request cancellation
+    if (!config.signal) {
+      const controller = getAbortController(method || 'get', url, config.params)
+      config.signal = controller.signal
+    }
+
     // Add Idempotency Key for financial mutation requests
     if (shouldAddIdempotencyKey(method, url) && !config.headers.get('Idempotency-Key')) {
       const idempotencyKey = getIdempotencyKey(method || 'POST', url, config.data)
@@ -167,6 +186,9 @@ apiClientNoVersion.interceptors.response.use(
     const url = response.config.url || ''
     const method = response.config.method?.toUpperCase() || 'GET'
 
+    // Clean up abort controller
+    removeAbortController(method.toLowerCase(), url, response.config.params)
+
     // Record success for circuit breaker (skip auth routes)
     if (!shouldBypassCircuitBreaker(url)) {
       recordSuccess(url)
@@ -182,6 +204,20 @@ apiClientNoVersion.interceptors.response.use(
   async (error: AxiosError<any>) => {
     const originalRequest = error.config as any
     const url = originalRequest?.url || ''
+    const method = originalRequest?.method?.toLowerCase() || 'get'
+
+    // Clean up abort controller
+    removeAbortController(method, url, originalRequest?.params)
+
+    // Don't process cancelled requests
+    if (isAbortError(error)) {
+      return Promise.reject({
+        status: 0,
+        message: 'Request cancelled',
+        code: 'CANCELLED',
+        error: true,
+      })
+    }
 
     // Record failure for circuit breaker (skip auth routes)
     if (!shouldBypassCircuitBreaker(url) && error.response?.status &&
@@ -237,7 +273,7 @@ apiClientNoVersion.interceptors.response.use(
 
 /**
  * Request Interceptor
- * Adds caching, deduplication, circuit breaker, idempotency, and CSRF token handling
+ * Adds tiered timeouts, request cancellation, deduplication, circuit breaker, idempotency, and CSRF token handling
  */
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
@@ -252,19 +288,32 @@ apiClient.interceptors.request.use(
 
     const url = config.url || ''
 
+    // Apply tiered timeout based on URL pattern (auth: 5s, default: 10s, upload: 120s)
+    if (!config.timeout || config.timeout === API_CONFIG.timeout) {
+      config.timeout = getTimeoutForUrl(url, method || 'GET')
+    }
+
+    // Add abort controller for request cancellation
+    if (!config.signal) {
+      const controller = getAbortController(method || 'get', url, config.params)
+      config.signal = controller.signal
+    }
+
     // Add Idempotency Key for financial mutation requests
     if (shouldAddIdempotencyKey(method, url) && !config.headers.get('Idempotency-Key')) {
       const idempotencyKey = getIdempotencyKey(method || 'POST', url, config.data)
       config.headers.set('Idempotency-Key', idempotencyKey)
     }
 
-    // Circuit Breaker Check - reject if circuit is open
-    const circuitCheck = shouldAllowRequest(url)
-    if (!circuitCheck.allowed) {
-      const error = new Error(`Circuit breaker open for ${url}`) as any
-      error.code = 'CIRCUIT_OPEN'
-      error.retryAfter = circuitCheck.retryAfter
-      return Promise.reject(error)
+    // Circuit Breaker Check - reject if circuit is open (skip for auth routes)
+    if (!shouldBypassCircuitBreaker(url)) {
+      const circuitCheck = shouldAllowRequest(url)
+      if (!circuitCheck.allowed) {
+        const error = new Error(`Circuit breaker open for ${url}`) as any
+        error.code = 'CIRCUIT_OPEN'
+        error.retryAfter = circuitCheck.retryAfter
+        return Promise.reject(error)
+      }
     }
 
     // Request Deduplication for GET requests
@@ -279,22 +328,7 @@ apiClient.interceptors.request.use(
       }
     }
 
-    // Check cache for GET requests
-    if (config.method === 'get' && config.url) {
-      const cacheKey = `${config.url}${JSON.stringify(config.params || {})}`
-      const cached = requestCache.get(cacheKey)
-
-      if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-        // Return cached data
-        config.adapter = () => Promise.resolve({
-          data: cached.data,
-          status: 200,
-          statusText: 'OK (Cached)',
-          headers: {},
-          config,
-        } as any)
-      }
-    }
+    // Note: No axios-level cache - TanStack Query handles caching with stale-while-revalidate
 
     return config
   },
@@ -331,28 +365,25 @@ apiClient.request = function<T = any, R = AxiosResponse<T>>(config: any): Promis
 
 /**
  * Response Interceptor
- * Handles caching, session warnings, errors, circuit breaker, idempotency, and retry logic
+ * Handles session warnings, errors, circuit breaker, idempotency, and retry logic
+ * Note: No axios-level cache - TanStack Query handles caching
  */
 apiClient.interceptors.response.use(
   (response) => {
     const url = response.config.url || ''
     const method = response.config.method?.toUpperCase() || 'GET'
 
-    // Record success for circuit breaker
-    recordSuccess(url)
+    // Clean up abort controller
+    removeAbortController(method.toLowerCase(), url, response.config.params)
+
+    // Record success for circuit breaker (skip auth routes)
+    if (!shouldBypassCircuitBreaker(url)) {
+      recordSuccess(url)
+    }
 
     // Clear idempotency key on successful mutation (next request gets new key)
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
       clearIdempotencyKey(method, url, response.config.data)
-    }
-
-    // Cache GET responses
-    if (response.config.method === 'get' && response.config.url) {
-      const cacheKey = `${response.config.url}${JSON.stringify(response.config.params || {})}`
-      requestCache.set(cacheKey, {
-        data: response.data,
-        timestamp: Date.now(),
-      })
     }
 
     // Check for session warning headers (5 minutes before expiry)
@@ -383,9 +414,24 @@ apiClient.interceptors.response.use(
   async (error: AxiosError<any>) => {
     const originalRequest = error.config as any
     const url = originalRequest?.url || ''
+    const method = originalRequest?.method?.toLowerCase() || 'get'
 
-    // Record failure for circuit breaker (only for server errors and rate limits)
-    if (error.response?.status && (error.response.status >= 500 || error.response.status === 429)) {
+    // Clean up abort controller
+    removeAbortController(method, url, originalRequest?.params)
+
+    // Don't process cancelled requests
+    if (isAbortError(error)) {
+      return Promise.reject({
+        status: 0,
+        message: 'Request cancelled',
+        code: 'CANCELLED',
+        error: true,
+      })
+    }
+
+    // Record failure for circuit breaker (only for server errors and rate limits, skip auth routes)
+    if (!shouldBypassCircuitBreaker(url) && error.response?.status &&
+        (error.response.status >= 500 || error.response.status === 429)) {
       recordFailure(url)
     }
 
@@ -699,35 +745,27 @@ export const handleApiError = (error: any): string => {
 }
 
 /**
- * Clear request cache
+ * Clear cache (deprecated - TanStack Query handles caching now)
+ * Kept for API compatibility - use queryClient.clear() instead
  */
-export const clearCache = (urlPattern?: string) => {
-  if (urlPattern) {
-    // Clear specific URLs matching pattern
-    Array.from(requestCache.keys()).forEach(key => {
-      if (key.includes(urlPattern)) {
-        requestCache.delete(key)
-      }
-    })
-  } else {
-    // Clear all cache
-    requestCache.clear()
-  }
+export const clearCache = (_urlPattern?: string) => {
+  // No-op: TanStack Query handles caching now
+  // Use queryClient.invalidateQueries() or queryClient.clear() instead
 }
 
 /**
- * Get cache size
+ * Get cache size (deprecated - TanStack Query handles caching now)
  */
 export const getCacheSize = () => {
-  return requestCache.size
+  return 0 // No axios-level cache
 }
 
 /**
- * Reset all API state (cache, pending requests, circuit breakers, idempotency keys)
+ * Reset all API state (pending requests, circuit breakers, idempotency keys)
  * Call this on logout to ensure clean state
  */
 export const resetApiState = () => {
-  clearCache()
+  cancelAllRequests('Logout - clearing state')
   clearPendingRequests()
   resetAllCircuits()
   clearAllIdempotencyKeys()
@@ -743,6 +781,13 @@ export {
   generateIdempotencyKey,
   FINANCIAL_PATHS,
 } from './idempotency'
+
+// Re-export request cancellation utilities
+export {
+  cancelAllRequests,
+  cancelNavigationRequests,
+  isAbortError,
+} from './request-cancellation'
 
 // Alias export for compatibility with services that import 'api'
 export const api = apiClient
