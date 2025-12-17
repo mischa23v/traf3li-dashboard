@@ -1,5 +1,5 @@
 import { TasksSidebar } from './tasks-sidebar'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
@@ -52,6 +52,19 @@ export function TasksListView() {
     const [showFilters, setShowFilters] = useState(false) // New state for mobile filters
     const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([])
 
+    // Performance optimization: Defer filter dropdown data loading
+    // These are only needed when user interacts with filters, not on initial render
+    const [isFilterDataReady, setIsFilterDataReady] = useState(false)
+
+    useEffect(() => {
+        // Defer loading of filter dropdown data by 200ms
+        // This allows the main task list to render first
+        const timer = setTimeout(() => {
+            setIsFilterDataReady(true)
+        }, 200)
+        return () => clearTimeout(timer)
+    }, [])
+
     // Filter states
     const [searchQuery, setSearchQuery] = useState('')
     const [priorityFilter, setPriorityFilter] = useState<string>('all')
@@ -60,9 +73,9 @@ export function TasksListView() {
     const [caseFilter, setCaseFilter] = useState<string>('all')
     const [sortBy, setSortBy] = useState<string>('dueDate')
 
-    // Fetch team members and cases for filter dropdowns
-    const { data: teamMembers } = useTeamMembers()
-    const { data: casesData } = useCases()
+    // Fetch team members and cases for filter dropdowns (DEFERRED)
+    const { data: teamMembers } = useTeamMembers(isFilterDataReady)
+    const { data: casesData } = useCases(undefined, isFilterDataReady)
 
     // Mutations for task actions
     const deleteTaskMutation = useDeleteTask()

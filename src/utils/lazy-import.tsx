@@ -130,3 +130,30 @@ export const FlowSkeleton = () => (
     <div className="text-slate-400 text-sm">Loading diagram...</div>
   </div>
 )
+
+export const DashboardSkeleton = () => (
+  <div className="w-full min-h-screen bg-[#f8f9fa] p-6 lg:p-8 space-y-6">
+    {/* Hero Banner Skeleton */}
+    <Skeleton className="h-48 w-full rounded-3xl" />
+    {/* Tabs Skeleton */}
+    <div className="flex gap-2">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <Skeleton key={i} className="h-10 w-24 rounded-xl" />
+      ))}
+    </div>
+    {/* Content Grid Skeleton */}
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="lg:col-span-2 space-y-6">
+        <Skeleton className="h-64 w-full rounded-3xl" />
+        <div className="grid grid-cols-2 gap-6">
+          <Skeleton className="h-48 w-full rounded-3xl" />
+          <Skeleton className="h-48 w-full rounded-3xl" />
+        </div>
+      </div>
+      <div className="space-y-6">
+        <Skeleton className="h-72 w-full rounded-3xl" />
+        <Skeleton className="h-56 w-full rounded-3xl" />
+      </div>
+    </div>
+  </div>
+)

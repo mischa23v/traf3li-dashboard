@@ -36,38 +36,38 @@ export const useDashboardHeroStats = () => {
   })
 }
 
-export const useTodayEvents = () => {
+export const useTodayEvents = (isEnabled = true) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
     queryKey: ['dashboard', 'today-events'],
     queryFn: () => dashboardService.getTodayEvents(),
     staleTime: 5 * 60 * 1000, // 5 minutes
-    enabled: isAuthenticated, // Only fetch when authenticated
+    enabled: isAuthenticated && isEnabled, // Only fetch when authenticated and enabled
     retry: 1, // Reduce retries to minimize 401 spam
   })
 }
 
-export const useFinancialSummary = () => {
+export const useFinancialSummary = (isEnabled = true) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
     queryKey: ['dashboard', 'financial-summary'],
     queryFn: () => dashboardService.getFinancialSummary(),
     staleTime: 5 * 60 * 1000, // 5 minutes
-    enabled: isAuthenticated, // Only fetch when authenticated
+    enabled: isAuthenticated && isEnabled, // Only fetch when authenticated and enabled
     retry: 1, // Reduce retries to minimize 401 spam
   })
 }
 
-export const useRecentMessages = (limit = 5) => {
+export const useRecentMessages = (limit = 5, isEnabled = true) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
     queryKey: ['dashboard', 'recent-messages', limit],
     queryFn: () => dashboardService.getRecentMessages(limit),
     staleTime: 30 * 1000, // 30 seconds
-    enabled: isAuthenticated, // Only fetch when authenticated
+    enabled: isAuthenticated && isEnabled, // Only fetch when authenticated and enabled
     retry: 1, // Reduce retries to minimize 401 spam
   })
 }

@@ -56,12 +56,14 @@ export const useLawyers = (params?: GetLawyersParams) => {
 
 /**
  * Hook to fetch team members (protected)
+ * @param isEnabled - Optional flag to defer loading (defaults to true)
  */
-export const useTeamMembers = () => {
+export const useTeamMembers = (isEnabled = true) => {
   return useQuery({
     queryKey: userKeys.team(),
     queryFn: () => usersService.getTeamMembers(),
     staleTime: 2 * 60 * 1000,
+    enabled: isEnabled, // Allow deferred loading for performance
   })
 }
 
