@@ -250,7 +250,8 @@ export const getDashboardHeroStats = async (): Promise<DashboardHeroStats> => {
 export const getDashboardSummary = async (): Promise<DashboardSummary> => {
   try {
     const response = await apiClient.get('/dashboard/summary')
-    return response.data
+    // Backend returns { success: true, data: { caseStats, taskStats, ... } }
+    return response.data.data
   } catch (error) {
     throw handleApiError(error)
   }
