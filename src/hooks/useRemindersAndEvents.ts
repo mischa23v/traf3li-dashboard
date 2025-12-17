@@ -15,8 +15,8 @@ import eventsService, {
   CreateEventData,
   Event,
 } from '@/services/eventsService'
-import { useAuthStore } from '@/stores/authStore'
-import { apiClient } from '@/lib/apiClient'
+import { useAuthStore } from '@/stores/auth-store'
+import apiClient from '@/lib/api'
 
 // ==================== Cache Configuration ====================
 // Cache data for 30 minutes to reduce API calls
