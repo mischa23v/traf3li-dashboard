@@ -259,6 +259,15 @@ const MAX_CONSECUTIVE_401 = 10 // Very high threshold - almost never auto-logout
 let pendingAuthRequest: Promise<User | null> | null = null
 
 /**
+ * Time-based request caching for getCurrentUser
+ * Prevents making new /auth/me requests if we recently verified auth
+ * This is critical for route preloading where multiple routes call beforeLoad in sequence
+ */
+let lastAuthRequestTime: number = 0
+let lastAuthRequestResult: User | null = null
+const AUTH_REQUEST_CACHE_MS = 10 * 1000 // Cache auth result for 10 seconds
+
+/**
  * Auth event logger - only logs in development mode
  * In production, this is a no-op for performance
  */
@@ -354,6 +363,9 @@ const authService = {
     memoryCachedUser = null
     lastSuccessfulAuth = 0
     consecutive401Count = 0
+    // Clear time-based request cache so next auth check makes a fresh request
+    lastAuthRequestTime = 0
+    lastAuthRequestResult = null
   },
 
   /**
@@ -365,8 +377,25 @@ const authService = {
    *
    * Uses request deduplication to prevent multiple concurrent /auth/me calls
    * when multiple routes preload simultaneously (e.g., TanStack Router's beforeLoad)
+   *
+   * Also uses time-based caching to prevent sequential route preloads from
+   * each making a new /auth/me request (10 second cache window)
    */
   getCurrentUser: async (): Promise<User | null> => {
+    const now = Date.now()
+
+    // TIME-BASED CACHE: If we successfully verified auth recently, return cached result
+    // This prevents sequential route preloads from each making a new /auth/me request
+    if (lastAuthRequestResult !== null && (now - lastAuthRequestTime) < AUTH_REQUEST_CACHE_MS) {
+      logAuthEvent('GET_CURRENT_USER_CACHED', {
+        action: 'returning cached result',
+        cacheAge: now - lastAuthRequestTime,
+        cacheMaxAge: AUTH_REQUEST_CACHE_MS,
+        userId: lastAuthRequestResult._id,
+      })
+      return lastAuthRequestResult
+    }
+
     // If there's already a pending request, return the same promise
     // This prevents multiple concurrent /auth/me calls
     if (pendingAuthRequest) {
@@ -435,6 +464,10 @@ const authService = {
 
       // Also keep in memory as backup
       memoryCachedUser = user
+
+      // Update time-based request cache (prevents sequential route preloads from making new requests)
+      lastAuthRequestTime = Date.now()
+      lastAuthRequestResult = user
 
       logAuthEvent('GET_CURRENT_USER_SUCCESS', {
         username: user.username,
