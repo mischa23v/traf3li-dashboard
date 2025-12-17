@@ -45,6 +45,11 @@ import {
   LeadActivity,
 } from '@/services/accountingService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // ==================== QUERY KEYS ====================
 
 export const accountingKeys = {
@@ -119,6 +124,8 @@ export const useAccountTypes = () => {
   return useQuery({
     queryKey: accountingKeys.accountTypes(),
     queryFn: accountingService.getAccountTypes,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -126,6 +133,8 @@ export const useAccounts = (filters?: AccountFilters) => {
   return useQuery({
     queryKey: accountingKeys.accountsList(filters),
     queryFn: () => accountingService.getAccounts(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -186,6 +195,8 @@ export const useGLEntries = (filters?: GLEntryFilters) => {
   return useQuery({
     queryKey: accountingKeys.glEntriesList(filters),
     queryFn: () => accountingService.getGLEntries(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -203,6 +214,8 @@ export const useJournalEntries = (filters?: { status?: string }) => {
   return useQuery({
     queryKey: accountingKeys.journalEntriesList(filters),
     queryFn: () => accountingService.getJournalEntries(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -291,6 +304,8 @@ export const useFiscalPeriods = () => {
   return useQuery({
     queryKey: accountingKeys.fiscalPeriodsList(),
     queryFn: accountingService.getFiscalPeriods,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -298,6 +313,8 @@ export const useCurrentFiscalPeriod = () => {
   return useQuery({
     queryKey: accountingKeys.currentFiscalPeriod(),
     queryFn: accountingService.getCurrentFiscalPeriod,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -313,6 +330,8 @@ export const useFiscalYearsSummary = () => {
   return useQuery({
     queryKey: accountingKeys.fiscalYearsSummary(),
     queryFn: accountingService.getFiscalYearsSummary,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -424,6 +443,8 @@ export const useRecurringTransactions = (filters?: { status?: RecurringStatus; t
   return useQuery({
     queryKey: accountingKeys.recurringList(filters),
     queryFn: () => accountingService.getRecurringTransactions(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -431,6 +452,8 @@ export const useUpcomingRecurring = () => {
   return useQuery({
     queryKey: accountingKeys.recurringUpcoming(),
     queryFn: accountingService.getUpcomingRecurring,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -547,6 +570,8 @@ export const usePriceLevels = () => {
   return useQuery({
     queryKey: accountingKeys.priceLevelsList(),
     queryFn: accountingService.getPriceLevels,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -629,6 +654,8 @@ export const useBills = (filters?: BillFilters) => {
   return useQuery({
     queryKey: accountingKeys.billsList(filters),
     queryFn: () => accountingService.getBills(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -734,6 +761,8 @@ export const useDebitNotes = (filters?: DebitNoteFilters) => {
   return useQuery({
     queryKey: accountingKeys.debitNotesList(filters),
     queryFn: () => accountingService.getDebitNotes(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -871,6 +900,8 @@ export const useVendors = (filters?: VendorFilters) => {
   return useQuery({
     queryKey: accountingKeys.vendorsList(filters),
     queryFn: () => accountingService.getVendors(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -931,6 +962,8 @@ export const useRetainers = (filters?: { clientId?: string; status?: RetainerSta
   return useQuery({
     queryKey: accountingKeys.retainersList(filters),
     queryFn: () => accountingService.getRetainers(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -1002,6 +1035,8 @@ export const useLeads = (filters?: LeadFilters) => {
   return useQuery({
     queryKey: accountingKeys.leadsList(filters),
     queryFn: () => accountingService.getLeads(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -1017,6 +1052,8 @@ export const useLeadStats = () => {
   return useQuery({
     queryKey: accountingKeys.leadStats(),
     queryFn: accountingService.getLeadStats,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -1115,6 +1152,8 @@ export const useProfitLossReport = (startDate: string, endDate: string) => {
     queryKey: accountingKeys.profitLoss(startDate, endDate),
     queryFn: () => accountingService.getProfitLossReport(startDate, endDate),
     enabled: !!startDate && !!endDate,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -1122,6 +1161,8 @@ export const useBalanceSheetReport = (asOfDate?: string) => {
   return useQuery({
     queryKey: accountingKeys.balanceSheet(asOfDate),
     queryFn: () => accountingService.getBalanceSheetReport(asOfDate),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -1129,6 +1170,8 @@ export const useTrialBalanceReport = (asOfDate?: string) => {
   return useQuery({
     queryKey: accountingKeys.trialBalance(asOfDate),
     queryFn: () => accountingService.getTrialBalanceReport(asOfDate),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -1136,6 +1179,8 @@ export const useARAgingReport = () => {
   return useQuery({
     queryKey: accountingKeys.arAging(),
     queryFn: accountingService.getARAgingReport,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -1144,6 +1189,8 @@ export const useCaseProfitabilityReport = (startDate: string, endDate: string) =
     queryKey: accountingKeys.caseProfitability(startDate, endDate),
     queryFn: () => accountingService.getCaseProfitabilityReport(startDate, endDate),
     enabled: !!startDate && !!endDate,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

@@ -31,6 +31,11 @@ import {
   type RehireEligibility,
 } from '@/services/offboardingService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query Keys
 export const offboardingKeys = {
   all: ['offboarding'] as const,
@@ -49,6 +54,8 @@ export const useOffboardings = (filters?: OffboardingFilters) => {
   return useQuery({
     queryKey: offboardingKeys.list(filters),
     queryFn: () => getOffboardings(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -66,6 +73,8 @@ export const useOffboardingStats = () => {
   return useQuery({
     queryKey: offboardingKeys.stats(),
     queryFn: () => getOffboardingStats(),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -83,6 +92,8 @@ export const usePendingClearances = () => {
   return useQuery({
     queryKey: offboardingKeys.pendingClearances(),
     queryFn: () => getPendingClearances(),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -91,6 +102,8 @@ export const usePendingSettlements = () => {
   return useQuery({
     queryKey: offboardingKeys.pendingSettlements(),
     queryFn: () => getPendingSettlements(),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

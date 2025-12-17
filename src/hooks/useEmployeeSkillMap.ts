@@ -26,6 +26,11 @@ import {
   type EmployeeSkillDetail,
 } from '@/services/employeeSkillMapService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query keys
 export const skillMapKeys = {
   all: ['skill-maps'] as const,
@@ -74,6 +79,8 @@ export const useEmployeeSkillMaps = (filters?: SkillMapFilters) => {
   return useQuery({
     queryKey: skillMapKeys.list(filters),
     queryFn: () => getEmployeeSkillMaps(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -83,6 +90,8 @@ export const useEmployeeSkillMap = (employeeId: string) => {
     queryKey: skillMapKeys.detail(employeeId),
     queryFn: () => getEmployeeSkillMap(employeeId),
     enabled: !!employeeId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -91,6 +100,8 @@ export const useSkillMatrix = (departmentId?: string) => {
   return useQuery({
     queryKey: skillMapKeys.matrix(departmentId),
     queryFn: () => getSkillMatrix(departmentId),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -100,6 +111,8 @@ export const useFindEmployeesWithSkill = (skillId: string, minProficiency?: numb
     queryKey: skillMapKeys.employeesWithSkill(skillId, minProficiency),
     queryFn: () => findEmployeesWithSkill(skillId, minProficiency),
     enabled: !!skillId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -109,6 +122,8 @@ export const useSkillDistribution = (skillId: string) => {
     queryKey: skillMapKeys.skillDistribution(skillId),
     queryFn: () => getSkillDistribution(skillId),
     enabled: !!skillId,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -118,6 +133,8 @@ export const useTrainingRecommendations = (employeeId: string) => {
     queryKey: skillMapKeys.trainingRecommendations(employeeId),
     queryFn: () => recommendTraining(employeeId),
     enabled: !!employeeId,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -127,6 +144,8 @@ export const useDepartmentSkillSummary = (departmentId: string) => {
     queryKey: skillMapKeys.departmentSummary(departmentId),
     queryFn: () => getDepartmentSkillSummary(departmentId),
     enabled: !!departmentId,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -136,6 +155,8 @@ export const useSkillTrends = (employeeId: string, skillId: string) => {
     queryKey: skillMapKeys.skillTrends(employeeId, skillId),
     queryFn: () => getSkillTrends(employeeId, skillId),
     enabled: !!employeeId && !!skillId,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

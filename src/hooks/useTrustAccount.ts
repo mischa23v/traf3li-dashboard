@@ -8,6 +8,11 @@ import {
   type ReconciliationAdjustment,
 } from '@/services/trustAccountService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query key factory
 export const trustAccountKeys = {
   all: ['trust-accounts'] as const,
@@ -40,6 +45,8 @@ export function useTrustAccounts(params?: {
   return useQuery({
     queryKey: trustAccountKeys.list(params),
     queryFn: () => trustAccountService.getTrustAccounts(params),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -139,6 +146,8 @@ export function useClientTrustBalances(params?: {
   return useQuery({
     queryKey: [...trustAccountKeys.clientBalances(), params],
     queryFn: () => trustAccountService.getClientTrustBalances(params),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -165,6 +174,8 @@ export function useTrustTransactions(params?: {
   return useQuery({
     queryKey: trustAccountKeys.transactionList(params),
     queryFn: () => trustAccountService.getTrustTransactions(params),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -339,6 +350,8 @@ export function useTrustReconciliations(params?: {
   return useQuery({
     queryKey: trustAccountKeys.reconciliationList(params),
     queryFn: () => trustAccountService.getReconciliations(params),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -452,6 +465,8 @@ export function useThreeWayReconciliation(accountId: string) {
     queryKey: trustAccountKeys.threeWay(accountId),
     queryFn: () => trustAccountService.getThreeWayReconciliationHistory(accountId),
     enabled: !!accountId,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -490,6 +505,8 @@ export function useClientLedgerReport(
     queryFn: () =>
       trustAccountService.getClientLedgerReport(accountId, clientId, params),
     enabled: !!accountId && !!clientId,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

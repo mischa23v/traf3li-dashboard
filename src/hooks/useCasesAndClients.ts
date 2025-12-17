@@ -45,6 +45,11 @@ import lawyersService, {
 import eventsService from '@/services/eventsService'
 import remindersService from '@/services/remindersService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // ==================== CASES ====================
 
 /**
@@ -54,7 +59,8 @@ export const useCases = (filters?: CaseFilters) => {
   return useQuery({
     queryKey: ['cases', filters],
     queryFn: () => casesService.getCases(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -68,7 +74,8 @@ export const useCase = (id: string) => {
     queryFn: () => casesService.getCase(id),
     enabled: !!id,
     retry: false, // Don't retry on 403/404 - prevents page freeze
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -399,7 +406,8 @@ export const useClients = (filters?: ClientFilters) => {
   return useQuery({
     queryKey: ['clients', filters],
     queryFn: () => clientsService.getClients(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -409,7 +417,8 @@ export const useClient = (id: string) => {
     queryFn: () => clientsService.getClient(id),
     enabled: !!id,
     retry: false, // Don't retry on 403/404 - prevents page freeze
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -517,7 +526,8 @@ export const useSearchClients = (query: string) => {
     queryKey: ['clients', 'search', query],
     queryFn: () => clientsService.searchClients(query),
     enabled: query.length >= 2,
-    staleTime: 1 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -525,7 +535,8 @@ export const useClientStats = () => {
   return useQuery({
     queryKey: ['clients', 'stats'],
     queryFn: () => clientsService.getStats(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -533,7 +544,8 @@ export const useTopRevenueClients = (limit: number = 10) => {
   return useQuery({
     queryKey: ['clients', 'top-revenue', limit],
     queryFn: () => clientsService.getTopRevenue(limit),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -546,7 +558,8 @@ export const useLawyers = (filters?: LawyerFilters) => {
   return useQuery({
     queryKey: ['lawyers', filters],
     queryFn: () => lawyersService.getAll(filters),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -558,6 +571,8 @@ export const useLawyer = (id: string) => {
     queryKey: ['lawyers', id],
     queryFn: () => lawyersService.getById(id),
     enabled: !!id,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -568,7 +583,8 @@ export const useTeamMembers = () => {
   return useQuery({
     queryKey: ['lawyers', 'team'],
     queryFn: () => lawyersService.getTeamMembers(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -899,7 +915,8 @@ export const useCaseAuditHistory = (caseId: string) => {
     queryKey: ['cases', caseId, 'audit'],
     queryFn: () => casesService.getAuditHistory(caseId),
     enabled: !!caseId,
-    staleTime: 1 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -937,7 +954,8 @@ export const useCaseStatisticsFromAPI = () => {
   return useQuery({
     queryKey: ['cases', 'statistics'],
     queryFn: () => casesService.getStatistics(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -971,7 +989,8 @@ export const usePipelineCases = (category: CaseCategory) => {
     queryKey: ['cases', 'pipeline', category],
     queryFn: () => casesService.getPipelineCases(category),
     enabled: !!category,
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -983,7 +1002,8 @@ export const usePipelineStatistics = (category?: CaseCategory) => {
   return useQuery({
     queryKey: ['cases', 'pipeline', 'statistics', category],
     queryFn: () => casesService.getPipelineStatistics(category),
-    staleTime: 2 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -996,7 +1016,8 @@ export const usePipelineStages = (category: CaseCategory) => {
     queryKey: ['cases', 'pipeline', 'stages', category],
     queryFn: () => casesService.getPipelineStages(category),
     enabled: !!category,
-    staleTime: 10 * 60 * 1000, // Stages don't change often
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

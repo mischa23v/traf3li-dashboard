@@ -31,6 +31,11 @@ import {
   type DisbursementMethod,
 } from '@/services/loansService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query Keys
 export const loanKeys = {
   all: ['loans'] as const,
@@ -51,6 +56,8 @@ export const useLoans = (filters?: LoanFilters) => {
   return useQuery({
     queryKey: loanKeys.list(filters),
     queryFn: () => getLoans(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -60,6 +67,8 @@ export const useLoan = (loanId: string) => {
     queryKey: loanKeys.detail(loanId),
     queryFn: () => getLoan(loanId),
     enabled: !!loanId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -68,6 +77,8 @@ export const useLoanStats = () => {
   return useQuery({
     queryKey: loanKeys.stats(),
     queryFn: () => getLoanStats(),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -77,6 +88,8 @@ export const useEmployeeLoans = (employeeId: string) => {
     queryKey: loanKeys.byEmployee(employeeId),
     queryFn: () => getEmployeeLoans(employeeId),
     enabled: !!employeeId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -85,6 +98,8 @@ export const usePendingApprovals = () => {
   return useQuery({
     queryKey: loanKeys.pendingApprovals(),
     queryFn: () => getPendingApprovals(),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -93,6 +108,8 @@ export const useOverdueInstallments = () => {
   return useQuery({
     queryKey: loanKeys.overdueInstallments(),
     queryFn: () => getOverdueInstallments(),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -102,6 +119,8 @@ export const useCheckEligibility = (employeeId: string, amount: number) => {
     queryKey: loanKeys.eligibility(employeeId, amount),
     queryFn: () => checkLoanEligibility(employeeId, amount),
     enabled: !!employeeId && amount > 0,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -111,6 +130,8 @@ export const useEarlySettlementCalculation = (loanId: string) => {
     queryKey: loanKeys.earlySettlement(loanId),
     queryFn: () => calculateEarlySettlement(loanId),
     enabled: !!loanId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

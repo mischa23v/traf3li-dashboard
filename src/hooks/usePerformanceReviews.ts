@@ -19,6 +19,11 @@ import performanceReviewService, {
   type RatingScale,
 } from '@/services/performanceReviewService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query Keys
 export const performanceReviewKeys = {
   all: ['performance-reviews'] as const,
@@ -43,6 +48,8 @@ export function usePerformanceReviews(filters?: PerformanceReviewFilters) {
   return useQuery({
     queryKey: performanceReviewKeys.list(filters),
     queryFn: () => performanceReviewService.getPerformanceReviews(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -51,6 +58,8 @@ export function usePerformanceReview(reviewId: string) {
     queryKey: performanceReviewKeys.detail(reviewId),
     queryFn: () => performanceReviewService.getPerformanceReview(reviewId),
     enabled: !!reviewId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -313,6 +322,8 @@ export function useReviewTemplates(reviewType?: ReviewType) {
   return useQuery({
     queryKey: performanceReviewKeys.templatesByType(reviewType),
     queryFn: () => performanceReviewService.getReviewTemplates(reviewType),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -333,6 +344,8 @@ export function useCalibrationSessions(filters?: { periodYear?: number; status?:
   return useQuery({
     queryKey: performanceReviewKeys.calibrationSessionsFiltered(filters),
     queryFn: () => performanceReviewService.getCalibrationSessions(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -366,6 +379,8 @@ export function usePerformanceStats(filters?: { periodYear?: number; departmentI
   return useQuery({
     queryKey: performanceReviewKeys.stats(filters),
     queryFn: () => performanceReviewService.getPerformanceStats(filters),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -374,6 +389,8 @@ export function useEmployeePerformanceHistory(employeeId: string) {
     queryKey: performanceReviewKeys.employeeHistory(employeeId),
     queryFn: () => performanceReviewService.getEmployeePerformanceHistory(employeeId),
     enabled: !!employeeId,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -382,6 +399,8 @@ export function useTeamPerformanceSummary(managerId: string, periodYear?: number
     queryKey: performanceReviewKeys.teamSummary(managerId, periodYear),
     queryFn: () => performanceReviewService.getTeamPerformanceSummary(managerId, periodYear),
     enabled: !!managerId,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

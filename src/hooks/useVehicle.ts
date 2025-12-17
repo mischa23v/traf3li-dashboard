@@ -27,6 +27,11 @@ import {
   type ReimbursementStatus,
 } from '@/services/vehicleService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query keys
 export const vehicleKeys = {
   all: ['vehicles'] as const,
@@ -56,6 +61,8 @@ export const useVehicles = (filters?: VehicleFilters) => {
   return useQuery({
     queryKey: vehicleKeys.list(filters),
     queryFn: () => getVehicles(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -65,6 +72,8 @@ export const useVehicle = (vehicleId: string) => {
     queryKey: vehicleKeys.detail(vehicleId),
     queryFn: () => getVehicle(vehicleId),
     enabled: !!vehicleId,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -73,6 +82,8 @@ export const useVehicleStats = () => {
   return useQuery({
     queryKey: vehicleKeys.stats(),
     queryFn: getVehicleStats,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -81,6 +92,8 @@ export const useFleetSummary = () => {
   return useQuery({
     queryKey: vehicleKeys.fleetSummary(),
     queryFn: getFleetSummary,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -89,6 +102,8 @@ export const useVehiclesDueForService = () => {
   return useQuery({
     queryKey: vehicleKeys.serviceDue(),
     queryFn: getVehiclesDueForService,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -98,6 +113,8 @@ export const useVehicleUtilization = (vehicleId: string, dateRange?: { from: str
     queryKey: vehicleKeys.utilization(vehicleId, dateRange),
     queryFn: () => getVehicleUtilization(vehicleId, dateRange),
     enabled: !!vehicleId,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -107,6 +124,8 @@ export const useVehicleExpenses = (vehicleId: string, dateRange?: { from: string
     queryKey: vehicleKeys.expenses(vehicleId, dateRange),
     queryFn: () => getVehicleExpenses(vehicleId, dateRange),
     enabled: !!vehicleId,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -213,6 +232,8 @@ export const useVehicleLogs = (filters?: VehicleLogFilters) => {
   return useQuery({
     queryKey: vehicleLogKeys.list(filters),
     queryFn: () => getVehicleLogs(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

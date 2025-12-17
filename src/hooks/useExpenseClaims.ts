@@ -38,6 +38,11 @@ import {
   type PaymentMethod,
 } from '@/services/expenseClaimsService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query keys
 export const expenseClaimKeys = {
   all: ['expense-claims'] as const,
@@ -59,6 +64,8 @@ export const useExpenseClaims = (filters?: ExpenseClaimFilters) => {
   return useQuery({
     queryKey: expenseClaimKeys.list(filters),
     queryFn: () => getExpenseClaims(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -76,6 +83,8 @@ export const useExpenseClaimStats = () => {
   return useQuery({
     queryKey: expenseClaimKeys.stats(),
     queryFn: getExpenseClaimStats,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -93,6 +102,8 @@ export const usePendingClaimApprovals = () => {
   return useQuery({
     queryKey: expenseClaimKeys.pendingApprovals(),
     queryFn: getPendingClaimApprovals,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -101,6 +112,8 @@ export const usePendingPayments = () => {
   return useQuery({
     queryKey: expenseClaimKeys.pendingPayments(),
     queryFn: getPendingPayments,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -109,6 +122,8 @@ export const useMileageRates = () => {
   return useQuery({
     queryKey: expenseClaimKeys.mileageRates(),
     queryFn: getMileageRates,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -117,6 +132,8 @@ export const useExpensePolicies = () => {
   return useQuery({
     queryKey: expenseClaimKeys.policies(),
     queryFn: getExpensePolicies,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

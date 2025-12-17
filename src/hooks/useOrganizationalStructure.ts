@@ -32,6 +32,11 @@ import {
   type LeadershipPosition,
 } from '@/services/organizationalStructureService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query keys
 export const organizationalStructureKeys = {
   all: ['organizational-structure'] as const,
@@ -50,6 +55,8 @@ export const useOrganizationalUnits = (filters?: OrganizationalUnitFilters) => {
   return useQuery({
     queryKey: organizationalStructureKeys.list(filters),
     queryFn: () => getOrganizationalUnits(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -59,6 +66,8 @@ export const useOrganizationalUnit = (unitId: string) => {
     queryKey: organizationalStructureKeys.detail(unitId),
     queryFn: () => getOrganizationalUnit(unitId),
     enabled: !!unitId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -67,6 +76,8 @@ export const useOrganizationalStructureStats = () => {
   return useQuery({
     queryKey: organizationalStructureKeys.stats(),
     queryFn: getOrganizationalStructureStats,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -75,6 +86,8 @@ export const useHierarchyTree = (rootUnitId?: string) => {
   return useQuery({
     queryKey: organizationalStructureKeys.tree(rootUnitId),
     queryFn: () => getHierarchyTree(rootUnitId),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -84,6 +97,8 @@ export const useChildUnits = (parentUnitId: string) => {
     queryKey: organizationalStructureKeys.children(parentUnitId),
     queryFn: () => getChildUnits(parentUnitId),
     enabled: !!parentUnitId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -93,6 +108,8 @@ export const useUnitPath = (unitId: string) => {
     queryKey: organizationalStructureKeys.path(unitId),
     queryFn: () => getUnitPath(unitId),
     enabled: !!unitId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

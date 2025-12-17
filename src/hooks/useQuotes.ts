@@ -7,21 +7,32 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import quoteService, { QuoteFilters, CreateQuoteData, QuoteStatus } from '@/services/quoteService'
 
+// ==================== Cache Configuration ====================
+// Cache data for 30 minutes to reduce API calls
+// Data is refreshed automatically when mutations occur
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour (keep in cache)
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Get all quotes
-export const useQuotes = (filters?: QuoteFilters) => {
+export const useQuotes = (filters?: QuoteFilters, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['quotes', filters],
     queryFn: () => quoteService.getQuotes(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
 // Get single quote
-export const useQuote = (id: string) => {
+export const useQuote = (id: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['quotes', id],
     queryFn: () => quoteService.getQuote(id),
-    enabled: !!id,
+    enabled: !!id && enabled,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -172,11 +183,13 @@ export const useConvertQuoteToInvoice = () => {
 }
 
 // Get quotes summary
-export const useQuotesSummary = (filters?: QuoteFilters) => {
+export const useQuotesSummary = (filters?: QuoteFilters, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['quotes', 'summary', filters],
     queryFn: () => quoteService.getQuotesSummary(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 

@@ -20,6 +20,13 @@ import type {
 } from '@/features/case-notion/data/schema'
 
 // ═══════════════════════════════════════════════════════════════
+// Cache Configuration
+// ═══════════════════════════════════════════════════════════════
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
+// ═══════════════════════════════════════════════════════════════
 // QUERY KEYS
 // ═══════════════════════════════════════════════════════════════
 
@@ -54,6 +61,8 @@ export function useCaseNotionPages(caseId: string, filters?: PageFilters) {
     queryKey: caseNotionKeys.pagesList(caseId, filters),
     queryFn: () => caseNotionService.listPages(caseId, filters),
     enabled: !!caseId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -65,6 +74,8 @@ export function useCaseNotionPage(caseId: string, pageId: string) {
     queryKey: caseNotionKeys.page(caseId, pageId),
     queryFn: () => caseNotionService.getPage(caseId, pageId),
     enabled: !!caseId && !!pageId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -212,6 +223,8 @@ export function useCaseNotionBlocks(caseId: string, pageId: string) {
     queryKey: caseNotionKeys.blocks(caseId, pageId),
     queryFn: () => caseNotionService.getBlocks(caseId, pageId),
     enabled: !!caseId && !!pageId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -365,6 +378,8 @@ export function useBlockComments(caseId: string, blockId: string) {
     queryKey: caseNotionKeys.comments(caseId, blockId),
     queryFn: () => caseNotionService.getComments(caseId, blockId),
     enabled: !!caseId && !!blockId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -448,6 +463,8 @@ export function usePageActivity(caseId: string, pageId: string, limit?: number) 
     queryKey: caseNotionKeys.activity(caseId, pageId),
     queryFn: () => caseNotionService.getPageActivity(caseId, pageId, limit),
     enabled: !!caseId && !!pageId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -462,6 +479,8 @@ export function useCaseNotionTemplates(category?: string) {
   return useQuery({
     queryKey: caseNotionKeys.templates(category),
     queryFn: () => caseNotionService.getTemplates(category),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -522,6 +541,8 @@ export function useCaseNotionSearch(caseId: string, query: string) {
     queryKey: caseNotionKeys.search(caseId, query),
     queryFn: () => caseNotionService.search(caseId, query),
     enabled: !!caseId && !!query && query.length > 2,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

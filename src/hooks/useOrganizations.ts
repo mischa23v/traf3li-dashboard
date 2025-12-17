@@ -7,6 +7,11 @@ import organizationsService, {
 import { toast } from '@/hooks/use-toast'
 import { useTranslation } from 'react-i18next'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query keys
 export const organizationsKeys = {
   all: ['organizations'] as const,
@@ -23,7 +28,8 @@ export const useOrganizations = (filters?: OrganizationFilters) => {
   return useQuery({
     queryKey: organizationsKeys.list(filters || {}),
     queryFn: () => organizationsService.getOrganizations(filters),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -33,6 +39,8 @@ export const useOrganization = (id: string) => {
     queryKey: organizationsKeys.detail(id),
     queryFn: () => organizationsService.getOrganization(id),
     enabled: !!id,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -42,6 +50,8 @@ export const useOrganizationsByClient = (clientId: string) => {
     queryKey: organizationsKeys.byClient(clientId),
     queryFn: () => organizationsService.getOrganizationsByClient(clientId),
     enabled: !!clientId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -52,6 +62,7 @@ export const useSearchOrganizations = (query: string) => {
     queryFn: () => organizationsService.searchOrganizations(query),
     enabled: query.length >= 2,
     staleTime: 30 * 1000, // 30 seconds
+    gcTime: STATS_GC_TIME,
   })
 }
 

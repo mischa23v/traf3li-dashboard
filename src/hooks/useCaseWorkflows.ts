@@ -17,6 +17,11 @@ import caseWorkflowsService, {
   type CompleteRequirementData,
 } from '@/services/caseWorkflowsService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // ==================== QUERY KEYS ====================
 
 export const caseWorkflowKeys = {
@@ -40,6 +45,8 @@ export function useWorkflows(filters?: WorkflowFilters) {
   return useQuery({
     queryKey: caseWorkflowKeys.list(filters),
     queryFn: () => caseWorkflowsService.getWorkflows(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -51,6 +58,8 @@ export function useWorkflow(id: string) {
     queryKey: caseWorkflowKeys.detail(id),
     queryFn: () => caseWorkflowsService.getWorkflow(id),
     enabled: !!id,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -62,6 +71,8 @@ export function useWorkflowByCategory(category: string) {
     queryKey: caseWorkflowKeys.byCategory(category),
     queryFn: () => caseWorkflowsService.getWorkflowByCategory(category),
     enabled: !!category,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -72,6 +83,8 @@ export function usePresetTemplates() {
   return useQuery({
     queryKey: caseWorkflowKeys.presets(),
     queryFn: () => caseWorkflowsService.getPresetTemplates(),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -82,6 +95,8 @@ export function useWorkflowStatistics() {
   return useQuery({
     queryKey: caseWorkflowKeys.statistics(),
     queryFn: () => caseWorkflowsService.getStatistics(),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -93,6 +108,8 @@ export function useCaseProgress(caseId: string) {
     queryKey: caseWorkflowKeys.caseProgress(caseId),
     queryFn: () => caseWorkflowsService.getCaseProgress(caseId),
     enabled: !!caseId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

@@ -12,6 +12,11 @@ import {
 } from '@/services/compensationService'
 import { toast } from 'sonner'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query Keys
 export const compensationKeys = {
   all: ['compensation'] as const,
@@ -30,7 +35,9 @@ export const compensationKeys = {
 export function useCompensationRecords(filters?: CompensationFilters) {
   return useQuery({
     queryKey: compensationKeys.list(filters),
-    queryFn: () => compensationApi.getAll(filters)
+    queryFn: () => compensationApi.getAll(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -39,7 +46,9 @@ export function useCompensationRecord(id: string) {
   return useQuery({
     queryKey: compensationKeys.detail(id),
     queryFn: () => compensationApi.getById(id),
-    enabled: !!id
+    enabled: !!id,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -48,7 +57,9 @@ export function useCompensationByEmployee(employeeId: string) {
   return useQuery({
     queryKey: compensationKeys.byEmployee(employeeId),
     queryFn: () => compensationApi.getByEmployee(employeeId),
-    enabled: !!employeeId
+    enabled: !!employeeId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -56,7 +67,9 @@ export function useCompensationByEmployee(employeeId: string) {
 export function useCompensationStats(officeId?: string) {
   return useQuery({
     queryKey: compensationKeys.stats(officeId),
-    queryFn: () => compensationApi.getStats(officeId)
+    queryFn: () => compensationApi.getStats(officeId),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -65,7 +78,9 @@ export function usePayGradeAnalysis(payGrade: string) {
   return useQuery({
     queryKey: compensationKeys.payGradeAnalysis(payGrade),
     queryFn: () => compensationApi.getPayGradeAnalysis(payGrade),
-    enabled: !!payGrade
+    enabled: !!payGrade,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

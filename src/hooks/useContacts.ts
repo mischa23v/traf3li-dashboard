@@ -8,6 +8,11 @@ import { toast } from '@/hooks/use-toast'
 import { useTranslation } from 'react-i18next'
 import { createOptimisticMutation } from '@/lib/mutation-utils'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query keys
 export const contactsKeys = {
   all: ['contacts'] as const,
@@ -25,7 +30,8 @@ export const useContacts = (filters?: ContactFilters) => {
   return useQuery({
     queryKey: ['contacts', filters],  // Simple key like useClients uses
     queryFn: () => contactsService.getContacts(filters),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -35,6 +41,8 @@ export const useContact = (id: string) => {
     queryKey: contactsKeys.detail(id),
     queryFn: () => contactsService.getContact(id),
     enabled: !!id,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -44,6 +52,8 @@ export const useContactsByCase = (caseId: string) => {
     queryKey: contactsKeys.byCase(caseId),
     queryFn: () => contactsService.getContactsByCase(caseId),
     enabled: !!caseId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -53,6 +63,8 @@ export const useContactsByClient = (clientId: string) => {
     queryKey: contactsKeys.byClient(clientId),
     queryFn: () => contactsService.getContactsByClient(clientId),
     enabled: !!clientId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -63,6 +75,7 @@ export const useSearchContacts = (query: string) => {
     queryFn: () => contactsService.searchContacts(query),
     enabled: query.length >= 2,
     staleTime: 30 * 1000, // 30 seconds
+    gcTime: STATS_GC_TIME,
   })
 }
 

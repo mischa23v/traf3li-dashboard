@@ -6,6 +6,11 @@ import employeePromotionService, {
   UpdatePromotionInput,
 } from '@/services/employeePromotionService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // ==================== PROMOTIONS ====================
 
 /**
@@ -15,7 +20,8 @@ export const usePromotions = (filters?: PromotionFilters) => {
   return useQuery({
     queryKey: ['employee-promotions', filters],
     queryFn: () => employeePromotionService.getPromotions(filters),
-    staleTime: 5 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -28,7 +34,8 @@ export const usePromotion = (id: string) => {
     queryKey: ['employee-promotions', id],
     queryFn: () => employeePromotionService.getPromotion(id),
     enabled: !!id,
-    staleTime: 5 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -44,7 +51,8 @@ export const usePromotionStats = (filters?: {
   return useQuery({
     queryKey: ['employee-promotions', 'stats', filters],
     queryFn: () => employeePromotionService.getPromotionStats(filters),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -57,6 +65,7 @@ export const usePendingPromotions = () => {
     queryKey: ['employee-promotions', 'pending'],
     queryFn: () => employeePromotionService.getPendingPromotions(),
     staleTime: 2 * 60 * 1000,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -69,6 +78,7 @@ export const usePromotionsAwaitingApplication = () => {
     queryKey: ['employee-promotions', 'awaiting-application'],
     queryFn: () => employeePromotionService.getPromotionsAwaitingApplication(),
     staleTime: 2 * 60 * 1000,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -81,7 +91,8 @@ export const usePromotionHistory = (employeeId: string) => {
     queryKey: ['employee-promotions', 'history', employeeId],
     queryFn: () => employeePromotionService.getPromotionHistory(employeeId),
     enabled: !!employeeId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -97,7 +108,8 @@ export const useEmployeePromotions = (
     queryKey: ['employee-promotions', 'employee', employeeId, filters],
     queryFn: () => employeePromotionService.getEmployeePromotions(employeeId, filters),
     enabled: !!employeeId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }

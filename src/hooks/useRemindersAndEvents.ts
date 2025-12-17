@@ -14,13 +14,21 @@ import eventsService, {
   CreateEventData,
 } from '@/services/eventsService'
 
+// ==================== Cache Configuration ====================
+// Cache data for 30 minutes to reduce API calls
+// Data is refreshed automatically when reminders/events are created/updated/deleted
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour (keep in cache)
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists (more dynamic)
+
 // ==================== REMINDERS ====================
 
 export const useReminders = (filters?: ReminderFilters) => {
   return useQuery({
     queryKey: ['reminders', filters],
     queryFn: () => remindersService.getReminders(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -29,6 +37,7 @@ export const useReminder = (id: string) => {
     queryKey: ['reminders', id],
     queryFn: () => remindersService.getReminder(id),
     enabled: !!id,
+    staleTime: LIST_STALE_TIME,
   })
 }
 
@@ -227,27 +236,35 @@ export const useDeleteReminder = () => {
   })
 }
 
-export const useUpcomingReminders = (days: number = 7) => {
+export const useUpcomingReminders = (days: number = 7, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['reminders', 'upcoming', days],
     queryFn: () => remindersService.getUpcoming(days),
-    staleTime: 1 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
-export const useOverdueReminders = () => {
+export const useOverdueReminders = (enabled: boolean = true) => {
   return useQuery({
     queryKey: ['reminders', 'overdue'],
     queryFn: () => remindersService.getOverdue(),
-    staleTime: 1 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
-export const useReminderStats = (filters?: { assignedTo?: string; dateFrom?: string; dateTo?: string }) => {
+export const useReminderStats = (options?: { assignedTo?: string; dateFrom?: string; dateTo?: string; enabled?: boolean }) => {
+  const { enabled = true, ...filters } = options || {}
+  const hasFilters = Object.keys(filters).length > 0
   return useQuery({
-    queryKey: ['reminders', 'stats', filters],
-    queryFn: () => remindersService.getStats(filters),
-    staleTime: 5 * 60 * 1000,
+    queryKey: ['reminders', 'stats', hasFilters ? filters : undefined],
+    queryFn: () => remindersService.getStats(hasFilters ? filters : undefined),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
@@ -354,7 +371,8 @@ export const useEvents = (filters?: EventFilters) => {
   return useQuery({
     queryKey: ['events', filters],
     queryFn: () => eventsService.getEvents(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -550,19 +568,23 @@ export const useRSVPEvent = () => {
   })
 }
 
-export const useUpcomingEvents = (days: number = 7) => {
+export const useUpcomingEvents = (days: number = 7, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['events', 'upcoming', days],
     queryFn: () => eventsService.getUpcoming(days),
-    staleTime: 1 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
-export const useEventStats = (filters?: { dateFrom?: string; dateTo?: string; caseId?: string }) => {
+export const useEventStats = (filters?: { dateFrom?: string; dateTo?: string; caseId?: string }, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['events', 'stats', filters],
     queryFn: () => eventsService.getStats(filters),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 

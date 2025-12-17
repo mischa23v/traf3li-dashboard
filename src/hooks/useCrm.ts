@@ -34,6 +34,13 @@ import type {
   AddNoteData,
 } from '@/types/crm'
 
+// ==================== Cache Configuration ====================
+// Cache data for 30 minutes to reduce API calls
+// Data is refreshed automatically when mutations occur
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour (keep in cache)
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // ═══════════════════════════════════════════════════════════════
 // LEAD HOOKS
 // ═══════════════════════════════════════════════════════════════
@@ -41,57 +48,65 @@ import type {
 /**
  * Get all leads with optional filters
  */
-export const useLeads = (filters?: LeadFilters) => {
+export const useLeads = (filters?: LeadFilters, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['leads', filters],
     queryFn: () => leadService.getLeads(filters),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
 /**
  * Get single lead with activities
  */
-export const useLead = (leadId: string) => {
+export const useLead = (leadId: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['leads', leadId],
     queryFn: () => leadService.getLead(leadId),
-    enabled: !!leadId,
-    staleTime: 2 * 60 * 1000,
+    enabled: !!leadId && enabled,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
 /**
  * Get lead statistics
  */
-export const useLeadStats = (params?: { startDate?: string; endDate?: string }) => {
+export const useLeadStats = (params?: { startDate?: string; endDate?: string }, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['leads', 'stats', params],
     queryFn: () => leadService.getStats(params),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
 /**
  * Get leads by pipeline (Kanban view)
  */
-export const useLeadsByPipeline = (pipelineId?: string) => {
+export const useLeadsByPipeline = (pipelineId?: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['leads', 'pipeline', pipelineId],
     queryFn: () => leadService.getByPipeline(pipelineId),
-    enabled: !!pipelineId, // Only fetch when we have a valid pipeline ID
-    staleTime: 1 * 60 * 1000, // 1 minute
+    enabled: !!pipelineId && enabled, // Only fetch when we have a valid pipeline ID
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
 /**
  * Get leads needing follow-up
  */
-export const useLeadsNeedingFollowUp = (limit?: number) => {
+export const useLeadsNeedingFollowUp = (limit?: number, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['leads', 'follow-up', limit],
     queryFn: () => leadService.getNeedingFollowUp(limit),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
@@ -100,13 +115,15 @@ export const useLeadsNeedingFollowUp = (limit?: number) => {
  */
 export const useLeadActivities = (
   leadId: string,
-  params?: { type?: string; page?: number }
+  params?: { type?: string; page?: number },
+  enabled: boolean = true
 ) => {
   return useQuery({
     queryKey: ['leads', leadId, 'activities', params],
     queryFn: () => leadService.getActivities(leadId, params),
-    enabled: !!leadId,
-    staleTime: 1 * 60 * 1000,
+    enabled: !!leadId && enabled,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -373,35 +390,39 @@ export const useLogLeadActivity = () => {
 /**
  * Get all pipelines
  */
-export const usePipelines = (params?: PipelineFilters) => {
+export const usePipelines = (params?: PipelineFilters, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['pipelines', params],
     queryFn: () => pipelineService.getPipelines(params),
-    staleTime: 5 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
 /**
  * Get single pipeline with stage counts
  */
-export const usePipeline = (pipelineId: string) => {
+export const usePipeline = (pipelineId: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['pipelines', pipelineId],
     queryFn: () => pipelineService.getPipeline(pipelineId),
-    enabled: !!pipelineId,
-    staleTime: 2 * 60 * 1000,
+    enabled: !!pipelineId && enabled,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
 /**
  * Get pipeline statistics
  */
-export const usePipelineStats = (pipelineId: string) => {
+export const usePipelineStats = (pipelineId: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['pipelines', pipelineId, 'stats'],
     queryFn: () => pipelineService.getStats(pipelineId),
-    enabled: !!pipelineId,
-    staleTime: 5 * 60 * 1000,
+    enabled: !!pipelineId && enabled,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -661,23 +682,26 @@ export const useDuplicatePipeline = () => {
 /**
  * Get all referrals
  */
-export const useReferrals = (filters?: ReferralFilters) => {
+export const useReferrals = (filters?: ReferralFilters, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['referrals', filters],
     queryFn: () => referralService.getReferrals(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
 /**
  * Get single referral
  */
-export const useReferral = (referralId: string) => {
+export const useReferral = (referralId: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['referrals', referralId],
     queryFn: () => referralService.getReferral(referralId),
-    enabled: !!referralId,
-    staleTime: 2 * 60 * 1000,
+    enabled: !!referralId && enabled,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -687,22 +711,26 @@ export const useReferral = (referralId: string) => {
 export const useReferralStats = (params?: {
   startDate?: string
   endDate?: string
-}) => {
+}, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['referrals', 'stats', params],
     queryFn: () => referralService.getStats(params),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
 /**
  * Get top referrers
  */
-export const useTopReferrers = (limit?: number) => {
+export const useTopReferrers = (limit?: number, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['referrals', 'top', limit],
     queryFn: () => referralService.getTopReferrers(limit),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
@@ -968,12 +996,13 @@ export const useRecordReferralPayment = () => {
  */
 export const useCalculateReferralFee = (
   referralId: string,
-  caseValue: number
+  caseValue: number,
+  enabled: boolean = true
 ) => {
   return useQuery({
     queryKey: ['referrals', referralId, 'calculate-fee', caseValue],
     queryFn: () => referralService.calculateFee(referralId, caseValue),
-    enabled: !!referralId && caseValue > 0,
+    enabled: !!referralId && caseValue > 0 && enabled,
     staleTime: 0, // Always fresh
   })
 }
@@ -985,23 +1014,26 @@ export const useCalculateReferralFee = (
 /**
  * Get all activities
  */
-export const useActivities = (params?: ActivityFilters) => {
+export const useActivities = (params?: ActivityFilters, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['activities', params],
     queryFn: () => crmActivityService.getActivities(params),
-    staleTime: 1 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
 /**
  * Get single activity
  */
-export const useActivity = (activityId: string) => {
+export const useActivity = (activityId: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['activities', activityId],
     queryFn: () => crmActivityService.getActivity(activityId),
-    enabled: !!activityId,
-    staleTime: 2 * 60 * 1000,
+    enabled: !!activityId && enabled,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -1012,11 +1044,13 @@ export const useActivityTimeline = (params?: {
   entityTypes?: string
   types?: string
   limit?: number
-}) => {
+}, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['activity-timeline', params],
     queryFn: () => crmActivityService.getTimeline(params),
-    staleTime: 1 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
@@ -1026,11 +1060,13 @@ export const useActivityTimeline = (params?: {
 export const useActivityStats = (params?: {
   startDate?: string
   endDate?: string
-}) => {
+}, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['activities', 'stats', params],
     queryFn: () => crmActivityService.getStats(params),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
@@ -1040,14 +1076,16 @@ export const useActivityStats = (params?: {
 export const useEntityActivities = (
   entityType: string,
   entityId: string,
-  params?: { type?: string }
+  params?: { type?: string },
+  enabled: boolean = true
 ) => {
   return useQuery({
     queryKey: ['activities', 'entity', entityType, entityId, params],
     queryFn: () =>
       crmActivityService.getEntityActivities(entityType, entityId, params),
-    enabled: !!entityType && !!entityId,
-    staleTime: 1 * 60 * 1000,
+    enabled: !!entityType && !!entityId && enabled,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -1058,11 +1096,13 @@ export const useUpcomingTasks = (params?: {
   assignedTo?: string
   endDate?: string
   limit?: number
-}) => {
+}, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['activities', 'tasks', 'upcoming', params],
     queryFn: () => crmActivityService.getUpcomingTasks(params),
-    staleTime: 1 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 

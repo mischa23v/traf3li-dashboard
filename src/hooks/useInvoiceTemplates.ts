@@ -7,6 +7,11 @@ import invoiceTemplatesService, {
 } from '@/services/invoiceTemplatesService'
 import { useTranslation } from 'react-i18next'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query key factory
 export const templateKeys = {
   all: ['invoice-templates'] as const,
@@ -22,6 +27,8 @@ export function useInvoiceTemplates(filters?: TemplateFilters) {
   return useQuery({
     queryKey: templateKeys.list(filters),
     queryFn: () => invoiceTemplatesService.getAll(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -39,6 +46,8 @@ export function useDefaultTemplate() {
   return useQuery({
     queryKey: templateKeys.default(),
     queryFn: () => invoiceTemplatesService.getDefault(),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

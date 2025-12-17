@@ -28,23 +28,34 @@ import type {
   ConversationFilters,
 } from '@/types/crm-advanced'
 
+// ==================== Cache Configuration ====================
+// Cache data for 30 minutes to reduce API calls
+// Data is refreshed automatically when mutations occur
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour (keep in cache)
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // ═══════════════════════════════════════════════════════════════
 // EMAIL TEMPLATE HOOKS
 // ═══════════════════════════════════════════════════════════════
 
-export const useEmailTemplates = (category?: string) => {
+export const useEmailTemplates = (category?: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['email-templates', category],
     queryFn: () => emailTemplateService.getTemplates(category),
-    staleTime: 5 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
-export const useEmailTemplate = (id: string) => {
+export const useEmailTemplate = (id: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['email-template', id],
     queryFn: () => emailTemplateService.getTemplate(id),
-    enabled: !!id,
+    enabled: !!id && enabled,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -103,19 +114,23 @@ export const usePreviewTemplate = () => {
 // EMAIL CAMPAIGN HOOKS
 // ═══════════════════════════════════════════════════════════════
 
-export const useEmailCampaigns = (filters?: CampaignFilters) => {
+export const useEmailCampaigns = (filters?: CampaignFilters, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['email-campaigns', filters],
     queryFn: () => emailCampaignService.getCampaigns(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
-export const useEmailCampaign = (id: string) => {
+export const useEmailCampaign = (id: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['email-campaign', id],
     queryFn: () => emailCampaignService.getCampaign(id),
-    enabled: !!id,
+    enabled: !!id && enabled,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -190,11 +205,13 @@ export const useResumeCampaign = () => {
   })
 }
 
-export const useCampaignAnalytics = (id: string) => {
+export const useCampaignAnalytics = (id: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['campaign-analytics', id],
     queryFn: () => emailCampaignService.getAnalytics(id),
-    enabled: !!id,
+    enabled: !!id && enabled,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     refetchInterval: 30000, // Refresh every 30 seconds during active campaigns
   })
 }
@@ -203,19 +220,23 @@ export const useCampaignAnalytics = (id: string) => {
 // DRIP CAMPAIGN HOOKS
 // ═══════════════════════════════════════════════════════════════
 
-export const useDripCampaigns = () => {
+export const useDripCampaigns = (enabled: boolean = true) => {
   return useQuery({
     queryKey: ['drip-campaigns'],
     queryFn: () => dripCampaignService.getCampaigns(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
-export const useDripCampaign = (id: string) => {
+export const useDripCampaign = (id: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['drip-campaign', id],
     queryFn: () => dripCampaignService.getCampaign(id),
-    enabled: !!id,
+    enabled: !!id && enabled,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -271,11 +292,13 @@ export const useSubscribers = (params?: {
   search?: string
   page?: number
   limit?: number
-}) => {
+}, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['subscribers', params],
     queryFn: () => subscriberService.getSubscribers(params),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
@@ -314,11 +337,13 @@ export const useUnsubscribe = () => {
 // SEGMENT HOOKS
 // ═══════════════════════════════════════════════════════════════
 
-export const useSegments = () => {
+export const useSegments = (enabled: boolean = true) => {
   return useQuery({
     queryKey: ['segments'],
     queryFn: () => segmentService.getSegments(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
@@ -351,19 +376,23 @@ export const useLeadScores = (params?: {
   grade?: string
   minScore?: number
   maxScore?: number
-}) => {
+}, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['lead-scores', params],
     queryFn: () => leadScoringService.getScores(params),
-    staleTime: 2 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
-export const useLeadInsights = (leadId: string) => {
+export const useLeadInsights = (leadId: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['lead-insights', leadId],
     queryFn: () => leadScoringService.getLeadInsights(leadId),
-    enabled: !!leadId,
+    enabled: !!leadId && enabled,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -396,19 +425,23 @@ export const useCalculateAllScores = () => {
   })
 }
 
-export const useLeadLeaderboard = (limit: number = 10) => {
+export const useLeadLeaderboard = (limit: number = 10, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['lead-leaderboard', limit],
     queryFn: () => leadScoringService.getLeaderboard(limit),
-    staleTime: 2 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
-export const useLeadScoreDistribution = () => {
+export const useLeadScoreDistribution = (enabled: boolean = true) => {
   return useQuery({
     queryKey: ['lead-score-distribution'],
     queryFn: () => leadScoringService.getDistribution(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
@@ -497,11 +530,13 @@ export const useTrackCall = () => {
   })
 }
 
-export const useLeadScoringConfig = () => {
+export const useLeadScoringConfig = (enabled: boolean = true) => {
   return useQuery({
     queryKey: ['lead-scoring-config'],
     queryFn: () => leadScoringService.getConfig(),
-    staleTime: 10 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
     retry: 1,
   })
 }
@@ -524,20 +559,24 @@ export const useUpdateLeadScoringConfig = () => {
 // WHATSAPP HOOKS
 // ═══════════════════════════════════════════════════════════════
 
-export const useWhatsAppConversations = (filters?: ConversationFilters) => {
+export const useWhatsAppConversations = (filters?: ConversationFilters, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['whatsapp-conversations', filters],
     queryFn: () => whatsAppService.getConversations(filters),
     staleTime: 30 * 1000,
+    gcTime: STATS_GC_TIME,
+    enabled,
     refetchInterval: 30000, // Refresh every 30 seconds (reduced from 10s for performance)
   })
 }
 
-export const useWhatsAppConversation = (id: string) => {
+export const useWhatsAppConversation = (id: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['whatsapp-conversation', id],
     queryFn: () => whatsAppService.getConversation(id),
-    enabled: !!id,
+    enabled: !!id && enabled,
+    staleTime: 30 * 1000,
+    gcTime: STATS_GC_TIME,
     refetchInterval: 5000, // Refresh every 5 seconds for active chat
   })
 }
@@ -599,11 +638,13 @@ export const useAssignConversation = () => {
   })
 }
 
-export const useWhatsAppTemplates = () => {
+export const useWhatsAppTemplates = (enabled: boolean = true) => {
   return useQuery({
     queryKey: ['whatsapp-templates'],
     queryFn: () => whatsAppService.getTemplates(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
@@ -621,11 +662,13 @@ export const useCreateWhatsAppTemplate = () => {
   })
 }
 
-export const useWhatsAppBroadcasts = () => {
+export const useWhatsAppBroadcasts = (enabled: boolean = true) => {
   return useQuery({
     queryKey: ['whatsapp-broadcasts'],
     queryFn: () => whatsAppService.getBroadcasts(),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 

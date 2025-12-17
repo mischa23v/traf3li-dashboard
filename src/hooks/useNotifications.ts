@@ -13,6 +13,11 @@ import notificationService, {
   type CreateNotificationData,
 } from '@/services/notificationService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query keys
 export const notificationKeys = {
   all: ['notifications'] as const,
@@ -34,7 +39,8 @@ export const useNotifications = (filters?: NotificationFilters) => {
   return useQuery({
     queryKey: notificationKeys.list(filters),
     queryFn: () => notificationService.getNotifications(filters),
-    staleTime: 1 * 60 * 1000, // 1 minute
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -46,6 +52,8 @@ export const useNotification = (id: string) => {
     queryKey: notificationKeys.detail(id),
     queryFn: () => notificationService.getNotification(id),
     enabled: !!id,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -56,7 +64,8 @@ export const useUnreadCount = () => {
   return useQuery({
     queryKey: notificationKeys.unreadCount(),
     queryFn: () => notificationService.getUnreadCount(),
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     refetchInterval: 60 * 1000, // Refetch every minute
   })
 }
@@ -69,6 +78,8 @@ export const useNotificationsByType = (type: string, params?: { page?: number; l
     queryKey: notificationKeys.byType(type),
     queryFn: () => notificationService.getNotificationsByType(type, params),
     enabled: !!type,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -306,7 +317,8 @@ export const useNotificationSettings = () => {
   return useQuery({
     queryKey: notificationKeys.settings(),
     queryFn: () => notificationService.getSettings(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

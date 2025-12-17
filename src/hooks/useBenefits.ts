@@ -23,6 +23,11 @@ import {
   type Beneficiary,
 } from '@/services/benefitsService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query keys
 export const benefitKeys = {
   all: ['benefits'] as const,
@@ -39,6 +44,8 @@ export const useBenefits = (filters?: BenefitFilters) => {
   return useQuery({
     queryKey: benefitKeys.list(filters),
     queryFn: () => getBenefits(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -48,6 +55,8 @@ export const useBenefit = (benefitId: string) => {
     queryKey: benefitKeys.detail(benefitId),
     queryFn: () => getBenefit(benefitId),
     enabled: !!benefitId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -56,6 +65,8 @@ export const useBenefitStats = () => {
   return useQuery({
     queryKey: benefitKeys.stats(),
     queryFn: getBenefitStats,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -65,6 +76,8 @@ export const useEmployeeBenefits = (employeeId: string) => {
     queryKey: benefitKeys.byEmployee(employeeId),
     queryFn: () => getEmployeeBenefits(employeeId),
     enabled: !!employeeId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

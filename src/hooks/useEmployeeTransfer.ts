@@ -9,6 +9,11 @@ import employeeTransferService, {
   type ApprovalStep,
 } from '@/services/employeeTransferService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // ==================== QUERY KEYS ====================
 
 export const employeeTransferKeys = {
@@ -29,7 +34,8 @@ export const useEmployeeTransfers = (filters?: EmployeeTransferFilters) => {
   return useQuery({
     queryKey: employeeTransferKeys.list(filters),
     queryFn: () => employeeTransferService.getTransfers(filters),
-    staleTime: 5 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -39,7 +45,8 @@ export const useEmployeeTransfer = (id: string) => {
     queryKey: employeeTransferKeys.detail(id),
     queryFn: () => employeeTransferService.getTransfer(id),
     enabled: !!id,
-    staleTime: 5 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -48,7 +55,8 @@ export const useEmployeeTransferStats = () => {
   return useQuery({
     queryKey: employeeTransferKeys.stats(),
     queryFn: () => employeeTransferService.getTransferStats(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -58,7 +66,8 @@ export const useEmployeeTransferHistory = (employeeId: string) => {
     queryKey: employeeTransferKeys.history(employeeId),
     queryFn: () => employeeTransferService.getTransferHistory(employeeId),
     enabled: !!employeeId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -68,6 +77,7 @@ export const usePendingApprovals = (approverId?: string) => {
     queryKey: employeeTransferKeys.pendingApprovals(approverId),
     queryFn: () => employeeTransferService.getPendingApprovals(approverId),
     staleTime: 2 * 60 * 1000,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -77,6 +87,7 @@ export const usePendingHandovers = () => {
     queryKey: employeeTransferKeys.pendingHandovers(),
     queryFn: () => employeeTransferService.getPendingHandovers(),
     staleTime: 2 * 60 * 1000,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }

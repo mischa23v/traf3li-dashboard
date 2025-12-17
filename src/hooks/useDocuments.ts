@@ -8,6 +8,11 @@ import { toast } from '@/hooks/use-toast'
 import { useTranslation } from 'react-i18next'
 import { Analytics } from '@/lib/analytics'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query keys
 export const documentsKeys = {
   all: ['documents'] as const,
@@ -29,7 +34,8 @@ export const useDocuments = (filters?: DocumentFilters) => {
   return useQuery({
     queryKey: documentsKeys.list(filters || {}),
     queryFn: () => documentsService.getDocuments(filters),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -39,6 +45,8 @@ export const useDocument = (id: string) => {
     queryKey: documentsKeys.detail(id),
     queryFn: () => documentsService.getDocument(id),
     enabled: !!id,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -48,6 +56,8 @@ export const useDocumentsByCase = (caseId: string) => {
     queryKey: documentsKeys.byCase(caseId),
     queryFn: () => documentsService.getDocumentsByCase(caseId),
     enabled: !!caseId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -57,6 +67,8 @@ export const useDocumentsByClient = (clientId: string) => {
     queryKey: documentsKeys.byClient(clientId),
     queryFn: () => documentsService.getDocumentsByClient(clientId),
     enabled: !!clientId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -65,7 +77,8 @@ export const useDocumentStats = () => {
   return useQuery({
     queryKey: documentsKeys.stats(),
     queryFn: () => documentsService.getDocumentStats(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -74,6 +87,8 @@ export const useRecentDocuments = (limit: number = 10) => {
   return useQuery({
     queryKey: documentsKeys.recent(limit),
     queryFn: () => documentsService.getRecentDocuments(limit),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -83,7 +98,8 @@ export const useSearchDocuments = (query: string) => {
     queryKey: documentsKeys.search(query),
     queryFn: () => documentsService.searchDocuments(query),
     enabled: query.length > 0,
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -92,6 +108,8 @@ export const useJudgments = (caseId?: string) => {
   return useQuery({
     queryKey: documentsKeys.judgments(caseId),
     queryFn: () => documentsService.getJudgments(caseId),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -101,6 +119,8 @@ export const useDocumentVersions = (documentId: string) => {
     queryKey: documentsKeys.versions(documentId),
     queryFn: () => documentsService.getDocumentVersions(documentId),
     enabled: !!documentId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

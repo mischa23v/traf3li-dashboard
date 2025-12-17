@@ -33,6 +33,11 @@ import {
   type OnboardingTask,
 } from '@/services/onboardingService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query Keys
 export const onboardingKeys = {
   all: ['onboarding'] as const,
@@ -50,6 +55,8 @@ export const useOnboardings = (filters?: OnboardingFilters) => {
   return useQuery({
     queryKey: onboardingKeys.list(filters),
     queryFn: () => getOnboardings(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -67,6 +74,8 @@ export const useOnboardingStats = () => {
   return useQuery({
     queryKey: onboardingKeys.stats(),
     queryFn: () => getOnboardingStats(),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -84,6 +93,8 @@ export const useUpcomingProbationReviews = (days?: number) => {
   return useQuery({
     queryKey: onboardingKeys.upcomingReviews(days),
     queryFn: () => getUpcomingProbationReviews(days),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

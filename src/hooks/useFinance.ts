@@ -20,13 +20,19 @@ import financeService, {
   CreateCreditNoteData,
 } from '@/services/financeService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // ==================== INVOICES ====================
 
 export const useInvoices = (filters?: InvoiceFilters) => {
   return useQuery({
     queryKey: ['invoices', filters],
     queryFn: () => financeService.getInvoices(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -123,7 +129,8 @@ export const useOverdueInvoices = () => {
   return useQuery({
     queryKey: ['invoices', 'overdue'],
     queryFn: () => financeService.getOverdueInvoices(),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -133,7 +140,8 @@ export const useCreditNotes = (filters?: CreditNoteFilters) => {
   return useQuery({
     queryKey: ['creditNotes', filters],
     queryFn: () => financeService.getCreditNotes(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -295,7 +303,8 @@ export const useCreditNotesForInvoice = (invoiceId: string) => {
     queryKey: ['creditNotes', 'invoice', invoiceId],
     queryFn: () => financeService.getCreditNotesForInvoice(invoiceId),
     enabled: !!invoiceId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -343,7 +352,8 @@ export const useExpenses = (filters?: ExpenseFilters) => {
   return useQuery({
     queryKey: ['expenses', filters],
     queryFn: () => financeService.getExpenses(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -438,7 +448,8 @@ export const useExpenseStats = (filters?: {
   return useQuery({
     queryKey: ['expenses', 'stats', filters],
     queryFn: () => financeService.getExpenseStats(filters),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -532,7 +543,8 @@ export const useTimeEntries = (filters?: TimeEntryFilters) => {
   return useQuery({
     queryKey: ['timeEntries', filters],
     queryFn: () => financeService.getTimeEntries(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -593,7 +605,8 @@ export const useTimeStats = (filters?: {
   return useQuery({
     queryKey: ['timeEntries', 'stats', filters],
     queryFn: () => financeService.getTimeStats(filters),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -703,7 +716,8 @@ export const usePayments = (filters?: any) => {
   return useQuery({
     queryKey: ['payments', filters],
     queryFn: () => financeService.getPayments(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -778,7 +792,8 @@ export const usePaymentsSummary = (filters?: any) => {
   return useQuery({
     queryKey: ['payments', 'summary', filters],
     queryFn: () => financeService.getPaymentsSummary(filters),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -788,7 +803,8 @@ export const useTransactions = (filters?: any) => {
   return useQuery({
     queryKey: ['transactions', filters],
     queryFn: () => financeService.getTransactions(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -842,7 +858,8 @@ export const useAccountBalance = (upToDate?: string) => {
   return useQuery({
     queryKey: ['transactions', 'balance', upToDate],
     queryFn: () => financeService.getAccountBalance(upToDate),
-    staleTime: 1 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -850,7 +867,8 @@ export const useTransactionSummary = (filters?: any) => {
   return useQuery({
     queryKey: ['transactions', 'summary', filters],
     queryFn: () => financeService.getTransactionSummary(filters),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -860,7 +878,8 @@ export const useStatements = (filters?: any) => {
   return useQuery({
     queryKey: ['statements', filters],
     queryFn: () => financeService.getStatements(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -949,7 +968,8 @@ export const useActivities = (filters?: any) => {
   return useQuery({
     queryKey: ['activities', filters],
     queryFn: () => financeService.getActivities(filters),
-    staleTime: 1 * 60 * 1000, // 1 minute
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -984,7 +1004,8 @@ export const useAccountsAgingReport = (filters?: { clientId?: string }) => {
   return useQuery({
     queryKey: ['reports', 'accounts-aging', filters],
     queryFn: () => financeService.getAccountsAgingReport(filters),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -992,7 +1013,8 @@ export const useRevenueByClientReport = (filters?: { startDate?: string; endDate
   return useQuery({
     queryKey: ['reports', 'revenue-by-client', filters],
     queryFn: () => financeService.getRevenueByClientReport(filters),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -1000,7 +1022,8 @@ export const useOutstandingInvoicesReport = (filters?: { clientId?: string }) =>
   return useQuery({
     queryKey: ['reports', 'outstanding-invoices', filters],
     queryFn: () => financeService.getOutstandingInvoicesReport(filters),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -1008,7 +1031,8 @@ export const useTimeEntriesReport = (filters?: { startDate?: string; endDate?: s
   return useQuery({
     queryKey: ['reports', 'time-entries', filters],
     queryFn: () => financeService.getTimeEntriesReport(filters),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -1038,7 +1062,8 @@ export const useWeeklyTimeEntries = (weekStartDate: string) => {
   return useQuery({
     queryKey: ['timeEntries', 'weekly', weekStartDate],
     queryFn: () => financeService.getWeeklyTimeEntries(weekStartDate),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     enabled: !!weekStartDate,
   })
 }
@@ -1313,7 +1338,8 @@ export const useInvoicesPendingApproval = (filters?: {
   return useQuery({
     queryKey: ['invoices', 'pending-approval', filters],
     queryFn: () => financeService.getInvoicesPendingApproval(filters),
-    staleTime: 1 * 60 * 1000, // 1 minute
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -1446,7 +1472,8 @@ export const useApprovalWorkflowConfig = () => {
   return useQuery({
     queryKey: ['invoices', 'approval-config'],
     queryFn: () => financeService.getApprovalWorkflowConfig(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -1488,7 +1515,8 @@ export const useRecurringInvoices = (filters?: RecurringInvoiceFilters) => {
   return useQuery({
     queryKey: ['recurringInvoices', filters],
     queryFn: () => recurringInvoiceService.getAll(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -1665,7 +1693,8 @@ export const useRecurringInvoiceStats = () => {
   return useQuery({
     queryKey: ['recurringInvoices', 'stats'],
     queryFn: () => recurringInvoiceService.getStats(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -1674,7 +1703,8 @@ export const useRecurringInvoiceHistory = (id: string) => {
     queryKey: ['recurringInvoices', id, 'history'],
     queryFn: () => recurringInvoiceService.getHistory(id),
     enabled: !!id,
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

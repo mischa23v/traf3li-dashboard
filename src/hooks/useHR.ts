@@ -7,13 +7,19 @@ import hrService, {
   DocumentType,
 } from '@/services/hrService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // ==================== EMPLOYEES ====================
 
 export const useEmployees = (filters?: EmployeeFilters) => {
   return useQuery({
     queryKey: ['employees', filters],
     queryFn: () => hrService.getEmployees(filters),
-    staleTime: 5 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -23,7 +29,8 @@ export const useEmployee = (id: string) => {
     queryKey: ['employees', id],
     queryFn: () => hrService.getEmployee(id),
     enabled: !!id,
-    staleTime: 5 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -32,7 +39,8 @@ export const useEmployeeStats = () => {
   return useQuery({
     queryKey: ['employees', 'stats'],
     queryFn: () => hrService.getEmployeeStats(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
