@@ -139,7 +139,7 @@ apiClient.interceptors.request.use(
 
 /**
  * Response Interceptor
- * Handles caching, errors, and retry logic
+ * Handles caching, session warnings, errors, and retry logic
  */
 apiClient.interceptors.response.use(
   (response) => {
@@ -150,6 +150,29 @@ apiClient.interceptors.response.use(
         data: response.data,
         timestamp: Date.now(),
       })
+    }
+
+    // Check for session warning headers (5 minutes before expiry)
+    const headers = response.headers
+    const idleWarning = headers['x-session-idle-warning']
+    const idleRemaining = headers['x-session-idle-remaining']
+    const absoluteWarning = headers['x-session-absolute-warning']
+    const absoluteRemaining = headers['x-session-absolute-remaining']
+
+    if (idleWarning === 'true' || absoluteWarning === 'true') {
+      const remaining = Math.min(
+        idleRemaining ? parseInt(idleRemaining, 10) : Infinity,
+        absoluteRemaining ? parseInt(absoluteRemaining, 10) : Infinity
+      )
+
+      // Dispatch custom event for session warning (components can listen to this)
+      window.dispatchEvent(new CustomEvent('session-expiry-warning', {
+        detail: {
+          remainingSeconds: remaining,
+          isIdleWarning: idleWarning === 'true',
+          isAbsoluteWarning: absoluteWarning === 'true',
+        }
+      }))
     }
 
     return response
@@ -177,6 +200,29 @@ apiClient.interceptors.response.use(
       }
     }
 
+    // Handle 423 Account Locked
+    if (error.response?.status === 423) {
+      const data = error.response?.data
+      const remainingTime = data?.remainingTime || 15
+      const message = data?.message || `الحساب مقفل مؤقتاً. حاول مرة أخرى بعد ${remainingTime} دقيقة`
+
+      import('sonner').then(({ toast }) => {
+        toast.error(message, {
+          description: `يرجى الانتظار ${remainingTime} دقيقة قبل المحاولة مرة أخرى`,
+          duration: 10000,
+        })
+      })
+
+      return Promise.reject({
+        status: 423,
+        message,
+        code: 'ACCOUNT_LOCKED',
+        error: true,
+        remainingTime,
+        requestId: error.response?.data?.requestId,
+      })
+    }
+
     // Handle 429 Rate Limited
     if (error.response?.status === 429) {
       const retryAfter = parseInt(error.response.headers['retry-after'] || '60', 10)
@@ -199,18 +245,49 @@ apiClient.interceptors.response.use(
       })
     }
 
-    // Handle 401 Unauthorized
-    // DON'T redirect here - let the route guard handle auth state
-    // Hard redirecting on ANY 401 causes logout loops when backend has issues
+    // Handle 401 Unauthorized - Check for session timeout codes
     if (error.response?.status === 401) {
+      const errorCode = error.response?.data?.code
+      const reason = error.response?.data?.reason
+
+      // Handle specific session timeout codes
+      if (errorCode === 'SESSION_IDLE_TIMEOUT' || errorCode === 'SESSION_ABSOLUTE_TIMEOUT') {
+        const isIdleTimeout = reason === 'idle_timeout' || errorCode === 'SESSION_IDLE_TIMEOUT'
+        const message = isIdleTimeout
+          ? 'انتهت جلستك بسبب عدم النشاط'
+          : 'انتهت جلستك. يرجى تسجيل الدخول مرة أخرى'
+
+        // Clear auth state
+        localStorage.removeItem('user')
+
+        import('sonner').then(({ toast }) => {
+          toast.warning(message, {
+            description: 'جارٍ إعادة التوجيه إلى صفحة تسجيل الدخول...',
+            duration: 3000,
+          })
+        })
+
+        // Redirect to login with reason
+        setTimeout(() => {
+          window.location.href = `/sign-in?reason=${reason || 'session_expired'}`
+        }, 2000)
+
+        return Promise.reject({
+          status: 401,
+          message,
+          code: errorCode,
+          error: true,
+          reason,
+        })
+      }
+
+      // Log other 401s but don't redirect - let auth system handle it
       console.warn('[API] 401 Unauthorized:', {
         url: error.config?.url,
         method: error.config?.method,
         message: error.response?.data?.message,
         timestamp: new Date().toISOString(),
       })
-      // Don't clear localStorage or redirect - let auth system handle it
-      // The _authenticated route guard will check auth and redirect if needed
     }
 
     // Handle 400 with "Unauthorized" message
