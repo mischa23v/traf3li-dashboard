@@ -1,1 +1,7 @@
-/* /index.html 200
+# Proxy API requests to backend (except /api/ai which uses Pages Functions)
+/api/auth/*  https://api.traf3li.com/api/auth/:splat  200
+/api/v1/*    https://api.traf3li.com/api/v1/:splat    200
+/api/currency/*  https://api.traf3li.com/api/currency/:splat  200
+
+# SPA fallback - must be last
+/*  /index.html  200
