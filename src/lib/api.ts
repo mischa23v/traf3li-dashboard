@@ -2,10 +2,28 @@
  * API Client Configuration
  * Axios instance configured to communicate with Traf3li backend
  * Handles authentication, credentials, and error responses
+ *
+ * Gold Standard Features:
+ * - Request deduplication (prevents thundering herd)
+ * - Circuit breaker pattern (prevents cascading failures)
+ * - Smart retry with exponential backoff + jitter
+ * - Retry-After header support
  */
 
-import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios'
+import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios'
 import { API_CONFIG, getApiUrl } from '@/config/api'
+import {
+  generateRequestKey,
+  getPendingRequest,
+  registerPendingRequest,
+  clearPendingRequests,
+} from './request-deduplication'
+import {
+  shouldAllowRequest,
+  recordSuccess,
+  recordFailure,
+  resetAllCircuits,
+} from './circuit-breaker'
 
 // API Base URL - Change based on environment
 const API_BASE_URL = getApiUrl()
@@ -102,7 +120,7 @@ apiClientNoVersion.interceptors.response.use(
 
 /**
  * Request Interceptor
- * Adds caching for GET requests and CSRF token for mutating requests
+ * Adds caching, deduplication, circuit breaker, and CSRF token handling
  */
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
@@ -112,6 +130,29 @@ apiClient.interceptors.request.use(
       const csrfToken = getCsrfToken()
       if (csrfToken) {
         config.headers.set('X-CSRF-Token', csrfToken)
+      }
+    }
+
+    const url = config.url || ''
+
+    // Circuit Breaker Check - reject if circuit is open
+    const circuitCheck = shouldAllowRequest(url)
+    if (!circuitCheck.allowed) {
+      const error = new Error(`Circuit breaker open for ${url}`) as any
+      error.code = 'CIRCUIT_OPEN'
+      error.retryAfter = circuitCheck.retryAfter
+      return Promise.reject(error)
+    }
+
+    // Request Deduplication for GET requests
+    if (method === 'get' && url) {
+      const dedupeKey = generateRequestKey(method, url, config.params)
+      const pendingRequest = getPendingRequest(dedupeKey)
+
+      if (pendingRequest) {
+        // Return the existing request's promise via adapter
+        config.adapter = () => pendingRequest
+        return config
       }
     }
 
@@ -138,11 +179,44 @@ apiClient.interceptors.request.use(
 )
 
 /**
+ * Wrapper to register deduplication after request is made
+ */
+const originalRequest = apiClient.request.bind(apiClient)
+apiClient.request = function<T = any, R = AxiosResponse<T>>(config: any): Promise<R> {
+  const method = config.method?.toLowerCase() || 'get'
+  const url = config.url || ''
+
+  // Only deduplicate GET requests
+  if (method === 'get' && url) {
+    const dedupeKey = generateRequestKey(method, url, config.params)
+
+    // Check if there's already a pending request
+    const existingRequest = getPendingRequest(dedupeKey)
+    if (existingRequest) {
+      return existingRequest as Promise<R>
+    }
+
+    // Make the request and register it
+    const requestPromise = originalRequest<T, R>(config)
+    registerPendingRequest(dedupeKey, requestPromise)
+
+    return requestPromise
+  }
+
+  return originalRequest<T, R>(config)
+}
+
+/**
  * Response Interceptor
- * Handles caching, session warnings, errors, and retry logic
+ * Handles caching, session warnings, errors, circuit breaker, and retry logic
  */
 apiClient.interceptors.response.use(
   (response) => {
+    const url = response.config.url || ''
+
+    // Record success for circuit breaker
+    recordSuccess(url)
+
     // Cache GET responses
     if (response.config.method === 'get' && response.config.url) {
       const cacheKey = `${response.config.url}${JSON.stringify(response.config.params || {})}`
@@ -179,8 +253,14 @@ apiClient.interceptors.response.use(
   },
   async (error: AxiosError<any>) => {
     const originalRequest = error.config as any
+    const url = originalRequest?.url || ''
 
-    // Retry logic for network errors or 5xx errors
+    // Record failure for circuit breaker (only for server errors and rate limits)
+    if (error.response?.status && (error.response.status >= 500 || error.response.status === 429)) {
+      recordFailure(url)
+    }
+
+    // Retry logic for network errors or 5xx errors (NOT 429 - let TanStack Query handle that)
     if (
       !originalRequest._retry &&
       (!error.response || (error.response.status >= 500 && error.response.status < 600))
@@ -188,12 +268,11 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true
       originalRequest._retryCount = (originalRequest._retryCount || 0) + 1
 
-      // Max retries with exponential backoff
+      // Max retries with exponential backoff + jitter
       if (originalRequest._retryCount <= API_CONFIG.retryAttempts) {
-        const delay = Math.min(1000 * Math.pow(2, originalRequest._retryCount - 1), 4000)
-
-        if (import.meta.env.DEV) {
-        }
+        const baseDelay = 1000 * Math.pow(2, originalRequest._retryCount - 1)
+        const jitter = baseDelay * 0.3 * Math.random() // 30% jitter
+        const delay = Math.min(baseDelay + jitter, 8000)
 
         await new Promise(resolve => setTimeout(resolve, delay))
         return apiClient(originalRequest)
@@ -223,26 +302,51 @@ apiClient.interceptors.response.use(
       })
     }
 
-    // Handle 429 Rate Limited
+    // Handle 429 Rate Limited - DON'T retry here, let TanStack Query handle it with smart backoff
     if (error.response?.status === 429) {
-      const retryAfter = parseInt(error.response.headers['retry-after'] || '60', 10)
+      const retryAfterHeader = error.response.headers['retry-after']
+      let retryAfter = 60 // Default 60 seconds
+
+      if (retryAfterHeader) {
+        // Could be seconds or HTTP date
+        const seconds = parseInt(retryAfterHeader, 10)
+        if (!isNaN(seconds)) {
+          retryAfter = seconds
+        } else {
+          // Try parsing as date
+          const date = Date.parse(retryAfterHeader)
+          if (!isNaN(date)) {
+            retryAfter = Math.max(1, Math.ceil((date - Date.now()) / 1000))
+          }
+        }
+      }
+
       const message = error.response?.data?.message || `طلبات كثيرة جداً. يرجى الانتظار ${formatRetryAfter(retryAfter)}.`
 
-      // Import toast dynamically to avoid circular dependencies
-      import('sonner').then(({ toast }) => {
-        toast.error(message, {
-          description: 'حاول مرة أخرى لاحقاً',
-          duration: 5000,
+      // Only show toast once (not on retries)
+      if (!originalRequest._rateLimitToastShown) {
+        originalRequest._rateLimitToastShown = true
+        import('sonner').then(({ toast }) => {
+          toast.error(message, {
+            description: `سيتم إعادة المحاولة تلقائياً بعد ${formatRetryAfter(retryAfter)}`,
+            duration: Math.min(retryAfter * 1000, 10000),
+          })
         })
-      })
+      }
 
-      return Promise.reject({
+      // Return error with retryAfter for TanStack Query to use
+      const rateLimitError = {
         status: 429,
         message,
         error: true,
         requestId: error.response?.data?.requestId,
         retryAfter,
-      })
+      }
+
+      // Attach to axios error for TanStack Query retry logic
+      ;(error as any).retryAfter = retryAfter
+
+      return Promise.reject(rateLimitError)
     }
 
     // Handle 401 Unauthorized - Check for session timeout codes
@@ -488,6 +592,20 @@ export const clearCache = (urlPattern?: string) => {
 export const getCacheSize = () => {
   return requestCache.size
 }
+
+/**
+ * Reset all rate limiting state (cache, pending requests, circuit breakers)
+ * Call this on logout to ensure clean state
+ */
+export const resetApiState = () => {
+  clearCache()
+  clearPendingRequests()
+  resetAllCircuits()
+}
+
+// Re-export circuit breaker utilities for monitoring
+export { getOpenCircuits, getCircuitStatus } from './circuit-breaker'
+export { getPendingRequestCount } from './request-deduplication'
 
 // Alias export for compatibility with services that import 'api'
 export const api = apiClient

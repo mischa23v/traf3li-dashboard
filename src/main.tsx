@@ -10,6 +10,7 @@ import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
 import { handleServerError } from '@/lib/handle-server-error'
+import { smartRetry, smartRetryDelay } from '@/lib/query-retry-config'
 import { ErrorBoundary } from '@/components/error-boundary'
 import { DirectionProvider } from './context/direction-provider'
 import { FontProvider } from './context/font-provider'
@@ -42,21 +43,28 @@ initWebVitals()
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: (failureCount, error) => {
-        // eslint-disable-next-line no-console
-        if (failureCount >= 0 && import.meta.env.DEV) return false
-        if (failureCount > 3 && import.meta.env.PROD) return false
-        return !(
-          error instanceof AxiosError &&
-          [401, 403].includes(error.response?.status ?? 0)
-        )
-      },
+      // Gold Standard: Smart retry with exponential backoff + jitter
+      // - Never retries 4xx errors (except 429 with backoff)
+      // - Uses Retry-After header when available
+      // - Prevents thundering herd with jitter
+      retry: smartRetry,
+      retryDelay: smartRetryDelay,
       refetchOnWindowFocus: false, // Disable refetch on window focus for better performance
       refetchIntervalInBackground: false, // Stop polling when tab is hidden (saves API calls)
       staleTime: 2 * 60 * 1000, // 2 minutes (increased from 10s for better caching)
       gcTime: 5 * 60 * 1000, // 5 minutes in cache (renamed from cacheTime in React Query v5)
     },
     mutations: {
+      // More conservative retry for mutations - only network errors
+      retry: (failureCount, error) => {
+        if (failureCount >= 2) return false
+        // Only retry on network errors or 429 for mutations
+        if (error instanceof AxiosError) {
+          return !error.response || error.response.status === 429
+        }
+        return false
+      },
+      retryDelay: smartRetryDelay,
       onError: (error) => {
         handleServerError(error)
         if (error instanceof AxiosError) {
