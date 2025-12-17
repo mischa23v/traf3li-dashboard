@@ -33,14 +33,80 @@ const normalizeBaseUrl = (url: string): string => {
   return normalized
 }
 
+/**
+ * Tiered Timeouts - Gold Standard for Speed/Latency
+ * Different operations need different timeout thresholds
+ */
+export const TIMEOUTS = {
+  /** Auth operations - must be fast (5 seconds) */
+  AUTH: 5000,
+  /** Critical/fast operations like /me checks (5 seconds) */
+  CRITICAL: 5000,
+  /** Normal API operations (10 seconds) */
+  DEFAULT: 10000,
+  /** Data-heavy operations like reports, exports (30 seconds) */
+  HEAVY: 30000,
+  /** File uploads (2 minutes) */
+  UPLOAD: 120000,
+  /** Long-running operations like bulk imports (5 minutes) */
+  LONG_RUNNING: 300000,
+} as const
+
 export const API_CONFIG = {
   version: 'v1',
   baseUrl: normalizeBaseUrl(rawBaseUrl),
   wsUrl: import.meta.env.VITE_WS_URL || 'wss://api.traf3li.com',
-  timeout: 30000,
+  timeout: TIMEOUTS.DEFAULT, // Default 10s (was 30s)
   retryAttempts: 3,
   useProxy, // Expose for debugging
 } as const
+
+/**
+ * Get appropriate timeout based on URL pattern
+ */
+export const getTimeoutForUrl = (url: string, method: string = 'GET'): number => {
+  const lowerUrl = url.toLowerCase()
+  const upperMethod = method.toUpperCase()
+
+  // Auth routes - must be fast
+  if (lowerUrl.includes('/auth/')) {
+    return TIMEOUTS.AUTH
+  }
+
+  // File uploads
+  if (upperMethod === 'POST' && (
+    lowerUrl.includes('/upload') ||
+    lowerUrl.includes('/attachments') ||
+    lowerUrl.includes('/documents') ||
+    lowerUrl.includes('/files') ||
+    lowerUrl.includes('/import')
+  )) {
+    return TIMEOUTS.UPLOAD
+  }
+
+  // Heavy operations - reports, exports, bulk
+  if (
+    lowerUrl.includes('/export') ||
+    lowerUrl.includes('/report') ||
+    lowerUrl.includes('/bulk') ||
+    lowerUrl.includes('/analytics') ||
+    lowerUrl.includes('/dashboard/stats')
+  ) {
+    return TIMEOUTS.HEAVY
+  }
+
+  // Long-running operations
+  if (
+    lowerUrl.includes('/process') ||
+    lowerUrl.includes('/migrate') ||
+    lowerUrl.includes('/sync')
+  ) {
+    return TIMEOUTS.LONG_RUNNING
+  }
+
+  // Default timeout
+  return TIMEOUTS.DEFAULT
+}
 
 /**
  * Get the full versioned API URL

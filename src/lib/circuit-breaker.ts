@@ -34,10 +34,10 @@ interface CircuitBreakerState {
 // Per-endpoint circuit breakers
 const circuits = new Map<string, CircuitBreakerState>()
 
-// Default options
+// Default options - Optimized for faster recovery
 const DEFAULT_OPTIONS: CircuitBreakerOptions = {
   failureThreshold: 5, // Open after 5 failures
-  resetTimeout: 30 * 1000, // Try again after 30 seconds
+  resetTimeout: 15 * 1000, // Try again after 15 seconds (was 30s - faster recovery)
   successThreshold: 2, // Need 2 successes to close
   failureWindow: 60 * 1000, // Count failures in 1 minute window
 }
