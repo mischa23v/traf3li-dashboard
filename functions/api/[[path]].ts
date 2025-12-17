@@ -10,10 +10,14 @@
  */
 
 interface Env {
-  // Add any environment bindings here if needed
+  // Environment bindings - set in Cloudflare Pages dashboard
+  BACKEND_URL?: string;
 }
 
-const BACKEND_URL = 'https://api.traf3li.com';
+// Backend URL - configurable via environment variable, defaults to production
+const getBackendUrl = (env: Env): string => {
+  return env.BACKEND_URL || 'https://api.traf3li.com';
+};
 
 // Headers to forward from client to backend
 const FORWARDED_REQUEST_HEADERS = [
@@ -48,7 +52,7 @@ const FORWARDED_RESPONSE_HEADERS = [
  * Handle all HTTP methods for API proxy
  */
 export const onRequest: PagesFunction<Env> = async (context) => {
-  const { request, params } = context;
+  const { request, params, env } = context;
   const url = new URL(request.url);
 
   // Get the path after /api/
@@ -62,8 +66,8 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     return new Response('Not Found', { status: 404 });
   }
 
-  // Construct the backend URL
-  const backendUrl = `${BACKEND_URL}/api/${path}${url.search}`;
+  // Construct the backend URL using environment variable or default
+  const backendUrl = `${getBackendUrl(env)}/api/${path}${url.search}`;
 
   // Build headers to forward
   const headers = new Headers();
