@@ -39,11 +39,14 @@ interface ProductivityHeroProps {
 export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = false, children, stats, backUrl, listMode = false }: ProductivityHeroProps) {
     const { t } = useTranslation()
 
+    // Only fetch stats if not provided via props (reduces API calls)
+    const shouldFetchStats = !stats || stats.length === 0
+
     // Fetch Stats (only if stats prop is not provided)
-    const { data: dueTodayTasks } = useDueTodayTasks()
-    const { data: overdueTasks } = useOverdueTasks()
-    const { data: upcomingTasks } = useUpcomingTasks(14) // Next 14 days
-    const { data: reminderStats } = useReminderStats()
+    const { data: dueTodayTasks } = useDueTodayTasks(shouldFetchStats)
+    const { data: overdueTasks } = useOverdueTasks(shouldFetchStats)
+    const { data: upcomingTasks } = useUpcomingTasks(14, shouldFetchStats)
+    const { data: reminderStats } = useReminderStats(shouldFetchStats ? undefined : { enabled: false })
 
     // Calculate counts
     const tasksDueTodayCount = Array.isArray(dueTodayTasks) ? dueTodayTasks.length : 0

@@ -243,11 +243,14 @@ export const useOverdueReminders = () => {
   })
 }
 
-export const useReminderStats = (filters?: { assignedTo?: string; dateFrom?: string; dateTo?: string }) => {
+export const useReminderStats = (options?: { assignedTo?: string; dateFrom?: string; dateTo?: string; enabled?: boolean }) => {
+  const { enabled = true, ...filters } = options || {}
+  const hasFilters = Object.keys(filters).length > 0
   return useQuery({
-    queryKey: ['reminders', 'stats', filters],
-    queryFn: () => remindersService.getStats(filters),
+    queryKey: ['reminders', 'stats', hasFilters ? filters : undefined],
+    queryFn: () => remindersService.getStats(hasFilters ? filters : undefined),
     staleTime: 5 * 60 * 1000,
+    enabled,
   })
 }
 

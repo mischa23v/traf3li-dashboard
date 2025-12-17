@@ -39,27 +39,30 @@ export const useTask = (id: string) => {
   })
 }
 
-export const useUpcomingTasks = (days: number = 7) => {
+export const useUpcomingTasks = (days: number = 7, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['tasks', 'upcoming', days],
     queryFn: () => tasksService.getUpcoming(days),
     staleTime: 1 * 60 * 1000,
+    enabled,
   })
 }
 
-export const useOverdueTasks = () => {
+export const useOverdueTasks = (enabled: boolean = true) => {
   return useQuery({
     queryKey: ['tasks', 'overdue'],
     queryFn: () => tasksService.getOverdue(),
     staleTime: 1 * 60 * 1000,
+    enabled,
   })
 }
 
-export const useDueTodayTasks = () => {
+export const useDueTodayTasks = (enabled: boolean = true) => {
   return useQuery({
     queryKey: ['tasks', 'due-today'],
     queryFn: () => tasksService.getDueToday(),
     staleTime: 1 * 60 * 1000,
+    enabled,
   })
 }
 
