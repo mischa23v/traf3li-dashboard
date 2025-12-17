@@ -311,7 +311,7 @@ export const usePreviewPdfmeTemplate = () => {
     mutationFn: async ({ id, inputs }: { id: string; inputs?: Record<string, any> }) => {
       const blob = await pdfmeService.previewTemplate(id, inputs)
       const url = window.URL.createObjectURL(blob)
-      window.open(url)
+      window.open(url, '_blank', 'noopener,noreferrer')
       // Clean up after a delay to allow the browser to open the PDF
       setTimeout(() => window.URL.revokeObjectURL(url), 1000)
       return blob
