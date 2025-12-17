@@ -40,6 +40,26 @@ import {
   cancelNavigationRequests,
   isAbortError,
 } from './request-cancellation'
+import { generateDeviceFingerprint, getStoredFingerprint, storeDeviceFingerprint } from './device-fingerprint'
+
+// Cached device fingerprint for request headers
+let cachedDeviceFingerprint: string | null = null
+
+/**
+ * Initialize device fingerprint (call on app start)
+ */
+export async function initDeviceFingerprint(): Promise<string> {
+  if (!cachedDeviceFingerprint) {
+    // Try to get stored fingerprint first
+    cachedDeviceFingerprint = getStoredFingerprint()
+
+    // If not stored, generate and store new one
+    if (!cachedDeviceFingerprint) {
+      cachedDeviceFingerprint = await storeDeviceFingerprint()
+    }
+  }
+  return cachedDeviceFingerprint
+}
 
 // API Base URL - Change based on environment
 const API_BASE_URL = getApiUrl()
@@ -113,6 +133,11 @@ apiClientNoVersion.interceptors.request.use(
       if (csrfToken) {
         config.headers.set('X-CSRF-Token', csrfToken)
       }
+    }
+
+    // Add device fingerprint for session binding (NCA ECC 2-1-4)
+    if (cachedDeviceFingerprint) {
+      config.headers.set('X-Device-Fingerprint', cachedDeviceFingerprint)
     }
 
     const url = config.url || ''
@@ -284,6 +309,11 @@ apiClient.interceptors.request.use(
       if (csrfToken) {
         config.headers.set('X-CSRF-Token', csrfToken)
       }
+    }
+
+    // Add device fingerprint for session binding (NCA ECC 2-1-4)
+    if (cachedDeviceFingerprint) {
+      config.headers.set('X-Device-Fingerprint', cachedDeviceFingerprint)
     }
 
     const url = config.url || ''
