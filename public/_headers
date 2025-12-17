@@ -1,0 +1,36 @@
+# Security Headers for Cloudflare Pages
+# These headers are applied to all responses
+
+/*
+  # Prevent clickjacking attacks
+  X-Frame-Options: DENY
+
+  # Prevent MIME type sniffing
+  X-Content-Type-Options: nosniff
+
+  # Enable XSS filter in browsers
+  X-XSS-Protection: 1; mode=block
+
+  # Control referrer information
+  Referrer-Policy: strict-origin-when-cross-origin
+
+  # Restrict browser features
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+
+  # Content Security Policy
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https://api.traf3li.com wss://api.traf3li.com https://*.google-analytics.com https://*.sentry.io; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; upgrade-insecure-requests;
+
+  # Force HTTPS
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+
+# Cache static assets
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Don't cache HTML (for SPA updates)
+/*.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# Don't cache the index
+/
+  Cache-Control: no-cache, no-store, must-revalidate
