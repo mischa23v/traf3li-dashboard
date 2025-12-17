@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { fonts } from '@/config/fonts'
-import { getCookie, setCookie, removeCookie } from '@/lib/cookies'
+import { getCookie, setCookie, deleteCookie } from '@/lib/cookies'
 
 type Font = (typeof fonts)[number]
 
@@ -34,12 +34,12 @@ export function FontProvider({ children }: { children: React.ReactNode }) {
   }, [font])
 
   const setFont = (font: Font) => {
-    setCookie(FONT_COOKIE_NAME, font, FONT_COOKIE_MAX_AGE)
+    setCookie(FONT_COOKIE_NAME, font, { expires: 365 }) // 1 year
     _setFont(font)
   }
 
   const resetFont = () => {
-    removeCookie(FONT_COOKIE_NAME)
+    deleteCookie(FONT_COOKIE_NAME)
     _setFont(fonts[0])
   }
 

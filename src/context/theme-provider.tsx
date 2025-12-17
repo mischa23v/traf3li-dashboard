@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, useMemo } from 'react'
-import { getCookie, setCookie, removeCookie } from '@/lib/cookies'
+import { getCookie, setCookie, deleteCookie } from '@/lib/cookies'
 
 type Theme = 'dark' | 'light' | 'system'
 type ResolvedTheme = Exclude<Theme, 'system'>
@@ -84,12 +84,12 @@ export function ThemeProvider({
 
   const setTheme = (newTheme: Theme) => {
     // Allow all theme options including dark mode
-    setCookie(storageKey, newTheme, THEME_COOKIE_MAX_AGE)
+    setCookie(storageKey, newTheme, { expires: 365 }) // 1 year
     _setTheme(newTheme)
   }
 
   const resetTheme = () => {
-    removeCookie(storageKey)
+    deleteCookie(storageKey)
     _setTheme(DEFAULT_THEME)
   }
 
