@@ -6,15 +6,22 @@
 import { useQuery } from '@tanstack/react-query'
 import calendarService, { CalendarFilters } from '@/services/calendarService'
 
+// ==================== Cache Configuration ====================
+// Cache data for 30 minutes to reduce API calls
+// Data is refreshed automatically when tasks/reminders/events are created/updated/deleted
+const CALENDAR_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const CALENDAR_GC_TIME = 60 * 60 * 1000 // 1 hour (keep in cache)
+
 /**
  * Get unified calendar view
  */
-export const useCalendar = (filters: CalendarFilters) => {
+export const useCalendar = (filters: CalendarFilters, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['calendar', filters],
     queryFn: () => calendarService.getCalendar(filters),
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    enabled: !!(filters.startDate && filters.endDate),
+    staleTime: CALENDAR_STALE_TIME,
+    gcTime: CALENDAR_GC_TIME,
+    enabled: enabled && !!(filters.startDate && filters.endDate),
     retry: 1,
   })
 }
@@ -22,12 +29,13 @@ export const useCalendar = (filters: CalendarFilters) => {
 /**
  * Get calendar by specific date
  */
-export const useCalendarByDate = (date: string) => {
+export const useCalendarByDate = (date: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['calendar', 'date', date],
     queryFn: () => calendarService.getCalendarByDate(date),
-    staleTime: 2 * 60 * 1000,
-    enabled: !!date,
+    staleTime: CALENDAR_STALE_TIME,
+    gcTime: CALENDAR_GC_TIME,
+    enabled: enabled && !!date,
     retry: 1,
   })
 }
@@ -35,12 +43,13 @@ export const useCalendarByDate = (date: string) => {
 /**
  * Get calendar by month
  */
-export const useCalendarByMonth = (year: number, month: number) => {
+export const useCalendarByMonth = (year: number, month: number, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['calendar', 'month', year, month],
     queryFn: () => calendarService.getCalendarByMonth(year, month),
-    staleTime: 2 * 60 * 1000,
-    enabled: !!(year && month),
+    staleTime: CALENDAR_STALE_TIME,
+    gcTime: CALENDAR_GC_TIME,
+    enabled: enabled && !!(year && month),
     retry: 1,
   })
 }
@@ -48,11 +57,13 @@ export const useCalendarByMonth = (year: number, month: number) => {
 /**
  * Get upcoming items
  */
-export const useUpcomingCalendar = (days: number = 7) => {
+export const useUpcomingCalendar = (days: number = 7, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['calendar', 'upcoming', days],
     queryFn: () => calendarService.getUpcoming(days),
-    staleTime: 1 * 60 * 1000, // 1 minute
+    staleTime: CALENDAR_STALE_TIME,
+    gcTime: CALENDAR_GC_TIME,
+    enabled,
     retry: 1,
   })
 }
@@ -60,11 +71,13 @@ export const useUpcomingCalendar = (days: number = 7) => {
 /**
  * Get overdue items
  */
-export const useOverdueCalendar = () => {
+export const useOverdueCalendar = (enabled: boolean = true) => {
   return useQuery({
     queryKey: ['calendar', 'overdue'],
     queryFn: () => calendarService.getOverdue(),
-    staleTime: 1 * 60 * 1000,
+    staleTime: CALENDAR_STALE_TIME,
+    gcTime: CALENDAR_GC_TIME,
+    enabled,
     retry: 1,
   })
 }
@@ -75,11 +88,13 @@ export const useOverdueCalendar = () => {
 export const useCalendarStats = (filters?: {
   startDate?: string
   endDate?: string
-}) => {
+}, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['calendar', 'stats', filters],
     queryFn: () => calendarService.getStats(filters),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CALENDAR_STALE_TIME,
+    gcTime: CALENDAR_GC_TIME,
+    enabled,
     retry: 1,
   })
 }

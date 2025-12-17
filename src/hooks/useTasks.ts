@@ -21,13 +21,21 @@ import tasksService, {
   Attachment,
 } from '@/services/tasksService'
 
+// ==================== Cache Configuration ====================
+// Cache data for 30 minutes to reduce API calls
+// Data is refreshed automatically when tasks are created/updated/deleted
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour (keep in cache)
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists (more dynamic)
+
 // ==================== Query Hooks ====================
 
 export const useTasks = (filters?: TaskFilters) => {
   return useQuery({
     queryKey: ['tasks', filters],
     queryFn: () => tasksService.getTasks(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -36,6 +44,7 @@ export const useTask = (id: string) => {
     queryKey: ['tasks', id],
     queryFn: () => tasksService.getTask(id),
     enabled: !!id,
+    staleTime: LIST_STALE_TIME,
   })
 }
 
@@ -43,7 +52,8 @@ export const useUpcomingTasks = (days: number = 7, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['tasks', 'upcoming', days],
     queryFn: () => tasksService.getUpcoming(days),
-    staleTime: 1 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     enabled,
   })
 }
@@ -52,7 +62,8 @@ export const useOverdueTasks = (enabled: boolean = true) => {
   return useQuery({
     queryKey: ['tasks', 'overdue'],
     queryFn: () => tasksService.getOverdue(),
-    staleTime: 1 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     enabled,
   })
 }
@@ -61,7 +72,8 @@ export const useDueTodayTasks = (enabled: boolean = true) => {
   return useQuery({
     queryKey: ['tasks', 'due-today'],
     queryFn: () => tasksService.getDueToday(),
-    staleTime: 1 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     enabled,
   })
 }
@@ -70,7 +82,8 @@ export const useMyTasks = (filters?: Omit<TaskFilters, 'assignedTo'>) => {
   return useQuery({
     queryKey: ['tasks', 'my-tasks', filters],
     queryFn: () => tasksService.getMyTasks(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -78,7 +91,8 @@ export const useTaskStats = (filters?: { caseId?: string; assignedTo?: string; d
   return useQuery<TaskStats>({
     queryKey: ['tasks', 'stats', filters],
     queryFn: () => tasksService.getStats(filters),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -86,7 +100,8 @@ export const useTaskTemplates = () => {
   return useQuery({
     queryKey: ['tasks', 'templates'],
     queryFn: () => tasksService.getTemplates(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
