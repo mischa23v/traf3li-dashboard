@@ -81,7 +81,17 @@ export const apiClientNoVersion = axios.create({
   timeout: API_CONFIG.timeout,
 })
 
-// Apply same interceptors to non-versioned client
+// Routes that should bypass circuit breaker (critical auth flows)
+const CIRCUIT_BREAKER_BYPASS_ROUTES = ['/auth/login', '/auth/logout', '/auth/me', '/auth/otp']
+
+/**
+ * Check if a URL should bypass circuit breaker
+ */
+const shouldBypassCircuitBreaker = (url: string): boolean => {
+  return CIRCUIT_BREAKER_BYPASS_ROUTES.some(route => url.includes(route))
+}
+
+// Apply same interceptors to non-versioned client (with gold standard protections)
 apiClientNoVersion.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const method = config.method?.toLowerCase()
@@ -91,17 +101,104 @@ apiClientNoVersion.interceptors.request.use(
         config.headers.set('X-CSRF-Token', csrfToken)
       }
     }
+
+    const url = config.url || ''
+
+    // Circuit Breaker Check - skip for auth routes (users must always be able to login)
+    if (!shouldBypassCircuitBreaker(url)) {
+      const circuitCheck = shouldAllowRequest(url)
+      if (!circuitCheck.allowed) {
+        const error = new Error(`Circuit breaker open for ${url}`) as any
+        error.code = 'CIRCUIT_OPEN'
+        error.retryAfter = circuitCheck.retryAfter
+        return Promise.reject(error)
+      }
+    }
+
+    // Request Deduplication for GET requests
+    if (method === 'get' && url) {
+      const dedupeKey = generateRequestKey(method, url, config.params)
+      const pendingRequest = getPendingRequest(dedupeKey)
+
+      if (pendingRequest) {
+        config.adapter = () => pendingRequest
+        return config
+      }
+    }
+
     return config
   },
   (error: AxiosError) => Promise.reject(error)
 )
 
+// Wrapper for apiClientNoVersion deduplication
+const originalNoVersionRequest = apiClientNoVersion.request.bind(apiClientNoVersion)
+apiClientNoVersion.request = function<T = any, R = AxiosResponse<T>>(config: any): Promise<R> {
+  const method = config.method?.toLowerCase() || 'get'
+  const url = config.url || ''
+
+  if (method === 'get' && url) {
+    const dedupeKey = generateRequestKey(method, url, config.params)
+    const existingRequest = getPendingRequest(dedupeKey)
+    if (existingRequest) {
+      return existingRequest as Promise<R>
+    }
+    const requestPromise = originalNoVersionRequest<T, R>(config)
+    registerPendingRequest(dedupeKey, requestPromise)
+    return requestPromise
+  }
+
+  return originalNoVersionRequest<T, R>(config)
+}
+
 apiClientNoVersion.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const url = response.config.url || ''
+    // Record success for circuit breaker (skip auth routes)
+    if (!shouldBypassCircuitBreaker(url)) {
+      recordSuccess(url)
+    }
+    return response
+  },
   async (error: AxiosError<any>) => {
+    const originalRequest = error.config as any
+    const url = originalRequest?.url || ''
+
+    // Record failure for circuit breaker (skip auth routes)
+    if (!shouldBypassCircuitBreaker(url) && error.response?.status &&
+        (error.response.status >= 500 || error.response.status === 429)) {
+      recordFailure(url)
+    }
+
+    // Handle 429 Rate Limited
+    if (error.response?.status === 429) {
+      const retryAfterHeader = error.response.headers['retry-after']
+      let retryAfter = 60
+
+      if (retryAfterHeader) {
+        const seconds = parseInt(retryAfterHeader, 10)
+        if (!isNaN(seconds)) {
+          retryAfter = seconds
+        }
+      }
+
+      const message = error.response?.data?.message || `طلبات كثيرة جداً. يرجى الانتظار ${formatRetryAfter(retryAfter)}.`
+
+      if (!originalRequest._rateLimitToastShown) {
+        originalRequest._rateLimitToastShown = true
+        import('sonner').then(({ toast }) => {
+          toast.error(message, {
+            description: `سيتم إعادة المحاولة تلقائياً بعد ${formatRetryAfter(retryAfter)}`,
+            duration: Math.min(retryAfter * 1000, 10000),
+          })
+        })
+      }
+
+      ;(error as any).retryAfter = retryAfter
+    }
+
     // DON'T auto-redirect on 401 for auth routes
     // Let the auth service decide what to do based on the specific endpoint
-    // This prevents logout on temporary errors or non-auth 401s
     // Support both nested error object (error.error.message) and root-level message
     const errorObj = error.response?.data?.error
     const errorMessage = errorObj?.messageAr || errorObj?.message || error.response?.data?.message || 'حدث خطأ غير متوقع'
@@ -114,6 +211,7 @@ apiClientNoVersion.interceptors.response.use(
       error: true,
       requestId: error.response?.data?.meta?.requestId || error.response?.data?.requestId,
       errors: error.response?.data?.errors,
+      retryAfter: (error as any).retryAfter,
     })
   }
 )
