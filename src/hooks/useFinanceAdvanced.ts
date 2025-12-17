@@ -23,6 +23,11 @@ import type {
   CurrencySettings,
 } from '@/types/finance-advanced'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // ═══════════════════════════════════════════════════════════════
 // BANK FEED HOOKS
 // ═══════════════════════════════════════════════════════════════
@@ -31,7 +36,8 @@ export const useBankFeeds = (filters?: BankFeedFilters) => {
   return useQuery({
     queryKey: ['bank-feeds', filters],
     queryFn: () => bankFeedService.getFeeds(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -262,7 +268,8 @@ export const useMatchingRules = () => {
   return useQuery({
     queryKey: ['matching-rules'],
     queryFn: () => matchingRulesService.getRules(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -335,7 +342,8 @@ export const useReconciliationReport = (
     queryKey: ['reconciliation-report', accountId, params],
     queryFn: () => reconciliationReportService.getReport(accountId, params),
     enabled: !!accountId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -366,7 +374,8 @@ export const useExchangeRates = () => {
   return useQuery({
     queryKey: ['exchange-rates'],
     queryFn: () => currencyService.getRates(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -387,7 +396,8 @@ export const useRateHistory = (
     queryKey: ['rate-history', fromCurrency, toCurrency, params],
     queryFn: () => currencyService.getRateHistory(fromCurrency, toCurrency, params),
     enabled: !!fromCurrency && !!toCurrency,
-    staleTime: 10 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -437,7 +447,8 @@ export const useCurrencySettings = () => {
   return useQuery({
     queryKey: ['currency-settings'],
     queryFn: () => currencyService.getSettings(),
-    staleTime: 10 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }

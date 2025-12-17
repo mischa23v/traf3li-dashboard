@@ -24,6 +24,11 @@ import {
   UpdateLeaveRequestData,
 } from '@/services/leaveService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query keys
 export const leaveKeys = {
   all: ['leave-requests'] as const,
@@ -43,6 +48,8 @@ export const useLeaveRequests = (filters?: LeaveRequestFilters) => {
   return useQuery({
     queryKey: leaveKeys.list(filters || {}),
     queryFn: () => getLeaveRequests(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -52,6 +59,8 @@ export const useLeaveRequest = (requestId: string) => {
     queryKey: leaveKeys.detail(requestId),
     queryFn: () => getLeaveRequest(requestId),
     enabled: !!requestId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -61,6 +70,8 @@ export const useLeaveBalance = (employeeId: string) => {
     queryKey: leaveKeys.balance(employeeId),
     queryFn: () => getLeaveBalance(employeeId),
     enabled: !!employeeId,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -69,6 +80,8 @@ export const useLeaveStats = (filters?: { year?: number; department?: string }) 
   return useQuery({
     queryKey: leaveKeys.stats(filters),
     queryFn: () => getLeaveStats(filters),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -78,6 +91,8 @@ export const useTeamCalendar = (startDate: string, endDate: string, department?:
     queryKey: leaveKeys.calendar(startDate, endDate, department),
     queryFn: () => getTeamCalendar(startDate, endDate, department),
     enabled: !!startDate && !!endDate,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -86,6 +101,8 @@ export const usePendingApprovals = () => {
   return useQuery({
     queryKey: leaveKeys.pendingApprovals(),
     queryFn: getPendingApprovals,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -262,6 +279,7 @@ export const useLeaveTypes = () => {
   return useQuery({
     queryKey: leaveKeys.types(),
     queryFn: getLeaveTypes,
-    staleTime: 1000 * 60 * 60, // 1 hour - leave types don't change often
+    staleTime: STATS_GC_TIME, // 1 hour - leave types don't change often
+    gcTime: STATS_GC_TIME,
   })
 }

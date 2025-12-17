@@ -9,6 +9,11 @@ import {
 } from '@/services/successionPlanningService'
 import { toast } from 'sonner'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query Keys
 export const successionPlanningKeys = {
   all: ['succession-plans'] as const,
@@ -30,7 +35,9 @@ export const successionPlanningKeys = {
 export function useSuccessionPlans(filters?: SuccessionPlanFilters) {
   return useQuery({
     queryKey: successionPlanningKeys.list(filters),
-    queryFn: () => successionPlanningApi.getAll(filters)
+    queryFn: () => successionPlanningApi.getAll(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -39,7 +46,9 @@ export function useSuccessionPlan(id: string) {
   return useQuery({
     queryKey: successionPlanningKeys.detail(id),
     queryFn: () => successionPlanningApi.getById(id),
-    enabled: !!id
+    enabled: !!id,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -48,7 +57,9 @@ export function useSuccessionPlansByPosition(positionId: string) {
   return useQuery({
     queryKey: successionPlanningKeys.byPosition(positionId),
     queryFn: () => successionPlanningApi.getByPosition(positionId),
-    enabled: !!positionId
+    enabled: !!positionId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -57,7 +68,9 @@ export function useSuccessionPlansByIncumbent(incumbentId: string) {
   return useQuery({
     queryKey: successionPlanningKeys.byIncumbent(incumbentId),
     queryFn: () => successionPlanningApi.getByIncumbent(incumbentId),
-    enabled: !!incumbentId
+    enabled: !!incumbentId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -65,7 +78,9 @@ export function useSuccessionPlansByIncumbent(incumbentId: string) {
 export function useSuccessionPlansReviewDue() {
   return useQuery({
     queryKey: successionPlanningKeys.reviewDue(),
-    queryFn: () => successionPlanningApi.getReviewDue()
+    queryFn: () => successionPlanningApi.getReviewDue(),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -73,7 +88,9 @@ export function useSuccessionPlansReviewDue() {
 export function useHighRiskSuccessionPlans() {
   return useQuery({
     queryKey: successionPlanningKeys.highRisk(),
-    queryFn: () => successionPlanningApi.getHighRisk()
+    queryFn: () => successionPlanningApi.getHighRisk(),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -81,7 +98,9 @@ export function useHighRiskSuccessionPlans() {
 export function useCriticalWithoutSuccessors() {
   return useQuery({
     queryKey: successionPlanningKeys.criticalWithoutSuccessors(),
-    queryFn: () => successionPlanningApi.getCriticalWithoutSuccessors()
+    queryFn: () => successionPlanningApi.getCriticalWithoutSuccessors(),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -89,7 +108,9 @@ export function useCriticalWithoutSuccessors() {
 export function useSuccessionPlanningStats(officeId?: string) {
   return useQuery({
     queryKey: successionPlanningKeys.stats(officeId),
-    queryFn: () => successionPlanningApi.getStats(officeId)
+    queryFn: () => successionPlanningApi.getStats(officeId),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

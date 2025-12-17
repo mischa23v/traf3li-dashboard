@@ -21,6 +21,11 @@ import type {
   ProductivityFilters,
 } from '@/types/gantt'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // ═══════════════════════════════════════════════════════════════
 // GANTT DATA HOOKS
 // ═══════════════════════════════════════════════════════════════
@@ -30,7 +35,8 @@ export const useGanttData = (caseId: string) => {
     queryKey: ['gantt-data', caseId],
     queryFn: () => ganttService.getGanttData(caseId),
     enabled: !!caseId,
-    staleTime: 30 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -39,7 +45,8 @@ export const useDHtmlxGanttData = (caseId: string) => {
     queryKey: ['gantt-dhtmlx', caseId],
     queryFn: () => ganttService.getDHtmlxData(caseId),
     enabled: !!caseId,
-    staleTime: 30 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -51,7 +58,8 @@ export const useProductivityGanttData = (filters?: ProductivityFilters) => {
   return useQuery({
     queryKey: ['gantt', 'productivity', filters],
     queryFn: () => ganttService.getProductivityData(filters),
-    staleTime: 30 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -122,7 +130,8 @@ export const useCriticalPath = (caseId: string) => {
     queryKey: ['gantt-critical-path', caseId],
     queryFn: () => ganttService.getCriticalPath(caseId),
     enabled: !!caseId,
-    staleTime: 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -167,7 +176,8 @@ export const useMilestones = (caseId: string) => {
     queryKey: ['gantt-milestones', caseId],
     queryFn: () => milestoneService.getMilestones(caseId),
     enabled: !!caseId,
-    staleTime: 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -240,7 +250,8 @@ export const useBaselines = (caseId: string) => {
     queryKey: ['gantt-baselines', caseId],
     queryFn: () => baselineService.getBaselines(caseId),
     enabled: !!caseId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -277,7 +288,8 @@ export const useCompareWithBaseline = (caseId: string, baselineId: string) => {
     queryKey: ['gantt-baseline-compare', caseId, baselineId],
     queryFn: () => baselineService.compareWithBaseline(caseId, baselineId),
     enabled: !!caseId && !!baselineId,
-    staleTime: 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -290,7 +302,8 @@ export const useResourceLoading = (caseId: string) => {
     queryKey: ['gantt-resource-loading', caseId],
     queryFn: () => ganttResourceService.getResourceLoading(caseId),
     enabled: !!caseId,
-    staleTime: 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -302,7 +315,8 @@ export const useResourceWorkload = (
     queryKey: ['gantt-resource-workload', resourceId, params],
     queryFn: () => ganttResourceService.getResourceWorkload(resourceId, params),
     enabled: !!resourceId,
-    staleTime: 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

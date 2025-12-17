@@ -2,6 +2,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { payrollService } from '@/services/payrollService'
 import type { SalarySlipFilters, CreateSalarySlipData } from '@/services/payrollService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query Keys
 export const payrollKeys = {
     all: ['payroll'] as const,
@@ -18,6 +23,8 @@ export function useSalarySlips(filters?: SalarySlipFilters) {
     return useQuery({
         queryKey: payrollKeys.list(filters),
         queryFn: () => payrollService.getSalarySlips(filters),
+        staleTime: LIST_STALE_TIME,
+        gcTime: STATS_GC_TIME,
     })
 }
 
@@ -27,6 +34,8 @@ export function useSalarySlip(id: string) {
         queryKey: payrollKeys.detail(id),
         queryFn: () => payrollService.getSalarySlip(id),
         enabled: !!id,
+        staleTime: LIST_STALE_TIME,
+        gcTime: STATS_GC_TIME,
     })
 }
 
@@ -36,6 +45,8 @@ export function useEmployeeSalarySlips(employeeId: string) {
         queryKey: payrollKeys.employee(employeeId),
         queryFn: () => payrollService.getEmployeeSalarySlips(employeeId),
         enabled: !!employeeId,
+        staleTime: LIST_STALE_TIME,
+        gcTime: STATS_GC_TIME,
     })
 }
 
@@ -44,6 +55,8 @@ export function usePayrollStats(month?: number, year?: number) {
     return useQuery({
         queryKey: payrollKeys.stats(month, year),
         queryFn: () => payrollService.getPayrollStats(month, year),
+        staleTime: STATS_STALE_TIME,
+        gcTime: STATS_GC_TIME,
     })
 }
 

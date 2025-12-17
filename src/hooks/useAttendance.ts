@@ -55,6 +55,11 @@ import {
   type CorrectionRequest,
 } from '@/services/attendanceService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query Keys
 export const attendanceKeys = {
   all: ['attendance'] as const,
@@ -79,6 +84,8 @@ export const useAttendanceRecords = (filters?: AttendanceFilters) => {
   return useQuery({
     queryKey: attendanceKeys.list(filters),
     queryFn: () => getAttendanceRecords(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -88,6 +95,8 @@ export const useAttendanceRecord = (recordId: string) => {
     queryKey: attendanceKeys.detail(recordId),
     queryFn: () => getAttendanceRecord(recordId),
     enabled: !!recordId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -329,6 +338,8 @@ export const useDailySummary = (date: string, department?: string) => {
     queryKey: attendanceKeys.dailySummary(date, department),
     queryFn: () => getDailySummary(date, department),
     enabled: !!date,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -338,6 +349,8 @@ export const useEmployeeSummary = (employeeId: string, startDate: string, endDat
     queryKey: attendanceKeys.employeeSummary(employeeId, startDate, endDate),
     queryFn: () => getEmployeeSummary(employeeId, startDate, endDate),
     enabled: !!employeeId && !!startDate && !!endDate,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -350,6 +363,8 @@ export const useAttendanceStats = (filters?: {
   return useQuery({
     queryKey: attendanceKeys.stats(filters),
     queryFn: () => getAttendanceStats(filters),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -358,6 +373,8 @@ export const useTodayAttendance = (department?: string) => {
   return useQuery({
     queryKey: attendanceKeys.today(department),
     queryFn: () => getTodayAttendance(department),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     refetchInterval: 60000, // Refresh every minute
   })
 }
@@ -367,6 +384,8 @@ export const usePendingApprovals = () => {
   return useQuery({
     queryKey: attendanceKeys.pendingApprovals(),
     queryFn: () => getPendingApprovals(),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -402,6 +421,8 @@ export const useViolations = (recordId: string) => {
     queryKey: attendanceKeys.violations(recordId),
     queryFn: () => getViolations(recordId),
     enabled: !!recordId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -446,6 +467,8 @@ export const useComplianceReport = (startDate: string, endDate: string, departme
     queryKey: attendanceKeys.complianceReport(startDate, endDate, department),
     queryFn: () => getComplianceReport(startDate, endDate, department),
     enabled: !!startDate && !!endDate,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -456,6 +479,8 @@ export const useAllViolations = () => {
   return useQuery({
     queryKey: [...attendanceKeys.all, 'all-violations'],
     queryFn: getAllViolations,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -464,6 +489,8 @@ export const useMonthlyReport = (month?: number, year?: number, department?: str
   return useQuery({
     queryKey: [...attendanceKeys.all, 'monthly-report', month, year, department],
     queryFn: () => getMonthlyReport(month, year, department),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -472,6 +499,8 @@ export const useDepartmentStats = (department?: string) => {
   return useQuery({
     queryKey: [...attendanceKeys.all, 'department-stats', department],
     queryFn: () => getDepartmentStats(department),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -481,6 +510,8 @@ export const useCheckInStatus = (employeeId: string) => {
     queryKey: [...attendanceKeys.all, 'check-in-status', employeeId],
     queryFn: () => getCheckInStatus(employeeId),
     enabled: !!employeeId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     refetchInterval: 30000, // Refresh every 30 seconds
   })
 }
@@ -491,6 +522,8 @@ export const useAttendanceSummaryForEmployee = (employeeId: string, startDate?: 
     queryKey: [...attendanceKeys.all, 'employee-summary-alt', employeeId, startDate, endDate],
     queryFn: () => getAttendanceSummaryForEmployee(employeeId, startDate, endDate),
     enabled: !!employeeId,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -500,6 +533,8 @@ export const useAttendanceByEmployeeAndDate = (employeeId: string, date: string)
     queryKey: [...attendanceKeys.all, 'by-employee-date', employeeId, date],
     queryFn: () => getAttendanceByEmployeeAndDate(employeeId, date),
     enabled: !!employeeId && !!date,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -561,6 +596,8 @@ export const useBreaks = (recordId: string) => {
     queryKey: [...attendanceKeys.all, 'breaks', recordId],
     queryFn: () => getBreaks(recordId),
     enabled: !!recordId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

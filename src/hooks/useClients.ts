@@ -5,11 +5,17 @@ import clientsService, {
 } from '@/services/clientsService'
 import { toast } from 'sonner'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 export const useClients = (filters?: ClientFilters) => {
   return useQuery({
     queryKey: ['clients', filters],
     queryFn: () => clientsService.getClients(filters),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -18,7 +24,8 @@ export const useClient = (clientId: string) => {
     queryKey: ['clients', clientId],
     queryFn: () => clientsService.getClient(clientId),
     enabled: !!clientId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -86,6 +93,7 @@ export const useSearchClients = (query: string) => {
     queryFn: () => clientsService.searchClients(query),
     enabled: query.length >= 2,
     staleTime: 30 * 1000, // 30 seconds
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -93,7 +101,8 @@ export const useClientStats = () => {
   return useQuery({
     queryKey: ['clients', 'stats'],
     queryFn: () => clientsService.getStats(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -101,7 +110,8 @@ export const useTopRevenueClients = (limit: number = 10) => {
   return useQuery({
     queryKey: ['clients', 'top-revenue', limit],
     queryFn: () => clientsService.getTopRevenue(limit),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -127,7 +137,8 @@ export const useClientPayments = (clientId: string) => {
     queryKey: ['clients', clientId, 'payments'],
     queryFn: () => clientsService.getClientPayments(clientId),
     enabled: !!clientId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -136,7 +147,8 @@ export const useClientBillingInfo = (clientId: string) => {
     queryKey: ['clients', clientId, 'billing-info'],
     queryFn: () => clientsService.getBillingInfo(clientId),
     enabled: !!clientId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -163,7 +175,8 @@ export const useWathqData = (clientId: string, dataType: string) => {
     queryKey: ['clients', clientId, 'wathq', dataType],
     queryFn: () => clientsService.getWathqData(clientId, dataType),
     enabled: !!clientId && !!dataType,
-    staleTime: 5 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

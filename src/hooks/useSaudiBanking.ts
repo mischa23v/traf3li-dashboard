@@ -2,6 +2,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/lib/api'
 import { toast } from 'sonner'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // ============================================
 // TYPES
 // ============================================
@@ -190,7 +195,8 @@ export function useLeanBanks() {
       const response = await api.get('/saudi-banking/lean/banks')
       return response.data
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -203,7 +209,8 @@ export function useLeanCustomers() {
       const response = await api.get('/saudi-banking/lean/customers')
       return response.data
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -217,7 +224,8 @@ export function useLeanCustomer(customerId: string) {
       return response.data
     },
     enabled: !!customerId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -249,7 +257,8 @@ export function useLeanCustomerToken(customerId: string) {
       return response.data
     },
     enabled: !!customerId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -263,7 +272,8 @@ export function useLeanEntities(customerId: string) {
       return response.data
     },
     enabled: !!customerId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -277,7 +287,8 @@ export function useLeanTransactions(accountId: string, params?: { page?: number;
       return response.data
     },
     enabled: !!accountId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -291,7 +302,8 @@ export function useLeanBalance(accountId: string) {
       return response.data
     },
     enabled: !!accountId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -326,7 +338,8 @@ export function useWPSFiles(params?: { page?: number; limit?: number; status?: s
       const response = await api.get('/saudi-banking/wps/files', { params })
       return response.data
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -340,7 +353,8 @@ export function useWPSFile(fileId: string) {
       return response.data
     },
     enabled: !!fileId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -353,7 +367,8 @@ export function useSARIEBanks() {
       const response = await api.get('/saudi-banking/wps/sarie-banks')
       return response.data
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -428,7 +443,8 @@ export function useSADADBillers(category?: string) {
       const response = await api.get('/saudi-banking/sadad/billers', { params: { category } })
       return response.data
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -442,7 +458,8 @@ export function useSearchSADADBillers(query: string) {
       return response.data
     },
     enabled: query.length > 2,
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -490,7 +507,8 @@ export function useSADADPayments(params?: { fromDate?: string; toDate?: string; 
       const response = await api.get('/saudi-banking/sadad/payments/history', { params })
       return response.data
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -504,7 +522,8 @@ export function useSADADPayment(paymentId: string) {
       return response.data
     },
     enabled: !!paymentId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -577,7 +596,8 @@ export function useMudadPayrolls(params?: { page?: number; limit?: number; month
       const response = await api.get('/saudi-banking/mudad/payrolls', { params })
       return response.data
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }
@@ -590,7 +610,8 @@ export function useMudadCompliance() {
       const response = await api.get('/saudi-banking/mudad/compliance')
       return response.data
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
     retry: 1,
   })
 }

@@ -13,6 +13,11 @@ import jobsService, {
   JobFilters,
 } from '@/services/jobsService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // ==================== QUERIES ====================
 
 /**
@@ -22,7 +27,8 @@ export const useJobs = (filters?: JobFilters) => {
   return useQuery({
     queryKey: ['jobs', filters],
     queryFn: () => jobsService.getJobs(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -33,7 +39,8 @@ export const useMyJobs = () => {
   return useQuery({
     queryKey: ['jobs', 'my-jobs'],
     queryFn: () => jobsService.getMyJobs(),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -45,6 +52,8 @@ export const useJob = (id: string) => {
     queryKey: ['jobs', id],
     queryFn: () => jobsService.getJob(id),
     enabled: !!id,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

@@ -16,6 +16,11 @@ import {
   type SkillCategory,
 } from '@/services/skillService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query keys
 export const skillKeys = {
   all: ['skills'] as const,
@@ -33,6 +38,8 @@ export const useSkills = (filters?: SkillFilters) => {
   return useQuery({
     queryKey: skillKeys.list(filters),
     queryFn: () => getSkills(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -42,6 +49,8 @@ export const useSkill = (skillId: string) => {
     queryKey: skillKeys.detail(skillId),
     queryFn: () => getSkill(skillId),
     enabled: !!skillId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -50,6 +59,8 @@ export const useSkillStats = () => {
   return useQuery({
     queryKey: skillKeys.stats(),
     queryFn: getSkillStats,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -59,6 +70,8 @@ export const useSkillsByCategory = (category: SkillCategory) => {
     queryKey: skillKeys.byCategory(category),
     queryFn: () => getSkillsByCategory(category),
     enabled: !!category,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -67,6 +80,8 @@ export const useActiveSkills = () => {
   return useQuery({
     queryKey: skillKeys.active(),
     queryFn: getActiveSkills,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

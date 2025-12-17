@@ -29,6 +29,11 @@ import {
   type OutcomeType,
 } from '@/services/grievancesService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query keys
 export const grievanceKeys = {
   all: ['grievances'] as const,
@@ -45,6 +50,8 @@ export const useGrievances = (filters?: GrievanceFilters) => {
   return useQuery({
     queryKey: grievanceKeys.list(filters),
     queryFn: () => getGrievances(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -54,6 +61,8 @@ export const useGrievance = (grievanceId: string) => {
     queryKey: grievanceKeys.detail(grievanceId),
     queryFn: () => getGrievance(grievanceId),
     enabled: !!grievanceId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -62,6 +71,8 @@ export const useGrievanceStats = () => {
   return useQuery({
     queryKey: grievanceKeys.stats(),
     queryFn: getGrievanceStats,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -71,6 +82,8 @@ export const useEmployeeGrievances = (employeeId: string) => {
     queryKey: grievanceKeys.byEmployee(employeeId),
     queryFn: () => getEmployeeGrievances(employeeId),
     enabled: !!employeeId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

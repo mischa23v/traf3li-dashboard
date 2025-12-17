@@ -35,6 +35,11 @@ import {
   type CertificateType,
 } from '@/services/trainingService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query keys
 export const trainingKeys = {
   all: ['trainings'] as const,
@@ -57,6 +62,8 @@ export const useTrainings = (filters?: TrainingFilters) => {
   return useQuery({
     queryKey: trainingKeys.list(filters),
     queryFn: () => getTrainings(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -66,6 +73,8 @@ export const useTraining = (trainingId: string) => {
     queryKey: trainingKeys.detail(trainingId),
     queryFn: () => getTraining(trainingId),
     enabled: !!trainingId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -74,6 +83,8 @@ export const useTrainingStats = () => {
   return useQuery({
     queryKey: trainingKeys.stats(),
     queryFn: getTrainingStats,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -83,6 +94,8 @@ export const useEmployeeTrainings = (employeeId: string) => {
     queryKey: trainingKeys.byEmployee(employeeId),
     queryFn: () => getEmployeeTrainings(employeeId),
     enabled: !!employeeId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -91,6 +104,8 @@ export const usePendingTrainingApprovals = () => {
   return useQuery({
     queryKey: trainingKeys.pendingApprovals(),
     queryFn: getPendingTrainingApprovals,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -99,6 +114,8 @@ export const useUpcomingTrainings = () => {
   return useQuery({
     queryKey: trainingKeys.upcoming(),
     queryFn: getUpcomingTrainings,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -107,6 +124,8 @@ export const useOverdueComplianceTrainings = () => {
   return useQuery({
     queryKey: trainingKeys.overdueCompliance(),
     queryFn: getOverdueComplianceTrainings,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -116,6 +135,8 @@ export const useCLESummary = (employeeId: string) => {
     queryKey: trainingKeys.cleSummary(employeeId),
     queryFn: () => getCLESummary(employeeId),
     enabled: !!employeeId,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -124,6 +145,8 @@ export const useTrainingCalendar = (month: number, year: number) => {
   return useQuery({
     queryKey: trainingKeys.calendar(month, year),
     queryFn: () => getTrainingCalendar(month, year),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -132,6 +155,8 @@ export const useTrainingProviders = () => {
   return useQuery({
     queryKey: trainingKeys.providers(),
     queryFn: getTrainingProviders,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

@@ -28,6 +28,11 @@ import {
   type IncidentType,
 } from '@/services/assetAssignmentService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query keys
 export const assetAssignmentKeys = {
   all: ['asset-assignments'] as const,
@@ -46,6 +51,8 @@ export const useAssetAssignments = (filters?: AssetAssignmentFilters) => {
   return useQuery({
     queryKey: assetAssignmentKeys.list(filters),
     queryFn: () => getAssetAssignments(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -55,6 +62,8 @@ export const useAssetAssignment = (assignmentId: string) => {
     queryKey: assetAssignmentKeys.detail(assignmentId),
     queryFn: () => getAssetAssignment(assignmentId),
     enabled: !!assignmentId,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -63,6 +72,8 @@ export const useAssetAssignmentStats = () => {
   return useQuery({
     queryKey: assetAssignmentKeys.stats(),
     queryFn: getAssetAssignmentStats,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -72,6 +83,8 @@ export const useEmployeeAssetAssignments = (employeeId: string) => {
     queryKey: assetAssignmentKeys.byEmployee(employeeId),
     queryFn: () => getEmployeeAssetAssignments(employeeId),
     enabled: !!employeeId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -80,6 +93,8 @@ export const useOverdueReturns = () => {
   return useQuery({
     queryKey: assetAssignmentKeys.overdueReturns(),
     queryFn: getOverdueReturns,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -88,6 +103,8 @@ export const useMaintenanceDue = () => {
   return useQuery({
     queryKey: assetAssignmentKeys.maintenanceDue(),
     queryFn: getMaintenanceDue,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

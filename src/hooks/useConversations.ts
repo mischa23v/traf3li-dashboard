@@ -10,13 +10,19 @@ import conversationsService, {
 } from '@/services/conversationsService'
 import messagesService, { SendMessageData } from '@/services/messagesService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // ==================== CONVERSATIONS ====================
 
 export const useConversations = (params?: { page?: number; limit?: number }) => {
   return useQuery({
     queryKey: ['conversations', params],
     queryFn: () => conversationsService.getConversations(params),
-    staleTime: 1 * 60 * 1000, // 1 minute
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -25,6 +31,8 @@ export const useSingleConversation = (sellerID: string, buyerID: string) => {
     queryKey: ['conversations', 'single', sellerID, buyerID],
     queryFn: () => conversationsService.getSingleConversation(sellerID, buyerID),
     enabled: !!sellerID && !!buyerID,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -66,7 +74,8 @@ export const useMessages = (
     queryKey: ['messages', conversationId, params],
     queryFn: () => messagesService.getMessages(conversationId, params),
     enabled: !!conversationId,
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

@@ -26,6 +26,11 @@ import {
   type DayOfWeek,
 } from '@/services/shiftTypeService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query keys
 export const shiftTypeKeys = {
   all: ['shift-types'] as const,
@@ -45,6 +50,8 @@ export const useShiftTypes = (filters?: ShiftTypeFilters) => {
   return useQuery({
     queryKey: shiftTypeKeys.list(filters),
     queryFn: () => getShiftTypes(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -54,6 +61,8 @@ export const useShiftType = (shiftTypeId: string) => {
     queryKey: shiftTypeKeys.detail(shiftTypeId),
     queryFn: () => getShiftType(shiftTypeId),
     enabled: !!shiftTypeId,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -62,6 +71,8 @@ export const useShiftTypeStats = () => {
   return useQuery({
     queryKey: shiftTypeKeys.stats(),
     queryFn: getShiftTypeStats,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -70,6 +81,8 @@ export const useDefaultShift = () => {
   return useQuery({
     queryKey: shiftTypeKeys.default(),
     queryFn: getDefaultShift,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -79,6 +92,8 @@ export const useShiftsByDay = (day: DayOfWeek) => {
     queryKey: shiftTypeKeys.byDay(day),
     queryFn: () => getShiftsByDay(day),
     enabled: !!day,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -87,6 +102,8 @@ export const useActiveShifts = () => {
   return useQuery({
     queryKey: shiftTypeKeys.active(),
     queryFn: getActiveShifts,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -95,6 +112,8 @@ export const useRamadanShifts = () => {
   return useQuery({
     queryKey: shiftTypeKeys.ramadan(),
     queryFn: getRamadanShifts,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

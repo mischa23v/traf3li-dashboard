@@ -1,6 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import apiClient from '@/lib/api'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Types
 export interface Message {
     _id: string
@@ -63,7 +68,8 @@ export const useConversations = () => {
             const response = await apiClient.get('/conversations')
             return response.data as Conversation[]
         },
-        staleTime: 30000, // 30 seconds
+        staleTime: LIST_STALE_TIME,
+        gcTime: STATS_GC_TIME,
     })
 }
 
@@ -77,7 +83,8 @@ export const useMessages = (conversationID: string | null) => {
             return response.data as Message[]
         },
         enabled: !!conversationID,
-        staleTime: 10000, // 10 seconds
+        staleTime: LIST_STALE_TIME,
+        gcTime: STATS_GC_TIME,
     })
 }
 
@@ -198,5 +205,7 @@ export const useSingleConversation = (sellerID: string | null, buyerID: string |
             return response.data as Conversation
         },
         enabled: !!sellerID && !!buyerID,
+        staleTime: STATS_STALE_TIME,
+        gcTime: STATS_GC_TIME,
     })
 }

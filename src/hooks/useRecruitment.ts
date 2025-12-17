@@ -14,6 +14,11 @@ import recruitmentService, {
   type Recommendation,
 } from '@/services/recruitmentService'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query Keys
 export const recruitmentKeys = {
   // Job Postings
@@ -41,6 +46,8 @@ export function useJobPostings(filters?: JobPostingFilters) {
   return useQuery({
     queryKey: recruitmentKeys.jobList(filters),
     queryFn: () => recruitmentService.getJobPostings(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -56,6 +63,8 @@ export function useRecruitmentStats() {
   return useQuery({
     queryKey: recruitmentKeys.jobStats(),
     queryFn: () => recruitmentService.getRecruitmentStats(),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -63,6 +72,8 @@ export function useJobPostingStats() {
   return useQuery({
     queryKey: recruitmentKeys.jobStats(),
     queryFn: () => recruitmentService.getJobPostingStats(),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -70,6 +81,8 @@ export function useTalentPool() {
   return useQuery({
     queryKey: ['talent-pool'],
     queryFn: () => recruitmentService.getTalentPool(),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -77,6 +90,8 @@ export function useJobsNearingDeadline() {
   return useQuery({
     queryKey: ['jobs-nearing-deadline'],
     queryFn: () => recruitmentService.getJobsNearingDeadline(),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -210,6 +225,8 @@ export function useApplicants(filters?: ApplicantFilters) {
   return useQuery({
     queryKey: recruitmentKeys.applicantList(filters),
     queryFn: () => recruitmentService.getApplicants(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -233,6 +250,8 @@ export function useApplicantStats(jobId?: string) {
   return useQuery({
     queryKey: recruitmentKeys.applicantStats(jobId),
     queryFn: () => recruitmentService.getApplicantStats(jobId),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

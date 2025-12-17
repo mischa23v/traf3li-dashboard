@@ -9,6 +9,11 @@ import type {
 } from '@/services/salaryComponentService'
 import { toast } from 'sonner'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // Query Keys
 export const salaryComponentKeys = {
   all: ['salary-components'] as const,
@@ -30,6 +35,8 @@ export function useSalaryComponents(filters?: SalaryComponentFilters) {
   return useQuery({
     queryKey: salaryComponentKeys.list(filters),
     queryFn: () => salaryComponentService.getSalaryComponents(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -39,6 +46,8 @@ export function useSalaryComponent(id: string) {
     queryKey: salaryComponentKeys.detail(id),
     queryFn: () => salaryComponentService.getSalaryComponent(id),
     enabled: !!id,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -47,6 +56,8 @@ export function useEarningComponents() {
   return useQuery({
     queryKey: salaryComponentKeys.earnings(),
     queryFn: () => salaryComponentService.getEarningComponents(),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -55,6 +66,8 @@ export function useDeductionComponents() {
   return useQuery({
     queryKey: salaryComponentKeys.deductions(),
     queryFn: () => salaryComponentService.getDeductionComponents(),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -64,6 +77,8 @@ export function useComponentsByType(type: ComponentType) {
     queryKey: salaryComponentKeys.byType(type),
     queryFn: () => salaryComponentService.getComponentsByType(type),
     enabled: !!type,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -72,6 +87,8 @@ export function useComponentsStats() {
   return useQuery({
     queryKey: salaryComponentKeys.stats(),
     queryFn: () => salaryComponentService.getComponentsStats(),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -81,6 +98,8 @@ export function useComponentUsage(id: string) {
     queryKey: salaryComponentKeys.usage(id),
     queryFn: () => salaryComponentService.getComponentUsage(id),
     enabled: !!id,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 

@@ -13,6 +13,13 @@ import activityService, {
   type CreateActivityInput,
 } from '@/services/activityService'
 
+// ==================== Cache Configuration ====================
+// Cache data for 30 minutes to reduce API calls
+// Data is refreshed automatically when mutations occur
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour (keep in cache)
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // ==================== QUERY KEYS ====================
 
 export const activityKeys = {
@@ -29,10 +36,13 @@ export const activityKeys = {
 /**
  * Get activities with optional filters
  */
-export function useActivities(filters?: ActivityFilters) {
+export function useActivities(filters?: ActivityFilters, enabled: boolean = true) {
   return useQuery({
     queryKey: activityKeys.list(filters),
     queryFn: () => activityService.getAll(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
@@ -42,44 +52,50 @@ export function useActivities(filters?: ActivityFilters) {
 export function useEntityActivities(
   entityType: ActivityEntityType,
   entityId: string,
-  limit = 50
+  limit = 50,
+  enabled: boolean = true
 ) {
   return useQuery({
     queryKey: activityKeys.entity(entityType, entityId),
     queryFn: () => activityService.getByEntity(entityType, entityId, limit),
-    enabled: !!entityId,
+    enabled: !!entityId && enabled,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
 /**
  * Get recent activities for the current user
  */
-export function useRecentActivities(limit = 20) {
+export function useRecentActivities(limit = 20, enabled: boolean = true) {
   return useQuery({
     queryKey: activityKeys.recent(limit),
     queryFn: () => activityService.getRecent(limit),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 
 /**
  * Get task activities
  */
-export function useTaskActivities(taskId: string, limit = 50) {
-  return useEntityActivities('task', taskId, limit)
+export function useTaskActivities(taskId: string, limit = 50, enabled: boolean = true) {
+  return useEntityActivities('task', taskId, limit, enabled)
 }
 
 /**
  * Get event activities
  */
-export function useEventActivities(eventId: string, limit = 50) {
-  return useEntityActivities('event', eventId, limit)
+export function useEventActivities(eventId: string, limit = 50, enabled: boolean = true) {
+  return useEntityActivities('event', eventId, limit, enabled)
 }
 
 /**
  * Get reminder activities
  */
-export function useReminderActivities(reminderId: string, limit = 50) {
-  return useEntityActivities('reminder', reminderId, limit)
+export function useReminderActivities(reminderId: string, limit = 50, enabled: boolean = true) {
+  return useEntityActivities('reminder', reminderId, limit, enabled)
 }
 
 // ==================== MUTATIONS ====================

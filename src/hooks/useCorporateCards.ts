@@ -15,13 +15,19 @@ import type {
   ReconcileTransactionData,
 } from '@/features/finance/types/corporate-card-types'
 
+// ==================== Cache Configuration ====================
+const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
+const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+
 // ==================== CORPORATE CARDS ====================
 
 export const useCorporateCards = (filters?: CorporateCardFilters) => {
   return useQuery({
     queryKey: ['corporate-cards', filters],
     queryFn: () => corporateCardService.getCorporateCards(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -120,7 +126,8 @@ export const useCardTransactions = (filters?: CardTransactionFilters) => {
   return useQuery({
     queryKey: ['card-transactions', filters],
     queryFn: () => corporateCardService.getCardTransactions(filters),
-    staleTime: 1 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -186,7 +193,8 @@ export const useUnreconciledTransactions = (cardId?: string) => {
   return useQuery({
     queryKey: ['card-transactions', 'unreconciled', cardId],
     queryFn: () => corporateCardService.getUnreconciledTransactions(cardId),
-    staleTime: 1 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -194,7 +202,8 @@ export const useDisputedTransactions = (cardId?: string) => {
   return useQuery({
     queryKey: ['card-transactions', 'disputed', cardId],
     queryFn: () => corporateCardService.getDisputedTransactions(cardId),
-    staleTime: 1 * 60 * 1000,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -326,7 +335,8 @@ export const useCardStatistics = (startDate?: string, endDate?: string) => {
   return useQuery({
     queryKey: ['card-statistics', startDate, endDate],
     queryFn: () => corporateCardService.getCardStatistics(startDate, endDate),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -335,7 +345,8 @@ export const useReconciliationReport = (cardId?: string, startDate?: string, end
     queryKey: ['card-reconciliation-report', cardId, startDate, endDate],
     queryFn: () => corporateCardService.getReconciliationReport(cardId, startDate, endDate),
     enabled: !!(startDate && endDate),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -343,7 +354,8 @@ export const useSpendingByCategory = (cardId?: string, startDate?: string, endDa
   return useQuery({
     queryKey: ['card-spending-by-category', cardId, startDate, endDate],
     queryFn: () => corporateCardService.getSpendingByCategory(cardId, startDate, endDate),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -351,7 +363,8 @@ export const useSpendingByCard = (startDate?: string, endDate?: string) => {
   return useQuery({
     queryKey: ['card-spending-by-card', startDate, endDate],
     queryFn: () => corporateCardService.getSpendingByCard(startDate, endDate),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
@@ -359,7 +372,8 @@ export const useMonthlySpendingTrend = (cardId?: string, months: number = 6) => 
   return useQuery({
     queryKey: ['card-monthly-spending-trend', cardId, months],
     queryFn: () => corporateCardService.getMonthlySpendingTrend(cardId, months),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
   })
 }
 
