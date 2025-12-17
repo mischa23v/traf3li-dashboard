@@ -24,6 +24,12 @@ import {
   recordFailure,
   resetAllCircuits,
 } from './circuit-breaker'
+import {
+  shouldAddIdempotencyKey,
+  getIdempotencyKey,
+  clearIdempotencyKey,
+  clearAllIdempotencyKeys,
+} from './idempotency'
 
 // API Base URL - Change based on environment
 const API_BASE_URL = getApiUrl()
@@ -103,6 +109,12 @@ apiClientNoVersion.interceptors.request.use(
 
     const url = config.url || ''
 
+    // Add Idempotency Key for financial mutation requests
+    if (shouldAddIdempotencyKey(method, url) && !config.headers.get('Idempotency-Key')) {
+      const idempotencyKey = getIdempotencyKey(method || 'POST', url, config.data)
+      config.headers.set('Idempotency-Key', idempotencyKey)
+    }
+
     // Circuit Breaker Check - skip for auth routes (users must always be able to login)
     if (!shouldBypassCircuitBreaker(url)) {
       const circuitCheck = shouldAllowRequest(url)
@@ -153,10 +165,18 @@ apiClientNoVersion.request = function<T = any, R = AxiosResponse<T>>(config: any
 apiClientNoVersion.interceptors.response.use(
   (response) => {
     const url = response.config.url || ''
+    const method = response.config.method?.toUpperCase() || 'GET'
+
     // Record success for circuit breaker (skip auth routes)
     if (!shouldBypassCircuitBreaker(url)) {
       recordSuccess(url)
     }
+
+    // Clear idempotency key on successful mutation (next request gets new key)
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+      clearIdempotencyKey(method, url, response.config.data)
+    }
+
     return response
   },
   async (error: AxiosError<any>) => {
@@ -217,7 +237,7 @@ apiClientNoVersion.interceptors.response.use(
 
 /**
  * Request Interceptor
- * Adds caching, deduplication, circuit breaker, and CSRF token handling
+ * Adds caching, deduplication, circuit breaker, idempotency, and CSRF token handling
  */
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
@@ -231,6 +251,12 @@ apiClient.interceptors.request.use(
     }
 
     const url = config.url || ''
+
+    // Add Idempotency Key for financial mutation requests
+    if (shouldAddIdempotencyKey(method, url) && !config.headers.get('Idempotency-Key')) {
+      const idempotencyKey = getIdempotencyKey(method || 'POST', url, config.data)
+      config.headers.set('Idempotency-Key', idempotencyKey)
+    }
 
     // Circuit Breaker Check - reject if circuit is open
     const circuitCheck = shouldAllowRequest(url)
@@ -305,14 +331,20 @@ apiClient.request = function<T = any, R = AxiosResponse<T>>(config: any): Promis
 
 /**
  * Response Interceptor
- * Handles caching, session warnings, errors, circuit breaker, and retry logic
+ * Handles caching, session warnings, errors, circuit breaker, idempotency, and retry logic
  */
 apiClient.interceptors.response.use(
   (response) => {
     const url = response.config.url || ''
+    const method = response.config.method?.toUpperCase() || 'GET'
 
     // Record success for circuit breaker
     recordSuccess(url)
+
+    // Clear idempotency key on successful mutation (next request gets new key)
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+      clearIdempotencyKey(method, url, response.config.data)
+    }
 
     // Cache GET responses
     if (response.config.method === 'get' && response.config.url) {
@@ -691,18 +723,26 @@ export const getCacheSize = () => {
 }
 
 /**
- * Reset all rate limiting state (cache, pending requests, circuit breakers)
+ * Reset all API state (cache, pending requests, circuit breakers, idempotency keys)
  * Call this on logout to ensure clean state
  */
 export const resetApiState = () => {
   clearCache()
   clearPendingRequests()
   resetAllCircuits()
+  clearAllIdempotencyKeys()
 }
 
 // Re-export circuit breaker utilities for monitoring
 export { getOpenCircuits, getCircuitStatus } from './circuit-breaker'
 export { getPendingRequestCount } from './request-deduplication'
+
+// Re-export idempotency utilities
+export {
+  shouldAddIdempotencyKey,
+  generateIdempotencyKey,
+  FINANCIAL_PATHS,
+} from './idempotency'
 
 // Alias export for compatibility with services that import 'api'
 export const api = apiClient

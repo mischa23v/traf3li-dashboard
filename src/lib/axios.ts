@@ -12,6 +12,9 @@ export {
   getOpenCircuits,
   getCircuitStatus,
   getPendingRequestCount,
+  shouldAddIdempotencyKey,
+  generateIdempotencyKey,
+  FINANCIAL_PATHS,
   type ApiError,
   type RateLimitInfo,
 } from './api'
@@ -24,3 +27,10 @@ export {
   isRetryableError,
   calculateBackoffDelay,
 } from './query-retry-config'
+
+// Re-export idempotency utilities for custom use
+export {
+  getIdempotencyKey,
+  clearIdempotencyKey,
+  clearAllIdempotencyKeys,
+} from './idempotency'
