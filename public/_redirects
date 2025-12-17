@@ -1,7 +1,7 @@
-# Proxy API requests to backend (except /api/ai which uses Pages Functions)
-/api/auth/*  https://api.traf3li.com/api/auth/:splat  200
-/api/v1/*    https://api.traf3li.com/api/v1/:splat    200
-/api/currency/*  https://api.traf3li.com/api/currency/:splat  200
+# API routes are handled by Cloudflare Pages Functions (see functions/api/[[path]].ts)
+# No proxy redirects needed here - Cloudflare Pages doesn't support external URL proxies
 
-# SPA fallback - must be last
-/*  /index.html  200
+# SPA fallback for client-side routing
+# Note: /api/* paths are excluded by _routes.json and handled by Functions
+/*.html  /:splat  301
+/index.html  /  301
