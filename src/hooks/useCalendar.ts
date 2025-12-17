@@ -3,7 +3,8 @@
  * TanStack Query hooks for calendar operations
  */
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useCallback } from 'react'
 import calendarService, { CalendarFilters } from '@/services/calendarService'
 
 // ==================== Cache Configuration ====================
@@ -97,4 +98,54 @@ export const useCalendarStats = (filters?: {
     enabled,
     retry: 1,
   })
+}
+
+/**
+ * Hook to prefetch adjacent months for smoother navigation
+ * Returns callbacks to prefetch prev/next months on hover
+ */
+export const usePrefetchAdjacentMonths = (currentDate: Date) => {
+  const queryClient = useQueryClient()
+
+  const prefetchMonth = useCallback((date: Date) => {
+    const year = date.getFullYear()
+    const month = date.getMonth()
+    const firstDay = new Date(year, month, 1)
+    const lastDay = new Date(year, month + 1, 0)
+
+    // Add buffer for calendar grid (same as fullcalendar-view)
+    const startDate = new Date(firstDay)
+    startDate.setDate(startDate.getDate() - 7)
+    const endDate = new Date(lastDay)
+    endDate.setDate(endDate.getDate() + 7)
+
+    const filters: CalendarFilters = {
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0],
+    }
+
+    // Only prefetch if not already in cache
+    const cached = queryClient.getQueryData(['calendar', filters])
+    if (!cached) {
+      queryClient.prefetchQuery({
+        queryKey: ['calendar', filters],
+        queryFn: () => calendarService.getCalendar(filters),
+        staleTime: CALENDAR_STALE_TIME,
+      })
+    }
+  }, [queryClient])
+
+  const prefetchPrevMonth = useCallback(() => {
+    const prevDate = new Date(currentDate)
+    prevDate.setMonth(prevDate.getMonth() - 1)
+    prefetchMonth(prevDate)
+  }, [currentDate, prefetchMonth])
+
+  const prefetchNextMonth = useCallback(() => {
+    const nextDate = new Date(currentDate)
+    nextDate.setMonth(nextDate.getMonth() + 1)
+    prefetchMonth(nextDate)
+  }, [currentDate, prefetchMonth])
+
+  return { prefetchPrevMonth, prefetchNextMonth }
 }

@@ -3,7 +3,7 @@
  * Production-ready calendar with drag-and-drop, events, and full features
  */
 
-import { useState, useMemo, useCallback, useRef } from 'react'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import FullCalendar from '@fullcalendar/react'
@@ -35,7 +35,7 @@ import {
   Check,
   ChevronDown,
 } from 'lucide-react'
-import { useCalendar, useCalendarByMonth } from '@/hooks/useCalendar'
+import { useCalendar, useCalendarByMonth, usePrefetchAdjacentMonths } from '@/hooks/useCalendar'
 import { useCreateEvent, useUpdateEvent } from '@/hooks/useRemindersAndEvents'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
@@ -195,6 +195,34 @@ export function FullCalendarView() {
   // Mutations
   const createEventMutation = useCreateEvent()
   const updateEventMutation = useUpdateEvent()
+
+  // Prefetch adjacent months for smoother navigation
+  const { prefetchPrevMonth, prefetchNextMonth } = usePrefetchAdjacentMonths(currentDate)
+
+  // Attach hover listeners to navigation buttons for prefetching
+  useEffect(() => {
+    const wrapper = document.querySelector('.fullcalendar-wrapper')
+    if (!wrapper) return
+
+    const prevBtn = wrapper.querySelector('.fc-prev-button')
+    const nextBtn = wrapper.querySelector('.fc-next-button')
+
+    if (prevBtn) {
+      prevBtn.addEventListener('mouseenter', prefetchPrevMonth)
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener('mouseenter', prefetchNextMonth)
+    }
+
+    return () => {
+      if (prevBtn) {
+        prevBtn.removeEventListener('mouseenter', prefetchPrevMonth)
+      }
+      if (nextBtn) {
+        nextBtn.removeEventListener('mouseenter', prefetchNextMonth)
+      }
+    }
+  }, [prefetchPrevMonth, prefetchNextMonth])
 
   // Transform API data to FullCalendar format
   const calendarEvents = useMemo<CalendarEvent[]>(() => {
@@ -926,6 +954,10 @@ export function FullCalendarView() {
       <style>{`
         .fullcalendar-wrapper .fc {
           font-family: inherit;
+        }
+        /* CSS containment for day cells - improves paint and layout performance */
+        .fullcalendar-wrapper .fc-daygrid-day {
+          contain: content;
         }
         .fullcalendar-wrapper .fc-toolbar-title {
           font-size: 1.5rem;
