@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { PERF_DEBUG, perfLog } from '@/lib/perf-debug'
 import {
   ZoomIn,
   ZoomOut,
@@ -51,8 +52,46 @@ export function GanttView() {
   const [showCriticalPath, setShowCriticalPath] = useState(false)
   const [filterType, setFilterType] = useState<SourceType | 'all'>('all')
 
+  // Performance profiling
+  const renderCount = useRef(0)
+  const mountTime = useRef(performance.now())
+
+  useEffect(() => {
+    perfLog('GanttView MOUNTED')
+    return () => perfLog('GanttView UNMOUNTED')
+  }, [])
+
+  renderCount.current++
+  if (PERF_DEBUG && renderCount.current <= 5) {
+    perfLog(`GanttView RENDER #${renderCount.current}`, {
+      timeSinceMount: (performance.now() - mountTime.current).toFixed(2) + 'ms'
+    })
+  }
+
   // Fetch productivity data (tasks + reminders + events)
-  const { data: productivityData, isLoading, isError, error, refetch } = useProductivityGanttData()
+  const { data: productivityData, isLoading, isError, error, refetch, isFetching } = useProductivityGanttData()
+
+  // Performance: Track API load completion
+  useEffect(() => {
+    if (productivityData) perfLog('API LOADED: ganttData', {
+      itemCount: productivityData?.data?.length,
+      summary: productivityData?.summary
+    })
+  }, [productivityData])
+
+  useEffect(() => {
+    if (isFetching) {
+      perfLog('GanttView FETCHING: ganttData')
+    }
+  }, [isFetching])
+
+  useEffect(() => {
+    if (isGanttLoaded) perfLog('DHTMLX Gantt library LOADED')
+  }, [isGanttLoaded])
+
+  useEffect(() => {
+    if (isGanttInitialized) perfLog('DHTMLX Gantt INITIALIZED')
+  }, [isGanttInitialized])
 
   // Derived data for DHTMLX Gantt
   const ganttData = productivityData ? {

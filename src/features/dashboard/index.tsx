@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   MessageSquare,
@@ -27,6 +27,9 @@ import {
   FileText,
   GraduationCap,
 } from 'lucide-react'
+
+// Performance profiling - import from shared utility
+import { PERF_DEBUG, perfLog, perfMark } from '@/lib/perf-debug'
 import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import {
@@ -72,6 +75,24 @@ export function Dashboard() {
   const user = useAuthStore((state) => state.user)
   const [activeTab, setActiveTab] = useState<TabType>('overview')
 
+  // Performance profiling - track component mount
+  const renderCount = useRef(0)
+  const mountTime = useRef(performance.now())
+
+  useEffect(() => {
+    perfMark('dashboard-mount')
+    perfLog('Dashboard MOUNTED', { renderCount: renderCount.current })
+    return () => perfLog('Dashboard UNMOUNTED')
+  }, [])
+
+  // Track render count
+  renderCount.current++
+  if (PERF_DEBUG && renderCount.current <= 5) {
+    perfLog(`Dashboard RENDER #${renderCount.current}`, {
+      timeSinceMount: (performance.now() - mountTime.current).toFixed(2) + 'ms'
+    })
+  }
+
   // Performance optimization: Defer secondary data loading to prevent blocking initial render
   // This reduces the initial 7 parallel API calls to 4, then loads 3 more after 150ms
   const [isSecondaryDataReady, setIsSecondaryDataReady] = useState(false)
@@ -79,7 +100,9 @@ export function Dashboard() {
   useEffect(() => {
     // Defer loading of overview tab data (events, financial, messages)
     // to allow critical hero stats to load first
+    perfLog('Scheduling deferred data load (150ms)')
     const timer = setTimeout(() => {
+      perfLog('Deferred data load TRIGGERED - loading overview data')
       setIsSecondaryDataReady(true)
     }, 150)
     return () => clearTimeout(timer)
@@ -122,15 +145,15 @@ export function Dashboard() {
   const shouldLoadOverviewData = isSecondaryDataReady && isOverviewTab
 
   // Fetch stats for hero card (IMMEDIATE - always needed for top stats)
-  const { data: caseStats } = useCaseStatisticsFromAPI()
-  const { data: taskStats } = useTaskStats()
-  const { data: messageStats } = useMessageStats()
-  const { data: reminderStats } = useReminderStats()
+  const { data: caseStats, isFetching: caseStatsFetching } = useCaseStatisticsFromAPI()
+  const { data: taskStats, isFetching: taskStatsFetching } = useTaskStats()
+  const { data: messageStats, isFetching: messageStatsFetching } = useMessageStats()
+  const { data: reminderStats, isFetching: reminderStatsFetching } = useReminderStats()
 
   // Fetch overview tab data (DEFERRED - load after 150ms to prevent blocking)
-  const { data: todayEvents, isLoading: eventsLoading } = useTodayEvents(shouldLoadOverviewData)
-  const { data: financialSummary, isLoading: financialLoading } = useFinancialSummary(shouldLoadOverviewData)
-  const { data: recentMessages, isLoading: messagesLoading } = useRecentMessages(3, shouldLoadOverviewData)
+  const { data: todayEvents, isLoading: eventsLoading, isFetching: eventsFetching } = useTodayEvents(shouldLoadOverviewData)
+  const { data: financialSummary, isLoading: financialLoading, isFetching: financialFetching } = useFinancialSummary(shouldLoadOverviewData)
+  const { data: recentMessages, isLoading: messagesLoading, isFetching: messagesFetching } = useRecentMessages(3, shouldLoadOverviewData)
 
   // Fetch analytics data (only when analytics tab is active)
   const { data: crmStats, isLoading: crmLoading } = useCRMStats(isAnalyticsTab)
@@ -143,6 +166,53 @@ export function Dashboard() {
 
   // Fetch lawyer-focused data (only when analytics tab is active)
   const { data: pendingDocuments, isLoading: documentsLoading } = usePendingDocuments(isAnalyticsTab)
+
+  // ==================== PERFORMANCE: Track API call completion ====================
+  useEffect(() => {
+    if (caseStats) perfLog('API LOADED: caseStats', { count: caseStats?.active })
+  }, [caseStats])
+
+  useEffect(() => {
+    if (taskStats) perfLog('API LOADED: taskStats', { total: taskStats?.total })
+  }, [taskStats])
+
+  useEffect(() => {
+    if (messageStats) perfLog('API LOADED: messageStats', { unread: messageStats?.unreadMessages })
+  }, [messageStats])
+
+  useEffect(() => {
+    if (reminderStats) perfLog('API LOADED: reminderStats', { pending: reminderStats?.byStatus?.pending })
+  }, [reminderStats])
+
+  useEffect(() => {
+    if (todayEvents) perfLog('API LOADED: todayEvents (DEFERRED)', { count: todayEvents?.length })
+  }, [todayEvents])
+
+  useEffect(() => {
+    if (financialSummary) perfLog('API LOADED: financialSummary (DEFERRED)', financialSummary)
+  }, [financialSummary])
+
+  useEffect(() => {
+    if (recentMessages) perfLog('API LOADED: recentMessages (DEFERRED)', { count: recentMessages?.length })
+  }, [recentMessages])
+
+  // Log current fetching status
+  useEffect(() => {
+    const fetchingStatus = {
+      caseStats: caseStatsFetching,
+      taskStats: taskStatsFetching,
+      messageStats: messageStatsFetching,
+      reminderStats: reminderStatsFetching,
+      events: eventsFetching,
+      financial: financialFetching,
+      messages: messagesFetching,
+    }
+    const activeFetches = Object.entries(fetchingStatus).filter(([, v]) => v).map(([k]) => k)
+    if (activeFetches.length > 0) {
+      perfLog('Currently FETCHING:', activeFetches)
+    }
+  }, [caseStatsFetching, taskStatsFetching, messageStatsFetching, reminderStatsFetching, eventsFetching, financialFetching, messagesFetching])
+  // ==================== END PERFORMANCE TRACKING ====================
 
   // Calculate counts for hero stat cards
   const activeCasesCount = caseStats?.active || 0
