@@ -3,7 +3,7 @@
  * Production-ready calendar with drag-and-drop, events, and full features
  */
 
-import { useState, useMemo, useCallback, useRef } from 'react'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import FullCalendar from '@fullcalendar/react'
@@ -35,7 +35,13 @@ import {
   Check,
   ChevronDown,
 } from 'lucide-react'
-import { useCalendar, useCalendarByMonth } from '@/hooks/useCalendar'
+import {
+  useCalendarGridItems,
+  useCalendarGridSummary,
+  useCalendarItemDetails,
+  usePrefetchAdjacentMonthsOptimized,
+} from '@/hooks/useCalendar'
+import type { GridItem } from '@/services/calendarService'
 import { useCreateEvent, useUpdateEvent } from '@/hooks/useRemindersAndEvents'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
@@ -151,6 +157,7 @@ export function FullCalendarView() {
 
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
+  const [selectedItemForDetails, setSelectedItemForDetails] = useState<{ type: string; id: string } | null>(null)
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [filterTypes, setFilterTypes] = useState<string[]>([])
@@ -189,93 +196,90 @@ export function FullCalendarView() {
     }
   }, [currentDate])
 
-  // Fetch calendar data
-  const { data: calendarData, isLoading, isError, error, refetch } = useCalendar(dateRange)
+  // Fetch calendar data using optimized endpoints
+  // Grid items: minimal data (~150 bytes/item) for calendar display
+  const { data: gridItemsData, isLoading, isError, error, refetch } = useCalendarGridItems({
+    ...dateRange,
+    types: filterTypes.length > 0 ? filterTypes.join(',') : undefined,
+  })
+
+  // Grid summary: counts per day for the banner
+  const { data: summaryData } = useCalendarGridSummary(dateRange)
+
+  // Lazy load full details when user clicks an event
+  const { data: itemDetailsData, isLoading: isLoadingDetails } = useCalendarItemDetails(
+    selectedItemForDetails?.type ?? null,
+    selectedItemForDetails?.id ?? null,
+    !!selectedItemForDetails
+  )
 
   // Mutations
   const createEventMutation = useCreateEvent()
   const updateEventMutation = useUpdateEvent()
 
-  // Transform API data to FullCalendar format
-  const calendarEvents = useMemo<CalendarEvent[]>(() => {
-    if (!calendarData?.data) return []
+  // Prefetch adjacent months for smoother navigation (using optimized endpoints)
+  const { prefetchPrevMonth, prefetchNextMonth } = usePrefetchAdjacentMonthsOptimized(currentDate)
 
-    const events: CalendarEvent[] = []
+  // Attach hover listeners to navigation buttons for prefetching
+  useEffect(() => {
+    const wrapper = document.querySelector('.fullcalendar-wrapper')
+    if (!wrapper) return
 
-    // Map events
-    calendarData.data.events?.forEach((event: any) => {
-      const eventType = event.eventType || event.type || 'other'
-      const colors = EVENT_COLORS[eventType as keyof typeof EVENT_COLORS] || EVENT_COLORS.other
+    const prevBtn = wrapper.querySelector('.fc-prev-button')
+    const nextBtn = wrapper.querySelector('.fc-next-button')
 
-      events.push({
-        id: `event-${event.id}`,
-        title: event.title,
-        start: event.startDate,
-        end: event.endDate || event.startDate,
-        allDay: event.allDay || false,
-        extendedProps: {
-          type: 'event',
-          eventType,
-          description: event.description,
-          location: event.location,
-          caseId: event.caseId,
-          caseName: event.caseName,
-          caseNumber: event.caseNumber,
-          priority: event.priority,
-          status: event.status,
-          attendees: event.attendees,
-        },
-      })
-    })
-
-    // Map tasks
-    calendarData.data.tasks?.forEach((task: any) => {
-      events.push({
-        id: `task-${task.id}`,
-        title: task.title,
-        start: task.startDate || task.dueDate,
-        end: task.startDate || task.dueDate,
-        allDay: true,
-        extendedProps: {
-          type: 'task',
-          eventType: 'task',
-          description: task.description,
-          caseId: task.caseId,
-          caseName: task.caseName,
-          caseNumber: task.caseNumber,
-          priority: task.priority,
-          status: task.status,
-        },
-      })
-    })
-
-    // Map reminders
-    calendarData.data.reminders?.forEach((reminder: any) => {
-      events.push({
-        id: `reminder-${reminder.id}`,
-        title: reminder.title,
-        start: reminder.startDate || reminder.reminderDate,
-        end: reminder.startDate || reminder.reminderDate,
-        allDay: true,
-        extendedProps: {
-          type: 'reminder',
-          eventType: 'reminder',
-          description: reminder.description,
-          caseId: reminder.caseId,
-          caseName: reminder.caseName,
-          priority: reminder.priority,
-          status: reminder.status,
-        },
-      })
-    })
-
-    // Apply type filter
-    if (filterTypes.length > 0) {
-      return events.filter(e => filterTypes.includes(e.extendedProps.eventType || ''))
+    if (prevBtn) {
+      prevBtn.addEventListener('mouseenter', prefetchPrevMonth)
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener('mouseenter', prefetchNextMonth)
     }
 
-    return events
-  }, [calendarData, filterTypes])
+    return () => {
+      if (prevBtn) {
+        prevBtn.removeEventListener('mouseenter', prefetchPrevMonth)
+      }
+      if (nextBtn) {
+        nextBtn.removeEventListener('mouseenter', prefetchNextMonth)
+      }
+    }
+  }, [prefetchPrevMonth, prefetchNextMonth])
+
+  // Transform grid items to FullCalendar format
+  // Much simpler now - backend returns minimal data with color already included
+  const calendarEvents = useMemo<CalendarEvent[]>(() => {
+    if (!gridItemsData?.data) return []
+
+    return gridItemsData.data.map((item: GridItem) => ({
+      id: `${item.type}-${item.id}`,
+      title: item.title,
+      start: item.startDate,
+      end: item.endDate || item.startDate,
+      allDay: item.allDay,
+      extendedProps: {
+        type: item.type,
+        eventType: item.eventType || item.type,
+        status: item.status,
+        priority: item.priority,
+        color: item.color,
+      },
+    }))
+  }, [gridItemsData])
+
+  // Calculate summary counts from grid summary
+  const summaryCounts = useMemo(() => {
+    if (!summaryData?.data?.days) {
+      return { eventCount: 0, taskCount: 0, reminderCount: 0 }
+    }
+    return summaryData.data.days.reduce(
+      (acc, day) => ({
+        eventCount: acc.eventCount + day.events,
+        taskCount: acc.taskCount + day.tasks,
+        reminderCount: acc.reminderCount + day.reminders,
+      }),
+      { eventCount: 0, taskCount: 0, reminderCount: 0 }
+    )
+  }, [summaryData])
 
   // Navigation links
   const topNav = [
@@ -284,9 +288,12 @@ export function FullCalendarView() {
     { title: 'المهام', href: '/dashboard/tasks', isActive: false, disabled: false },
   ]
 
-  // Event click handler
+  // Event click handler - triggers lazy load for full details
   const handleEventClick = useCallback((info: EventClickArg) => {
     const event = info.event
+    const [type, id] = event.id.split('-')
+
+    // Store minimal info for immediate display
     setSelectedEvent({
       id: event.id,
       title: event.title,
@@ -295,19 +302,22 @@ export function FullCalendarView() {
       allDay: event.allDay,
       extendedProps: event.extendedProps as CalendarEvent['extendedProps'],
     })
+
+    // Trigger lazy load for full details
+    setSelectedItemForDetails({ type, id })
     setIsEventDialogOpen(true)
   }, [])
 
-  // Date select handler (for creating new events)
+  // Date select handler (for creating new events) - use functional update to avoid dependency on createForm
   const handleDateSelect = useCallback((info: DateSelectArg) => {
-    setCreateForm({
-      ...createForm,
+    setCreateForm(prev => ({
+      ...prev,
       startDate: info.startStr.split('T')[0],
       endDate: info.endStr.split('T')[0],
       allDay: info.allDay,
-    })
+    }))
     setIsCreateDialogOpen(true)
-  }, [createForm])
+  }, []) // Stable callback - no dependency on createForm
 
   // Event drop handler (drag and drop)
   const handleEventDrop = useCallback(async (info: EventDropArg) => {
@@ -396,11 +406,15 @@ export function FullCalendarView() {
     setIsEventDialogOpen(false)
   }
 
-  // Custom event rendering
-  const renderEventContent = (eventInfo: EventContentArg) => {
+  // Custom event rendering - uses color from backend grid item
+  const renderEventContent = useCallback((eventInfo: EventContentArg) => {
     const { event } = eventInfo
     const eventType = event.extendedProps.eventType || 'other'
-    const colors = EVENT_COLORS[eventType as keyof typeof EVENT_COLORS] || EVENT_COLORS.other
+    // Use color from backend if available, fallback to EVENT_COLORS
+    const backendColor = event.extendedProps.color
+    const colors = backendColor
+      ? { bg: backendColor, border: backendColor, text: '#ffffff' }
+      : EVENT_COLORS[eventType as keyof typeof EVENT_COLORS] || EVENT_COLORS.other
 
     return (
       <div
@@ -425,7 +439,7 @@ export function FullCalendarView() {
         </div>
       </div>
     )
-  }
+  }, []) // Empty deps - EVENT_COLORS is static fallback, icons are stable
 
   // Loading state
   if (isLoading) {
@@ -535,15 +549,15 @@ export function FullCalendarView() {
               <p className="text-slate-300 text-lg max-w-xl">
                 لديك{' '}
                 <span className="text-white font-bold border-b-2 border-brand-blue">
-                  {calendarData?.data.summary?.eventCount || 0} أحداث
+                  {summaryCounts.eventCount} أحداث
                 </span>
                 {' '}و{' '}
                 <span className="text-white font-bold border-b-2 border-orange-500">
-                  {calendarData?.data.summary?.taskCount || 0} مهام
+                  {summaryCounts.taskCount} مهام
                 </span>
                 {' '}و{' '}
                 <span className="text-white font-bold border-b-2 border-purple-500">
-                  {calendarData?.data.summary?.reminderCount || 0} تذكيرات
+                  {summaryCounts.reminderCount} تذكيرات
                 </span>
               </p>
             </div>
@@ -685,8 +699,11 @@ export function FullCalendarView() {
         </Card>
       </Main>
 
-      {/* Event Details Dialog */}
-      <Dialog open={isEventDialogOpen} onOpenChange={setIsEventDialogOpen}>
+      {/* Event Details Dialog - uses lazy-loaded details */}
+      <Dialog open={isEventDialogOpen} onOpenChange={(open) => {
+        setIsEventDialogOpen(open)
+        if (!open) setSelectedItemForDetails(null) // Clear lazy load state when closing
+      }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -708,6 +725,7 @@ export function FullCalendarView() {
 
           {selectedEvent && (
             <div className="space-y-4">
+              {/* Basic info - always available */}
               <div className="flex items-center gap-2 text-sm text-slate-600">
                 <Clock className="h-4 w-4" aria-hidden="true" />
                 <span>
@@ -720,30 +738,7 @@ export function FullCalendarView() {
                 </span>
               </div>
 
-              {selectedEvent.extendedProps.location && (
-                <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <MapPin className="h-4 w-4" aria-hidden="true" />
-                  <span>{selectedEvent.extendedProps.location}</span>
-                </div>
-              )}
-
-              {selectedEvent.extendedProps.caseName && (
-                <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <Briefcase className="h-4 w-4" />
-                  <span>
-                    {selectedEvent.extendedProps.caseName}
-                    {selectedEvent.extendedProps.caseNumber &&
-                      ` (${selectedEvent.extendedProps.caseNumber})`}
-                  </span>
-                </div>
-              )}
-
-              {selectedEvent.extendedProps.description && (
-                <p className="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg">
-                  {selectedEvent.extendedProps.description}
-                </p>
-              )}
-
+              {/* Priority - available from grid item */}
               {selectedEvent.extendedProps.priority && (
                 <Badge
                   variant={
@@ -761,6 +756,52 @@ export function FullCalendarView() {
                     ? 'متوسط'
                     : 'منخفض'}
                 </Badge>
+              )}
+
+              {/* Lazy-loaded details */}
+              {isLoadingDetails ? (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
+                  <span className="ms-2 text-sm text-slate-500">جاري تحميل التفاصيل...</span>
+                </div>
+              ) : itemDetailsData?.data && (
+                <>
+                  {itemDetailsData.data.location && (
+                    <div className="flex items-center gap-2 text-sm text-slate-600">
+                      <MapPin className="h-4 w-4" aria-hidden="true" />
+                      <span>{itemDetailsData.data.location}</span>
+                    </div>
+                  )}
+
+                  {itemDetailsData.data.caseName && (
+                    <div className="flex items-center gap-2 text-sm text-slate-600">
+                      <Briefcase className="h-4 w-4" />
+                      <span>
+                        {itemDetailsData.data.caseName}
+                        {itemDetailsData.data.caseNumber &&
+                          ` (${itemDetailsData.data.caseNumber})`}
+                      </span>
+                    </div>
+                  )}
+
+                  {itemDetailsData.data.description && (
+                    <p className="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg">
+                      {itemDetailsData.data.description}
+                    </p>
+                  )}
+
+                  {itemDetailsData.data.attendees && itemDetailsData.data.attendees.length > 0 && (
+                    <div className="flex items-start gap-2 text-sm text-slate-600">
+                      <Users className="h-4 w-4 mt-0.5" aria-hidden="true" />
+                      <div>
+                        <span className="font-medium">الحضور:</span>
+                        <span className="ms-1">
+                          {itemDetailsData.data.attendees.map((a: any) => a.name || a.username).join('، ')}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -926,6 +967,10 @@ export function FullCalendarView() {
       <style>{`
         .fullcalendar-wrapper .fc {
           font-family: inherit;
+        }
+        /* CSS containment for day cells - improves paint and layout performance */
+        .fullcalendar-wrapper .fc-daygrid-day {
+          contain: content;
         }
         .fullcalendar-wrapper .fc-toolbar-title {
           font-size: 1.5rem;

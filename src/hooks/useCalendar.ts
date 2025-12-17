@@ -3,8 +3,9 @@
  * TanStack Query hooks for calendar operations
  */
 
-import { useQuery } from '@tanstack/react-query'
-import calendarService, { CalendarFilters } from '@/services/calendarService'
+import { useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
+import { useCallback } from 'react'
+import calendarService, { CalendarFilters, ListFilters } from '@/services/calendarService'
 
 // ==================== Cache Configuration ====================
 // Cache data for 30 minutes to reduce API calls
@@ -97,4 +98,197 @@ export const useCalendarStats = (filters?: {
     enabled,
     retry: 1,
   })
+}
+
+/**
+ * Hook to prefetch adjacent months for smoother navigation
+ * Returns callbacks to prefetch prev/next months on hover
+ */
+export const usePrefetchAdjacentMonths = (currentDate: Date) => {
+  const queryClient = useQueryClient()
+
+  const prefetchMonth = useCallback((date: Date) => {
+    const year = date.getFullYear()
+    const month = date.getMonth()
+    const firstDay = new Date(year, month, 1)
+    const lastDay = new Date(year, month + 1, 0)
+
+    // Add buffer for calendar grid (same as fullcalendar-view)
+    const startDate = new Date(firstDay)
+    startDate.setDate(startDate.getDate() - 7)
+    const endDate = new Date(lastDay)
+    endDate.setDate(endDate.getDate() + 7)
+
+    const filters: CalendarFilters = {
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0],
+    }
+
+    // Only prefetch if not already in cache
+    const cached = queryClient.getQueryData(['calendar', filters])
+    if (!cached) {
+      queryClient.prefetchQuery({
+        queryKey: ['calendar', filters],
+        queryFn: () => calendarService.getCalendar(filters),
+        staleTime: CALENDAR_STALE_TIME,
+      })
+    }
+  }, [queryClient])
+
+  const prefetchPrevMonth = useCallback(() => {
+    const prevDate = new Date(currentDate)
+    prevDate.setMonth(prevDate.getMonth() - 1)
+    prefetchMonth(prevDate)
+  }, [currentDate, prefetchMonth])
+
+  const prefetchNextMonth = useCallback(() => {
+    const nextDate = new Date(currentDate)
+    nextDate.setMonth(nextDate.getMonth() + 1)
+    prefetchMonth(nextDate)
+  }, [currentDate, prefetchMonth])
+
+  return { prefetchPrevMonth, prefetchNextMonth }
+}
+
+// ==================== Optimized Calendar Hooks ====================
+
+// Shorter cache times for optimized endpoints (backend handles caching)
+const GRID_STALE_TIME = 1 * 60 * 1000 // 1 minute
+const GRID_ITEMS_STALE_TIME = 2 * 60 * 1000 // 2 minutes
+const ITEM_DETAILS_STALE_TIME = 5 * 60 * 1000 // 5 minutes
+const LIST_STALE_TIME = 1 * 60 * 1000 // 1 minute
+
+/**
+ * Get grid summary - counts per day for calendar badges
+ * Use this for showing event counts on calendar cells
+ */
+export const useCalendarGridSummary = (
+  filters: { startDate: string; endDate: string; types?: string },
+  enabled: boolean = true
+) => {
+  return useQuery({
+    queryKey: ['calendar', 'grid-summary', filters],
+    queryFn: () => calendarService.getGridSummary(filters),
+    staleTime: GRID_STALE_TIME,
+    gcTime: CALENDAR_GC_TIME,
+    enabled: enabled && !!(filters.startDate && filters.endDate),
+    retry: 1,
+  })
+}
+
+/**
+ * Get grid items - minimal event data for calendar display
+ * ~150 bytes per item vs 2-5KB for full objects
+ */
+export const useCalendarGridItems = (
+  filters: { startDate: string; endDate: string; types?: string; caseId?: string },
+  enabled: boolean = true
+) => {
+  return useQuery({
+    queryKey: ['calendar', 'grid-items', filters],
+    queryFn: () => calendarService.getGridItems(filters),
+    staleTime: GRID_ITEMS_STALE_TIME,
+    gcTime: CALENDAR_GC_TIME,
+    enabled: enabled && !!(filters.startDate && filters.endDate),
+    retry: 1,
+  })
+}
+
+/**
+ * Get full item details - lazy loaded on click
+ * Only fetches when user clicks an event
+ */
+export const useCalendarItemDetails = (
+  type: string | null,
+  id: string | null,
+  enabled: boolean = true
+) => {
+  return useQuery({
+    queryKey: ['calendar', 'item', type, id],
+    queryFn: () => calendarService.getItemDetails(type!, id!),
+    staleTime: ITEM_DETAILS_STALE_TIME,
+    gcTime: CALENDAR_GC_TIME,
+    enabled: enabled && !!type && !!id,
+    retry: 1,
+  })
+}
+
+/**
+ * Get list view with infinite scroll
+ * Uses cursor-based pagination for efficient loading
+ */
+export const useCalendarList = (
+  filters: Omit<ListFilters, 'cursor'>,
+  enabled: boolean = true
+) => {
+  return useInfiniteQuery({
+    queryKey: ['calendar', 'list', filters],
+    queryFn: ({ pageParam }) =>
+      calendarService.getList({ ...filters, cursor: pageParam }),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) =>
+      lastPage.pagination.hasMore ? lastPage.pagination.cursor : undefined,
+    staleTime: LIST_STALE_TIME,
+    gcTime: CALENDAR_GC_TIME,
+    enabled,
+    retry: 1,
+  })
+}
+
+/**
+ * Hook to prefetch adjacent months using optimized grid endpoints
+ */
+export const usePrefetchAdjacentMonthsOptimized = (currentDate: Date) => {
+  const queryClient = useQueryClient()
+
+  const prefetchMonth = useCallback((date: Date) => {
+    const year = date.getFullYear()
+    const month = date.getMonth()
+    const firstDay = new Date(year, month, 1)
+    const lastDay = new Date(year, month + 1, 0)
+
+    const startDate = new Date(firstDay)
+    startDate.setDate(startDate.getDate() - 7)
+    const endDate = new Date(lastDay)
+    endDate.setDate(endDate.getDate() + 7)
+
+    const filters = {
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0],
+    }
+
+    // Prefetch both summary and items in parallel
+    const summaryKey = ['calendar', 'grid-summary', filters]
+    const itemsKey = ['calendar', 'grid-items', filters]
+
+    if (!queryClient.getQueryData(summaryKey)) {
+      queryClient.prefetchQuery({
+        queryKey: summaryKey,
+        queryFn: () => calendarService.getGridSummary(filters),
+        staleTime: GRID_STALE_TIME,
+      })
+    }
+
+    if (!queryClient.getQueryData(itemsKey)) {
+      queryClient.prefetchQuery({
+        queryKey: itemsKey,
+        queryFn: () => calendarService.getGridItems(filters),
+        staleTime: GRID_ITEMS_STALE_TIME,
+      })
+    }
+  }, [queryClient])
+
+  const prefetchPrevMonth = useCallback(() => {
+    const prevDate = new Date(currentDate)
+    prevDate.setMonth(prevDate.getMonth() - 1)
+    prefetchMonth(prevDate)
+  }, [currentDate, prefetchMonth])
+
+  const prefetchNextMonth = useCallback(() => {
+    const nextDate = new Date(currentDate)
+    nextDate.setMonth(nextDate.getMonth() + 1)
+    prefetchMonth(nextDate)
+  }, [currentDate, prefetchMonth])
+
+  return { prefetchPrevMonth, prefetchNextMonth }
 }

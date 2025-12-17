@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback, useRef } from 'react'
 import {
     ChevronLeft,
     ChevronRight,
@@ -40,6 +40,10 @@ export function CalendarView() {
     const [currentDate, setCurrentDate] = useState(new Date())
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date())
     const [view, setView] = useState<'month' | 'week' | 'day'>('month')
+
+    // Cache today's date to avoid creating new Date objects on every render
+    const todayRef = useRef(new Date())
+    const todayDateString = todayRef.current.toDateString()
 
     const topNav = [
         {
@@ -190,17 +194,27 @@ export function CalendarView() {
         return days
     }
 
-    const getItemsForDate = (date: Date | null) => {
-        if (!date) return []
-        return calendarItems.filter(item =>
-            item.date.toDateString() === date.toDateString()
-        )
-    }
+    // Memoize items grouped by date for O(1) lookup instead of O(n) filter
+    const itemsByDate = useMemo(() => {
+        const map = new Map<string, typeof calendarItems>()
+        calendarItems.forEach(item => {
+            const dateKey = item.date.toDateString()
+            const existing = map.get(dateKey) || []
+            map.set(dateKey, [...existing, item])
+        })
+        return map
+    }, [calendarItems])
 
-    const isSameDay = (d1: Date | null, d2: Date | null) => {
+    // O(1) lookup instead of O(n) filter on every cell render
+    const getItemsForDate = useCallback((date: Date | null) => {
+        if (!date) return []
+        return itemsByDate.get(date.toDateString()) || []
+    }, [itemsByDate])
+
+    const isSameDay = useCallback((d1: Date | null, d2: Date | null) => {
         if (!d1 || !d2) return false
         return d1.toDateString() === d2.toDateString()
-    }
+    }, [])
 
     const days = getDaysInMonth(currentDate)
     const weekDays = getWeekDays(currentDate)
@@ -444,13 +458,21 @@ export function CalendarView() {
                                     {monthNames[currentDate.getMonth()]} <span className="text-slate-500 font-medium text-xl">{currentDate.getFullYear()}</span>
                                 </h2>
                                 <div className="flex bg-slate-50 rounded-xl p-1 border border-slate-100">
-                                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-white hover:shadow-sm text-slate-600" onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)))}>
+                                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-white hover:shadow-sm text-slate-600" onClick={() => {
+                                        const newDate = new Date(currentDate)
+                                        newDate.setMonth(newDate.getMonth() - 1)
+                                        setCurrentDate(newDate)
+                                    }}>
                                         <ChevronRight className="h-5 w-5" aria-hidden="true" />
                                     </Button>
                                     <Button variant="ghost" className="h-9 px-4 rounded-lg hover:bg-white hover:shadow-sm text-slate-600 font-bold text-sm" onClick={() => setCurrentDate(new Date())}>
                                         اليوم
                                     </Button>
-                                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-white hover:shadow-sm text-slate-600" onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)))}>
+                                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-white hover:shadow-sm text-slate-600" onClick={() => {
+                                        const newDate = new Date(currentDate)
+                                        newDate.setMonth(newDate.getMonth() + 1)
+                                        setCurrentDate(newDate)
+                                    }}>
                                         <ChevronLeft className="h-5 w-5" aria-hidden="true" />
                                     </Button>
                                 </div>
@@ -491,7 +513,8 @@ export function CalendarView() {
                                         {days.map((d, i) => {
                                             const items = getItemsForDate(d.date)
                                             const isSelected = isSameDay(d.date, selectedDate)
-                                            const isTodayDate = d.date && isSameDay(d.date, new Date())
+                                            // Use cached todayDateString instead of creating new Date() 42 times
+                                            const isTodayDate = d.date && d.date.toDateString() === todayDateString
 
                                             return (
                                                 <div
