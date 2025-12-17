@@ -98,28 +98,33 @@ export function Dashboard() {
     }
   }
 
-  // Fetch dashboard data
+  // Determine which tabs are active to avoid unnecessary API calls
+  const isOverviewTab = activeTab === 'overview'
+  const isAnalyticsTab = activeTab === 'analytics'
+  const isReportsTab = activeTab === 'reports'
+
+  // Fetch dashboard data (overview tab - always load for hero stats)
   const { data: todayEvents, isLoading: eventsLoading } = useTodayEvents()
   const { data: financialSummary, isLoading: financialLoading } = useFinancialSummary()
   const { data: recentMessages, isLoading: messagesLoading } = useRecentMessages(3)
 
-  // Fetch stats for hero card
+  // Fetch stats for hero card (always needed for top stats)
   const { data: caseStats } = useCaseStatisticsFromAPI()
   const { data: taskStats } = useTaskStats()
   const { data: messageStats } = useMessageStats()
   const { data: reminderStats } = useReminderStats()
 
-  // Fetch analytics data
-  const { data: crmStats, isLoading: crmLoading } = useCRMStats()
-  const { data: financeStats, isLoading: financeStatsLoading } = useFinanceStats()
+  // Fetch analytics data (only when analytics tab is active)
+  const { data: crmStats, isLoading: crmLoading } = useCRMStats(isAnalyticsTab)
+  const { data: financeStats, isLoading: financeStatsLoading } = useFinanceStats(isAnalyticsTab)
 
-  // Fetch chart data
-  const { data: casesChart, isLoading: casesChartLoading } = useCasesChart(12)
-  const { data: revenueChart, isLoading: revenueChartLoading } = useRevenueChart(12)
-  const { data: tasksChart, isLoading: tasksChartLoading } = useTasksChart(12)
+  // Fetch chart data (only when reports tab is active)
+  const { data: casesChart, isLoading: casesChartLoading } = useCasesChart(12, isReportsTab)
+  const { data: revenueChart, isLoading: revenueChartLoading } = useRevenueChart(12, isReportsTab)
+  const { data: tasksChart, isLoading: tasksChartLoading } = useTasksChart(12, isReportsTab)
 
-  // Fetch lawyer-focused data
-  const { data: pendingDocuments, isLoading: documentsLoading } = usePendingDocuments()
+  // Fetch lawyer-focused data (only when analytics tab is active)
+  const { data: pendingDocuments, isLoading: documentsLoading } = usePendingDocuments(isAnalyticsTab)
 
   // Calculate counts for hero stat cards
   const activeCasesCount = caseStats?.active || 0
