@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  MessageSquare,
   Briefcase,
   Scale,
   DollarSign,
@@ -230,8 +229,6 @@ export function Dashboard() {
   // Calculate counts for hero stat cards
   const activeCasesCount = caseStats?.active || 0
   const activeTasksCount = (taskStats?.byStatus?.todo || 0) + (taskStats?.byStatus?.in_progress || 0)
-  // unreadMessagesCount: Now shows 0 - fetch separately via useMessageStats() if needed
-  const unreadMessagesCount = 0
   const pendingRemindersCount = reminderStats?.byStatus?.pending || 0
 
   const topNav = [
@@ -365,13 +362,6 @@ export function Dashboard() {
                     value={activeTasksCount}
                     icon={ListTodo}
                     status="normal"
-                    className="py-3 px-4"
-                  />
-                  <StatCard
-                    label={t('dashboard.hero.stats.messages', 'الرسائل')}
-                    value={unreadMessagesCount}
-                    icon={MessageSquare}
-                    status={unreadMessagesCount > 0 ? "attention" : "zero"}
                     className="py-3 px-4"
                   />
                   <StatCard
