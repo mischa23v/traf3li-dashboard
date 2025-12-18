@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import {
     Clock, Bell, MapPin, Calendar as CalendarIcon,
     Plus, Trash2, List, X, ChevronRight, Loader2, AlertCircle,
@@ -48,6 +48,23 @@ export function CasePipelineSidebar({
     const startDate = useMemo(() => startOfDay(today).toISOString(), [today])
     const endDate = useMemo(() => endOfDay(addDays(today, 4)).toISOString(), [today])
 
+    // Memoize progress bar widths to prevent re-creating style objects
+    const wonCaseWidth = useMemo(() => ({
+        width: `${analytics && analytics.totalCases > 0 ? (analytics.wonCases / analytics.totalCases) * 100 : 0}%`
+    }), [analytics])
+
+    const lostCaseWidth = useMemo(() => ({
+        width: `${analytics && analytics.totalCases > 0 ? (analytics.lostCases / analytics.totalCases) * 100 : 0}%`
+    }), [analytics])
+
+    const settledCaseWidth = useMemo(() => ({
+        width: `${analytics && analytics.totalCases > 0 ? (analytics.settledCases / analytics.totalCases) * 100 : 0}%`
+    }), [analytics])
+
+    const ongoingCaseWidth = useMemo(() => ({
+        width: `${analytics && analytics.totalCases > 0 ? (analytics.ongoingCases / analytics.totalCases) * 100 : 0}%`
+    }), [analytics])
+
     // Fetch calendar data for the calendar tab
     const { data: calendarData, isLoading: isCalendarLoading } = useCalendar({
         startDate,
@@ -84,12 +101,12 @@ export function CasePipelineSidebar({
     }, [today])
 
     // Get color based on event type
-    const getEventColor = (event: { type?: string; isOverdue?: boolean }) => {
+    const getEventColor = useCallback((event: { type?: string; isOverdue?: boolean }) => {
         if (event.isOverdue) return 'red'
         if (event.type === 'event') return 'blue'
         if (event.type === 'task') return 'amber'
         return 'emerald'
-    }
+    }, [])
 
     // Static color class mappings for events
     const eventTextColorClasses: Record<string, string> = {
@@ -220,7 +237,7 @@ export function CasePipelineSidebar({
                                 <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
                                     <div
                                         className="h-full bg-emerald-500 rounded-full"
-                                        style={{ width: `${analytics.totalCases > 0 ? (analytics.wonCases / analytics.totalCases) * 100 : 0}%` }}
+                                        style={wonCaseWidth}
                                     />
                                 </div>
                                 <span className="text-sm font-medium text-slate-700 w-8 text-end">{analytics.wonCases}</span>
@@ -237,7 +254,7 @@ export function CasePipelineSidebar({
                                 <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
                                     <div
                                         className="h-full bg-red-500 rounded-full"
-                                        style={{ width: `${analytics.totalCases > 0 ? (analytics.lostCases / analytics.totalCases) * 100 : 0}%` }}
+                                        style={lostCaseWidth}
                                     />
                                 </div>
                                 <span className="text-sm font-medium text-slate-700 w-8 text-end">{analytics.lostCases}</span>
@@ -254,7 +271,7 @@ export function CasePipelineSidebar({
                                 <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
                                     <div
                                         className="h-full bg-purple-500 rounded-full"
-                                        style={{ width: `${analytics.totalCases > 0 ? (analytics.settledCases / analytics.totalCases) * 100 : 0}%` }}
+                                        style={settledCaseWidth}
                                     />
                                 </div>
                                 <span className="text-sm font-medium text-slate-700 w-8 text-end">{analytics.settledCases}</span>
@@ -271,7 +288,7 @@ export function CasePipelineSidebar({
                                 <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
                                     <div
                                         className="h-full bg-blue-500 rounded-full"
-                                        style={{ width: `${analytics.totalCases > 0 ? (analytics.ongoingCases / analytics.totalCases) * 100 : 0}%` }}
+                                        style={ongoingCaseWidth}
                                     />
                                 </div>
                                 <span className="text-sm font-medium text-slate-700 w-8 text-end">{analytics.ongoingCases}</span>

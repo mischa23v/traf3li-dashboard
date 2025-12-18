@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import {
     Search, Filter, Plus, MoreHorizontal,
     FileText, AlertCircle, CheckCircle, Bell, Loader2,
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { formatCurrency, formatDate } from '@/lib/utils'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -78,17 +79,17 @@ export default function InvoicesDashboard() {
     }, [startDate, endDate, selectedClient])
 
     // Clear all filters
-    const clearFilters = () => {
+    const clearFilters = useCallback(() => {
         setStartDate('')
         setEndDate('')
         setSelectedClient('')
         setCurrentPage(1)
-    }
+    }, [])
 
     // Handle export
-    const handleExport = (format: 'csv' | 'pdf') => {
+    const handleExport = useCallback((format: 'csv' | 'pdf') => {
         exportReport({ reportType: 'invoices', format, filters })
-    }
+    }, [exportReport, filters])
 
     // Fetch data
     const { data: invoicesData, isLoading, isError, error, refetch } = useInvoices(filters)
@@ -103,9 +104,9 @@ export default function InvoicesDashboard() {
             id: inv.invoiceNumber || inv._id,
             client: inv.clientId?.name || (inv.clientId?.firstName && inv.clientId?.lastName ? `${inv.clientId.firstName} ${inv.clientId.lastName}` : 'عميل غير محدد'),
             amount: inv.totalAmount || 0,
-            date: new Date(inv.issueDate).toLocaleDateString('ar-SA'),
+            date: formatDate(inv.issueDate),
             status: inv.status,
-            dueDate: new Date(inv.dueDate).toLocaleDateString('ar-SA'),
+            dueDate: formatDate(inv.dueDate),
             _id: inv._id,
         }))
     }, [invoicesData])
@@ -145,14 +146,6 @@ export default function InvoicesDashboard() {
 
         return { totalPending, totalOverdue, totalPaidThisMonth }
     }, [invoicesData, overdueData])
-
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('ar-SA', {
-            style: 'currency',
-            currency: 'SAR',
-            minimumFractionDigits: 0
-        }).format(amount)
-    }
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
@@ -455,13 +448,13 @@ export default function InvoicesDashboard() {
                                                 )}
                                                 {startDate && (
                                                     <Badge variant="outline" className="bg-purple-50 border-purple-200 text-purple-700 gap-1">
-                                                        من: {new Date(startDate).toLocaleDateString('ar-SA')}
+                                                        من: {formatDate(startDate)}
                                                         <X className="w-3 h-3 cursor-pointer" aria-label="إزالة" onClick={() => setStartDate('')} />
                                                     </Badge>
                                                 )}
                                                 {endDate && (
                                                     <Badge variant="outline" className="bg-purple-50 border-purple-200 text-purple-700 gap-1">
-                                                        إلى: {new Date(endDate).toLocaleDateString('ar-SA')}
+                                                        إلى: {formatDate(endDate)}
                                                         <X className="w-3 h-3 cursor-pointer" aria-label="إزالة" onClick={() => setEndDate('')} />
                                                     </Badge>
                                                 )}

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -47,18 +47,18 @@ export function OutstandingInvoicesReport() {
   const { data: casesAndClients } = useCasesAndClients()
   const exportReport = useExportReport()
 
-  const handleExport = (format: 'csv' | 'pdf') => {
+  const handleExport = useCallback((format: 'csv' | 'pdf') => {
     exportReport.mutate({ type: 'outstanding-invoices', format, filters })
-  }
+  }, [exportReport, filters])
 
-  const getDaysOverdueColor = (days: number) => {
+  const getDaysOverdueColor = useCallback((days: number) => {
     if (days <= 0) return 'bg-green-100 text-green-800'
     if (days <= 30) return 'bg-yellow-100 text-yellow-800'
     if (days <= 60) return 'bg-orange-100 text-orange-800'
     return 'bg-red-100 text-red-800'
-  }
+  }, [])
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = useCallback((status: string) => {
     switch (status) {
       case 'overdue':
         return <Badge variant="destructive">متأخرة</Badge>
@@ -69,7 +69,7 @@ export function OutstandingInvoicesReport() {
       default:
         return <Badge variant="outline">مسودة</Badge>
     }
-  }
+  }, [])
 
   if (isLoading) {
     return (

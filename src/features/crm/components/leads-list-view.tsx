@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   MoreHorizontal,
@@ -40,6 +40,7 @@ import {
 import type { Lead, LeadStatus } from '@/types/crm'
 import { SalesSidebar } from './sales-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { VirtualList } from '@/components/virtual-list'
 
 // Status labels are now handled via i18n in the component
 
@@ -81,20 +82,20 @@ export function LeadsListView() {
   }, [leadsData])
 
   // Selection Handlers
-  const handleToggleSelectionMode = () => {
+  const handleToggleSelectionMode = useCallback(() => {
     setIsSelectionMode(!isSelectionMode)
     setSelectedLeadIds([])
-  }
+  }, [isSelectionMode])
 
-  const handleSelectLead = (leadId: string) => {
+  const handleSelectLead = useCallback((leadId: string) => {
     if (selectedLeadIds.includes(leadId)) {
       setSelectedLeadIds(selectedLeadIds.filter((id) => id !== leadId))
     } else {
       setSelectedLeadIds([...selectedLeadIds, leadId])
     }
-  }
+  }, [selectedLeadIds])
 
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = useCallback(() => {
     if (selectedLeadIds.length === 0) return
 
     if (confirm(`هل أنت متأكد من حذف ${selectedLeadIds.length} عميل محتمل؟`)) {
@@ -104,7 +105,7 @@ export function LeadsListView() {
       setIsSelectionMode(false)
       setSelectedLeadIds([])
     }
-  }
+  }, [selectedLeadIds, deleteLead])
 
   const topNav = [
     { title: t('sidebar.nav.leads'), href: '/dashboard/crm/leads', isActive: true },
@@ -257,140 +258,147 @@ export function LeadsListView() {
                   </div>
                 )}
 
-                {/* Success State - Leads List */}
-                {!isLoading &&
-                  !isError &&
-                  leads.map((lead: Lead) => (
-                    <div
-                      key={lead._id}
-                      className={`bg-[#F8F9FA] rounded-2xl p-6 border transition-all group ${selectedLeadIds.includes(lead._id)
-                        ? 'border-emerald-500 bg-emerald-50/30'
-                        : 'border-slate-100 hover:border-emerald-200'
-                        }`}
-                    >
-                      <div className="flex justify-between items-start mb-4">
-                        <div className="flex gap-4 items-center">
-                          {isSelectionMode && (
-                            <Checkbox
-                              checked={selectedLeadIds.includes(lead._id)}
-                              onCheckedChange={() => handleSelectLead(lead._id)}
-                              className="h-6 w-6 rounded-md border-slate-300 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
-                            />
-                          )}
-                          <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-sm text-emerald-600">
-                            <Users className="h-6 w-6" aria-hidden="true" />
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <h4 className="font-bold text-navy text-lg">
-                                {lead.displayName}
-                              </h4>
-                              <Badge
-                                className={`${statusColors[lead.status]} border-0 rounded-md px-2`}
-                              >
-                                {t(`leads.status.${lead.status}`)}
-                              </Badge>
+                {/* Success State - Leads List with Virtualization */}
+                {!isLoading && !isError && leads.length > 0 && (
+                  <VirtualList
+                    items={leads}
+                    itemHeight={220}
+                    height={Math.min(leads.length * 220 + (leads.length - 1) * 16, 800)}
+                    renderItem={(lead: Lead, index, style) => (
+                      <div key={lead._id} style={{ ...style, paddingBottom: '16px' }}>
+                        <div
+                          className={`bg-[#F8F9FA] rounded-2xl p-6 border transition-all group ${selectedLeadIds.includes(lead._id)
+                            ? 'border-emerald-500 bg-emerald-50/30'
+                            : 'border-slate-100 hover:border-emerald-200'
+                            }`}
+                        >
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="flex gap-4 items-center">
+                              {isSelectionMode && (
+                                <Checkbox
+                                  checked={selectedLeadIds.includes(lead._id)}
+                                  onCheckedChange={() => handleSelectLead(lead._id)}
+                                  className="h-6 w-6 rounded-md border-slate-300 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
+                                />
+                              )}
+                              <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-sm text-emerald-600">
+                                <Users className="h-6 w-6" aria-hidden="true" />
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h4 className="font-bold text-navy text-lg">
+                                    {lead.displayName}
+                                  </h4>
+                                  <Badge
+                                    className={`${statusColors[lead.status]} border-0 rounded-md px-2`}
+                                  >
+                                    {t(`leads.status.${lead.status}`)}
+                                  </Badge>
+                                </div>
+                                <div className="flex items-center gap-4 text-slate-500 text-sm">
+                                  {lead.phone && (
+                                    <span className="flex items-center gap-1">
+                                      <Phone className="h-3 w-3" aria-hidden="true" />
+                                      {lead.phone}
+                                    </span>
+                                  )}
+                                  {lead.email && (
+                                    <span className="flex items-center gap-1">
+                                      <Mail className="h-3 w-3" aria-hidden="true" />
+                                      {lead.email}
+                                    </span>
+                                  )}
+                                  {lead.organizationId && typeof lead.organizationId === 'object' && (
+                                    <span className="flex items-center gap-1 text-emerald-600">
+                                      <Building2 className="h-3 w-3" aria-hidden="true" />
+                                      {lead.organizationId.legalName}
+                                    </span>
+                                  )}
+                                  {lead.contactId && typeof lead.contactId === 'object' && (
+                                    <span className="flex items-center gap-1 text-blue-600">
+                                      <User className="h-3 w-3" aria-hidden="true" />
+                                      {lead.contactId.firstName} {lead.contactId.lastName || ''}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-4 text-slate-500 text-sm">
-                              {lead.phone && (
-                                <span className="flex items-center gap-1">
-                                  <Phone className="h-3 w-3" aria-hidden="true" />
-                                  {lead.phone}
-                                </span>
-                              )}
-                              {lead.email && (
-                                <span className="flex items-center gap-1">
-                                  <Mail className="h-3 w-3" aria-hidden="true" />
-                                  {lead.email}
-                                </span>
-                              )}
-                              {lead.organizationId && typeof lead.organizationId === 'object' && (
-                                <span className="flex items-center gap-1 text-emerald-600">
-                                  <Building2 className="h-3 w-3" aria-hidden="true" />
-                                  {lead.organizationId.legalName}
-                                </span>
-                              )}
-                              {lead.contactId && typeof lead.contactId === 'object' && (
-                                <span className="flex items-center gap-1 text-blue-600">
-                                  <User className="h-3 w-3" aria-hidden="true" />
-                                  {lead.contactId.firstName} {lead.contactId.lastName || ''}
-                                </span>
-                              )}
-                            </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="text-slate-500 hover:text-navy"
+                                >
+                                  <MoreHorizontal className="h-5 w-5" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem asChild>
+                                  <Link to={`/dashboard/crm/leads/${lead._id}`}>
+                                    {t('common.viewDetails')}
+                                  </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => convertLead(lead._id)}
+                                  disabled={lead.convertedToClient}
+                                >
+                                  <ArrowUpRight className="h-4 w-4 ms-2" />
+                                  {t('leads.convertToClient')}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => deleteLead(lead._id)}
+                                  className="text-red-600"
+                                >
+                                  {t('common.delete')}
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
-                        </div>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-slate-500 hover:text-navy"
-                            >
-                              <MoreHorizontal className="h-5 w-5" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem asChild>
-                              <Link to={`/dashboard/crm/leads/${lead._id}`}>
-                                {t('common.viewDetails')}
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => convertLead(lead._id)}
-                              disabled={lead.convertedToClient}
-                            >
-                              <ArrowUpRight className="h-4 w-4 ms-2" />
-                              {t('leads.convertToClient')}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => deleteLead(lead._id)}
-                              className="text-red-600"
-                            >
-                              {t('common.delete')}
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
 
-                      <div className="flex items-center justify-between pt-4 border-t border-slate-200/50">
-                        <div className="flex items-center gap-6">
-                          {lead.estimatedValue > 0 && (
-                            <div className="text-center">
-                              <div className="text-xs text-slate-500 mb-1">
-                                {t('leads.estimatedValue')}
-                              </div>
-                              <div className="font-bold text-emerald-600">
-                                {lead.estimatedValue.toLocaleString('ar-SA')} {t('common.sar')}
-                              </div>
+                          <div className="flex items-center justify-between pt-4 border-t border-slate-200/50">
+                            <div className="flex items-center gap-6">
+                              {lead.estimatedValue > 0 && (
+                                <div className="text-center">
+                                  <div className="text-xs text-slate-500 mb-1">
+                                    {t('leads.estimatedValue')}
+                                  </div>
+                                  <div className="font-bold text-emerald-600">
+                                    {lead.estimatedValue.toLocaleString('ar-SA')} {t('common.sar')}
+                                  </div>
+                                </div>
+                              )}
+                              {lead.intake?.caseType && (
+                                <div className="text-center">
+                                  <div className="text-xs text-slate-500 mb-1">
+                                    {t('leads.caseType')}
+                                  </div>
+                                  <div className="font-bold text-navy">
+                                    {lead.intake.caseType}
+                                  </div>
+                                </div>
+                              )}
+                              {lead.source?.type && (
+                                <div className="text-center">
+                                  <div className="text-xs text-slate-500 mb-1">{t('leads.source')}</div>
+                                  <div className="font-bold text-navy">
+                                    {lead.source.type}
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                          )}
-                          {lead.intake?.caseType && (
-                            <div className="text-center">
-                              <div className="text-xs text-slate-500 mb-1">
-                                {t('leads.caseType')}
-                              </div>
-                              <div className="font-bold text-navy">
-                                {lead.intake.caseType}
-                              </div>
-                            </div>
-                          )}
-                          {lead.source?.type && (
-                            <div className="text-center">
-                              <div className="text-xs text-slate-500 mb-1">{t('leads.source')}</div>
-                              <div className="font-bold text-navy">
-                                {lead.source.type}
-                              </div>
-                            </div>
-                          )}
+                            <Link to={`/dashboard/crm/leads/${lead._id}`}>
+                              <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
+                                {t('common.viewDetails')}
+                              </Button>
+                            </Link>
+                          </div>
                         </div>
-                        <Link to={`/dashboard/crm/leads/${lead._id}`}>
-                          <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
-                            {t('common.viewDetails')}
-                          </Button>
-                        </Link>
                       </div>
-                    </div>
-                  ))}
+                    )}
+                    getItemKey={(index, data) => data[index]._id}
+                  />
+                )}
               </div>
 
               <div className="p-4 pt-0 text-center">

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { useTranslation } from 'react-i18next'
 import { Link, useParams, useNavigate } from '@tanstack/react-router'
 import {
@@ -99,6 +100,12 @@ export function NotionSidebar({ caseId, activePageId, onPageSelect }: NotionSide
   const navigate = useNavigate()
 
   const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
   const [showCreateDialog, setShowCreateDialog] = useState(false)
   const [newPageTitle, setNewPageTitle] = useState('')
   const [newPageType, setNewPageType] = useState<keyof typeof pageTypeLabels>('general')
@@ -352,8 +359,8 @@ export function NotionSidebar({ caseId, activePageId, onPageSelect }: NotionSide
           <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input
             placeholder={t('caseNotion.searchPages')}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            defaultValue={searchQuery}
+            onChange={(e) => debouncedSetSearch(e.target.value)}
             className="ps-9 h-9 text-sm"
           />
         </div>

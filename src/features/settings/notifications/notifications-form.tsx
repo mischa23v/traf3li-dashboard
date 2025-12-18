@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo, useCallback, memo } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -41,33 +41,47 @@ const notificationsFormSchema = z.object({
 
 type NotificationsFormValues = z.infer<typeof notificationsFormSchema>
 
+// Memoized loading skeleton to prevent unnecessary re-renders
+const LoadingSkeleton = memo(function LoadingSkeleton() {
+  return (
+    <div className='space-y-8'>
+      <Skeleton className='h-32 w-full' />
+      <Skeleton className='h-32 w-full' />
+      <Skeleton className='h-32 w-full' />
+      <Skeleton className='h-10 w-32' />
+    </div>
+  )
+})
+
 export function NotificationsForm() {
   const { t } = useTranslation()
   const { data: settings, isLoading: loadingSettings } = useSettings()
   const { mutate: updateSettings, isPending } = useUpdateNotificationSettings()
 
+  const defaultValues = useMemo(() => ({
+    email: {
+      enabled: true,
+      newMessages: true,
+      taskReminders: true,
+      caseUpdates: true,
+      financialAlerts: true,
+    },
+    push: {
+      enabled: false,
+      newMessages: false,
+      taskReminders: false,
+      caseUpdates: false,
+    },
+    inApp: {
+      enabled: true,
+      sound: true,
+      desktop: false,
+    },
+  }), [])
+
   const form = useForm<NotificationsFormValues>({
     resolver: zodResolver(notificationsFormSchema) as any,
-    defaultValues: {
-      email: {
-        enabled: true,
-        newMessages: true,
-        taskReminders: true,
-        caseUpdates: true,
-        financialAlerts: true,
-      },
-      push: {
-        enabled: false,
-        newMessages: false,
-        taskReminders: false,
-        caseUpdates: false,
-      },
-      inApp: {
-        enabled: true,
-        sound: true,
-        desktop: false,
-      },
-    },
+    defaultValues,
   })
 
   // Update form when settings load
@@ -81,23 +95,17 @@ export function NotificationsForm() {
     }
   }, [settings, form])
 
-  function onSubmit(data: NotificationsFormValues) {
+  // Memoize submit handler to prevent recreation on every render
+  const onSubmit = useCallback((data: NotificationsFormValues) => {
     updateSettings({
       email: data.email,
       push: data.push,
       inApp: data.inApp,
     })
-  }
+  }, [updateSettings])
 
   if (loadingSettings) {
-    return (
-      <div className='space-y-8'>
-        <Skeleton className='h-32 w-full' />
-        <Skeleton className='h-32 w-full' />
-        <Skeleton className='h-32 w-full' />
-        <Skeleton className='h-10 w-32' />
-      </div>
-    )
+    return <LoadingSkeleton />
   }
 
   return (

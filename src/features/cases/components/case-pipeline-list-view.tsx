@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
@@ -58,14 +58,14 @@ export function CasePipelineListView() {
   const { data: casesData, isLoading, isError, error, refetch } = useCases()
 
   // Helper function to format dates based on current locale
-  const formatDualDate = (dateString: string | null | undefined) => {
+  const formatDualDate = useCallback((dateString: string | null | undefined) => {
     if (!dateString) return { arabic: t('casePipeline.list.notSet', 'غير محدد'), english: t('casePipeline.list.notSet', 'Not set') }
     const date = new Date(dateString)
     return {
       arabic: format(date, 'd MMMM', { locale: arSA }),
       english: format(date, 'MMM d, yyyy', { locale: enUS })
     }
-  }
+  }, [t])
 
   // Transform and filter API data
   const cases = useMemo(() => {
@@ -151,38 +151,38 @@ export function CasePipelineListView() {
         latestNote: caseItem.notes?.[0]?.text || caseItem.notes?.[caseItem.notes?.length - 1]?.text,
       }
     })
-  }, [casesData, searchQuery, categoryFilter, statusFilter, sortBy, t])
+  }, [casesData, searchQuery, categoryFilter, statusFilter, sortBy, t, formatDualDate])
 
   // Check if any filter is active
   const hasActiveFilters = searchQuery || categoryFilter !== 'all' || statusFilter !== 'all'
 
   // Clear all filters
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setSearchQuery('')
     setCategoryFilter('all')
     setStatusFilter('all')
-  }
+  }, [])
 
   // Navigation handlers
-  const handleOpenPipeline = (caseId: string) => {
+  const handleOpenPipeline = useCallback((caseId: string) => {
     console.log('[CasePipelineListView] 🚀 Opening pipeline for case:', {
       caseId,
       navigateTo: `/dashboard/cases/${caseId}/pipeline`,
       timestamp: new Date().toISOString(),
     })
     navigate({ to: `/dashboard/cases/${caseId}/pipeline` as any })
-  }
+  }, [navigate])
 
-  const handleViewCase = (caseId: string) => {
+  const handleViewCase = useCallback((caseId: string) => {
     console.log('[CasePipelineListView] 🚀 Opening case details:', {
       caseId,
       navigateTo: `/dashboard/cases/${caseId}`,
     })
     navigate({ to: `/dashboard/cases/${caseId}` as any })
-  }
+  }, [navigate])
 
   // Get status badge
-  const getStatusBadge = (caseItem: any) => {
+  const getStatusBadge = useCallback((caseItem: any) => {
     if (caseItem.outcome === 'won') {
       return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-0 rounded-md px-2 gap-1"><CheckCircle className="h-3 w-3" />{t('casePipeline.outcome.won', 'كسب')}</Badge>
     }
@@ -196,10 +196,10 @@ export function CasePipelineListView() {
       return <Badge className="bg-slate-100 text-slate-700 hover:bg-slate-200 border-0 rounded-md px-2">{t('casePipeline.status.closed', 'مغلق')}</Badge>
     }
     return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border-0 rounded-md px-2 gap-1"><Play className="h-3 w-3" />{t('casePipeline.status.active', 'نشط')}</Badge>
-  }
+  }, [t])
 
   // Get priority badge
-  const getPriorityBadge = (priority: string) => {
+  const getPriorityBadge = useCallback((priority: string) => {
     const styles: Record<string, string> = {
       critical: 'bg-red-100 text-red-700',
       high: 'bg-orange-100 text-orange-700',
@@ -209,13 +209,13 @@ export function CasePipelineListView() {
     return <Badge className={cn("border-0 rounded-md px-2", styles[priority] || styles.medium)}>
       {t(`casePipeline.priority.${priority}`, priority)}
     </Badge>
-  }
+  }, [t])
 
   // Get category label
-  const getCategoryLabel = (category: string) => {
+  const getCategoryLabel = useCallback((category: string) => {
     const type = caseTypes.find(t => t.value === category)
     return type ? (isRTL ? type.label : type.labelEn) : category
-  }
+  }, [isRTL])
 
   const topNav = [
     { title: t('casePipeline.nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },

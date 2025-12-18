@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { Link } from '@tanstack/react-router'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
@@ -122,6 +123,12 @@ export function SaudiBankingLeanView() {
     const [activeTab, setActiveTab] = useState('accounts')
     const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null)
     const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
     const [typeFilter, setTypeFilter] = useState('all')
 
     // Fetch data
@@ -424,8 +431,8 @@ export function SaudiBankingLeanView() {
                                                 <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                                                 <Input
                                                     placeholder="بحث في المعاملات..."
-                                                    value={searchQuery}
-                                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                                    defaultValue={searchQuery}
+                                                    onChange={(e) => debouncedSetSearch(e.target.value)}
                                                     className="pe-10 rounded-xl"
                                                 />
                                             </div>

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import {
     TrendingUp, TrendingDown, FileText, Search, Bell,
     ChevronDown, Calendar, Wallet, AlertCircle, CheckCircle, Download,
@@ -161,9 +161,9 @@ export default function FinancialReportsDashboard() {
         return { banksTotal, unpaidInvoicesTotal }
     }, [balanceSheetData])
 
-    const formatCurrency = (amount: number) => {
+    const formatCurrency = useCallback((amount: number) => {
         return formatSAR(amount / 100) // Convert from halalas
-    }
+    }, [])
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },

@@ -63,6 +63,7 @@ export function useExportStatus(jobId: string, enabled = true) {
       }
       return 2000 // Poll every 2 seconds while processing
     },
+    retry: false,
   })
 }
 
@@ -192,6 +193,7 @@ export function useImportStatus(jobId: string, enabled = true) {
       }
       return 2000 // Poll every 2 seconds while processing
     },
+    retry: false,
   })
 }
 

@@ -203,8 +203,11 @@ export function ChatView() {
                                                     {otherParty.image ? (
                                                         <img
                                                             src={otherParty.image}
-                                                            alt={otherParty.username}
+                                                            alt={`${otherParty.username} avatar`}
                                                             className={`w-12 h-12 rounded-2xl object-cover ring-2 ${isActive ? 'ring-white/30' : 'ring-white shadow-sm'}`}
+                                                            loading="lazy"
+                                                            width="48"
+                                                            height="48"
                                                         />
                                                     ) : (
                                                         <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-lg font-bold shadow-sm ring-2 ${isActive ? 'bg-white/20 text-white ring-white/30' : 'bg-slate-100 text-slate-500 ring-white'
@@ -255,8 +258,10 @@ export function ChatView() {
                                             {otherUser.image ? (
                                                 <img
                                                     src={otherUser.image}
-                                                    alt={otherUser.username}
+                                                    alt={`${otherUser.username} avatar`}
                                                     className="w-12 h-12 rounded-2xl object-cover shadow-sm ring-2 ring-slate-50"
+                                                    width="48"
+                                                    height="48"
                                                 />
                                             ) : (
                                                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-lg font-bold shadow-md shadow-blue-500/20">
@@ -334,7 +339,7 @@ export function ChatView() {
                                                             null
                                                         ) : (
                                                             otherUser?.image ?
-                                                                <img src={otherUser.image} className="w-8 h-8 rounded-xl object-cover shadow-sm ring-2 ring-white" alt="" />
+                                                                <img src={otherUser.image} className="w-8 h-8 rounded-xl object-cover shadow-sm ring-2 ring-white" alt={`${otherUser?.username} avatar`} loading="lazy" width="32" height="32" />
                                                                 : <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold ring-2 ring-white">{otherUser?.username.charAt(0)}</div>
                                                         )}
                                                     </div>

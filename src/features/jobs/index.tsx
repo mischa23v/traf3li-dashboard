@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { useTranslation } from 'react-i18next'
 import {
   Briefcase, Plus, Search, Filter, MoreVertical,
@@ -64,6 +65,12 @@ export function MyServices() {
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
 
@@ -225,8 +232,8 @@ export function MyServices() {
                     <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                     <Input
                       placeholder={isRTL ? 'بحث في الخدمات...' : 'Search services...'}
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      defaultValue={searchQuery}
+                      onChange={(e) => debouncedSetSearch(e.target.value)}
                       className="ps-10 rounded-xl border-slate-200"
                     />
                   </div>

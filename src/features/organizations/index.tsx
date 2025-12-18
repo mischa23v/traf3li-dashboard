@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDebouncedCallback } from 'use-debounce'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -58,6 +59,13 @@ function OrganizationsListView() {
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState('')
+
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
   const [typeFilter, setTypeFilter] = useState<string>('all')
   const [statusFilter, setStatusFilter] = useState<string>('all')
 
@@ -207,8 +215,8 @@ function OrganizationsListView() {
                     <Input
                       type="text"
                       placeholder={t('organizations.searchPlaceholder', 'البحث عن منظمة...')}
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      defaultValue={searchQuery}
+                      onChange={(e) => debouncedSetSearch(e.target.value)}
                       className="pe-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
                     />
                   </div>

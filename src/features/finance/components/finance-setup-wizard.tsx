@@ -435,7 +435,7 @@ export function FinanceSetupWizard() {
                 </Label>
                 <div className="flex items-center gap-4">
                   {logoPreview && (
-                    <img src={logoPreview} alt="Logo preview" className="w-20 h-20 object-contain rounded-lg border border-slate-200" />
+                    <img src={logoPreview} alt="Company logo preview" className="w-20 h-20 object-contain rounded-lg border border-slate-200" width="80" height="80" />
                   )}
                   <div className="flex-1">
                     <Input

@@ -1,5 +1,6 @@
 import { Outlet } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { useMemo } from 'react'
 import { Monitor, Bell, Palette, Wrench, UserCog } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { ConfigDrawer } from '@/components/config-drawer'
@@ -13,7 +14,8 @@ import { SidebarNav } from './components/sidebar-nav'
 export function Settings() {
   const { t } = useTranslation()
 
-  const sidebarNavItems = [
+  // Memoize sidebar navigation items to prevent recreation on every render
+  const sidebarNavItems = useMemo(() => [
     {
       title: t('settings.tabs.profile'),
       href: '/settings',
@@ -39,7 +41,7 @@ export function Settings() {
       href: '/settings/display',
       icon: <Monitor size={18} />,
     },
-  ]
+  ], [t])
 
   return (
     <>

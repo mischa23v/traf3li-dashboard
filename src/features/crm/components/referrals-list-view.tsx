@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import {
   MoreHorizontal,
   Plus,
@@ -88,20 +88,20 @@ export function ReferralsListView() {
   const stats = statsData?.stats
 
   // Selection Handlers
-  const handleToggleSelectionMode = () => {
+  const handleToggleSelectionMode = useCallback(() => {
     setIsSelectionMode(!isSelectionMode)
     setSelectedReferralIds([])
-  }
+  }, [isSelectionMode])
 
-  const handleSelectReferral = (referralId: string) => {
+  const handleSelectReferral = useCallback((referralId: string) => {
     if (selectedReferralIds.includes(referralId)) {
       setSelectedReferralIds(selectedReferralIds.filter((id) => id !== referralId))
     } else {
       setSelectedReferralIds([...selectedReferralIds, referralId])
     }
-  }
+  }, [selectedReferralIds])
 
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = useCallback(() => {
     if (selectedReferralIds.length === 0) return
 
     if (confirm(`هل أنت متأكد من حذف ${selectedReferralIds.length} مصدر إحالة؟`)) {
@@ -111,7 +111,7 @@ export function ReferralsListView() {
       setIsSelectionMode(false)
       setSelectedReferralIds([])
     }
-  }
+  }, [selectedReferralIds, deleteReferral])
 
   const topNav = [
     { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: false },

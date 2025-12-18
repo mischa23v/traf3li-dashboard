@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDebouncedCallback } from 'use-debounce'
 import {
   Briefcase,
   Plus,
@@ -38,6 +39,7 @@ import {
 import type { Case, CaseStatus, CaseCategory, CasePriority, ClientRef, LawyerRef } from '@/services/casesService'
 import { PracticeSidebar } from './practice-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { VirtualList } from '@/components/virtual-list'
 
 // Constants for courts, committees, and arbitration centers
 const COURTS = [
@@ -155,6 +157,12 @@ export function CasesListView() {
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState('')
 
+  // Debounced search handler
+  const debouncedSetSearch = useDebouncedCallback(
+    (value: string) => setSearchQuery(value),
+    300
+  )
+
   const filters = useMemo(() => {
     const f: any = {}
     if (statusFilter !== 'all') f.status = statusFilter
@@ -186,7 +194,7 @@ export function CasesListView() {
     { title: t('nav.cases', 'القضايا'), href: '/dashboard/cases', isActive: true },
   ]
 
-  const getPriorityColor = (priority: CasePriority) => {
+  const getPriorityColor = useCallback((priority: CasePriority) => {
     switch (priority) {
       case 'critical':
         return 'bg-red-50 text-red-500 border-red-100'
@@ -197,9 +205,9 @@ export function CasesListView() {
       default:
         return 'bg-slate-50 text-slate-500 border-slate-100'
     }
-  }
+  }, [])
 
-  const getStatusColor = (status: CaseStatus) => {
+  const getStatusColor = useCallback((status: CaseStatus) => {
     switch (status) {
       case 'active':
         return 'bg-blue-500'
@@ -220,9 +228,9 @@ export function CasesListView() {
       default:
         return 'bg-slate-500'
     }
-  }
+  }, [])
 
-  const getStatusLabel = (status: CaseStatus): string => {
+  const getStatusLabel = useCallback((status: CaseStatus): string => {
     const labels: Record<CaseStatus, string> = {
       active: t('cases.status.active', 'نشطة'),
       closed: t('cases.status.closed', 'مغلقة'),
@@ -235,9 +243,9 @@ export function CasesListView() {
       settled: t('cases.status.settled', 'تمت التسوية'),
     }
     return labels[status] || status
-  }
+  }, [t])
 
-  const getCategoryLabel = (category: CaseCategory): string => {
+  const getCategoryLabel = useCallback((category: CaseCategory): string => {
     const labels: Record<CaseCategory, string> = {
       labor: t('cases.category.labor', 'عمالية'),
       commercial: t('cases.category.commercial', 'تجارية'),
@@ -248,19 +256,19 @@ export function CasesListView() {
       other: t('cases.category.other', 'أخرى'),
     }
     return labels[category] || category
-  }
+  }, [t])
 
-  const formatDate = (dateString?: string) => {
+  const formatDate = useCallback((dateString?: string) => {
     if (!dateString) return t('cases.notSpecified', 'غير محدد')
     return new Date(dateString).toLocaleDateString('ar-SA', {
       day: 'numeric',
       month: 'long',
     })
-  }
+  }, [t])
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = useCallback((amount: number) => {
     return new Intl.NumberFormat('ar-SA').format(amount)
-  }
+  }, [])
 
   // Calculate success rate
   const successRate = statistics.total > 0
@@ -331,8 +339,8 @@ export function CasesListView() {
                 <Search className="w-5 h-5 text-slate-500" aria-hidden="true" />
                 <Input
                   placeholder={t('cases.searchPlaceholder', 'بحث في القضايا...')}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  defaultValue={searchQuery}
+                  onChange={(e) => debouncedSetSearch(e.target.value)}
                   className="border-0 focus-visible:ring-0 text-navy placeholder:text-slate-500 h-9 w-full sm:w-64"
                 />
               </div>
@@ -431,15 +439,19 @@ export function CasesListView() {
                 </div>
               )}
 
-              {/* Success State - Case Cards */}
+              {/* Success State - Case Cards with Virtualization */}
               {!isLoading &&
                 !isError &&
-                filteredCases.length > 0 &&
-                filteredCases.map((caseItem) => (
-                  <div
-                    key={caseItem._id}
-                    className="bg-white rounded-2xl p-6 border border-slate-100 hover:border-blue-200 transition-all group shadow-sm"
-                  >
+                filteredCases.length > 0 && (
+                  <VirtualList
+                    items={filteredCases}
+                    itemHeight={340}
+                    height={Math.min(filteredCases.length * 340 + (filteredCases.length - 1) * 16, 800)}
+                    renderItem={(caseItem, index, style) => (
+                      <div key={caseItem._id} style={{ ...style, paddingBottom: '16px' }}>
+                        <div
+                          className="bg-white rounded-2xl p-6 border border-slate-100 hover:border-blue-200 transition-all group shadow-sm"
+                        >
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex gap-4 items-start flex-1">
                         <div
@@ -519,7 +531,7 @@ export function CasesListView() {
                       <div className="w-full bg-slate-200 rounded-full h-2">
                         <div
                           className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-                          style={{ width: `${caseItem.progress}%` }}
+                          style={useMemo(() => ({ width: `${caseItem.progress}%` }), [caseItem.progress])}
                         ></div>
                       </div>
                     </div>
@@ -566,8 +578,12 @@ export function CasesListView() {
                         </Link>
                       </div>
                     </div>
-                  </div>
-                ))}
+                        </div>
+                      </div>
+                    )}
+                    getItemKey={(index, data) => data[index]._id}
+                  />
+                )}
             </div>
 
             {/* Load More */}

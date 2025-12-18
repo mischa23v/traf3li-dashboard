@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useMemo } from 'react'
+import { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react'
 import { getCookie, setCookie, deleteCookie } from '@/lib/cookies'
 
 type Theme = 'dark' | 'light' | 'system'
@@ -82,24 +82,27 @@ export function ThemeProvider({
     return () => mediaQuery.removeEventListener('change', handleChange)
   }, [theme, resolvedTheme])
 
-  const setTheme = (newTheme: Theme) => {
+  // Memoize setTheme to prevent unnecessary re-renders
+  const setTheme = useCallback((newTheme: Theme) => {
     // Allow all theme options including dark mode
     setCookie(storageKey, newTheme, { expires: 365 }) // 1 year
     _setTheme(newTheme)
-  }
+  }, [storageKey])
 
-  const resetTheme = () => {
+  // Memoize resetTheme to prevent unnecessary re-renders
+  const resetTheme = useCallback(() => {
     deleteCookie(storageKey)
     _setTheme(DEFAULT_THEME)
-  }
+  }, [storageKey])
 
-  const contextValue = {
+  // Memoize the entire context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
     defaultTheme,
     resolvedTheme,
     resetTheme,
     theme,
     setTheme,
-  }
+  }), [defaultTheme, resolvedTheme, resetTheme, theme, setTheme])
 
   return (
     <ThemeContext value={contextValue} {...props}>

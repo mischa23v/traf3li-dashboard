@@ -1,5 +1,5 @@
 import { HRSidebar } from './hr-sidebar'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -105,13 +105,16 @@ export function PayrollListView() {
     }, [statusFilter, monthFilter, yearFilter, searchQuery, sortBy])
 
     // Check if any filter is active
-    const hasActiveFilters = searchQuery || statusFilter !== 'all'
+    const hasActiveFilters = useMemo(() =>
+        searchQuery || statusFilter !== 'all',
+        [searchQuery, statusFilter]
+    )
 
     // Clear filters (except month/year)
-    const clearFilters = () => {
+    const clearFilters = useCallback(() => {
         setSearchQuery('')
         setStatusFilter('all')
-    }
+    }, [])
 
     // Fetch salary slips
     const { data: slipsData, isLoading, isError, error, refetch } = useSalarySlips(filters)
@@ -124,33 +127,33 @@ export function PayrollListView() {
     }, [slipsData])
 
     // Selection Handlers
-    const handleToggleSelectionMode = () => {
-        setIsSelectionMode(!isSelectionMode)
+    const handleToggleSelectionMode = useCallback(() => {
+        setIsSelectionMode(prev => !prev)
         setSelectedIds([])
-    }
+    }, [])
 
-    const handleSelectSlip = (slipId: string) => {
-        if (selectedIds.includes(slipId)) {
-            setSelectedIds(selectedIds.filter(id => id !== slipId))
-        } else {
-            setSelectedIds([...selectedIds, slipId])
-        }
-    }
+    const handleSelectSlip = useCallback((slipId: string) => {
+        setSelectedIds(prev =>
+            prev.includes(slipId)
+                ? prev.filter(id => id !== slipId)
+                : [...prev, slipId]
+        )
+    }, [])
 
     // Single slip actions
-    const handleViewSlip = (slipId: string) => {
+    const handleViewSlip = useCallback((slipId: string) => {
         navigate({ to: '/dashboard/hr/payroll/$slipId', params: { slipId } })
-    }
+    }, [navigate])
 
-    const handleEditSlip = (slipId: string) => {
+    const handleEditSlip = useCallback((slipId: string) => {
         navigate({ to: '/dashboard/hr/payroll/new', search: { editId: slipId } })
-    }
+    }, [navigate])
 
-    const handleDeleteSlip = (slipId: string) => {
+    const handleDeleteSlip = useCallback((slipId: string) => {
         if (confirm('هل أنت متأكد من حذف هذه القسيمة؟')) {
             deleteSlipMutation.mutate(slipId)
         }
-    }
+    }, [deleteSlipMutation])
 
     // Status badge styling
     const getStatusBadge = (status: PaymentStatus) => {

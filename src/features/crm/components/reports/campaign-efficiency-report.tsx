@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, lazy, Suspense } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
     Download,
@@ -42,7 +42,17 @@ import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell, LabelList } from 'recharts'
+import { ChartSkeleton } from '@/utils/lazy-import'
+
+// Lazy load Recharts components
+const ResponsiveContainer = lazy(() => import('recharts').then((mod) => ({ default: mod.ResponsiveContainer })))
+const BarChart = lazy(() => import('recharts').then((mod) => ({ default: mod.BarChart })))
+const Bar = lazy(() => import('recharts').then((mod) => ({ default: mod.Bar })))
+const XAxis = lazy(() => import('recharts').then((mod) => ({ default: mod.XAxis })))
+const YAxis = lazy(() => import('recharts').then((mod) => ({ default: mod.YAxis })))
+const Tooltip = lazy(() => import('recharts').then((mod) => ({ default: mod.Tooltip })))
+const Cell = lazy(() => import('recharts').then((mod) => ({ default: mod.Cell })))
+const LabelList = lazy(() => import('recharts').then((mod) => ({ default: mod.LabelList })))
 
 // Mock hook - replace with actual API hook when available
 const useCampaignEfficiencyReport = (filters: any) => {
@@ -523,32 +533,34 @@ export function CampaignEfficiencyReport() {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-6">
-                                <ResponsiveContainer width="100%" height={300}>
-                                    <BarChart data={funnelData} layout="vertical">
-                                        <XAxis type="number" hide />
-                                        <YAxis
-                                            type="category"
-                                            dataKey="stage"
-                                            width={100}
-                                            tick={{ fontSize: 12, fill: '#64748b' }}
-                                        />
-                                        <Tooltip
-                                            formatter={(value: number) => value.toLocaleString()}
-                                            contentStyle={{
-                                                backgroundColor: 'white',
-                                                border: '1px solid #e2e8f0',
-                                                borderRadius: '8px',
-                                                fontSize: '12px',
-                                            }}
-                                        />
-                                        <Bar dataKey="value" radius={[0, 8, 8, 0]}>
-                                            {funnelData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.color} />
-                                            ))}
-                                            <LabelList dataKey="value" position="right" fill="#1e293b" fontSize={12} />
-                                        </Bar>
-                                    </BarChart>
-                                </ResponsiveContainer>
+                                <Suspense fallback={<ChartSkeleton />}>
+                                    <ResponsiveContainer width="100%" height={300}>
+                                        <BarChart data={funnelData} layout="vertical">
+                                            <XAxis type="number" hide />
+                                            <YAxis
+                                                type="category"
+                                                dataKey="stage"
+                                                width={100}
+                                                tick={{ fontSize: 12, fill: '#64748b' }}
+                                            />
+                                            <Tooltip
+                                                formatter={(value: number) => value.toLocaleString()}
+                                                contentStyle={{
+                                                    backgroundColor: 'white',
+                                                    border: '1px solid #e2e8f0',
+                                                    borderRadius: '8px',
+                                                    fontSize: '12px',
+                                                }}
+                                            />
+                                            <Bar dataKey="value" radius={[0, 8, 8, 0]}>
+                                                {funnelData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                                ))}
+                                                <LabelList dataKey="value" position="right" fill="#1e293b" fontSize={12} />
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </Suspense>
 
                                 {/* Conversion Rates */}
                                 <div className="mt-6 space-y-3">

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PERF_DEBUG, perfLog } from '@/lib/perf-debug'
 import { TasksSidebar } from './tasks-sidebar'
@@ -153,17 +153,20 @@ export function RemindersView() {
     }, [activeTab, searchQuery, priorityFilter, typeFilter, sortBy])
 
     // Check if any filter is active
-    const hasActiveFilters = searchQuery || priorityFilter !== 'all' || typeFilter !== 'all'
+    const hasActiveFilters = useMemo(() =>
+        searchQuery || priorityFilter !== 'all' || typeFilter !== 'all',
+        [searchQuery, priorityFilter, typeFilter]
+    )
 
     // Clear all filters
-    const clearFilters = () => {
+    const clearFilters = useCallback(() => {
         setSearchQuery('')
         setPriorityFilter('all')
         setTypeFilter('all')
-    }
+    }, [])
 
     // Helper function to format dates based on current locale
-    const formatDualDate = (dateString: string | null | undefined) => {
+    const formatDualDate = useCallback((dateString: string | null | undefined) => {
         if (!dateString) return { arabic: t('reminders.list.notSet'), english: t('reminders.list.notSet') }
         const date = new Date(dateString)
         if (isNaN(date.getTime())) return { arabic: t('reminders.list.notSet'), english: t('reminders.list.notSet') }
@@ -171,7 +174,7 @@ export function RemindersView() {
             arabic: format(date, 'd MMMM', { locale: arSA }),
             english: format(date, 'MMM d, yyyy', { locale: enUS })
         }
-    }
+    }, [t])
 
     // Fetch reminders
     const { data: remindersData, isLoading, isError, error, refetch, isFetching } = useReminders(filters)
@@ -213,11 +216,11 @@ export function RemindersView() {
     const [delegateNote, setDelegateNote] = useState('')
 
     // Single reminder actions
-    const handleViewReminder = (reminderId: string) => {
+    const handleViewReminder = useCallback((reminderId: string) => {
         navigate({ to: '/dashboard/tasks/reminders/$reminderId', params: { reminderId } })
-    }
+    }, [navigate])
 
-    const handleDeleteReminder = async (reminderId: string) => {
+    const handleDeleteReminder = useCallback(async (reminderId: string) => {
         if (confirm(t('reminders.list.deleteConfirm'))) {
             try {
                 await deleteReminder(reminderId)
@@ -226,21 +229,21 @@ export function RemindersView() {
                 toast.error(t('reminders.toast.deleteFailed'))
             }
         }
-    }
+    }, [t, deleteReminder])
 
-    const handleCompleteReminder = (reminderId: string) => {
+    const handleCompleteReminder = useCallback((reminderId: string) => {
         completeReminderMutation.mutate(reminderId)
-    }
+    }, [completeReminderMutation])
 
-    const handleDismissReminder = (reminderId: string) => {
+    const handleDismissReminder = useCallback((reminderId: string) => {
         dismissReminderMutation.mutate(reminderId)
-    }
+    }, [dismissReminderMutation])
 
-    const handleSnoozeReminder = (reminderId: string, duration: number) => {
+    const handleSnoozeReminder = useCallback((reminderId: string, duration: number) => {
         snoozeReminderMutation.mutate({ id: reminderId, duration })
-    }
+    }, [snoozeReminderMutation])
 
-    const handleDelegateReminder = () => {
+    const handleDelegateReminder = useCallback(() => {
         if (!delegateReminderId || !delegateTo) return
         delegateReminderMutation.mutate(
             { id: delegateReminderId, delegateTo, note: delegateNote || undefined },
@@ -252,11 +255,11 @@ export function RemindersView() {
                 }
             }
         )
-    }
+    }, [delegateReminderId, delegateTo, delegateNote, delegateReminderMutation])
 
-    const handlePriorityChange = (reminderId: string, priority: string) => {
+    const handlePriorityChange = useCallback((reminderId: string, priority: string) => {
         updateReminderMutation.mutate({ id: reminderId, data: { priority: priority as 'low' | 'medium' | 'high' | 'critical' } })
-    }
+    }, [updateReminderMutation])
 
     // Transform API data
     const reminders = useMemo(() => {
@@ -283,20 +286,20 @@ export function RemindersView() {
     }, [remindersData])
 
     // Selection Handlers
-    const handleToggleSelectionMode = () => {
+    const handleToggleSelectionMode = useCallback(() => {
         setIsSelectionMode(!isSelectionMode)
         setSelectedReminderIds([])
-    }
+    }, [isSelectionMode])
 
-    const handleSelectReminder = (id: string) => {
+    const handleSelectReminder = useCallback((id: string) => {
         if (selectedReminderIds.includes(id)) {
             setSelectedReminderIds(selectedReminderIds.filter(itemId => itemId !== id))
         } else {
             setSelectedReminderIds([...selectedReminderIds, id])
         }
-    }
+    }, [selectedReminderIds])
 
-    const handleDeleteSelected = async () => {
+    const handleDeleteSelected = useCallback(async () => {
         if (selectedReminderIds.length === 0) return
 
         if (confirm(t('reminders.list.deleteMultipleConfirm', { count: selectedReminderIds.length }))) {
@@ -310,7 +313,7 @@ export function RemindersView() {
                 toast.error(t('reminders.toast.deleteError'))
             }
         }
-    }
+    }, [selectedReminderIds, t, deleteReminder])
 
     const topNav = [
         { title: t('reminders.nav.overview'), href: '/dashboard/overview', isActive: false },

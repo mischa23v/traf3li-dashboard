@@ -2,6 +2,7 @@
  * Socket Service
  * Handles all Socket.IO real-time communication
  * Includes authentication error handling and session management
+ * Optimized with throttling for high-frequency events
  */
 
 import { io, Socket } from 'socket.io-client'
@@ -16,6 +17,13 @@ class SocketService {
   private userId: string | null = null
   private reconnectAttempts = 0
   private maxReconnectAttempts = 5
+
+  // Throttling for high-frequency events
+  private typingThrottleMap = new Map<string, number>()
+  private readonly TYPING_THROTTLE_MS = 1000 // Max once per second per conversation
+
+  // Event handler references for proper cleanup
+  private eventHandlers = new Map<string, (...args: any[]) => void>()
 
   /**
    * Initialize socket connection
@@ -121,6 +129,24 @@ class SocketService {
       this.socket = null
       this.userId = null
     }
+    // Clear throttle maps
+    this.typingThrottleMap.clear()
+    this.eventHandlers.clear()
+  }
+
+  /**
+   * Throttle helper for high-frequency events
+   */
+  private shouldThrottle(key: string, throttleMs: number): boolean {
+    const now = Date.now()
+    const lastCall = this.typingThrottleMap.get(key)
+
+    if (!lastCall || now - lastCall >= throttleMs) {
+      this.typingThrottleMap.set(key, now)
+      return false // Don't throttle
+    }
+
+    return true // Throttle
   }
 
   /**
@@ -174,6 +200,9 @@ class SocketService {
     callback: (data: { conversationId: string; message: any }) => void
   ): void {
     if (!this.socket) return
+
+    // Store reference for proper cleanup
+    this.eventHandlers.set('message:receive', callback)
     this.socket.on('message:receive', callback)
   }
 
@@ -182,11 +211,19 @@ class SocketService {
    */
   offMessageReceive(): void {
     if (!this.socket) return
-    this.socket.off('message:receive')
+
+    const handler = this.eventHandlers.get('message:receive')
+    if (handler) {
+      this.socket.off('message:receive', handler)
+      this.eventHandlers.delete('message:receive')
+    } else {
+      // Fallback to remove all handlers for this event
+      this.socket.off('message:receive')
+    }
   }
 
   /**
-   * Send typing indicator
+   * Send typing indicator (throttled to prevent spam)
    */
   startTyping(data: {
     conversationId: string
@@ -194,6 +231,13 @@ class SocketService {
     username: string
   }): void {
     if (!this.socket) return
+
+    // Throttle typing indicators per conversation
+    const throttleKey = `typing:${data.conversationId}`
+    if (this.shouldThrottle(throttleKey, this.TYPING_THROTTLE_MS)) {
+      return // Skip if called too frequently
+    }
+
     this.socket.emit('typing:start', data)
   }
 
@@ -210,6 +254,9 @@ class SocketService {
    */
   onTyping(callback: (data: { userId: string; username: string }) => void): void {
     if (!this.socket) return
+
+    // Store reference for proper cleanup
+    this.eventHandlers.set('typing:show', callback)
     this.socket.on('typing:show', callback)
   }
 
@@ -218,6 +265,9 @@ class SocketService {
    */
   onStopTyping(callback: (data: { userId: string }) => void): void {
     if (!this.socket) return
+
+    // Store reference for proper cleanup
+    this.eventHandlers.set('typing:hide', callback)
     this.socket.on('typing:hide', callback)
   }
 
@@ -226,8 +276,23 @@ class SocketService {
    */
   offTyping(): void {
     if (!this.socket) return
-    this.socket.off('typing:show')
-    this.socket.off('typing:hide')
+
+    const showHandler = this.eventHandlers.get('typing:show')
+    const hideHandler = this.eventHandlers.get('typing:hide')
+
+    if (showHandler) {
+      this.socket.off('typing:show', showHandler)
+      this.eventHandlers.delete('typing:show')
+    } else {
+      this.socket.off('typing:show')
+    }
+
+    if (hideHandler) {
+      this.socket.off('typing:hide', hideHandler)
+      this.eventHandlers.delete('typing:hide')
+    } else {
+      this.socket.off('typing:hide')
+    }
   }
 
   /**
@@ -243,6 +308,9 @@ class SocketService {
    */
   onMessageRead(callback: (data: { userId: string }) => void): void {
     if (!this.socket) return
+
+    // Store reference for proper cleanup
+    this.eventHandlers.set('message:read', callback)
     this.socket.on('message:read', callback)
   }
 
@@ -251,7 +319,14 @@ class SocketService {
    */
   offMessageRead(): void {
     if (!this.socket) return
-    this.socket.off('message:read')
+
+    const handler = this.eventHandlers.get('message:read')
+    if (handler) {
+      this.socket.off('message:read', handler)
+      this.eventHandlers.delete('message:read')
+    } else {
+      this.socket.off('message:read')
+    }
   }
 
   // ==================== ONLINE PRESENCE ====================
@@ -261,6 +336,9 @@ class SocketService {
    */
   onUserOnline(callback: (data: { userId: string; socketId: string }) => void): void {
     if (!this.socket) return
+
+    // Store reference for proper cleanup
+    this.eventHandlers.set('user:online', callback)
     this.socket.on('user:online', callback)
   }
 
@@ -269,6 +347,9 @@ class SocketService {
    */
   onUserOffline(callback: (data: { userId: string }) => void): void {
     if (!this.socket) return
+
+    // Store reference for proper cleanup
+    this.eventHandlers.set('user:offline', callback)
     this.socket.on('user:offline', callback)
   }
 
@@ -277,8 +358,23 @@ class SocketService {
    */
   offPresence(): void {
     if (!this.socket) return
-    this.socket.off('user:online')
-    this.socket.off('user:offline')
+
+    const onlineHandler = this.eventHandlers.get('user:online')
+    const offlineHandler = this.eventHandlers.get('user:offline')
+
+    if (onlineHandler) {
+      this.socket.off('user:online', onlineHandler)
+      this.eventHandlers.delete('user:online')
+    } else {
+      this.socket.off('user:online')
+    }
+
+    if (offlineHandler) {
+      this.socket.off('user:offline', offlineHandler)
+      this.eventHandlers.delete('user:offline')
+    } else {
+      this.socket.off('user:offline')
+    }
   }
 
   // ==================== NOTIFICATIONS ====================
@@ -288,6 +384,9 @@ class SocketService {
    */
   onNotification(callback: (notification: any) => void): void {
     if (!this.socket) return
+
+    // Store reference for proper cleanup
+    this.eventHandlers.set('notification:new', callback)
     this.socket.on('notification:new', callback)
   }
 
@@ -296,6 +395,9 @@ class SocketService {
    */
   onNotificationCount(callback: (data: { count: number }) => void): void {
     if (!this.socket) return
+
+    // Store reference for proper cleanup
+    this.eventHandlers.set('notification:count', callback)
     this.socket.on('notification:count', callback)
   }
 
@@ -304,8 +406,23 @@ class SocketService {
    */
   offNotifications(): void {
     if (!this.socket) return
-    this.socket.off('notification:new')
-    this.socket.off('notification:count')
+
+    const newHandler = this.eventHandlers.get('notification:new')
+    const countHandler = this.eventHandlers.get('notification:count')
+
+    if (newHandler) {
+      this.socket.off('notification:new', newHandler)
+      this.eventHandlers.delete('notification:new')
+    } else {
+      this.socket.off('notification:new')
+    }
+
+    if (countHandler) {
+      this.socket.off('notification:count', countHandler)
+      this.eventHandlers.delete('notification:count')
+    } else {
+      this.socket.off('notification:count')
+    }
   }
 
   // ==================== CLEANUP ====================

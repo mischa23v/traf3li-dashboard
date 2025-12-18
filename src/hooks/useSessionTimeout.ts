@@ -63,7 +63,7 @@ interface UseSessionTimeoutReturn {
  */
 export function useSessionTimeout(): UseSessionTimeoutReturn {
   const { t } = useTranslation()
-  const { logout } = useAuthStore()
+  const logout = useAuthStore((state) => state.logout)
 
   // Track last activity timestamp
   const lastActivityRef = useRef<number>(Date.now())

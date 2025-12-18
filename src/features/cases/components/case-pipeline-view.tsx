@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import {
   Scale,
   Search,
@@ -149,13 +149,13 @@ export function CasePipelineView() {
   }, [selectedCase, currentPipeline])
 
   // Handle case type change
-  const handleCaseTypeChange = (type: string) => {
+  const handleCaseTypeChange = useCallback((type: string) => {
     setSelectedCaseType(type)
     setSelectedCaseId('') // Reset case selection when type changes
-  }
+  }, [])
 
   // Handle moving case to a stage
-  const handleMoveToStage = (stageId: string) => {
+  const handleMoveToStage = useCallback((stageId: string) => {
     if (!selectedCaseId) return
 
     updateCase({
@@ -170,31 +170,31 @@ export function CasePipelineView() {
         refetch()
       }
     })
-  }
+  }, [selectedCaseId, updateCase, refetch])
 
   // Handle moving to next/previous stage
-  const handleMoveNext = () => {
+  const handleMoveNext = useCallback(() => {
     if (currentStageIndex < currentPipeline.stages.length - 1) {
       const nextStage = currentPipeline.stages[currentStageIndex + 1]
       handleMoveToStage(nextStage.id)
     }
-  }
+  }, [currentStageIndex, currentPipeline.stages, handleMoveToStage])
 
-  const handleMovePrevious = () => {
+  const handleMovePrevious = useCallback(() => {
     if (currentStageIndex > 0) {
       const prevStage = currentPipeline.stages[currentStageIndex - 1]
       handleMoveToStage(prevStage.id)
     }
-  }
+  }, [currentStageIndex, currentPipeline.stages, handleMoveToStage])
 
   // Handle end case
-  const handleOpenEndCase = () => {
+  const handleOpenEndCase = useCallback(() => {
     if (selectedCaseId) {
       setEndCaseDialogOpen(true)
     }
-  }
+  }, [selectedCaseId])
 
-  const handleEndCase = () => {
+  const handleEndCase = useCallback(() => {
     if (!selectedCaseId) return
 
     updateCase({
@@ -217,7 +217,7 @@ export function CasePipelineView() {
         setFinalAmount('')
       }
     })
-  }
+  }, [selectedCaseId, updateCase, endOutcome, endReason, endNotes, finalAmount, refetch])
 
   // Calculate days in current stage
   const daysInCurrentStage = useMemo(() => {
@@ -522,10 +522,10 @@ export function CasePipelineView() {
                     <div className="absolute top-8 left-0 right-0 h-1 bg-slate-200 rounded-full" />
                     <div
                       className="absolute top-8 left-0 h-1 bg-emerald-500 rounded-full transition-all duration-500"
-                      style={{
+                      style={useMemo(() => ({
                         width: `${((currentStageIndex) / (currentPipeline.stages.length - 1)) * 100}%`,
-                        direction: 'ltr'
-                      }}
+                        direction: 'ltr' as const
+                      }), [currentStageIndex, currentPipeline.stages.length])}
                     />
 
                     {/* Stages */}

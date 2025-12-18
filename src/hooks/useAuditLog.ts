@@ -182,6 +182,7 @@ export const useFailedLogins = (
     enabled,
     staleTime: 60 * 1000, // 1 minute
     refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes
+    retry: false,
   })
 }
 
@@ -202,6 +203,7 @@ export const useSuspiciousActivity = (
     enabled,
     staleTime: 60 * 1000, // 1 minute
     refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes
+    retry: false,
   })
 }
 

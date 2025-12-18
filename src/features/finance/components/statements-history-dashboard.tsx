@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import {
     Search, Download, Plus, MoreHorizontal,
     FileText, Calendar, Building, FileClock, Send, Bell,
@@ -31,6 +32,12 @@ import { FinanceSidebar } from './finance-sidebar'
 export default function StatementsHistoryDashboard() {
     const [activeTab, setActiveTab] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
 
     // Fetch statements from API
     const { data, isLoading, isError, error } = useStatements({ status: activeTab === 'all' ? undefined : activeTab })
@@ -173,8 +180,8 @@ export default function StatementsHistoryDashboard() {
                                         <Input
                                             placeholder="بحث في الكشوفات..."
                                             className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            defaultValue={searchQuery}
+                                            onChange={(e) => debouncedSetSearch(e.target.value)}
                                         />
                                     </div>
                                 </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { Link } from '@tanstack/react-router'
 import {
   FileBarChart,
@@ -70,6 +71,12 @@ const categoryIcons: Partial<Record<ReportCategory, React.ElementType>> = {
 
 export function SalesReportsListView() {
   const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [statusFilter, setStatusFilter] = useState<string>('all')
 
@@ -213,8 +220,8 @@ export function SalesReportsListView() {
               <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
               <Input
                 placeholder="بحث في التقارير..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                defaultValue={searchQuery}
+                onChange={(e) => debouncedSetSearch(e.target.value)}
                 className="pe-10 rounded-xl"
               />
             </div>

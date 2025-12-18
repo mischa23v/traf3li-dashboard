@@ -9,7 +9,7 @@
  * - Stage statistics and totals
  */
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback, memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
@@ -85,7 +85,7 @@ interface CaseCardData {
 }
 
 // Case card component (similar to LeadCard in CRM)
-function CaseCard({
+const CaseCard = memo(function CaseCard({
   caseItem,
   onDragStart,
   onDragEnd,
@@ -272,7 +272,9 @@ function CaseCard({
       </div>
     </div>
   )
-}
+})
+
+CaseCard.displayName = 'CaseCard'
 
 export function CasePipelineBoardView() {
   const { t, i18n } = useTranslation()
@@ -371,17 +373,17 @@ export function CasePipelineBoardView() {
   }, [casesByStage])
 
   // Handle drag and drop
-  const handleDragStart = (e: React.DragEvent, caseId: string) => {
+  const handleDragStart = useCallback((e: React.DragEvent, caseId: string) => {
     setDraggedCaseId(caseId)
     e.dataTransfer.effectAllowed = 'move'
-  }
+  }, [])
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     e.dataTransfer.dropEffect = 'move'
-  }
+  }, [])
 
-  const handleDrop = (e: React.DragEvent, stageId: string) => {
+  const handleDrop = useCallback((e: React.DragEvent, stageId: string) => {
     e.preventDefault()
     if (draggedCaseId) {
       updateCase({
@@ -402,30 +404,30 @@ export function CasePipelineBoardView() {
       })
       setDraggedCaseId(null)
     }
-  }
+  }, [draggedCaseId, updateCase, t, refetch])
 
-  const handleDragEnd = () => {
+  const handleDragEnd = useCallback(() => {
     setDraggedCaseId(null)
-  }
+  }, [])
 
   // Navigation handlers
-  const handleOpenCase = (caseId: string) => {
+  const handleOpenCase = useCallback((caseId: string) => {
     navigate({ to: `/dashboard/cases/${caseId}` as any })
-  }
+  }, [navigate])
 
-  const handleOpenPipeline = (caseId: string) => {
+  const handleOpenPipeline = useCallback((caseId: string) => {
     navigate({ to: `/dashboard/cases/${caseId}/pipeline` as any })
-  }
+  }, [navigate])
 
   // Calculate stage totals
-  const getStageTotals = (stageId: string) => {
+  const getStageTotals = useCallback((stageId: string) => {
     const cases = casesByStage[stageId] || []
     return {
       count: cases.length,
       value: cases.reduce((sum, c) => sum + c.claimAmount, 0),
       overdueCases: cases.filter(c => c.daysInStage > 14).length,
     }
-  }
+  }, [casesByStage])
 
   const topNav = [
     { title: t('casePipeline.nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import {
     Search, Filter, Plus, MoreHorizontal, Building2, AlertCircle, Loader2, Bell,
     Phone, Mail, MapPin, CreditCard, Edit, Trash2
@@ -34,6 +35,12 @@ import { type Vendor } from '@/services/accountingService'
 export default function VendorsDashboard() {
     const [activeTab, setActiveTab] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
     const [isActionDialogOpen, setIsActionDialogOpen] = useState(false)
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
     const [currentVendor, setCurrentVendor] = useState<Vendor | undefined>(undefined)
@@ -308,8 +315,8 @@ export default function VendorsDashboard() {
                                             <Input
                                                 placeholder="بحث في الموردين..."
                                                 className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
-                                                value={searchQuery}
-                                                onChange={(e) => setSearchQuery(e.target.value)}
+                                                defaultValue={searchQuery}
+                                                onChange={(e) => debouncedSetSearch(e.target.value)}
                                             />
                                         </div>
                                         <Button onClick={handleCreate} className="bg-[#022c22] hover:bg-[#033d2e] text-white rounded-xl px-4">

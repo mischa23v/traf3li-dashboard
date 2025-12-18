@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useCallback } from 'react'
 import { CheckIcon, PlusCircledIcon } from '@radix-ui/react-icons'
 import { type Column } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
@@ -28,6 +29,59 @@ type DataTableFacetedFilterProps<TData, TValue> = {
     value: string
     icon?: React.ComponentType<{ className?: string }>
   }[]
+}
+
+type FilterOptionItemProps = {
+  option: {
+    label: string
+    value: string
+    icon?: React.ComponentType<{ className?: string }>
+  }
+  isSelected: boolean
+  selectedValues: Set<string>
+  column?: Column<any, any>
+  facets?: Map<any, number>
+}
+
+function FilterOptionItem({ option, isSelected, selectedValues, column, facets }: FilterOptionItemProps) {
+  const handleSelect = useCallback(() => {
+    if (isSelected) {
+      selectedValues.delete(option.value)
+    } else {
+      selectedValues.add(option.value)
+    }
+    const filterValues = Array.from(selectedValues)
+    column?.setFilterValue(
+      filterValues.length ? filterValues : undefined
+    )
+  }, [isSelected, selectedValues, option.value, column])
+
+  return (
+    <CommandItem
+      key={option.value}
+      onSelect={handleSelect}
+    >
+      <div
+        className={cn(
+          'border-primary flex size-4 items-center justify-center rounded-sm border',
+          isSelected
+            ? 'bg-primary text-primary-foreground'
+            : 'opacity-50 [&_svg]:invisible'
+        )}
+      >
+        <CheckIcon className={cn('text-background h-4 w-4')} />
+      </div>
+      {option.icon && (
+        <option.icon className='text-muted-foreground size-4' />
+      )}
+      <span>{option.label}</span>
+      {facets?.get(option.value) && (
+        <span className='ms-auto flex h-4 w-4 items-center justify-center font-mono text-xs'>
+          {facets.get(option.value)}
+        </span>
+      )}
+    </CommandItem>
+  )
 }
 
 export function DataTableFacetedFilter<TData, TValue>({
@@ -88,40 +142,14 @@ export function DataTableFacetedFilter<TData, TValue>({
               {options.map((option) => {
                 const isSelected = selectedValues.has(option.value)
                 return (
-                  <CommandItem
+                  <FilterOptionItem
                     key={option.value}
-                    onSelect={() => {
-                      if (isSelected) {
-                        selectedValues.delete(option.value)
-                      } else {
-                        selectedValues.add(option.value)
-                      }
-                      const filterValues = Array.from(selectedValues)
-                      column?.setFilterValue(
-                        filterValues.length ? filterValues : undefined
-                      )
-                    }}
-                  >
-                    <div
-                      className={cn(
-                        'border-primary flex size-4 items-center justify-center rounded-sm border',
-                        isSelected
-                          ? 'bg-primary text-primary-foreground'
-                          : 'opacity-50 [&_svg]:invisible'
-                      )}
-                    >
-                      <CheckIcon className={cn('text-background h-4 w-4')} />
-                    </div>
-                    {option.icon && (
-                      <option.icon className='text-muted-foreground size-4' />
-                    )}
-                    <span>{option.label}</span>
-                    {facets?.get(option.value) && (
-                      <span className='ms-auto flex h-4 w-4 items-center justify-center font-mono text-xs'>
-                        {facets.get(option.value)}
-                      </span>
-                    )}
-                  </CommandItem>
+                    option={option}
+                    isSelected={isSelected}
+                    selectedValues={selectedValues}
+                    column={column}
+                    facets={facets}
+                  />
                 )
               })}
             </CommandGroup>

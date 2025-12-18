@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 
@@ -74,11 +75,15 @@ function SkeletonTable({
   className,
   showHeader = true
 }: SkeletonTableProps) {
+  const gridStyle = useMemo(() => ({
+    gridTemplateColumns: `repeat(${columns}, 1fr)`
+  }), [columns])
+
   return (
     <div className={cn('w-full', className)}>
       {showHeader && (
         <div className="border-b pb-3 mb-3">
-          <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
+          <div className="grid gap-4" style={gridStyle}>
             {Array.from({ length: columns }).map((_, i) => (
               <Skeleton key={`header-${i}`} className="h-4" />
             ))}
@@ -90,7 +95,7 @@ function SkeletonTable({
           <div
             key={rowIndex}
             className="grid gap-4"
-            style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
+            style={gridStyle}
           >
             {Array.from({ length: columns }).map((_, colIndex) => (
               <Skeleton

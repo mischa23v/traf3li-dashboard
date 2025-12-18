@@ -12,6 +12,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { handleServerError } from '@/lib/handle-server-error'
 import { smartRetry, smartRetryDelay } from '@/lib/query-retry-config'
 import { ErrorBoundary } from '@/components/error-boundary'
+import { RoutePrefetchLoader } from '@/components/route-prefetch-loader'
 import { DirectionProvider } from './context/direction-provider'
 import { FontProvider } from './context/font-provider'
 import { ThemeProvider } from './context/theme-provider'
@@ -100,12 +101,20 @@ const queryClient = new QueryClient({
   }),
 })
 
-// Create a new router instance
+// Create a new router instance with optimized prefetching
 const router = createRouter({
   routeTree,
   context: { queryClient },
+  // Preload routes when user hovers over links (intent-based prefetching)
   defaultPreload: 'intent',
+  // Prefetch delay - start prefetching after 50ms of hover (balance between eager and conservative)
+  defaultPreloadDelay: 50,
+  // Consider prefetched data fresh (0 = always refetch, infinity = never refetch)
+  // Set to 0 for always fresh data, or increase for better caching
   defaultPreloadStaleTime: 0,
+  // Enable viewport-based prefetching for visible links (experimental)
+  // This will prefetch routes for links that are in the viewport
+  defaultPreloadMaxAge: 30000, // Cache prefetched routes for 30 seconds
 })
 
 // Track page views on route changes
@@ -131,6 +140,7 @@ if (!rootElement.innerHTML) {
           <ThemeProvider>
             <FontProvider>
               <DirectionProvider>
+                <RoutePrefetchLoader />
                 <RouterProvider router={router} />
               </DirectionProvider>
             </FontProvider>

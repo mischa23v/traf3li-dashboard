@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { useTranslation } from 'react-i18next'
 import {
     Search, Filter, Plus, MoreHorizontal, AlertCircle, Loader2, Bell,
@@ -56,6 +57,12 @@ export default function ChartOfAccountsView() {
     const [viewMode, setViewMode] = useState<ViewMode>('tree')
     const [activeTab, setActiveTab] = useState<'all' | AccountType>('all')
     const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
     const [isAccountDialogOpen, setIsAccountDialogOpen] = useState(false)
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
     const [currentAccount, setCurrentAccount] = useState<Account | undefined>(undefined)
@@ -574,8 +581,8 @@ export default function ChartOfAccountsView() {
                                     <Input
                                         type="text"
                                         placeholder={isRTL ? 'بحث عن حساب...' : 'Search accounts...'}
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        defaultValue={searchQuery}
+                                        onChange={(e) => debouncedSetSearch(e.target.value)}
                                         className="ps-9"
                                     />
                                 </div>

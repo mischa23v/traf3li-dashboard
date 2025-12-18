@@ -1,9 +1,10 @@
 /**
  * Socket Provider
  * Provides Socket.IO connection and real-time notification handling
+ * Optimized with batching and throttling for high-frequency events
  */
 
-import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode, useRef } from 'react'
 import { io, Socket } from 'socket.io-client'
 import { useAuthStore } from '@/stores/auth-store'
 import { getWsUrl } from '@/config/api'
@@ -48,7 +49,15 @@ export function SocketProvider({ children }: SocketProviderProps) {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
 
-  const { user, isAuthenticated } = useAuthStore()
+  const user = useAuthStore((state) => state.user)
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  // Refs for batching and throttling
+  const pendingNotifications = useRef<Notification[]>([])
+  const batchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const lastCountUpdate = useRef<number>(0)
+  const COUNT_THROTTLE_MS = 500 // Throttle count updates to max once per 500ms
+  const BATCH_DELAY_MS = 100 // Batch notifications every 100ms
 
   // Initialize socket connection
   useEffect(() => {
@@ -59,6 +68,12 @@ export function SocketProvider({ children }: SocketProviderProps) {
         setSocket(null)
         setIsConnected(false)
       }
+      // Clear any pending batches
+      if (batchTimeoutRef.current) {
+        clearTimeout(batchTimeoutRef.current)
+        batchTimeoutRef.current = null
+      }
+      pendingNotifications.current = []
       return
     }
 
@@ -72,43 +87,96 @@ export function SocketProvider({ children }: SocketProviderProps) {
       reconnectionAttempts: 5,
     })
 
-    // Connection events
-    newSocket.on('connect', () => {
-      setIsConnected(true)
+    // Flush pending notifications to state
+    const flushNotifications = () => {
+      if (pendingNotifications.current.length > 0) {
+        const toAdd = [...pendingNotifications.current]
+        pendingNotifications.current = []
 
+        setNotifications((prev) => [...toAdd, ...prev])
+        setUnreadCount((prev) => prev + toAdd.filter(n => !n.read).length)
+      }
+      batchTimeoutRef.current = null
+    }
+
+    // Stable handler for connection
+    const handleConnect = () => {
+      setIsConnected(true)
       // Join user session
       newSocket.emit('user:join', user._id)
-    })
+    }
 
-    newSocket.on('disconnect', (reason) => {
+    // Stable handler for disconnect
+    const handleDisconnect = () => {
       setIsConnected(false)
-    })
+    }
 
-    newSocket.on('connect_error', (error) => {
+    // Stable handler for connection error
+    const handleConnectError = () => {
       setIsConnected(false)
-    })
+    }
 
-    // Notification events
-    newSocket.on('notification', (notification: Notification) => {
-      setNotifications((prev) => [notification, ...prev])
-      setUnreadCount((prev) => prev + 1)
-    })
+    // Stable handler for new notifications (with batching)
+    const handleNotification = (notification: Notification) => {
+      pendingNotifications.current.push(notification)
 
-    newSocket.on('notificationCount', (count: number) => {
-      setUnreadCount(count)
-    })
+      // Schedule batch flush if not already scheduled
+      if (!batchTimeoutRef.current) {
+        batchTimeoutRef.current = setTimeout(flushNotifications, BATCH_DELAY_MS)
+      }
+    }
 
-    newSocket.on('notificationsRead', () => {
+    // Stable handler for notification count (with throttling)
+    const handleNotificationCount = (count: number) => {
+      const now = Date.now()
+      const timeSinceLastUpdate = now - lastCountUpdate.current
+
+      if (timeSinceLastUpdate >= COUNT_THROTTLE_MS) {
+        setUnreadCount(count)
+        lastCountUpdate.current = now
+      } else {
+        // Schedule delayed update
+        setTimeout(() => {
+          setUnreadCount(count)
+          lastCountUpdate.current = Date.now()
+        }, COUNT_THROTTLE_MS - timeSinceLastUpdate)
+      }
+    }
+
+    // Stable handler for notifications read
+    const handleNotificationsRead = () => {
       setNotifications((prev) =>
         prev.map((n) => ({ ...n, read: true }))
       )
       setUnreadCount(0)
-    })
+    }
+
+    // Register event handlers
+    newSocket.on('connect', handleConnect)
+    newSocket.on('disconnect', handleDisconnect)
+    newSocket.on('connect_error', handleConnectError)
+    newSocket.on('notification', handleNotification)
+    newSocket.on('notificationCount', handleNotificationCount)
+    newSocket.on('notificationsRead', handleNotificationsRead)
 
     setSocket(newSocket)
 
     // Cleanup on unmount
     return () => {
+      // Flush any pending notifications before cleanup
+      if (batchTimeoutRef.current) {
+        clearTimeout(batchTimeoutRef.current)
+        flushNotifications()
+      }
+
+      // Remove event listeners with stable references
+      newSocket.off('connect', handleConnect)
+      newSocket.off('disconnect', handleDisconnect)
+      newSocket.off('connect_error', handleConnectError)
+      newSocket.off('notification', handleNotification)
+      newSocket.off('notificationCount', handleNotificationCount)
+      newSocket.off('notificationsRead', handleNotificationsRead)
+
       newSocket.disconnect()
     }
   }, [isAuthenticated, user?._id])

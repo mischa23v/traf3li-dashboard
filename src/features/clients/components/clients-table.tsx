@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import {
   type SortingState,
   type VisibilityState,
@@ -87,6 +87,29 @@ export function ClientsTable({ data, search, navigate }: DataTableProps) {
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
 
+  // Memoize filter options to prevent recreation on every render
+  const filterOptions = useMemo(
+    () => [
+      {
+        columnId: 'status',
+        title: t('clients.columns.status'),
+        options: clientStatuses.map((status) => ({
+          label: isArabic ? status.label : status.labelEn,
+          value: status.value,
+        })),
+      },
+      {
+        columnId: 'preferredContactMethod',
+        title: t('clients.columns.contactMethod'),
+        options: contactMethods.map((method) => ({
+          label: isArabic ? method.label : method.labelEn,
+          value: method.value,
+        })),
+      },
+    ],
+    [isArabic, t]
+  )
+
   useEffect(() => {
     ensurePageInRange(table.getPageCount())
   }, [table, ensurePageInRange])
@@ -102,24 +125,7 @@ export function ClientsTable({ data, search, navigate }: DataTableProps) {
         table={table}
         searchPlaceholder={t('clients.searchPlaceholder')}
         searchKey='fullName'
-        filters={[
-          {
-            columnId: 'status',
-            title: t('clients.columns.status'),
-            options: clientStatuses.map((status) => ({
-              label: isArabic ? status.label : status.labelEn,
-              value: status.value,
-            })),
-          },
-          {
-            columnId: 'preferredContactMethod',
-            title: t('clients.columns.contactMethod'),
-            options: contactMethods.map((method) => ({
-              label: isArabic ? method.label : method.labelEn,
-              value: method.value,
-            })),
-          },
-        ]}
+        filters={filterOptions}
       />
       <div className='overflow-hidden rounded-md border'>
         <Table>

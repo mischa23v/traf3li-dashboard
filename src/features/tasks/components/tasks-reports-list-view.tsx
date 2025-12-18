@@ -1,5 +1,6 @@
 import { TasksSidebar } from './tasks-sidebar'
 import { useState } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -54,6 +55,12 @@ import {
 export function TasksReportsListView() {
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
   const [statusFilter, setStatusFilter] = useState<ReportStatus | 'all'>('all')
   const [categoryFilter, setCategoryFilter] = useState<ReportCategory | 'all'>('all')
   const [typeFilter, setTypeFilter] = useState<ReportType | 'all'>('all')
@@ -256,8 +263,8 @@ export function TasksReportsListView() {
                     <div className="relative flex-1 md:w-48">
                       <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                       <Input
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        defaultValue={searchQuery}
+                        onChange={(e) => debouncedSetSearch(e.target.value)}
                         placeholder="بحث عن تقرير..."
                         className="pe-9 rounded-xl"
                       />

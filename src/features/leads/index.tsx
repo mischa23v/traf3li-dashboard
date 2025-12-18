@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDebouncedCallback } from 'use-debounce'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
@@ -69,6 +70,13 @@ export function Leads() {
 
     // Filter states
     const [searchQuery, setSearchQuery] = useState('')
+
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
     const [statusFilter, setStatusFilter] = useState<string>('all')
     const [sourceFilter, setSourceFilter] = useState<string>('all')
     const [sortBy, setSortBy] = useState<string>('createdAt')
@@ -234,8 +242,8 @@ export function Leads() {
                                         <Input
                                             type="text"
                                             placeholder="ابحث عن عميل محتمل..."
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            defaultValue={searchQuery}
+                                            onChange={(e) => debouncedSetSearch(e.target.value)}
                                             className="pe-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
                                         />
                                     </div>
@@ -370,11 +378,12 @@ export function Leads() {
                                     const statusStripColor = getStatusStripColor(status)
                                     const createdDate = formatDualDate(lead.createdAt)
                                     const statusLabel = LEAD_STATUSES.find(s => s.value === status)?.label || status
+                                    const animationStyle = useMemo(() => ({ animationDelay: `${index * 50}ms` }), [index])
 
                                     return (
                                         <div
                                             key={lead._id}
-                                            style={{ animationDelay: `${index * 50}ms` }}
+                                            style={animationStyle}
                                             className={cn(
                                                 "bg-[#F8F9FA] rounded-2xl p-6 border transition-all group relative overflow-hidden",
                                                 "animate-in fade-in slide-in-from-bottom-4",

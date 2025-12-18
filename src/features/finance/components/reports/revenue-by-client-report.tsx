@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import {
     Download, Filter, Calendar, TrendingUp,
     Users, DollarSign, AlertCircle, CheckCircle,
@@ -53,17 +53,17 @@ export function RevenueByClientReport() {
     const { data: clientsData } = useClients()
     const { mutate: exportReport, isPending: isExporting } = useExportReport()
 
-    const formatCurrency = (amount: number) => {
+    const formatCurrency = useCallback((amount: number) => {
         return new Intl.NumberFormat('ar-SA', {
             style: 'currency',
             currency: 'SAR',
             minimumFractionDigits: 0
         }).format(amount)
-    }
+    }, [])
 
-    const handleExport = (format: 'csv' | 'pdf') => {
+    const handleExport = useCallback((format: 'csv' | 'pdf') => {
         exportReport({ reportType: 'revenue-by-client', format, filters })
-    }
+    }, [exportReport, filters])
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
@@ -191,10 +191,14 @@ export function RevenueByClientReport() {
     ]
 
     // Sort clients by revenue (highest first)
-    const sortedClients = [...mockClients].sort((a, b) => b.totalRevenue - a.totalRevenue)
+    const sortedClients = useMemo(() => {
+        return [...mockClients].sort((a, b) => b.totalRevenue - a.totalRevenue)
+    }, [mockClients])
 
     // Calculate max revenue for bar chart scaling
-    const maxRevenue = Math.max(...mockClients.map(c => c.totalRevenue))
+    const maxRevenue = useMemo(() => {
+        return Math.max(...mockClients.map(c => c.totalRevenue))
+    }, [mockClients])
 
     return (
         <>

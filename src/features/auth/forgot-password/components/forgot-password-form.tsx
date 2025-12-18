@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -30,9 +30,11 @@ export function ForgotPasswordForm({
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
 
+  const defaultValues = useMemo(() => ({ email: '' }), [])
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema) as any,
-    defaultValues: { email: '' },
+    defaultValues,
   })
 
   function onSubmit(data: z.infer<typeof formSchema>) {

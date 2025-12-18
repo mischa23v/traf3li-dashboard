@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useCallback, memo } from 'react'
 import { Check, Moon, Sun } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useTheme } from '@/context/theme-provider'
@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
-export function ThemeSwitch({ className }: { className?: string }) {
+export const ThemeSwitch = memo(function ThemeSwitch({ className }: { className?: string }) {
   const { theme, setTheme } = useTheme()
 
   /* Update theme-color meta tag
@@ -20,6 +20,11 @@ export function ThemeSwitch({ className }: { className?: string }) {
     const metaThemeColor = document.querySelector("meta[name='theme-color']")
     if (metaThemeColor) metaThemeColor.setAttribute('content', themeColor)
   }, [theme])
+
+  // Memoize theme change handlers to prevent unnecessary re-renders
+  const handleLightTheme = useCallback(() => setTheme('light'), [setTheme])
+  const handleDarkTheme = useCallback(() => setTheme('dark'), [setTheme])
+  const handleSystemTheme = useCallback(() => setTheme('system'), [setTheme])
 
   return (
     <DropdownMenu modal={false}>
@@ -31,21 +36,21 @@ export function ThemeSwitch({ className }: { className?: string }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
-        <DropdownMenuItem onClick={() => setTheme('light')}>
+        <DropdownMenuItem onClick={handleLightTheme}>
           Light{' '}
           <Check
             size={14}
             className={cn('ms-auto', theme !== 'light' && 'hidden')}
           />
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('dark')}>
+        <DropdownMenuItem onClick={handleDarkTheme}>
           Dark
           <Check
             size={14}
             className={cn('ms-auto', theme !== 'dark' && 'hidden')}
           />
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('system')}>
+        <DropdownMenuItem onClick={handleSystemTheme}>
           System
           <Check
             size={14}
@@ -55,4 +60,4 @@ export function ThemeSwitch({ className }: { className?: string }) {
       </DropdownMenuContent>
     </DropdownMenu>
   )
-}
+})

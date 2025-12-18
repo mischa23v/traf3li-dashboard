@@ -83,7 +83,7 @@ const Icons = {
 export function SignIn() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { login } = useAuthStore();
+  const login = useAuthStore((state) => state.login);
   const search = useSearch({ from: '/(auth)/sign-in' });
   const isRTL = i18n.language === 'ar';
 

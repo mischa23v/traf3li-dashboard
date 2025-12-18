@@ -3,6 +3,7 @@ import { Link, useLocation } from '@tanstack/react-router'
 import { ChevronRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useDirection } from '@/context/direction-provider'
+import { useRoutePrefetch } from '@/hooks/use-route-prefetch'
 import {
   Collapsible,
   CollapsibleContent,
@@ -76,6 +77,7 @@ function NavBadge({ children }: { children: ReactNode }) {
 
 function SidebarMenuLink({ item, href }: { item: NavLink; href: string }) {
   const { setOpenMobile } = useSidebar()
+  const prefetch = useRoutePrefetch()
   const translatedTitle = useNavTitle(item.title)
   return (
     <SidebarMenuItem>
@@ -84,7 +86,11 @@ function SidebarMenuLink({ item, href }: { item: NavLink; href: string }) {
         isActive={checkIsActive(href, item)}
         tooltip={translatedTitle}
       >
-        <Link to={item.url} onClick={() => setOpenMobile(false)}>
+        <Link
+          to={item.url}
+          onClick={() => setOpenMobile(false)}
+          onMouseEnter={() => prefetch(item.url)}
+        >
           {item.icon && <item.icon />}
           <span>{translatedTitle}</span>
           {item.badge && <NavBadge>{item.badge}</NavBadge>}
@@ -102,6 +108,7 @@ function SidebarMenuCollapsible({
   href: string
 }) {
   const { setOpenMobile } = useSidebar()
+  const prefetch = useRoutePrefetch()
   const { t } = useTranslation()
   const translateTitle = (title: string) => title.includes('.') ? t(title) : title
   const translatedTitle = translateTitle(item.title)
@@ -128,7 +135,11 @@ function SidebarMenuCollapsible({
                   asChild
                   isActive={checkIsActive(href, subItem)}
                 >
-                  <Link to={subItem.url} onClick={() => setOpenMobile(false)}>
+                  <Link
+                    to={subItem.url}
+                    onClick={() => setOpenMobile(false)}
+                    onMouseEnter={() => prefetch(subItem.url)}
+                  >
                     {subItem.icon && <subItem.icon />}
                     <span>{translateTitle(subItem.title)}</span>
                     {subItem.badge && <NavBadge>{subItem.badge}</NavBadge>}
@@ -152,6 +163,7 @@ function SidebarMenuCollapsedDropdown({
 }) {
   const { t } = useTranslation()
   const { dir } = useDirection()
+  const prefetch = useRoutePrefetch()
   const translateTitle = (title: string) => title.includes('.') ? t(title) : title
   const translatedTitle = translateTitle(item.title)
   return (
@@ -178,6 +190,7 @@ function SidebarMenuCollapsedDropdown({
               <Link
                 to={sub.url}
                 className={`${checkIsActive(href, sub) ? 'bg-secondary' : ''}`}
+                onMouseEnter={() => prefetch(sub.url)}
               >
                 {sub.icon && <sub.icon />}
                 <span className='max-w-52 text-wrap'>{translateTitle(sub.title)}</span>

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import {
     Search, Filter, Plus, MoreHorizontal,
     Wallet, AlertCircle, CheckCircle, Bell, Loader2,
@@ -94,6 +95,12 @@ interface RetainerWithDetails {
 export default function RetainersDashboard() {
     const [activeTab, setActiveTab] = useState<'all' | RetainerStatus>('all')
     const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
     const [currentPage, setCurrentPage] = useState(1)
     const [itemsPerPage, setItemsPerPage] = useState(10)
     const [selectedClient, setSelectedClient] = useState('')
@@ -485,8 +492,8 @@ export default function RetainersDashboard() {
                                                 <Input
                                                     placeholder="بحث في حسابات الأمانة..."
                                                     className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
-                                                    value={searchQuery}
-                                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                                    defaultValue={searchQuery}
+                                                    onChange={(e) => debouncedSetSearch(e.target.value)}
                                                 />
                                             </div>
                                             <Popover open={showFilters} onOpenChange={setShowFilters}>

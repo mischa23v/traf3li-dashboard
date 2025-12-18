@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import {
     Search, Filter, Plus, MoreHorizontal,
     Calendar, Clock, Play, Pause, X, Bell,
@@ -89,6 +90,12 @@ const typeLabels: Record<RecurringTransactionType, string> = {
 export default function RecurringTransactionsDashboard() {
     const [activeTab, setActiveTab] = useState<RecurringStatus | 'all'>('all')
     const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
     const [isSelectionMode, setIsSelectionMode] = useState(false)
     const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
@@ -391,8 +398,8 @@ export default function RecurringTransactionsDashboard() {
                                             <Input
                                                 placeholder="بحث في المعاملات..."
                                                 className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
-                                                value={searchQuery}
-                                                onChange={(e) => setSearchQuery(e.target.value)}
+                                                defaultValue={searchQuery}
+                                                onChange={(e) => debouncedSetSearch(e.target.value)}
                                             />
                                         </div>
                                         <Button variant="outline" size="icon" className="rounded-xl border-slate-200">

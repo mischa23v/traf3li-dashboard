@@ -13,8 +13,10 @@ import { usePermissionsStore } from '@/stores/permissions-store'
 export function NoFirmPage() {
   const { t, i18n } = useTranslation()
   const isRtl = i18n.language === 'ar'
-  const { logout, user } = useAuthStore()
-  const { fetchPermissions, isLoading } = usePermissionsStore()
+  const logout = useAuthStore((state) => state.logout)
+  const user = useAuthStore((state) => state.user)
+  const fetchPermissions = usePermissionsStore((state) => state.fetchPermissions)
+  const isLoading = usePermissionsStore((state) => state.isLoading)
 
   const handleRefresh = async () => {
     await fetchPermissions()

@@ -173,5 +173,6 @@ export const useOTPStatus = () => {
     queryFn: () => authService.checkOTPStatus(),
     staleTime: 30 * 1000, // 30 seconds
     refetchInterval: 30 * 1000, // Refetch every 30 seconds
+    retry: false,
   })
 }

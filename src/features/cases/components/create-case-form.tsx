@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -82,6 +82,11 @@ export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
     const [laborDetailsOpen, setLaborDetailsOpen] = useState(false)
     const createCaseMutation = useCreateCase()
 
+    const defaultValues = useMemo(() => ({
+        category: 'labor' as CaseCategory,
+        priority: 'medium' as CasePriority,
+    }), [])
+
     const {
         register,
         handleSubmit,
@@ -90,10 +95,7 @@ export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
         formState: { errors, isSubmitting },
     } = useForm<CreateCaseFormData>({
         resolver: zodResolver(createCaseSchema) as any,
-        defaultValues: {
-            category: 'labor',
-            priority: 'medium',
-        },
+        defaultValues,
     })
 
     const selectedCategory = watch('category')

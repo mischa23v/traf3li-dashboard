@@ -1,10 +1,13 @@
 /**
  * Notifications Page
  * Full page view for managing notifications
+ * Optimized with virtualization, memoization, and batched updates
  */
 
-import { useState } from 'react'
+import { useState, useMemo, useCallback } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { useTranslation } from 'react-i18next'
+import { FixedSizeList as VirtualList } from 'react-window'
 import {
   Bell,
   CheckCheck,
@@ -44,9 +47,13 @@ import {
   useMarkMultipleAsRead,
   useDeleteMultipleNotifications,
 } from '@/hooks/useNotifications'
-import type { NotificationType, NotificationPriority } from '@/types/notification'
+import type { NotificationType, NotificationPriority, Notification } from '@/types/notification'
 
 type FilterTab = 'all' | 'unread' | 'finance' | 'cases' | 'system'
+
+// Virtualization constants
+const NOTIFICATION_ITEM_HEIGHT = 120
+const VIRTUAL_LIST_HEIGHT = 600
 
 export function NotificationsPage() {
   const { t, i18n } = useTranslation()
@@ -55,6 +62,12 @@ export function NotificationsPage() {
   // State
   const [activeTab, setActiveTab] = useState<FilterTab>('all')
   const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
   const [priorityFilter, setPriorityFilter] = useState<NotificationPriority | 'all'>('all')
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
 
@@ -74,67 +87,79 @@ export function NotificationsPage() {
   const notifications = data?.notifications || []
   const unreadCount = data?.unreadCount || 0
 
-  // Filter notifications based on active tab
-  const filteredNotifications = notifications.filter((notification) => {
-    // Tab filter
-    if (activeTab === 'unread' && notification.read) return false
-    if (
-      activeTab === 'finance' &&
-      !['invoice_approval', 'time_entry_approval', 'expense_approval', 'payment_received', 'invoice_overdue', 'budget_alert'].includes(
-        notification.type
+  // Memoize filtered notifications for performance
+  const filteredNotifications = useMemo(() => {
+    return notifications.filter((notification) => {
+      // Tab filter
+      if (activeTab === 'unread' && notification.read) return false
+      if (
+        activeTab === 'finance' &&
+        !['invoice_approval', 'time_entry_approval', 'expense_approval', 'payment_received', 'invoice_overdue', 'budget_alert'].includes(
+          notification.type
+        )
       )
-    )
-      return false
-    if (
-      activeTab === 'cases' &&
-      !['task_reminder', 'hearing_reminder', 'case_update'].includes(notification.type)
-    )
-      return false
-    if (activeTab === 'system' && notification.type !== 'system') return false
+        return false
+      if (
+        activeTab === 'cases' &&
+        !['task_reminder', 'hearing_reminder', 'case_update'].includes(notification.type)
+      )
+        return false
+      if (activeTab === 'system' && notification.type !== 'system') return false
 
-    // Priority filter
-    if (priorityFilter !== 'all' && notification.priority !== priorityFilter) return false
+      // Priority filter
+      if (priorityFilter !== 'all' && notification.priority !== priorityFilter) return false
 
-    // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      const title = isRtl && notification.titleAr ? notification.titleAr : notification.title
-      const message = isRtl && notification.messageAr ? notification.messageAr : notification.message
-      return title.toLowerCase().includes(query) || message.toLowerCase().includes(query)
-    }
+      // Search filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase()
+        const title = isRtl && notification.titleAr ? notification.titleAr : notification.title
+        const message = isRtl && notification.messageAr ? notification.messageAr : notification.message
+        return title.toLowerCase().includes(query) || message.toLowerCase().includes(query)
+      }
 
-    return true
-  })
+      return true
+    })
+  }, [notifications, activeTab, priorityFilter, searchQuery, isRtl])
 
-  // Handlers
-  const handleMarkAsRead = (id: string) => {
+  // Memoize stats calculations
+  const stats = useMemo(() => ({
+    total: notifications.length,
+    unread: unreadCount,
+    urgent: notifications.filter((n) => n.priority === 'urgent' && !n.read).length,
+    finance: notifications.filter((n) =>
+      ['invoice_approval', 'time_entry_approval', 'expense_approval', 'payment_received', 'invoice_overdue', 'budget_alert'].includes(n.type)
+    ).length,
+  }), [notifications, unreadCount])
+
+  // Handlers with useCallback for performance
+  const handleMarkAsRead = useCallback((id: string) => {
     markAsReadMutation.mutate(id)
     setSelectedIds((prev) => {
       const next = new Set(prev)
       next.delete(id)
       return next
     })
-  }
+  }, [markAsReadMutation])
 
-  const handleDelete = (id: string) => {
+  const handleDelete = useCallback((id: string) => {
     deleteNotificationMutation.mutate(id)
     setSelectedIds((prev) => {
       const next = new Set(prev)
       next.delete(id)
       return next
     })
-  }
+  }, [deleteNotificationMutation])
 
-  const handleMarkAllAsRead = () => {
+  const handleMarkAllAsRead = useCallback(() => {
     markAllAsReadMutation.mutate()
     setSelectedIds(new Set())
-  }
+  }, [markAllAsReadMutation])
 
-  const handleClearRead = () => {
+  const handleClearRead = useCallback(() => {
     clearReadMutation.mutate()
-  }
+  }, [clearReadMutation])
 
-  const handleToggleSelect = (id: string) => {
+  const handleToggleSelect = useCallback((id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev)
       if (next.has(id)) {
@@ -144,27 +169,27 @@ export function NotificationsPage() {
       }
       return next
     })
-  }
+  }, [])
 
-  const handleSelectAll = () => {
+  const handleSelectAll = useCallback(() => {
     if (selectedIds.size === filteredNotifications.length) {
       setSelectedIds(new Set())
     } else {
       setSelectedIds(new Set(filteredNotifications.map((n) => n._id)))
     }
-  }
+  }, [selectedIds.size, filteredNotifications])
 
-  const handleMarkSelectedAsRead = () => {
+  const handleMarkSelectedAsRead = useCallback(() => {
     const ids = Array.from(selectedIds)
     markMultipleAsReadMutation.mutate(ids)
     setSelectedIds(new Set())
-  }
+  }, [selectedIds, markMultipleAsReadMutation])
 
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = useCallback(() => {
     const ids = Array.from(selectedIds)
     deleteMultipleMutation.mutate(ids)
     setSelectedIds(new Set())
-  }
+  }, [selectedIds, deleteMultipleMutation])
 
   return (
     <>
@@ -216,7 +241,7 @@ export function NotificationsPage() {
       </Header>
 
       <div className="flex-1 space-y-4 p-4 md:p-6 lg:p-8">
-        {/* Stats Cards */}
+        {/* Stats Cards - Optimized with memoized values */}
         <div className="grid gap-4 md:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -226,7 +251,7 @@ export function NotificationsPage() {
               <Bell className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{notifications.length}</div>
+              <div className="text-2xl font-bold">{stats.total}</div>
             </CardContent>
           </Card>
 
@@ -238,7 +263,7 @@ export function NotificationsPage() {
               <AlertTriangle className="h-4 w-4 text-orange-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-orange-600">{unreadCount}</div>
+              <div className="text-2xl font-bold text-orange-600">{stats.unread}</div>
             </CardContent>
           </Card>
 
@@ -250,9 +275,7 @@ export function NotificationsPage() {
               <XCircle className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">
-                {notifications.filter((n) => n.priority === 'urgent' && !n.read).length}
-              </div>
+              <div className="text-2xl font-bold text-red-600">{stats.urgent}</div>
             </CardContent>
           </Card>
 
@@ -264,20 +287,7 @@ export function NotificationsPage() {
               <Info className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">
-                {
-                  notifications.filter((n) =>
-                    [
-                      'invoice_approval',
-                      'time_entry_approval',
-                      'expense_approval',
-                      'payment_received',
-                      'invoice_overdue',
-                      'budget_alert',
-                    ].includes(n.type)
-                  ).length
-                }
-              </div>
+              <div className="text-2xl font-bold text-blue-600">{stats.finance}</div>
             </CardContent>
           </Card>
         </div>
@@ -290,8 +300,8 @@ export function NotificationsPage() {
                 <Search className="h-4 w-4 text-slate-500" />
                 <Input
                   placeholder={t('notifications.search', 'Search notifications...')}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  defaultValue={searchQuery}
+                  onChange={(e) => debouncedSetSearch(e.target.value)}
                   className="max-w-sm"
                 />
               </div>
@@ -375,18 +385,26 @@ export function NotificationsPage() {
                     <p className="text-sm text-slate-500">{t('notifications.error', 'Failed to load notifications')}</p>
                   </div>
                 ) : filteredNotifications.length > 0 ? (
-                  <ScrollArea className="h-[600px]">
-                    <div className="divide-y">
-                      {filteredNotifications.map((notification) => (
-                        <NotificationItem
-                          key={notification._id}
-                          notification={notification}
-                          onMarkAsRead={handleMarkAsRead}
-                          onDelete={handleDelete}
-                        />
-                      ))}
-                    </div>
-                  </ScrollArea>
+                  <VirtualList
+                    height={VIRTUAL_LIST_HEIGHT}
+                    itemCount={filteredNotifications.length}
+                    itemSize={NOTIFICATION_ITEM_HEIGHT}
+                    width="100%"
+                    className="scrollbar-thin"
+                  >
+                    {({ index, style }) => {
+                      const notification = filteredNotifications[index]
+                      return (
+                        <div style={style} key={notification._id}>
+                          <NotificationItem
+                            notification={notification}
+                            onMarkAsRead={handleMarkAsRead}
+                            onDelete={handleDelete}
+                          />
+                        </div>
+                      )
+                    }}
+                  </VirtualList>
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
                     <CheckCircle className="w-12 h-12 text-green-500 mb-3" />

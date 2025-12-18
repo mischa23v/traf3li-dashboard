@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import {
     Search, Filter, Plus, MoreHorizontal,
     FileText, AlertCircle, CheckCircle, Bell, Loader2,
@@ -54,6 +55,12 @@ export default function DebitNotesDashboard() {
     const navigate = useNavigate()
     const [activeTab, setActiveTab] = useState<DebitNoteStatus | 'all'>('all')
     const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
     const [currentPage, setCurrentPage] = useState(1)
     const [itemsPerPage, setItemsPerPage] = useState(10)
     const [startDate, setStartDate] = useState('')
@@ -305,7 +312,7 @@ export default function DebitNotesDashboard() {
                                         <div className="flex items-center gap-3">
                                             <div className="relative w-full max-w-xs">
                                                 <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
-                                                <Input placeholder="بحث..." className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                                                <Input placeholder="بحث..." className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]" defaultValue={searchQuery} onChange={(e) => debouncedSetSearch(e.target.value)} />
                                             </div>
                                             <Button onClick={() => navigate({ to: '/dashboard/finance/debit-notes/new' })} className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white">
                                                 <Plus className="w-4 h-4 ms-2" aria-hidden="true" />

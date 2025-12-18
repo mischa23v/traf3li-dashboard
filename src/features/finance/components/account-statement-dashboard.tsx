@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import {
     Search, Filter, Download, Plus, MoreHorizontal,
     ArrowUpRight, ArrowDownRight,
@@ -29,6 +30,12 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 export default function AccountStatementDashboard() {
     const [activeTab, setActiveTab] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
 
     // Mock Data
     const transactions = [
@@ -293,8 +300,8 @@ export default function AccountStatementDashboard() {
                                         <Input
                                             placeholder="بحث في المعاملات..."
                                             className="pe-10 rounded-xl border-slate-200 focus:ring-navy focus:border-navy"
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            defaultValue={searchQuery}
+                                            onChange={(e) => debouncedSetSearch(e.target.value)}
                                         />
                                     </div>
                                     <Button variant="outline" size="icon" className="rounded-xl border-slate-200">

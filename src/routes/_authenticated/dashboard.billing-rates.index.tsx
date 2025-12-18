@@ -1,6 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
-import BillingRates from '@/features/billing-rates'
+import { lazyImport, TableSkeleton } from '@/utils/lazy-import'
+
+// Lazy load the billing rates component (heavy table with complex filters)
+const BillingRates = lazyImport(
+  () => import('@/features/billing-rates').then(mod => ({ default: mod.default })),
+  <TableSkeleton />
+)
 
 const billingRatesSearchSchema = z.object({
   page: z.number().optional().catch(1),

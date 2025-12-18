@@ -1,11 +1,13 @@
 /**
  * Notification Bell Component
  * Displays notification icon with unread count and dropdown
+ * Optimized with virtualization and memoization
  */
 
-import { useState, memo } from 'react'
+import { useState, memo, useCallback, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { FixedSizeList as VirtualList } from 'react-window'
 import { Bell, Check, CheckCheck, Trash2, ExternalLink } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { ar, enUS } from 'date-fns/locale'
@@ -20,6 +22,10 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { useNotifications, Notification } from '@/context/socket-provider'
+
+// Virtualization constants
+const BELL_ITEM_HEIGHT = 90
+const BELL_LIST_HEIGHT = 300
 
 // Notification type icons
 const notificationIcons: Record<string, string> = {
@@ -43,8 +49,8 @@ const notificationColors: Record<string, string> = {
 
 interface NotificationItemProps {
   notification: Notification
-  onRead: () => void
-  onClick?: () => void
+  onRead: (id: string) => void
+  onClick: (notification: Notification) => void
 }
 
 const NotificationItem = memo(function NotificationItem({ notification, onRead, onClick }: NotificationItemProps) {
@@ -52,13 +58,22 @@ const NotificationItem = memo(function NotificationItem({ notification, onRead, 
   const isRtl = i18n.language === 'ar'
   const locale = isRtl ? ar : enUS
 
-  const title = isRtl && notification.titleAr ? notification.titleAr : notification.title
-  const message = isRtl && notification.messageAr ? notification.messageAr : notification.message
+  // Memoize computed values for performance
+  const { title, message, timeAgo } = useMemo(() => {
+    const computedTitle = isRtl && notification.titleAr ? notification.titleAr : notification.title
+    const computedMessage = isRtl && notification.messageAr ? notification.messageAr : notification.message
+    const computedTimeAgo = formatDistanceToNow(new Date(notification.createdAt), {
+      addSuffix: true,
+      locale,
+    })
 
-  const timeAgo = formatDistanceToNow(new Date(notification.createdAt), {
-    addSuffix: true,
-    locale,
-  })
+    return { title: computedTitle, message: computedMessage, timeAgo: computedTimeAgo }
+  }, [notification.titleAr, notification.title, notification.messageAr, notification.message, notification.createdAt, isRtl, locale])
+
+  const handleClick = useCallback(() => {
+    if (!notification.read) onRead(notification._id)
+    onClick(notification)
+  }, [notification, onRead, onClick])
 
   return (
     <div
@@ -66,10 +81,7 @@ const NotificationItem = memo(function NotificationItem({ notification, onRead, 
         'p-3 hover:bg-slate-50 transition-colors cursor-pointer',
         !notification.read && 'bg-blue-50/50'
       )}
-      onClick={() => {
-        if (!notification.read) onRead()
-        onClick?.()
-      }}
+      onClick={handleClick}
     >
       <div className="flex gap-3">
         {/* Icon */}
@@ -113,12 +125,15 @@ export function NotificationBell() {
 
   const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications } = useNotifications()
 
-  const handleNotificationClick = (notification: Notification) => {
+  // Memoize limited notifications list for better performance
+  const displayNotifications = useMemo(() => notifications.slice(0, 20), [notifications])
+
+  const handleNotificationClick = useCallback((notification: Notification) => {
     if (notification.link) {
       navigate({ to: notification.link })
       setOpen(false)
     }
-  }
+  }, [navigate])
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -166,20 +181,28 @@ export function NotificationBell() {
           </div>
         </div>
 
-        {/* Notifications List */}
-        {notifications.length > 0 ? (
-          <ScrollArea className="h-[300px]">
-            <div className="divide-y">
-              {notifications.slice(0, 20).map((notification) => (
-                <NotificationItem
-                  key={notification._id}
-                  notification={notification}
-                  onRead={() => markAsRead(notification._id)}
-                  onClick={() => handleNotificationClick(notification)}
-                />
-              ))}
-            </div>
-          </ScrollArea>
+        {/* Notifications List - Virtualized for performance */}
+        {displayNotifications.length > 0 ? (
+          <VirtualList
+            height={BELL_LIST_HEIGHT}
+            itemCount={displayNotifications.length}
+            itemSize={BELL_ITEM_HEIGHT}
+            width="100%"
+            className="scrollbar-thin"
+          >
+            {({ index, style }) => {
+              const notification = displayNotifications[index]
+              return (
+                <div style={style} key={notification._id}>
+                  <NotificationItem
+                    notification={notification}
+                    onRead={markAsRead}
+                    onClick={handleNotificationClick}
+                  />
+                </div>
+              )
+            }}
+          </VirtualList>
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <Bell className="w-12 h-12 text-slate-300 mb-3" />

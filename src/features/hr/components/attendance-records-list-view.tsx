@@ -1,5 +1,5 @@
 import { HRSidebar } from './hr-sidebar'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -52,14 +52,17 @@ export function AttendanceRecordsListView() {
   const [sortBy, setSortBy] = useState<string>('time')
 
   // Check if any filter is active
-  const hasActiveFilters = searchQuery || statusFilter !== 'all' || departmentFilter !== 'all'
+  const hasActiveFilters = useMemo(() =>
+    searchQuery || statusFilter !== 'all' || departmentFilter !== 'all',
+    [searchQuery, statusFilter, departmentFilter]
+  )
 
   // Clear all filters
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setSearchQuery('')
     setStatusFilter('all')
     setDepartmentFilter('all')
-  }
+  }, [])
 
   // Fetch attendance records
   const { data: attendanceData, isLoading, isError, error, refetch } = useAttendanceRecords({
@@ -96,42 +99,42 @@ export function AttendanceRecordsListView() {
   }, [attendanceData?.data, searchQuery, sortBy])
 
   // Selection Handlers
-  const handleToggleSelectionMode = () => {
-    setIsSelectionMode(!isSelectionMode)
+  const handleToggleSelectionMode = useCallback(() => {
+    setIsSelectionMode(prev => !prev)
     setSelectedIds([])
-  }
+  }, [])
 
-  const handleSelectRecord = (recordId: string) => {
-    if (selectedIds.includes(recordId)) {
-      setSelectedIds(selectedIds.filter(id => id !== recordId))
-    } else {
-      setSelectedIds([...selectedIds, recordId])
-    }
-  }
+  const handleSelectRecord = useCallback((recordId: string) => {
+    setSelectedIds(prev =>
+      prev.includes(recordId)
+        ? prev.filter(id => id !== recordId)
+        : [...prev, recordId]
+    )
+  }, [])
 
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = useCallback(() => {
     if (selectedIds.length === 0) return
     if (confirm(`هل أنت متأكد من حذف ${selectedIds.length} سجل؟`)) {
       // TODO: Implement bulk delete
       setIsSelectionMode(false)
       setSelectedIds([])
     }
-  }
+  }, [selectedIds])
 
   // Single record actions
-  const handleViewRecord = (recordId: string) => {
+  const handleViewRecord = useCallback((recordId: string) => {
     navigate({ to: '/dashboard/hr/attendance/$recordId', params: { recordId } })
-  }
+  }, [navigate])
 
-  const handleEditRecord = (recordId: string) => {
+  const handleEditRecord = useCallback((recordId: string) => {
     navigate({ to: '/dashboard/hr/attendance/new', search: { editId: recordId } })
-  }
+  }, [navigate])
 
-  const handleDeleteRecord = (recordId: string) => {
+  const handleDeleteRecord = useCallback((recordId: string) => {
     if (confirm('هل أنت متأكد من حذف هذا السجل؟')) {
       // TODO: Implement delete
     }
-  }
+  }, [])
 
   // Status badge
   const getStatusBadge = (status: AttendanceStatus) => {
@@ -185,15 +188,17 @@ export function AttendanceRecordsListView() {
   }
 
   // Navigate date
-  const navigateDate = (direction: 'prev' | 'next') => {
-    const current = new Date(dateFilter)
-    if (direction === 'prev') {
-      current.setDate(current.getDate() - 1)
-    } else {
-      current.setDate(current.getDate() + 1)
-    }
-    setDateFilter(current.toISOString().split('T')[0])
-  }
+  const navigateDate = useCallback((direction: 'prev' | 'next') => {
+    setDateFilter(current => {
+      const date = new Date(current)
+      if (direction === 'prev') {
+        date.setDate(date.getDate() - 1)
+      } else {
+        date.setDate(date.getDate() + 1)
+      }
+      return date.toISOString().split('T')[0]
+    })
+  }, [])
 
   // Stats for hero
   const heroStats = useMemo(() => {

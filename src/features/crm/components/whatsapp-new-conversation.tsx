@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -48,6 +49,12 @@ export function WhatsAppNewConversation() {
   const [scheduledDate, setScheduledDate] = useState('')
   const [scheduledTime, setScheduledTime] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
 
   // Fetch data
   const { data: templatesData } = useWhatsAppTemplates()
@@ -369,8 +376,8 @@ export function WhatsAppNewConversation() {
                 <div className="relative">
                   <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" aria-hidden="true" />
                   <Input
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    defaultValue={searchQuery}
+                    onChange={(e) => debouncedSetSearch(e.target.value)}
                     placeholder="البحث عن عميل..."
                     className="h-12 ps-12 rounded-xl bg-slate-50 border-0 hover:bg-slate-100 focus:ring-4 focus:ring-emerald-500/10"
                   />

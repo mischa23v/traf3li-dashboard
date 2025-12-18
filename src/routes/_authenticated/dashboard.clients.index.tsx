@@ -1,6 +1,12 @@
 import z from 'zod'
 import { createFileRoute } from '@tanstack/react-router'
-import { Clients } from '@/features/clients'
+import { lazyImport, TableSkeleton } from '@/utils/lazy-import'
+
+// Lazy load the clients component (heavy table with many rows)
+const Clients = lazyImport(
+  () => import('@/features/clients').then(mod => ({ default: mod.Clients })),
+  <TableSkeleton />
+)
 
 // Stable fallback arrays to prevent infinite re-renders
 const EMPTY_STATUS_ARRAY: ('active' | 'inactive' | 'archived')[] = []

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo, useCallback, memo } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -29,12 +29,24 @@ import { Skeleton } from '@/components/ui/skeleton'
 const REGIONS = ['الرياض', 'مكة المكرمة', 'المدينة المنورة', 'القصيم', 'الشرقية', 'عسير', 'تبوك', 'حائل', 'الحدود الشمالية', 'جازان', 'نجران', 'الباحة', 'الجوف']
 const NATIONALITIES = ['سعودي', 'إماراتي', 'كويتي', 'قطري', 'بحريني', 'عماني', 'يمني', 'عراقي', 'سوري', 'لبناني', 'أردني', 'فلسطيني', 'مصري', 'سوداني', 'ليبي', 'تونسي', 'جزائري', 'مغربي', 'هندي', 'باكستاني', 'بنغلاديشي', 'فلبيني', 'إندونيسي', 'بريطاني', 'فرنسي', 'ألماني', 'أمريكي', 'كندي']
 
+// Memoized loading skeleton to prevent unnecessary re-renders
+const LoadingSkeleton = memo(function LoadingSkeleton() {
+  return (
+    <div className='space-y-8'>
+      <Skeleton className='h-20 w-full' />
+      <Skeleton className='h-20 w-full' />
+      <Skeleton className='h-20 w-full' />
+      <Skeleton className='h-10 w-32' />
+    </div>
+  )
+})
+
 export function ProfileForm() {
   const { t } = useTranslation()
   const user = useAuthStore((state) => state.user)
   const isLoading = !user
 
-  const profileFormSchema = z.object({
+  const profileFormSchema = useMemo(() => z.object({
     firstName: z
       .string()
       .min(1, t('settings.profile.validation.firstNameRequired'))
@@ -56,23 +68,25 @@ export function ProfileForm() {
     region: z.string().optional(),
     city: z.string().optional(),
     bio: z.string().max(500, t('settings.profile.validation.bioMaxLength')).optional(),
-  })
+  }), [t])
 
   type ProfileFormValues = z.infer<typeof profileFormSchema>
 
+  const defaultValues = useMemo(() => ({
+    firstName: '',
+    lastName: '',
+    username: '',
+    email: '',
+    phone: '',
+    nationality: '',
+    region: '',
+    city: '',
+    bio: '',
+  }), [])
+
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema) as any,
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      username: '',
-      email: '',
-      phone: '',
-      nationality: '',
-      region: '',
-      city: '',
-      bio: '',
-    },
+    defaultValues,
   })
 
   // Update form when user data loads
@@ -92,19 +106,14 @@ export function ProfileForm() {
     }
   }, [user, form])
 
-  function onSubmit(data: ProfileFormValues) {
+  // Memoize submit handler to prevent recreation on every render
+  const onSubmit = useCallback((data: ProfileFormValues) => {
     // TODO: Implement profile update API call
-  }
+    console.log('Profile update:', data)
+  }, [])
 
   if (isLoading) {
-    return (
-      <div className='space-y-8'>
-        <Skeleton className='h-20 w-full' />
-        <Skeleton className='h-20 w-full' />
-        <Skeleton className='h-20 w-full' />
-        <Skeleton className='h-10 w-32' />
-      </div>
-    )
+    return <LoadingSkeleton />
   }
 
   return (

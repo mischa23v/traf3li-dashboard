@@ -1,6 +1,7 @@
 /**
  * Notification Hooks
  * TanStack Query hooks for notification operations
+ * Optimized with batched updates and better caching strategies
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -14,9 +15,11 @@ import notificationService, {
 } from '@/services/notificationService'
 
 // ==================== Cache Configuration ====================
+// Optimized cache times for better performance
 const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
 const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
 const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+const UNREAD_COUNT_REFETCH_INTERVAL = 2 * 60 * 1000 // 2 minutes (batched updates)
 
 // Query keys
 export const notificationKeys = {
@@ -34,6 +37,7 @@ export const notificationKeys = {
 
 /**
  * Hook to get all notifications with filters
+ * Optimized with proper caching and stale time configuration
  */
 export const useNotifications = (filters?: NotificationFilters) => {
   return useQuery({
@@ -41,6 +45,8 @@ export const useNotifications = (filters?: NotificationFilters) => {
     queryFn: () => notificationService.getNotifications(filters),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
+    refetchOnWindowFocus: false, // Prevent unnecessary refetches on window focus
+    refetchOnMount: false, // Use cached data if available
   })
 }
 
@@ -59,6 +65,7 @@ export const useNotification = (id: string) => {
 
 /**
  * Hook to get unread notification count
+ * Optimized with batched refetch interval (2 minutes instead of 1)
  */
 export const useUnreadCount = () => {
   return useQuery({
@@ -66,7 +73,9 @@ export const useUnreadCount = () => {
     queryFn: () => notificationService.getUnreadCount(),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    refetchInterval: 60 * 1000, // Refetch every minute
+    refetchInterval: UNREAD_COUNT_REFETCH_INTERVAL, // Batched updates every 2 minutes
+    refetchIntervalInBackground: false, // Don't refetch in background to save resources
+    retry: false,
   })
 }
 
@@ -87,6 +96,7 @@ export const useNotificationsByType = (type: string, params?: { page?: number; l
 
 /**
  * Hook to mark a notification as read
+ * Optimized with optimistic updates and batched invalidation
  */
 export const useMarkAsRead = () => {
   const queryClient = useQueryClient()
@@ -129,7 +139,7 @@ export const useMarkAsRead = () => {
       }
     },
     onSettled: () => {
-      // Refetch to ensure consistency
+      // Batch invalidation - React Query automatically batches these
       queryClient.invalidateQueries({ queryKey: notificationKeys.all })
     },
   })

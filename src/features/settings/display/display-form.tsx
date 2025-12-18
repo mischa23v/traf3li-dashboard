@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo, useCallback, memo } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -48,20 +48,35 @@ const displayFormSchema = z.object({
 
 type DisplayFormValues = z.infer<typeof displayFormSchema>
 
+// Memoized loading skeleton to prevent unnecessary re-renders
+const LoadingSkeleton = memo(function LoadingSkeleton() {
+  return (
+    <div className='space-y-8'>
+      <Skeleton className='h-20 w-full' />
+      <Skeleton className='h-20 w-full' />
+      <Skeleton className='h-20 w-full' />
+      <Skeleton className='h-20 w-full' />
+      <Skeleton className='h-10 w-32' />
+    </div>
+  )
+})
+
 export function DisplayForm() {
   const { t } = useTranslation()
   const { data: settings, isLoading: loadingSettings } = useSettings()
   const { mutate: updateSettings, isPending } = useUpdateDisplaySettings()
 
+  const defaultValues = useMemo(() => ({
+    dateFormat: 'DD/MM/YYYY',
+    timeFormat: '24h' as const,
+    currency: 'USD',
+    startOfWeek: 'sunday' as const,
+    compactMode: false,
+  }), [])
+
   const form = useForm<DisplayFormValues>({
     resolver: zodResolver(displayFormSchema) as any,
-    defaultValues: {
-      dateFormat: 'DD/MM/YYYY',
-      timeFormat: '24h',
-      currency: 'USD',
-      startOfWeek: 'sunday',
-      compactMode: false,
-    },
+    defaultValues,
   })
 
   // Update form when settings load
@@ -77,7 +92,8 @@ export function DisplayForm() {
     }
   }, [settings, form])
 
-  function onSubmit(data: DisplayFormValues) {
+  // Memoize submit handler to prevent recreation on every render
+  const onSubmit = useCallback((data: DisplayFormValues) => {
     updateSettings({
       dateFormat: data.dateFormat,
       timeFormat: data.timeFormat,
@@ -85,18 +101,10 @@ export function DisplayForm() {
       startOfWeek: data.startOfWeek,
       compactMode: data.compactMode,
     })
-  }
+  }, [updateSettings])
 
   if (loadingSettings) {
-    return (
-      <div className='space-y-8'>
-        <Skeleton className='h-20 w-full' />
-        <Skeleton className='h-20 w-full' />
-        <Skeleton className='h-20 w-full' />
-        <Skeleton className='h-20 w-full' />
-        <Skeleton className='h-10 w-32' />
-      </div>
-    )
+    return <LoadingSkeleton />
   }
 
   return (
