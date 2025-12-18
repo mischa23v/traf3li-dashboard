@@ -89,12 +89,18 @@ export const useMyTasks = (filters?: Omit<TaskFilters, 'assignedTo'>) => {
   })
 }
 
-export const useTaskStats = (filters?: { caseId?: string; assignedTo?: string; dateFrom?: string; dateTo?: string }) => {
+export const useTaskStats = (enabledOrFilters?: boolean | { caseId?: string; assignedTo?: string; dateFrom?: string; dateTo?: string }) => {
+  // Support both boolean (enabled) and filters object for backwards compatibility
+  const isBoolean = typeof enabledOrFilters === 'boolean'
+  const enabled = isBoolean ? enabledOrFilters : true
+  const filters = isBoolean ? undefined : enabledOrFilters
+
   return useQuery<TaskStats>({
     queryKey: ['tasks', 'stats', filters],
     queryFn: () => tasksService.getStats(filters),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 

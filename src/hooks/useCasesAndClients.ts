@@ -955,12 +955,13 @@ export const useUpdateCaseProgress = () => {
  * Fetch case statistics from API
  * GET /api/cases/statistics
  */
-export const useCaseStatisticsFromAPI = () => {
+export const useCaseStatisticsFromAPI = (enabled = true) => {
   return useQuery({
     queryKey: ['cases', 'statistics'],
     queryFn: () => casesService.getStatistics(),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 

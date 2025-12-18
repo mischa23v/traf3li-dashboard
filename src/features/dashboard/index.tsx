@@ -92,12 +92,14 @@ export function Dashboard() {
 
   // Data fetching - Gold Standard single API call
   const { data: dashboardSummary, isLoading: summaryLoading, isError: summaryError } = useDashboardSummary()
-  const useFallbackHooks = summaryError || !dashboardSummary
 
-  // Fallback hooks
-  const { data: caseStatsFallback } = useCaseStatisticsFromAPI()
-  const { data: taskStatsFallback } = useTaskStats()
-  const { data: reminderStatsFallback } = useReminderStats()
+  // Only use fallback hooks if summary FAILED (not just loading)
+  const useFallbackHooks = summaryError === true
+
+  // Fallback hooks - DISABLED unless summary endpoint fails
+  const { data: caseStatsFallback } = useCaseStatisticsFromAPI(useFallbackHooks)
+  const { data: taskStatsFallback } = useTaskStats(useFallbackHooks)
+  const { data: reminderStatsFallback } = useReminderStats({ enabled: useFallbackHooks })
 
   // Overview tab data
   const shouldLoadOverviewData = useFallbackHooks && isSecondaryDataReady && isOverviewTab
