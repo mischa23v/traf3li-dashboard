@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo, useCallback, memo } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -42,12 +42,24 @@ type AccountFormValues = {
   language: string
 }
 
+// Memoized loading skeleton to prevent unnecessary re-renders
+const LoadingSkeleton = memo(function LoadingSkeleton() {
+  return (
+    <div className='space-y-8'>
+      <Skeleton className='h-20 w-full' />
+      <Skeleton className='h-20 w-full' />
+      <Skeleton className='h-20 w-full' />
+      <Skeleton className='h-10 w-32' />
+    </div>
+  )
+})
+
 export function AccountForm() {
   const { t } = useTranslation()
   const { data: settings, isLoading: loadingSettings } = useSettings()
   const { mutate: updateSettings, isPending } = useUpdateAccountSettings()
 
-  const accountFormSchema = z.object({
+  const accountFormSchema = useMemo(() => z.object({
     name: z
       .string()
       .min(1, t('settings.account.validation.nameRequired'))
@@ -55,14 +67,16 @@ export function AccountForm() {
       .max(30, t('settings.account.validation.nameMaxLength')),
     dob: z.date().optional(),
     language: z.string().min(1, t('settings.account.validation.languageRequired')),
-  })
+  }), [t])
+
+  const defaultValues = useMemo(() => ({
+    name: '',
+    language: 'en',
+  }), [])
 
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountFormSchema) as any,
-    defaultValues: {
-      name: '',
-      language: 'en',
-    },
+    defaultValues,
   })
 
   // Update form when settings load
@@ -76,23 +90,17 @@ export function AccountForm() {
     }
   }, [settings, form])
 
-  function onSubmit(data: AccountFormValues) {
+  // Memoize submit handler to prevent recreation on every render
+  const onSubmit = useCallback((data: AccountFormValues) => {
     updateSettings({
       name: data.name,
       dob: data.dob?.toISOString(),
       language: data.language,
     })
-  }
+  }, [updateSettings])
 
   if (loadingSettings) {
-    return (
-      <div className='space-y-8'>
-        <Skeleton className='h-20 w-full' />
-        <Skeleton className='h-20 w-full' />
-        <Skeleton className='h-20 w-full' />
-        <Skeleton className='h-10 w-32' />
-      </div>
-    )
+    return <LoadingSkeleton />
   }
 
   return (

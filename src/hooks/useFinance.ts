@@ -501,6 +501,7 @@ export const useTimerStatus = () => {
     queryFn: () => financeService.getTimerStatus(),
     refetchInterval: 10 * 1000, // Refetch every 10 seconds
     staleTime: 5 * 1000, // 5 seconds
+    retry: false,
   })
 }
 
@@ -1603,6 +1604,7 @@ export const usePendingApprovalsCount = () => {
     queryFn: () => financeService.getPendingApprovalsCount(),
     refetchInterval: 30 * 1000, // Refetch every 30 seconds
     staleTime: 15 * 1000, // 15 seconds
+    retry: false,
   })
 }
 

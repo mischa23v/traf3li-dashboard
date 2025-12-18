@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import {
   type SortingState,
@@ -26,7 +26,7 @@ import { DataTablePagination, DataTableToolbar } from '@/components/data-table'
 import { priorities, statuses } from '../data/data'
 import { type Task } from '../data/schema'
 import { DataTableBulkActions } from './data-table-bulk-actions'
-import { tasksColumns as columns } from './tasks-columns'
+import { tasksColumns } from './tasks-columns'
 
 const route = getRouteApi('/_authenticated/dashboard/tasks/list')
 
@@ -39,6 +39,9 @@ export function TasksTable({ data }: DataTableProps) {
   const [rowSelection, setRowSelection] = useState({})
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+
+  // Memoize columns to prevent recreation on every render
+  const columns = useMemo(() => tasksColumns, [])
 
   // Local state management for table (uncomment to use local-only state, not synced with URL)
   // const [globalFilter, onGlobalFilterChange] = useState('')
@@ -64,6 +67,23 @@ export function TasksTable({ data }: DataTableProps) {
       { columnId: 'priority', searchKey: 'priority', type: 'array' },
     ],
   })
+
+  // Memoize filter options
+  const filterOptions = useMemo(
+    () => [
+      {
+        columnId: 'status',
+        title: 'الحالة',
+        options: statuses,
+      },
+      {
+        columnId: 'priority',
+        title: 'الأولوية',
+        options: priorities,
+      },
+    ],
+    []
+  )
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
@@ -114,18 +134,7 @@ export function TasksTable({ data }: DataTableProps) {
       <DataTableToolbar
         table={table}
         searchPlaceholder='البحث بالعنوان أو المعرف...'
-        filters={[
-          {
-            columnId: 'status',
-            title: 'الحالة',
-            options: statuses,
-          },
-          {
-            columnId: 'priority',
-            title: 'الأولوية',
-            options: priorities,
-          },
-        ]}
+        filters={filterOptions}
       />
       <div className='overflow-hidden rounded-md border'>
         <Table>

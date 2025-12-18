@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PERF_DEBUG, perfLog } from '@/lib/perf-debug'
 import {
@@ -94,12 +94,15 @@ export function GanttView() {
   }, [isGanttInitialized])
 
   // Derived data for DHTMLX Gantt
-  const ganttData = productivityData ? {
-    data: filterType === 'all'
-      ? productivityData.data
-      : productivityData.data.filter(item => item.sourceType === filterType),
-    links: productivityData.links
-  } : null
+  const ganttData = useMemo(() => {
+    if (!productivityData) return null
+    return {
+      data: filterType === 'all'
+        ? productivityData.data
+        : productivityData.data.filter(item => item.sourceType === filterType),
+      links: productivityData.links
+    }
+  }, [productivityData, filterType])
 
   const summary = productivityData?.summary
 
@@ -312,7 +315,7 @@ export function GanttView() {
   }, [isGanttLoaded, isGanttInitialized, ganttData])
 
   // Update time scale
-  const updateTimeScale = (scale: TimeScale) => {
+  const updateTimeScale = useCallback((scale: TimeScale) => {
     const gantt = ganttRef.current
     if (!gantt) return
 
@@ -348,44 +351,44 @@ export function GanttView() {
         break
     }
     gantt.render()
-  }
+  }, [t])
 
-  const handleTimeScaleChange = (scale: TimeScale) => {
+  const handleTimeScaleChange = useCallback((scale: TimeScale) => {
     setTimeScale(scale)
     updateTimeScale(scale)
-  }
+  }, [updateTimeScale])
 
-  const handleZoomIn = () => {
+  const handleZoomIn = useCallback(() => {
     const scales: TimeScale[] = ['year', 'quarter', 'month', 'week', 'day']
     const currentIndex = scales.indexOf(timeScale)
     if (currentIndex < scales.length - 1) {
       handleTimeScaleChange(scales[currentIndex + 1])
     }
-  }
+  }, [timeScale, handleTimeScaleChange])
 
-  const handleZoomOut = () => {
+  const handleZoomOut = useCallback(() => {
     const scales: TimeScale[] = ['year', 'quarter', 'month', 'week', 'day']
     const currentIndex = scales.indexOf(timeScale)
     if (currentIndex > 0) {
       handleTimeScaleChange(scales[currentIndex - 1])
     }
-  }
+  }, [timeScale, handleTimeScaleChange])
 
-  const handleToggleCriticalPath = () => {
+  const handleToggleCriticalPath = useCallback(() => {
     setShowCriticalPath(!showCriticalPath)
     const gantt = ganttRef.current
     if (gantt) {
       gantt.config.highlight_critical_path = !showCriticalPath
       gantt.render()
     }
-  }
+  }, [showCriticalPath])
 
-  const handleFitToView = () => {
+  const handleFitToView = useCallback(() => {
     const gantt = ganttRef.current
     if (gantt) {
       gantt.render()
     }
-  }
+  }, [])
 
   return (
     <>

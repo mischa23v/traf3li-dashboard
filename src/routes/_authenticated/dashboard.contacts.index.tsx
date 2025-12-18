@@ -1,6 +1,12 @@
 import z from 'zod'
 import { createFileRoute } from '@tanstack/react-router'
-import { Contacts } from '@/features/contacts'
+import { lazyImport, TableSkeleton } from '@/utils/lazy-import'
+
+// Lazy load the contacts component (heavy table with many contacts)
+const Contacts = lazyImport(
+  () => import('@/features/contacts').then(mod => ({ default: mod.Contacts })),
+  <TableSkeleton />
+)
 
 // Stable fallback arrays to prevent infinite re-renders
 // Match the pattern used in clients route which works correctly

@@ -31,7 +31,7 @@ import {
 } from 'lucide-react'
 import { useCases } from '@/hooks/useCasesAndClients'
 import { useInvoices, usePayments } from '@/hooks/useFinance'
-import { cn } from '@/lib/utils'
+import { cn, formatCurrency as formatCurrencyUtil } from '@/lib/utils'
 
 interface MetricCardProps {
   title: string
@@ -175,15 +175,12 @@ export function KPIMetrics() {
 
   const isLoading = casesLoading || invoicesLoading || paymentsLoading
 
-  // Format currency
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat(isRTL ? 'ar-SA' : 'en-SA', {
-      style: 'currency',
-      currency: 'SAR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value)
-  }
+  // Use memoized currency formatter
+  const formatCurrency = (value: number) => formatCurrencyUtil(value, {
+    locale: isRTL ? 'ar-SA' : 'en-SA',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  })
 
   return (
     <div className="space-y-4">

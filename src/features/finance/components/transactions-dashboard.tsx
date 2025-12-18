@@ -18,7 +18,8 @@
  * - RTL/LTR support for Arabic/English
  */
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import {
     Search, Filter, Download, RefreshCw, Eye, Printer,
     FileText, Receipt, Wallet, FileSpreadsheet, BookOpen,
@@ -322,12 +323,12 @@ export default function TransactionsDashboard() {
     const totalCount = entriesData?.total || 0
 
     // Handle period change
-    const handlePeriodChange = (period: string) => {
+    const handlePeriodChange = useCallback((period: string) => {
         setFilters(prev => ({ ...prev, period, page: 1 }))
-    }
+    }, [])
 
     // Handle filter clear
-    const handleClearFilters = () => {
+    const handleClearFilters = useCallback(() => {
         setFilters({
             period: 'this-month',
             startDate: '',
@@ -338,23 +339,23 @@ export default function TransactionsDashboard() {
             page: 1,
             pageSize: 25,
         })
-    }
+    }, [])
 
     // Open entry detail
-    const handleViewDetails = (entry: GLEntry) => {
+    const handleViewDetails = useCallback((entry: GLEntry) => {
         setSelectedEntry(entry)
         setDetailDialogOpen(true)
-    }
+    }, [])
 
     // Export handlers (placeholder - would need backend implementation)
-    const handleExport = (format: 'excel' | 'pdf' | 'csv') => {
+    const handleExport = useCallback((format: 'excel' | 'pdf' | 'csv') => {
         // TODO: Implement export functionality
-    }
+    }, [])
 
     // Print handler
-    const handlePrint = () => {
+    const handlePrint = useCallback(() => {
         window.print()
-    }
+    }, [])
 
     // Top navigation
     const topNav = [

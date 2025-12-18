@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -50,9 +50,11 @@ export function OtpForm({ className, email, onResendOtp, ...props }: OtpFormProp
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [requestId, setRequestId] = useState<string | null>(null)
 
+  const defaultValues = useMemo(() => ({ otp: '' }), [])
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema) as any,
-    defaultValues: { otp: '' },
+    defaultValues,
   })
 
   // eslint-disable-next-line react-hooks/incompatible-library

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo, memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   flexRender,
@@ -38,12 +38,28 @@ interface DataTableProps<TData, TValue = unknown> {
   showPagination?: boolean
 }
 
+// Memoized table row component for performance
+const MemoizedTableRow = memo(({ row, cells }: { row: any; cells: any[] }) => (
+  <TableRow
+    data-state={row.getIsSelected() && 'selected'}
+  >
+    {cells.map((cell) => (
+      <TableCell key={cell.id}>
+        {flexRender(
+          cell.column.columnDef.cell,
+          cell.getContext()
+        )}
+      </TableCell>
+    ))}
+  </TableRow>
+))
+
 export function DataTable<TData, TValue = unknown>({
   table: externalTable,
   columns,
   data,
   totalCount,
-  page = 1,
+  page: _page = 1,
   pageSize = 10,
   isLoading = false,
   toolbar,
@@ -55,30 +71,42 @@ export function DataTable<TData, TValue = unknown>({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
 
+  // Memoize table configuration
+  const tableConfig = useMemo(
+    () => ({
+      getCoreRowModel: getCoreRowModel(),
+      getPaginationRowModel: getPaginationRowModel(),
+      getSortedRowModel: getSortedRowModel(),
+      getFilteredRowModel: getFilteredRowModel(),
+      onSortingChange: setSorting,
+      onColumnFiltersChange: setColumnFilters,
+      onColumnVisibilityChange: setColumnVisibility,
+      onRowSelectionChange: setRowSelection,
+      manualPagination: !!totalCount,
+      pageCount: totalCount ? Math.ceil(totalCount / pageSize) : undefined,
+    }),
+    [totalCount, pageSize]
+  )
+
   // Create internal table only if external table is not provided
   const internalTable = columns && data ? useReactTable({
     data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
+    ...tableConfig,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
     },
-    manualPagination: !!totalCount,
-    pageCount: totalCount ? Math.ceil(totalCount / pageSize) : undefined,
   }) : null
 
   // Use external table if provided, otherwise use internal table
   const table = externalTable || internalTable
+
+  // Memoize rows for performance - must be called before early returns
+  const rowModel = table?.getRowModel()
+  const rows = useMemo(() => rowModel?.rows || [], [rowModel])
 
   if (!table) {
     return null
@@ -138,21 +166,13 @@ export function DataTable<TData, TValue = unknown>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
+            {rows?.length ? (
+              rows.map((row) => (
+                <MemoizedTableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
+                  row={row}
+                  cells={row.getVisibleCells()}
+                />
               ))
             ) : (
               <TableRow>

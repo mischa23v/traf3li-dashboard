@@ -57,7 +57,7 @@ export function OtpLogin({ purpose = 'login' }: OtpLoginProps) {
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
   const isRtl = i18n.language === 'ar'
-  const { setUser } = useAuthStore()
+  const setUser = useAuthStore((state) => state.setUser)
   const search = useSearch({ from: '/(auth)/otp-login' })
 
   // State

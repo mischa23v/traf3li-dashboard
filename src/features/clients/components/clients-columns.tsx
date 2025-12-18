@@ -1,4 +1,5 @@
 import { type ColumnDef } from '@tanstack/react-table'
+import { useMemo, memo } from 'react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -21,11 +22,62 @@ const getDisplayName = (client: Client): string => {
   return client.companyName || client.companyNameEnglish || '-'
 }
 
+// Memoized cell components
+const ContactMethodCell = memo(({ method, label }: { method: string; label: string }) => {
+  const contactMethod = contactMethods.find((m) => m.value === method)
+  return (
+    <div className='flex items-center gap-2'>
+      {contactMethod?.icon && (
+        <contactMethod.icon size={16} className='text-muted-foreground' />
+      )}
+      <span className='text-sm'>{label}</span>
+    </div>
+  )
+})
+
+const IdentityTypeCell = memo(({ idType, label }: { idType: string; label: string }) => {
+  const identityType = identityTypes.find((i) => i.value === idType)
+  const IdIcon = identityType?.icon
+  return (
+    <div className='flex items-center gap-2'>
+      {IdIcon && <IdIcon size={16} className='text-muted-foreground' />}
+      <span className='text-sm'>{label}</span>
+    </div>
+  )
+})
+
+const VerificationCell = memo(({ isVerified, verifiedLabel, notVerifiedLabel }: { isVerified: boolean; verifiedLabel: string; notVerifiedLabel: string }) => {
+  const badgeColor = verificationStatusColors.get(isVerified ? 'verified' : 'not_verified')
+  return (
+    <div className='flex items-center gap-2'>
+      {isVerified ? (
+        <BadgeCheck size={16} className='text-emerald-600' />
+      ) : (
+        <AlertCircle size={16} className='text-muted-foreground' />
+      )}
+      <Badge variant='outline' className={cn('text-xs', badgeColor)}>
+        {isVerified ? verifiedLabel : notVerifiedLabel}
+      </Badge>
+    </div>
+  )
+})
+
+const StatusCell = memo(({ status, label }: { status: string; label: string }) => {
+  const badgeColor = clientStatusColors.get(status as any)
+  return (
+    <div className='flex gap-2'>
+      <Badge variant='outline' className={cn('capitalize', badgeColor)}>
+        {label}
+      </Badge>
+    </div>
+  )
+})
+
 export const useClientsColumns = (): ColumnDef<Client>[] => {
   const { t, i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
 
-  return [
+  return useMemo(() => [
     {
       id: 'select',
       header: ({ table }) => (
@@ -121,16 +173,11 @@ export const useClientsColumns = (): ColumnDef<Client>[] => {
       ),
       cell: ({ row }) => {
         const method = (row.original.preferredContactMethod || row.original.preferredContact || 'phone') as string
-        const contactMethod = contactMethods.find((m) => m.value === method)
         return (
-          <div className='flex items-center gap-2'>
-            {contactMethod?.icon && (
-              <contactMethod.icon size={16} className='text-muted-foreground' />
-            )}
-            <span className='text-sm'>
-              {t(`clients.contactMethods.${method}`)}
-            </span>
-          </div>
+          <ContactMethodCell
+            method={method}
+            label={t(`clients.contactMethods.${method}`)}
+          />
         )
       },
       filterFn: (row, id, value) => {
@@ -148,14 +195,11 @@ export const useClientsColumns = (): ColumnDef<Client>[] => {
       cell: ({ row }) => {
         const idType = row.original.identityType || 'national_id'
         const identityType = identityTypes.find((i) => i.value === idType)
-        const IdIcon = identityType?.icon
         return (
-          <div className='flex items-center gap-2'>
-            {IdIcon && <IdIcon size={16} className='text-muted-foreground' />}
-            <span className='text-sm'>
-              {isArabic ? identityType?.label : identityType?.labelEn}
-            </span>
-          </div>
+          <IdentityTypeCell
+            idType={idType}
+            label={isArabic ? identityType?.label || '' : identityType?.labelEn || ''}
+          />
         )
       },
       enableSorting: false,
@@ -166,22 +210,13 @@ export const useClientsColumns = (): ColumnDef<Client>[] => {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('clients.columns.verified')} />
       ),
-      cell: ({ row }) => {
-        const isVerified = row.original.isVerified
-        const badgeColor = verificationStatusColors.get(isVerified ? 'verified' : 'not_verified')
-        return (
-          <div className='flex items-center gap-2'>
-            {isVerified ? (
-              <BadgeCheck size={16} className='text-emerald-600' />
-            ) : (
-              <AlertCircle size={16} className='text-muted-foreground' />
-            )}
-            <Badge variant='outline' className={cn('text-xs', badgeColor)}>
-              {isVerified ? t('clients.verified') : t('clients.notVerified')}
-            </Badge>
-          </div>
-        )
-      },
+      cell: ({ row }) => (
+        <VerificationCell
+          isVerified={row.original.isVerified}
+          verifiedLabel={t('clients.verified')}
+          notVerifiedLabel={t('clients.notVerified')}
+        />
+      ),
       enableSorting: false,
     },
     {
@@ -192,13 +227,11 @@ export const useClientsColumns = (): ColumnDef<Client>[] => {
       ),
       cell: ({ row }) => {
         const status = (row.original.status || 'active') as string
-        const badgeColor = clientStatusColors.get(status as any)
         return (
-          <div className='flex gap-2'>
-            <Badge variant='outline' className={cn('capitalize', badgeColor)}>
-              {t(`clients.statuses.${status}`)}
-            </Badge>
-          </div>
+          <StatusCell
+            status={status}
+            label={t(`clients.statuses.${status}`)}
+          />
         )
       },
       filterFn: (row, id, value) => {
@@ -212,5 +245,5 @@ export const useClientsColumns = (): ColumnDef<Client>[] => {
       id: 'actions',
       cell: DataTableRowActions,
     },
-  ]
+  ], [t, isArabic])
 }

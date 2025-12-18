@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import {
     Search, Download, Plus, MoreHorizontal,
     Clock, Play, Pause, Square, DollarSign,
@@ -11,6 +12,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Input } from '@/components/ui/input'
+import { formatCurrency, formatDate } from '@/lib/utils'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -33,6 +35,12 @@ import { FinanceSidebar } from './finance-sidebar'
 export default function TimeEntriesDashboard() {
     const [activeTab, setActiveTab] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
     const [currentTime, setCurrentTime] = useState(0)
     const [timerDescription, setTimerDescription] = useState('')
 
@@ -90,7 +98,7 @@ export default function TimeEntriesDashboard() {
         if (!entriesData?.data) return []
         return entriesData.data.map((entry: any) => ({
             id: entry._id,
-            date: new Date(entry.date).toLocaleDateString('ar-SA'),
+            date: formatDate(entry.date),
             client: entry.clientId?.name || entry.clientId?.firstName + ' ' + entry.clientId?.lastName || 'عميل غير محدد',
             caseNumber: entry.caseId?.caseNumber || 'غير محدد',
             task: entry.description || 'مهمة غير محددة',
@@ -156,15 +164,6 @@ export default function TimeEntriesDashboard() {
         })
         setTimerDescription('')
     }, [timerDescription, stopTimerMutation])
-
-    // Format currency
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('ar-SA', {
-            style: 'currency',
-            currency: 'SAR',
-            minimumFractionDigits: 0
-        }).format(amount)
-    }
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
@@ -243,8 +242,8 @@ export default function TimeEntriesDashboard() {
                                         <Input
                                             placeholder="بحث في السجلات..."
                                             className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            defaultValue={searchQuery}
+                                            onChange={(e) => debouncedSetSearch(e.target.value)}
                                         />
                                     </div>
                                 </div>

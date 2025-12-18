@@ -1,4 +1,4 @@
-import { useState, type JSX } from 'react'
+import { useState, useCallback, memo, type JSX } from 'react'
 import { useLocation, useNavigate, Link } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
@@ -19,15 +19,16 @@ type SidebarNavProps = React.HTMLAttributes<HTMLElement> & {
   }[]
 }
 
-export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
+export const SidebarNav = memo(function SidebarNav({ className, items, ...props }: SidebarNavProps) {
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const [val, setVal] = useState(pathname ?? '/settings')
 
-  const handleSelect = (e: string) => {
+  // Memoize the select handler to prevent unnecessary re-renders
+  const handleSelect = useCallback((e: string) => {
     setVal(e)
     navigate({ to: e })
-  }
+  }, [navigate])
 
   return (
     <>
@@ -81,4 +82,4 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
       </ScrollArea>
     </>
   )
-}
+})

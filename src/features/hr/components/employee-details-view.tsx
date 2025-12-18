@@ -241,7 +241,7 @@ export function EmployeeDetailsView() {
                                                         <div className="flex gap-6 items-start">
                                                             <div className="w-20 h-20 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-2xl">
                                                                 {employee.avatar ? (
-                                                                    <img src={employee.avatar} alt={employee.fullName} className="w-full h-full rounded-2xl object-cover" />
+                                                                    <img src={employee.avatar} alt={`${employee.fullName} avatar`} className="w-full h-full rounded-2xl object-cover" width="80" height="80" />
                                                                 ) : (
                                                                     employee.fullName.charAt(0)
                                                                 )}

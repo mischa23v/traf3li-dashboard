@@ -1,23 +1,14 @@
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 
 /**
- * Debounce a value - returns debounced value after specified delay
- * Use for search inputs, filter fields, etc.
+ * Custom hook to debounce a value
+ * Useful for auto-save functionality and preventing excessive API calls
  *
  * @param value - The value to debounce
- * @param delay - Debounce delay in milliseconds (default: 300ms)
+ * @param delay - The delay in milliseconds (default: 500ms)
  * @returns The debounced value
- *
- * @example
- * const [search, setSearch] = useState('')
- * const debouncedSearch = useDebounce(search, 300)
- *
- * useEffect(() => {
- *   // This runs only after user stops typing for 300ms
- *   filterData(debouncedSearch)
- * }, [debouncedSearch])
  */
-export function useDebounce<T>(value: T, delay: number = 300): T {
+export function useDebounce<T>(value: T, delay: number = 500): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value)
 
   useEffect(() => {
@@ -25,89 +16,43 @@ export function useDebounce<T>(value: T, delay: number = 300): T {
       setDebouncedValue(value)
     }, delay)
 
-    return () => clearTimeout(handler)
+    return () => {
+      clearTimeout(handler)
+    }
   }, [value, delay])
 
   return debouncedValue
 }
 
 /**
- * Debounced callback - returns a function that is debounced
- * Use when you need to debounce a callback function
+ * Custom hook to create a debounced callback function
+ * Useful for debouncing form field changes and auto-save operations
  *
- * @param callback - The function to debounce
- * @param delay - Debounce delay in milliseconds (default: 300ms)
- * @returns A debounced version of the callback
- *
- * @example
- * const debouncedSearch = useDebouncedCallback((query: string) => {
- *   api.search(query)
- * }, 500)
- *
- * <Input onChange={(e) => debouncedSearch(e.target.value)} />
+ * @param callback - The callback function to debounce
+ * @param delay - The delay in milliseconds (default: 500ms)
+ * @returns The debounced callback function
  */
-export function useDebouncedCallback<T extends (...args: Parameters<T>) => void>(
+export function useDebouncedCallback<T extends (...args: any[]) => any>(
   callback: T,
-  delay: number = 300
+  delay: number = 500
 ): (...args: Parameters<T>) => void {
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const callbackRef = useRef(callback)
-
-  // Update callback ref when callback changes
-  useEffect(() => {
-    callbackRef.current = callback
-  }, [callback])
-
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
+      // Cleanup on unmount
     }
   }, [])
 
-  return useCallback(
-    (...args: Parameters<T>) => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null)
 
-      timeoutRef.current = setTimeout(() => {
-        callbackRef.current(...args)
-      }, delay)
-    },
-    [delay]
-  )
-}
-
-/**
- * Throttle a value - limits updates to once per specified interval
- * Use for scroll events, resize events, etc.
- *
- * @param value - The value to throttle
- * @param interval - Throttle interval in milliseconds (default: 100ms)
- * @returns The throttled value
- */
-export function useThrottle<T>(value: T, interval: number = 100): T {
-  const [throttledValue, setThrottledValue] = useState<T>(value)
-  const lastUpdated = useRef<number>(Date.now())
-
-  useEffect(() => {
-    const now = Date.now()
-
-    if (now >= lastUpdated.current + interval) {
-      lastUpdated.current = now
-      setThrottledValue(value)
-    } else {
-      const timerId = setTimeout(() => {
-        lastUpdated.current = Date.now()
-        setThrottledValue(value)
-      }, interval - (now - lastUpdated.current))
-
-      return () => clearTimeout(timerId)
+  return (...args: Parameters<T>) => {
+    if (timeoutId) {
+      clearTimeout(timeoutId)
     }
-  }, [value, interval])
 
-  return throttledValue
+    const newTimeoutId = setTimeout(() => {
+      callback(...args)
+    }, delay)
+
+    setTimeoutId(newTimeoutId)
+  }
 }

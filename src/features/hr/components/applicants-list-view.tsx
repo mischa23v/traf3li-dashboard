@@ -1,5 +1,5 @@
 import { HRSidebar } from './hr-sidebar'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -115,27 +115,27 @@ export function ApplicantsListView() {
   }
 
   // Selection handlers
-  const handleToggleSelectionMode = () => {
-    setIsSelectionMode(!isSelectionMode)
+  const handleToggleSelectionMode = useCallback(() => {
+    setIsSelectionMode(prev => !prev)
     setSelectedIds([])
-  }
+  }, [])
 
-  const handleSelectApplicant = (applicantId: string) => {
-    if (selectedIds.includes(applicantId)) {
-      setSelectedIds(selectedIds.filter(id => id !== applicantId))
-    } else {
-      setSelectedIds([...selectedIds, applicantId])
-    }
-  }
+  const handleSelectApplicant = useCallback((applicantId: string) => {
+    setSelectedIds(prev =>
+      prev.includes(applicantId)
+        ? prev.filter(id => id !== applicantId)
+        : [...prev, applicantId]
+    )
+  }, [])
 
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = useCallback(() => {
     if (selectedIds.length === 0) return
     if (confirm(`هل أنت متأكد من حذف ${selectedIds.length} متقدم؟`)) {
       // Bulk delete logic here
       setIsSelectionMode(false)
       setSelectedIds([])
     }
-  }
+  }, [selectedIds])
 
   // Stats for hero
   const heroStats = useMemo(() => {

@@ -1,5 +1,5 @@
 import { HRSidebar } from './hr-sidebar'
-import { useState } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -133,25 +133,23 @@ const getBgClasses = (color: string) => {
   const { data: stats } = useOrganizationalStructureStats()
   const bulkDeleteMutation = useBulkDeleteOrganizationalUnits()
 
-  const units = unitsData?.data || []
+  const units = useMemo(() => unitsData?.data || [], [unitsData])
 
-  const handleSelectAll = () => {
-    if (selectedIds.length === units.length) {
-      setSelectedIds([])
-    } else {
-      setSelectedIds(units.map(u => u._id))
-    }
-  }
+  const handleSelectAll = useCallback(() => {
+    setSelectedIds(prev =>
+      prev.length === units.length ? [] : units.map(u => u._id)
+    )
+  }, [units])
 
-  const handleSelectOne = (id: string) => {
-    if (selectedIds.includes(id)) {
-      setSelectedIds(selectedIds.filter(i => i !== id))
-    } else {
-      setSelectedIds([...selectedIds, id])
-    }
-  }
+  const handleSelectOne = useCallback((id: string) => {
+    setSelectedIds(prev =>
+      prev.includes(id)
+        ? prev.filter(i => i !== id)
+        : [...prev, id]
+    )
+  }, [])
 
-  const handleBulkDelete = () => {
+  const handleBulkDelete = useCallback(() => {
     if (selectedIds.length > 0 && confirm(`هل أنت متأكد من حذف ${selectedIds.length} وحدة تنظيمية؟`)) {
       bulkDeleteMutation.mutate(selectedIds, {
         onSuccess: () => {
@@ -160,7 +158,7 @@ const getBgClasses = (color: string) => {
         },
       })
     }
-  }
+  }, [selectedIds, bulkDeleteMutation])
 
   const getStatusColor = (status: UnitStatus) => {
     const colors: Record<UnitStatus, string> = {

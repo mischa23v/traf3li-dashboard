@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import {
     Search, Check, X, MessageSquare, Download, Filter,
     Clock, User, FileText, AlertCircle, CheckCircle2, XCircle,
@@ -93,6 +94,12 @@ const useRequestTimeEntryChanges = () => ({
 
 export default function TimeEntryApprovalsView() {
     const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
     const [selectedEmployee, setSelectedEmployee] = useState<string>('all')
     const [dateRange, setDateRange] = useState<string>('week')
     const [selectedEntries, setSelectedEntries] = useState<Set<string>>(new Set())
@@ -406,8 +413,8 @@ export default function TimeEntryApprovalsView() {
                                     <Input
                                         placeholder="بحث في السجلات..."
                                         className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        defaultValue={searchQuery}
+                                        onChange={(e) => debouncedSetSearch(e.target.value)}
                                     />
                                 </div>
                             </div>

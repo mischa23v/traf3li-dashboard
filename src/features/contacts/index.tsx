@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDebouncedCallback } from 'use-debounce'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -60,6 +61,13 @@ function ContactsListView() {
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState('')
+
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
   const [typeFilter, setTypeFilter] = useState<string>('all')
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [statusFilter, setStatusFilter] = useState<string>('all')
@@ -95,12 +103,12 @@ function ContactsListView() {
   const hasActiveFilters = searchQuery || typeFilter !== 'all' || categoryFilter !== 'all' || statusFilter !== 'all'
 
   // Clear all filters
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setSearchQuery('')
     setTypeFilter('all')
     setCategoryFilter('all')
     setStatusFilter('all')
-  }
+  }, [])
 
   // Fetch contacts
   const { data: contactsData, isLoading, isError, error, refetch } = useContacts(filters)
@@ -126,20 +134,20 @@ function ContactsListView() {
   }, [contactsData, t])
 
   // Selection Handlers
-  const handleToggleSelectionMode = () => {
+  const handleToggleSelectionMode = useCallback(() => {
     setIsSelectionMode(!isSelectionMode)
     setSelectedContactIds([])
-  }
+  }, [isSelectionMode])
 
-  const handleSelectContact = (contactId: string) => {
+  const handleSelectContact = useCallback((contactId: string) => {
     if (selectedContactIds.includes(contactId)) {
       setSelectedContactIds(selectedContactIds.filter(id => id !== contactId))
     } else {
       setSelectedContactIds([...selectedContactIds, contactId])
     }
-  }
+  }, [selectedContactIds])
 
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = useCallback(() => {
     if (selectedContactIds.length === 0) return
 
     if (confirm(t('contacts.deleteMultipleConfirm', { count: selectedContactIds.length }))) {
@@ -150,42 +158,42 @@ function ContactsListView() {
         }
       })
     }
-  }
+  }, [selectedContactIds, t, bulkDeleteMutation])
 
   // Single contact actions
-  const handleViewContact = (contactId: string) => {
+  const handleViewContact = useCallback((contactId: string) => {
     navigate({ to: '/dashboard/contacts/$contactId', params: { contactId } })
-  }
+  }, [navigate])
 
-  const handleEditContact = (contactId: string) => {
+  const handleEditContact = useCallback((contactId: string) => {
     navigate({ to: '/dashboard/contacts/$contactId/edit', params: { contactId } })
-  }
+  }, [navigate])
 
-  const handleDeleteContact = (contactId: string) => {
+  const handleDeleteContact = useCallback((contactId: string) => {
     if (confirm(t('contacts.deleteConfirm'))) {
       deleteContactMutation.mutate(contactId)
     }
-  }
+  }, [t, deleteContactMutation])
 
   // Get icon for contact type
-  const getTypeIcon = (type: string) => {
+  const getTypeIcon = useCallback((type: string) => {
     const typeData = contactTypes.find(t => t.value === type)
     if (typeData) {
       const Icon = typeData.icon
       return <Icon className="h-5 w-5" />
     }
     return <User className="h-5 w-5" />
-  }
+  }, [])
 
   // Get icon for category
-  const getCategoryIcon = (category: string) => {
+  const getCategoryIcon = useCallback((category: string) => {
     const catData = contactCategories.find(c => c.value === category)
     if (catData) {
       const Icon = catData.icon
       return <Icon className="h-4 w-4" />
     }
     return null
-  }
+  }, [])
 
   const topNav = [
     { title: t('contacts.nav.contacts'), href: '/dashboard/contacts', isActive: true },
@@ -244,8 +252,8 @@ function ContactsListView() {
                     <Input
                       type="text"
                       placeholder={t('contacts.searchPlaceholder')}
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      defaultValue={searchQuery}
+                      onChange={(e) => debouncedSetSearch(e.target.value)}
                       className="pe-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
                     />
                   </div>

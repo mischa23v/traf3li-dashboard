@@ -58,3 +58,81 @@ export function getPageNumbers(currentPage: number, totalPages: number) {
 
   return rangeWithDots
 }
+
+/**
+ * Format number as currency in SAR (Arabic locale)
+ * This is a pure function suitable for use in loops and can be memoized
+ */
+export function formatCurrency(amount: number, options?: {
+  locale?: 'ar-SA' | 'en-SA'
+  minimumFractionDigits?: number
+  maximumFractionDigits?: number
+}): string {
+  const {
+    locale = 'ar-SA',
+    minimumFractionDigits = 0,
+    maximumFractionDigits = 2
+  } = options || {}
+
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: 'SAR',
+    minimumFractionDigits,
+    maximumFractionDigits
+  }).format(amount)
+}
+
+/**
+ * Format date to localized string (Arabic locale by default)
+ * This is a pure function suitable for use in loops and can be memoized
+ */
+export function formatDate(date: Date | string | number, options?: {
+  locale?: 'ar-SA' | 'en-SA'
+  dateStyle?: 'full' | 'long' | 'medium' | 'short'
+  timeStyle?: 'full' | 'long' | 'medium' | 'short'
+}): string {
+  const {
+    locale = 'ar-SA',
+    dateStyle,
+    timeStyle
+  } = options || {}
+
+  const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
+
+  if (isNaN(dateObj.getTime())) {
+    return '-'
+  }
+
+  if (dateStyle || timeStyle) {
+    return new Intl.DateTimeFormat(locale, {
+      dateStyle,
+      timeStyle
+    }).format(dateObj)
+  }
+
+  return dateObj.toLocaleDateString(locale)
+}
+
+/**
+ * Format number with locale-specific formatting
+ * This is a pure function suitable for use in loops and can be memoized
+ */
+export function formatNumber(value: number, options?: {
+  locale?: 'ar-SA' | 'en-SA'
+  minimumFractionDigits?: number
+  maximumFractionDigits?: number
+  notation?: 'standard' | 'scientific' | 'engineering' | 'compact'
+}): string {
+  const {
+    locale = 'ar-SA',
+    minimumFractionDigits = 0,
+    maximumFractionDigits = 2,
+    notation = 'standard'
+  } = options || {}
+
+  return new Intl.NumberFormat(locale, {
+    minimumFractionDigits,
+    maximumFractionDigits,
+    notation
+  }).format(value)
+}

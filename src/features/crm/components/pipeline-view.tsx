@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo, useEffect, useCallback, memo } from 'react'
 import {
   Plus,
   Users,
@@ -87,8 +87,11 @@ import { PipelineAutomationDialog } from './pipeline-automation-dialog'
 import { cn } from '@/lib/utils'
 import type { PipelineAutoAction } from '@/types/crm'
 
+// Static style for RTL direction
+const rtlStyle = { direction: 'rtl' as const }
+
 // Analytics metric card component
-function MetricCard({
+const MetricCard = memo(function MetricCard({
   title,
   value,
   icon: Icon,
@@ -151,10 +154,12 @@ function MetricCard({
       </CardContent>
     </Card>
   )
-}
+})
+
+MetricCard.displayName = 'MetricCard'
 
 // Lead card with enhanced info
-function LeadCard({
+const LeadCard = memo(function LeadCard({
   lead,
   onDragStart,
   onDragEnd,
@@ -324,7 +329,9 @@ function LeadCard({
       </div>
     </div>
   )
-}
+})
+
+LeadCard.displayName = 'LeadCard'
 
 export function PipelineView() {
   const [selectedPipelineId, setSelectedPipelineId] = useState<string>('')
@@ -434,36 +441,36 @@ export function PipelineView() {
   }, [leadsByStage])
 
   // Handle drag and drop
-  const handleDragStart = (e: React.DragEvent, leadId: string) => {
+  const handleDragStart = useCallback((e: React.DragEvent, leadId: string) => {
     setDraggedLeadId(leadId)
     e.dataTransfer.effectAllowed = 'move'
-  }
+  }, [])
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     e.dataTransfer.dropEffect = 'move'
-  }
+  }, [])
 
-  const handleDrop = (e: React.DragEvent, stageId: string) => {
+  const handleDrop = useCallback((e: React.DragEvent, stageId: string) => {
     e.preventDefault()
     if (draggedLeadId) {
       moveToStage({ leadId: draggedLeadId, stageId })
       setDraggedLeadId(null)
     }
-  }
+  }, [draggedLeadId, moveToStage])
 
-  const handleDragEnd = () => {
+  const handleDragEnd = useCallback(() => {
     setDraggedLeadId(null)
-  }
+  }, [])
 
   // Handle opening automation dialog for a stage
-  const handleOpenAutomation = (stage: PipelineStage) => {
+  const handleOpenAutomation = useCallback((stage: PipelineStage) => {
     setSelectedStageForAutomation(stage)
     setAutomationDialogOpen(true)
-  }
+  }, [])
 
   // Handle saving automation settings
-  const handleSaveAutomation = async (autoActions: PipelineAutoAction[]) => {
+  const handleSaveAutomation = useCallback(async (autoActions: PipelineAutoAction[]) => {
     if (!pipeline || !selectedStageForAutomation) return
 
     return new Promise<void>((resolve, reject) => {
@@ -484,7 +491,7 @@ export function PipelineView() {
         }
       )
     })
-  }
+  }, [pipeline, selectedStageForAutomation, updateStage, refetch])
 
   const topNav = [
     { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: false },
@@ -494,7 +501,7 @@ export function PipelineView() {
   ]
 
   // Calculate stage totals
-  const getStageTotals = (stageId: string) => {
+  const getStageTotals = useCallback((stageId: string) => {
     const leads = leadsByStage[stageId] || []
     return {
       count: leads.length,
@@ -503,10 +510,10 @@ export function PipelineView() {
         sum + ((lead.estimatedValue || 0) * (lead.probability || 50) / 100), 0
       ),
     }
-  }
+  }, [leadsByStage])
 
   // Filter leads in stage
-  const getFilteredLeads = (stageId: string): Lead[] => {
+  const getFilteredLeads = useCallback((stageId: string): Lead[] => {
     let leads = leadsByStage[stageId] || []
 
     if (filterSource !== 'all') {
@@ -518,7 +525,7 @@ export function PipelineView() {
     }
 
     return leads
-  }
+  }, [leadsByStage, filterSource, filterUrgency])
 
   return (
     <>
@@ -577,12 +584,14 @@ export function PipelineView() {
                   لا توجد مسارات متاحة
                 </SelectItem>
               ) : (
-                pipelines.map((p: Pipeline) => (
+                pipelines.map((p: Pipeline) => {
+                  const colorStyle = useMemo(() => ({ backgroundColor: p.color }), [p.color])
+                  return (
                   <SelectItem key={p._id} value={p._id}>
                     <div className="flex items-center gap-2">
                       <div
                         className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: p.color }}
+                        style={colorStyle}
                       />
                       <span>{p.nameAr || p.name}</span>
                       {p.isDefault && (
@@ -592,7 +601,7 @@ export function PipelineView() {
                       )}
                     </div>
                   </SelectItem>
-                ))
+                )})
               )}
             </SelectContent>
           </Select>
@@ -764,7 +773,7 @@ export function PipelineView() {
             ) : (
               <div
                 className="flex gap-4 overflow-x-auto pb-4"
-                style={{ direction: 'rtl' }}
+                style={rtlStyle}
               >
                 {pipeline.stages.map((stage: PipelineStage, index: number) => {
                   const totals = getStageTotals(stage.stageId)
@@ -773,12 +782,14 @@ export function PipelineView() {
                     ? Math.round((totals.count / analytics.totalLeads) * 100)
                     : 0
 
+                  const stageHeaderStyle = useMemo(() => ({ backgroundColor: stage.color }), [stage.color])
+
                   return (
                     <div key={stage.stageId} className="flex-shrink-0 w-80">
                       {/* Stage Header */}
                       <div
                         className="p-4 rounded-t-xl text-white font-semibold"
-                        style={{ backgroundColor: stage.color }}
+                        style={stageHeaderStyle}
                       >
                         <div className="flex justify-between items-center mb-2">
                           <div className="flex items-center gap-2">

@@ -1,5 +1,6 @@
 import { CaseNotionSidebar } from './case-notion-sidebar'
 import { useState, useMemo } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { useTranslation } from 'react-i18next'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
@@ -48,6 +49,12 @@ export function CaseNotionListView() {
 
     // Filter states
     const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
     const [statusFilter, setStatusFilter] = useState<string>('all')
     const [sortBy, setSortBy] = useState<string>('updatedAt')
 
@@ -225,8 +232,8 @@ export function CaseNotionListView() {
                                     <Input
                                         type="text"
                                         placeholder={t('caseNotion.list.searchPlaceholder', 'ابحث عن قضية...')}
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        defaultValue={searchQuery}
+                                        onChange={(e) => debouncedSetSearch(e.target.value)}
                                         className="pe-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
                                     />
                                 </div>

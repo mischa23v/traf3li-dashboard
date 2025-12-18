@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import {
   type SortingState,
   type VisibilityState,
@@ -25,7 +25,7 @@ import { DataTablePagination, DataTableToolbar } from '@/components/data-table'
 import { roles } from '../data/data'
 import { type User } from '../data/schema'
 import { DataTableBulkActions } from './data-table-bulk-actions'
-import { usersColumns as columns } from './users-columns'
+import { usersColumns } from './users-columns'
 
 type DataTableProps = {
   data: User[]
@@ -38,6 +38,9 @@ export function UsersTable({ data, search, navigate }: DataTableProps) {
   const [rowSelection, setRowSelection] = useState({})
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [sorting, setSorting] = useState<SortingState>([])
+
+  // Memoize columns to prevent recreation on every render
+  const columns = useMemo(() => usersColumns, [])
 
   // Local state management for table (uncomment to use local-only state, not synced with URL)
   // const [columnFilters, onColumnFiltersChange] = useState<ColumnFiltersState>([])
@@ -62,6 +65,28 @@ export function UsersTable({ data, search, navigate }: DataTableProps) {
       { columnId: 'role', searchKey: 'role', type: 'array' },
     ],
   })
+
+  // Memoize filter options
+  const filterOptions = useMemo(
+    () => [
+      {
+        columnId: 'status',
+        title: 'Status',
+        options: [
+          { label: 'Active', value: 'active' },
+          { label: 'Inactive', value: 'inactive' },
+          { label: 'Invited', value: 'invited' },
+          { label: 'Suspended', value: 'suspended' },
+        ],
+      },
+      {
+        columnId: 'role',
+        title: 'Role',
+        options: roles.map((role) => ({ ...role })),
+      },
+    ],
+    []
+  )
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
@@ -103,23 +128,7 @@ export function UsersTable({ data, search, navigate }: DataTableProps) {
         table={table}
         searchPlaceholder='Filter users...'
         searchKey='username'
-        filters={[
-          {
-            columnId: 'status',
-            title: 'Status',
-            options: [
-              { label: 'Active', value: 'active' },
-              { label: 'Inactive', value: 'inactive' },
-              { label: 'Invited', value: 'invited' },
-              { label: 'Suspended', value: 'suspended' },
-            ],
-          },
-          {
-            columnId: 'role',
-            title: 'Role',
-            options: roles.map((role) => ({ ...role })),
-          },
-        ]}
+        filters={filterOptions}
       />
       <div className='overflow-hidden rounded-md border'>
         <Table>

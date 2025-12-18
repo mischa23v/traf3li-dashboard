@@ -1,6 +1,7 @@
 import { TasksSidebar } from './tasks-sidebar'
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDebouncedCallback } from 'use-debounce'
 import { PERF_DEBUG, perfLog } from '@/lib/perf-debug'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
@@ -44,6 +45,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useCases } from '@/hooks/useCasesAndClients'
 import { useTeamMembers } from '@/hooks/useStaff'
+import { VirtualList } from '@/components/virtual-list'
 
 export function TasksListView() {
     const { t, i18n } = useTranslation()
@@ -91,6 +93,12 @@ export function TasksListView() {
     const [dueDateFilter, setDueDateFilter] = useState<string>('all')
     const [caseFilter, setCaseFilter] = useState<string>('all')
     const [sortBy, setSortBy] = useState<string>('dueDate')
+
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
 
     // Fetch team members and cases for filter dropdowns (DEFERRED)
     const { data: teamMembers } = useTeamMembers(isFilterDataReady)
@@ -178,16 +186,19 @@ export function TasksListView() {
     }, [activeStatusTab, searchQuery, priorityFilter, assignedFilter, dueDateFilter, caseFilter, sortBy])
 
     // Check if any filter is active
-    const hasActiveFilters = searchQuery || priorityFilter !== 'all' || assignedFilter !== 'all' || dueDateFilter !== 'all' || caseFilter !== 'all'
+    const hasActiveFilters = useMemo(() =>
+        searchQuery || priorityFilter !== 'all' || assignedFilter !== 'all' || dueDateFilter !== 'all' || caseFilter !== 'all',
+        [searchQuery, priorityFilter, assignedFilter, dueDateFilter, caseFilter]
+    )
 
     // Clear all filters
-    const clearFilters = () => {
+    const clearFilters = useCallback(() => {
         setSearchQuery('')
         setPriorityFilter('all')
         setAssignedFilter('all')
         setDueDateFilter('all')
         setCaseFilter('all')
-    }
+    }, [])
 
     // Fetch tasks
     const { data: tasksData, isLoading, isError, error, refetch, isFetching } = useTasks(filters)
@@ -220,7 +231,7 @@ export function TasksListView() {
     }, [isFetching, statsFetching])
 
     // Helper function to format dates based on current locale
-    const formatDualDate = (dateString: string | null | undefined) => {
+    const formatDualDate = useCallback((dateString: string | null | undefined) => {
         if (!dateString) return { arabic: t('tasks.list.notSet'), english: t('tasks.list.notSet') }
         const date = new Date(dateString)
         const locale = i18n.language === 'ar' ? arSA : enUS
@@ -228,7 +239,7 @@ export function TasksListView() {
             arabic: format(date, 'd MMMM', { locale: arSA }),
             english: format(date, 'MMM d, yyyy', { locale: enUS })
         }
-    }
+    }, [t, i18n.language])
 
     // Transform API data
     const tasks = useMemo(() => {
@@ -251,20 +262,20 @@ export function TasksListView() {
     }, [tasksData, t, i18n.language])
 
     // Selection Handlers
-    const handleToggleSelectionMode = () => {
+    const handleToggleSelectionMode = useCallback(() => {
         setIsSelectionMode(!isSelectionMode)
         setSelectedTaskIds([])
-    }
+    }, [isSelectionMode])
 
-    const handleSelectTask = (taskId: string) => {
+    const handleSelectTask = useCallback((taskId: string) => {
         if (selectedTaskIds.includes(taskId)) {
             setSelectedTaskIds(selectedTaskIds.filter(id => id !== taskId))
         } else {
             setSelectedTaskIds([...selectedTaskIds, taskId])
         }
-    }
+    }, [selectedTaskIds])
 
-    const handleDeleteSelected = () => {
+    const handleDeleteSelected = useCallback(() => {
         if (selectedTaskIds.length === 0) return
 
         if (confirm(t('tasks.list.deleteMultipleConfirm', { count: selectedTaskIds.length }))) {
@@ -275,34 +286,34 @@ export function TasksListView() {
                 }
             })
         }
-    }
+    }, [selectedTaskIds, t, bulkDeleteTasks])
 
     // Single task actions
-    const handleViewTask = (taskId: string) => {
+    const handleViewTask = useCallback((taskId: string) => {
         navigate({ to: '/dashboard/tasks/$taskId', params: { taskId } })
-    }
+    }, [navigate])
 
-    const handleEditTask = (taskId: string) => {
+    const handleEditTask = useCallback((taskId: string) => {
         navigate({ to: '/dashboard/tasks/create', search: { editId: taskId } } as any)
-    }
+    }, [navigate])
 
-    const handleDeleteTask = (taskId: string) => {
+    const handleDeleteTask = useCallback((taskId: string) => {
         if (confirm(t('tasks.list.deleteConfirm'))) {
             deleteTaskMutation.mutate(taskId)
         }
-    }
+    }, [t, deleteTaskMutation])
 
-    const handleCompleteTask = (taskId: string) => {
+    const handleCompleteTask = useCallback((taskId: string) => {
         completeTaskMutation.mutate({ id: taskId })
-    }
+    }, [completeTaskMutation])
 
-    const handleReopenTask = (taskId: string) => {
+    const handleReopenTask = useCallback((taskId: string) => {
         reopenTaskMutation.mutate(taskId)
-    }
+    }, [reopenTaskMutation])
 
-    const handlePriorityChange = (taskId: string, priority: string) => {
+    const handlePriorityChange = useCallback((taskId: string, priority: string) => {
         updateTaskMutation.mutate({ id: taskId, data: { priority: priority as any } })
-    }
+    }, [updateTaskMutation])
 
     const topNav = [
         { title: t('tasks.nav.overview'), href: '/dashboard/overview', isActive: false },
@@ -361,8 +372,8 @@ export function TasksListView() {
                                         <GosiInput
                                             type="text"
                                             placeholder={t('tasks.list.searchPlaceholder')}
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            defaultValue={searchQuery}
+                                            onChange={(e) => debouncedSetSearch(e.target.value)}
                                             className="pe-12 h-14 w-full text-base"
                                         />
                                     </div>
@@ -566,13 +577,18 @@ export function TasksListView() {
                                 </div>
                             )}
 
-                            {/* Success State - Tasks List */}
-                            {!isLoading && !isError && tasks.map((task, index) => (
-                                <div
-                                    key={task.id}
-                                    onClick={() => navigate({ to: '/dashboard/tasks/$taskId', params: { taskId: task.id } })}
-                                    style={{ animationDelay: `${index * 50}ms` }}
-                                    className={`
+                            {/* Success State - Tasks List with Virtualization */}
+                            {!isLoading && !isError && tasks.length > 0 && (
+                                <VirtualList
+                                    items={tasks}
+                                    itemHeight={280}
+                                    height={Math.min(tasks.length * 280 + (tasks.length - 1) * 16, 800)}
+                                    renderItem={(task, index, style) => (
+                                        <div key={task.id} style={{ ...style, paddingBottom: '16px' }}>
+                                            <div
+                                                onClick={() => navigate({ to: '/dashboard/tasks/$taskId', params: { taskId: task.id } })}
+                                                style={{ animationDelay: `${index * 50}ms` }}
+                                                className={`
                                         animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-backwards
                                         bg-white rounded-[2rem] p-5 md:p-7
                                         border-0 ring-1 ring-black/[0.03] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)]
@@ -781,7 +797,11 @@ export function TasksListView() {
                                         </Link>
                                     </div>
                                 </div>
-                            ))}
+                                        </div>
+                                    )}
+                                    getItemKey={(index, data) => data[index].id}
+                                />
+                            )}
                         </div>
 
                     </div>

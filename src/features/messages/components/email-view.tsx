@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { useTranslation } from 'react-i18next'
 import {
   Mail, Search, Plus, Star, Trash2, Archive, Tag,
@@ -107,6 +108,12 @@ export function EmailView() {
   const [selectedFolder, setSelectedFolder] = useState('inbox')
   const [selectedEmail, setSelectedEmail] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
   const [selectedEmails, setSelectedEmails] = useState<string[]>([])
 
   const topNav = [
@@ -194,8 +201,8 @@ export function EmailView() {
                   <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                   <Input
                     placeholder={isRTL ? 'بحث في البريد...' : 'Search emails...'}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    defaultValue={searchQuery}
+                    onChange={(e) => debouncedSetSearch(e.target.value)}
                     className="ps-10"
                   />
                 </div>

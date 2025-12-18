@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { useTranslation } from 'react-i18next'
 import {
   HelpCircle, Search, Book, MessageCircle, Phone, Mail,
@@ -143,6 +144,12 @@ export function HelpCenter() {
   const { i18n, t } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
 
   const topNav = [
     { title: isRTL ? 'مركز المساعدة' : 'Help Center', href: '/dashboard/help', isActive: true },
@@ -222,8 +229,8 @@ export function HelpCenter() {
               <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" aria-hidden="true" />
               <Input
                 placeholder={isRTL ? 'ابحث في المساعدة...' : 'Search for help...'}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                defaultValue={searchQuery}
+                onChange={(e) => debouncedSetSearch(e.target.value)}
                 className="ps-12 h-14 text-lg rounded-2xl border-slate-200 shadow-sm bg-white"
               />
             </div>

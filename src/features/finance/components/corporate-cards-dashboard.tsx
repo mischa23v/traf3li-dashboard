@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import {
     CreditCard, TrendingUp, AlertCircle, CheckCircle, XCircle, FileText,
     Upload, Download, Plus, Search, Filter, Eye, Ban, Unlock,
@@ -41,6 +42,12 @@ import { CARD_STATUSES, CARD_TYPES } from '@/features/finance/types/corporate-ca
 
 export function CorporateCardsDashboard() {
     const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
     const [statusFilter, setStatusFilter] = useState<string>('all')
     const [typeFilter, setTypeFilter] = useState<string>('all')
 
@@ -127,8 +134,8 @@ export function CorporateCardsDashboard() {
                         <input
                             type="text"
                             placeholder="بحث في البطاقات..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                            defaultValue={searchQuery}
+                            onChange={(e) => debouncedSetSearch(e.target.value)}
                             className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                         />
                     </div>

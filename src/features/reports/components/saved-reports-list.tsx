@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { format } from 'date-fns'
 import {
   Play,
@@ -44,6 +45,12 @@ export function SavedReportsList({ onRunReport, onEditReport }: SavedReportsList
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const [search, setSearch] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearch(value),
+        300
+    )
+
   const [deleteTarget, setDeleteTarget] = useState<SavedReport | null>(null)
 
   const { data, isLoading } = useSavedReports({ search })
@@ -75,8 +82,8 @@ export function SavedReportsList({ onRunReport, onEditReport }: SavedReportsList
       <div className="flex items-center gap-4">
         <Input
           placeholder={t('reports.searchReports')}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          defaultValue={search}
+          onChange={(e) => debouncedSetSearch(e.target.value)}
           className="max-w-sm"
         />
       </div>

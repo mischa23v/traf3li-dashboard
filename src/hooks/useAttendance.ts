@@ -376,6 +376,7 @@ export const useTodayAttendance = (department?: string) => {
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
     refetchInterval: 60000, // Refresh every minute
+    retry: false,
   })
 }
 
@@ -513,6 +514,7 @@ export const useCheckInStatus = (employeeId: string) => {
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
     refetchInterval: 30000, // Refresh every 30 seconds
+    retry: false,
   })
 }
 

@@ -6,6 +6,7 @@ import {
 } from '@radix-ui/react-icons'
 import { type Table } from '@tanstack/react-table'
 import { useTranslation } from 'react-i18next'
+import { useCallback } from 'react'
 import { cn, getPageNumbers } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -19,6 +20,33 @@ import {
 type DataTablePaginationProps<TData> = {
   table: Table<TData>
   className?: string
+}
+
+// Static style for overflow clip margin
+const overflowClipStyle = { overflowClipMargin: 1 }
+
+type PageButtonProps = {
+  pageNumber: number
+  currentPage: number
+  table: Table<any>
+  t: (key: string, options?: any) => string
+}
+
+function PageButton({ pageNumber, currentPage, table, t }: PageButtonProps) {
+  const handleClick = useCallback(() => {
+    table.setPageIndex(pageNumber - 1)
+  }, [table, pageNumber])
+
+  return (
+    <Button
+      variant={currentPage === pageNumber ? 'default' : 'outline'}
+      className='h-8 min-w-8 px-2'
+      onClick={handleClick}
+    >
+      <span className='sr-only'>{t('dataTable.pagination.goToPage', { page: pageNumber })}</span>
+      {pageNumber}
+    </Button>
+  )
 }
 
 export function DataTablePagination<TData>({
@@ -37,7 +65,7 @@ export function DataTablePagination<TData>({
         '@max-2xl/content:flex-col-reverse @max-2xl/content:gap-4',
         className
       )}
-      style={{ overflowClipMargin: 1 }}
+      style={overflowClipStyle}
     >
       <div className='flex w-full items-center justify-between'>
         <div className='flex w-[100px] items-center justify-center text-sm font-medium @2xl/content:hidden'>
@@ -95,14 +123,12 @@ export function DataTablePagination<TData>({
               {pageNumber === '...' ? (
                 <span className='text-muted-foreground px-1 text-sm'>...</span>
               ) : (
-                <Button
-                  variant={currentPage === pageNumber ? 'default' : 'outline'}
-                  className='h-8 min-w-8 px-2'
-                  onClick={() => table.setPageIndex((pageNumber as number) - 1)}
-                >
-                  <span className='sr-only'>{t('dataTable.pagination.goToPage', { page: pageNumber })}</span>
-                  {pageNumber}
-                </Button>
+                <PageButton
+                  pageNumber={pageNumber as number}
+                  currentPage={currentPage}
+                  table={table}
+                  t={t}
+                />
               )}
             </div>
           ))}

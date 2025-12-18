@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import {
   Plus,
   Users,
@@ -740,6 +741,12 @@ function ActivityDialog({
 export function LeadsDashboard() {
   const [selectedStage, setSelectedStage] = useState<LeadStage | 'all'>('all')
   const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
   const [draggedLeadId, setDraggedLeadId] = useState<string | null>(null)
   const [showLeadForm, setShowLeadForm] = useState(false)
   const [showConvertDialog, setShowConvertDialog] = useState(false)
@@ -962,8 +969,8 @@ export function LeadsDashboard() {
               <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
               <Input
                 placeholder="بحث عن عملاء محتملين..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                defaultValue={searchQuery}
+                onChange={(e) => debouncedSetSearch(e.target.value)}
                 className="pe-10 rounded-xl"
               />
             </div>

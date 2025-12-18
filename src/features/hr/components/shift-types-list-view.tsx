@@ -1,5 +1,6 @@
 import { HRSidebar } from './hr-sidebar'
 import { useState, useMemo } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -127,6 +128,12 @@ export function ShiftTypesListView() {
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
   const [activeFilter, setActiveFilter] = useState<string>('all')
   const [ramadanFilter, setRamadanFilter] = useState<string>('all')
   const [sortBy, setSortBy] = useState<string>('name')
@@ -360,8 +367,8 @@ export function ShiftTypesListView() {
               type="search"
               placeholder="بحث في أنواع الورديات..."
               className="w-full rounded-lg bg-background ltr:pl-8 rtl:pr-8 md:w-[200px] lg:w-[336px]"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              defaultValue={searchQuery}
+              onChange={(e) => debouncedSetSearch(e.target.value)}
             />
           </div>
           <LanguageSwitcher />

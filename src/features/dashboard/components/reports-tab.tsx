@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useMemo } from 'react'
 import { Scale, TrendingUp, ListTodo, Loader2 } from 'lucide-react'
 import {
   Card,
@@ -45,8 +45,8 @@ const CasesChartCard = memo(function CasesChartCard({
   casesChart,
   casesChartLoading,
 }: CasesChartCardProps) {
-  const data = casesChart?.data?.slice(-12) || []
-  const maxValue = Math.max(...data.map((d: CasesChartData) => d.total), 1)
+  const data = useMemo(() => casesChart?.data?.slice(-12) || [], [casesChart?.data])
+  const maxValue = useMemo(() => Math.max(...data.map((d: CasesChartData) => d.total), 1), [data])
 
   return (
     <Card className="rounded-3xl border-slate-100 shadow-sm">
@@ -80,30 +80,42 @@ const CasesChartCard = memo(function CasesChartCard({
               ))}
             </div>
             {/* Summary */}
-            <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-100">
-              <div className="text-center">
-                <p className="text-xs text-slate-500">{t('dashboard.reports.opened', 'مفتوحة')}</p>
-                <p className="font-bold text-green-600">
-                  {data.reduce((sum: number, item: CasesChartData) => sum + (item.opened || 0), 0)}
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-xs text-slate-500">{t('dashboard.reports.closed', 'مغلقة')}</p>
-                <p className="font-bold text-blue-600">
-                  {data.reduce((sum: number, item: CasesChartData) => sum + (item.closed || 0), 0)}
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-xs text-slate-500">{t('dashboard.reports.pending', 'معلقة')}</p>
-                <p className="font-bold text-amber-600">
-                  {data.reduce((sum: number, item: CasesChartData) => sum + (item.pending || 0), 0)}
-                </p>
-              </div>
-            </div>
+            <CasesChartSummary t={t} data={data} />
           </div>
         )}
       </CardContent>
     </Card>
+  )
+})
+
+const CasesChartSummary = memo(function CasesChartSummary({
+  t,
+  data,
+}: {
+  t: CasesChartCardProps['t']
+  data: CasesChartData[]
+}) {
+  const summaryStats = useMemo(() => ({
+    opened: data.reduce((sum: number, item: CasesChartData) => sum + (item.opened || 0), 0),
+    closed: data.reduce((sum: number, item: CasesChartData) => sum + (item.closed || 0), 0),
+    pending: data.reduce((sum: number, item: CasesChartData) => sum + (item.pending || 0), 0),
+  }), [data])
+
+  return (
+    <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-100">
+      <div className="text-center">
+        <p className="text-xs text-slate-500">{t('dashboard.reports.opened', 'مفتوحة')}</p>
+        <p className="font-bold text-green-600">{summaryStats.opened}</p>
+      </div>
+      <div className="text-center">
+        <p className="text-xs text-slate-500">{t('dashboard.reports.closed', 'مغلقة')}</p>
+        <p className="font-bold text-blue-600">{summaryStats.closed}</p>
+      </div>
+      <div className="text-center">
+        <p className="text-xs text-slate-500">{t('dashboard.reports.pending', 'معلقة')}</p>
+        <p className="font-bold text-amber-600">{summaryStats.pending}</p>
+      </div>
+    </div>
   )
 })
 
@@ -118,8 +130,8 @@ const RevenueChartCard = memo(function RevenueChartCard({
   revenueChart,
   revenueChartLoading,
 }: RevenueChartCardProps) {
-  const data = revenueChart?.data?.slice(-12) || []
-  const maxValue = Math.max(...data.map((d: RevenueChartData) => d.revenue), 1)
+  const data = useMemo(() => revenueChart?.data?.slice(-12) || [], [revenueChart?.data])
+  const maxValue = useMemo(() => Math.max(...data.map((d: RevenueChartData) => d.revenue), 1), [data])
 
   return (
     <Card className="rounded-3xl border-slate-100 shadow-sm">
@@ -191,7 +203,7 @@ const TasksChartCard = memo(function TasksChartCard({
   tasksChart,
   tasksChartLoading,
 }: TasksChartCardProps) {
-  const data = tasksChart?.data?.slice(-12) || []
+  const data = useMemo(() => tasksChart?.data?.slice(-12) || [], [tasksChart?.data])
 
   return (
     <Card className="rounded-3xl border-slate-100 shadow-sm">

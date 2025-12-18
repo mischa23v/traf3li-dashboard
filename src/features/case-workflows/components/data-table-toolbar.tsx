@@ -6,6 +6,7 @@ import { DataTableViewOptions, DataTableFacetedFilter } from '@/components/data-
 import type { WorkflowTemplate } from '../data/schema'
 import { caseCategories } from '../data/data'
 import { useTranslation } from 'react-i18next'
+import { useDebouncedCallback } from 'use-debounce'
 
 interface DataTableToolbarProps {
   table: Table<WorkflowTemplate>
@@ -15,6 +16,11 @@ export function DataTableToolbar({ table }: DataTableToolbarProps) {
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const isFiltered = table.getState().columnFilters.length > 0
+
+  const debouncedFilter = useDebouncedCallback(
+    (column: any, value: string) => column?.setFilterValue(value),
+    300
+  )
 
   const categoryOptions = caseCategories.map((category) => ({
     value: category.value,
@@ -33,7 +39,7 @@ export function DataTableToolbar({ table }: DataTableToolbarProps) {
         <Input
           placeholder={t('caseWorkflows.searchPlaceholder')}
           value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
-          onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
+          onChange={(event) => { const col = table.getColumn('name'); debouncedFilter(col, event.target.value); }}
           className="h-8 w-[150px] lg:w-[250px]"
         />
         {table.getColumn('caseCategory') && (

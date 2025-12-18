@@ -1,5 +1,5 @@
 import { HRSidebar } from './hr-sidebar'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -81,14 +81,17 @@ export function LeaveRequestsListView() {
     }, [statusFilter, typeFilter])
 
     // Check if any filter is active
-    const hasActiveFilters = searchQuery || statusFilter !== 'all' || typeFilter !== 'all'
+    const hasActiveFilters = useMemo(() =>
+        searchQuery || statusFilter !== 'all' || typeFilter !== 'all',
+        [searchQuery, statusFilter, typeFilter]
+    )
 
     // Clear filters
-    const clearFilters = () => {
+    const clearFilters = useCallback(() => {
         setSearchQuery('')
         setStatusFilter('all')
         setTypeFilter('all')
-    }
+    }, [])
 
     // Fetch leave requests
     const { data: requestsData, isLoading, isError, error, refetch } = useLeaveRequests(filters)
@@ -114,33 +117,33 @@ export function LeaveRequestsListView() {
     }, [requestsData, searchQuery])
 
     // Selection Handlers
-    const handleToggleSelectionMode = () => {
-        setIsSelectionMode(!isSelectionMode)
+    const handleToggleSelectionMode = useCallback(() => {
+        setIsSelectionMode(prev => !prev)
         setSelectedIds([])
-    }
+    }, [])
 
-    const handleSelectRequest = (requestId: string) => {
-        if (selectedIds.includes(requestId)) {
-            setSelectedIds(selectedIds.filter(id => id !== requestId))
-        } else {
-            setSelectedIds([...selectedIds, requestId])
-        }
-    }
+    const handleSelectRequest = useCallback((requestId: string) => {
+        setSelectedIds(prev =>
+            prev.includes(requestId)
+                ? prev.filter(id => id !== requestId)
+                : [...prev, requestId]
+        )
+    }, [])
 
     // Single request actions
-    const handleViewRequest = (requestId: string) => {
+    const handleViewRequest = useCallback((requestId: string) => {
         navigate({ to: '/dashboard/hr/leave/$requestId', params: { requestId } })
-    }
+    }, [navigate])
 
-    const handleEditRequest = (requestId: string) => {
+    const handleEditRequest = useCallback((requestId: string) => {
         navigate({ to: '/dashboard/hr/leave/new', search: { editId: requestId } })
-    }
+    }, [navigate])
 
-    const handleDeleteRequest = (requestId: string) => {
+    const handleDeleteRequest = useCallback((requestId: string) => {
         if (confirm('هل أنت متأكد من حذف هذا الطلب؟')) {
             deleteRequestMutation.mutate(requestId)
         }
-    }
+    }, [deleteRequestMutation])
 
     // Status badge styling
     const getStatusBadge = (status: LeaveStatus) => {

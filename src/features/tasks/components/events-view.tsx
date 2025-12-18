@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PERF_DEBUG, perfLog } from '@/lib/perf-debug'
 import { TasksSidebar } from './tasks-sidebar'
@@ -122,16 +122,19 @@ export function EventsView() {
     }, [activeTab, searchQuery, typeFilter, sortBy])
 
     // Check if any filter is active
-    const hasActiveFilters = searchQuery || typeFilter !== 'all'
+    const hasActiveFilters = useMemo(() =>
+        searchQuery || typeFilter !== 'all',
+        [searchQuery, typeFilter]
+    )
 
     // Clear all filters
-    const clearFilters = () => {
+    const clearFilters = useCallback(() => {
         setSearchQuery('')
         setTypeFilter('all')
-    }
+    }, [])
 
     // Helper function to format dates based on current locale
-    const formatDualDate = (dateString: string | null | undefined) => {
+    const formatDualDate = useCallback((dateString: string | null | undefined) => {
         if (!dateString) return { arabic: t('events.list.notSet'), english: t('events.list.notSet') }
         const date = new Date(dateString)
         if (isNaN(date.getTime())) return { arabic: t('events.list.notSet'), english: t('events.list.notSet') }
@@ -139,7 +142,7 @@ export function EventsView() {
             arabic: format(date, 'd MMMM', { locale: arSA }),
             english: format(date, 'MMM d, yyyy', { locale: enUS })
         }
-    }
+    }, [t])
 
     // Fetch events
     const { data: eventsData, isLoading, isError, error, refetch, isFetching } = useEvents(filters)
@@ -202,11 +205,11 @@ export function EventsView() {
     }, [eventsData])
 
     // Single event actions
-    const handleViewEvent = (eventId: string) => {
+    const handleViewEvent = useCallback((eventId: string) => {
         navigate({ to: '/dashboard/tasks/events/$eventId', params: { eventId } })
-    }
+    }, [navigate])
 
-    const handleDeleteEvent = async (eventId: string) => {
+    const handleDeleteEvent = useCallback(async (eventId: string) => {
         if (confirm('هل أنت متأكد من حذف هذا الحدث؟')) {
             try {
                 await deleteEvent(eventId)
@@ -215,17 +218,17 @@ export function EventsView() {
                 toast.error('فشل حذف الحدث')
             }
         }
-    }
+    }, [deleteEvent])
 
-    const handleCompleteEvent = (eventId: string) => {
+    const handleCompleteEvent = useCallback((eventId: string) => {
         completeEventMutation.mutate({ id: eventId })
-    }
+    }, [completeEventMutation])
 
-    const handleCancelEvent = (eventId: string) => {
+    const handleCancelEvent = useCallback((eventId: string) => {
         cancelEventMutation.mutate({ id: eventId })
-    }
+    }, [cancelEventMutation])
 
-    const handlePostponeEvent = () => {
+    const handlePostponeEvent = useCallback(() => {
         if (!postponeEventId || !postponeDate || !postponeTime) return
         const newDateTime = new Date(`${postponeDate}T${postponeTime}:00`).toISOString()
         postponeEventMutation.mutate(
@@ -239,23 +242,23 @@ export function EventsView() {
                 }
             }
         )
-    }
+    }, [postponeEventId, postponeDate, postponeTime, postponeReason, postponeEventMutation])
 
     // Selection Handlers
-    const handleToggleSelectionMode = () => {
+    const handleToggleSelectionMode = useCallback(() => {
         setIsSelectionMode(!isSelectionMode)
         setSelectedEventIds([])
-    }
+    }, [isSelectionMode])
 
-    const handleSelectEvent = (id: string) => {
+    const handleSelectEvent = useCallback((id: string) => {
         if (selectedEventIds.includes(id)) {
             setSelectedEventIds(selectedEventIds.filter(itemId => itemId !== id))
         } else {
             setSelectedEventIds([...selectedEventIds, id])
         }
-    }
+    }, [selectedEventIds])
 
-    const handleDeleteSelected = async () => {
+    const handleDeleteSelected = useCallback(async () => {
         if (selectedEventIds.length === 0) return
 
         if (confirm(t('events.list.deleteMultipleConfirm', { count: selectedEventIds.length }))) {
@@ -268,15 +271,15 @@ export function EventsView() {
                 toast.error(t('events.toast.deleteError'))
             }
         }
-    }
+    }, [selectedEventIds, t, deleteEvent])
 
-    const handleRSVP = (id: string, status: 'accepted' | 'declined') => {
+    const handleRSVP = useCallback((id: string, status: 'accepted' | 'declined') => {
         rsvpEvent({ id, status }, {
             onSuccess: () => {
                 toast.success(status === 'accepted' ? t('events.toast.rsvpAccepted') : t('events.toast.rsvpDeclined'))
             }
         })
-    }
+    }, [rsvpEvent, t])
 
     const topNav = [
         { title: t('events.nav.overview'), href: '/dashboard/overview', isActive: false },

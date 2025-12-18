@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { useTranslation } from 'react-i18next'
 import {
   FileText, Search, Download, ExternalLink, Calendar,
@@ -139,6 +140,12 @@ export function FormsView() {
   const { i18n, t } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [formatFilter, setFormatFilter] = useState('all')
   const [bookmarkedForms, setBookmarkedForms] = useState<string[]>(['1', '3'])
@@ -268,8 +275,8 @@ export function FormsView() {
                     <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                     <Input
                       placeholder={isRTL ? 'بحث في النماذج...' : 'Search forms...'}
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      defaultValue={searchQuery}
+                      onChange={(e) => debouncedSetSearch(e.target.value)}
                       className="ps-10 rounded-xl border-slate-200"
                     />
                   </div>

@@ -1,9 +1,10 @@
 /**
  * Notification Item Component
  * Displays a single notification with actions
+ * Optimized with React.memo and useCallback
  */
 
-import { memo } from 'react'
+import { memo, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from '@tanstack/react-router'
 import { formatDistanceToNow } from 'date-fns'
@@ -87,17 +88,28 @@ export const NotificationItem = memo(function NotificationItem({
   const isRtl = i18n.language === 'ar'
   const locale = isRtl ? ar : enUS
 
-  const title = isRtl && notification.titleAr ? notification.titleAr : notification.title
-  const message = isRtl && notification.messageAr ? notification.messageAr : notification.message
-  const actionLabel =
-    isRtl && notification.actionLabelAr ? notification.actionLabelAr : notification.actionLabel
+  // Memoize computed values
+  const { title, message, actionLabel, timeAgo } = useMemo(() => {
+    const computedTitle = isRtl && notification.titleAr ? notification.titleAr : notification.title
+    const computedMessage = isRtl && notification.messageAr ? notification.messageAr : notification.message
+    const computedActionLabel =
+      isRtl && notification.actionLabelAr ? notification.actionLabelAr : notification.actionLabel
+    const computedTimeAgo = formatDistanceToNow(new Date(notification.createdAt), {
+      addSuffix: true,
+      locale,
+    })
 
-  const timeAgo = formatDistanceToNow(new Date(notification.createdAt), {
-    addSuffix: true,
-    locale,
-  })
+    return {
+      title: computedTitle,
+      message: computedMessage,
+      actionLabel: computedActionLabel,
+      timeAgo: computedTimeAgo,
+    }
+  }, [notification.titleAr, notification.title, notification.messageAr, notification.message,
+      notification.actionLabelAr, notification.actionLabel, notification.createdAt, isRtl, locale])
 
-  const handleClick = () => {
+  // Optimize handlers with useCallback
+  const handleClick = useCallback(() => {
     if (!notification.read && onMarkAsRead) {
       onMarkAsRead(notification._id)
     }
@@ -107,12 +119,17 @@ export const NotificationItem = memo(function NotificationItem({
     }
 
     onClick?.(notification)
-  }
+  }, [notification, onMarkAsRead, navigate, onClick])
 
-  const handleDelete = (e: React.MouseEvent) => {
+  const handleDelete = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
     onDelete?.(notification._id)
-  }
+  }, [onDelete, notification._id])
+
+  const handleMarkAsReadClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
+    onMarkAsRead?.(notification._id)
+  }, [onMarkAsRead, notification._id])
 
   return (
     <div
@@ -191,10 +208,7 @@ export const NotificationItem = memo(function NotificationItem({
               variant="ghost"
               size="icon"
               className="h-7 w-7"
-              onClick={(e) => {
-                e.stopPropagation()
-                onMarkAsRead(notification._id)
-              }}
+              onClick={handleMarkAsReadClick}
               aria-label={t('notifications.markAsRead', 'Mark as read')}
             >
               <CheckCircle className="h-4 w-4" />

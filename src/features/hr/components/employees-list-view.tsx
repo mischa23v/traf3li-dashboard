@@ -1,5 +1,6 @@
 import { HRSidebar } from './hr-sidebar'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -35,6 +36,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import type { Employee, EmploymentStatus, EmploymentType } from '@/services/hrService'
+import { VirtualList } from '@/components/virtual-list'
 
 export function EmployeesListView() {
     const navigate = useNavigate()
@@ -47,6 +49,12 @@ export function EmployeesListView() {
     const [typeFilter, setTypeFilter] = useState<string>('all')
     const [nationalityFilter, setNationalityFilter] = useState<string>('all')
     const [sortBy, setSortBy] = useState<string>('hireDate')
+
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
 
     // Mutations
     const deleteEmployeeMutation = useDeleteEmployee()
@@ -94,15 +102,18 @@ export function EmployeesListView() {
     }, [statusFilter, typeFilter, nationalityFilter, searchQuery, sortBy])
 
     // Check if any filter is active
-    const hasActiveFilters = searchQuery || statusFilter !== 'all' || typeFilter !== 'all' || nationalityFilter !== 'all'
+    const hasActiveFilters = useMemo(() =>
+        searchQuery || statusFilter !== 'all' || typeFilter !== 'all' || nationalityFilter !== 'all',
+        [searchQuery, statusFilter, typeFilter, nationalityFilter]
+    )
 
     // Clear all filters
-    const clearFilters = () => {
+    const clearFilters = useCallback(() => {
         setSearchQuery('')
         setStatusFilter('all')
         setTypeFilter('all')
         setNationalityFilter('all')
-    }
+    }, [])
 
     // Fetch employees
     const { data: employeesData, isLoading, isError, error, refetch } = useEmployees(filters)
@@ -146,20 +157,20 @@ export function EmployeesListView() {
     }, [employeesData])
 
     // Selection Handlers
-    const handleToggleSelectionMode = () => {
-        setIsSelectionMode(!isSelectionMode)
+    const handleToggleSelectionMode = useCallback(() => {
+        setIsSelectionMode(prev => !prev)
         setSelectedIds([])
-    }
+    }, [])
 
-    const handleSelectEmployee = (employeeId: string) => {
-        if (selectedIds.includes(employeeId)) {
-            setSelectedIds(selectedIds.filter(id => id !== employeeId))
-        } else {
-            setSelectedIds([...selectedIds, employeeId])
-        }
-    }
+    const handleSelectEmployee = useCallback((employeeId: string) => {
+        setSelectedIds(prev =>
+            prev.includes(employeeId)
+                ? prev.filter(id => id !== employeeId)
+                : [...prev, employeeId]
+        )
+    }, [])
 
-    const handleDeleteSelected = () => {
+    const handleDeleteSelected = useCallback(() => {
         if (selectedIds.length === 0) return
 
         if (confirm(`هل أنت متأكد من حذف ${selectedIds.length} موظف؟`)) {
@@ -170,22 +181,22 @@ export function EmployeesListView() {
                 }
             })
         }
-    }
+    }, [selectedIds, bulkDeleteEmployees])
 
     // Single employee actions
-    const handleViewEmployee = (employeeId: string) => {
+    const handleViewEmployee = useCallback((employeeId: string) => {
         navigate({ to: '/dashboard/hr/employees/$employeeId', params: { employeeId } })
-    }
+    }, [navigate])
 
-    const handleEditEmployee = (employeeId: string) => {
+    const handleEditEmployee = useCallback((employeeId: string) => {
         navigate({ to: '/dashboard/hr/employees/new', search: { editId: employeeId } })
-    }
+    }, [navigate])
 
-    const handleDeleteEmployee = (employeeId: string) => {
+    const handleDeleteEmployee = useCallback((employeeId: string) => {
         if (confirm('هل أنت متأكد من حذف هذا الموظف؟')) {
             deleteEmployeeMutation.mutate(employeeId)
         }
-    }
+    }, [deleteEmployeeMutation])
 
     // Status badge styling
     const getStatusBadge = (status: EmploymentStatus) => {
@@ -284,8 +295,8 @@ export function EmployeesListView() {
                                         <Input
                                             type="text"
                                             placeholder="بحث بالاسم أو الرقم الوظيفي..." aria-label="بحث بالاسم أو الرقم الوظيفي"
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            defaultValue={searchQuery}
+                                            onChange={(e) => debouncedSetSearch(e.target.value)}
                                             className="pe-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
                                         />
                                     </div>
@@ -425,94 +436,104 @@ export function EmployeesListView() {
                                     </div>
                                 )}
 
-                                {/* Success State - Employees List */}
-                                {!isLoading && !isError && employees.map((employee) => (
-                                    <div key={employee.id} className={`bg-[#F8F9FA] rounded-2xl p-6 border transition-all group ${selectedIds.includes(employee.id) ? 'border-emerald-500 bg-emerald-50/30' : 'border-slate-100 hover:border-emerald-200'}`}>
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div className="flex gap-4 items-center">
-                                                {isSelectionMode && (
-                                                    <Checkbox
-                                                        checked={selectedIds.includes(employee.id)}
-                                                        onCheckedChange={() => handleSelectEmployee(employee.id)}
-                                                        className="h-6 w-6 rounded-md border-slate-300 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
-                                                    />
-                                                )}
-                                                <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center shadow-sm text-emerald-600 font-bold text-lg">
-                                                    {employee.avatar ? (
-                                                        <img src={employee.avatar} alt={employee.fullName} className="w-full h-full rounded-xl object-cover" />
-                                                    ) : (
-                                                        employee.fullName.charAt(0)
-                                                    )}
-                                                </div>
-                                                <div>
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <h4 className="font-bold text-navy text-lg">{employee.fullName}</h4>
-                                                        {getStatusBadge(employee.status)}
+                                {/* Success State - Employees List with Virtualization */}
+                                {!isLoading && !isError && employees.length > 0 && (
+                                    <VirtualList
+                                        items={employees}
+                                        itemHeight={200}
+                                        height={Math.min(employees.length * 200 + (employees.length - 1) * 16, 800)}
+                                        renderItem={(employee, index, style) => (
+                                            <div key={employee.id} style={{ ...style, paddingBottom: '16px' }}>
+                                                <div className={`bg-[#F8F9FA] rounded-2xl p-6 border transition-all group ${selectedIds.includes(employee.id) ? 'border-emerald-500 bg-emerald-50/30' : 'border-slate-100 hover:border-emerald-200'}`}>
+                                                    <div className="flex justify-between items-start mb-4">
+                                                        <div className="flex gap-4 items-center">
+                                                            {isSelectionMode && (
+                                                                <Checkbox
+                                                                    checked={selectedIds.includes(employee.id)}
+                                                                    onCheckedChange={() => handleSelectEmployee(employee.id)}
+                                                                    className="h-6 w-6 rounded-md border-slate-300 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
+                                                                />
+                                                            )}
+                                                            <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center shadow-sm text-emerald-600 font-bold text-lg">
+                                                                {employee.avatar ? (
+                                                                    <img src={employee.avatar} alt={`${employee.fullName} avatar`} className="w-full h-full rounded-xl object-cover" loading="lazy" width="56" height="56" />
+                                                                ) : (
+                                                                    employee.fullName.charAt(0)
+                                                                )}
+                                                            </div>
+                                                            <div>
+                                                                <div className="flex items-center gap-2 mb-1">
+                                                                    <h4 className="font-bold text-navy text-lg">{employee.fullName}</h4>
+                                                                    {getStatusBadge(employee.status)}
+                                                                </div>
+                                                                <p className="text-slate-500 text-sm">{employee.jobTitleArabic} • {employee.employeeNumber}</p>
+                                                            </div>
+                                                        </div>
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy" aria-label="خيارات">
+                                                                    <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end" className="w-48">
+                                                                <DropdownMenuItem onClick={() => handleViewEmployee(employee.id)}>
+                                                                    <Eye className="h-4 w-4 ms-2" aria-hidden="true" />
+                                                                    عرض التفاصيل
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem onClick={() => handleEditEmployee(employee.id)}>
+                                                                    <Edit3 className="h-4 w-4 ms-2 text-blue-500" aria-hidden="true" />
+                                                                    تعديل البيانات
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuSeparator />
+                                                                <DropdownMenuItem
+                                                                    onClick={() => handleDeleteEmployee(employee.id)}
+                                                                    className="text-red-600 focus:text-red-600"
+                                                                >
+                                                                    <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />
+                                                                    حذف الموظف
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
                                                     </div>
-                                                    <p className="text-slate-500 text-sm">{employee.jobTitleArabic} • {employee.employeeNumber}</p>
-                                                </div>
-                                            </div>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy" aria-label="خيارات">
-                                                        <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-48">
-                                                    <DropdownMenuItem onClick={() => handleViewEmployee(employee.id)}>
-                                                        <Eye className="h-4 w-4 ms-2" aria-hidden="true" />
-                                                        عرض التفاصيل
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleEditEmployee(employee.id)}>
-                                                        <Edit3 className="h-4 w-4 ms-2 text-blue-500" aria-hidden="true" />
-                                                        تعديل البيانات
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuSeparator />
-                                                    <DropdownMenuItem
-                                                        onClick={() => handleDeleteEmployee(employee.id)}
-                                                        className="text-red-600 focus:text-red-600"
-                                                    >
-                                                        <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />
-                                                        حذف الموظف
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </div>
 
-                                        <div className="flex items-center justify-between pt-4 border-t border-slate-200/50">
-                                            <div className="flex items-center gap-6">
-                                                {/* Contact Info */}
-                                                <div className="flex items-center gap-4 text-sm text-slate-500">
-                                                    {employee.mobile && (
-                                                        <span className="flex items-center gap-1">
-                                                            <Phone className="h-4 w-4" aria-hidden="true" />
-                                                            {employee.mobile}
-                                                        </span>
-                                                    )}
-                                                    {employee.email && (
-                                                        <span className="flex items-center gap-1">
-                                                            <Mail className="h-4 w-4" aria-hidden="true" />
-                                                            {employee.email}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                {/* Employment Info */}
-                                                <div className="flex items-center gap-3">
-                                                    {getTypeBadge(employee.employmentType)}
-                                                    <div className="text-center">
-                                                        <div className="text-xs text-slate-600">تاريخ التعيين</div>
-                                                        <div className="font-medium text-navy text-sm">{employee.hireDateFormatted.arabic}</div>
+                                                    <div className="flex items-center justify-between pt-4 border-t border-slate-200/50">
+                                                        <div className="flex items-center gap-6">
+                                                            {/* Contact Info */}
+                                                            <div className="flex items-center gap-4 text-sm text-slate-500">
+                                                                {employee.mobile && (
+                                                                    <span className="flex items-center gap-1">
+                                                                        <Phone className="h-4 w-4" aria-hidden="true" />
+                                                                        {employee.mobile}
+                                                                    </span>
+                                                                )}
+                                                                {employee.email && (
+                                                                    <span className="flex items-center gap-1">
+                                                                        <Mail className="h-4 w-4" aria-hidden="true" />
+                                                                        {employee.email}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            {/* Employment Info */}
+                                                            <div className="flex items-center gap-3">
+                                                                {getTypeBadge(employee.employmentType)}
+                                                                <div className="text-center">
+                                                                    <div className="text-xs text-slate-600">تاريخ التعيين</div>
+                                                                    <div className="font-medium text-navy text-sm">{employee.hireDateFormatted.arabic}</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <Link to={`/dashboard/hr/employees/${employee.id}`}>
+                                                            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
+                                                                عرض الملف
+                                                            </Button>
+                                                        </Link>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <Link to={`/dashboard/hr/employees/${employee.id}`}>
-                                                <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
-                                                    عرض الملف
-                                                </Button>
-                                            </Link>
-                                        </div>
-                                    </div>
-                                ))}
+                                        )}
+                                        getItemKey={(index, data) => data[index].id}
+                                    />
+                                )}
                             </div>
 
                             <div className="p-4 pt-0 text-center">

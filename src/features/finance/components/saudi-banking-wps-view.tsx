@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
@@ -132,6 +133,12 @@ function WPSSidebar() {
 export function SaudiBankingWPSView() {
     const navigate = useNavigate()
     const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
     const [statusFilter, setStatusFilter] = useState('all')
 
     // Fetch data
@@ -296,8 +303,8 @@ export function SaudiBankingWPSView() {
                                         <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                                         <Input
                                             placeholder="بحث بالاسم أو المرجع..."
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            defaultValue={searchQuery}
+                                            onChange={(e) => debouncedSetSearch(e.target.value)}
                                             className="pe-10 rounded-xl"
                                         />
                                     </div>

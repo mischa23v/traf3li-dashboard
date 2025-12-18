@@ -213,6 +213,7 @@ export const useCampaignAnalytics = (id: string, enabled: boolean = true) => {
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
     refetchInterval: 30000, // Refresh every 30 seconds during active campaigns
+    retry: false,
   })
 }
 
@@ -567,6 +568,7 @@ export const useWhatsAppConversations = (filters?: ConversationFilters, enabled:
     gcTime: STATS_GC_TIME,
     enabled,
     refetchInterval: 30000, // Refresh every 30 seconds (reduced from 10s for performance)
+    retry: false,
   })
 }
 
@@ -578,6 +580,7 @@ export const useWhatsAppConversation = (id: string, enabled: boolean = true) => 
     staleTime: 30 * 1000,
     gcTime: STATS_GC_TIME,
     refetchInterval: 5000, // Refresh every 5 seconds for active chat
+    retry: false,
   })
 }
 

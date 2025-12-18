@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import {
     Search, Filter, Plus, MoreHorizontal,
     FileText, AlertCircle, CheckCircle, Bell, Loader2,
@@ -113,12 +113,12 @@ export default function BillsDashboard() {
     }, [startDate, endDate, selectedVendor])
 
     // Clear all filters
-    const clearFilters = () => {
+    const clearFilters = useCallback(() => {
         setStartDate('')
         setEndDate('')
         setSelectedVendor('')
         setCurrentPage(1)
-    }
+    }, [])
 
     // Fetch data
     const { data: billsData, isLoading, isError, error, refetch } = useBills(filters)
@@ -155,39 +155,49 @@ export default function BillsDashboard() {
     }, [bills, searchQuery])
 
     // Calculate line item total
-    const calculateLineTotal = (line: BillLine) => {
+    const calculateLineTotal = useCallback((line: BillLine) => {
         return line.quantity * line.unitCost
-    }
+    }, [])
 
     // Calculate new bill totals
     const newBillTotals = useMemo(() => {
-        const subtotal = newBillLines.reduce((sum, line) => sum + calculateLineTotal(line), 0)
+        const subtotal = newBillLines.reduce((sum, line) => sum + (line.quantity * line.unitCost), 0)
         const vatAmount = subtotal * (newBillVatRate / 100)
         const total = subtotal + vatAmount
         return { subtotal, vatAmount, total }
     }, [newBillLines, newBillVatRate])
 
     // Add line item
-    const addLineItem = () => {
+    const addLineItem = useCallback(() => {
         setNewBillLines([...newBillLines, { description: '', quantity: 1, unitCost: 0 }])
-    }
+    }, [newBillLines])
 
     // Remove line item
-    const removeLineItem = (index: number) => {
+    const removeLineItem = useCallback((index: number) => {
         if (newBillLines.length > 1) {
             setNewBillLines(newBillLines.filter((_, i) => i !== index))
         }
-    }
+    }, [newBillLines])
 
     // Update line item
-    const updateLineItem = (index: number, field: keyof BillLine, value: any) => {
+    const updateLineItem = useCallback((index: number, field: keyof BillLine, value: any) => {
         const updated = [...newBillLines]
         updated[index] = { ...updated[index], [field]: value }
         setNewBillLines(updated)
-    }
+    }, [newBillLines])
+
+    // Reset new bill form
+    const resetNewBillForm = useCallback(() => {
+        setNewBillVendorId('')
+        setNewBillDate(new Date().toISOString().split('T')[0])
+        setNewBillDueDate('')
+        setNewBillLines([{ description: '', quantity: 1, unitCost: 0 }])
+        setNewBillVatRate(15)
+        setNewBillNotes('')
+    }, [])
 
     // Handle create bill
-    const handleCreateBill = () => {
+    const handleCreateBill = useCallback(() => {
         if (!newBillVendorId || !newBillDueDate || newBillLines.some(l => !l.description)) {
             return
         }
@@ -211,20 +221,10 @@ export default function BillsDashboard() {
                 resetNewBillForm()
             }
         })
-    }
-
-    // Reset new bill form
-    const resetNewBillForm = () => {
-        setNewBillVendorId('')
-        setNewBillDate(new Date().toISOString().split('T')[0])
-        setNewBillDueDate('')
-        setNewBillLines([{ description: '', quantity: 1, unitCost: 0 }])
-        setNewBillVatRate(15)
-        setNewBillNotes('')
-    }
+    }, [newBillVendorId, newBillDueDate, newBillLines, newBillDate, newBillVatRate, newBillNotes, createBill, resetNewBillForm])
 
     // Status badge helper
-    const getStatusBadge = (status: string) => {
+    const getStatusBadge = useCallback((status: string) => {
         const statusMap = {
             draft: { label: 'مسودة', className: 'bg-slate-100 text-slate-600' },
             pending: { label: 'معلقة', className: 'bg-amber-100 text-amber-700' },
@@ -236,7 +236,7 @@ export default function BillsDashboard() {
         }
         const config = statusMap[status as keyof typeof statusMap] || statusMap.pending
         return <Badge className={`${config.className} border-0 px-2 py-0.5`}>{config.label}</Badge>
-    }
+    }, [])
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },

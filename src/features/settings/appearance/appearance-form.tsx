@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo, useCallback, memo } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -30,6 +30,17 @@ const appearanceFormSchema = z.object({
 
 type AppearanceFormValues = z.infer<typeof appearanceFormSchema>
 
+// Memoized loading skeleton to prevent unnecessary re-renders
+const LoadingSkeleton = memo(function LoadingSkeleton() {
+  return (
+    <div className='space-y-8'>
+      <Skeleton className='h-20 w-full' />
+      <Skeleton className='h-32 w-full' />
+      <Skeleton className='h-10 w-32' />
+    </div>
+  )
+})
+
 export function AppearanceForm() {
   const { t } = useTranslation()
   const { font, setFont } = useFont()
@@ -37,12 +48,14 @@ export function AppearanceForm() {
   const { data: settings, isLoading: loadingSettings } = useSettings()
   const { mutate: updateSettings, isPending } = useUpdateAppearanceSettings()
 
+  const defaultValues = useMemo(() => ({
+    theme: theme as 'light' | 'dark' | 'system',
+    font,
+  }), [theme, font])
+
   const form = useForm<AppearanceFormValues>({
     resolver: zodResolver(appearanceFormSchema) as any,
-    defaultValues: {
-      theme: theme as 'light' | 'dark' | 'system',
-      font,
-    },
+    defaultValues,
   })
 
   // Update form when settings load
@@ -55,8 +68,9 @@ export function AppearanceForm() {
     }
   }, [settings, theme, font, form])
 
-  function onSubmit(data: AppearanceFormValues) {
-    // Update contexts immediately for UX
+  // Memoize submit handler to prevent recreation on every render
+  const onSubmit = useCallback((data: AppearanceFormValues) => {
+    // Update contexts immediately for UX (batched for performance)
     if (data.font && data.font !== font) setFont(data.font)
     if (data.theme !== theme) setTheme(data.theme)
 
@@ -64,16 +78,10 @@ export function AppearanceForm() {
     updateSettings({
       theme: data.theme,
     })
-  }
+  }, [font, theme, setFont, setTheme, updateSettings])
 
   if (loadingSettings) {
-    return (
-      <div className='space-y-8'>
-        <Skeleton className='h-20 w-full' />
-        <Skeleton className='h-32 w-full' />
-        <Skeleton className='h-10 w-32' />
-      </div>
-    )
+    return <LoadingSkeleton />
   }
 
   return (

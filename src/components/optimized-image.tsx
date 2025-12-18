@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { cn } from '@/lib/utils'
 import { useInViewport } from '@/hooks/useImageLoader'
 import { generateSrcSet, getOptimizedUrl } from '@/utils/image-utils'
@@ -71,6 +71,14 @@ export function OptimizedImage({
 
   const shouldLoad = !lazy || isInView
 
+  // Memoize container style to prevent re-creating object
+  const containerStyle = useMemo(() => ({ width, height }), [width, height])
+
+  // Memoize image background style
+  const imageBackgroundStyle = useMemo(() => ({
+    backgroundColor: isLoading ? '#f1f5f9' : 'transparent',
+  }), [isLoading])
+
   useEffect(() => {
     if (!shouldLoad || !src) return
 
@@ -108,7 +116,7 @@ export function OptimizedImage({
         'relative overflow-hidden',
         className
       )}
-      style={{ width, height }}
+      style={containerStyle}
     >
       <img
         ref={imgRef}
@@ -129,9 +137,7 @@ export function OptimizedImage({
           isLoading && 'blur-sm scale-105',
           !isLoading && 'blur-0 scale-100'
         )}
-        style={{
-          backgroundColor: isLoading ? '#f1f5f9' : 'transparent',
-        }}
+        style={imageBackgroundStyle}
       />
 
       {isLoading && (

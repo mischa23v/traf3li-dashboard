@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useMemo } from 'react'
 import { Link } from '@tanstack/react-router'
 import {
   Scale,
@@ -123,26 +123,33 @@ interface EventRowProps {
 }
 
 const EventRow = memo(function EventRow({ event, t }: EventRowProps) {
-  const eventTime = event.startDate
-    ? new Date(event.startDate).toLocaleTimeString('ar-SA', {
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    : t('dashboard.schedule.notSpecified')
+  const eventTime = useMemo(() =>
+    event.startDate
+      ? new Date(event.startDate).toLocaleTimeString('ar-SA', {
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+      : t('dashboard.schedule.notSpecified'),
+    [event.startDate, t]
+  )
 
-  const colorClasses = {
-    meeting: { bar: 'bg-blue-500', badge: 'bg-blue-50 text-blue-700' },
-    session: { bar: 'bg-green-500', badge: 'bg-green-50 text-green-700' },
-    deadline: { bar: 'bg-amber-500', badge: 'bg-amber-50 text-amber-700' },
-  }
-  const colors = colorClasses[event.type] || colorClasses.meeting
+  const colors = useMemo(() => {
+    const colorClasses = {
+      meeting: { bar: 'bg-blue-500', badge: 'bg-blue-50 text-blue-700' },
+      session: { bar: 'bg-green-500', badge: 'bg-green-50 text-green-700' },
+      deadline: { bar: 'bg-amber-500', badge: 'bg-amber-50 text-amber-700' },
+    }
+    return colorClasses[event.type] || colorClasses.meeting
+  }, [event.type])
 
-  const locationDisplay =
+  const locationDisplay = useMemo(() =>
     typeof event.location === 'string'
       ? event.location
       : (event.location as { name?: string; address?: string })?.name ||
         (event.location as { name?: string; address?: string })?.address ||
-        t('dashboard.schedule.remote')
+        t('dashboard.schedule.remote'),
+    [event.location, t]
+  )
 
   return (
     <Link

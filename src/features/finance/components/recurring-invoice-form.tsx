@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { Plus, Trash2, ArrowRight, Save, Loader2, Calendar as CalendarIcon } from 'lucide-react'
@@ -51,6 +51,32 @@ export default function RecurringInvoiceForm({ initialData, isEdit = false }: Re
     initialData?.endDate ? new Date(initialData.endDate) : undefined
   )
 
+  const defaultValues = useMemo(() => initialData
+    ? {
+        name: initialData.name,
+        nameAr: initialData.nameAr,
+        clientId: typeof initialData.clientId === 'object' ? initialData.clientId._id : initialData.clientId,
+        caseId: typeof initialData.caseId === 'object' ? initialData.caseId._id : initialData.caseId,
+        frequency: initialData.frequency,
+        dayOfMonth: initialData.dayOfMonth,
+        dayOfWeek: initialData.dayOfWeek,
+        startDate: initialData.startDate,
+        endDate: initialData.endDate,
+        maxGenerations: initialData.maxGenerations,
+        items: initialData.items,
+        vatRate: initialData.vatRate,
+        paymentTerms: initialData.paymentTerms,
+        notes: initialData.notes,
+        notesAr: initialData.notesAr,
+        autoSend: initialData.autoSend,
+      }
+    : {
+        items: [{ description: '', descriptionAr: '', quantity: 1, unitPrice: 0, total: 0 }],
+        vatRate: 15,
+        paymentTerms: 'net_30',
+        autoSend: false,
+      }, [initialData])
+
   const {
     register,
     handleSubmit,
@@ -59,31 +85,7 @@ export default function RecurringInvoiceForm({ initialData, isEdit = false }: Re
     control,
     formState: { errors },
   } = useForm<FormData>({
-    defaultValues: initialData
-      ? {
-          name: initialData.name,
-          nameAr: initialData.nameAr,
-          clientId: typeof initialData.clientId === 'object' ? initialData.clientId._id : initialData.clientId,
-          caseId: typeof initialData.caseId === 'object' ? initialData.caseId._id : initialData.caseId,
-          frequency: initialData.frequency,
-          dayOfMonth: initialData.dayOfMonth,
-          dayOfWeek: initialData.dayOfWeek,
-          startDate: initialData.startDate,
-          endDate: initialData.endDate,
-          maxGenerations: initialData.maxGenerations,
-          items: initialData.items,
-          vatRate: initialData.vatRate,
-          paymentTerms: initialData.paymentTerms,
-          notes: initialData.notes,
-          notesAr: initialData.notesAr,
-          autoSend: initialData.autoSend,
-        }
-      : {
-          items: [{ description: '', descriptionAr: '', quantity: 1, unitPrice: 0, total: 0 }],
-          vatRate: 15,
-          paymentTerms: 'net_30',
-          autoSend: false,
-        },
+    defaultValues,
   })
 
   const { fields, append, remove } = useFieldArray({

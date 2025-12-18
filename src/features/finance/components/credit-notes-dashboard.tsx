@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import {
   FileText, Plus, Filter, MoreVertical, Download, Search,
   Eye, Edit, Trash2, Receipt, CheckCircle2, XCircle,
@@ -59,6 +60,12 @@ const reasonCategoryMap = {
 export function CreditNotesDashboard() {
   const [statusFilter, setStatusFilter] = useState<string>('')
   const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
   const [reasonFilter, setReasonFilter] = useState<string>('')
 
   // Fetch credit notes
@@ -172,8 +179,8 @@ export function CreditNotesDashboard() {
                 <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   placeholder="بحث بالرقم أو العميل..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  defaultValue={searchQuery}
+                  onChange={(e) => debouncedSetSearch(e.target.value)}
                   className="pe-9"
                 />
               </div>

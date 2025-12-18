@@ -3,16 +3,19 @@
  * Production-ready calendar with drag-and-drop, events, and full features
  */
 
-import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
+import { useState, useMemo, useCallback, useRef, useEffect, lazy, Suspense } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { PERF_DEBUG, perfLog } from '@/lib/perf-debug'
-import FullCalendar from '@fullcalendar/react'
+import type FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import listPlugin from '@fullcalendar/list'
 import interactionPlugin from '@fullcalendar/interaction'
 import type { EventClickArg, DateSelectArg, EventDropArg, EventContentArg } from '@fullcalendar/core'
+
+// Lazy load FullCalendar component
+const FullCalendarComponent = lazy(() => import('@fullcalendar/react'))
 import {
   Plus,
   Filter,
@@ -128,6 +131,42 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
   document_review: 'مراجعة مستند',
   training: 'تدريب',
   other: 'أخرى',
+}
+
+// FullCalendar Library Loading Skeleton
+// This is shown while the heavy FullCalendar library itself is being loaded
+// (separate from the route-level CalendarSkeleton which loads the entire view)
+function FullCalendarLibrarySkeleton() {
+  return (
+    <div className="p-4 space-y-4 animate-pulse">
+      {/* Header with buttons */}
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex gap-2">
+          <Skeleton className="h-10 w-20" />
+          <Skeleton className="h-10 w-20" />
+          <Skeleton className="h-10 w-24" />
+        </div>
+        <Skeleton className="h-10 w-48" />
+        <div className="flex gap-2">
+          <Skeleton className="h-10 w-24" />
+          <Skeleton className="h-10 w-24" />
+          <Skeleton className="h-10 w-24" />
+          <Skeleton className="h-10 w-24" />
+        </div>
+      </div>
+      {/* Calendar grid */}
+      <div className="grid grid-cols-7 gap-2">
+        {/* Week header */}
+        {Array.from({ length: 7 }).map((_, i) => (
+          <Skeleton key={`header-${i}`} className="h-12 w-full" />
+        ))}
+        {/* Calendar days */}
+        {Array.from({ length: 35 }).map((_, i) => (
+          <Skeleton key={`day-${i}`} className="h-24 w-full" />
+        ))}
+      </div>
+    </div>
+  )
 }
 
 interface CalendarEvent {
@@ -793,33 +832,35 @@ export function FullCalendarView() {
               className="fullcalendar-wrapper p-4"
               style={{ direction: isRTL ? 'rtl' : 'ltr' }}
             >
-              <FullCalendar
-                ref={calendarRef}
-                plugins={CALENDAR_PLUGINS}
-                initialView="dayGridMonth"
-                locale={isRTL ? 'ar' : 'en'}
-                direction={isRTL ? 'rtl' : 'ltr'}
-                headerToolbar={headerToolbar}
-                buttonText={buttonText}
-                events={calendarEvents}
-                eventClick={handleEventClick}
-                select={handleDateSelect}
-                eventDrop={handleEventDrop}
-                selectable={true}
-                editable={true}
-                droppable={true}
-                eventContent={renderEventContent}
-                height={700}
-                dayMaxEvents={4}
-                moreLinkText={moreLinkText}
-                nowIndicator={true}
-                weekNumbers={false}
-                firstDay={0}
-                handleWindowResize={false}
-                rerenderDelay={10}
-                progressiveEventRendering={true}
-                datesSet={handleDatesSet}
-              />
+              <Suspense fallback={<FullCalendarLibrarySkeleton />}>
+                <FullCalendarComponent
+                  ref={calendarRef}
+                  plugins={CALENDAR_PLUGINS}
+                  initialView="dayGridMonth"
+                  locale={isRTL ? 'ar' : 'en'}
+                  direction={isRTL ? 'rtl' : 'ltr'}
+                  headerToolbar={headerToolbar}
+                  buttonText={buttonText}
+                  events={calendarEvents}
+                  eventClick={handleEventClick}
+                  select={handleDateSelect}
+                  eventDrop={handleEventDrop}
+                  selectable={true}
+                  editable={true}
+                  droppable={true}
+                  eventContent={renderEventContent}
+                  height={700}
+                  dayMaxEvents={4}
+                  moreLinkText={moreLinkText}
+                  nowIndicator={true}
+                  weekNumbers={false}
+                  firstDay={0}
+                  handleWindowResize={false}
+                  rerenderDelay={10}
+                  progressiveEventRendering={true}
+                  datesSet={handleDatesSet}
+                />
+              </Suspense>
             </div>
           </CardContent>
         </Card>

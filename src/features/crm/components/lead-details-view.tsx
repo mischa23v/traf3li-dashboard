@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import {
   FileText,
   Calendar,
@@ -127,27 +127,27 @@ export function LeadDetailsView() {
   const updateStatusMutation = useUpdateLeadStatus()
   const scheduleFollowUpMutation = useScheduleFollowUp()
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     deleteLeadMutation.mutate(leadId, {
       onSuccess: () => {
         navigate({ to: '/dashboard/crm/leads' })
       },
     })
-  }
+  }, [leadId, deleteLeadMutation, navigate])
 
-  const handleConvert = () => {
+  const handleConvert = useCallback(() => {
     convertLeadMutation.mutate(leadId, {
       onSuccess: () => {
         navigate({ to: '/dashboard/clients' })
       },
     })
-  }
+  }, [leadId, convertLeadMutation, navigate])
 
-  const handleStatusChange = (status: LeadStatus) => {
+  const handleStatusChange = useCallback((status: LeadStatus) => {
     updateStatusMutation.mutate({ leadId, status })
-  }
+  }, [leadId, updateStatusMutation])
 
-  const handleScheduleFollowUp = () => {
+  const handleScheduleFollowUp = useCallback(() => {
     if (followUpDate) {
       scheduleFollowUpMutation.mutate(
         { leadId, date: followUpDate, note: followUpNote },
@@ -159,7 +159,7 @@ export function LeadDetailsView() {
         }
       )
     }
-  }
+  }, [leadId, followUpDate, followUpNote, scheduleFollowUpMutation])
 
   // Transform API data
   const lead = leadData?.lead

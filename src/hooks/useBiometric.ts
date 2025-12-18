@@ -122,6 +122,7 @@ export const useDeviceHealth = (id: string) => {
     queryFn: () => deviceService.getDeviceHealth(id),
     enabled: !!id,
     refetchInterval: 30000, // Refresh every 30 seconds
+    retry: false,
   })
 }
 
@@ -264,6 +265,7 @@ export const useLiveFeed = (limit: number = 20) => {
     queryKey: ['verification-live-feed', limit],
     queryFn: () => verificationService.getLiveFeed(limit),
     refetchInterval: 30000, // Refresh every 30 seconds (reduced from 5s for performance)
+    retry: false,
   })
 }
 

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { X, Plus, Check } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -34,6 +34,37 @@ interface TagInputProps {
   entityId: string
   className?: string
   disabled?: boolean
+}
+
+type TagCommandItemProps = {
+  tag: Tag
+  handleAddTag: (tag: Tag) => void
+  getDisplayName: (tag: Tag) => string
+}
+
+function TagCommandItem({ tag, handleAddTag, getDisplayName }: TagCommandItemProps) {
+  const handleSelect = useCallback(() => {
+    handleAddTag(tag)
+  }, [handleAddTag, tag])
+
+  return (
+    <CommandItem
+      key={tag._id}
+      onSelect={handleSelect}
+      className='flex items-center gap-2'
+    >
+      <div
+        className='h-3 w-3 rounded-full'
+        style={{ backgroundColor: tag.color }}
+      />
+      <span>{getDisplayName(tag)}</span>
+      {tag.usageCount !== undefined && tag.usageCount > 0 && (
+        <span className='ms-auto text-xs text-muted-foreground'>
+          ({tag.usageCount})
+        </span>
+      )}
+    </CommandItem>
+  )
 }
 
 export function TagInput({
@@ -227,22 +258,12 @@ export function TagInput({
                   </CommandEmpty>
                   <CommandGroup>
                     {availableTags.map((tag) => (
-                      <CommandItem
+                      <TagCommandItem
                         key={tag._id}
-                        onSelect={() => handleAddTag(tag)}
-                        className='flex items-center gap-2'
-                      >
-                        <div
-                          className='h-3 w-3 rounded-full'
-                          style={{ backgroundColor: tag.color }}
-                        />
-                        <span>{getDisplayName(tag)}</span>
-                        {tag.usageCount !== undefined && tag.usageCount > 0 && (
-                          <span className='ms-auto text-xs text-muted-foreground'>
-                            ({tag.usageCount})
-                          </span>
-                        )}
-                      </CommandItem>
+                        tag={tag}
+                        handleAddTag={handleAddTag}
+                        getDisplayName={getDisplayName}
+                      />
                     ))}
                   </CommandGroup>
                 </CommandList>

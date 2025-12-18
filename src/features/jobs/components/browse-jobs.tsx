@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { useTranslation } from 'react-i18next'
 import {
   Briefcase, Search, MapPin, Clock, DollarSign,
@@ -70,6 +71,12 @@ export function BrowseJobs() {
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
   const [bookmarkedJobs, setBookmarkedJobs] = useState<string[]>([])
@@ -211,8 +218,8 @@ export function BrowseJobs() {
                     <Input
                       type="text"
                       placeholder={isRTL ? 'بحث بالعنوان أو الوصف...' : 'Search by title or description...'}
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      defaultValue={searchQuery}
+                      onChange={(e) => debouncedSetSearch(e.target.value)}
                       className="pe-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
                     />
                   </div>

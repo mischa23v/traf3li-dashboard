@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback, memo } from 'react'
 import {
   Search,
   Bell,
@@ -158,7 +158,7 @@ const DATE_RANGES = [
 ]
 
 // Metric Card Component
-function MetricCard({
+const MetricCard = memo(function MetricCard({
   title,
   value,
   icon: Icon,
@@ -204,7 +204,9 @@ function MetricCard({
       </CardContent>
     </Card>
   )
-}
+})
+
+MetricCard.displayName = 'MetricCard'
 
 // Quick Log Dialog Component
 function QuickLogDialog({ trigger }: { trigger: React.ReactNode }) {
@@ -332,7 +334,7 @@ function QuickLogDialog({ trigger }: { trigger: React.ReactNode }) {
 }
 
 // Activity Card Component
-function ActivityCard({ activity, isLast }: { activity: CrmActivity; isLast: boolean }) {
+const ActivityCard = memo(function ActivityCard({ activity, isLast }: { activity: CrmActivity; isLast: boolean }) {
   const colors = activityColors[activity.type] || activityColors.note
 
   return (
@@ -468,7 +470,9 @@ function ActivityCard({ activity, isLast }: { activity: CrmActivity; isLast: boo
       </div>
     </div>
   )
-}
+})
+
+ActivityCard.displayName = 'ActivityCard'
 
 export function ActivitiesView() {
   const [activeTypeFilter, setActiveTypeFilter] = useState<string>('all')

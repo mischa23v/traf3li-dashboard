@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import {
     Search, Filter, Plus, MoreHorizontal,
     CreditCard, AlertCircle, CheckCircle, Bell, Loader2,
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { formatCurrency, formatDate } from '@/lib/utils'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -85,17 +86,17 @@ export default function PaymentsDashboard() {
     }, [startDate, endDate, selectedClient])
 
     // Clear all filters
-    const clearFilters = () => {
+    const clearFilters = useCallback(() => {
         setStartDate('')
         setEndDate('')
         setSelectedClient('')
         setCurrentPage(1)
-    }
+    }, [])
 
     // Handle export
-    const handleExport = (format: 'csv' | 'pdf') => {
+    const handleExport = useCallback((format: 'csv' | 'pdf') => {
         exportReport({ reportType: 'payments', format, filters })
-    }
+    }, [exportReport, filters])
 
     // Fetch data
     const { data: paymentsData, isLoading, isError, error, refetch } = usePayments(filters)
@@ -109,7 +110,7 @@ export default function PaymentsDashboard() {
             invoiceNumber: payment.invoiceId?.invoiceNumber || '-',
             clientName: payment.invoiceId?.clientId?.name || 'عميل غير معروف',
             amount: payment.amount,
-            date: new Date(payment.paymentDate).toLocaleDateString('ar-SA'),
+            date: formatDate(payment.paymentDate),
             method: payment.paymentMethod,
             status: payment.status,
             reference: payment.reference || '-',
@@ -168,14 +169,6 @@ export default function PaymentsDashboard() {
 
         return { totalCompleted, totalPending, totalRefunded, totalThisMonth }
     }, [paymentsData, summaryData])
-
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('ar-SA', {
-            style: 'currency',
-            currency: 'SAR',
-            minimumFractionDigits: 0
-        }).format(amount)
-    }
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
@@ -476,13 +469,13 @@ export default function PaymentsDashboard() {
                                                 )}
                                                 {startDate && (
                                                     <Badge variant="outline" className="bg-purple-50 border-purple-200 text-purple-700 gap-1">
-                                                        من: {new Date(startDate).toLocaleDateString('ar-SA')}
+                                                        من: {formatDate(startDate)}
                                                         <X className="w-3 h-3 cursor-pointer" aria-label="إزالة" onClick={() => setStartDate('')} />
                                                     </Badge>
                                                 )}
                                                 {endDate && (
                                                     <Badge variant="outline" className="bg-purple-50 border-purple-200 text-purple-700 gap-1">
-                                                        إلى: {new Date(endDate).toLocaleDateString('ar-SA')}
+                                                        إلى: {formatDate(endDate)}
                                                         <X className="w-3 h-3 cursor-pointer" aria-label="إزالة" onClick={() => setEndDate('')} />
                                                     </Badge>
                                                 )}

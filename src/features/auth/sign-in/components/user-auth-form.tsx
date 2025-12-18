@@ -4,7 +4,7 @@
  * Includes client-side rate limiting (NCA ECC 2-1-2 compliant)
  */
 
-import { HTMLAttributes, useState, useEffect, useCallback } from 'react'
+import { HTMLAttributes, useState, useEffect, useCallback, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -51,7 +51,9 @@ const createFormSchema = (t: any) =>
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const { login, error: authError, clearError } = useAuthStore()
+  const login = useAuthStore((state) => state.login)
+  const authError = useAuthStore((state) => state.error)
+  const clearError = useAuthStore((state) => state.clearError)
   const [isLoading, setIsLoading] = useState(false)
 
   // Rate limiting state
@@ -59,7 +61,12 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [waitTime, setWaitTime] = useState<number>(0)
   const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null)
 
-  const formSchema = createFormSchema(t)
+  const formSchema = useMemo(() => createFormSchema(t), [t])
+
+  const defaultValues = useMemo(() => ({
+    username: '',
+    password: '',
+  }), [])
 
   // Countdown timer for rate limiting
   useEffect(() => {
@@ -86,10 +93,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema) as any,
-    defaultValues: {
-      username: '',
-      password: '',
-    },
+    defaultValues,
   })
 
   /**

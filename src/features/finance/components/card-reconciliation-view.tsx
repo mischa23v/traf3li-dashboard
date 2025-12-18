@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import {
     CheckCircle, XCircle, AlertCircle, FileText, Plus, Search, Filter,
     Link as LinkIcon, User, DollarSign, Calendar, ShoppingBag, Receipt,
@@ -63,6 +64,12 @@ export function CardReconciliationView() {
     const navigate = useNavigate()
 
     const [searchQuery, setSearchQuery] = useState('')
+    // Debounced search handler
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => setSearchQuery(value),
+        300
+    )
+
     const [statusFilter, setStatusFilter] = useState<string>('all')
     const [selectedTransactionId, setSelectedTransactionId] = useState<string | null>(null)
     const [reconcileDialog, setReconcileDialog] = useState<ReconcileDialogState>({ isOpen: false, transaction: null })
@@ -174,8 +181,8 @@ export function CardReconciliationView() {
                         <input
                             type="text"
                             placeholder="بحث في المعاملات..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                            defaultValue={searchQuery}
+                            onChange={(e) => debouncedSetSearch(e.target.value)}
                             className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                         />
                     </div>

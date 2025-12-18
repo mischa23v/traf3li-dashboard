@@ -12,6 +12,7 @@ import {
   type VisibilityState,
 } from '@tanstack/react-table'
 import { useState } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { X } from 'lucide-react'
 import {
   Table,
@@ -37,6 +38,11 @@ export function TemplatesTable({ data }: TemplatesTableProps) {
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const columns = useTemplatesColumns()
+
+  const debouncedFilter = useDebouncedCallback(
+    (column: any, value: string) => column?.setFilterValue(value),
+    300
+  )
   const [rowSelection, setRowSelection] = useState({})
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -80,7 +86,7 @@ export function TemplatesTable({ data }: TemplatesTableProps) {
           <Input
             placeholder={t('invoiceTemplates.searchTemplates')}
             value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
-            onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
+            onChange={(event) => { const col = table.getColumn('name'); debouncedFilter(col, event.target.value); }}
             className="h-8 w-[150px] lg:w-[250px]"
           />
           {table.getColumn('type') && (

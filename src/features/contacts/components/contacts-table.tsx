@@ -13,7 +13,7 @@ import {
   type SortingState,
   type VisibilityState,
 } from '@tanstack/react-table'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { DataTable, DataTableToolbar } from '@/components/data-table'
 import { type Contact } from '../data/schema'
 import { contactStatusColors, contactTypes, contactCategories } from '../data/data'
@@ -39,6 +39,42 @@ export function ContactsTable({ data, search, navigate }: ContactsTableProps) {
     pageSize: 10,
   })
 
+  // Memoize filter options to prevent recreation on every render
+  const filterOptions = useMemo(
+    () => [
+      {
+        columnId: 'type',
+        title: t('contacts.columns.type'),
+        options: contactTypes.map((type) => ({
+          label: t(`contacts.types.${type.value}`),
+          value: type.value,
+          icon: type.icon,
+        })),
+      },
+      {
+        columnId: 'category',
+        title: t('contacts.columns.category'),
+        options: contactCategories.map((category) => ({
+          label: t(`contacts.categories.${category.value}`),
+          value: category.value,
+          icon: category.icon,
+        })),
+      },
+      {
+        columnId: 'status',
+        title: t('contacts.columns.status'),
+        options: Array.from(contactStatusColors.entries()).map(
+          ([value, colorClass]) => ({
+            label: t(`contacts.statuses.${value}`),
+            value,
+            colorClass,
+          })
+        ),
+      },
+    ],
+    [t]
+  )
+
   const table = useReactTable({
     data,
     columns,
@@ -63,50 +99,13 @@ export function ContactsTable({ data, search, navigate }: ContactsTableProps) {
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
 
-  // Create filter options from data constants
-  const typeOptions = contactTypes.map((type) => ({
-    label: t(`contacts.types.${type.value}`),
-    value: type.value,
-    icon: type.icon,
-  }))
-
-  const categoryOptions = contactCategories.map((category) => ({
-    label: t(`contacts.categories.${category.value}`),
-    value: category.value,
-    icon: category.icon,
-  }))
-
-  const statusOptions = Array.from(contactStatusColors.entries()).map(
-    ([value, colorClass]) => ({
-      label: t(`contacts.statuses.${value}`),
-      value,
-      colorClass,
-    })
-  )
-
   return (
     <div className='space-y-4'>
       <DataTableToolbar
         table={table}
         searchKey='name'
         searchPlaceholder={t('contacts.searchPlaceholder')}
-        filters={[
-          {
-            columnId: 'type',
-            title: t('contacts.columns.type'),
-            options: typeOptions,
-          },
-          {
-            columnId: 'category',
-            title: t('contacts.columns.category'),
-            options: categoryOptions,
-          },
-          {
-            columnId: 'status',
-            title: t('contacts.columns.status'),
-            options: statusOptions,
-          },
-        ]}
+        filters={filterOptions}
       />
       <ContactsBulkActions table={table} />
       <DataTable table={table} />

@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Input } from '@/components/ui/input'
+import { formatCurrency, formatDate } from '@/lib/utils'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -55,17 +56,14 @@ export default function ExpensesDashboard() {
         if (!expensesData) return []
         // Handle both { expenses: [] } and { data: [] } response structures
         const expenseArray = expensesData.expenses ?? expensesData.data ?? []
-        return expenseArray.map((exp: any) => {
-            const date = new Date(exp.date)
-            const formattedDate = isNaN(date.getTime()) ? '-' : date.toLocaleDateString('ar-SA')
-            return {
+        return expenseArray.map((exp: any) => ({
             id: exp.expenseId || exp._id,
             _id: exp._id,
             description: exp.description,
             category: exp.category,
             categoryIcon: getCategoryIcon(exp.category),
             amount: exp.amount,
-            date: formattedDate,
+            date: formatDate(exp.date),
             caseNumber: exp.caseId?.caseNumber || null,
             caseName: exp.caseId?.title ? `قضية ${exp.caseId.title}` : 'مصروف عام',
             paymentMethod: exp.paymentMethod,
@@ -78,7 +76,7 @@ export default function ExpensesDashboard() {
             hasReceipt: (exp.receipts && exp.receipts.length > 0) || false,
             vendor: exp.vendor || 'غير محدد',
             isBillable: exp.isBillable,
-        }})
+        }))
     }, [expensesData])
 
     // Filter Logic
@@ -119,15 +117,6 @@ export default function ExpensesDashboard() {
             expensesByCategory: byCategory,
         }
     }, [expenses])
-
-    // Format currency
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('ar-SA', {
-            style: 'currency',
-            currency: 'SAR',
-            minimumFractionDigits: 0
-        }).format(amount)
-    }
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },

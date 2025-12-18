@@ -1,5 +1,5 @@
 import { HRSidebar } from './hr-sidebar'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -78,15 +78,18 @@ export function PerformanceReviewsListView() {
   const [yearFilter, setYearFilter] = useState<number>(new Date().getFullYear())
 
   // Check if any filter is active
-  const hasActiveFilters = searchQuery || statusFilter !== 'all' || typeFilter !== 'all' || departmentFilter !== 'all'
+  const hasActiveFilters = useMemo(() =>
+    searchQuery || statusFilter !== 'all' || typeFilter !== 'all' || departmentFilter !== 'all',
+    [searchQuery, statusFilter, typeFilter, departmentFilter]
+  )
 
   // Clear all filters
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setSearchQuery('')
     setStatusFilter('all')
     setTypeFilter('all')
     setDepartmentFilter('all')
-  }
+  }, [])
 
   // Fetch performance reviews
   const { data: reviewsData, isLoading, isError } = usePerformanceReviews({
@@ -112,42 +115,42 @@ export function PerformanceReviewsListView() {
   }, [reviewsData?.data, searchQuery])
 
   // Selection Handlers
-  const handleToggleSelectionMode = () => {
-    setIsSelectionMode(!isSelectionMode)
+  const handleToggleSelectionMode = useCallback(() => {
+    setIsSelectionMode(prev => !prev)
     setSelectedIds([])
-  }
+  }, [])
 
-  const handleSelectReview = (reviewId: string) => {
-    if (selectedIds.includes(reviewId)) {
-      setSelectedIds(selectedIds.filter(id => id !== reviewId))
-    } else {
-      setSelectedIds([...selectedIds, reviewId])
-    }
-  }
+  const handleSelectReview = useCallback((reviewId: string) => {
+    setSelectedIds(prev =>
+      prev.includes(reviewId)
+        ? prev.filter(id => id !== reviewId)
+        : [...prev, reviewId]
+    )
+  }, [])
 
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = useCallback(() => {
     if (selectedIds.length === 0) return
     if (confirm(`هل أنت متأكد من حذف ${selectedIds.length} تقييم؟`)) {
       // TODO: Implement bulk delete
       setIsSelectionMode(false)
       setSelectedIds([])
     }
-  }
+  }, [selectedIds])
 
   // Single review actions
-  const handleViewReview = (reviewId: string) => {
+  const handleViewReview = useCallback((reviewId: string) => {
     navigate({ to: '/dashboard/hr/performance/$reviewId', params: { reviewId } })
-  }
+  }, [navigate])
 
-  const handleEditReview = (reviewId: string) => {
+  const handleEditReview = useCallback((reviewId: string) => {
     navigate({ to: '/dashboard/hr/performance/new', search: { editId: reviewId } })
-  }
+  }, [navigate])
 
-  const handleDeleteReview = (reviewId: string) => {
+  const handleDeleteReview = useCallback((reviewId: string) => {
     if (confirm('هل أنت متأكد من حذف هذا التقييم؟')) {
       // TODO: Implement delete
     }
-  }
+  }, [])
 
   // Status badge
   const getStatusBadge = (status: ReviewStatus) => {
