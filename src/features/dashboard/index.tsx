@@ -14,17 +14,12 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { ConfigDrawer } from '@/components/config-drawer'
 import {
   useDashboardSummary,
-  useTodayEvents,
-  useFinancialSummary,
   useCRMStats,
   useFinanceStats,
   useCasesChart,
   useRevenueChart,
   useTasksChart,
 } from '@/hooks/useDashboard'
-import { useTaskStats } from '@/hooks/useTasks'
-import { useReminderStats } from '@/hooks/useRemindersAndEvents'
-import { useCaseStatisticsFromAPI } from '@/hooks/useCasesAndClients'
 import { useAuthStore } from '@/stores/auth-store'
 import { getLocalizedFirstName } from '@/lib/arabic-names'
 
@@ -57,18 +52,6 @@ export function Dashboard() {
     })
   }
 
-  // Defer secondary data loading
-  const [isSecondaryDataReady, setIsSecondaryDataReady] = useState(false)
-
-  useEffect(() => {
-    perfLog('Scheduling deferred data load (150ms)')
-    const timer = setTimeout(() => {
-      perfLog('Deferred data load TRIGGERED')
-      setIsSecondaryDataReady(true)
-    }, 150)
-    return () => clearTimeout(timer)
-  }, [])
-
   // User display helpers
   const getUserDisplayName = useCallback(() => {
     const locale = i18n.language
@@ -90,31 +73,18 @@ export function Dashboard() {
   const isAnalyticsTab = activeTab === 'analytics'
   const isReportsTab = activeTab === 'reports'
 
-  // Data fetching - Gold Standard single API call
-  const { data: dashboardSummary, isLoading: summaryLoading, isError: summaryError } = useDashboardSummary()
+  // Data fetching - SINGLE API call only
+  const { data: dashboardSummary, isLoading: summaryLoading } = useDashboardSummary()
 
-  // Only use fallback hooks if summary FAILED (not just loading)
-  const useFallbackHooks = summaryError === true
+  // Extract all data from the single summary response
+  const caseStats = dashboardSummary?.caseStats
+  const taskStats = dashboardSummary?.taskStats
+  const reminderStats = dashboardSummary?.reminderStats
+  const todayEvents = dashboardSummary?.todayEvents
+  const financialSummary = dashboardSummary?.financialSummary
 
-  // Fallback hooks - DISABLED unless summary endpoint fails
-  const { data: caseStatsFallback } = useCaseStatisticsFromAPI(useFallbackHooks)
-  const { data: taskStatsFallback } = useTaskStats(useFallbackHooks)
-  const { data: reminderStatsFallback } = useReminderStats({ enabled: useFallbackHooks })
-
-  // Overview tab data
-  const shouldLoadOverviewData = useFallbackHooks && isSecondaryDataReady && isOverviewTab
-  const { data: todayEventsFallback, isLoading: eventsLoadingFallback } = useTodayEvents(shouldLoadOverviewData)
-  const { data: financialSummaryFallback, isLoading: financialLoadingFallback } = useFinancialSummary(shouldLoadOverviewData)
-
-  // Resolve data
-  const caseStats = dashboardSummary?.caseStats || caseStatsFallback
-  const taskStats = dashboardSummary?.taskStats || taskStatsFallback
-  const reminderStats = dashboardSummary?.reminderStats || reminderStatsFallback
-  const todayEvents = dashboardSummary?.todayEvents || todayEventsFallback
-  const financialSummary = dashboardSummary?.financialSummary || financialSummaryFallback
-
-  const eventsLoading = summaryLoading || eventsLoadingFallback
-  const financialLoading = summaryLoading || financialLoadingFallback
+  const eventsLoading = summaryLoading
+  const financialLoading = summaryLoading
 
   // Analytics tab data
   const { data: crmStats, isLoading: crmLoading } = useCRMStats(isAnalyticsTab)
