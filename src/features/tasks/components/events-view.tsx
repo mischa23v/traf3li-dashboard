@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { PERF_DEBUG, perfLog } from '@/lib/perf-debug'
 import { TasksSidebar } from './tasks-sidebar'
 import {
     Calendar as CalendarIcon, MoreHorizontal, Plus,
@@ -71,22 +70,6 @@ export function EventsView() {
     const [isSelectionMode, setIsSelectionMode] = useState(false)
     const [selectedEventIds, setSelectedEventIds] = useState<string[]>([])
 
-    // Performance profiling
-    const renderCount = useRef(0)
-    const mountTime = useRef(performance.now())
-
-    useEffect(() => {
-        perfLog('EventsView MOUNTED')
-        return () => perfLog('EventsView UNMOUNTED')
-    }, [])
-
-    renderCount.current++
-    if (PERF_DEBUG && renderCount.current <= 5) {
-        perfLog(`EventsView RENDER #${renderCount.current}`, {
-            timeSinceMount: (performance.now() - mountTime.current).toFixed(2) + 'ms'
-        })
-    }
-
     // Filter states
     const [searchQuery, setSearchQuery] = useState('')
     const [typeFilter, setTypeFilter] = useState<string>('all')
@@ -149,23 +132,6 @@ export function EventsView() {
     const completeEventMutation = useCompleteEvent()
     const cancelEventMutation = useCancelEvent()
     const postponeEventMutation = usePostponeEvent()
-
-    // Performance: Track API load completion
-    useEffect(() => {
-        if (eventsData) perfLog('API LOADED: events', { count: eventsData?.events?.length })
-    }, [eventsData])
-
-    useEffect(() => {
-        if (stats) perfLog('API LOADED: eventStats', stats)
-    }, [stats])
-
-    useEffect(() => {
-        const fetchingStatus = { events: isFetching, stats: statsFetching }
-        const activeFetches = Object.entries(fetchingStatus).filter(([, v]) => v).map(([k]) => k)
-        if (activeFetches.length > 0) {
-            perfLog('EventsView FETCHING:', activeFetches)
-        }
-    }, [isFetching, statsFetching])
 
     // Postpone dialog state
     const [postponeEventId, setPostponeEventId] = useState<string | null>(null)

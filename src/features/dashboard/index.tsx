@@ -1,8 +1,7 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Search } from 'lucide-react'
 
-import { PERF_DEBUG, perfLog, perfMark } from '@/lib/perf-debug'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { TopNav } from '@/components/layout/top-nav'
@@ -40,30 +39,11 @@ export function Dashboard() {
   const user = useAuthStore((state) => state.user)
   const [activeTab, setActiveTab] = useState<TabType>('overview')
 
-  // Performance profiling
-  const renderCount = useRef(0)
-  const mountTime = useRef(performance.now())
-
-  useEffect(() => {
-    perfMark('dashboard-mount')
-    perfLog('Dashboard MOUNTED', { renderCount: renderCount.current })
-    return () => perfLog('Dashboard UNMOUNTED')
-  }, [])
-
-  renderCount.current++
-  if (PERF_DEBUG && renderCount.current <= 5) {
-    perfLog(`Dashboard RENDER #${renderCount.current}`, {
-      timeSinceMount: (performance.now() - mountTime.current).toFixed(2) + 'ms',
-    })
-  }
-
   // Defer secondary data loading
   const [isSecondaryDataReady, setIsSecondaryDataReady] = useState(false)
 
   useEffect(() => {
-    perfLog('Scheduling deferred data load (150ms)')
     const timer = setTimeout(() => {
-      perfLog('Deferred data load TRIGGERED')
       setIsSecondaryDataReady(true)
     }, 150)
     return () => clearTimeout(timer)

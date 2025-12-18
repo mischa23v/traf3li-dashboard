@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { PERF_DEBUG, perfLog } from '@/lib/perf-debug'
 import { TasksSidebar } from './tasks-sidebar'
 import {
     Clock, MoreHorizontal, Plus,
@@ -71,30 +70,11 @@ export function RemindersView() {
     const { t, i18n } = useTranslation()
     const navigate = useNavigate()
 
-    // Performance profiling
-    const renderCount = useRef(0)
-    const mountTime = useRef(performance.now())
-
-    useEffect(() => {
-        perfLog('RemindersView MOUNTED')
-        return () => perfLog('RemindersView UNMOUNTED')
-    }, [])
-
-    renderCount.current++
-    if (PERF_DEBUG && renderCount.current <= 5) {
-        perfLog(`RemindersView RENDER #${renderCount.current}`, {
-            timeSinceMount: (performance.now() - mountTime.current).toFixed(2) + 'ms'
-        })
-    }
-
-    // Performance optimization: Defer team members loading
-    // Only needed when user opens the delegate dialog
+    // Defer team members loading - only needed when user opens the delegate dialog
     const [isDelegationDataReady, setIsDelegationDataReady] = useState(false)
 
     useEffect(() => {
-        perfLog('Scheduling delegation data load (250ms)')
         const timer = setTimeout(() => {
-            perfLog('Delegation data load TRIGGERED - loading teamMembers')
             setIsDelegationDataReady(true)
         }, 250)
         return () => clearTimeout(timer)
@@ -185,27 +165,6 @@ export function RemindersView() {
 
     // Team members for delegation (DEFERRED - only needed when delegate dialog opens)
     const { data: teamMembers } = useTeamMembers(isDelegationDataReady)
-
-    // Performance: Track API load completion
-    useEffect(() => {
-        if (remindersData) perfLog('API LOADED: reminders', { count: remindersData?.reminders?.length })
-    }, [remindersData])
-
-    useEffect(() => {
-        if (stats) perfLog('API LOADED: reminderStats', stats)
-    }, [stats])
-
-    useEffect(() => {
-        if (teamMembers) perfLog('API LOADED: teamMembers (DEFERRED)', { count: teamMembers?.length })
-    }, [teamMembers])
-
-    useEffect(() => {
-        const fetchingStatus = { reminders: isFetching, stats: statsFetching }
-        const activeFetches = Object.entries(fetchingStatus).filter(([, v]) => v).map(([k]) => k)
-        if (activeFetches.length > 0) {
-            perfLog('RemindersView FETCHING:', activeFetches)
-        }
-    }, [isFetching, statsFetching])
 
     // Delegate dialog state
     const [delegateReminderId, setDelegateReminderId] = useState<string | null>(null)

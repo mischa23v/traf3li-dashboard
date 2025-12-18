@@ -6,7 +6,6 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { PERF_DEBUG, perfLog } from '@/lib/perf-debug'
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
@@ -169,26 +168,6 @@ export function FullCalendarView() {
   const calendarRef = useRef<FullCalendar>(null)
   const isRTL = i18n.language === 'ar'
 
-  // Performance profiling
-  const renderCount = useRef(0)
-  const mountTime = useRef(performance.now())
-
-  useEffect(() => {
-    perfLog('FullCalendarView MOUNTED')
-    return () => perfLog('FullCalendarView UNMOUNTED')
-  }, [])
-
-  renderCount.current++
-  if (PERF_DEBUG && renderCount.current <= 5) {
-    perfLog(`FullCalendarView RENDER #${renderCount.current}`, {
-      timeSinceMount: (performance.now() - mountTime.current).toFixed(2) + 'ms'
-    })
-  }
-
-  // Track API calls
-  const gridItemsLoadStart = useRef(performance.now())
-  const summaryLoadStart = useRef(performance.now())
-
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
   const [selectedItemForDetails, setSelectedItemForDetails] = useState<{ type: string; id: string } | null>(null)
@@ -246,41 +225,6 @@ export function FullCalendarView() {
     selectedItemForDetails?.id ?? null,
     !!selectedItemForDetails
   )
-
-  // Track loading state
-  useEffect(() => {
-    if (isLoading) {
-      perfLog('Calendar LOADING started - fetching grid items')
-      gridItemsLoadStart.current = performance.now()
-    }
-  }, [isLoading])
-
-  // API load tracking
-  useEffect(() => {
-    if (gridItemsData) {
-      const loadTime = (performance.now() - gridItemsLoadStart.current).toFixed(2)
-      perfLog('API LOADED: calendarGridItems', {
-        count: gridItemsData?.data?.length,
-        loadTime: loadTime + 'ms'
-      })
-    }
-  }, [gridItemsData])
-
-  useEffect(() => {
-    if (summaryData) {
-      const loadTime = (performance.now() - summaryLoadStart.current).toFixed(2)
-      perfLog('API LOADED: calendarGridSummary', {
-        days: summaryData?.data?.days?.length,
-        loadTime: loadTime + 'ms'
-      })
-    }
-  }, [summaryData])
-
-  useEffect(() => {
-    if (itemDetailsData) {
-      perfLog('API LOADED: calendarItemDetails', { id: selectedItemForDetails?.id })
-    }
-  }, [itemDetailsData, selectedItemForDetails?.id])
 
   // Mutations
   const createEventMutation = useCreateEvent()
@@ -429,17 +373,9 @@ export function FullCalendarView() {
 
       // Only update if we're viewing a different month
       if (prev.getMonth() === viewCenter.getMonth() && prev.getFullYear() === viewCenter.getFullYear()) {
-        perfLog('Calendar datesSet SKIPPED - same month', {
-          prev: prev.toISOString().split('T')[0],
-          viewStart: newStart.toISOString().split('T')[0]
-        })
         return prev // Keep same reference to prevent re-render
       }
 
-      perfLog('Calendar datesSet UPDATING month', {
-        from: prev.toISOString().split('T')[0],
-        to: viewCenter.toISOString().split('T')[0]
-      })
       return viewCenter
     })
   }, [])

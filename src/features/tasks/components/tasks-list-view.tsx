@@ -1,7 +1,6 @@
 import { TasksSidebar } from './tasks-sidebar'
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { PERF_DEBUG, perfLog } from '@/lib/perf-debug'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -53,32 +52,11 @@ export function TasksListView() {
     const [showFilters, setShowFilters] = useState(false) // New state for mobile filters
     const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([])
 
-    // Performance profiling
-    const renderCount = useRef(0)
-    const mountTime = useRef(performance.now())
-
-    useEffect(() => {
-        perfLog('TasksListView MOUNTED')
-        return () => perfLog('TasksListView UNMOUNTED')
-    }, [])
-
-    renderCount.current++
-    if (PERF_DEBUG && renderCount.current <= 5) {
-        perfLog(`TasksListView RENDER #${renderCount.current}`, {
-            timeSinceMount: (performance.now() - mountTime.current).toFixed(2) + 'ms'
-        })
-    }
-
-    // Performance optimization: Defer filter dropdown data loading
-    // These are only needed when user interacts with filters, not on initial render
+    // Defer filter dropdown data loading - only needed when user interacts with filters
     const [isFilterDataReady, setIsFilterDataReady] = useState(false)
 
     useEffect(() => {
-        // Defer loading of filter dropdown data by 200ms
-        // This allows the main task list to render first
-        perfLog('Scheduling filter data load (200ms)')
         const timer = setTimeout(() => {
-            perfLog('Filter data load TRIGGERED - loading teamMembers & cases')
             setIsFilterDataReady(true)
         }, 200)
         return () => clearTimeout(timer)
@@ -193,31 +171,6 @@ export function TasksListView() {
     const { data: tasksData, isLoading, isError, error, refetch, isFetching } = useTasks(filters)
     const { data: stats, isFetching: statsFetching } = useTaskStats()
     const { mutate: bulkDeleteTasks } = useBulkDeleteTasks()
-
-    // Performance: Track API load completion
-    useEffect(() => {
-        if (tasksData) perfLog('API LOADED: tasks', { count: tasksData?.tasks?.length })
-    }, [tasksData])
-
-    useEffect(() => {
-        if (stats) perfLog('API LOADED: taskStats', stats)
-    }, [stats])
-
-    useEffect(() => {
-        if (teamMembers) perfLog('API LOADED: teamMembers (DEFERRED)', { count: teamMembers?.length })
-    }, [teamMembers])
-
-    useEffect(() => {
-        if (casesData) perfLog('API LOADED: cases (DEFERRED)', { count: casesData?.cases?.length })
-    }, [casesData])
-
-    useEffect(() => {
-        const fetchingStatus = { tasks: isFetching, stats: statsFetching }
-        const activeFetches = Object.entries(fetchingStatus).filter(([, v]) => v).map(([k]) => k)
-        if (activeFetches.length > 0) {
-            perfLog('TasksListView FETCHING:', activeFetches)
-        }
-    }, [isFetching, statsFetching])
 
     // Helper function to format dates based on current locale
     const formatDualDate = (dateString: string | null | undefined) => {
