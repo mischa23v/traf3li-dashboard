@@ -1,0 +1,136 @@
+name: Deploy Frontend to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: false
+        default: 'production'
+
+env:
+  NODE_VERSION: '20'
+  EC2_HOST: '15.185.200.21'
+  EC2_USER: 'ec2-user'
+  DEPLOY_PATH: '~/dashboard'
+
+jobs:
+  build:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run type check
+        run: npm run typecheck
+
+      - name: Build for AWS production
+        run: npm run build
+        env:
+          # Use AWS backend API
+          VITE_API_URL: https://api-aws.traf3li.com
+          VITE_WS_URL: wss://api-aws.traf3li.com
+          # Disable Vercel proxy (make direct API calls)
+          VITE_DISABLE_API_PROXY: 'true'
+          # Clerk authentication (from secrets)
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+          # Sentry error tracking (optional)
+          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 1
+
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: List build files
+        run: |
+          echo "📦 Build contents:"
+          ls -la dist/
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.EC2_HOST }}
+          username: ${{ env.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo "🗑️ Cleaning old deployment..."
+            mkdir -p ~/dashboard
+            rm -rf ~/dashboard/*
+            echo "✅ Ready for new deployment"
+
+      - name: Copy files to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.EC2_HOST }}
+          username: ${{ env.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "dist/*"
+          target: "~/dashboard/"
+          strip_components: 1
+
+      - name: Verify deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.EC2_HOST }}
+          username: ${{ env.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo "📂 Deployed files:"
+            ls -la ~/dashboard/
+            echo ""
+            echo "📄 Checking index.html..."
+            if [ -f ~/dashboard/index.html ]; then
+              echo "✅ index.html exists"
+              head -5 ~/dashboard/index.html
+            else
+              echo "❌ index.html not found!"
+              exit 1
+            fi
+            echo ""
+            echo "📊 Deployment stats:"
+            du -sh ~/dashboard/
+            echo ""
+            echo "🎉 Deployment complete!"
+
+      - name: Deployment Summary
+        run: |
+          echo "## 🚀 Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Frontend URL:** https://dashboard.traf3li.com" >> $GITHUB_STEP_SUMMARY
+          echo "**Backend API:** https://api-aws.traf3li.com" >> $GITHUB_STEP_SUMMARY
+          echo "**EC2 Instance:** ${{ env.EC2_HOST }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Verify the site at https://dashboard.traf3li.com" >> $GITHUB_STEP_SUMMARY
+          echo "2. Check browser console for any errors" >> $GITHUB_STEP_SUMMARY
+          echo "3. Test authentication flow" >> $GITHUB_STEP_SUMMARY
