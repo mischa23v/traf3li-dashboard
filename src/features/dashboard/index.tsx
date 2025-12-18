@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Briefcase,
@@ -104,7 +104,7 @@ export function Dashboard() {
   }, [])
 
   // Get user's display name based on current locale
-  const getUserDisplayName = () => {
+  const getUserDisplayName = useCallback(() => {
     const locale = i18n.language
     // Use localized name (Arabic name if in Arabic locale, with fallback to lookup table)
     const localizedName = getLocalizedFirstName(user?.firstName, user?.firstNameAr, locale)
@@ -115,10 +115,10 @@ export function Dashboard() {
       return user.username
     }
     return t('common.user', 'مستخدم')
-  }
+  }, [i18n.language, user?.firstName, user?.firstNameAr, user?.username, t])
 
   // Get time-based greeting
-  const getTimeBasedGreeting = () => {
+  const getTimeBasedGreeting = useCallback(() => {
     const hour = new Date().getHours()
     if (hour >= 5 && hour < 12) {
       return t('dashboard.hero.greetingMorning', 'صباح الخير')
@@ -127,7 +127,7 @@ export function Dashboard() {
     } else {
       return t('dashboard.hero.greetingEvening', 'مساء الخير')
     }
-  }
+  }, [t])
 
   // Determine which tabs are active to avoid unnecessary API calls
   const isOverviewTab = activeTab === 'overview'
@@ -219,12 +219,14 @@ export function Dashboard() {
   }, [summaryLoading, useFallbackHooks, caseStatsFetching, taskStatsFetching, reminderStatsFetching, eventsFetching, financialFetching])
   // ==================== END PERFORMANCE TRACKING ====================
 
-  // Calculate counts for hero stat cards
-  const activeCasesCount = caseStats?.active || 0
-  const activeTasksCount = (taskStats?.byStatus?.todo || 0) + (taskStats?.byStatus?.in_progress || 0)
-  const pendingRemindersCount = reminderStats?.byStatus?.pending || 0
+  // Calculate counts for hero stat cards (memoized)
+  const heroStats = useMemo(() => ({
+    activeCasesCount: caseStats?.active || 0,
+    activeTasksCount: (taskStats?.byStatus?.todo || 0) + (taskStats?.byStatus?.in_progress || 0),
+    pendingRemindersCount: reminderStats?.byStatus?.pending || 0,
+  }), [caseStats?.active, taskStats?.byStatus?.todo, taskStats?.byStatus?.in_progress, reminderStats?.byStatus?.pending])
 
-  const topNav = [
+  const topNav = useMemo(() => [
     {
       title: t('dashboard.topNav.home'),
       href: 'dashboard/overview',
@@ -243,14 +245,14 @@ export function Dashboard() {
       isActive: false,
       disabled: true,
     },
-  ]
+  ], [t])
 
-  const tabs: { id: TabType; label: string }[] = [
+  const tabs = useMemo<{ id: TabType; label: string }[]>(() => [
     { id: 'overview', label: t('dashboard.tabs.overview', 'نظرة عامة') },
     { id: 'analytics', label: t('dashboard.tabs.analytics', 'التحليلات') },
     { id: 'reports', label: t('dashboard.tabs.reports', 'التقارير') },
     { id: 'notifications', label: t('dashboard.tabs.notifications', 'الإشعارات') },
-  ]
+  ], [t])
 
   return (
     <>
@@ -345,21 +347,21 @@ export function Dashboard() {
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                   <StatCard
                     label={t('dashboard.hero.stats.cases', 'القضايا')}
-                    value={activeCasesCount}
+                    value={heroStats.activeCasesCount}
                     icon={Scale}
                     status="normal"
                     className="py-3 px-4"
                   />
                   <StatCard
                     label={t('dashboard.hero.stats.tasks', 'المهام')}
-                    value={activeTasksCount}
+                    value={heroStats.activeTasksCount}
                     icon={ListTodo}
                     status="normal"
                     className="py-3 px-4"
                   />
                   <StatCard
                     label={t('dashboard.hero.stats.reminders', 'التذكيرات')}
-                    value={pendingRemindersCount}
+                    value={heroStats.pendingRemindersCount}
                     icon={Bell}
                     status="normal"
                     className="py-3 px-4"
