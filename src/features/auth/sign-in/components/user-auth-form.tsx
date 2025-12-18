@@ -138,25 +138,33 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         navigate({ to: '/' }) // Client dashboard
       }
     } catch (error: any) {
-      // Record failed attempt for rate limiting
-      const failedResult = recordFailedAttempt(identifier)
-      setAttemptsRemaining(failedResult.attemptsRemaining)
+      const status = error?.status || error?.response?.status
 
-      // Handle server-side 429 rate limit
-      if (error?.status === 429 || error?.response?.status === 429) {
+      // Handle server-side 429 rate limit - DON'T count as failed attempt
+      // 429 means "slow down", not "wrong password"
+      if (status === 429) {
         const serverWaitTime = error.retryAfter || error?.response?.data?.retryAfter || 60
         setRateLimitError(t('auth.signIn.serverRateLimited', { time: formatLockoutTime(serverWaitTime) }))
         setWaitTime(serverWaitTime)
         return
       }
 
-      // Handle client-side lockout from failed attempts
-      if (failedResult.locked) {
-        setRateLimitError(
-          t('auth.signIn.accountLocked', { time: formatLockoutTime(failedResult.waitTime || 0) })
-        )
-        setWaitTime(failedResult.waitTime || 0)
+      // Only record failed attempt for actual auth failures (401, 400 with wrong credentials)
+      // NOT for network errors, server errors, or rate limits
+      const isAuthFailure = status === 401 || status === 400
+      if (isAuthFailure) {
+        const failedResult = recordFailedAttempt(identifier)
+        setAttemptsRemaining(failedResult.attemptsRemaining)
+
+        // Handle client-side lockout from failed attempts
+        if (failedResult.locked) {
+          setRateLimitError(
+            t('auth.signIn.accountLocked', { time: formatLockoutTime(failedResult.waitTime || 0) })
+          )
+          setWaitTime(failedResult.waitTime || 0)
+        }
       }
+      // For other errors (network, 500s), just let the error display without counting
     } finally {
       setIsLoading(false)
     }
