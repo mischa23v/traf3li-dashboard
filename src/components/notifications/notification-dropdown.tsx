@@ -7,7 +7,6 @@
 import { useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from '@tanstack/react-router'
-import { FixedSizeList as VirtualList } from 'react-window'
 import { Bell, CheckCheck, Trash2, Settings, Filter } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -31,10 +30,6 @@ import {
   useClearReadNotifications,
 } from '@/hooks/useNotifications'
 import type { NotificationType, Notification } from '@/types/notification'
-
-// Virtualization constants
-const DROPDOWN_ITEM_HEIGHT = 100
-const DROPDOWN_LIST_HEIGHT = 400
 
 interface NotificationDropdownProps {
   className?: string
@@ -197,28 +192,20 @@ export function NotificationDropdown({ className }: NotificationDropdownProps) {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900 dark:border-slate-100" />
               </div>
             ) : notifications.length > 0 ? (
-              <VirtualList
-                height={DROPDOWN_LIST_HEIGHT}
-                itemCount={notifications.length}
-                itemSize={DROPDOWN_ITEM_HEIGHT}
-                width="100%"
-                className="scrollbar-thin"
-              >
-                {({ index, style }) => {
-                  const notification = notifications[index]
-                  return (
-                    <div style={style} key={notification._id}>
-                      <NotificationItem
-                        notification={notification}
-                        onMarkAsRead={handleMarkAsRead}
-                        onDelete={handleDelete}
-                        onClick={handleNotificationClick}
-                        compact
-                      />
-                    </div>
-                  )
-                }}
-              </VirtualList>
+              <ScrollArea className="h-[400px]">
+                <div className="divide-y">
+                  {notifications.map((notification) => (
+                    <NotificationItem
+                      key={notification._id}
+                      notification={notification}
+                      onMarkAsRead={handleMarkAsRead}
+                      onDelete={handleDelete}
+                      onClick={handleNotificationClick}
+                      compact
+                    />
+                  ))}
+                </div>
+              </ScrollArea>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center px-4">
                 <Bell className="w-12 h-12 text-slate-300 dark:text-slate-700 mb-3" />
@@ -232,28 +219,20 @@ export function NotificationDropdown({ className }: NotificationDropdownProps) {
           {/* Finance Notifications */}
           <TabsContent value="finance" className="m-0">
             {financeNotifications.length > 0 ? (
-              <VirtualList
-                height={DROPDOWN_LIST_HEIGHT}
-                itemCount={financeNotifications.length}
-                itemSize={DROPDOWN_ITEM_HEIGHT}
-                width="100%"
-                className="scrollbar-thin"
-              >
-                {({ index, style }) => {
-                  const notification = financeNotifications[index]
-                  return (
-                    <div style={style} key={notification._id}>
-                      <NotificationItem
-                        notification={notification}
-                        onMarkAsRead={handleMarkAsRead}
-                        onDelete={handleDelete}
-                        onClick={handleNotificationClick}
-                        compact
-                      />
-                    </div>
-                  )
-                }}
-              </VirtualList>
+              <ScrollArea className="h-[400px]">
+                <div className="divide-y">
+                  {financeNotifications.map((notification) => (
+                    <NotificationItem
+                      key={notification._id}
+                      notification={notification}
+                      onMarkAsRead={handleMarkAsRead}
+                      onDelete={handleDelete}
+                      onClick={handleNotificationClick}
+                      compact
+                    />
+                  ))}
+                </div>
+              </ScrollArea>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center px-4">
                 <Bell className="w-12 h-12 text-slate-300 dark:text-slate-700 mb-3" />
@@ -267,28 +246,20 @@ export function NotificationDropdown({ className }: NotificationDropdownProps) {
           {/* Unread Notifications */}
           <TabsContent value="unread" className="m-0">
             {unreadNotifications.length > 0 ? (
-              <VirtualList
-                height={DROPDOWN_LIST_HEIGHT}
-                itemCount={unreadNotifications.length}
-                itemSize={DROPDOWN_ITEM_HEIGHT}
-                width="100%"
-                className="scrollbar-thin"
-              >
-                {({ index, style }) => {
-                  const notification = unreadNotifications[index]
-                  return (
-                    <div style={style} key={notification._id}>
-                      <NotificationItem
-                        notification={notification}
-                        onMarkAsRead={handleMarkAsRead}
-                        onDelete={handleDelete}
-                        onClick={handleNotificationClick}
-                        compact
-                      />
-                    </div>
-                  )
-                }}
-              </VirtualList>
+              <ScrollArea className="h-[400px]">
+                <div className="divide-y">
+                  {unreadNotifications.map((notification) => (
+                    <NotificationItem
+                      key={notification._id}
+                      notification={notification}
+                      onMarkAsRead={handleMarkAsRead}
+                      onDelete={handleDelete}
+                      onClick={handleNotificationClick}
+                      compact
+                    />
+                  ))}
+                </div>
+              </ScrollArea>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center px-4">
                 <CheckCheck className="w-12 h-12 text-green-500 dark:text-green-600 mb-3" />

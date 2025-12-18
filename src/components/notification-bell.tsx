@@ -7,7 +7,6 @@
 import { useState, memo, useCallback, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { FixedSizeList as VirtualList } from 'react-window'
 import { Bell, Check, CheckCheck, Trash2, ExternalLink } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { ar, enUS } from 'date-fns/locale'
@@ -22,10 +21,6 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { useNotifications, Notification } from '@/context/socket-provider'
-
-// Virtualization constants
-const BELL_ITEM_HEIGHT = 90
-const BELL_LIST_HEIGHT = 300
 
 // Notification type icons
 const notificationIcons: Record<string, string> = {
@@ -181,28 +176,20 @@ export function NotificationBell() {
           </div>
         </div>
 
-        {/* Notifications List - Virtualized for performance */}
+        {/* Notifications List */}
         {displayNotifications.length > 0 ? (
-          <VirtualList
-            height={BELL_LIST_HEIGHT}
-            itemCount={displayNotifications.length}
-            itemSize={BELL_ITEM_HEIGHT}
-            width="100%"
-            className="scrollbar-thin"
-          >
-            {({ index, style }) => {
-              const notification = displayNotifications[index]
-              return (
-                <div style={style} key={notification._id}>
-                  <NotificationItem
-                    notification={notification}
-                    onRead={markAsRead}
-                    onClick={handleNotificationClick}
-                  />
-                </div>
-              )
-            }}
-          </VirtualList>
+          <ScrollArea className="h-[300px]">
+            <div className="divide-y">
+              {displayNotifications.map((notification) => (
+                <NotificationItem
+                  key={notification._id}
+                  notification={notification}
+                  onRead={markAsRead}
+                  onClick={handleNotificationClick}
+                />
+              ))}
+            </div>
+          </ScrollArea>
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <Bell className="w-12 h-12 text-slate-300 mb-3" />

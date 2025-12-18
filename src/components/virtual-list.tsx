@@ -3,7 +3,14 @@
  * Uses react-window for efficient rendering of large lists
  */
 
-import { FixedSizeList, VariableSizeList, ListChildComponentProps } from 'react-window'
+import { List } from 'react-window'
+import type { ReactNode } from 'react'
+
+// react-window v2 child component props
+interface ListChildComponentProps {
+  index: number
+  style: CSSProperties
+}
 import { forwardRef, memo, useCallback, useRef, CSSProperties, useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 
@@ -59,7 +66,7 @@ function VirtualListInner<T>({
   )
 
   return (
-    <FixedSizeList
+    <List
       height={height}
       width={width}
       itemCount={items.length}
@@ -70,7 +77,7 @@ function VirtualListInner<T>({
       itemKey={getItemKey ? (index) => getItemKey(index, items) : undefined}
     >
       {Row}
-    </FixedSizeList>
+    </List>
   )
 }
 
@@ -90,8 +97,6 @@ function VariableVirtualListInner<T>({
   estimatedItemHeight = 50,
   getItemKey,
 }: VariableListProps<T>) {
-  const listRef = useRef<VariableSizeList>(null)
-
   const Row = useCallback(
     ({ index, style }: ListChildComponentProps) => {
       const item = items[index]
@@ -100,26 +105,19 @@ function VariableVirtualListInner<T>({
     [items, renderItem]
   )
 
-  // Reset cache when items change
-  const resetAfterIndex = useCallback((index: number) => {
-    listRef.current?.resetAfterIndex(index)
-  }, [])
-
   return (
-    <VariableSizeList
-      ref={listRef}
+    <List
       height={height}
       width={width}
       itemCount={items.length}
       itemSize={getItemHeight}
       overscanCount={overscanCount}
       direction={direction}
-      estimatedItemSize={estimatedItemHeight}
       className={cn('scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent', className)}
       itemKey={getItemKey ? (index) => getItemKey(index, items) : undefined}
     >
       {Row}
-    </VariableSizeList>
+    </List>
   )
 }
 

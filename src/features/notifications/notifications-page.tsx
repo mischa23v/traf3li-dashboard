@@ -7,7 +7,6 @@
 import { useState, useMemo, useCallback } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import { useTranslation } from 'react-i18next'
-import { FixedSizeList as VirtualList } from 'react-window'
 import {
   Bell,
   CheckCheck,
@@ -50,10 +49,6 @@ import {
 import type { NotificationType, NotificationPriority, Notification } from '@/types/notification'
 
 type FilterTab = 'all' | 'unread' | 'finance' | 'cases' | 'system'
-
-// Virtualization constants
-const NOTIFICATION_ITEM_HEIGHT = 120
-const VIRTUAL_LIST_HEIGHT = 600
 
 export function NotificationsPage() {
   const { t, i18n } = useTranslation()
@@ -385,26 +380,18 @@ export function NotificationsPage() {
                     <p className="text-sm text-slate-500">{t('notifications.error', 'Failed to load notifications')}</p>
                   </div>
                 ) : filteredNotifications.length > 0 ? (
-                  <VirtualList
-                    height={VIRTUAL_LIST_HEIGHT}
-                    itemCount={filteredNotifications.length}
-                    itemSize={NOTIFICATION_ITEM_HEIGHT}
-                    width="100%"
-                    className="scrollbar-thin"
-                  >
-                    {({ index, style }) => {
-                      const notification = filteredNotifications[index]
-                      return (
-                        <div style={style} key={notification._id}>
-                          <NotificationItem
-                            notification={notification}
-                            onMarkAsRead={handleMarkAsRead}
-                            onDelete={handleDelete}
-                          />
-                        </div>
-                      )
-                    }}
-                  </VirtualList>
+                  <ScrollArea className="h-[600px]">
+                    <div className="divide-y">
+                      {filteredNotifications.map((notification) => (
+                        <NotificationItem
+                          key={notification._id}
+                          notification={notification}
+                          onMarkAsRead={handleMarkAsRead}
+                          onDelete={handleDelete}
+                        />
+                      ))}
+                    </div>
+                  </ScrollArea>
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
                     <CheckCircle className="w-12 h-12 text-green-500 mb-3" />
