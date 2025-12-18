@@ -48,8 +48,6 @@ jobs:
           VITE_WS_URL: wss://api-aws.traf3li.com
           # Disable Vercel proxy (make direct API calls)
           VITE_DISABLE_API_PROXY: 'true'
-          # Clerk authentication (from secrets)
-          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
           # Sentry error tracking (optional)
           VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
 
