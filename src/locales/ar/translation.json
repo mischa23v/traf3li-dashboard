@@ -234,7 +234,13 @@
         "passwordMinLength": "كلمة المرور يجب أن تكون 6 أحرف على الأقل"
       },
       "welcomeBack": "مرحباً بعودتك، {{email}}!",
-      "error": "خطأ"
+      "error": "خطأ",
+      "accountLocked": "تم قفل حسابك مؤقتاً. يرجى الانتظار {{time}}",
+      "tooManyAttempts": "محاولات كثيرة جداً. يرجى الانتظار {{time}}",
+      "serverRateLimited": "تم تجاوز حد المحاولات. يرجى الانتظار {{time}}",
+      "waitingTime": "الوقت المتبقي: {{time}}",
+      "attemptsRemaining": "المحاولات المتبقية: {{count}}",
+      "waitToRetry": "انتظر للمحاولة مرة أخرى"
     },
     "otp": {
       "title": "التحقق من البريد الإلكتروني",
