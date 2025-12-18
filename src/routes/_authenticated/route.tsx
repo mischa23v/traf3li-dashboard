@@ -4,18 +4,12 @@ import { useAuthStore } from '@/stores/auth-store'
 
 export const Route = createFileRoute('/_authenticated')({
   beforeLoad: async ({ location }) => {
-    const { checkAuth } = useAuthStore.getState()
+    const { isAuthenticated, checkAuth } = useAuthStore.getState()
 
-    // Verify authentication with backend
-    try {
-      await checkAuth()
-    } catch {
-      // checkAuth() shouldn't throw, but if it does, continue to auth check below
-    }
-
-    const isAuthenticated = useAuthStore.getState().isAuthenticated
-
+    // PERFORMANCE FIX: Trust cached auth state for immediate render
+    // Don't block on API call - verify in background instead
     if (!isAuthenticated) {
+      // No cached auth - must redirect to sign in
       throw redirect({
         to: '/sign-in',
         search: {
@@ -23,6 +17,13 @@ export const Route = createFileRoute('/_authenticated')({
         },
       })
     }
+
+    // Verify auth in background (non-blocking)
+    // This will update state if session expired, triggering re-render
+    checkAuth().catch(() => {
+      // If verification fails and user is actually logged out,
+      // the next navigation will redirect to sign-in
+    })
   },
   component: AuthenticatedLayout,
 })

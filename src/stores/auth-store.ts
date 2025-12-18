@@ -67,14 +67,13 @@ export const useAuthStore = create<AuthState>()(
           })
 
           // Handle permissions based on user type
+          // PERFORMANCE FIX: Don't await permissions - fetch in parallel
           if (user.role === 'lawyer') {
             if (user.firmId) {
-              // Firm member - fetch permissions from firm API
-              try {
-                await usePermissionsStore.getState().fetchPermissions()
-              } catch (permError) {
+              // Firm member - fetch permissions from firm API (non-blocking)
+              usePermissionsStore.getState().fetchPermissions().catch(() => {
                 // Don't fail login if permissions fetch fails
-              }
+              })
             } else {
               // No firm = solo lawyer
               // Set permissions from login response if available, otherwise mark as solo
@@ -167,14 +166,13 @@ export const useAuthStore = create<AuthState>()(
           }
 
           // Handle permissions based on user type
+          // PERFORMANCE FIX: Don't await permissions - fetch in parallel
           if (user && user.role === 'lawyer') {
             if (user.firmId) {
-              // Firm member - fetch permissions from firm API
-              try {
-                await usePermissionsStore.getState().fetchPermissions()
-              } catch {
+              // Firm member - fetch permissions from firm API (non-blocking)
+              usePermissionsStore.getState().fetchPermissions().catch(() => {
                 // Don't fail auth check if permissions fetch fails
-              }
+              })
             } else {
               // No firm = solo lawyer
               usePermissionsStore.getState().setPermissionsFromLogin(user.permissions || null, true)
