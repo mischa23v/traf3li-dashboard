@@ -48,8 +48,10 @@ jobs:
           VITE_WS_URL: wss://api-aws.traf3li.com
           # Disable Vercel proxy (make direct API calls)
           VITE_DISABLE_API_PROXY: 'true'
-          # Sentry error tracking (optional)
-          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
+          # Google Analytics
+          VITE_GA_MEASUREMENT_ID: ${{ secrets.VITE_GA_MEASUREMENT_ID }}
+          # Push notifications
+          VITE_VAPID_PUBLIC_KEY: ${{ secrets.VITE_VAPID_PUBLIC_KEY }}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
