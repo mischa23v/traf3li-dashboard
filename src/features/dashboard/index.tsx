@@ -23,7 +23,6 @@ import {
   PiggyBank,
   BarChart3,
   Activity,
-  FileText,
   GraduationCap,
 } from 'lucide-react'
 
@@ -52,14 +51,11 @@ import {
   useDashboardSummary,
   useTodayEvents,
   useFinancialSummary,
-  // useRecentMessages, // REMOVED - messages no longer in dashboard summary for performance
-  // useMessageStats,   // REMOVED - messages no longer in dashboard summary for performance
   useCRMStats,
   useFinanceStats,
   useCasesChart,
   useRevenueChart,
   useTasksChart,
-  usePendingDocuments,
 } from '@/hooks/useDashboard'
 import { useTaskStats } from '@/hooks/useTasks'
 import { useReminderStats } from '@/hooks/useRemindersAndEvents'
@@ -179,9 +175,6 @@ export function Dashboard() {
   const { data: casesChart, isLoading: casesChartLoading } = useCasesChart(12, isReportsTab)
   const { data: revenueChart, isLoading: revenueChartLoading } = useRevenueChart(12, isReportsTab)
   const { data: tasksChart, isLoading: tasksChartLoading } = useTasksChart(12, isReportsTab)
-
-  // Fetch lawyer-focused data (only when analytics tab is active)
-  const { data: pendingDocuments, isLoading: documentsLoading } = usePendingDocuments(isAnalyticsTab)
 
   // ==================== PERFORMANCE: Track API call completion ====================
   useEffect(() => {
@@ -413,8 +406,6 @@ export function Dashboard() {
             financeStats={financeStats}
             financeStatsLoading={financeStatsLoading}
             caseStats={caseStats}
-            pendingDocuments={pendingDocuments}
-            documentsLoading={documentsLoading}
           />
         )}
 
@@ -656,8 +647,6 @@ interface AnalyticsTabProps {
   financeStats: any
   financeStatsLoading: boolean
   caseStats: any
-  pendingDocuments: any
-  documentsLoading: boolean
 }
 
 function AnalyticsTab({
@@ -667,11 +656,9 @@ function AnalyticsTab({
   financeStats,
   financeStatsLoading,
   caseStats,
-  pendingDocuments,
-  documentsLoading,
 }: AnalyticsTabProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {/* CRM Card */}
       <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all">
         <CardHeader className="pb-2">
@@ -714,54 +701,6 @@ function AnalyticsTab({
                   <span className="text-xs font-medium text-slate-600">{t('dashboard.analytics.conversionRate', 'معدل التحويل')}</span>
                 </div>
                 <span className="font-bold text-purple-600">{crmStats?.conversionRate || 0}%</span>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Pending Documents Card */}
-      <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-            <FileText className="h-5 w-5 text-purple-500" />
-            {t('dashboard.analytics.pendingDocs', 'المستندات المعلقة')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {documentsLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-navy" />
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-amber-50 rounded-xl">
-                <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-amber-500" />
-                  <span className="text-xs font-medium text-slate-600">{t('dashboard.analytics.awaitingSignature', 'بانتظار التوقيع')}</span>
-                </div>
-                <span className="font-bold text-amber-600">{pendingDocuments?.counts?.awaitingSignature || 0}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-xl">
-                <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-blue-500" />
-                  <span className="text-xs font-medium text-slate-600">{t('dashboard.analytics.awaitingReview', 'بانتظار المراجعة')}</span>
-                </div>
-                <span className="font-bold text-blue-600">{pendingDocuments?.counts?.awaitingReview || 0}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-purple-50 rounded-xl">
-                <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-purple-500" />
-                  <span className="text-xs font-medium text-slate-600">{t('dashboard.analytics.awaitingClient', 'بانتظار العميل')}</span>
-                </div>
-                <span className="font-bold text-purple-600">{pendingDocuments?.counts?.awaitingClient || 0}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-slate-500" />
-                  <span className="text-xs font-medium text-slate-600">{t('dashboard.analytics.totalPending', 'إجمالي المعلق')}</span>
-                </div>
-                <span className="font-bold text-navy">{pendingDocuments?.total || 0}</span>
               </div>
             </div>
           )}
