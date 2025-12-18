@@ -1,9 +1,11 @@
 /**
  * Socket Service
  * Handles all Socket.IO real-time communication
+ * Includes authentication error handling and session management
  */
 
 import { io, Socket } from 'socket.io-client'
+import type { SocketSessionExpiredEvent, SocketForceLogoutEvent } from '@/types/api'
 
 const SOCKET_URL =
   import.meta.env.VITE_API_URL?.replace('/api', '') ||
@@ -12,6 +14,8 @@ const SOCKET_URL =
 class SocketService {
   private socket: Socket | null = null
   private userId: string | null = null
+  private reconnectAttempts = 0
+  private maxReconnectAttempts = 5
 
   /**
    * Initialize socket connection
@@ -24,15 +28,25 @@ class SocketService {
     this.userId = userId
 
     this.socket = io(SOCKET_URL, {
-      withCredentials: true,
+      withCredentials: true, // Send cookies for authentication
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
-      reconnectionAttempts: 5,
+      reconnectionAttempts: this.maxReconnectAttempts,
     })
 
+    this.setupAuthEventHandlers()
+  }
+
+  /**
+   * Setup authentication and session event handlers
+   */
+  private setupAuthEventHandlers(): void {
+    if (!this.socket) return
+
     this.socket.on('connect', () => {
+      this.reconnectAttempts = 0
       // Join user session
       if (this.userId) {
         this.socket?.emit('user:join', this.userId)
@@ -43,11 +57,27 @@ class SocketService {
       if (import.meta.env.DEV) {
         console.warn('[Socket] Disconnected:', reason)
       }
+
+      // Server forced disconnect - likely auth issue
+      if (reason === 'io server disconnect') {
+        // Try to reconnect
+        this.socket?.connect()
+      }
     })
 
     this.socket.on('connect_error', (error) => {
       if (import.meta.env.DEV) {
         console.warn('[Socket] Connection error:', error.message)
+      }
+
+      // Handle authentication errors
+      if (
+        error.message.includes('Authentication') ||
+        error.message.includes('unauthorized') ||
+        error.message.includes('401')
+      ) {
+        // Redirect to login
+        window.location.href = '/sign-in?reason=socket_auth_failed'
       }
     })
 
@@ -55,6 +85,30 @@ class SocketService {
       if (import.meta.env.DEV) {
         console.warn('[Socket] Error:', error)
       }
+    })
+
+    // Handle session expiry via socket
+    this.socket.on('session:expired', (data: SocketSessionExpiredEvent) => {
+      if (import.meta.env.DEV) {
+        console.log('[Socket] Session expired:', data.reason)
+      }
+      window.location.href = `/sign-in?reason=${data.reason || 'session_expired'}`
+    })
+
+    // Handle forced logout (e.g., account locked, permission revoked)
+    this.socket.on('force:logout', (data: SocketForceLogoutEvent) => {
+      if (import.meta.env.DEV) {
+        console.log('[Socket] Forced logout:', data.reason)
+      }
+      window.location.href = `/sign-in?reason=${data.reason || 'forced'}`
+    })
+
+    // Handle account locked notification
+    this.socket.on('account:locked', (data: { remainingTime?: number }) => {
+      if (import.meta.env.DEV) {
+        console.log('[Socket] Account locked:', data)
+      }
+      window.location.href = '/sign-in?reason=account_locked'
     })
   }
 

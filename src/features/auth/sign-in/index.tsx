@@ -1,7 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link, useSearch } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/auth-store';
+import {
+  checkLoginAllowed,
+  recordFailedAttempt,
+  recordSuccessfulLogin,
+  formatLockoutTime,
+} from '@/lib/login-throttle';
+import { getLogoutReasonMessage } from '@/constants/errorCodes';
 
 // ============================================
 // SVG ICONS
@@ -52,27 +60,82 @@ const Icons = {
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
   ),
+  AlertTriangle: () => (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+    </svg>
+  ),
+  Clock: () => (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  ),
+  Info: () => (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  ),
 };
 
 // ============================================
 // MAIN COMPONENT
 // ============================================
 export function SignIn() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { login } = useAuthStore();
   const search = useSearch({ from: '/(auth)/sign-in' });
+  const isRTL = i18n.language === 'ar';
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [apiError, setApiError] = useState('');
 
+  // Rate limiting state
+  const [rateLimitError, setRateLimitError] = useState<string | null>(null);
+  const [waitTime, setWaitTime] = useState<number>(0);
+  const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null);
+
   // Login form data
   const [formData, setFormData] = useState({
     usernameOrEmail: '',
     password: '',
   });
+
+  // Show logout reason message on mount
+  useEffect(() => {
+    const reason = (search as any).reason as string | undefined;
+    if (reason) {
+      const message = getLogoutReasonMessage(reason, isRTL ? 'ar' : 'en');
+      if (message) {
+        toast.info(message, { duration: 5000 });
+      }
+    }
+  }, [search, isRTL]);
+
+  // Countdown timer for rate limiting
+  useEffect(() => {
+    if (waitTime <= 0) return;
+
+    const timer = setInterval(() => {
+      setWaitTime((prev) => {
+        const newTime = prev - 1;
+        if (newTime <= 0) {
+          setRateLimitError(null);
+          return 0;
+        }
+        return newTime;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [waitTime]);
+
+  // Get login identifier
+  const getLoginIdentifier = useCallback((username: string): string => {
+    return username.toLowerCase().trim();
+  }, []);
 
   const updateField = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -108,8 +171,24 @@ export function SignIn() {
 
     if (!validateLoginForm()) return;
 
+    const identifier = getLoginIdentifier(formData.usernameOrEmail);
+
+    // Check client-side rate limiting BEFORE making API call
+    const throttleCheck = checkLoginAllowed(identifier);
+    if (!throttleCheck.allowed) {
+      setRateLimitError(
+        throttleCheck.lockedUntil
+          ? t('auth.signIn.accountLocked', { time: formatLockoutTime(throttleCheck.waitTime || 0) })
+          : t('auth.signIn.tooManyAttempts', { time: formatLockoutTime(throttleCheck.waitTime || 0) })
+      );
+      setWaitTime(throttleCheck.waitTime || 0);
+      setAttemptsRemaining(throttleCheck.attemptsRemaining || 0);
+      return;
+    }
+
     setIsLoading(true);
     setApiError('');
+    setRateLimitError(null);
 
     try {
       // Call backend auth service
@@ -118,11 +197,50 @@ export function SignIn() {
         password: formData.password,
       });
 
+      // Record successful login - clears throttle data
+      recordSuccessfulLogin(identifier);
+
       // Navigate to redirect URL or dashboard
       // No firm check needed - lawyers without firm are treated as solo lawyers
-      const redirectTo = search.redirect || '/';
+      const redirectTo = (search as any).redirect || '/';
       navigate({ to: redirectTo });
     } catch (err: any) {
+      const status = err?.status || err?.response?.status;
+
+      // Handle server-side 429 rate limit - DON'T count as failed attempt
+      if (status === 429) {
+        const serverWaitTime = err.retryAfter || err?.response?.data?.retryAfter || 60;
+        setRateLimitError(t('auth.signIn.serverRateLimited', { time: formatLockoutTime(serverWaitTime) }));
+        setWaitTime(serverWaitTime);
+        if (err?.attemptsRemaining !== undefined) {
+          setAttemptsRemaining(err.attemptsRemaining);
+        }
+        return;
+      }
+
+      // Handle 423 Account Locked
+      if (status === 423) {
+        const remainingTime = err?.remainingTime || err?.response?.data?.remainingTime || 15;
+        setRateLimitError(t('auth.signIn.accountLocked', { time: `${remainingTime} ${isRTL ? 'دقيقة' : 'minutes'}` }));
+        setWaitTime(remainingTime * 60); // Convert minutes to seconds
+        return;
+      }
+
+      // Only record failed attempt for actual auth failures (401, 400)
+      const isAuthFailure = status === 401 || status === 400;
+      if (isAuthFailure) {
+        const failedResult = recordFailedAttempt(identifier);
+        setAttemptsRemaining(failedResult.attemptsRemaining);
+
+        // Handle client-side lockout from failed attempts
+        if (failedResult.locked) {
+          setRateLimitError(
+            t('auth.signIn.accountLocked', { time: formatLockoutTime(failedResult.waitTime || 0) })
+          );
+          setWaitTime(failedResult.waitTime || 0);
+        }
+      }
+
       setApiError(err.message || t('common.error'));
     } finally {
       setIsLoading(false);
@@ -150,11 +268,43 @@ export function SignIn() {
           <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
             <form onSubmit={handleLoginSubmit} className="p-6 space-y-5">
 
+              {/* Rate Limit Warning */}
+              {rateLimitError && (
+                <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 text-sm">
+                  <div className="flex items-start gap-2">
+                    <Icons.AlertTriangle />
+                    <div className="flex-1">
+                      <p>{rateLimitError}</p>
+                      {waitTime > 0 && (
+                        <p className="mt-1 flex items-center gap-1 text-xs">
+                          <Icons.Clock />
+                          {t('auth.signIn.waitingTime', { time: formatLockoutTime(waitTime) })}
+                        </p>
+                      )}
+                      {attemptsRemaining !== null && attemptsRemaining > 0 && !waitTime && (
+                        <p className="mt-1 text-xs">
+                          {t('auth.signIn.attemptsRemaining', { count: attemptsRemaining })}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* API Error */}
-              {apiError && (
-                <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-center gap-2">
-                  <Icons.XCircle />
-                  {apiError}
+              {apiError && !rateLimitError && (
+                <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+                  <div className="flex items-start gap-2">
+                    <Icons.XCircle />
+                    <div className="flex-1">
+                      <p>{apiError}</p>
+                      {attemptsRemaining !== null && attemptsRemaining > 0 && (
+                        <p className="mt-1 text-xs opacity-80">
+                          {t('auth.signIn.attemptsRemaining', { count: attemptsRemaining })}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -177,7 +327,7 @@ export function SignIn() {
                     placeholder=""
                     dir="ltr"
                     autoComplete="username"
-                    disabled={isLoading}
+                    disabled={isLoading || waitTime > 0}
                   />
                 </div>
                 {errors.usernameOrEmail && (
@@ -212,13 +362,13 @@ export function SignIn() {
                     placeholder=""
                     dir="ltr"
                     autoComplete="current-password"
-                    disabled={isLoading}
+                    disabled={isLoading || waitTime > 0}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute end-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600"
-                    disabled={isLoading}
+                    disabled={isLoading || waitTime > 0}
                   >
                     {showPassword ? <Icons.EyeOff /> : <Icons.Eye />}
                   </button>
@@ -231,13 +381,18 @@ export function SignIn() {
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || waitTime > 0}
                 className="w-full h-12 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isLoading ? (
                   <>
                     <Icons.Spinner />
                     {t('auth.signIn.signingIn')}
+                  </>
+                ) : waitTime > 0 ? (
+                  <>
+                    <Icons.Clock />
+                    {t('auth.signIn.waitToRetry')} ({formatLockoutTime(waitTime)})
                   </>
                 ) : (
                   t('auth.signIn.signInButton')
@@ -258,7 +413,7 @@ export function SignIn() {
               <button
                 type="button"
                 onClick={handleGoogleLogin}
-                disabled={isLoading}
+                disabled={isLoading || waitTime > 0}
                 className="w-full h-12 rounded-xl border-2 border-slate-200 bg-white text-[#0f172a] font-medium hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 <Icons.Google />
