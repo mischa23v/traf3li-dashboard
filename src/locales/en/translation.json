@@ -234,7 +234,13 @@
         "passwordMinLength": "Password must be at least 6 characters long"
       },
       "welcomeBack": "Welcome back, {{email}}!",
-      "error": "Error"
+      "error": "Error",
+      "accountLocked": "Your account is temporarily locked. Please wait {{time}}",
+      "tooManyAttempts": "Too many attempts. Please wait {{time}}",
+      "serverRateLimited": "Rate limit exceeded. Please wait {{time}}",
+      "waitingTime": "Time remaining: {{time}}",
+      "attemptsRemaining": "Attempts remaining: {{count}}",
+      "waitToRetry": "Wait to retry"
     },
     "otp": {
       "title": "Email Verification",
