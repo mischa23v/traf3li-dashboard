@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, lazy, Suspense } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Star,
@@ -71,9 +71,11 @@ import {
   useExportPagePdf,
   useExportPageMarkdown,
 } from '@/hooks/useCaseNotion'
-import { BlockEditor } from './block-editor'
-import { WhiteboardView } from './whiteboard'
 import type { CaseNotionPage, Block } from '../data/schema'
+
+// Lazy load heavy editor components - only loaded when viewing document/whiteboard
+const BlockEditor = lazy(() => import('./block-editor').then(mod => ({ default: mod.BlockEditor })))
+const WhiteboardView = lazy(() => import('./whiteboard').then(mod => ({ default: mod.WhiteboardView })))
 import { pageTypeLabels } from '../data/schema'
 
 type ViewMode = 'document' | 'whiteboard'
@@ -519,14 +521,22 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
         </div>
       </div>
 
-      {/* Page content */}
-      {viewMode === 'whiteboard' ? (
-        /* Whiteboard View */
-        <WhiteboardView
-          caseId={caseId}
-          pageId={pageId}
-        />
-      ) : (
+      {/* Page content - Lazy loaded editors */}
+      <Suspense fallback={
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-500" />
+            <p className="mt-2 text-sm text-slate-500">{t('common.loading')}</p>
+          </div>
+        </div>
+      }>
+        {viewMode === 'whiteboard' ? (
+          /* Whiteboard View */
+          <WhiteboardView
+            caseId={caseId}
+            pageId={pageId}
+          />
+        ) : (
         /* Document View */
         <ScrollArea className="flex-1">
           <div className="max-w-4xl mx-auto px-8 py-12">
@@ -619,7 +629,8 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
             />
           </div>
         </ScrollArea>
-      )}
+        )}
+      </Suspense>
 
       {/* Activity Dialog */}
       <Dialog open={showActivityDialog} onOpenChange={setShowActivityDialog}>
