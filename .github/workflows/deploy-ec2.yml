@@ -1,0 +1,58 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            echo "🚀 Starting deployment..."
+
+            # Navigate to dashboard directory
+            cd ~/dashboard
+
+            # Check if it's a git repo, if not clone it
+            if [ ! -d ".git" ]; then
+              echo "📦 Cloning repository..."
+              cd ~
+              rm -rf dashboard
+              git clone https://github.com/mischa23v/traf3li-dashboard.git dashboard
+              cd dashboard
+            fi
+
+            # Pull latest changes
+            echo "📥 Pulling latest changes..."
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Install dependencies
+            echo "📦 Installing dependencies..."
+            npm ci --production=false
+
+            # Build the project
+            echo "🔨 Building project..."
+            npm run build
+
+            # Copy to nginx serve directory
+            echo "📁 Deploying to nginx..."
+            rm -rf ~/dist/*
+            cp -r dist/* ~/dist/
+
+            # Restart nginx
+            echo "🔄 Restarting nginx..."
+            sudo systemctl restart nginx
+
+            echo "✅ Deployment complete!"
