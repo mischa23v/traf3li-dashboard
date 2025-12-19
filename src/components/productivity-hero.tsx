@@ -138,14 +138,14 @@ export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = f
 
     return (
         <div className="bg-[#022c22] rounded-3xl p-6 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20">
-            {/* Animated Gradient Background */}
+            {/* Subtle Animated Gradient Background - reduced opacity for clarity */}
             <div className="absolute inset-0 z-0">
                 <div
-                    className="absolute inset-0 opacity-30"
+                    className="absolute inset-0 opacity-20"
                     style={{
                         background: 'linear-gradient(-45deg, #022c22, #064e3b, #022c22, #0f766e)',
                         backgroundSize: '400% 400%',
-                        animation: 'gradientShift 15s ease infinite'
+                        animation: 'gradientShift 20s ease infinite'
                     }}
                 />
                 <style>{`
@@ -156,16 +156,16 @@ export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = f
                     }
                 `}</style>
             </div>
-            {/* Background Pattern */}
+            {/* Background Pattern - reduced opacity */}
             <div className="absolute inset-0 z-0">
                 <img
                     src="/images/hero-wave.png"
-                    alt="Background Pattern"
-                    className="w-full h-full object-cover opacity-40 mix-blend-overlay"
+                    alt=""
+                    className="w-full h-full object-cover opacity-25 mix-blend-overlay"
                 />
             </div>
-            <div className="absolute top-0 end-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl -me-48 -mt-48 pointer-events-none"></div>
-            <div className="absolute bottom-0 start-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -ms-48 -mb-48 pointer-events-none"></div>
+            {/* Subtle accent glow - reduced blur for clarity */}
+            <div className="absolute top-0 end-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-2xl -me-32 -mt-32 pointer-events-none"></div>
 
             <div className="relative z-10">
                 <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-center">
