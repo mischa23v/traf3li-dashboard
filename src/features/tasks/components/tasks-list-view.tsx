@@ -163,10 +163,10 @@ export function TasksListView() {
         setAiLoading(true)
         setAiError(false)
 
-        // Create timeout (10 seconds)
+        // Create timeout (30 seconds - AI inference can take time)
         const timeoutId = setTimeout(() => {
             aiAbortController.current?.abort()
-        }, 10000)
+        }, 30000)
 
         try {
             const requestBody: AiSuggestionRequest = {
