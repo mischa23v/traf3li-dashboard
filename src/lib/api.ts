@@ -78,12 +78,57 @@ export const API_DOMAIN = API_CONFIG.useProxy ? 'https://api.traf3li.com' : API_
 // Note: No axios-level cache - TanStack Query handles caching with smarter stale-while-revalidate
 
 /**
- * Extract CSRF token from cookies
- * The token is set by the backend as an HttpOnly cookie
+ * Cached CSRF token from response headers (fallback when cookie isn't accessible)
+ */
+let cachedCsrfToken: string | null = null
+
+/**
+ * Extract CSRF token from cookies or use cached token
+ * The cookie is NOT httpOnly, so JavaScript can read it
+ * Falls back to cached token from response headers for cross-origin requests
  */
 const getCsrfToken = (): string => {
-  const match = document.cookie.match(/csrf-token=([^;]+)/)
-  return match ? match[1] : ''
+  const cookies = document.cookie
+
+  // Try cookie first (primary method)
+  const match = cookies.match(/csrf-token=([^;]+)/)
+  if (match && match[1]) {
+    cachedCsrfToken = match[1] // Cache it
+    return match[1]
+  }
+
+  // Try alternative cookie names
+  const xsrfMatch = cookies.match(/XSRF-TOKEN=([^;]+)/)
+  if (xsrfMatch && xsrfMatch[1]) {
+    cachedCsrfToken = xsrfMatch[1]
+    return xsrfMatch[1]
+  }
+
+  // Fallback to cached token from response headers
+  if (cachedCsrfToken) {
+    return cachedCsrfToken
+  }
+
+  // Debug logging for CSRF token issues (only log once per session to avoid spam)
+  if (!getCsrfToken.hasLoggedWarning) {
+    getCsrfToken.hasLoggedWarning = true
+    const availableCookies = cookies ? cookies.split(';').map(c => c.trim().split('=')[0]).filter(Boolean) : []
+    console.warn('[CSRF] No csrf-token found. Available cookies:', availableCookies,
+      '\nThis may be a cross-origin cookie issue. Backend should set SameSite=None; Secure for the csrf-token cookie.')
+  }
+
+  return ''
+}
+getCsrfToken.hasLoggedWarning = false
+
+/**
+ * Update cached CSRF token from response headers
+ * Called by response interceptor to capture token from X-CSRF-Token header
+ */
+export const updateCsrfTokenFromResponse = (token: string) => {
+  if (token) {
+    cachedCsrfToken = token
+  }
 }
 
 /**
@@ -222,6 +267,12 @@ apiClientNoVersion.interceptors.response.use(
     // Clear idempotency key on successful mutation (next request gets new key)
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
       clearIdempotencyKey(method, url, response.config.data)
+    }
+
+    // Capture CSRF token from response headers (for cross-origin requests where cookie isn't accessible)
+    const csrfTokenHeader = response.headers['x-csrf-token'] || response.headers['x-xsrf-token']
+    if (csrfTokenHeader) {
+      updateCsrfTokenFromResponse(csrfTokenHeader)
     }
 
     return response
@@ -414,6 +465,12 @@ apiClient.interceptors.response.use(
     // Clear idempotency key on successful mutation (next request gets new key)
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
       clearIdempotencyKey(method, url, response.config.data)
+    }
+
+    // Capture CSRF token from response headers (for cross-origin requests where cookie isn't accessible)
+    const csrfTokenHeader = response.headers['x-csrf-token'] || response.headers['x-xsrf-token']
+    if (csrfTokenHeader) {
+      updateCsrfTokenFromResponse(csrfTokenHeader)
     }
 
     // Check for session warning headers (5 minutes before expiry)
