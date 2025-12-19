@@ -27,7 +27,7 @@ export default defineConfig({
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "font-src 'self' https://fonts.gstatic.com",
         "img-src 'self' data: https: blob:",
-        "connect-src 'self' https://api.traf3li.com wss://api.traf3li.com https://*.sentry.io ws://localhost:* http://localhost:*",
+        "connect-src 'self' https://api.traf3li.com wss://api.traf3li.com https://*.sentry.io https://*.workers.dev ws://localhost:* http://localhost:*",
         "frame-ancestors 'none'",
         "form-action 'self'",
         "base-uri 'self'",
