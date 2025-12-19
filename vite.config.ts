@@ -43,22 +43,24 @@ export default defineConfig({
           'vendor-react': ['react', 'react-dom', 'react-hook-form'],
           'vendor-router': ['@tanstack/react-router', '@tanstack/react-query'],
 
-          // UI Libraries
+          // UI Libraries - Core components used across most pages
           'vendor-ui': [
             '@radix-ui/react-dialog',
             '@radix-ui/react-dropdown-menu',
-            '@radix-ui/react-popover',
             '@radix-ui/react-select',
             '@radix-ui/react-tooltip',
             '@radix-ui/react-tabs',
-            '@radix-ui/react-accordion',
+          ],
+          // UI Libraries - Less common, lazy-loaded with specific features
+          'vendor-ui-forms': [
+            '@radix-ui/react-popover',
             '@radix-ui/react-collapsible',
             '@radix-ui/react-scroll-area',
+            '@radix-ui/react-accordion',
           ],
 
           // Heavy Chart Libraries (lazy loaded)
           'vendor-charts': ['recharts'],
-          'vendor-charts-nivo': ['@nivo/core', '@nivo/line', '@nivo/pie'],
           'vendor-charts-trading': ['@mathieuc/tradingview'],
 
           // Calendar Libraries (lazy loaded)
@@ -72,11 +74,7 @@ export default defineConfig({
           ],
           'vendor-gantt': ['dhtmlx-gantt'],
 
-          // Rich Text Editors (lazy loaded)
-          'vendor-editor-ckeditor': [
-            '@ckeditor/ckeditor5-react',
-            '@ckeditor/ckeditor5-build-classic',
-          ],
+          // Rich Text Editor (lazy loaded) - Using TipTap only
           'vendor-editor-tiptap': [
             '@tiptap/react',
             '@tiptap/core',
@@ -92,9 +90,6 @@ export default defineConfig({
           // Map Libraries (lazy loaded)
           'vendor-maps': ['leaflet', 'react-leaflet'],
 
-          // Flow/Diagram Libraries (lazy loaded)
-          'vendor-flow': ['reactflow'],
-
           // Table Libraries
           'vendor-table': ['@tanstack/react-table'],
 
@@ -104,16 +99,20 @@ export default defineConfig({
           // Date/Time utilities
           'vendor-date': ['date-fns', 'date-fns-tz'],
 
-          // Utilities
+          // Core Utilities - needed immediately on all pages
           'vendor-utils': [
             'axios',
-            'zod',
             'clsx',
             'tailwind-merge',
             'class-variance-authority',
             'zustand',
             'i18next',
             'react-i18next',
+          ],
+          // Form validation - loaded with forms only
+          'vendor-forms': [
+            'zod',
+            '@hookform/resolvers',
           ],
         },
       },

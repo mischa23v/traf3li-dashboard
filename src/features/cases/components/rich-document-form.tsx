@@ -30,8 +30,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
-// Lazy load the rich text editor
-const RichTextEditor = lazy(() => import('@/components/rich-text-editor'))
+// Lazy load the rich text editor (using TipTap instead of CKEditor for smaller bundle)
+const TipTapEditor = lazy(() => import('@/components/tiptap-editor').then(mod => ({ default: mod.TipTapEditor })))
 
 import {
   useCreateCaseRichDocument,
@@ -337,11 +337,13 @@ export function RichDocumentForm({
               {isArabic ? 'المحتوى *' : 'Content *'}
             </label>
             <Suspense fallback={<Skeleton className="min-h-[300px] w-full rounded-xl" />}>
-              <RichTextEditor
-                value={formData.content}
-                onChange={(content) => handleChange('content', content)}
+              <TipTapEditor
+                content={formData.content}
+                onChange={(html) => handleChange('content', html)}
                 placeholder={isArabic ? 'اكتب محتوى المستند هنا...' : 'Write document content here...'}
                 minHeight="300px"
+                dir={formData.textDirection === 'ltr' ? 'ltr' : 'rtl'}
+                editable={!isLoading}
               />
             </Suspense>
           </div>
