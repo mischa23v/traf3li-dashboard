@@ -19,9 +19,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
-import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, CheckCircle, XCircle, Edit3, Calendar, SortAsc, Filter, X, ArrowRight, ArrowUpDown } from 'lucide-react'
+import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, CheckCircle, XCircle, Edit3, Calendar, SortAsc, Filter, X, ArrowRight, ArrowUpDown, Clock, AlertTriangle, User } from 'lucide-react'
+import { differenceInDays, isToday, isTomorrow, isThisWeek, isPast, startOfDay } from 'date-fns'
 import { useNavigate } from '@tanstack/react-router'
-import { useDeleteTask, useCompleteTask, useReopenTask, useUpdateTask } from '@/hooks/useTasks'
+import { useDeleteTask, useUpdateTaskStatus, useUpdateTask } from '@/hooks/useTasks'
 import { format } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
 import { Input } from '@/components/ui/input' // Keep for types if needed, but prefer GosiInput
@@ -45,7 +46,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useCases } from '@/hooks/useCasesAndClients'
 import { useTeamMembers } from '@/hooks/useStaff'
-import { VirtualList } from '@/components/virtual-list'
 
 export function TasksListView() {
     const { t, i18n } = useTranslation()
@@ -54,6 +54,7 @@ export function TasksListView() {
     const [isSelectionMode, setIsSelectionMode] = useState(false)
     const [showFilters, setShowFilters] = useState(false) // New state for mobile filters
     const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([])
+    const [visibleCount, setVisibleCount] = useState(10) // Load-more pagination: show 10 at a time
 
     // Performance profiling
     const renderCount = useRef(0)
@@ -106,8 +107,7 @@ export function TasksListView() {
 
     // Mutations for task actions
     const deleteTaskMutation = useDeleteTask()
-    const completeTaskMutation = useCompleteTask()
-    const reopenTaskMutation = useReopenTask()
+    const updateTaskStatusMutation = useUpdateTaskStatus()
     const updateTaskMutation = useUpdateTask()
 
     // API Filters - Map UI tabs to actual task status values
@@ -198,7 +198,13 @@ export function TasksListView() {
         setAssignedFilter('all')
         setDueDateFilter('all')
         setCaseFilter('all')
+        setVisibleCount(10) // Reset pagination when clearing filters
     }, [])
+
+    // Reset visible count when filters change
+    useEffect(() => {
+        setVisibleCount(10)
+    }, [activeStatusTab, searchQuery, priorityFilter, assignedFilter, dueDateFilter, caseFilter, sortBy])
 
     // Fetch tasks
     const { data: tasksData, isLoading, isError, error, refetch, isFetching } = useTasks(filters)
@@ -241,27 +247,98 @@ export function TasksListView() {
         }
     }, [t, i18n.language])
 
+    // Smart date label helper - returns "اليوم", "غداً", "هذا الأسبوع", or formatted date
+    const getSmartDateLabel = useCallback((dateString: string | null | undefined) => {
+        if (!dateString) return { label: t('tasks.list.notSet'), isOverdue: false, daysRemaining: null }
+
+        const date = startOfDay(new Date(dateString))
+        const today = startOfDay(new Date())
+        const daysRemaining = differenceInDays(date, today)
+        const isOverdue = isPast(date) && !isToday(date)
+
+        let label: string
+        if (isToday(date)) {
+            label = t('tasks.smartDates.today', 'اليوم')
+        } else if (isTomorrow(date)) {
+            label = t('tasks.smartDates.tomorrow', 'غداً')
+        } else if (isOverdue) {
+            label = t('tasks.smartDates.overdue', 'متأخر')
+        } else if (isThisWeek(date)) {
+            label = t('tasks.smartDates.thisWeek', 'هذا الأسبوع')
+        } else if (daysRemaining > 0 && daysRemaining <= 7) {
+            label = t('tasks.smartDates.daysRemaining', 'متبقي {{days}} أيام', { days: daysRemaining })
+        } else {
+            const locale = i18n.language === 'ar' ? arSA : enUS
+            label = format(date, 'd MMM', { locale })
+        }
+
+        return { label, isOverdue, daysRemaining }
+    }, [t, i18n.language])
+
+    // Timeline status helper - on track, at risk, or overdue
+    const getTimelineStatus = useCallback((dateString: string | null | undefined, status: string) => {
+        if (status === 'done') return { status: 'completed', color: 'emerald', icon: CheckCircle }
+        if (!dateString) return { status: 'no-date', color: 'slate', icon: Calendar }
+
+        const date = startOfDay(new Date(dateString))
+        const today = startOfDay(new Date())
+        const daysRemaining = differenceInDays(date, today)
+
+        if (isPast(date) && !isToday(date)) {
+            return { status: 'overdue', color: 'red', icon: AlertTriangle }
+        } else if (daysRemaining <= 2) {
+            return { status: 'at-risk', color: 'amber', icon: Clock }
+        } else {
+            return { status: 'on-track', color: 'emerald', icon: CheckCircle }
+        }
+    }, [])
+
     // Transform API data
     const tasks = useMemo(() => {
         if (!tasksData?.tasks) return []
 
-        return tasksData.tasks.map((task: any) => ({
-            id: task._id,
-            title: task.title || task.description || t('tasks.list.notSet'),
-            client: task.caseId?.clientId?.name || task.clientId?.name || t('tasks.list.notSet'),
-            dueDate: task.dueDate,
-            createdAt: task.createdAt,
-            dueDateFormatted: formatDualDate(task.dueDate),
-            createdAtFormatted: formatDualDate(task.createdAt),
-            priority: task.priority || 'medium',
-            status: task.status || 'backlog',
-            linkedEventId: task.linkedEventId, // Task ↔ Event sync
-            eventId: task.eventId, // Manual event link
-            subtaskCount: task.subtasks?.length || 0,
-            completedSubtasks: task.subtasks?.filter((s: any) => s.completed)?.length || 0,
-            _id: task._id,
-        }))
-    }, [tasksData, t, i18n.language])
+        return tasksData.tasks.map((task: any) => {
+            const smartDate = getSmartDateLabel(task.dueDate)
+            const timeline = getTimelineStatus(task.dueDate, task.status)
+
+            return {
+                id: task._id,
+                title: task.title || task.description || t('tasks.list.notSet'),
+                client: task.caseId?.clientId?.name || task.clientId?.name || t('tasks.list.notSet'),
+                dueDate: task.dueDate,
+                createdAt: task.createdAt,
+                dueDateFormatted: formatDualDate(task.dueDate),
+                createdAtFormatted: formatDualDate(task.createdAt),
+                priority: task.priority || 'medium',
+                status: task.status || 'backlog',
+                linkedEventId: task.linkedEventId, // Task ↔ Event sync
+                eventId: task.eventId, // Manual event link
+                subtaskCount: task.subtasks?.length || 0,
+                completedSubtasks: task.subtasks?.filter((s: any) => s.completed)?.length || 0,
+                _id: task._id,
+                // New smart fields
+                smartDate,
+                timeline,
+                assignee: task.assignedTo,
+                assigneeName: task.assignedTo?.name || task.assignedTo?.username,
+                assigneeAvatar: task.assignedTo?.avatar,
+                tags: task.tags || [],
+            }
+        })
+    }, [tasksData, t, i18n.language, getSmartDateLabel, getTimelineStatus])
+
+    // Visible tasks (paginated) - only render what's needed
+    const visibleTasks = useMemo(() => {
+        return tasks.slice(0, visibleCount)
+    }, [tasks, visibleCount])
+
+    // Check if there are more tasks to load
+    const hasMoreTasks = tasks.length > visibleCount
+
+    // Load more handler
+    const handleLoadMore = useCallback(() => {
+        setVisibleCount(prev => prev + 10)
+    }, [])
 
     // Selection Handlers
     const handleToggleSelectionMode = useCallback(() => {
@@ -306,12 +383,16 @@ export function TasksListView() {
     }, [t, deleteTaskMutation])
 
     const handleCompleteTask = useCallback((taskId: string) => {
-        completeTaskMutation.mutate({ id: taskId })
-    }, [completeTaskMutation])
+        // Using updateTaskStatusMutation (PATCH) instead of completeTaskMutation (POST)
+        // to avoid CSRF token issues since PATCH requests work without CSRF
+        updateTaskStatusMutation.mutate({ id: taskId, status: 'done' })
+    }, [updateTaskStatusMutation])
 
     const handleReopenTask = useCallback((taskId: string) => {
-        reopenTaskMutation.mutate(taskId)
-    }, [reopenTaskMutation])
+        // Using updateTaskStatusMutation (PATCH) instead of reopenTaskMutation (POST)
+        // to avoid CSRF token issues since PATCH requests work without CSRF
+        updateTaskStatusMutation.mutate({ id: taskId, status: 'in_progress' })
+    }, [updateTaskStatusMutation])
 
     const handlePriorityChange = useCallback((taskId: string, priority: string) => {
         updateTaskMutation.mutate({ id: taskId, data: { priority: priority as any } })
@@ -396,8 +477,8 @@ export function TasksListView() {
                                     </GosiButton>
                                 </div>
 
-                                {/* filters container - Hidden by default, shown on toggle */}
-                                <div className={`${showFilters ? 'flex' : 'hidden'} flex-wrap gap-4 transition-all duration-300 ease-in-out`}>
+                                {/* filters container - Animated slide with smooth transitions */}
+                                <div className={`flex-wrap gap-4 transition-all duration-300 ease-in-out overflow-hidden ${showFilters ? 'flex opacity-100 max-h-[500px] mt-4' : 'hidden opacity-0 max-h-0'}`}>
 
                                     {/* Status */}
                                     <div className="flex-1 min-w-[220px]">
@@ -536,9 +617,37 @@ export function TasksListView() {
                         {/* LIST OF TASKS - REDESIGNED "10/10" */}
                         <div className="flex flex-col gap-4">
                             {isLoading && (
-                                <div className="space-y-4">
-                                    {[1, 2, 3].map((i) => (
-                                        <Skeleton key={i} className="h-48 w-full rounded-[2rem] bg-slate-100" />
+                                <div className="space-y-3">
+                                    {[1, 2, 3, 4].map((i) => (
+                                        <div
+                                            key={i}
+                                            className="bg-white rounded-2xl p-4 border border-slate-100 animate-pulse"
+                                            style={{ animationDelay: `${i * 100}ms` }}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                {/* Checkbox skeleton */}
+                                                <Skeleton className="h-5 w-5 rounded-full" />
+                                                {/* Icon skeleton */}
+                                                <Skeleton className="h-10 w-10 rounded-xl" />
+                                                {/* Content skeleton */}
+                                                <div className="flex-1 space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <Skeleton className="h-4 w-48" />
+                                                        <Skeleton className="h-5 w-16 rounded-full" />
+                                                    </div>
+                                                    <Skeleton className="h-3 w-24" />
+                                                </div>
+                                                {/* Action skeleton */}
+                                                <Skeleton className="h-8 w-8 rounded-lg" />
+                                            </div>
+                                            {/* Footer skeleton */}
+                                            <div className="flex items-center gap-3 mt-3 pt-3 border-t border-slate-50">
+                                                <Skeleton className="h-6 w-20 rounded-lg" />
+                                                <Skeleton className="h-6 w-24 rounded-lg" />
+                                                <div className="flex-1" />
+                                                <Skeleton className="h-6 w-24 rounded-lg" />
+                                            </div>
+                                        </div>
                                     ))}
                                 </div>
                             )}
@@ -577,50 +686,38 @@ export function TasksListView() {
                                 </div>
                             )}
 
-                            {/* Success State - Tasks List with Virtualization */}
+                            {/* Success State - Tasks List with Load More Pagination */}
                             {!isLoading && !isError && tasks.length > 0 && (
-                                <VirtualList
-                                    items={tasks}
-                                    itemHeight={148}
-                                    height={Math.min(tasks.length * 148 + (tasks.length - 1) * 8, 800)}
-                                    renderItem={(task, index, style) => (
-                                        <div key={task.id} style={{ ...style, paddingBottom: '8px' }}>
+                                <>
+                                {visibleTasks.map((task, index) => (
+                                        <div key={task.id} className="mb-2">
                                             <div
                                                 onClick={() => navigate({ to: '/dashboard/tasks/$taskId', params: { taskId: task.id } })}
                                                 style={{ animationDelay: `${index * 50}ms` }}
                                                 className={`
                                         animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-backwards
-                                        bg-white rounded-2xl p-3 md:p-4
-                                        border-0 ring-1 ring-black/[0.03] shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)]
+                                        rounded-2xl p-3 md:p-4
+                                        border-0 ring-1 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)]
                                         transition-all duration-300 group
                                         hover:shadow-[0_12px_24px_-8px_rgba(0,0,0,0.1)] hover:-translate-y-1
                                         cursor-pointer relative overflow-hidden
-                                        ${selectedTaskIds.includes(task.id) ? 'ring-2 ring-emerald-500 bg-emerald-50/20' : ''}
+                                        ${task.smartDate.isOverdue && task.status !== 'done'
+                                            ? 'bg-red-50/50 ring-red-200/50'
+                                            : selectedTaskIds.includes(task.id)
+                                                ? 'ring-2 ring-emerald-500 bg-emerald-50/20'
+                                                : 'bg-white ring-black/[0.03]'
+                                        }
                                     `}
                                 >
-                                    {/* Priority Strip Indicator - Shows on hover */}
-                                    <div className={`absolute start-0 top-0 bottom-0 w-1 rounded-s-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${task.priority === 'urgent' ? 'bg-red-500' :
+                                    {/* Priority Strip Indicator - Always visible with color coding */}
+                                    <div className={`absolute start-0 top-0 bottom-0 w-1.5 rounded-s-2xl transition-all duration-300 ${
+                                        task.priority === 'urgent' ? 'bg-red-500' :
                                         task.priority === 'high' ? 'bg-orange-500' :
-                                            task.priority === 'medium' ? 'bg-amber-400' :
-                                                'bg-emerald-400'
-                                        }`} />
+                                        task.priority === 'medium' ? 'bg-amber-400' :
+                                        'bg-emerald-400'
+                                    }`} />
 
-                                    <div className="flex items-center gap-3 ps-3">
-                                        {/* Quick Complete Checkbox */}
-                                        <div onClick={(e) => e.stopPropagation()} className="flex-shrink-0">
-                                            <Checkbox
-                                                checked={task.status === 'done'}
-                                                onCheckedChange={(checked) => {
-                                                    if (checked) {
-                                                        handleCompleteTask(task.id)
-                                                    } else {
-                                                        handleReopenTask(task.id)
-                                                    }
-                                                }}
-                                                className="h-5 w-5 rounded-full border-2 border-slate-300 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500 transition-all duration-200 hover:border-emerald-400"
-                                            />
-                                        </div>
-
+                                    <div className="flex items-center gap-3 ps-4">
                                         {isSelectionMode && (
                                             <div onClick={(e) => e.stopPropagation()} className="flex-shrink-0">
                                                 <Checkbox
@@ -631,9 +728,17 @@ export function TasksListView() {
                                             </div>
                                         )}
 
-                                        {/* Task Icon - Compact */}
-                                        <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-500 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-all duration-300 flex-shrink-0 border border-slate-100">
-                                            <Briefcase className="h-5 w-5" strokeWidth={1.5} />
+                                        {/* Task Icon with Timeline Status */}
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 flex-shrink-0 border ${
+                                            task.timeline.status === 'overdue' ? 'bg-red-50 text-red-600 border-red-200' :
+                                            task.timeline.status === 'at-risk' ? 'bg-amber-50 text-amber-600 border-amber-200' :
+                                            task.timeline.status === 'completed' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+                                            'bg-slate-50 text-slate-500 border-slate-100 group-hover:bg-emerald-50 group-hover:text-emerald-600'
+                                        }`}>
+                                            {task.timeline.status === 'overdue' ? <AlertTriangle className="h-5 w-5" strokeWidth={1.5} /> :
+                                             task.timeline.status === 'at-risk' ? <Clock className="h-5 w-5" strokeWidth={1.5} /> :
+                                             task.timeline.status === 'completed' ? <CheckCircle className="h-5 w-5" strokeWidth={1.5} /> :
+                                             <Briefcase className="h-5 w-5" strokeWidth={1.5} />}
                                         </div>
 
                                         {/* Task Info */}
@@ -643,24 +748,31 @@ export function TasksListView() {
                                                     {task.title}
                                                 </h4>
 
-                                                {/* Status Chip */}
-                                                <div className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                                                    task.status === 'done' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
-                                                    task.status === 'in_progress' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
-                                                    task.status === 'todo' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
-                                                    'bg-slate-50 text-slate-600 border border-slate-200'
-                                                }`}>
-                                                    <span className={`w-1.5 h-1.5 rounded-full ${
-                                                        task.status === 'done' ? 'bg-emerald-500' :
-                                                        task.status === 'in_progress' ? 'bg-blue-500 animate-pulse' :
-                                                        task.status === 'todo' ? 'bg-amber-500' :
-                                                        'bg-slate-400'
-                                                    }`}></span>
-                                                    {task.status === 'done' ? t('tasks.statuses.done', 'مكتمل') :
-                                                     task.status === 'in_progress' ? t('tasks.statuses.inProgress', 'قيد التنفيذ') :
-                                                     task.status === 'todo' ? t('tasks.statuses.todo', 'للتنفيذ') :
-                                                     t('tasks.statuses.backlog', 'معلق')}
-                                                </div>
+                                                {/* Timeline Status Chip - only show for overdue, at-risk, or in_progress */}
+                                                {task.status !== 'done' && (task.timeline.status === 'overdue' || task.timeline.status === 'at-risk' || task.status === 'in_progress') && (
+                                                    <div className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                                                        task.timeline.status === 'overdue' ? 'bg-red-100 text-red-700 border border-red-200' :
+                                                        task.timeline.status === 'at-risk' ? 'bg-amber-100 text-amber-700 border border-amber-200' :
+                                                        'bg-blue-50 text-blue-700 border border-blue-200'
+                                                    }`}>
+                                                        <span className={`w-1.5 h-1.5 rounded-full ${
+                                                            task.timeline.status === 'overdue' ? 'bg-red-500 animate-pulse' :
+                                                            task.timeline.status === 'at-risk' ? 'bg-amber-500' :
+                                                            'bg-blue-500 animate-pulse'
+                                                        }`}></span>
+                                                        {task.timeline.status === 'overdue' ? t('tasks.timeline.overdue', 'متأخر') :
+                                                         task.timeline.status === 'at-risk' ? t('tasks.timeline.atRisk', 'قريب') :
+                                                         t('tasks.statuses.inProgress', 'قيد التنفيذ')}
+                                                    </div>
+                                                )}
+
+                                                {/* Completed Badge */}
+                                                {task.status === 'done' && (
+                                                    <div className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                                        <CheckCircle className="w-3 h-3" />
+                                                        {t('tasks.statuses.done', 'مكتمل')}
+                                                    </div>
+                                                )}
 
                                                 {/* Task ↔ Event Sync Badge */}
                                                 {(task.linkedEventId || task.eventId) && (
@@ -675,11 +787,40 @@ export function TasksListView() {
                                                         {t('tasks.list.linkedEvent', 'حدث')}
                                                     </div>
                                                 )}
+
+                                                {/* Tag Chips */}
+                                                {task.tags && task.tags.length > 0 && task.tags.slice(0, 2).map((tag: string, idx: number) => (
+                                                    <div key={idx} className="bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-full px-2 py-0.5 text-[10px] font-bold">
+                                                        {tag}
+                                                    </div>
+                                                ))}
+                                                {task.tags && task.tags.length > 2 && (
+                                                    <div className="bg-slate-100 text-slate-500 rounded-full px-2 py-0.5 text-[10px] font-bold">
+                                                        +{task.tags.length - 2}
+                                                    </div>
+                                                )}
                                             </div>
-                                            <p className="text-slate-500 text-xs font-medium flex items-center gap-1 mt-0.5">
-                                                <span className="text-slate-400">@</span>
-                                                {task.client}
-                                            </p>
+                                            <div className="flex items-center gap-2 mt-0.5">
+                                                <p className="text-slate-500 text-xs font-medium flex items-center gap-1">
+                                                    <span className="text-slate-400">@</span>
+                                                    {task.client}
+                                                </p>
+
+                                                {/* Assignee Avatar */}
+                                                {task.assigneeName && (
+                                                    <div className="flex items-center gap-1 text-xs text-slate-500">
+                                                        <span className="text-slate-300">•</span>
+                                                        {task.assigneeAvatar ? (
+                                                            <img src={task.assigneeAvatar} alt={task.assigneeName} className="w-4 h-4 rounded-full" />
+                                                        ) : (
+                                                            <div className="w-4 h-4 rounded-full bg-slate-200 flex items-center justify-center text-[8px] font-bold text-slate-600">
+                                                                {task.assigneeName.charAt(0)}
+                                                            </div>
+                                                        )}
+                                                        <span className="font-medium truncate max-w-[60px]">{task.assigneeName}</span>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
 
                                         {/* Mobile Chevron */}
@@ -700,7 +841,6 @@ export function TasksListView() {
                                                         <Edit3 className="h-4 w-4 ms-2 text-blue-500" aria-hidden="true" />
                                                         {t('tasks.list.editTask')}
                                                     </DropdownMenuItem>
-                                                    {/* View Details is now the card click, but keep in menu for accessibility */}
                                                     <DropdownMenuItem onClick={() => handleViewTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
                                                         <Eye className="h-4 w-4 ms-2" />
                                                         {t('tasks.list.viewDetails')}
@@ -727,6 +867,21 @@ export function TasksListView() {
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
+                                        </div>
+
+                                        {/* Complete Task Checkbox - Next to 3 dots menu */}
+                                        <div onClick={(e) => e.stopPropagation()} className="hidden md:flex items-center">
+                                            <Checkbox
+                                                checked={task.status === 'done'}
+                                                onCheckedChange={(checked) => {
+                                                    if (checked) {
+                                                        handleCompleteTask(task.id)
+                                                    } else {
+                                                        handleReopenTask(task.id)
+                                                    }
+                                                }}
+                                                className="h-5 w-5 rounded-md border-2 border-slate-300 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500 transition-all duration-200 hover:border-emerald-400 me-2"
+                                            />
                                         </div>
 
                                         {/* DESKTOP Action Menu */}
@@ -772,14 +927,14 @@ export function TasksListView() {
                                     </div>
 
                                     {/* Compact Footer */}
-                                    <div className="flex items-center justify-between pt-2 mt-2 border-t border-slate-100 ps-3">
-                                        <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+                                    <div className="flex items-center justify-between pt-2 mt-2 border-t border-slate-100 ps-4">
+                                        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                                             {/* Priority Chip */}
                                             <GosiSelect
                                                 value={task.priority}
                                                 onValueChange={(value) => handlePriorityChange(task.id, value)}
                                             >
-                                                <GosiSelectTrigger className={`w-auto min-w-[90px] h-7 text-[10px] font-bold rounded-lg border-0 px-2 ${task.priority === 'urgent' ? 'bg-red-50 text-red-700' :
+                                                <GosiSelectTrigger className={`w-auto min-w-[80px] h-6 text-[10px] font-bold rounded-md border-0 px-2 ${task.priority === 'urgent' ? 'bg-red-50 text-red-700' :
                                                     task.priority === 'high' ? 'bg-orange-50 text-orange-700' :
                                                         task.priority === 'medium' ? 'bg-amber-50 text-amber-700' :
                                                             'bg-emerald-50 text-emerald-700'
@@ -794,16 +949,34 @@ export function TasksListView() {
                                                 </GosiSelectContent>
                                             </GosiSelect>
 
-                                            {/* Due Date Compact */}
-                                            <div className="flex items-center gap-1.5 text-xs text-slate-500 bg-slate-50 px-2 py-1 rounded-lg">
-                                                <Calendar className="w-3 h-3" />
-                                                <span className="font-medium">{task.dueDateFormatted.arabic}</span>
+                                            {/* Smart Due Date with countdown */}
+                                            <div className={`flex items-center gap-1.5 text-[10px] px-2 py-1 rounded-md font-bold ${
+                                                task.smartDate.isOverdue ? 'bg-red-100 text-red-700' :
+                                                task.smartDate.daysRemaining !== null && task.smartDate.daysRemaining <= 2 ? 'bg-amber-100 text-amber-700' :
+                                                'bg-slate-100 text-slate-600'
+                                            }`}>
+                                                {task.smartDate.isOverdue ? (
+                                                    <AlertTriangle className="w-3 h-3" />
+                                                ) : task.smartDate.daysRemaining !== null && task.smartDate.daysRemaining <= 2 ? (
+                                                    <Clock className="w-3 h-3" />
+                                                ) : (
+                                                    <Calendar className="w-3 h-3" />
+                                                )}
+                                                <span>{task.smartDate.label}</span>
                                             </div>
+
+                                            {/* Time Remaining Countdown */}
+                                            {task.smartDate.daysRemaining !== null && task.smartDate.daysRemaining > 0 && task.smartDate.daysRemaining <= 7 && task.status !== 'done' && (
+                                                <div className="hidden md:flex items-center gap-1 text-[10px] text-slate-500 bg-slate-50 px-2 py-1 rounded-md">
+                                                    <Clock className="w-3 h-3" />
+                                                    <span className="font-medium">{t('tasks.smartDates.remaining', 'متبقي')} {task.smartDate.daysRemaining} {t('tasks.smartDates.days', 'أيام')}</span>
+                                                </div>
+                                            )}
 
                                             {/* Subtask Progress (if available) */}
                                             {task.subtaskCount && task.subtaskCount > 0 && (
-                                                <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                                                    <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                                <div className="hidden sm:flex items-center gap-1.5 text-[10px] text-slate-500">
+                                                    <div className="w-12 h-1.5 bg-slate-200 rounded-full overflow-hidden">
                                                         <div
                                                             className="h-full bg-emerald-500 rounded-full transition-all"
                                                             style={{ width: `${(task.completedSubtasks || 0) / task.subtaskCount * 100}%` }}
@@ -815,7 +988,7 @@ export function TasksListView() {
                                         </div>
 
                                         <Link to={`/dashboard/tasks/${task.id}` as any} className="hidden sm:inline-flex" onClick={(e) => e.stopPropagation()}>
-                                            <GosiButton size="sm" className="bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white border-0 rounded-lg px-3 h-7 text-xs transition-all group/btn">
+                                            <GosiButton size="sm" className="bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white border-0 rounded-md px-3 h-6 text-[10px] transition-all group/btn">
                                                 {t('tasks.list.viewDetails')}
                                                 <ArrowRight className="w-3 h-3 ms-1 rtl:rotate-180 transition-transform group-hover/btn:translate-x-0.5 rtl:group-hover/btn:-translate-x-0.5" />
                                             </GosiButton>
@@ -823,9 +996,36 @@ export function TasksListView() {
                                     </div>
                                 </div>
                             </div>
-                                    )}
-                                    getItemKey={(index, data) => data[index].id}
-                                />
+                                    ))}
+
+                                    {/* Load More Section */}
+                                    <div className="flex flex-col items-center gap-3 pt-4">
+                                        {/* Show More Button - only if there are more tasks */}
+                                        {hasMoreTasks && (
+                                            <GosiButton
+                                                onClick={handleLoadMore}
+                                                variant="outline"
+                                                className="w-full max-w-sm h-12 rounded-2xl border-2 border-dashed border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50 text-slate-600 hover:text-emerald-600 font-bold transition-all"
+                                            >
+                                                <Plus className="w-5 h-5 ms-2" />
+                                                {t('tasks.list.showMore', 'عرض المزيد')}
+                                                <span className="text-xs text-slate-400 ms-2">
+                                                    ({visibleCount} / {tasks.length})
+                                                </span>
+                                            </GosiButton>
+                                        )}
+
+                                        {/* View All Tasks Link - always show at bottom */}
+                                        <Link
+                                            to="/dashboard/tasks/list"
+                                            className="flex items-center gap-2 text-sm font-bold text-emerald-600 hover:text-emerald-700 transition-colors group py-2"
+                                        >
+                                            {t('tasks.list.viewAllTasks', 'عرض جميع المهام')}
+                                            <span className="text-xs text-slate-400">({tasks.length})</span>
+                                            <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1" />
+                                        </Link>
+                                    </div>
+                                </>
                             )}
                         </div>
 

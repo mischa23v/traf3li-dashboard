@@ -138,7 +138,25 @@ export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = f
 
     return (
         <div className="bg-[#022c22] rounded-3xl p-6 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20">
-            {/* Background Effects */}
+            {/* Animated Gradient Background */}
+            <div className="absolute inset-0 z-0">
+                <div
+                    className="absolute inset-0 opacity-30"
+                    style={{
+                        background: 'linear-gradient(-45deg, #022c22, #064e3b, #022c22, #0f766e)',
+                        backgroundSize: '400% 400%',
+                        animation: 'gradientShift 15s ease infinite'
+                    }}
+                />
+                <style>{`
+                    @keyframes gradientShift {
+                        0% { background-position: 0% 50%; }
+                        50% { background-position: 100% 50%; }
+                        100% { background-position: 0% 50%; }
+                    }
+                `}</style>
+            </div>
+            {/* Background Pattern */}
             <div className="absolute inset-0 z-0">
                 <img
                     src="/images/hero-wave.png"

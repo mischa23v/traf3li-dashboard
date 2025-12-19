@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
     Clock, Bell, MapPin, Calendar as CalendarIcon,
     Plus, CheckSquare, Trash2, List, X, ChevronRight, Loader2, AlertCircle,
@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
 import { useCalendar } from '@/hooks/useCalendar'
 import { useUpcomingReminders } from '@/hooks/useRemindersAndEvents'
@@ -94,6 +94,70 @@ export function TasksSidebar({
     }
 
     const currentLinks = links[context]
+    const navigate = useNavigate()
+
+    // Keyboard shortcuts for Quick Actions
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Skip if user is typing in an input, textarea, or contenteditable
+            const target = e.target as HTMLElement
+            if (
+                target.tagName === 'INPUT' ||
+                target.tagName === 'TEXTAREA' ||
+                target.isContentEditable
+            ) {
+                return
+            }
+
+            // Handle shortcuts based on view mode
+            if (taskId) {
+                // Task Details View shortcuts
+                switch (e.key.toLowerCase()) {
+                    case 'c':
+                        e.preventDefault()
+                        onCompleteTask?.()
+                        break
+                    case 'e':
+                        e.preventDefault()
+                        navigate({ to: '/dashboard/tasks/create', search: { editId: taskId } })
+                        break
+                    case 'd':
+                        e.preventDefault()
+                        onDeleteTask?.()
+                        break
+                    case 'v':
+                        e.preventDefault()
+                        navigate({ to: currentLinks.viewAll })
+                        break
+                }
+            } else {
+                // List View shortcuts
+                switch (e.key.toLowerCase()) {
+                    case 'n':
+                        e.preventDefault()
+                        navigate({ to: currentLinks.create })
+                        break
+                    case 's':
+                        e.preventDefault()
+                        onToggleSelectionMode?.()
+                        break
+                    case 'd':
+                        e.preventDefault()
+                        if (isSelectionMode && selectedCount > 0) {
+                            onDeleteSelected?.()
+                        }
+                        break
+                    case 'v':
+                        e.preventDefault()
+                        navigate({ to: currentLinks.viewAll })
+                        break
+                }
+            }
+        }
+
+        document.addEventListener('keydown', handleKeyDown)
+        return () => document.removeEventListener('keydown', handleKeyDown)
+    }, [taskId, currentLinks, navigate, onCompleteTask, onDeleteTask, onToggleSelectionMode, onDeleteSelected, isSelectionMode, selectedCount])
 
     // Generate 5 days for the strip
     const calendarStripDays = useMemo(() => {
@@ -203,7 +267,11 @@ export function TasksSidebar({
                                 ) : (
                                     <CheckSquare className="h-7 w-7" />
                                 )}
-                                <span className="text-sm font-bold">
+                                <span className="flex items-center gap-1.5 text-sm font-bold">
+                                    <kbd className={cn(
+                                        "text-[10px] font-mono px-1.5 py-0.5 rounded",
+                                        isTaskCompleted ? "bg-amber-100 text-amber-600" : "bg-emerald-100 text-emerald-600"
+                                    )}>C</kbd>
                                     {isTaskCompleted ? 'إعادة فتح' : 'إكمال'}
                                 </span>
                             </Button>
@@ -212,7 +280,10 @@ export function TasksSidebar({
                             <Button asChild className="bg-white hover:bg-blue-50 text-blue-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
                                 <Link to="/dashboard/tasks/create" search={{ editId: taskId }}>
                                     <Edit3 className="h-7 w-7" aria-hidden="true" />
-                                    <span className="text-sm font-bold">تعديل</span>
+                                    <span className="flex items-center gap-1.5 text-sm font-bold">
+                                        <kbd className="text-[10px] font-mono bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded">E</kbd>
+                                        تعديل
+                                    </span>
                                 </Link>
                             </Button>
 
@@ -228,29 +299,38 @@ export function TasksSidebar({
                                 ) : (
                                     <Trash2 className="h-6 w-6" aria-hidden="true" />
                                 )}
-                                <span className="text-sm font-bold">حذف</span>
+                                <span className="flex items-center gap-1.5 text-sm font-bold">
+                                    <kbd className="text-[10px] font-mono bg-red-100 text-red-500 px-1.5 py-0.5 rounded">D</kbd>
+                                    حذف
+                                </span>
                             </Button>
 
                             {/* View All Button */}
                             <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
                                 <Link to={currentLinks.viewAll}>
                                     <List className="h-6 w-6" aria-hidden="true" />
-                                    <span className="text-sm font-bold">عرض جميع</span>
+                                    <span className="flex items-center gap-1.5 text-sm font-bold">
+                                        <kbd className="text-[10px] font-mono bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">V</kbd>
+                                        عرض جميع
+                                    </span>
                                 </Link>
                             </Button>
                         </>
                     ) : (
                         // List View - Show Create, Select, Delete, View All
                         <>
-                            {/* Create Button - White + Green Text + Glow */}
+                            {/* Create Button */}
                             <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
                                 <Link to={currentLinks.create}>
                                     <Plus className="h-7 w-7" aria-hidden="true" />
-                                    <span className="text-sm font-bold">إنشاء</span>
+                                    <span className="flex items-center gap-1.5 text-sm font-bold">
+                                        <kbd className="text-[10px] font-mono bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded">N</kbd>
+                                        إنشاء
+                                    </span>
                                 </Link>
                             </Button>
 
-                            {/* Select Button - White + Dark Text + Glow */}
+                            {/* Select Button */}
                             <Button
                                 variant="ghost"
                                 className={cn(
@@ -262,10 +342,16 @@ export function TasksSidebar({
                                 onClick={onToggleSelectionMode}
                             >
                                 {isSelectionMode ? <X className="h-6 w-6" aria-hidden="true" /> : <CheckSquare className="h-6 w-6" aria-hidden="true" />}
-                                <span className="text-sm font-bold">{isSelectionMode ? 'إلغاء' : 'تحديد'}</span>
+                                <span className="flex items-center gap-1.5 text-sm font-bold">
+                                    <kbd className={cn(
+                                        "text-[10px] font-mono px-1.5 py-0.5 rounded",
+                                        isSelectionMode ? "bg-emerald-200 text-emerald-700" : "bg-slate-100 text-slate-500"
+                                    )}>S</kbd>
+                                    {isSelectionMode ? 'إلغاء' : 'تحديد'}
+                                </span>
                             </Button>
 
-                            {/* Delete Button - White + Red Text + Glow */}
+                            {/* Delete Button */}
                             <Button
                                 variant="ghost"
                                 className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
@@ -273,16 +359,20 @@ export function TasksSidebar({
                                 disabled={!isSelectionMode || selectedCount === 0}
                             >
                                 <Trash2 className="h-6 w-6" aria-hidden="true" />
-                                <span className="text-sm font-bold">
+                                <span className="flex items-center gap-1.5 text-sm font-bold">
+                                    <kbd className="text-[10px] font-mono bg-red-100 text-red-500 px-1.5 py-0.5 rounded">D</kbd>
                                     {selectedCount > 0 ? `حذف (${selectedCount})` : 'حذف'}
                                 </span>
                             </Button>
 
-                            {/* View All Button - White + Dark Text + Glow */}
+                            {/* View All Button */}
                             <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
                                 <Link to={currentLinks.viewAll}>
                                     <List className="h-6 w-6" aria-hidden="true" />
-                                    <span className="text-sm font-bold">عرض جميع</span>
+                                    <span className="flex items-center gap-1.5 text-sm font-bold">
+                                        <kbd className="text-[10px] font-mono bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">V</kbd>
+                                        عرض مسبق
+                                    </span>
                                 </Link>
                             </Button>
                         </>
