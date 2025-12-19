@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, lazy, Suspense } from 'react'
 import { useParams, useNavigate, Link } from '@tanstack/react-router'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
@@ -23,17 +23,9 @@ import {
 import { format } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 import type { GeofenceType } from '@/types/biometric'
-import { MapContainer, TileLayer, Circle as LeafletCircle, Polygon as LeafletPolygon, Marker, Popup } from 'react-leaflet'
-import 'leaflet/dist/leaflet.css'
-import L from 'leaflet'
 
-// Fix for default marker icon
-delete (L.Icon.Default.prototype as any)._getIconUrl
-L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-})
+// Lazy load Leaflet map components (~250KB) - only loaded when viewing geofencing details
+const LeafletMap = lazy(() => import('./geofencing-map').then(mod => ({ default: mod.GeofencingMap })))
 
 export function GeofencingDetailsView() {
     const { zoneId } = useParams({ strict: false }) as { zoneId: string }
@@ -281,53 +273,13 @@ export function GeofencingDetailsView() {
                                                     </CardHeader>
                                                     <CardContent>
                                                         <div className="rounded-2xl overflow-hidden border border-slate-200" style={{ height: '400px' }}>
-                                                            <MapContainer
-                                                                center={[mapCenter.lat, mapCenter.lng]}
-                                                                zoom={14}
-                                                                style={{ height: '100%', width: '100%' }}
-                                                                scrollWheelZoom={false}
-                                                            >
-                                                                <TileLayer
-                                                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                                                />
-
-                                                                {zone.type === 'circle' && zone.center && zone.radius ? (
-                                                                    <>
-                                                                        <Marker position={[zone.center.latitude, zone.center.longitude]}>
-                                                                            <Popup>{zone.name}</Popup>
-                                                                        </Marker>
-                                                                        <LeafletCircle
-                                                                            center={[zone.center.latitude, zone.center.longitude]}
-                                                                            radius={zone.radius}
-                                                                            pathOptions={{
-                                                                                color: zone.isActive ? '#10b981' : '#94a3b8',
-                                                                                fillColor: zone.isActive ? '#10b981' : '#94a3b8',
-                                                                                fillOpacity: 0.2,
-                                                                            }}
-                                                                        />
-                                                                    </>
-                                                                ) : zone.type === 'polygon' && zone.coordinates && zone.coordinates.length > 0 ? (
-                                                                    <>
-                                                                        {zone.coordinates.map((coord, idx) => (
-                                                                            <Marker
-                                                                                key={idx}
-                                                                                position={[coord.latitude, coord.longitude]}
-                                                                            />
-                                                                        ))}
-                                                                        <LeafletPolygon
-                                                                            positions={zone.coordinates.map(c => [c.latitude, c.longitude])}
-                                                                            pathOptions={{
-                                                                                color: zone.isActive ? '#8b5cf6' : '#94a3b8',
-                                                                                fillColor: zone.isActive ? '#8b5cf6' : '#94a3b8',
-                                                                                fillOpacity: 0.2,
-                                                                            }}
-                                                                        >
-                                                                            <Popup>{zone.name}</Popup>
-                                                                        </LeafletPolygon>
-                                                                    </>
-                                                                ) : null}
-                                                            </MapContainer>
+                                                            <Suspense fallback={
+                                                                <div className="h-full w-full bg-slate-100 animate-pulse flex items-center justify-center">
+                                                                    <span className="text-slate-500">جاري تحميل الخريطة...</span>
+                                                                </div>
+                                                            }>
+                                                                <LeafletMap mapCenter={mapCenter} zone={zone} />
+                                                            </Suspense>
                                                         </div>
                                                     </CardContent>
                                                 </Card>

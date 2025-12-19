@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, lazy, Suspense } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
@@ -28,32 +28,14 @@ import {
     Search, Bell, MapPin, Loader2, CheckCircle, Circle, Hexagon, Plus, Trash2, AlertCircle, Clock
 } from 'lucide-react'
 import type { CreateGeofenceData, GeofenceType } from '@/types/biometric'
-import { MapContainer, TileLayer, Circle as LeafletCircle, Polygon as LeafletPolygon, Marker, useMapEvents } from 'react-leaflet'
-import 'leaflet/dist/leaflet.css'
-import L from 'leaflet'
 
-// Fix for default marker icon
-delete (L.Icon.Default.prototype as any)._getIconUrl
-L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-})
+// Lazy load Leaflet map components (~155KB) - only loaded when viewing this page
+const GeofencingCreateMap = lazy(() => import('./geofencing-interactive-map').then(mod => ({ default: mod.GeofencingCreateMap })))
 
 interface CoordinatePoint {
     id: string
     latitude: number
     longitude: number
-}
-
-// Map Click Handler Component
-function MapClickHandler({ onClick }: { onClick: (lat: number, lng: number) => void }) {
-    useMapEvents({
-        click: (e) => {
-            onClick(e.latlng.lat, e.latlng.lng)
-        },
-    })
-    return null
 }
 
 export function GeofencingCreateView() {
@@ -393,53 +375,25 @@ export function GeofencingCreateView() {
                                         </>
                                     )}
 
-                                    {/* Interactive Map */}
+                                    {/* Interactive Map - Lazy Loaded */}
                                     <div className="rounded-2xl overflow-hidden border-2 border-slate-200" style={{ height: '400px' }}>
-                                        <MapContainer
-                                            center={[centerLat, centerLng]}
-                                            zoom={13}
-                                            style={{ height: '100%', width: '100%' }}
-                                        >
-                                            <TileLayer
-                                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                        <Suspense fallback={
+                                            <div className="h-full w-full bg-slate-100 animate-pulse flex items-center justify-center">
+                                                <div className="text-center">
+                                                    <Loader2 className="h-8 w-8 animate-spin mx-auto text-emerald-500 mb-2" />
+                                                    <span className="text-slate-500 text-sm">جاري تحميل الخريطة...</span>
+                                                </div>
+                                            </div>
+                                        }>
+                                            <GeofencingCreateMap
+                                                centerLat={centerLat}
+                                                centerLng={centerLng}
+                                                radius={radius}
+                                                type={type}
+                                                coordinates={coordinates}
+                                                onMapClick={handleMapClick}
                                             />
-                                            <MapClickHandler onClick={handleMapClick} />
-
-                                            {type === 'circle' ? (
-                                                <>
-                                                    <Marker position={[centerLat, centerLng]} />
-                                                    <LeafletCircle
-                                                        center={[centerLat, centerLng]}
-                                                        radius={radius}
-                                                        pathOptions={{
-                                                            color: '#10b981',
-                                                            fillColor: '#10b981',
-                                                            fillOpacity: 0.2,
-                                                        }}
-                                                    />
-                                                </>
-                                            ) : (
-                                                <>
-                                                    {coordinates.map((coord) => (
-                                                        <Marker
-                                                            key={coord.id}
-                                                            position={[coord.latitude, coord.longitude]}
-                                                        />
-                                                    ))}
-                                                    {coordinates.length >= 3 && (
-                                                        <LeafletPolygon
-                                                            positions={coordinates.map(c => [c.latitude, c.longitude])}
-                                                            pathOptions={{
-                                                                color: '#8b5cf6',
-                                                                fillColor: '#8b5cf6',
-                                                                fillOpacity: 0.2,
-                                                            }}
-                                                        />
-                                                    )}
-                                                </>
-                                            )}
-                                        </MapContainer>
+                                        </Suspense>
                                     </div>
                                 </CardContent>
                             </Card>
