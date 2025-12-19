@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { lazy, Suspense } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -38,10 +39,12 @@ import {
   useDeletePdfmeTemplate,
   useClonePdfmeTemplate,
 } from '@/hooks/usePdfme'
-import { PdfViewer } from './pdf-viewer'
 import { templateCategories, templateTypes } from '../data/data'
 import { useTranslation } from 'react-i18next'
-import { Check, X } from 'lucide-react'
+import { Check, X, Loader2 } from 'lucide-react'
+
+// Lazy load PdfViewer - contains heavy @pdfme libraries (~6MB)
+const PdfViewer = lazy(() => import('./pdf-viewer').then(mod => ({ default: mod.PdfViewer })))
 
 const duplicateFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -343,14 +346,23 @@ export function TemplatePreviewDialog() {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           ) : templateData ? (
-            <PdfViewer
-              template={{
-                basePdf: templateData.basePdf,
-                schemas: templateData.schemas,
-              }}
-              inputs={sampleInputs}
-              lang={isRTL ? 'ar' : 'en'}
-            />
+            <Suspense fallback={
+              <div className="flex items-center justify-center h-full bg-slate-50">
+                <div className="text-center">
+                  <Loader2 className="h-8 w-8 animate-spin mx-auto text-blue-500 mb-2" />
+                  <p className="text-slate-500 text-sm">{t('common.loading', 'جاري التحميل...')}</p>
+                </div>
+              </div>
+            }>
+              <PdfViewer
+                template={{
+                  basePdf: templateData.basePdf,
+                  schemas: templateData.schemas,
+                }}
+                inputs={sampleInputs}
+                lang={isRTL ? 'ar' : 'en'}
+              />
+            </Suspense>
           ) : (
             <div className="flex items-center justify-center h-full text-muted-foreground">
               {t('pdfTemplates.noPreviewAvailable')}
