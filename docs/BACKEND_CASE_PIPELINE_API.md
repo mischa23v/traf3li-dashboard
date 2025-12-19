@@ -17,7 +17,7 @@ GET  /api/v1/cases/:id          → Get single case (used by detail view)
 PATCH /api/v1/cases/:id         → Update case (for stage changes)
 ```
 
-### Minimum Required Fields in Case Response
+### Minimum Required Fields in Casefdsfs Response
 
 ```json
 {
