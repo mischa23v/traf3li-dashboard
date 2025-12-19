@@ -19,7 +19,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
-import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, CheckCircle, XCircle, Edit3, Calendar, SortAsc, Filter, X, ArrowRight, ArrowUpDown } from 'lucide-react'
+import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, CheckCircle, XCircle, Edit3, Calendar, SortAsc, Filter, X, ArrowRight, ArrowUpDown, Palette } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { useDeleteTask, useCompleteTask, useReopenTask, useUpdateTask } from '@/hooks/useTasks'
 import { format } from 'date-fns'
@@ -42,6 +42,10 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
+    DropdownMenuSub,
+    DropdownMenuSubTrigger,
+    DropdownMenuSubContent,
+    DropdownMenuPortal,
 } from '@/components/ui/dropdown-menu'
 import { useCases } from '@/hooks/useCasesAndClients'
 import { useTeamMembers } from '@/hooks/useStaff'
@@ -662,65 +666,64 @@ export function TasksListView() {
                                             </div>
                                         </div>
 
-                                        {/* RIGHT SIDE: Action Menu (Absolute on mobile top-right, or just stacked) */}
-                                        <div className="flex md:hidden absolute end-4 top-4 pt-1" onClick={(e) => e.stopPropagation()}>
+                                        {/* Action Menu - Same for mobile/desktop, just positioned differently */}
+                                        <div className="absolute end-4 top-4 pt-1 md:relative md:end-auto md:top-auto md:pt-0" onClick={(e) => e.stopPropagation()}>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy hover:bg-slate-100 rounded-xl">
                                                         <MoreHorizontal className="h-6 w-6" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-xl border-0 ring-1 ring-black/5">
-                                                    <DropdownMenuItem onClick={() => handleEditTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
-                                                        <Edit3 className="h-4 w-4 ms-2 text-blue-500" aria-hidden="true" />
-                                                        {t('tasks.list.editTask')}
-                                                    </DropdownMenuItem>
-                                                    {/* View Details is now the card click, but keep in menu for accessibility */}
+                                                <DropdownMenuContent align="end" className="w-52 rounded-xl shadow-xl border-0 ring-1 ring-black/5 p-1">
                                                     <DropdownMenuItem onClick={() => handleViewTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
-                                                        <Eye className="h-4 w-4 ms-2" />
+                                                        <Eye className="h-4 w-4 ms-2 text-slate-500" />
                                                         {t('tasks.list.viewDetails')}
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuSeparator />
-                                                    {task.status !== 'done' ? (
-                                                        <DropdownMenuItem onClick={() => handleCompleteTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
-                                                            <CheckCircle className="h-4 w-4 ms-2 text-emerald-500" />
-                                                            {t('tasks.list.completeTask')}
-                                                        </DropdownMenuItem>
-                                                    ) : (
-                                                        <DropdownMenuItem onClick={() => handleReopenTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
-                                                            <XCircle className="h-4 w-4 ms-2 text-amber-500" />
-                                                            {t('tasks.list.reopenTask')}
-                                                        </DropdownMenuItem>
-                                                    )}
-                                                    <DropdownMenuSeparator />
-                                                    <DropdownMenuItem
-                                                        onClick={() => handleDeleteTask(task.id)}
-                                                        className="text-red-600 focus:text-red-600 rounded-lg py-2.5 cursor-pointer bg-red-50/50 hover:bg-red-50"
-                                                    >
-                                                        <Trash2 className="h-4 w-4 ms-2" />
-                                                        {t('tasks.list.deleteTask')}
+                                                    <DropdownMenuItem onClick={() => handleEditTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                        <Edit3 className="h-4 w-4 ms-2 text-blue-500" />
+                                                        {t('tasks.list.editTask')}
                                                     </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </div>
 
-                                        {/* DESKTOP Action Menu */}
-                                        <div className="hidden md:flex" onClick={(e) => e.stopPropagation()}>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy hover:bg-slate-100 rounded-xl">
-                                                        <MoreHorizontal className="h-6 w-6" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-xl border-0 ring-1 ring-black/5">
-                                                    <DropdownMenuItem onClick={() => handleEditTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
-                                                        <Edit3 className="h-4 w-4 ms-2 text-blue-500" aria-hidden="true" />
-                                                        {t('tasks.list.editTask')}
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleViewTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
-                                                        <Eye className="h-4 w-4 ms-2" />
-                                                        {t('tasks.list.viewDetails')}
-                                                    </DropdownMenuItem>
+                                                    {/* Priority Submenu */}
+                                                    <DropdownMenuSub>
+                                                        <DropdownMenuSubTrigger className="rounded-lg py-2.5 cursor-pointer">
+                                                            <Palette className="h-4 w-4 ms-2 text-purple-500" />
+                                                            {t('tasks.list.changePriority', 'تغيير الأولوية')}
+                                                        </DropdownMenuSubTrigger>
+                                                        <DropdownMenuPortal>
+                                                            <DropdownMenuSubContent className="rounded-xl shadow-xl border-0 ring-1 ring-black/5 p-1">
+                                                                <DropdownMenuItem
+                                                                    onClick={() => handlePriorityChange(task.id, 'urgent')}
+                                                                    className="rounded-lg py-2 cursor-pointer"
+                                                                >
+                                                                    <span className="w-2 h-2 rounded-full bg-red-500 ms-2" />
+                                                                    <span className="text-red-700">{t('tasks.priorities.urgent')}</span>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem
+                                                                    onClick={() => handlePriorityChange(task.id, 'high')}
+                                                                    className="rounded-lg py-2 cursor-pointer"
+                                                                >
+                                                                    <span className="w-2 h-2 rounded-full bg-orange-500 ms-2" />
+                                                                    <span className="text-orange-700">{t('tasks.priorities.high')}</span>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem
+                                                                    onClick={() => handlePriorityChange(task.id, 'medium')}
+                                                                    className="rounded-lg py-2 cursor-pointer"
+                                                                >
+                                                                    <span className="w-2 h-2 rounded-full bg-amber-500 ms-2" />
+                                                                    <span className="text-amber-700">{t('tasks.priorities.medium')}</span>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem
+                                                                    onClick={() => handlePriorityChange(task.id, 'low')}
+                                                                    className="rounded-lg py-2 cursor-pointer"
+                                                                >
+                                                                    <span className="w-2 h-2 rounded-full bg-emerald-500 ms-2" />
+                                                                    <span className="text-emerald-700">{t('tasks.priorities.low')}</span>
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuSubContent>
+                                                        </DropdownMenuPortal>
+                                                    </DropdownMenuSub>
+
                                                     <DropdownMenuSeparator />
                                                     {task.status !== 'done' ? (
                                                         <DropdownMenuItem onClick={() => handleCompleteTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
@@ -746,60 +749,34 @@ export function TasksListView() {
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-5 mt-3 border-t border-slate-50 gap-4 ps-2">
-                                        <div className="flex flex-wrap items-center gap-4 sm:gap-8 w-full sm:w-auto" onClick={(e) => e.stopPropagation()}>
-                                            {/* Priority Dropdown - WIDENED to 140px */}
-                                            <div>
-                                                {/* Typography Fix: Increased label from text-[10px] to text-xs (12px) for better readability */}
-                                                <div className="text-xs uppercase tracking-wider text-slate-600 mb-1.5 font-bold flex items-center gap-1">
-                                                    {t('tasks.list.priorityLabel')}
-                                                </div>
-                                                <GosiSelect
-                                                    value={task.priority}
-                                                    onValueChange={(value) => handlePriorityChange(task.id, value)}
-                                                >
-                                                    <GosiSelectTrigger className={`w-[140px] h-10 text-xs font-bold rounded-xl border-0 shadow-sm transition-all hover:scale-105 active:scale-95 ${task.priority === 'urgent' ? 'bg-red-50 text-red-700 ring-1 ring-red-200' :
-                                                        task.priority === 'high' ? 'bg-orange-50 text-orange-700 ring-1 ring-orange-200' :
-                                                            task.priority === 'medium' ? 'bg-amber-50 text-amber-700 ring-1 ring-amber-200' :
-                                                                'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
-                                                        }`}>
-                                                        <GosiSelectValue />
-                                                    </GosiSelectTrigger>
-                                                    <GosiSelectContent>
-                                                        <GosiSelectItem value="urgent" className="text-red-700 focus:bg-red-50">{t('tasks.priorities.urgent')}</GosiSelectItem>
-                                                        <GosiSelectItem value="high" className="text-orange-700 focus:bg-orange-50">{t('tasks.priorities.high')}</GosiSelectItem>
-                                                        <GosiSelectItem value="medium" className="text-amber-700 focus:bg-amber-50">{t('tasks.priorities.medium')}</GosiSelectItem>
-                                                        <GosiSelectItem value="low" className="text-emerald-700 focus:bg-emerald-50">{t('tasks.priorities.low')}</GosiSelectItem>
-                                                    </GosiSelectContent>
-                                                </GosiSelect>
-                                            </div>
-                                            {/* Due Date - Dual Language */}
-                                            <div className="text-center">
-                                                {/* Typography Fix: Increased label from text-[10px] to text-xs (12px) */}
-                                                <div className="text-xs uppercase tracking-wider text-slate-600 mb-1.5 font-bold">{t('tasks.list.dueDate')}</div>
-                                                <div className="font-bold text-slate-800 text-sm bg-slate-50 px-4 py-2 rounded-xl border border-slate-100 shadow-sm flex items-center gap-2 h-10">
-                                                    <Calendar className="w-4 h-4 text-slate-500" />
-                                                    {task.dueDateFormatted.arabic}
-                                                </div>
-                                            </div>
-                                            {/* Creation Date - Dual Language */}
-                                            <div className="text-center hidden sm:block">
-                                                {/* Typography Fix: Increased label from text-[10px] to text-xs (12px) */}
-                                                <div className="text-xs uppercase tracking-wider text-slate-600 mb-1.5 font-bold">{t('tasks.list.createdAt')}</div>
-                                                <div className="font-bold text-slate-500 text-sm px-2 py-2 h-10 flex items-center">{task.createdAtFormatted.arabic}</div>
-                                            </div>
+                                    {/* Bottom section: Priority badge + Due date - Cleaner design */}
+                                    <div className="flex flex-wrap items-center gap-3 pt-4 mt-3 border-t border-slate-100/50 ps-2">
+                                        {/* Priority Badge - Static (edit via action menu) */}
+                                        <div className={`
+                                            inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold
+                                            transition-all duration-200 select-none
+                                            ${task.priority === 'urgent'
+                                                ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-md shadow-red-500/20'
+                                                : task.priority === 'high'
+                                                ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/20'
+                                                : task.priority === 'medium'
+                                                ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 shadow-md shadow-amber-500/20'
+                                                : 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md shadow-emerald-500/20'
+                                            }
+                                        `}>
+                                            <span className={`w-1.5 h-1.5 rounded-full ${task.priority === 'urgent' ? 'bg-white animate-pulse' : 'bg-white/80'}`} />
+                                            {t(`tasks.priorities.${task.priority}`)}
                                         </div>
-                                        <Link to={`/dashboard/tasks/${task.id}` as any} className="hidden sm:inline-flex w-auto" onClick={(e) => e.stopPropagation()}>
-                                            <GosiButton className="bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white border border-emerald-100 hover:border-emerald-500 rounded-xl px-6 h-10 shadow-sm hover:shadow-lg hover:shadow-emerald-500/20 w-auto transition-all duration-300 hover:scale-105 active:scale-95 group/btn">
-                                                {t('tasks.list.viewDetails')}
-                                                <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180 transition-transform group-hover/btn:translate-x-1 rtl:group-hover/btn:-translate-x-1" />
-                                            </GosiButton>
-                                        </Link>
+
+                                        {/* Due Date Badge */}
+                                        <div className="inline-flex items-center gap-2 px-3.5 py-2 bg-slate-50 rounded-xl border border-slate-100 text-xs">
+                                            <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                                            <span className="font-medium text-slate-600">{task.dueDateFormatted.arabic}</span>
+                                        </div>
                                     </div>
                                 </div>
                                         </div>
                                     )}
-                                    getItemKey={(index, data) => data[index].id}
                                 />
                             )}
                         </div>

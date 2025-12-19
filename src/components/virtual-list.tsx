@@ -1,17 +1,11 @@
 /**
  * Virtual List Components
- * Uses react-window for efficient rendering of large lists
+ * Uses react-window v2 for efficient rendering of large lists
  */
 
 import { List } from 'react-window'
-import type { ReactNode } from 'react'
-
-// react-window v2 child component props
-interface ListChildComponentProps {
-  index: number
-  style: CSSProperties
-}
-import { forwardRef, memo, useCallback, useRef, CSSProperties, useState, useEffect } from 'react'
+import type { ReactElement, CSSProperties, ReactNode } from 'react'
+import { forwardRef, memo, useState, useEffect, useMemo } from 'react'
 import { cn } from '@/lib/utils'
 
 // ==================== TYPES ====================
@@ -19,21 +13,21 @@ import { cn } from '@/lib/utils'
 interface VirtualListProps<T> {
   /** Array of items to render */
   items: T[]
-  /** Height of each item in pixels (for FixedSizeList) */
+  /** Height of each item in pixels */
   itemHeight: number
   /** Total height of the list container */
-  height: number
+  height?: number
   /** Width of the list container (default: 100%) */
   width?: number | string
   /** Render function for each item */
-  renderItem: (item: T, index: number, style: CSSProperties) => React.ReactNode
+  renderItem: (item: T, index: number, style: CSSProperties) => ReactNode
   /** Additional class name for the list container */
   className?: string
   /** Number of items to render outside visible area */
   overscanCount?: number
   /** RTL layout support */
   direction?: 'ltr' | 'rtl'
-  /** Key extractor for items */
+  /** Key extractor for items (optional, for compatibility - not used in v2) */
   getItemKey?: (index: number, data: T[]) => string | number
 }
 
@@ -42,6 +36,14 @@ interface VariableListProps<T> extends Omit<VirtualListProps<T>, 'itemHeight'> {
   getItemHeight: (index: number) => number
   /** Estimated item height for initial render */
   estimatedItemHeight?: number
+}
+
+// ==================== ROW PROPS TYPE FOR V2 API ====================
+// rowProps must NOT contain ariaAttributes, index, or style - those are auto-passed
+
+interface RowPropsData<T> {
+  items: T[]
+  renderItem: (item: T, index: number, style: CSSProperties) => ReactNode
 }
 
 // ==================== FIXED SIZE LIST ====================
@@ -55,29 +57,40 @@ function VirtualListInner<T>({
   className,
   overscanCount = 5,
   direction = 'rtl',
-  getItemKey,
 }: VirtualListProps<T>) {
-  const Row = useCallback(
-    ({ index, style }: ListChildComponentProps) => {
-      const item = items[index]
-      return renderItem(item, index, style)
-    },
-    [items, renderItem]
-  )
+  // Memoize rowProps to prevent unnecessary re-renders
+  const rowProps = useMemo<RowPropsData<T>>(() => ({ items, renderItem }), [items, renderItem])
+
+  // Row component for v2 API - defined outside of render to be stable
+  // ariaAttributes, index, style are auto-passed by List
+  // items, renderItem come from rowProps
+  const Row = useMemo(() => {
+    const RowComponent = (props: {
+      ariaAttributes: { 'aria-posinset': number; 'aria-setsize': number; role: 'listitem' }
+      index: number
+      style: CSSProperties
+      items: T[]
+      renderItem: (item: T, index: number, style: CSSProperties) => ReactNode
+    }): ReactElement => {
+      const { index, style, items: rowItems, renderItem: rowRenderItem } = props
+      const item = rowItems[index]
+      return <>{rowRenderItem(item, index, style)}</>
+    }
+    return RowComponent
+  }, [])
 
   return (
-    <List
-      height={height}
-      width={width}
-      itemCount={items.length}
-      itemSize={itemHeight}
+    <List<RowPropsData<T>>
+      rowComponent={Row}
+      rowCount={items.length}
+      rowHeight={itemHeight}
+      rowProps={rowProps}
       overscanCount={overscanCount}
-      direction={direction}
+      dir={direction}
+      defaultHeight={height}
       className={cn('scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent', className)}
-      itemKey={getItemKey ? (index) => getItemKey(index, items) : undefined}
-    >
-      {Row}
-    </List>
+      style={{ width }}
+    />
   )
 }
 
@@ -94,30 +107,38 @@ function VariableVirtualListInner<T>({
   className,
   overscanCount = 5,
   direction = 'rtl',
-  estimatedItemHeight = 50,
-  getItemKey,
 }: VariableListProps<T>) {
-  const Row = useCallback(
-    ({ index, style }: ListChildComponentProps) => {
-      const item = items[index]
-      return renderItem(item, index, style)
-    },
-    [items, renderItem]
-  )
+  // Memoize rowProps to prevent unnecessary re-renders
+  const rowProps = useMemo<RowPropsData<T>>(() => ({ items, renderItem }), [items, renderItem])
+
+  // Row component for v2 API
+  const Row = useMemo(() => {
+    const RowComponent = (props: {
+      ariaAttributes: { 'aria-posinset': number; 'aria-setsize': number; role: 'listitem' }
+      index: number
+      style: CSSProperties
+      items: T[]
+      renderItem: (item: T, index: number, style: CSSProperties) => ReactNode
+    }): ReactElement => {
+      const { index, style, items: rowItems, renderItem: rowRenderItem } = props
+      const item = rowItems[index]
+      return <>{rowRenderItem(item, index, style)}</>
+    }
+    return RowComponent
+  }, [])
 
   return (
-    <List
-      height={height}
-      width={width}
-      itemCount={items.length}
-      itemSize={getItemHeight}
+    <List<RowPropsData<T>>
+      rowComponent={Row}
+      rowCount={items.length}
+      rowHeight={getItemHeight}
+      rowProps={rowProps}
       overscanCount={overscanCount}
-      direction={direction}
+      dir={direction}
+      defaultHeight={height}
       className={cn('scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent', className)}
-      itemKey={getItemKey ? (index) => getItemKey(index, items) : undefined}
-    >
-      {Row}
-    </List>
+      style={{ width }}
+    />
   )
 }
 
