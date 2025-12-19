@@ -47,6 +47,26 @@ import {
 import { useCases } from '@/hooks/useCasesAndClients'
 import { useTeamMembers } from '@/hooks/useStaff'
 
+// AI Suggestion Types
+interface AiTaskInput {
+    title: string
+    priority: string
+    dueDate: string | null
+    status: string
+}
+
+interface AiSuggestionRequest {
+    tasks: AiTaskInput[]
+    language: string
+}
+
+interface AiSuggestionResponse {
+    suggestion: string
+}
+
+// AI Worker URL from environment variable
+const AI_WORKER_URL = import.meta.env.VITE_AI_WORKER_URL || 'https://shrill-band-bfcb.mischa23v.workers.dev'
+
 export function TasksListView() {
     const { t, i18n } = useTranslation()
     const navigate = useNavigate()
@@ -62,6 +82,8 @@ export function TasksListView() {
     const [aiDismissed, setAiDismissed] = useState(false)
     const [aiError, setAiError] = useState(false)
     const aiLastFetch = useRef<number>(0)
+    const aiHasFetched = useRef<boolean>(false) // Track if we've successfully fetched
+    const aiAbortController = useRef<AbortController | null>(null) // For cleanup
 
     // Performance profiling
     const renderCount = useRef(0)
@@ -69,7 +91,11 @@ export function TasksListView() {
 
     useEffect(() => {
         perfLog('TasksListView MOUNTED')
-        return () => perfLog('TasksListView UNMOUNTED')
+        return () => {
+            perfLog('TasksListView UNMOUNTED')
+            // Cleanup: abort any in-flight AI requests
+            aiAbortController.current?.abort()
+        }
     }, [])
 
     renderCount.current++
@@ -117,11 +143,11 @@ export function TasksListView() {
     const updateTaskStatusMutation = useUpdateTaskStatus()
     const updateTaskMutation = useUpdateTask()
 
-    // AI Suggestion fetch function
-    const fetchAiSuggestion = useCallback(async (taskList: any[]) => {
-        // Rate limit: only fetch once per 10 minutes
+    // AI Suggestion fetch function with proper cleanup, timeout, and rate limiting
+    const fetchAiSuggestion = useCallback(async (taskList: any[], forceRefresh = false) => {
+        // Rate limit: only fetch once per 10 minutes (unless force refresh)
         const now = Date.now()
-        if (now - aiLastFetch.current < 10 * 60 * 1000 && aiSuggestion) {
+        if (!forceRefresh && now - aiLastFetch.current < 10 * 60 * 1000 && aiHasFetched.current) {
             return
         }
 
@@ -130,36 +156,55 @@ export function TasksListView() {
             return
         }
 
+        // Abort any in-flight request
+        aiAbortController.current?.abort()
+        aiAbortController.current = new AbortController()
+
         setAiLoading(true)
         setAiError(false)
 
+        // Create timeout (10 seconds)
+        const timeoutId = setTimeout(() => {
+            aiAbortController.current?.abort()
+        }, 10000)
+
         try {
-            const response = await fetch('https://shrill-band-bfcb.mischa23v.workers.dev', {
+            const requestBody: AiSuggestionRequest = {
+                tasks: taskList.slice(0, 10).map((t): AiTaskInput => ({
+                    title: t.title,
+                    priority: t.priority,
+                    dueDate: t.dueDate,
+                    status: t.status
+                })),
+                language: i18n.language
+            }
+
+            const response = await fetch(AI_WORKER_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    tasks: taskList.slice(0, 10).map(t => ({
-                        title: t.title,
-                        priority: t.priority,
-                        dueDate: t.dueDate,
-                        status: t.status
-                    })),
-                    language: i18n.language
-                })
+                body: JSON.stringify(requestBody),
+                signal: aiAbortController.current.signal
             })
 
             if (!response.ok) throw new Error('AI request failed')
 
-            const data = await response.json()
+            const data: AiSuggestionResponse = await response.json()
             setAiSuggestion(data.suggestion)
             aiLastFetch.current = now
+            aiHasFetched.current = true
         } catch (err) {
+            // Don't set error state if request was aborted (user navigated away or refreshed)
+            if (err instanceof Error && err.name === 'AbortError') {
+                console.log('AI suggestion request aborted')
+                return
+            }
             console.error('AI suggestion error:', err)
             setAiError(true)
         } finally {
+            clearTimeout(timeoutId)
             setAiLoading(false)
         }
-    }, [i18n.language, aiSuggestion])
+    }, [i18n.language]) // Removed aiSuggestion from deps to prevent recreation
 
     // API Filters - Map UI tabs to actual task status values
     // TaskStatus: 'backlog' | 'todo' | 'in_progress' | 'done' | 'canceled'
@@ -722,18 +767,20 @@ export function TasksListView() {
                                         <div className="flex items-center gap-2 mt-3">
                                             <button
                                                 onClick={() => {
-                                                    aiLastFetch.current = 0
                                                     setAiSuggestion(null)
                                                     setAiError(false)
-                                                    if (tasksData?.tasks) fetchAiSuggestion(tasksData.tasks)
+                                                    if (tasksData?.tasks) fetchAiSuggestion(tasksData.tasks, true) // forceRefresh=true
                                                 }}
-                                                className="text-xs font-medium text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+                                                disabled={aiLoading}
+                                                aria-label={i18n.language === 'ar' ? 'تحديث الاقتراح' : 'Refresh suggestion'}
+                                                className="text-xs font-medium text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 <RefreshCw className={`h-3.5 w-3.5 ${aiLoading ? 'animate-spin' : ''}`} />
                                                 {i18n.language === 'ar' ? 'تحديث' : 'Refresh'}
                                             </button>
                                             <button
                                                 onClick={() => setAiDismissed(true)}
+                                                aria-label={i18n.language === 'ar' ? 'تجاهل الاقتراح' : 'Dismiss suggestion'}
                                                 className="text-xs font-medium text-slate-500 hover:text-slate-600 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors"
                                             >
                                                 {i18n.language === 'ar' ? 'تجاهل' : 'Dismiss'}
@@ -744,6 +791,7 @@ export function TasksListView() {
                                     {/* Dismiss X button */}
                                     <button
                                         onClick={() => setAiDismissed(true)}
+                                        aria-label={i18n.language === 'ar' ? 'إغلاق الاقتراح' : 'Close suggestion'}
                                         className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors flex-shrink-0"
                                     >
                                         <X className="h-4 w-4" />
