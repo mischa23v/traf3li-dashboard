@@ -19,7 +19,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
-import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, CheckCircle, XCircle, Edit3, Calendar, SortAsc, Filter, X, ArrowRight, ArrowUpDown, Clock, AlertTriangle, User } from 'lucide-react'
+import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, CheckCircle, XCircle, Edit3, Calendar, SortAsc, Filter, X, ArrowRight, ArrowUpDown, Clock, AlertTriangle, User, Sparkles, Lightbulb, RefreshCw, Loader2 } from 'lucide-react'
 import { differenceInDays, isToday, isTomorrow, isThisWeek, isPast, startOfDay } from 'date-fns'
 import { useNavigate } from '@tanstack/react-router'
 import { useDeleteTask, useUpdateTaskStatus, useUpdateTask } from '@/hooks/useTasks'
@@ -55,6 +55,13 @@ export function TasksListView() {
     const [showFilters, setShowFilters] = useState(false) // New state for mobile filters
     const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([])
     const [visibleCount, setVisibleCount] = useState(10) // Load-more pagination: show 10 at a time
+
+    // AI Suggestion state
+    const [aiSuggestion, setAiSuggestion] = useState<string | null>(null)
+    const [aiLoading, setAiLoading] = useState(false)
+    const [aiDismissed, setAiDismissed] = useState(false)
+    const [aiError, setAiError] = useState(false)
+    const aiLastFetch = useRef<number>(0)
 
     // Performance profiling
     const renderCount = useRef(0)
@@ -109,6 +116,50 @@ export function TasksListView() {
     const deleteTaskMutation = useDeleteTask()
     const updateTaskStatusMutation = useUpdateTaskStatus()
     const updateTaskMutation = useUpdateTask()
+
+    // AI Suggestion fetch function
+    const fetchAiSuggestion = useCallback(async (taskList: any[]) => {
+        // Rate limit: only fetch once per 10 minutes
+        const now = Date.now()
+        if (now - aiLastFetch.current < 10 * 60 * 1000 && aiSuggestion) {
+            return
+        }
+
+        if (taskList.length === 0) {
+            setAiSuggestion(null)
+            return
+        }
+
+        setAiLoading(true)
+        setAiError(false)
+
+        try {
+            const response = await fetch('https://shrill-band-bfcb.mischa23v.workers.dev', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    tasks: taskList.slice(0, 10).map(t => ({
+                        title: t.title,
+                        priority: t.priority,
+                        dueDate: t.dueDate,
+                        status: t.status
+                    })),
+                    language: i18n.language
+                })
+            })
+
+            if (!response.ok) throw new Error('AI request failed')
+
+            const data = await response.json()
+            setAiSuggestion(data.suggestion)
+            aiLastFetch.current = now
+        } catch (err) {
+            console.error('AI suggestion error:', err)
+            setAiError(true)
+        } finally {
+            setAiLoading(false)
+        }
+    }, [i18n.language, aiSuggestion])
 
     // API Filters - Map UI tabs to actual task status values
     // TaskStatus: 'backlog' | 'todo' | 'in_progress' | 'done' | 'canceled'
@@ -235,6 +286,13 @@ export function TasksListView() {
             perfLog('TasksListView FETCHING:', activeFetches)
         }
     }, [isFetching, statsFetching])
+
+    // Fetch AI suggestion when tasks are loaded (only once per session or on refresh)
+    useEffect(() => {
+        if (tasksData?.tasks && tasksData.tasks.length > 0 && !aiDismissed && !aiSuggestion && !aiLoading) {
+            fetchAiSuggestion(tasksData.tasks)
+        }
+    }, [tasksData?.tasks, aiDismissed, aiSuggestion, aiLoading, fetchAiSuggestion])
 
     // Helper function to format dates based on current locale
     const formatDualDate = useCallback((dateString: string | null | undefined) => {
@@ -613,6 +671,86 @@ export function TasksListView() {
                                 </div>
                             </div>
                         </GosiCard>
+
+                        {/* AI SUGGESTION CARD */}
+                        {!aiDismissed && (aiLoading || aiSuggestion || aiError) && (
+                            <div
+                                className="
+                                    animate-in fade-in slide-in-from-bottom-4 duration-500
+                                    rounded-2xl p-3 md:p-4
+                                    border-0 ring-1 ring-black/[0.03] shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)]
+                                    transition-all duration-300 group
+                                    hover:shadow-[0_12px_24px_-8px_rgba(0,0,0,0.1)] hover:-translate-y-0.5
+                                    bg-gradient-to-br from-white to-emerald-50/30 relative overflow-hidden
+                                "
+                            >
+                                {/* Emerald accent strip on left */}
+                                <div className="absolute start-0 top-0 bottom-0 w-1.5 rounded-s-2xl bg-gradient-to-b from-emerald-400 to-emerald-600" />
+
+                                <div className="flex items-start gap-3 ps-4">
+                                    {/* AI Icon */}
+                                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-100 text-emerald-600 border border-emerald-200 flex-shrink-0">
+                                        {aiLoading ? (
+                                            <Loader2 className="h-5 w-5 animate-spin" strokeWidth={1.5} />
+                                        ) : (
+                                            <Sparkles className="h-5 w-5" strokeWidth={1.5} />
+                                        )}
+                                    </div>
+
+                                    {/* AI Content */}
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className="text-xs font-semibold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">
+                                                {i18n.language === 'ar' ? 'اقتراح ذكي' : 'AI Suggestion'}
+                                            </span>
+                                        </div>
+                                        <p className="text-sm text-slate-700 leading-relaxed">
+                                            {aiLoading ? (
+                                                <span className="text-slate-500">
+                                                    {i18n.language === 'ar' ? 'جاري تحليل المهام...' : 'Analyzing your tasks...'}
+                                                </span>
+                                            ) : aiError ? (
+                                                <span className="text-red-500">
+                                                    {i18n.language === 'ar' ? 'حدث خطأ. انقر للمحاولة مرة أخرى.' : 'Error occurred. Click to retry.'}
+                                                </span>
+                                            ) : (
+                                                aiSuggestion
+                                            )}
+                                        </p>
+
+                                        {/* Action buttons */}
+                                        <div className="flex items-center gap-2 mt-3">
+                                            <button
+                                                onClick={() => {
+                                                    aiLastFetch.current = 0
+                                                    setAiSuggestion(null)
+                                                    setAiError(false)
+                                                    if (tasksData?.tasks) fetchAiSuggestion(tasksData.tasks)
+                                                }}
+                                                className="text-xs font-medium text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+                                            >
+                                                <RefreshCw className={`h-3.5 w-3.5 ${aiLoading ? 'animate-spin' : ''}`} />
+                                                {i18n.language === 'ar' ? 'تحديث' : 'Refresh'}
+                                            </button>
+                                            <button
+                                                onClick={() => setAiDismissed(true)}
+                                                className="text-xs font-medium text-slate-500 hover:text-slate-600 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors"
+                                            >
+                                                {i18n.language === 'ar' ? 'تجاهل' : 'Dismiss'}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Dismiss X button */}
+                                    <button
+                                        onClick={() => setAiDismissed(true)}
+                                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors flex-shrink-0"
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
 
                         {/* LIST OF TASKS - REDESIGNED "10/10" */}
                         <div className="flex flex-col gap-4">

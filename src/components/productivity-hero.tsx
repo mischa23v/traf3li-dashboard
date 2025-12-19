@@ -137,7 +137,7 @@ export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = f
     const displayTitle = title || t('hero.productivity')
 
     return (
-        <div className="bg-[#022c22] rounded-3xl p-6 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20">
+        <div className="bg-[#022c22] rounded-3xl p-6 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20 min-h-[140px] lg:min-h-[160px] xl:min-h-[180px] max-h-[180px] lg:max-h-[190px] xl:max-h-[220px]">
             {/* Subtle Animated Gradient Background - reduced opacity for clarity */}
             <div className="absolute inset-0 z-0">
                 <div
