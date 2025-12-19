@@ -12,7 +12,6 @@ import { useAuthStore } from '@/stores/auth-store'
 import { handleServerError } from '@/lib/handle-server-error'
 import { smartRetry, smartRetryDelay } from '@/lib/query-retry-config'
 import { ErrorBoundary } from '@/components/error-boundary'
-import { RoutePrefetchLoader } from '@/components/route-prefetch-loader'
 import { DirectionProvider } from './context/direction-provider'
 import { FontProvider } from './context/font-provider'
 import { ThemeProvider } from './context/theme-provider'
@@ -140,7 +139,6 @@ if (!rootElement.innerHTML) {
           <ThemeProvider>
             <FontProvider>
               <DirectionProvider>
-                <RoutePrefetchLoader />
                 <RouterProvider router={router} />
               </DirectionProvider>
             </FontProvider>
