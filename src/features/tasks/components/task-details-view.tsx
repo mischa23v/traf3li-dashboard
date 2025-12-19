@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useCallback } from 'react'
+import { useState, useMemo, useRef, useCallback, lazy, Suspense } from 'react'
 import {
     FileText, Calendar, CheckSquare, Clock, MoreHorizontal, Plus, Upload,
     User, Briefcase, Trash2, Edit3, Loader2, Mic,
@@ -28,8 +28,10 @@ import tasksService from '@/services/tasksService'
 import { API_DOMAIN, API_URL } from '@/lib/api'
 import { toast } from 'sonner'
 import { VoiceMemoRecorder, VoiceMemoPlayer, isVoiceMemo } from './voice-memo-recorder'
-import { DocumentEditorDialog } from './document-editor-dialog'
 import { AttachmentVersionsDialog } from './attachment-versions-dialog'
+
+// Lazy load DocumentEditorDialog - contains TipTap editor (~150KB)
+const DocumentEditorDialog = lazy(() => import('./document-editor-dialog').then(mod => ({ default: mod.DocumentEditorDialog })))
 import type { Attachment } from '@/services/tasksService'
 import { useParams, useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
@@ -1227,16 +1229,20 @@ export function TaskDetailsView() {
                 </div>
             )}
 
-            {/* Document Editor Dialog */}
-            <DocumentEditorDialog
-                open={isDocumentEditorOpen}
-                onOpenChange={handleCloseDocumentEditor}
-                taskId={taskId}
-                documentId={editingDocumentId}
-                onSuccess={async () => {
-                    // Cache update handled by hook
-                }}
-            />
+            {/* Document Editor Dialog - Lazy loaded with TipTap editor */}
+            {isDocumentEditorOpen && (
+                <Suspense fallback={null}>
+                    <DocumentEditorDialog
+                        open={isDocumentEditorOpen}
+                        onOpenChange={handleCloseDocumentEditor}
+                        taskId={taskId}
+                        documentId={editingDocumentId}
+                        onSuccess={async () => {
+                            // Cache update handled by hook
+                        }}
+                    />
+                </Suspense>
+            )}
 
             {/* Attachment Versions Dialog */}
             {versionsAttachment && (
