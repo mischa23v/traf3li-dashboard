@@ -19,7 +19,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
-import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, CheckCircle, XCircle, Edit3, Calendar, SortAsc, Filter, X, ArrowRight, ArrowUpDown, Palette } from 'lucide-react'
+import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, CheckCircle, XCircle, Edit3, Calendar, SortAsc, Filter, X, ArrowRight, ArrowUpDown } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { useDeleteTask, useCompleteTask, useReopenTask, useUpdateTask } from '@/hooks/useTasks'
 import { format } from 'date-fns'
@@ -42,10 +42,6 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-    DropdownMenuSub,
-    DropdownMenuSubTrigger,
-    DropdownMenuSubContent,
-    DropdownMenuPortal,
 } from '@/components/ui/dropdown-menu'
 import { useCases } from '@/hooks/useCasesAndClients'
 import { useTeamMembers } from '@/hooks/useStaff'
@@ -258,9 +254,11 @@ export function TasksListView() {
             dueDateFormatted: formatDualDate(task.dueDate),
             createdAtFormatted: formatDualDate(task.createdAt),
             priority: task.priority || 'medium',
-            status: task.status || 'pending',
+            status: task.status || 'backlog',
             linkedEventId: task.linkedEventId, // Task ↔ Event sync
             eventId: task.eventId, // Manual event link
+            subtaskCount: task.subtasks?.length || 0,
+            completedSubtasks: task.subtasks?.filter((s: any) => s.completed)?.length || 0,
             _id: task._id,
         }))
     }, [tasksData, t, i18n.language])
@@ -382,11 +380,11 @@ export function TasksListView() {
                                         />
                                     </div>
 
-                                    {/* Mobile/Tablet Filter Toggle Button */}
+                                    {/* Filter Toggle Button - All screen sizes */}
                                     <GosiButton
                                         variant={showFilters || hasActiveFilters ? "default" : "outline"}
                                         onClick={() => setShowFilters(!showFilters)}
-                                        className={`lg:hidden h-14 w-full sm:w-auto px-6 whitespace-nowrap transition-all ${showFilters || hasActiveFilters ? 'bg-navy text-white border-navy' : ''}`}
+                                        className={`h-14 w-full sm:w-auto px-6 whitespace-nowrap transition-all ${showFilters || hasActiveFilters ? 'bg-navy text-white border-navy' : ''}`}
                                     >
                                         <Filter className="h-5 w-5 ms-2" />
                                         {t('tasks.list.filters', 'تصفية')}
@@ -396,12 +394,10 @@ export function TasksListView() {
                                             </span>
                                         )}
                                     </GosiButton>
-
-                                    {/* Clear All Button (Desktop) - Optional placement, but kept in grid for now */}
                                 </div>
 
-                                {/* filters container - Responsive Flex Wrap for Best Text Fit */}
-                                <div className={`${showFilters ? 'flex' : 'hidden'} lg:flex flex-wrap gap-4 transition-all duration-300 ease-in-out`}>
+                                {/* filters container - Hidden by default, shown on toggle */}
+                                <div className={`${showFilters ? 'flex' : 'hidden'} flex-wrap gap-4 transition-all duration-300 ease-in-out`}>
 
                                     {/* Status */}
                                     <div className="flex-1 min-w-[220px]">
@@ -585,145 +581,171 @@ export function TasksListView() {
                             {!isLoading && !isError && tasks.length > 0 && (
                                 <VirtualList
                                     items={tasks}
-                                    itemHeight={280}
-                                    height={Math.min(tasks.length * 280 + (tasks.length - 1) * 16, 800)}
+                                    itemHeight={148}
+                                    height={Math.min(tasks.length * 148 + (tasks.length - 1) * 8, 800)}
                                     renderItem={(task, index, style) => (
-                                        <div key={task.id} style={{ ...style, paddingBottom: '16px' }}>
+                                        <div key={task.id} style={{ ...style, paddingBottom: '8px' }}>
                                             <div
                                                 onClick={() => navigate({ to: '/dashboard/tasks/$taskId', params: { taskId: task.id } })}
                                                 style={{ animationDelay: `${index * 50}ms` }}
                                                 className={`
                                         animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-backwards
-                                        bg-white rounded-[2rem] p-5 md:p-7
-                                        border-0 ring-1 ring-black/[0.03] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)]
-                                        transition-all duration-300 group 
-                                        hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1),0_8px_24px_-8px_rgba(0,0,0,0.04)] hover:-translate-y-1.5 
+                                        bg-white rounded-2xl p-3 md:p-4
+                                        border-0 ring-1 ring-black/[0.03] shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)]
+                                        transition-all duration-300 group
+                                        hover:shadow-[0_12px_24px_-8px_rgba(0,0,0,0.1)] hover:-translate-y-1
                                         cursor-pointer relative overflow-hidden
                                         ${selectedTaskIds.includes(task.id) ? 'ring-2 ring-emerald-500 bg-emerald-50/20' : ''}
                                     `}
                                 >
-                                    {/* Status Strip Indicator */}
-                                    <div className={`absolute start-0 top-0 bottom-0 w-1.5 ${task.priority === 'urgent' ? 'bg-red-500' :
+                                    {/* Priority Strip Indicator - Shows on hover */}
+                                    <div className={`absolute start-0 top-0 bottom-0 w-1 rounded-s-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${task.priority === 'urgent' ? 'bg-red-500' :
                                         task.priority === 'high' ? 'bg-orange-500' :
                                             task.priority === 'medium' ? 'bg-amber-400' :
                                                 'bg-emerald-400'
-                                        } opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                                        }`} />
 
-                                    <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-4 ps-2">
-                                        {/* LEFT SIDE: Checkbox + Icon + Info */}
-                                        <div className="flex gap-5 items-start w-full md:w-auto">
-                                            {isSelectionMode && (
-                                                <div onClick={(e) => e.stopPropagation()}>
-                                                    <Checkbox
-                                                        checked={selectedTaskIds.includes(task.id)}
-                                                        onCheckedChange={() => handleSelectTask(task.id)}
-                                                        className="h-6 w-6 mt-1 rounded-md border-slate-300 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500 flex-shrink-0 transition-all duration-200"
-                                                    />
-                                                </div>
-                                            )}
-                                            {/* Reverted to Clean Slate/Emerald Look */}
-                                            <div className="w-14 h-14 md:w-16 md:h-16 rounded-[1.2rem] bg-slate-50 flex items-center justify-center shadow-inner text-slate-600 group-hover:bg-emerald-50 group-hover:text-emerald-700 group-hover:scale-105 transition-all duration-300 flex-shrink-0 border border-slate-100 group-hover:border-emerald-100">
-                                                <Briefcase className="h-7 w-7 md:h-8 md:w-8" strokeWidth={1.5} />
-                                            </div>
-                                            <div className="min-w-0 flex-1 space-y-1.5">
-                                                <div className="flex flex-wrap items-center gap-3 mb-1">
-                                                    {/* Typography Fix: Reduced from text-xl to text-lg (18px) for balanced readability */}
-                                                    <h4 className="font-bold text-slate-950 text-base md:text-lg group-hover:text-emerald-900 transition-colors truncate leading-tight tracking-tight max-w-full">
-                                                        {task.title}
-                                                    </h4>
-
-                                                    <div className="flex items-center gap-2">
-                                                        {task.status === 'active' && (
-                                                            <div className="flex items-center gap-1 bg-blue-50/80 text-blue-800 border border-blue-200 rounded-full px-2.5 py-0.5 text-[10px] font-bold shadow-sm">
-                                                                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>
-                                                                {t('tasks.list.active')}
-                                                            </div>
-                                                        )}
-                                                        {/* Task ↔ Event Sync Badge */}
-                                                        {(task.linkedEventId || task.eventId) && (
-                                                            <div
-                                                                className="bg-purple-50/80 text-purple-700 hover:bg-purple-100 border border-purple-100 rounded-full px-2.5 py-0.5 flex items-center gap-1 cursor-pointer transition-all text-[10px] font-bold shadow-sm"
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation()
-                                                                    navigate({ to: '/dashboard/tasks/events/$eventId', params: { eventId: task.linkedEventId || task.eventId } } as any)
-                                                                }}
-                                                            >
-                                                                <Calendar className="h-3 w-3" />
-                                                                {t('tasks.list.linkedEvent', 'مرتبط بحدث')}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <p className="text-slate-700 text-xs md:text-sm font-bold flex items-center gap-2">
-                                                    <span className="text-slate-500">@</span>
-                                                    {t('tasks.list.taskClient', { name: task.client })}
-                                                </p>
-                                            </div>
-
-                                            {/* Mobile Chevron Indicator - Animated */}
-                                            <div className="md:hidden ms-auto text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-[-4px] transition-all duration-300 rtl:rotate-180 self-center">
-                                                <ChevronLeft className="h-6 w-6 rtl:rotate-0 ltr:rotate-180" />
-                                            </div>
+                                    <div className="flex items-center gap-3 ps-3">
+                                        {/* Quick Complete Checkbox */}
+                                        <div onClick={(e) => e.stopPropagation()} className="flex-shrink-0">
+                                            <Checkbox
+                                                checked={task.status === 'done'}
+                                                onCheckedChange={(checked) => {
+                                                    if (checked) {
+                                                        handleCompleteTask(task.id)
+                                                    } else {
+                                                        handleReopenTask(task.id)
+                                                    }
+                                                }}
+                                                className="h-5 w-5 rounded-full border-2 border-slate-300 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500 transition-all duration-200 hover:border-emerald-400"
+                                            />
                                         </div>
 
-                                        {/* Action Menu - Same for mobile/desktop, just positioned differently */}
-                                        <div className="absolute end-4 top-4 pt-1 md:relative md:end-auto md:top-auto md:pt-0" onClick={(e) => e.stopPropagation()}>
+                                        {isSelectionMode && (
+                                            <div onClick={(e) => e.stopPropagation()} className="flex-shrink-0">
+                                                <Checkbox
+                                                    checked={selectedTaskIds.includes(task.id)}
+                                                    onCheckedChange={() => handleSelectTask(task.id)}
+                                                    className="h-5 w-5 rounded-md border-slate-300 data-[state=checked]:bg-navy data-[state=checked]:border-navy flex-shrink-0 transition-all duration-200"
+                                                />
+                                            </div>
+                                        )}
+
+                                        {/* Task Icon - Compact */}
+                                        <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-500 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-all duration-300 flex-shrink-0 border border-slate-100">
+                                            <Briefcase className="h-5 w-5" strokeWidth={1.5} />
+                                        </div>
+
+                                        {/* Task Info */}
+                                        <div className="min-w-0 flex-1">
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <h4 className={`font-bold text-sm md:text-base group-hover:text-emerald-900 transition-colors truncate leading-tight ${task.status === 'done' ? 'text-slate-400 line-through' : 'text-slate-900'}`}>
+                                                    {task.title}
+                                                </h4>
+
+                                                {/* Status Chip */}
+                                                <div className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                                                    task.status === 'done' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                                                    task.status === 'in_progress' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
+                                                    task.status === 'todo' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+                                                    'bg-slate-50 text-slate-600 border border-slate-200'
+                                                }`}>
+                                                    <span className={`w-1.5 h-1.5 rounded-full ${
+                                                        task.status === 'done' ? 'bg-emerald-500' :
+                                                        task.status === 'in_progress' ? 'bg-blue-500 animate-pulse' :
+                                                        task.status === 'todo' ? 'bg-amber-500' :
+                                                        'bg-slate-400'
+                                                    }`}></span>
+                                                    {task.status === 'done' ? t('tasks.statuses.done', 'مكتمل') :
+                                                     task.status === 'in_progress' ? t('tasks.statuses.inProgress', 'قيد التنفيذ') :
+                                                     task.status === 'todo' ? t('tasks.statuses.todo', 'للتنفيذ') :
+                                                     t('tasks.statuses.backlog', 'معلق')}
+                                                </div>
+
+                                                {/* Task ↔ Event Sync Badge */}
+                                                {(task.linkedEventId || task.eventId) && (
+                                                    <div
+                                                        className="bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 rounded-full px-2 py-0.5 flex items-center gap-1 cursor-pointer transition-all text-[10px] font-bold"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            navigate({ to: '/dashboard/tasks/events/$eventId', params: { eventId: task.linkedEventId || task.eventId } } as any)
+                                                        }}
+                                                    >
+                                                        <Calendar className="h-3 w-3" />
+                                                        {t('tasks.list.linkedEvent', 'حدث')}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <p className="text-slate-500 text-xs font-medium flex items-center gap-1 mt-0.5">
+                                                <span className="text-slate-400">@</span>
+                                                {task.client}
+                                            </p>
+                                        </div>
+
+                                        {/* Mobile Chevron */}
+                                        <div className="md:hidden text-slate-400 group-hover:text-emerald-600 transition-all duration-300 rtl:rotate-180">
+                                            <ChevronLeft className="h-5 w-5 rtl:rotate-0 ltr:rotate-180" />
+                                        </div>
+
+                                        {/* RIGHT SIDE: Action Menu */}
+                                        <div className="flex md:hidden absolute end-3 top-3" onClick={(e) => e.stopPropagation()}>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy hover:bg-slate-100 rounded-xl">
                                                         <MoreHorizontal className="h-6 w-6" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-52 rounded-xl shadow-xl border-0 ring-1 ring-black/5 p-1">
-                                                    <DropdownMenuItem onClick={() => handleViewTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
-                                                        <Eye className="h-4 w-4 ms-2 text-slate-500" />
-                                                        {t('tasks.list.viewDetails')}
-                                                    </DropdownMenuItem>
+                                                <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-xl border-0 ring-1 ring-black/5">
                                                     <DropdownMenuItem onClick={() => handleEditTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
-                                                        <Edit3 className="h-4 w-4 ms-2 text-blue-500" />
+                                                        <Edit3 className="h-4 w-4 ms-2 text-blue-500" aria-hidden="true" />
                                                         {t('tasks.list.editTask')}
                                                     </DropdownMenuItem>
+                                                    {/* View Details is now the card click, but keep in menu for accessibility */}
+                                                    <DropdownMenuItem onClick={() => handleViewTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                        <Eye className="h-4 w-4 ms-2" />
+                                                        {t('tasks.list.viewDetails')}
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                    {task.status !== 'done' ? (
+                                                        <DropdownMenuItem onClick={() => handleCompleteTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                            <CheckCircle className="h-4 w-4 ms-2 text-emerald-500" />
+                                                            {t('tasks.list.completeTask')}
+                                                        </DropdownMenuItem>
+                                                    ) : (
+                                                        <DropdownMenuItem onClick={() => handleReopenTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                            <XCircle className="h-4 w-4 ms-2 text-amber-500" />
+                                                            {t('tasks.list.reopenTask')}
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem
+                                                        onClick={() => handleDeleteTask(task.id)}
+                                                        className="text-red-600 focus:text-red-600 rounded-lg py-2.5 cursor-pointer bg-red-50/50 hover:bg-red-50"
+                                                    >
+                                                        <Trash2 className="h-4 w-4 ms-2" />
+                                                        {t('tasks.list.deleteTask')}
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
 
-                                                    {/* Priority Submenu */}
-                                                    <DropdownMenuSub>
-                                                        <DropdownMenuSubTrigger className="rounded-lg py-2.5 cursor-pointer">
-                                                            <Palette className="h-4 w-4 ms-2 text-purple-500" />
-                                                            {t('tasks.list.changePriority', 'تغيير الأولوية')}
-                                                        </DropdownMenuSubTrigger>
-                                                        <DropdownMenuPortal>
-                                                            <DropdownMenuSubContent className="rounded-xl shadow-xl border-0 ring-1 ring-black/5 p-1">
-                                                                <DropdownMenuItem
-                                                                    onClick={() => handlePriorityChange(task.id, 'urgent')}
-                                                                    className="rounded-lg py-2 cursor-pointer"
-                                                                >
-                                                                    <span className="w-2 h-2 rounded-full bg-red-500 ms-2" />
-                                                                    <span className="text-red-700">{t('tasks.priorities.urgent')}</span>
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem
-                                                                    onClick={() => handlePriorityChange(task.id, 'high')}
-                                                                    className="rounded-lg py-2 cursor-pointer"
-                                                                >
-                                                                    <span className="w-2 h-2 rounded-full bg-orange-500 ms-2" />
-                                                                    <span className="text-orange-700">{t('tasks.priorities.high')}</span>
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem
-                                                                    onClick={() => handlePriorityChange(task.id, 'medium')}
-                                                                    className="rounded-lg py-2 cursor-pointer"
-                                                                >
-                                                                    <span className="w-2 h-2 rounded-full bg-amber-500 ms-2" />
-                                                                    <span className="text-amber-700">{t('tasks.priorities.medium')}</span>
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem
-                                                                    onClick={() => handlePriorityChange(task.id, 'low')}
-                                                                    className="rounded-lg py-2 cursor-pointer"
-                                                                >
-                                                                    <span className="w-2 h-2 rounded-full bg-emerald-500 ms-2" />
-                                                                    <span className="text-emerald-700">{t('tasks.priorities.low')}</span>
-                                                                </DropdownMenuItem>
-                                                            </DropdownMenuSubContent>
-                                                        </DropdownMenuPortal>
-                                                    </DropdownMenuSub>
-
+                                        {/* DESKTOP Action Menu */}
+                                        <div className="hidden md:flex" onClick={(e) => e.stopPropagation()}>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy hover:bg-slate-100 rounded-xl">
+                                                        <MoreHorizontal className="h-6 w-6" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-xl border-0 ring-1 ring-black/5">
+                                                    <DropdownMenuItem onClick={() => handleEditTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                        <Edit3 className="h-4 w-4 ms-2 text-blue-500" aria-hidden="true" />
+                                                        {t('tasks.list.editTask')}
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleViewTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                        <Eye className="h-4 w-4 ms-2" />
+                                                        {t('tasks.list.viewDetails')}
+                                                    </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     {task.status !== 'done' ? (
                                                         <DropdownMenuItem onClick={() => handleCompleteTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
@@ -749,34 +771,60 @@ export function TasksListView() {
                                         </div>
                                     </div>
 
-                                    {/* Bottom section: Priority badge + Due date - Cleaner design */}
-                                    <div className="flex flex-wrap items-center gap-3 pt-4 mt-3 border-t border-slate-100/50 ps-2">
-                                        {/* Priority Badge - Static (edit via action menu) */}
-                                        <div className={`
-                                            inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold
-                                            transition-all duration-200 select-none
-                                            ${task.priority === 'urgent'
-                                                ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-md shadow-red-500/20'
-                                                : task.priority === 'high'
-                                                ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/20'
-                                                : task.priority === 'medium'
-                                                ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 shadow-md shadow-amber-500/20'
-                                                : 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md shadow-emerald-500/20'
-                                            }
-                                        `}>
-                                            <span className={`w-1.5 h-1.5 rounded-full ${task.priority === 'urgent' ? 'bg-white animate-pulse' : 'bg-white/80'}`} />
-                                            {t(`tasks.priorities.${task.priority}`)}
+                                    {/* Compact Footer */}
+                                    <div className="flex items-center justify-between pt-2 mt-2 border-t border-slate-100 ps-3">
+                                        <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+                                            {/* Priority Chip */}
+                                            <GosiSelect
+                                                value={task.priority}
+                                                onValueChange={(value) => handlePriorityChange(task.id, value)}
+                                            >
+                                                <GosiSelectTrigger className={`w-auto min-w-[90px] h-7 text-[10px] font-bold rounded-lg border-0 px-2 ${task.priority === 'urgent' ? 'bg-red-50 text-red-700' :
+                                                    task.priority === 'high' ? 'bg-orange-50 text-orange-700' :
+                                                        task.priority === 'medium' ? 'bg-amber-50 text-amber-700' :
+                                                            'bg-emerald-50 text-emerald-700'
+                                                    }`}>
+                                                    <GosiSelectValue />
+                                                </GosiSelectTrigger>
+                                                <GosiSelectContent>
+                                                    <GosiSelectItem value="urgent" className="text-red-700 focus:bg-red-50">{t('tasks.priorities.urgent')}</GosiSelectItem>
+                                                    <GosiSelectItem value="high" className="text-orange-700 focus:bg-orange-50">{t('tasks.priorities.high')}</GosiSelectItem>
+                                                    <GosiSelectItem value="medium" className="text-amber-700 focus:bg-amber-50">{t('tasks.priorities.medium')}</GosiSelectItem>
+                                                    <GosiSelectItem value="low" className="text-emerald-700 focus:bg-emerald-50">{t('tasks.priorities.low')}</GosiSelectItem>
+                                                </GosiSelectContent>
+                                            </GosiSelect>
+
+                                            {/* Due Date Compact */}
+                                            <div className="flex items-center gap-1.5 text-xs text-slate-500 bg-slate-50 px-2 py-1 rounded-lg">
+                                                <Calendar className="w-3 h-3" />
+                                                <span className="font-medium">{task.dueDateFormatted.arabic}</span>
+                                            </div>
+
+                                            {/* Subtask Progress (if available) */}
+                                            {task.subtaskCount && task.subtaskCount > 0 && (
+                                                <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                                                    <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                                        <div
+                                                            className="h-full bg-emerald-500 rounded-full transition-all"
+                                                            style={{ width: `${(task.completedSubtasks || 0) / task.subtaskCount * 100}%` }}
+                                                        />
+                                                    </div>
+                                                    <span className="font-medium">{task.completedSubtasks || 0}/{task.subtaskCount}</span>
+                                                </div>
+                                            )}
                                         </div>
 
-                                        {/* Due Date Badge */}
-                                        <div className="inline-flex items-center gap-2 px-3.5 py-2 bg-slate-50 rounded-xl border border-slate-100 text-xs">
-                                            <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                                            <span className="font-medium text-slate-600">{task.dueDateFormatted.arabic}</span>
-                                        </div>
+                                        <Link to={`/dashboard/tasks/${task.id}` as any} className="hidden sm:inline-flex" onClick={(e) => e.stopPropagation()}>
+                                            <GosiButton size="sm" className="bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white border-0 rounded-lg px-3 h-7 text-xs transition-all group/btn">
+                                                {t('tasks.list.viewDetails')}
+                                                <ArrowRight className="w-3 h-3 ms-1 rtl:rotate-180 transition-transform group-hover/btn:translate-x-0.5 rtl:group-hover/btn:-translate-x-0.5" />
+                                            </GosiButton>
+                                        </Link>
                                     </div>
                                 </div>
-                                        </div>
+                            </div>
                                     )}
+                                    getItemKey={(index, data) => data[index].id}
                                 />
                             )}
                         </div>

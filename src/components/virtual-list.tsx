@@ -4,8 +4,7 @@
  */
 
 import { List } from 'react-window'
-import type { ReactElement, CSSProperties, ReactNode } from 'react'
-import { forwardRef, memo, useState, useEffect, useMemo } from 'react'
+import { forwardRef, memo, useCallback, CSSProperties, useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 
 // ==================== TYPES ====================
@@ -13,21 +12,21 @@ import { cn } from '@/lib/utils'
 interface VirtualListProps<T> {
   /** Array of items to render */
   items: T[]
-  /** Height of each item in pixels */
+  /** Height of each item in pixels (for FixedSizeList) */
   itemHeight: number
   /** Total height of the list container */
-  height?: number
+  height: number
   /** Width of the list container (default: 100%) */
   width?: number | string
   /** Render function for each item */
-  renderItem: (item: T, index: number, style: CSSProperties) => ReactNode
+  renderItem: (item: T, index: number, style: CSSProperties) => React.ReactNode
   /** Additional class name for the list container */
   className?: string
   /** Number of items to render outside visible area */
   overscanCount?: number
   /** RTL layout support */
   direction?: 'ltr' | 'rtl'
-  /** Key extractor for items (optional, for compatibility - not used in v2) */
+  /** Key extractor for items */
   getItemKey?: (index: number, data: T[]) => string | number
 }
 
@@ -38,12 +37,17 @@ interface VariableListProps<T> extends Omit<VirtualListProps<T>, 'itemHeight'> {
   estimatedItemHeight?: number
 }
 
-// ==================== ROW PROPS TYPE FOR V2 API ====================
-// rowProps must NOT contain ariaAttributes, index, or style - those are auto-passed
+// ==================== react-window v2 Row Component ====================
 
 interface RowPropsData<T> {
   items: T[]
-  renderItem: (item: T, index: number, style: CSSProperties) => ReactNode
+  renderItem: (item: T, index: number, style: CSSProperties) => React.ReactNode
+}
+
+// In react-window v2, rowProps are spread directly onto the component (not passed as 'data')
+function Row<T>({ index, style, items, renderItem }: { index: number; style: CSSProperties } & RowPropsData<T>) {
+  const item = items[index]
+  return <>{renderItem(item, index, style)}</>
 }
 
 // ==================== FIXED SIZE LIST ====================
@@ -58,26 +62,7 @@ function VirtualListInner<T>({
   overscanCount = 5,
   direction = 'rtl',
 }: VirtualListProps<T>) {
-  // Memoize rowProps to prevent unnecessary re-renders
-  const rowProps = useMemo<RowPropsData<T>>(() => ({ items, renderItem }), [items, renderItem])
-
-  // Row component for v2 API - defined outside of render to be stable
-  // ariaAttributes, index, style are auto-passed by List
-  // items, renderItem come from rowProps
-  const Row = useMemo(() => {
-    const RowComponent = (props: {
-      ariaAttributes: { 'aria-posinset': number; 'aria-setsize': number; role: 'listitem' }
-      index: number
-      style: CSSProperties
-      items: T[]
-      renderItem: (item: T, index: number, style: CSSProperties) => ReactNode
-    }): ReactElement => {
-      const { index, style, items: rowItems, renderItem: rowRenderItem } = props
-      const item = rowItems[index]
-      return <>{rowRenderItem(item, index, style)}</>
-    }
-    return RowComponent
-  }, [])
+  const rowProps: RowPropsData<T> = { items, renderItem }
 
   return (
     <List<RowPropsData<T>>
@@ -108,24 +93,7 @@ function VariableVirtualListInner<T>({
   overscanCount = 5,
   direction = 'rtl',
 }: VariableListProps<T>) {
-  // Memoize rowProps to prevent unnecessary re-renders
-  const rowProps = useMemo<RowPropsData<T>>(() => ({ items, renderItem }), [items, renderItem])
-
-  // Row component for v2 API
-  const Row = useMemo(() => {
-    const RowComponent = (props: {
-      ariaAttributes: { 'aria-posinset': number; 'aria-setsize': number; role: 'listitem' }
-      index: number
-      style: CSSProperties
-      items: T[]
-      renderItem: (item: T, index: number, style: CSSProperties) => ReactNode
-    }): ReactElement => {
-      const { index, style, items: rowItems, renderItem: rowRenderItem } = props
-      const item = rowItems[index]
-      return <>{rowRenderItem(item, index, style)}</>
-    }
-    return RowComponent
-  }, [])
+  const rowProps: RowPropsData<T> = { items, renderItem }
 
   return (
     <List<RowPropsData<T>>
