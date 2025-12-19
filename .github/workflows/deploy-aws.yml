@@ -35,9 +35,10 @@ jobs:
           REMOTE_USER: ${{ secrets.EC2_USERNAME }}
           SOURCE: "dist/"
           TARGET: "/home/ec2-user/dashboard/"
-          ARGS: "-rlgoDzvc -i --delete"
+          ARGS: "-avz --delete"
           SCRIPT_BEFORE: |
             mkdir -p /home/ec2-user/dashboard
+            chmod 755 /home/ec2-user/dashboard
           SCRIPT_AFTER: |
             echo "Deployment completed at $(date)"
             ls -la /home/ec2-user/dashboard/
