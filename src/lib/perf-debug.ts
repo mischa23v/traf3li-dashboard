@@ -11,7 +11,7 @@
 
 // Master switch for performance debugging
 // Set to true to see detailed performance logs in console
-export const PERF_DEBUG = false
+export const PERF_DEBUG = true
 
 /**
  * Log a performance event with timestamp
