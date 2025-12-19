@@ -33,47 +33,52 @@ export const StatCard = memo(function StatCard({
         <div
             onClick={onClick}
             className={cn(
-                'flex flex-col justify-between rounded-2xl p-4 transition-all duration-200 border border-white/5',
+                'flex flex-col justify-between rounded-xl p-4 transition-all duration-200 border backdrop-blur-sm',
                 {
-                    'bg-white/10 text-white': status === 'normal' || status === 'attention',
-                    'bg-white/5 text-white/40': status === 'zero',
-                    'cursor-pointer hover:bg-white/15': !!onClick,
+                    'bg-white/[0.08] border-white/10 text-white': status === 'normal',
+                    'bg-amber-500/10 border-amber-500/20 text-white': status === 'attention',
+                    'bg-white/[0.03] border-white/5 text-white/40': status === 'zero',
+                    'cursor-pointer hover:bg-white/[0.12] hover:border-white/15': !!onClick,
                 },
                 className
             )}
         >
-            <div className="flex justify-between items-start mb-2">
+            <div className="flex justify-between items-start mb-3">
                 <div className={cn(
-                    "p-2 rounded-xl",
+                    "p-2 rounded-lg",
                     {
-                        'bg-white/10 text-white': status === 'normal',
-                        'bg-white/10 text-amber-400': status === 'attention',
-                        'bg-white/5 text-white/40': status === 'zero',
+                        'bg-emerald-500/20 text-emerald-400': status === 'normal',
+                        'bg-amber-500/20 text-amber-400': status === 'attention',
+                        'bg-white/5 text-white/30': status === 'zero',
                     }
                 )}>
-                    <Icon className="w-5 h-5" />
+                    <Icon className="w-4 h-4" />
                 </div>
                 {trend && (
-                    <span className="text-xs font-medium bg-white/10 px-2 py-1 rounded-full text-white/80">
+                    <span className={cn(
+                        "text-[10px] font-semibold px-2 py-0.5 rounded-full",
+                        trend.startsWith('+') ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/10 text-white/70'
+                    )}>
                         {trend}
                     </span>
                 )}
             </div>
             <div>
                 <div className={cn(
-                    "text-2xl font-bold mb-1",
+                    "text-2xl font-bold mb-0.5 tabular-nums",
                     {
-                        'text-white': status === 'normal' || status === 'attention',
-                        'text-white/40': status === 'zero',
+                        'text-white': status === 'normal',
+                        'text-amber-400': status === 'attention',
+                        'text-white/30': status === 'zero',
                     }
                 )}>
                     {value}
                 </div>
                 <div className={cn(
-                    "text-sm font-medium",
+                    "text-xs font-medium",
                     {
-                        'text-white/60': status === 'normal' || status === 'attention',
-                        'text-white/30': status === 'zero',
+                        'text-white/50': status === 'normal' || status === 'attention',
+                        'text-white/20': status === 'zero',
                     }
                 )}>
                     {label}
