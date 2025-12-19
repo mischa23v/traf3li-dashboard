@@ -10,6 +10,7 @@
  */
 
 // Master switch for performance debugging
+// Set to true to see detailed performance logs in console
 export const PERF_DEBUG = true
 
 /**

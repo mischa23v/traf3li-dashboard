@@ -23,8 +23,6 @@
     "audit:console": "node scripts/console-audit.js"
   },
   "dependencies": {
-    "@ckeditor/ckeditor5-build-classic": "^39.0.2",
-    "@ckeditor/ckeditor5-react": "^11.0.0",
     "@clerk/clerk-react": "^5.51.0",
     "@floating-ui/dom": "^1.7.4",
     "@fullcalendar/core": "^6.1.19",
@@ -35,9 +33,6 @@
     "@fullcalendar/timegrid": "^6.1.19",
     "@hookform/resolvers": "^5.2.2",
     "@mathieuc/tradingview": "^3.5.2",
-    "@nivo/core": "^0.99.0",
-    "@nivo/line": "^0.99.0",
-    "@nivo/pie": "^0.99.0",
     "@pdfme/common": "^5.5.7",
     "@pdfme/schemas": "^5.5.7",
     "@pdfme/ui": "^5.2.16",
@@ -113,7 +108,6 @@
     "react-top-loading-bar": "^3.0.2",
     "react-window": "^2.0.0",
     "react-window-infinite-loader": "^2.0.0",
-    "reactflow": "^11.11.4",
     "recharts": "^3.2.1",
     "socket.io-client": "^4.8.1",
     "sonner": "^2.0.7",
