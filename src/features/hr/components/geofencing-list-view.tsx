@@ -1,5 +1,5 @@
 import { HRSidebar } from './hr-sidebar'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, lazy, Suspense } from 'react'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -15,7 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
-import { Search, Bell, AlertCircle, MapPin, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, Edit3, SortAsc, Filter, X, Users, Circle, Hexagon, Clock } from 'lucide-react'
+import { Search, Bell, AlertCircle, MapPin, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, Edit3, SortAsc, Filter, X, Users, Circle, Hexagon, Clock, Loader2 } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import { arSA } from 'date-fns/locale'
@@ -35,17 +35,9 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import type { GeofenceZone, GeofenceType } from '@/types/biometric'
-import { MapContainer, TileLayer, Circle as LeafletCircle, Polygon as LeafletPolygon, Marker, Popup } from 'react-leaflet'
-import 'leaflet/dist/leaflet.css'
-import L from 'leaflet'
 
-// Fix for default marker icon
-delete (L.Icon.Default.prototype as any)._getIconUrl
-L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-})
+// Lazy load Leaflet map components (~155KB) - only loaded when viewing this page
+const GeofencingListMap = lazy(() => import('./geofencing-interactive-map').then(mod => ({ default: mod.GeofencingListMap })))
 
 export function GeofencingListView() {
     const navigate = useNavigate()
@@ -281,71 +273,32 @@ export function GeofencingListView() {
                             <div className="p-4">
                                 <div className="rounded-2xl overflow-hidden border border-slate-200" style={{ height: '400px' }}>
                                     {!isLoading && geofences.length > 0 ? (
-                                        <MapContainer
-                                            center={[mapCenter.lat, mapCenter.lng]}
-                                            zoom={12}
-                                            style={{ height: '100%', width: '100%' }}
-                                            scrollWheelZoom={false}
-                                        >
-                                            <TileLayer
-                                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                        <Suspense fallback={
+                                            <div className="h-full w-full bg-slate-100 animate-pulse flex items-center justify-center">
+                                                <div className="text-center">
+                                                    <Loader2 className="h-8 w-8 animate-spin mx-auto text-emerald-500 mb-2" />
+                                                    <span className="text-slate-500 text-sm">جاري تحميل الخريطة...</span>
+                                                </div>
+                                            </div>
+                                        }>
+                                            <GeofencingListMap
+                                                mapCenter={mapCenter}
+                                                zones={geofences.map(zone => ({
+                                                    id: zone.id,
+                                                    name: zone.name,
+                                                    type: zone.type,
+                                                    center: zone.center,
+                                                    radius: zone.radius,
+                                                    coordinates: zone.coordinates,
+                                                    isActive: zone.isActive,
+                                                }))}
                                             />
-                                            {geofences.map((zone) => {
-                                                if (zone.type === 'circle' && zone.center && zone.radius) {
-                                                    return (
-                                                        <LeafletCircle
-                                                            key={zone.id}
-                                                            center={[zone.center.latitude, zone.center.longitude]}
-                                                            radius={zone.radius}
-                                                            pathOptions={{
-                                                                color: zone.isActive ? '#10b981' : '#94a3b8',
-                                                                fillColor: zone.isActive ? '#10b981' : '#94a3b8',
-                                                                fillOpacity: 0.2,
-                                                            }}
-                                                        >
-                                                            <Popup>
-                                                                <div className="text-center">
-                                                                    <strong>{zone.name}</strong>
-                                                                    <br />
-                                                                    <span className="text-xs text-slate-500">
-                                                                        {zone.isActive ? 'نشط' : 'غير نشط'}
-                                                                    </span>
-                                                                </div>
-                                                            </Popup>
-                                                        </LeafletCircle>
-                                                    )
-                                                } else if (zone.type === 'polygon' && zone.coordinates && zone.coordinates.length > 0) {
-                                                    return (
-                                                        <LeafletPolygon
-                                                            key={zone.id}
-                                                            positions={zone.coordinates.map(coord => [coord.latitude, coord.longitude])}
-                                                            pathOptions={{
-                                                                color: zone.isActive ? '#10b981' : '#94a3b8',
-                                                                fillColor: zone.isActive ? '#10b981' : '#94a3b8',
-                                                                fillOpacity: 0.2,
-                                                            }}
-                                                        >
-                                                            <Popup>
-                                                                <div className="text-center">
-                                                                    <strong>{zone.name}</strong>
-                                                                    <br />
-                                                                    <span className="text-xs text-slate-500">
-                                                                        {zone.isActive ? 'نشط' : 'غير نشط'}
-                                                                    </span>
-                                                                </div>
-                                                            </Popup>
-                                                        </LeafletPolygon>
-                                                    )
-                                                }
-                                                return null
-                                            })}
-                                        </MapContainer>
+                                        </Suspense>
                                     ) : (
                                         <div className="flex items-center justify-center h-full bg-slate-50">
                                             {isLoading ? (
                                                 <div className="text-center">
-                                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto mb-2"></div>
+                                                    <Loader2 className="h-8 w-8 animate-spin mx-auto text-emerald-500 mb-2" />
                                                     <p className="text-slate-500 text-sm">جاري تحميل الخريطة...</p>
                                                 </div>
                                             ) : (

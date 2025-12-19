@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { useSearch } from '@tanstack/react-router'
 import { useDocuments, useDocumentStats } from '@/hooks/useDocuments'
 import { Header } from '@/components/layout/header'
@@ -11,8 +12,8 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { DocumentsProvider } from './components/documents-provider'
 import { DocumentsTable } from './components/documents-table'
 import { DocumentsPrimaryButtons } from './components/documents-primary-buttons'
-import { DocumentsDialogs } from './components/documents-dialogs'
 import { useTranslation } from 'react-i18next'
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { FileText, Lock, HardDrive, Calendar, Search, Bell, Scale } from 'lucide-react'
 import { formatFileSize } from './data/data'
@@ -21,6 +22,9 @@ import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PracticeSidebar } from '../cases/components/practice-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
+
+// Lazy load DocumentsDialogs - only needed when user interacts with dialogs
+const DocumentsDialogs = lazy(() => import('./components/documents-dialogs').then(mod => ({ default: mod.DocumentsDialogs })))
 
 export default function Documents() {
   const { t } = useTranslation()
@@ -163,7 +167,9 @@ export default function Documents() {
         </div>
       </Main>
 
-      <DocumentsDialogs />
+      <Suspense fallback={null}>
+        <DocumentsDialogs />
+      </Suspense>
     </DocumentsProvider>
   )
 }

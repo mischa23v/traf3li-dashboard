@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import { Plus, DollarSign, Layers, Search, Bell, Scale } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -15,14 +15,16 @@ import { useBillingRates, useRateGroups } from '@/hooks/useBillingRates'
 import { RatesProvider, useRatesContext } from './components/rates-provider'
 import { RatesTable } from './components/rates-table'
 import { GroupsTable } from './components/groups-table'
-import { RateActionDialog } from './components/rate-action-dialog'
-import { GroupActionDialog } from './components/group-action-dialog'
-import { RateDeleteDialog } from './components/rate-delete-dialog'
-import { GroupDeleteDialog } from './components/group-delete-dialog'
-import { RateViewDialog } from './components/rate-view-dialog'
-import { GroupViewDialog } from './components/group-view-dialog'
 import { useTranslation } from 'react-i18next'
 import { SettingsSidebar } from '../settings/components/settings-sidebar'
+
+// Lazy load dialog components - only loaded when user opens a dialog
+const RateActionDialog = lazy(() => import('./components/rate-action-dialog').then(mod => ({ default: mod.RateActionDialog })))
+const GroupActionDialog = lazy(() => import('./components/group-action-dialog').then(mod => ({ default: mod.GroupActionDialog })))
+const RateDeleteDialog = lazy(() => import('./components/rate-delete-dialog').then(mod => ({ default: mod.RateDeleteDialog })))
+const GroupDeleteDialog = lazy(() => import('./components/group-delete-dialog').then(mod => ({ default: mod.GroupDeleteDialog })))
+const RateViewDialog = lazy(() => import('./components/rate-view-dialog').then(mod => ({ default: mod.RateViewDialog })))
+const GroupViewDialog = lazy(() => import('./components/group-view-dialog').then(mod => ({ default: mod.GroupViewDialog })))
 
 function BillingRatesContent() {
   const { t } = useTranslation()
@@ -201,43 +203,57 @@ function BillingRatesContent() {
         </div>
       </Main>
 
-      {/* Rate Dialogs */}
-      <RateActionDialog
-        open={open === 'add-rate' || open === 'edit-rate'}
-        onOpenChange={(isOpen) => !isOpen && handleCloseDialog()}
-        currentRate={currentRate}
-      />
+      {/* Rate Dialogs - Lazy Loaded */}
+      <Suspense fallback={null}>
+        {(open === 'add-rate' || open === 'edit-rate') && (
+          <RateActionDialog
+            open={true}
+            onOpenChange={(isOpen) => !isOpen && handleCloseDialog()}
+            currentRate={currentRate}
+          />
+        )}
 
-      <RateViewDialog
-        open={open === 'view-rate'}
-        onOpenChange={(isOpen) => !isOpen && handleCloseDialog()}
-        currentRate={currentRate}
-      />
+        {open === 'view-rate' && (
+          <RateViewDialog
+            open={true}
+            onOpenChange={(isOpen) => !isOpen && handleCloseDialog()}
+            currentRate={currentRate}
+          />
+        )}
 
-      <RateDeleteDialog
-        open={open === 'delete-rate'}
-        onOpenChange={(isOpen) => !isOpen && handleCloseDialog()}
-        currentRate={currentRate}
-      />
+        {open === 'delete-rate' && (
+          <RateDeleteDialog
+            open={true}
+            onOpenChange={(isOpen) => !isOpen && handleCloseDialog()}
+            currentRate={currentRate}
+          />
+        )}
 
-      {/* Group Dialogs */}
-      <GroupActionDialog
-        open={open === 'add-group' || open === 'edit-group'}
-        onOpenChange={(isOpen) => !isOpen && handleCloseDialog()}
-        currentGroup={currentGroup}
-      />
+        {/* Group Dialogs */}
+        {(open === 'add-group' || open === 'edit-group') && (
+          <GroupActionDialog
+            open={true}
+            onOpenChange={(isOpen) => !isOpen && handleCloseDialog()}
+            currentGroup={currentGroup}
+          />
+        )}
 
-      <GroupViewDialog
-        open={open === 'view-group'}
-        onOpenChange={(isOpen) => !isOpen && handleCloseDialog()}
-        currentGroup={currentGroup}
-      />
+        {open === 'view-group' && (
+          <GroupViewDialog
+            open={true}
+            onOpenChange={(isOpen) => !isOpen && handleCloseDialog()}
+            currentGroup={currentGroup}
+          />
+        )}
 
-      <GroupDeleteDialog
-        open={open === 'delete-group'}
-        onOpenChange={(isOpen) => !isOpen && handleCloseDialog()}
-        currentGroup={currentGroup}
-      />
+        {open === 'delete-group' && (
+          <GroupDeleteDialog
+            open={true}
+            onOpenChange={(isOpen) => !isOpen && handleCloseDialog()}
+            currentGroup={currentGroup}
+          />
+        )}
+      </Suspense>
     </>
   )
 }

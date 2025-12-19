@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { Plus, Upload, Download, Search, Bell, FileText, Layers, CheckCircle2, Calendar } from 'lucide-react'
+import { Plus, Upload, Download, Search, Bell, FileText, Layers, CheckCircle2, Calendar, Loader2 } from 'lucide-react'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
@@ -19,9 +19,11 @@ import { usePdfmeTemplates } from '@/hooks/usePdfme'
 import { PdfTemplatesProvider, usePdfTemplatesContext } from './components/template-provider'
 import { PdfTemplatesTable } from './components/template-table'
 import { TemplateViewDialog, TemplateDeleteDialog, TemplateDuplicateDialog, TemplatePreviewDialog } from './components/template-dialogs'
-import { PdfDesigner } from './components/pdf-designer'
 import { SettingsSidebar } from '../settings/components/settings-sidebar'
 import type { PdfmeTemplateCategory } from '@/services/pdfmeService'
+
+// Lazy load PdfDesigner - contains heavy @pdfme libraries (~200KB+)
+const PdfDesigner = lazy(() => import('./components/pdf-designer').then(mod => ({ default: mod.PdfDesigner })))
 
 function PdfTemplatesContent() {
   const { t, i18n } = useTranslation()
@@ -286,18 +288,27 @@ function PdfTemplatesContent() {
       <TemplateDuplicateDialog />
       <TemplatePreviewDialog />
 
-      {/* PDF Designer Modal - Full Screen */}
+      {/* PDF Designer Modal - Full Screen (Lazy Loaded) */}
       <Dialog open={designerOpen} onOpenChange={setDesignerOpen}>
         <DialogContent className="max-w-[95vw] h-[95vh] p-0">
-          <PdfDesigner
-            template={currentTemplate ? {
-              basePdf: currentTemplate.basePdf,
-              schemas: currentTemplate.schemas,
-            } : undefined}
-            onSave={handleSaveTemplate}
-            onCancel={handleCloseDesigner}
-            lang={i18n.language === 'ar' ? 'ar' : 'en'}
-          />
+          <Suspense fallback={
+            <div className="h-full w-full flex items-center justify-center bg-slate-50">
+              <div className="text-center">
+                <Loader2 className="h-10 w-10 animate-spin mx-auto text-blue-500 mb-3" />
+                <p className="text-slate-600 font-medium">{t('common.loading', 'جاري التحميل...')}</p>
+              </div>
+            </div>
+          }>
+            <PdfDesigner
+              template={currentTemplate ? {
+                basePdf: currentTemplate.basePdf,
+                schemas: currentTemplate.schemas,
+              } : undefined}
+              onSave={handleSaveTemplate}
+              onCancel={handleCloseDesigner}
+              lang={i18n.language === 'ar' ? 'ar' : 'en'}
+            />
+          </Suspense>
         </DialogContent>
       </Dialog>
     </>
