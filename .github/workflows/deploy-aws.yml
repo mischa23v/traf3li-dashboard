@@ -41,3 +41,34 @@ jobs:
           SCRIPT_AFTER: |
             echo "Deployment completed at $(date)"
             ls -la /home/ec2-user/dashboard/
+
+            # Configure nginx for SPA routing
+            sudo tee /etc/nginx/conf.d/dashboard.conf > /dev/null << 'NGINX'
+            server {
+                listen 80;
+                server_name _;
+                root /home/ec2-user/dashboard;
+                index index.html;
+
+                location / {
+                    try_files $uri $uri/ /index.html;
+                }
+
+                # Cache static assets
+                location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {
+                    expires 1y;
+                    add_header Cache-Control "public, immutable";
+                }
+            }
+            NGINX
+
+            # Disable default nginx site if it exists
+            sudo rm -f /etc/nginx/conf.d/default.conf 2>/dev/null || true
+
+            # Fix permissions
+            sudo chmod 755 /home/ec2-user
+            sudo chmod -R 755 /home/ec2-user/dashboard
+
+            # Test and reload nginx
+            sudo nginx -t && sudo systemctl reload nginx
+            echo "Nginx configured for SPA routing"
