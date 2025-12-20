@@ -123,16 +123,6 @@ export function Dashboard() {
   const { data: revenueChart, isLoading: revenueChartLoading } = useRevenueChart(12, isReportsTab)
   const { data: tasksChart, isLoading: tasksChartLoading } = useTasksChart(12, isReportsTab)
 
-  // Memoized values
-  const heroStats = useMemo(
-    () => ({
-      activeCasesCount: caseStats?.active || 0,
-      activeTasksCount: (taskStats?.byStatus?.todo || 0) + (taskStats?.byStatus?.in_progress || 0),
-      pendingRemindersCount: reminderStats?.byStatus?.pending || 0,
-    }),
-    [caseStats?.active, taskStats?.byStatus?.todo, taskStats?.byStatus?.in_progress, reminderStats?.byStatus?.pending]
-  )
-
   const topNav = useMemo(
     () => [
       { title: t('dashboard.topNav.home'), href: 'dashboard/overview', isActive: true, disabled: false },
@@ -188,7 +178,7 @@ export function Dashboard() {
       {/* Main Content */}
       <Main fluid className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden">
         {/* Hero Banner */}
-        <HeroBanner t={t} heroStats={heroStats} greeting={getTimeBasedGreeting()} userName={getUserDisplayName()} />
+        <HeroBanner t={t} greeting={getTimeBasedGreeting()} userName={getUserDisplayName()} />
 
         {/* Tab Navigation */}
         <div className="flex items-center gap-2 border-b border-slate-200 pb-0">

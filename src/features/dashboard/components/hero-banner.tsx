@@ -1,29 +1,59 @@
 import { memo } from 'react'
 import { Link } from '@tanstack/react-router'
-import { Plus, ListTodo, CheckSquare } from 'lucide-react'
+import { Plus, ListTodo, CheckSquare, Calendar as CalendarIcon, AlertCircle, CalendarRange, Bell } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { StatCard } from '@/components/stat-card'
-import { Scale, Bell } from 'lucide-react'
+import { useDueTodayTasks, useOverdueTasks, useUpcomingTasks } from '@/hooks/useTasks'
+import { useReminderStats } from '@/hooks/useRemindersAndEvents'
 import type { HeroBannerProps } from '../types'
 
 export const HeroBanner = memo(function HeroBanner({
   t,
-  heroStats,
   greeting,
   userName,
-}: HeroBannerProps) {
+}: Omit<HeroBannerProps, 'heroStats'>) {
+  // Fetch stats data
+  const { data: dueTodayTasks } = useDueTodayTasks()
+  const { data: overdueTasks } = useOverdueTasks()
+  const { data: upcomingTasks } = useUpcomingTasks(14)
+  const { data: reminderStats } = useReminderStats()
+
+  // Calculate counts
+  const tasksDueTodayCount = Array.isArray(dueTodayTasks) ? dueTodayTasks.length : 0
+  const overdueTasksCount = Array.isArray(overdueTasks) ? overdueTasks.length : 0
+  const upcomingEventsCount = Array.isArray(upcomingTasks) ? upcomingTasks.length : 0
+  const pendingRemindersCount = reminderStats?.pending || 0
+
   return (
-    <div className="bg-[#022c22] rounded-3xl p-6 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20">
-      {/* Background Effects */}
+    <div className="bg-[#022c22] rounded-3xl p-6 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20 min-h-[140px] lg:min-h-[160px] xl:min-h-[180px] max-h-[180px] lg:max-h-[190px] xl:max-h-[220px]">
+      {/* Subtle Animated Gradient Background */}
+      <div className="absolute inset-0 z-0">
+        <div
+          className="absolute inset-0 opacity-20"
+          style={{
+            background: 'linear-gradient(-45deg, #022c22, #064e3b, #022c22, #0f766e)',
+            backgroundSize: '400% 400%',
+            animation: 'gradientShift 20s ease infinite'
+          }}
+        />
+        <style>{`
+          @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+        `}</style>
+      </div>
+      {/* Background Pattern */}
       <div className="absolute inset-0 z-0">
         <img
           src="/images/hero-wave.png"
           alt=""
-          className="w-full h-full object-cover opacity-40 mix-blend-overlay"
+          className="w-full h-full object-cover opacity-25 mix-blend-overlay"
         />
       </div>
-      <div className="absolute top-0 end-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl -me-48 -mt-48 pointer-events-none" />
-      <div className="absolute bottom-0 start-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -ms-48 -mb-48 pointer-events-none" />
+      {/* Subtle accent glow */}
+      <div className="absolute top-0 end-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-2xl -me-32 -mt-32 pointer-events-none" />
 
       <div className="relative z-10">
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-center">
@@ -52,9 +82,9 @@ export const HeroBanner = memo(function HeroBanner({
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-10 px-5 rounded-xl font-bold border-white/10 text-white hover:bg-white/10 hover:text-white bg-transparent text-sm">
-                <Link to="/dashboard/tasks/new">
-                  <ListTodo className="ms-2 h-4 w-4" />
-                  {t('dashboard.hero.newTask', 'مهمة جديدة')}
+                <Link to="/dashboard/tasks/events">
+                  <CalendarIcon className="ms-2 h-4 w-4" />
+                  {t('hero.calendar', 'التقويم')}
                 </Link>
               </Button>
             </div>
@@ -64,22 +94,29 @@ export const HeroBanner = memo(function HeroBanner({
           <div className="xl:col-span-8">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               <StatCard
-                label={t('dashboard.hero.stats.cases', 'القضايا')}
-                value={heroStats.activeCasesCount}
-                icon={Scale}
-                status="normal"
-                className="py-3 px-4"
-              />
-              <StatCard
-                label={t('dashboard.hero.stats.tasks', 'المهام')}
-                value={heroStats.activeTasksCount}
+                label={t('hero.stats.todaysTasks', 'مهام اليوم')}
+                value={tasksDueTodayCount}
                 icon={ListTodo}
                 status="normal"
                 className="py-3 px-4"
               />
               <StatCard
-                label={t('dashboard.hero.stats.reminders', 'التذكيرات')}
-                value={heroStats.pendingRemindersCount}
+                label={t('hero.stats.overdue', 'متأخرة')}
+                value={overdueTasksCount}
+                icon={AlertCircle}
+                status={overdueTasksCount > 0 ? "attention" : "zero"}
+                className="py-3 px-4"
+              />
+              <StatCard
+                label={t('hero.stats.upcomingEvents', 'أحداث قادمة')}
+                value={upcomingEventsCount}
+                icon={CalendarRange}
+                status="normal"
+                className="py-3 px-4"
+              />
+              <StatCard
+                label={t('hero.stats.reminders', 'تذكيرات')}
+                value={pendingRemindersCount}
                 icon={Bell}
                 status="normal"
                 className="py-3 px-4"
