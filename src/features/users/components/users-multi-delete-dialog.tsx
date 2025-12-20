@@ -4,30 +4,32 @@ import { useState } from 'react'
 import { type Table } from '@tanstack/react-table'
 import { AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
-import { sleep } from '@/lib/utils'
+import { useDeleteUser } from '@/hooks/useUsers'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ConfirmDialog } from '@/components/confirm-dialog'
+import { type User } from '../data/schema'
 
-type UserMultiDeleteDialogProps<TData> = {
+type UserMultiDeleteDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  table: Table<TData>
+  table: Table<User>
 }
 
 const CONFIRM_WORD = 'DELETE'
 
-export function UsersMultiDeleteDialog<TData>({
+export function UsersMultiDeleteDialog({
   open,
   onOpenChange,
   table,
-}: UserMultiDeleteDialogProps<TData>) {
+}: UserMultiDeleteDialogProps) {
   const [value, setValue] = useState('')
+  const deleteUserMutation = useDeleteUser()
 
   const selectedRows = table.getFilteredSelectedRowModel().rows
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (value.trim() !== CONFIRM_WORD) {
       toast.error(`Please type "${CONFIRM_WORD}" to confirm.`)
       return
@@ -35,7 +37,11 @@ export function UsersMultiDeleteDialog<TData>({
 
     onOpenChange(false)
 
-    toast.promise(sleep(2000), {
+    const deletePromises = selectedRows.map((row) =>
+      deleteUserMutation.mutateAsync(row.original.id)
+    )
+
+    toast.promise(Promise.all(deletePromises), {
       loading: 'Deleting users...',
       success: () => {
         table.resetRowSelection()
@@ -43,7 +49,7 @@ export function UsersMultiDeleteDialog<TData>({
           selectedRows.length > 1 ? 'users' : 'user'
         }`
       },
-      error: 'Error',
+      error: 'Failed to delete some users',
     })
   }
 
