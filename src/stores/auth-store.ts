@@ -10,21 +10,6 @@ import { Analytics, identifyUser, clearUser as clearAnalyticsUser } from '@/lib/
 import authService, { User, LoginCredentials, isPlanAtLeast, getPlanLevel, hasFeature } from '@/services/authService'
 import { usePermissionsStore } from './permissions-store'
 
-/**
- * Check if a user account has been deleted/anonymized
- * Deleted users have their data anonymized for GDPR compliance:
- * - firstName set to "Deleted"
- * - email set to {hash}@deleted.local
- */
-const isDeletedUser = (user: User | null): boolean => {
-  if (!user) return false
-  return (
-    user.firstName === 'Deleted' ||
-    user.email?.endsWith('@deleted.local') ||
-    user.username?.startsWith('deleted_')
-  )
-}
-
 interface AuthState {
   // State
   user: User | null
@@ -160,23 +145,6 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true })
         try {
           const user = await authService.getCurrentUser()
-
-          // Check if user account has been deleted/anonymized
-          // If so, force logout to clear the stale session
-          if (isDeletedUser(user)) {
-            console.warn('[AUTH] Detected deleted/anonymized user, forcing logout')
-            await authService.logout()
-            set({
-              user: null,
-              isAuthenticated: false,
-              isLoading: false,
-              error: null,
-            })
-            setSentryUser(null)
-            usePermissionsStore.getState().clearPermissions()
-            return
-          }
-
           set({
             user,
             isAuthenticated: user !== null,
@@ -213,8 +181,7 @@ export const useAuthStore = create<AuthState>()(
         } catch {
           // getCurrentUser shouldn't throw - but if it does, try cached user
           const cachedUser = authService.getCachedUser()
-          // Don't restore deleted/anonymized users from cache
-          if (cachedUser && !isDeletedUser(cachedUser)) {
+          if (cachedUser) {
             set({
               user: cachedUser,
               isAuthenticated: true,
@@ -308,9 +275,3 @@ export const selectPlanLevel = (state: AuthState) => getPlanLevel(state.user?.pl
  */
 export const selectHasFeature = (featureName: string) =>
   (state: AuthState) => hasFeature(state.user, featureName)
-
-/**
- * Deleted/anonymized user selector
- * Check if current user account has been deleted
- */
-export const selectIsDeletedUser = (state: AuthState) => isDeletedUser(state.user)
