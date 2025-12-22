@@ -1,6 +1,8 @@
 const { Task, User, Case } = require('../models');
 const { CustomException } = require('../utils');
 const { syncTaskToCalendar } = require('./event.controller'); // ✅ ADDED
+const fs = require('fs').promises;
+const path = require('path');
 
 // Create task
 const createTask = async (request, response) => {
@@ -496,6 +498,92 @@ const calculateNextDueDate = (currentDueDate, frequency) => {
     return nextDate;
 };
 
+// Delete attachment (with path traversal protection)
+const deleteAttachment = async (request, response) => {
+    const { _id, attachmentId } = request.params;
+
+    try {
+        // Find the task
+        const task = await Task.findById(_id);
+
+        if (!task) {
+            throw CustomException('Task not found!', 404);
+        }
+
+        // Check permissions - only creator or assigned user can delete attachments
+        const canDelete =
+            task.createdBy.toString() === request.userID ||
+            task.assignedTo.toString() === request.userID;
+
+        if (!canDelete) {
+            throw CustomException('You do not have permission to delete attachments from this task!', 403);
+        }
+
+        // Find the attachment
+        const attachment = task.attachments.id(attachmentId);
+
+        if (!attachment) {
+            throw CustomException('Attachment not found!', 404);
+        }
+
+        // Security: Validate and sanitize the file path
+        const uploadsDir = path.resolve(__dirname, '../../uploads'); // Absolute path to uploads directory
+
+        // Get the filename from the attachment
+        let filename = attachment.filename;
+
+        // 1. Check for null bytes (common attack vector)
+        if (filename.includes('\0')) {
+            throw CustomException('Invalid filename: contains null bytes', 400);
+        }
+
+        // 2. Check for ".." sequences (directory traversal attempt)
+        if (filename.includes('..')) {
+            throw CustomException('Invalid filename: directory traversal detected', 400);
+        }
+
+        // 3. Normalize the path to resolve any encoded or relative path components
+        const requestedPath = path.normalize(filename);
+
+        // 4. Build the full absolute path
+        const fullPath = path.resolve(uploadsDir, requestedPath);
+
+        // 5. Verify the resolved path is still within uploads directory
+        if (!fullPath.startsWith(uploadsDir + path.sep)) {
+            throw CustomException('Invalid filename: path traversal attempt detected', 400);
+        }
+
+        // 6. Additional check: ensure the path doesn't contain any suspicious patterns
+        const suspiciousPatterns = [/\.\./g, /\0/g, /\\/g];
+        if (suspiciousPatterns.some(pattern => pattern.test(requestedPath))) {
+            throw CustomException('Invalid filename: suspicious pattern detected', 400);
+        }
+
+        // Try to delete the file from filesystem
+        try {
+            await fs.unlink(fullPath);
+        } catch (fileError) {
+            // Log error but don't fail the request if file doesn't exist
+            console.warn(`File deletion warning: ${fileError.message}`);
+            // Continue to remove from database even if file doesn't exist
+        }
+
+        // Remove attachment from task
+        attachment.deleteOne();
+        await task.save();
+
+        return response.send({
+            error: false,
+            message: 'Attachment deleted successfully!'
+        });
+    } catch ({ message, status = 500 }) {
+        return response.status(status).send({
+            error: true,
+            message
+        });
+    }
+};
+
 module.exports = {
     createTask,
     getTasks,
@@ -506,5 +594,6 @@ module.exports = {
     getUpcomingTasks,
     getOverdueTasks,
     getTasksByCase,
-    bulkDeleteTasks
+    bulkDeleteTasks,
+    deleteAttachment
 };
