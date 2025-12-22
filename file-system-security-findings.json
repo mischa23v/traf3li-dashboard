@@ -1,0 +1,362 @@
+{
+  "scanDate": "2025-12-22",
+  "repository": "traf3li-backend",
+  "totalFilesScanned": 130,
+  "totalVulnerabilities": 9,
+  "summary": {
+    "critical": 2,
+    "high": 3,
+    "medium": 3,
+    "low": 1,
+    "secure": 2
+  },
+  "vulnerabilities": [
+    {
+      "id": "FS-001",
+      "severity": "CRITICAL",
+      "cvssScore": 9.1,
+      "title": "Unauthenticated File Access - Static File Serving",
+      "category": "Arbitrary File Read",
+      "file": "/home/user/traf3li-dashboard/traf3li-backend-for testing only different github/src/server.js",
+      "line": 149,
+      "description": "The /uploads directory is served statically without any authentication or authorization checks. Any user can access any file if they know or can guess the filename.",
+      "impact": [
+        "Complete data breach of uploaded files",
+        "PDPL compliance violation",
+        "Access to sensitive invoices, contracts, messages",
+        "Enumeration of files via timestamp guessing"
+      ],
+      "exploitScenario": "Attacker can download sensitive files: curl http://api.traf3li.com/uploads/pdfs/invoice-123.pdf",
+      "recommendation": "Remove static file serving and implement authenticated file download endpoints with ownership verification",
+      "cwe": "CWE-306: Missing Authentication for Critical Function",
+      "owasp": "A01:2021 – Broken Access Control"
+    },
+    {
+      "id": "FS-002",
+      "severity": "CRITICAL",
+      "title": "Missing Route Exposure - Delete Attachment",
+      "category": "Missing Functionality",
+      "file": "/home/user/traf3li-dashboard/traf3li-backend-for testing only different github/src/routes/task.route.js",
+      "description": "Secure deleteAttachment function exists in task.controller.js but is not exposed via routes. Users cannot delete attachments, leading to orphaned files.",
+      "impact": [
+        "Orphaned files accumulate on disk",
+        "Disk space exhaustion",
+        "Users cannot delete sensitive data",
+        "GDPR/PDPL right to deletion violation"
+      ],
+      "recommendation": "Add route: app.delete('/:_id/attachments/:attachmentId', userMiddleware, deleteAttachment)",
+      "cwe": "CWE-404: Improper Resource Shutdown or Release"
+    },
+    {
+      "id": "FS-003",
+      "severity": "HIGH",
+      "title": "Synchronous File Writes Block Event Loop",
+      "category": "Arbitrary File Write",
+      "files": [
+        {
+          "path": "/home/user/traf3li-dashboard/traf3li-backend-for testing only different github/src/controllers/pdfme.controller.js",
+          "lines": [573, 622, 672, 713]
+        }
+      ],
+      "description": "Multiple synchronous file write operations (fs.writeFileSync) block the Node.js event loop, causing server hangs and potential race conditions.",
+      "impact": [
+        "Server hangs during PDF generation",
+        "Denial of Service (DoS)",
+        "File corruption due to race conditions",
+        "No disk space validation",
+        "Potential file overwrites"
+      ],
+      "exploitScenario": "Concurrent PDF generation requests cause server to become unresponsive",
+      "recommendation": "Replace with async operations: await fs.promises.writeFile(tempPath, buffer); await fs.promises.rename(tempPath, finalPath);",
+      "cwe": "CWE-662: Improper Synchronization",
+      "owasp": "A04:2021 – Insecure Design"
+    },
+    {
+      "id": "FS-004",
+      "severity": "HIGH",
+      "title": "No Disk Space Validation",
+      "category": "Resource Exhaustion",
+      "files": [
+        {
+          "path": "/home/user/traf3li-dashboard/traf3li-backend-for testing only different github/src/controllers/pdfme.controller.js",
+          "functions": ["generateInvoicePdf", "generateContractPdf", "generateReceiptPdf", "generatePdfAsync"]
+        }
+      ],
+      "description": "PDF generation does not check available disk space before writing files. Can lead to disk exhaustion and server crashes.",
+      "impact": [
+        "Disk space exhaustion",
+        "Server crashes",
+        "Partial file writes",
+        "Database inconsistency"
+      ],
+      "exploitScenario": "Attacker generates large PDFs repeatedly until disk is full",
+      "recommendation": "Add disk space check: const stats = await fs.statfs('uploads'); if (stats.bavail * stats.bsize < MIN_SPACE) throw error;",
+      "cwe": "CWE-400: Uncontrolled Resource Consumption"
+    },
+    {
+      "id": "FS-005",
+      "severity": "HIGH",
+      "title": "Race Conditions in File Operations",
+      "category": "File Race Condition",
+      "files": [
+        {
+          "path": "/home/user/traf3li-dashboard/traf3li-backend-for testing only different github/src/controllers/pdfme.controller.js",
+          "lines": [573, 622, 672, 713]
+        }
+      ],
+      "description": "Direct file writes without atomic operations can cause race conditions when multiple requests use the same filename.",
+      "impact": [
+        "File corruption",
+        "Partial writes",
+        "Data loss",
+        "Inconsistent state"
+      ],
+      "exploitScenario": "Two users generating invoices with same number simultaneously causes file corruption",
+      "recommendation": "Use atomic operations: write to .tmp file, then rename()",
+      "cwe": "CWE-362: Concurrent Execution using Shared Resource with Improper Synchronization"
+    },
+    {
+      "id": "FS-006",
+      "severity": "MEDIUM",
+      "title": "Predictable File Storage Structure",
+      "category": "Information Disclosure",
+      "files": [
+        {
+          "path": "/home/user/traf3li-dashboard/traf3li-backend-for testing only different github/src/configs/multer.js",
+          "line": 17
+        },
+        {
+          "path": "/home/user/traf3li-dashboard/traf3li-backend-for testing only different github/src/configs/multerPdf.js",
+          "line": 19
+        }
+      ],
+      "description": "Filenames use weak randomness (Math.random()) and timestamp-based naming, making them predictable and enumerable.",
+      "impact": [
+        "File enumeration via timestamp ranges",
+        "Predictable filename structure",
+        "Facilitates brute force attacks"
+      ],
+      "exploitScenario": "Attacker enumerates files: for(t=start; t<end; t++) fetch(`/uploads/pdfs/${t}-*.pdf`)",
+      "recommendation": "Use cryptographically secure random: crypto.randomBytes(32).toString('hex')",
+      "cwe": "CWE-330: Use of Insufficiently Random Values",
+      "owasp": "A02:2021 – Cryptographic Failures"
+    },
+    {
+      "id": "FS-007",
+      "severity": "MEDIUM",
+      "title": "No File Cleanup Mechanism",
+      "category": "Resource Exhaustion",
+      "description": "Generated PDFs persist indefinitely with no cleanup job or TTL (Time To Live) mechanism.",
+      "impact": [
+        "Disk space exhaustion over time",
+        "Orphaned files accumulate",
+        "Increased backup costs",
+        "Performance degradation"
+      ],
+      "recommendation": "Implement daily cron job to delete files older than TTL (e.g., 90 days)",
+      "cwe": "CWE-404: Improper Resource Shutdown or Release"
+    },
+    {
+      "id": "FS-008",
+      "severity": "MEDIUM",
+      "title": "Missing File Permission Controls",
+      "category": "File Permission Issues",
+      "description": "No explicit chmod on created files/directories. Relies on process umask which could result in overly permissive permissions.",
+      "impact": [
+        "Files may have 0777 permissions",
+        "Other users on system can read sensitive files",
+        "Potential privilege escalation"
+      ],
+      "recommendation": "Set explicit permissions: await fs.writeFile(path, data, {mode: 0o640}); await fs.mkdir(dir, {mode: 0o750});",
+      "cwe": "CWE-276: Incorrect Default Permissions",
+      "owasp": "A01:2021 – Broken Access Control"
+    },
+    {
+      "id": "FS-009",
+      "severity": "LOW",
+      "title": "Message File Upload - Limited Validation",
+      "category": "Input Validation",
+      "file": "/home/user/traf3li-dashboard/traf3li-backend-for testing only different github/src/controllers/message.controller.js",
+      "lines": [9, 27],
+      "description": "File path construction uses string concatenation and stores unvalidated paths in database.",
+      "impact": [
+        "Minor path injection risk",
+        "Database integrity issues"
+      ],
+      "recommendation": "Use path.join() for path construction and validate file existence before storing",
+      "cwe": "CWE-20: Improper Input Validation"
+    }
+  ],
+  "secureImplementations": [
+    {
+      "id": "SEC-001",
+      "title": "Excellent Path Traversal Protection",
+      "file": "/home/user/traf3li-dashboard/traf3li-backend-for testing only different github/src/controllers/task.controller.js",
+      "function": "deleteAttachment",
+      "lines": "501-585",
+      "strengths": [
+        "Null byte detection",
+        "Directory traversal detection (..)",
+        "Path normalization",
+        "Directory boundary validation",
+        "Suspicious pattern matching",
+        "Multiple layers of defense"
+      ],
+      "recommendation": "Use as reference implementation for all file deletion operations"
+    },
+    {
+      "id": "SEC-002",
+      "title": "Good Filename Sanitization",
+      "file": "/home/user/traf3li-dashboard/traf3li-backend-for testing only different github/src/controllers/pdfme.controller.js",
+      "function": "sanitizeFileName",
+      "lines": "19-27",
+      "strengths": [
+        "Uses path.basename() to remove directory components",
+        "Regex validation for allowed characters",
+        "File extension validation"
+      ],
+      "recommendation": "Apply to all file download operations"
+    }
+  ],
+  "fileSystemOperations": {
+    "totalOperations": 11,
+    "breakdown": {
+      "fileReads": 2,
+      "fileWrites": 4,
+      "fileDeletes": 1,
+      "staticServing": 1,
+      "fileUploads": 3
+    }
+  },
+  "affectedEndpoints": [
+    {
+      "endpoint": "/uploads/*",
+      "method": "GET",
+      "vulnerability": "FS-001",
+      "severity": "CRITICAL"
+    },
+    {
+      "endpoint": "/api/pdfme/generate/invoice",
+      "method": "POST",
+      "vulnerability": "FS-003",
+      "severity": "HIGH"
+    },
+    {
+      "endpoint": "/api/pdfme/generate/contract",
+      "method": "POST",
+      "vulnerability": "FS-003",
+      "severity": "HIGH"
+    },
+    {
+      "endpoint": "/api/pdfme/generate/receipt",
+      "method": "POST",
+      "vulnerability": "FS-003",
+      "severity": "HIGH"
+    },
+    {
+      "endpoint": "/api/pdfme/generate/async",
+      "method": "POST",
+      "vulnerability": "FS-003",
+      "severity": "HIGH"
+    },
+    {
+      "endpoint": "/api/pdfme/download/:fileName",
+      "method": "GET",
+      "vulnerability": "FS-001",
+      "severity": "CRITICAL",
+      "note": "Has path traversal protection but accessible via static serving"
+    },
+    {
+      "endpoint": "/api/messages",
+      "method": "POST",
+      "vulnerability": "FS-009",
+      "severity": "LOW"
+    }
+  ],
+  "remediationPriority": [
+    {
+      "priority": 1,
+      "timeline": "Immediate (24 hours)",
+      "items": [
+        "Remove static file serving (FS-001)",
+        "Implement authenticated file download endpoints",
+        "Expose deleteAttachment route (FS-002)"
+      ]
+    },
+    {
+      "priority": 2,
+      "timeline": "Within 7 days",
+      "items": [
+        "Replace synchronous file writes (FS-003)",
+        "Add disk space validation (FS-004)",
+        "Implement atomic file operations (FS-005)"
+      ]
+    },
+    {
+      "priority": 3,
+      "timeline": "Within 30 days",
+      "items": [
+        "Implement cryptographically secure filenames (FS-006)",
+        "Add file cleanup cron job (FS-007)",
+        "Set explicit file permissions (FS-008)",
+        "Enhance message upload validation (FS-009)"
+      ]
+    }
+  ],
+  "complianceImpact": {
+    "PDPL": {
+      "violations": [
+        "Unauthenticated access to personal data (FS-001)",
+        "Cannot delete personal data (FS-002)"
+      ],
+      "severity": "Critical"
+    },
+    "GDPR": {
+      "violations": [
+        "Right to deletion not implemented (FS-002)",
+        "Inadequate access controls (FS-001)"
+      ],
+      "severity": "Critical"
+    },
+    "OWASP": {
+      "categories": [
+        "A01:2021 – Broken Access Control",
+        "A02:2021 – Cryptographic Failures",
+        "A04:2021 – Insecure Design"
+      ]
+    }
+  },
+  "testingRecommendations": [
+    {
+      "category": "Path Traversal",
+      "tests": [
+        "Test ../ sequences in filenames",
+        "Test null byte injection",
+        "Test absolute paths",
+        "Test symbolic links"
+      ]
+    },
+    {
+      "category": "File Upload",
+      "tests": [
+        "Test file size limits",
+        "Test invalid file types",
+        "Test concurrent uploads",
+        "Test disk space exhaustion"
+      ]
+    },
+    {
+      "category": "Access Control",
+      "tests": [
+        "Test unauthenticated access",
+        "Test cross-user file access",
+        "Test ownership verification"
+      ]
+    }
+  ],
+  "secureCodeExamples": {
+    "secureFileUpload": "See FILE_SYSTEM_SECURITY_SCAN_REPORT.md - Pattern 1",
+    "secureFileDownload": "See FILE_SYSTEM_SECURITY_SCAN_REPORT.md - Pattern 2",
+    "secureFileDeletion": "See FILE_SYSTEM_SECURITY_SCAN_REPORT.md - Pattern 3"
+  }
+}

@@ -1,0 +1,297 @@
+{
+  "scan_metadata": {
+    "scan_date": "2025-12-22",
+    "scanner": "Claude Security Audit",
+    "repository": "traf3li-backend",
+    "total_vulnerabilities": 12,
+    "critical": 6,
+    "high": 4,
+    "medium": 2,
+    "low": 0
+  },
+  "vulnerabilities": [
+    {
+      "id": "BL-001",
+      "title": "Price Manipulation - Gig/Order Payment Bypass",
+      "severity": "CRITICAL",
+      "cvss_score": 9.8,
+      "category": "Price Manipulation",
+      "cwe": "CWE-841: Improper Enforcement of Behavioral Workflow",
+      "file": "/src/controllers/order.controller.js",
+      "lines": "30-82",
+      "description": "Payment intent accepts gig price directly without server-side recalculation, allowing race condition attacks to purchase services for near-zero cost",
+      "attack_vector": "Race condition during payment processing",
+      "business_impact": "Unlimited - attackers can purchase any service for near-zero cost",
+      "exploitation_difficulty": "Easy",
+      "status": "OPEN",
+      "remediation_effort": "High",
+      "affected_endpoints": [
+        "POST /api/orders/payment-intent/:id"
+      ]
+    },
+    {
+      "id": "BL-002",
+      "title": "Proposal Price Manipulation",
+      "severity": "CRITICAL",
+      "cvss_score": 9.5,
+      "category": "Price Manipulation",
+      "cwe": "CWE-841: Improper Enforcement of Behavioral Workflow",
+      "file": "/src/controllers/order.controller.js",
+      "lines": "85-153",
+      "description": "Proposal payment trusts proposedAmount without verification, allowing price tampering before payment",
+      "attack_vector": "Database manipulation or API exploit before payment",
+      "business_impact": "Severe - either party can be defrauded of entire contract value",
+      "exploitation_difficulty": "Medium",
+      "status": "OPEN",
+      "remediation_effort": "High",
+      "affected_endpoints": [
+        "POST /api/orders/proposal-payment-intent/:id"
+      ]
+    },
+    {
+      "id": "BL-003",
+      "title": "Invoice Total Manipulation",
+      "severity": "CRITICAL",
+      "cvss_score": 9.1,
+      "category": "Price Manipulation",
+      "cwe": "CWE-602: Client-Side Enforcement of Server-Side Security",
+      "file": "/src/controllers/invoice.controller.js",
+      "lines": "14-66",
+      "description": "Invoice total calculated from client-submitted items without server-side validation, allowing arbitrary total manipulation",
+      "attack_vector": "Client-side item price/total manipulation",
+      "business_impact": "100% revenue loss per invoice",
+      "exploitation_difficulty": "Very Easy",
+      "status": "OPEN",
+      "remediation_effort": "Medium",
+      "affected_endpoints": [
+        "POST /api/invoices"
+      ]
+    },
+    {
+      "id": "BL-004",
+      "title": "Payment Amount Mismatch - Invoice Payment",
+      "severity": "CRITICAL",
+      "cvss_score": 8.9,
+      "category": "Payment Validation",
+      "cwe": "CWE-1240: Missing Cryptographic Step",
+      "file": "/src/controllers/invoice.controller.js",
+      "lines": "198-236",
+      "description": "Payment intent uses invoice.total from database without verifying tampering, allowing overcharging",
+      "attack_vector": "Database manipulation between invoice creation and payment",
+      "business_impact": "Overcharging clients, legal disputes",
+      "exploitation_difficulty": "Medium",
+      "status": "OPEN",
+      "remediation_effort": "Medium",
+      "affected_endpoints": [
+        "POST /api/invoices/:id/payment-intent"
+      ]
+    },
+    {
+      "id": "BL-005",
+      "title": "Race Condition - Payment Completion",
+      "severity": "CRITICAL",
+      "cvss_score": 8.6,
+      "category": "Race Condition",
+      "cwe": "CWE-362: Concurrent Execution using Shared Resource with Improper Synchronization",
+      "file": "/src/controllers/payment.controller.js",
+      "lines": "274-350",
+      "description": "Payment completion lacks transaction isolation, allowing double-payment and balance corruption",
+      "attack_vector": "Concurrent API requests",
+      "business_impact": "Double-counting payments, corrupted financial records, refund fraud",
+      "exploitation_difficulty": "Easy",
+      "status": "OPEN",
+      "remediation_effort": "High",
+      "affected_endpoints": [
+        "POST /api/payments/:id/complete"
+      ]
+    },
+    {
+      "id": "BL-006",
+      "title": "Retainer Balance Manipulation",
+      "severity": "HIGH",
+      "cvss_score": 7.8,
+      "category": "Race Condition",
+      "cwe": "CWE-362: Concurrent Execution using Shared Resource with Improper Synchronization",
+      "file": "/src/controllers/retainer.controller.js",
+      "lines": "248-320, 326-386",
+      "description": "Retainer consumption/replenishment lacks transaction isolation, allowing concurrent double-spend attacks",
+      "attack_vector": "Simultaneous consume/replenish requests",
+      "business_impact": "Unlimited consumption beyond balance, negative balances",
+      "exploitation_difficulty": "Medium",
+      "status": "OPEN",
+      "remediation_effort": "High",
+      "affected_endpoints": [
+        "POST /api/retainers/:id/consume",
+        "POST /api/retainers/:id/replenish"
+      ]
+    },
+    {
+      "id": "BL-007",
+      "title": "Review System Abuse - No Purchase Validation",
+      "severity": "HIGH",
+      "cvss_score": 7.5,
+      "category": "Business Logic Bypass",
+      "cwe": "CWE-840: Business Logic Errors",
+      "file": "/src/controllers/review.controller.js",
+      "lines": "4-30",
+      "description": "Review system allows submissions without purchase verification, enabling fake reviews and competitor sabotage",
+      "attack_vector": "Direct API calls without order completion",
+      "business_impact": "Platform trust destruction, unfair competition, legal liability",
+      "exploitation_difficulty": "Very Easy",
+      "status": "OPEN",
+      "remediation_effort": "Medium",
+      "affected_endpoints": [
+        "POST /api/reviews"
+      ]
+    },
+    {
+      "id": "BL-008",
+      "title": "Refund Amount Validation Bypass",
+      "severity": "HIGH",
+      "cvss_score": 7.4,
+      "category": "Business Logic Bypass",
+      "cwe": "CWE-840: Business Logic Errors",
+      "file": "/src/controllers/payment.controller.js",
+      "lines": "400-485",
+      "description": "Multiple partial refunds can exceed original payment amount due to missing aggregate validation",
+      "attack_vector": "Sequential partial refund requests",
+      "business_impact": "Unlimited refunds, financial loss",
+      "exploitation_difficulty": "Easy",
+      "status": "OPEN",
+      "remediation_effort": "Medium",
+      "affected_endpoints": [
+        "POST /api/payments/:id/refund"
+      ]
+    },
+    {
+      "id": "BL-009",
+      "title": "Test Mode Bypass - Production Exploit",
+      "severity": "CRITICAL",
+      "cvss_score": 9.9,
+      "category": "Authentication Bypass",
+      "cwe": "CWE-489: Active Debug Code",
+      "file": "/src/controllers/order.controller.js",
+      "lines": "205-265, 268-334",
+      "description": "Test endpoints that bypass payment are accessible in production, offering completely free services",
+      "attack_vector": "Direct API calls to test endpoints",
+      "business_impact": "CATASTROPHIC - All services available for free, business model collapse",
+      "exploitation_difficulty": "Trivial",
+      "status": "OPEN",
+      "remediation_effort": "Low",
+      "affected_endpoints": [
+        "POST /api/orders/test/:gigId",
+        "POST /api/orders/test-proposal/:proposalId"
+      ]
+    },
+    {
+      "id": "BL-010",
+      "title": "User Profile Mass Assignment",
+      "severity": "HIGH",
+      "cvss_score": 7.6,
+      "category": "Privilege Escalation",
+      "cwe": "CWE-915: Improperly Controlled Modification of Dynamically-Determined Object Attributes",
+      "file": "/src/controllers/user.controller.js",
+      "lines": "242-266",
+      "description": "Profile update accepts any field from request body, allowing privilege escalation and impersonation",
+      "attack_vector": "Manipulated update requests with privileged fields",
+      "business_impact": "Account takeover, privilege escalation, fake credentials",
+      "exploitation_difficulty": "Easy",
+      "status": "OPEN",
+      "remediation_effort": "Low",
+      "affected_endpoints": [
+        "PUT /api/users/:id"
+      ]
+    },
+    {
+      "id": "BL-011",
+      "title": "Status Transition Bypass - Case Workflow",
+      "severity": "MEDIUM",
+      "cvss_score": 6.5,
+      "category": "Workflow Bypass",
+      "cwe": "CWE-841: Improper Enforcement of Behavioral Workflow",
+      "file": "/src/controllers/case.controller.js",
+      "lines": "282-313, 316-357",
+      "description": "Case status updates lack transition validation, allowing workflow bypass and metrics manipulation",
+      "attack_vector": "Invalid status transition requests",
+      "business_impact": "Billing fraud, metrics gaming, contract violations",
+      "exploitation_difficulty": "Easy",
+      "status": "OPEN",
+      "remediation_effort": "Medium",
+      "affected_endpoints": [
+        "PUT /api/cases/:id/status",
+        "PUT /api/cases/:id/outcome"
+      ]
+    },
+    {
+      "id": "BL-012",
+      "title": "Expense Manipulation - Negative Amounts",
+      "severity": "MEDIUM",
+      "cvss_score": 5.9,
+      "category": "Input Validation",
+      "cwe": "CWE-20: Improper Input Validation",
+      "file": "/src/controllers/expense.controller.js",
+      "lines": "6-62, 143-183",
+      "description": "Expense validation allows zero amounts and update bypass enables negative amounts",
+      "attack_vector": "Zero-amount spam, negative amount updates",
+      "business_impact": "Report pollution, accounting errors",
+      "exploitation_difficulty": "Easy",
+      "status": "OPEN",
+      "remediation_effort": "Low",
+      "affected_endpoints": [
+        "POST /api/expenses",
+        "PUT /api/expenses/:id"
+      ]
+    }
+  ],
+  "risk_assessment": {
+    "overall_risk": "CRITICAL",
+    "financial_risk": "UNLIMITED",
+    "data_integrity_risk": "HIGH",
+    "compliance_risk": "HIGH",
+    "reputation_risk": "HIGH"
+  },
+  "remediation_priorities": [
+    {
+      "priority": 1,
+      "timeline": "24 hours",
+      "actions": [
+        "Remove test endpoints from production (BL-009)",
+        "Implement price locking with transactions (BL-001, BL-002, BL-003, BL-004)",
+        "Add MongoDB transactions for payment operations (BL-005)"
+      ]
+    },
+    {
+      "priority": 2,
+      "timeline": "48 hours",
+      "actions": [
+        "Implement purchase verification for reviews (BL-007)",
+        "Add refund tracking and limits (BL-008)",
+        "Implement field whitelisting for profiles (BL-010)",
+        "Fix retainer race conditions (BL-006)"
+      ]
+    },
+    {
+      "priority": 3,
+      "timeline": "1 week",
+      "actions": [
+        "Add status transition validation (BL-011)",
+        "Strengthen amount validation (BL-012)",
+        "Implement comprehensive audit logging",
+        "Add fraud detection monitoring"
+      ]
+    }
+  ],
+  "testing_recommendations": [
+    "Automated race condition testing",
+    "Concurrent payment stress tests",
+    "Price manipulation security tests",
+    "Review system abuse tests",
+    "Privilege escalation tests"
+  ],
+  "compliance_impact": {
+    "pci_dss": "MAJOR - Payment handling vulnerabilities",
+    "gdpr": "MODERATE - Profile manipulation risks",
+    "sox": "MAJOR - Financial record integrity",
+    "local_regulations": "MAJOR - Consumer protection violations"
+  }
+}

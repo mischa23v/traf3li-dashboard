@@ -1,0 +1,392 @@
+{
+  "scan_metadata": {
+    "scan_date": "2025-12-22",
+    "repository": "traf3li-backend",
+    "total_findings": 43,
+    "severity_breakdown": {
+      "critical": 2,
+      "high": 8,
+      "medium": 28,
+      "low": 5
+    }
+  },
+  "critical_findings": [
+    {
+      "id": "INFO-001",
+      "title": "Stack Trace Exposure in Error Middleware",
+      "severity": "CRITICAL",
+      "cwe": "CWE-209",
+      "locations": [
+        "/src/middlewares/errorMiddleware.js:10",
+        "/src/middlewares/errorMiddleware.js:23",
+        "/src/utils/asyncHandler.js:23",
+        "/src/server.js:220"
+      ],
+      "information_leaked": [
+        "Full file paths",
+        "Function call hierarchy",
+        "Line numbers",
+        "Library names and versions",
+        "Internal implementation details"
+      ],
+      "impact": "Attackers can map internal application structure and identify vulnerable code paths",
+      "remediation": "Implement environment-based error handling that never sends stack traces to clients"
+    },
+    {
+      "id": "INFO-002",
+      "title": "Detailed Error Debugging in Production",
+      "severity": "CRITICAL",
+      "cwe": "CWE-209",
+      "locations": [
+        "/src/middlewares/errorMiddleware.js:2-14",
+        "/src/controllers/client.controller.js:110-117"
+      ],
+      "information_leaked": [
+        "Request URLs and methods",
+        "Error types and codes",
+        "MongoDB error codes",
+        "Mongoose validation errors",
+        "Full error objects"
+      ],
+      "impact": "Extensive application internals exposed through logging",
+      "remediation": "Use structured logging with sanitized production logs"
+    }
+  ],
+  "high_findings": [
+    {
+      "id": "INFO-003",
+      "title": "Error Message Exposure Across All Controllers",
+      "severity": "HIGH",
+      "cwe": "CWE-209",
+      "affected_controllers": [
+        "/src/controllers/reference.controller.js (13 instances)",
+        "/src/controllers/dashboard.controller.js (6 instances)",
+        "/src/controllers/expense.controller.js (9 instances)",
+        "/src/controllers/benefit.controller.js (19 instances)",
+        "/src/controllers/user.controller.js",
+        "/src/controllers/retainer.controller.js"
+      ],
+      "vulnerable_pattern": "res.json({ error: error.message })",
+      "information_leaked": [
+        "MongoDB error messages",
+        "Mongoose validation details",
+        "Type errors",
+        "Database field names",
+        "Business logic details"
+      ],
+      "remediation": "Implement centralized error handler that sanitizes all error messages"
+    },
+    {
+      "id": "INFO-004",
+      "title": "Database Error Code Exposure",
+      "severity": "HIGH",
+      "cwe": "CWE-209",
+      "locations": [
+        "/src/controllers/auth.controller.js:36"
+      ],
+      "information_leaked": [
+        "MongoDB E11000 duplicate key errors",
+        "Index structure",
+        "Field names with unique constraints",
+        "Collection names"
+      ],
+      "example": "E11000 duplicate key error collection: traf3li.users index: email_1 dup key: { email: \"test@example.com\" }",
+      "remediation": "Create database error handler that maps error codes to user-friendly messages"
+    },
+    {
+      "id": "INFO-005",
+      "title": "JWT Token Implementation Disclosure",
+      "severity": "HIGH",
+      "cwe": "CWE-209",
+      "locations": [
+        "/src/utils/generateToken.js:23-29",
+        "/src/utils/generateToken.js:57",
+        "/src/utils/generateToken.js:84",
+        "/src/middlewares/authenticate.js:20-24"
+      ],
+      "information_leaked": [
+        "JWT library error messages",
+        "Token structure details",
+        "Default secret patterns",
+        "Configuration warnings"
+      ],
+      "jwt_errors_exposed": [
+        "jwt malformed",
+        "jwt expired",
+        "invalid signature",
+        "jwt must be provided"
+      ],
+      "remediation": "Sanitize all JWT errors to generic 'Authentication failed' messages"
+    },
+    {
+      "id": "INFO-006",
+      "title": "Health Endpoint Process Information Exposure",
+      "severity": "HIGH",
+      "cwe": "CWE-200",
+      "locations": [
+        "/src/server.js:209-216"
+      ],
+      "information_leaked": [
+        "Server uptime (process.uptime())",
+        "Precise timestamps",
+        "Server restart patterns"
+      ],
+      "attack_scenario": "Attackers can monitor uptime to identify restart windows and deployment patterns",
+      "remediation": "Implement minimal health check for public access, detailed health for authenticated admins only"
+    },
+    {
+      "id": "INFO-007",
+      "title": "MongoDB Connection Error Disclosure",
+      "severity": "HIGH",
+      "cwe": "CWE-209",
+      "locations": [
+        "/src/configs/db.js:19-34"
+      ],
+      "information_leaked": [
+        "MongoDB connection errors",
+        "Database host and port (if misconfigured)",
+        "Authentication failures",
+        "Network topology"
+      ],
+      "remediation": "Sanitize database connection errors before logging"
+    },
+    {
+      "id": "INFO-008",
+      "title": "Environment and Configuration Disclosure on Startup",
+      "severity": "HIGH",
+      "cwe": "CWE-200",
+      "locations": [
+        "/src/server.js:226-239"
+      ],
+      "information_leaked": [
+        "Port number",
+        "Environment type (production/development)",
+        "All CORS-allowed origins",
+        "Cookie configuration details",
+        "Deployment URLs",
+        "Vercel deployment IDs",
+        "Technology stack (Socket.io)"
+      ],
+      "remediation": "Minimize startup logging in production, use DEBUG mode for verbose output"
+    },
+    {
+      "id": "INFO-009",
+      "title": "CORS Origin Logging",
+      "severity": "HIGH",
+      "cwe": "CWE-209",
+      "locations": [
+        "/src/server.js:119"
+      ],
+      "information_leaked": [
+        "Attack attempts",
+        "Origin patterns",
+        "Unauthorized request timing"
+      ],
+      "remediation": "Use security monitoring service instead of console logging"
+    },
+    {
+      "id": "INFO-010",
+      "title": "Validation Error Schema Disclosure",
+      "severity": "HIGH",
+      "cwe": "CWE-209",
+      "locations": [
+        "/src/middlewares/errorMiddleware.js:13"
+      ],
+      "information_leaked": [
+        "Field names",
+        "Validation rules",
+        "Required fields",
+        "Data types",
+        "Model structure"
+      ],
+      "remediation": "Sanitize validation errors to only show affected field names, not full error objects"
+    }
+  ],
+  "medium_findings": [
+    {
+      "id": "INFO-011",
+      "title": "Console.log Statements in Production",
+      "severity": "MEDIUM",
+      "cwe": "CWE-532",
+      "count": "50+ instances",
+      "sample_locations": [
+        "/src/middlewares/errorMiddleware.js",
+        "/src/controllers/client.controller.js:10",
+        "/src/controllers/user.controller.js:232-233",
+        "/src/utils/encryption.js:70,103,176,207",
+        "/src/utils/generateToken.js:23-24,57,84",
+        "/src/utils/taskReminders.js:8,44,46,50"
+      ],
+      "information_leaked": [
+        "Request parameters",
+        "Error messages",
+        "Stack traces",
+        "User data",
+        "Encryption failures"
+      ],
+      "remediation": "Replace all console.log with Winston logger, implement environment-based logging"
+    },
+    {
+      "id": "INFO-012",
+      "title": "Database Connection Strings in Documentation",
+      "severity": "MEDIUM",
+      "cwe": "CWE-312",
+      "locations": [
+        "/AUTHENTICATION_SETUP_GUIDE.md",
+        "/DEPLOYMENT_INSTRUCTIONS.md",
+        "/RENDER_DEPLOYMENT_GUIDE.md"
+      ],
+      "information_leaked": [
+        "Connection string format",
+        "Database architecture",
+        "Default credential patterns"
+      ],
+      "remediation": "Use placeholder format in all documentation"
+    },
+    {
+      "id": "INFO-013",
+      "title": "Middleware Error Disclosure",
+      "severity": "MEDIUM",
+      "cwe": "CWE-209",
+      "locations": [
+        "/src/middlewares/checkOwnership.middleware.js:87-88,272-273",
+        "/src/middlewares/adminIPWhitelist.middleware.js:101-102,189-190",
+        "/src/middlewares/authorize.middleware.js:42-43,151-152,206-207,251-252",
+        "/src/middlewares/auditLog.middleware.js:92,172,210"
+      ],
+      "remediation": "Return generic error messages from middleware"
+    },
+    {
+      "id": "INFO-014",
+      "title": "Admin IP Whitelist Warning",
+      "severity": "MEDIUM",
+      "cwe": "CWE-209",
+      "locations": [
+        "/src/middlewares/adminIPWhitelist.middleware.js:32-34"
+      ],
+      "information_leaked": [
+        "Security configuration status",
+        "Admin access control mechanism"
+      ],
+      "remediation": "Fail fast instead of warning, never log security config status"
+    },
+    {
+      "id": "INFO-015",
+      "title": "Test File Exposure",
+      "severity": "MEDIUM",
+      "cwe": "CWE-538",
+      "locations": [
+        "/test-password-hash.cjs"
+      ],
+      "information_leaked": [
+        "Bcrypt algorithm details",
+        "Salt rounds",
+        "Common test passwords",
+        "Hash verification logic"
+      ],
+      "remediation": "Remove from production, move to /test directory, add to .gitignore"
+    }
+  ],
+  "low_findings": [
+    {
+      "id": "INFO-016",
+      "title": "TODO Comments with Implementation Details",
+      "severity": "LOW",
+      "cwe": "CWE-615",
+      "locations": [
+        "/src/controllers/statement.controller.js:214",
+        "/src/controllers/report.controller.js:90",
+        "/src/controllers/invoice.controller.js:183",
+        "/src/controllers/payment.controller.js:513",
+        "/src/controllers/retainer.controller.js:302"
+      ],
+      "information_leaked": [
+        "Unimplemented features",
+        "Planned functionality",
+        "Integration points"
+      ],
+      "remediation": "Move TODOs to issue tracker, remove from source code"
+    },
+    {
+      "id": "INFO-017",
+      "title": "Package.json Version Disclosure",
+      "severity": "LOW",
+      "cwe": "CWE-200",
+      "locations": [
+        "/package.json"
+      ],
+      "information_leaked": [
+        "Dependency versions",
+        "Technology stack"
+      ],
+      "remediation": "Ensure package.json not served statically, use security headers"
+    }
+  ],
+  "remediation_priority": [
+    {
+      "phase": 1,
+      "timeline": "Week 1 (Immediate)",
+      "tasks": [
+        "Replace error middleware with production-ready version",
+        "Remove stack trace logging from all handlers",
+        "Sanitize all error responses to clients",
+        "Implement AppError class for controlled errors"
+      ]
+    },
+    {
+      "phase": 2,
+      "timeline": "Week 2 (High Priority)",
+      "tasks": [
+        "Update all controllers to use sanitized error handling",
+        "Fix database error disclosure across codebase",
+        "Secure JWT error messages",
+        "Fix health endpoint information disclosure",
+        "Sanitize MongoDB connection errors"
+      ]
+    },
+    {
+      "phase": 3,
+      "timeline": "Week 3 (Medium Priority)",
+      "tasks": [
+        "Replace console.log with Winston logger",
+        "Remove debugging statements from production code",
+        "Clean up documentation examples",
+        "Implement environment-based logging"
+      ]
+    },
+    {
+      "phase": 4,
+      "timeline": "Week 4 (Low Priority)",
+      "tasks": [
+        "Remove TODO comments or move to issues",
+        "Clean up test files",
+        "Review all middleware error handling",
+        "Implement structured logging"
+      ]
+    }
+  ],
+  "tools_used": [
+    "Grep (ripgrep)",
+    "File analysis",
+    "Pattern matching",
+    "Manual code review"
+  ],
+  "compliance_impact": {
+    "gdpr": "Article 32 - Security of processing",
+    "pci_dss": "Requirement 6.5.5 - Improper error handling",
+    "owasp_top_10": [
+      "A01:2021 - Broken Access Control",
+      "A05:2021 - Security Misconfiguration"
+    ],
+    "saudi_pdpl": "Article 19 - Security measures"
+  },
+  "next_steps": [
+    "Implement centralized error handling",
+    "Deploy Winston logging service",
+    "Configure Sentry for production error tracking",
+    "Set up automated secret scanning",
+    "Implement error response testing in CI/CD",
+    "Conduct penetration testing",
+    "Schedule regular security audits"
+  ]
+}
