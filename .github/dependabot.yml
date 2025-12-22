@@ -1,0 +1,86 @@
+version: 2
+updates:
+  # Enable version updates for npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "mischa23v"
+    assignees:
+      - "mischa23v"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "automated"
+    versioning-strategy: increase
+    # Group minor and patch updates together
+    groups:
+      development-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+      production-dependencies:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+    # Ignore specific dependencies if needed
+    ignore:
+      # Example: ignore major version updates for react
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "mischa23v"
+    assignees:
+      - "mischa23v"
+    commit-message:
+      prefix: "chore(ci)"
+    labels:
+      - "github-actions"
+      - "automated"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  # Enable security updates for all ecosystems
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 5
+    labels:
+      - "security"
+      - "dependencies"
+      - "automated"
+    commit-message:
+      prefix: "fix(security)"
+      include: "scope"
+    # Only create PRs for security updates
+    allow:
+      - dependency-type: "all"
+    # Priority for security updates
+    reviewers:
+      - "mischa23v"
+    assignees:
+      - "mischa23v"
