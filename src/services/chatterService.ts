@@ -130,6 +130,12 @@ export interface ActivitiesResponse {
 
 /**
  * Get followers for a record
+ *
+ * @endpoint GET /chatter/followers/:resModel/:resId
+ * @description Retrieves all followers for a specific record
+ * @param resModel - The resource model type (e.g., 'Lead', 'Client')
+ * @param resId - The ID of the record
+ * @returns Promise containing followers list and total count
  */
 export const getFollowers = async (
   resModel: ThreadResModel,
@@ -141,6 +147,11 @@ export const getFollowers = async (
 
 /**
  * Add a follower to a record
+ *
+ * @endpoint POST /chatter/followers
+ * @description Creates a new follower relationship for a record
+ * @param data - Follower data including userId, resModel, resId, and preferences
+ * @returns Promise containing the created follower record
  */
 export const addFollower = async (data: CreateFollowerData): Promise<Follower> => {
   const response = await apiClient.post('/chatter/followers', data)
@@ -149,6 +160,11 @@ export const addFollower = async (data: CreateFollowerData): Promise<Follower> =
 
 /**
  * Remove a follower from a record
+ *
+ * @endpoint DELETE /chatter/followers/:followerId
+ * @description Removes a follower relationship by ID
+ * @param followerId - The ID of the follower record to delete
+ * @returns Promise that resolves when the follower is removed
  */
 export const removeFollower = async (followerId: string): Promise<void> => {
   await apiClient.delete(`/chatter/followers/${followerId}`)
@@ -156,6 +172,12 @@ export const removeFollower = async (followerId: string): Promise<void> => {
 
 /**
  * Update follower notification preferences
+ *
+ * @endpoint PATCH /chatter/followers/:followerId/preferences
+ * @description Updates notification preferences (email, push, SMS) for a follower
+ * @param followerId - The ID of the follower record to update
+ * @param preferences - Notification preferences to update (email, push, sms)
+ * @returns Promise containing the updated follower record
  */
 export const updateFollowerPreferences = async (
   followerId: string,
@@ -173,6 +195,12 @@ export const updateFollowerPreferences = async (
 
 /**
  * Check if current user is following a record
+ *
+ * @endpoint GET /chatter/followers/:resModel/:resId/me
+ * @description Checks if the current authenticated user is following a specific record
+ * @param resModel - The resource model type (e.g., 'Lead', 'Client')
+ * @param resId - The ID of the record
+ * @returns Promise containing following status and follower record if following
  */
 export const isFollowing = async (
   resModel: ThreadResModel,
@@ -184,6 +212,12 @@ export const isFollowing = async (
 
 /**
  * Toggle follow status for current user
+ *
+ * @endpoint POST /chatter/followers/:resModel/:resId/toggle
+ * @description Toggles the current user's follow status for a record (follow if not following, unfollow if following)
+ * @param resModel - The resource model type (e.g., 'Lead', 'Client')
+ * @param resId - The ID of the record
+ * @returns Promise containing updated following status and follower record
  */
 export const toggleFollow = async (
   resModel: ThreadResModel,
@@ -197,6 +231,10 @@ export const toggleFollow = async (
 
 /**
  * Get activity types
+ *
+ * @endpoint GET /chatter/activity-types
+ * @description Retrieves all available activity types (e.g., Call, Meeting, Email)
+ * @returns Promise containing an array of activity types
  */
 export const getActivityTypes = async (): Promise<ActivityType[]> => {
   const response = await apiClient.get('/chatter/activity-types')
@@ -205,6 +243,13 @@ export const getActivityTypes = async (): Promise<ActivityType[]> => {
 
 /**
  * Get scheduled activities for a record
+ *
+ * @endpoint GET /chatter/activities/:resModel/:resId
+ * @description Retrieves all scheduled activities for a specific record, optionally filtered by state
+ * @param resModel - The resource model type (e.g., 'Lead', 'Client')
+ * @param resId - The ID of the record
+ * @param state - Optional state filter (planned, today, overdue, done, cancelled)
+ * @returns Promise containing activities list and total count
  */
 export const getActivities = async (
   resModel: ThreadResModel,
@@ -222,6 +267,12 @@ export const getActivities = async (
 
 /**
  * Get all activities assigned to current user
+ *
+ * @endpoint GET /chatter/activities/me
+ * @description Retrieves all activities assigned to the current authenticated user
+ * @param state - Optional state filter (planned, today, overdue, done, cancelled)
+ * @param limit - Optional limit on number of activities to return
+ * @returns Promise containing activities list and total count
  */
 export const getMyActivities = async (
   state?: string,
@@ -237,6 +288,11 @@ export const getMyActivities = async (
 
 /**
  * Schedule a new activity
+ *
+ * @endpoint POST /chatter/activities
+ * @description Creates a new scheduled activity for a record
+ * @param data - Activity data including type, record reference, summary, due date, and assigned user
+ * @returns Promise containing the created activity
  */
 export const scheduleActivity = async (
   data: CreateActivityData
@@ -247,6 +303,12 @@ export const scheduleActivity = async (
 
 /**
  * Update an activity
+ *
+ * @endpoint PATCH /chatter/activities/:activityId
+ * @description Updates an existing activity's details (summary, due date, assigned user, state)
+ * @param activityId - The ID of the activity to update
+ * @param data - Updated activity data (partial updates supported)
+ * @returns Promise containing the updated activity
  */
 export const updateActivity = async (
   activityId: string,
@@ -258,6 +320,12 @@ export const updateActivity = async (
 
 /**
  * Mark activity as done
+ *
+ * @endpoint POST /chatter/activities/:activityId/done
+ * @description Marks an activity as completed with optional feedback
+ * @param activityId - The ID of the activity to mark as done
+ * @param feedback - Optional feedback or completion notes
+ * @returns Promise containing the updated activity with 'done' state
  */
 export const markActivityDone = async (
   activityId: string,
@@ -271,6 +339,11 @@ export const markActivityDone = async (
 
 /**
  * Cancel an activity
+ *
+ * @endpoint DELETE /chatter/activities/:activityId
+ * @description Deletes or cancels a scheduled activity
+ * @param activityId - The ID of the activity to cancel
+ * @returns Promise that resolves when the activity is deleted
  */
 export const cancelActivity = async (activityId: string): Promise<void> => {
   await apiClient.delete(`/chatter/activities/${activityId}`)
@@ -280,6 +353,13 @@ export const cancelActivity = async (activityId: string): Promise<void> => {
 
 /**
  * Upload file attachment
+ *
+ * @endpoint POST /chatter/attachments
+ * @description Uploads a single file attachment to a record
+ * @param file - The file to upload
+ * @param resModel - The resource model type (e.g., 'Lead', 'Client')
+ * @param resId - The ID of the record to attach the file to
+ * @returns Promise containing the created file attachment record
  */
 export const uploadAttachment = async (
   file: File,
@@ -301,6 +381,13 @@ export const uploadAttachment = async (
 
 /**
  * Upload multiple file attachments
+ *
+ * @endpoint POST /chatter/attachments/bulk
+ * @description Uploads multiple file attachments to a record in a single request
+ * @param files - Array of files to upload
+ * @param resModel - The resource model type (e.g., 'Lead', 'Client')
+ * @param resId - The ID of the record to attach the files to
+ * @returns Promise containing an array of created file attachment records
  */
 export const uploadAttachments = async (
   files: File[],
@@ -324,6 +411,12 @@ export const uploadAttachments = async (
 
 /**
  * Get attachments for a record
+ *
+ * @endpoint GET /chatter/attachments/:resModel/:resId
+ * @description Retrieves all file attachments for a specific record
+ * @param resModel - The resource model type (e.g., 'Lead', 'Client')
+ * @param resId - The ID of the record
+ * @returns Promise containing an array of file attachments
  */
 export const getAttachments = async (
   resModel: ThreadResModel,
@@ -335,6 +428,11 @@ export const getAttachments = async (
 
 /**
  * Delete an attachment
+ *
+ * @endpoint DELETE /chatter/attachments/:attachmentId
+ * @description Deletes a file attachment by ID
+ * @param attachmentId - The ID of the attachment to delete
+ * @returns Promise that resolves when the attachment is deleted
  */
 export const deleteAttachment = async (attachmentId: string): Promise<void> => {
   await apiClient.delete(`/chatter/attachments/${attachmentId}`)

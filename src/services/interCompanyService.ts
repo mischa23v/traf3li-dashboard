@@ -192,9 +192,63 @@ export interface ReconciliationFilters {
  * ==================== API METHODS ====================
  */
 
+/**
+ * Inter-Company Service API Client
+ *
+ * Complete API Documentation:
+ * This service provides access to all inter-company transaction management endpoints.
+ *
+ * ==================== ENDPOINT PATTERNS ====================
+ *
+ * TRANSACTIONS (15 endpoints total):
+ * - GET    /api/inter-company/transactions              - List transactions with filters
+ * - GET    /api/inter-company/transactions/:id          - Get single transaction details
+ * - POST   /api/inter-company/transactions              - Create new transaction
+ * - PUT    /api/inter-company/transactions/:id          - Update transaction
+ * - DELETE /api/inter-company/transactions/:id          - Delete transaction
+ * - POST   /api/inter-company/transactions/:id/post     - Post transaction to accounting
+ * - POST   /api/inter-company/transactions/:id/cancel   - Cancel transaction with reason
+ * - GET    /api/inter-company/transactions/between      - Get transactions between two firms
+ *
+ * BALANCES (2 endpoints total):
+ * - GET    /api/inter-company/balances                  - Get balance matrix for all companies
+ * - GET    /api/inter-company/balances/between          - Get balance between two specific firms
+ *
+ * RECONCILIATIONS (9 endpoints total):
+ * ⚠️  IMPORTANT: Uses PLURAL form "/reconciliations" (NOT singular "/reconciliation")
+ * - GET    /api/inter-company/reconciliations                      - List reconciliations with filters
+ * - GET    /api/inter-company/reconciliations/:id                  - Get single reconciliation details
+ * - POST   /api/inter-company/reconciliations                      - Create new reconciliation
+ * - POST   /api/inter-company/reconciliations/:id/auto-match       - Auto-match transactions
+ * - POST   /api/inter-company/reconciliations/:id/manual-match     - Manually match two transactions
+ * - POST   /api/inter-company/reconciliations/:id/unmatch          - Unmatch previously matched transactions
+ * - POST   /api/inter-company/reconciliations/:id/adjustments      - Create adjustment entry
+ * - POST   /api/inter-company/reconciliations/:id/complete         - Complete reconciliation
+ * - POST   /api/inter-company/reconciliations/:id/approve          - Approve reconciliation
+ *
+ * FIRMS/COMPANIES (1 endpoint total):
+ * - GET    /api/inter-company/firms                     - Get all active firms/companies
+ *
+ * EXCHANGE RATES (1 endpoint total):
+ * - GET    /api/inter-company/exchange-rate             - Get exchange rate between currencies
+ *
+ * REPORTS (2 endpoints total):
+ * - GET    /api/inter-company/reports/summary           - Get summary report with date range
+ * - POST   /api/inter-company/reports/export            - Export report in various formats
+ *
+ * ==================== TOTAL: 30 ENDPOINTS ====================
+ *
+ * All endpoints use the firmId parameter (not companyId) per backend team requirements.
+ */
 class InterCompanyService {
   // ==================== Transactions ====================
 
+  /**
+   * Get inter-company transactions with optional filters
+   * @param filters - Optional filters including sourceFirmId, targetFirmId, status, date range, etc.
+   * @returns Promise with transactions list and pagination info
+   * @endpoint GET /api/inter-company/transactions
+   */
   async getTransactions(filters?: InterCompanyTransactionFilters) {
     try {
       const response = await apiClient.get('/api/inter-company/transactions', { params: filters })
@@ -204,6 +258,12 @@ class InterCompanyService {
     }
   }
 
+  /**
+   * Get a single inter-company transaction by ID
+   * @param id - Transaction ID
+   * @returns Promise with transaction details
+   * @endpoint GET /api/inter-company/transactions/:id
+   */
   async getTransaction(id: string) {
     try {
       const response = await apiClient.get(`/api/inter-company/transactions/${id}`)
@@ -213,6 +273,12 @@ class InterCompanyService {
     }
   }
 
+  /**
+   * Create a new inter-company transaction
+   * @param data - Transaction data including sourceFirmId, targetFirmId, amount, currency, etc.
+   * @returns Promise with created transaction
+   * @endpoint POST /api/inter-company/transactions
+   */
   async createTransaction(data: CreateInterCompanyTransactionData): Promise<InterCompanyTransaction> {
     try {
       const response = await apiClient.post('/api/inter-company/transactions', data)
@@ -222,6 +288,13 @@ class InterCompanyService {
     }
   }
 
+  /**
+   * Update an existing inter-company transaction
+   * @param id - Transaction ID
+   * @param data - Partial transaction data to update
+   * @returns Promise with updated transaction
+   * @endpoint PUT /api/inter-company/transactions/:id
+   */
   async updateTransaction(id: string, data: Partial<CreateInterCompanyTransactionData>): Promise<InterCompanyTransaction> {
     try {
       const response = await apiClient.put(`/api/inter-company/transactions/${id}`, data)
@@ -231,6 +304,12 @@ class InterCompanyService {
     }
   }
 
+  /**
+   * Delete an inter-company transaction
+   * @param id - Transaction ID
+   * @returns Promise with deletion confirmation
+   * @endpoint DELETE /api/inter-company/transactions/:id
+   */
   async deleteTransaction(id: string) {
     try {
       const response = await apiClient.delete(`/api/inter-company/transactions/${id}`)
@@ -240,6 +319,13 @@ class InterCompanyService {
     }
   }
 
+  /**
+   * Post transaction to accounting system
+   * Changes status from 'draft' or 'pending' to 'posted'
+   * @param id - Transaction ID
+   * @returns Promise with posted transaction
+   * @endpoint POST /api/inter-company/transactions/:id/post
+   */
   async postTransaction(id: string) {
     try {
       const response = await apiClient.post(`/api/inter-company/transactions/${id}/post`)
@@ -249,6 +335,13 @@ class InterCompanyService {
     }
   }
 
+  /**
+   * Cancel an inter-company transaction
+   * @param id - Transaction ID
+   * @param reason - Reason for cancellation
+   * @returns Promise with cancelled transaction
+   * @endpoint POST /api/inter-company/transactions/:id/cancel
+   */
   async cancelTransaction(id: string, reason: string) {
     try {
       const response = await apiClient.post(`/api/inter-company/transactions/${id}/cancel`, { reason })
@@ -260,6 +353,12 @@ class InterCompanyService {
 
   // ==================== Balances ====================
 
+  /**
+   * Get inter-company balance matrix for all companies
+   * @param currency - Optional currency filter
+   * @returns Promise with balance matrix including companies, balances, and currencies
+   * @endpoint GET /api/inter-company/balances
+   */
   async getBalances(currency?: string): Promise<InterCompanyBalanceMatrix> {
     try {
       const response = await apiClient.get('/api/inter-company/balances', {
@@ -271,6 +370,14 @@ class InterCompanyService {
     }
   }
 
+  /**
+   * Get balance between two specific companies
+   * @param sourceFirmId - Source firm ID
+   * @param targetFirmId - Target firm ID
+   * @param currency - Optional currency filter
+   * @returns Promise with balance details (receivable, payable, netBalance)
+   * @endpoint GET /api/inter-company/balances/between
+   */
   async getBalanceBetweenCompanies(sourceFirmId: string, targetFirmId: string, currency?: string): Promise<InterCompanyBalance> {
     try {
       const response = await apiClient.get('/api/inter-company/balances/between', {
@@ -282,6 +389,14 @@ class InterCompanyService {
     }
   }
 
+  /**
+   * Get transactions between two specific companies
+   * @param sourceFirmId - Source firm ID
+   * @param targetFirmId - Target firm ID
+   * @param filters - Optional additional filters
+   * @returns Promise with transactions list
+   * @endpoint GET /api/inter-company/transactions/between
+   */
   async getTransactionsBetweenCompanies(
     sourceFirmId: string,
     targetFirmId: string,
@@ -298,7 +413,14 @@ class InterCompanyService {
   }
 
   // ==================== Reconciliation ====================
+  // IMPORTANT: All reconciliation endpoints use PLURAL form "/reconciliations"
 
+  /**
+   * Get inter-company reconciliations with optional filters
+   * @param filters - Optional filters including sourceFirmId, targetFirmId, status, date range
+   * @returns Promise with reconciliations list and pagination info
+   * @endpoint GET /api/inter-company/reconciliations (PLURAL)
+   */
   async getReconciliations(filters?: ReconciliationFilters) {
     try {
       const response = await apiClient.get('/api/inter-company/reconciliations', { params: filters })
@@ -308,6 +430,12 @@ class InterCompanyService {
     }
   }
 
+  /**
+   * Get a single reconciliation by ID
+   * @param id - Reconciliation ID
+   * @returns Promise with reconciliation details
+   * @endpoint GET /api/inter-company/reconciliations/:id (PLURAL)
+   */
   async getReconciliation(id: string): Promise<InterCompanyReconciliation> {
     try {
       const response = await apiClient.get(`/api/inter-company/reconciliations/${id}`)
@@ -317,6 +445,12 @@ class InterCompanyService {
     }
   }
 
+  /**
+   * Create a new inter-company reconciliation
+   * @param data - Reconciliation data including firms, period, currency
+   * @returns Promise with created reconciliation
+   * @endpoint POST /api/inter-company/reconciliations (PLURAL)
+   */
   async createReconciliation(data: CreateReconciliationData): Promise<InterCompanyReconciliation> {
     try {
       const response = await apiClient.post('/api/inter-company/reconciliations', data)
@@ -326,6 +460,13 @@ class InterCompanyService {
     }
   }
 
+  /**
+   * Automatically match transactions in a reconciliation
+   * Uses smart matching algorithm to find corresponding transactions
+   * @param reconciliationId - Reconciliation ID
+   * @returns Promise with updated reconciliation including matched transactions
+   * @endpoint POST /api/inter-company/reconciliations/:id/auto-match (PLURAL)
+   */
   async autoMatchTransactions(reconciliationId: string) {
     try {
       const response = await apiClient.post(`/api/inter-company/reconciliations/${reconciliationId}/auto-match`)
@@ -335,6 +476,14 @@ class InterCompanyService {
     }
   }
 
+  /**
+   * Manually match two transactions in a reconciliation
+   * @param reconciliationId - Reconciliation ID
+   * @param sourceTransactionId - Source transaction ID
+   * @param targetTransactionId - Target transaction ID
+   * @returns Promise with updated reconciliation
+   * @endpoint POST /api/inter-company/reconciliations/:id/manual-match (PLURAL)
+   */
   async manualMatchTransactions(
     reconciliationId: string,
     sourceTransactionId: string,
@@ -351,6 +500,13 @@ class InterCompanyService {
     }
   }
 
+  /**
+   * Unmatch previously matched transactions
+   * @param reconciliationId - Reconciliation ID
+   * @param matchId - Match ID to remove
+   * @returns Promise with updated reconciliation
+   * @endpoint POST /api/inter-company/reconciliations/:id/unmatch (PLURAL)
+   */
   async unmatchTransactions(reconciliationId: string, matchId: string) {
     try {
       const response = await apiClient.post(`/api/inter-company/reconciliations/${reconciliationId}/unmatch`, {
@@ -362,6 +518,14 @@ class InterCompanyService {
     }
   }
 
+  /**
+   * Create an adjustment entry for a reconciliation
+   * Used for exchange rate adjustments, corrections, or other adjustments
+   * @param reconciliationId - Reconciliation ID
+   * @param adjustment - Adjustment data (type, amount, currency, reason, description)
+   * @returns Promise with updated reconciliation including new adjustment
+   * @endpoint POST /api/inter-company/reconciliations/:id/adjustments (PLURAL)
+   */
   async createAdjustmentEntry(reconciliationId: string, adjustment: Omit<AdjustmentEntry, '_id' | 'createdAt'>) {
     try {
       const response = await apiClient.post(`/api/inter-company/reconciliations/${reconciliationId}/adjustments`, adjustment)
@@ -371,6 +535,13 @@ class InterCompanyService {
     }
   }
 
+  /**
+   * Mark reconciliation as complete
+   * Changes status to 'completed' and finalizes all matches and adjustments
+   * @param reconciliationId - Reconciliation ID
+   * @returns Promise with completed reconciliation
+   * @endpoint POST /api/inter-company/reconciliations/:id/complete (PLURAL)
+   */
   async completeReconciliation(reconciliationId: string) {
     try {
       const response = await apiClient.post(`/api/inter-company/reconciliations/${reconciliationId}/complete`)
@@ -380,6 +551,13 @@ class InterCompanyService {
     }
   }
 
+  /**
+   * Approve a completed reconciliation
+   * Changes status to 'approved' and locks the reconciliation
+   * @param reconciliationId - Reconciliation ID
+   * @returns Promise with approved reconciliation
+   * @endpoint POST /api/inter-company/reconciliations/:id/approve (PLURAL)
+   */
   async approveReconciliation(reconciliationId: string) {
     try {
       const response = await apiClient.post(`/api/inter-company/reconciliations/${reconciliationId}/approve`)
@@ -391,6 +569,11 @@ class InterCompanyService {
 
   // ==================== Companies ====================
 
+  /**
+   * Get all active companies/firms in the organization
+   * @returns Promise with array of companies
+   * @endpoint GET /api/inter-company/firms
+   */
   async getCompanies(): Promise<Company[]> {
     try {
       const response = await apiClient.get('/api/inter-company/firms')
@@ -402,6 +585,14 @@ class InterCompanyService {
 
   // ==================== Exchange Rates ====================
 
+  /**
+   * Get exchange rate between two currencies
+   * @param fromCurrency - Source currency code (e.g., 'SAR')
+   * @param toCurrency - Target currency code (e.g., 'USD')
+   * @param date - Optional date for historical rate (defaults to current date)
+   * @returns Promise with exchange rate
+   * @endpoint GET /api/inter-company/exchange-rate
+   */
   async getExchangeRate(fromCurrency: string, toCurrency: string, date?: string): Promise<number> {
     try {
       const response = await apiClient.get('/api/inter-company/exchange-rate', {
@@ -415,6 +606,12 @@ class InterCompanyService {
 
   // ==================== Reports ====================
 
+  /**
+   * Get inter-company summary report
+   * @param params - Report parameters (startDate, endDate, optional firmId, optional currency)
+   * @returns Promise with report data including totals, breakdowns, trends
+   * @endpoint GET /api/inter-company/reports/summary
+   */
   async getInterCompanyReport(params: {
     startDate: string
     endDate: string
@@ -429,6 +626,12 @@ class InterCompanyService {
     }
   }
 
+  /**
+   * Export inter-company report in various formats
+   * @param params - Export parameters (reportType, format, optional filters)
+   * @returns Promise with blob data for download
+   * @endpoint POST /api/inter-company/reports/export
+   */
   async exportReport(params: {
     reportType: 'transactions' | 'balances' | 'reconciliation'
     format: 'csv' | 'pdf' | 'excel'

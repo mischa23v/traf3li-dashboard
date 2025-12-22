@@ -1,6 +1,55 @@
 /**
  * Company Service
- * Handles all company-related API calls for multi-company support
+ *
+ * This service handles multi-company hierarchy and access control within the Traf3li system.
+ * It manages the organizational structure, parent-child relationships between companies,
+ * and user access permissions across the company hierarchy.
+ *
+ * ## Dual-Service Architecture
+ *
+ * The Traf3li platform uses two services that interact with the same backend endpoints
+ * but serve different domain concerns:
+ *
+ * ### companyService.ts (this file)
+ * - **Domain**: Multi-company hierarchy and organizational structure
+ * - **Concerns**:
+ *   - Company tree management (parent-child relationships)
+ *   - Multi-company access control
+ *   - Company switching and context
+ *   - Hierarchical permissions (canAccessChildren, canAccessParent)
+ * - **Data Models**: Company, UserCompanyAccess, CompanyTreeNode
+ *
+ * ### firmService.ts
+ * - **Domain**: RBAC (Role-Based Access Control), team management, and firm operations
+ * - **Concerns**:
+ *   - Role and permission management
+ *   - Team creation and user assignments
+ *   - Firm-level settings and configuration
+ *   - User invitation and onboarding
+ * - **Data Models**: Firm, Team, TeamMember, Role, Permission
+ *
+ * ## Shared Backend
+ *
+ * Both services call `/api/firms/*` endpoints because:
+ * - The backend uses "firm" as the primary entity name
+ * - A "Company" in the UI is represented as a "Firm" in the database
+ * - The Company interfaces use `firmId` internally to maintain consistency with the backend
+ *
+ * ## Usage Guidelines
+ *
+ * - Use **companyService** for organizational hierarchy, multi-company features, and access control
+ * - Use **firmService** for RBAC, team management, and firm-specific operations
+ * - Both services can be used together when features require both hierarchy and permissions
+ *
+ * @example
+ * // Get company hierarchy
+ * const tree = await companyService.getTree();
+ *
+ * // Switch active company context
+ * await companyService.switchCompany(firmId);
+ *
+ * // Grant user access to a company
+ * await companyService.grantAccess(firmId, userId, { role: 'manager' });
  */
 
 import apiClient, { handleApiError } from '@/lib/api'

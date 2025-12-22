@@ -177,10 +177,103 @@ interface ConsolidatedReportResponse<T> {
 
 // ==================== SERVICE ====================
 
+/**
+ * Consolidated Report Service
+ *
+ * @description
+ * This service handles multi-company consolidated reporting with currency conversion
+ * and inter-company eliminations. It provides endpoints for generating consolidated
+ * financial reports across multiple companies.
+ *
+ * @important
+ * - The component exists at `/src/components/ConsolidatedReports.tsx`
+ * - **Component is NOT currently accessible** - needs to be added to routing configuration
+ * - Cash flow report is defined in ConsolidationFilters type but NOT implemented in service
+ *
+ * @apiPattern All endpoints follow the pattern:
+ * - Base URL: `/api/reports/consolidated`
+ * - Response format: `{ success: boolean, data: T }`
+ * - Error handling: Uses handleApiError() for consistent error messages
+ *
+ * @endpoints Available Endpoints:
+ *
+ * **Report Generation:**
+ * - POST   /reports/consolidated/profit-loss       - Generate consolidated P&L report
+ * - POST   /reports/consolidated/balance-sheet     - Generate consolidated balance sheet
+ * - POST   /reports/consolidated/summary           - Get consolidation summary metrics
+ * - POST   /reports/consolidated/export            - Export report (PDF/Excel/CSV)
+ *
+ * **Inter-Company Management:**
+ * - GET    /reports/consolidated/inter-company-transactions  - List inter-company transactions
+ * - POST   /reports/consolidated/comparisons       - Get company metric comparisons
+ *
+ * **Elimination Rules:**
+ * - GET    /reports/consolidated/elimination-rules           - List all elimination rules
+ * - POST   /reports/consolidated/elimination-rules           - Create elimination rule
+ * - PUT    /reports/consolidated/elimination-rules/:id       - Update elimination rule
+ * - DELETE /reports/consolidated/elimination-rules/:id       - Delete elimination rule
+ *
+ * **Currency Management:**
+ * - GET    /reports/consolidated/exchange-rates    - Get currency conversion rates
+ * - POST   /reports/consolidated/exchange-rates    - Set manual exchange rate
+ *
+ * @notImplemented
+ * - Cash Flow Report: Type 'cash_flow' exists in ConsolidationFilters.reportType
+ *   but no corresponding service method (getConsolidatedCashFlow) is implemented.
+ *   Backend endpoint may not exist yet.
+ *
+ * @example Basic Usage
+ * ```typescript
+ * import consolidatedReportService from '@/services/consolidatedReportService'
+ *
+ * // Generate consolidated P&L
+ * const report = await consolidatedReportService.getConsolidatedProfitLoss({
+ *   firmIds: ['firm1', 'firm2'],
+ *   startDate: '2024-01-01',
+ *   endDate: '2024-12-31',
+ *   reportType: 'profit_loss',
+ *   includeEliminationEntries: true,
+ *   baseCurrency: 'SAR',
+ *   consolidationMethod: 'full'
+ * })
+ * ```
+ */
 const consolidatedReportService = {
   /**
    * Generate consolidated profit & loss report
-   * POST /api/reports/consolidated/profit-loss
+   *
+   * @description
+   * Generates a consolidated profit and loss statement across multiple companies
+   * with currency conversion and inter-company eliminations.
+   *
+   * @endpoint POST /api/reports/consolidated/profit-loss
+   *
+   * @param {ConsolidationFilters} filters - Consolidation parameters
+   * @param {string[]} filters.firmIds - Array of firm IDs to consolidate
+   * @param {string} filters.startDate - Start date (YYYY-MM-DD)
+   * @param {string} filters.endDate - End date (YYYY-MM-DD)
+   * @param {string} filters.reportType - Report type (should be 'profit_loss')
+   * @param {boolean} [filters.includeEliminationEntries] - Include elimination entries
+   * @param {string} [filters.baseCurrency] - Base currency for consolidation (default: SAR)
+   * @param {string} [filters.consolidationMethod] - Consolidation method (default: full)
+   *
+   * @returns {Promise<ConsolidatedProfitLoss>} Consolidated P&L report with:
+   * - Income and expense line items broken down by company
+   * - Inter-company eliminations
+   * - Currency conversions
+   * - Net income before and after eliminations
+   *
+   * @throws {Error} API error message from handleApiError()
+   *
+   * @example
+   * const profitLoss = await consolidatedReportService.getConsolidatedProfitLoss({
+   *   firmIds: ['firm1', 'firm2'],
+   *   startDate: '2024-01-01',
+   *   endDate: '2024-12-31',
+   *   reportType: 'profit_loss',
+   *   includeEliminationEntries: true,
+   *   baseCurrency: 'SAR'
+   * })
    */
   getConsolidatedProfitLoss: async (
     filters: ConsolidationFilters
@@ -198,7 +291,29 @@ const consolidatedReportService = {
 
   /**
    * Generate consolidated balance sheet
-   * POST /api/reports/consolidated/balance-sheet
+   *
+   * @description
+   * Generates a consolidated balance sheet across multiple companies showing
+   * assets, liabilities, and equity with inter-company balance eliminations.
+   *
+   * @endpoint POST /api/reports/consolidated/balance-sheet
+   *
+   * @param {ConsolidationFilters} filters - Consolidation parameters
+   * @param {string[]} filters.firmIds - Array of firm IDs to consolidate
+   * @param {string} filters.startDate - Start date for period
+   * @param {string} filters.endDate - End date/as-of date (YYYY-MM-DD)
+   * @param {string} filters.reportType - Report type (should be 'balance_sheet')
+   * @param {boolean} [filters.includeEliminationEntries] - Include elimination entries
+   * @param {string} [filters.baseCurrency] - Base currency for consolidation
+   *
+   * @returns {Promise<ConsolidatedBalanceSheet>} Consolidated balance sheet with:
+   * - Current and non-current assets by company
+   * - Current and non-current liabilities by company
+   * - Equity breakdown by company
+   * - Inter-company balance eliminations
+   * - Currency conversions
+   *
+   * @throws {Error} API error message from handleApiError()
    */
   getConsolidatedBalanceSheet: async (
     filters: ConsolidationFilters
@@ -216,7 +331,28 @@ const consolidatedReportService = {
 
   /**
    * Get inter-company transactions
-   * GET /api/reports/consolidated/inter-company-transactions
+   *
+   * @description
+   * Retrieves all inter-company transactions between specified firms for a given period.
+   * Used for identifying and managing inter-company eliminations.
+   *
+   * @endpoint GET /api/reports/consolidated/inter-company-transactions
+   *
+   * @param {string[]} firmIds - Array of firm IDs to check for inter-company transactions
+   * @param {string} startDate - Start date (YYYY-MM-DD)
+   * @param {string} endDate - End date (YYYY-MM-DD)
+   *
+   * @queryParams Sent as URL parameters:
+   * - firmIds: Comma-separated list of firm IDs
+   * - startDate: ISO date string
+   * - endDate: ISO date string
+   *
+   * @returns {Promise<InterCompanyTransaction[]>} List of inter-company transactions with:
+   * - Transaction details (from/to companies, type, amount)
+   * - Currency and conversion information
+   * - Suggested elimination entries
+   *
+   * @throws {Error} API error message from handleApiError()
    */
   getInterCompanyTransactions: async (
     firmIds: string[],
@@ -242,7 +378,24 @@ const consolidatedReportService = {
 
   /**
    * Get company metric comparisons
-   * POST /api/reports/consolidated/comparisons
+   *
+   * @description
+   * Compares financial metrics across multiple companies for analysis and benchmarking.
+   * Provides rankings, percentages, and statistical summaries.
+   *
+   * @endpoint POST /api/reports/consolidated/comparisons
+   *
+   * @param {string[]} firmIds - Array of firm IDs to compare
+   * @param {string} startDate - Start date for period (YYYY-MM-DD)
+   * @param {string} endDate - End date for period (YYYY-MM-DD)
+   * @param {string[]} metrics - Array of metric names to compare (e.g., ['revenue', 'profit_margin'])
+   *
+   * @returns {Promise<CompanyMetricComparison[]>} Array of metric comparisons with:
+   * - Metric values for each company
+   * - Rankings and percentages of total
+   * - Statistical summaries (total, average, median)
+   *
+   * @throws {Error} API error message from handleApiError()
    */
   getCompanyComparisons: async (
     firmIds: string[],
@@ -267,7 +420,18 @@ const consolidatedReportService = {
 
   /**
    * Get elimination rules
-   * GET /api/reports/consolidated/elimination-rules
+   *
+   * @description
+   * Retrieves all configured elimination rules for inter-company transaction eliminations.
+   *
+   * @endpoint GET /api/reports/consolidated/elimination-rules
+   *
+   * @returns {Promise<EliminationRule[]>} List of all elimination rules with:
+   * - Rule configuration (type, accounts, companies)
+   * - Active/inactive status
+   * - Automatic vs manual application
+   *
+   * @throws {Error} API error message from handleApiError()
    */
   getEliminationRules: async (): Promise<EliminationRule[]> => {
     try {
@@ -282,7 +446,21 @@ const consolidatedReportService = {
 
   /**
    * Create elimination rule
-   * POST /api/reports/consolidated/elimination-rules
+   *
+   * @description
+   * Creates a new elimination rule for automated inter-company transaction eliminations.
+   *
+   * @endpoint POST /api/reports/consolidated/elimination-rules
+   *
+   * @param {Omit<EliminationRule, 'id'>} rule - New elimination rule (without ID)
+   * @param {string} rule.name - Rule name
+   * @param {string} rule.type - Rule type (inter_company_sales, loans, dividends, etc.)
+   * @param {boolean} rule.enabled - Whether rule is active
+   * @param {boolean} rule.automatic - Whether to apply automatically
+   *
+   * @returns {Promise<EliminationRule>} Created elimination rule with generated ID
+   *
+   * @throws {Error} API error message from handleApiError()
    */
   createEliminationRule: async (
     rule: Omit<EliminationRule, 'id'>
@@ -300,7 +478,18 @@ const consolidatedReportService = {
 
   /**
    * Update elimination rule
-   * PUT /api/reports/consolidated/elimination-rules/:id
+   *
+   * @description
+   * Updates an existing elimination rule by ID.
+   *
+   * @endpoint PUT /api/reports/consolidated/elimination-rules/:id
+   *
+   * @param {string} id - Elimination rule ID to update
+   * @param {Partial<EliminationRule>} updates - Fields to update
+   *
+   * @returns {Promise<EliminationRule>} Updated elimination rule
+   *
+   * @throws {Error} API error message from handleApiError()
    */
   updateEliminationRule: async (
     id: string,
@@ -319,7 +508,17 @@ const consolidatedReportService = {
 
   /**
    * Delete elimination rule
-   * DELETE /api/reports/consolidated/elimination-rules/:id
+   *
+   * @description
+   * Deletes an elimination rule by ID. This action cannot be undone.
+   *
+   * @endpoint DELETE /api/reports/consolidated/elimination-rules/:id
+   *
+   * @param {string} id - Elimination rule ID to delete
+   *
+   * @returns {Promise<void>} No return value on success
+   *
+   * @throws {Error} API error message from handleApiError()
    */
   deleteEliminationRule: async (id: string): Promise<void> => {
     try {
@@ -331,7 +530,26 @@ const consolidatedReportService = {
 
   /**
    * Get currency conversion rates
-   * GET /api/reports/consolidated/exchange-rates
+   *
+   * @description
+   * Retrieves currency conversion rates for specified currencies. Can optionally
+   * specify a date for historical rates.
+   *
+   * @endpoint GET /api/reports/consolidated/exchange-rates
+   *
+   * @param {string[]} currencies - Array of currency codes (e.g., ['USD', 'EUR', 'SAR'])
+   * @param {string} [date] - Optional date for historical rates (YYYY-MM-DD)
+   *
+   * @queryParams Sent as URL parameters:
+   * - currencies: Comma-separated list of currency codes
+   * - date: ISO date string (optional)
+   *
+   * @returns {Promise<CurrencyConversion[]>} Array of currency conversions with:
+   * - Currency pair (from/to)
+   * - Conversion rate
+   * - Date and source (manual, auto, ECB, central bank)
+   *
+   * @throws {Error} API error message from handleApiError()
    */
   getExchangeRates: async (
     currencies: string[],
@@ -355,7 +573,22 @@ const consolidatedReportService = {
 
   /**
    * Set manual exchange rate
-   * POST /api/reports/consolidated/exchange-rates
+   *
+   * @description
+   * Sets a manual currency conversion rate. Used when automatic rates are unavailable
+   * or when a specific rate needs to be enforced for consolidation purposes.
+   *
+   * @endpoint POST /api/reports/consolidated/exchange-rates
+   *
+   * @param {Omit<CurrencyConversion, 'source'>} conversion - Currency conversion to set
+   * @param {string} conversion.fromCurrency - Source currency code
+   * @param {string} conversion.toCurrency - Target currency code
+   * @param {number} conversion.rate - Conversion rate
+   * @param {string} conversion.date - Date for the rate (YYYY-MM-DD)
+   *
+   * @returns {Promise<CurrencyConversion>} Created currency conversion with source set to 'manual'
+   *
+   * @throws {Error} API error message from handleApiError()
    */
   setExchangeRate: async (conversion: Omit<CurrencyConversion, 'source'>): Promise<CurrencyConversion> => {
     try {
@@ -371,7 +604,25 @@ const consolidatedReportService = {
 
   /**
    * Get consolidation summary
-   * POST /api/reports/consolidated/summary
+   *
+   * @description
+   * Retrieves high-level summary metrics for a consolidated report including
+   * totals, eliminations, and key financial ratios.
+   *
+   * @endpoint POST /api/reports/consolidated/summary
+   *
+   * @param {ConsolidationFilters} filters - Consolidation parameters
+   * @param {string[]} filters.firmIds - Array of firm IDs to consolidate
+   * @param {string} filters.startDate - Start date (YYYY-MM-DD)
+   * @param {string} filters.endDate - End date (YYYY-MM-DD)
+   *
+   * @returns {Promise<ConsolidationSummary>} Summary metrics including:
+   * - Total revenue, expenses, and net income
+   * - Total assets, liabilities, and equity
+   * - Inter-company eliminations count and amount
+   * - Currencies involved and conversion rates used
+   *
+   * @throws {Error} API error message from handleApiError()
    */
   getConsolidationSummary: async (
     filters: ConsolidationFilters
@@ -389,7 +640,30 @@ const consolidatedReportService = {
 
   /**
    * Export consolidated report
-   * POST /api/reports/consolidated/export
+   *
+   * @description
+   * Exports a consolidated report in the specified format (PDF, Excel, or CSV).
+   * Returns a Blob that can be downloaded by the user.
+   *
+   * @endpoint POST /api/reports/consolidated/export
+   *
+   * @param {ConsolidationFilters} filters - Consolidation parameters for the report
+   * @param {'pdf' | 'excel' | 'csv'} format - Export format
+   *   - 'pdf': Full formatted report with charts and tables
+   *   - 'excel': Multi-sheet workbook with detailed data
+   *   - 'csv': Simple comma-separated values for data analysis
+   *
+   * @returns {Promise<Blob>} File blob that can be downloaded
+   *
+   * @throws {Error} API error message from handleApiError()
+   *
+   * @example
+   * const blob = await consolidatedReportService.exportConsolidatedReport(filters, 'pdf')
+   * const url = window.URL.createObjectURL(blob)
+   * const a = document.createElement('a')
+   * a.href = url
+   * a.download = 'consolidated-report.pdf'
+   * a.click()
    */
   exportConsolidatedReport: async (
     filters: ConsolidationFilters,

@@ -349,6 +349,25 @@ export const leadService = {
 // ═══════════════════════════════════════════════════════════════
 // PIPELINE SERVICE
 // ═══════════════════════════════════════════════════════════════
+/**
+ * Pipeline Service - Manages CRM pipelines and stages
+ *
+ * IMPORTANT: Base path is `/crm-pipelines` NOT `/pipelines`
+ *
+ * API Endpoints:
+ * - GET    /crm-pipelines                      - List all pipelines
+ * - GET    /crm-pipelines/:id                  - Get single pipeline with stage counts
+ * - POST   /crm-pipelines                      - Create new pipeline
+ * - PUT    /crm-pipelines/:id                  - Update pipeline
+ * - DELETE /crm-pipelines/:id                  - Delete pipeline
+ * - POST   /crm-pipelines/:id/stages           - Add stage to pipeline
+ * - PUT    /crm-pipelines/:id/stages/:stageId  - Update stage
+ * - DELETE /crm-pipelines/:id/stages/:stageId  - Remove stage
+ * - POST   /crm-pipelines/:id/stages/reorder   - Reorder stages (NOTE: Uses POST not PUT)
+ * - GET    /crm-pipelines/:id/stats            - Get pipeline statistics
+ * - POST   /crm-pipelines/:id/default          - Set as default pipeline
+ * - POST   /crm-pipelines/:id/duplicate        - Duplicate pipeline
+ */
 export const pipelineService = {
   /**
    * Get all pipelines

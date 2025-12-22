@@ -1,20 +1,32 @@
 /**
  * Chatter/Message Types
  * Based on Odoo's mail.message model for threaded discussions
+ *
+ * These types are used with the Message API endpoints:
+ * - All message endpoints use /api/messages/* (NOT /api/thread-messages/*)
+ * - See messageService.ts for full endpoint documentation
  */
 
 // ═══════════════════════════════════════════════════════════════
 // MESSAGE TYPE DEFINITIONS
 // ═══════════════════════════════════════════════════════════════
 
+/**
+ * Message type classification
+ * Used in API filters and message display logic
+ */
 export type ThreadMessageType =
-  | 'comment' // User comment
+  | 'comment' // User comment (public or internal)
   | 'notification' // System notification
   | 'email' // Email message
   | 'activity_done' // Activity completion log
   | 'stage_change' // Pipeline stage change
   | 'auto_log' // Automated log entry
 
+/**
+ * Resource model types that support threading
+ * Used as res_model parameter in API requests
+ */
 export type ThreadResModel =
   | 'Case'
   | 'Client'
@@ -29,6 +41,10 @@ export type ThreadResModel =
 // USER & ATTACHMENT TYPES
 // ═══════════════════════════════════════════════════════════════
 
+/**
+ * Message author/partner information
+ * Populated in message responses from the API
+ */
 export interface MessageAuthor {
   _id: string
   firstName: string
@@ -37,13 +53,18 @@ export interface MessageAuthor {
   avatar?: string
 }
 
+/**
+ * Message attachment metadata
+ * Returned when messages include attachments
+ * Endpoint: Files are uploaded separately, then attached by ID
+ */
 export interface MessageAttachment {
   _id: string
   name: string
   filename: string
   mimetype: string
   size: number
-  url: string
+  url: string // URL to download/view the attachment
   createdAt: string
 }
 
@@ -51,6 +72,11 @@ export interface MessageAttachment {
 // TRACKING VALUE (Field change tracking)
 // ═══════════════════════════════════════════════════════════════
 
+/**
+ * Field change tracking for audit trail
+ * Automatically generated when tracked fields are modified
+ * Used in stage_change and auto_log message types
+ */
 export interface TrackingValue {
   field: string // Field name in database
   field_desc: string // Human-readable field name (English)
@@ -72,25 +98,36 @@ export interface TrackingValue {
 // THREAD MESSAGE INTERFACE
 // ═══════════════════════════════════════════════════════════════
 
+/**
+ * Main message/chatter object
+ * Returned by all message API endpoints
+ *
+ * API Endpoints that return this type:
+ * - GET /api/messages/:id - Single message
+ * - POST /api/messages - Create message
+ * - POST /api/messages/note - Create note
+ * - PATCH /api/messages/:id - Update message
+ * - POST /api/messages/:id/star - Toggle star
+ */
 export interface ThreadMessage {
   _id: string
-  res_model: ThreadResModel
-  res_id: string
-  parent_id?: string | ThreadMessage // For nested replies
+  res_model: ThreadResModel // Type of record this message belongs to
+  res_id: string // ID of the record
+  parent_id?: string | ThreadMessage // For nested replies (not fully implemented)
   message_type: ThreadMessageType
   subtype?: string // e.g., 'mail.mt_note', 'mail.mt_comment'
   subject?: string
   body: string // HTML content
   bodyPlain?: string // Plain text version
-  author_id: MessageAuthor | string
+  author_id: MessageAuthor | string // Message creator
   partner_ids: (MessageAuthor | string)[] // Mentioned/notified users
   attachment_ids: MessageAttachment[]
-  tracking_value_ids: TrackingValue[]
+  tracking_value_ids: TrackingValue[] // Field changes (for audit logs)
   is_internal: boolean // Internal note vs public comment
   starred_partner_ids: string[] // Users who starred this message
-  is_starred?: boolean // For current user
-  email_from?: string
-  email_to?: string[]
+  is_starred?: boolean // For current user (computed field)
+  email_from?: string // For email message type
+  email_to?: string[] // For email message type
   createdAt: string
   updatedAt: string
 }
@@ -99,84 +136,122 @@ export interface ThreadMessage {
 // MESSAGE CREATE/UPDATE
 // ═══════════════════════════════════════════════════════════════
 
+/**
+ * Data for creating a new message/comment
+ * Used with: POST /api/messages
+ */
 export interface CreateMessageData {
-  res_model: ThreadResModel
-  res_id: string
-  parent_id?: string
-  body: string
-  is_internal?: boolean
-  attachment_ids?: string[]
-  partner_ids?: string[] // Users to mention/notify
-  subject?: string
+  res_model: ThreadResModel // Model type to attach message to
+  res_id: string // Record ID to attach message to
+  parent_id?: string // Parent message ID for replies (not fully implemented)
+  body: string // HTML content of the message
+  is_internal?: boolean // true = internal note, false = public comment
+  attachment_ids?: string[] // Array of attachment IDs (upload files first)
+  partner_ids?: string[] // User IDs to mention/notify
+  subject?: string // Optional subject line
 }
 
+/**
+ * Data for creating an internal note
+ * Used with: POST /api/messages/note
+ * Note: is_internal is automatically set to true by the service
+ */
 export interface CreateNoteData {
   res_model: ThreadResModel
   res_id: string
-  body: string
+  body: string // HTML content of the note
   attachment_ids?: string[]
-  partner_ids?: string[]
+  partner_ids?: string[] // User IDs to mention/notify
 }
 
 // ═══════════════════════════════════════════════════════════════
 // RECORD THREAD (Grouped messages for a record)
 // ═══════════════════════════════════════════════════════════════
 
+/**
+ * Full thread for a specific record, with messages grouped by type
+ * Returned by: GET /api/messages/thread/:resModel/:resId
+ *
+ * This provides a complete view of all messages for a record,
+ * organized into categories for easier display in the UI
+ */
 export interface RecordThread {
   res_model: ThreadResModel
   res_id: string
-  res_name?: string
-  comments: ThreadMessage[]
-  notes: ThreadMessage[]
-  notifications: ThreadMessage[]
+  res_name?: string // Display name of the record
+  comments: ThreadMessage[] // Public comments
+  notes: ThreadMessage[] // Internal notes
+  notifications: ThreadMessage[] // System notifications
   activities: ThreadMessage[] // Activity completion logs
-  tracking: ThreadMessage[] // Field change logs
-  total_count: number
+  tracking: ThreadMessage[] // Field change audit logs
+  total_count: number // Total number of messages across all types
 }
 
 // ═══════════════════════════════════════════════════════════════
 // MESSAGE FILTERS & RESPONSES
 // ═══════════════════════════════════════════════════════════════
 
+/**
+ * Filter parameters for querying messages
+ * Used with: GET /api/messages?[query params]
+ *
+ * All filters are optional and can be combined
+ */
 export interface MessageFilters {
-  res_model?: ThreadResModel
-  res_id?: string
-  message_type?: ThreadMessageType | ThreadMessageType[]
-  author_id?: string
-  is_internal?: boolean
-  is_starred?: boolean
-  search?: string
-  date_from?: string
-  date_to?: string
-  sortOrder?: 'asc' | 'desc'
-  page?: number
-  limit?: number
+  res_model?: ThreadResModel // Filter by model type
+  res_id?: string // Filter by specific record
+  message_type?: ThreadMessageType | ThreadMessageType[] // Single type or array
+  author_id?: string // Filter by message author
+  is_internal?: boolean // Filter internal notes vs public comments
+  is_starred?: boolean // Filter starred messages
+  search?: string // Full-text search in message body
+  date_from?: string // Filter messages after this date
+  date_to?: string // Filter messages before this date
+  sortOrder?: 'asc' | 'desc' // Sort by creation date
+  page?: number // Pagination page number
+  limit?: number // Items per page
 }
 
+/**
+ * Paginated message response
+ * Returned by:
+ * - GET /api/messages
+ * - GET /api/messages/search
+ * - GET /api/messages/starred
+ */
 export interface MessageResponse {
   messages: ThreadMessage[]
-  total: number
-  page: number
-  limit: number
-  hasMore: boolean
+  total: number // Total count across all pages
+  page: number // Current page number
+  limit: number // Items per page
+  hasMore: boolean // Whether more pages exist
 }
 
+/**
+ * Mention-specific response with unread count
+ * Returned by: GET /api/messages/mentions
+ */
 export interface MentionSearchResult {
-  messages: ThreadMessage[]
-  total: number
-  unread_count: number
+  messages: ThreadMessage[] // Messages that mention current user
+  total: number // Total mention count
+  unread_count: number // Number of unread mentions
 }
 
 // ═══════════════════════════════════════════════════════════════
 // MESSAGE SUBTYPES (for filtering/display)
 // ═══════════════════════════════════════════════════════════════
 
+/**
+ * Message subtype constants (Odoo mail.message subtypes)
+ * These correspond to the 'subtype' field in ThreadMessage
+ * Used for filtering and display logic in the UI
+ */
 export const MESSAGE_SUBTYPES = {
-  COMMENT: 'mail.mt_comment',
-  NOTE: 'mail.mt_note',
-  ACTIVITIES: 'mail.mt_activities',
-  STAGE_CHANGE: 'mail.mt_stage_change',
-  TRACKING: 'mail.mt_tracking',
+  COMMENT: 'mail.mt_comment', // User comment
+  NOTE: 'mail.mt_note', // Internal note
+  ACTIVITIES: 'mail.mt_activities', // Activity completion
+  STAGE_CHANGE: 'mail.mt_stage_change', // Pipeline stage change
+  TRACKING: 'mail.mt_tracking', // Field change tracking
 } as const
 
 // ═══════════════════════════════════════════════════════════════
@@ -186,15 +261,30 @@ export const MESSAGE_SUBTYPES = {
 /**
  * Mention format in body: @[User Name](user:userId)
  * This regex extracts mentions from message body
+ *
+ * Example: "@[John Doe](user:507f1f77bcf86cd799439011)"
  */
 export const MENTION_REGEX = /@\[([^\]]+)\]\(user:([^)]+)\)/g
 
+/**
+ * Parsed mention result
+ */
 export interface ParsedMention {
-  displayName: string
-  userId: string
-  fullMatch: string
+  displayName: string // User's display name (e.g., "John Doe")
+  userId: string // User's database ID
+  fullMatch: string // The complete matched mention string
 }
 
+/**
+ * Extract all mentions from a message body
+ *
+ * @param body - Message body HTML containing mentions
+ * @returns Array of parsed mentions
+ *
+ * @example
+ * const mentions = parseMentions("Hey @[John](user:123), can you review?")
+ * // Returns: [{ displayName: "John", userId: "123", fullMatch: "@[John](user:123)" }]
+ */
 export function parseMentions(body: string): ParsedMention[] {
   const mentions: ParsedMention[] = []
   let match
@@ -211,7 +301,14 @@ export function parseMentions(body: string): ParsedMention[] {
 }
 
 /**
- * Replace mentions with HTML for display
+ * Convert mention syntax to HTML for display
+ *
+ * @param body - Message body with mention syntax
+ * @returns HTML string with mentions rendered as spans
+ *
+ * @example
+ * renderMentions("Hey @[John](user:123)")
+ * // Returns: "Hey <span class="mention" data-user-id="123">@John</span>"
  */
 export function renderMentions(body: string): string {
   return body.replace(

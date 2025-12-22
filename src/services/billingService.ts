@@ -1,6 +1,53 @@
 /**
  * Billing Service
  * Handles subscription, payment methods, and billing history operations
+ *
+ * ⚠️ STRIPE INTEGRATION STATUS: INCOMPLETE (STUB IMPLEMENTATION)
+ *
+ * This service defines the API contract for billing operations, but the backend
+ * Stripe integration is not yet fully implemented. Current implementation serves
+ * as a stub/interface definition for future development.
+ *
+ * EXPECTED BACKEND ENDPOINTS:
+ *
+ * Subscription Management:
+ * - GET    /billing/subscription              - Get current subscription details
+ * - GET    /billing/usage                     - Get usage metrics for current plan
+ * - POST   /billing/subscription/change-plan  - Change subscription plan
+ * - POST   /billing/subscription/cancel       - Cancel subscription at period end
+ * - POST   /billing/subscription/reactivate   - Reactivate canceled subscription
+ * - GET    /billing/subscription/upcoming-invoice - Preview upcoming invoice
+ *
+ * Payment Methods (Requires Stripe Elements integration):
+ * - GET    /billing/payment-methods           - List all payment methods
+ * - POST   /billing/payment-methods           - Add new payment method (requires Stripe paymentMethodId)
+ * - PATCH  /billing/payment-methods/:id/set-default - Set default payment method
+ * - DELETE /billing/payment-methods/:id       - Remove payment method
+ * - POST   /billing/payment-methods/setup-intent - Create Stripe SetupIntent for adding payment methods
+ *
+ * Billing History:
+ * - GET    /billing/invoices                  - Get invoice history with pagination
+ * - GET    /billing/invoices/:id              - Get single invoice details
+ * - GET    /billing/invoices/:id/download     - Download invoice PDF
+ * - POST   /billing/invoices/:id/pay          - Pay outstanding invoice
+ *
+ * FRONTEND INTEGRATION REQUIREMENTS:
+ *
+ * Payment Method Addition:
+ * - Requires Stripe Elements library (@stripe/stripe-js, @stripe/react-stripe-js)
+ * - Flow:
+ *   1. Call createSetupIntent() to get clientSecret
+ *   2. Mount Stripe CardElement or PaymentElement on the page
+ *   3. Use stripe.confirmSetup() to validate card and get paymentMethodId
+ *   4. Call addPaymentMethod() with the paymentMethodId from Stripe
+ * - See: https://stripe.com/docs/payments/save-and-reuse
+ *
+ * TODO - Backend Implementation:
+ * - Integrate Stripe SDK for subscription management
+ * - Implement webhook handlers for Stripe events
+ * - Add proper error handling for Stripe API errors
+ * - Implement invoice generation and PDF download
+ * - Set up secure payment method storage via Stripe
  */
 
 import apiClient, { handleApiError } from '@/lib/api'
@@ -96,8 +143,16 @@ export interface PaymentMethod {
   createdAt: string
 }
 
+/**
+ * Data required to add a new payment method
+ *
+ * ⚠️ The paymentMethodId must be obtained from Stripe Elements.
+ * Never send raw card details directly - use Stripe's client-side validation first.
+ */
 export interface CreatePaymentMethodData {
-  paymentMethodId: string // Stripe payment method ID
+  /** Stripe PaymentMethod ID obtained from stripe.confirmSetup() or stripe.createPaymentMethod() */
+  paymentMethodId: string
+  /** Set as the default payment method for future charges */
   isDefault?: boolean
 }
 
@@ -249,6 +304,32 @@ const billingService = {
 
   /**
    * Add new payment method
+   *
+   * ⚠️ REQUIRES STRIPE ELEMENTS INTEGRATION
+   *
+   * This function expects a paymentMethodId that must be obtained from Stripe Elements.
+   * You cannot directly send card details to the backend for PCI compliance.
+   *
+   * Implementation steps:
+   * 1. Install: npm install @stripe/stripe-js @stripe/react-stripe-js
+   * 2. Get clientSecret from createSetupIntent()
+   * 3. Use Stripe CardElement or PaymentElement to collect card details
+   * 4. Call stripe.confirmSetup() to get paymentMethodId
+   * 5. Pass the paymentMethodId to this function
+   *
+   * @param data - Object containing Stripe paymentMethodId and optional default flag
+   * @returns The created payment method details
+   *
+   * @example
+   * // After collecting card with Stripe Elements:
+   * const { paymentMethod } = await stripe.confirmSetup({
+   *   elements,
+   *   confirmParams: { return_url: window.location.href }
+   * });
+   * await billingService.addPaymentMethod({
+   *   paymentMethodId: paymentMethod.id,
+   *   isDefault: true
+   * });
    */
   addPaymentMethod: async (data: CreatePaymentMethodData): Promise<PaymentMethod> => {
     try {
@@ -284,6 +365,20 @@ const billingService = {
 
   /**
    * Create Stripe setup intent for adding payment method
+   *
+   * This is step 1 of the Stripe Elements payment method collection flow.
+   * The returned clientSecret is used to initialize Stripe Elements on the frontend.
+   *
+   * ⚠️ Backend must create a Stripe SetupIntent and return its client_secret
+   *
+   * @returns Object containing clientSecret for Stripe Elements initialization
+   *
+   * @example
+   * const { clientSecret } = await billingService.createSetupIntent();
+   * // Use clientSecret with Stripe Elements:
+   * // <Elements stripe={stripePromise} options={{ clientSecret }}>
+   * //   <PaymentElement />
+   * // </Elements>
    */
   createSetupIntent: async (): Promise<{ clientSecret: string }> => {
     try {

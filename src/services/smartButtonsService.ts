@@ -1,3 +1,22 @@
+/**
+ * @deprecated This service is not currently used in the application.
+ *
+ * IMPORTANT: The endpoints defined in this service (e.g., `/smart-buttons/:model/:recordId/counts`)
+ * are NOT implemented or called anywhere in the codebase.
+ *
+ * ACTUAL IMPLEMENTATION:
+ * The smart button counts functionality is implemented using entity-specific endpoints
+ * in the `useSmartButtonCounts.ts` hook, which calls individual endpoints like:
+ * - `/clients/:id/cases/count`
+ * - `/clients/:id/invoices/count`
+ * - `/clients/:id/documents/count`
+ * etc.
+ *
+ * This file is preserved for reference and potential future use if a unified
+ * smart buttons API endpoint is implemented on the backend.
+ *
+ * @see src/hooks/useSmartButtonCounts.ts for the actual implementation
+ */
 import { apiClient } from '@/lib/api'
 
 // Types

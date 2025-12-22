@@ -1,6 +1,19 @@
 /**
  * Message/Chatter Service
  * API service for threaded messages and discussions (based on Odoo mail.message)
+ *
+ * ACTUAL API ENDPOINTS (all prefixed with /api):
+ * - POST   /api/messages                      - Create a message/comment
+ * - POST   /api/messages/note                 - Create an internal note
+ * - GET    /api/messages                      - Get messages with filters
+ * - GET    /api/messages/thread/:model/:id    - Get full thread for a record
+ * - GET    /api/messages/mentions             - Get mentions for current user
+ * - GET    /api/messages/starred              - Get starred messages
+ * - GET    /api/messages/search               - Search messages
+ * - GET    /api/messages/:id                  - Get single message by ID
+ * - POST   /api/messages/:id/star             - Toggle star on message
+ * - PATCH  /api/messages/:id                  - Update message
+ * - DELETE /api/messages/:id                  - Delete message
  */
 
 import apiClient from '@/lib/api'
@@ -19,6 +32,10 @@ import type {
 
 /**
  * Post a new message/comment
+ *
+ * Endpoint: POST /api/messages
+ * @param data - Message creation data
+ * @returns Created message
  */
 export const createMessage = async (data: CreateMessageData): Promise<ThreadMessage> => {
   const response = await apiClient.post('/messages', data)
@@ -27,6 +44,10 @@ export const createMessage = async (data: CreateMessageData): Promise<ThreadMess
 
 /**
  * Post an internal note
+ *
+ * Endpoint: POST /api/messages/note
+ * @param data - Note creation data
+ * @returns Created note (marked as internal)
  */
 export const createNote = async (data: CreateNoteData): Promise<ThreadMessage> => {
   const response = await apiClient.post('/messages/note', {
@@ -38,6 +59,10 @@ export const createNote = async (data: CreateNoteData): Promise<ThreadMessage> =
 
 /**
  * Get messages with filters
+ *
+ * Endpoint: GET /api/messages?[query params]
+ * @param filters - Optional filters for messages
+ * @returns Paginated message response
  */
 export const getMessages = async (filters?: MessageFilters): Promise<MessageResponse> => {
   const params = new URLSearchParams()
@@ -67,6 +92,11 @@ export const getMessages = async (filters?: MessageFilters): Promise<MessageResp
 
 /**
  * Get full thread for a record (grouped by type)
+ *
+ * Endpoint: GET /api/messages/thread/:resModel/:resId
+ * @param resModel - Model type (Case, Client, Lead, etc.)
+ * @param resId - Record ID
+ * @returns Thread with messages grouped by type (comments, notes, notifications, etc.)
  */
 export const getRecordThread = async (
   resModel: ThreadResModel,
@@ -78,6 +108,11 @@ export const getRecordThread = async (
 
 /**
  * Get messages mentioning current user
+ *
+ * Endpoint: GET /api/messages/mentions?[query params]
+ * @param page - Page number for pagination
+ * @param limit - Number of items per page
+ * @returns Mention search results with unread count
  */
 export const getMyMentions = async (
   page?: number,
@@ -93,6 +128,11 @@ export const getMyMentions = async (
 
 /**
  * Get starred messages for current user
+ *
+ * Endpoint: GET /api/messages/starred?[query params]
+ * @param page - Page number for pagination
+ * @param limit - Number of items per page
+ * @returns Paginated starred messages
  */
 export const getStarredMessages = async (
   page?: number,
@@ -108,6 +148,13 @@ export const getStarredMessages = async (
 
 /**
  * Search messages
+ *
+ * Endpoint: GET /api/messages/search?[query params]
+ * @param query - Search query string
+ * @param resModel - Optional model filter
+ * @param page - Page number for pagination
+ * @param limit - Number of items per page
+ * @returns Paginated search results
  */
 export const searchMessages = async (
   query: string,
@@ -127,6 +174,10 @@ export const searchMessages = async (
 
 /**
  * Get a single message by ID
+ *
+ * Endpoint: GET /api/messages/:id
+ * @param id - Message ID
+ * @returns Single message
  */
 export const getMessageById = async (id: string): Promise<ThreadMessage> => {
   const response = await apiClient.get(`/messages/${id}`)
@@ -135,6 +186,10 @@ export const getMessageById = async (id: string): Promise<ThreadMessage> => {
 
 /**
  * Toggle star on a message
+ *
+ * Endpoint: POST /api/messages/:id/star
+ * @param id - Message ID
+ * @returns Updated message with toggled star status
  */
 export const toggleMessageStar = async (id: string): Promise<ThreadMessage> => {
   const response = await apiClient.post(`/messages/${id}/star`)
@@ -143,6 +198,9 @@ export const toggleMessageStar = async (id: string): Promise<ThreadMessage> => {
 
 /**
  * Delete a message
+ *
+ * Endpoint: DELETE /api/messages/:id
+ * @param id - Message ID
  */
 export const deleteMessage = async (id: string): Promise<void> => {
   await apiClient.delete(`/messages/${id}`)
@@ -150,6 +208,11 @@ export const deleteMessage = async (id: string): Promise<void> => {
 
 /**
  * Update a message (only for own messages, within time limit)
+ *
+ * Endpoint: PATCH /api/messages/:id
+ * @param id - Message ID
+ * @param body - New message body content
+ * @returns Updated message
  */
 export const updateMessage = async (
   id: string,
@@ -163,6 +226,15 @@ export const updateMessage = async (
 
 /**
  * Post a quick comment to a record
+ *
+ * This is a convenience wrapper around createMessage()
+ * Endpoint: POST /api/messages
+ *
+ * @param resModel - Model type (Case, Client, Lead, etc.)
+ * @param resId - Record ID
+ * @param body - Comment body (HTML)
+ * @param attachmentIds - Optional attachment IDs
+ * @returns Created comment message
  */
 export const postComment = async (
   resModel: ThreadResModel,
@@ -181,6 +253,15 @@ export const postComment = async (
 
 /**
  * Post a quick internal note to a record
+ *
+ * This is a convenience wrapper around createNote()
+ * Endpoint: POST /api/messages/note
+ *
+ * @param resModel - Model type (Case, Client, Lead, etc.)
+ * @param resId - Record ID
+ * @param body - Note body (HTML)
+ * @param partnerIds - Optional partner IDs to mention/notify
+ * @returns Created internal note
  */
 export const postInternalNote = async (
   resModel: ThreadResModel,
