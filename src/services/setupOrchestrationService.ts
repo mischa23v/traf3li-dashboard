@@ -20,7 +20,7 @@
  * - Critical modules (hr, crm, finance) block certain features until complete
  * - Non-critical modules (inventory, projects) can be skipped
  */
-import { apiClient } from '@/lib/api-client'
+import { apiClient } from '@/lib/api'
 
 // Types
 export interface ModuleSetupStatus {
