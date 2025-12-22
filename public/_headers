@@ -1,36 +1,102 @@
-# Security Headers for Cloudflare Pages
-# These headers are applied to all responses
+# Security Headers for Netlify/Cloudflare Pages/Static Hosts
+# These headers provide defense-in-depth security for the application
+# See /src/lib/security-headers.ts for detailed documentation
+
+# ============================================================================
+# Global Security Headers - Applied to all pages
+# ============================================================================
 
 /*
+  # Force HTTPS connections (HSTS)
+  # Prevents protocol downgrade attacks and cookie hijacking
+  # max-age: 1 year, includeSubDomains: apply to all subdomains, preload: eligible for browser preload list
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+
   # Prevent clickjacking attacks
+  # DENY: page cannot be displayed in any iframe
   X-Frame-Options: DENY
 
   # Prevent MIME type sniffing
+  # Blocks requests if content-type doesn't match declared type
   X-Content-Type-Options: nosniff
 
-  # Enable XSS filter in browsers
+  # Enable XSS filter in browsers (legacy browsers)
+  # Modern browsers use CSP, but this provides defense in depth
   X-XSS-Protection: 1; mode=block
 
-  # Control referrer information
+  # Control referrer information sent to other sites
+  # Important for privacy and PDPL compliance
+  # strict-origin-when-cross-origin: send full URL for same-origin, only origin for cross-origin
   Referrer-Policy: strict-origin-when-cross-origin
 
-  # Restrict browser features
-  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  # Restrict browser features and APIs (Permissions-Policy)
+  # Reduces attack surface and improves privacy
+  # Disabled features: camera, microphone, geolocation, payment, USB, FLoC
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
 
-  # Content Security Policy
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https://api.traf3li.com wss://api.traf3li.com https://*.google-analytics.com https://*.sentry.io https://cloudflareinsights.com https://*.workers.dev; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; upgrade-insecure-requests;
+  # Content Security Policy - Controls what resources can be loaded
+  # Protects against XSS, data injection, and clickjacking attacks
+  # Note: 'unsafe-inline' is required for some libraries but should be minimized
+  # Note: 'unsafe-eval' removed for better security (not needed in production)
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.traf3li.com wss://api.traf3li.com https://*.sentry.io https://cloudflareinsights.com https://*.workers.dev; frame-src 'none'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; upgrade-insecure-requests;
 
-  # Force HTTPS
-  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+# ============================================================================
+# Cache Control Headers - Optimize performance while securing sensitive data
+# ============================================================================
 
-# Cache static assets
+# Static assets with hashed filenames - Cache for 1 year
+# These files are immutable and can be cached indefinitely
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Don't cache HTML (for SPA updates)
+# Fonts - Cache for 1 year
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# HTML files - Never cache
+# Ensures users always get the latest SPA version
 /*.html
   Cache-Control: no-cache, no-store, must-revalidate
 
-# Don't cache the index
+# Index page - Never cache
+# Critical for SPA updates
 /
   Cache-Control: no-cache, no-store, must-revalidate
+
+# Manifest and Service Worker - Must revalidate
+# Ensures users get updated PWA configuration
+/manifest.json
+  Cache-Control: public, max-age=0, must-revalidate
+  Content-Type: application/manifest+json
+
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+  Service-Worker-Allowed: /
+
+# Favicon and icons - Cache for 1 week
+/favicon.ico
+  Cache-Control: public, max-age=604800
+
+/icons/*
+  Cache-Control: public, max-age=604800
+
+# ============================================================================
+# Sensitive Pages - Additional security for pages with user data
+# ============================================================================
+
+# Dashboard and admin pages - No caching, additional security
+/dashboard/*
+  Cache-Control: private, no-cache, no-store, must-revalidate
+
+/admin/*
+  Cache-Control: private, no-cache, no-store, must-revalidate
+
+/settings/*
+  Cache-Control: private, no-cache, no-store, must-revalidate
+
+# ============================================================================
+# API Routes - Prevent caching of API responses
+# ============================================================================
+
+/api/*
+  Cache-Control: private, no-cache, no-store, must-revalidate
