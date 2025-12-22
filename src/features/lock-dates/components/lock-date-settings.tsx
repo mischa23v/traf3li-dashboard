@@ -15,11 +15,9 @@ import {
   AlertTriangle,
   Shield,
   Loader2,
-  Info,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
   Card,
@@ -68,7 +66,7 @@ interface LockDateSettingsProps {
 }
 
 export function LockDateSettings({ className, isAdmin = false }: LockDateSettingsProps) {
-  const { t, i18n } = useTranslation()
+  const { i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
   const [editingLock, setEditingLock] = React.useState<LockType | null>(null)
   const [newDate, setNewDate] = React.useState<Date | undefined>(undefined)
@@ -95,7 +93,7 @@ export function LockDateSettings({ className, isAdmin = false }: LockDateSetting
       setEditingLock(null)
       setNewDate(undefined)
       setReason('')
-    } catch (error) {
+    } catch {
       // Error handled by mutation
     }
   }

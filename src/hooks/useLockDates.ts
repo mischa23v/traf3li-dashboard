@@ -28,7 +28,7 @@ export const lockDateKeys = {
   all: ['lock-dates'] as const,
   config: () => [...lockDateKeys.all, 'config'] as const,
   periods: (year?: number) => [...lockDateKeys.all, 'periods', year] as const,
-  history: (lockType?: LockType) => [...lockDateKeys.all, 'history', lockType] as const,
+  history: (lockType?: LockType, page?: number, limit?: number) => [...lockDateKeys.all, 'history', lockType, page, limit] as const,
   check: (date: string, lockType?: LockType) =>
     [...lockDateKeys.all, 'check', date, lockType] as const,
 }
@@ -71,7 +71,7 @@ export function useLockDateHistory(
   enabled = true
 ) {
   return useQuery({
-    queryKey: lockDateKeys.history(lockType),
+    queryKey: lockDateKeys.history(lockType, page, limit),
     queryFn: () => lockDateService.getLockDateHistory(lockType, page, limit),
     staleTime: HISTORY_STALE_TIME,
     gcTime: CONFIG_GC_TIME,
@@ -112,7 +112,7 @@ export function useUpdateLockDate() {
       queryClient.invalidateQueries({ queryKey: lockDateKeys.history() })
       toast.success('تم تحديث تاريخ القفل بنجاح')
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل في تحديث تاريخ القفل')
     },
   })
@@ -131,7 +131,7 @@ export function useClearLockDate() {
       queryClient.invalidateQueries({ queryKey: lockDateKeys.history() })
       toast.success('تم مسح تاريخ القفل')
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل في مسح تاريخ القفل')
     },
   })
@@ -150,7 +150,7 @@ export function useLockPeriod() {
       queryClient.invalidateQueries({ queryKey: lockDateKeys.periods() })
       toast.success('تم قفل الفترة بنجاح')
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل في قفل الفترة')
     },
   })
@@ -169,7 +169,7 @@ export function useReopenPeriod() {
       queryClient.invalidateQueries({ queryKey: lockDateKeys.periods() })
       toast.success('تم إعادة فتح الفترة')
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل في إعادة فتح الفترة')
     },
   })
@@ -189,7 +189,7 @@ export function useUpdateFiscalYearEnd() {
       queryClient.invalidateQueries({ queryKey: lockDateKeys.periods() })
       toast.success('تم تحديث نهاية السنة المالية')
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل في تحديث نهاية السنة المالية')
     },
   })

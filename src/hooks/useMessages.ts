@@ -29,10 +29,10 @@ export const messageKeys = {
   list: (filters?: MessageFilters) => [...messageKeys.lists(), filters] as const,
   thread: (resModel: ThreadResModel, resId: string) =>
     [...messageKeys.all, 'thread', resModel, resId] as const,
-  mentions: () => [...messageKeys.all, 'mentions'] as const,
-  starred: () => [...messageKeys.all, 'starred'] as const,
-  search: (query: string, resModel?: ThreadResModel) =>
-    [...messageKeys.all, 'search', query, resModel] as const,
+  mentions: (page?: number, limit?: number) => [...messageKeys.all, 'mentions', page, limit] as const,
+  starred: (page?: number, limit?: number) => [...messageKeys.all, 'starred', page, limit] as const,
+  search: (query: string, resModel?: ThreadResModel, page?: number, limit?: number) =>
+    [...messageKeys.all, 'search', query, resModel, page, limit] as const,
   detail: (id: string) => [...messageKeys.all, 'detail', id] as const,
 }
 
@@ -73,7 +73,7 @@ export function useRecordThread(
  */
 export function useMyMentions(page?: number, limit?: number, enabled = true) {
   return useQuery({
-    queryKey: messageKeys.mentions(),
+    queryKey: messageKeys.mentions(page, limit),
     queryFn: () => messageService.getMyMentions(page, limit),
     staleTime: MENTION_STALE_TIME,
     gcTime: THREAD_GC_TIME,
@@ -87,7 +87,7 @@ export function useMyMentions(page?: number, limit?: number, enabled = true) {
  */
 export function useStarredMessages(page?: number, limit?: number, enabled = true) {
   return useQuery({
-    queryKey: messageKeys.starred(),
+    queryKey: messageKeys.starred(page, limit),
     queryFn: () => messageService.getStarredMessages(page, limit),
     staleTime: THREAD_STALE_TIME,
     gcTime: THREAD_GC_TIME,
@@ -106,7 +106,7 @@ export function useSearchMessages(
   enabled = true
 ) {
   return useQuery({
-    queryKey: messageKeys.search(query, resModel),
+    queryKey: messageKeys.search(query, resModel, page, limit),
     queryFn: () => messageService.searchMessages(query, resModel, page, limit),
     staleTime: THREAD_STALE_TIME,
     gcTime: THREAD_GC_TIME,

@@ -208,7 +208,7 @@ export interface CreateAutomatedActionData {
   priority?: number
 }
 
-export interface UpdateAutomatedActionData extends Partial<CreateAutomatedActionData> {}
+export type UpdateAutomatedActionData = Partial<CreateAutomatedActionData>
 
 // ═══════════════════════════════════════════════════════════════
 // FILTERS & RESPONSES

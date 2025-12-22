@@ -5,7 +5,7 @@
 
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { format, formatDistanceToNow, isAfter, isToday, isBefore } from 'date-fns'
+import { format, isToday } from 'date-fns'
 import { ar, enUS } from 'date-fns/locale'
 import {
   Mail,
@@ -47,7 +47,6 @@ import {
   useRecordActivities,
   useMarkActivityDone,
   useCancelActivity,
-  useRescheduleActivity,
 } from '@/hooks/useOdooActivities'
 import type { OdooActivity, OdooActivityResModel, OdooActivityUser } from '@/types/activity'
 
@@ -78,7 +77,7 @@ export function ActivityList({
   maxItems,
   className,
 }: ActivityListProps) {
-  const { t, i18n } = useTranslation()
+  const { i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
   const [feedbackDialogOpen, setFeedbackDialogOpen] = React.useState(false)
   const [selectedActivity, setSelectedActivity] = React.useState<OdooActivity | null>(null)
@@ -92,7 +91,6 @@ export function ActivityList({
 
   const markDone = useMarkActivityDone()
   const cancelActivity = useCancelActivity()
-  const rescheduleActivity = useRescheduleActivity()
 
   const displayedActivities = maxItems ? activities?.slice(0, maxItems) : activities
 
@@ -111,7 +109,7 @@ export function ActivityList({
       setFeedbackDialogOpen(false)
       setFeedback('')
       setSelectedActivity(null)
-    } catch (error) {
+    } catch {
       // Error handled by mutation
     }
   }
@@ -119,7 +117,7 @@ export function ActivityList({
   const handleCancel = async (activityId: string) => {
     try {
       await cancelActivity.mutateAsync(activityId)
-    } catch (error) {
+    } catch {
       // Error handled by mutation
     }
   }
@@ -292,10 +290,6 @@ export function ActivityList({
                     <DropdownMenuItem onClick={() => handleMarkDone(activity)}>
                       <Check className="h-4 w-4 me-2" />
                       {isArabic ? 'إتمام' : 'Mark as Done'}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Clock className="h-4 w-4 me-2" />
-                      {isArabic ? 'تأجيل' : 'Reschedule'}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem

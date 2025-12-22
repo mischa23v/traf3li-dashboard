@@ -37,7 +37,7 @@ import {
   useToggleMessageStar,
   useDeleteMessage,
 } from '@/hooks/useMessages'
-import type { ThreadMessage, ThreadResModel, MessageAuthor, TrackingValue } from '@/types/message'
+import type { ThreadMessage, ThreadResModel, TrackingValue } from '@/types/message'
 import { renderMentions } from '@/types/message'
 
 interface ChatterProps {
@@ -48,7 +48,7 @@ interface ChatterProps {
 }
 
 export function Chatter({ resModel, resId, className, maxHeight = 400 }: ChatterProps) {
-  const { t, i18n } = useTranslation()
+  const { i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
   const [activeTab, setActiveTab] = React.useState<'messages' | 'activities'>('messages')
   const [message, setMessage] = React.useState('')
@@ -79,7 +79,7 @@ export function Chatter({ resModel, resId, className, maxHeight = 400 }: Chatter
         })
       }
       setMessage('')
-    } catch (error) {
+    } catch {
       // Error handled by mutation
     }
   }
@@ -88,11 +88,6 @@ export function Chatter({ resModel, resId, className, maxHeight = 400 }: Chatter
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
       handleSend()
     }
-  }
-
-  const getAuthor = (author: MessageAuthor | string): MessageAuthor | null => {
-    if (typeof author === 'string') return null
-    return author
   }
 
   const allMessages = React.useMemo(() => {
@@ -118,7 +113,7 @@ export function Chatter({ resModel, resId, className, maxHeight = 400 }: Chatter
   return (
     <div className={cn('flex flex-col', className)}>
       {/* Tab Navigation */}
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'messages' | 'activities')}>
         <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent">
           <TabsTrigger
             value="messages"
@@ -358,16 +353,25 @@ function MessageItem({ message, isArabic, onToggleStar, onDelete }: MessageItemP
           {message.attachment_ids && message.attachment_ids.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
               {message.attachment_ids.map((attachment) => (
-                <a
+                <span
                   key={typeof attachment === 'string' ? attachment : attachment._id}
-                  href={typeof attachment === 'object' ? attachment.url : '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-xs text-blue-600 hover:underline"
+                  className="flex items-center gap-1 text-xs text-blue-600 hover:underline cursor-pointer"
+                  onClick={() => {
+                    if (typeof attachment === 'object' && attachment.url) {
+                      window.open(attachment.url, '_blank', 'noopener,noreferrer')
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && typeof attachment === 'object' && attachment.url) {
+                      window.open(attachment.url, '_blank', 'noopener,noreferrer')
+                    }
+                  }}
                 >
                   <Paperclip className="h-3 w-3" />
                   {typeof attachment === 'object' ? attachment.name : isArabic ? 'مرفق' : 'Attachment'}
-                </a>
+                </span>
               ))}
             </div>
           )}
@@ -385,7 +389,7 @@ interface TrackingItemProps {
 
 function TrackingItem({ tracking, isArabic }: TrackingItemProps) {
   const getDisplayValue = (
-    type: string,
+    _type: string,
     char?: string,
     int?: number,
     float?: number,

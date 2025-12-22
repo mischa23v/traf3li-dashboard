@@ -60,7 +60,7 @@ interface ActivityStatsProps {
 }
 
 export function ActivityStats({ className }: ActivityStatsProps) {
-  const { t, i18n } = useTranslation()
+  const { i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
 
   const { data: stats, isLoading } = useActivityStats()

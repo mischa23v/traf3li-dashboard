@@ -139,7 +139,7 @@ export function useCreateAutomatedAction() {
       queryClient.invalidateQueries({ queryKey: automatedActionKeys.lists() })
       toast.success('تم إنشاء الإجراء التلقائي بنجاح')
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل في إنشاء الإجراء التلقائي')
     },
   })
@@ -159,7 +159,7 @@ export function useUpdateAutomatedAction() {
       queryClient.invalidateQueries({ queryKey: automatedActionKeys.lists() })
       toast.success('تم تحديث الإجراء التلقائي')
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل في تحديث الإجراء التلقائي')
     },
   })
@@ -177,7 +177,7 @@ export function useDeleteAutomatedAction() {
       queryClient.invalidateQueries({ queryKey: automatedActionKeys.lists() })
       toast.success('تم حذف الإجراء التلقائي')
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل في حذف الإجراء التلقائي')
     },
   })
@@ -200,7 +200,7 @@ export function useToggleAutomatedAction() {
           : 'تم تعطيل الإجراء التلقائي'
       )
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل في تغيير حالة الإجراء التلقائي')
     },
   })
@@ -220,7 +220,7 @@ export function useTestAutomatedAction() {
         toast.info(result.reason || 'الإجراء لن يتم تنفيذه - الشروط غير مستوفاة')
       }
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل في اختبار الإجراء')
     },
   })
@@ -238,7 +238,7 @@ export function useDuplicateAutomatedAction() {
       queryClient.invalidateQueries({ queryKey: automatedActionKeys.lists() })
       toast.success('تم نسخ الإجراء التلقائي')
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل في نسخ الإجراء التلقائي')
     },
   })
@@ -258,7 +258,7 @@ export function useEnableAutomatedActions() {
       queryClient.invalidateQueries({ queryKey: automatedActionKeys.lists() })
       toast.success('تم تفعيل الإجراءات المحددة')
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل في تفعيل الإجراءات')
     },
   })
@@ -276,7 +276,7 @@ export function useDisableAutomatedActions() {
       queryClient.invalidateQueries({ queryKey: automatedActionKeys.lists() })
       toast.success('تم تعطيل الإجراءات المحددة')
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل في تعطيل الإجراءات')
     },
   })
@@ -294,7 +294,7 @@ export function useDeleteAutomatedActions() {
       queryClient.invalidateQueries({ queryKey: automatedActionKeys.lists() })
       toast.success('تم حذف الإجراءات المحددة')
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل في حذف الإجراءات')
     },
   })
