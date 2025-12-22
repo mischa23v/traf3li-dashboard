@@ -57,6 +57,9 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ClientsSidebar } from '@/features/clients/components/clients-sidebar'
+import { SmartButton, SmartButtonGroup, getSmartButtons, resolveNavigationPath } from '@/components/smart-button'
+import { useSmartButtonCounts } from '@/hooks/useSmartButtonCounts'
+import { useTranslation } from 'react-i18next'
 
 const CONTACT_TYPE_LABELS: Record<string, string> = {
   individual: 'فرد',
@@ -98,6 +101,8 @@ const CONFLICT_STATUS_LABELS: Record<string, { label: string; color: string; ico
 }
 
 export function ContactDetailsView() {
+  const { t, i18n } = useTranslation()
+  const isArabic = i18n.language === 'ar'
   const { contactId } = useParams({ strict: false }) as { contactId: string }
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('overview')
@@ -108,6 +113,15 @@ export function ContactDetailsView() {
 
   // Mutations
   const deleteContactMutation = useDeleteContact()
+
+  // Smart Buttons Configuration
+  const smartButtonConfigs = getSmartButtons('contact')
+  const { counts, isLoading: countsLoading } = useSmartButtonCounts(
+    'contact',
+    contactId,
+    smartButtonConfigs,
+    !isLoading && !!contactData
+  )
 
   const handleDelete = () => {
     deleteContactMutation.mutate(contactId, {
@@ -299,6 +313,33 @@ export function ContactDetailsView() {
                 )}
               </div>
             </ProductivityHero>
+
+            {/* Smart Buttons - Odoo Style */}
+            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">
+                {t('smartButtons.relatedRecords') || (isArabic ? 'السجلات المرتبطة' : 'Related Records')}
+              </h3>
+              <SmartButtonGroup layout="auto">
+                {smartButtonConfigs.map((config) => (
+                  <SmartButton
+                    key={config.id}
+                    icon={config.icon}
+                    label={isArabic ? config.labelAr : config.labelEn}
+                    count={counts[config.id]}
+                    isLoading={countsLoading}
+                    variant={config.variant}
+                    onClick={
+                      config.clickable
+                        ? () => {
+                            const path = resolveNavigationPath(config.navigateTo, contactId)
+                            navigate({ to: path })
+                          }
+                        : undefined
+                    }
+                  />
+                ))}
+              </SmartButtonGroup>
+            </div>
 
             {/* MAIN CONTENT GRID */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

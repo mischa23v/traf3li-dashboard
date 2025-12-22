@@ -309,6 +309,32 @@ const documentsService = {
     const response = await api.get(`/documents?${params.toString()}`)
     return response.data.data || response.data
   },
+
+  // Get preview URL (with inline disposition for browser viewing)
+  getPreviewUrl: async (id: string): Promise<string> => {
+    const response = await api.get(`/documents/${id}/preview-url`)
+    return response.data.url || response.data
+  },
+
+  // Get download URL (with attachment disposition)
+  getDownloadUrl: async (id: string, disposition: 'inline' | 'attachment' = 'attachment'): Promise<string> => {
+    const response = await api.get(`/documents/${id}/download-url?disposition=${disposition}`)
+    return response.data.url || response.data
+  },
+
+  // Encrypt document
+  encryptDocument: async (id: string): Promise<Document> => {
+    const response = await api.post(`/documents/${id}/encrypt`)
+    return response.data
+  },
+
+  // Decrypt document
+  decryptDocument: async (id: string): Promise<Blob> => {
+    const response = await api.post(`/documents/${id}/decrypt`, {
+      responseType: 'blob',
+    })
+    return response.data
+  },
 }
 
 export default documentsService

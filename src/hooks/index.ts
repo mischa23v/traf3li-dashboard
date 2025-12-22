@@ -20,3 +20,6 @@ export {
   useServiceHealth,
   useCacheStats,
 } from './use-service-health'
+
+// Welcome onboarding hook
+export { useWelcome } from './useWelcome'

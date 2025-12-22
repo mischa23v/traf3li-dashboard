@@ -1,7 +1,7 @@
 import { Outlet } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { useMemo } from 'react'
-import { Monitor, Bell, Palette, Wrench, UserCog } from 'lucide-react'
+import { Monitor, Bell, Palette, Wrench, UserCog, Key, Plug, Webhook, Mail, CreditCard } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
@@ -40,6 +40,31 @@ export function Settings() {
       title: t('settings.tabs.display'),
       href: '/settings/display',
       icon: <Monitor size={18} />,
+    },
+    {
+      title: t('settings.tabs.billing', 'Billing'),
+      href: '/settings/billing',
+      icon: <CreditCard size={18} />,
+    },
+    {
+      title: t('settings.tabs.email', 'Email'),
+      href: '/settings/email',
+      icon: <Mail size={18} />,
+    },
+    {
+      title: t('settings.tabs.apiKeys'),
+      href: '/settings/api-keys',
+      icon: <Key size={18} />,
+    },
+    {
+      title: t('settings.tabs.webhooks', 'Webhooks'),
+      href: '/settings/webhooks',
+      icon: <Webhook size={18} />,
+    },
+    {
+      title: t('settings.tabs.integrations'),
+      href: '/settings/integrations',
+      icon: <Plug size={18} />,
     },
   ], [t])
 

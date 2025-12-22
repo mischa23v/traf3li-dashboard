@@ -100,6 +100,87 @@ Start the server
   pnpm run dev
 ```
 
+## Docker Deployment
+
+### Prerequisites
+
+- Docker (20.10+)
+- Docker Compose (1.29+)
+
+### Quick Start with Docker
+
+Build and run the containerized application:
+
+```bash
+# Development/default configuration
+docker-compose up -d
+
+# Production configuration
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+```
+
+The application will be available at `http://localhost`
+
+### Docker Commands
+
+```bash
+# Build the image
+docker-compose build
+
+# Start containers
+docker-compose up -d
+
+# Stop containers
+docker-compose down
+
+# View logs
+docker-compose logs -f frontend
+
+# Rebuild and restart
+docker-compose up -d --build
+
+# Production deployment
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+```
+
+### Environment Variables
+
+Create a `.env` file in the project root for environment-specific variables:
+
+```env
+VITE_API_URL=https://your-api-url.com
+VITE_CLERK_PUBLISHABLE_KEY=your_clerk_key
+```
+
+Update `docker-compose.yml` to use these variables.
+
+### Docker Image Details
+
+- **Base Image:** Node.js 20 Alpine (builder), Nginx Alpine (production)
+- **Build:** Multi-stage build for optimized image size
+- **Port:** 80 (configurable in docker-compose.yml)
+- **Health Check:** Automatic health monitoring on `/health` endpoint
+
+### Production Features
+
+The production configuration (`docker-compose.prod.yml`) includes:
+
+- Resource limits (CPU: 1.0, Memory: 512MB)
+- Automatic restart policies
+- Structured logging with rotation
+- Read-only root filesystem
+- Security hardening
+
+### Custom Configuration
+
+To customize Nginx configuration:
+
+1. Edit `nginx.conf`
+2. Rebuild the image: `docker-compose build`
+3. Restart containers: `docker-compose up -d`
+
+For API proxy configuration, uncomment and configure the `/api` location block in `nginx.conf`.
+
 ## Sponsoring this project ❤️
 
 If you find this project helpful or use this in your own work, consider [sponsoring me](https://github.com/sponsors/satnaing) to support development and maintenance. You can [buy me a coffee](https://buymeacoffee.com/satnaing) as well. Don’t worry, every penny helps. Thank you! 🙏

@@ -185,6 +185,12 @@ apiClientNoVersion.interceptors.request.use(
       config.headers.set('X-Device-Fingerprint', cachedDeviceFingerprint)
     }
 
+    // Add active company ID header (for multi-company support)
+    const activeCompanyId = localStorage.getItem('activeCompanyId')
+    if (activeCompanyId) {
+      config.headers.set('X-Company-Id', activeCompanyId)
+    }
+
     const url = config.url || ''
 
     // Apply tiered timeout based on URL pattern
@@ -365,6 +371,12 @@ apiClient.interceptors.request.use(
     // Add device fingerprint for session binding (NCA ECC 2-1-4)
     if (cachedDeviceFingerprint) {
       config.headers.set('X-Device-Fingerprint', cachedDeviceFingerprint)
+    }
+
+    // Add active company ID header (for multi-company support)
+    const activeCompanyId = localStorage.getItem('activeCompanyId')
+    if (activeCompanyId) {
+      config.headers.set('X-Company-Id', activeCompanyId)
     }
 
     const url = config.url || ''

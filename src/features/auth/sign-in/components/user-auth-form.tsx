@@ -2,14 +2,14 @@
  * User Authentication Form (Sign In)
  * Connects to Traf3li backend for authentication
  * Includes client-side rate limiting (NCA ECC 2-1-2 compliant)
+ * CAPTCHA integration for enhanced security
  */
 
-import { HTMLAttributes, useState, useEffect, useCallback, useMemo } from 'react'
+import { HTMLAttributes, useState, useCallback, useMemo, useRef, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconBrandGoogle, IconAlertTriangle, IconClock } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 import {
   Form,
@@ -24,12 +24,22 @@ import { Button } from '@/components/ui/button'
 import { PasswordInput } from '@/components/password-input'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
+import { useRateLimit } from '@/hooks/useRateLimit'
+import { AccountLockoutWarning } from '@/components/auth/account-lockout-warning'
+import { ProgressiveDelay } from '@/components/auth/progressive-delay'
+import { toast } from '@/hooks/use-toast'
+import { SSOLoginButtons } from '@/components/auth/sso-login-buttons'
 import {
-  checkLoginAllowed,
-  recordFailedAttempt,
-  recordSuccessfulLogin,
-  formatLockoutTime,
-} from '@/lib/login-throttle'
+  CaptchaChallenge,
+  type CaptchaChallengeRef,
+} from '@/components/auth/captcha-challenge'
+import {
+  getCaptchaConfig,
+  isDeviceRecognized,
+  markDeviceAsRecognized,
+  calculateRiskScore,
+} from '@/services/captchaService'
+import type { CaptchaConfig } from '@/components/auth/captcha-config'
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -50,16 +60,12 @@ const createFormSchema = (t: any) =>
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const navigate = useNavigate()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const isArabic = i18n.language === 'ar'
   const login = useAuthStore((state) => state.login)
   const authError = useAuthStore((state) => state.error)
   const clearError = useAuthStore((state) => state.clearError)
   const [isLoading, setIsLoading] = useState(false)
-
-  // Rate limiting state
-  const [rateLimitError, setRateLimitError] = useState<string | null>(null)
-  const [waitTime, setWaitTime] = useState<number>(0)
-  const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null)
 
   const formSchema = useMemo(() => createFormSchema(t), [t])
 
@@ -68,62 +74,178 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     password: '',
   }), [])
 
-  // Countdown timer for rate limiting
-  useEffect(() => {
-    if (waitTime <= 0) return
-
-    const timer = setInterval(() => {
-      setWaitTime((prev) => {
-        const newTime = prev - 1
-        if (newTime <= 0) {
-          setRateLimitError(null)
-          return 0
-        }
-        return newTime
-      })
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [waitTime])
-
   // Get login identifier (username or email)
   const getLoginIdentifier = useCallback((username: string): string => {
     return username.toLowerCase().trim()
   }, [])
+
+  // Rate limiting hook
+  const [currentIdentifier, setCurrentIdentifier] = useState('')
+  const rateLimit = useRateLimit({
+    identifier: currentIdentifier,
+    onLockout: (status) => {
+      toast({
+        title: isArabic ? 'تم قفل الحساب' : 'Account Locked',
+        description: isArabic
+          ? `تم قفل حسابك مؤقتاً بسبب محاولات تسجيل دخول فاشلة متعددة. يرجى الانتظار ${status.waitTime} دقيقة.`
+          : `Your account has been temporarily locked due to multiple failed login attempts. Please wait ${Math.ceil(status.waitTime / 60)} minutes.`,
+        variant: 'destructive',
+      })
+    },
+    onUnlock: () => {
+      toast({
+        title: isArabic ? 'تم فتح الحساب' : 'Account Unlocked',
+        description: isArabic
+          ? 'يمكنك الآن محاولة تسجيل الدخول مرة أخرى.'
+          : 'You can now try logging in again.',
+      })
+    },
+  })
+
+  const [attemptNumber, setAttemptNumber] = useState(0)
+
+  // CAPTCHA state
+  const [captchaConfig, setCaptchaConfig] = useState<CaptchaConfig | null>(null)
+  const [captchaToken, setCaptchaToken] = useState<string>('')
+  const [showCaptcha, setShowCaptcha] = useState(false)
+  const captchaRef = useRef<CaptchaChallengeRef>(null)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema) as any,
     defaultValues,
   })
 
+  // Load CAPTCHA configuration on mount
+  useEffect(() => {
+    getCaptchaConfig()
+      .then((config) => {
+        setCaptchaConfig(config)
+
+        // Check if CAPTCHA should be shown for new devices
+        if (config.enabled && config.alwaysForNewDevices && !isDeviceRecognized()) {
+          setShowCaptcha(true)
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load CAPTCHA config:', err)
+      })
+  }, [])
+
+  // Check if CAPTCHA should be shown based on failed attempts
+  const checkCaptchaRequired = useCallback(() => {
+    if (!captchaConfig || !captchaConfig.enabled) {
+      return false
+    }
+
+    // Always show for new devices
+    if (captchaConfig.alwaysForNewDevices && !isDeviceRecognized()) {
+      return true
+    }
+
+    // Show after X failed attempts
+    if (attemptNumber >= captchaConfig.requireAfterFailedAttempts) {
+      return true
+    }
+
+    // Calculate risk score
+    const riskScore = calculateRiskScore({
+      failedAttempts: attemptNumber,
+      isNewDevice: !isDeviceRecognized(),
+      rapidAttempts: rateLimit.progressiveDelay > 0,
+      suspiciousActivity: false,
+    })
+
+    // Show if risk score is high
+    if (riskScore >= captchaConfig.riskScoreThreshold) {
+      return true
+    }
+
+    return false
+  }, [captchaConfig, attemptNumber, rateLimit.progressiveDelay])
+
+  // Update CAPTCHA visibility when failed attempts change
+  useEffect(() => {
+    if (checkCaptchaRequired()) {
+      setShowCaptcha(true)
+    }
+  }, [checkCaptchaRequired])
+
   /**
-   * Handle form submission with rate limiting
+   * Handle CAPTCHA success
+   */
+  const handleCaptchaSuccess = useCallback((token: string) => {
+    setCaptchaToken(token)
+  }, [])
+
+  /**
+   * Handle CAPTCHA error
+   */
+  const handleCaptchaError = useCallback((error: Error) => {
+    console.error('CAPTCHA error:', error)
+    toast({
+      title: isArabic ? 'خطأ في التحقق' : 'Verification Error',
+      description: isArabic
+        ? 'فشل التحقق. يرجى المحاولة مرة أخرى.'
+        : 'Verification failed. Please try again.',
+      variant: 'destructive',
+    })
+  }, [isArabic])
+
+  /**
+   * Handle form submission with rate limiting and CAPTCHA
    */
   async function onSubmit(data: z.infer<typeof formSchema>) {
     const identifier = getLoginIdentifier(data.username)
+    setCurrentIdentifier(identifier)
 
     // Check client-side rate limiting BEFORE making API call
-    const throttleCheck = checkLoginAllowed(identifier)
-    if (!throttleCheck.allowed) {
-      setRateLimitError(
-        throttleCheck.lockedUntil
-          ? t('auth.signIn.accountLocked', { time: formatLockoutTime(throttleCheck.waitTime || 0) })
-          : t('auth.signIn.tooManyAttempts', { time: formatLockoutTime(throttleCheck.waitTime || 0) })
-      )
-      setWaitTime(throttleCheck.waitTime || 0)
-      setAttemptsRemaining(throttleCheck.attemptsRemaining || 0)
+    const status = rateLimit.checkAllowed()
+    if (!status.allowed) {
+      // Rate limit UI components will show the error
       return
+    }
+
+    // Check if CAPTCHA is required and get token
+    if (showCaptcha && captchaConfig?.enabled) {
+      if (!captchaToken) {
+        // Try to execute CAPTCHA
+        try {
+          const token = await captchaRef.current?.execute()
+          if (token) {
+            setCaptchaToken(token)
+          } else {
+            toast({
+              title: isArabic ? 'التحقق مطلوب' : 'Verification Required',
+              description: isArabic
+                ? 'يرجى إكمال التحقق للمتابعة.'
+                : 'Please complete the verification to continue.',
+              variant: 'destructive',
+            })
+            return
+          }
+        } catch (err) {
+          console.error('CAPTCHA execution failed:', err)
+          return
+        }
+      }
     }
 
     setIsLoading(true)
     clearError()
-    setRateLimitError(null)
 
     try {
-      await login(data)
+      // Include CAPTCHA token in login data if available
+      const loginData = captchaToken
+        ? { ...data, captchaToken, captchaProvider: captchaConfig?.provider }
+        : data
 
-      // Record successful login - clears throttle data
-      recordSuccessfulLogin(identifier)
+      await login(loginData)
+
+      // Record successful login - clears rate limit data
+      rateLimit.recordSuccess()
+
+      // Mark device as recognized
+      markDeviceAsRecognized()
 
       // Get user from store to determine redirect
       const user = useAuthStore.getState().user
@@ -146,10 +268,15 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 
       // Handle server-side 429 rate limit - DON'T count as failed attempt
       // 429 means "slow down", not "wrong password"
-      if (status === 429) {
-        const serverWaitTime = error.retryAfter || error?.response?.data?.retryAfter || 60
-        setRateLimitError(t('auth.signIn.serverRateLimited', { time: formatLockoutTime(serverWaitTime) }))
-        setWaitTime(serverWaitTime)
+      const rateLimitInfo = rateLimit.handle429(error)
+      if (rateLimitInfo.isRateLimited) {
+        toast({
+          title: isArabic ? 'تم تجاوز الحد المسموح' : 'Rate Limit Exceeded',
+          description: isArabic
+            ? `يرجى الانتظار ${rateLimitInfo.retryAfter} ثانية قبل المحاولة مرة أخرى.`
+            : `Please wait ${rateLimitInfo.retryAfter} seconds before trying again.`,
+          variant: 'destructive',
+        })
         return
       }
 
@@ -157,15 +284,16 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       // NOT for network errors, server errors, or rate limits
       const isAuthFailure = status === 401 || status === 400
       if (isAuthFailure) {
-        const failedResult = recordFailedAttempt(identifier)
-        setAttemptsRemaining(failedResult.attemptsRemaining)
+        const failedStatus = await rateLimit.recordFailed()
+        setAttemptNumber((prev) => prev + 1)
 
-        // Handle client-side lockout from failed attempts
-        if (failedResult.locked) {
-          setRateLimitError(
-            t('auth.signIn.accountLocked', { time: formatLockoutTime(failedResult.waitTime || 0) })
-          )
-          setWaitTime(failedResult.waitTime || 0)
+        // Reset CAPTCHA token on failed attempt
+        setCaptchaToken('')
+        captchaRef.current?.reset()
+
+        // Show progressive delay or lockout warning via components
+        if (!failedStatus.isLocked && failedStatus.progressiveDelay > 0) {
+          // Progressive delay will be shown by ProgressiveDelay component
         }
       }
       // For other errors (network, 500s), just let the error display without counting
@@ -226,72 +354,60 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               )}
             />
 
-            {/* Display Rate Limit Error */}
-            {rateLimitError && (
-              <div className='rounded-md bg-amber-500/15 p-3 text-sm text-amber-700 dark:text-amber-400'>
-                <div className='flex items-start gap-2'>
-                  <IconAlertTriangle className='mt-0.5 h-4 w-4 shrink-0' />
-                  <div className='flex-1'>
-                    <p>{rateLimitError}</p>
-                    {waitTime > 0 && (
-                      <p className='mt-1 flex items-center gap-1 text-xs'>
-                        <IconClock className='h-3 w-3' />
-                        {t('auth.signIn.waitingTime', { time: formatLockoutTime(waitTime) })}
-                      </p>
-                    )}
-                    {attemptsRemaining !== null && attemptsRemaining > 0 && !waitTime && (
-                      <p className='mt-1 text-xs'>
-                        {t('auth.signIn.attemptsRemaining', { count: attemptsRemaining })}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
+            {/* Account Lockout Warning */}
+            <AccountLockoutWarning
+              isLocked={rateLimit.isLocked}
+              remainingSeconds={rateLimit.remainingTime}
+              attemptsRemaining={rateLimit.attemptsRemaining}
+              onUnlock={() => rateLimit.refreshStatus()}
+            />
+
+            {/* Progressive Delay */}
+            {!rateLimit.isLocked && rateLimit.progressiveDelay > 0 && (
+              <ProgressiveDelay
+                delaySeconds={rateLimit.progressiveDelay}
+                attemptNumber={attemptNumber}
+                onDelayComplete={() => rateLimit.refreshStatus()}
+              />
             )}
 
             {/* Display API Error */}
-            {authError && !rateLimitError && (
+            {authError && !rateLimit.isLocked && (
               <div className='rounded-md bg-destructive/15 p-3 text-sm text-destructive'>
                 {authError}
-                {attemptsRemaining !== null && attemptsRemaining > 0 && (
+                {rateLimit.attemptsRemaining > 0 && rateLimit.attemptsRemaining <= 2 && (
                   <p className='mt-1 text-xs opacity-80'>
-                    {t('auth.signIn.attemptsRemaining', { count: attemptsRemaining })}
+                    {t('auth.signIn.attemptsRemaining', { count: rateLimit.attemptsRemaining })}
                   </p>
                 )}
               </div>
             )}
 
+            {/* CAPTCHA Challenge */}
+            {showCaptcha && captchaConfig && captchaConfig.enabled && captchaConfig.siteKey && (
+              <CaptchaChallenge
+                ref={captchaRef}
+                provider={captchaConfig.provider}
+                siteKey={captchaConfig.siteKey}
+                mode={captchaConfig.mode}
+                action='login'
+                onSuccess={handleCaptchaSuccess}
+                onError={handleCaptchaError}
+                className='my-4'
+              />
+            )}
+
             {/* Submit Button */}
-            <Button type='submit' className='mt-2' disabled={isLoading || waitTime > 0}>
+            <Button type='submit' className='mt-2' disabled={isLoading || !rateLimit.isAllowed}>
               {isLoading
                 ? t('auth.signIn.signingIn')
-                : waitTime > 0
-                  ? `${t('auth.signIn.waitToRetry')} (${formatLockoutTime(waitTime)})`
+                : !rateLimit.isAllowed
+                  ? t('auth.signIn.waitToRetry')
                   : t('auth.signIn.signInButton')}
             </Button>
 
-            {/* Divider */}
-            <div className='relative my-2'>
-              <div className='absolute inset-0 flex items-center'>
-                <span className='w-full border-t' />
-              </div>
-              <div className='relative flex justify-center text-xs uppercase'>
-                <span className='bg-background px-2 text-muted-foreground'>
-                  {t('auth.signIn.orContinueWith')}
-                </span>
-              </div>
-            </div>
-
-            {/* Social Login Buttons */}
-            <Button
-              variant='outline'
-              className='w-full'
-              type='button'
-              disabled={isLoading}
-            >
-              <IconBrandGoogle className='me-2 h-4 w-4' />
-              {t('auth.signIn.google')}
-            </Button>
+            {/* SSO Login Buttons */}
+            <SSOLoginButtons disabled={isLoading || !rateLimit.isAllowed} />
           </div>
         </form>
       </Form>

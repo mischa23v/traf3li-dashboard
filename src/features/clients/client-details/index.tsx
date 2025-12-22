@@ -49,6 +49,8 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { ClientsSidebar } from '../components/clients-sidebar'
+import { SmartButton, SmartButtonGroup, getSmartButtons, resolveNavigationPath } from '@/components/smart-button'
+import { useSmartButtonCounts } from '@/hooks/useSmartButtonCounts'
 
 const route = getRouteApi('/_authenticated/dashboard/clients/$clientId')
 
@@ -97,6 +99,15 @@ export function ClientDetails() {
   const contactMethod = contactMethods.find((m) => m.value === preferredMethod)
   const ContactIcon = contactMethod?.icon || MessageCircle
   const clientStatus = client?.status || 'active'
+
+  // Smart Buttons Configuration
+  const smartButtonConfigs = getSmartButtons('client')
+  const { counts, isLoading: countsLoading } = useSmartButtonCounts(
+    'client',
+    clientId,
+    smartButtonConfigs,
+    !isLoading && !!client
+  )
 
   return (
     <>
@@ -291,6 +302,33 @@ export function ClientDetails() {
                   {summary.outstandingBalance.toLocaleString()} <span className="text-sm font-normal">{t('common.sar')}</span>
                 </p>
               </div>
+            </div>
+
+            {/* Smart Buttons - Odoo Style */}
+            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">
+                {t('smartButtons.relatedRecords') || (isArabic ? 'السجلات المرتبطة' : 'Related Records')}
+              </h3>
+              <SmartButtonGroup layout="auto">
+                {smartButtonConfigs.map((config) => (
+                  <SmartButton
+                    key={config.id}
+                    icon={config.icon}
+                    label={isArabic ? config.labelAr : config.labelEn}
+                    count={counts[config.id]}
+                    isLoading={countsLoading}
+                    variant={config.variant}
+                    onClick={
+                      config.clickable
+                        ? () => {
+                            const path = resolveNavigationPath(config.navigateTo, clientId)
+                            navigate({ to: path })
+                          }
+                        : undefined
+                    }
+                  />
+                ))}
+              </SmartButtonGroup>
             </div>
 
             {/* Main Grid - 3 columns */}

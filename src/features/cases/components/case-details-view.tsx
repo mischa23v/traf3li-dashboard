@@ -124,6 +124,9 @@ import type {
   AuditLogEntry,
 } from '@/services/casesService'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { SmartButton, SmartButtonGroup, getSmartButtons, resolveNavigationPath } from '@/components/smart-button'
+import { useSmartButtonCounts } from '@/hooks/useSmartButtonCounts'
+import { useNavigate } from '@tanstack/react-router'
 
 // Constants for courts, committees, and arbitration centers
 const COURTS = [
@@ -305,7 +308,9 @@ const getDefendantName = (c: Case): string => {
 }
 
 export function CaseDetailsView() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const isArabic = i18n.language === 'ar'
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('overview')
 
   // Note states
@@ -366,6 +371,15 @@ export function CaseDetailsView() {
   // Queries
   const { data: caseData, isLoading, isError, error, refetch } = useCase(caseId)
   const { data: auditHistory } = useCaseAuditHistory(caseId)
+
+  // Smart Buttons Configuration
+  const smartButtonConfigs = getSmartButtons('case')
+  const { counts, isLoading: countsLoading } = useSmartButtonCounts(
+    'case',
+    caseId,
+    smartButtonConfigs,
+    !isLoading && !!caseData
+  )
 
   // Note mutations
   const addNoteMutation = useAddCaseNote()
@@ -827,6 +841,33 @@ export function CaseDetailsView() {
                 </Link>
               </div>
             </ProductivityHero>
+
+            {/* Smart Buttons - Odoo Style */}
+            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">
+                {t('smartButtons.relatedRecords') || (isArabic ? 'السجلات المرتبطة' : 'Related Records')}
+              </h3>
+              <SmartButtonGroup layout="auto">
+                {smartButtonConfigs.map((config) => (
+                  <SmartButton
+                    key={config.id}
+                    icon={config.icon}
+                    label={isArabic ? config.labelAr : config.labelEn}
+                    count={counts[config.id]}
+                    isLoading={countsLoading}
+                    variant={config.variant}
+                    onClick={
+                      config.clickable
+                        ? () => {
+                            const path = resolveNavigationPath(config.navigateTo, caseId)
+                            navigate({ to: path })
+                          }
+                        : undefined
+                    }
+                  />
+                ))}
+              </SmartButtonGroup>
+            </div>
 
             {/* MAIN CONTENT GRID */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
