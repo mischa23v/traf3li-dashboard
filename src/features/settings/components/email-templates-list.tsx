@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import {
   Mail, Edit, Trash2, Eye, Plus, Search, FileText, Bell,
-  UserPlus, Clock, Filter, Loader2, Power
+  UserPlus, Clock, Filter, Loader2, Power, Save, X
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -36,11 +38,18 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useEmailTemplates, useDeleteEmailTemplate, useToggleEmailTemplateStatus } from '@/hooks/useEmailSettings'
+import {
+  useEmailTemplates,
+  useCreateEmailTemplate,
+  useUpdateEmailTemplate,
+  useDeleteEmailTemplate,
+  useToggleEmailTemplateStatus
+} from '@/hooks/useEmailSettings'
 import { formatDistanceToNow } from 'date-fns'
 import { ar } from 'date-fns/locale'
 import { Switch } from '@/components/ui/switch'
@@ -69,8 +78,21 @@ const categoryColors: Record<string, string> = {
   custom: 'bg-gray-100 text-gray-800',
 }
 
+interface TemplateFormData {
+  name: string
+  nameAr: string
+  category: 'invoice' | 'notification' | 'welcome' | 'reminder' | 'custom'
+  subjectEn: string
+  subjectAr: string
+  bodyEn: string
+  bodyAr: string
+  variables: string
+}
+
 export function EmailTemplatesList() {
   const { data: templatesData, isLoading } = useEmailTemplates()
+  const createMutation = useCreateEmailTemplate()
+  const updateMutation = useUpdateEmailTemplate()
   const deleteMutation = useDeleteEmailTemplate()
   const toggleStatusMutation = useToggleEmailTemplateStatus()
 
@@ -78,6 +100,19 @@ export function EmailTemplatesList() {
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [previewTemplate, setPreviewTemplate] = useState<any>(null)
+  const [showForm, setShowForm] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+
+  const [formData, setFormData] = useState<TemplateFormData>({
+    name: '',
+    nameAr: '',
+    category: 'custom',
+    subjectEn: '',
+    subjectAr: '',
+    bodyEn: '',
+    bodyAr: '',
+    variables: '',
+  })
 
   const templates = templatesData?.templates || []
 
@@ -87,6 +122,79 @@ export function EmailTemplatesList() {
     const matchesCategory = categoryFilter === 'all' || template.category === categoryFilter
     return matchesSearch && matchesCategory
   })
+
+  const handleOpenForm = (template?: any) => {
+    if (template) {
+      setEditingId(template._id)
+      setFormData({
+        name: template.name,
+        nameAr: template.nameAr,
+        category: template.category,
+        subjectEn: template.subjectEn,
+        subjectAr: template.subjectAr,
+        bodyEn: template.bodyEn,
+        bodyAr: template.bodyAr,
+        variables: template.variables?.join(', ') || '',
+      })
+    } else {
+      setEditingId(null)
+      setFormData({
+        name: '',
+        nameAr: '',
+        category: 'custom',
+        subjectEn: '',
+        subjectAr: '',
+        bodyEn: '',
+        bodyAr: '',
+        variables: '',
+      })
+    }
+    setShowForm(true)
+  }
+
+  const handleCloseForm = () => {
+    setShowForm(false)
+    setEditingId(null)
+    setFormData({
+      name: '',
+      nameAr: '',
+      category: 'custom',
+      subjectEn: '',
+      subjectAr: '',
+      bodyEn: '',
+      bodyAr: '',
+      variables: '',
+    })
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    // Convert variables string to array
+    const variablesArray = formData.variables
+      .split(',')
+      .map(v => v.trim())
+      .filter(v => v.length > 0)
+
+    const submitData = {
+      name: formData.name,
+      nameAr: formData.nameAr,
+      category: formData.category,
+      subjectEn: formData.subjectEn,
+      subjectAr: formData.subjectAr,
+      bodyEn: formData.bodyEn,
+      bodyAr: formData.bodyAr,
+      variables: variablesArray.length > 0 ? variablesArray : undefined,
+    }
+
+    if (editingId) {
+      await updateMutation.mutateAsync({ id: editingId, data: submitData })
+    } else {
+      await createMutation.mutateAsync(submitData)
+    }
+
+    handleCloseForm()
+  }
 
   const handleDelete = async () => {
     if (!deleteId) return
@@ -126,7 +234,10 @@ export function EmailTemplatesList() {
                 إدارة قوالب رسائل البريد الإلكتروني المرسلة
               </CardDescription>
             </div>
-            <Button className="bg-brand-blue hover:bg-brand-blue/90">
+            <Button
+              className="bg-brand-blue hover:bg-brand-blue/90"
+              onClick={() => handleOpenForm()}
+            >
               <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
               قالب جديد
             </Button>
@@ -231,7 +342,11 @@ export function EmailTemplatesList() {
                             >
                               <Eye className="h-4 w-4" aria-hidden="true" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleOpenForm(template)}
+                            >
                               <Edit className="h-4 w-4" aria-hidden="true" />
                             </Button>
                             <Button
@@ -355,6 +470,152 @@ export function EmailTemplatesList() {
               )}
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Create/Edit Dialog */}
+      <Dialog open={showForm} onOpenChange={handleCloseForm}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Mail className="h-5 w-5 text-brand-blue" aria-hidden="true" />
+              {editingId ? 'تعديل القالب' : 'قالب جديد'}
+            </DialogTitle>
+            <DialogDescription>
+              {editingId ? 'قم بتعديل بيانات القالب' : 'أضف قالباً جديداً لرسائل البريد الإلكتروني'}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4 py-4">
+            {/* Template Names */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="nameAr">اسم القالب (عربي)</Label>
+                <Input
+                  id="nameAr"
+                  value={formData.nameAr}
+                  onChange={(e) => setFormData({ ...formData, nameAr: e.target.value })}
+                  placeholder="قالب الفاتورة"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="name">Template Name (English)</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Invoice Template"
+                  dir="ltr"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Category */}
+            <div className="space-y-2">
+              <Label htmlFor="category">الفئة</Label>
+              <Select
+                value={formData.category}
+                onValueChange={(value: any) => setFormData({ ...formData, category: value })}
+              >
+                <SelectTrigger id="category">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="invoice">فواتير</SelectItem>
+                  <SelectItem value="notification">إشعارات</SelectItem>
+                  <SelectItem value="welcome">ترحيب</SelectItem>
+                  <SelectItem value="reminder">تذكيرات</SelectItem>
+                  <SelectItem value="custom">مخصص</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Subjects */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="subjectAr">الموضوع (عربي)</Label>
+                <Input
+                  id="subjectAr"
+                  value={formData.subjectAr}
+                  onChange={(e) => setFormData({ ...formData, subjectAr: e.target.value })}
+                  placeholder="فاتورة رقم {{invoiceNumber}}"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="subjectEn">Subject (English)</Label>
+                <Input
+                  id="subjectEn"
+                  value={formData.subjectEn}
+                  onChange={(e) => setFormData({ ...formData, subjectEn: e.target.value })}
+                  placeholder="Invoice #{{invoiceNumber}}"
+                  dir="ltr"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Body Content */}
+            <div className="space-y-2">
+              <Label htmlFor="bodyAr">المحتوى (عربي)</Label>
+              <Textarea
+                id="bodyAr"
+                value={formData.bodyAr}
+                onChange={(e) => setFormData({ ...formData, bodyAr: e.target.value })}
+                placeholder="عزيزي {{customerName}}،&#10;&#10;نشكرك على تعاملك معنا...&#10;&#10;يمكنك استخدام المتغيرات مثل: {{invoiceNumber}}, {{amount}}, {{date}}"
+                rows={8}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="bodyEn">Content (English)</Label>
+              <Textarea
+                id="bodyEn"
+                value={formData.bodyEn}
+                onChange={(e) => setFormData({ ...formData, bodyEn: e.target.value })}
+                placeholder="Dear {{customerName}},&#10;&#10;Thank you for your business...&#10;&#10;You can use variables like: {{invoiceNumber}}, {{amount}}, {{date}}"
+                dir="ltr"
+                rows={8}
+                required
+              />
+            </div>
+
+            {/* Variables */}
+            <div className="space-y-2">
+              <Label htmlFor="variables">المتغيرات المتاحة (اختياري)</Label>
+              <Input
+                id="variables"
+                value={formData.variables}
+                onChange={(e) => setFormData({ ...formData, variables: e.target.value })}
+                placeholder="customerName, invoiceNumber, amount, date (افصل بفاصلة)"
+                dir="ltr"
+              />
+              <p className="text-xs text-slate-500">
+                أدخل أسماء المتغيرات مفصولة بفواصل. مثال: customerName, invoiceNumber, amount
+              </p>
+            </div>
+
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={handleCloseForm}>
+                <X className="h-4 w-4 ms-2" aria-hidden="true" />
+                إلغاء
+              </Button>
+              <Button
+                type="submit"
+                className="bg-brand-blue hover:bg-brand-blue/90"
+                disabled={createMutation.isPending || updateMutation.isPending}
+              >
+                {(createMutation.isPending || updateMutation.isPending) ? (
+                  <Loader2 className="h-4 w-4 ms-2 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4 ms-2" aria-hidden="true" />
+                )}
+                {editingId ? 'حفظ التعديلات' : 'إضافة القالب'}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </>
