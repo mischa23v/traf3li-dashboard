@@ -33,41 +33,33 @@ import { OverviewTab } from './components/overview-tab'
 import { AnalyticsTab } from './components/analytics-tab'
 import { ReportsTab } from './components/reports-tab'
 import { NotificationsTab } from './components/notifications-tab'
-import type { TabType } from './types'
+import type { TabType, HeroStats } from './types'
 
 export function Dashboard() {
   const { t, i18n } = useTranslation()
   const user = useAuthStore((state) => state.user)
   const [activeTab, setActiveTab] = useState<TabType>('overview')
 
-  // Performance profiling
+  // Performance profiling - only in dev mode
   const renderCount = useRef(0)
   const mountTime = useRef(performance.now())
 
   useEffect(() => {
-    perfMark('dashboard-mount')
-    perfLog('Dashboard MOUNTED', { renderCount: renderCount.current })
-    return () => perfLog('Dashboard UNMOUNTED')
+    if (PERF_DEBUG) {
+      perfMark('dashboard-mount')
+      perfLog('Dashboard MOUNTED', { renderCount: renderCount.current })
+      return () => perfLog('Dashboard UNMOUNTED')
+    }
   }, [])
 
-  renderCount.current++
-  if (PERF_DEBUG && renderCount.current <= 5) {
-    perfLog(`Dashboard RENDER #${renderCount.current}`, {
-      timeSinceMount: (performance.now() - mountTime.current).toFixed(2) + 'ms',
-    })
+  if (PERF_DEBUG) {
+    renderCount.current++
+    if (renderCount.current <= 5) {
+      perfLog(`Dashboard RENDER #${renderCount.current}`, {
+        timeSinceMount: (performance.now() - mountTime.current).toFixed(2) + 'ms',
+      })
+    }
   }
-
-  // Defer secondary data loading
-  const [isSecondaryDataReady, setIsSecondaryDataReady] = useState(false)
-
-  useEffect(() => {
-    perfLog('Scheduling deferred data load (150ms)')
-    const timer = setTimeout(() => {
-      perfLog('Deferred data load TRIGGERED')
-      setIsSecondaryDataReady(true)
-    }, 150)
-    return () => clearTimeout(timer)
-  }, [])
 
   // User display helpers
   const getUserDisplayName = useCallback(() => {
@@ -92,27 +84,41 @@ export function Dashboard() {
 
   // Data fetching - Gold Standard single API call
   const { data: dashboardSummary, isLoading: summaryLoading, isError: summaryError } = useDashboardSummary()
-  const useFallbackHooks = summaryError || !dashboardSummary
 
-  // Fallback hooks
-  const { data: caseStatsFallback } = useCaseStatisticsFromAPI()
-  const { data: taskStatsFallback } = useTaskStats()
-  const { data: reminderStatsFallback } = useReminderStats()
+  // OPTIMIZATION: Only enable fallback hooks when primary API fails
+  // This prevents duplicate API calls when summary succeeds
+  const useFallbackHooks = summaryError || (!summaryLoading && !dashboardSummary)
 
-  // Overview tab data
-  const shouldLoadOverviewData = useFallbackHooks && isSecondaryDataReady && isOverviewTab
-  const { data: todayEventsFallback, isLoading: eventsLoadingFallback } = useTodayEvents(shouldLoadOverviewData)
-  const { data: financialSummaryFallback, isLoading: financialLoadingFallback } = useFinancialSummary(shouldLoadOverviewData)
+  // Fallback hooks - CONDITIONALLY ENABLED to reduce unnecessary API calls
+  const { data: caseStatsFallback } = useCaseStatisticsFromAPI(useFallbackHooks)
+  const { data: taskStatsFallback } = useTaskStats(useFallbackHooks)
+  const { data: reminderStatsFallback } = useReminderStats({ enabled: useFallbackHooks })
 
-  // Resolve data
+  // Overview tab data - Only fetch when fallback is needed AND on overview tab
+  const shouldLoadOverviewFallback = useFallbackHooks && isOverviewTab
+  const { data: todayEventsFallback, isLoading: eventsLoadingFallback } = useTodayEvents(shouldLoadOverviewFallback)
+  const { data: financialSummaryFallback, isLoading: financialLoadingFallback } = useFinancialSummary(shouldLoadOverviewFallback)
+
+  // Resolve data - prefer summary, fallback only when needed
   const caseStats = dashboardSummary?.caseStats || caseStatsFallback
   const taskStats = dashboardSummary?.taskStats || taskStatsFallback
   const reminderStats = dashboardSummary?.reminderStats || reminderStatsFallback
   const todayEvents = dashboardSummary?.todayEvents || todayEventsFallback
   const financialSummary = dashboardSummary?.financialSummary || financialSummaryFallback
 
-  const eventsLoading = summaryLoading || eventsLoadingFallback
-  const financialLoading = summaryLoading || financialLoadingFallback
+  const eventsLoading = summaryLoading || (useFallbackHooks && eventsLoadingFallback)
+  const financialLoading = summaryLoading || (useFallbackHooks && financialLoadingFallback)
+
+  // Memoized hero stats from dashboard summary to avoid extra API calls in HeroBanner
+  const heroStats: HeroStats | undefined = useMemo(() => {
+    if (!taskStats || !reminderStats) return undefined
+    return {
+      tasksDueTodayCount: taskStats.byStatus?.todo || 0,
+      overdueTasksCount: taskStats.byStatus?.in_progress || 0, // Map to available data
+      upcomingEventsCount: todayEvents?.length || 0,
+      pendingRemindersCount: reminderStats.byStatus?.pending || 0,
+    }
+  }, [taskStats, reminderStats, todayEvents])
 
   // Analytics tab data
   const { data: crmStats, isLoading: crmLoading } = useCRMStats(isAnalyticsTab)
@@ -177,8 +183,8 @@ export function Dashboard() {
 
       {/* Main Content */}
       <Main fluid className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden">
-        {/* Hero Banner */}
-        <HeroBanner t={t} greeting={getTimeBasedGreeting()} userName={getUserDisplayName()} />
+        {/* Hero Banner - pass pre-fetched stats to avoid extra API calls */}
+        <HeroBanner t={t} greeting={getTimeBasedGreeting()} userName={getUserDisplayName()} heroStats={heroStats} />
 
         {/* Tab Navigation */}
         <div className="flex items-center gap-2 border-b border-slate-200 pb-0">

@@ -61,10 +61,11 @@ export interface ReminderStats {
   }
 }
 
-/** Hero stats for the dashboard banner */
+/** Hero stats for the dashboard banner - passed from parent to avoid extra API calls */
 export interface HeroStats {
-  activeCasesCount: number
-  activeTasksCount: number
+  tasksDueTodayCount: number
+  overdueTasksCount: number
+  upcomingEventsCount: number
   pendingRemindersCount: number
 }
 
@@ -106,7 +107,7 @@ export interface NotificationsTabProps {
 /** Hero banner props */
 export interface HeroBannerProps {
   t: TFunction
-  heroStats: HeroStats
+  heroStats?: HeroStats  // Optional - will fetch own data if not provided
   greeting: string
   userName: string
 }

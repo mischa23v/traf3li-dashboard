@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useMemo } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Plus, ListTodo, CheckSquare, Calendar as CalendarIcon, AlertCircle, CalendarRange, Bell } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -11,18 +11,31 @@ export const HeroBanner = memo(function HeroBanner({
   t,
   greeting,
   userName,
-}: Omit<HeroBannerProps, 'heroStats'>) {
-  // Fetch stats data
-  const { data: dueTodayTasks } = useDueTodayTasks()
-  const { data: overdueTasks } = useOverdueTasks()
-  const { data: upcomingTasks } = useUpcomingTasks(14)
-  const { data: reminderStats } = useReminderStats()
+  heroStats, // Pre-fetched stats from parent - avoids 4 extra API calls when available
+}: HeroBannerProps) {
+  // OPTIMIZATION: Only fetch data if heroStats not provided from parent
+  // This prevents 4 redundant API calls when dashboard summary succeeds
+  const shouldFetchOwnData = !heroStats
 
-  // Calculate counts
-  const tasksDueTodayCount = Array.isArray(dueTodayTasks) ? dueTodayTasks.length : 0
-  const overdueTasksCount = Array.isArray(overdueTasks) ? overdueTasks.length : 0
-  const upcomingEventsCount = Array.isArray(upcomingTasks) ? upcomingTasks.length : 0
-  const pendingRemindersCount = reminderStats?.pending || 0
+  const { data: dueTodayTasks } = useDueTodayTasks(shouldFetchOwnData)
+  const { data: overdueTasks } = useOverdueTasks(shouldFetchOwnData)
+  const { data: upcomingTasks } = useUpcomingTasks(14, shouldFetchOwnData)
+  const { data: reminderStats } = useReminderStats({ enabled: shouldFetchOwnData })
+
+  // Calculate counts - use passed heroStats or fallback to fetched data
+  const stats = useMemo(() => {
+    if (heroStats) {
+      return heroStats
+    }
+    return {
+      tasksDueTodayCount: Array.isArray(dueTodayTasks) ? dueTodayTasks.length : 0,
+      overdueTasksCount: Array.isArray(overdueTasks) ? overdueTasks.length : 0,
+      upcomingEventsCount: Array.isArray(upcomingTasks) ? upcomingTasks.length : 0,
+      pendingRemindersCount: reminderStats?.pending || 0,
+    }
+  }, [heroStats, dueTodayTasks, overdueTasks, upcomingTasks, reminderStats])
+
+  const { tasksDueTodayCount, overdueTasksCount, upcomingEventsCount, pendingRemindersCount } = stats
 
   return (
     <div className="bg-[#022c22] rounded-3xl p-6 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20 min-h-[140px] lg:min-h-[160px] xl:min-h-[180px] max-h-[180px] lg:max-h-[190px] xl:max-h-[220px]">

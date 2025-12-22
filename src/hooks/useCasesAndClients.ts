@@ -954,13 +954,15 @@ export const useUpdateCaseProgress = () => {
 /**
  * Fetch case statistics from API
  * GET /api/cases/statistics
+ * @param enabled - Whether to enable the query (defaults to true)
  */
-export const useCaseStatisticsFromAPI = () => {
+export const useCaseStatisticsFromAPI = (enabled: boolean = true) => {
   return useQuery({
     queryKey: ['cases', 'statistics'],
     queryFn: () => casesService.getStatistics(),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
+    enabled,
   })
 }
 

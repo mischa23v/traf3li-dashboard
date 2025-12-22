@@ -2,7 +2,10 @@
  * Performance Debugging Utilities
  * Enable detailed console logging to identify performance bottlenecks
  *
- * Set PERF_DEBUG = true to see:
+ * PERF_DEBUG is automatically enabled in development mode.
+ * To enable in production, set VITE_PERF_DEBUG=true in environment.
+ *
+ * When enabled, you'll see:
  * - Component mount/unmount times
  * - API call start/completion times
  * - Render counts
@@ -10,8 +13,8 @@
  */
 
 // Master switch for performance debugging
-// Set to true to see detailed performance logs in console
-export const PERF_DEBUG = true
+// Automatically enabled in development, disabled in production unless explicitly set
+export const PERF_DEBUG = import.meta.env.DEV || import.meta.env.VITE_PERF_DEBUG === 'true'
 
 /**
  * Log a performance event with timestamp
