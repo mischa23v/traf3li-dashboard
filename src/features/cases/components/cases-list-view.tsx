@@ -15,6 +15,8 @@ import {
   User,
   Eye,
   ChevronLeft,
+  Kanban,
+  List,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -377,6 +379,28 @@ export function CasesListView() {
                 <span className="text-sm text-slate-500 font-medium">
                   {filteredCases.length} {t('cases.case', 'قضية')}
                 </span>
+                {/* View Toggle */}
+                <div className="flex bg-slate-100 rounded-xl p-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="rounded-lg px-3 bg-white shadow-sm"
+                  >
+                    <List className="h-4 w-4 ms-2" />
+                    {t('cases.list.view', 'قائمة')}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    asChild
+                    className="rounded-lg px-3"
+                  >
+                    <Link to="/dashboard/cases/kanban">
+                      <Kanban className="h-4 w-4 ms-2" />
+                      {t('cases.kanban.view', 'كانبان')}
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </div>
 

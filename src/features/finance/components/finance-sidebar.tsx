@@ -14,7 +14,7 @@ import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
 
 interface FinanceSidebarProps {
-    context?: 'invoices' | 'quotes' | 'payments' | 'expenses' | 'statements' | 'transactions' | 'activity' | 'time-tracking' | 'bills' | 'vendors' | 'retainers' | 'recurring' | 'reports' | 'fiscal-periods' | 'reconciliation' | 'currency' | 'chart-of-accounts' | 'credit-notes' | 'journal-entries' | 'general-ledger'
+    context?: 'invoices' | 'quotes' | 'payments' | 'expenses' | 'statements' | 'transactions' | 'activity' | 'time-tracking' | 'bills' | 'vendors' | 'retainers' | 'recurring' | 'reports' | 'fiscal-periods' | 'reconciliation' | 'currency' | 'chart-of-accounts' | 'credit-notes' | 'journal-entries' | 'general-ledger' | 'inter-company' | 'inter-company-balances' | 'inter-company-reconciliation'
     isSelectionMode?: boolean
     onToggleSelectionMode?: () => void
     selectedCount?: number
@@ -143,13 +143,25 @@ export function FinanceSidebar({
         'general-ledger': {
             create: '',
             viewAll: '/dashboard/finance/general-ledger'
+        },
+        'inter-company': {
+            create: '/dashboard/finance/inter-company/new',
+            viewAll: '/dashboard/finance/inter-company'
+        },
+        'inter-company-balances': {
+            create: '',
+            viewAll: '/dashboard/finance/inter-company/balances'
+        },
+        'inter-company-reconciliation': {
+            create: '/dashboard/finance/inter-company/reconciliation/new',
+            viewAll: '/dashboard/finance/inter-company/reconciliation'
         }
     }
 
     const currentLinks = links[context] || links.invoices
 
-    // Transactions, chart-of-accounts, and general-ledger are read-only - no create action in sidebar
-    const isReadOnlyContext = context === 'transactions' || context === 'chart-of-accounts' || context === 'general-ledger'
+    // Transactions, chart-of-accounts, general-ledger, and inter-company-balances are read-only - no create action in sidebar
+    const isReadOnlyContext = context === 'transactions' || context === 'chart-of-accounts' || context === 'general-ledger' || context === 'inter-company-balances'
 
     // Generate 5 days for the strip
     const calendarStripDays = useMemo(() => {

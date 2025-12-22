@@ -10,6 +10,7 @@ import {
   formatLockoutTime,
 } from '@/lib/login-throttle';
 import { getLogoutReasonMessage } from '@/constants/errorCodes';
+import { SSOLoginButtons } from '@/components/auth/sso-login-buttons';
 
 // ============================================
 // SVG ICONS
@@ -416,26 +417,8 @@ export function SignIn() {
                 )}
               </button>
 
-              {/* Divider */}
-              <div className="relative my-6">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-slate-200" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-4 text-slate-500">{t('auth.signIn.orContinueWith')}</span>
-                </div>
-              </div>
-
-              {/* Google Login */}
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                disabled={isLoading || waitTime > 0}
-                className="w-full h-12 rounded-xl border-2 border-slate-200 bg-white text-[#0f172a] font-medium hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
-              >
-                <Icons.Google />
-                {t('auth.signIn.google')}
-              </button>
+              {/* SSO Login Buttons */}
+              <SSOLoginButtons disabled={isLoading || waitTime > 0} />
             </form>
 
             {/* Footer */}

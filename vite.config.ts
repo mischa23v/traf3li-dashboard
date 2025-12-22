@@ -21,11 +21,30 @@ export default defineConfig({
   },
   server: {
     headers: {
+      // HSTS - Force HTTPS (disabled in dev since we use HTTP)
+      // 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+
+      // Prevent clickjacking
+      'X-Frame-Options': 'DENY',
+
+      // Prevent MIME-sniffing
+      'X-Content-Type-Options': 'nosniff',
+
+      // Enable XSS filter (legacy browsers)
+      'X-XSS-Protection': '1; mode=block',
+
+      // Control referrer information
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
+
+      // Restrict browser features
+      'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()',
+
+      // Content Security Policy (dev version with HMR support)
       'Content-Security-Policy': [
         "default-src 'self'",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-        "font-src 'self' https://fonts.gstatic.com",
+        "font-src 'self' data: https://fonts.gstatic.com",
         "img-src 'self' data: https: blob:",
         "connect-src 'self' https://api.traf3li.com wss://api.traf3li.com https://*.sentry.io https://*.workers.dev ws://localhost:* http://localhost:*",
         "frame-ancestors 'none'",
