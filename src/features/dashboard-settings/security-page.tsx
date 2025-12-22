@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Shield, Lock, Key, Smartphone, Eye, EyeOff,
-  AlertTriangle, CheckCircle, Clock, MapPin, Monitor
+  AlertTriangle, CheckCircle, Clock, MapPin, Monitor,
+  Loader2, KeyRound
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,7 +17,6 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
 import {
   Dialog,
   DialogContent,
@@ -34,57 +34,134 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { DynamicIsland } from '@/components/dynamic-island'
-
-const recentSessions = [
-  {
-    id: '1',
-    device: 'Chrome على Windows',
-    deviceEn: 'Chrome on Windows',
-    location: 'الرياض، السعودية',
-    locationEn: 'Riyadh, Saudi Arabia',
-    ip: '192.168.1.xxx',
-    lastActive: 'الآن',
-    lastActiveEn: 'Now',
-    isCurrent: true,
-  },
-  {
-    id: '2',
-    device: 'Safari على iPhone',
-    deviceEn: 'Safari on iPhone',
-    location: 'جدة، السعودية',
-    locationEn: 'Jeddah, Saudi Arabia',
-    ip: '192.168.2.xxx',
-    lastActive: 'منذ ساعة',
-    lastActiveEn: '1 hour ago',
-    isCurrent: false,
-  },
-  {
-    id: '3',
-    device: 'Firefox على macOS',
-    deviceEn: 'Firefox on macOS',
-    location: 'الدمام، السعودية',
-    locationEn: 'Dammam, Saudi Arabia',
-    ip: '192.168.3.xxx',
-    lastActive: 'منذ 3 أيام',
-    lastActiveEn: '3 days ago',
-    isCurrent: false,
-  },
-]
+import { MFASetupWizard, BackupCodesModal } from '@/components/mfa'
+import { useMFAStatus, useMFARoleRequirement, useDisableMFA } from '@/hooks/useMFA'
+import { useActiveSessions, useRevokeSession, useRevokeAllSessions } from '@/hooks/useSessions'
+import { formatLastActive, formatDevice, formatLocation } from '@/services/sessions.service'
+import { useAuthStore } from '@/stores/auth-store'
+import { toast } from 'sonner'
 
 export function SecurityPage() {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
+  const user = useAuthStore((state) => state.user)
+
+  // Password dialog state
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false)
-  const [loginAlerts, setLoginAlerts] = useState(true)
   const [changePasswordOpen, setChangePasswordOpen] = useState(false)
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [isChangingPassword, setIsChangingPassword] = useState(false)
+
+  // MFA state
+  const [showMFASetup, setShowMFASetup] = useState(false)
+  const [showBackupCodes, setShowBackupCodes] = useState(false)
+  const [showDisableMFA, setShowDisableMFA] = useState(false)
+  const [disableCode, setDisableCode] = useState('')
+  const [disablePassword, setDisablePassword] = useState('')
+  const [backupCodes, setBackupCodes] = useState<string[]>([])
+
+  // Login alerts state
+  const [loginAlerts, setLoginAlerts] = useState(true)
+
+  // Fetch MFA status
+  const { data: mfaStatus, isLoading: isMFALoading, refetch: refetchMFA } = useMFAStatus()
+  const mfaEnabled = mfaStatus?.data?.enabled ?? false
+  const mfaMethod = mfaStatus?.data?.method
+
+  // Check if MFA is required for user's role
+  const { isRequired: isMFARequired, isRecommended: isMFARecommended } = useMFARoleRequirement(
+    user?.firmRole || user?.role
+  )
+
+  // Disable MFA mutation
+  const disableMFAMutation = useDisableMFA()
+
+  // Sessions hooks
+  const { data: sessions, isLoading: isSessionsLoading } = useActiveSessions()
+  const revokeSessionMutation = useRevokeSession()
+  const revokeAllSessionsMutation = useRevokeAllSessions()
 
   const topNav = [
     { title: isRTL ? 'الملف الشخصي' : 'Profile', href: '/dashboard/settings/profile', isActive: false },
     { title: isRTL ? 'الأمان' : 'Security', href: '/dashboard/settings/security', isActive: true },
     { title: isRTL ? 'التفضيلات' : 'Preferences', href: '/dashboard/settings/preferences', isActive: false },
   ]
+
+  const handlePasswordChange = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast.error(t('common.fillAllFields'))
+      return
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.error(t('auth.signUp.passwordMismatch'))
+      return
+    }
+
+    if (newPassword.length < 8) {
+      toast.error(t('security.password.requirements'))
+      return
+    }
+
+    setIsChangingPassword(true)
+    try {
+      // TODO: Call change password API
+      // await authService.changePassword(currentPassword, newPassword)
+      toast.success(t('security.password.changed'))
+      setChangePasswordOpen(false)
+      setCurrentPassword('')
+      setNewPassword('')
+      setConfirmPassword('')
+    } catch (error: any) {
+      toast.error(error.message || t('common.error'))
+    } finally {
+      setIsChangingPassword(false)
+    }
+  }
+
+  const handleMFASetupComplete = () => {
+    refetchMFA()
+    toast.success(t('mfa.setup.setupComplete'))
+  }
+
+  const handleMFAToggle = (checked: boolean) => {
+    if (checked) {
+      setShowMFASetup(true)
+    } else {
+      if (isMFARequired) {
+        toast.error(t('mfa.status.required'))
+        return
+      }
+      setShowDisableMFA(true)
+    }
+  }
+
+  const handleDisableMFA = async () => {
+    if (!disableCode || !disablePassword) {
+      toast.error(t('common.fillAllFields'))
+      return
+    }
+
+    try {
+      await disableMFAMutation.mutateAsync({ code: disableCode, password: disablePassword })
+      setShowDisableMFA(false)
+      setDisableCode('')
+      setDisablePassword('')
+      refetchMFA()
+    } catch (error) {
+      // Error handled by mutation
+    }
+  }
+
+  const handleViewBackupCodes = () => {
+    // TODO: Fetch backup codes from API
+    // For now, show empty state
+    setBackupCodes([])
+    setShowBackupCodes(true)
+  }
 
   return (
     <>
@@ -107,12 +184,44 @@ export function SecurityPage() {
           {/* Page Header */}
           <div>
             <h1 className="text-2xl font-bold text-navy">
-              {isRTL ? 'الأمان' : 'Security Settings'}
+              {t('security.title')}
             </h1>
             <p className="text-slate-500 mt-1">
-              {isRTL ? 'إدارة إعدادات الأمان وحماية حسابك' : 'Manage security settings and protect your account'}
+              {t('security.description')}
             </p>
           </div>
+
+          {/* MFA Required/Recommended Banner */}
+          {(isMFARequired || isMFARecommended) && !mfaEnabled && (
+            <Card className={isMFARequired ? 'border-red-200 bg-red-50' : 'border-amber-200 bg-amber-50'}>
+              <CardContent className="py-4">
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className={`h-5 w-5 ${isMFARequired ? 'text-red-600' : 'text-amber-600'}`} />
+                  <div>
+                    <p className={`font-medium ${isMFARequired ? 'text-red-800' : 'text-amber-800'}`}>
+                      {isMFARequired ? t('mfa.status.required') : t('mfa.status.recommended')}
+                    </p>
+                    {mfaStatus?.data?.gracePeriodEndsAt && (
+                      <p className={`text-sm ${isMFARequired ? 'text-red-600' : 'text-amber-600'}`}>
+                        {t('mfa.status.gracePeriod', {
+                          days: Math.ceil(
+                            (new Date(mfaStatus.data.gracePeriodEndsAt).getTime() - Date.now()) /
+                              (24 * 60 * 60 * 1000)
+                          ),
+                        })}
+                      </p>
+                    )}
+                  </div>
+                  <Button
+                    className="ms-auto"
+                    onClick={() => setShowMFASetup(true)}
+                  >
+                    {t('mfa.setup.title')}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Password Section */}
           <Card>
@@ -122,9 +231,9 @@ export function SecurityPage() {
                   <Lock className="h-5 w-5 text-blue-600" />
                 </div>
                 <div>
-                  <CardTitle>{isRTL ? 'كلمة المرور' : 'Password'}</CardTitle>
+                  <CardTitle>{t('security.password.title')}</CardTitle>
                   <CardDescription>
-                    {isRTL ? 'تم تغيير كلمة المرور منذ 30 يوماً' : 'Password changed 30 days ago'}
+                    {t('security.password.lastChanged', { date: '30 days' })}
                   </CardDescription>
                 </div>
               </div>
@@ -134,21 +243,25 @@ export function SecurityPage() {
                 <DialogTrigger asChild>
                   <Button variant="outline">
                     <Key className="h-4 w-4 me-2" />
-                    {isRTL ? 'تغيير كلمة المرور' : 'Change Password'}
+                    {t('security.password.change')}
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent dir={isRTL ? 'rtl' : 'ltr'}>
                   <DialogHeader>
-                    <DialogTitle>{isRTL ? 'تغيير كلمة المرور' : 'Change Password'}</DialogTitle>
+                    <DialogTitle>{t('security.password.change')}</DialogTitle>
                     <DialogDescription>
-                      {isRTL ? 'أدخل كلمة المرور الحالية والجديدة' : 'Enter your current and new password'}
+                      {t('security.password.requirements')}
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label>{isRTL ? 'كلمة المرور الحالية' : 'Current Password'}</Label>
+                      <Label>{t('security.password.current')}</Label>
                       <div className="relative">
-                        <Input type={showCurrentPassword ? 'text' : 'password'} />
+                        <Input
+                          type={showCurrentPassword ? 'text' : 'password'}
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
+                        />
                         <Button
                           type="button"
                           variant="ghost"
@@ -161,9 +274,13 @@ export function SecurityPage() {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label>{isRTL ? 'كلمة المرور الجديدة' : 'New Password'}</Label>
+                      <Label>{t('security.password.new')}</Label>
                       <div className="relative">
-                        <Input type={showNewPassword ? 'text' : 'password'} />
+                        <Input
+                          type={showNewPassword ? 'text' : 'password'}
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                        />
                         <Button
                           type="button"
                           variant="ghost"
@@ -176,16 +293,25 @@ export function SecurityPage() {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label>{isRTL ? 'تأكيد كلمة المرور الجديدة' : 'Confirm New Password'}</Label>
-                      <Input type="password" />
+                      <Label>{t('security.password.confirm')}</Label>
+                      <Input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                      />
                     </div>
                   </div>
                   <DialogFooter>
                     <Button variant="outline" onClick={() => setChangePasswordOpen(false)}>
-                      {isRTL ? 'إلغاء' : 'Cancel'}
+                      {t('common.cancel')}
                     </Button>
-                    <Button className="bg-emerald-500 hover:bg-emerald-600">
-                      {isRTL ? 'حفظ' : 'Save'}
+                    <Button
+                      className="bg-emerald-500 hover:bg-emerald-600"
+                      onClick={handlePasswordChange}
+                      disabled={isChangingPassword}
+                    >
+                      {isChangingPassword && <Loader2 className="h-4 w-4 animate-spin me-2" />}
+                      {t('common.save')}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -202,28 +328,48 @@ export function SecurityPage() {
                     <Smartphone className="h-5 w-5 text-emerald-600" />
                   </div>
                   <div>
-                    <CardTitle>{isRTL ? 'المصادقة الثنائية' : 'Two-Factor Authentication'}</CardTitle>
-                    <CardDescription>
-                      {isRTL ? 'أضف طبقة حماية إضافية لحسابك' : 'Add an extra layer of security to your account'}
-                    </CardDescription>
+                    <CardTitle>{t('mfa.title')}</CardTitle>
+                    <CardDescription>{t('mfa.description')}</CardDescription>
                   </div>
                 </div>
-                <Switch
-                  checked={twoFactorEnabled}
-                  onCheckedChange={setTwoFactorEnabled}
-                />
+                {isMFALoading ? (
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                ) : (
+                  <Switch
+                    checked={mfaEnabled}
+                    onCheckedChange={handleMFAToggle}
+                    disabled={isMFARequired && mfaEnabled}
+                  />
+                )}
               </div>
             </CardHeader>
             <CardContent>
-              {twoFactorEnabled ? (
-                <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 p-3 rounded-lg">
-                  <CheckCircle className="h-5 w-5" />
-                  <span>{isRTL ? 'المصادقة الثنائية مفعلة' : 'Two-factor authentication is enabled'}</span>
+              {mfaEnabled ? (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 p-3 rounded-lg">
+                    <CheckCircle className="h-5 w-5" />
+                    <span>{t('mfa.status.enabled')}</span>
+                    {mfaMethod && (
+                      <Badge variant="secondary" className="ms-auto">
+                        {mfaMethod === 'totp'
+                          ? t('mfa.setup.totp')
+                          : mfaMethod === 'sms'
+                            ? t('mfa.setup.sms')
+                            : t('mfa.setup.email')}
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={handleViewBackupCodes}>
+                      <KeyRound className="h-4 w-4 me-2" />
+                      {t('mfa.backup.title')}
+                    </Button>
+                  </div>
                 </div>
               ) : (
                 <div className="flex items-center gap-2 text-amber-600 bg-amber-50 p-3 rounded-lg">
                   <AlertTriangle className="h-5 w-5" aria-hidden="true" />
-                  <span>{isRTL ? 'المصادقة الثنائية غير مفعلة' : 'Two-factor authentication is not enabled'}</span>
+                  <span>{t('mfa.status.disabled')}</span>
                 </div>
               )}
             </CardContent>
@@ -238,16 +384,11 @@ export function SecurityPage() {
                     <Shield className="h-5 w-5 text-purple-600" />
                   </div>
                   <div>
-                    <CardTitle>{isRTL ? 'تنبيهات تسجيل الدخول' : 'Login Alerts'}</CardTitle>
-                    <CardDescription>
-                      {isRTL ? 'تلقي إشعارات عند تسجيل الدخول من جهاز جديد' : 'Get notified when logging in from a new device'}
-                    </CardDescription>
+                    <CardTitle>{t('security.loginAlerts.title')}</CardTitle>
+                    <CardDescription>{t('security.loginAlerts.description')}</CardDescription>
                   </div>
                 </div>
-                <Switch
-                  checked={loginAlerts}
-                  onCheckedChange={setLoginAlerts}
-                />
+                <Switch checked={loginAlerts} onCheckedChange={setLoginAlerts} />
               </div>
             </CardHeader>
           </Card>
@@ -261,60 +402,148 @@ export function SecurityPage() {
                     <Monitor className="h-5 w-5 text-amber-600" />
                   </div>
                   <div>
-                    <CardTitle>{isRTL ? 'الجلسات النشطة' : 'Active Sessions'}</CardTitle>
-                    <CardDescription>
-                      {isRTL ? 'إدارة الأجهزة المتصلة بحسابك' : 'Manage devices connected to your account'}
-                    </CardDescription>
+                    <CardTitle>{t('security.sessions.title')}</CardTitle>
+                    <CardDescription>{t('security.sessions.description')}</CardDescription>
                   </div>
                 </div>
-                <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
-                  {isRTL ? 'تسجيل الخروج من الكل' : 'Sign Out All'}
-                </Button>
+                {sessions && sessions.filter(s => !s.isCurrent).length > 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-red-600 hover:text-red-700"
+                    onClick={() => revokeAllSessionsMutation.mutate()}
+                    disabled={revokeAllSessionsMutation.isPending}
+                  >
+                    {revokeAllSessionsMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin me-2" />
+                    ) : null}
+                    {t('security.sessions.endAllSessions')}
+                  </Button>
+                )}
               </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {recentSessions.map((session) => (
-                  <div key={session.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                    <div className="flex items-center gap-4">
-                      <div className="h-10 w-10 bg-white rounded-lg flex items-center justify-center border">
-                        <Monitor className="h-5 w-5 text-slate-600" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-navy">
-                            {isRTL ? session.device : session.deviceEn}
-                          </span>
-                          {session.isCurrent && (
-                            <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
-                              {isRTL ? 'الجهاز الحالي' : 'Current'}
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-4 text-sm text-slate-500 mt-1">
-                          <span className="flex items-center">
-                            <MapPin className="h-3 w-3 me-1" aria-hidden="true" />
-                            {isRTL ? session.location : session.locationEn}
-                          </span>
-                          <span className="flex items-center">
-                            <Clock className="h-3 w-3 me-1" aria-hidden="true" />
-                            {isRTL ? session.lastActive : session.lastActiveEn}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    {!session.isCurrent && (
-                      <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">
-                        {isRTL ? 'إنهاء' : 'End'}
-                      </Button>
-                    )}
+                {isSessionsLoading ? (
+                  <div className="flex items-center justify-center py-8 text-muted-foreground">
+                    <Loader2 className="h-5 w-5 animate-spin me-2" />
+                    {t('security.sessions.loading')}
                   </div>
-                ))}
+                ) : sessions && sessions.length > 0 ? (
+                  sessions.map((session) => (
+                    <div key={session.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                      <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 bg-white rounded-lg flex items-center justify-center border">
+                          <Monitor className="h-5 w-5 text-slate-600" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-navy">
+                              {formatDevice(session, isRTL)}
+                            </span>
+                            {session.isCurrent && (
+                              <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
+                                {t('security.sessions.current')}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-4 text-sm text-slate-500 mt-1">
+                            <span className="flex items-center">
+                              <MapPin className="h-3 w-3 me-1" aria-hidden="true" />
+                              {formatLocation(session, isRTL)}
+                            </span>
+                            <span className="flex items-center">
+                              <Clock className="h-3 w-3 me-1" aria-hidden="true" />
+                              {formatLastActive(session.lastActiveAt, isRTL)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      {!session.isCurrent && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-red-600 hover:text-red-700"
+                          onClick={() => revokeSessionMutation.mutate(session.id)}
+                          disabled={revokeSessionMutation.isPending}
+                        >
+                          {revokeSessionMutation.isPending ? (
+                            <Loader2 className="h-4 w-4 animate-spin me-2" />
+                          ) : null}
+                          {t('security.sessions.endSession')}
+                        </Button>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    {t('security.sessions.noOtherSessions')}
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
         </div>
       </Main>
+
+      {/* MFA Setup Wizard */}
+      <MFASetupWizard
+        open={showMFASetup}
+        onOpenChange={setShowMFASetup}
+        onComplete={handleMFASetupComplete}
+        onCancel={() => setShowMFASetup(false)}
+      />
+
+      {/* Backup Codes Modal */}
+      <BackupCodesModal
+        open={showBackupCodes}
+        onOpenChange={setShowBackupCodes}
+        backupCodes={backupCodes}
+        onRegenerate={(codes) => setBackupCodes(codes)}
+      />
+
+      {/* Disable MFA Dialog */}
+      <Dialog open={showDisableMFA} onOpenChange={setShowDisableMFA}>
+        <DialogContent dir={isRTL ? 'rtl' : 'ltr'}>
+          <DialogHeader>
+            <DialogTitle>{t('mfa.disable.title')}</DialogTitle>
+            <DialogDescription>{t('mfa.disable.warning')}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>{t('mfa.disable.confirmCode')}</Label>
+              <Input
+                type="text"
+                value={disableCode}
+                onChange={(e) => setDisableCode(e.target.value)}
+                placeholder="000000"
+                maxLength={6}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>{t('mfa.disable.confirmPassword')}</Label>
+              <Input
+                type="password"
+                value={disablePassword}
+                onChange={(e) => setDisablePassword(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDisableMFA(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDisableMFA}
+              disabled={disableMFAMutation.isPending || !disableCode || !disablePassword}
+            >
+              {disableMFAMutation.isPending && <Loader2 className="h-4 w-4 animate-spin me-2" />}
+              {t('mfa.disable.button')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

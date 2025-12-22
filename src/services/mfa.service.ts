@@ -3,7 +3,7 @@
  * Integrates with backend MFA endpoints (NCA ECC 2-1-3)
  */
 
-import { apiClient } from '@/lib/api'
+import { apiClientNoVersion } from '@/lib/api'
 import { setMFASession, clearMFASession } from '@/lib/mfa-enforcement'
 
 /**
@@ -49,7 +49,7 @@ export interface MFAStatusResponse {
  * Initiate MFA setup - generates secret and QR code
  */
 export async function setupMFA(method: 'totp' | 'sms' | 'email' = 'totp'): Promise<MFASetupResponse> {
-  const response = await apiClient.post('/auth/mfa/setup', { method })
+  const response = await apiClientNoVersion.post('/auth/mfa/setup', { method })
   return response.data
 }
 
@@ -57,7 +57,7 @@ export async function setupMFA(method: 'totp' | 'sms' | 'email' = 'totp'): Promi
  * Verify MFA code during setup (enables MFA)
  */
 export async function verifyMFASetup(code: string): Promise<MFAVerifyResponse> {
-  const response = await apiClient.post('/auth/mfa/verify', { code })
+  const response = await apiClientNoVersion.post('/auth/mfa/verify', { code })
 
   if (response.data.success && response.data.data.verified) {
     // Set MFA session on successful verification
@@ -71,7 +71,7 @@ export async function verifyMFASetup(code: string): Promise<MFAVerifyResponse> {
  * Verify MFA code for protected action
  */
 export async function verifyMFA(code: string, action?: string): Promise<MFAVerifyResponse> {
-  const response = await apiClient.post('/auth/mfa/challenge', { code, action })
+  const response = await apiClientNoVersion.post('/auth/mfa/challenge', { code, action })
 
   if (response.data.success && response.data.data.verified) {
     // Extend MFA session on successful verification
@@ -85,7 +85,7 @@ export async function verifyMFA(code: string, action?: string): Promise<MFAVerif
  * Get current MFA status
  */
 export async function getMFAStatus(): Promise<MFAStatusResponse> {
-  const response = await apiClient.get('/auth/mfa/status')
+  const response = await apiClientNoVersion.get('/auth/mfa/status')
   return response.data
 }
 
@@ -96,7 +96,7 @@ export async function disableMFA(code: string, password: string): Promise<{
   success: boolean
   message: string
 }> {
-  const response = await apiClient.delete('/auth/mfa', {
+  const response = await apiClientNoVersion.delete('/auth/mfa', {
     data: { code, password }
   })
 
@@ -115,7 +115,7 @@ export async function requestMFACode(method: 'sms' | 'email'): Promise<{
   message: string
   expiresIn: number // seconds
 }> {
-  const response = await apiClient.post('/auth/mfa/send-code', { method })
+  const response = await apiClientNoVersion.post('/auth/mfa/send-code', { method })
   return response.data
 }
 
@@ -128,7 +128,7 @@ export async function regenerateBackupCodes(code: string): Promise<{
     backupCodes: string[]
   }
 }> {
-  const response = await apiClient.post('/auth/mfa/backup-codes', { code })
+  const response = await apiClientNoVersion.post('/auth/mfa/backup-codes', { code })
   return response.data
 }
 
@@ -136,7 +136,7 @@ export async function regenerateBackupCodes(code: string): Promise<{
  * Verify using backup code (one-time use)
  */
 export async function verifyBackupCode(backupCode: string): Promise<MFAVerifyResponse> {
-  const response = await apiClient.post('/auth/mfa/verify-backup', { backupCode })
+  const response = await apiClientNoVersion.post('/auth/mfa/verify-backup', { backupCode })
 
   if (response.data.success && response.data.data.verified) {
     setMFASession('totp') // Backup codes are for TOTP

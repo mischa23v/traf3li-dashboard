@@ -1173,7 +1173,11 @@
     "active": "Active",
     "inactive": "Inactive",
     "createdAt": "Created At",
-    "default": "Default"
+    "default": "Default",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "continue": "Continue"
   },
   "validation": {
     "required": "This field is required",
@@ -4112,5 +4116,154 @@
     "securePaymentDescription": "Your data is protected with bank-level encryption",
     "allPricesInSAR": "All prices are in Saudi Riyal (SAR) and exclude VAT",
     "cancelAnytime": "Cancel anytime. No long-term contracts."
+  },
+  "mfa": {
+    "title": "Two-Factor Authentication",
+    "description": "Add an extra layer of security to your account",
+    "setup": {
+      "title": "Set Up Two-Factor Authentication",
+      "description": "Secure your account with multi-factor authentication",
+      "selectMethod": "Choose Authentication Method",
+      "totp": "Authenticator App",
+      "totpDescription": "Use apps like Google Authenticator or Authy",
+      "sms": "SMS Code",
+      "smsDescription": "Receive verification codes via SMS",
+      "email": "Email Code",
+      "emailDescription": "Receive verification codes via email",
+      "qrCode": "Scan QR Code",
+      "scanInstructions": "Use your authenticator app to scan this QR code",
+      "cantScan": "Can't scan the code?",
+      "manualEntry": "Enter this code manually in your app:",
+      "enterCode": "Enter the 6-digit code from your authenticator app",
+      "verifySetup": "Verify & Enable",
+      "setupComplete": "Two-Factor Authentication Enabled",
+      "setupCompleteDescription": "Your account is now protected with two-factor authentication"
+    },
+    "verify": {
+      "title": "Verify Your Identity",
+      "description": "Enter the verification code to continue",
+      "enterCode": "Enter your 6-digit code",
+      "verifying": "Verifying...",
+      "verify": "Verify",
+      "codeExpired": "Code expired. Please request a new one.",
+      "invalidCode": "Invalid code. Please try again.",
+      "tooManyAttempts": "Too many failed attempts. Please try again later.",
+      "resendCode": "Resend Code",
+      "useBackupCode": "Use backup code instead",
+      "rememberDevice": "Trust this device for 30 days",
+      "useAuthenticator": "Use authenticator app",
+      "success": "Verification successful",
+      "resendIn": "Resend in {{seconds}}s"
+    },
+    "backup": {
+      "title": "Backup Codes",
+      "description": "Save these codes in a safe place. You can use them if you lose access to your authenticator.",
+      "warning": "Each code can only be used once. Store them securely.",
+      "download": "Download Codes",
+      "copy": "Copy Codes",
+      "copied": "Codes copied to clipboard",
+      "print": "Print Codes",
+      "regenerate": "Generate New Codes",
+      "regenerateWarning": "This will invalidate all existing backup codes.",
+      "codesRemaining": "{{count}} backup codes remaining",
+      "enterBackupCode": "Enter your backup code",
+      "enterCode": "Enter your backup code"
+    },
+    "disable": {
+      "title": "Disable Two-Factor Authentication",
+      "warning": "This will reduce your account security. Are you sure?",
+      "confirmPassword": "Enter your password to confirm",
+      "confirmCode": "Enter your authentication code",
+      "button": "Disable Two-Factor Authentication",
+      "disabled": "Two-Factor Authentication Disabled"
+    },
+    "status": {
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "required": "Required for your role",
+      "recommended": "Recommended for your role",
+      "method": "Method",
+      "lastVerified": "Last verified",
+      "setupRequired": "Setup Required",
+      "gracePeriod": "You have {{days}} days to set up two-factor authentication",
+      "gracePeriodExpired": "Grace period expired. Please set up two-factor authentication to continue."
+    },
+    "challenge": {
+      "title": "Two-Factor Verification",
+      "descriptionTotp": "Enter the 6-digit code from your authenticator app",
+      "descriptionSms": "Enter the 6-digit code sent to your phone",
+      "descriptionEmail": "Enter the 6-digit code sent to your email",
+      "signInDifferent": "Sign in with different account",
+      "securityNote": "This additional verification helps protect your account from unauthorized access"
+    },
+    "errors": {
+      "setupFailed": "Failed to set up two-factor authentication",
+      "verificationFailed": "Verification failed",
+      "invalidBackupCode": "Invalid backup code",
+      "backupCodeUsed": "This backup code has already been used",
+      "mfaRequired": "Two-factor authentication is required",
+      "sessionExpired": "MFA session expired. Please verify again."
+    }
+  },
+  "security": {
+    "title": "Security",
+    "description": "Manage your account security settings",
+    "password": {
+      "title": "Password",
+      "lastChanged": "Last changed {{date}}",
+      "change": "Change Password",
+      "current": "Current Password",
+      "new": "New Password",
+      "confirm": "Confirm New Password",
+      "changed": "Password changed successfully",
+      "requirements": "Password must be at least 8 characters with uppercase, lowercase, and numbers"
+    },
+    "sessions": {
+      "title": "Active Sessions",
+      "description": "Manage devices and locations where you are logged in",
+      "current": "Current Session",
+      "device": "Device",
+      "location": "Location",
+      "ipAddress": "IP Address",
+      "lastActive": "Last active",
+      "browser": "Browser",
+      "endSession": "End Session",
+      "endAllSessions": "End All Other Sessions",
+      "endAllConfirm": "This will log you out of all other devices",
+      "sessionEnded": "Session ended successfully",
+      "allSessionsEnded": "Ended {{count}} session(s)",
+      "endSessionError": "Failed to end session",
+      "endAllSessionsError": "Failed to end all sessions",
+      "confirmEndSession": "Are you sure you want to end this session?",
+      "confirmEndAllSessions": "Are you sure you want to end all other sessions? You will remain logged in on this device.",
+      "noOtherSessions": "No other active sessions",
+      "loading": "Loading sessions..."
+    },
+    "loginAlerts": {
+      "title": "Login Alerts",
+      "description": "Get notified of new login activity",
+      "enabled": "Login alerts are enabled",
+      "newDevice": "New device login detected"
+    },
+    "devices": {
+      "title": "Trusted Devices",
+      "description": "Devices that don't require MFA verification",
+      "trust": "Trust this device",
+      "trusted": "Trusted",
+      "remove": "Remove",
+      "addedOn": "Added on {{date}}",
+      "noDevices": "No trusted devices"
+    },
+    "audit": {
+      "title": "Security Activity",
+      "description": "Recent security-related activity",
+      "viewAll": "View All Activity",
+      "loginSuccess": "Successful login",
+      "loginFailed": "Failed login attempt",
+      "passwordChanged": "Password changed",
+      "mfaEnabled": "Two-factor authentication enabled",
+      "mfaDisabled": "Two-factor authentication disabled",
+      "sessionEnded": "Session ended"
+    }
   }
 }

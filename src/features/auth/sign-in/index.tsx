@@ -200,10 +200,27 @@ export function SignIn() {
       // Record successful login - clears throttle data
       recordSuccessfulLogin(identifier);
 
+      // Get the updated user from store to check MFA status
+      const currentUser = useAuthStore.getState().user;
+
       // Navigate to redirect URL or dashboard
       // No firm check needed - lawyers without firm are treated as solo lawyers
       const redirectTo = (search as any).redirect || '/';
-      navigate({ to: redirectTo });
+
+      // Check if MFA verification is required
+      if (currentUser?.mfaEnabled || currentUser?.mfaPending) {
+        // Set mfaPending flag if not already set
+        if (!currentUser.mfaPending) {
+          useAuthStore.getState().setUser({
+            ...currentUser,
+            mfaPending: true,
+          });
+        }
+        // Redirect to MFA challenge page with original redirect preserved
+        navigate({ to: '/mfa-challenge', search: { redirect: redirectTo } });
+      } else {
+        navigate({ to: redirectTo });
+      }
     } catch (err: any) {
       const status = err?.status || err?.response?.status;
 
