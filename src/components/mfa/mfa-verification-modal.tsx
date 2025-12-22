@@ -26,7 +26,7 @@ export interface MFAVerificationModalProps {
   onOpenChange: (open: boolean) => void
   onVerified: () => void
   onCancel?: () => void
-  action?: string
+  userId: string // Required for verification
   title?: string
   description?: string
 }
@@ -36,7 +36,7 @@ export function MFAVerificationModal({
   onOpenChange,
   onVerified,
   onCancel,
-  action,
+  userId,
   title,
   description,
 }: MFAVerificationModalProps) {
@@ -78,28 +78,37 @@ export function MFAVerificationModal({
     try {
       let response
       if (useBackupCode) {
-        response = await verifyBackupCode(backupCode.trim())
-      } else {
-        response = await verifyMFA(code, action)
-      }
+        // Format: XXXX-XXXX
+        const cleanCode = backupCode.replace(/[\s]/g, '').toUpperCase()
+        response = await verifyBackupCode(userId, cleanCode)
 
-      if (response.success && response.data.verified) {
-        onVerified()
-        onOpenChange(false)
+        if (!response.error && response.valid) {
+          onVerified()
+          onOpenChange(false)
+        } else {
+          setError(t('mfa.errors.invalidBackupCode'))
+        }
       } else {
-        setError(t('mfa.verify.invalidCode'))
+        response = await verifyMFA(userId, code)
+
+        if (!response.error && response.valid) {
+          onVerified()
+          onOpenChange(false)
+        } else {
+          setError(t('mfa.verify.invalidCode'))
+        }
       }
     } catch (err: any) {
-      if (err.code === 'INVALID_CODE' || err.status === 401) {
-        setError(t('mfa.verify.invalidCode'))
-      } else if (err.code === 'TOO_MANY_ATTEMPTS' || err.status === 429) {
+      const errorCode = err.response?.data?.code
+      if (errorCode === 'INVALID_TOKEN' || errorCode === 'INVALID_CODE') {
+        setError(useBackupCode ? t('mfa.errors.invalidBackupCode') : t('mfa.verify.invalidCode'))
+      } else if (errorCode === 'AUTH_RATE_LIMIT_EXCEEDED') {
         setError(t('mfa.verify.tooManyAttempts'))
-      } else if (err.code === 'CODE_EXPIRED') {
-        setError(t('mfa.verify.codeExpired'))
-      } else if (err.code === 'BACKUP_CODE_USED') {
-        setError(t('mfa.errors.backupCodeUsed'))
+      } else if (errorCode === 'INVALID_FORMAT') {
+        setError(t('mfa.errors.invalidBackupFormat'))
       } else {
-        setError(t('mfa.errors.verificationFailed'))
+        const message = err.response?.data?.messageEn || err.response?.data?.message
+        setError(message || t('mfa.errors.verificationFailed'))
       }
     } finally {
       setIsLoading(false)
@@ -180,7 +189,7 @@ export function MFAVerificationModal({
                   setBackupCode(e.target.value.toUpperCase())
                   setError(null)
                 }}
-                placeholder={t('mfa.backup.enterBackupCode')}
+                placeholder="XXXX-XXXX"
                 disabled={isLoading}
                 autoFocus
                 className={cn(
@@ -208,7 +217,7 @@ export function MFAVerificationModal({
             disabled={isLoading}
             className="text-muted-foreground"
           >
-            {useBackupCode ? t('mfa.verify.enterCode') : t('mfa.verify.useBackupCode')}
+            {useBackupCode ? t('mfa.verify.useAuthenticator') : t('mfa.verify.useBackupCode')}
           </Button>
         </div>
 

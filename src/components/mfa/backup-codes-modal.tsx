@@ -22,12 +22,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-  InputOTPSeparator,
-} from '@/components/ui/input-otp'
 import { regenerateBackupCodes } from '@/services/mfa.service'
 
 interface BackupCodesModalProps {
@@ -48,9 +42,7 @@ export function BackupCodesModal({
 
   const [copied, setCopied] = React.useState(false)
   const [showRegenerateConfirm, setShowRegenerateConfirm] = React.useState(false)
-  const [showVerification, setShowVerification] = React.useState(false)
   const [isRegenerating, setIsRegenerating] = React.useState(false)
-  const [verificationCode, setVerificationCode] = React.useState('')
   const [error, setError] = React.useState<string | null>(null)
   const [codes, setCodes] = React.useState<string[]>(backupCodes)
 
@@ -64,7 +56,6 @@ export function BackupCodesModal({
     if (open) {
       setCopied(false)
       setError(null)
-      setVerificationCode('')
     }
   }, [open])
 
@@ -102,36 +93,23 @@ Generated: ${new Date().toISOString()}
     setShowRegenerateConfirm(true)
   }
 
-  const handleConfirmRegenerate = () => {
-    setShowRegenerateConfirm(false)
-    setShowVerification(true)
-  }
-
   const handleRegenerate = async () => {
-    if (verificationCode.length !== 6) {
-      setError(t('mfa.verify.enterCode'))
-      return
-    }
-
+    setShowRegenerateConfirm(false)
     setIsRegenerating(true)
     setError(null)
 
     try {
-      const response = await regenerateBackupCodes(verificationCode)
-      if (response.success && response.data.backupCodes) {
-        setCodes(response.data.backupCodes)
-        onRegenerate?.(response.data.backupCodes)
-        setShowVerification(false)
-        setVerificationCode('')
+      // Backend: POST /api/auth/mfa/backup-codes/regenerate - no body needed
+      const response = await regenerateBackupCodes()
+      if (!response.error && response.codes) {
+        setCodes(response.codes)
+        onRegenerate?.(response.codes)
       } else {
         setError(t('mfa.errors.verificationFailed'))
       }
     } catch (err: any) {
-      if (err.code === 'INVALID_CODE' || err.status === 401) {
-        setError(t('mfa.verify.invalidCode'))
-      } else {
-        setError(t('mfa.errors.verificationFailed'))
-      }
+      const message = err.response?.data?.messageEn || err.response?.data?.message
+      setError(message || t('mfa.errors.verificationFailed'))
     } finally {
       setIsRegenerating(false)
     }
@@ -155,6 +133,12 @@ Generated: ${new Date().toISOString()}
                 </p>
               </div>
             </div>
+
+            {error && (
+              <div className="mb-4 rounded-lg border border-destructive/50 bg-destructive/10 p-3">
+                <p className="text-sm text-destructive">{error}</p>
+              </div>
+            )}
 
             {codes.length > 0 ? (
               <div className="grid grid-cols-2 gap-2 rounded-lg border bg-muted/50 p-4">
@@ -203,8 +187,13 @@ Generated: ${new Date().toISOString()}
                   variant="outline"
                   size="sm"
                   onClick={handleRegenerateClick}
+                  disabled={isRegenerating}
                 >
-                  <RefreshCw className="h-4 w-4" />
+                  {isRegenerating ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <RefreshCw className="h-4 w-4" />
+                  )}
                   {t('mfa.backup.regenerate')}
                 </Button>
               )}
@@ -230,82 +219,12 @@ Generated: ${new Date().toISOString()}
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmRegenerate}>
+            <AlertDialogAction onClick={handleRegenerate}>
               {t('common.continue')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {/* Verification Dialog */}
-      <Dialog open={showVerification} onOpenChange={setShowVerification}>
-        <DialogContent dir={isRTL ? 'rtl' : 'ltr'} className="sm:max-w-md">
-          <DialogHeader className="text-center sm:text-center">
-            <DialogTitle>{t('mfa.verify.title')}</DialogTitle>
-            <DialogDescription>
-              {t('mfa.verify.description')}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="flex flex-col items-center gap-4 py-4">
-            <InputOTP
-              maxLength={6}
-              value={verificationCode}
-              onChange={(value) => {
-                setVerificationCode(value)
-                setError(null)
-              }}
-              disabled={isRegenerating}
-              autoFocus
-            >
-              <InputOTPGroup>
-                <InputOTPSlot index={0} />
-                <InputOTPSlot index={1} />
-                <InputOTPSlot index={2} />
-              </InputOTPGroup>
-              <InputOTPSeparator />
-              <InputOTPGroup>
-                <InputOTPSlot index={3} />
-                <InputOTPSlot index={4} />
-                <InputOTPSlot index={5} />
-              </InputOTPGroup>
-            </InputOTP>
-
-            {error && (
-              <p className="text-sm text-destructive" role="alert">
-                {error}
-              </p>
-            )}
-          </div>
-
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setShowVerification(false)
-                setVerificationCode('')
-                setError(null)
-              }}
-              disabled={isRegenerating}
-            >
-              {t('common.cancel')}
-            </Button>
-            <Button
-              onClick={handleRegenerate}
-              disabled={isRegenerating || verificationCode.length !== 6}
-            >
-              {isRegenerating ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  {t('mfa.verify.verifying')}
-                </>
-              ) : (
-                t('mfa.backup.regenerate')
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   )
 }
