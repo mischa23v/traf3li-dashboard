@@ -42,9 +42,14 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null })
         try {
           const user = await authService.login(credentials)
+
+          // Check if MFA verification is required
+          // Backend may return mfaEnabled or mfaPending flag
+          const mfaPending = user.mfaEnabled && !user.mfaPending ? true : user.mfaPending
+
           set({
-            user,
-            isAuthenticated: true,
+            user: { ...user, mfaPending },
+            isAuthenticated: !mfaPending, // Not fully authenticated until MFA verified
             isLoading: false,
             error: null,
           })

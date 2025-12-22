@@ -115,6 +115,11 @@ export interface User {
     languages: string[]
     firmID?: string
   }
+  // MFA-related fields
+  mfaEnabled?: boolean
+  mfaMethod?: 'totp' | 'sms' | 'email' | null
+  mfaRequired?: boolean
+  mfaPending?: boolean // True when login succeeded but MFA verification is needed
   createdAt: string
   updatedAt: string
 }
