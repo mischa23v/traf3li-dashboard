@@ -32,7 +32,7 @@ interface ActivityBellProps {
 }
 
 export function ActivityBell({ className }: ActivityBellProps) {
-  const { t, i18n } = useTranslation()
+  const { i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
   const [open, setOpen] = React.useState(false)
 

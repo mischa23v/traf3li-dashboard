@@ -9,8 +9,6 @@ import { format } from 'date-fns'
 import { ar, enUS } from 'date-fns/locale'
 import {
   Zap,
-  Play,
-  Pause,
   Copy,
   Trash2,
   MoreHorizontal,
@@ -21,7 +19,6 @@ import {
   AlertTriangle,
   Loader2,
   History,
-  Settings,
   Edit,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -31,9 +28,6 @@ import { Switch } from '@/components/ui/switch'
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from '@/components/ui/card'
 import {
   Table,
@@ -79,7 +73,7 @@ export function AutomatedActionList({
   onEdit,
   onCreate,
 }: AutomatedActionListProps) {
-  const { t, i18n } = useTranslation()
+  const { i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
   const [logsDialogOpen, setLogsDialogOpen] = React.useState(false)
   const [selectedAction, setSelectedAction] = React.useState<AutomatedAction | null>(null)

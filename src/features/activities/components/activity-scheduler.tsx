@@ -32,13 +32,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Calendar as CalendarComponent } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useActivityTypes, useScheduleActivity } from '@/hooks/useOdooActivities'
@@ -73,7 +66,7 @@ export function ActivityScheduler({
   trigger,
   defaultOpen = false,
 }: ActivitySchedulerProps) {
-  const { t, i18n } = useTranslation()
+  const { i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
   const [open, setOpen] = React.useState(defaultOpen)
   const [selectedTypeId, setSelectedTypeId] = React.useState<string>('')
@@ -129,7 +122,7 @@ export function ActivityScheduler({
       setDeadline(undefined)
       setOpen(false)
       onScheduled?.()
-    } catch (error) {
+    } catch {
       // Error is handled by the mutation
     }
   }
