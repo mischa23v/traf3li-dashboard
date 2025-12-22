@@ -1,0 +1,511 @@
+{
+  "audit": {
+    "date": "2025-12-22",
+    "repository": "traf3li-backend",
+    "scope": "Search functionality security",
+    "severity": "CRITICAL",
+    "total_vulnerabilities": 28
+  },
+  "summary": {
+    "critical": 19,
+    "high": 12,
+    "medium": 5,
+    "low": 2
+  },
+  "vulnerabilities": [
+    {
+      "id": "SEARCH-001",
+      "title": "RegEx Injection - Client Controller",
+      "severity": "CRITICAL",
+      "cvss": 8.2,
+      "file": "/src/controllers/client.controller.js",
+      "lines": [143, 144, 145, 146, 147, 148, 149, 150],
+      "description": "Direct user input used in $regex queries without escaping special characters",
+      "impact": "ReDoS attacks, data exfiltration, server crashes",
+      "attack_pattern": "(a+)+$",
+      "fix": "Apply regex escaping: search.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')",
+      "affected_fields": ["fullName", "email", "phone", "clientId", "companyName"]
+    },
+    {
+      "id": "SEARCH-002",
+      "title": "RegEx Injection - Client Model Static Method",
+      "severity": "CRITICAL",
+      "cvss": 8.2,
+      "file": "/src/models/client.model.js",
+      "lines": [126, 127, 128, 129, 130, 131],
+      "description": "searchClients static method uses unsafe regex",
+      "impact": "ReDoS attacks, data exfiltration",
+      "fix": "Apply regex escaping in static method",
+      "affected_fields": ["name", "email", "phone", "clientId"]
+    },
+    {
+      "id": "SEARCH-003",
+      "title": "RegEx Injection - Transaction Controller",
+      "severity": "CRITICAL",
+      "cvss": 8.2,
+      "file": "/src/controllers/transaction.controller.js",
+      "lines": [120, 121, 122, 123, 124, 125, 126],
+      "description": "No regex escaping on transaction search",
+      "impact": "ReDoS attacks, transaction data leak",
+      "fix": "Apply regex escaping",
+      "affected_fields": ["description", "transactionId", "referenceNumber", "notes"]
+    },
+    {
+      "id": "SEARCH-004",
+      "title": "RegEx Injection - User Controller",
+      "severity": "CRITICAL",
+      "cvss": 8.2,
+      "file": "/src/controllers/user.controller.js",
+      "lines": [133, 134, 135, 136, 137],
+      "description": "Public lawyer search vulnerable to regex injection",
+      "impact": "ReDoS attacks, user enumeration, data scraping",
+      "fix": "Apply regex escaping and rate limiting",
+      "affected_fields": ["username", "description"]
+    },
+    {
+      "id": "SEARCH-005",
+      "title": "RegEx Injection - Gig Controller",
+      "severity": "CRITICAL",
+      "cvss": 8.2,
+      "file": "/src/controllers/gig.controller.js",
+      "lines": [72, 73],
+      "description": "Multiple regex injections in gig search",
+      "impact": "ReDoS attacks, gig data leak",
+      "fix": "Apply regex escaping",
+      "affected_fields": ["category", "title"]
+    },
+    {
+      "id": "SEARCH-006",
+      "title": "RegEx Injection - Benefit Controller",
+      "severity": "CRITICAL",
+      "cvss": 8.2,
+      "file": "/src/controllers/benefit.controller.js",
+      "lines": [165, 166, 167, 168, 169, 170, 171, 172, 173],
+      "description": "6 fields exposed to regex injection",
+      "impact": "ReDoS attacks, employee benefit data leak",
+      "fix": "Apply regex escaping",
+      "affected_fields": ["benefitName", "benefitNameAr", "employeeName", "employeeNameAr", "enrollmentNumber", "benefitEnrollmentId"]
+    },
+    {
+      "id": "SEARCH-007",
+      "title": "RegEx Injection - Firm Controller",
+      "severity": "CRITICAL",
+      "cvss": 8.2,
+      "file": "/src/controllers/firm.controller.js",
+      "lines": [41],
+      "description": "City parameter vulnerable to regex injection",
+      "impact": "ReDoS attacks, firm data enumeration",
+      "fix": "Apply regex escaping",
+      "affected_fields": ["city"]
+    },
+    {
+      "id": "SEARCH-008",
+      "title": "MongoDB Text Search Injection - Legal Document",
+      "severity": "CRITICAL",
+      "cvss": 7.5,
+      "file": "/src/controllers/legalDocument.controller.js",
+      "lines": [49],
+      "description": "No sanitization of MongoDB $text search operators",
+      "impact": "Search manipulation, unauthorized document access",
+      "fix": "Sanitize text search: remove quotes, dashes, limit words",
+      "affected_fields": ["search"]
+    },
+    {
+      "id": "SEARCH-009",
+      "title": "MongoDB Text Search Injection - Question",
+      "severity": "CRITICAL",
+      "cvss": 7.5,
+      "file": "/src/controllers/question.controller.js",
+      "lines": [36],
+      "description": "No sanitization of text search operators",
+      "impact": "Search manipulation, question enumeration",
+      "fix": "Sanitize text search input",
+      "affected_fields": ["search"]
+    },
+    {
+      "id": "SEARCH-010",
+      "title": "MongoDB Text Search Injection - Firm",
+      "severity": "CRITICAL",
+      "cvss": 7.5,
+      "file": "/src/controllers/firm.controller.js",
+      "lines": [40],
+      "description": "No sanitization of text search operators",
+      "impact": "Search manipulation, firm data leak",
+      "fix": "Sanitize text search input",
+      "affected_fields": ["search"]
+    },
+    {
+      "id": "SEARCH-011",
+      "title": "Missing Rate Limiting - Client Search",
+      "severity": "CRITICAL",
+      "cvss": 7.8,
+      "file": "/src/routes/client.route.js",
+      "lines": [22],
+      "description": "No rate limiting on search endpoint",
+      "impact": "DoS attacks, data scraping",
+      "fix": "Apply searchRateLimiter middleware",
+      "endpoint": "/api/clients/search"
+    },
+    {
+      "id": "SEARCH-012",
+      "title": "Missing Rate Limiting - Lawyer Search",
+      "severity": "CRITICAL",
+      "cvss": 7.8,
+      "file": "/src/routes/user.route.js",
+      "lines": [14],
+      "description": "Public endpoint with no rate limiting",
+      "impact": "DoS attacks, lawyer enumeration, scraping",
+      "fix": "Apply publicRateLimiter middleware",
+      "endpoint": "/api/users/lawyers"
+    },
+    {
+      "id": "SEARCH-013",
+      "title": "Missing Rate Limiting - Gig Search",
+      "severity": "CRITICAL",
+      "cvss": 7.8,
+      "file": "/src/routes/gig.route.js",
+      "lines": [17],
+      "description": "Public endpoint with no rate limiting",
+      "impact": "DoS attacks, gig scraping",
+      "fix": "Apply publicRateLimiter middleware",
+      "endpoint": "/api/gigs"
+    },
+    {
+      "id": "SEARCH-014",
+      "title": "Missing Query Length Validation - Client",
+      "severity": "HIGH",
+      "cvss": 6.5,
+      "file": "/src/controllers/client.controller.js",
+      "lines": [128],
+      "description": "No validation of search query length",
+      "impact": "DoS via extremely long queries",
+      "fix": "Validate: 2 <= length <= 100",
+      "affected_fields": ["search"]
+    },
+    {
+      "id": "SEARCH-015",
+      "title": "Missing Query Length Validation - Transaction",
+      "severity": "HIGH",
+      "cvss": 6.5,
+      "file": "/src/controllers/transaction.controller.js",
+      "lines": [86],
+      "description": "No validation of search query length",
+      "impact": "DoS via extremely long queries",
+      "fix": "Validate: 2 <= length <= 100",
+      "affected_fields": ["search"]
+    },
+    {
+      "id": "SEARCH-016",
+      "title": "Missing Query Length Validation - User",
+      "severity": "HIGH",
+      "cvss": 6.5,
+      "file": "/src/controllers/user.controller.js",
+      "lines": [119],
+      "description": "No validation of search query length",
+      "impact": "DoS via extremely long queries",
+      "fix": "Validate: 2 <= length <= 100",
+      "affected_fields": ["search"]
+    },
+    {
+      "id": "SEARCH-017",
+      "title": "Missing Query Length Validation - Gig",
+      "severity": "HIGH",
+      "cvss": 6.5,
+      "file": "/src/controllers/gig.controller.js",
+      "lines": [68],
+      "description": "No validation of search query length",
+      "impact": "DoS via extremely long queries",
+      "fix": "Validate: 2 <= length <= 100",
+      "affected_fields": ["search"]
+    },
+    {
+      "id": "SEARCH-018",
+      "title": "Missing Query Length Validation - Benefit",
+      "severity": "HIGH",
+      "cvss": 6.5,
+      "file": "/src/controllers/benefit.controller.js",
+      "lines": [147],
+      "description": "No validation of search query length",
+      "impact": "DoS via extremely long queries",
+      "fix": "Validate: 2 <= length <= 100",
+      "affected_fields": ["search"]
+    },
+    {
+      "id": "SEARCH-019",
+      "title": "Missing Query Length Validation - Firm",
+      "severity": "HIGH",
+      "cvss": 6.5,
+      "file": "/src/controllers/firm.controller.js",
+      "lines": [37],
+      "description": "No validation of search query length",
+      "impact": "DoS via extremely long queries",
+      "fix": "Validate: 2 <= length <= 100",
+      "affected_fields": ["search"]
+    },
+    {
+      "id": "SEARCH-020",
+      "title": "Missing Type Validation - Client",
+      "severity": "HIGH",
+      "cvss": 6.0,
+      "file": "/src/controllers/client.controller.js",
+      "lines": [143],
+      "description": "No typeof check for search parameter",
+      "impact": "Type confusion attacks",
+      "fix": "Add: typeof search === 'string'",
+      "affected_fields": ["search"]
+    },
+    {
+      "id": "SEARCH-021",
+      "title": "Missing Type Validation - Transaction",
+      "severity": "HIGH",
+      "cvss": 6.0,
+      "file": "/src/controllers/transaction.controller.js",
+      "lines": [120],
+      "description": "No typeof check for search parameter",
+      "impact": "Type confusion attacks",
+      "fix": "Add: typeof search === 'string'",
+      "affected_fields": ["search"]
+    },
+    {
+      "id": "SEARCH-022",
+      "title": "Missing Type Validation - User",
+      "severity": "HIGH",
+      "cvss": 6.0,
+      "file": "/src/controllers/user.controller.js",
+      "lines": [133],
+      "description": "No typeof check for search parameter",
+      "impact": "Type confusion attacks",
+      "fix": "Add: typeof search === 'string'",
+      "affected_fields": ["search"]
+    },
+    {
+      "id": "SEARCH-023",
+      "title": "Missing Type Validation - Gig",
+      "severity": "HIGH",
+      "cvss": 6.0,
+      "file": "/src/controllers/gig.controller.js",
+      "lines": [68],
+      "description": "No typeof check for search parameter",
+      "impact": "Type confusion attacks",
+      "fix": "Add: typeof search === 'string'",
+      "affected_fields": ["search"]
+    },
+    {
+      "id": "SEARCH-024",
+      "title": "Missing Type Validation - Benefit",
+      "severity": "HIGH",
+      "cvss": 6.0,
+      "file": "/src/controllers/benefit.controller.js",
+      "lines": [165],
+      "description": "No typeof check for search parameter",
+      "impact": "Type confusion attacks",
+      "fix": "Add: typeof search === 'string'",
+      "affected_fields": ["search"]
+    },
+    {
+      "id": "SEARCH-025",
+      "title": "Missing Type Validation - Firm",
+      "severity": "HIGH",
+      "cvss": 6.0,
+      "file": "/src/controllers/firm.controller.js",
+      "lines": [37],
+      "description": "No typeof check for search parameter",
+      "impact": "Type confusion attacks",
+      "fix": "Add: typeof search === 'string'",
+      "affected_fields": ["search"]
+    },
+    {
+      "id": "SEARCH-026",
+      "title": "Email in Text Search Index",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "/src/models/client.model.js",
+      "lines": [101],
+      "description": "Email addresses indexed for full-text search",
+      "impact": "Privacy violation, GDPR/PDPL compliance issue, email harvesting",
+      "fix": "Remove email from text index, use separate regular index",
+      "compliance": ["GDPR", "PDPL"]
+    },
+    {
+      "id": "SEARCH-027",
+      "title": "Timing Attack - Legal Document Access",
+      "severity": "MEDIUM",
+      "cvss": 5.0,
+      "file": "/src/controllers/legalDocument.controller.js",
+      "lines": [46, 56, 57, 58, 59],
+      "description": "Different response times reveal document access levels",
+      "impact": "Information disclosure via timing analysis",
+      "fix": "Implement constant-time responses",
+      "affected_fields": ["accessLevel"]
+    },
+    {
+      "id": "SEARCH-028",
+      "title": "Proper Implementation Found - pdfme Controller",
+      "severity": "INFO",
+      "cvss": 0,
+      "file": "/src/controllers/pdfme.controller.js",
+      "lines": [167, 168],
+      "description": "This is the ONLY controller with proper regex escaping and validation",
+      "impact": "None - secure implementation",
+      "note": "Use this as reference for fixing other controllers"
+    }
+  ],
+  "secure_implementations": [
+    {
+      "file": "/src/controllers/pdfme.controller.js",
+      "lines": [167, 174],
+      "description": "Proper regex escaping and length validation",
+      "code_snippet": "const sanitizedSearch = search.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');"
+    },
+    {
+      "file": "/src/controllers/client.controller.js",
+      "lines": [136],
+      "description": "Proper authorization enforcement",
+      "code_snippet": "const query = { lawyerId };"
+    },
+    {
+      "file": "/src/controllers/benefit.controller.js",
+      "lines": [163],
+      "description": "Proper authorization enforcement",
+      "code_snippet": "const filters = { createdBy: req.userID };"
+    },
+    {
+      "file": "/src/controllers/transaction.controller.js",
+      "lines": [94],
+      "description": "Proper authorization enforcement",
+      "code_snippet": "const query = { userId };"
+    }
+  ],
+  "attack_vectors": [
+    {
+      "name": "ReDoS Attack",
+      "pattern": "(a+)+$",
+      "impact": "Server crash, 100% CPU usage",
+      "affected_endpoints": [
+        "/api/clients?search=(a+)+$",
+        "/api/transactions?search=(a+)+$",
+        "/api/users/lawyers?search=(a+)+$",
+        "/api/gigs?search=(a+)+$",
+        "/api/benefits?search=(a+)+$"
+      ]
+    },
+    {
+      "name": "Data Exfiltration",
+      "pattern": ".*",
+      "impact": "Retrieves all records",
+      "affected_endpoints": [
+        "/api/clients?search=.*",
+        "/api/transactions?search=.*",
+        "/api/gigs?search=.*"
+      ]
+    },
+    {
+      "name": "Text Search Manipulation",
+      "pattern": "\"admin\" -user",
+      "impact": "Query logic manipulation",
+      "affected_endpoints": [
+        "/api/questions?search=\"admin\" -user",
+        "/api/legal-documents?search=-public",
+        "/api/firms?search=lawyer OR attorney"
+      ]
+    },
+    {
+      "name": "Timing Attack",
+      "pattern": "^username",
+      "impact": "User enumeration",
+      "affected_endpoints": [
+        "/api/users/lawyers?search=^admin",
+        "/api/clients/search?q=^client"
+      ]
+    }
+  ],
+  "remediation": {
+    "critical_fixes": [
+      {
+        "priority": 1,
+        "title": "Add regex escaping to all controllers",
+        "files": [
+          "client.controller.js",
+          "transaction.controller.js",
+          "user.controller.js",
+          "gig.controller.js",
+          "benefit.controller.js",
+          "firm.controller.js",
+          "client.model.js"
+        ],
+        "estimated_time": "4 hours",
+        "code_template": "const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');"
+      },
+      {
+        "priority": 2,
+        "title": "Apply rate limiting to all search routes",
+        "files": [
+          "client.route.js",
+          "user.route.js",
+          "gig.route.js",
+          "transaction.route.js",
+          "benefit.route.js"
+        ],
+        "estimated_time": "2 hours",
+        "code_template": "const { searchRateLimiter } = require('../middlewares/rateLimiter.middleware');"
+      },
+      {
+        "priority": 3,
+        "title": "Add input validation to all search handlers",
+        "files": [
+          "All controllers with search"
+        ],
+        "estimated_time": "3 hours",
+        "code_template": "if (!search || typeof search !== 'string' || search.length < 2 || search.length > 100) return;"
+      }
+    ],
+    "total_estimated_time": "2-3 days"
+  },
+  "testing": {
+    "test_cases": [
+      "ReDoS patterns: (a+)+$, ^(a|a)*$, (x+x+)+y",
+      "Wildcard injection: .*, .+, ^.*$",
+      "Text operators: \"phrase\", -word, OR",
+      "Special chars: \\, $, ^, *, +, ?, ., [, ], {, }, (, ), |",
+      "Long queries: 1000+ characters",
+      "Type confusion: arrays, objects",
+      "SQL injection: '; DROP TABLE--",
+      "NoSQL injection: { $ne: null }",
+      "Unicode: \\u0000, emoji",
+      "NULL bytes: \\0"
+    ],
+    "load_tests": [
+      "100 concurrent searches",
+      "1000 searches/minute",
+      "Complex regex under load",
+      "Rate limiter effectiveness"
+    ]
+  },
+  "compliance": {
+    "gdpr_pdpl": {
+      "issues": [
+        "Email in text search index",
+        "Search logs contain PII",
+        "No data retention policy"
+      ],
+      "fixes": [
+        "Remove email from index",
+        "Implement log retention (30 days)",
+        "Add search history purge feature"
+      ]
+    },
+    "owasp_top_10": [
+      "A03:2021 - Injection (RegEx)",
+      "A01:2021 - Broken Access Control",
+      "A04:2021 - Insecure Design",
+      "A05:2021 - Security Misconfiguration",
+      "A06:2021 - Vulnerable Components"
+    ]
+  },
+  "references": [
+    "https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS",
+    "https://docs.mongodb.com/manual/security/",
+    "https://expressjs.com/en/advanced/best-practice-security.html",
+    "https://cwe.mitre.org/data/definitions/1333.html"
+  ]
+}

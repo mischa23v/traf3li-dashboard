@@ -1,0 +1,415 @@
+{
+  "audit": {
+    "date": "2025-12-22",
+    "repository": "https://github.com/mischa23v/traf3li-backend",
+    "scope": [
+      "Email Notifications",
+      "SMS Notifications",
+      "WhatsApp Notifications",
+      "Push Notifications",
+      "Content Sanitization",
+      "Notification Preferences",
+      "Privacy Controls"
+    ],
+    "overall_risk_score": 9.2,
+    "risk_level": "CRITICAL"
+  },
+  "summary": {
+    "total_vulnerabilities": 24,
+    "by_severity": {
+      "critical": 9,
+      "high": 10,
+      "medium": 5,
+      "low": 0
+    },
+    "by_category": {
+      "email_security": 6,
+      "sms_security": 4,
+      "push_security": 4,
+      "content_sanitization": 3,
+      "privacy": 4,
+      "miscellaneous": 3
+    }
+  },
+  "vulnerabilities": [
+    {
+      "id": "VULN-EMAIL-001",
+      "title": "API Key Exposure Risk",
+      "severity": "CRITICAL",
+      "cwe": "CWE-798",
+      "category": "Email Security",
+      "file": "/src/services/email.service.js",
+      "line": 16,
+      "description": "Resend API key loaded from environment without validation, rotation mechanism, or usage monitoring",
+      "impact": "API key could be logged, stolen, or misused",
+      "remediation": "Implement API key validation, rotation tracking, and secure error handling",
+      "cvss_score": 8.5
+    },
+    {
+      "id": "VULN-EMAIL-002",
+      "title": "Insufficient Email Address Validation",
+      "severity": "HIGH",
+      "cwe": "CWE-20",
+      "category": "Email Security",
+      "file": "/src/services/email.service.js",
+      "line": "100-107",
+      "description": "No format validation, domain verification, or disposable email detection",
+      "impact": "Could send to invalid/malicious addresses, wasting resources",
+      "remediation": "Implement comprehensive email validation with DNS MX checks and disposable domain blacklist",
+      "cvss_score": 6.5
+    },
+    {
+      "id": "VULN-EMAIL-003",
+      "title": "OTP Email Rate Limit Bypass",
+      "severity": "HIGH",
+      "cwe": "CWE-307",
+      "category": "Email Security",
+      "file": "/src/services/notificationDelivery.service.js",
+      "line": "325-367",
+      "description": "OTP emails bypass rate limiting entirely, allowing email bombing attacks",
+      "impact": "Email bombing, spam abuse, resource exhaustion",
+      "remediation": "Implement OTP-specific rate limiting (5 per hour) with exponential backoff",
+      "cvss_score": 7.0
+    },
+    {
+      "id": "VULN-EMAIL-004",
+      "title": "Missing SPF/DKIM/DMARC Configuration",
+      "severity": "MEDIUM",
+      "cwe": "CWE-358",
+      "category": "Email Security",
+      "file": "N/A",
+      "line": "N/A",
+      "description": "No email authentication mechanisms configured",
+      "impact": "Emails could be spoofed or rejected by recipients",
+      "remediation": "Configure SPF records, enable DKIM signing, implement DMARC policy",
+      "cvss_score": 5.0
+    },
+    {
+      "id": "VULN-EMAIL-005",
+      "title": "Information Disclosure in Error Messages",
+      "severity": "MEDIUM",
+      "cwe": "CWE-209",
+      "category": "Email Security",
+      "file": "Multiple files",
+      "line": "Multiple",
+      "description": "Email addresses and subject lines logged in error messages",
+      "impact": "PII leakage, user identification",
+      "remediation": "Hash email addresses in logs, redact subject lines",
+      "cvss_score": 4.5
+    },
+    {
+      "id": "VULN-EMAIL-006",
+      "title": "No Content Security Policy for Email HTML",
+      "severity": "MEDIUM",
+      "cwe": "CWE-1021",
+      "category": "Email Security",
+      "file": "/src/services/emailTemplate.service.js",
+      "line": "N/A",
+      "description": "Email HTML templates lack CSP headers",
+      "impact": "Email client XSS, external resource loading",
+      "remediation": "Add CSP meta tags to email templates",
+      "cvss_score": 4.0
+    },
+    {
+      "id": "VULN-SMS-001",
+      "title": "No SMS Implementation - Stub Only",
+      "severity": "CRITICAL",
+      "cwe": "CWE-749",
+      "category": "SMS Security",
+      "file": "/src/services/notificationDelivery.service.js",
+      "line": "226-251",
+      "description": "SMS functionality is a stub with no security controls when implemented",
+      "impact": "False security, no validation, rate limiting, or sanitization in place",
+      "remediation": "Implement complete SMS security before enabling feature",
+      "cvss_score": 8.0
+    },
+    {
+      "id": "VULN-SMS-002",
+      "title": "Missing Phone Number Validation",
+      "severity": "HIGH",
+      "cwe": "CWE-20",
+      "category": "SMS Security",
+      "file": "/src/services/whatsapp.service.js",
+      "line": "1241-1264",
+      "description": "Basic phone validation only, no libphonenumber, carrier lookup, or spam blacklist",
+      "impact": "Invalid numbers, spam abuse, cost waste",
+      "remediation": "Use libphonenumber-js for comprehensive validation",
+      "cvss_score": 7.0
+    },
+    {
+      "id": "VULN-SMS-003",
+      "title": "No SMS Content Sanitization",
+      "severity": "HIGH",
+      "cwe": "CWE-79",
+      "category": "SMS Security",
+      "file": "Multiple SMS sending functions",
+      "line": "N/A",
+      "description": "SMS content not sanitized for control characters, phishing links, or encoding issues",
+      "impact": "SMS injection, phishing, Unicode attacks",
+      "remediation": "Sanitize SMS content for GSM 7-bit charset and validate URLs",
+      "cvss_score": 6.8
+    },
+    {
+      "id": "VULN-SMS-004",
+      "title": "No SMS Rate Limiting",
+      "severity": "CRITICAL",
+      "cwe": "CWE-770",
+      "category": "SMS Security",
+      "file": "N/A",
+      "line": "N/A",
+      "description": "No rate limiting for SMS messages",
+      "impact": "SMS bombing, high cost abuse, unlimited sending",
+      "remediation": "Implement per-user, per-phone, and global SMS rate limits",
+      "cvss_score": 9.0
+    },
+    {
+      "id": "VULN-PUSH-001",
+      "title": "VAPID Public Key Exposure",
+      "severity": "MEDIUM",
+      "cwe": "CWE-200",
+      "category": "Push Security",
+      "file": "/src/controllers/pushSubscription.controller.js",
+      "line": "187-212",
+      "description": "VAPID public key exposed via API without rate limiting",
+      "impact": "Information disclosure, potential scraping/abuse",
+      "remediation": "Serve via static file or add authentication and rate limiting",
+      "cvss_score": 4.0
+    },
+    {
+      "id": "VULN-PUSH-002",
+      "title": "No Push Subscription Endpoint Validation",
+      "severity": "CRITICAL",
+      "cwe": "CWE-918",
+      "category": "Push Security",
+      "file": "/src/controllers/pushSubscription.controller.js",
+      "line": "13-61",
+      "description": "Push subscription endpoint not validated, allowing SSRF attacks",
+      "impact": "SSRF to internal network, data exfiltration, service probing",
+      "remediation": "Validate endpoint against whitelist of push service domains and block private IPs",
+      "cvss_score": 9.5
+    },
+    {
+      "id": "VULN-PUSH-003",
+      "title": "No Push Content Sanitization",
+      "severity": "HIGH",
+      "cwe": "CWE-79",
+      "category": "Push Security",
+      "file": "/src/queues/notification.queue.js",
+      "line": "93-99",
+      "description": "Push notification title, body, and data not sanitized",
+      "impact": "XSS in push notifications, malicious data payloads",
+      "remediation": "Sanitize all push notification content before sending",
+      "cvss_score": 7.5
+    },
+    {
+      "id": "VULN-PUSH-004",
+      "title": "Expired Subscription Not Cleaned Up",
+      "severity": "MEDIUM",
+      "cwe": "CWE-404",
+      "category": "Push Security",
+      "file": "/src/queues/notification.queue.js",
+      "line": "114-125",
+      "description": "Expired push subscriptions marked but not removed from database",
+      "impact": "Database bloat, continued failed send attempts",
+      "remediation": "Automatically remove expired subscriptions from database",
+      "cvss_score": 3.5
+    },
+    {
+      "id": "VULN-SANITIZE-001",
+      "title": "Notification Controller Doesn't Sanitize Input",
+      "severity": "CRITICAL",
+      "cwe": "CWE-79",
+      "category": "Content Sanitization",
+      "file": "/src/controllers/notification.controller.js",
+      "line": "159-179",
+      "description": "Notification creation accepts unsanitized title, message, and link",
+      "impact": "Stored XSS, script injection, phishing via notifications",
+      "remediation": "Sanitize all notification fields before storage and emission",
+      "cvss_score": 9.0
+    },
+    {
+      "id": "VULN-SANITIZE-002",
+      "title": "WhatsApp Service No Content Sanitization",
+      "severity": "HIGH",
+      "cwe": "CWE-79",
+      "category": "Content Sanitization",
+      "file": "/src/services/whatsapp.service.js",
+      "line": "146-221",
+      "description": "WhatsApp text messages not sanitized for formatting abuse or phishing",
+      "impact": "WhatsApp formatting abuse, phishing links, homograph attacks",
+      "remediation": "Sanitize WhatsApp content for control characters and validate URLs",
+      "cvss_score": 7.0
+    },
+    {
+      "id": "VULN-SANITIZE-003",
+      "title": "Dangerous iFrame Allowed in Rich Text",
+      "severity": "HIGH",
+      "cwe": "CWE-1021",
+      "category": "Content Sanitization",
+      "file": "/src/utils/sanitize.js",
+      "line": "104-112",
+      "description": "iFrames allowed with limited whitelist, enabling clickjacking",
+      "impact": "Clickjacking, embedded malicious content, UI redressing",
+      "remediation": "Remove iFrame support or implement strict sandbox attributes",
+      "cvss_score": 7.0
+    },
+    {
+      "id": "VULN-PRIVACY-001",
+      "title": "No Encryption of Sensitive Preference Data",
+      "severity": "HIGH",
+      "cwe": "CWE-311",
+      "category": "Privacy",
+      "file": "/src/models/notificationSettings.model.js",
+      "line": "68-87",
+      "description": "Email addresses and phone numbers stored in plain text",
+      "impact": "Data breach exposure, privacy compliance violations (GDPR/PDPL)",
+      "remediation": "Encrypt email addresses and phone numbers using AES-256-GCM",
+      "cvss_score": 7.5
+    },
+    {
+      "id": "VULN-PRIVACY-002",
+      "title": "No Access Control on Notification Settings",
+      "severity": "CRITICAL",
+      "cwe": "CWE-639",
+      "category": "Privacy",
+      "file": "Notification settings endpoints",
+      "line": "N/A",
+      "description": "No validation that userId matches authenticated user (IDOR vulnerability)",
+      "impact": "Unauthorized access/modification of other users' notification settings",
+      "remediation": "Add middleware to verify user ownership of settings",
+      "cvss_score": 9.0
+    },
+    {
+      "id": "VULN-PRIVACY-003",
+      "title": "Push Subscription Stored Without Encryption",
+      "severity": "HIGH",
+      "cwe": "CWE-312",
+      "category": "Privacy",
+      "file": "/src/controllers/pushSubscription.controller.js",
+      "line": "36-45",
+      "description": "Push subscription keys (p256dh, auth) stored in plain text",
+      "impact": "Subscription keys exposed, unauthorized notifications possible",
+      "remediation": "Encrypt subscription keys before database storage",
+      "cvss_score": 7.0
+    },
+    {
+      "id": "VULN-PRIVACY-004",
+      "title": "No Audit Logging for Preference Changes",
+      "severity": "MEDIUM",
+      "cwe": "CWE-778",
+      "category": "Privacy",
+      "file": "All preference update endpoints",
+      "line": "N/A",
+      "description": "No logging of notification preference changes",
+      "impact": "No accountability, can't detect unauthorized changes, compliance issues",
+      "remediation": "Implement comprehensive audit logging for all preference changes",
+      "cvss_score": 5.0
+    },
+    {
+      "id": "VULN-MISC-001",
+      "title": "SSRF in Webhook Notifications",
+      "severity": "HIGH",
+      "cwe": "CWE-918",
+      "category": "Miscellaneous",
+      "file": "/src/queues/notification.queue.js",
+      "line": "214-253",
+      "description": "Webhook URL validation vulnerable to DNS rebinding and TOCTOU attacks",
+      "impact": "Internal network probing, cloud metadata access, SSRF",
+      "remediation": "Add DNS rebinding protection, block cloud metadata IPs, disable redirects",
+      "cvss_score": 8.0
+    },
+    {
+      "id": "VULN-MISC-002",
+      "title": "No CSRF Protection on Notification Endpoints",
+      "severity": "HIGH",
+      "cwe": "CWE-352",
+      "category": "Miscellaneous",
+      "file": "All state-changing notification endpoints",
+      "line": "N/A",
+      "description": "POST/PUT/DELETE operations lack CSRF tokens",
+      "impact": "Unauthorized notification setting changes via CSRF",
+      "remediation": "Implement CSRF protection using csurf middleware",
+      "cvss_score": 7.0
+    },
+    {
+      "id": "VULN-MISC-003",
+      "title": "Missing Input Length Validation",
+      "severity": "MEDIUM",
+      "cwe": "CWE-1284",
+      "category": "Miscellaneous",
+      "file": "Multiple notification endpoints",
+      "line": "N/A",
+      "description": "No length limits on notification title, message, or data",
+      "impact": "Database bloat, out-of-memory errors, DoS attacks",
+      "remediation": "Enforce length limits: title 200 chars, message 1000 chars, data 5KB",
+      "cvss_score": 5.5
+    }
+  ],
+  "compliance": {
+    "gdpr": {
+      "compliant": false,
+      "issues": [
+        "No right to erasure mechanism for notification history",
+        "Excessive data retention (indefinite)",
+        "No consent tracking for notification channels",
+        "Unencrypted personal data storage"
+      ]
+    },
+    "pdpl": {
+      "compliant": false,
+      "issues": [
+        "No data localization verification",
+        "Third-party services may store data abroad",
+        "Missing Arabic privacy policies",
+        "No data residency controls"
+      ]
+    }
+  },
+  "recommendations": {
+    "immediate": [
+      "Sanitize all notification content at all entry points",
+      "Implement SMS rate limiting (per-user, per-phone, global)",
+      "Validate push subscription endpoints with whitelist",
+      "Add access control to notification settings endpoints",
+      "Encrypt email addresses and phone numbers"
+    ],
+    "short_term": [
+      "Add CSRF protection to all state-changing operations",
+      "Implement comprehensive email validation with DNS checks",
+      "Add content length validation at API and model levels",
+      "Fix OTP rate limiting with database-backed tracking",
+      "Clean up expired push subscriptions automatically"
+    ],
+    "medium_term": [
+      "Implement comprehensive audit logging",
+      "Configure SPF/DKIM/DMARC for email authentication",
+      "Use libphonenumber-js for phone validation",
+      "Remove or restrict dangerous HTML features (iFrames)",
+      "Implement notification archiving and retention policies"
+    ],
+    "long_term": [
+      "End-to-end encryption for notification content",
+      "ML-based spam and anomaly detection",
+      "GDPR/PDPL compliance automation",
+      "Multi-region support with data residency",
+      "Advanced notification analytics and monitoring"
+    ]
+  },
+  "estimated_effort": {
+    "p0_critical": "1-2 weeks",
+    "p1_high": "1-2 weeks",
+    "p2_medium": "2-4 weeks",
+    "p3_low": "Ongoing",
+    "total": "3-4 developer weeks for P0-P1"
+  },
+  "tools_required": [
+    "validator@^13.11.0",
+    "sanitize-html@^2.11.0",
+    "libphonenumber-js@^1.10.51",
+    "csurf@^1.11.0",
+    "helmet@^7.1.0",
+    "express-rate-limit@^7.1.5",
+    "redis@^4.6.11",
+    "web-push@^3.6.6"
+  ]
+}

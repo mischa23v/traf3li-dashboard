@@ -1,0 +1,475 @@
+{
+  "scanDate": "2025-12-22",
+  "repository": "https://github.com/mischa23v/traf3li-backend",
+  "scanner": "PCI-DSS Compliance Audit",
+  "overallStatus": "NON_COMPLIANT",
+  "complianceScore": 23,
+  "riskLevel": "CRITICAL",
+  "summary": {
+    "totalIssues": 15,
+    "critical": 3,
+    "high": 4,
+    "medium": 3,
+    "low": 5,
+    "canProcessPayments": false
+  },
+  "criticalFindings": [
+    {
+      "id": "PCI-CRITICAL-001",
+      "title": "Unencrypted Cardholder Data Storage",
+      "severity": "CRITICAL",
+      "pciRequirement": "3.4",
+      "requirementDescription": "Render PAN unreadable anywhere it is stored",
+      "status": "FAILED",
+      "location": {
+        "file": "/src/models/employeeBenefit.model.js",
+        "lines": [240, 241]
+      },
+      "vulnerableCode": "cardNumber: { type: String, trim: true },\ncardExpiryDate: { type: Date },",
+      "description": "Card numbers and expiry dates are stored in PLAIN TEXT in MongoDB. This is a critical PCI-DSS violation.",
+      "impact": "Data breach risk, potential fines up to $500,000 per incident, loss of payment processing privileges",
+      "remediation": {
+        "priority": "IMMEDIATE",
+        "timeline": "24 hours",
+        "steps": [
+          "Remove cardNumber and cardExpiryDate fields from schema",
+          "Implement Stripe tokenization",
+          "Store only last 4 digits for display",
+          "Purge existing card data from database",
+          "Never store CVV/CVC codes"
+        ],
+        "codeExample": "stripeCardToken: { type: String },\ncardLast4: { type: String, maxlength: 4 },\ncardBrand: { type: String },"
+      },
+      "references": [
+        "https://www.pcisecuritystandards.org/document_library",
+        "https://stripe.com/docs/security/guide"
+      ]
+    },
+    {
+      "id": "PCI-CRITICAL-002",
+      "title": "No Database Encryption at Rest",
+      "severity": "CRITICAL",
+      "pciRequirement": "3.4, 4.1",
+      "requirementDescription": "Protect stored cardholder data with encryption",
+      "status": "FAILED",
+      "location": {
+        "file": "/src/configs/db.js",
+        "lines": [8, 14]
+      },
+      "vulnerableCode": "await mongoose.connect(process.env.MONGODB_URI, {\n    maxPoolSize: 10,\n    minPoolSize: 2,\n    // NO TLS/SSL configuration\n    // NO encryption at rest\n});",
+      "description": "MongoDB connection does not enable TLS/SSL or encryption at rest. Cardholder data stored unencrypted.",
+      "impact": "Database compromise would expose all payment data in plain text",
+      "remediation": {
+        "priority": "IMMEDIATE",
+        "timeline": "24-48 hours",
+        "steps": [
+          "Enable TLS for MongoDB connections",
+          "Configure MongoDB Atlas encryption at rest",
+          "Implement field-level encryption for sensitive data",
+          "Use MongoDB Client-Side Field Level Encryption (CSFLE)"
+        ],
+        "codeExample": "await mongoose.connect(process.env.MONGODB_URI, {\n    tls: true,\n    tlsAllowInvalidCertificates: false,\n    tlsCAFile: process.env.MONGODB_CA_CERT\n});"
+      },
+      "references": [
+        "https://docs.mongodb.com/manual/core/security-encryption-at-rest/",
+        "https://docs.mongodb.com/manual/core/csfle/"
+      ]
+    },
+    {
+      "id": "PCI-CRITICAL-003",
+      "title": "Unsafe Payment Gateway Response Storage",
+      "severity": "CRITICAL",
+      "pciRequirement": "3.2",
+      "requirementDescription": "Do not store sensitive authentication data after authorization",
+      "status": "AT_RISK",
+      "location": {
+        "file": "/src/models/payment.model.js",
+        "lines": [57]
+      },
+      "vulnerableCode": "gatewayResponse: mongoose.Schema.Types.Mixed,",
+      "description": "Gateway response field accepts any data structure without validation. Could store CVV, full card numbers, or magnetic stripe data.",
+      "impact": "May inadvertently store prohibited sensitive authentication data",
+      "remediation": {
+        "priority": "IMMEDIATE",
+        "timeline": "1 week",
+        "steps": [
+          "Whitelist only safe gateway response fields",
+          "Sanitize all gateway responses before storage",
+          "Never store: CVV, full PAN, magnetic stripe, PIN",
+          "Document approved gateway response fields"
+        ],
+        "codeExample": "const sanitizeGatewayResponse = (response) => {\n    return {\n        transactionId: response.id,\n        status: response.status,\n        timestamp: response.created\n    };\n};"
+      },
+      "references": [
+        "https://www.pcisecuritystandards.org/documents/PCI_DSS_v3-2-1.pdf"
+      ]
+    }
+  ],
+  "highSeverityFindings": [
+    {
+      "id": "PCI-HIGH-001",
+      "title": "No HTTPS Enforcement",
+      "severity": "HIGH",
+      "pciRequirement": "4.1",
+      "requirementDescription": "Use strong cryptography and security protocols for transmission",
+      "status": "FAILED",
+      "location": {
+        "file": "/src/server.js",
+        "lines": [59]
+      },
+      "vulnerableCode": "const server = http.createServer(app);",
+      "description": "HTTP server instead of HTTPS. No TLS/SSL enforcement. Payment data transmitted unencrypted.",
+      "impact": "Man-in-the-middle attacks, payment data interception",
+      "remediation": {
+        "priority": "HIGH",
+        "timeline": "1 week",
+        "steps": [
+          "Configure HTTPS server with TLS 1.2+",
+          "Add HSTS headers",
+          "Redirect HTTP to HTTPS",
+          "Disable weak ciphers"
+        ]
+      }
+    },
+    {
+      "id": "PCI-HIGH-002",
+      "title": "Insufficient Access Controls",
+      "severity": "HIGH",
+      "pciRequirement": "7.1, 7.2",
+      "requirementDescription": "Limit access to cardholder data by business need to know",
+      "status": "FAILED",
+      "location": {
+        "file": "/src/middlewares/authenticate.js",
+        "lines": [4, 26]
+      },
+      "description": "No role-based access control for payment data. Any authenticated lawyer can access all payments. No MFA.",
+      "impact": "Unauthorized access to payment data, insider threats",
+      "remediation": {
+        "priority": "HIGH",
+        "timeline": "2 weeks",
+        "steps": [
+          "Implement role-based access control (RBAC)",
+          "Create specific permissions for payment operations",
+          "Require multi-factor authentication for sensitive operations",
+          "Log all access to payment data"
+        ]
+      }
+    },
+    {
+      "id": "PCI-HIGH-003",
+      "title": "Inadequate Audit Logging",
+      "severity": "HIGH",
+      "pciRequirement": "10.1, 10.2",
+      "requirementDescription": "Implement audit trails to link all access to system components",
+      "status": "PARTIAL",
+      "location": {
+        "file": "/src/controllers/payment.controller.js",
+        "lines": [9, 97, 167]
+      },
+      "description": "Not all payment operations have comprehensive audit logging. Missing automated alerting.",
+      "impact": "Cannot detect or investigate security incidents, compliance violation",
+      "remediation": {
+        "priority": "HIGH",
+        "timeline": "1 week",
+        "steps": [
+          "Apply auditLog middleware to ALL payment routes",
+          "Log all payment card access (success and failure)",
+          "Implement real-time alerting for suspicious activity",
+          "Ensure log immutability"
+        ]
+      }
+    },
+    {
+      "id": "PCI-HIGH-004",
+      "title": "Vulnerable Dependencies",
+      "severity": "HIGH",
+      "pciRequirement": "6.2",
+      "requirementDescription": "Ensure all system components are protected from known vulnerabilities",
+      "status": "FAILED",
+      "location": {
+        "file": "/package.json",
+        "dependency": "jws",
+        "currentVersion": "<3.2.3"
+      },
+      "vulnerability": {
+        "cve": "GHSA-869p-cjfg-cm3x",
+        "description": "Improperly Verifies HMAC Signature",
+        "severity": "HIGH"
+      },
+      "description": "Known high severity vulnerability in JWT signature verification. Could allow authentication bypass.",
+      "impact": "Attackers could bypass authentication and access payment data",
+      "remediation": {
+        "priority": "IMMEDIATE",
+        "timeline": "24 hours",
+        "steps": [
+          "Run 'npm audit fix' immediately",
+          "Implement automated dependency scanning (Dependabot)",
+          "Regular security updates schedule",
+          "Add vulnerability scanning to CI/CD pipeline"
+        ]
+      }
+    }
+  ],
+  "mediumSeverityFindings": [
+    {
+      "id": "PCI-MEDIUM-001",
+      "title": "Weak Encryption Key Management",
+      "severity": "MEDIUM",
+      "pciRequirement": "3.5, 3.6",
+      "requirementDescription": "Document and implement key management processes",
+      "status": "PARTIAL",
+      "location": {
+        "file": "/src/utils/encryption.js",
+        "lines": [20, 27]
+      },
+      "description": "Encryption key stored in env vars. Falls back to hardcoded default. No key rotation. No HSM.",
+      "impact": "Compromised encryption keys, weak key security",
+      "remediation": {
+        "priority": "MEDIUM",
+        "timeline": "1 month",
+        "steps": [
+          "Use AWS KMS, Azure Key Vault, or HashiCorp Vault",
+          "Implement key rotation every 90 days",
+          "Remove default fallback keys",
+          "Document key management procedures"
+        ]
+      }
+    },
+    {
+      "id": "PCI-MEDIUM-002",
+      "title": "Insufficient Input Validation",
+      "severity": "MEDIUM",
+      "pciRequirement": "6.5.1",
+      "requirementDescription": "Address common coding vulnerabilities - Injection flaws",
+      "status": "PARTIAL",
+      "location": {
+        "file": "/src/controllers/payment.controller.js",
+        "lines": [10, 26]
+      },
+      "description": "Payment amounts not strictly validated. Currency codes not validated. Missing sanitization.",
+      "impact": "Injection attacks, data manipulation",
+      "remediation": {
+        "priority": "MEDIUM",
+        "timeline": "2 weeks",
+        "steps": [
+          "Validate all payment input fields",
+          "Sanitize currency codes against ISO 4217",
+          "Validate payment method enum values",
+          "Add request parameter sanitization"
+        ]
+      }
+    },
+    {
+      "id": "PCI-MEDIUM-003",
+      "title": "No Network Segmentation",
+      "severity": "MEDIUM",
+      "pciRequirement": "1.2, 1.3",
+      "requirementDescription": "Build firewall configuration and DMZ",
+      "status": "FAILED",
+      "location": {
+        "infrastructure": true
+      },
+      "description": "No network segmentation between cardholder data environment and other networks. No DMZ.",
+      "impact": "Lateral movement in case of breach, wider attack surface",
+      "remediation": {
+        "priority": "MEDIUM",
+        "timeline": "1 month",
+        "steps": [
+          "Implement network segmentation (VPC/subnets)",
+          "Place database in private subnet",
+          "Use bastion host for admin access",
+          "Document network architecture"
+        ]
+      }
+    }
+  ],
+  "complianceChecklist": {
+    "secureNetwork": {
+      "score": 20,
+      "status": "FAILING",
+      "requirements": {
+        "1.1": { "status": "NOT_IMPLEMENTED", "name": "Firewall configuration standards" },
+        "1.2": { "status": "FAILED", "name": "Network segmentation" },
+        "1.3": { "status": "NOT_IMPLEMENTED", "name": "DMZ configuration" },
+        "2.1": { "status": "UNABLE_TO_VERIFY", "name": "Vendor defaults changed" },
+        "2.2": { "status": "PARTIAL", "name": "Configuration standards" },
+        "2.3": { "status": "NOT_VERIFIED", "name": "Encrypted admin access" }
+      }
+    },
+    "protectCardholderData": {
+      "score": 15,
+      "status": "CRITICAL_FAILURE",
+      "requirements": {
+        "3.1": { "status": "NOT_DOCUMENTED", "name": "Data retention policy" },
+        "3.2": { "status": "AT_RISK", "name": "No sensitive auth data storage" },
+        "3.3": { "status": "NOT_IMPLEMENTED", "name": "Mask PAN when displayed" },
+        "3.4": { "status": "FAILED", "name": "Render PAN unreadable" },
+        "3.5": { "status": "PARTIAL", "name": "Key management procedures" },
+        "3.6": { "status": "NOT_IMPLEMENTED", "name": "Key rotation" },
+        "4.1": { "status": "PARTIAL", "name": "Strong cryptography for transmission" },
+        "4.2": { "status": "UNABLE_TO_VERIFY", "name": "No unencrypted PAN transmission" }
+      }
+    },
+    "vulnerabilityManagement": {
+      "score": 40,
+      "status": "AT_RISK",
+      "requirements": {
+        "5.1": { "status": "NOT_APPLICABLE", "name": "Anti-virus on systems" },
+        "6.1": { "status": "PARTIAL", "name": "Security patch management" },
+        "6.2": { "status": "FAILED", "name": "Vulnerabilities patched" },
+        "6.3": { "status": "PARTIAL", "name": "Secure development practices" },
+        "6.5": { "status": "PARTIAL", "name": "Common vulnerabilities addressed" }
+      }
+    },
+    "accessControl": {
+      "score": 35,
+      "status": "AT_RISK",
+      "requirements": {
+        "7.1": { "status": "FAILED", "name": "Limit access by business need" },
+        "7.2": { "status": "PARTIAL", "name": "Access control system" },
+        "8.1": { "status": "PASSED", "name": "Unique user IDs" },
+        "8.2": { "status": "PASSED", "name": "User authentication" },
+        "8.3": { "status": "NOT_IMPLEMENTED", "name": "Multi-factor authentication" },
+        "9.1": { "status": "NOT_APPLICABLE", "name": "Physical access controls" }
+      }
+    },
+    "monitoringAndTesting": {
+      "score": 45,
+      "status": "AT_RISK",
+      "requirements": {
+        "10.1": { "status": "PARTIAL", "name": "Audit trail for all access" },
+        "10.2": { "status": "PARTIAL", "name": "Automated logs" },
+        "10.3": { "status": "PASSED", "name": "Audit trail details" },
+        "10.7": { "status": "PASSED", "name": "Audit log retention (7 years)" },
+        "11.1": { "status": "NOT_APPLICABLE", "name": "Wireless access points" },
+        "11.2": { "status": "NOT_IMPLEMENTED", "name": "Vulnerability scanning" },
+        "11.3": { "status": "NOT_PERFORMED", "name": "Penetration testing" }
+      }
+    },
+    "securityPolicy": {
+      "score": 0,
+      "status": "NOT_STARTED",
+      "requirements": {
+        "12.1": { "status": "NOT_DOCUMENTED", "name": "Security policy" },
+        "12.2": { "status": "NOT_PERFORMED", "name": "Risk assessment" },
+        "12.3": { "status": "NOT_DOCUMENTED", "name": "Usage policies" },
+        "12.10": { "status": "NOT_DOCUMENTED", "name": "Incident response plan" }
+      }
+    }
+  },
+  "filesAnalyzed": {
+    "total": 93,
+    "paymentRelated": 13,
+    "modelsReviewed": 5,
+    "controllersReviewed": 4,
+    "middlewareReviewed": 6,
+    "configFilesReviewed": 2
+  },
+  "keyFilesWithIssues": [
+    "/src/models/employeeBenefit.model.js",
+    "/src/models/payment.model.js",
+    "/src/controllers/payment.controller.js",
+    "/src/configs/db.js",
+    "/src/server.js",
+    "/src/middlewares/authenticate.js",
+    "/src/utils/encryption.js",
+    "/package.json"
+  ],
+  "recommendations": {
+    "immediate": [
+      "Stop storing card numbers in plain text",
+      "Fix vulnerable jws dependency (npm audit fix)",
+      "Enable TLS for database connections",
+      "Purge existing card data from database"
+    ],
+    "highPriority": [
+      "Implement Stripe Checkout/Elements for tokenization",
+      "Configure HTTPS with TLS 1.2+",
+      "Enable MongoDB encryption at rest",
+      "Sanitize payment gateway responses",
+      "Add comprehensive audit logging to all payment routes"
+    ],
+    "mediumPriority": [
+      "Implement role-based access control",
+      "Add multi-factor authentication",
+      "Setup key management service (AWS KMS)",
+      "Configure network segmentation",
+      "Implement input validation for all payment fields"
+    ],
+    "ongoing": [
+      "Regular vulnerability scanning (weekly)",
+      "Dependency updates (monthly)",
+      "Penetration testing (annually)",
+      "Security policy documentation",
+      "Incident response plan creation",
+      "PCI-DSS SAQ completion",
+      "Engage Qualified Security Assessor (QSA)"
+    ]
+  },
+  "businessImpact": {
+    "canProcessPayments": false,
+    "regulatoryRisks": [
+      "Payment brand may revoke processing privileges",
+      "Fines up to $500,000 per incident",
+      "Monthly fines $5,000-$100,000 for non-compliance",
+      "Required breach disclosure to cardholders"
+    ],
+    "financialRisks": [
+      "Unlimited data breach liability",
+      "Customer lawsuits",
+      "Reputational damage",
+      "Loss of customer trust"
+    ],
+    "estimatedRemediationCost": {
+      "minimum": 18000,
+      "maximum": 55000,
+      "currency": "USD",
+      "timeline": "2-4 weeks"
+    }
+  },
+  "nextSteps": [
+    {
+      "step": 1,
+      "action": "Stop accepting credit card payments immediately",
+      "timeline": "Today",
+      "priority": "CRITICAL"
+    },
+    {
+      "step": 2,
+      "action": "Fix critical issues (card storage, vulnerabilities)",
+      "timeline": "This week",
+      "priority": "CRITICAL"
+    },
+    {
+      "step": 3,
+      "action": "Implement Stripe Checkout",
+      "timeline": "Week 2",
+      "priority": "HIGH"
+    },
+    {
+      "step": 4,
+      "action": "Security hardening (HTTPS, encryption, access controls)",
+      "timeline": "Week 3",
+      "priority": "HIGH"
+    },
+    {
+      "step": 5,
+      "action": "Testing and documentation",
+      "timeline": "Week 4",
+      "priority": "MEDIUM"
+    },
+    {
+      "step": 6,
+      "action": "Engage Qualified Security Assessor",
+      "timeline": "Month 2",
+      "priority": "MEDIUM"
+    }
+  ],
+  "metadata": {
+    "scanVersion": "1.0",
+    "scanDuration": "45 minutes",
+    "lastUpdated": "2025-12-22T19:30:00Z",
+    "fullReportPath": "PCI_DSS_COMPLIANCE_SCAN_REPORT.md",
+    "executiveSummaryPath": "PCI_DSS_EXECUTIVE_SUMMARY.md"
+  }
+}

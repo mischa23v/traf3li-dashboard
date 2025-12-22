@@ -1,0 +1,380 @@
+{
+  "audit": {
+    "title": "API Versioning and Deprecation Security Audit",
+    "repository": "https://github.com/mischa23v/traf3li-backend",
+    "date": "2025-12-22",
+    "scanner": "Claude Code Security Scanner",
+    "overall_severity": "HIGH RISK"
+  },
+  "statistics": {
+    "total_vulnerabilities": 7,
+    "critical": 2,
+    "high": 2,
+    "medium": 3,
+    "low": 0,
+    "total_routes_analyzed": 38,
+    "versioned_routes": 0,
+    "deprecated_routes": 0
+  },
+  "vulnerabilities": [
+    {
+      "id": "VER-001",
+      "title": "No API Version Isolation",
+      "severity": "CRITICAL",
+      "cwe": "CWE-657",
+      "cvss_score": 7.5,
+      "category": "Version Management",
+      "description": "All API routes are mounted at /api/* with no version prefixes (v1, v2, etc.)",
+      "location": "src/server.js",
+      "lines": "164-207",
+      "impact": "All clients affected by breaking changes simultaneously. No gradual migration path. Cannot maintain backward compatibility.",
+      "exploitation": "Breaking changes cause immediate service disruption for all clients. No rollback mechanism for specific versions.",
+      "recommendation": "Implement URL-based versioning (/api/v1/, /api/v2/) with separate route handlers",
+      "remediation_effort": "High (80 hours)",
+      "references": [
+        "https://owasp.org/www-project-api-security/",
+        "https://cwe.mitre.org/data/definitions/657.html"
+      ]
+    },
+    {
+      "id": "VER-002",
+      "title": "Test Endpoints in Production Code",
+      "severity": "CRITICAL",
+      "cwe": "CWE-489",
+      "cvss_score": 8.1,
+      "category": "Active Debug Code",
+      "description": "Test mode endpoints that bypass payment verification exist in production codebase, controlled only by environment variable",
+      "location": "src/routes/order.route.js",
+      "lines": "27-34",
+      "affected_endpoints": [
+        "POST /api/orders/create-test-contract/:id",
+        "POST /api/orders/create-test-proposal-contract/:id"
+      ],
+      "impact": "Payment bypass if TEST_MODE environment variable leaked or misconfigured in production. Financial fraud risk.",
+      "exploitation": "If TEST_MODE=true in production, attackers can create orders without payment, bypass Stripe integration, and commit financial fraud",
+      "code_snippet": "if (process.env.TEST_MODE === 'true') {\n    app.post('/create-test-contract/:_id', userMiddleware, createTestContract);\n}",
+      "recommendation": "Remove test endpoints from production builds. Use NODE_ENV check instead of TEST_MODE. Move to separate development-only codebase.",
+      "remediation_effort": "Low (4 hours)",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/489.html",
+        "https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure"
+      ]
+    },
+    {
+      "id": "VER-003",
+      "title": "No Deprecation Strategy",
+      "severity": "HIGH",
+      "cwe": "CWE-1059",
+      "cvss_score": 6.8,
+      "category": "Incomplete Documentation",
+      "description": "No mechanism to mark endpoints as deprecated, warn clients, or track deprecated endpoint usage",
+      "location": "Entire codebase",
+      "impact": "Cannot safely remove vulnerable features. No migration path for security updates. Clients have no warning before breaking changes.",
+      "exploitation": "Security vulnerabilities in old endpoints cannot be deprecated gracefully, forcing immediate breaking changes or continued exposure",
+      "recommendation": "Implement Sunset and Deprecation HTTP headers. Create deprecation middleware. Track deprecated endpoint usage.",
+      "remediation_effort": "Medium (40 hours)",
+      "references": [
+        "https://tools.ietf.org/html/rfc8594",
+        "https://cwe.mitre.org/data/definitions/1059.html"
+      ]
+    },
+    {
+      "id": "VER-004",
+      "title": "No Version Negotiation",
+      "severity": "HIGH",
+      "cwe": "CWE-757",
+      "cvss_score": 6.5,
+      "category": "Selection of Less-Secure Algorithm",
+      "description": "No support for Accept-Version, X-API-Version headers, or any version negotiation mechanism",
+      "location": "src/middlewares/",
+      "impact": "Clients cannot specify API version. Server cannot serve appropriate security level. Forced upgrades to potentially breaking versions.",
+      "exploitation": "Old mobile apps cannot maintain compatibility. Security updates force breaking changes. No grace period for migrations.",
+      "recommendation": "Implement version negotiation via Accept-Version header and X-API-Version response header",
+      "remediation_effort": "Medium (32 hours)",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/757.html"
+      ]
+    },
+    {
+      "id": "VER-005",
+      "title": "Inconsistent Response Format",
+      "severity": "MEDIUM",
+      "cwe": "CWE-650",
+      "cvss_score": 5.9,
+      "category": "Trusting HTTP Permission Methods",
+      "description": "Response formats inconsistent across endpoints. Auth returns user directly, others wrap in 'data' property",
+      "location": [
+        "src/controllers/auth.controller.js",
+        "src/controllers/*.controller.js"
+      ],
+      "impact": "Breaking changes when standardizing response format. No versioning to maintain both formats during transition.",
+      "exploitation": "Standardization efforts break client parsers. No backward compatibility path.",
+      "recommendation": "Define standard response format in v2 API. Maintain legacy format in v1 for backward compatibility.",
+      "remediation_effort": "Medium (24 hours)",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/650.html"
+      ]
+    },
+    {
+      "id": "VER-006",
+      "title": "No Backward Compatibility Strategy",
+      "severity": "MEDIUM",
+      "cwe": "CWE-1126",
+      "cvss_score": 5.5,
+      "category": "Declaration of Variable with Unnecessarily Wide Scope",
+      "description": "Changes to authentication, cookies, or security settings affect all users simultaneously with no migration path",
+      "location": "src/controllers/auth.controller.js",
+      "lines": "79-85",
+      "impact": "Cookie configuration changes log out all users. No gradual migration for session management updates.",
+      "exploitation": "Security improvements to auth system cause mass logout. Service disruption.",
+      "recommendation": "Implement version-specific cookie configurations. Maintain old sessions during migration period.",
+      "remediation_effort": "Low (16 hours)",
+      "references": []
+    },
+    {
+      "id": "VER-007",
+      "title": "No API Gateway Configuration",
+      "severity": "MEDIUM",
+      "cwe": "CWE-1008",
+      "cvss_score": 5.5,
+      "category": "Architectural Concepts",
+      "description": "Direct Express server deployment without API gateway layer for centralized version routing",
+      "location": "render.yaml",
+      "impact": "No centralized version routing. No version-specific rate limiting. No version-based security policies.",
+      "exploitation": "Cannot apply different security policies per version. No centralized deprecation handling.",
+      "recommendation": "Deploy NGINX or cloud API gateway for version routing, rate limiting, and security policy enforcement",
+      "remediation_effort": "High (120 hours)",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/1008.html"
+      ]
+    }
+  ],
+  "missing_features": [
+    {
+      "feature": "URL-based versioning",
+      "status": "NOT_IMPLEMENTED",
+      "risk": "CRITICAL"
+    },
+    {
+      "feature": "Version negotiation headers",
+      "status": "NOT_IMPLEMENTED",
+      "risk": "HIGH"
+    },
+    {
+      "feature": "Deprecation headers (Sunset, Deprecation)",
+      "status": "NOT_IMPLEMENTED",
+      "risk": "HIGH"
+    },
+    {
+      "feature": "Deprecated endpoint tracking",
+      "status": "NOT_IMPLEMENTED",
+      "risk": "MEDIUM"
+    },
+    {
+      "feature": "Version-specific rate limiting",
+      "status": "NOT_IMPLEMENTED",
+      "risk": "MEDIUM"
+    },
+    {
+      "feature": "Backward compatibility testing",
+      "status": "NOT_IMPLEMENTED",
+      "risk": "MEDIUM"
+    },
+    {
+      "feature": "API Gateway",
+      "status": "NOT_IMPLEMENTED",
+      "risk": "MEDIUM"
+    },
+    {
+      "feature": "Migration documentation",
+      "status": "NOT_IMPLEMENTED",
+      "risk": "MEDIUM"
+    },
+    {
+      "feature": "Version usage analytics",
+      "status": "NOT_IMPLEMENTED",
+      "risk": "LOW"
+    },
+    {
+      "feature": "Breaking change policy",
+      "status": "NOT_IMPLEMENTED",
+      "risk": "MEDIUM"
+    }
+  ],
+  "test_mode_analysis": {
+    "test_endpoints_found": 2,
+    "endpoints": [
+      {
+        "path": "POST /api/orders/create-test-contract/:id",
+        "controller": "src/controllers/order.controller.js",
+        "security_bypass": "payment_verification",
+        "risk": "CRITICAL",
+        "details": "Bypasses Stripe payment, auto-completes orders"
+      },
+      {
+        "path": "POST /api/orders/create-test-proposal-contract/:id",
+        "controller": "src/controllers/order.controller.js",
+        "security_bypass": "payment_verification",
+        "risk": "CRITICAL",
+        "details": "Bypasses Stripe payment for proposals, auto-completes orders"
+      }
+    ],
+    "control_mechanism": "Environment variable: TEST_MODE",
+    "production_risk": "If TEST_MODE=true in production, complete payment bypass",
+    "information_disclosure": "Warning messages reveal test mode existence to attackers"
+  },
+  "route_analysis": {
+    "total_routes": 38,
+    "route_prefixes": {
+      "/api/*": 38,
+      "/api/v1/*": 0,
+      "/api/v2/*": 0
+    },
+    "routes_without_version": 38,
+    "deprecated_routes": 0,
+    "test_only_routes": 2
+  },
+  "rate_limiting_analysis": {
+    "version_aware": false,
+    "legacy_headers_disabled": true,
+    "standard_headers_enabled": true,
+    "version_specific_limits": false,
+    "finding": "Rate limiting applies uniformly to all endpoints regardless of version. Cannot incentivize migration or apply stricter limits to deprecated versions."
+  },
+  "compliance": {
+    "owasp_api_security": {
+      "API4_2023_lack_of_resources": "FAIL - No version-specific rate limiting",
+      "API9_2023_improper_inventory_management": "FAIL - No version tracking"
+    },
+    "rfc_8594_sunset_header": "FAIL - Not implemented",
+    "semantic_versioning": "FAIL - Not implemented",
+    "openapi_specification": "PARTIAL - Documented but not enforced"
+  },
+  "attack_scenarios": [
+    {
+      "scenario": "Breaking Change DoS",
+      "steps": [
+        "Developer deploys breaking change to /api/auth/login",
+        "All mobile apps break immediately",
+        "Users unable to login",
+        "Service disruption",
+        "Emergency rollback required"
+      ],
+      "impact": "Denial of Service, reputation damage",
+      "likelihood": "HIGH"
+    },
+    {
+      "scenario": "Test Mode Exposure",
+      "steps": [
+        "Misconfigured TEST_MODE=true in production",
+        "Attacker discovers test endpoints",
+        "Bypasses payment system",
+        "Creates unlimited free orders",
+        "Financial fraud"
+      ],
+      "impact": "Financial loss, system abuse",
+      "likelihood": "MEDIUM"
+    },
+    {
+      "scenario": "Deprecation Without Migration",
+      "steps": [
+        "Security vulnerability in /api/payments",
+        "Team wants immediate deprecation",
+        "No version system available",
+        "Forced breaking change OR continued exposure",
+        "Security window during migration"
+      ],
+      "impact": "Extended vulnerability exposure",
+      "likelihood": "HIGH"
+    }
+  ],
+  "remediation": {
+    "immediate_actions": [
+      {
+        "priority": 1,
+        "action": "Remove test endpoints from production code",
+        "effort_hours": 4,
+        "files": ["src/routes/order.route.js", "src/controllers/order.controller.js"]
+      },
+      {
+        "priority": 2,
+        "action": "Add deprecation headers middleware",
+        "effort_hours": 8,
+        "files": ["src/middlewares/deprecation.middleware.js"]
+      },
+      {
+        "priority": 3,
+        "action": "Implement version tracking middleware",
+        "effort_hours": 4,
+        "files": ["src/middlewares/versionTracking.middleware.js"]
+      }
+    ],
+    "short_term_actions": [
+      {
+        "action": "Implement URL-based versioning (/api/v1, /api/v2)",
+        "effort_hours": 40,
+        "files": ["src/server.js", "src/routes/v1/", "src/routes/v2/"]
+      },
+      {
+        "action": "Create version-specific security policies",
+        "effort_hours": 24,
+        "files": ["src/middlewares/versionSecurity.middleware.js"]
+      },
+      {
+        "action": "Add version negotiation support",
+        "effort_hours": 16,
+        "files": ["src/middlewares/versionNegotiation.middleware.js"]
+      }
+    ],
+    "long_term_actions": [
+      {
+        "action": "Deploy API Gateway (NGINX/cloud)",
+        "effort_hours": 120,
+        "files": ["nginx.conf", "docker-compose.yml"]
+      },
+      {
+        "action": "Implement migration tracking system",
+        "effort_hours": 40,
+        "files": ["src/models/migrationTracker.model.js"]
+      },
+      {
+        "action": "Create version analytics dashboard",
+        "effort_hours": 40,
+        "files": ["src/controllers/analytics.controller.js"]
+      }
+    ],
+    "total_effort_hours": 296
+  },
+  "recommendations": {
+    "priority_order": [
+      "Remove test endpoints from production",
+      "Implement URL-based versioning",
+      "Add deprecation headers",
+      "Deploy API gateway",
+      "Create migration strategy",
+      "Implement version analytics"
+    ],
+    "quick_wins": [
+      "Add X-API-Version header to all responses",
+      "Log current API usage by endpoint",
+      "Document current API as v1",
+      "Remove TEST_MODE endpoints"
+    ]
+  },
+  "files_analyzed": [
+    "src/server.js",
+    "src/routes/index.js",
+    "src/routes/*.route.js (38 files)",
+    "src/controllers/*.controller.js",
+    "src/middlewares/*.middleware.js",
+    "package.json",
+    "render.yaml",
+    "API_SPECIFICATION.md"
+  ],
+  "tools_used": [
+    "Grep - Pattern searching",
+    "Glob - File discovery",
+    "Read - Source code analysis",
+    "Bash - Repository exploration"
+  ]
+}
