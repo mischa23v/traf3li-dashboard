@@ -99,7 +99,7 @@ export function CompanyProvider({ children }: CompanyProviderProps) {
       queryClient.invalidateQueries()
 
       // Update local storage
-      localStorage.setItem('activeFirmId', data.companyId)
+      localStorage.setItem('activeFirmId', data.firmId)
 
       toast.success(
         `تم التبديل إلى: ${data.company.nameAr || data.company.name}`,
@@ -116,7 +116,7 @@ export function CompanyProvider({ children }: CompanyProviderProps) {
   })
 
   // Derived state
-  const activeFirmId = activeCompanyData?.companyId || null
+  const activeFirmId = activeCompanyData?.firmId || null
   const activeCompany = activeCompanyData?.company || null
   const activeCompanyAccess = activeCompanyData?.access || null
 
@@ -191,7 +191,7 @@ export function CompanyProvider({ children }: CompanyProviderProps) {
 
   const getCompanyAccess = useCallback(
     (firmId: string): UserCompanyAccess | undefined => {
-      return userCompanyAccess.find((access) => access.companyId === firmId)
+      return userCompanyAccess.find((access) => access.firmId === firmId)
     },
     [userCompanyAccess]
   )

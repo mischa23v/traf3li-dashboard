@@ -75,8 +75,8 @@ export default function InterCompanyReconciliation({
   const [isArabic, setIsArabic] = useState(true)
 
   // Create mode state
-  const [sourceFirmId, setSourceCompanyId] = useState('')
-  const [targetFirmId, setTargetCompanyId] = useState('')
+  const [sourceFirmId, setSourceFirmId] = useState('')
+  const [targetFirmId, setTargetFirmId] = useState('')
   const [periodStart, setPeriodStart] = useState('')
   const [periodEnd, setPeriodEnd] = useState('')
   const [currency, setCurrency] = useState('SAR')
@@ -260,7 +260,7 @@ export default function InterCompanyReconciliation({
                         {isArabic ? 'الشركة الأولى' : 'Source Company'}
                         <span className="text-red-500">*</span>
                       </Label>
-                      <Select value={sourceFirmId} onValueChange={setSourceCompanyId} required>
+                      <Select value={sourceFirmId} onValueChange={setSourceFirmId} required>
                         <SelectTrigger id="sourceCompany">
                           <SelectValue placeholder={isArabic ? 'اختر الشركة' : 'Select company'} />
                         </SelectTrigger>
@@ -279,7 +279,7 @@ export default function InterCompanyReconciliation({
                         {isArabic ? 'الشركة الثانية' : 'Target Company'}
                         <span className="text-red-500">*</span>
                       </Label>
-                      <Select value={targetFirmId} onValueChange={setTargetCompanyId} required>
+                      <Select value={targetFirmId} onValueChange={setTargetFirmId} required>
                         <SelectTrigger id="targetCompany">
                           <SelectValue placeholder={isArabic ? 'اختر الشركة' : 'Select company'} />
                         </SelectTrigger>
