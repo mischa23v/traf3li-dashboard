@@ -53,9 +53,9 @@ export function CompanySwitcher({
 
   const {
     activeCompany,
-    activeCompanyId,
+    activeFirmId,
     accessibleCompanies,
-    selectedCompanyIds,
+    selectedFirmIds,
     isMultiSelectMode,
     isLoading,
     isSwitching,
@@ -86,10 +86,10 @@ export function CompanySwitcher({
   }
 
   // Handle company switch
-  const handleSwitchCompany = async (companyId: string) => {
+  const handleSwitchCompany = async (firmId: string) => {
     if (!isMultiSelectMode) {
       try {
-        await switchCompany(companyId)
+        await switchCompany(firmId)
         setOpen(false)
       } catch (error) {
         console.error('Failed to switch company:', error)
@@ -98,17 +98,17 @@ export function CompanySwitcher({
   }
 
   // Handle multi-select toggle
-  const handleToggleCompany = (companyId: string) => {
-    if (selectedCompanyIds.includes(companyId)) {
-      deselectCompany(companyId)
+  const handleToggleCompany = (firmId: string) => {
+    if (selectedFirmIds.includes(firmId)) {
+      deselectCompany(firmId)
     } else {
-      selectCompany(companyId)
+      selectCompany(firmId)
     }
   }
 
   // Group companies by parent (if needed)
-  const rootCompanies = accessibleCompanies.filter((c) => !c.parentCompanyId)
-  const childCompanies = accessibleCompanies.filter((c) => c.parentCompanyId)
+  const rootCompanies = accessibleCompanies.filter((c) => !c.parentFirmId)
+  const childCompanies = accessibleCompanies.filter((c) => c.parentFirmId)
 
   // Loading state
   if (isLoading) {
@@ -160,9 +160,9 @@ export function CompanySwitcher({
               </div>
             )}
             <span className="truncate font-medium">{getCompanyName(activeCompany)}</span>
-            {isMultiSelectMode && selectedCompanyIds.length > 1 && (
+            {isMultiSelectMode && selectedFirmIds.length > 1 && (
               <Badge variant="secondary" className="shrink-0 text-xs">
-                +{selectedCompanyIds.length - 1}
+                +{selectedFirmIds.length - 1}
               </Badge>
             )}
           </div>
@@ -243,8 +243,8 @@ export function CompanySwitcher({
               <CompanyMenuItem
                 key={company._id}
                 company={company}
-                isActive={!isMultiSelectMode && activeCompanyId === company._id}
-                isSelected={isMultiSelectMode && selectedCompanyIds.includes(company._id)}
+                isActive={!isMultiSelectMode && activeFirmId === company._id}
+                isSelected={isMultiSelectMode && selectedFirmIds.includes(company._id)}
                 isMultiSelectMode={isMultiSelectMode}
                 onClick={() =>
                   isMultiSelectMode
@@ -270,8 +270,8 @@ export function CompanySwitcher({
               <CompanyMenuItem
                 key={company._id}
                 company={company}
-                isActive={!isMultiSelectMode && activeCompanyId === company._id}
-                isSelected={isMultiSelectMode && selectedCompanyIds.includes(company._id)}
+                isActive={!isMultiSelectMode && activeFirmId === company._id}
+                isSelected={isMultiSelectMode && selectedFirmIds.includes(company._id)}
                 isMultiSelectMode={isMultiSelectMode}
                 isChild
                 onClick={() =>
@@ -297,7 +297,7 @@ export function CompanySwitcher({
           </DropdownMenuItem>
         )}
 
-        {showManageButton && onManageClick && canManageCompany(activeCompanyId!) && (
+        {showManageButton && onManageClick && canManageCompany(activeFirmId!) && (
           <DropdownMenuItem onClick={onManageClick}>
             <Settings className={cn('h-4 w-4', isArabic ? 'ml-2' : 'mr-2')} />
             {isArabic ? 'إدارة الشركات' : 'Manage Companies'}

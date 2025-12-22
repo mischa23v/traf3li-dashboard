@@ -60,7 +60,7 @@ export function ConsolidatedReport() {
   const { accessibleCompanies } = useCompanyContext()
 
   // State
-  const [selectedCompanyIds, setSelectedCompanyIds] = useState<string[]>([])
+  const [selectedFirmIds, setSelectedFirmIds] = useState<string[]>([])
   const [period, setPeriod] = useState<PeriodType>('this-month')
   const [customStartDate, setCustomStartDate] = useState('')
   const [customEndDate, setCustomEndDate] = useState('')
@@ -111,7 +111,7 @@ export function ConsolidatedReport() {
   // Build consolidation filters
   const consolidationFilters: ConsolidationFilters = useMemo(
     () => ({
-      companyIds: selectedCompanyIds,
+      firmIds: selectedFirmIds,
       startDate: dateRange.start,
       endDate: dateRange.end,
       reportType,
@@ -119,7 +119,7 @@ export function ConsolidatedReport() {
       baseCurrency,
       consolidationMethod,
     }),
-    [selectedCompanyIds, dateRange, reportType, includeEliminationEntries, baseCurrency, consolidationMethod]
+    [selectedFirmIds, dateRange, reportType, includeEliminationEntries, baseCurrency, consolidationMethod]
   )
 
   // Fetch consolidation summary
@@ -132,23 +132,23 @@ export function ConsolidatedReport() {
   }
 
   // Handle company selection
-  const toggleCompany = (companyId: string) => {
-    setSelectedCompanyIds((prev) =>
-      prev.includes(companyId) ? prev.filter((id) => id !== companyId) : [...prev, companyId]
+  const toggleCompany = (firmId: string) => {
+    setSelectedFirmIds((prev) =>
+      prev.includes(firmId) ? prev.filter((id) => id !== firmId) : [...prev, firmId]
     )
   }
 
   const selectAllCompanies = () => {
-    setSelectedCompanyIds(accessibleCompanies.map((c) => c._id))
+    setSelectedFirmIds(accessibleCompanies.map((c) => c._id))
   }
 
   const clearAllCompanies = () => {
-    setSelectedCompanyIds([])
+    setSelectedFirmIds([])
   }
 
   // Handle export
   const handleExport = (format: 'pdf' | 'excel' | 'csv') => {
-    if (selectedCompanyIds.length === 0) {
+    if (selectedFirmIds.length === 0) {
       return
     }
     exportMutation.mutate({ filters: consolidationFilters, format })
@@ -156,8 +156,8 @@ export function ConsolidatedReport() {
 
   // Get selected companies
   const selectedCompanies = useMemo(
-    () => accessibleCompanies.filter((c) => selectedCompanyIds.includes(c._id)),
-    [accessibleCompanies, selectedCompanyIds]
+    () => accessibleCompanies.filter((c) => selectedFirmIds.includes(c._id)),
+    [accessibleCompanies, selectedFirmIds]
   )
 
   // Available currencies
@@ -180,9 +180,9 @@ export function ConsolidatedReport() {
           <div className="space-y-3">
             <Label className="text-sm font-bold text-navy">
               {isArabic ? 'اختيار الشركات' : 'Select Companies'}
-              {selectedCompanyIds.length > 0 && (
+              {selectedFirmIds.length > 0 && (
                 <Badge variant="secondary" className="ms-2">
-                  {selectedCompanyIds.length}
+                  {selectedFirmIds.length}
                 </Badge>
               )}
             </Label>
@@ -193,19 +193,19 @@ export function ConsolidatedReport() {
                     variant="outline"
                     className={cn(
                       'rounded-xl min-w-[200px] justify-between',
-                      selectedCompanyIds.length === 0 && 'text-muted-foreground'
+                      selectedFirmIds.length === 0 && 'text-muted-foreground'
                     )}
                   >
                     <div className="flex items-center gap-2 overflow-hidden">
                       <Building2 className="w-4 h-4 shrink-0" />
                       <span className="truncate">
-                        {selectedCompanyIds.length === 0
+                        {selectedFirmIds.length === 0
                           ? isArabic
                             ? 'اختر الشركات'
                             : 'Select companies'
-                          : selectedCompanyIds.length === 1
+                          : selectedFirmIds.length === 1
                           ? getCompanyName(selectedCompanies[0])
-                          : `${selectedCompanyIds.length} ${isArabic ? 'شركات' : 'companies'}`}
+                          : `${selectedFirmIds.length} ${isArabic ? 'شركات' : 'companies'}`}
                       </span>
                     </div>
                     <CheckSquare className="w-4 h-4 shrink-0 opacity-50" />
@@ -241,7 +241,7 @@ export function ConsolidatedReport() {
                   {accessibleCompanies.map((company) => (
                     <DropdownMenuCheckboxItem
                       key={company._id}
-                      checked={selectedCompanyIds.includes(company._id)}
+                      checked={selectedFirmIds.includes(company._id)}
                       onCheckedChange={() => toggleCompany(company._id)}
                     >
                       <div className="flex items-center gap-2 flex-1 overflow-hidden">
@@ -254,7 +254,7 @@ export function ConsolidatedReport() {
               </DropdownMenu>
 
               {/* Quick action: Select all visible */}
-              {selectedCompanyIds.length > 0 && (
+              {selectedFirmIds.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {selectedCompanies.slice(0, 3).map((company) => (
                     <Badge
@@ -432,7 +432,7 @@ export function ConsolidatedReport() {
                   <Button
                     variant="outline"
                     className="rounded-xl"
-                    disabled={selectedCompanyIds.length === 0 || exportMutation.isPending}
+                    disabled={selectedFirmIds.length === 0 || exportMutation.isPending}
                   >
                     <Download className="w-4 h-4 me-2" />
                     {isArabic ? 'تصدير' : 'Export'}
@@ -454,7 +454,7 @@ export function ConsolidatedReport() {
           </div>
 
           {/* Summary Stats */}
-          {summary && !isSummaryLoading && selectedCompanyIds.length > 0 && (
+          {summary && !isSummaryLoading && selectedFirmIds.length > 0 && (
             <>
               <Separator />
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -495,7 +495,7 @@ export function ConsolidatedReport() {
       </Card>
 
       {/* Reports Display */}
-      {selectedCompanyIds.length > 0 && (
+      {selectedFirmIds.length > 0 && (
         <>
           {/* Consolidated Financial Report */}
           {(reportType === 'all' || reportType === 'profit_loss' || reportType === 'balance_sheet') && (
@@ -505,7 +505,7 @@ export function ConsolidatedReport() {
           {/* Inter-Company Elimination */}
           {includeEliminationEntries && (
             <InterCompanyElimination
-              companyIds={selectedCompanyIds}
+              firmIds={selectedFirmIds}
               startDate={dateRange.start}
               endDate={dateRange.end}
             />
@@ -513,7 +513,7 @@ export function ConsolidatedReport() {
 
           {/* Company Comparison Chart */}
           <CompanyComparisonChart
-            companyIds={selectedCompanyIds}
+            firmIds={selectedFirmIds}
             startDate={dateRange.start}
             endDate={dateRange.end}
           />
@@ -521,7 +521,7 @@ export function ConsolidatedReport() {
       )}
 
       {/* No Companies Selected */}
-      {selectedCompanyIds.length === 0 && (
+      {selectedFirmIds.length === 0 && (
         <Card className="border-0 shadow-sm rounded-3xl overflow-hidden">
           <CardContent className="p-12">
             <div className="text-center text-slate-500">

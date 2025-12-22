@@ -13,8 +13,8 @@ import apiClient, { handleApiError } from '@/lib/api'
 export interface InterCompanyTransaction {
   _id: string
   transactionNumber: string
-  sourceCompanyId: string | Company
-  targetCompanyId: string | Company
+  sourceFirmId: string | Company
+  targetFirmId: string | Company
   transactionType: 'invoice' | 'payment' | 'expense' | 'transfer'
   amount: number
   currency: string
@@ -61,8 +61,8 @@ export interface TransactionHistory {
 }
 
 export interface CreateInterCompanyTransactionData {
-  sourceCompanyId: string
-  targetCompanyId: string
+  sourceFirmId: string
+  targetFirmId: string
   transactionType: 'invoice' | 'payment' | 'expense' | 'transfer'
   amount: number
   currency: string
@@ -76,8 +76,8 @@ export interface CreateInterCompanyTransactionData {
 }
 
 export interface InterCompanyTransactionFilters {
-  sourceCompanyId?: string
-  targetCompanyId?: string
+  sourceFirmId?: string
+  targetFirmId?: string
   transactionType?: string
   status?: string
   currency?: string
@@ -93,9 +93,9 @@ export interface InterCompanyTransactionFilters {
  */
 
 export interface InterCompanyBalance {
-  sourceCompanyId: string
+  sourceFirmId: string
   sourceCompany: Company
-  targetCompanyId: string
+  targetFirmId: string
   targetCompany: Company
   receivable: number // Amount source company should receive from target
   payable: number // Amount source company should pay to target
@@ -119,8 +119,8 @@ export interface InterCompanyBalanceMatrix {
 export interface InterCompanyReconciliation {
   _id: string
   reconciliationNumber: string
-  sourceCompanyId: string | Company
-  targetCompanyId: string | Company
+  sourceFirmId: string | Company
+  targetFirmId: string | Company
   reconciliationDate: string
   reconciliationPeriodStart: string
   reconciliationPeriodEnd: string
@@ -170,8 +170,8 @@ export interface ReconciliationHistory {
 }
 
 export interface CreateReconciliationData {
-  sourceCompanyId: string
-  targetCompanyId: string
+  sourceFirmId: string
+  targetFirmId: string
   reconciliationPeriodStart: string
   reconciliationPeriodEnd: string
   currency: string
@@ -179,8 +179,8 @@ export interface CreateReconciliationData {
 }
 
 export interface ReconciliationFilters {
-  sourceCompanyId?: string
-  targetCompanyId?: string
+  sourceFirmId?: string
+  targetFirmId?: string
   status?: string
   startDate?: string
   endDate?: string
@@ -271,10 +271,10 @@ class InterCompanyService {
     }
   }
 
-  async getBalanceBetweenCompanies(sourceCompanyId: string, targetCompanyId: string, currency?: string): Promise<InterCompanyBalance> {
+  async getBalanceBetweenCompanies(sourceFirmId: string, targetFirmId: string, currency?: string): Promise<InterCompanyBalance> {
     try {
       const response = await apiClient.get('/api/inter-company/balances/between', {
-        params: { sourceCompanyId, targetCompanyId, currency }
+        params: { sourceFirmId, targetFirmId, currency }
       })
       return response.data
     } catch (error) {
@@ -283,13 +283,13 @@ class InterCompanyService {
   }
 
   async getTransactionsBetweenCompanies(
-    sourceCompanyId: string,
-    targetCompanyId: string,
+    sourceFirmId: string,
+    targetFirmId: string,
     filters?: Partial<InterCompanyTransactionFilters>
   ) {
     try {
       const response = await apiClient.get('/api/inter-company/transactions/between', {
-        params: { sourceCompanyId, targetCompanyId, ...filters }
+        params: { sourceFirmId, targetFirmId, ...filters }
       })
       return response.data
     } catch (error) {
@@ -393,7 +393,7 @@ class InterCompanyService {
 
   async getCompanies(): Promise<Company[]> {
     try {
-      const response = await apiClient.get('/api/inter-company/companies')
+      const response = await apiClient.get('/api/inter-company/firms')
       return response.data
     } catch (error) {
       throw handleApiError(error)
@@ -418,7 +418,7 @@ class InterCompanyService {
   async getInterCompanyReport(params: {
     startDate: string
     endDate: string
-    companyId?: string
+    firmId?: string
     currency?: string
   }) {
     try {

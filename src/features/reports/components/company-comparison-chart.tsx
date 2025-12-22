@@ -43,7 +43,7 @@ import { useCompanyComparisons } from '@/hooks/useConsolidatedReport'
 import type { CompanyMetricComparison } from '@/services/consolidatedReportService'
 
 interface CompanyComparisonChartProps {
-  companyIds: string[]
+  firmIds: string[]
   startDate: string
   endDate: string
 }
@@ -59,7 +59,7 @@ const AVAILABLE_METRICS = [
 ]
 
 export function CompanyComparisonChart({
-  companyIds,
+  firmIds,
   startDate,
   endDate,
 }: CompanyComparisonChartProps) {
@@ -75,7 +75,7 @@ export function CompanyComparisonChart({
     data: comparisons,
     isLoading,
     error,
-  } = useCompanyComparisons(companyIds, startDate, endDate, selectedMetrics)
+  } = useCompanyComparisons(firmIds, startDate, endDate, selectedMetrics)
 
   // Format value based on type
   const formatValue = (value: number, unit: 'currency' | 'percentage' | 'number') => {
@@ -262,7 +262,7 @@ export function CompanyComparisonChart({
                     const percentage = maxValue > 0 ? (company.value / maxValue) * 100 : 0
 
                     return (
-                      <div key={company.companyId} className="space-y-2">
+                      <div key={company.firmId} className="space-y-2">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2 flex-1 overflow-hidden">
                             {getRankBadge(company.rank)}
@@ -332,7 +332,7 @@ export function CompanyComparisonChart({
                     {activeComparison.byCompany
                       .sort((a, b) => a.rank - b.rank)
                       .map((company) => (
-                        <tr key={company.companyId} className="hover:bg-slate-50 transition-colors">
+                        <tr key={company.firmId} className="hover:bg-slate-50 transition-colors">
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-2">
                               {getRankBadge(company.rank)}

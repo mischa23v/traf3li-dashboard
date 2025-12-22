@@ -55,8 +55,8 @@ export default function InterCompanyBalances() {
   // API hooks
   const { data: balanceMatrix, isLoading, refetch } = useInterCompanyBalances(selectedCurrency)
   const { data: transactionsData, isLoading: transactionsLoading } = useInterCompanyTransactionsBetween(
-    selectedBalance?.sourceCompanyId || '',
-    selectedBalance?.targetCompanyId || '',
+    selectedBalance?.sourceFirmId || '',
+    selectedBalance?.targetFirmId || '',
     { status: 'posted' }
   )
   const exportMutation = useExportInterCompanyReport()
@@ -86,7 +86,7 @@ export default function InterCompanyBalances() {
 
         // Find balance from source to target
         const balance = balances.find(
-          b => b.sourceCompanyId === sourceCompany._id && b.targetCompanyId === targetCompany._id
+          b => b.sourceFirmId === sourceCompany._id && b.targetFirmId === targetCompany._id
         )
 
         return balance || null
@@ -105,11 +105,11 @@ export default function InterCompanyBalances() {
 
     balanceMatrix.companies?.forEach(company => {
       const receivable = balanceMatrix.balances
-        ?.filter(b => b.sourceCompanyId === company._id)
+        ?.filter(b => b.sourceFirmId === company._id)
         .reduce((sum, b) => sum + (b.receivable || 0), 0) || 0
 
       const payable = balanceMatrix.balances
-        ?.filter(b => b.sourceCompanyId === company._id)
+        ?.filter(b => b.sourceFirmId === company._id)
         .reduce((sum, b) => sum + (b.payable || 0), 0) || 0
 
       totals[company._id] = {

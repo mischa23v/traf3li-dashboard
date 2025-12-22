@@ -12,12 +12,12 @@ import { toast } from 'sonner'
 
 interface CompanyContextValue {
   // Active company state
-  activeCompanyId: string | null
+  activeFirmId: string | null
   activeCompany: Company | null
   activeCompanyAccess: UserCompanyAccess | null
 
   // Multi-select mode (for consolidated views)
-  selectedCompanyIds: string[]
+  selectedFirmIds: string[]
   isMultiSelectMode: boolean
 
   // User's accessible companies
@@ -30,19 +30,19 @@ interface CompanyContextValue {
   isSwitching: boolean
 
   // Actions
-  switchCompany: (companyId: string) => Promise<void>
+  switchCompany: (firmId: string) => Promise<void>
   toggleMultiSelect: () => void
-  selectCompany: (companyId: string) => void
-  deselectCompany: (companyId: string) => void
+  selectCompany: (firmId: string) => void
+  deselectCompany: (firmId: string) => void
   selectAllCompanies: () => void
   clearSelectedCompanies: () => void
-  setSelectedCompanyIds: (companyIds: string[]) => void
+  setSelectedFirmIds: (firmIds: string[]) => void
 
   // Helpers
-  canAccessCompany: (companyId: string) => boolean
-  getCompanyAccess: (companyId: string) => UserCompanyAccess | undefined
-  hasRole: (companyId: string, role: UserCompanyAccess['role']) => boolean
-  canManageCompany: (companyId: string) => boolean // owner or admin
+  canAccessCompany: (firmId: string) => boolean
+  getCompanyAccess: (firmId: string) => UserCompanyAccess | undefined
+  hasRole: (firmId: string, role: UserCompanyAccess['role']) => boolean
+  canManageCompany: (firmId: string) => boolean // owner or admin
 
   // Refresh
   refetch: () => void
@@ -63,7 +63,7 @@ export function CompanyProvider({ children }: CompanyProviderProps) {
 
   // Local state for multi-select mode
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false)
-  const [selectedCompanyIds, setSelectedCompanyIds] = useState<string[]>([])
+  const [selectedFirmIds, setSelectedFirmIds] = useState<string[]>([])
 
   // Fetch active company
   const {
@@ -90,7 +90,7 @@ export function CompanyProvider({ children }: CompanyProviderProps) {
 
   // Switch company mutation
   const switchMutation = useMutation({
-    mutationFn: (companyId: string) => companyService.switchCompany(companyId),
+    mutationFn: (firmId: string) => companyService.switchCompany(firmId),
     onSuccess: (data) => {
       // Invalidate active company query
       queryClient.invalidateQueries({ queryKey: ['company', 'active'] })
@@ -99,7 +99,7 @@ export function CompanyProvider({ children }: CompanyProviderProps) {
       queryClient.invalidateQueries()
 
       // Update local storage
-      localStorage.setItem('activeCompanyId', data.companyId)
+      localStorage.setItem('activeFirmId', data.companyId)
 
       toast.success(
         `تم التبديل إلى: ${data.company.nameAr || data.company.name}`,
@@ -116,7 +116,7 @@ export function CompanyProvider({ children }: CompanyProviderProps) {
   })
 
   // Derived state
-  const activeCompanyId = activeCompanyData?.companyId || null
+  const activeFirmId = activeCompanyData?.companyId || null
   const activeCompany = activeCompanyData?.company || null
   const activeCompanyAccess = activeCompanyData?.access || null
 
@@ -132,81 +132,81 @@ export function CompanyProvider({ children }: CompanyProviderProps) {
     return map
   }, [accessibleCompanies])
 
-  // Sync selectedCompanyIds with activeCompanyId when not in multi-select mode
+  // Sync selectedFirmIds with activeFirmId when not in multi-select mode
   useEffect(() => {
-    if (!isMultiSelectMode && activeCompanyId) {
-      setSelectedCompanyIds([activeCompanyId])
+    if (!isMultiSelectMode && activeFirmId) {
+      setSelectedFirmIds([activeFirmId])
     }
-  }, [isMultiSelectMode, activeCompanyId])
+  }, [isMultiSelectMode, activeFirmId])
 
   // Actions
   const switchCompany = useCallback(
-    async (companyId: string) => {
-      if (companyId === activeCompanyId) {
+    async (firmId: string) => {
+      if (firmId === activeFirmId) {
         return // Already active
       }
-      await switchMutation.mutateAsync(companyId)
+      await switchMutation.mutateAsync(firmId)
     },
-    [activeCompanyId, switchMutation]
+    [activeFirmId, switchMutation]
   )
 
   const toggleMultiSelect = useCallback(() => {
     setIsMultiSelectMode((prev) => !prev)
     if (isMultiSelectMode) {
       // Exiting multi-select mode, reset to active company only
-      if (activeCompanyId) {
-        setSelectedCompanyIds([activeCompanyId])
+      if (activeFirmId) {
+        setSelectedFirmIds([activeFirmId])
       }
     }
-  }, [isMultiSelectMode, activeCompanyId])
+  }, [isMultiSelectMode, activeFirmId])
 
-  const selectCompany = useCallback((companyId: string) => {
-    setSelectedCompanyIds((prev) => {
-      if (prev.includes(companyId)) {
+  const selectCompany = useCallback((firmId: string) => {
+    setSelectedFirmIds((prev) => {
+      if (prev.includes(firmId)) {
         return prev
       }
-      return [...prev, companyId]
+      return [...prev, firmId]
     })
   }, [])
 
-  const deselectCompany = useCallback((companyId: string) => {
-    setSelectedCompanyIds((prev) => prev.filter((id) => id !== companyId))
+  const deselectCompany = useCallback((firmId: string) => {
+    setSelectedFirmIds((prev) => prev.filter((id) => id !== firmId))
   }, [])
 
   const selectAllCompanies = useCallback(() => {
-    setSelectedCompanyIds(accessibleCompanies.map((c) => c._id))
+    setSelectedFirmIds(accessibleCompanies.map((c) => c._id))
   }, [accessibleCompanies])
 
   const clearSelectedCompanies = useCallback(() => {
-    setSelectedCompanyIds(activeCompanyId ? [activeCompanyId] : [])
-  }, [activeCompanyId])
+    setSelectedFirmIds(activeFirmId ? [activeFirmId] : [])
+  }, [activeFirmId])
 
   // Helpers
   const canAccessCompany = useCallback(
-    (companyId: string): boolean => {
-      return accessibleCompaniesMap.has(companyId)
+    (firmId: string): boolean => {
+      return accessibleCompaniesMap.has(firmId)
     },
     [accessibleCompaniesMap]
   )
 
   const getCompanyAccess = useCallback(
-    (companyId: string): UserCompanyAccess | undefined => {
-      return userCompanyAccess.find((access) => access.companyId === companyId)
+    (firmId: string): UserCompanyAccess | undefined => {
+      return userCompanyAccess.find((access) => access.companyId === firmId)
     },
     [userCompanyAccess]
   )
 
   const hasRole = useCallback(
-    (companyId: string, role: UserCompanyAccess['role']): boolean => {
-      const access = getCompanyAccess(companyId)
+    (firmId: string, role: UserCompanyAccess['role']): boolean => {
+      const access = getCompanyAccess(firmId)
       return access?.role === role
     },
     [getCompanyAccess]
   )
 
   const canManageCompany = useCallback(
-    (companyId: string): boolean => {
-      const access = getCompanyAccess(companyId)
+    (firmId: string): boolean => {
+      const access = getCompanyAccess(firmId)
       return access?.role === 'owner' || access?.role === 'admin'
     },
     [getCompanyAccess]
@@ -220,10 +220,10 @@ export function CompanyProvider({ children }: CompanyProviderProps) {
   // Context value
   const value: CompanyContextValue = useMemo(
     () => ({
-      activeCompanyId,
+      activeFirmId,
       activeCompany,
       activeCompanyAccess,
-      selectedCompanyIds,
+      selectedFirmIds,
       isMultiSelectMode,
       accessibleCompanies,
       accessibleCompaniesMap,
@@ -236,7 +236,7 @@ export function CompanyProvider({ children }: CompanyProviderProps) {
       deselectCompany,
       selectAllCompanies,
       clearSelectedCompanies,
-      setSelectedCompanyIds,
+      setSelectedFirmIds,
       canAccessCompany,
       getCompanyAccess,
       hasRole,
@@ -244,10 +244,10 @@ export function CompanyProvider({ children }: CompanyProviderProps) {
       refetch,
     }),
     [
-      activeCompanyId,
+      activeFirmId,
       activeCompany,
       activeCompanyAccess,
-      selectedCompanyIds,
+      selectedFirmIds,
       isMultiSelectMode,
       accessibleCompanies,
       accessibleCompaniesMap,

@@ -14,7 +14,7 @@ export interface Company {
   nameAr?: string
   code?: string
   logo?: string
-  parentCompanyId?: string | null
+  parentFirmId?: string | null
   level: number // 0 = root, 1 = child, 2 = grandchild, etc.
   industry?: string
   taxId?: string
@@ -56,7 +56,7 @@ export interface Company {
 export interface UserCompanyAccess {
   _id: string
   userId: string
-  companyId: string
+  firmId: string
   role: 'owner' | 'admin' | 'manager' | 'employee' | 'viewer'
   permissions?: string[]
   canAccessChildren?: boolean // Can access child companies
@@ -71,7 +71,7 @@ export interface UserCompanyAccess {
  * Company Filters
  */
 export interface CompanyFilters {
-  parentCompanyId?: string | null
+  parentFirmId?: string | null
   status?: 'active' | 'inactive' | 'suspended'
   search?: string
   level?: number
@@ -86,7 +86,7 @@ export interface CreateCompanyData {
   nameAr?: string
   code?: string
   logo?: string
-  parentCompanyId?: string | null
+  parentFirmId?: string | null
   industry?: string
   taxId?: string
   commercialRegistration?: string
@@ -139,7 +139,7 @@ interface UserCompanyAccessResponse {
 interface SwitchCompanyResponse {
   success: boolean
   data: {
-    companyId: string
+    firmId: string
     company: Company
     access: UserCompanyAccess
   }
@@ -151,11 +151,11 @@ interface SwitchCompanyResponse {
 const companyService = {
   /**
    * Get all companies accessible to current user
-   * GET /api/companies
+   * GET /api/firms
    */
   getAll: async (filters?: CompanyFilters): Promise<{ companies: Company[]; total: number }> => {
     try {
-      const response = await apiClient.get<CompaniesResponse>('/companies', {
+      const response = await apiClient.get<CompaniesResponse>('/firms', {
         params: filters,
       })
       return {
@@ -169,11 +169,11 @@ const companyService = {
 
   /**
    * Get company by ID
-   * GET /api/companies/:id
+   * GET /api/firms/:id
    */
   getById: async (id: string): Promise<Company> => {
     try {
-      const response = await apiClient.get<CompanyResponse>(`/companies/${id}`)
+      const response = await apiClient.get<CompanyResponse>(`/firms/${id}`)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -182,12 +182,12 @@ const companyService = {
 
   /**
    * Get company hierarchy tree
-   * GET /api/companies/tree
+   * GET /api/firms/tree
    */
-  getTree: async (rootCompanyId?: string): Promise<CompanyTreeNode[]> => {
+  getTree: async (rootFirmId?: string): Promise<CompanyTreeNode[]> => {
     try {
-      const response = await apiClient.get<CompanyTreeResponse>('/companies/tree', {
-        params: rootCompanyId ? { rootCompanyId } : undefined,
+      const response = await apiClient.get<CompanyTreeResponse>('/firms/tree', {
+        params: rootFirmId ? { rootFirmId } : undefined,
       })
       return response.data.data
     } catch (error: any) {
@@ -197,11 +197,11 @@ const companyService = {
 
   /**
    * Get child companies
-   * GET /api/companies/:id/children
+   * GET /api/firms/:id/children
    */
   getChildren: async (parentId: string): Promise<Company[]> => {
     try {
-      const response = await apiClient.get<CompaniesResponse>(`/companies/${parentId}/children`)
+      const response = await apiClient.get<CompaniesResponse>(`/firms/${parentId}/children`)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -210,11 +210,11 @@ const companyService = {
 
   /**
    * Create new company
-   * POST /api/companies
+   * POST /api/firms
    */
   create: async (data: CreateCompanyData): Promise<Company> => {
     try {
-      const response = await apiClient.post<CompanyResponse>('/companies', data)
+      const response = await apiClient.post<CompanyResponse>('/firms', data)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -223,11 +223,11 @@ const companyService = {
 
   /**
    * Update company
-   * PUT /api/companies/:id
+   * PUT /api/firms/:id
    */
   update: async (id: string, data: UpdateCompanyData): Promise<Company> => {
     try {
-      const response = await apiClient.put<CompanyResponse>(`/companies/${id}`, data)
+      const response = await apiClient.put<CompanyResponse>(`/firms/${id}`, data)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -236,11 +236,11 @@ const companyService = {
 
   /**
    * Delete company
-   * DELETE /api/companies/:id
+   * DELETE /api/firms/:id
    */
   delete: async (id: string): Promise<void> => {
     try {
-      await apiClient.delete(`/companies/${id}`)
+      await apiClient.delete(`/firms/${id}`)
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -248,12 +248,12 @@ const companyService = {
 
   /**
    * Move company to different parent
-   * PUT /api/companies/:id/move
+   * PUT /api/firms/:id/move
    */
   move: async (id: string, newParentId: string | null): Promise<Company> => {
     try {
-      const response = await apiClient.put<CompanyResponse>(`/companies/${id}/move`, {
-        parentCompanyId: newParentId,
+      const response = await apiClient.put<CompanyResponse>(`/firms/${id}/move`, {
+        parentFirmId: newParentId,
       })
       return response.data.data
     } catch (error: any) {
@@ -263,7 +263,7 @@ const companyService = {
 
   /**
    * Get user's accessible companies
-   * GET /api/companies/user/accessible
+   * GET /api/firms/user/accessible
    */
   getUserAccessibleCompanies: async (): Promise<{
     companies: Company[]
@@ -273,7 +273,7 @@ const companyService = {
       const response = await apiClient.get<{
         success: boolean
         data: { companies: Company[]; access: UserCompanyAccess[] }
-      }>('/companies/user/accessible')
+      }>('/firms/user/accessible')
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -282,16 +282,16 @@ const companyService = {
 
   /**
    * Switch active company context
-   * POST /api/companies/switch
+   * POST /api/firms/switch
    */
-  switchCompany: async (companyId: string): Promise<{
-    companyId: string
+  switchCompany: async (firmId: string): Promise<{
+    firmId: string
     company: Company
     access: UserCompanyAccess
   }> => {
     try {
-      const response = await apiClient.post<SwitchCompanyResponse>('/companies/switch', {
-        companyId,
+      const response = await apiClient.post<SwitchCompanyResponse>('/firms/switch', {
+        firmId,
       })
       return response.data.data
     } catch (error: any) {
@@ -301,15 +301,15 @@ const companyService = {
 
   /**
    * Get active company context
-   * GET /api/companies/active
+   * GET /api/firms/active
    */
   getActiveCompany: async (): Promise<{
-    companyId: string
+    firmId: string
     company: Company
     access: UserCompanyAccess
   }> => {
     try {
-      const response = await apiClient.get<SwitchCompanyResponse>('/companies/active')
+      const response = await apiClient.get<SwitchCompanyResponse>('/firms/active')
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -318,10 +318,10 @@ const companyService = {
 
   /**
    * Grant user access to company
-   * POST /api/companies/:id/access
+   * POST /api/firms/:id/access
    */
   grantAccess: async (
-    companyId: string,
+    firmId: string,
     userId: string,
     data: {
       role: UserCompanyAccess['role']
@@ -333,7 +333,7 @@ const companyService = {
   ): Promise<UserCompanyAccess> => {
     try {
       const response = await apiClient.post<{ success: boolean; data: UserCompanyAccess }>(
-        `/companies/${companyId}/access`,
+        `/firms/${firmId}/access`,
         { userId, ...data }
       )
       return response.data.data
@@ -344,11 +344,11 @@ const companyService = {
 
   /**
    * Revoke user access to company
-   * DELETE /api/companies/:id/access/:userId
+   * DELETE /api/firms/:id/access/:userId
    */
-  revokeAccess: async (companyId: string, userId: string): Promise<void> => {
+  revokeAccess: async (firmId: string, userId: string): Promise<void> => {
     try {
-      await apiClient.delete(`/companies/${companyId}/access/${userId}`)
+      await apiClient.delete(`/firms/${firmId}/access/${userId}`)
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -356,16 +356,16 @@ const companyService = {
 
   /**
    * Update user access to company
-   * PUT /api/companies/:id/access/:userId
+   * PUT /api/firms/:id/access/:userId
    */
   updateAccess: async (
-    companyId: string,
+    firmId: string,
     userId: string,
     data: Partial<UserCompanyAccess>
   ): Promise<UserCompanyAccess> => {
     try {
       const response = await apiClient.put<{ success: boolean; data: UserCompanyAccess }>(
-        `/companies/${companyId}/access/${userId}`,
+        `/firms/${firmId}/access/${userId}`,
         data
       )
       return response.data.data
@@ -376,12 +376,12 @@ const companyService = {
 
   /**
    * Get company access list
-   * GET /api/companies/:id/access
+   * GET /api/firms/:id/access
    */
-  getAccessList: async (companyId: string): Promise<UserCompanyAccess[]> => {
+  getAccessList: async (firmId: string): Promise<UserCompanyAccess[]> => {
     try {
       const response = await apiClient.get<UserCompanyAccessResponse>(
-        `/companies/${companyId}/access`
+        `/firms/${firmId}/access`
       )
       return response.data.data
     } catch (error: any) {

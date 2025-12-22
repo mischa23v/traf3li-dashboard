@@ -19,10 +19,10 @@ export const consolidatedReportKeys = {
     [...consolidatedReportKeys.all, 'profit-loss', filters] as const,
   balanceSheet: (filters: ConsolidationFilters) =>
     [...consolidatedReportKeys.all, 'balance-sheet', filters] as const,
-  interCompanyTransactions: (companyIds: string[], startDate: string, endDate: string) =>
-    [...consolidatedReportKeys.all, 'inter-company-transactions', { companyIds, startDate, endDate }] as const,
-  comparisons: (companyIds: string[], startDate: string, endDate: string, metrics: string[]) =>
-    [...consolidatedReportKeys.all, 'comparisons', { companyIds, startDate, endDate, metrics }] as const,
+  interCompanyTransactions: (firmIds: string[], startDate: string, endDate: string) =>
+    [...consolidatedReportKeys.all, 'inter-company-transactions', { firmIds, startDate, endDate }] as const,
+  comparisons: (firmIds: string[], startDate: string, endDate: string, metrics: string[]) =>
+    [...consolidatedReportKeys.all, 'comparisons', { firmIds, startDate, endDate, metrics }] as const,
   summary: (filters: ConsolidationFilters) =>
     [...consolidatedReportKeys.all, 'summary', filters] as const,
   eliminationRules: () => [...consolidatedReportKeys.all, 'elimination-rules'] as const,
@@ -36,7 +36,7 @@ export const useConsolidatedProfitLoss = (filters: ConsolidationFilters) => {
   return useQuery({
     queryKey: consolidatedReportKeys.profitLoss(filters),
     queryFn: () => consolidatedReportService.getConsolidatedProfitLoss(filters),
-    enabled: filters.companyIds.length > 0 && !!filters.startDate && !!filters.endDate,
+    enabled: filters.firmIds.length > 0 && !!filters.startDate && !!filters.endDate,
     staleTime: 2 * 60 * 1000, // 2 minutes
     retry: 2,
   })
@@ -48,7 +48,7 @@ export const useConsolidatedBalanceSheet = (filters: ConsolidationFilters) => {
   return useQuery({
     queryKey: consolidatedReportKeys.balanceSheet(filters),
     queryFn: () => consolidatedReportService.getConsolidatedBalanceSheet(filters),
-    enabled: filters.companyIds.length > 0 && !!filters.startDate && !!filters.endDate,
+    enabled: filters.firmIds.length > 0 && !!filters.startDate && !!filters.endDate,
     staleTime: 2 * 60 * 1000, // 2 minutes
     retry: 2,
   })
@@ -57,15 +57,15 @@ export const useConsolidatedBalanceSheet = (filters: ConsolidationFilters) => {
 // ==================== INTER-COMPANY TRANSACTIONS ====================
 
 export const useInterCompanyTransactions = (
-  companyIds: string[],
+  firmIds: string[],
   startDate: string,
   endDate: string
 ) => {
   return useQuery({
-    queryKey: consolidatedReportKeys.interCompanyTransactions(companyIds, startDate, endDate),
+    queryKey: consolidatedReportKeys.interCompanyTransactions(firmIds, startDate, endDate),
     queryFn: () =>
-      consolidatedReportService.getInterCompanyTransactions(companyIds, startDate, endDate),
-    enabled: companyIds.length > 1 && !!startDate && !!endDate,
+      consolidatedReportService.getInterCompanyTransactions(firmIds, startDate, endDate),
+    enabled: firmIds.length > 1 && !!startDate && !!endDate,
     staleTime: 2 * 60 * 1000, // 2 minutes
   })
 }
@@ -73,16 +73,16 @@ export const useInterCompanyTransactions = (
 // ==================== COMPANY COMPARISONS ====================
 
 export const useCompanyComparisons = (
-  companyIds: string[],
+  firmIds: string[],
   startDate: string,
   endDate: string,
   metrics: string[]
 ) => {
   return useQuery({
-    queryKey: consolidatedReportKeys.comparisons(companyIds, startDate, endDate, metrics),
+    queryKey: consolidatedReportKeys.comparisons(firmIds, startDate, endDate, metrics),
     queryFn: () =>
-      consolidatedReportService.getCompanyComparisons(companyIds, startDate, endDate, metrics),
-    enabled: companyIds.length > 0 && !!startDate && !!endDate && metrics.length > 0,
+      consolidatedReportService.getCompanyComparisons(firmIds, startDate, endDate, metrics),
+    enabled: firmIds.length > 0 && !!startDate && !!endDate && metrics.length > 0,
     staleTime: 2 * 60 * 1000, // 2 minutes
   })
 }
@@ -93,7 +93,7 @@ export const useConsolidationSummary = (filters: ConsolidationFilters) => {
   return useQuery({
     queryKey: consolidatedReportKeys.summary(filters),
     queryFn: () => consolidatedReportService.getConsolidationSummary(filters),
-    enabled: filters.companyIds.length > 0 && !!filters.startDate && !!filters.endDate,
+    enabled: filters.firmIds.length > 0 && !!filters.startDate && !!filters.endDate,
     staleTime: 2 * 60 * 1000, // 2 minutes
   })
 }

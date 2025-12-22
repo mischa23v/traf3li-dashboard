@@ -34,9 +34,9 @@ import { useCompanyTree } from '@/hooks/useCompanies'
 import type { CompanyTreeNode } from '@/services/companyService'
 
 interface CompanyTreeViewProps {
-  rootCompanyId?: string
-  onEdit?: (companyId: string) => void
-  onDelete?: (companyId: string) => void
+  rootFirmId?: string
+  onEdit?: (firmId: string) => void
+  onDelete?: (firmId: string) => void
   onAddChild?: (parentId: string) => void
   className?: string
   canEdit?: boolean
@@ -45,7 +45,7 @@ interface CompanyTreeViewProps {
 }
 
 export function CompanyTreeView({
-  rootCompanyId,
+  rootFirmId,
   onEdit,
   onDelete,
   onAddChild,
@@ -57,7 +57,7 @@ export function CompanyTreeView({
   const { i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
 
-  const { data: treeData, isLoading, error } = useCompanyTree(rootCompanyId)
+  const { data: treeData, isLoading, error } = useCompanyTree(rootFirmId)
 
   if (isLoading) {
     return (
@@ -142,8 +142,8 @@ export function CompanyTreeView({
 interface CompanyTreeNodeProps {
   node: CompanyTreeNode
   level: number
-  onEdit?: (companyId: string) => void
-  onDelete?: (companyId: string) => void
+  onEdit?: (firmId: string) => void
+  onDelete?: (firmId: string) => void
   onAddChild?: (parentId: string) => void
   canEdit: boolean
   canDelete: boolean

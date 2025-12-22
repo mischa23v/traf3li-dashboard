@@ -23,14 +23,14 @@ export function ConsolidatedDashboard() {
 
   const {
     activeCompany,
-    selectedCompanyIds,
+    selectedFirmIds,
     isMultiSelectMode,
     toggleMultiSelect,
   } = useCompanyContext()
 
   // Fetch stats for selected companies
   const { data: stats } = useQuery({
-    queryKey: ['dashboard-stats', selectedCompanyIds],
+    queryKey: ['dashboard-stats', selectedFirmIds],
     queryFn: async () => {
       // Mock API call - replace with your actual API
       return {
@@ -40,7 +40,7 @@ export function ConsolidatedDashboard() {
         growth: 15.5,
       }
     },
-    enabled: selectedCompanyIds.length > 0,
+    enabled: selectedFirmIds.length > 0,
   })
 
   return (
@@ -54,8 +54,8 @@ export function ConsolidatedDashboard() {
           <p className="text-muted-foreground">
             {isMultiSelectMode
               ? isArabic
-                ? `عرض موحد لـ ${selectedCompanyIds.length} شركات`
-                : `Consolidated view of ${selectedCompanyIds.length} companies`
+                ? `عرض موحد لـ ${selectedFirmIds.length} شركات`
+                : `Consolidated view of ${selectedFirmIds.length} companies`
               : activeCompany?.nameAr || activeCompany?.name}
           </p>
         </div>
@@ -84,8 +84,8 @@ export function ConsolidatedDashboard() {
               <Building2 className="h-5 w-5 text-primary" />
               <span className="font-medium">
                 {isArabic
-                  ? `البيانات من ${selectedCompanyIds.length} شركات`
-                  : `Data from ${selectedCompanyIds.length} companies`}
+                  ? `البيانات من ${selectedFirmIds.length} شركات`
+                  : `Data from ${selectedFirmIds.length} companies`}
               </span>
             </div>
             <Badge variant="secondary">
@@ -131,7 +131,7 @@ export function CrossCompanyReports() {
   const isArabic = i18n.language === 'ar'
 
   const {
-    selectedCompanyIds,
+    selectedFirmIds,
     accessibleCompanies,
     isMultiSelectMode,
     selectCompany,
@@ -140,17 +140,17 @@ export function CrossCompanyReports() {
 
   // Fetch report data for selected companies
   const { data: reportData, isLoading } = useQuery({
-    queryKey: ['reports', 'comparison', selectedCompanyIds],
+    queryKey: ['reports', 'comparison', selectedFirmIds],
     queryFn: async () => {
       // Mock API call
-      return selectedCompanyIds.map((id) => ({
-        companyId: id,
+      return selectedFirmIds.map((id) => ({
+        firmId: id,
         revenue: Math.random() * 100000,
         expenses: Math.random() * 50000,
         profit: Math.random() * 50000,
       }))
     },
-    enabled: selectedCompanyIds.length > 0,
+    enabled: selectedFirmIds.length > 0,
   })
 
   return (
@@ -169,7 +169,7 @@ export function CrossCompanyReports() {
             </h3>
             <div className="flex flex-wrap gap-2">
               {accessibleCompanies.map((company) => {
-                const isSelected = selectedCompanyIds.includes(company._id)
+                const isSelected = selectedFirmIds.includes(company._id)
                 return (
                   <Button
                     key={company._id}
@@ -211,10 +211,10 @@ export function CrossCompanyReports() {
                 <tbody>
                   {reportData.map((row, index) => {
                     const company = accessibleCompanies.find(
-                      (c) => c._id === row.companyId
+                      (c) => c._id === row.firmId
                     )
                     return (
-                      <tr key={row.companyId} className="border-b">
+                      <tr key={row.firmId} className="border-b">
                         <td className="p-2">
                           {isArabic
                             ? company?.nameAr || company?.name
@@ -256,7 +256,7 @@ export function HierarchicalView() {
 
   // Get child companies
   const childCompanies = accessibleCompanies.filter(
-    (c) => c.parentCompanyId === activeCompany?._id
+    (c) => c.parentFirmId === activeCompany?._id
   )
 
   // Fetch aggregated data
@@ -270,7 +270,7 @@ export function HierarchicalView() {
           employees: 50,
         },
         children: childCompanies.map((child) => ({
-          companyId: child._id,
+          firmId: child._id,
           revenue: Math.random() * 100000,
           employees: Math.floor(Math.random() * 20),
         })),
@@ -326,7 +326,7 @@ export function HierarchicalView() {
               </h4>
               {childCompanies.map((child) => {
                 const childData = aggregatedData?.children.find(
-                  (d) => d.companyId === child._id
+                  (d) => d.firmId === child._id
                 )
                 return (
                   <div
@@ -414,15 +414,15 @@ export function PermissionBasedUI() {
   const isArabic = i18n.language === 'ar'
 
   const {
-    activeCompanyId,
+    activeFirmId,
     canManageCompany,
     getCompanyAccess,
     hasRole,
   } = useCompanyContext()
 
-  const access = getCompanyAccess(activeCompanyId!)
-  const isAdmin = hasRole(activeCompanyId!, 'admin')
-  const canManage = canManageCompany(activeCompanyId!)
+  const access = getCompanyAccess(activeFirmId!)
+  const isAdmin = hasRole(activeFirmId!, 'admin')
+  const canManage = canManageCompany(activeFirmId!)
 
   return (
     <Card>

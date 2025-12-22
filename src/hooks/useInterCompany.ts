@@ -146,28 +146,28 @@ export const useInterCompanyBalances = (currency?: string) => {
 }
 
 export const useInterCompanyBalanceBetween = (
-  sourceCompanyId: string,
-  targetCompanyId: string,
+  sourceFirmId: string,
+  targetFirmId: string,
   currency?: string
 ) => {
   return useQuery({
-    queryKey: ['inter-company-balance', sourceCompanyId, targetCompanyId, currency],
-    queryFn: () => interCompanyService.getBalanceBetweenCompanies(sourceCompanyId, targetCompanyId, currency),
-    enabled: !!sourceCompanyId && !!targetCompanyId,
+    queryKey: ['inter-company-balance', sourceFirmId, targetFirmId, currency],
+    queryFn: () => interCompanyService.getBalanceBetweenCompanies(sourceFirmId, targetFirmId, currency),
+    enabled: !!sourceFirmId && !!targetFirmId,
     staleTime: CACHE_STALE_TIME,
     gcTime: CACHE_GC_TIME,
   })
 }
 
 export const useInterCompanyTransactionsBetween = (
-  sourceCompanyId: string,
-  targetCompanyId: string,
+  sourceFirmId: string,
+  targetFirmId: string,
   filters?: Partial<InterCompanyTransactionFilters>
 ) => {
   return useQuery({
-    queryKey: ['inter-company-transactions-between', sourceCompanyId, targetCompanyId, filters],
-    queryFn: () => interCompanyService.getTransactionsBetweenCompanies(sourceCompanyId, targetCompanyId, filters),
-    enabled: !!sourceCompanyId && !!targetCompanyId,
+    queryKey: ['inter-company-transactions-between', sourceFirmId, targetFirmId, filters],
+    queryFn: () => interCompanyService.getTransactionsBetweenCompanies(sourceFirmId, targetFirmId, filters),
+    enabled: !!sourceFirmId && !!targetFirmId,
     staleTime: CACHE_STALE_TIME,
     gcTime: CACHE_GC_TIME,
   })
@@ -339,7 +339,7 @@ export const useApproveReconciliation = () => {
 
 export const useInterCompanyCompanies = () => {
   return useQuery({
-    queryKey: ['inter-company-companies'],
+    queryKey: ['inter-company-firms'],
     queryFn: () => interCompanyService.getCompanies(),
     staleTime: 30 * 60 * 1000, // 30 minutes - companies don't change often
     gcTime: 60 * 60 * 1000, // 1 hour
@@ -363,7 +363,7 @@ export const useExchangeRate = (fromCurrency: string, toCurrency: string, date?:
 export const useInterCompanyReport = (params: {
   startDate: string
   endDate: string
-  companyId?: string
+  firmId?: string
   currency?: string
 }) => {
   return useQuery({
