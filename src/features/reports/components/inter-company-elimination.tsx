@@ -41,13 +41,13 @@ import { useInterCompanyTransactions } from '@/hooks/useConsolidatedReport'
 import type { InterCompanyTransaction } from '@/services/consolidatedReportService'
 
 interface InterCompanyEliminationProps {
-  companyIds: string[]
+  firmIds: string[]
   startDate: string
   endDate: string
 }
 
 export function InterCompanyElimination({
-  companyIds,
+  firmIds,
   startDate,
   endDate,
 }: InterCompanyEliminationProps) {
@@ -62,7 +62,7 @@ export function InterCompanyElimination({
     data: transactions,
     isLoading,
     error,
-  } = useInterCompanyTransactions(companyIds, startDate, endDate)
+  } = useInterCompanyTransactions(firmIds, startDate, endDate)
 
   // Format currency
   const formatCurrency = (amount: number) => {

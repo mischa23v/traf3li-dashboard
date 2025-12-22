@@ -8,7 +8,7 @@ import apiClient, { handleApiError } from '@/lib/api'
 // ==================== TYPES ====================
 
 export interface ConsolidationFilters {
-  companyIds: string[]
+  firmIds: string[]
   startDate: string
   endDate: string
   reportType: 'profit_loss' | 'balance_sheet' | 'cash_flow' | 'all'
@@ -30,7 +30,7 @@ export interface ConsolidatedLineItem {
   accountAr?: string
   accountCode?: string
   byCompany: Array<{
-    companyId: string
+    firmId: string
     companyName: string
     companyNameAr?: string
     amount: number
@@ -46,10 +46,10 @@ export interface ConsolidatedLineItem {
 
 export interface InterCompanyTransaction {
   id: string
-  fromCompanyId: string
+  fromFirmId: string
   fromCompanyName: string
   fromCompanyNameAr?: string
-  toCompanyId: string
+  toFirmId: string
   toCompanyName: string
   toCompanyNameAr?: string
   transactionType: 'sale' | 'purchase' | 'loan' | 'service' | 'other'
@@ -75,7 +75,7 @@ export interface ConsolidatedProfitLoss {
   }
   baseCurrency: string
   companies: Array<{
-    companyId: string
+    firmId: string
     companyName: string
     companyNameAr?: string
   }>
@@ -98,7 +98,7 @@ export interface ConsolidatedBalanceSheet {
   asOfDate: string
   baseCurrency: string
   companies: Array<{
-    companyId: string
+    firmId: string
     companyName: string
     companyNameAr?: string
   }>
@@ -127,7 +127,7 @@ export interface CompanyMetricComparison {
   metricType: 'revenue' | 'expenses' | 'profit' | 'margin' | 'growth' | 'efficiency'
   unit: 'currency' | 'percentage' | 'number'
   byCompany: Array<{
-    companyId: string
+    firmId: string
     companyName: string
     companyNameAr?: string
     value: number
@@ -144,8 +144,8 @@ export interface EliminationRule {
   name: string
   nameAr?: string
   type: 'inter_company_sales' | 'inter_company_loans' | 'dividends' | 'management_fees' | 'custom'
-  fromCompanyIds?: string[]
-  toCompanyIds?: string[]
+  fromFirmIds?: string[]
+  toFirmIds?: string[]
   accountPatterns?: string[]
   enabled: boolean
   automatic: boolean
@@ -219,7 +219,7 @@ const consolidatedReportService = {
    * GET /api/reports/consolidated/inter-company-transactions
    */
   getInterCompanyTransactions: async (
-    companyIds: string[],
+    firmIds: string[],
     startDate: string,
     endDate: string
   ): Promise<InterCompanyTransaction[]> => {
@@ -228,7 +228,7 @@ const consolidatedReportService = {
         '/reports/consolidated/inter-company-transactions',
         {
           params: {
-            companyIds: companyIds.join(','),
+            firmIds: firmIds.join(','),
             startDate,
             endDate,
           },
@@ -245,7 +245,7 @@ const consolidatedReportService = {
    * POST /api/reports/consolidated/comparisons
    */
   getCompanyComparisons: async (
-    companyIds: string[],
+    firmIds: string[],
     startDate: string,
     endDate: string,
     metrics: string[]
@@ -254,7 +254,7 @@ const consolidatedReportService = {
       const response = await apiClient.post<
         ConsolidatedReportResponse<CompanyMetricComparison[]>
       >('/reports/consolidated/comparisons', {
-        companyIds,
+        firmIds,
         startDate,
         endDate,
         metrics,

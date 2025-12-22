@@ -25,6 +25,20 @@ interface ApiResponse<T> {
 }
 
 /**
+ * Switch Firm Response
+ */
+interface SwitchFirmResponse {
+  activeFirm: {
+    id: string
+    name: string
+    nameArabic: string
+    logo?: string
+    role: string
+  }
+  token: string
+}
+
+/**
  * Firm Service Object
  */
 const firmService = {
@@ -477,6 +491,29 @@ const firmService = {
   removeLawyer: async (lawyerId: string, firmId: string): Promise<void> => {
     try {
       await apiClient.post('/firms/lawyer/remove', { lawyerId, firmId })
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Switch active firm
+   * POST /api/firms/switch
+   * Switches the user's active firm and returns a new JWT token
+   */
+  switchFirm: async (firmId: string): Promise<SwitchFirmResponse> => {
+    try {
+      const response = await apiClient.post<ApiResponse<SwitchFirmResponse>>(
+        '/firms/switch',
+        { firmId }
+      )
+
+      // Store the new token
+      if (response.data.data.token) {
+        localStorage.setItem('token', response.data.data.token)
+      }
+
+      return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

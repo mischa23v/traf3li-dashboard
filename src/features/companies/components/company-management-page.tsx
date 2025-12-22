@@ -49,7 +49,7 @@ export function CompanyManagementPage() {
   const [showAddDialog, setShowAddDialog] = React.useState(false)
   const [showEditDialog, setShowEditDialog] = React.useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false)
-  const [selectedCompanyId, setSelectedCompanyId] = React.useState<string | null>(null)
+  const [selectedFirmId, setSelectedFirmId] = React.useState<string | null>(null)
   const [selectedParentId, setSelectedParentId] = React.useState<string | null>(null)
 
   const [formData, setFormData] = React.useState<CreateCompanyData>({
@@ -57,7 +57,7 @@ export function CompanyManagementPage() {
     nameAr: '',
     code: '',
     status: 'active',
-    parentCompanyId: null,
+    parentFirmId: null,
   })
 
   // Handle add company
@@ -67,7 +67,7 @@ export function CompanyManagementPage() {
       nameAr: '',
       code: '',
       status: 'active',
-      parentCompanyId: selectedParentId,
+      parentFirmId: selectedParentId,
     })
     setShowAddDialog(true)
   }
@@ -79,7 +79,7 @@ export function CompanyManagementPage() {
       nameAr: '',
       code: '',
       status: 'active',
-      parentCompanyId: parentId,
+      parentFirmId: parentId,
     })
     setShowAddDialog(true)
   }
@@ -96,16 +96,16 @@ export function CompanyManagementPage() {
   }
 
   // Handle edit company
-  const handleEditCompany = (companyId: string) => {
-    const company = accessibleCompanies.find((c) => c._id === companyId)
+  const handleEditCompany = (firmId: string) => {
+    const company = accessibleCompanies.find((c) => c._id === firmId)
     if (company) {
-      setSelectedCompanyId(companyId)
+      setSelectedFirmId(firmId)
       setFormData({
         name: company.name,
         nameAr: company.nameAr,
         code: company.code,
         status: company.status,
-        parentCompanyId: company.parentCompanyId,
+        parentFirmId: company.parentFirmId,
       })
       setShowEditDialog(true)
     }
@@ -113,33 +113,33 @@ export function CompanyManagementPage() {
 
   const handleSubmitEdit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!selectedCompanyId) return
+    if (!selectedFirmId) return
 
     try {
       await updateMutation.mutateAsync({
-        id: selectedCompanyId,
+        id: selectedFirmId,
         data: formData,
       })
       setShowEditDialog(false)
-      setSelectedCompanyId(null)
+      setSelectedFirmId(null)
     } catch (error) {
       console.error('Failed to update company:', error)
     }
   }
 
   // Handle delete company
-  const handleDeleteCompany = (companyId: string) => {
-    setSelectedCompanyId(companyId)
+  const handleDeleteCompany = (firmId: string) => {
+    setSelectedFirmId(firmId)
     setShowDeleteDialog(true)
   }
 
   const handleConfirmDelete = async () => {
-    if (!selectedCompanyId) return
+    if (!selectedFirmId) return
 
     try {
-      await deleteMutation.mutateAsync(selectedCompanyId)
+      await deleteMutation.mutateAsync(selectedFirmId)
       setShowDeleteDialog(false)
-      setSelectedCompanyId(null)
+      setSelectedFirmId(null)
     } catch (error) {
       console.error('Failed to delete company:', error)
     }

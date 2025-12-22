@@ -75,8 +75,8 @@ export default function InterCompanyReconciliation({
   const [isArabic, setIsArabic] = useState(true)
 
   // Create mode state
-  const [sourceCompanyId, setSourceCompanyId] = useState('')
-  const [targetCompanyId, setTargetCompanyId] = useState('')
+  const [sourceFirmId, setSourceCompanyId] = useState('')
+  const [targetFirmId, setTargetCompanyId] = useState('')
   const [periodStart, setPeriodStart] = useState('')
   const [periodEnd, setPeriodEnd] = useState('')
   const [currency, setCurrency] = useState('SAR')
@@ -133,8 +133,8 @@ export default function InterCompanyReconciliation({
 
     try {
       const result = await createMutation.mutateAsync({
-        sourceCompanyId,
-        targetCompanyId,
+        sourceFirmId,
+        targetFirmId,
         reconciliationPeriodStart: periodStart,
         reconciliationPeriodEnd: periodEnd,
         currency,
@@ -260,7 +260,7 @@ export default function InterCompanyReconciliation({
                         {isArabic ? 'الشركة الأولى' : 'Source Company'}
                         <span className="text-red-500">*</span>
                       </Label>
-                      <Select value={sourceCompanyId} onValueChange={setSourceCompanyId} required>
+                      <Select value={sourceFirmId} onValueChange={setSourceCompanyId} required>
                         <SelectTrigger id="sourceCompany">
                           <SelectValue placeholder={isArabic ? 'اختر الشركة' : 'Select company'} />
                         </SelectTrigger>
@@ -279,13 +279,13 @@ export default function InterCompanyReconciliation({
                         {isArabic ? 'الشركة الثانية' : 'Target Company'}
                         <span className="text-red-500">*</span>
                       </Label>
-                      <Select value={targetCompanyId} onValueChange={setTargetCompanyId} required>
+                      <Select value={targetFirmId} onValueChange={setTargetCompanyId} required>
                         <SelectTrigger id="targetCompany">
                           <SelectValue placeholder={isArabic ? 'اختر الشركة' : 'Select company'} />
                         </SelectTrigger>
                         <SelectContent>
                           {companies
-                            ?.filter(c => c._id !== sourceCompanyId)
+                            ?.filter(c => c._id !== sourceFirmId)
                             .map((company) => (
                               <SelectItem key={company._id} value={company._id}>
                                 {isArabic ? company.nameAr : company.name}
@@ -407,8 +407,8 @@ export default function InterCompanyReconciliation({
     )
   }
 
-  const sourceCompany = reconciliation.sourceCompanyId as any
-  const targetCompany = reconciliation.targetCompanyId as any
+  const sourceCompany = reconciliation.sourceFirmId as any
+  const targetCompany = reconciliation.targetFirmId as any
 
   return (
     <>

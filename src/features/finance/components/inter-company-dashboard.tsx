@@ -348,15 +348,15 @@ export default function InterCompanyDashboard() {
                           >
                             <TableCell>{formatDate(transaction.transactionDate)}</TableCell>
                             <TableCell>
-                              {typeof transaction.sourceCompanyId === 'object'
-                                ? (isArabic ? transaction.sourceCompanyId.nameAr : transaction.sourceCompanyId.name)
-                                : transaction.sourceCompanyId
+                              {typeof transaction.sourceFirmId === 'object'
+                                ? (isArabic ? transaction.sourceFirmId.nameAr : transaction.sourceFirmId.name)
+                                : transaction.sourceFirmId
                               }
                             </TableCell>
                             <TableCell>
-                              {typeof transaction.targetCompanyId === 'object'
-                                ? (isArabic ? transaction.targetCompanyId.nameAr : transaction.targetCompanyId.name)
-                                : transaction.targetCompanyId
+                              {typeof transaction.targetFirmId === 'object'
+                                ? (isArabic ? transaction.targetFirmId.nameAr : transaction.targetFirmId.name)
+                                : transaction.targetFirmId
                               }
                             </TableCell>
                             <TableCell>
@@ -439,13 +439,13 @@ export default function InterCompanyDashboard() {
                               {reconciliation.reconciliationNumber}
                             </TableCell>
                             <TableCell>
-                              {typeof reconciliation.sourceCompanyId === 'object'
-                                ? (isArabic ? reconciliation.sourceCompanyId.nameAr : reconciliation.sourceCompanyId.name)
+                              {typeof reconciliation.sourceFirmId === 'object'
+                                ? (isArabic ? reconciliation.sourceFirmId.nameAr : reconciliation.sourceFirmId.name)
                                 : ''
                               }
                               {' ↔ '}
-                              {typeof reconciliation.targetCompanyId === 'object'
-                                ? (isArabic ? reconciliation.targetCompanyId.nameAr : reconciliation.targetCompanyId.name)
+                              {typeof reconciliation.targetFirmId === 'object'
+                                ? (isArabic ? reconciliation.targetFirmId.nameAr : reconciliation.targetFirmId.name)
                                 : ''
                               }
                             </TableCell>

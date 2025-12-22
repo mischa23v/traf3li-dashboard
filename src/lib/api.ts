@@ -185,10 +185,12 @@ apiClientNoVersion.interceptors.request.use(
       config.headers.set('X-Device-Fingerprint', cachedDeviceFingerprint)
     }
 
-    // Add active company ID header (for multi-company support)
-    const activeCompanyId = localStorage.getItem('activeCompanyId')
-    if (activeCompanyId) {
-      config.headers.set('X-Company-Id', activeCompanyId)
+    // Firm ID is now in JWT token (no need to send as header)
+    // Keep localStorage for caching purposes only
+    const activeFirmId = localStorage.getItem('activeFirmId')
+    // Note: X-Company-Id header removed - backend extracts firmId from JWT token
+    if (activeFirmId) {
+      // config.headers.set('X-Company-Id', activeFirmId) // Disabled: firmId is in JWT
     }
 
     const url = config.url || ''
@@ -373,10 +375,12 @@ apiClient.interceptors.request.use(
       config.headers.set('X-Device-Fingerprint', cachedDeviceFingerprint)
     }
 
-    // Add active company ID header (for multi-company support)
-    const activeCompanyId = localStorage.getItem('activeCompanyId')
-    if (activeCompanyId) {
-      config.headers.set('X-Company-Id', activeCompanyId)
+    // Firm ID is now in JWT token (no need to send as header)
+    // Keep localStorage for caching purposes only
+    const activeFirmId = localStorage.getItem('activeFirmId')
+    // Note: X-Company-Id header removed - backend extracts firmId from JWT token
+    if (activeFirmId) {
+      // config.headers.set('X-Company-Id', activeFirmId) // Disabled: firmId is in JWT
     }
 
     const url = config.url || ''
