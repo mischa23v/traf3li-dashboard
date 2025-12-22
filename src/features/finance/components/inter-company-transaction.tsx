@@ -47,8 +47,8 @@ export default function InterCompanyTransactionForm({
   const [isArabic, setIsArabic] = useState(true)
 
   // Form state
-  const [sourceFirmId, setSourceCompanyId] = useState('')
-  const [targetFirmId, setTargetCompanyId] = useState('')
+  const [sourceFirmId, setSourceFirmId] = useState('')
+  const [targetFirmId, setTargetFirmId] = useState('')
   const [transactionType, setTransactionType] = useState<'invoice' | 'payment' | 'expense' | 'transfer'>('invoice')
   const [amount, setAmount] = useState('')
   const [currency, setCurrency] = useState('SAR')
@@ -180,7 +180,7 @@ export default function InterCompanyTransactionForm({
                         {isArabic ? 'الشركة المصدرة' : 'Source Company'}
                         <span className="text-red-500">*</span>
                       </Label>
-                      <Select value={sourceFirmId} onValueChange={setSourceCompanyId} required>
+                      <Select value={sourceFirmId} onValueChange={setSourceFirmId} required>
                         <SelectTrigger id="sourceCompany">
                           <SelectValue placeholder={isArabic ? 'اختر الشركة' : 'Select company'} />
                         </SelectTrigger>
@@ -210,7 +210,7 @@ export default function InterCompanyTransactionForm({
                         {isArabic ? 'الشركة المستقبلة' : 'Target Company'}
                         <span className="text-red-500">*</span>
                       </Label>
-                      <Select value={targetFirmId} onValueChange={setTargetCompanyId} required>
+                      <Select value={targetFirmId} onValueChange={setTargetFirmId} required>
                         <SelectTrigger id="targetCompany">
                           <SelectValue placeholder={isArabic ? 'اختر الشركة' : 'Select company'} />
                         </SelectTrigger>
