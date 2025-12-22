@@ -1,0 +1,348 @@
+{
+  "scan_info": {
+    "application": "traf3li-backend",
+    "scan_date": "2025-12-22",
+    "scan_type": "Report Generation Security Scan",
+    "repository": "https://github.com/mischa23v/traf3li-backend",
+    "scanner": "Claude Code Security Scanner v1.0"
+  },
+  "summary": {
+    "total_vulnerabilities": 15,
+    "critical": 3,
+    "high": 5,
+    "medium": 5,
+    "low": 2,
+    "overall_status": "CRITICAL"
+  },
+  "vulnerabilities": [
+    {
+      "id": "RPT-001",
+      "title": "Server-Side Template Injection via PDFMe Templates",
+      "severity": "CRITICAL",
+      "category": "Template Injection",
+      "cwe": "CWE-94",
+      "cvss_score": 9.8,
+      "location": {
+        "files": [
+          "src/controllers/pdfme.controller.js:146-170",
+          "src/services/pdfme.service.js:51-96"
+        ]
+      },
+      "description": "Users can create custom PDF templates with arbitrary schemas that are directly passed to PDFMe generator without validation, allowing template injection attacks.",
+      "impact": "Code execution in PDF rendering context, data exfiltration, DoS, generation of malicious PDFs",
+      "remediation": "Implement strict template schema validation with whitelisted types and properties. Sanitize all content fields.",
+      "status": "open",
+      "priority": "P0"
+    },
+    {
+      "id": "RPT-002",
+      "title": "Cross-Site Scripting (XSS) in PDF Generation",
+      "severity": "CRITICAL",
+      "category": "XSS",
+      "cwe": "CWE-79",
+      "cvss_score": 9.3,
+      "location": {
+        "files": [
+          "src/services/pdfExporter.service.js:8-17",
+          "src/services/pdfExporter.service.js:22-116"
+        ]
+      },
+      "description": "HTML generation for PDF export does not properly sanitize user-provided content. Image URLs are not validated, leading to XSS when PDFs are viewed in browsers.",
+      "impact": "XSS in generated PDFs, session hijacking, credential theft, malware distribution",
+      "remediation": "Use sanitize-html library with strict whitelist. Validate all URLs against trusted domains. Only allow HTTPS URLs.",
+      "status": "open",
+      "priority": "P0"
+    },
+    {
+      "id": "RPT-003",
+      "title": "CSV Injection Vulnerability",
+      "severity": "CRITICAL",
+      "category": "Injection",
+      "cwe": "CWE-1236",
+      "cvss_score": 8.8,
+      "location": {
+        "files": [
+          "src/queues/report.queue.js:495-504"
+        ]
+      },
+      "description": "CSV export does not sanitize data, allowing CSV injection (formula injection) attacks. Values starting with =, +, -, @ are not escaped.",
+      "impact": "Remote code execution on victim's machine when CSV is opened in Excel, data exfiltration via external formulas",
+      "remediation": "Prefix dangerous characters with single quote. Implement proper CSV escaping for all values.",
+      "status": "open",
+      "priority": "P0"
+    },
+    {
+      "id": "RPT-004",
+      "title": "Insufficient Puppeteer Sandboxing",
+      "severity": "HIGH",
+      "category": "Configuration",
+      "cwe": "CWE-693",
+      "cvss_score": 8.1,
+      "location": {
+        "files": [
+          "src/services/pdfExporter.service.js:211-214"
+        ]
+      },
+      "description": "Puppeteer launched with --no-sandbox and --disable-setuid-sandbox flags, disabling Chrome's security sandbox.",
+      "impact": "Browser sandbox escapes, remote code execution on server, server compromise",
+      "remediation": "Remove dangerous flags. Enable sandboxing. Run Puppeteer as non-root user. Add timeout protections.",
+      "status": "open",
+      "priority": "P1"
+    },
+    {
+      "id": "RPT-005",
+      "title": "Path Traversal and Missing Authorization in PDF Download",
+      "severity": "HIGH",
+      "category": "Access Control",
+      "cwe": "CWE-22",
+      "cvss_score": 8.6,
+      "location": {
+        "files": [
+          "src/controllers/pdfme.controller.js:770-842"
+        ]
+      },
+      "description": "PDF download endpoint lacks ownership verification. Any authenticated user can download any PDF by guessing filenames. No database check for file ownership.",
+      "impact": "Unauthorized access to other users' PDFs, enumeration of sensitive documents, data breach",
+      "remediation": "Implement database-backed file ownership verification. Check lawyerId and firmId. Use UUID-based filenames. Add audit logging.",
+      "status": "open",
+      "priority": "P1"
+    },
+    {
+      "id": "RPT-006",
+      "title": "Sensitive Data Exposure in Reports",
+      "severity": "HIGH",
+      "category": "Data Leakage",
+      "cwe": "CWE-359",
+      "cvss_score": 7.5,
+      "location": {
+        "files": [
+          "src/controllers/report.controller.js:372-399",
+          "src/controllers/report.controller.js:730-731"
+        ]
+      },
+      "description": "Reports expose sensitive financial data, email addresses, and personal information without masking or redaction. No role-based data filtering.",
+      "impact": "Privacy violations, PDPL non-compliance, data breach if reports leaked, insider threats",
+      "remediation": "Implement data masking utilities. Apply role-based data filtering. Remove unnecessary PII from reports.",
+      "status": "open",
+      "priority": "P1"
+    },
+    {
+      "id": "RPT-007",
+      "title": "Report Files Not Cleaned Up",
+      "severity": "HIGH",
+      "category": "Data Retention",
+      "cwe": "CWE-404",
+      "cvss_score": 6.5,
+      "location": {
+        "files": [
+          "src/services/pdfme.service.js:1050-1070",
+          "src/queues/report.queue.js:462-463"
+        ]
+      },
+      "description": "Generated report files stored indefinitely without cleanup. No expiration policy or TTL. Old sensitive data persists.",
+      "impact": "Disk space exhaustion, PDPL compliance issues, persistent sensitive data, increased attack surface",
+      "remediation": "Implement file cleanup job with 30-day retention. Add TTL indexes to MongoDB. Implement PDPL-compliant retention policies.",
+      "status": "open",
+      "priority": "P1"
+    },
+    {
+      "id": "RPT-008",
+      "title": "Missing Firm-Level Isolation in Report Queries",
+      "severity": "HIGH",
+      "category": "Access Control",
+      "cwe": "CWE-639",
+      "cvss_score": 8.2,
+      "location": {
+        "files": [
+          "src/controllers/report.controller.js:132",
+          "src/controllers/report.controller.js:360",
+          "src/controllers/report.controller.js:787"
+        ]
+      },
+      "description": "Report queries filter by lawyerId but don't check firmId, allowing users to access data from other firms in multi-tenant setup.",
+      "impact": "Multi-tenant data leakage, cross-firm data access, regulatory violations",
+      "remediation": "Add firmId checks to all queries. Implement firm isolation middleware. Apply defense-in-depth with both lawyerId and firmId filters.",
+      "status": "open",
+      "priority": "P1"
+    },
+    {
+      "id": "RPT-009",
+      "title": "Public Reports Accessible Without Proper Authorization",
+      "severity": "HIGH",
+      "category": "Access Control",
+      "cwe": "CWE-284",
+      "cvss_score": 7.8,
+      "location": {
+        "files": [
+          "src/controllers/report.controller.js:164-172"
+        ]
+      },
+      "description": "Reports marked as isPublic can be accessed without firm-level checks, allowing unauthorized cross-firm access to public reports.",
+      "impact": "Financial data exposure, cross-firm information disclosure, potential competitive intelligence theft",
+      "remediation": "Restrict public reports to same firm only. Add permission checks even for public reports. Implement firm-aware public flag.",
+      "status": "open",
+      "priority": "P1"
+    },
+    {
+      "id": "RPT-010",
+      "title": "Missing Excel Export Implementation",
+      "severity": "MEDIUM",
+      "category": "Configuration",
+      "cwe": "CWE-440",
+      "cvss_score": 5.3,
+      "location": {
+        "files": [
+          "src/controllers/report.controller.js:952-954",
+          "src/controllers/report.controller.js:1038-1049"
+        ]
+      },
+      "description": "Excel export advertised but not implemented. Only placeholder code exists. Raw JSON data returned instead of Excel file.",
+      "impact": "Misleading functionality, raw data exposure through JSON responses, potential data leakage",
+      "remediation": "Implement actual Excel export using exceljs library. Remove Excel option from formats until implemented.",
+      "status": "open",
+      "priority": "P2"
+    },
+    {
+      "id": "RPT-011",
+      "title": "Predictable Report URLs",
+      "severity": "MEDIUM",
+      "category": "Information Disclosure",
+      "cwe": "CWE-330",
+      "cvss_score": 5.9,
+      "location": {
+        "files": [
+          "src/queues/report.queue.js:459",
+          "src/controllers/pdfme.controller.js:463",
+          "src/controllers/pdfme.controller.js:626"
+        ]
+      },
+      "description": "Report filenames use predictable patterns (timestamps, sequential IDs), allowing enumeration attacks.",
+      "impact": "Enumeration of reports, unauthorized access to predictable files, information disclosure",
+      "remediation": "Use UUID v4 for filenames. Add HMAC hash. Store public ID to filename mapping in database.",
+      "status": "open",
+      "priority": "P2"
+    },
+    {
+      "id": "RPT-012",
+      "title": "Missing Rate Limiting on Export Endpoints",
+      "severity": "MEDIUM",
+      "category": "Availability",
+      "cwe": "CWE-770",
+      "cvss_score": 6.5,
+      "location": {
+        "files": [
+          "src/routes/report.route.js:60",
+          "src/controllers/dataExport.controller.js"
+        ]
+      },
+      "description": "Data export endpoints lack rate limiting, allowing abuse and DoS attacks through massive export requests.",
+      "impact": "Resource exhaustion, denial of service, database overload, increased costs",
+      "remediation": "Implement rate limiting with 10 exports per 15 minutes per user. Add queue-based export processing.",
+      "status": "open",
+      "priority": "P2"
+    },
+    {
+      "id": "RPT-013",
+      "title": "Mustache Template Potential Injection Risk",
+      "severity": "MEDIUM",
+      "category": "Template Injection",
+      "cwe": "CWE-94",
+      "cvss_score": 6.1,
+      "location": {
+        "files": [
+          "package.json:90"
+        ]
+      },
+      "description": "Mustache library used in codebase. If user input passed to templates without sanitization, template injection possible.",
+      "impact": "Template injection if user input templated, potential XSS, information disclosure",
+      "remediation": "Audit all Mustache usage. Never allow user-provided templates. Use pre-defined templates only. Enable autoescaping.",
+      "status": "open",
+      "priority": "P2"
+    },
+    {
+      "id": "RPT-014",
+      "title": "Missing Security Headers on Report Downloads",
+      "severity": "MEDIUM",
+      "category": "Configuration",
+      "cwe": "CWE-693",
+      "cvss_score": 5.3,
+      "location": {
+        "files": [
+          "src/controllers/pdfme.controller.js:826-830"
+        ]
+      },
+      "description": "PDF download responses include some security headers but missing comprehensive CSP and other protective headers.",
+      "impact": "Clickjacking, MIME confusion attacks, reduced defense-in-depth",
+      "remediation": "Add comprehensive security headers: CSP, X-Frame-Options, Referrer-Policy, Permissions-Policy",
+      "status": "open",
+      "priority": "P2"
+    },
+    {
+      "id": "RPT-015",
+      "title": "PDPL Non-Compliance",
+      "severity": "MEDIUM",
+      "category": "Compliance",
+      "cwe": "CWE-359",
+      "cvss_score": 6.5,
+      "location": {
+        "files": [
+          "Multiple files"
+        ]
+      },
+      "description": "Report generation violates PDPL requirements: no data minimization, no retention policy, insufficient encryption, no consent tracking.",
+      "impact": "Legal violations, regulatory fines, reputational damage, mandatory breach notifications",
+      "remediation": "Implement data retention policies, consent tracking, data subject rights, encryption at rest, breach notification procedures.",
+      "status": "open",
+      "priority": "P1"
+    }
+  ],
+  "recommendations": {
+    "immediate": [
+      "Disable CSV export until CSV injection is fixed",
+      "Add ownership verification to PDF download endpoint",
+      "Disable Puppeteer --no-sandbox flag",
+      "Add rate limiting to all export endpoints",
+      "Implement template schema validation for PDFMe"
+    ],
+    "short_term": [
+      "Implement data masking for sensitive fields",
+      "Add file cleanup job with 30-day retention",
+      "Implement proper Excel export with exceljs",
+      "Add audit logging for all report access",
+      "Encrypt reports at rest"
+    ],
+    "medium_term": [
+      "Implement PDPL compliance measures",
+      "Add watermarks to PDFs",
+      "Implement secure filename generation",
+      "Add Content Security Policy headers",
+      "Conduct penetration testing"
+    ]
+  },
+  "compliance": {
+    "pdpl": {
+      "status": "NON_COMPLIANT",
+      "violations": [
+        "Data Minimization (Article 4)",
+        "Purpose Limitation (Article 5)",
+        "Storage Limitation (Article 7)",
+        "Data Security (Article 21)",
+        "Data Breach Notification (Article 28)"
+      ]
+    }
+  },
+  "testing": {
+    "required_tests": [
+      "Penetration test PDF generation with malicious templates",
+      "Test CSV injection with formula payloads",
+      "Attempt path traversal attacks on download endpoints",
+      "Test access controls with cross-user/firm requests",
+      "Fuzz test report generation with large datasets",
+      "Test rate limiting effectiveness",
+      "Verify encryption at rest",
+      "Test data masking implementation",
+      "Verify file cleanup job functionality",
+      "Audit log verification"
+    ]
+  }
+}

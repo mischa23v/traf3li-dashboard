@@ -1,0 +1,492 @@
+{
+  "scan_date": "2025-12-22",
+  "repository": "https://github.com/mischa23v/traf3li-backend",
+  "overall_status": "CRITICAL",
+  "implementation_status": {
+    "backend": "NOT_IMPLEMENTED",
+    "frontend": "COMPLETE_BUT_UNUSABLE",
+    "api_endpoints": "ALL_RETURN_404"
+  },
+  "scan_results": {
+    "1_totp_implementation": {
+      "status": "NOT_IMPLEMENTED",
+      "severity": "CRITICAL",
+      "issues": [
+        {
+          "id": "TOTP-1",
+          "title": "No TOTP Library Installed",
+          "severity": "CRITICAL",
+          "description": "No speakeasy or otplib package installed",
+          "file": "package.json",
+          "impact": "Cannot generate or validate TOTP codes",
+          "fix": "npm install speakeasy qrcode"
+        },
+        {
+          "id": "TOTP-2",
+          "title": "No User Model MFA Fields",
+          "severity": "CRITICAL",
+          "description": "User schema missing mfaEnabled, mfaSecret, mfaBackupCodes fields",
+          "file": "/src/models/user.model.js",
+          "impact": "Cannot store MFA configuration",
+          "fix": "Add MFA fields to User schema"
+        },
+        {
+          "id": "TOTP-3",
+          "title": "No MFA Routes",
+          "severity": "CRITICAL",
+          "description": "All /auth/mfa/* endpoints return 404",
+          "file": "/src/routes/auth.route.js",
+          "impact": "Frontend MFA calls fail",
+          "fix": "Create /src/routes/mfa.route.js"
+        },
+        {
+          "id": "TOTP-4",
+          "title": "No MFA Controller",
+          "severity": "CRITICAL",
+          "description": "No mfa.controller.js file exists",
+          "file": "N/A - File missing",
+          "impact": "No business logic for MFA",
+          "fix": "Create /src/controllers/mfa.controller.js"
+        },
+        {
+          "id": "TOTP-5",
+          "title": "No QR Code Generation",
+          "severity": "HIGH",
+          "description": "No qrcode package installed",
+          "file": "package.json",
+          "impact": "Cannot display QR codes to users",
+          "fix": "npm install qrcode"
+        },
+        {
+          "id": "TOTP-6",
+          "title": "No Secret Encryption",
+          "severity": "CRITICAL",
+          "description": "No encryption mechanism for TOTP secrets",
+          "file": "N/A",
+          "impact": "Secrets would be stored in plain text",
+          "fix": "Implement AES-256-GCM encryption"
+        },
+        {
+          "id": "TOTP-7",
+          "title": "No Rate Limiting",
+          "severity": "HIGH",
+          "description": "No rate limiting on MFA verification",
+          "file": "N/A",
+          "impact": "Vulnerable to brute force attacks",
+          "fix": "Add rate limiting middleware (5 attempts/15min)"
+        }
+      ]
+    },
+    "2_webauthn_fido2": {
+      "status": "NOT_IMPLEMENTED",
+      "severity": "INFO",
+      "note": "WebAuthn not planned - TOTP-only is acceptable",
+      "issues": []
+    },
+    "3_backup_codes": {
+      "status": "NOT_IMPLEMENTED",
+      "severity": "CRITICAL",
+      "issues": [
+        {
+          "id": "BACKUP-1",
+          "title": "No Backup Code Generation",
+          "severity": "CRITICAL",
+          "description": "No endpoint to generate backup codes",
+          "file": "N/A",
+          "impact": "Users cannot recover if TOTP device lost",
+          "fix": "Implement backup code generation (10 codes, 8 chars each)"
+        },
+        {
+          "id": "BACKUP-2",
+          "title": "No Backup Code Storage",
+          "severity": "CRITICAL",
+          "description": "User model has no backupCodes field",
+          "file": "/src/models/user.model.js",
+          "impact": "Cannot store backup codes",
+          "fix": "Add mfaBackupCodes array to User schema"
+        },
+        {
+          "id": "BACKUP-3",
+          "title": "No Backup Code Verification",
+          "severity": "CRITICAL",
+          "description": "No endpoint to verify backup codes during login",
+          "file": "N/A",
+          "impact": "Backup codes cannot be used",
+          "fix": "Create POST /auth/mfa/backup-codes/verify"
+        },
+        {
+          "id": "BACKUP-4",
+          "title": "No One-Time Use Enforcement",
+          "severity": "HIGH",
+          "description": "No mechanism to mark codes as used",
+          "file": "N/A",
+          "impact": "Codes could be reused",
+          "fix": "Track used codes with timestamp"
+        },
+        {
+          "id": "BACKUP-5",
+          "title": "Codes Not Hashed",
+          "severity": "CRITICAL",
+          "description": "No hashing mechanism for backup codes",
+          "file": "N/A",
+          "impact": "Codes would be stored in plain text",
+          "fix": "Hash codes with bcrypt before storage"
+        }
+      ]
+    },
+    "4_mfa_bypass_protection": {
+      "status": "COMPLETELY_VULNERABLE",
+      "severity": "CRITICAL",
+      "issues": [
+        {
+          "id": "BYPASS-1",
+          "title": "Authentication Bypass - No MFA Check in Login",
+          "severity": "CRITICAL",
+          "cvss": 9.8,
+          "description": "Login controller issues JWT token without checking mfaEnabled flag",
+          "file": "/src/controllers/auth.controller.js",
+          "line": "67-92",
+          "vulnerable_code": "if(match) { const token = jwt.sign(...); return response.cookie('accessToken', token); }",
+          "impact": "Attackers can bypass MFA with password only",
+          "attack_scenario": "1. User enables MFA. 2. Attacker obtains password. 3. Attacker logs in. 4. Backend skips MFA check. 5. Full access granted.",
+          "fix": "Add if(user.mfaEnabled) check before issuing token"
+        },
+        {
+          "id": "BYPASS-2",
+          "title": "No MFA Pending State",
+          "severity": "CRITICAL",
+          "description": "No concept of mfaPending state after password verification",
+          "file": "/src/controllers/auth.controller.js",
+          "impact": "Cannot implement two-phase authentication",
+          "fix": "Return mfaPending:true and userId instead of token"
+        },
+        {
+          "id": "BYPASS-3",
+          "title": "No Role-Based MFA Enforcement",
+          "severity": "HIGH",
+          "description": "Backend doesn't enforce MFA for admin/owner/accountant roles",
+          "file": "N/A",
+          "impact": "Privileged accounts can skip MFA",
+          "fix": "Implement role check and MFA requirement"
+        },
+        {
+          "id": "BYPASS-4",
+          "title": "No Action-Level MFA Verification",
+          "severity": "HIGH",
+          "description": "Sensitive actions don't require MFA re-verification",
+          "file": "N/A",
+          "impact": "Session hijacking enables unauthorized operations",
+          "fix": "Add MFA re-auth middleware for sensitive endpoints"
+        },
+        {
+          "id": "BYPASS-5",
+          "title": "No MFA Session Management",
+          "severity": "HIGH",
+          "description": "No concept of MFA session timeout",
+          "file": "N/A",
+          "impact": "No step-up authentication",
+          "fix": "Implement 15-minute MFA session"
+        },
+        {
+          "id": "BYPASS-6",
+          "title": "No MFA Verification Middleware",
+          "severity": "CRITICAL",
+          "description": "No middleware to check MFA status",
+          "file": "/src/middlewares/authenticate.js",
+          "impact": "Cannot enforce MFA globally",
+          "fix": "Create requireMFA middleware"
+        }
+      ]
+    },
+    "5_recovery_mechanisms": {
+      "status": "NONE_EXIST",
+      "severity": "CRITICAL",
+      "issues": [
+        {
+          "id": "RECOVERY-1",
+          "title": "No Backup Codes",
+          "severity": "CRITICAL",
+          "description": "Primary recovery mechanism not implemented",
+          "file": "N/A",
+          "impact": "Permanent account lockout if TOTP device lost",
+          "fix": "Implement backup code system"
+        },
+        {
+          "id": "RECOVERY-2",
+          "title": "No Admin Override",
+          "severity": "HIGH",
+          "description": "No admin capability to reset user MFA",
+          "file": "N/A",
+          "impact": "Cannot help locked-out users",
+          "fix": "Add admin MFA reset endpoint with audit"
+        },
+        {
+          "id": "RECOVERY-3",
+          "title": "No Recovery Email Process",
+          "severity": "HIGH",
+          "description": "No email-based MFA recovery",
+          "file": "N/A",
+          "impact": "No alternative recovery method",
+          "fix": "Implement recovery email with identity verification"
+        },
+        {
+          "id": "RECOVERY-4",
+          "title": "No MFA Disable Endpoint",
+          "severity": "HIGH",
+          "description": "POST /auth/mfa/disable returns 404",
+          "file": "N/A",
+          "impact": "Users cannot disable MFA",
+          "fix": "Create disable endpoint requiring password"
+        },
+        {
+          "id": "RECOVERY-5",
+          "title": "No Grace Period Implementation",
+          "severity": "MEDIUM",
+          "description": "7-day grace period defined in frontend but not enforced",
+          "file": "N/A",
+          "impact": "New users cannot delay MFA setup",
+          "fix": "Track mfaEnrolledAt and implement grace period"
+        }
+      ]
+    },
+    "6_additional_vulnerabilities": {
+      "issues": [
+        {
+          "id": "VULN-1",
+          "title": "No Audit Logging",
+          "severity": "MEDIUM",
+          "description": "MFA events not logged",
+          "file": "N/A",
+          "impact": "Cannot detect suspicious activity",
+          "fix": "Log all MFA setup/verify/disable events"
+        },
+        {
+          "id": "VULN-2",
+          "title": "No Account Lockout",
+          "severity": "MEDIUM",
+          "description": "No temporary lockout after failed MFA attempts",
+          "file": "N/A",
+          "impact": "Unlimited brute force attempts",
+          "fix": "Lock account after 5 failed attempts for 15 minutes"
+        },
+        {
+          "id": "VULN-3",
+          "title": "No Device Fingerprinting",
+          "severity": "MEDIUM",
+          "description": "No tracking of trusted devices",
+          "file": "N/A",
+          "impact": "MFA required on every login",
+          "fix": "Implement device fingerprinting"
+        },
+        {
+          "id": "VULN-4",
+          "title": "No Replay Attack Protection",
+          "severity": "HIGH",
+          "description": "No mechanism to prevent token reuse",
+          "file": "N/A",
+          "impact": "TOTP codes could be replayed within time window",
+          "fix": "Track used tokens with Redis/cache"
+        },
+        {
+          "id": "VULN-5",
+          "title": "No Time Window Validation",
+          "severity": "HIGH",
+          "description": "No TOTP time window configuration",
+          "file": "N/A",
+          "impact": "Cannot handle clock drift",
+          "fix": "Set window:2 for ±60 seconds tolerance"
+        }
+      ]
+    }
+  },
+  "missing_endpoints": [
+    "POST /api/auth/mfa/setup",
+    "POST /api/auth/mfa/verify-setup",
+    "POST /api/auth/mfa/verify",
+    "GET /api/auth/mfa/status",
+    "POST /api/auth/mfa/disable",
+    "POST /api/auth/mfa/backup-codes/verify",
+    "POST /api/auth/mfa/backup-codes/regenerate",
+    "GET /api/auth/mfa/backup-codes/count"
+  ],
+  "missing_dependencies": [
+    "speakeasy",
+    "qrcode"
+  ],
+  "missing_database_fields": [
+    "User.mfaEnabled",
+    "User.mfaSecret",
+    "User.mfaBackupCodes",
+    "User.mfaEnrolledAt",
+    "User.mfaMethod",
+    "User.mfaVerified"
+  ],
+  "compliance_violations": [
+    {
+      "regulation": "NCA ECC 2-1-3",
+      "requirement": "Multi-factor authentication for critical systems",
+      "status": "VIOLATED",
+      "impact": "Regulatory penalties"
+    },
+    {
+      "regulation": "PCI DSS 8.3",
+      "requirement": "MFA required for administrative access",
+      "status": "VIOLATED",
+      "impact": "Loss of payment processing capability"
+    },
+    {
+      "regulation": "PDPL",
+      "requirement": "Adequate protection of personal data",
+      "status": "VIOLATED",
+      "impact": "Fines and legal liability"
+    },
+    {
+      "regulation": "ISO 27001 A.9.4",
+      "requirement": "Access control",
+      "status": "VIOLATED",
+      "impact": "Certification failure"
+    }
+  ],
+  "attack_scenarios": [
+    {
+      "name": "Password Compromise Attack",
+      "steps": [
+        "Attacker obtains user password via phishing",
+        "User has 'MFA enabled' in frontend UI",
+        "Attacker submits valid credentials to /auth/login",
+        "Backend verifies password successfully",
+        "Backend skips MFA check (not implemented)",
+        "Backend issues full access JWT token",
+        "Attacker gains complete system access"
+      ],
+      "success_probability": "100%",
+      "impact": "CRITICAL"
+    },
+    {
+      "name": "Privileged Account Takeover",
+      "steps": [
+        "Admin user enables MFA in UI",
+        "Frontend shows 'MFA Protected' status",
+        "Admin password is compromised",
+        "Attacker logs in with password only",
+        "Backend has no MFA check for admin role",
+        "Attacker gains admin privileges",
+        "Attacker approves fraudulent payments",
+        "Attacker deletes audit logs"
+      ],
+      "success_probability": "100%",
+      "impact": "CRITICAL"
+    }
+  ],
+  "risk_assessment": {
+    "current_risk_level": "CRITICAL",
+    "categories": {
+      "authentication_bypass": "CRITICAL",
+      "account_takeover": "CRITICAL",
+      "data_breach": "HIGH",
+      "compliance_violation": "HIGH",
+      "reputation_damage": "HIGH",
+      "financial_loss": "MEDIUM",
+      "user_lockout": "MEDIUM"
+    },
+    "post_implementation_risk": "LOW"
+  },
+  "recommendations": {
+    "immediate": [
+      {
+        "priority": "P0",
+        "action": "Install TOTP libraries",
+        "command": "npm install speakeasy qrcode",
+        "timeline": "Day 1"
+      },
+      {
+        "priority": "P0",
+        "action": "Add MFA fields to User model",
+        "file": "/src/models/user.model.js",
+        "timeline": "Day 1"
+      },
+      {
+        "priority": "P0",
+        "action": "Create MFA controller",
+        "file": "/src/controllers/mfa.controller.js",
+        "timeline": "Day 2-3"
+      },
+      {
+        "priority": "P0",
+        "action": "Update login to check MFA",
+        "file": "/src/controllers/auth.controller.js",
+        "timeline": "Day 3"
+      },
+      {
+        "priority": "P0",
+        "action": "Create MFA routes",
+        "file": "/src/routes/mfa.route.js",
+        "timeline": "Day 3"
+      },
+      {
+        "priority": "P0",
+        "action": "Add rate limiting",
+        "file": "/src/middlewares/rateLimiter.middleware.js",
+        "timeline": "Day 4"
+      },
+      {
+        "priority": "P0",
+        "action": "Test all MFA flows",
+        "timeline": "Day 5"
+      }
+    ],
+    "short_term": [
+      {
+        "priority": "P1",
+        "action": "Implement role-based MFA enforcement",
+        "timeline": "Week 2"
+      },
+      {
+        "priority": "P1",
+        "action": "Add action-level MFA verification",
+        "timeline": "Week 2"
+      },
+      {
+        "priority": "P1",
+        "action": "Implement audit logging",
+        "timeline": "Week 3"
+      },
+      {
+        "priority": "P1",
+        "action": "Add account recovery process",
+        "timeline": "Week 3"
+      }
+    ],
+    "medium_term": [
+      {
+        "priority": "P2",
+        "action": "Add device fingerprinting",
+        "timeline": "Month 2"
+      },
+      {
+        "priority": "P2",
+        "action": "Implement account lockout",
+        "timeline": "Month 2"
+      },
+      {
+        "priority": "P2",
+        "action": "Add security monitoring",
+        "timeline": "Month 2"
+      }
+    ]
+  },
+  "implementation_timeline": {
+    "critical_path_days": 5,
+    "full_implementation_weeks": 3,
+    "estimated_effort": "5 developer-days for core functionality"
+  },
+  "summary": {
+    "total_vulnerabilities": 13,
+    "critical": 8,
+    "high": 3,
+    "medium": 2,
+    "status": "Backend MFA completely not implemented despite frontend being ready",
+    "immediate_action_required": true,
+    "business_impact": "Users have false sense of security, accounts vulnerable to password-only attacks"
+  }
+}

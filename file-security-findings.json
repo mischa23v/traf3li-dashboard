@@ -1,0 +1,420 @@
+{
+  "scan_metadata": {
+    "repository": "traf3li-backend",
+    "scan_date": "2025-12-22",
+    "scan_type": "File Handling & Document Security",
+    "scanner": "Claude Code Security Audit",
+    "total_files_analyzed": 15,
+    "lines_of_code_reviewed": 3500
+  },
+  "summary": {
+    "total_vulnerabilities": 20,
+    "critical": 8,
+    "high": 5,
+    "medium": 7,
+    "low": 0,
+    "overall_risk": "CRITICAL"
+  },
+  "critical_vulnerabilities": [
+    {
+      "id": "FILE-001",
+      "title": "No File Type Validation Beyond Extension/MIME",
+      "severity": "CRITICAL",
+      "cwe": "CWE-434",
+      "cvss_score": 9.1,
+      "location": "/src/configs/multer.js:23-33, /src/configs/multerPdf.js:36-60",
+      "description": "File validation relies solely on file extension and MIME type checking, which can be easily spoofed by attackers",
+      "attack_vector": "Attacker uploads malware.exe renamed to malware.pdf with Content-Type: application/pdf",
+      "impact": "Malware distribution, server compromise, XSS attacks, data exfiltration",
+      "remediation": "Implement magic number validation using file-type library",
+      "exploit_difficulty": "LOW"
+    },
+    {
+      "id": "FILE-002",
+      "title": "No Antivirus/Malware Scanning",
+      "severity": "CRITICAL",
+      "cwe": "CWE-434",
+      "cvss_score": 9.3,
+      "location": "All upload endpoints",
+      "description": "No antivirus or malware scanning before storing uploaded files",
+      "impact": "Platform becomes vector for malware distribution, legal liability, compliance violations",
+      "remediation": "Install and integrate ClamAV for real-time file scanning",
+      "exploit_difficulty": "LOW"
+    },
+    {
+      "id": "FILE-003",
+      "title": "S3 Configuration Only in Test Code",
+      "severity": "CRITICAL",
+      "cwe": "CWE-311",
+      "cvss_score": 8.5,
+      "location": "/test/BATCH_7_BACKEND_PHASE2/BATCH_7_BACKEND_PHASE2/controllers/documents.controller.js",
+      "description": "Proper S3 storage with security features exists only in test code, not in production",
+      "impact": "No encryption at rest, no redundancy, data loss risk, scalability issues",
+      "remediation": "Migrate production to S3 storage immediately",
+      "exploit_difficulty": "N/A",
+      "production_ready": false
+    },
+    {
+      "id": "FILE-004",
+      "title": "Missing Authentication on File Download Endpoint",
+      "severity": "CRITICAL",
+      "cwe": "CWE-306",
+      "cvss_score": 9.1,
+      "location": "/src/routes/legalDocument.route.js:30",
+      "description": "Download endpoint lacks authentication middleware",
+      "attack_vector": "Attacker enumerates document IDs and downloads confidential legal documents",
+      "impact": "Unauthorized access to confidential legal documents, PDPL violations",
+      "remediation": "Add userMiddleware and authenticate to download endpoint",
+      "exploit_difficulty": "LOW"
+    },
+    {
+      "id": "FILE-005",
+      "title": "Message Attachments Served Without Path Validation",
+      "severity": "CRITICAL",
+      "cwe": "CWE-22",
+      "cvss_score": 8.8,
+      "location": "/src/controllers/message.controller.js:18-25",
+      "description": "Attachment URLs constructed without validation enabling path traversal",
+      "attack_vector": "Attacker manipulates filename to access ../../etc/passwd",
+      "impact": "Arbitrary file read, sensitive data exposure, system compromise",
+      "remediation": "Sanitize filenames and implement controlled download endpoint",
+      "exploit_difficulty": "MEDIUM"
+    },
+    {
+      "id": "FILE-006",
+      "title": "No Public Document Access Control",
+      "severity": "CRITICAL",
+      "cwe": "CWE-285",
+      "cvss_score": 7.5,
+      "location": "/src/routes/legalDocument.route.js:18",
+      "description": "Public documents accessible without any authentication",
+      "attack_vector": "Unauthenticated user lists and reads all public legal documents",
+      "impact": "Information disclosure, no audit trail, PDPL compliance issues",
+      "remediation": "Require authentication for all document endpoints",
+      "exploit_difficulty": "LOW"
+    },
+    {
+      "id": "FILE-007",
+      "title": "Document Encryption Not Actually Enforced",
+      "severity": "CRITICAL",
+      "cwe": "CWE-311",
+      "cvss_score": 8.2,
+      "location": "/test/.../documents.controller.js:99-104",
+      "description": "Files marked as encrypted but encryption not actually performed",
+      "impact": "Confidential documents stored in plaintext, false sense of security",
+      "remediation": "Implement actual file encryption using AES-256-GCM",
+      "exploit_difficulty": "N/A"
+    },
+    {
+      "id": "FILE-008",
+      "title": "Weak Access Control Model Implementation",
+      "severity": "CRITICAL",
+      "cwe": "CWE-284",
+      "cvss_score": 7.8,
+      "location": "/test/.../document.model.js:119-130",
+      "description": "Access control doesn't verify case ownership for document access",
+      "impact": "Users can't access documents from their own cases",
+      "remediation": "Implement case ownership verification in isAccessibleBy method",
+      "exploit_difficulty": "LOW"
+    }
+  ],
+  "high_vulnerabilities": [
+    {
+      "id": "FILE-009",
+      "title": "Excessive File Size Limits",
+      "severity": "HIGH",
+      "cwe": "CWE-400",
+      "cvss_score": 7.5,
+      "location": "/src/configs/multer.js:38, /src/configs/multerPdf.js:66,75",
+      "description": "50MB limit for templates enables DoS attacks through disk space exhaustion",
+      "impact": "Service denial, increased storage costs, resource exhaustion",
+      "remediation": "Reduce limits to 5MB and implement per-user storage quotas",
+      "exploit_difficulty": "LOW"
+    },
+    {
+      "id": "FILE-010",
+      "title": "No Server-Side Encryption for S3 Files",
+      "severity": "HIGH",
+      "cwe": "CWE-311",
+      "cvss_score": 7.4,
+      "location": "Test S3 configuration",
+      "description": "S3 uploads don't specify server-side encryption",
+      "impact": "Data stored unencrypted at rest, compliance violations",
+      "remediation": "Enable serverSideEncryption: 'AES256' in S3 config",
+      "exploit_difficulty": "N/A"
+    },
+    {
+      "id": "FILE-011",
+      "title": "Missing S3 Bucket Policy Hardening",
+      "severity": "HIGH",
+      "cwe": "CWE-732",
+      "cvss_score": 7.3,
+      "location": "AWS S3 configuration",
+      "description": "No evidence of S3 bucket policies restricting access",
+      "impact": "Potential unauthorized S3 access, insecure transport allowed",
+      "remediation": "Implement strict S3 bucket policies denying unencrypted uploads",
+      "exploit_difficulty": "MEDIUM"
+    },
+    {
+      "id": "FILE-012",
+      "title": "No Audit Logging for File Operations",
+      "severity": "HIGH",
+      "cwe": "CWE-778",
+      "cvss_score": 6.5,
+      "location": "All file operation endpoints",
+      "description": "No comprehensive audit trail for file operations",
+      "impact": "Cannot detect breaches, no forensic capability, compliance violations",
+      "remediation": "Implement comprehensive audit logging for all file operations",
+      "exploit_difficulty": "N/A"
+    },
+    {
+      "id": "FILE-013",
+      "title": "No Data Retention Policies",
+      "severity": "HIGH",
+      "cwe": "CWE-404",
+      "cvss_score": 6.2,
+      "location": "Document storage",
+      "description": "Files stored indefinitely without deletion policies",
+      "impact": "PDPL compliance violations, unnecessary data retention",
+      "remediation": "Implement automated data retention and deletion policies",
+      "exploit_difficulty": "N/A"
+    }
+  ],
+  "medium_vulnerabilities": [
+    {
+      "id": "FILE-014",
+      "title": "No File Upload Rate Limiting",
+      "severity": "MEDIUM",
+      "cwe": "CWE-770",
+      "cvss_score": 5.3,
+      "location": "All upload endpoints",
+      "description": "No rate limiting on file uploads allows abuse",
+      "impact": "DoS through excessive uploads, resource exhaustion",
+      "remediation": "Implement express-rate-limit with 10 uploads per 15 minutes",
+      "exploit_difficulty": "LOW"
+    },
+    {
+      "id": "FILE-015",
+      "title": "No S3 Access Logging",
+      "severity": "MEDIUM",
+      "cwe": "CWE-778",
+      "cvss_score": 5.0,
+      "location": "S3 configuration",
+      "description": "S3 access logs not enabled for audit trails",
+      "impact": "No audit trail for S3 access, cannot investigate incidents",
+      "remediation": "Enable S3 server access logging to separate bucket",
+      "exploit_difficulty": "N/A"
+    },
+    {
+      "id": "FILE-016",
+      "title": "Share Token Doesn't Expire Properly",
+      "severity": "MEDIUM",
+      "cwe": "CWE-613",
+      "cvss_score": 5.9,
+      "location": "/test/.../documents.controller.js:516-561",
+      "description": "Share token generation doesn't validate expiration on access",
+      "impact": "Expired share links may still work, unauthorized access",
+      "remediation": "Validate shareExpiresAt on document access",
+      "exploit_difficulty": "MEDIUM"
+    },
+    {
+      "id": "FILE-017",
+      "title": "PDF Generation Creates Files Without Cleanup",
+      "severity": "MEDIUM",
+      "cwe": "CWE-404",
+      "cvss_score": 4.3,
+      "location": "/src/controllers/pdfme.controller.js:573-714",
+      "description": "Generated PDFs saved to disk but never cleaned up",
+      "impact": "Disk space exhaustion, data retention violations",
+      "remediation": "Implement auto-cleanup cron job or use temporary files",
+      "exploit_difficulty": "N/A"
+    },
+    {
+      "id": "FILE-018",
+      "title": "No Content Security Policy for PDF Responses",
+      "severity": "MEDIUM",
+      "cwe": "CWE-693",
+      "cvss_score": 4.7,
+      "location": "/src/controllers/pdfme.controller.js:491-533",
+      "description": "PDFs served inline without CSP headers",
+      "impact": "Potential XSS if PDF contains malicious content",
+      "remediation": "Add X-Content-Type-Options, X-Frame-Options, CSP headers",
+      "exploit_difficulty": "MEDIUM"
+    },
+    {
+      "id": "FILE-019",
+      "title": "Encryption Key Defaults in Development",
+      "severity": "MEDIUM",
+      "cwe": "CWE-321",
+      "cvss_score": 6.5,
+      "location": "/src/utils/encryption.js:20-35",
+      "description": "Falls back to hardcoded key if environment variable not set",
+      "impact": "All encrypted data uses known key if misconfigured in production",
+      "remediation": "Fail hard in production if ENCRYPTION_KEY not set",
+      "exploit_difficulty": "LOW"
+    },
+    {
+      "id": "FILE-020",
+      "title": "No File Integrity Validation",
+      "severity": "MEDIUM",
+      "cwe": "CWE-354",
+      "cvss_score": 5.3,
+      "location": "Document storage",
+      "description": "No checksums/hashes to verify file integrity",
+      "impact": "Cannot detect file corruption or tampering",
+      "remediation": "Calculate SHA-256 hash on upload and verify on download",
+      "exploit_difficulty": "N/A"
+    }
+  ],
+  "positive_findings": [
+    {
+      "id": "GOOD-001",
+      "title": "Excellent Path Traversal Protection in PDF Download",
+      "location": "/src/controllers/pdfme.controller.js:736-768",
+      "description": "Multiple layers of path traversal protection including sanitization, validation, and resolved path verification"
+    },
+    {
+      "id": "GOOD-002",
+      "title": "Strong Encryption Implementation",
+      "location": "/src/utils/encryption.js",
+      "description": "Uses AES-256-GCM with proper IV generation and authentication tags"
+    },
+    {
+      "id": "GOOD-003",
+      "title": "Task Attachment Deletion Security",
+      "location": "/src/controllers/task.controller.js:520-585",
+      "description": "Comprehensive path traversal protection with null byte checks and pattern validation"
+    }
+  ],
+  "compliance_gaps": {
+    "pdpl": {
+      "data_minimization": "FAIL",
+      "encryption_sensitive_data": "PARTIAL",
+      "data_retention": "FAIL",
+      "right_to_erasure": "FAIL",
+      "audit_trail": "FAIL",
+      "consent_management": "FAIL"
+    },
+    "iso_27001": {
+      "access_control": "PARTIAL",
+      "encryption_key_management": "PARTIAL",
+      "incident_response": "FAIL",
+      "security_assessments": "FAIL",
+      "backup_recovery": "FAIL"
+    }
+  },
+  "affected_endpoints": [
+    "POST /api/messages - Message file upload",
+    "POST /api/documents/upload - Document upload (test code)",
+    "GET /api/documents/:id - Document download",
+    "GET /api/legal-documents - Legal document listing",
+    "POST /api/legal-documents/:id/download - Legal document download",
+    "GET /api/pdfme/download/:fileName - PDF download",
+    "POST /api/pdfme/generate/invoice - Invoice generation",
+    "POST /api/pdfme/generate/contract - Contract generation",
+    "POST /api/pdfme/generate/receipt - Receipt generation"
+  ],
+  "remediation_priority": {
+    "immediate": [
+      "FILE-001: Implement magic number file validation",
+      "FILE-002: Install ClamAV antivirus scanning",
+      "FILE-004: Add authentication to download endpoints",
+      "FILE-005: Fix message attachment path traversal",
+      "FILE-014: Add upload rate limiting"
+    ],
+    "week_1": [
+      "FILE-003: Migrate to S3 storage",
+      "FILE-009: Implement storage quotas",
+      "FILE-010: Enable S3 server-side encryption",
+      "FILE-012: Implement audit logging",
+      "FILE-020: Add file integrity validation"
+    ],
+    "month_1": [
+      "FILE-011: Harden S3 bucket policies",
+      "FILE-013: Implement data retention policies",
+      "FILE-015: Enable S3 access logging",
+      "FILE-017: Implement PDF cleanup",
+      "FILE-018: Add security headers"
+    ],
+    "ongoing": [
+      "Regular security audits",
+      "Penetration testing",
+      "Monitor audit logs",
+      "Update encryption keys"
+    ]
+  },
+  "estimated_remediation": {
+    "immediate_fixes": "4-6 hours",
+    "week_1_fixes": "3-4 days",
+    "month_1_fixes": "2 weeks",
+    "total_effort": "3-4 weeks with 2 developers"
+  },
+  "business_impact": {
+    "legal_liability": "HIGH - Data breach potential",
+    "compliance_fines": "PDPL fines up to SAR 3 million",
+    "reputational_damage": "SEVERE - Loss of customer trust",
+    "service_disruption": "MEDIUM - Malware could cause outages",
+    "data_loss_risk": "HIGH - No backups with local storage"
+  },
+  "attack_scenarios": [
+    {
+      "scenario": "Malware Distribution",
+      "likelihood": "HIGH",
+      "impact": "CRITICAL",
+      "description": "Attacker uploads malware disguised as PDF, other users download and execute"
+    },
+    {
+      "scenario": "Unauthorized Document Access",
+      "likelihood": "HIGH",
+      "impact": "CRITICAL",
+      "description": "Attacker enumerates and downloads confidential legal documents without authentication"
+    },
+    {
+      "scenario": "Path Traversal Attack",
+      "likelihood": "MEDIUM",
+      "impact": "HIGH",
+      "description": "Attacker uses message attachments to read arbitrary server files"
+    },
+    {
+      "scenario": "Storage DoS Attack",
+      "likelihood": "MEDIUM",
+      "impact": "HIGH",
+      "description": "Attacker exhausts disk space by uploading 50MB files repeatedly"
+    },
+    {
+      "scenario": "Data Exfiltration",
+      "likelihood": "MEDIUM",
+      "impact": "CRITICAL",
+      "description": "Attacker exploits weak access controls to download all legal documents"
+    }
+  ],
+  "recommendations": {
+    "architecture": [
+      "Migrate from local filesystem to AWS S3",
+      "Implement CDN for file downloads",
+      "Use signed URLs for S3 access",
+      "Separate storage for different data classifications"
+    ],
+    "security": [
+      "Deploy ClamAV in production",
+      "Implement comprehensive audit logging",
+      "Add rate limiting on all upload endpoints",
+      "Enable two-factor authentication for document access",
+      "Implement file integrity monitoring"
+    ],
+    "compliance": [
+      "Document data retention policies",
+      "Implement right to erasure",
+      "Add consent tracking for file sharing",
+      "Regular PDPL compliance audits",
+      "Encrypt all sensitive documents at rest"
+    ],
+    "monitoring": [
+      "Set up alerts for failed access attempts",
+      "Monitor virus detection events",
+      "Track storage usage per user",
+      "Alert on unusual download patterns",
+      "Log all document access for forensics"
+    ]
+  }
+}

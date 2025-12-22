@@ -1,0 +1,266 @@
+{
+  "audit": {
+    "date": "2025-12-22",
+    "auditor": "Claude AI Security Analyst",
+    "system": "Traf3li Backend",
+    "scope": "RBAC/ABAC Authorization System",
+    "risk_score": 7.5,
+    "risk_level": "HIGH"
+  },
+  "summary": {
+    "total_vulnerabilities": 12,
+    "critical": 6,
+    "high": 4,
+    "medium": 4,
+    "low": 0
+  },
+  "vulnerabilities": [
+    {
+      "id": "RBAC-001",
+      "title": "Role Hierarchy Bypass via Custom Permissions",
+      "severity": "CRITICAL",
+      "cvss": 9.1,
+      "cwe": "CWE-269",
+      "file": "/home/user/traf3li-backend/src/models/firm.model.js",
+      "lines": "526-551",
+      "function": "addMember",
+      "description": "The addMember() function accepts arbitrary permissions that override default role permissions without validation. An admin could grant a secretary role full permissions by passing custom permissions.",
+      "impact": "Privilege escalation, violates principle of least privilege, bypasses intended role hierarchy",
+      "exploitability": "High",
+      "recommendation": "Add validatePermissionsForRole() function to cap custom permissions at role defaults",
+      "priority": "P0",
+      "timeline": "Fix within 24 hours"
+    },
+    {
+      "id": "RBAC-002",
+      "title": "Missing Authorization Middleware on Sensitive Routes",
+      "severity": "CRITICAL",
+      "cvss": 8.8,
+      "cwe": "CWE-862",
+      "file": "/home/user/traf3li-backend/src/routes/team.route.js",
+      "lines": "70, 73, 55",
+      "routes": [
+        "PATCH /:id/permissions",
+        "PATCH /:id/role",
+        "DELETE /:id"
+      ],
+      "description": "Sensitive routes lack proper authorization middleware. Only controller-level checks exist, violating defense-in-depth principle.",
+      "impact": "Single point of failure, potential authorization bypass if controller validation is compromised",
+      "exploitability": "Medium",
+      "recommendation": "Add firmOwnerOnly middleware to all sensitive routes",
+      "priority": "P0",
+      "timeline": "Fix within 24 hours"
+    },
+    {
+      "id": "RBAC-003",
+      "title": "Race Condition in Role Updates",
+      "severity": "CRITICAL",
+      "cvss": 8.1,
+      "cwe": "CWE-362",
+      "file": "/home/user/traf3li-backend/src/controllers/team.controller.js",
+      "lines": "655-657",
+      "function": "changeRole",
+      "description": "Role updates to Staff and User models are not atomic. Between member.save() and User.findByIdAndUpdate(), user could make requests with old role but new permissions.",
+      "impact": "Temporary privilege escalation window, inconsistent authorization state",
+      "exploitability": "Medium",
+      "recommendation": "Use MongoDB transactions with session.startTransaction() for atomic updates",
+      "priority": "P0",
+      "timeline": "Fix within 48 hours"
+    },
+    {
+      "id": "RBAC-004",
+      "title": "Owner Role Escalation Vulnerability",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "cwe": "CWE-269",
+      "file": "/home/user/traf3li-backend/src/controllers/team.controller.js",
+      "lines": "614-633",
+      "function": "changeRole",
+      "description": "Function checks that target is not owner but doesn't check if new role is owner. System allows creating multiple owners by changing any member's role to 'owner'.",
+      "impact": "Complete privilege escalation, multiple owners possible, ownership transfer bypass",
+      "exploitability": "High",
+      "recommendation": "Block role === 'owner' assignment in changeRole function",
+      "priority": "P0",
+      "timeline": "Fix within 24 hours"
+    },
+    {
+      "id": "RBAC-005",
+      "title": "Departed User Reinstatement Privilege Escalation",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "cwe": "CWE-269",
+      "file": "/home/user/traf3li-backend/src/models/firm.model.js",
+      "lines": "737-769",
+      "function": "reinstateMember",
+      "description": "reinstateMember() accepts any role without validation. Departed user could be reinstated as owner, bypassing role hierarchy.",
+      "impact": "Privilege escalation, unauthorized access restoration",
+      "exploitability": "Medium",
+      "recommendation": "Add validation to prevent reinstating as 'owner', validate role is in allowed list",
+      "priority": "P1",
+      "timeline": "Fix within 1 week"
+    },
+    {
+      "id": "RBAC-006",
+      "title": "Team Invitation Role Validation Bypass",
+      "severity": "CRITICAL",
+      "cvss": 9.1,
+      "cwe": "CWE-269",
+      "file": "/home/user/traf3li-backend/src/controllers/team.controller.js",
+      "lines": "243-359",
+      "function": "inviteTeamMember",
+      "description": "inviteTeamMember() accepts arbitrary roles from request body without validation. Admin could invite new member as 'owner', creating multiple owners.",
+      "impact": "Complete authorization bypass, circumvents ownership transfer process",
+      "exploitability": "High",
+      "recommendation": "Block 'owner' role in invitations, require owner approval for 'admin' invites",
+      "priority": "P0",
+      "timeline": "Fix within 24 hours"
+    },
+    {
+      "id": "RBAC-007",
+      "title": "Permission Policy Modification Without Validation",
+      "severity": "HIGH",
+      "cvss": 7.3,
+      "cwe": "CWE-284",
+      "file": "/home/user/traf3li-backend/src/models/permission.model.js",
+      "lines": "224-252",
+      "function": "upsertPolicy",
+      "description": "upsertPolicy() may allow modifying system policies if isSystem flag is manipulated in the policy parameter.",
+      "impact": "System policy tampering, authorization framework compromise",
+      "exploitability": "Low",
+      "recommendation": "Always preserve isSystem flag from existing policy, force new policies to isSystem: false",
+      "priority": "P1",
+      "timeline": "Fix within 1 week"
+    },
+    {
+      "id": "RBAC-008",
+      "title": "Insufficient Validation in updateMember",
+      "severity": "HIGH",
+      "cvss": 7.8,
+      "cwe": "CWE-269",
+      "file": "/home/user/traf3li-backend/src/models/firm.model.js",
+      "lines": "576-597",
+      "function": "updateMember",
+      "description": "updateMember() accepts any role and permissions without validation. Model-level function bypasses controller authorization.",
+      "impact": "Privilege escalation if called from compromised code, direct database manipulation possible",
+      "exploitability": "Medium",
+      "recommendation": "Add role and permission validation, prevent escalation to owner, validate status changes",
+      "priority": "P1",
+      "timeline": "Fix within 1 week"
+    },
+    {
+      "id": "RBAC-009",
+      "title": "Permission Cache Invalidation Issues",
+      "severity": "MEDIUM",
+      "cvss": 5.4,
+      "cwe": "CWE-524",
+      "file": "/home/user/traf3li-backend/src/services/permissionEnforcer.service.js",
+      "lines": "661-669",
+      "function": "invalidateCacheForResource",
+      "description": "Cache invalidation is limited to specific resources. Policy changes, role hierarchy changes, and permission updates don't invalidate cache. Stale permissions cached for up to 5 minutes.",
+      "impact": "User might retain old permissions for up to 5 minutes, security policy changes delayed, privilege escalation window",
+      "exploitability": "Low",
+      "recommendation": "Implement firm-wide cache invalidation on policy/permission changes",
+      "priority": "P1",
+      "timeline": "Fix within 2 weeks"
+    },
+    {
+      "id": "RBAC-010",
+      "title": "Cross-Tenant Data Leakage via Populate",
+      "severity": "MEDIUM",
+      "cvss": 5.9,
+      "cwe": "CWE-639",
+      "file": "/home/user/traf3li-backend/src/controllers/team.controller.js",
+      "lines": "154-156",
+      "function": "getTeam",
+      "description": "Mongoose .populate() calls don't validate populated documents' firmId. If reportsTo points to user in different firm, data leakage possible.",
+      "impact": "Cross-tenant information disclosure",
+      "exploitability": "Low",
+      "recommendation": "Add match: { firmId } to populate options, filter out null populated fields",
+      "priority": "P2",
+      "timeline": "Fix within 2 weeks"
+    },
+    {
+      "id": "RBAC-011",
+      "title": "Solo Lawyer to Firm Conversion Data Migration Gap",
+      "severity": "MEDIUM",
+      "cvss": 5.3,
+      "cwe": "CWE-404",
+      "file": "/home/user/traf3li-backend/src/middlewares/firmFilter.middleware.js",
+      "lines": "67-107",
+      "function": "firmFilter",
+      "description": "Solo lawyer has firmId = null, firmQuery filters by lawyerId. When they join a firm, no validation ensures proper data migration. Old data becomes inaccessible.",
+      "impact": "Data loss when solo lawyer joins firm, orphaned records",
+      "exploitability": "Low",
+      "recommendation": "Implement migrateSoloLawyerToFirm() function with transaction support",
+      "priority": "P2",
+      "timeline": "Fix within 1 month"
+    },
+    {
+      "id": "RBAC-012",
+      "title": "Mass Assignment in Permission Updates",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "cwe": "CWE-915",
+      "file": "/home/user/traf3li-backend/src/controllers/team.controller.js",
+      "lines": "568-576",
+      "function": "updatePermissions",
+      "description": "updatePermissions() accepts raw permissions object without sanitization. Client can send arbitrary permission structure, inject malicious permission keys, bypass permission level validation.",
+      "impact": "Privilege escalation via mass assignment",
+      "exploitability": "Medium",
+      "recommendation": "Whitelist valid modules and levels, validate against role defaults, sanitize input",
+      "priority": "P1",
+      "timeline": "Fix within 1 week"
+    }
+  ],
+  "recommendations": {
+    "immediate": [
+      "Add role validation to addMember() function",
+      "Add authorization middleware to sensitive routes",
+      "Block 'owner' role in changeRole() function",
+      "Validate invitation roles",
+      "Implement atomic transactions for role updates"
+    ],
+    "high_priority": [
+      "Enhance permission validation in updateMember()",
+      "Add validation to departed user reinstatement",
+      "Improve cache invalidation",
+      "Add mass assignment protection"
+    ],
+    "medium_priority": [
+      "Add populate validation",
+      "Implement solo lawyer migration",
+      "Enhanced audit logging",
+      "Add API rate limiting"
+    ]
+  },
+  "compliance": {
+    "pdpl": {
+      "status": "PARTIAL",
+      "issues": [
+        "Authorization gaps could lead to unauthorized data access",
+        "Data residency enforcement exists but authorization weaknesses remain"
+      ]
+    },
+    "iso27001": {
+      "status": "NON_COMPLIANT",
+      "failed_controls": [
+        "A.9.2.3 - Management of privileged access rights"
+      ]
+    },
+    "soc2": {
+      "status": "CONTROL_DEFICIENCY",
+      "issues": [
+        "Access control testing would fail due to privilege escalation vulnerabilities"
+      ]
+    }
+  },
+  "test_cases": [
+    "Test preventing secretary from gaining admin permissions via custom permissions",
+    "Test preventing multiple owners via invitation",
+    "Test preventing role change to owner",
+    "Test multi-tenancy isolation prevents cross-tenant data access",
+    "Test departed user restrictions to read-only assigned cases",
+    "Test cache invalidation on permission changes",
+    "Test atomic role updates prevent race conditions"
+  ]
+}

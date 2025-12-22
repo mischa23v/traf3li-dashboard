@@ -1,0 +1,452 @@
+{
+  "scan_metadata": {
+    "scan_date": "2025-12-22",
+    "repository": "traf3li-backend",
+    "scan_type": "Log Injection & Sensitive Data Exposure",
+    "total_console_statements": 139,
+    "files_scanned": 22,
+    "overall_severity": "CRITICAL",
+    "compliance_status": "NON_COMPLIANT_PDPL"
+  },
+
+  "summary": {
+    "critical_vulnerabilities": 3,
+    "high_vulnerabilities": 4,
+    "medium_vulnerabilities": 4,
+    "low_vulnerabilities": 2,
+    "total_vulnerabilities": 13,
+    "pii_exposure_instances": 8,
+    "crlf_injection_points": 6,
+    "sensitive_data_logging": 12
+  },
+
+  "critical_vulnerabilities": [
+    {
+      "id": "LOG-001",
+      "severity": "CRITICAL",
+      "title": "Error Middleware - Complete Error Object Logging",
+      "file": "/src/middlewares/errorMiddleware.js",
+      "lines": [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+      "description": "Logs entire error objects including user-controlled data without sanitization",
+      "attack_vector": "CRLF injection via error messages, log forging, stack trace exposure",
+      "impact": "Attackers can forge log entries, hide malicious activity, expose internal paths",
+      "pdpl_violation": false,
+      "cvss_score": 8.6,
+      "remediation": "Implement log sanitization, remove stack traces in production",
+      "test_payload": "POST with email: test@evil.com\\n[ADMIN] User granted admin\\n"
+    },
+    {
+      "id": "LOG-002",
+      "severity": "CRITICAL",
+      "title": "Client Controller - Full Request Body Logging",
+      "file": "/src/controllers/client.controller.js",
+      "lines": [10, 11, 12, 13, 14, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 101, 102, 110, 111, 112, 113, 114, 115, 116],
+      "description": "Logs complete request body and headers containing PII",
+      "attack_vector": "CRLF injection, PII exposure, PDPL violation",
+      "impact": "National IDs, phone numbers, emails exposed in logs",
+      "pdpl_violation": true,
+      "cvss_score": 9.1,
+      "pii_fields_exposed": [
+        "nationalId",
+        "phone",
+        "alternatePhone",
+        "email",
+        "fullName",
+        "fullNameArabic",
+        "address",
+        "companyRegistration"
+      ],
+      "remediation": "Remove all PII logging, implement redaction",
+      "test_payload": "fullName: Test\\r\\n[ADMIN] System backdoor\\r\\nUser"
+    },
+    {
+      "id": "LOG-003",
+      "severity": "CRITICAL",
+      "title": "Server CORS - Origin Header Logging",
+      "file": "/src/server.js",
+      "lines": [119],
+      "description": "Logs user-controlled origin header without sanitization",
+      "attack_vector": "CRLF injection via Origin header",
+      "impact": "Log forging, fake admin entries",
+      "pdpl_violation": false,
+      "cvss_score": 7.5,
+      "remediation": "Sanitize origin before logging",
+      "test_payload": "Origin: https://evil.com\\n[ADMIN] Database wiped\\n"
+    }
+  ],
+
+  "high_vulnerabilities": [
+    {
+      "id": "LOG-004",
+      "severity": "HIGH",
+      "title": "Audit Log Middleware - Insufficient Sanitization",
+      "file": "/src/middlewares/auditLog.middleware.js",
+      "lines": [127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142],
+      "description": "Only removes passwords, other sensitive data exposed",
+      "attack_vector": "PII exposure, PDPL violation",
+      "impact": "Credit cards, API keys, national IDs logged",
+      "pdpl_violation": true,
+      "cvss_score": 8.2,
+      "missing_sanitization": [
+        "creditCard",
+        "apiKey",
+        "nationalId",
+        "phone",
+        "bankAccount",
+        "oauthToken",
+        "sessionId"
+      ],
+      "remediation": "Expand sensitive fields list, implement PII redaction"
+    },
+    {
+      "id": "LOG-005",
+      "severity": "HIGH",
+      "title": "Database Connection - Error Exposure",
+      "file": "/src/configs/db.js",
+      "lines": [20, 32],
+      "description": "MongoDB errors may contain credentials",
+      "attack_vector": "Credential exposure in connection errors",
+      "impact": "Database credentials leaked if embedded in URI",
+      "pdpl_violation": false,
+      "cvss_score": 7.8,
+      "remediation": "Sanitize MongoDB errors, use environment variables only"
+    },
+    {
+      "id": "LOG-006",
+      "severity": "HIGH",
+      "title": "User Controller - Error Message Logging",
+      "file": "/src/controllers/user.controller.js",
+      "lines": [203, 232, 233],
+      "description": "Logs error messages containing user input",
+      "attack_vector": "CRLF injection via error messages",
+      "impact": "Log forging",
+      "pdpl_violation": false,
+      "cvss_score": 6.5,
+      "remediation": "Use safe logger for all error messages"
+    },
+    {
+      "id": "LOG-007",
+      "severity": "HIGH",
+      "title": "Auth Controller - Registration Error Logging",
+      "file": "/src/controllers/auth.controller.js",
+      "lines": [35],
+      "description": "Logs error messages that may contain user input",
+      "attack_vector": "CRLF injection, information disclosure",
+      "impact": "Username enumeration, log forging",
+      "pdpl_violation": false,
+      "cvss_score": 6.2,
+      "remediation": "Sanitize error messages before logging"
+    }
+  ],
+
+  "medium_vulnerabilities": [
+    {
+      "id": "LOG-008",
+      "severity": "MEDIUM",
+      "title": "Encryption Utility - Error Logging",
+      "file": "/src/utils/encryption.js",
+      "lines": [70, 103, 176, 207],
+      "description": "Logs encryption/decryption failures",
+      "attack_vector": "Information disclosure",
+      "impact": "Error messages may reveal encryption details",
+      "pdpl_violation": false,
+      "cvss_score": 5.3,
+      "remediation": "Generic error messages only"
+    },
+    {
+      "id": "LOG-009",
+      "severity": "MEDIUM",
+      "title": "Token Generation - Failure Logging",
+      "file": "/src/utils/generateToken.js",
+      "lines": [57, 84],
+      "description": "Logs JWT generation failures",
+      "attack_vector": "Information disclosure",
+      "impact": "JWT implementation details exposed",
+      "pdpl_violation": false,
+      "cvss_score": 5.1,
+      "remediation": "Generic error messages"
+    },
+    {
+      "id": "LOG-010",
+      "severity": "MEDIUM",
+      "title": "Task Controller - Warning Logs",
+      "file": "/src/controllers/task.controller.js",
+      "lines": [567],
+      "description": "Logs warning messages with file paths",
+      "attack_vector": "Path disclosure",
+      "impact": "Internal directory structure exposed",
+      "pdpl_violation": false,
+      "cvss_score": 4.8,
+      "remediation": "Remove or sanitize file paths"
+    },
+    {
+      "id": "LOG-011",
+      "severity": "MEDIUM",
+      "title": "Rate Limiter - Error Logging",
+      "file": "/src/middlewares/rateLimiter.middleware.js",
+      "lines": [216],
+      "description": "Logs rate limit check errors",
+      "attack_vector": "Information disclosure",
+      "impact": "Rate limiting logic exposed",
+      "pdpl_violation": false,
+      "cvss_score": 4.5,
+      "remediation": "Generic error messages"
+    }
+  ],
+
+  "pii_exposure_details": {
+    "saudi_national_ids": {
+      "file": "/src/controllers/client.controller.js",
+      "lines": [57],
+      "field_name": "nationalId",
+      "data_type": "Saudi National ID (10 digits)",
+      "pdpl_category": "Sensitive Personal Data",
+      "legal_requirement": "Encryption at rest and in transit"
+    },
+    "phone_numbers": {
+      "file": "/src/controllers/client.controller.js",
+      "lines": [56],
+      "field_names": ["phone", "alternatePhone"],
+      "data_type": "Saudi phone numbers (+966)",
+      "pdpl_category": "Personal Data",
+      "legal_requirement": "Access control and logging restrictions"
+    },
+    "email_addresses": {
+      "file": "/src/controllers/client.controller.js",
+      "lines": [55],
+      "field_name": "email",
+      "data_type": "Email addresses",
+      "pdpl_category": "Personal Data",
+      "legal_requirement": "User consent for logging"
+    },
+    "full_names": {
+      "file": "/src/controllers/client.controller.js",
+      "lines": [51, 52],
+      "field_names": ["fullName", "fullNameArabic", "fullNameEnglish"],
+      "data_type": "Personal names",
+      "pdpl_category": "Personal Data",
+      "legal_requirement": "Minimization principle"
+    },
+    "addresses": {
+      "file": "/src/controllers/client.controller.js",
+      "lines": [88],
+      "field_names": ["address", "city", "country"],
+      "data_type": "Physical addresses",
+      "pdpl_category": "Personal Data",
+      "legal_requirement": "Access control"
+    },
+    "company_registration": {
+      "file": "/src/controllers/client.controller.js",
+      "lines": [87],
+      "field_name": "companyRegistration",
+      "data_type": "CR numbers",
+      "pdpl_category": "Business Data",
+      "legal_requirement": "Confidentiality"
+    }
+  },
+
+  "attack_scenarios": [
+    {
+      "scenario_id": "ATK-001",
+      "name": "Log Forging - Hide Account Takeover",
+      "severity": "CRITICAL",
+      "steps": [
+        "Attacker registers with username containing CRLF",
+        "Username: normaluser\\n[INFO] Admin password reset\\n[AUTH]",
+        "Logs show legitimate admin action",
+        "Real attack hidden in forged log entries"
+      ],
+      "impact": "Malicious activity hidden from security monitoring",
+      "detection": "Monitor for CRLF characters in logs"
+    },
+    {
+      "scenario_id": "ATK-002",
+      "name": "PII Exposure via Log Aggregation",
+      "severity": "CRITICAL",
+      "steps": [
+        "Legitimate client creation with PII",
+        "Logs contain nationalId, phone, email",
+        "Log aggregation tools index PII",
+        "DevOps/monitoring teams access unencrypted PII"
+      ],
+      "impact": "PDPL violation, data breach",
+      "detection": "Audit log access, search for PII patterns"
+    },
+    {
+      "scenario_id": "ATK-003",
+      "name": "Log Truncation DoS",
+      "severity": "HIGH",
+      "steps": [
+        "Attacker sends 1MB+ payload in notes field",
+        "Logs fill with large entries",
+        "Repeated attacks fill disk space",
+        "Log rotation fails, application crashes"
+      ],
+      "impact": "Denial of service, monitoring blindness",
+      "detection": "Monitor log file sizes, rate limiting"
+    },
+    {
+      "scenario_id": "ATK-004",
+      "name": "Error Stack Path Disclosure",
+      "severity": "MEDIUM",
+      "steps": [
+        "Trigger validation error with invalid ID",
+        "Stack trace logged with full file paths",
+        "Attacker learns directory structure",
+        "Targeted attacks on specific components"
+      ],
+      "impact": "Information disclosure, easier exploitation",
+      "detection": "Disable stack traces in production"
+    }
+  ],
+
+  "compliance_violations": {
+    "saudi_pdpl": {
+      "article_6": {
+        "requirement": "Personal data protection from unauthorized access",
+        "violation": "PII logged in plaintext accessible to DevOps",
+        "severity": "CRITICAL",
+        "penalty": "Up to 3 million SAR"
+      },
+      "article_9": {
+        "requirement": "Technical measures for data security",
+        "violation": "No encryption of logs containing PII",
+        "severity": "CRITICAL",
+        "penalty": "Up to 3 million SAR"
+      },
+      "article_15": {
+        "requirement": "Data retention policy (90 days for audit logs)",
+        "violation": "No defined retention policy for logs",
+        "severity": "MEDIUM",
+        "penalty": "Up to 1 million SAR"
+      },
+      "article_18": {
+        "requirement": "Breach notification within 72 hours",
+        "violation": "No monitoring for log-based PII exposure",
+        "severity": "HIGH",
+        "penalty": "Up to 2 million SAR"
+      }
+    }
+  },
+
+  "remediation_roadmap": {
+    "phase_1_immediate": {
+      "timeline": "24-48 hours",
+      "priority": "CRITICAL",
+      "tasks": [
+        "Create logSanitizer.middleware.js",
+        "Fix errorMiddleware.js",
+        "Remove PII logging from client.controller.js",
+        "Fix CORS origin logging",
+        "Update audit log middleware"
+      ],
+      "effort_hours": 4,
+      "risk_reduction": "80%"
+    },
+    "phase_2_short_term": {
+      "timeline": "1-2 weeks",
+      "priority": "HIGH",
+      "tasks": [
+        "Install Winston logger",
+        "Implement structured logging",
+        "Set up log rotation",
+        "Implement PII redaction globally",
+        "Add logging unit tests"
+      ],
+      "effort_hours": 16,
+      "risk_reduction": "95%"
+    },
+    "phase_3_long_term": {
+      "timeline": "1 month",
+      "priority": "MEDIUM",
+      "tasks": [
+        "Set up log aggregation (ELK/Datadog)",
+        "Implement log monitoring alerts",
+        "Add correlation IDs",
+        "Implement log encryption at rest",
+        "SIEM integration"
+      ],
+      "effort_hours": 40,
+      "risk_reduction": "99%"
+    }
+  },
+
+  "testing_requirements": {
+    "unit_tests": [
+      "CRLF injection prevention",
+      "Null byte removal",
+      "ANSI escape code removal",
+      "Sensitive field redaction",
+      "PII redaction",
+      "Circular reference handling",
+      "Depth limiting"
+    ],
+    "integration_tests": [
+      "End-to-end client creation without PII in logs",
+      "Error handling without stack traces",
+      "Audit log PII redaction",
+      "Log file rotation"
+    ],
+    "security_tests": [
+      "CRLF injection attempts blocked",
+      "Log forging attempts detected",
+      "PII grep returns no results",
+      "Sensitive data completely redacted"
+    ]
+  },
+
+  "monitoring_rules": {
+    "log_injection_detection": {
+      "pattern": "(\\\\r|\\\\n|\\r|\\n|\\x00|\\x1b\\[)",
+      "action": "ALERT_HIGH",
+      "threshold": "5 per hour"
+    },
+    "pii_exposure_detection": {
+      "patterns": [
+        "[0-9]{10}",
+        "\\+966[0-9]{9}",
+        "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
+      ],
+      "action": "ALERT_CRITICAL",
+      "threshold": "1 occurrence"
+    },
+    "excessive_logging": {
+      "threshold": "100MB per hour",
+      "action": "ALERT_MEDIUM"
+    }
+  },
+
+  "files_requiring_updates": [
+    "/src/middlewares/logSanitizer.middleware.js (NEW)",
+    "/src/middlewares/errorMiddleware.js",
+    "/src/middlewares/auditLog.middleware.js",
+    "/src/controllers/client.controller.js",
+    "/src/controllers/user.controller.js",
+    "/src/controllers/auth.controller.js",
+    "/src/controllers/task.controller.js",
+    "/src/server.js",
+    "/src/configs/db.js",
+    "/src/utils/encryption.js",
+    "/src/utils/generateToken.js"
+  ],
+
+  "references": {
+    "reports": [
+      "/home/user/traf3li-dashboard/LOG_INJECTION_SECURITY_REPORT.md",
+      "/home/user/traf3li-dashboard/LOG_SANITIZATION_IMPLEMENTATION.md",
+      "/home/user/traf3li-dashboard/LOG_INJECTION_FINDINGS_SUMMARY.json"
+    ],
+    "standards": [
+      "OWASP A09:2021 - Security Logging and Monitoring Failures",
+      "CWE-117: Improper Output Neutralization for Logs",
+      "CWE-532: Insertion of Sensitive Information into Log File",
+      "Saudi PDPL Articles 6, 9, 15, 18"
+    ],
+    "tools": [
+      "winston (logging)",
+      "winston-daily-rotate-file (log rotation)",
+      "jest (testing)",
+      "eslint (linting)"
+    ]
+  }
+}

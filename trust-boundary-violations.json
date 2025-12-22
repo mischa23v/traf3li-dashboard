@@ -1,0 +1,306 @@
+{
+  "scan_date": "2025-12-22",
+  "repository": "traf3li-backend",
+  "overall_severity": "CRITICAL",
+  "severity_score": 9.8,
+  "total_violations": 10,
+  "critical_count": 4,
+  "high_count": 3,
+  "medium_count": 3,
+
+  "violations": [
+    {
+      "id": "TBV-001",
+      "severity": "CRITICAL",
+      "score": 10.0,
+      "title": "Client-Controlled Role Assignment",
+      "category": "Privilege Escalation",
+      "file": "src/controllers/auth.controller.js",
+      "line": 24,
+      "code": "role: role || (isSeller ? 'lawyer' : 'client')",
+      "description": "Clients can specify their own role during registration, allowing direct privilege escalation to admin",
+      "impact": [
+        "Complete system compromise",
+        "Unauthorized admin access",
+        "Access to all sensitive data"
+      ],
+      "attack_vector": "POST /api/auth/register with role=admin",
+      "remediation": "Remove role from request body, set roles server-side only",
+      "cwe": "CWE-269: Improper Privilege Management"
+    },
+    {
+      "id": "TBV-002",
+      "severity": "CRITICAL",
+      "score": 9.5,
+      "title": "Mass Assignment - Invoice Update",
+      "category": "Mass Assignment",
+      "file": "src/controllers/invoice.controller.js",
+      "line": 149,
+      "code": "{ $set: request.body }",
+      "description": "Entire request body is used to update invoice, allowing modification of protected fields",
+      "impact": [
+        "Financial fraud (changing amounts)",
+        "Status manipulation (mark as paid)",
+        "Ownership theft"
+      ],
+      "attack_vector": "PUT /api/invoices/:id with arbitrary fields",
+      "remediation": "Use allowlist of updatable fields",
+      "cwe": "CWE-915: Improperly Controlled Modification of Dynamically-Determined Object Attributes"
+    },
+    {
+      "id": "TBV-003",
+      "severity": "CRITICAL",
+      "score": 9.5,
+      "title": "Mass Assignment - Job Update",
+      "category": "Mass Assignment",
+      "file": "src/controllers/job.controller.js",
+      "line": 73,
+      "code": "Object.assign(job, req.body)",
+      "description": "Object.assign spreads all request body fields into job object",
+      "impact": [
+        "Ownership theft (userID manipulation)",
+        "Status manipulation",
+        "Metrics fraud"
+      ],
+      "attack_vector": "PUT /api/jobs/:id with protected fields",
+      "remediation": "Use explicit field extraction and allowlist",
+      "cwe": "CWE-915: Improperly Controlled Modification of Dynamically-Determined Object Attributes"
+    },
+    {
+      "id": "TBV-004",
+      "severity": "CRITICAL",
+      "score": 9.0,
+      "title": "Mass Assignment - Spread Operators in Create",
+      "category": "Mass Assignment",
+      "files": [
+        "src/controllers/job.controller.js:9",
+        "src/controllers/proposal.controller.js:21",
+        "src/controllers/benefit.controller.js:317"
+      ],
+      "code": "{ ...req.body, userID: req.userID }",
+      "description": "Spread operator allows setting any model field during creation",
+      "impact": [
+        "Bypass business logic",
+        "Set protected fields",
+        "Data integrity issues"
+      ],
+      "attack_vector": "POST /api/jobs with status, proposalsCount, etc.",
+      "remediation": "Extract allowed fields explicitly",
+      "cwe": "CWE-915: Improperly Controlled Modification of Dynamically-Determined Object Attributes"
+    },
+    {
+      "id": "TBV-005",
+      "severity": "HIGH",
+      "score": 8.5,
+      "title": "IP Address Spoofing via Headers",
+      "category": "Header Trust",
+      "files": [
+        "src/middlewares/adminIPWhitelist.middleware.js:118-138",
+        "src/middlewares/auditLog.middleware.js:64"
+      ],
+      "code": "req.headers['x-forwarded-for']?.split(',')[0]",
+      "description": "X-Forwarded-For and other headers are trusted without validation",
+      "impact": [
+        "Bypass IP-based access controls",
+        "False audit logs",
+        "Admin access from unauthorized IPs"
+      ],
+      "attack_vector": "Set X-Forwarded-For header to whitelisted IP",
+      "remediation": "Configure Express trust proxy, validate proxy chain",
+      "cwe": "CWE-290: Authentication Bypass by Spoofing"
+    },
+    {
+      "id": "TBV-006",
+      "severity": "HIGH",
+      "score": 7.0,
+      "title": "User-Agent Header Trust",
+      "category": "Header Trust",
+      "files": [
+        "src/controllers/timeTracking.controller.js",
+        "src/controllers/payment.controller.js",
+        "src/controllers/retainer.controller.js"
+      ],
+      "code": "userAgent: req.get('user-agent')",
+      "description": "User-Agent header stored without validation or sanitization",
+      "impact": [
+        "Log injection",
+        "Potential XSS in log viewers",
+        "False tracking data"
+      ],
+      "attack_vector": "Send malicious User-Agent header",
+      "remediation": "Sanitize User-Agent before storage",
+      "cwe": "CWE-117: Improper Output Neutralization for Logs"
+    },
+    {
+      "id": "TBV-007",
+      "severity": "HIGH",
+      "score": 7.5,
+      "title": "Environment Detection via Origin Header",
+      "category": "Environment Confusion",
+      "file": "src/controllers/auth.controller.js",
+      "lines": [76, 77, 107, 108],
+      "code": "const isLocalhost = origin.includes('localhost')",
+      "description": "Security settings (cookie secure flag) based on client-controlled Origin header",
+      "impact": [
+        "Insecure cookie settings in production",
+        "Potential session theft",
+        "CSRF vulnerabilities"
+      ],
+      "attack_vector": "Send Origin: http://localhost header in production",
+      "remediation": "Use process.env.NODE_ENV for environment detection",
+      "cwe": "CWE-807: Reliance on Untrusted Inputs in a Security Decision"
+    },
+    {
+      "id": "TBV-008",
+      "severity": "MEDIUM",
+      "score": 6.5,
+      "title": "Direct Object References Without Validation",
+      "category": "IDOR",
+      "files": [
+        "src/controllers/job.controller.js:63,85",
+        "src/controllers/proposal.controller.js:8,56,92"
+      ],
+      "code": "Job.findById(req.params._id)",
+      "description": "Client-provided IDs used directly without format validation",
+      "impact": [
+        "Potential unauthorized access",
+        "Information disclosure"
+      ],
+      "attack_vector": "Provide arbitrary IDs in URL parameters",
+      "remediation": "Validate ObjectId format, verify ownership",
+      "cwe": "CWE-639: Authorization Bypass Through User-Controlled Key"
+    },
+    {
+      "id": "TBV-009",
+      "severity": "MEDIUM",
+      "score": 6.0,
+      "title": "Missing Input Validation",
+      "category": "Input Validation",
+      "files": "All 35 controller files",
+      "description": "No validation library in use, minimal manual validation",
+      "impact": [
+        "Invalid data in database",
+        "Type confusion attacks",
+        "Unexpected behavior"
+      ],
+      "attack_vector": "Send invalid data types, ranges, formats",
+      "remediation": "Implement Joi validation for all endpoints",
+      "cwe": "CWE-20: Improper Input Validation"
+    },
+    {
+      "id": "TBV-010",
+      "severity": "MEDIUM",
+      "score": 6.5,
+      "title": "Client-Controlled Foreign Keys",
+      "category": "Data Tampering",
+      "file": "src/controllers/proposal.controller.js",
+      "line": 26,
+      "code": "Job.findByIdAndUpdate(req.body.jobId, { $inc: { proposalsCount: 1 } })",
+      "description": "Client provides jobId which is used to increment proposal count",
+      "impact": [
+        "Metrics manipulation",
+        "Inflate competitor proposal counts",
+        "Resource state tampering"
+      ],
+      "attack_vector": "Provide different jobId in request body",
+      "remediation": "Verify job ownership before incrementing",
+      "cwe": "CWE-472: External Control of Assumed-Immutable Web Parameter"
+    }
+  ],
+
+  "trust_boundaries_violated": [
+    {
+      "boundary": "External Client → Backend Server (Input)",
+      "violations": ["Mass Assignment", "Role Assignment", "Missing Validation", "IDOR"],
+      "count": 8
+    },
+    {
+      "boundary": "External Client → Backend Server (Headers)",
+      "violations": ["IP Spoofing", "User-Agent Trust", "Environment Detection"],
+      "count": 3
+    },
+    {
+      "boundary": "Backend Server → Database",
+      "violations": ["Unvalidated Updates", "Foreign Key Manipulation"],
+      "count": 2
+    }
+  ],
+
+  "attack_scenarios": [
+    {
+      "name": "Privilege Escalation to Admin",
+      "steps": [
+        "POST /api/auth/register",
+        "Include role: 'admin' in request body",
+        "Gain full admin access"
+      ],
+      "severity": "CRITICAL"
+    },
+    {
+      "name": "Invoice Amount Manipulation",
+      "steps": [
+        "PUT /api/invoices/:id",
+        "Include total: 1, status: 'paid' in request body",
+        "Avoid payment, reduce bill to $1"
+      ],
+      "severity": "CRITICAL"
+    },
+    {
+      "name": "IP Whitelist Bypass",
+      "steps": [
+        "Set X-Forwarded-For: <whitelisted-admin-ip>",
+        "GET /api/admin/users",
+        "Bypass IP-based access control"
+      ],
+      "severity": "HIGH"
+    }
+  ],
+
+  "remediation_priority": [
+    {
+      "priority": "P1 - Immediate (24-48 hours)",
+      "items": [
+        "Fix client-controlled role assignment",
+        "Implement allowlist for invoice/job updates",
+        "Remove Object.assign and spread operators"
+      ]
+    },
+    {
+      "priority": "P2 - Urgent (1 week)",
+      "items": [
+        "Configure trust proxy properly",
+        "Use NODE_ENV for environment detection",
+        "Sanitize User-Agent headers",
+        "Implement Joi validation"
+      ]
+    },
+    {
+      "priority": "P3 - Important (1 month)",
+      "items": [
+        "Add ObjectId validation middleware",
+        "Comprehensive input sanitization",
+        "Enhanced audit logging",
+        "Security test suite"
+      ]
+    }
+  ],
+
+  "recommended_libraries": [
+    "joi - Input validation",
+    "express-validator - Alternative input validation",
+    "express-mongo-sanitize - NoSQL injection prevention",
+    "hpp - HTTP Parameter Pollution prevention",
+    "validator - String validation/sanitization"
+  ],
+
+  "compliance_impact": {
+    "PDPL": "Critical violations in data integrity and access control",
+    "PCI-DSS": "Payment data manipulation vulnerabilities",
+    "OWASP_Top_10": [
+      "A01:2021 - Broken Access Control",
+      "A03:2021 - Injection",
+      "A04:2021 - Insecure Design",
+      "A07:2021 - Identification and Authentication Failures"
+    ]
+  }
+}

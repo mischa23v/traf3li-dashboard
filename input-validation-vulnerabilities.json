@@ -1,0 +1,665 @@
+{
+  "scan_metadata": {
+    "scan_date": "2025-12-22",
+    "repository": "traf3li-backend",
+    "severity": "CRITICAL",
+    "risk_score": 9.5,
+    "total_vulnerable_endpoints": 35,
+    "total_controllers": 35,
+    "validation_library_installed": false
+  },
+  "critical_findings": {
+    "no_validation_library": {
+      "severity": "CRITICAL",
+      "description": "No Joi or express-validator installed",
+      "impact": "All endpoints accept any data type without validation"
+    },
+    "direct_input_usage": {
+      "severity": "CRITICAL",
+      "description": "165+ direct req.body/req.query/req.params usages",
+      "impact": "No protection against injection attacks"
+    },
+    "no_validation_middleware": {
+      "severity": "CRITICAL",
+      "description": "No validation middleware exists in codebase",
+      "impact": "Cannot enforce validation at route level"
+    }
+  },
+  "vulnerable_endpoints": [
+    {
+      "id": 1,
+      "path": "/api/auth/register",
+      "method": "POST",
+      "controller": "auth.controller.js",
+      "line": 10,
+      "severity": "CRITICAL",
+      "vulnerabilities": [
+        "No username validation (accepts objects, arrays)",
+        "No email format validation",
+        "No password strength requirements",
+        "Role injection possible (can set role='admin')",
+        "No length limits on any field",
+        "NoSQL injection via object injection"
+      ],
+      "attack_vectors": [
+        {
+          "type": "NoSQL Injection",
+          "payload": {
+            "username": { "$ne": null },
+            "password": { "$ne": null }
+          }
+        },
+        {
+          "type": "Role Escalation",
+          "payload": {
+            "username": "hacker",
+            "email": "hack@test.com",
+            "password": "pass",
+            "role": "admin"
+          }
+        }
+      ],
+      "recommended_fix": "Implement registerSchema with Joi validation"
+    },
+    {
+      "id": 2,
+      "path": "/api/auth/login",
+      "method": "POST",
+      "controller": "auth.controller.js",
+      "line": 50,
+      "severity": "CRITICAL",
+      "vulnerabilities": [
+        "NoSQL injection in username field",
+        "Accepts objects instead of strings",
+        "No input sanitization"
+      ],
+      "attack_vectors": [
+        {
+          "type": "Authentication Bypass",
+          "payload": {
+            "username": { "$ne": null },
+            "password": { "$ne": null }
+          }
+        }
+      ],
+      "recommended_fix": "Implement loginSchema with string validation only"
+    },
+    {
+      "id": 3,
+      "path": "/api/payments",
+      "method": "POST",
+      "controller": "payment.controller.js",
+      "line": 10,
+      "severity": "CRITICAL",
+      "vulnerabilities": [
+        "Amount accepts negative values",
+        "Amount accepts Infinity",
+        "Amount accepts strings (type coercion)",
+        "Currency not validated (enum)",
+        "TransactionId accepts special characters",
+        "Allocations array not validated",
+        "No length limits on notes/internalNotes"
+      ],
+      "attack_vectors": [
+        {
+          "type": "Negative Amount Attack",
+          "payload": {
+            "clientId": "valid-id",
+            "amount": -1000000,
+            "paymentMethod": "cash"
+          }
+        },
+        {
+          "type": "Type Confusion",
+          "payload": {
+            "amount": "999999999999999999",
+            "allocations": "not-array"
+          }
+        }
+      ],
+      "recommended_fix": "Implement createPaymentSchema with strict validation"
+    },
+    {
+      "id": 4,
+      "path": "/api/payments/:id/refund",
+      "method": "POST",
+      "controller": "payment.controller.js",
+      "line": 400,
+      "severity": "CRITICAL",
+      "vulnerabilities": [
+        "Amount can exceed original payment",
+        "Reason not validated",
+        "No minimum reason length"
+      ],
+      "attack_vectors": [
+        {
+          "type": "Refund Fraud",
+          "payload": {
+            "amount": 999999999,
+            "reason": ""
+          }
+        }
+      ],
+      "recommended_fix": "Implement refundSchema with amount validation"
+    },
+    {
+      "id": 5,
+      "path": "/api/clients",
+      "method": "POST",
+      "controller": "client.controller.js",
+      "line": 19,
+      "severity": "CRITICAL",
+      "vulnerabilities": [
+        "No length limits on any field",
+        "Email not validated",
+        "Phone not validated",
+        "NationalId not validated against Saudi ID format",
+        "Notes field unlimited (DoS risk)",
+        "XSS possible in all text fields"
+      ],
+      "attack_vectors": [
+        {
+          "type": "Buffer Overflow",
+          "payload": {
+            "notes": "A".repeat(100000000)
+          }
+        },
+        {
+          "type": "XSS Injection",
+          "payload": {
+            "fullName": "<script>alert(document.cookie)</script>"
+          }
+        }
+      ],
+      "recommended_fix": "Implement createClientSchema with length limits and format validation"
+    },
+    {
+      "id": 6,
+      "path": "/api/clients",
+      "method": "GET",
+      "controller": "client.controller.js",
+      "line": 125,
+      "severity": "HIGH",
+      "vulnerabilities": [
+        "Search parameter enables ReDoS",
+        "Regex injection in search",
+        "No pagination limits"
+      ],
+      "attack_vectors": [
+        {
+          "type": "ReDoS",
+          "payload": "?search=(a+)+$"
+        },
+        {
+          "type": "Regex Injection",
+          "payload": "?search=.*"
+        }
+      ],
+      "recommended_fix": "Implement searchSchema with safe regex patterns"
+    },
+    {
+      "id": 7,
+      "path": "/api/clients/:id",
+      "method": "PUT",
+      "controller": "client.controller.js",
+      "line": 246,
+      "severity": "CRITICAL",
+      "vulnerabilities": [
+        "Mass assignment vulnerability",
+        "No field validation",
+        "No length limits",
+        "Can update any field"
+      ],
+      "attack_vectors": [
+        {
+          "type": "Mass Assignment",
+          "payload": {
+            "lawyerId": "attacker-id",
+            "status": "deleted"
+          }
+        }
+      ],
+      "recommended_fix": "Implement updateClientSchema with allowed fields only"
+    },
+    {
+      "id": 8,
+      "path": "/api/clients/bulk",
+      "method": "DELETE",
+      "controller": "client.controller.js",
+      "line": 464,
+      "severity": "HIGH",
+      "vulnerabilities": [
+        "No limit on array size",
+        "Can delete unlimited clients",
+        "Array items not validated as ObjectIds"
+      ],
+      "attack_vectors": [
+        {
+          "type": "Mass Deletion",
+          "payload": {
+            "clientIds": ["id1", "id2", "...1000 more"]
+          }
+        }
+      ],
+      "recommended_fix": "Limit bulk operations to 100 items max"
+    },
+    {
+      "id": 9,
+      "path": "/api/invoices",
+      "method": "POST",
+      "controller": "invoice.controller.js",
+      "line": 16,
+      "severity": "CRITICAL",
+      "vulnerabilities": [
+        "Items array not validated",
+        "Item totals can be negative",
+        "No limit on number of items",
+        "DueDate not validated",
+        "Can create invoice with past due date"
+      ],
+      "attack_vectors": [
+        {
+          "type": "Invoice Manipulation",
+          "payload": {
+            "items": [{ "total": -99999 }],
+            "dueDate": "not-a-date"
+          }
+        }
+      ],
+      "recommended_fix": "Implement createInvoiceSchema with items validation"
+    },
+    {
+      "id": 10,
+      "path": "/api/invoices/:id",
+      "method": "PUT",
+      "controller": "invoice.controller.js",
+      "line": 131,
+      "severity": "CRITICAL",
+      "vulnerabilities": [
+        "Mass assignment via $set",
+        "Can update any field including calculated fields",
+        "No validation on update payload"
+      ],
+      "attack_vectors": [
+        {
+          "type": "Amount Manipulation",
+          "payload": {
+            "total": 0,
+            "vatAmount": 0,
+            "status": "paid"
+          }
+        }
+      ],
+      "recommended_fix": "Use allowedFields whitelist and validation schema"
+    },
+    {
+      "id": 11,
+      "path": "/api/cases",
+      "method": "POST",
+      "controller": "case.controller.js",
+      "line": 6,
+      "severity": "CRITICAL",
+      "vulnerabilities": [
+        "Documents array not validated",
+        "No validation on document URLs (path traversal)",
+        "LaborCaseDetails not validated",
+        "StartDate not validated",
+        "No length limits"
+      ],
+      "attack_vectors": [
+        {
+          "type": "Path Traversal",
+          "payload": {
+            "documents": [{ "url": "../../../etc/passwd" }]
+          }
+        }
+      ],
+      "recommended_fix": "Implement createCaseSchema with document URL validation"
+    },
+    {
+      "id": 12,
+      "path": "/api/cases/:id",
+      "method": "PUT",
+      "controller": "case.controller.js",
+      "line": 153,
+      "severity": "CRITICAL",
+      "vulnerabilities": [
+        "Mass assignment via $set",
+        "Can update lawyerId",
+        "Can update clientId",
+        "No field whitelist"
+      ],
+      "attack_vectors": [
+        {
+          "type": "Case Hijacking",
+          "payload": {
+            "lawyerId": "attacker-id",
+            "status": "completed"
+          }
+        }
+      ],
+      "recommended_fix": "Whitelist allowed update fields"
+    },
+    {
+      "id": 13,
+      "path": "/api/cases/:id/notes",
+      "method": "POST",
+      "controller": "case.controller.js",
+      "line": 186,
+      "severity": "HIGH",
+      "vulnerabilities": [
+        "No length limit on text",
+        "No XSS protection",
+        "No sanitization"
+      ],
+      "attack_vectors": [
+        {
+          "type": "XSS Storage",
+          "payload": {
+            "text": "<script>steal(document.cookie)</script>"
+          }
+        }
+      ],
+      "recommended_fix": "Add text length limit (max 10000) and sanitization"
+    },
+    {
+      "id": 14,
+      "path": "/api/cases/:id/documents",
+      "method": "POST",
+      "controller": "case.controller.js",
+      "line": 217,
+      "severity": "CRITICAL",
+      "vulnerabilities": [
+        "URL not validated",
+        "Path traversal possible",
+        "Name not validated",
+        "Null byte injection possible"
+      ],
+      "attack_vectors": [
+        {
+          "type": "Path Traversal",
+          "payload": {
+            "url": "../../../etc/passwd",
+            "name": "doc.pdf\x00.exe"
+          }
+        }
+      ],
+      "recommended_fix": "Validate URL format and sanitize file names"
+    },
+    {
+      "id": 15,
+      "path": "/api/expenses",
+      "method": "POST",
+      "controller": "expense.controller.js",
+      "line": 6,
+      "severity": "CRITICAL",
+      "vulnerabilities": [
+        "Amount has basic check but no max limit",
+        "Description unlimited length",
+        "Date not validated properly",
+        "Category not enum validated"
+      ],
+      "attack_vectors": [
+        {
+          "type": "Large Amount",
+          "payload": {
+            "amount": 999999999999999,
+            "description": "A".repeat(1000000)
+          }
+        }
+      ],
+      "recommended_fix": "Implement createExpenseSchema with strict limits"
+    },
+    {
+      "id": 16,
+      "path": "/api/transactions",
+      "method": "POST",
+      "controller": "transaction.controller.js",
+      "line": 9,
+      "severity": "CRITICAL",
+      "vulnerabilities": [
+        "Amount only checked for > 0, no max",
+        "Type not validated against enum",
+        "Category not validated",
+        "PaymentMethod not validated"
+      ],
+      "attack_vectors": [
+        {
+          "type": "Invalid Type",
+          "payload": {
+            "type": "malicious",
+            "amount": 999999999
+          }
+        }
+      ],
+      "recommended_fix": "Implement createTransactionSchema with enum validation"
+    },
+    {
+      "id": 17,
+      "path": "/api/transactions",
+      "method": "GET",
+      "controller": "transaction.controller.js",
+      "line": 73,
+      "severity": "HIGH",
+      "vulnerabilities": [
+        "Search enables NoSQL injection",
+        "Regex injection in search",
+        "No limit on search length"
+      ],
+      "attack_vectors": [
+        {
+          "type": "NoSQL Injection",
+          "payload": "?search[$ne]=null"
+        }
+      ],
+      "recommended_fix": "Sanitize search parameter and add length limit"
+    },
+    {
+      "id": 18,
+      "path": "/api/users/:id",
+      "method": "PUT",
+      "controller": "user.controller.js",
+      "line": 242,
+      "severity": "CRITICAL",
+      "vulnerabilities": [
+        "Mass assignment via $set",
+        "Can update role, isSeller",
+        "No field validation",
+        "Can escalate privileges"
+      ],
+      "attack_vectors": [
+        {
+          "type": "Privilege Escalation",
+          "payload": {
+            "role": "admin",
+            "isSeller": true
+          }
+        }
+      ],
+      "recommended_fix": "Whitelist updatable fields, never allow role updates"
+    },
+    {
+      "id": 19,
+      "path": "/api/users/lawyers",
+      "method": "GET",
+      "controller": "user.controller.js",
+      "line": 116,
+      "severity": "HIGH",
+      "vulnerabilities": [
+        "Search regex injection",
+        "ReDoS vulnerability",
+        "No search length limit"
+      ],
+      "attack_vectors": [
+        {
+          "type": "ReDoS",
+          "payload": "?search=(a+)+b"
+        }
+      ],
+      "recommended_fix": "Escape regex special characters, add length limit"
+    },
+    {
+      "id": 20,
+      "path": "/api/orders/payment-intent/:id",
+      "method": "POST",
+      "controller": "order.controller.js",
+      "line": 30,
+      "severity": "CRITICAL",
+      "vulnerabilities": [
+        "ID parameter not validated",
+        "Price sent to Stripe without validation",
+        "Can manipulate gig price"
+      ],
+      "attack_vectors": [
+        {
+          "type": "Price Manipulation",
+          "payload": "Price read from DB but not revalidated"
+        }
+      ],
+      "recommended_fix": "Validate MongoDB ObjectId format in params"
+    },
+    {
+      "id": 21,
+      "path": "/api/orders/confirm-payment",
+      "method": "POST",
+      "controller": "order.controller.js",
+      "line": 155,
+      "severity": "CRITICAL",
+      "vulnerabilities": [
+        "payment_intent not validated",
+        "Can inject malicious payment_intent",
+        "No length limit"
+      ],
+      "attack_vectors": [
+        {
+          "type": "Payment Intent Injection",
+          "payload": {
+            "payment_intent": { "$ne": null }
+          }
+        }
+      ],
+      "recommended_fix": "Validate payment_intent as string with pattern"
+    }
+  ],
+  "vulnerability_statistics": {
+    "by_severity": {
+      "critical": 18,
+      "high": 10,
+      "medium": 7
+    },
+    "by_type": {
+      "no_validation": 35,
+      "nosql_injection": 12,
+      "xss": 8,
+      "buffer_overflow": 15,
+      "type_coercion": 20,
+      "mass_assignment": 8,
+      "regex_injection": 6,
+      "path_traversal": 3
+    },
+    "by_controller": {
+      "auth.controller.js": 2,
+      "client.controller.js": 5,
+      "payment.controller.js": 4,
+      "invoice.controller.js": 2,
+      "case.controller.js": 4,
+      "expense.controller.js": 2,
+      "transaction.controller.js": 2,
+      "user.controller.js": 3,
+      "order.controller.js": 2
+    }
+  },
+  "remediation_steps": [
+    {
+      "step": 1,
+      "action": "Install Joi validation library",
+      "command": "npm install joi",
+      "priority": "IMMEDIATE"
+    },
+    {
+      "step": 2,
+      "action": "Install sanitization libraries",
+      "command": "npm install express-mongo-sanitize xss-clean",
+      "priority": "IMMEDIATE"
+    },
+    {
+      "step": 3,
+      "action": "Create validation middleware",
+      "file": "/src/middlewares/validation.middleware.js",
+      "priority": "IMMEDIATE"
+    },
+    {
+      "step": 4,
+      "action": "Implement auth validation schemas",
+      "file": "/src/validations/auth.validation.js",
+      "priority": "CRITICAL"
+    },
+    {
+      "step": 5,
+      "action": "Implement payment validation schemas",
+      "file": "/src/validations/payment.validation.js",
+      "priority": "CRITICAL"
+    },
+    {
+      "step": 6,
+      "action": "Implement client validation schemas",
+      "file": "/src/validations/client.validation.js",
+      "priority": "CRITICAL"
+    },
+    {
+      "step": 7,
+      "action": "Apply validation to all routes",
+      "files": "/src/routes/*.route.js",
+      "priority": "HIGH"
+    },
+    {
+      "step": 8,
+      "action": "Add global sanitization middleware",
+      "file": "/src/server.js",
+      "priority": "HIGH"
+    },
+    {
+      "step": 9,
+      "action": "Write validation tests",
+      "file": "/tests/validation/*.test.js",
+      "priority": "MEDIUM"
+    },
+    {
+      "step": 10,
+      "action": "Conduct security audit",
+      "priority": "MEDIUM"
+    }
+  ],
+  "compliance_impact": {
+    "pdpl": {
+      "compliant": false,
+      "violations": [
+        "No data integrity controls",
+        "No input validation for personal data",
+        "No protection against data manipulation"
+      ]
+    },
+    "pci_dss": {
+      "compliant": false,
+      "violations": [
+        "Payment amounts not validated",
+        "No protection against payment manipulation",
+        "Insufficient input validation for payment data"
+      ]
+    },
+    "owasp_top_10": {
+      "vulnerabilities": [
+        "A03:2021 – Injection",
+        "A04:2021 – Insecure Design",
+        "A05:2021 – Security Misconfiguration"
+      ]
+    }
+  },
+  "estimated_effort": {
+    "phase_1_critical": "1 week",
+    "phase_2_high": "1 week",
+    "phase_3_medium": "1 week",
+    "phase_4_testing": "1 week",
+    "total": "4 weeks"
+  }
+}

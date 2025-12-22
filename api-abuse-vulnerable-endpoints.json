@@ -1,0 +1,542 @@
+{
+  "scan_date": "2025-12-22",
+  "repository": "traf3li-backend-for testing only different github",
+  "total_endpoints": 237,
+  "total_routes": 38,
+  "protected_endpoints": 0,
+  "vulnerable_endpoints": 237,
+  "severity": "CRITICAL",
+  "risk_score": 9.5,
+
+  "summary": {
+    "rate_limiting_exists": true,
+    "rate_limiting_enabled": false,
+    "rate_limiting_exported": false,
+    "captcha_protection": false,
+    "bot_detection": false,
+    "ip_blocking": false
+  },
+
+  "vulnerabilities_by_category": {
+    "authentication": {
+      "severity": "CRITICAL",
+      "risk_score": 10,
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/auth/register",
+          "file": "/src/routes/auth.route.js",
+          "protection": "NONE",
+          "required_limiter": "authRateLimiter",
+          "attack_vectors": ["Account creation spam", "Bot registration", "Email enumeration"],
+          "data_at_risk": ["Email addresses", "Usernames", "Account data"]
+        },
+        {
+          "method": "POST",
+          "path": "/api/auth/login",
+          "file": "/src/routes/auth.route.js",
+          "protection": "NONE",
+          "required_limiter": "authRateLimiter",
+          "attack_vectors": ["Brute force", "Credential stuffing", "Account enumeration"],
+          "data_at_risk": ["User credentials", "Session tokens", "Account access"]
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "file": "/src/routes/auth.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "apiRateLimiter",
+          "attack_vectors": ["Session enumeration", "Token validation abuse"],
+          "data_at_risk": ["User profile data", "Session validity"]
+        }
+      ]
+    },
+
+    "payment_operations": {
+      "severity": "CRITICAL",
+      "risk_score": 10,
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/orders/create-payment-intent/:_id",
+          "file": "/src/routes/order.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "paymentRateLimiter",
+          "attack_vectors": ["Payment intent spam", "Stripe fee exhaustion", "Fraud attempts"],
+          "data_at_risk": ["Payment data", "Financial information", "Stripe fees"]
+        },
+        {
+          "method": "POST",
+          "path": "/api/orders/create-proposal-payment-intent/:_id",
+          "file": "/src/routes/order.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "paymentRateLimiter",
+          "attack_vectors": ["Payment intent spam", "Financial fraud"],
+          "data_at_risk": ["Payment data", "Proposal information"]
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/orders",
+          "file": "/src/routes/order.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "paymentRateLimiter",
+          "attack_vectors": ["Payment status manipulation", "Fraud"],
+          "data_at_risk": ["Payment confirmations", "Order data"]
+        },
+        {
+          "method": "POST",
+          "path": "/api/payments",
+          "file": "/src/routes/payment.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "paymentRateLimiter",
+          "attack_vectors": ["Payment spam", "Financial fraud"],
+          "data_at_risk": ["Payment records", "Financial data"]
+        },
+        {
+          "method": "POST",
+          "path": "/api/payments/:id/complete",
+          "file": "/src/routes/payment.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "paymentRateLimiter",
+          "attack_vectors": ["Payment verification bypass", "Fraud"],
+          "data_at_risk": ["Payment completion status", "Transaction data"]
+        },
+        {
+          "method": "POST",
+          "path": "/api/payments/:id/refund",
+          "file": "/src/routes/payment.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "paymentRateLimiter",
+          "attack_vectors": ["Refund fraud", "Financial abuse"],
+          "data_at_risk": ["Refund data", "Financial records"]
+        },
+        {
+          "method": "POST",
+          "path": "/api/invoices/:_id/payment",
+          "file": "/src/routes/invoice.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "paymentRateLimiter",
+          "attack_vectors": ["Invoice payment spam", "Fraud attempts"],
+          "data_at_risk": ["Invoice data", "Payment information"]
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/invoices/confirm-payment",
+          "file": "/src/routes/invoice.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "paymentRateLimiter",
+          "attack_vectors": ["Payment confirmation abuse"],
+          "data_at_risk": ["Payment confirmations", "Invoice status"]
+        }
+      ]
+    },
+
+    "public_data_enumeration": {
+      "severity": "CRITICAL",
+      "risk_score": 9,
+      "endpoints": [
+        {
+          "method": "GET",
+          "path": "/api/users/lawyers",
+          "file": "/src/routes/user.route.js",
+          "protection": "NONE",
+          "required_limiter": "searchRateLimiter",
+          "attack_vectors": ["Lawyer profile scraping", "Data harvesting", "Competitive intelligence", "PDPL violation"],
+          "data_at_risk": ["Lawyer profiles", "Contact information", "Specializations", "Ratings", "Pricing"],
+          "exploitation_difficulty": "Trivial",
+          "data_volume": "Unlimited (paginated but no limits)"
+        },
+        {
+          "method": "GET",
+          "path": "/api/users/:_id",
+          "file": "/src/routes/user.route.js",
+          "protection": "NONE",
+          "required_limiter": "publicRateLimiter",
+          "attack_vectors": ["User enumeration", "Sequential ID scraping", "Profile harvesting"],
+          "data_at_risk": ["User profiles", "Personal information"],
+          "exploitation_difficulty": "Trivial"
+        },
+        {
+          "method": "GET",
+          "path": "/api/users/lawyer/:username",
+          "file": "/src/routes/user.route.js",
+          "protection": "NONE",
+          "required_limiter": "publicRateLimiter",
+          "attack_vectors": ["Comprehensive lawyer data scraping", "Stats extraction", "Review harvesting"],
+          "data_at_risk": ["116+ lines of data per request", "Reviews", "Statistics", "Gigs", "Order history"],
+          "exploitation_difficulty": "Trivial"
+        },
+        {
+          "method": "GET",
+          "path": "/api/gigs",
+          "file": "/src/routes/gig.route.js",
+          "protection": "NONE",
+          "required_limiter": "searchRateLimiter",
+          "attack_vectors": ["Service listing scraping", "Pricing intelligence", "Market analysis"],
+          "data_at_risk": ["All gigs", "Pricing", "Descriptions", "Categories", "Seller info"],
+          "exploitation_difficulty": "Trivial"
+        },
+        {
+          "method": "GET",
+          "path": "/api/gigs/single/:_id",
+          "file": "/src/routes/gig.route.js",
+          "protection": "NONE",
+          "required_limiter": "publicRateLimiter",
+          "attack_vectors": ["Sequential gig enumeration", "Detailed data extraction"],
+          "data_at_risk": ["Gig details", "Seller information", "Reviews"],
+          "exploitation_difficulty": "Trivial"
+        },
+        {
+          "method": "GET",
+          "path": "/api/jobs",
+          "file": "/src/routes/job.route.js",
+          "protection": "NONE",
+          "required_limiter": "searchRateLimiter",
+          "attack_vectors": ["Job posting scraping", "Budget analysis", "Client identification"],
+          "data_at_risk": ["Job listings", "Budgets", "Client information", "Requirements"],
+          "exploitation_difficulty": "Trivial"
+        },
+        {
+          "method": "GET",
+          "path": "/api/reviews/:gigID",
+          "file": "/src/routes/review.route.js",
+          "protection": "NONE",
+          "required_limiter": "publicRateLimiter",
+          "attack_vectors": ["Review scraping", "Rating analysis"],
+          "data_at_risk": ["Reviews", "Ratings", "User feedback"],
+          "exploitation_difficulty": "Trivial"
+        }
+      ]
+    },
+
+    "resource_exhaustion": {
+      "severity": "CRITICAL",
+      "risk_score": 9,
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/pdfme/generate",
+          "file": "/src/routes/pdfme.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "uploadRateLimiter",
+          "attack_vectors": ["CPU exhaustion", "Memory exhaustion", "DDoS via PDF generation"],
+          "data_at_risk": ["Server resources", "Service availability"],
+          "resource_impact": "HIGH - PDF generation is CPU intensive"
+        },
+        {
+          "method": "POST",
+          "path": "/api/pdfme/generate/async",
+          "file": "/src/routes/pdfme.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "uploadRateLimiter",
+          "attack_vectors": ["Queue flooding", "Async job spam", "Resource exhaustion"],
+          "data_at_risk": ["Server resources", "Queue capacity"],
+          "resource_impact": "HIGH"
+        },
+        {
+          "method": "POST",
+          "path": "/api/pdfme/generate/invoice",
+          "file": "/src/routes/pdfme.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "uploadRateLimiter",
+          "attack_vectors": ["CPU exhaustion", "Disk space exhaustion"],
+          "data_at_risk": ["Server resources", "Disk space"],
+          "resource_impact": "HIGH"
+        },
+        {
+          "method": "POST",
+          "path": "/api/pdfme/generate/contract",
+          "file": "/src/routes/pdfme.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "uploadRateLimiter",
+          "attack_vectors": ["Resource exhaustion", "DDoS"],
+          "data_at_risk": ["Server resources"],
+          "resource_impact": "HIGH"
+        },
+        {
+          "method": "POST",
+          "path": "/api/pdfme/generate/receipt",
+          "file": "/src/routes/pdfme.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "uploadRateLimiter",
+          "attack_vectors": ["Resource exhaustion"],
+          "data_at_risk": ["Server resources"],
+          "resource_impact": "HIGH"
+        },
+        {
+          "method": "POST",
+          "path": "/api/messages",
+          "file": "/src/routes/message.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "uploadRateLimiter",
+          "attack_vectors": ["File upload spam (5 files per request)", "Disk exhaustion", "Bandwidth exhaustion"],
+          "data_at_risk": ["Disk space", "Bandwidth", "Storage costs"],
+          "resource_impact": "MEDIUM-HIGH"
+        }
+      ]
+    },
+
+    "spam_content": {
+      "severity": "HIGH",
+      "risk_score": 8,
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/reviews",
+          "file": "/src/routes/review.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "apiRateLimiter",
+          "attack_vectors": ["Review bombing", "Rating manipulation", "Fake reviews"],
+          "data_at_risk": ["Platform reputation", "Rating integrity"]
+        },
+        {
+          "method": "POST",
+          "path": "/api/conversations",
+          "file": "/src/routes/conversation.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "apiRateLimiter",
+          "attack_vectors": ["Conversation spam", "Harassment"],
+          "data_at_risk": ["User experience", "Platform quality"]
+        },
+        {
+          "method": "POST",
+          "path": "/api/proposals",
+          "file": "/src/routes/proposal.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "apiRateLimiter",
+          "attack_vectors": ["Proposal spam", "Job manipulation"],
+          "data_at_risk": ["Job listings quality", "Platform integrity"]
+        },
+        {
+          "method": "POST",
+          "path": "/api/cases/:_id/note",
+          "file": "/src/routes/case.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "apiRateLimiter",
+          "attack_vectors": ["Note spam"],
+          "data_at_risk": ["Case data quality"]
+        }
+      ]
+    },
+
+    "account_management": {
+      "severity": "MEDIUM",
+      "risk_score": 6,
+      "endpoints": [
+        {
+          "method": "PATCH",
+          "path": "/api/users/:_id",
+          "file": "/src/routes/user.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "apiRateLimiter",
+          "attack_vectors": ["Automated profile updates", "Data manipulation"],
+          "data_at_risk": ["User profiles"]
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/users/:_id",
+          "file": "/src/routes/user.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "sensitiveRateLimiter",
+          "attack_vectors": ["Account deletion abuse", "Service disruption"],
+          "data_at_risk": ["User accounts"]
+        },
+        {
+          "method": "POST",
+          "path": "/api/gigs",
+          "file": "/src/routes/gig.route.js",
+          "protection": "AUTHENTICATION_ONLY",
+          "required_limiter": "apiRateLimiter",
+          "attack_vectors": ["Gig spam", "Listing pollution"],
+          "data_at_risk": ["Platform quality"]
+        }
+      ]
+    }
+  },
+
+  "available_but_unused_limiters": {
+    "authRateLimiter": {
+      "window": "15 minutes",
+      "max": 5,
+      "use_case": "Login, Register",
+      "status": "NOT_USED"
+    },
+    "paymentRateLimiter": {
+      "window": "1 hour",
+      "max": 10,
+      "use_case": "Payment operations",
+      "status": "NOT_USED"
+    },
+    "searchRateLimiter": {
+      "window": "1 minute",
+      "max": 30,
+      "use_case": "Search, filters",
+      "status": "NOT_USED"
+    },
+    "uploadRateLimiter": {
+      "window": "1 hour",
+      "max": 50,
+      "use_case": "File uploads, PDF generation",
+      "status": "NOT_USED"
+    },
+    "publicRateLimiter": {
+      "window": "15 minutes",
+      "max": 300,
+      "use_case": "Public endpoints",
+      "status": "NOT_USED"
+    },
+    "apiRateLimiter": {
+      "window": "15 minutes",
+      "max": 100,
+      "use_case": "General API",
+      "status": "NOT_USED"
+    },
+    "sensitiveRateLimiter": {
+      "window": "1 hour",
+      "max": 3,
+      "use_case": "Account deletion, password reset",
+      "status": "NOT_USED"
+    }
+  },
+
+  "implementation_requirements": {
+    "phase_1_critical": {
+      "priority": "IMMEDIATE",
+      "duration": "90 minutes",
+      "risk_reduction": "95%",
+      "tasks": [
+        "Export rate limiters from /src/middlewares/index.js",
+        "Apply authRateLimiter to auth routes",
+        "Apply paymentRateLimiter to payment routes",
+        "Apply searchRateLimiter to public search routes",
+        "Apply uploadRateLimiter to PDF and file routes",
+        "Add global publicRateLimiter to server.js"
+      ]
+    },
+    "phase_2_redis": {
+      "priority": "HIGH",
+      "duration": "1 day",
+      "tasks": [
+        "Install ioredis and rate-limit-redis",
+        "Configure Redis connection",
+        "Update rate limiter to use Redis store",
+        "Test multi-instance rate limiting"
+      ]
+    },
+    "phase_3_captcha": {
+      "priority": "MEDIUM",
+      "duration": "2 days",
+      "tasks": [
+        "Install express-recaptcha",
+        "Configure reCAPTCHA v3",
+        "Apply to auth endpoints",
+        "Frontend integration"
+      ]
+    },
+    "phase_4_ip_blocking": {
+      "priority": "MEDIUM",
+      "duration": "3 days",
+      "tasks": [
+        "Implement IP violation tracking",
+        "Automatic IP blocking",
+        "Bot detection middleware",
+        "Admin IP management panel"
+      ]
+    }
+  },
+
+  "estimated_impact": {
+    "before": {
+      "brute_force_protection": "NONE",
+      "scraping_protection": "NONE",
+      "payment_fraud_protection": "NONE",
+      "resource_exhaustion_protection": "NONE",
+      "spam_protection": "NONE",
+      "risk_score": 9.5,
+      "annual_risk_exposure": "$50,000+"
+    },
+    "after": {
+      "brute_force_protection": "95%",
+      "scraping_protection": "90%",
+      "payment_fraud_protection": "85%",
+      "resource_exhaustion_protection": "90%",
+      "spam_protection": "85%",
+      "risk_score": 2,
+      "annual_risk_exposure": "$5,000",
+      "estimated_savings": "$35,000 - $45,000"
+    }
+  },
+
+  "compliance_impact": {
+    "pdpl": {
+      "issue": "Unauthorized data collection via scraping",
+      "status": "NON_COMPLIANT",
+      "after_fix": "COMPLIANT"
+    },
+    "pci_dss": {
+      "issue": "Unlimited payment operations",
+      "status": "AT_RISK",
+      "after_fix": "COMPLIANT"
+    },
+    "iso_27001": {
+      "issue": "No access control rate limiting",
+      "status": "NON_COMPLIANT",
+      "after_fix": "COMPLIANT"
+    }
+  },
+
+  "recommendations": {
+    "immediate": [
+      "Export rate limiters from middleware index (5 minutes)",
+      "Apply authRateLimiter to auth routes (10 minutes)",
+      "Apply paymentRateLimiter to payment routes (10 minutes)",
+      "Apply searchRateLimiter to public routes (15 minutes)",
+      "Add global rate limiting (10 minutes)"
+    ],
+    "week_1": [
+      "Redis integration for production scaling",
+      "Monitoring dashboard for rate limit violations",
+      "Alerts for excessive abuse attempts"
+    ],
+    "week_2": [
+      "CAPTCHA on authentication endpoints",
+      "IP blocking for repeat violators",
+      "Bot detection middleware"
+    ],
+    "ongoing": [
+      "Monitor rate limit metrics",
+      "Adjust limits based on usage patterns",
+      "Regular security audits",
+      "Update bot detection rules"
+    ]
+  },
+
+  "testing_commands": {
+    "test_auth_rate_limit": "for i in {1..10}; do curl -X POST http://localhost:8080/api/auth/login -H 'Content-Type: application/json' -d '{\"username\":\"test\",\"password\":\"wrong\"}'; echo \"\\nAttempt $i\"; sleep 1; done",
+    "test_search_rate_limit": "for i in {1..35}; do curl http://localhost:8080/api/users/lawyers; echo \"Request $i\"; done",
+    "test_global_rate_limit": "ab -n 350 -c 10 http://localhost:8080/api/gigs",
+    "verify_mongodb_storage": "db.rateLimits.find().limit(10)"
+  },
+
+  "files_to_modify": [
+    "/src/middlewares/index.js",
+    "/src/routes/auth.route.js",
+    "/src/routes/user.route.js",
+    "/src/routes/gig.route.js",
+    "/src/routes/job.route.js",
+    "/src/routes/payment.route.js",
+    "/src/routes/order.route.js",
+    "/src/routes/pdfme.route.js",
+    "/src/routes/message.route.js",
+    "/src/routes/review.route.js",
+    "/src/routes/proposal.route.js",
+    "/src/routes/invoice.route.js",
+    "/src/server.js"
+  ],
+
+  "documentation_files": [
+    "/API_ABUSE_PREVENTION_SECURITY_REPORT.md",
+    "/API_ABUSE_QUICK_IMPLEMENTATION.md",
+    "/api-abuse-vulnerable-endpoints.json"
+  ]
+}

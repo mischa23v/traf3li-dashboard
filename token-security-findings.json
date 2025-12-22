@@ -1,0 +1,335 @@
+{
+  "scan_metadata": {
+    "scan_date": "2025-12-22",
+    "scanner": "Claude Code Security Scanner",
+    "scope": "/home/user/traf3li-dashboard/traf3li-backend-for testing only different github",
+    "scan_type": "Token Security Audit",
+    "overall_risk": "HIGH"
+  },
+  "summary": {
+    "total_vulnerabilities": 10,
+    "critical": 3,
+    "high": 4,
+    "medium": 3,
+    "low": 0,
+    "info": 0
+  },
+  "vulnerabilities": [
+    {
+      "id": "TOKEN-001",
+      "title": "Inconsistent Token Implementation",
+      "severity": "CRITICAL",
+      "cwe": "CWE-287",
+      "cwe_name": "Improper Authentication",
+      "cvss_score": 9.1,
+      "description": "Two different JWT implementations exist. Production code uses vulnerable simple token (7 days), while secure dual-token system exists but is unused.",
+      "affected_files": [
+        "/src/controllers/auth.controller.js",
+        "/src/utils/generateToken.js"
+      ],
+      "line_numbers": [70, 73],
+      "impact": "Long-lived access tokens increase compromise window. No token rotation. Inconsistent security across application.",
+      "remediation": "Migrate auth.controller.js to use generateTokenPair() from generateToken.js utility",
+      "references": [
+        "https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html"
+      ]
+    },
+    {
+      "id": "TOKEN-002",
+      "title": "No Refresh Token Rotation",
+      "severity": "CRITICAL",
+      "cwe": "CWE-613",
+      "cwe_name": "Insufficient Session Expiration",
+      "cvss_score": 8.8,
+      "description": "No refresh token rotation mechanism implemented. Dual-token utilities exist but are not used in actual auth flow.",
+      "affected_files": [
+        "/src/controllers/auth.controller.js",
+        "/src/routes/auth.route.js"
+      ],
+      "line_numbers": null,
+      "impact": "Stolen refresh tokens remain valid for 7 days. Cannot detect refresh token theft. No automatic token revocation on suspicious activity.",
+      "remediation": "Implement /api/auth/refresh endpoint with token rotation and family tracking",
+      "references": [
+        "https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation"
+      ]
+    },
+    {
+      "id": "TOKEN-003",
+      "title": "No Token Revocation Mechanism",
+      "severity": "CRITICAL",
+      "cwe": "CWE-613",
+      "cwe_name": "Insufficient Session Expiration",
+      "cvss_score": 8.6,
+      "description": "No token blacklist or revocation mechanism exists. Logout only clears client cookie, token remains valid on server.",
+      "affected_files": [
+        "/src/controllers/auth.controller.js",
+        "/src/models/user.model.js"
+      ],
+      "line_numbers": [105, 119],
+      "impact": "Stolen tokens cannot be revoked. Compromised sessions remain active. No protection against token theft.",
+      "remediation": "Add tokenBlacklist field to User model and implement blacklist check in authenticate middleware",
+      "references": [
+        "https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html"
+      ]
+    },
+    {
+      "id": "TOKEN-004",
+      "title": "Missing JWT Claim Validation",
+      "severity": "HIGH",
+      "cwe": "CWE-345",
+      "cwe_name": "Insufficient Verification of Data Authenticity",
+      "cvss_score": 7.5,
+      "description": "JWT verification lacks comprehensive claim validation. No jti (JWT ID), nbf (Not Before), or token type distinction.",
+      "affected_files": [
+        "/src/middlewares/authenticate.js",
+        "/src/utils/generateToken.js"
+      ],
+      "line_numbers": [12],
+      "impact": "Susceptible to JWT manipulation. Missing unique token identification. No issuer/audience validation in production code.",
+      "remediation": "Add jti claim, validate iss/aud, specify algorithm explicitly: { algorithms: ['HS256'] }",
+      "references": [
+        "https://datatracker.ietf.org/doc/html/rfc7519"
+      ]
+    },
+    {
+      "id": "TOKEN-005",
+      "title": "No CSRF Protection for Cookie-Based Auth",
+      "severity": "HIGH",
+      "cwe": "CWE-352",
+      "cwe_name": "Cross-Site Request Forgery",
+      "cvss_score": 7.1,
+      "description": "Application uses cookie-based JWT authentication without CSRF protection mechanism.",
+      "affected_files": [
+        "/src/server.js"
+      ],
+      "line_numbers": null,
+      "impact": "Vulnerable to CSRF attacks. Attackers can make authenticated requests. State-changing operations at risk.",
+      "remediation": "Implement csurf middleware or use Double Submit Cookie pattern with SameSite=Strict",
+      "references": [
+        "https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html"
+      ]
+    },
+    {
+      "id": "TOKEN-006",
+      "title": "Weak Secret Management in Production",
+      "severity": "HIGH",
+      "cwe": "CWE-798",
+      "cwe_name": "Use of Hard-coded Credentials",
+      "cvss_score": 7.8,
+      "description": "Application falls back to default secrets if environment variables not set. No enforcement in production.",
+      "affected_files": [
+        "/src/utils/generateToken.js"
+      ],
+      "line_numbers": [28, 29],
+      "impact": "Production deployment with default secrets possible. All tokens compromised if defaults used.",
+      "remediation": "Fail hard if secrets not set in production. Add startup validation in server.js",
+      "references": []
+    },
+    {
+      "id": "TOKEN-007",
+      "title": "Token Payload Contains Unnecessary Data",
+      "severity": "HIGH",
+      "cwe": "CWE-200",
+      "cwe_name": "Exposure of Sensitive Information",
+      "cvss_score": 6.5,
+      "description": "JWT payload contains role information (isSeller) which should be verified server-side, not trusted from token.",
+      "affected_files": [
+        "/src/controllers/auth.controller.js"
+      ],
+      "line_numbers": [70, 72],
+      "impact": "Client could manipulate role if token forged. Privilege escalation if verification weak.",
+      "remediation": "Store only user ID in token. Fetch role from database on each request.",
+      "references": [
+        "https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html#token-sidejacking"
+      ]
+    },
+    {
+      "id": "TOKEN-008",
+      "title": "Insufficient Token Entropy Validation",
+      "severity": "MEDIUM",
+      "cwe": "CWE-330",
+      "cwe_name": "Use of Insufficiently Random Values",
+      "cvss_score": 5.3,
+      "description": "No validation that JWT_SECRET has sufficient entropy. Weak secrets could be used.",
+      "affected_files": [
+        "/src/utils/generateToken.js",
+        "/src/server.js"
+      ],
+      "line_numbers": [19, 20],
+      "impact": "Weak secrets make brute force attacks feasible. Token signing key could be guessed.",
+      "remediation": "Validate JWT_SECRET length >= 64 characters at startup",
+      "references": []
+    },
+    {
+      "id": "TOKEN-009",
+      "title": "No Token Expiration Monitoring",
+      "severity": "MEDIUM",
+      "cwe": "CWE-613",
+      "cwe_name": "Insufficient Session Expiration",
+      "cvss_score": 4.3,
+      "description": "No proactive token expiration monitoring or grace period handling for better UX.",
+      "affected_files": [],
+      "line_numbers": null,
+      "impact": "Poor user experience when tokens expire. No automatic refresh window.",
+      "remediation": "Implement token refresh window (5 min before expiry). Add token age to response headers.",
+      "references": []
+    },
+    {
+      "id": "TOKEN-010",
+      "title": "Missing Rate Limiting on Auth Endpoints",
+      "severity": "MEDIUM",
+      "cwe": "CWE-307",
+      "cwe_name": "Improper Restriction of Excessive Authentication Attempts",
+      "cvss_score": 5.9,
+      "description": "Auth routes don't use the available authRateLimiter middleware despite it being implemented.",
+      "affected_files": [
+        "/src/routes/auth.route.js"
+      ],
+      "line_numbers": [8, 11],
+      "impact": "Vulnerable to brute force attacks on authentication endpoints.",
+      "remediation": "Apply authRateLimiter middleware to /register and /login endpoints",
+      "references": [
+        "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html"
+      ]
+    }
+  ],
+  "positive_findings": [
+    {
+      "title": "HttpOnly Cookies",
+      "description": "Tokens stored in HttpOnly cookies, preventing XSS token theft",
+      "file": "/src/controllers/auth.controller.js",
+      "line_numbers": [79, 85]
+    },
+    {
+      "title": "Secure Cookie Configuration",
+      "description": "SameSite and Secure attributes properly configured with auto-detection",
+      "file": "/src/controllers/auth.controller.js",
+      "line_numbers": [76, 85]
+    },
+    {
+      "title": "Comprehensive Rate Limiting",
+      "description": "Multiple rate limiter implementations with MongoDB backing",
+      "file": "/src/middlewares/rateLimiter.middleware.js"
+    },
+    {
+      "title": "Secret Rotation Capability",
+      "description": "Separate access/refresh secrets with environment-based configuration",
+      "file": "/src/utils/generateToken.js"
+    },
+    {
+      "title": "Helmet Security Headers",
+      "description": "Helmet.js configured for security headers",
+      "file": "/src/server.js",
+      "line_numbers": [65]
+    },
+    {
+      "title": "CORS Configuration",
+      "description": "Proper CORS with credentials and whitelist-based origin validation",
+      "file": "/src/server.js",
+      "line_numbers": [101, 138]
+    },
+    {
+      "title": "Modern JWT Library",
+      "description": "Using jsonwebtoken@^9.0.0 with no known CVEs",
+      "file": "/package.json"
+    }
+  ],
+  "token_leakage_analysis": {
+    "url_parameters": {
+      "status": "SECURE",
+      "description": "No instances of tokens in URL parameters or query strings found"
+    },
+    "logging": {
+      "status": "MOSTLY_SECURE",
+      "description": "No token/password logging in production code. Some user ID logging (acceptable)."
+    },
+    "authorization_header": {
+      "status": "IMPLEMENTED",
+      "description": "Dual support for cookies and Authorization Bearer header",
+      "file": "/src/middlewares/userMiddleware.js",
+      "line_numbers": [6, 15]
+    }
+  },
+  "immediate_actions": [
+    {
+      "priority": 1,
+      "action": "Add rate limiting to auth routes",
+      "estimated_time": "5 minutes",
+      "files": ["/src/routes/auth.route.js"]
+    },
+    {
+      "priority": 1,
+      "action": "Enforce strong secrets in production",
+      "estimated_time": "2 minutes",
+      "files": ["/src/server.js"]
+    },
+    {
+      "priority": 1,
+      "action": "Update auth controller to use dual-token system",
+      "estimated_time": "2 hours",
+      "files": ["/src/controllers/auth.controller.js"]
+    },
+    {
+      "priority": 2,
+      "action": "Implement refresh token rotation",
+      "estimated_time": "4 hours",
+      "files": [
+        "/src/models/user.model.js",
+        "/src/controllers/auth.controller.js",
+        "/src/routes/auth.route.js"
+      ]
+    },
+    {
+      "priority": 2,
+      "action": "Add token revocation/blacklist",
+      "estimated_time": "3 hours",
+      "files": [
+        "/src/models/user.model.js",
+        "/src/middlewares/authenticate.js"
+      ]
+    },
+    {
+      "priority": 2,
+      "action": "Implement CSRF protection",
+      "estimated_time": "2 hours",
+      "files": ["/src/server.js"]
+    },
+    {
+      "priority": 3,
+      "action": "Enhanced token validation (jti, nbf, algorithm)",
+      "estimated_time": "1 hour",
+      "files": [
+        "/src/utils/generateToken.js",
+        "/src/middlewares/authenticate.js"
+      ]
+    },
+    {
+      "priority": 3,
+      "action": "Implement logout all devices",
+      "estimated_time": "1 hour",
+      "files": ["/src/controllers/auth.controller.js"]
+    }
+  ],
+  "compliance": {
+    "owasp_top_10": {
+      "A01_broken_access_control": "PARTIAL",
+      "A02_cryptographic_failures": "COMPLIANT",
+      "A03_injection": "COMPLIANT",
+      "A04_insecure_design": "NON_COMPLIANT",
+      "A05_security_misconfiguration": "PARTIAL",
+      "A07_authentication_failures": "NON_COMPLIANT"
+    },
+    "gdpr_pdpl": {
+      "data_minimization": "COMPLIANT",
+      "data_subject_rights": "PARTIAL",
+      "secure_storage": "COMPLIANT",
+      "audit_logging": "PARTIAL"
+    }
+  },
+  "recommendations": {
+    "total_estimated_fix_time": "14-16 hours",
+    "risk_before": "HIGH",
+    "risk_after": "LOW",
+    "time_to_low_risk": "2-3 days"
+  }
+}

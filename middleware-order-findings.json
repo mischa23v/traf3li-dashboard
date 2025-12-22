@@ -1,0 +1,514 @@
+{
+  "scan_metadata": {
+    "scan_type": "MIDDLEWARE_ORDER_VULNERABILITY_SCAN",
+    "scan_date": "2025-12-22",
+    "repository": "traf3li-backend-for testing only different github",
+    "total_route_files": 36,
+    "total_middleware_files": 9,
+    "severity": "CRITICAL"
+  },
+  "summary": {
+    "total_vulnerabilities": 6,
+    "critical": 3,
+    "high": 3,
+    "medium": 0,
+    "low": 0,
+    "routes_with_rate_limiting": 0,
+    "routes_with_authorization": 0,
+    "routes_with_ownership_checks": 0,
+    "routes_with_audit_logging": 0,
+    "routes_with_validation": 0
+  },
+  "vulnerabilities": [
+    {
+      "id": "MOV-001",
+      "title": "Rate Limiting Middleware Not Applied",
+      "severity": "CRITICAL",
+      "cwe": "CWE-307: Improper Restriction of Excessive Authentication Attempts",
+      "owasp": "A07:2021 - Identification and Authentication Failures",
+      "description": "Comprehensive rate limiting middleware exists but is never applied to any routes",
+      "impact": "DoS attacks, brute force attacks, API abuse, resource exhaustion",
+      "affected_files": [
+        "src/routes/auth.route.js",
+        "src/routes/payment.route.js",
+        "src/routes/retainer.route.js",
+        "src/routes/invoice.route.js",
+        "src/routes/message.route.js",
+        "All 36 route files"
+      ],
+      "evidence": [
+        {
+          "file": "src/routes/auth.route.js",
+          "line": 8,
+          "code": "app.post('/register', authRegister);",
+          "issue": "No authRateLimiter applied"
+        },
+        {
+          "file": "src/routes/auth.route.js",
+          "line": 11,
+          "code": "app.post('/login', authLogin);",
+          "issue": "No authRateLimiter applied - unlimited login attempts"
+        },
+        {
+          "file": "src/routes/payment.route.js",
+          "line": 20,
+          "code": "app.post('/', userMiddleware, createPayment);",
+          "issue": "No paymentRateLimiter applied"
+        },
+        {
+          "file": "src/routes/message.route.js",
+          "line": 9,
+          "code": "app.post('/', userMiddleware, upload.array('files', 5), createMessage);",
+          "issue": "No uploadRateLimiter applied - unlimited file uploads"
+        }
+      ],
+      "remediation": {
+        "priority": "P0",
+        "timeline": "Immediate (Day 1)",
+        "steps": [
+          "Import appropriate rate limiters in each route file",
+          "Apply authRateLimiter to authentication routes",
+          "Apply paymentRateLimiter to payment/financial routes",
+          "Apply uploadRateLimiter to file upload routes",
+          "Apply apiRateLimiter to general API routes"
+        ],
+        "code_example": "const { authRateLimiter } = require('../middlewares/rateLimiter.middleware');\napp.post('/login', authRateLimiter, authLogin);"
+      }
+    },
+    {
+      "id": "MOV-002",
+      "title": "Authorization Middleware Not Applied",
+      "severity": "CRITICAL",
+      "cwe": "CWE-862: Missing Authorization",
+      "owasp": "A01:2021 - Broken Access Control",
+      "description": "Role-based authorization middleware exists but is never imported or used in any routes",
+      "impact": "Privilege escalation, unauthorized access to resources, clients accessing lawyer-only features",
+      "affected_files": [
+        "src/routes/invoice.route.js",
+        "src/routes/case.route.js",
+        "src/routes/payment.route.js",
+        "src/routes/retainer.route.js",
+        "src/routes/timeTracking.route.js",
+        "All routes requiring role-based access"
+      ],
+      "evidence": [
+        {
+          "file": "src/routes/invoice.route.js",
+          "line": 16,
+          "code": "app.post('/', userMiddleware, createInvoice);",
+          "issue": "No role check - any authenticated user can create invoices"
+        },
+        {
+          "file": "src/routes/case.route.js",
+          "line": 17,
+          "code": "app.post('/', userMiddleware, createCase);",
+          "issue": "No role check - authorization done in controller after DB queries"
+        },
+        {
+          "file": "src/routes/timeTracking.route.js",
+          "line": 46,
+          "code": "app.post('/entries/:id/approve', userMiddleware, approveTimeEntry);",
+          "issue": "No role check - any user can approve time entries"
+        },
+        {
+          "file": "src/controllers/invoice.controller.js",
+          "line": 18,
+          "code": "const user = await User.findById(request.userID);",
+          "issue": "Authorization check happens AFTER expensive DB query"
+        }
+      ],
+      "remediation": {
+        "priority": "P0",
+        "timeline": "Day 1-2",
+        "steps": [
+          "Import authorize middleware in all route files",
+          "Apply authorize('lawyer') to lawyer-only routes",
+          "Apply authorize('admin') to admin routes",
+          "Apply authorize('lawyer', 'client') to shared routes",
+          "Remove redundant authorization checks from controllers"
+        ],
+        "code_example": "const { authorize } = require('../middlewares/authorize.middleware');\napp.post('/invoices', userMiddleware, authorize('lawyer'), createInvoice);"
+      }
+    },
+    {
+      "id": "MOV-003",
+      "title": "Ownership Check Middleware Not Applied",
+      "severity": "CRITICAL",
+      "cwe": "CWE-639: Authorization Bypass Through User-Controlled Key (IDOR)",
+      "owasp": "A01:2021 - Broken Access Control",
+      "description": "Comprehensive ownership validation middleware exists but is never used, leading to IDOR vulnerabilities",
+      "impact": "Complete data breach - users can access/modify any resource by ID, competitors can view confidential cases/invoices",
+      "affected_files": [
+        "All routes with /:id parameters",
+        "src/routes/payment.route.js",
+        "src/routes/case.route.js",
+        "src/routes/invoice.route.js",
+        "src/routes/expense.route.js",
+        "src/routes/task.route.js",
+        "src/routes/event.route.js"
+      ],
+      "evidence": [
+        {
+          "file": "src/routes/payment.route.js",
+          "line": 23,
+          "code": "app.get('/:id', userMiddleware, getPayment);",
+          "issue": "No ownership check - users can view ANY payment by ID"
+        },
+        {
+          "file": "src/routes/case.route.js",
+          "line": 23,
+          "code": "app.get('/:_id', userMiddleware, getCase);",
+          "issue": "No ownership check - IDOR vulnerability"
+        },
+        {
+          "file": "src/routes/invoice.route.js",
+          "line": 24,
+          "code": "app.get('/:_id', userMiddleware, getInvoice);",
+          "issue": "No ownership check - invoice enumeration possible"
+        },
+        {
+          "file": "src/controllers/payment.controller.js",
+          "line": 37,
+          "code": "const invoice = await Invoice.findById(invoiceId);",
+          "issue": "Ownership check happens AFTER DB query"
+        }
+      ],
+      "remediation": {
+        "priority": "P0",
+        "timeline": "Day 2-3",
+        "steps": [
+          "Import checkOwnership middleware in route files",
+          "Apply checkOwnership('Model') to all GET /:id routes",
+          "Apply checkOwnership('Model') to all PUT/PATCH /:id routes",
+          "Apply checkModifyPermission('Model') to all DELETE /:id routes",
+          "Use resource shortcuts like checkCaseAccess(), checkInvoiceAccess()",
+          "Remove redundant ownership checks from controllers"
+        ],
+        "code_example": "const { checkOwnership, checkCaseAccess } = require('../middlewares/checkOwnership.middleware');\napp.get('/:id', userMiddleware, checkOwnership('Payment'), getPayment);\napp.get('/:id', userMiddleware, checkCaseAccess(), getCase);"
+      }
+    },
+    {
+      "id": "MOV-004",
+      "title": "Audit Logging Middleware Not Applied",
+      "severity": "HIGH",
+      "cwe": "CWE-778: Insufficient Logging",
+      "owasp": "A09:2021 - Security Logging and Monitoring Failures",
+      "description": "PDPL-compliant audit logging middleware exists but is never used, creating compliance violations",
+      "impact": "PDPL non-compliance, no forensic evidence for incidents, cannot track unauthorized access, legal liability",
+      "affected_files": [
+        "All routes performing sensitive operations",
+        "src/routes/case.route.js",
+        "src/routes/payment.route.js",
+        "src/routes/auth.route.js",
+        "src/routes/invoice.route.js"
+      ],
+      "evidence": [
+        {
+          "file": "src/routes/case.route.js",
+          "line": 17,
+          "code": "app.post('/', userMiddleware, createCase);",
+          "issue": "Case creation not logged"
+        },
+        {
+          "file": "src/routes/case.route.js",
+          "line": 29,
+          "code": "app.post('/:_id/document', userMiddleware, addDocument);",
+          "issue": "Document uploads not logged (PDPL violation)"
+        },
+        {
+          "file": "src/routes/payment.route.js",
+          "line": 30,
+          "code": "app.post('/:id/refund', userMiddleware, createRefund);",
+          "issue": "Payment refunds not logged"
+        },
+        {
+          "file": "src/routes/auth.route.js",
+          "line": 11,
+          "code": "app.post('/login', authLogin);",
+          "issue": "Authentication attempts not logged"
+        }
+      ],
+      "remediation": {
+        "priority": "P1",
+        "timeline": "Week 1",
+        "steps": [
+          "Import auditLog middleware in route files",
+          "Apply auditLog('action') to all sensitive operations",
+          "Log all case creation/updates/deletions",
+          "Log all document uploads/downloads",
+          "Log all payment operations",
+          "Log all authentication events",
+          "Implement logAuthEvent() in auth controller"
+        ],
+        "code_example": "const { auditLog } = require('../middlewares/auditLog.middleware');\napp.post('/', userMiddleware, authorize('lawyer'), auditLog('create_case'), createCase);\napp.delete('/:id', userMiddleware, checkCaseAccess(), auditLog('delete_case'), deleteCase);"
+      }
+    },
+    {
+      "id": "MOV-005",
+      "title": "Input Validation Middleware Not Applied",
+      "severity": "HIGH",
+      "cwe": "CWE-20: Improper Input Validation",
+      "owasp": "A03:2021 - Injection",
+      "description": "No validation middleware (express-validator) applied at route level despite being available",
+      "impact": "Injection attacks, data corruption, type coercion vulnerabilities, MongoDB injection",
+      "affected_files": [
+        "All POST routes",
+        "All PUT/PATCH routes",
+        "src/routes/payment.route.js",
+        "src/routes/invoice.route.js",
+        "src/routes/expense.route.js"
+      ],
+      "evidence": [
+        {
+          "file": "src/routes/payment.route.js",
+          "line": 20,
+          "code": "app.post('/', userMiddleware, createPayment);",
+          "issue": "No validation - accepts any input shape"
+        },
+        {
+          "file": "src/controllers/payment.controller.js",
+          "line": 26,
+          "code": "const { clientId, invoiceId, amount } = req.body;",
+          "issue": "Destructures req.body without validation - could be any type"
+        },
+        {
+          "file": "src/controllers/payment.controller.js",
+          "line": 37,
+          "code": "const invoice = await Invoice.findById(invoiceId);",
+          "issue": "invoiceId used in query without validation - MongoDB injection risk"
+        }
+      ],
+      "remediation": {
+        "priority": "P1",
+        "timeline": "Week 2",
+        "steps": [
+          "Create src/middlewares/validation.middleware.js",
+          "Add validation rules to all POST routes",
+          "Add validation rules to all PUT/PATCH routes",
+          "Validate all MongoDB IDs with isMongoId()",
+          "Validate numeric inputs with isNumeric() or isFloat()",
+          "Validate enum fields with isIn([])",
+          "Sanitize string inputs to prevent XSS"
+        ],
+        "code_example": "const { body } = require('express-validator');\nconst validate = require('../middlewares/validation.middleware');\n\napp.post('/',\n    userMiddleware,\n    [\n        body('amount').isFloat({ min: 0.01 }),\n        body('clientId').isMongoId(),\n        body('paymentMethod').isIn(['card', 'bank_transfer', 'cash'])\n    ],\n    validate,\n    createPayment\n);"
+      }
+    },
+    {
+      "id": "MOV-006",
+      "title": "Validation After Business Logic",
+      "severity": "HIGH",
+      "cwe": "CWE-696: Incorrect Behavior Order",
+      "owasp": "API4:2023 - Unrestricted Resource Consumption",
+      "description": "Controllers execute expensive database queries before validating input",
+      "impact": "Database performance degradation, resource exhaustion via invalid requests",
+      "affected_files": [
+        "src/controllers/payment.controller.js",
+        "src/controllers/expense.controller.js",
+        "src/controllers/retainer.controller.js",
+        "src/controllers/invoice.controller.js"
+      ],
+      "evidence": [
+        {
+          "file": "src/controllers/payment.controller.js",
+          "line": 31,
+          "code": "if (!clientId || !amount || !paymentMethod) { throw ... }",
+          "issue": "Validation happens at line 31"
+        },
+        {
+          "file": "src/controllers/payment.controller.js",
+          "line": 37,
+          "code": "const invoice = await Invoice.findById(invoiceId);",
+          "issue": "But DB query happens at line 37 - AFTER validation should occur"
+        },
+        {
+          "file": "src/controllers/expense.controller.js",
+          "line": 20,
+          "code": "if (!amount || amount < 0) { throw ... }",
+          "issue": "Amount validation"
+        },
+        {
+          "file": "src/controllers/expense.controller.js",
+          "line": 27,
+          "code": "const caseDoc = await Case.findById(caseId);",
+          "issue": "DB query with potentially invalid caseId"
+        }
+      ],
+      "remediation": {
+        "priority": "P2",
+        "timeline": "Week 3",
+        "steps": [
+          "Move all validation to TOP of controller functions",
+          "Validate ALL inputs before ANY database queries",
+          "Use middleware validation instead of controller validation",
+          "Fail fast - reject invalid input immediately",
+          "Optimize query order: validate -> auth -> query"
+        ],
+        "code_example": "// BEFORE:\nconst createPayment = async (req, res) => {\n    const { invoiceId, amount } = req.body;\n    if (invoiceId) {\n        const invoice = await Invoice.findById(invoiceId);  // Query first\n    }\n    if (!amount) throw error;  // Validate after\n}\n\n// AFTER:\nconst createPayment = async (req, res) => {\n    const { invoiceId, amount } = req.body;\n    if (!amount) throw error;  // Validate first\n    if (invoiceId) {\n        const invoice = await Invoice.findById(invoiceId);  // Query after\n    }\n}"
+      }
+    }
+  ],
+  "middleware_inventory": {
+    "available_middleware": [
+      {
+        "file": "src/middlewares/rateLimiter.middleware.js",
+        "functions": [
+          "authRateLimiter",
+          "apiRateLimiter",
+          "publicRateLimiter",
+          "sensitiveRateLimiter",
+          "uploadRateLimiter",
+          "paymentRateLimiter",
+          "searchRateLimiter",
+          "userRateLimiter",
+          "roleBasedRateLimiter"
+        ],
+        "used_in_routes": 0,
+        "status": "EXISTS_NOT_USED"
+      },
+      {
+        "file": "src/middlewares/authorize.middleware.js",
+        "functions": [
+          "authorize",
+          "requireAdmin",
+          "requireLawyer",
+          "requireClient",
+          "requireLawyerOrAdmin",
+          "checkPermission",
+          "requireActiveAccount",
+          "requireVerifiedLawyer"
+        ],
+        "used_in_routes": 0,
+        "status": "EXISTS_NOT_USED"
+      },
+      {
+        "file": "src/middlewares/checkOwnership.middleware.js",
+        "functions": [
+          "checkOwnership",
+          "checkCaseAccess",
+          "checkDocumentAccess",
+          "checkInvoiceAccess",
+          "checkModifyPermission"
+        ],
+        "used_in_routes": 0,
+        "status": "EXISTS_NOT_USED"
+      },
+      {
+        "file": "src/middlewares/auditLog.middleware.js",
+        "functions": [
+          "auditLog",
+          "logAuthEvent",
+          "checkSuspiciousActivity"
+        ],
+        "used_in_routes": 0,
+        "status": "EXISTS_NOT_USED"
+      },
+      {
+        "file": "src/middlewares/authenticate.js",
+        "functions": [
+          "authenticate"
+        ],
+        "used_in_routes": 1,
+        "status": "PARTIALLY_USED"
+      },
+      {
+        "file": "src/middlewares/userMiddleware.js",
+        "functions": [
+          "userMiddleware"
+        ],
+        "used_in_routes": 35,
+        "status": "WIDELY_USED"
+      },
+      {
+        "file": "src/middlewares/errorMiddleware.js",
+        "functions": [
+          "errorMiddleware"
+        ],
+        "used_in_routes": 1,
+        "status": "GLOBALLY_APPLIED"
+      }
+    ]
+  },
+  "route_analysis": {
+    "routes_requiring_rate_limiting": 36,
+    "routes_with_rate_limiting": 0,
+    "routes_requiring_authorization": 30,
+    "routes_with_authorization": 0,
+    "routes_requiring_ownership_checks": 25,
+    "routes_with_ownership_checks": 0,
+    "routes_requiring_audit_logging": 20,
+    "routes_with_audit_logging": 0,
+    "routes_requiring_validation": 36,
+    "routes_with_validation": 0
+  },
+  "attack_surface": {
+    "idor_vulnerable_routes": [
+      "/api/payments/:id (GET, PUT, DELETE)",
+      "/api/cases/:_id (GET, PATCH, DELETE)",
+      "/api/invoices/:_id (GET, PATCH)",
+      "/api/expenses/:id (GET, PUT, DELETE)",
+      "/api/tasks/:_id (GET, PATCH, DELETE)",
+      "/api/events/:id (GET, PATCH, DELETE)",
+      "/api/retainers/:id (GET, PUT)",
+      "/api/clients/:id (GET, PUT, DELETE)"
+    ],
+    "brute_force_vulnerable_routes": [
+      "/api/auth/login",
+      "/api/auth/register"
+    ],
+    "privilege_escalation_routes": [
+      "/api/invoices (POST)",
+      "/api/cases (POST)",
+      "/api/time-tracking/entries/:id/approve (POST)"
+    ],
+    "resource_exhaustion_routes": [
+      "/api/payments (POST)",
+      "/api/messages (POST with file upload)",
+      "/api/expenses (POST)"
+    ]
+  },
+  "compliance_impact": {
+    "pdpl_violations": [
+      "No audit logging for personal data access",
+      "No audit logging for data modifications",
+      "No tracking of who accessed what data",
+      "No retention of access logs"
+    ],
+    "owasp_violations": [
+      "A01:2021 - Broken Access Control",
+      "A03:2021 - Injection",
+      "A07:2021 - Identification and Authentication Failures",
+      "A09:2021 - Security Logging and Monitoring Failures",
+      "API4:2023 - Unrestricted Resource Consumption"
+    ]
+  },
+  "remediation_timeline": {
+    "phase_1_critical": {
+      "duration": "Week 1",
+      "tasks": [
+        "Apply rate limiting to all routes",
+        "Apply authorization middleware to role-specific routes",
+        "Apply ownership checks to resource access routes"
+      ],
+      "files_to_modify": 36
+    },
+    "phase_2_high": {
+      "duration": "Week 2-3",
+      "tasks": [
+        "Implement input validation middleware",
+        "Add validation rules to all routes",
+        "Apply audit logging to sensitive operations"
+      ],
+      "files_to_modify": 36,
+      "files_to_create": 1
+    },
+    "phase_3_optimization": {
+      "duration": "Week 4",
+      "tasks": [
+        "Refactor controllers to remove duplicate checks",
+        "Optimize validation order in controllers",
+        "Add global rate limiting"
+      ],
+      "files_to_modify": 25
+    }
+  }
+}

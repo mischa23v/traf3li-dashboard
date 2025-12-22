@@ -1,0 +1,206 @@
+{
+  "scanDate": "2025-12-22",
+  "repository": "traf3li-backend",
+  "summary": {
+    "totalDependencies": {
+      "production": 253,
+      "dev": 29,
+      "total": 282
+    },
+    "vulnerabilities": {
+      "critical": 0,
+      "high": 2,
+      "medium": 4,
+      "low": 3,
+      "total": 9
+    }
+  },
+  "criticalFindings": [
+    {
+      "id": "VULN-001",
+      "severity": "HIGH",
+      "package": "jws",
+      "currentVersion": "3.2.2",
+      "fixedVersion": "3.2.3",
+      "isDirect": false,
+      "viaPackage": "jsonwebtoken@9.0.0",
+      "advisory": "GHSA-869p-cjfg-cm3x",
+      "cvss": 7.5,
+      "cwe": "CWE-347",
+      "description": "Improper HMAC Signature Verification",
+      "impact": "Authentication bypass, token forgery",
+      "remediation": "npm install jsonwebtoken@latest",
+      "urgency": "IMMEDIATE"
+    },
+    {
+      "id": "VULN-002",
+      "severity": "HIGH",
+      "package": "multer",
+      "currentVersion": "1.4.5-lts.2",
+      "fixedVersion": "2.0.2",
+      "isDirect": true,
+      "deprecated": true,
+      "description": "Deprecated package with known vulnerabilities",
+      "impact": "File upload exploits, path traversal, DoS",
+      "remediation": "npm install multer@2 (breaking changes)",
+      "urgency": "IMMEDIATE"
+    },
+    {
+      "id": "VULN-003",
+      "severity": "MEDIUM",
+      "package": "bcrypt",
+      "currentVersion": "5.1.0",
+      "latestVersion": "6.0.0",
+      "isDirect": true,
+      "description": "Outdated version missing security improvements",
+      "remediation": "npm install bcrypt@latest",
+      "urgency": "SHORT_TERM"
+    },
+    {
+      "id": "VULN-004",
+      "severity": "MEDIUM",
+      "package": "mongoose",
+      "currentVersion": "7.8.7",
+      "latestVersion": "9.0.2",
+      "isDirect": true,
+      "majorVersionsBehind": 2,
+      "description": "2 major versions behind, missing security patches",
+      "remediation": "npm install mongoose@8 then mongoose@9",
+      "urgency": "MEDIUM_TERM"
+    },
+    {
+      "id": "VULN-005",
+      "severity": "MEDIUM",
+      "package": "stripe",
+      "currentVersion": "12.0.0",
+      "latestVersion": "20.1.0",
+      "isDirect": true,
+      "majorVersionsBehind": 8,
+      "description": "8 major versions behind, missing security and API updates",
+      "remediation": "npm install stripe@latest (review breaking changes)",
+      "urgency": "MEDIUM_TERM"
+    },
+    {
+      "id": "VULN-006",
+      "severity": "MEDIUM",
+      "package": "dotenv",
+      "currentVersion": "16.0.3",
+      "latestVersion": "17.2.3",
+      "isDirect": true,
+      "description": "Missing security improvements in v17",
+      "remediation": "npm install dotenv@latest",
+      "urgency": "MEDIUM_TERM"
+    },
+    {
+      "id": "VULN-007",
+      "severity": "LOW",
+      "package": "satelize",
+      "currentVersion": "0.1.2",
+      "lastUpdate": "2015-06-17",
+      "isDirect": true,
+      "unmaintained": true,
+      "yearsSinceUpdate": 10,
+      "description": "Unmaintained package, API may be unreliable",
+      "remediation": "Replace with geoip-lite or @maxmind/geoip2-node",
+      "urgency": "SHORT_TERM"
+    },
+    {
+      "id": "VULN-008",
+      "severity": "LOW",
+      "package": "ip-range-check",
+      "currentVersion": "0.2.0",
+      "lastUpdate": "2019-06-21",
+      "isDirect": true,
+      "unmaintained": true,
+      "yearsSinceUpdate": 6,
+      "description": "No updates in 6+ years",
+      "remediation": "Replace with ipaddr.js or built-in alternatives",
+      "urgency": "MEDIUM_TERM"
+    },
+    {
+      "id": "VULN-009",
+      "severity": "LOW",
+      "package": "helmet",
+      "currentVersion": "7.2.0",
+      "latestVersion": "8.1.0",
+      "isDirect": true,
+      "description": "Minor version behind, missing latest security headers",
+      "remediation": "npm install helmet@latest",
+      "urgency": "ONGOING"
+    }
+  ],
+  "quickFixes": [
+    "npm install jsonwebtoken@latest",
+    "npm install dotenv@latest",
+    "npm install helmet@latest",
+    "npm install uuid@latest",
+    "npm install node-cron@latest"
+  ],
+  "requiresManualReview": [
+    {
+      "package": "multer",
+      "reason": "Breaking changes in v2.x, requires code updates and testing"
+    },
+    {
+      "package": "mongoose",
+      "reason": "Major version upgrade requires migration guide review"
+    },
+    {
+      "package": "stripe",
+      "reason": "8 major versions gap requires extensive testing"
+    },
+    {
+      "package": "satelize",
+      "reason": "Package replacement required"
+    },
+    {
+      "package": "ip-range-check",
+      "reason": "Package replacement recommended"
+    }
+  ],
+  "automatedFix": {
+    "available": true,
+    "command": "npm audit fix",
+    "willFix": ["jws via jsonwebtoken update"],
+    "requiresForce": false
+  },
+  "maintenanceStatus": {
+    "activelyMaintained": 17,
+    "unmaintained": 2,
+    "deprecated": 1,
+    "total": 20
+  },
+  "securityScore": {
+    "overall": "MODERATE_RISK",
+    "rating": 6.5,
+    "maxRating": 10,
+    "factors": {
+      "hasHighVulnerabilities": true,
+      "hasDeprecatedPackages": true,
+      "hasUnmaintainedPackages": true,
+      "percentUpToDate": 35
+    }
+  },
+  "recommendations": {
+    "immediate": [
+      "Run 'npm audit fix' to patch jws vulnerability",
+      "Plan multer v2 upgrade with code review"
+    ],
+    "shortTerm": [
+      "Upgrade multer to v2.x with testing",
+      "Update bcrypt to v6.x",
+      "Replace satelize with modern alternative"
+    ],
+    "mediumTerm": [
+      "Upgrade mongoose to v8/v9",
+      "Upgrade stripe to v20.x",
+      "Update dotenv to v17.x",
+      "Replace ip-range-check"
+    ],
+    "ongoing": [
+      "Set up automated dependency scanning (Dependabot/Snyk)",
+      "Establish monthly dependency review process",
+      "Implement security testing in CI/CD"
+    ]
+  }
+}

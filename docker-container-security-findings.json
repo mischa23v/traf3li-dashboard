@@ -1,0 +1,586 @@
+{
+  "scan_metadata": {
+    "scan_date": "2025-12-22",
+    "scanner": "Claude Code Security Scanner",
+    "scanner_version": "1.0",
+    "repository": "https://github.com/mischa23v/traf3li-backend",
+    "repository_path": "/home/user/traf3li-backend",
+    "scan_type": "Docker/Container Security",
+    "scan_duration": "comprehensive"
+  },
+  "summary": {
+    "total_issues": 15,
+    "critical": 3,
+    "high": 4,
+    "medium": 5,
+    "low": 3,
+    "strengths": 8,
+    "risk_score": 7.2,
+    "risk_level": "HIGH",
+    "compliance_score": {
+      "cis_docker_benchmark": "45%",
+      "owasp_container_top10": "40%"
+    }
+  },
+  "findings": [
+    {
+      "id": "DOCKER-001",
+      "severity": "CRITICAL",
+      "title": "Hardcoded Default MongoDB Password",
+      "category": "Credentials & Secrets",
+      "cwe": "CWE-798",
+      "owasp": "A07:2021",
+      "description": "MongoDB root password defaults to 'changeme' if MONGO_ROOT_PASSWORD is not set",
+      "file": "/home/user/traf3li-backend/docker-compose.yml",
+      "line": 58,
+      "code_snippet": "- MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-changeme}",
+      "impact": [
+        "Unauthorized database access",
+        "Data breach potential",
+        "Complete system compromise"
+      ],
+      "remediation": "Remove default value and require environment variable: ${MONGO_ROOT_PASSWORD:?MONGO_ROOT_PASSWORD must be set}",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/798.html",
+        "https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/"
+      ],
+      "status": "open",
+      "priority": 1
+    },
+    {
+      "id": "DOCKER-002",
+      "severity": "CRITICAL",
+      "title": "Empty Default Redis Password",
+      "category": "Credentials & Secrets",
+      "cwe": "CWE-798",
+      "owasp": "A01:2021",
+      "description": "Redis authentication is disabled by default (empty password)",
+      "file": "/home/user/traf3li-backend/docker-compose.yml",
+      "line": 81,
+      "code_snippet": "command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}",
+      "impact": [
+        "Unauthorized access to cache data",
+        "Data leakage",
+        "Cache poisoning attacks",
+        "Session hijacking"
+      ],
+      "remediation": "Require password: command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD must be set}",
+      "references": [
+        "https://redis.io/docs/management/security/",
+        "https://nvd.nist.gov/vuln/detail/CVE-2021-32687"
+      ],
+      "status": "open",
+      "priority": 1
+    },
+    {
+      "id": "DOCKER-003",
+      "severity": "CRITICAL",
+      "title": "Exposed Production IP Address in CI/CD",
+      "category": "Information Disclosure",
+      "cwe": "CWE-200",
+      "owasp": "A01:2021",
+      "description": "Production EC2 server IP address (15.185.200.21) is hardcoded in GitHub Actions workflow",
+      "file": "/home/user/traf3li-backend/.github/workflows/deploy-aws.yml",
+      "line": 53,
+      "code_snippet": "host: 15.185.200.21",
+      "impact": [
+        "Information disclosure",
+        "Attack surface exposure",
+        "Easier targeting for attackers"
+      ],
+      "remediation": "Use GitHub Secrets: host: ${{ secrets.EC2_HOST }}",
+      "references": [
+        "https://docs.github.com/en/actions/security-guides/encrypted-secrets"
+      ],
+      "status": "open",
+      "priority": 1
+    },
+    {
+      "id": "DOCKER-004",
+      "severity": "HIGH",
+      "title": "Unversioned Base Image (latest tag)",
+      "category": "Image Security",
+      "cwe": "CWE-494",
+      "owasp": "Container Security",
+      "description": "ClamAV Dockerfile uses :latest tag instead of pinned version",
+      "file": "/home/user/traf3li-backend/Dockerfile.clamav",
+      "line": 5,
+      "code_snippet": "FROM clamav/clamav:latest",
+      "impact": [
+        "Inconsistent builds",
+        "Unexpected breaking changes",
+        "Untested vulnerability patches",
+        "Supply chain attack risk"
+      ],
+      "remediation": "Pin to specific version: FROM clamav/clamav:1.4.1",
+      "references": [
+        "https://docs.docker.com/develop/dev-best-practices/",
+        "https://workbench.cisecurity.org/benchmarks/6654"
+      ],
+      "status": "open",
+      "priority": 2
+    },
+    {
+      "id": "DOCKER-005",
+      "severity": "HIGH",
+      "title": "Database Ports Exposed to Host Network",
+      "category": "Network Security",
+      "cwe": "CWE-668",
+      "owasp": "A01:2021",
+      "description": "MongoDB (27017) and Redis (6379) ports are unnecessarily exposed to host network",
+      "file": "/home/user/traf3li-backend/docker-compose.yml",
+      "lines": [54, 55, 79, 80],
+      "code_snippet": "ports:\n  - \"27017:27017\"\n  - \"6379:6379\"",
+      "impact": [
+        "Direct database access from host",
+        "Increased attack surface",
+        "Bypass of application-level security",
+        "Unauthorized data access"
+      ],
+      "remediation": "Remove port mappings and use 'expose' instead for Docker-only access",
+      "references": [
+        "https://workbench.cisecurity.org/benchmarks/6654",
+        "https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html"
+      ],
+      "status": "open",
+      "priority": 2
+    },
+    {
+      "id": "DOCKER-006",
+      "severity": "HIGH",
+      "title": "NPM Dependency Vulnerabilities - expr-eval",
+      "category": "Dependency Vulnerabilities",
+      "cwe": "CWE-1321",
+      "cve": ["GHSA-8gw3-rxh4-v6jx", "GHSA-jc85-fpwf-qm7x"],
+      "description": "expr-eval package has prototype pollution and unrestricted function evaluation vulnerabilities",
+      "file": "/home/user/traf3li-backend/package.json",
+      "package": "expr-eval",
+      "version": "2.0.2",
+      "impact": [
+        "Remote code execution potential",
+        "Prototype pollution attacks",
+        "Arbitrary code execution"
+      ],
+      "remediation": "Replace with safer alternatives (mathjs) or implement strict input sanitization",
+      "references": [
+        "https://github.com/advisories/GHSA-8gw3-rxh4-v6jx",
+        "https://github.com/advisories/GHSA-jc85-fpwf-qm7x"
+      ],
+      "status": "open",
+      "priority": 2
+    },
+    {
+      "id": "DOCKER-007",
+      "severity": "HIGH",
+      "title": "NPM Dependency Vulnerabilities - nodemailer",
+      "category": "Dependency Vulnerabilities",
+      "cwe": "CWE-1333",
+      "cve": ["GHSA-mm7p-fcc7-pg87", "GHSA-rcmh-qjqh-p98v", "GHSA-46j5-6fg5-4gv3"],
+      "description": "nodemailer <= 7.0.10 vulnerable to DoS and domain confusion",
+      "file": "/home/user/traf3li-backend/package.json",
+      "package": "nodemailer",
+      "version": "6.9.15",
+      "impact": [
+        "Denial of service attacks",
+        "Email spoofing/misdirection",
+        "Resource exhaustion"
+      ],
+      "remediation": "Update to nodemailer@7.0.12 or later",
+      "fix_command": "npm install nodemailer@^7.0.12",
+      "references": [
+        "https://github.com/advisories/GHSA-mm7p-fcc7-pg87"
+      ],
+      "status": "open",
+      "priority": 2
+    },
+    {
+      "id": "DOCKER-008",
+      "severity": "MEDIUM",
+      "title": "test/.env Not in .gitignore",
+      "category": "Secrets Management",
+      "cwe": "CWE-540",
+      "description": "Test environment file is not excluded by .gitignore, risking accidental commit",
+      "file": "/home/user/traf3li-backend/.gitignore",
+      "impact": [
+        "Accidental secret exposure",
+        "Credential leakage in version control"
+      ],
+      "remediation": "Add **/.env and **/.env.* patterns to .gitignore",
+      "status": "open",
+      "priority": 3
+    },
+    {
+      "id": "DOCKER-009",
+      "severity": "MEDIUM",
+      "title": "No Resource Limits on Main Application Container",
+      "category": "Resource Management",
+      "cwe": "CWE-770",
+      "description": "Application container lacks CPU/memory limits, enabling resource exhaustion",
+      "file": "/home/user/traf3li-backend/docker-compose.yml",
+      "impact": [
+        "Resource exhaustion attacks",
+        "DoS via memory leaks",
+        "Poor multi-tenancy isolation"
+      ],
+      "remediation": "Add deploy.resources limits and pids_limit configuration",
+      "status": "open",
+      "priority": 3
+    },
+    {
+      "id": "DOCKER-010",
+      "severity": "MEDIUM",
+      "title": "ClamAV Port Exposed to Host Network",
+      "category": "Network Security",
+      "cwe": "CWE-668",
+      "description": "ClamAV daemon port 3310 is exposed to host network unnecessarily",
+      "file": "/home/user/traf3li-backend/docker-compose.clamav.yml",
+      "lines": [22, 23],
+      "impact": [
+        "Unauthorized scanning requests",
+        "Potential DoS on scanning service"
+      ],
+      "remediation": "Use 'expose' instead of 'ports' for Docker-only access",
+      "status": "open",
+      "priority": 3
+    },
+    {
+      "id": "DOCKER-011",
+      "severity": "MEDIUM",
+      "title": "Missing Container Security Options",
+      "category": "Container Hardening",
+      "cis": "5.25",
+      "description": "No security hardening options (AppArmor, seccomp, capabilities) configured",
+      "file": "/home/user/traf3li-backend/docker-compose.yml",
+      "impact": [
+        "Container escape risk",
+        "Privilege escalation potential",
+        "Kernel vulnerability exploitation"
+      ],
+      "remediation": "Add security_opt, cap_drop, and cap_add configurations",
+      "status": "open",
+      "priority": 3
+    },
+    {
+      "id": "DOCKER-012",
+      "severity": "MEDIUM",
+      "title": "No Read-Only Root Filesystem",
+      "category": "Container Hardening",
+      "cis": "5.12",
+      "description": "Containers can write to their entire filesystem",
+      "file": "/home/user/traf3li-backend/docker-compose.yml",
+      "impact": [
+        "Malware persistence",
+        "Unauthorized file modifications"
+      ],
+      "remediation": "Add read_only: true with tmpfs for writable directories",
+      "status": "open",
+      "priority": 3
+    },
+    {
+      "id": "DOCKER-013",
+      "severity": "LOW",
+      "title": "Logging Configuration Missing in docker-compose.yml",
+      "category": "Logging & Monitoring",
+      "description": "Development compose file lacks logging rotation configuration",
+      "file": "/home/user/traf3li-backend/docker-compose.yml",
+      "impact": [
+        "Disk space exhaustion",
+        "Performance degradation"
+      ],
+      "remediation": "Add logging driver with max-size and max-file options",
+      "status": "open",
+      "priority": 4
+    },
+    {
+      "id": "DOCKER-014",
+      "severity": "LOW",
+      "title": "Health Check Uses Insecure HTTP",
+      "category": "Network Security",
+      "description": "Health check endpoint uses HTTP instead of HTTPS",
+      "file": "/home/user/traf3li-backend/Dockerfile",
+      "line": 71,
+      "impact": [
+        "Minor information leakage",
+        "Man-in-the-middle on health checks"
+      ],
+      "remediation": "Use HTTPS for health checks if TLS is configured",
+      "status": "open",
+      "priority": 4
+    },
+    {
+      "id": "DOCKER-015",
+      "severity": "LOW",
+      "title": "Missing Network Encryption Between Containers",
+      "category": "Network Security",
+      "description": "No TLS/SSL configured for inter-container communication",
+      "file": "/home/user/traf3li-backend/docker-compose.yml",
+      "impact": [
+        "Unencrypted data in transit",
+        "Man-in-the-middle on Docker network"
+      ],
+      "remediation": "Enable TLS for MongoDB and Redis connections",
+      "status": "open",
+      "priority": 4
+    }
+  ],
+  "strengths": [
+    {
+      "id": "STRENGTH-001",
+      "title": "Non-Root User in Dockerfile",
+      "category": "Container Security",
+      "file": "/home/user/traf3li-backend/Dockerfile",
+      "lines": [33, 34, 64],
+      "description": "Application runs as non-root user (nodejs, UID 1001)",
+      "compliance": ["CIS 4.1"]
+    },
+    {
+      "id": "STRENGTH-002",
+      "title": "Multi-Stage Docker Build",
+      "category": "Image Security",
+      "file": "/home/user/traf3li-backend/Dockerfile",
+      "lines": [8, 30],
+      "description": "Uses multi-stage build to reduce image size and attack surface",
+      "compliance": ["Docker Best Practices"]
+    },
+    {
+      "id": "STRENGTH-003",
+      "title": "Comprehensive .dockerignore",
+      "category": "Secrets Management",
+      "file": "/home/user/traf3li-backend/.dockerignore",
+      "description": "54 patterns configured to exclude sensitive files from Docker context"
+    },
+    {
+      "id": "STRENGTH-004",
+      "title": "Alpine-Based Images",
+      "category": "Image Security",
+      "file": "/home/user/traf3li-backend/Dockerfile",
+      "description": "Uses minimal Alpine Linux base images"
+    },
+    {
+      "id": "STRENGTH-005",
+      "title": "Health Checks Configured",
+      "category": "Reliability",
+      "files": [
+        "/home/user/traf3li-backend/Dockerfile",
+        "/home/user/traf3li-backend/docker-compose.yml"
+      ],
+      "description": "All services have proper health check configurations",
+      "compliance": ["CIS 5.6"]
+    },
+    {
+      "id": "STRENGTH-006",
+      "title": "Automated NPM Security Scanning",
+      "category": "CI/CD Security",
+      "file": "/home/user/traf3li-backend/.github/workflows/security-scan.yml",
+      "description": "GitHub Actions blocks PRs with critical/high npm vulnerabilities"
+    },
+    {
+      "id": "STRENGTH-007",
+      "title": "Resource Limits on ClamAV",
+      "category": "Resource Management",
+      "file": "/home/user/traf3li-backend/docker-compose.clamav.yml",
+      "description": "ClamAV container has CPU and memory limits configured"
+    },
+    {
+      "id": "STRENGTH-008",
+      "title": "Production Dependency Pruning",
+      "category": "Image Security",
+      "file": "/home/user/traf3li-backend/Dockerfile",
+      "line": 25,
+      "description": "Development dependencies removed from production image"
+    }
+  ],
+  "compliance": {
+    "cis_docker_benchmark": {
+      "version": "1.6.0",
+      "total_controls": 20,
+      "passed": 9,
+      "failed": 11,
+      "score": "45%",
+      "controls": {
+        "4.1": { "status": "PASS", "title": "Dockerfile User Instruction" },
+        "4.2": { "status": "PARTIAL", "title": "Trusted Base Images" },
+        "4.7": { "status": "PASS", "title": "Update Instructions" },
+        "5.6": { "status": "PASS", "title": "Health Check" },
+        "5.7": { "status": "FAIL", "title": "Expose Required Ports Only" },
+        "5.12": { "status": "FAIL", "title": "Read-only Root Filesystem" },
+        "5.25": { "status": "FAIL", "title": "Restrict Container Capabilities" },
+        "5.28": { "status": "FAIL", "title": "PIDs cgroup limit" }
+      }
+    },
+    "owasp_container_top10": {
+      "total_risks": 10,
+      "addressed": 4,
+      "partial": 4,
+      "not_addressed": 2,
+      "score": "40%",
+      "risks": {
+        "1_insecure_images": { "status": "PARTIAL", "notes": "Latest tag usage, no image scanning" },
+        "2_vulnerable_components": { "status": "FAIL", "notes": "NPM vulnerabilities present" },
+        "3_secrets_in_images": { "status": "PASS", "notes": "No hardcoded secrets in images" },
+        "4_excessive_permissions": { "status": "PARTIAL", "notes": "Non-root user, but no cap_drop" },
+        "5_network_segmentation": { "status": "FAIL", "notes": "Database ports exposed to host" },
+        "6_resource_exhaustion": { "status": "FAIL", "notes": "No resource limits on main app" },
+        "7_container_config": { "status": "PARTIAL", "notes": "Basic hardening missing" },
+        "9_runtime_security": { "status": "PARTIAL", "notes": "No AppArmor/seccomp profiles" },
+        "10_supply_chain": { "status": "PARTIAL", "notes": "No image signature verification" }
+      }
+    }
+  },
+  "metrics": {
+    "files_scanned": 12,
+    "dockerfiles": 2,
+    "compose_files": 3,
+    "config_files": 4,
+    "workflow_files": 2,
+    "script_files": 1,
+    "total_lines_analyzed": 850,
+    "npm_packages_analyzed": 100,
+    "npm_vulnerabilities": {
+      "critical": 0,
+      "high": 1,
+      "moderate": 1,
+      "low": 0,
+      "total": 2
+    }
+  },
+  "remediation_summary": {
+    "immediate_action": {
+      "timeframe": "24-48 hours",
+      "issues": ["DOCKER-001", "DOCKER-002", "DOCKER-003", "DOCKER-004"]
+    },
+    "short_term": {
+      "timeframe": "1-2 weeks",
+      "issues": ["DOCKER-005", "DOCKER-006", "DOCKER-007", "DOCKER-008"]
+    },
+    "medium_term": {
+      "timeframe": "1 month",
+      "issues": ["DOCKER-009", "DOCKER-010", "DOCKER-011", "DOCKER-012"]
+    },
+    "long_term": {
+      "timeframe": "Ongoing",
+      "issues": ["DOCKER-013", "DOCKER-014", "DOCKER-015"]
+    }
+  },
+  "next_actions": [
+    {
+      "priority": 1,
+      "action": "Remove hardcoded database credentials",
+      "file": "docker-compose.yml",
+      "estimated_time": "15 minutes"
+    },
+    {
+      "priority": 2,
+      "action": "Pin ClamAV to specific version",
+      "file": "Dockerfile.clamav",
+      "estimated_time": "5 minutes"
+    },
+    {
+      "priority": 3,
+      "action": "Remove database port exposure",
+      "file": "docker-compose.yml",
+      "estimated_time": "10 minutes"
+    },
+    {
+      "priority": 4,
+      "action": "Update nodemailer dependency",
+      "file": "package.json",
+      "estimated_time": "10 minutes"
+    },
+    {
+      "priority": 5,
+      "action": "Add Trivy image scanning to CI/CD",
+      "file": ".github/workflows/security-scan.yml",
+      "estimated_time": "30 minutes"
+    },
+    {
+      "priority": 6,
+      "action": "Add resource limits to containers",
+      "file": "docker-compose.yml",
+      "estimated_time": "20 minutes"
+    },
+    {
+      "priority": 7,
+      "action": "Implement container security hardening",
+      "file": "docker-compose.yml",
+      "estimated_time": "30 minutes"
+    }
+  ],
+  "tools_used": [
+    {
+      "name": "npm audit",
+      "version": "10.x",
+      "purpose": "Dependency vulnerability scanning"
+    },
+    {
+      "name": "Docker best practices analysis",
+      "purpose": "Dockerfile security review"
+    },
+    {
+      "name": "CIS Benchmark comparison",
+      "version": "1.6.0",
+      "purpose": "Compliance assessment"
+    },
+    {
+      "name": "OWASP Container Security",
+      "purpose": "Container security assessment"
+    }
+  ],
+  "recommended_tools": [
+    {
+      "name": "Trivy",
+      "purpose": "Container image vulnerability scanning",
+      "install": "https://aquasecurity.github.io/trivy/"
+    },
+    {
+      "name": "Hadolint",
+      "purpose": "Dockerfile linting",
+      "install": "https://github.com/hadolint/hadolint"
+    },
+    {
+      "name": "Snyk",
+      "purpose": "Continuous security monitoring",
+      "install": "https://snyk.io/"
+    },
+    {
+      "name": "Falco",
+      "purpose": "Runtime security monitoring",
+      "install": "https://falco.org/"
+    }
+  ],
+  "references": [
+    {
+      "title": "CIS Docker Benchmark v1.6.0",
+      "url": "https://www.cisecurity.org/benchmark/docker"
+    },
+    {
+      "title": "OWASP Docker Security Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html"
+    },
+    {
+      "title": "NIST Container Security Guide SP 800-190",
+      "url": "https://csrc.nist.gov/publications/detail/sp/800-190/final"
+    },
+    {
+      "title": "Docker Security Best Practices",
+      "url": "https://docs.docker.com/develop/security-best-practices/"
+    }
+  ],
+  "report_files": [
+    {
+      "name": "DOCKER_CONTAINER_SECURITY_SCAN_REPORT.md",
+      "path": "/home/user/traf3li-dashboard/DOCKER_CONTAINER_SECURITY_SCAN_REPORT.md",
+      "description": "Comprehensive security scan report with detailed findings"
+    },
+    {
+      "name": "DOCKER_SECURITY_QUICK_FIXES.md",
+      "path": "/home/user/traf3li-dashboard/DOCKER_SECURITY_QUICK_FIXES.md",
+      "description": "Quick reference guide for implementing security fixes"
+    },
+    {
+      "name": "docker-container-security-findings.json",
+      "path": "/home/user/traf3li-dashboard/docker-container-security-findings.json",
+      "description": "Structured findings in JSON format for automation"
+    }
+  ]
+}

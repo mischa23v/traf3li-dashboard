@@ -1,0 +1,455 @@
+{
+  "scan_metadata": {
+    "scan_date": "2025-12-22",
+    "scanner": "Manual Security Audit",
+    "repository": "traf3li-backend",
+    "scan_type": "Queue/Job Security",
+    "total_vulnerabilities": 13,
+    "critical": 4,
+    "high": 3,
+    "medium": 3,
+    "low": 3
+  },
+  "infrastructure": {
+    "queue_system": "NONE",
+    "cron_system": "node-cron@3.0.3",
+    "realtime": "socket.io@4.7.2",
+    "payment_gateway": "stripe@12.0.0",
+    "pdf_generation": "@pdfme/generator@5.5.7",
+    "database": "mongoose@7.0.1",
+    "redis": "NOT_INSTALLED"
+  },
+  "vulnerabilities": [
+    {
+      "id": "QUEUE-001",
+      "title": "Async PDF Generation Without Queue System",
+      "severity": "CRITICAL",
+      "cwe": "CWE-400",
+      "cvss_score": 8.6,
+      "category": "Resource Exhaustion",
+      "file": "/src/controllers/pdfme.controller.js",
+      "line_number": 693,
+      "vulnerable_code": "const generatePdfAsync = async (request, response) => {\n    const pdfBuffer = await generatePdfFromTemplate(template, inputs || {});\n    fs.writeFileSync(filePath, pdfBuffer);\n}",
+      "description": "PDF generation endpoint claims to be 'async' but executes synchronously, blocking the event loop. No job queue, timeout protection, or concurrency limits.",
+      "attack_scenario": "Attacker sends 50 complex PDF generation requests simultaneously, causing event loop blockage and complete server unavailability.",
+      "impact": [
+        "Server DoS via PDF bomb attacks",
+        "Event loop blocking affects all users",
+        "No way to cancel long-running jobs",
+        "Memory exhaustion from unlimited concurrent operations"
+      ],
+      "remediation": {
+        "priority": "IMMEDIATE",
+        "effort": "HIGH",
+        "steps": [
+          "Install Bull queue system (npm install bull ioredis)",
+          "Setup Redis server",
+          "Implement PDF generation queue with 30s timeout",
+          "Add concurrency limit (max 5 simultaneous)",
+          "Add rate limiting (10 PDFs per user per minute)"
+        ]
+      },
+      "references": [
+        "https://owasp.org/www-community/attacks/Denial_of_Service",
+        "https://github.com/OptimalBits/bull"
+      ]
+    },
+    {
+      "id": "QUEUE-002",
+      "title": "Notification Flood Without Batch Limits",
+      "severity": "CRITICAL",
+      "cwe": "CWE-770",
+      "cvss_score": 8.2,
+      "category": "Resource Allocation",
+      "file": "/src/controllers/notification.controller.js",
+      "line_number": 182,
+      "vulnerable_code": "const createBulkNotifications = async (notifications) => {\n    const result = await Notification.insertMany(notifications);\n    result.forEach(notification => {\n        emitNotification(notification.userId, notification.toObject());\n    });\n}",
+      "description": "No validation on notification array size. Attacker can send millions of notifications in a single request, overwhelming database and Socket.io.",
+      "attack_scenario": "POST /api/notifications/bulk with 1,000,000 notifications crashes MongoDB and Socket.io, affecting all connected users.",
+      "impact": [
+        "Database memory exhaustion",
+        "Socket.io connection saturation",
+        "MongoDB crashes",
+        "All real-time features become unavailable"
+      ],
+      "remediation": {
+        "priority": "IMMEDIATE",
+        "effort": "LOW",
+        "steps": [
+          "Add array size validation (max 100 items)",
+          "Implement notification queue with batching",
+          "Add throttling to Socket.io emissions (10ms delay)",
+          "Add rate limiting (100 notifications per minute)"
+        ]
+      },
+      "exploit_code": "POST /api/notifications/bulk\n{\n  \"notifications\": Array(1000000).fill({\n    \"userId\": \"target\",\n    \"message\": \"flood\"\n  })\n}"
+    },
+    {
+      "id": "QUEUE-003",
+      "title": "Payment Retry Bomb - Infinite Retries",
+      "severity": "CRITICAL",
+      "cwe": "CWE-841",
+      "cvss_score": 7.8,
+      "category": "Workflow Enforcement",
+      "file": "/src/controllers/payment.controller.js",
+      "line_number": 374,
+      "vulnerable_code": "payment.retryCount = (payment.retryCount || 0) + 1;",
+      "description": "No maximum retry limit enforced. Payments can retry infinitely, causing Stripe API rate limit violations and resource exhaustion.",
+      "attack_scenario": "Attacker triggers payment failure loop, retrying thousands of times until Stripe blocks the account.",
+      "impact": [
+        "Infinite retry loops",
+        "Stripe API rate limit violations",
+        "Account suspension by payment gateway",
+        "Database pollution with failed payment records"
+      ],
+      "remediation": {
+        "priority": "IMMEDIATE",
+        "effort": "LOW",
+        "steps": [
+          "Add max retry limit (5 attempts)",
+          "Implement exponential backoff",
+          "Add retryCount validation in schema",
+          "Set payment to 'failed_permanently' after max retries"
+        ]
+      }
+    },
+    {
+      "id": "QUEUE-004",
+      "title": "Cron Job Task Processing Without Batching",
+      "severity": "CRITICAL",
+      "cwe": "CWE-94",
+      "cvss_score": 7.5,
+      "category": "Code Injection",
+      "file": "/src/utils/taskReminders.js",
+      "line_number": 28,
+      "vulnerable_code": "for (const task of tasks) {\n    await createNotification({\n        userId: task.assignedTo._id,\n        message: `مهمة \"${task.title}\" تنتهي خلال 24 ساعة`\n    });\n}",
+      "description": "Cron job processes all tasks sequentially without batching. If 100,000 tasks are due, cron runs for hours, blocking server.",
+      "attack_scenario": "Create 100,000 tasks due tomorrow. Next day at 9 AM, cron job runs for hours sending notifications, server becomes unresponsive.",
+      "impact": [
+        "Cron job timeout/hang",
+        "Server unavailability during execution",
+        "Notification provider rate limits",
+        "Email/SMS gateway blocks"
+      ],
+      "remediation": {
+        "priority": "HIGH",
+        "effort": "MEDIUM",
+        "steps": [
+          "Implement batch processing (100 tasks per batch)",
+          "Add 1-second delay between batches",
+          "Queue notifications instead of sending directly",
+          "Add timeout protection (max 10 minutes)",
+          "Add error handling and admin alerts"
+        ]
+      }
+    },
+    {
+      "id": "QUEUE-005",
+      "title": "Recurring Task Race Condition",
+      "severity": "HIGH",
+      "cwe": "CWE-362",
+      "cvss_score": 6.8,
+      "category": "Race Condition",
+      "file": "/src/controllers/task.controller.js",
+      "line_number": 277,
+      "vulnerable_code": "task.status = 'done';\nask.completedAt = new Date();\nawait task.save();\n\nif (task.recurring && task.recurring.enabled) {\n    const nextTask = await Task.create({...});\n}",
+      "description": "No transaction support for recurring task completion. Concurrent completions can create duplicate next occurrences.",
+      "attack_scenario": "Send 10 simultaneous completion requests for same recurring task, creating 10 duplicate next occurrences.",
+      "impact": [
+        "Duplicate task creation",
+        "Database pollution",
+        "User confusion from multiple identical tasks",
+        "Notification spam"
+      ],
+      "remediation": {
+        "priority": "HIGH",
+        "effort": "MEDIUM",
+        "steps": [
+          "Implement MongoDB transactions",
+          "Add idempotency check for next task",
+          "Create unique constraint on originalTaskId + status",
+          "Add optimistic locking"
+        ]
+      },
+      "exploit_code": "for i in {1..10}; do\n  curl -X POST /api/tasks/TASK_ID/complete &\ndone"
+    },
+    {
+      "id": "QUEUE-006",
+      "title": "Bulk Delete Without Size Limits",
+      "severity": "HIGH",
+      "cwe": "CWE-1284",
+      "cvss_score": 6.5,
+      "category": "Input Validation",
+      "file": "/src/controllers/payment.controller.js",
+      "line_number": 621,
+      "vulnerable_code": "const { paymentIds } = req.body;\nconst payments = await Payment.find({\n    _id: { $in: paymentIds }\n});",
+      "description": "No validation on bulk operation array size. Can delete millions of records in single request, causing MongoDB timeout.",
+      "attack_scenario": "Send DELETE request with 1 million payment IDs, causing MongoDB query timeout and service disruption.",
+      "impact": [
+        "MongoDB query timeout",
+        "Memory exhaustion loading all records",
+        "Accidental mass deletion",
+        "Database server overload"
+      ],
+      "remediation": {
+        "priority": "HIGH",
+        "effort": "LOW",
+        "steps": [
+          "Add array size validation (max 100 items)",
+          "Implement pagination for large deletions",
+          "Add confirmation for bulk operations",
+          "Log all bulk deletions for audit"
+        ]
+      }
+    },
+    {
+      "id": "QUEUE-007",
+      "title": "Socket.io Message Injection",
+      "severity": "HIGH",
+      "cwe": "CWE-79",
+      "cvss_score": 6.2,
+      "category": "XSS",
+      "file": "/src/configs/socket.js",
+      "line_number": 52,
+      "vulnerable_code": "socket.on('message:send', (data) => {\n    socket.to(data.conversationId).emit('message:receive', data);\n});",
+      "description": "No sanitization of Socket.io message data. Attacker can inject malicious HTML/JavaScript in real-time messages.",
+      "attack_scenario": "Send message with XSS payload via Socket.io, executing JavaScript in all conversation participants' browsers.",
+      "impact": [
+        "XSS attacks on all users in conversation",
+        "Session hijacking",
+        "Malicious script execution",
+        "Account compromise"
+      ],
+      "remediation": {
+        "priority": "MEDIUM",
+        "effort": "LOW",
+        "steps": [
+          "Sanitize all message content (DOMPurify)",
+          "Validate conversationId ownership",
+          "Add rate limiting (10 messages per second)",
+          "Implement message queue for flood protection"
+        ]
+      }
+    },
+    {
+      "id": "QUEUE-008",
+      "title": "Stripe Webhook Without Signature Verification",
+      "severity": "MEDIUM",
+      "cwe": "CWE-345",
+      "cvss_score": 5.9,
+      "category": "Authentication",
+      "file": "/src/controllers/order.controller.js",
+      "line_number": 155,
+      "vulnerable_code": "const updatePaymentStatus = async (request, response) => {\n    const { payment_intent } = request.body;\n    const order = await Order.findOneAndUpdate(\n        { payment_intent },\n        { isCompleted: true }\n    );\n}",
+      "description": "Stripe webhook endpoint does not verify signature. Attacker can forge payment completion webhooks.",
+      "attack_scenario": "POST to webhook endpoint with fake payment_intent, marking orders as paid without actual payment.",
+      "impact": [
+        "Fraudulent order completion",
+        "Financial loss",
+        "Free service access",
+        "Replay attacks"
+      ],
+      "remediation": {
+        "priority": "MEDIUM",
+        "effort": "MEDIUM",
+        "steps": [
+          "Implement stripe.webhooks.constructEvent()",
+          "Verify webhook signature on every request",
+          "Add STRIPE_WEBHOOK_SECRET to environment",
+          "Log all webhook verification failures"
+        ]
+      }
+    },
+    {
+      "id": "QUEUE-009",
+      "title": "Stale Notification Accumulation",
+      "severity": "MEDIUM",
+      "cwe": "CWE-404",
+      "cvss_score": 5.3,
+      "category": "Resource Management",
+      "file": "/src/models/notification.model.js",
+      "line_number": 1,
+      "vulnerable_code": "// No TTL or cleanup mechanism",
+      "description": "Notifications are stored forever without cleanup. Database can accumulate millions of old notifications.",
+      "attack_scenario": "After 1 year, notification collection contains 10 million records, slowing down all queries.",
+      "impact": [
+        "Database size growth",
+        "Query performance degradation",
+        "Increased storage costs",
+        "Slow notification fetching"
+      ],
+      "remediation": {
+        "priority": "MEDIUM",
+        "effort": "LOW",
+        "steps": [
+          "Add MongoDB TTL index (expire after 30 days)",
+          "Implement cleanup cron job",
+          "Delete read notifications older than 30 days",
+          "Archive important notifications before deletion"
+        ]
+      }
+    },
+    {
+      "id": "QUEUE-010",
+      "title": "PDF Generation Without Timeout",
+      "severity": "MEDIUM",
+      "cwe": "CWE-400",
+      "cvss_score": 5.1,
+      "category": "Resource Consumption",
+      "file": "/src/controllers/pdfme.controller.js",
+      "line_number": 460,
+      "vulnerable_code": "const generatePdfFromTemplate = async (template, inputs) => {\n    const pdf = await generate({\n        template: templateData,\n        inputs: [inputs]\n    });\n    return Buffer.from(pdf);\n};",
+      "description": "PDF generation has no timeout. Complex templates can run indefinitely, consuming resources.",
+      "attack_scenario": "Submit extremely complex PDF template, causing generation to run for hours and consume all CPU.",
+      "impact": [
+        "Long-running operations",
+        "CPU exhaustion",
+        "Memory leaks",
+        "Event loop blocking"
+      ],
+      "remediation": {
+        "priority": "MEDIUM",
+        "effort": "LOW",
+        "steps": [
+          "Add Promise.race() with 30s timeout",
+          "Kill long-running PDF processes",
+          "Add complexity validation for templates",
+          "Limit schema size and nesting"
+        ]
+      }
+    },
+    {
+      "id": "QUEUE-011",
+      "title": "Missing Job Priority System",
+      "severity": "LOW",
+      "cwe": "N/A",
+      "cvss_score": 3.2,
+      "category": "Design Flaw",
+      "file": "N/A",
+      "line_number": 0,
+      "vulnerable_code": "// No job queue implemented",
+      "description": "No way to prioritize urgent operations. All async tasks processed FIFO, delaying critical operations.",
+      "impact": [
+        "Critical operations delayed",
+        "Poor user experience",
+        "No SLA guarantees"
+      ],
+      "remediation": {
+        "priority": "LOW",
+        "effort": "HIGH",
+        "steps": [
+          "Implement Bull queue with priority support",
+          "Define priority levels (critical, high, normal, low)",
+          "Route urgent operations to high-priority queue"
+        ]
+      }
+    },
+    {
+      "id": "QUEUE-012",
+      "title": "No Job Cancellation Mechanism",
+      "severity": "LOW",
+      "cwe": "N/A",
+      "cvss_score": 3.0,
+      "category": "Design Flaw",
+      "file": "N/A",
+      "line_number": 0,
+      "vulnerable_code": "// No job queue implemented",
+      "description": "Once started, operations cannot be cancelled. No way to abort long-running PDF generation or stop unwanted jobs.",
+      "impact": [
+        "Wasted resources on unwanted operations",
+        "No user control over submitted jobs",
+        "Cannot stop accidental job submissions"
+      ],
+      "remediation": {
+        "priority": "LOW",
+        "effort": "MEDIUM",
+        "steps": [
+          "Implement job cancellation API",
+          "Add abort signal to long-running operations",
+          "Expose job status/cancellation to users"
+        ]
+      }
+    },
+    {
+      "id": "QUEUE-013",
+      "title": "Missing Dead Letter Queue",
+      "severity": "LOW",
+      "cwe": "N/A",
+      "cvss_score": 2.8,
+      "category": "Monitoring",
+      "file": "N/A",
+      "line_number": 0,
+      "vulnerable_code": "// No job queue implemented",
+      "description": "Failed operations not logged systematically. No retry mechanism for transient failures or alerting on repeated failures.",
+      "impact": [
+        "Silent failures",
+        "Data loss on transient errors",
+        "No visibility into failure patterns"
+      ],
+      "remediation": {
+        "priority": "LOW",
+        "effort": "MEDIUM",
+        "steps": [
+          "Implement Bull failed job tracking",
+          "Add dead letter queue for permanently failed jobs",
+          "Alert on high failure rates",
+          "Manual retry mechanism for failed jobs"
+        ]
+      }
+    }
+  ],
+  "recommendations": {
+    "immediate": [
+      "Install and configure Bull queue system with Redis",
+      "Add rate limiting to all async endpoints",
+      "Enforce maximum retry limits (5) on payments",
+      "Add batch size validation (max 100) to all bulk operations"
+    ],
+    "high_priority": [
+      "Implement MongoDB transactions for recurring tasks",
+      "Add batch processing to cron jobs",
+      "Implement notification queue with throttling",
+      "Add Stripe webhook signature verification"
+    ],
+    "medium_priority": [
+      "Add timeout protection (30s) to PDF generation",
+      "Implement notification cleanup cron job",
+      "Add Socket.io message sanitization",
+      "Add monitoring and alerting for queue metrics"
+    ],
+    "testing": [
+      "Load test PDF generation (100 concurrent requests)",
+      "Load test notification system (10,000 notifications)",
+      "Test payment retry limits under failure conditions",
+      "Test cron job performance with 100,000+ tasks",
+      "Penetration test race conditions in concurrent operations"
+    ]
+  },
+  "compliance": {
+    "pdpl": {
+      "status": "PARTIALLY_COMPLIANT",
+      "gaps": [
+        "No encryption for job data at rest",
+        "No audit trail for background jobs",
+        "No user control over queued operations"
+      ]
+    },
+    "pci_dss": {
+      "status": "NON_COMPLIANT",
+      "gaps": [
+        "Payment webhooks not verified",
+        "No isolation for payment jobs",
+        "Payment retry attempts not properly logged"
+      ]
+    }
+  },
+  "metrics": {
+    "total_async_operations": 6,
+    "operations_with_timeout": 0,
+    "operations_with_retry_limit": 0,
+    "operations_with_rate_limiting": 0,
+    "operations_with_validation": 2,
+    "queue_system_present": false,
+    "monitoring_present": false
+  }
+}
