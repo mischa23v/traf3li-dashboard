@@ -43,6 +43,7 @@ import { Route as authPrivacyRouteImport } from './routes/(auth)/privacy'
 import { Route as authOtpLoginRouteImport } from './routes/(auth)/otp-login'
 import { Route as authOtpRouteImport } from './routes/(auth)/otp'
 import { Route as authNoFirmRouteImport } from './routes/(auth)/no-firm'
+import { Route as authMfaChallengeRouteImport } from './routes/(auth)/mfa-challenge'
 import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
 import { Route as authConflictPolicyRouteImport } from './routes/(auth)/conflict-policy'
 import { Route as ClerkAuthenticatedRouteRouteImport } from './routes/clerk/_authenticated/route'
@@ -506,6 +507,11 @@ const authOtpRoute = authOtpRouteImport.update({
 const authNoFirmRoute = authNoFirmRouteImport.update({
   id: '/(auth)/no-firm',
   path: '/no-firm',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authMfaChallengeRoute = authMfaChallengeRouteImport.update({
+  id: '/(auth)/mfa-challenge',
+  path: '/mfa-challenge',
   getParentRoute: () => rootRouteImport,
 } as any)
 const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
@@ -2292,6 +2298,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/conflict-policy': typeof authConflictPolicyRoute
   '/forgot-password': typeof authForgotPasswordRoute
+  '/mfa-challenge': typeof authMfaChallengeRoute
   '/no-firm': typeof authNoFirmRoute
   '/otp': typeof authOtpRoute
   '/otp-login': typeof authOtpLoginRoute
@@ -2619,6 +2626,7 @@ export interface FileRoutesByTo {
   '/time-entries': typeof TimeEntriesRoute
   '/conflict-policy': typeof authConflictPolicyRoute
   '/forgot-password': typeof authForgotPasswordRoute
+  '/mfa-challenge': typeof authMfaChallengeRoute
   '/no-firm': typeof authNoFirmRoute
   '/otp': typeof authOtpRoute
   '/otp-login': typeof authOtpLoginRoute
@@ -2951,6 +2959,7 @@ export interface FileRoutesById {
   '/clerk/_authenticated': typeof ClerkAuthenticatedRouteRouteWithChildren
   '/(auth)/conflict-policy': typeof authConflictPolicyRoute
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
+  '/(auth)/mfa-challenge': typeof authMfaChallengeRoute
   '/(auth)/no-firm': typeof authNoFirmRoute
   '/(auth)/otp': typeof authOtpRoute
   '/(auth)/otp-login': typeof authOtpLoginRoute
@@ -3281,6 +3290,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/conflict-policy'
     | '/forgot-password'
+    | '/mfa-challenge'
     | '/no-firm'
     | '/otp'
     | '/otp-login'
@@ -3608,6 +3618,7 @@ export interface FileRouteTypes {
     | '/time-entries'
     | '/conflict-policy'
     | '/forgot-password'
+    | '/mfa-challenge'
     | '/no-firm'
     | '/otp'
     | '/otp-login'
@@ -3939,6 +3950,7 @@ export interface FileRouteTypes {
     | '/clerk/_authenticated'
     | '/(auth)/conflict-policy'
     | '/(auth)/forgot-password'
+    | '/(auth)/mfa-challenge'
     | '/(auth)/no-firm'
     | '/(auth)/otp'
     | '/(auth)/otp-login'
@@ -4268,6 +4280,7 @@ export interface RootRouteChildren {
   TimeEntriesRoute: typeof TimeEntriesRoute
   authConflictPolicyRoute: typeof authConflictPolicyRoute
   authForgotPasswordRoute: typeof authForgotPasswordRoute
+  authMfaChallengeRoute: typeof authMfaChallengeRoute
   authNoFirmRoute: typeof authNoFirmRoute
   authOtpRoute: typeof authOtpRoute
   authOtpLoginRoute: typeof authOtpLoginRoute
@@ -4521,6 +4534,13 @@ declare module '@tanstack/react-router' {
       path: '/no-firm'
       fullPath: '/no-firm'
       preLoaderRoute: typeof authNoFirmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/mfa-challenge': {
+      id: '/(auth)/mfa-challenge'
+      path: '/mfa-challenge'
+      fullPath: '/mfa-challenge'
+      preLoaderRoute: typeof authMfaChallengeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(auth)/forgot-password': {
@@ -7674,6 +7694,7 @@ const rootRouteChildren: RootRouteChildren = {
   TimeEntriesRoute: TimeEntriesRoute,
   authConflictPolicyRoute: authConflictPolicyRoute,
   authForgotPasswordRoute: authForgotPasswordRoute,
+  authMfaChallengeRoute: authMfaChallengeRoute,
   authNoFirmRoute: authNoFirmRoute,
   authOtpRoute: authOtpRoute,
   authOtpLoginRoute: authOtpLoginRoute,
