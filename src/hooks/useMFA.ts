@@ -1,6 +1,9 @@
 /**
  * MFA React Hooks
  * Provides React Query-based hooks for MFA operations
+ *
+ * Backend: /api/auth/mfa/*
+ * Only TOTP supported (no SMS/email)
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -14,13 +17,17 @@ import {
   verifyMFA,
   getMFAStatus,
   disableMFA,
-  requestMFACode,
   regenerateBackupCodes,
   verifyBackupCode,
+  getBackupCodesCount,
   checkMFARequirement,
   type MFASetupResponse,
+  type MFAVerifySetupResponse,
   type MFAVerifyResponse,
   type MFAStatusResponse,
+  type BackupCodeVerifyResponse,
+  type BackupCodesRegenerateResponse,
+  type BackupCodesCountResponse,
 } from '@/services/mfa.service'
 import {
   isMFARequired,
@@ -37,6 +44,7 @@ export const mfaKeys = {
   all: ['mfa'] as const,
   status: () => [...mfaKeys.all, 'status'] as const,
   requirement: () => [...mfaKeys.all, 'requirement'] as const,
+  backupCodesCount: () => [...mfaKeys.all, 'backup-codes-count'] as const,
 }
 
 /**
@@ -66,62 +74,83 @@ export function useMFARequirement(enabled = true) {
 }
 
 /**
- * Hook to setup MFA
+ * Hook to get backup codes count
+ */
+export function useBackupCodesCount(enabled = true) {
+  return useQuery({
+    queryKey: mfaKeys.backupCodesCount(),
+    queryFn: getBackupCodesCount,
+    enabled,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  })
+}
+
+/**
+ * Hook to setup MFA (generates QR code)
+ * POST /api/auth/mfa/setup - no body required
  */
 export function useSetupMFA() {
   const { t } = useTranslation()
-  const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (method: 'totp' | 'sms' | 'email' = 'totp') => setupMFA(method),
+    mutationFn: () => setupMFA(),
     onError: (error: any) => {
-      toast.error(error.message || t('mfa.errors.setupFailed'))
+      const message = error.response?.data?.messageEn || error.response?.data?.message
+      toast.error(message || t('mfa.errors.setupFailed'))
     },
   })
 }
 
 /**
- * Hook to verify MFA setup (enable MFA)
+ * Hook to verify MFA setup (enables MFA)
+ * POST /api/auth/mfa/verify-setup { token }
  */
 export function useVerifyMFASetup() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (code: string) => verifyMFASetup(code),
+    mutationFn: (token: string) => verifyMFASetup(token),
     onSuccess: (data) => {
-      if (data.success && data.data.verified) {
+      if (!data.error && data.enabled) {
         toast.success(t('mfa.setup.setupComplete'))
         queryClient.invalidateQueries({ queryKey: mfaKeys.status() })
         queryClient.invalidateQueries({ queryKey: mfaKeys.requirement() })
+        queryClient.invalidateQueries({ queryKey: mfaKeys.backupCodesCount() })
       }
     },
     onError: (error: any) => {
-      if (error.code === 'INVALID_CODE') {
+      const code = error.response?.data?.code
+      if (code === 'INVALID_TOKEN') {
         toast.error(t('mfa.verify.invalidCode'))
       } else {
-        toast.error(error.message || t('mfa.errors.verificationFailed'))
+        const message = error.response?.data?.messageEn || error.response?.data?.message
+        toast.error(message || t('mfa.errors.verificationFailed'))
       }
     },
   })
 }
 
 /**
- * Hook to verify MFA for protected actions
+ * Hook to verify MFA for login
+ * POST /api/auth/mfa/verify { userId, token }
  */
 export function useVerifyMFA() {
   const { t } = useTranslation()
 
   return useMutation({
-    mutationFn: ({ code, action }: { code: string; action?: string }) =>
-      verifyMFA(code, action),
+    mutationFn: ({ userId, token }: { userId: string; token: string }) =>
+      verifyMFA(userId, token),
     onError: (error: any) => {
-      if (error.code === 'INVALID_CODE') {
+      const code = error.response?.data?.code
+      if (code === 'INVALID_TOKEN') {
         toast.error(t('mfa.verify.invalidCode'))
-      } else if (error.code === 'TOO_MANY_ATTEMPTS') {
+      } else if (code === 'AUTH_RATE_LIMIT_EXCEEDED') {
         toast.error(t('mfa.verify.tooManyAttempts'))
       } else {
-        toast.error(error.message || t('mfa.errors.verificationFailed'))
+        const message = error.response?.data?.messageEn || error.response?.data?.message
+        toast.error(message || t('mfa.errors.verificationFailed'))
       }
     },
   })
@@ -129,80 +158,81 @@ export function useVerifyMFA() {
 
 /**
  * Hook to disable MFA
+ * POST /api/auth/mfa/disable { password }
  */
 export function useDisableMFA() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ code, password }: { code: string; password: string }) =>
-      disableMFA(code, password),
+    mutationFn: (password: string) => disableMFA(password),
     onSuccess: (data) => {
-      if (data.success) {
+      if (!data.error && data.disabled) {
         toast.success(t('mfa.disable.disabled'))
         queryClient.invalidateQueries({ queryKey: mfaKeys.status() })
         queryClient.invalidateQueries({ queryKey: mfaKeys.requirement() })
+        queryClient.invalidateQueries({ queryKey: mfaKeys.backupCodesCount() })
       }
     },
     onError: (error: any) => {
-      toast.error(error.message || t('mfa.errors.verificationFailed'))
-    },
-  })
-}
-
-/**
- * Hook to request SMS/Email MFA code
- */
-export function useRequestMFACode() {
-  const { t } = useTranslation()
-
-  return useMutation({
-    mutationFn: (method: 'sms' | 'email') => requestMFACode(method),
-    onSuccess: () => {
-      toast.success(t('mfa.verify.resendCode'))
-    },
-    onError: (error: any) => {
-      toast.error(error.message || t('mfa.errors.verificationFailed'))
+      const code = error.response?.data?.code
+      if (code === 'INVALID_PASSWORD') {
+        toast.error(t('mfa.disable.invalidPassword'))
+      } else {
+        const message = error.response?.data?.messageEn || error.response?.data?.message
+        toast.error(message || t('mfa.errors.verificationFailed'))
+      }
     },
   })
 }
 
 /**
  * Hook to regenerate backup codes
+ * POST /api/auth/mfa/backup-codes/regenerate - no body
  */
 export function useRegenerateBackupCodes() {
   const { t } = useTranslation()
+  const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (code: string) => regenerateBackupCodes(code),
+    mutationFn: () => regenerateBackupCodes(),
     onSuccess: () => {
       toast.success(t('mfa.backup.regenerate'))
+      queryClient.invalidateQueries({ queryKey: mfaKeys.backupCodesCount() })
     },
     onError: (error: any) => {
-      if (error.code === 'INVALID_CODE') {
-        toast.error(t('mfa.verify.invalidCode'))
-      } else {
-        toast.error(error.message || t('mfa.errors.verificationFailed'))
-      }
+      const message = error.response?.data?.messageEn || error.response?.data?.message
+      toast.error(message || t('mfa.errors.verificationFailed'))
     },
   })
 }
 
 /**
  * Hook to verify using backup code
+ * POST /api/auth/mfa/backup-codes/verify { userId, code }
  */
 export function useVerifyBackupCode() {
   const { t } = useTranslation()
+  const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (backupCode: string) => verifyBackupCode(backupCode),
+    mutationFn: ({ userId, code }: { userId: string; code: string }) =>
+      verifyBackupCode(userId, code),
+    onSuccess: (data) => {
+      if (data.remainingCodes <= 2 && data.warning) {
+        toast.warning(t('mfa.backup.lowCodesWarning'))
+      }
+      queryClient.invalidateQueries({ queryKey: mfaKeys.backupCodesCount() })
+    },
     onError: (error: any) => {
-      if (error.code === 'INVALID_BACKUP_CODE') {
+      const code = error.response?.data?.code
+      if (code === 'INVALID_CODE') {
         toast.error(t('mfa.errors.invalidBackupCode'))
-      } else if (error.code === 'BACKUP_CODE_USED') {
-        toast.error(t('mfa.errors.backupCodeUsed'))
+      } else if (code === 'INVALID_FORMAT') {
+        toast.error(t('mfa.errors.invalidBackupFormat'))
       } else {
-        toast.error(error.message || t('mfa.errors.verificationFailed'))
+        const message = error.response?.data?.messageEn || error.response?.data?.message
+        toast.error(message || t('mfa.errors.verificationFailed'))
       }
     },
   })
@@ -217,7 +247,7 @@ export function useMFAProtection(action: string) {
   const [pendingAction, setPendingAction] = React.useState<(() => void) | null>(null)
   const { data: mfaStatus } = useMFAStatus()
 
-  const mfaEnabled = mfaStatus?.data?.enabled ?? false
+  const mfaEnabled = mfaStatus?.mfaEnabled ?? false
 
   /**
    * Check if MFA is required for this action and trigger verification if needed
@@ -315,11 +345,11 @@ export function useMFARoleRequirement(role?: string) {
 export default {
   useMFAStatus,
   useMFARequirement,
+  useBackupCodesCount,
   useSetupMFA,
   useVerifyMFASetup,
   useVerifyMFA,
   useDisableMFA,
-  useRequestMFACode,
   useRegenerateBackupCodes,
   useVerifyBackupCode,
   useMFAProtection,

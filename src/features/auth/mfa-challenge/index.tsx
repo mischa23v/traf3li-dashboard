@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { ShieldCheck, Loader2, KeyRound, ArrowLeft, RefreshCw } from 'lucide-react'
+import { ShieldCheck, Loader2, KeyRound, ArrowLeft } from 'lucide-react'
 import {
   InputOTP,
   InputOTPGroup,
@@ -12,14 +12,16 @@ import {
   InputOTPSeparator,
 } from '@/components/ui/input-otp'
 import { Button } from '@/components/ui/button'
-import { verifyMFA, verifyBackupCode, requestMFACode } from '@/services/mfa.service'
+import { verifyMFA, verifyBackupCode } from '@/services/mfa.service'
 import { useAuthStore } from '@/stores/auth-store'
-import { cn } from '@/lib/utils'
 
 /**
  * MFA Challenge Page
  * Shown after successful password login when MFA is enabled
  * NCA ECC 2-1-3 Compliance
+ *
+ * Backend: POST /api/auth/mfa/verify { userId, token }
+ * Only TOTP supported (no SMS/email)
  */
 export function MFAChallenge() {
   const { t, i18n } = useTranslation()
@@ -35,32 +37,21 @@ export function MFAChallenge() {
   const [error, setError] = useState<string | null>(null)
   const [useBackupCode, setUseBackupCode] = useState(false)
   const [backupCode, setBackupCode] = useState('')
-  const [resendCooldown, setResendCooldown] = useState(0)
 
   // Get redirect URL from search params
   const redirectTo = (search as any)?.redirect || '/'
-  const mfaMethod = user?.mfaMethod || 'totp'
+  // Get userId - either from user object or from search params (set during login)
+  const userId = user?._id || (search as any)?.userId || ''
 
-  // If user is not in MFA pending state, redirect appropriately
+  // If user is not in MFA pending state and no userId, redirect appropriately
   useEffect(() => {
-    if (!user) {
+    if (!user && !userId) {
       navigate({ to: '/sign-in' })
-    } else if (!user.mfaPending) {
+    } else if (user && !user.mfaPending) {
       // Already verified, go to dashboard
       navigate({ to: redirectTo })
     }
-  }, [user, navigate, redirectTo])
-
-  // Countdown timer for resend cooldown
-  useEffect(() => {
-    if (resendCooldown <= 0) return
-
-    const timer = setInterval(() => {
-      setResendCooldown((prev) => Math.max(0, prev - 1))
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [resendCooldown])
+  }, [user, userId, navigate, redirectTo])
 
   // Handle MFA code verification
   const handleVerify = async () => {
@@ -69,13 +60,18 @@ export function MFAChallenge() {
       return
     }
 
+    if (!userId) {
+      setError(t('mfa.errors.verificationFailed'))
+      return
+    }
+
     setIsLoading(true)
     setError(null)
 
     try {
-      const response = await verifyMFA(code, 'login')
+      const response = await verifyMFA(userId, code)
 
-      if (response.success && response.data.verified) {
+      if (!response.error && response.valid) {
         // Update user state to remove mfaPending
         if (user) {
           setUser({
@@ -89,14 +85,14 @@ export function MFAChallenge() {
         setError(t('mfa.verify.invalidCode'))
       }
     } catch (err: any) {
-      if (err.code === 'INVALID_CODE' || err.status === 401) {
+      const errorCode = err.response?.data?.code
+      if (errorCode === 'INVALID_TOKEN') {
         setError(t('mfa.verify.invalidCode'))
-      } else if (err.code === 'TOO_MANY_ATTEMPTS') {
+      } else if (errorCode === 'AUTH_RATE_LIMIT_EXCEEDED') {
         setError(t('mfa.verify.tooManyAttempts'))
-      } else if (err.code === 'CODE_EXPIRED') {
-        setError(t('mfa.verify.codeExpired'))
       } else {
-        setError(err.message || t('mfa.errors.verificationFailed'))
+        const message = err.response?.data?.messageEn || err.response?.data?.message
+        setError(message || t('mfa.errors.verificationFailed'))
       }
     } finally {
       setIsLoading(false)
@@ -105,9 +101,14 @@ export function MFAChallenge() {
 
   // Handle backup code verification
   const handleBackupCodeVerify = async () => {
-    const cleanCode = backupCode.replace(/[\s-]/g, '').toUpperCase()
+    const cleanCode = backupCode.replace(/[\s]/g, '').toUpperCase()
     if (cleanCode.length < 8) {
       setError(t('mfa.errors.invalidBackupCode'))
+      return
+    }
+
+    if (!userId) {
+      setError(t('mfa.errors.verificationFailed'))
       return
     }
 
@@ -115,9 +116,9 @@ export function MFAChallenge() {
     setError(null)
 
     try {
-      const response = await verifyBackupCode(cleanCode)
+      const response = await verifyBackupCode(userId, cleanCode)
 
-      if (response.success && response.data.verified) {
+      if (!response.error && response.valid) {
         // Update user state to remove mfaPending
         if (user) {
           setUser({
@@ -125,35 +126,29 @@ export function MFAChallenge() {
             mfaPending: false,
           })
         }
+
+        // Warn if low on backup codes
+        if (response.remainingCodes <= 2 && response.warning) {
+          toast.warning(t('mfa.backup.lowCodesWarning'))
+        }
+
         toast.success(t('mfa.verify.success'))
         navigate({ to: redirectTo })
       } else {
         setError(t('mfa.errors.invalidBackupCode'))
       }
     } catch (err: any) {
-      if (err.code === 'INVALID_BACKUP_CODE') {
+      const errorCode = err.response?.data?.code
+      if (errorCode === 'INVALID_CODE') {
         setError(t('mfa.errors.invalidBackupCode'))
-      } else if (err.code === 'BACKUP_CODE_USED') {
-        setError(t('mfa.errors.backupCodeUsed'))
+      } else if (errorCode === 'INVALID_FORMAT') {
+        setError(t('mfa.errors.invalidBackupFormat'))
       } else {
-        setError(err.message || t('mfa.errors.verificationFailed'))
+        const message = err.response?.data?.messageEn || err.response?.data?.message
+        setError(message || t('mfa.errors.verificationFailed'))
       }
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  // Handle resend code for SMS/Email methods
-  const handleResendCode = async () => {
-    if (resendCooldown > 0) return
-    if (mfaMethod !== 'sms' && mfaMethod !== 'email') return
-
-    try {
-      await requestMFACode(mfaMethod)
-      toast.success(t('mfa.verify.resendCode'))
-      setResendCooldown(60) // 60 second cooldown
-    } catch (err: any) {
-      toast.error(err.message || t('mfa.errors.verificationFailed'))
     }
   }
 
@@ -183,9 +178,7 @@ export function MFAChallenge() {
               {t('mfa.challenge.title')}
             </h1>
             <p className="text-slate-500 text-lg">
-              {mfaMethod === 'totp' && t('mfa.challenge.descriptionTotp')}
-              {mfaMethod === 'sms' && t('mfa.challenge.descriptionSms')}
-              {mfaMethod === 'email' && t('mfa.challenge.descriptionEmail')}
+              {t('mfa.challenge.descriptionTotp')}
             </p>
           </div>
 
@@ -224,26 +217,6 @@ export function MFAChallenge() {
                       <p className="text-sm text-destructive text-center" role="alert">
                         {error}
                       </p>
-                    )}
-
-                    {/* Resend Code Button (SMS/Email only) */}
-                    {(mfaMethod === 'sms' || mfaMethod === 'email') && (
-                      <Button
-                        variant="link"
-                        size="sm"
-                        onClick={handleResendCode}
-                        disabled={resendCooldown > 0 || isLoading}
-                        className="text-muted-foreground"
-                      >
-                        <RefreshCw className={cn(
-                          "h-4 w-4 me-2",
-                          resendCooldown > 0 && "animate-pulse"
-                        )} />
-                        {resendCooldown > 0
-                          ? t('mfa.verify.resendIn', { seconds: resendCooldown })
-                          : t('mfa.verify.resendCode')
-                        }
-                      </Button>
                     )}
                   </div>
 
