@@ -1,6 +1,54 @@
 /**
  * SSO Service
  * Handles all OAuth 2.0 SSO-related API calls
+ *
+ * @description
+ * This service provides functions for managing Single Sign-On (SSO) authentication
+ * using OAuth 2.0 protocol with multiple providers (Google, Microsoft, Custom).
+ *
+ * ## OAuth 2.0 Flow
+ *
+ * 1. **Initiation**: Client calls `initiateSSOLogin(provider)`
+ *    → Backend returns authorization URL with state parameter
+ *
+ * 2. **Authorization**: User is redirected to provider's OAuth consent screen
+ *
+ * 3. **Callback**: Provider redirects back with authorization code
+ *    → Backend handles the callback at `/auth/sso/:provider/callback`
+ *    → Backend exchanges code for access token
+ *    → Backend validates user and creates/updates account
+ *    → Backend returns JWT token to client
+ *
+ * 4. **Authentication**: Client stores JWT and uses it for subsequent requests
+ *
+ * ## Implemented Endpoints
+ *
+ * ### SSO Settings Management
+ * - GET    /settings/sso                        - Get SSO configuration
+ * - PATCH  /settings/sso                        - Update global SSO settings
+ * - GET    /settings/sso/providers/available    - List available providers
+ * - GET    /settings/sso/providers/:id          - Get specific provider config
+ * - POST   /settings/sso/providers              - Create provider config
+ * - PATCH  /settings/sso/providers/:id          - Update provider config
+ * - DELETE /settings/sso/providers/:id          - Delete provider config
+ * - POST   /settings/sso/test-connection        - Test provider connection
+ *
+ * ### SSO Authentication
+ * - POST   /auth/sso/:provider/initiate         - Start OAuth flow
+ * - GET    /auth/sso/enabled-providers          - Get enabled providers for login
+ * - GET    /auth/sso/:provider/callback         - OAuth callback (handled by backend)
+ *
+ * ## NOT Implemented
+ *
+ * The following account linking features are NOT currently implemented:
+ * - POST   /auth/sso/:provider/link             - Link SSO account to existing user
+ * - DELETE /auth/sso/:provider/unlink           - Unlink SSO account from user
+ * - GET    /auth/sso/linked-accounts            - List user's linked SSO accounts
+ *
+ * These features would allow users to:
+ * - Link multiple SSO providers to a single account
+ * - Unlink SSO providers while maintaining other login methods
+ * - View all linked authentication methods
  */
 
 import apiClient, { handleApiError } from '@/lib/api'
@@ -117,6 +165,14 @@ export interface SSOLoginInitiateResponse {
 
 /**
  * Get SSO configuration
+ *
+ * @endpoint GET /settings/sso
+ * @returns {Promise<SSOSettings>} Current SSO settings including global config and all providers
+ * @throws {Error} API error with message
+ *
+ * @example
+ * const settings = await getSSOSettings()
+ * console.log(settings.enabled, settings.providers)
  */
 export const getSSOSettings = async (): Promise<SSOSettings> => {
   try {
@@ -129,6 +185,19 @@ export const getSSOSettings = async (): Promise<SSOSettings> => {
 
 /**
  * Update SSO global settings
+ *
+ * @endpoint PATCH /settings/sso
+ * @param {Partial<SSOSettings>} data - Settings to update (enabled, allowPasswordLogin, autoProvision, defaultRole)
+ * @returns {Promise<SSOSettings>} Updated SSO settings
+ * @throws {Error} API error with message
+ *
+ * @example
+ * const updated = await updateSSOSettings({
+ *   enabled: true,
+ *   allowPasswordLogin: false,
+ *   autoProvision: true,
+ *   defaultRole: 'client'
+ * })
  */
 export const updateSSOSettings = async (data: Partial<SSOSettings>): Promise<SSOSettings> => {
   try {
@@ -141,6 +210,18 @@ export const updateSSOSettings = async (data: Partial<SSOSettings>): Promise<SSO
 
 /**
  * Get list of available SSO providers
+ *
+ * @endpoint GET /settings/sso/providers/available
+ * @returns {Promise<AvailableProvider[]>} List of all supported SSO providers with metadata
+ * @throws {Error} API error with message
+ *
+ * @description
+ * Returns information about all SSO providers that can be configured,
+ * including their default scopes, required fields, and documentation URLs.
+ *
+ * @example
+ * const providers = await getAvailableProviders()
+ * providers.forEach(p => console.log(p.name, p.defaultScopes))
  */
 export const getAvailableProviders = async (): Promise<AvailableProvider[]> => {
   try {
@@ -153,6 +234,15 @@ export const getAvailableProviders = async (): Promise<AvailableProvider[]> => {
 
 /**
  * Get a specific SSO provider configuration
+ *
+ * @endpoint GET /settings/sso/providers/:id
+ * @param {string} providerId - The provider ID (MongoDB _id)
+ * @returns {Promise<SSOProviderConfig>} Provider configuration (clientSecret is masked)
+ * @throws {Error} API error with message
+ *
+ * @example
+ * const provider = await getSSOProvider('507f1f77bcf86cd799439011')
+ * console.log(provider.displayName, provider.enabled)
  */
 export const getSSOProvider = async (providerId: string): Promise<SSOProviderConfig> => {
   try {
@@ -165,6 +255,23 @@ export const getSSOProvider = async (providerId: string): Promise<SSOProviderCon
 
 /**
  * Create a new SSO provider configuration
+ *
+ * @endpoint POST /settings/sso/providers
+ * @param {SaveProviderRequest} data - Provider configuration (clientSecret required)
+ * @returns {Promise<SSOProviderConfig>} Created provider configuration
+ * @throws {Error} API error with message
+ *
+ * @example
+ * const provider = await createSSOProvider({
+ *   provider: 'google',
+ *   enabled: true,
+ *   displayName: 'Google',
+ *   displayNameAr: 'جوجل',
+ *   clientId: 'your-client-id.apps.googleusercontent.com',
+ *   clientSecret: 'your-client-secret',
+ *   redirectUri: 'https://app.traf3li.com/auth/callback/google',
+ *   scope: 'openid profile email'
+ * })
  */
 export const createSSOProvider = async (data: SaveProviderRequest): Promise<SSOProviderConfig> => {
   try {
@@ -177,6 +284,21 @@ export const createSSOProvider = async (data: SaveProviderRequest): Promise<SSOP
 
 /**
  * Update an existing SSO provider configuration
+ *
+ * @endpoint PATCH /settings/sso/providers/:id
+ * @param {string} providerId - The provider ID (MongoDB _id)
+ * @param {Partial<SaveProviderRequest>} data - Fields to update (clientSecret optional)
+ * @returns {Promise<SSOProviderConfig>} Updated provider configuration
+ * @throws {Error} API error with message
+ *
+ * @description
+ * Updates provider settings. If clientSecret is not provided, the existing secret is retained.
+ *
+ * @example
+ * const updated = await updateSSOProvider('507f1f77bcf86cd799439011', {
+ *   enabled: false,
+ *   displayName: 'Google SSO'
+ * })
  */
 export const updateSSOProvider = async (
   providerId: string,
@@ -192,6 +314,18 @@ export const updateSSOProvider = async (
 
 /**
  * Delete an SSO provider configuration
+ *
+ * @endpoint DELETE /settings/sso/providers/:id
+ * @param {string} providerId - The provider ID (MongoDB _id)
+ * @returns {Promise<void>} No response body
+ * @throws {Error} API error with message
+ *
+ * @description
+ * Permanently removes the SSO provider configuration. Users who previously
+ * authenticated with this provider may lose access if no other login method exists.
+ *
+ * @example
+ * await deleteSSOProvider('507f1f77bcf86cd799439011')
  */
 export const deleteSSOProvider = async (providerId: string): Promise<void> => {
   try {
@@ -203,6 +337,25 @@ export const deleteSSOProvider = async (providerId: string): Promise<void> => {
 
 /**
  * Test SSO provider connection
+ *
+ * @endpoint POST /settings/sso/test-connection
+ * @param {TestConnectionRequest} data - Provider credentials to test
+ * @returns {Promise<TestConnectionResponse>} Test result with success/failure status
+ * @throws {Error} API error with message
+ *
+ * @description
+ * Validates OAuth configuration by attempting to reach the provider's
+ * authorization endpoint. Does not perform full authentication flow.
+ *
+ * @example
+ * const result = await testSSOConnection({
+ *   provider: 'google',
+ *   clientId: 'your-client-id.apps.googleusercontent.com',
+ *   clientSecret: 'your-client-secret',
+ *   redirectUri: 'https://app.traf3li.com/auth/callback/google',
+ *   scope: 'openid profile email'
+ * })
+ * console.log(result.success, result.message)
  */
 export const testSSOConnection = async (data: TestConnectionRequest): Promise<TestConnectionResponse> => {
   try {
@@ -215,6 +368,27 @@ export const testSSOConnection = async (data: TestConnectionRequest): Promise<Te
 
 /**
  * Initiate SSO login flow
+ *
+ * @endpoint POST /auth/sso/:provider/initiate
+ * @param {SSOProvider} provider - The SSO provider to use ('google' | 'microsoft' | 'custom')
+ * @returns {Promise<SSOLoginInitiateResponse>} Authorization URL and state parameter
+ * @throws {Error} API error with message
+ *
+ * @description
+ * **Step 1 of OAuth flow**: Initiates the OAuth 2.0 authentication flow.
+ * The backend generates a state parameter for CSRF protection and returns
+ * the provider's authorization URL.
+ *
+ * Client should redirect user to the returned authorizationUrl.
+ * After user consent, provider redirects to `/auth/sso/:provider/callback`
+ * which is handled entirely by the backend.
+ *
+ * @example
+ * const { authorizationUrl, state } = await initiateSSOLogin('google')
+ * // Store state in sessionStorage for validation
+ * sessionStorage.setItem('oauth_state', state)
+ * // Redirect user to provider's login page
+ * window.location.href = authorizationUrl
  */
 export const initiateSSOLogin = async (provider: SSOProvider): Promise<SSOLoginInitiateResponse> => {
   try {
@@ -227,6 +401,21 @@ export const initiateSSOLogin = async (provider: SSOProvider): Promise<SSOLoginI
 
 /**
  * Get enabled SSO providers for login page
+ *
+ * @endpoint GET /auth/sso/enabled-providers
+ * @returns {Promise<SSOProviderConfig[]>} List of enabled SSO providers (public endpoint)
+ * @throws {Error} API error with message
+ *
+ * @description
+ * Returns only enabled SSO providers for displaying login buttons.
+ * This is a public endpoint that doesn't require authentication.
+ * ClientSecret is masked in the response.
+ *
+ * @example
+ * const providers = await getEnabledSSOProviders()
+ * providers.forEach(p => {
+ *   console.log(`Login with ${p.displayName}`)
+ * })
  */
 export const getEnabledSSOProviders = async (): Promise<SSOProviderConfig[]> => {
   try {

@@ -29,6 +29,8 @@ import { AccountLockoutWarning } from '@/components/auth/account-lockout-warning
 import { ProgressiveDelay } from '@/components/auth/progressive-delay'
 import { toast } from '@/hooks/use-toast'
 import { SSOLoginButtons } from '@/components/auth/sso-login-buttons'
+import { LDAPLoginButton } from '@/components/auth/ldap-login-button'
+import ldapService from '@/services/ldapService'
 import {
   CaptchaChallenge,
   type CaptchaChallengeRef,
@@ -65,7 +67,9 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const login = useAuthStore((state) => state.login)
   const authError = useAuthStore((state) => state.error)
   const clearError = useAuthStore((state) => state.clearError)
+  const setUser = useAuthStore((state) => state.setUser)
   const [isLoading, setIsLoading] = useState(false)
+  const [isLDAPLoading, setIsLDAPLoading] = useState(false)
 
   const formSchema = useMemo(() => createFormSchema(t), [t])
 
@@ -302,6 +306,100 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     }
   }
 
+  /**
+   * Handle LDAP login
+   * Uses the same form fields but authenticates via LDAP
+   */
+  const handleLDAPLogin = async () => {
+    // Get current form values
+    const values = form.getValues()
+
+    // Validate form before attempting LDAP login
+    const isValid = await form.trigger()
+    if (!isValid) {
+      return
+    }
+
+    const identifier = getLoginIdentifier(values.username)
+    setCurrentIdentifier(identifier)
+
+    // Check client-side rate limiting
+    const status = rateLimit.checkAllowed()
+    if (!status.allowed) {
+      return
+    }
+
+    setIsLDAPLoading(true)
+    clearError()
+
+    try {
+      // Call LDAP login service
+      const user = await ldapService.login({
+        username: values.username,
+        password: values.password,
+      })
+
+      // Record successful login - clears rate limit data
+      rateLimit.recordSuccess()
+
+      // Mark device as recognized
+      markDeviceAsRecognized()
+
+      // Update auth store with user from LDAP
+      setUser(user)
+
+      // Show success message
+      toast({
+        title: isArabic ? 'نجح تسجيل الدخول عبر LDAP' : 'LDAP Login Successful',
+        description: isArabic
+          ? 'تم تسجيل دخولك بنجاح عبر Active Directory'
+          : 'You have been successfully authenticated via Active Directory',
+      })
+
+      // Redirect based on role
+      if (user.role === 'admin') {
+        navigate({ to: '/users' })
+      } else if (user.role === 'lawyer') {
+        navigate({ to: '/' }) // Dashboard home
+      } else {
+        navigate({ to: '/' }) // Client dashboard
+      }
+    } catch (error: any) {
+      const status = error?.status || error?.response?.status
+
+      // Handle server-side 429 rate limit
+      const rateLimitInfo = rateLimit.handle429(error)
+      if (rateLimitInfo.isRateLimited) {
+        toast({
+          title: isArabic ? 'تم تجاوز الحد المسموح' : 'Rate Limit Exceeded',
+          description: isArabic
+            ? `يرجى الانتظار ${rateLimitInfo.retryAfter} ثانية قبل المحاولة مرة أخرى.`
+            : `Please wait ${rateLimitInfo.retryAfter} seconds before trying again.`,
+          variant: 'destructive',
+        })
+        return
+      }
+
+      // Record failed attempt for auth failures
+      const isAuthFailure = status === 401 || status === 400
+      if (isAuthFailure) {
+        await rateLimit.recordFailed()
+        setAttemptNumber((prev) => prev + 1)
+      }
+
+      // Show error message
+      toast({
+        title: isArabic ? 'فشل تسجيل الدخول عبر LDAP' : 'LDAP Login Failed',
+        description: error.message || (isArabic
+          ? 'فشل التحقق من بيانات اعتماد LDAP'
+          : 'Failed to authenticate LDAP credentials'),
+        variant: 'destructive',
+      })
+    } finally {
+      setIsLDAPLoading(false)
+    }
+  }
+
   return (
     <div className={cn('grid gap-6', className)} {...props}>
       <Form {...form}>
@@ -398,7 +496,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             )}
 
             {/* Submit Button */}
-            <Button type='submit' className='mt-2' disabled={isLoading || !rateLimit.isAllowed}>
+            <Button type='submit' className='mt-2' disabled={isLoading || isLDAPLoading || !rateLimit.isAllowed}>
               {isLoading
                 ? t('auth.signIn.signingIn')
                 : !rateLimit.isAllowed
@@ -407,10 +505,17 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             </Button>
 
             {/* SSO Login Buttons */}
-            <SSOLoginButtons disabled={isLoading || !rateLimit.isAllowed} />
+            <SSOLoginButtons disabled={isLoading || isLDAPLoading || !rateLimit.isAllowed} />
           </div>
         </form>
       </Form>
+
+      {/* LDAP Login Button */}
+      <LDAPLoginButton
+        disabled={isLoading || isLDAPLoading || !rateLimit.isAllowed}
+        isLoading={isLDAPLoading}
+        onLDAPLogin={handleLDAPLogin}
+      />
 
       {/* Sign Up Link */}
       <p className='text-center text-sm text-muted-foreground'>

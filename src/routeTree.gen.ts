@@ -62,10 +62,12 @@ import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes
 import { Route as AuthenticatedSettingsIntegrationsRouteImport } from './routes/_authenticated/settings/integrations'
 import { Route as AuthenticatedSettingsEmailRouteImport } from './routes/_authenticated/settings/email'
 import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_authenticated/settings/display'
+import { Route as AuthenticatedSettingsBillingRouteImport } from './routes/_authenticated/settings/billing'
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsApiKeysRouteImport } from './routes/_authenticated/settings/api-keys'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
+import { Route as AuthenticatedDashboardSetupOrchestratorRouteImport } from './routes/_authenticated/dashboard.setup-orchestrator'
 import { Route as AuthenticatedDashboardNotionRouteImport } from './routes/_authenticated/dashboard.notion'
 import { Route as AuthenticatedDashboardHelpRouteImport } from './routes/_authenticated/dashboard.help'
 import { Route as AuthenticatedDashboardCalendarRouteImport } from './routes/_authenticated/dashboard.calendar'
@@ -118,6 +120,7 @@ import { Route as AuthenticatedDashboardFinanceOverviewRouteImport } from './rou
 import { Route as AuthenticatedDashboardFinanceOpeningBalancesRouteImport } from './routes/_authenticated/dashboard.finance.opening-balances'
 import { Route as AuthenticatedDashboardFinanceGeneralLedgerRouteImport } from './routes/_authenticated/dashboard.finance.general-ledger'
 import { Route as AuthenticatedDashboardFinanceCorporateCardsRouteImport } from './routes/_authenticated/dashboard.finance.corporate-cards'
+import { Route as AuthenticatedDashboardFinanceConsolidatedReportsRouteImport } from './routes/_authenticated/dashboard.finance.consolidated-reports'
 import { Route as AuthenticatedDashboardFinanceChartOfAccountsRouteImport } from './routes/_authenticated/dashboard.finance.chart-of-accounts'
 import { Route as AuthenticatedDashboardCrmTerritoriesRouteImport } from './routes/_authenticated/dashboard.crm.territories'
 import { Route as AuthenticatedDashboardCrmSetupWizardRouteImport } from './routes/_authenticated/dashboard.crm.setup-wizard'
@@ -131,6 +134,7 @@ import { Route as AuthenticatedDashboardClientsNewRouteImport } from './routes/_
 import { Route as AuthenticatedDashboardClientsClientIdRouteImport } from './routes/_authenticated/dashboard.clients.$clientId'
 import { Route as AuthenticatedDashboardCasesPipelineRouteImport } from './routes/_authenticated/dashboard.cases.pipeline'
 import { Route as AuthenticatedDashboardCasesNewRouteImport } from './routes/_authenticated/dashboard.cases.new'
+import { Route as AuthenticatedDashboardCasesKanbanRouteImport } from './routes/_authenticated/dashboard.cases.kanban'
 import { Route as AuthenticatedDashboardCasesCaseIdRouteImport } from './routes/_authenticated/dashboard.cases.$caseId'
 import { Route as AuthenticatedDashboardTasksReportsIndexRouteImport } from './routes/_authenticated/dashboard.tasks.reports.index'
 import { Route as AuthenticatedDashboardTasksRemindersIndexRouteImport } from './routes/_authenticated/dashboard.tasks.reminders.index'
@@ -615,6 +619,12 @@ const AuthenticatedSettingsDisplayRoute =
     path: '/display',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
+const AuthenticatedSettingsBillingRoute =
+  AuthenticatedSettingsBillingRouteImport.update({
+    id: '/billing',
+    path: '/billing',
+    getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any)
 const AuthenticatedSettingsAppearanceRoute =
   AuthenticatedSettingsAppearanceRouteImport.update({
     id: '/appearance',
@@ -637,6 +647,12 @@ const AuthenticatedErrorsErrorRoute =
   AuthenticatedErrorsErrorRouteImport.update({
     id: '/errors/$error',
     path: '/errors/$error',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardSetupOrchestratorRoute =
+  AuthenticatedDashboardSetupOrchestratorRouteImport.update({
+    id: '/dashboard/setup-orchestrator',
+    path: '/dashboard/setup-orchestrator',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardNotionRoute =
@@ -951,6 +967,12 @@ const AuthenticatedDashboardFinanceCorporateCardsRoute =
     path: '/dashboard/finance/corporate-cards',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardFinanceConsolidatedReportsRoute =
+  AuthenticatedDashboardFinanceConsolidatedReportsRouteImport.update({
+    id: '/dashboard/finance/consolidated-reports',
+    path: '/dashboard/finance/consolidated-reports',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardFinanceChartOfAccountsRoute =
   AuthenticatedDashboardFinanceChartOfAccountsRouteImport.update({
     id: '/dashboard/finance/chart-of-accounts',
@@ -1027,6 +1049,12 @@ const AuthenticatedDashboardCasesNewRoute =
   AuthenticatedDashboardCasesNewRouteImport.update({
     id: '/dashboard/cases/new',
     path: '/dashboard/cases/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardCasesKanbanRoute =
+  AuthenticatedDashboardCasesKanbanRouteImport.update({
+    id: '/dashboard/cases/kanban',
+    path: '/dashboard/cases/kanban',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardCasesCaseIdRoute =
@@ -2344,10 +2372,12 @@ export interface FileRoutesByFullPath {
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/dashboard/help': typeof AuthenticatedDashboardHelpRoute
   '/dashboard/notion': typeof AuthenticatedDashboardNotionRoute
+  '/dashboard/setup-orchestrator': typeof AuthenticatedDashboardSetupOrchestratorRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/api-keys': typeof AuthenticatedSettingsApiKeysRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
+  '/settings/billing': typeof AuthenticatedSettingsBillingRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/email': typeof AuthenticatedSettingsEmailRoute
   '/settings/integrations': typeof AuthenticatedSettingsIntegrationsRoute
@@ -2362,6 +2392,7 @@ export interface FileRoutesByFullPath {
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
   '/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
+  '/dashboard/cases/kanban': typeof AuthenticatedDashboardCasesKanbanRoute
   '/dashboard/cases/new': typeof AuthenticatedDashboardCasesNewRoute
   '/dashboard/cases/pipeline': typeof AuthenticatedDashboardCasesPipelineRouteWithChildren
   '/dashboard/clients/$clientId': typeof AuthenticatedDashboardClientsClientIdRoute
@@ -2375,6 +2406,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/crm/setup-wizard': typeof AuthenticatedDashboardCrmSetupWizardRoute
   '/dashboard/crm/territories': typeof AuthenticatedDashboardCrmTerritoriesRoute
   '/dashboard/finance/chart-of-accounts': typeof AuthenticatedDashboardFinanceChartOfAccountsRoute
+  '/dashboard/finance/consolidated-reports': typeof AuthenticatedDashboardFinanceConsolidatedReportsRoute
   '/dashboard/finance/corporate-cards': typeof AuthenticatedDashboardFinanceCorporateCardsRouteWithChildren
   '/dashboard/finance/general-ledger': typeof AuthenticatedDashboardFinanceGeneralLedgerRoute
   '/dashboard/finance/opening-balances': typeof AuthenticatedDashboardFinanceOpeningBalancesRoute
@@ -2676,10 +2708,12 @@ export interface FileRoutesByTo {
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/dashboard/help': typeof AuthenticatedDashboardHelpRoute
   '/dashboard/notion': typeof AuthenticatedDashboardNotionRoute
+  '/dashboard/setup-orchestrator': typeof AuthenticatedDashboardSetupOrchestratorRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/api-keys': typeof AuthenticatedSettingsApiKeysRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
+  '/settings/billing': typeof AuthenticatedSettingsBillingRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/email': typeof AuthenticatedSettingsEmailRoute
   '/settings/integrations': typeof AuthenticatedSettingsIntegrationsRoute
@@ -2694,6 +2728,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
   '/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
+  '/dashboard/cases/kanban': typeof AuthenticatedDashboardCasesKanbanRoute
   '/dashboard/cases/new': typeof AuthenticatedDashboardCasesNewRoute
   '/dashboard/cases/pipeline': typeof AuthenticatedDashboardCasesPipelineRouteWithChildren
   '/dashboard/clients/$clientId': typeof AuthenticatedDashboardClientsClientIdRoute
@@ -2707,6 +2742,7 @@ export interface FileRoutesByTo {
   '/dashboard/crm/setup-wizard': typeof AuthenticatedDashboardCrmSetupWizardRoute
   '/dashboard/crm/territories': typeof AuthenticatedDashboardCrmTerritoriesRoute
   '/dashboard/finance/chart-of-accounts': typeof AuthenticatedDashboardFinanceChartOfAccountsRoute
+  '/dashboard/finance/consolidated-reports': typeof AuthenticatedDashboardFinanceConsolidatedReportsRoute
   '/dashboard/finance/corporate-cards': typeof AuthenticatedDashboardFinanceCorporateCardsRouteWithChildren
   '/dashboard/finance/general-ledger': typeof AuthenticatedDashboardFinanceGeneralLedgerRoute
   '/dashboard/finance/opening-balances': typeof AuthenticatedDashboardFinanceOpeningBalancesRoute
@@ -3013,10 +3049,12 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/_authenticated/dashboard/help': typeof AuthenticatedDashboardHelpRoute
   '/_authenticated/dashboard/notion': typeof AuthenticatedDashboardNotionRoute
+  '/_authenticated/dashboard/setup-orchestrator': typeof AuthenticatedDashboardSetupOrchestratorRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/api-keys': typeof AuthenticatedSettingsApiKeysRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
+  '/_authenticated/settings/billing': typeof AuthenticatedSettingsBillingRoute
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/_authenticated/settings/email': typeof AuthenticatedSettingsEmailRoute
   '/_authenticated/settings/integrations': typeof AuthenticatedSettingsIntegrationsRoute
@@ -3031,6 +3069,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
   '/_authenticated/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
+  '/_authenticated/dashboard/cases/kanban': typeof AuthenticatedDashboardCasesKanbanRoute
   '/_authenticated/dashboard/cases/new': typeof AuthenticatedDashboardCasesNewRoute
   '/_authenticated/dashboard/cases/pipeline': typeof AuthenticatedDashboardCasesPipelineRouteWithChildren
   '/_authenticated/dashboard/clients/$clientId': typeof AuthenticatedDashboardClientsClientIdRoute
@@ -3044,6 +3083,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/crm/setup-wizard': typeof AuthenticatedDashboardCrmSetupWizardRoute
   '/_authenticated/dashboard/crm/territories': typeof AuthenticatedDashboardCrmTerritoriesRoute
   '/_authenticated/dashboard/finance/chart-of-accounts': typeof AuthenticatedDashboardFinanceChartOfAccountsRoute
+  '/_authenticated/dashboard/finance/consolidated-reports': typeof AuthenticatedDashboardFinanceConsolidatedReportsRoute
   '/_authenticated/dashboard/finance/corporate-cards': typeof AuthenticatedDashboardFinanceCorporateCardsRouteWithChildren
   '/_authenticated/dashboard/finance/general-ledger': typeof AuthenticatedDashboardFinanceGeneralLedgerRoute
   '/_authenticated/dashboard/finance/opening-balances': typeof AuthenticatedDashboardFinanceOpeningBalancesRoute
@@ -3348,10 +3388,12 @@ export interface FileRouteTypes {
     | '/dashboard/calendar'
     | '/dashboard/help'
     | '/dashboard/notion'
+    | '/dashboard/setup-orchestrator'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/api-keys'
     | '/settings/appearance'
+    | '/settings/billing'
     | '/settings/display'
     | '/settings/email'
     | '/settings/integrations'
@@ -3366,6 +3408,7 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/users'
     | '/dashboard/cases/$caseId'
+    | '/dashboard/cases/kanban'
     | '/dashboard/cases/new'
     | '/dashboard/cases/pipeline'
     | '/dashboard/clients/$clientId'
@@ -3379,6 +3422,7 @@ export interface FileRouteTypes {
     | '/dashboard/crm/setup-wizard'
     | '/dashboard/crm/territories'
     | '/dashboard/finance/chart-of-accounts'
+    | '/dashboard/finance/consolidated-reports'
     | '/dashboard/finance/corporate-cards'
     | '/dashboard/finance/general-ledger'
     | '/dashboard/finance/opening-balances'
@@ -3680,10 +3724,12 @@ export interface FileRouteTypes {
     | '/dashboard/calendar'
     | '/dashboard/help'
     | '/dashboard/notion'
+    | '/dashboard/setup-orchestrator'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/api-keys'
     | '/settings/appearance'
+    | '/settings/billing'
     | '/settings/display'
     | '/settings/email'
     | '/settings/integrations'
@@ -3698,6 +3744,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/users'
     | '/dashboard/cases/$caseId'
+    | '/dashboard/cases/kanban'
     | '/dashboard/cases/new'
     | '/dashboard/cases/pipeline'
     | '/dashboard/clients/$clientId'
@@ -3711,6 +3758,7 @@ export interface FileRouteTypes {
     | '/dashboard/crm/setup-wizard'
     | '/dashboard/crm/territories'
     | '/dashboard/finance/chart-of-accounts'
+    | '/dashboard/finance/consolidated-reports'
     | '/dashboard/finance/corporate-cards'
     | '/dashboard/finance/general-ledger'
     | '/dashboard/finance/opening-balances'
@@ -4016,10 +4064,12 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/calendar'
     | '/_authenticated/dashboard/help'
     | '/_authenticated/dashboard/notion'
+    | '/_authenticated/dashboard/setup-orchestrator'
     | '/_authenticated/errors/$error'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/api-keys'
     | '/_authenticated/settings/appearance'
+    | '/_authenticated/settings/billing'
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/email'
     | '/_authenticated/settings/integrations'
@@ -4034,6 +4084,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/'
     | '/_authenticated/users/'
     | '/_authenticated/dashboard/cases/$caseId'
+    | '/_authenticated/dashboard/cases/kanban'
     | '/_authenticated/dashboard/cases/new'
     | '/_authenticated/dashboard/cases/pipeline'
     | '/_authenticated/dashboard/clients/$clientId'
@@ -4047,6 +4098,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/crm/setup-wizard'
     | '/_authenticated/dashboard/crm/territories'
     | '/_authenticated/dashboard/finance/chart-of-accounts'
+    | '/_authenticated/dashboard/finance/consolidated-reports'
     | '/_authenticated/dashboard/finance/corporate-cards'
     | '/_authenticated/dashboard/finance/general-ledger'
     | '/_authenticated/dashboard/finance/opening-balances'
@@ -4721,6 +4773,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsDisplayRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
+    '/_authenticated/settings/billing': {
+      id: '/_authenticated/settings/billing'
+      path: '/billing'
+      fullPath: '/settings/billing'
+      preLoaderRoute: typeof AuthenticatedSettingsBillingRouteImport
+      parentRoute: typeof AuthenticatedSettingsRouteRoute
+    }
     '/_authenticated/settings/appearance': {
       id: '/_authenticated/settings/appearance'
       path: '/appearance'
@@ -4747,6 +4806,13 @@ declare module '@tanstack/react-router' {
       path: '/errors/$error'
       fullPath: '/errors/$error'
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/setup-orchestrator': {
+      id: '/_authenticated/dashboard/setup-orchestrator'
+      path: '/dashboard/setup-orchestrator'
+      fullPath: '/dashboard/setup-orchestrator'
+      preLoaderRoute: typeof AuthenticatedDashboardSetupOrchestratorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/notion': {
@@ -5113,6 +5179,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardFinanceCorporateCardsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/finance/consolidated-reports': {
+      id: '/_authenticated/dashboard/finance/consolidated-reports'
+      path: '/dashboard/finance/consolidated-reports'
+      fullPath: '/dashboard/finance/consolidated-reports'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceConsolidatedReportsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/finance/chart-of-accounts': {
       id: '/_authenticated/dashboard/finance/chart-of-accounts'
       path: '/dashboard/finance/chart-of-accounts'
@@ -5202,6 +5275,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/cases/new'
       fullPath: '/dashboard/cases/new'
       preLoaderRoute: typeof AuthenticatedDashboardCasesNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/cases/kanban': {
+      id: '/_authenticated/dashboard/cases/kanban'
+      path: '/dashboard/cases/kanban'
+      fullPath: '/dashboard/cases/kanban'
+      preLoaderRoute: typeof AuthenticatedDashboardCasesKanbanRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/cases/$caseId': {
@@ -6695,6 +6775,7 @@ interface AuthenticatedSettingsRouteRouteChildren {
   AuthenticatedSettingsAccountRoute: typeof AuthenticatedSettingsAccountRoute
   AuthenticatedSettingsApiKeysRoute: typeof AuthenticatedSettingsApiKeysRoute
   AuthenticatedSettingsAppearanceRoute: typeof AuthenticatedSettingsAppearanceRoute
+  AuthenticatedSettingsBillingRoute: typeof AuthenticatedSettingsBillingRoute
   AuthenticatedSettingsDisplayRoute: typeof AuthenticatedSettingsDisplayRoute
   AuthenticatedSettingsEmailRoute: typeof AuthenticatedSettingsEmailRoute
   AuthenticatedSettingsIntegrationsRoute: typeof AuthenticatedSettingsIntegrationsRoute
@@ -6708,6 +6789,7 @@ const AuthenticatedSettingsRouteRouteChildren: AuthenticatedSettingsRouteRouteCh
     AuthenticatedSettingsAccountRoute: AuthenticatedSettingsAccountRoute,
     AuthenticatedSettingsApiKeysRoute: AuthenticatedSettingsApiKeysRoute,
     AuthenticatedSettingsAppearanceRoute: AuthenticatedSettingsAppearanceRoute,
+    AuthenticatedSettingsBillingRoute: AuthenticatedSettingsBillingRoute,
     AuthenticatedSettingsDisplayRoute: AuthenticatedSettingsDisplayRoute,
     AuthenticatedSettingsEmailRoute: AuthenticatedSettingsEmailRoute,
     AuthenticatedSettingsIntegrationsRoute:
@@ -6927,12 +7009,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardCalendarRoute: typeof AuthenticatedDashboardCalendarRoute
   AuthenticatedDashboardHelpRoute: typeof AuthenticatedDashboardHelpRoute
   AuthenticatedDashboardNotionRoute: typeof AuthenticatedDashboardNotionRoute
+  AuthenticatedDashboardSetupOrchestratorRoute: typeof AuthenticatedDashboardSetupOrchestratorRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
   AuthenticatedDashboardCasesCaseIdRoute: typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
+  AuthenticatedDashboardCasesKanbanRoute: typeof AuthenticatedDashboardCasesKanbanRoute
   AuthenticatedDashboardCasesNewRoute: typeof AuthenticatedDashboardCasesNewRoute
   AuthenticatedDashboardCasesPipelineRoute: typeof AuthenticatedDashboardCasesPipelineRouteWithChildren
   AuthenticatedDashboardClientsClientIdRoute: typeof AuthenticatedDashboardClientsClientIdRoute
@@ -6946,6 +7030,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardCrmSetupWizardRoute: typeof AuthenticatedDashboardCrmSetupWizardRoute
   AuthenticatedDashboardCrmTerritoriesRoute: typeof AuthenticatedDashboardCrmTerritoriesRoute
   AuthenticatedDashboardFinanceChartOfAccountsRoute: typeof AuthenticatedDashboardFinanceChartOfAccountsRoute
+  AuthenticatedDashboardFinanceConsolidatedReportsRoute: typeof AuthenticatedDashboardFinanceConsolidatedReportsRoute
   AuthenticatedDashboardFinanceCorporateCardsRoute: typeof AuthenticatedDashboardFinanceCorporateCardsRouteWithChildren
   AuthenticatedDashboardFinanceGeneralLedgerRoute: typeof AuthenticatedDashboardFinanceGeneralLedgerRoute
   AuthenticatedDashboardFinanceOpeningBalancesRoute: typeof AuthenticatedDashboardFinanceOpeningBalancesRoute
@@ -7200,6 +7285,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardCalendarRoute: AuthenticatedDashboardCalendarRoute,
   AuthenticatedDashboardHelpRoute: AuthenticatedDashboardHelpRoute,
   AuthenticatedDashboardNotionRoute: AuthenticatedDashboardNotionRoute,
+  AuthenticatedDashboardSetupOrchestratorRoute:
+    AuthenticatedDashboardSetupOrchestratorRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
@@ -7207,6 +7294,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
   AuthenticatedDashboardCasesCaseIdRoute:
     AuthenticatedDashboardCasesCaseIdRouteWithChildren,
+  AuthenticatedDashboardCasesKanbanRoute:
+    AuthenticatedDashboardCasesKanbanRoute,
   AuthenticatedDashboardCasesNewRoute: AuthenticatedDashboardCasesNewRoute,
   AuthenticatedDashboardCasesPipelineRoute:
     AuthenticatedDashboardCasesPipelineRouteWithChildren,
@@ -7231,6 +7320,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardCrmTerritoriesRoute,
   AuthenticatedDashboardFinanceChartOfAccountsRoute:
     AuthenticatedDashboardFinanceChartOfAccountsRoute,
+  AuthenticatedDashboardFinanceConsolidatedReportsRoute:
+    AuthenticatedDashboardFinanceConsolidatedReportsRoute,
   AuthenticatedDashboardFinanceCorporateCardsRoute:
     AuthenticatedDashboardFinanceCorporateCardsRouteWithChildren,
   AuthenticatedDashboardFinanceGeneralLedgerRoute:

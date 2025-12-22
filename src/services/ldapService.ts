@@ -1,10 +1,47 @@
 /**
  * LDAP Service
  * Handles all LDAP/Active Directory configuration and operations
- * Base route: /api/ldap
+ *
+ * ⚠️ IMPORTANT API DOCUMENTATION:
+ * ==================================
+ *
+ * Base Path: /ldap (NOT /api/auth/ldap or /api/admin/ldap)
+ * -----------
+ * All endpoints use the base path `/ldap` which is automatically prefixed by apiClient.
+ * The backend serves these routes at `/api/ldap/*` but apiClient handles the `/api` prefix.
+ *
+ * Example:
+ * - Code calls: apiClient.get('/ldap/config')
+ * - Actual HTTP request: GET /api/ldap/config
+ *
+ * Endpoint Patterns:
+ * ------------------
+ * Configuration:
+ *   GET    /ldap/config          - Get LDAP configuration
+ *   POST   /ldap/config          - Create/save LDAP configuration
+ *   PUT    /ldap/config          - Update LDAP configuration
+ *   DELETE /ldap/config          - Delete LDAP configuration
+ *
+ * Testing:
+ *   POST   /ldap/test-connection - Test LDAP connection
+ *   POST   /ldap/test-user-lookup - Test user lookup
+ *
+ * Synchronization:
+ *   POST   /ldap/sync            - Trigger manual user sync
+ *   GET    /ldap/sync-status     - Get sync status
+ *
+ * Authentication:
+ *   POST   /ldap/login           - Authenticate via LDAP
+ *
+ * ⚠️ LDAP Login Status:
+ * ---------------------
+ * LDAP login is now integrated into the main login page.
+ * The feature will only show if LDAP is configured and enabled.
+ * Users can authenticate via LDAP using their directory credentials.
  */
 
 import apiClient, { handleApiError } from '@/lib/api'
+import type { User } from './authService'
 
 /**
  * LDAP Configuration Interface
@@ -114,12 +151,20 @@ export interface LDAPSyncStatus {
 }
 
 /**
+ * LDAP Login Credentials
+ */
+export interface LDAPLoginCredentials {
+  username: string
+  password: string
+}
+
+/**
  * LDAP Service Object
  */
 const ldapService = {
   /**
    * Get LDAP configuration
-   * GET /api/ldap/config
+   * GET /ldap/config
    */
   getConfig: async (): Promise<LDAPConfig | null> => {
     try {
@@ -136,7 +181,7 @@ const ldapService = {
 
   /**
    * Save LDAP configuration
-   * POST /api/ldap/config or PUT /api/ldap/config
+   * POST /ldap/config
    */
   saveConfig: async (data: LDAPConfigFormData): Promise<LDAPConfig> => {
     try {
@@ -149,7 +194,7 @@ const ldapService = {
 
   /**
    * Update LDAP configuration
-   * PUT /api/ldap/config
+   * PUT /ldap/config
    */
   updateConfig: async (data: Partial<LDAPConfigFormData>): Promise<LDAPConfig> => {
     try {
@@ -162,7 +207,7 @@ const ldapService = {
 
   /**
    * Test LDAP connection
-   * POST /api/ldap/test-connection
+   * POST /ldap/test-connection
    */
   testConnection: async (data: LDAPConfigFormData): Promise<LDAPTestResult> => {
     try {
@@ -175,7 +220,7 @@ const ldapService = {
 
   /**
    * Test LDAP user lookup
-   * POST /api/ldap/test-user-lookup
+   * POST /ldap/test-user-lookup
    */
   testUserLookup: async (username: string): Promise<LDAPUserLookup> => {
     try {
@@ -188,7 +233,7 @@ const ldapService = {
 
   /**
    * Trigger manual user sync
-   * POST /api/ldap/sync
+   * POST /ldap/sync
    */
   syncUsers: async (): Promise<{ message: string; messageAr: string }> => {
     try {
@@ -201,7 +246,7 @@ const ldapService = {
 
   /**
    * Get sync status
-   * GET /api/ldap/sync-status
+   * GET /ldap/sync-status
    */
   getSyncStatus: async (): Promise<LDAPSyncStatus> => {
     try {
@@ -214,11 +259,35 @@ const ldapService = {
 
   /**
    * Delete LDAP configuration
-   * DELETE /api/ldap/config
+   * DELETE /ldap/config
    */
   deleteConfig: async (): Promise<void> => {
     try {
       await apiClient.delete('/ldap/config')
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * LDAP Login
+   * Authenticate user via LDAP/Active Directory
+   * POST /ldap/login
+   */
+  login: async (credentials: LDAPLoginCredentials): Promise<User> => {
+    try {
+      const response = await apiClient.post('/ldap/login', credentials)
+
+      if (response.data.error || !response.data.user) {
+        throw new Error(response.data.message || 'LDAP authentication failed')
+      }
+
+      const user = response.data.user
+
+      // Store user data in localStorage (matching authService pattern)
+      localStorage.setItem('user', JSON.stringify(user))
+
+      return user
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

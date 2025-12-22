@@ -1,6 +1,62 @@
 /**
  * Firm Service
- * Handles all firm-related API calls including RBAC and team management
+ *
+ * This service handles RBAC (Role-Based Access Control), team management, invitations,
+ * and firm-level operations within the Traf3li system. It manages roles, permissions,
+ * team members, and firm-specific settings.
+ *
+ * ## Dual-Service Architecture
+ *
+ * The Traf3li platform uses two services that interact with the same backend endpoints
+ * but serve different domain concerns:
+ *
+ * ### firmService.ts (this file)
+ * - **Domain**: RBAC, team management, and firm operations
+ * - **Concerns**:
+ *   - Role and permission management (getMyPermissions, getAvailableRoles)
+ *   - Team member operations (getTeamMembers, inviteTeamMember, updateMemberRole)
+ *   - Member lifecycle (processDeparture, reinstateMember, getDepartedMembers)
+ *   - Invitations (createInvitation, resendInvitation, cancelInvitation)
+ *   - Firm settings and configuration (updateFirm, updateBillingSettings)
+ *   - Firm ownership (transferOwnership, leaveFirm)
+ * - **Data Models**: FirmMember, Role, Permission, Invitation, Team
+ *
+ * ### companyService.ts
+ * - **Domain**: Multi-company hierarchy and organizational structure
+ * - **Concerns**:
+ *   - Company tree management (parent-child relationships)
+ *   - Multi-company access control
+ *   - Company switching and context
+ *   - Hierarchical permissions (canAccessChildren, canAccessParent)
+ * - **Data Models**: Company, UserCompanyAccess, CompanyTreeNode
+ *
+ * ## Shared Backend
+ *
+ * Both services call `/api/firms/*` endpoints because:
+ * - The backend uses "firm" as the primary entity name
+ * - A "Company" in the UI is represented as a "Firm" in the database
+ * - The services separate concerns at the application layer while sharing the same backend API
+ *
+ * ## Usage Guidelines
+ *
+ * - Use **firmService** for RBAC, team/member operations, and firm-specific features
+ * - Use **companyService** for organizational hierarchy, multi-company features, and access control
+ * - Both services can be used together when features require both permissions and hierarchy
+ *
+ * @example
+ * // Get current user's permissions
+ * const permissions = await firmService.getMyPermissions();
+ *
+ * // Invite a team member
+ * await firmService.inviteTeamMember(firmId, {
+ *   email: 'user@example.com',
+ *   firstName: 'John',
+ *   lastName: 'Doe',
+ *   role: 'admin'
+ * });
+ *
+ * // Get team members with departed members
+ * const { members } = await firmService.getTeamMembers(firmId, { showDeparted: true });
  */
 
 import apiClient, { handleApiError } from '@/lib/api'

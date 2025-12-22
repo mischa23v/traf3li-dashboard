@@ -1,6 +1,18 @@
 /**
  * Automated Action Service
- * API service for workflow automation (based on Odoo base.automation)
+ *
+ * ⚠️ BACKEND STATUS: NOT IMPLEMENTED
+ *
+ * This service defines the frontend API client for automated actions/workflows.
+ * The backend endpoints are NOT YET IMPLEMENTED. This is frontend-ready code
+ * awaiting backend development.
+ *
+ * Expected endpoints:
+ * - GET /automated-actions
+ * - POST /automated-actions
+ * - POST /automated-actions/:id/toggle
+ * - POST /automated-actions/:id/test
+ * - etc.
  */
 
 import apiClient from '@/lib/api'

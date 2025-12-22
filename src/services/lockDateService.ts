@@ -1,5 +1,24 @@
 /**
  * Lock Date Service
+ *
+ * ⚠️ BACKEND STATUS: NOT IMPLEMENTED
+ *
+ * This service defines the frontend API client for lock date management.
+ * The backend endpoints are NOT YET IMPLEMENTED. This is frontend-ready code
+ * awaiting backend development.
+ *
+ * Expected endpoints:
+ * - GET /lock-dates
+ * - PATCH /lock-dates/:lockType
+ * - DELETE /lock-dates/:lockType
+ * - POST /lock-dates/check
+ * - POST /lock-dates/check-range
+ * - POST /lock-dates/periods/lock
+ * - POST /lock-dates/periods/reopen
+ * - GET /lock-dates/periods
+ * - GET /lock-dates/history
+ * - PATCH /lock-dates/fiscal-year-end
+ *
  * API service for fiscal period management and date locking
  */
 
