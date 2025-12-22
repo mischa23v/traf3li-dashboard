@@ -25,7 +25,6 @@ import {
 import {
   isMFARequired,
   isMFARecommended,
-  isActionMFAProtected,
   needsMFAForAction,
   hasMFASession,
   getMFASessionRemaining,

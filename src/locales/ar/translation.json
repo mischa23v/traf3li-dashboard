@@ -4025,7 +4025,11 @@
     "editedBy": "عدّله",
     "saved": "تم الحفظ",
     "saveError": "فشل الحفظ",
-    "user": "مستخدم"
+    "user": "مستخدم",
+    "back": "رجوع",
+    "next": "التالي",
+    "done": "تم",
+    "continue": "متابعة"
   },
   "pricing": {
     "upgradeYourPlan": "ترقية خطتك",

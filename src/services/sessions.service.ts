@@ -4,7 +4,7 @@
  * NCA ECC 2-2-3 Compliance
  */
 
-import { apiClient } from '@/lib/api'
+import { apiClientNoVersion } from '@/lib/api'
 
 /**
  * Session interface matching backend response
@@ -43,7 +43,7 @@ export interface SessionsResponse {
  */
 export async function getActiveSessions(): Promise<SessionsResponse> {
   try {
-    const response = await apiClient.get('/auth/sessions')
+    const response = await apiClientNoVersion.get('/auth/sessions')
     return response.data
   } catch (error: any) {
     // Return empty array on error to prevent UI crash
@@ -65,7 +65,7 @@ export async function revokeSession(sessionId: string): Promise<{
   success: boolean
   message: string
 }> {
-  const response = await apiClient.delete(`/auth/sessions/${sessionId}`)
+  const response = await apiClientNoVersion.delete(`/auth/sessions/${sessionId}`)
   return response.data
 }
 
@@ -77,7 +77,7 @@ export async function revokeAllSessions(): Promise<{
   message: string
   revokedCount: number
 }> {
-  const response = await apiClient.delete('/auth/sessions')
+  const response = await apiClientNoVersion.delete('/auth/sessions')
   return response.data
 }
 

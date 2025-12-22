@@ -127,7 +127,7 @@ export const useAuthStore = create<AuthState>()(
       setUser: (user: User | null) => {
         set({
           user,
-          isAuthenticated: user !== null,
+          isAuthenticated: user !== null && !user?.mfaPending,
           error: null,
         })
       },
@@ -152,7 +152,7 @@ export const useAuthStore = create<AuthState>()(
           const user = await authService.getCurrentUser()
           set({
             user,
-            isAuthenticated: user !== null,
+            isAuthenticated: user !== null && !user?.mfaPending,
             isLoading: false,
             error: null,
           })

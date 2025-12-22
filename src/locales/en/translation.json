@@ -1173,7 +1173,11 @@
     "active": "Active",
     "inactive": "Inactive",
     "createdAt": "Created At",
-    "default": "Default"
+    "default": "Default",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "continue": "Continue"
   },
   "validation": {
     "required": "This field is required",
