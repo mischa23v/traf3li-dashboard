@@ -253,8 +253,20 @@ const firmService = {
   /**
    * Get members (legacy endpoint)
    * GET /api/firms/:id/members
+   *
+   * @deprecated Use getTeamMembers() instead. This method is maintained for backward compatibility only.
+   * getTeamMembers() provides richer data including metadata (total count, active/departed counts)
+   * and supports filtering options like showDeparted.
    */
   getMembers: async (firmId: string): Promise<FirmMember[]> => {
+    console.warn(
+      '⚠️ DEPRECATED | تحذير: الدالة قديمة\n' +
+      'firmService.getMembers() is deprecated. Please use firmService.getTeamMembers() instead.\n' +
+      'getTeamMembers() provides richer data and filtering options.\n\n' +
+      'الدالة firmService.getMembers() قديمة. يرجى استخدام firmService.getTeamMembers() بدلاً منها.\n' +
+      'توفر getTeamMembers() بيانات أغنى وخيارات تصفية أفضل.\n\n' +
+      'Migration Guide: See /docs/migrations/getMembers-to-getTeamMembers.md'
+    )
     try {
       const response = await apiClient.get<ApiResponse<FirmMember[]>>(
         `/firms/${firmId}/members`

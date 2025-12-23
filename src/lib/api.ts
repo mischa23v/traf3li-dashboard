@@ -850,16 +850,48 @@ export const handleApiError = (error: any): string => {
 /**
  * Clear cache (deprecated - TanStack Query handles caching now)
  * Kept for API compatibility - use queryClient.clear() instead
+ *
+ * @deprecated This function is deprecated and does nothing. Use TanStack Query's queryClient methods instead:
+ * - To invalidate all queries: queryClient.clear()
+ * - To invalidate specific queries: queryClient.invalidateQueries({ queryKey: ['key'] })
+ * - To remove queries: queryClient.removeQueries({ queryKey: ['key'] })
+ *
+ * @param _urlPattern - Unused parameter (kept for API compatibility)
  */
 export const clearCache = (_urlPattern?: string) => {
+  console.warn(
+    '[DEPRECATED | قديم] clearCache() is deprecated and does nothing. | clearCache() قديم ولا يفعل شيء.\n' +
+    'Use TanStack Query methods instead | استخدم طرق TanStack Query بدلاً من ذلك:\n' +
+    '  - queryClient.clear() to clear all cache | لمسح جميع الذاكرة المؤقتة\n' +
+    '  - queryClient.invalidateQueries({ queryKey: [...] }) to invalidate specific queries | لإبطال استعلامات محددة\n' +
+    '  - queryClient.removeQueries({ queryKey: [...] }) to remove queries | لإزالة الاستعلامات\n\n' +
+    'Migration example | مثال الترحيل:\n' +
+    '  ❌ clearCache("/cases/123")\n' +
+    '  ✅ queryClient.invalidateQueries({ queryKey: ["case", "123"] })'
+  )
   // No-op: TanStack Query handles caching now
-  // Use queryClient.invalidateQueries() or queryClient.clear() instead
 }
 
 /**
  * Get cache size (deprecated - TanStack Query handles caching now)
+ *
+ * @deprecated This function is deprecated and always returns 0. Use TanStack Query's queryClient methods instead:
+ * - To get query cache: queryClient.getQueryCache()
+ * - To inspect queries: queryClient.getQueryData(queryKey)
+ *
+ * @returns 0 (no axios-level cache)
  */
 export const getCacheSize = () => {
+  console.warn(
+    '[DEPRECATED | قديم] getCacheSize() is deprecated and always returns 0. | getCacheSize() قديم ويرجع دائماً 0.\n' +
+    'Use TanStack Query methods instead | استخدم طرق TanStack Query بدلاً من ذلك:\n' +
+    '  - queryClient.getQueryCache() to access the query cache | للوصول إلى ذاكرة الاستعلامات\n' +
+    '  - queryClient.getQueryData(queryKey) to get specific query data | للحصول على بيانات استعلام محددة\n\n' +
+    'Migration example | مثال الترحيل:\n' +
+    '  ❌ const size = getCacheSize()\n' +
+    '  ✅ const cache = queryClient.getQueryCache()\n' +
+    '  ✅ const data = queryClient.getQueryData(["cases"])'
+  )
   return 0 // No axios-level cache
 }
 

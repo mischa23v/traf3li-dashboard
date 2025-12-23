@@ -522,37 +522,58 @@ export const unholdEmployee = async (runId: string, empId: string): Promise<Payr
   return response.data
 }
 
-// Exclude employee from payroll run (TODO: Backend endpoint not implemented)
+/**
+ * Exclude employee from payroll run
+ * @deprecated Backend endpoint not implemented - POST /payroll-runs/:id/employees/:empId/exclude
+ * @throws Error indicating the endpoint is not implemented
+ * TODO: [BACKEND-PENDING] Implement POST /payroll-runs/:id/employees/:empId/exclude endpoint
+ */
 export const excludeEmployee = async (runId: string, empId: string, reason: string): Promise<PayrollRun> => {
-  // TODO: Backend needs to implement POST /payroll-runs/:id/employees/:empId/exclude
-  const response = await api.post(`/payroll-runs/${runId}/employees/${empId}/exclude`, { reason })
-  return response.data
+  throw new Error(
+    'Feature not available: Employee exclusion is not yet implemented. | الميزة غير متاحة: استبعاد الموظف غير مطبق حالياً.\n' +
+    'Endpoint: POST /payroll-runs/:id/employees/:empId/exclude'
+  )
 }
 
-// Include employee back in payroll run (TODO: Backend endpoint not implemented)
+/**
+ * Include employee back in payroll run
+ * @deprecated Backend endpoint not implemented - POST /payroll-runs/:id/employees/:empId/include
+ * @throws Error indicating the endpoint is not implemented
+ * TODO: [BACKEND-PENDING] Implement POST /payroll-runs/:id/employees/:empId/include endpoint
+ */
 export const includeEmployee = async (runId: string, empId: string): Promise<PayrollRun> => {
-  // TODO: Backend needs to implement POST /payroll-runs/:id/employees/:empId/include
-  const response = await api.post(`/payroll-runs/${runId}/employees/${empId}/include`)
-  return response.data
+  throw new Error(
+    'Feature not available: Employee inclusion is not yet implemented. | الميزة غير متاحة: تضمين الموظف غير مطبق حالياً.\n' +
+    'Endpoint: POST /payroll-runs/:id/employees/:empId/include'
+  )
 }
 
-// Recalculate single employee in payroll run (TODO: Backend endpoint not implemented)
+/**
+ * Recalculate single employee in payroll run
+ * @deprecated Backend endpoint not implemented - POST /payroll-runs/:id/employees/:empId/recalculate
+ * @throws Error indicating the endpoint is not implemented
+ * TODO: [BACKEND-PENDING] Implement POST /payroll-runs/:id/employees/:empId/recalculate endpoint
+ */
 export const recalculateEmployee = async (runId: string, empId: string): Promise<PayrollRun> => {
-  // TODO: Backend needs to implement POST /payroll-runs/:id/employees/:empId/recalculate
-  const response = await api.post(`/payroll-runs/${runId}/employees/${empId}/recalculate`)
-  return response.data
+  throw new Error(
+    'Feature not available: Individual employee recalculation is not yet implemented. Please recalculate the entire payroll run. | الميزة غير متاحة: إعادة حساب الموظف الفردي غير مطبق حالياً. يرجى إعادة حساب دورة الرواتب بالكامل.\n' +
+    'Endpoint: POST /payroll-runs/:id/employees/:empId/recalculate'
+  )
 }
 
-// Export payroll run report (TODO: Backend endpoint not implemented)
+/**
+ * Export payroll run report
+ * @deprecated Backend endpoint not implemented - GET /payroll-runs/:id/export
+ * @throws Error indicating the endpoint is not implemented
+ * TODO: [BACKEND-PENDING] Implement GET /payroll-runs/:id/export endpoint with support for multiple report types and formats (pdf, excel, csv)
+ */
 export const exportPayrollRunReport = async (
   runId: string,
   reportType: 'summary' | 'detailed' | 'bank_file' | 'wps_sif' | 'journal_entry',
   format: 'pdf' | 'excel' | 'csv'
 ): Promise<Blob> => {
-  // TODO: Backend needs to implement GET /payroll-runs/:id/export
-  const response = await api.get(`/payroll-runs/${runId}/export`, {
-    params: { reportType, format },
-    responseType: 'blob'
-  })
-  return response.data
+  throw new Error(
+    'Export not available: Payroll report export is not yet implemented. | التصدير غير متاح: تصدير تقرير الرواتب غير مطبق حالياً.\n' +
+    'Endpoint: GET /payroll-runs/:id/export'
+  )
 }

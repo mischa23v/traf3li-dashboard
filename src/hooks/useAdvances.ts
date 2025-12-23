@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import {
   getAdvances,
   getAdvance,
@@ -165,14 +166,67 @@ export const useCheckAdvanceEligibility = () => {
 }
 
 // Submit advance request
+/**
+ * @deprecated Backend endpoint not implemented yet. Use at your own risk.
+ * This mutation will throw an error until the backend implements POST /hr/advances/:advanceId/submit
+ *
+ * TODO: [BACKEND-PENDING] Implement POST /hr/advances/:advanceId/submit endpoint
+ * The backend needs to implement this endpoint before this hook can be used in production.
+ */
 export const useSubmitAdvanceRequest = () => {
   const queryClient = useQueryClient()
+
+  // Deprecation warning
+  console.warn(
+    '⚠️ DEPRECATED: useSubmitAdvanceRequest is using a non-implemented backend endpoint. ' +
+    'Please implement POST /hr/advances/:advanceId/submit before using this mutation. | ' +
+    'تحذير: useSubmitAdvanceRequest يستخدم نقطة نهاية خلفية غير مطبقة. ' +
+    'يرجى تنفيذ POST /hr/advances/:advanceId/submit قبل استخدام هذا التحويل.'
+  )
+
   return useMutation({
-    mutationFn: (advanceId: string) => submitAdvanceRequest(advanceId),
+    mutationFn: async (advanceId: string) => {
+      try {
+        return await submitAdvanceRequest(advanceId)
+      } catch (error) {
+        // Enhanced error handling with bilingual messages
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error | خطأ غير معروف'
+
+        // Show user-facing error alert (bilingual)
+        toast.error(
+          'فشل إرسال طلب السلفة | Failed to Submit Advance Request',
+          {
+            description: 'نقطة النهاية الخلفية غير مطبقة. يرجى الاتصال بالدعم الفني. | Backend endpoint not implemented. Please contact technical support.',
+          }
+        )
+
+        if (error instanceof Error) {
+          throw new Error(
+            `Failed to submit advance request: ${error.message} | ` +
+            `فشل في إرسال طلب السلفة: ${error.message}`
+          )
+        }
+        throw new Error(
+          'An unexpected error occurred while submitting the advance request. | ' +
+          'حدث خطأ غير متوقع أثناء إرسال طلب السلفة.'
+        )
+      }
+    },
     onSuccess: (_, advanceId) => {
       queryClient.invalidateQueries({ queryKey: advanceKeys.detail(advanceId) })
       queryClient.invalidateQueries({ queryKey: advanceKeys.lists() })
       queryClient.invalidateQueries({ queryKey: advanceKeys.pendingApprovals() })
+
+      // Success toast
+      toast.success(
+        'تم إرسال طلب السلفة بنجاح | Advance Request Submitted Successfully'
+      )
+    },
+    onError: (error) => {
+      console.error(
+        '❌ Error submitting advance request | خطأ في إرسال طلب السلفة:',
+        error
+      )
     },
   })
 }
@@ -304,21 +358,74 @@ export const useProcessEarlyRecovery = () => {
 }
 
 // Waive advance
+/**
+ * @deprecated Backend endpoint not implemented yet. Use at your own risk.
+ * This mutation will throw an error until the backend implements POST /hr/advances/:advanceId/waive
+ *
+ * TODO: [BACKEND-PENDING] Implement POST /hr/advances/:advanceId/waive endpoint
+ * The backend needs to implement this endpoint before this hook can be used in production.
+ */
 export const useWaiveAdvance = () => {
   const queryClient = useQueryClient()
+
+  // Deprecation warning
+  console.warn(
+    '⚠️ DEPRECATED: useWaiveAdvance is using a non-implemented backend endpoint. ' +
+    'Please implement POST /hr/advances/:advanceId/waive before using this mutation. | ' +
+    'تحذير: useWaiveAdvance يستخدم نقطة نهاية خلفية غير مطبقة. ' +
+    'يرجى تنفيذ POST /hr/advances/:advanceId/waive قبل استخدام هذا التحويل.'
+  )
+
   return useMutation({
-    mutationFn: ({ advanceId, data }: {
+    mutationFn: async ({ advanceId, data }: {
       advanceId: string
       data: {
         waiveReason: string
         waiveAmount?: number
         comments?: string
       }
-    }) => waiveAdvance(advanceId, data),
+    }) => {
+      try {
+        return await waiveAdvance(advanceId, data)
+      } catch (error) {
+        // Enhanced error handling with bilingual messages
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error | خطأ غير معروف'
+
+        // Show user-facing error alert (bilingual)
+        toast.error(
+          'فشل إعفاء السلفة | Failed to Waive Advance',
+          {
+            description: 'نقطة النهاية الخلفية غير مطبقة. يرجى الاتصال بالدعم الفني. | Backend endpoint not implemented. Please contact technical support.',
+          }
+        )
+
+        if (error instanceof Error) {
+          throw new Error(
+            `Failed to waive advance: ${error.message} | ` +
+            `فشل في إعفاء السلفة: ${error.message}`
+          )
+        }
+        throw new Error(
+          'An unexpected error occurred while waiving the advance. | ' +
+          'حدث خطأ غير متوقع أثناء إعفاء السلفة.'
+        )
+      }
+    },
     onSuccess: (_, { advanceId }) => {
       queryClient.invalidateQueries({ queryKey: advanceKeys.detail(advanceId) })
       queryClient.invalidateQueries({ queryKey: advanceKeys.lists() })
       queryClient.invalidateQueries({ queryKey: advanceKeys.stats() })
+
+      // Success toast
+      toast.success(
+        'تم إعفاء السلفة بنجاح | Advance Waived Successfully'
+      )
+    },
+    onError: (error) => {
+      console.error(
+        '❌ Error waiving advance | خطأ في إعفاء السلفة:',
+        error
+      )
     },
   })
 }

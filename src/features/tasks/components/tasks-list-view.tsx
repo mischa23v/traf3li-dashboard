@@ -64,8 +64,8 @@ interface AiSuggestionResponse {
     suggestion: string
 }
 
-// AI Worker URL from environment variable
-const AI_WORKER_URL = import.meta.env.VITE_AI_WORKER_URL || 'https://shrill-band-bfcb.mischa23v.workers.dev'
+// AI Worker URL from environment variable (no fallback - AI disabled if not set)
+const AI_WORKER_URL = import.meta.env.VITE_AI_WORKER_URL
 
 export function TasksListView() {
     const { t, i18n } = useTranslation()
@@ -145,6 +145,12 @@ export function TasksListView() {
 
     // AI Suggestion fetch function with proper cleanup, timeout, and rate limiting
     const fetchAiSuggestion = useCallback(async (taskList: any[], forceRefresh = false) => {
+        // Check if AI Worker URL is configured - gracefully disable AI if not set
+        if (!AI_WORKER_URL) {
+            console.log('AI Worker URL not configured - AI suggestions disabled')
+            return
+        }
+
         // Rate limit: only fetch once per 10 minutes (unless force refresh)
         const now = Date.now()
         if (!forceRefresh && now - aiLastFetch.current < 10 * 60 * 1000 && aiHasFetched.current) {

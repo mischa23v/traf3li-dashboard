@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { payrollService } from '@/services/payrollService'
 import type { SalarySlipFilters, CreateSalarySlipData } from '@/services/payrollService'
 
@@ -146,6 +147,39 @@ export function useSubmitToWPS() {
         mutationFn: (ids: string[]) => payrollService.submitToWPS(ids),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: payrollKeys.all })
+        },
+    })
+}
+
+/**
+ * Download salary slip PDF
+ * @deprecated Backend endpoint not implemented - GET /payroll/:id/pdf
+ * This hook will throw an error when called. Use PDFme service for client-side PDF generation instead.
+ * TODO: [BACKEND-PENDING] Implement GET /payroll/:id/pdf endpoint OR implement client-side PDF generation using PDFme
+ */
+export function useDownloadSalarySlipPDF() {
+    return useMutation({
+        mutationFn: (id: string) => {
+            console.warn(
+                '[DEPRECATED] useDownloadSalarySlipPDF: Backend endpoint not implemented | [منتهي الصلاحية] استخدام تنزيل PDF: نقطة النهاية غير مطبقة',
+                '\nEndpoint: GET /payroll/:id/pdf',
+                '\nSalary Slip ID:', id,
+                '\nSuggestion: Use PDFme service for client-side PDF generation | اقتراح: استخدم خدمة PDFme لإنشاء PDF من جانب العميل'
+            )
+            return payrollService.downloadSalarySlipPDF(id)
+        },
+        onError: (error) => {
+            console.error(
+                '[ERROR] Failed to download salary slip PDF | [خطأ] فشل تنزيل PDF لقسيمة الراتب:',
+                error instanceof Error ? error.message : 'Unknown error | خطأ غير معروف'
+            )
+            // Show bilingual user-facing error alert
+            toast.error(
+                'PDF download not available | تنزيل PDF غير متاح',
+                {
+                    description: 'Salary slip PDF generation is not yet implemented. Please use the print function or contact support. | إنشاء PDF لقسيمة الراتب غير مطبق حالياً. يرجى استخدام وظيفة الطباعة أو التواصل مع الدعم الفني.',
+                }
+            )
         },
     })
 }

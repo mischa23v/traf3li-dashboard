@@ -1354,10 +1354,12 @@ const financeService = {
 
   /**
    * Update time entry
+   * ⚠️ NOTE: Backend uses PUT, not PATCH
    */
   updateTimeEntry: async (id: string, data: Partial<CreateTimeEntryData>): Promise<TimeEntry> => {
     try {
-      const response = await apiClient.patch(`/time-tracking/entries/${id}`, data)
+      // Backend uses PUT, not PATCH
+      const response = await apiClient.put(`/time-tracking/entries/${id}`, data)
       return response.data.timeEntry || response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))

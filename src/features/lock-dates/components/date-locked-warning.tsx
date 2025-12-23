@@ -29,9 +29,11 @@ export function DateLockedWarning({
   const { i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
 
-  const { data: check, isLoading } = useDateLockCheck(date, lockType)
+  // Backend not implemented - disable the check
+  const { data: check, isLoading, error } = useDateLockCheck(date, lockType, false)
 
-  if (isLoading || !check?.is_locked) return null
+  // Don't show warning if there's an error (backend not implemented) or no lock
+  if (isLoading || error || !check?.is_locked) return null
 
   const lockConfig = check.lock_type ? getLockTypeConfig(check.lock_type as LockType) : null
 

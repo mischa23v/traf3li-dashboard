@@ -3,7 +3,7 @@
  * Handles all authentication-related API calls
  */
 
-import { apiClientNoVersion, handleApiError, clearCache } from '@/lib/api'
+import { apiClientNoVersion, handleApiError } from '@/lib/api'
 
 // Auth routes are NOT versioned - they're at /api/auth/*, not /api/v1/auth/*
 // So we use apiClientNoVersion (baseURL: https://api.traf3li.com/api)
@@ -292,9 +292,8 @@ const authService = {
    */
   login: async (credentials: LoginCredentials): Promise<User> => {
     try {
-      // Clear any cached API responses before login
-      // This ensures fresh data is fetched after authentication
-      clearCache()
+      // NOTE: TanStack Query automatically invalidates queries on auth state change
+      // No manual cache clearing needed - query invalidation happens via queryClient
 
       // Call backend login API
       const response = await authApi.post<AuthResponse>(

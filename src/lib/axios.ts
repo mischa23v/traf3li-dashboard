@@ -4,8 +4,7 @@ export {
   apiClient,
   api,
   handleApiError,
-  clearCache,
-  getCacheSize,
+  // NOTE: clearCache and getCacheSize are deprecated - use TanStack Query methods instead
   getRateLimitInfo,
   formatRetryAfter,
   resetApiState,

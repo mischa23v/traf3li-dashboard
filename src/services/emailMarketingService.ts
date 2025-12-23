@@ -2,9 +2,35 @@
  * Email Marketing Service
  * Handles all email marketing API calls for campaigns, templates, subscribers, and segments
  * Base route: /api/email-marketing
+ *
+ * ⚠️ WARNING: Some endpoints are not yet implemented in the backend
+ * - All segment-related endpoints [BACKEND-PENDING]
+ * - Analytics endpoints (overview, trends) [BACKEND-PENDING]
+ * - Subscriber unsubscribe endpoint [BACKEND-PENDING]
  */
 
 import apiClient, { handleApiError } from '@/lib/api'
+
+/**
+ * Helper function to throw bilingual error message for not-yet-implemented endpoints
+ */
+const throwNotImplementedError = (operation: string, endpoint: string): never => {
+  throw new Error(
+    `❌ Backend Not Implemented | الخلفية غير مطبقة\n\n` +
+    `EN: The email marketing backend endpoint '${endpoint}' is not yet implemented. ` +
+    `This operation (${operation}) cannot be performed until the backend endpoint is created.\n\n` +
+    `AR: نقطة نهاية التسويق عبر البريد الإلكتروني '${endpoint}' غير مطبقة بعد. ` +
+    `لا يمكن تنفيذ هذه العملية (${operation}) حتى يتم إنشاء نقطة النهاية الخلفية.`
+  )
+}
+
+/**
+ * Helper function to format bilingual error messages for API errors
+ */
+const formatBilingualError = (error: any, operation: string): string => {
+  const errorMessage = handleApiError(error)
+  return `${errorMessage} | فشلت العملية: ${operation}`
+}
 
 /**
  * Email Campaign Interface
@@ -166,7 +192,7 @@ const emailMarketingService = {
       const response = await apiClient.post('/email-marketing/campaigns', data)
       return response.data.campaign || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Create Campaign | إنشاء حملة'))
     }
   },
 
@@ -186,7 +212,7 @@ const emailMarketingService = {
         total: response.data.total || 0,
       }
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Get Campaigns | الحصول على الحملات'))
     }
   },
 
@@ -199,7 +225,7 @@ const emailMarketingService = {
       const response = await apiClient.get(`/email-marketing/campaigns/${id}`)
       return response.data.campaign || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Get Campaign | الحصول على الحملة'))
     }
   },
 
@@ -212,7 +238,7 @@ const emailMarketingService = {
       const response = await apiClient.put(`/email-marketing/campaigns/${id}`, data)
       return response.data.campaign || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Update Campaign | تحديث الحملة'))
     }
   },
 
@@ -224,7 +250,7 @@ const emailMarketingService = {
     try {
       await apiClient.delete(`/email-marketing/campaigns/${id}`)
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Delete Campaign | حذف الحملة'))
     }
   },
 
@@ -237,7 +263,7 @@ const emailMarketingService = {
       const response = await apiClient.post(`/email-marketing/campaigns/${id}/duplicate`)
       return response.data.campaign || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Duplicate Campaign | تكرار الحملة'))
     }
   },
 
@@ -250,7 +276,7 @@ const emailMarketingService = {
       const response = await apiClient.post(`/email-marketing/campaigns/${id}/schedule`, { scheduledAt })
       return response.data.campaign || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Schedule Campaign | جدولة الحملة'))
     }
   },
 
@@ -263,7 +289,7 @@ const emailMarketingService = {
       const response = await apiClient.post(`/email-marketing/campaigns/${id}/send`)
       return response.data.campaign || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Send Campaign | إرسال الحملة'))
     }
   },
 
@@ -276,7 +302,7 @@ const emailMarketingService = {
       const response = await apiClient.post(`/email-marketing/campaigns/${id}/pause`)
       return response.data.campaign || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Pause Campaign | إيقاف الحملة مؤقتاً'))
     }
   },
 
@@ -289,7 +315,7 @@ const emailMarketingService = {
       const response = await apiClient.post(`/email-marketing/campaigns/${id}/resume`)
       return response.data.campaign || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Resume Campaign | استئناف الحملة'))
     }
   },
 
@@ -302,7 +328,7 @@ const emailMarketingService = {
       const response = await apiClient.post(`/email-marketing/campaigns/${id}/cancel`)
       return response.data.campaign || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Cancel Campaign | إلغاء الحملة'))
     }
   },
 
@@ -315,7 +341,7 @@ const emailMarketingService = {
       const response = await apiClient.post(`/email-marketing/campaigns/${id}/test`, { testEmails })
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Send Test Email | إرسال بريد اختباري'))
     }
   },
 
@@ -328,7 +354,7 @@ const emailMarketingService = {
       const response = await apiClient.get(`/email-marketing/campaigns/${id}/analytics`)
       return response.data.analytics || response.data.data || response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Email Marketing Operation | عملية التسويق عبر البريد الإلكتروني'))
     }
   },
 
@@ -350,7 +376,7 @@ const emailMarketingService = {
       const response = await apiClient.post('/email-marketing/templates', data)
       return response.data.template || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Create Template | إنشاء قالب'))
     }
   },
 
@@ -370,7 +396,7 @@ const emailMarketingService = {
         total: response.data.total || 0,
       }
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Get Templates | الحصول على القوالب'))
     }
   },
 
@@ -390,7 +416,7 @@ const emailMarketingService = {
         total: response.data.total || 0,
       }
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Email Marketing Operation | عملية التسويق عبر البريد الإلكتروني'))
     }
   },
 
@@ -403,7 +429,7 @@ const emailMarketingService = {
       const response = await apiClient.get(`/email-marketing/templates/${id}`)
       return response.data.template || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Email Marketing Operation | عملية التسويق عبر البريد الإلكتروني'))
     }
   },
 
@@ -422,7 +448,7 @@ const emailMarketingService = {
       const response = await apiClient.put(`/email-marketing/templates/${id}`, data)
       return response.data.template || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Email Marketing Operation | عملية التسويق عبر البريد الإلكتروني'))
     }
   },
 
@@ -434,7 +460,7 @@ const emailMarketingService = {
     try {
       await apiClient.delete(`/email-marketing/templates/${id}`)
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Email Marketing Operation | عملية التسويق عبر البريد الإلكتروني'))
     }
   },
 
@@ -447,7 +473,7 @@ const emailMarketingService = {
       const response = await apiClient.post(`/email-marketing/templates/${id}/preview`, { variables })
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Email Marketing Operation | عملية التسويق عبر البريد الإلكتروني'))
     }
   },
 
@@ -469,7 +495,7 @@ const emailMarketingService = {
       const response = await apiClient.post('/email-marketing/subscribers', data)
       return response.data.subscriber || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Email Marketing Operation | عملية التسويق عبر البريد الإلكتروني'))
     }
   },
 
@@ -490,7 +516,7 @@ const emailMarketingService = {
         total: response.data.total || 0,
       }
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Email Marketing Operation | عملية التسويق عبر البريد الإلكتروني'))
     }
   },
 
@@ -509,7 +535,7 @@ const emailMarketingService = {
       const response = await apiClient.put(`/email-marketing/subscribers/${id}`, data)
       return response.data.subscriber || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Email Marketing Operation | عملية التسويق عبر البريد الإلكتروني'))
     }
   },
 
@@ -521,7 +547,7 @@ const emailMarketingService = {
     try {
       await apiClient.delete(`/email-marketing/subscribers/${id}`)
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Email Marketing Operation | عملية التسويق عبر البريد الإلكتروني'))
     }
   },
 
@@ -548,7 +574,7 @@ const emailMarketingService = {
       })
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Email Marketing Operation | عملية التسويق عبر البريد الإلكتروني'))
     }
   },
 
@@ -564,168 +590,155 @@ const emailMarketingService = {
       const response = await apiClient.post('/email-marketing/subscribers/export', params)
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(formatBilingualError(error, 'Email Marketing Operation | عملية التسويق عبر البريد الإلكتروني'))
     }
   },
 
   /**
    * Unsubscribe subscriber
    * POST /api/email-marketing/subscribers/:id/unsubscribe
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message indicating the endpoint is not implemented
    */
   unsubscribe: async (id: string): Promise<EmailSubscriber> => {
-    try {
-      const response = await apiClient.post(`/email-marketing/subscribers/${id}/unsubscribe`)
-      return response.data.subscriber || response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    // TODO: [BACKEND-PENDING] Backend needs to implement POST /email-marketing/subscribers/:id/unsubscribe
+    throwNotImplementedError('unsubscribe', 'POST /email-marketing/subscribers/:id/unsubscribe')
   },
 
   // ==================== SEGMENTS ====================
+  // ⚠️ [BACKEND-PENDING] All segment endpoints are not yet implemented in the backend
 
   /**
    * Create new segment
    * POST /api/email-marketing/segments
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message indicating the endpoint is not implemented
    */
   createSegment: async (data: {
     name: string
     description?: string
     conditions: any[]
   }): Promise<EmailSegment> => {
-    try {
-      const response = await apiClient.post('/email-marketing/segments', data)
-      return response.data.segment || response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    // TODO: [BACKEND-PENDING] Backend needs to implement POST /email-marketing/segments
+    throwNotImplementedError('createSegment', 'POST /email-marketing/segments')
   },
 
   /**
    * Get all segments
    * GET /api/email-marketing/segments
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message indicating the endpoint is not implemented
    */
   getSegments: async (params?: {
     page?: number
     limit?: number
   }): Promise<{ segments: EmailSegment[]; total: number }> => {
-    try {
-      const response = await apiClient.get('/email-marketing/segments', { params })
-      return {
-        segments: response.data.segments || response.data.data || [],
-        total: response.data.total || 0,
-      }
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    // TODO: [BACKEND-PENDING] Backend needs to implement GET /email-marketing/segments
+    throwNotImplementedError('getSegments', 'GET /email-marketing/segments')
   },
 
   /**
    * Get single segment
    * GET /api/email-marketing/segments/:id
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message indicating the endpoint is not implemented
    */
   getSegment: async (id: string): Promise<EmailSegment> => {
-    try {
-      const response = await apiClient.get(`/email-marketing/segments/${id}`)
-      return response.data.segment || response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    // TODO: [BACKEND-PENDING] Backend needs to implement GET /email-marketing/segments/:id
+    throwNotImplementedError('getSegment', 'GET /email-marketing/segments/:id')
   },
 
   /**
    * Update segment
    * PUT /api/email-marketing/segments/:id
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message indicating the endpoint is not implemented
    */
   updateSegment: async (id: string, data: Partial<{
     name: string
     description?: string
     conditions: any[]
   }>): Promise<EmailSegment> => {
-    try {
-      const response = await apiClient.put(`/email-marketing/segments/${id}`, data)
-      return response.data.segment || response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    // TODO: [BACKEND-PENDING] Backend needs to implement PUT /email-marketing/segments/:id
+    throwNotImplementedError('updateSegment', 'PUT /email-marketing/segments/:id')
   },
 
   /**
    * Delete segment
    * DELETE /api/email-marketing/segments/:id
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message indicating the endpoint is not implemented
    */
   deleteSegment: async (id: string): Promise<void> => {
-    try {
-      await apiClient.delete(`/email-marketing/segments/${id}`)
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    // TODO: [BACKEND-PENDING] Backend needs to implement DELETE /email-marketing/segments/:id
+    throwNotImplementedError('deleteSegment', 'DELETE /email-marketing/segments/:id')
   },
 
   /**
    * Get subscribers in a segment
    * GET /api/email-marketing/segments/:id/subscribers
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message indicating the endpoint is not implemented
    */
   getSegmentSubscribers: async (
     id: string,
     params?: { page?: number; limit?: number }
   ): Promise<{ subscribers: EmailSubscriber[]; total: number }> => {
-    try {
-      const response = await apiClient.get(`/email-marketing/segments/${id}/subscribers`, { params })
-      return {
-        subscribers: response.data.subscribers || response.data.data || [],
-        total: response.data.total || 0,
-      }
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    // TODO: [BACKEND-PENDING] Backend needs to implement GET /email-marketing/segments/:id/subscribers
+    throwNotImplementedError('getSegmentSubscribers', 'GET /email-marketing/segments/:id/subscribers')
   },
 
   /**
    * Refresh segment (recalculate subscribers based on conditions)
    * POST /api/email-marketing/segments/:id/refresh
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message indicating the endpoint is not implemented
    */
   refreshSegment: async (id: string): Promise<EmailSegment> => {
-    try {
-      const response = await apiClient.post(`/email-marketing/segments/${id}/refresh`)
-      return response.data.segment || response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    // TODO: [BACKEND-PENDING] Backend needs to implement POST /email-marketing/segments/:id/refresh
+    throwNotImplementedError('refreshSegment', 'POST /email-marketing/segments/:id/refresh')
   },
 
   // ==================== ANALYTICS ====================
+  // ⚠️ [BACKEND-PENDING] Analytics endpoints are not yet implemented in the backend
 
   /**
    * Get overview analytics
    * GET /api/email-marketing/analytics/overview
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message indicating the endpoint is not implemented
    */
   getOverviewAnalytics: async (params?: {
     startDate?: string
     endDate?: string
   }): Promise<OverviewAnalytics> => {
-    try {
-      const response = await apiClient.get('/email-marketing/analytics/overview', { params })
-      return response.data.analytics || response.data.data || response.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    // TODO: [BACKEND-PENDING] Backend needs to implement GET /email-marketing/analytics/overview
+    throwNotImplementedError('getOverviewAnalytics', 'GET /email-marketing/analytics/overview')
   },
 
   /**
    * Get trends analytics
    * GET /api/email-marketing/analytics/trends
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message indicating the endpoint is not implemented
    */
   getTrendsAnalytics: async (params?: {
     period?: 'week' | 'month' | 'year'
     startDate?: string
     endDate?: string
   }): Promise<TrendsAnalytics> => {
-    try {
-      const response = await apiClient.get('/email-marketing/analytics/trends', { params })
-      return response.data.analytics || response.data.data || response.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    // TODO: [BACKEND-PENDING] Backend needs to implement GET /email-marketing/analytics/trends
+    throwNotImplementedError('getTrendsAnalytics', 'GET /email-marketing/analytics/trends')
   },
 }
 

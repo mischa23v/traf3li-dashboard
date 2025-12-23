@@ -173,6 +173,7 @@ export const useTogglePolicy = () => {
 
 /**
  * Hook to fetch relation tuples
+ * @deprecated Use useResourceRelations() instead. This hook will be removed in a future version.
  */
 export const useRelationTuples = (params?: {
   namespace?: string
@@ -182,10 +183,31 @@ export const useRelationTuples = (params?: {
   limit?: number
   offset?: number
 }) => {
+  console.warn(
+    '⚠️ DEPRECATED: useRelationTuples() is deprecated and will be removed in a future version.\n' +
+    'Please migrate to useResourceRelations(namespace, object) instead.\n' +
+    'تحذير: useRelationTuples() قديم وسيتم إزالته في إصدار مستقبلي.\n' +
+    'يرجى الترحيل إلى useResourceRelations(namespace, object) بدلاً من ذلك.'
+  )
+
   return useQuery({
     queryKey: permissionKeys.relationList(params),
-    queryFn: () => permissionService.getRelationTuples(params),
+    queryFn: async () => {
+      try {
+        return await permissionService.getRelationTuples(params)
+      } catch (error: any) {
+        const errorMessage = error?.message ||
+          'Failed to fetch relation tuples | فشل في جلب علاقات الصلاحيات'
+        console.error('Error fetching relation tuples:', errorMessage)
+        throw new Error(errorMessage)
+      }
+    },
     staleTime: 2 * 60 * 1000,
+    onError: (error: any) => {
+      const errorMsg = error?.message ||
+        'Failed to load permission relations | فشل في تحميل علاقات الصلاحيات'
+      toast.error(errorMsg)
+    },
   })
 }
 

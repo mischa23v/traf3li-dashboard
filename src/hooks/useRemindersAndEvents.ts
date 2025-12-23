@@ -278,10 +278,12 @@ export const useCompleteReminder = () => {
   return useMutation({
     mutationFn: (id: string) => remindersService.completeReminder(id),
     onSuccess: () => {
-      toast.success('تم إكمال التذكير بنجاح')
+      // Bilingual success message: English | Arabic
+      toast.success('Reminder completed successfully | تم إكمال التذكير بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إكمال التذكير')
+      // Bilingual error message: English | Arabic
+      toast.error(error.message || 'Failed to complete reminder | فشل إكمال التذكير')
     },
     onSettled: async (_, __, id) => {
       await queryClient.invalidateQueries({ queryKey: ['reminders'] })
@@ -297,10 +299,12 @@ export const useDismissReminder = () => {
   return useMutation({
     mutationFn: (id: string) => remindersService.dismissReminder(id),
     onSuccess: () => {
-      toast.success('تم تجاهل التذكير')
+      // Bilingual success message: English | Arabic
+      toast.success('Reminder dismissed | تم تجاهل التذكير')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تجاهل التذكير')
+      // Bilingual error message: English | Arabic
+      toast.error(error.message || 'Failed to dismiss reminder | فشل تجاهل التذكير')
     },
     onSettled: async (_, __, id) => {
       await queryClient.invalidateQueries({ queryKey: ['reminders'] })
@@ -310,17 +314,48 @@ export const useDismissReminder = () => {
   })
 }
 
+/**
+ * Hook to snooze a reminder
+ *
+ * MIGRATION NOTE - Snooze Options:
+ * ================================
+ * ✅ Modern (use these):
+ *   - snoozeMinutes: number of minutes to snooze
+ *   - snoozeUntil: ISO string for specific datetime
+ *   - snoozeReason: optional reason for snoozing
+ *
+ * ❌ Legacy (deprecated, avoid in new code):
+ *   - minutes: use snoozeMinutes instead
+ *   - hours: use snoozeMinutes instead (convert to minutes: hours * 60)
+ *   - days: use snoozeMinutes instead (convert to minutes: days * 24 * 60)
+ *   - until: use snoozeUntil instead
+ *   - reason: use snoozeReason instead
+ *
+ * Example migration:
+ *   // Before (legacy):
+ *   snoozeReminder(id, { minutes: 30 })
+ *   snoozeReminder(id, { hours: 1 })
+ *   snoozeReminder(id, { until: '2024-12-31T10:00:00Z' })
+ *
+ *   // After (modern):
+ *   snoozeReminder(id, { snoozeMinutes: 30 })
+ *   snoozeReminder(id, { snoozeMinutes: 60 })
+ *   snoozeReminder(id, { snoozeUntil: '2024-12-31T10:00:00Z' })
+ */
 export const useSnoozeReminder = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: ({ id, duration }: { id: string; duration: number }) =>
-      remindersService.snoozeReminder(id, { minutes: duration }),
+      // ✅ Updated to use modern API (snoozeMinutes instead of legacy 'minutes')
+      remindersService.snoozeReminder(id, { snoozeMinutes: duration }),
     onSuccess: () => {
-      toast.success('تم تأجيل التذكير بنجاح')
+      // Bilingual success message: English | Arabic
+      toast.success('Reminder snoozed successfully | تم تأجيل التذكير بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تأجيل التذكير')
+      // Bilingual error message: English | Arabic
+      toast.error(error.message || 'Failed to snooze reminder | فشل تأجيل التذكير')
     },
     onSettled: async (_, __, { id }) => {
       await queryClient.invalidateQueries({ queryKey: ['reminders'] })
@@ -336,10 +371,12 @@ export const useReopenReminder = () => {
   return useMutation({
     mutationFn: (id: string) => remindersService.reopenReminder(id),
     onSuccess: () => {
-      toast.success('تم إعادة فتح التذكير')
+      // Bilingual success message: English | Arabic
+      toast.success('Reminder reopened | تم إعادة فتح التذكير')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إعادة فتح التذكير')
+      // Bilingual error message: English | Arabic
+      toast.error(error.message || 'Failed to reopen reminder | فشل إعادة فتح التذكير')
     },
     onSettled: async (_, __, id) => {
       await queryClient.invalidateQueries({ queryKey: ['reminders'] })
@@ -356,10 +393,12 @@ export const useDelegateReminder = () => {
     mutationFn: ({ id, delegateTo, note }: { id: string; delegateTo: string; note?: string }) =>
       remindersService.delegateReminder(id, delegateTo, note),
     onSuccess: () => {
-      toast.success('تم تفويض التذكير بنجاح')
+      // Bilingual success message: English | Arabic
+      toast.success('Reminder delegated successfully | تم تفويض التذكير بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تفويض التذكير')
+      // Bilingual error message: English | Arabic
+      toast.error(error.message || 'Failed to delegate reminder | فشل تفويض التذكير')
     },
     onSettled: async (_, __, { id }) => {
       await queryClient.invalidateQueries({ queryKey: ['reminders'] })

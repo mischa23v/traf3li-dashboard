@@ -125,6 +125,23 @@ export const useDocumentVersions = (documentId: string) => {
 }
 
 // Upload document
+/**
+ * @deprecated This hook uses the legacy direct upload method.
+ *
+ * IMPORTANT: The direct upload endpoint is deprecated and will be removed in a future version.
+ * Please migrate to the S3-based upload flow for better performance and scalability:
+ *
+ * 1. Call documentsService.getUploadUrl() to get a presigned S3 URL
+ * 2. Upload the file directly to S3 using the presigned URL
+ * 3. Call documentsService.confirmUpload() to finalize the document record
+ *
+ * Example migration:
+ * ```typescript
+ * const { uploadUrl, documentId } = await documentsService.getUploadUrl(file.name, file.type, metadata)
+ * await fetch(uploadUrl, { method: 'PUT', body: file })
+ * const document = await documentsService.confirmUpload(documentId)
+ * ```
+ */
 export const useUploadDocument = () => {
   const queryClient = useQueryClient()
   const { t } = useTranslation()
@@ -141,6 +158,16 @@ export const useUploadDocument = () => {
     }) => documentsService.uploadDocument(file, metadata, onProgress),
     // Update cache on success (Stable & Correct)
     onSuccess: (data, variables) => {
+      // Show deprecation warning to user
+      toast({
+        variant: 'default',
+        title: t('status.warning', 'Warning | تحذير'),
+        description: t(
+          'documents.uploadDeprecationWarning',
+          'This upload method is deprecated. Please contact your administrator to migrate to S3-based uploads for better performance. | طريقة الرفع هذه قديمة. يرجى الاتصال بالمسؤول للترحيل إلى رفع الملفات المستند إلى S3 لتحسين الأداء.'
+        ),
+      })
+
       toast({
         title: t('status.success'),
         description: t('documents.uploadSuccess'),
@@ -172,11 +199,20 @@ export const useUploadDocument = () => {
       })
     },
     onError: (error: any) => {
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message || error.message || t('documents.uploadError')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description: error.response?.data?.message || t('documents.uploadError'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
+
+      // Log deprecation warning on error as well
+      console.warn(
+        '[DEPRECATED] documentsService.uploadDocument() failed. ' +
+        'Consider migrating to S3-based upload flow (getUploadUrl + confirmUpload) for better reliability.'
+      )
     },
     onSettled: async (_, __, variables) => {
       // Delay to allow DB propagation
@@ -340,6 +376,15 @@ export const useBulkDeleteDocuments = () => {
 }
 
 // Upload document version
+/**
+ * @deprecated This hook uses the legacy direct upload method for document versions.
+ *
+ * IMPORTANT: The direct upload endpoint is deprecated and will be removed in a future version.
+ * Please migrate to the S3-based upload flow for better performance and scalability.
+ *
+ * For new implementations, consider using documentVersionService which may support
+ * S3-based uploads, or implement a similar pattern as the main document upload.
+ */
 export const useUploadDocumentVersion = () => {
   const queryClient = useQueryClient()
   const { t } = useTranslation()
@@ -357,17 +402,42 @@ export const useUploadDocumentVersion = () => {
       onProgress?: (progress: number) => void
     }) => documentsService.uploadDocumentVersion(documentId, file, changeNote, onProgress),
     onSuccess: () => {
+      // Show deprecation warning to user
+      toast({
+        variant: 'default',
+        title: t('status.warning', 'Warning | تحذير'),
+        description: t(
+          'documents.versionUploadDeprecationWarning',
+          'This version upload method is deprecated. Please contact your administrator to migrate to S3-based uploads. | طريقة رفع الإصدار هذه قديمة. يرجى الاتصال بالمسؤول للترحيل إلى رفع الملفات المستند إلى S3.'
+        ),
+      })
+
       toast({
         title: t('status.success'),
         description: t('documents.versionUploadSuccess'),
       })
+
+      // Log deprecation warning
+      console.warn(
+        '[DEPRECATED] documentsService.uploadDocumentVersion() is deprecated. ' +
+        'Please migrate to S3-based upload flow for document versions.'
+      )
     },
     onError: (error: any) => {
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message || error.message || t('documents.uploadError')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description: error.response?.data?.message || t('documents.uploadError'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
+
+      // Log deprecation warning on error as well
+      console.warn(
+        '[DEPRECATED] documentsService.uploadDocumentVersion() failed. ' +
+        'Consider migrating to S3-based upload flow for better reliability.'
+      )
     },
     onSettled: async (_, __, { documentId }) => {
       await queryClient.invalidateQueries({ queryKey: documentsKeys.all })

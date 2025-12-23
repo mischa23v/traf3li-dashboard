@@ -95,8 +95,11 @@ const lawyersService = {
         const response = await apiClient.get<LawyersResponse>('/lawyers/team')
         return response.data.lawyers
       } catch (error: any) {
-        // Only fallback to getAll if the team endpoint doesn't exist (404)
-        // Don't fallback on rate limiting (429) or other errors - let them propagate
+        // Graceful fallback for backend compatibility:
+        // The /lawyers/team endpoint may not exist in all backend versions.
+        // If we get a 404 (endpoint not found), fall back to the standard /lawyers endpoint
+        // with active status filter for backward compatibility.
+        // Don't fallback on rate limiting (429) or other errors - let them propagate.
         if (axios.isAxiosError(error) && error.response?.status === 404) {
           return lawyersService.getAll({ status: 'active' })
         }

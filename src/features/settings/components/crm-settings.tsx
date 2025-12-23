@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react'
 import {
     Users, Briefcase, FileText, Mail, Calendar, Hash,
-    MapPin, UserCheck, ArrowRight, Save, Loader2
+    MapPin, UserCheck, ArrowRight, Save, Loader2, AlertCircle
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
     Select,
     SelectContent,
@@ -40,8 +41,24 @@ import type {
     ConversionSettings,
 } from '@/types/crmSettings'
 
-// TODO: Create these hooks when backend service is implemented
-// For now, using placeholder hooks
+/**
+ * TODO: Backend Integration Required
+ *
+ * These are placeholder hooks that need to be replaced with actual API integration:
+ *
+ * 1. useCRMSettings:
+ *    - Should fetch CRM settings from: GET /api/settings/crm
+ *    - Handle loading states and error cases
+ *    - Use React Query or similar for caching
+ *
+ * 2. useUpdateCRMSettings:
+ *    - Should update CRM settings via: PUT /api/settings/crm
+ *    - Handle success/error notifications
+ *    - Invalidate cache on successful update
+ *
+ * Reference: /docs/api/settings-endpoints.md
+ * Backend issue: #TBD (create issue in backend repository)
+ */
 const useCRMSettings = () => {
     return {
         data: null,
@@ -52,8 +69,8 @@ const useCRMSettings = () => {
 const useUpdateCRMSettings = () => {
     return {
         mutateAsync: async (data: any) => {
-            console.log('Update CRM Settings:', data)
-            // TODO: Implement actual API call
+            console.log('Update CRM Settings (Placeholder - No backend connected):', data)
+            // TODO: Replace with actual API call
             return Promise.resolve(data)
         },
         isPending: false,
@@ -180,6 +197,14 @@ export default function CRMSettings() {
                         <h1 className="text-2xl font-bold text-navy">إعدادات إدارة علاقات العملاء (CRM)</h1>
                         <p className="text-slate-500">تخصيص إعدادات العملاء المحتملين، القضايا، العروض، والمواعيد</p>
                     </div>
+
+                    {/* Backend Integration Notice */}
+                    <Alert className="mb-6 border-amber-200 bg-amber-50" dir="rtl">
+                        <AlertCircle className="h-4 w-4 text-amber-600" />
+                        <AlertDescription className="text-amber-800">
+                            <strong>ملاحظة:</strong> هذه الصفحة قيد التطوير حالياً. التغييرات التي تجريها سيتم حفظها محلياً ولن يتم إرسالها إلى الخادم حتى يتم ربط واجهة برمجة التطبيقات (API).
+                        </AlertDescription>
+                    </Alert>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <Tabs defaultValue="leads" dir="rtl" className="w-full">

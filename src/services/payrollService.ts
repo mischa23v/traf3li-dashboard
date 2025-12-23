@@ -264,11 +264,18 @@ export const payrollService = {
         return response.data
     },
 
-    // Download salary slip PDF (Note: Backend endpoint not implemented yet)
+    /**
+     * Download salary slip PDF
+     * @deprecated Backend endpoint not implemented - GET /payroll/:id/pdf
+     * @throws Error indicating the endpoint is not implemented
+     * TODO: [BACKEND-PENDING] Implement GET /payroll/:id/pdf endpoint OR use PDFme service for client-side PDF generation
+     */
     downloadSalarySlipPDF: async (id: string): Promise<Blob> => {
-        // TODO: Backend needs to implement GET /payroll/:id/pdf endpoint
-        const response = await apiClient.get(`/payroll/${id}/pdf`, { responseType: 'blob' })
-        return response.data
+        throw new Error(
+            'PDF download not available: Salary slip PDF generation is not yet implemented. | تنزيل PDF غير متاح: إنشاء PDF لقسيمة الراتب غير مطبق حالياً.\n' +
+            'Endpoint: GET /payroll/:id/pdf\n' +
+            'Alternative: Use PDFme service to generate PDF on client-side. | البديل: استخدم خدمة PDFme لإنشاء PDF من جانب العميل.'
+        )
     },
 
     // Bulk approve salary slips

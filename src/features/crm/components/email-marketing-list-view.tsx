@@ -134,7 +134,12 @@ export function EmailMarketingListView() {
         if (selectedIds.length === 0) return
 
         if (confirm(`هل أنت متأكد من حذف ${selectedIds.length} حملة؟`)) {
-            // TODO: Implement bulk delete when backend is ready
+            // TODO: [BACKEND-PENDING] Implement bulk delete campaign endpoint
+            // Backend needs DELETE /api/crm/campaigns/bulk endpoint
+            // Expected payload: { campaignIds: string[] }
+            // Track in: [Add JIRA/GitHub issue reference here]
+            console.warn('Bulk delete not implemented: Backend endpoint not ready')
+            alert('عذراً، ميزة الحذف الجماعي غير متوفرة حالياً. جاري العمل على تطويرها.')
             setIsSelectionMode(false)
             setSelectedIds([])
         }
@@ -151,7 +156,12 @@ export function EmailMarketingListView() {
 
     const handleDeleteCampaign = (campaignId: string) => {
         if (confirm('هل أنت متأكد من حذف هذه الحملة؟')) {
-            // TODO: Implement delete when backend is ready
+            // TODO: [BACKEND-PENDING] Implement single campaign delete endpoint
+            // Backend needs DELETE /api/crm/campaigns/:id endpoint
+            // Expected behavior: Delete campaign and return success/error status
+            // Track in: [Add JIRA/GitHub issue reference here]
+            console.warn(`Delete campaign ${campaignId} not implemented: Backend endpoint not ready`)
+            alert('عذراً، ميزة الحذف غير متوفرة حالياً. جاري العمل على تطويرها.')
         }
     }
 
@@ -450,6 +460,7 @@ export function EmailMarketingListView() {
                                                         </DropdownMenuItem>
                                                     )}
                                                     <DropdownMenuSeparator />
+                                                    {/* NOTE: Delete functionality shows in UI but alerts user it's not ready (backend pending) */}
                                                     <DropdownMenuItem
                                                         onClick={() => handleDeleteCampaign(campaign.id)}
                                                         className="text-red-600 focus:text-red-600"

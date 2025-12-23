@@ -30,8 +30,8 @@ import {
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCase, useUpdateCase } from '@/hooks/useCasesAndClients'
-import { clearCache } from '@/lib/api'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Header } from '@/components/layout/header'
@@ -99,6 +99,7 @@ export function CasePipelineDetailView() {
   const locale = isRTL ? ar : enUS
   const params = useParams({ strict: false })
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   // Get caseId from URL params
   const caseId = (params as { caseId?: string }).caseId || ''
@@ -119,13 +120,15 @@ export function CasePipelineDetailView() {
   const [endNotes, setEndNotes] = useState<string>('')
   const [finalAmount, setFinalAmount] = useState<string>('')
 
-  // Clear cache for this specific case when component mounts to ensure fresh data
+  // Invalidate cache for this specific case when component mounts to ensure fresh data
+  // Migration: Replaced deprecated clearCache() with TanStack Query invalidation
   useEffect(() => {
     if (caseId) {
-      console.log('[CasePipelineDetailView] 🧹 Clearing cache for:', `/cases/${caseId}`)
-      clearCache(`/cases/${caseId}`)
+      console.log('[CasePipelineDetailView] 🔄 Invalidating cache for case:', caseId)
+      // Invalidate queries for this specific case to ensure fresh data
+      queryClient.invalidateQueries({ queryKey: ['case', caseId] })
     }
-  }, [caseId])
+  }, [caseId, queryClient])
 
   // Fetch case data
   const { data: selectedCase, isLoading, isError, error, refetch, isFetching } = useCase(caseId)

@@ -37,6 +37,27 @@ import { useTranslation } from 'react-i18next'
 import { Upload, X, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+/**
+ * DocumentsUploadDialog Component
+ *
+ * @deprecated This component uses the deprecated direct upload method (useUploadDocument).
+ *
+ * MIGRATION GUIDE:
+ * The underlying useUploadDocument hook uses documentsService.uploadDocument(),
+ * which is deprecated. For new implementations or when refactoring, please use
+ * the S3-based upload flow:
+ *
+ * 1. Call documentsService.getUploadUrl() to get a presigned S3 URL
+ * 2. Upload the file directly to S3 using fetch() with the presigned URL
+ * 3. Call documentsService.confirmUpload() to finalize the document record
+ *
+ * This approach provides:
+ * - Better performance (direct upload to S3, bypassing the API server)
+ * - Improved scalability (reduces server load)
+ * - Better security (presigned URLs with time limits)
+ *
+ * Users will see a warning toast notification when using this component.
+ */
 interface DocumentsUploadDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void

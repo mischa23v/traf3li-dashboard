@@ -431,11 +431,19 @@ export const cancelAdvanceRequest = async (advanceId: string): Promise<AdvanceRe
   return response.data
 }
 
-// Submit advance request for approval (TODO: Backend endpoint not implemented)
+/**
+ * Submit advance request for approval
+ *
+ * @deprecated Backend endpoint not implemented yet. The backend needs to implement POST /hr/advances/:advanceId/submit
+ * @param advanceId - The ID of the advance to submit
+ * @throws Error with message in English and Arabic indicating the endpoint is not implemented
+ */
 export const submitAdvanceRequest = async (advanceId: string): Promise<AdvanceRecord> => {
-  // TODO: Backend needs to implement POST /hr/advances/:advanceId/submit
-  const response = await api.post(`/hr/advances/${advanceId}/submit`)
-  return response.data
+  // TODO: [BACKEND-PENDING] Backend needs to implement POST /hr/advances/:advanceId/submit
+  // This endpoint is required to allow employees to submit advance requests for approval
+  throw new Error(
+    'Backend endpoint not implemented. Please implement POST /hr/advances/:advanceId/submit | نقطة النهاية الخلفية غير مطبقة. يرجى تنفيذ POST /hr/advances/:advanceId/submit'
+  )
 }
 
 // Approve advance
@@ -515,15 +523,24 @@ export const writeOffAdvance = async (advanceId: string, data: {
   return response.data
 }
 
-// Waive advance (partial or full) (TODO: Backend endpoint not implemented)
+/**
+ * Waive advance (partial or full)
+ *
+ * @deprecated Backend endpoint not implemented yet. The backend needs to implement POST /hr/advances/:advanceId/waive
+ * @param advanceId - The ID of the advance to waive
+ * @param data - Waive details including reason, amount, and comments
+ * @throws Error with message in English and Arabic indicating the endpoint is not implemented
+ */
 export const waiveAdvance = async (advanceId: string, data: {
   waiveReason: string
   waiveAmount?: number
   comments?: string
 }): Promise<AdvanceRecord> => {
-  // TODO: Backend needs to implement POST /hr/advances/:advanceId/waive
-  const response = await api.post(`/hr/advances/${advanceId}/waive`, data)
-  return response.data
+  // TODO: [BACKEND-PENDING] Backend needs to implement POST /hr/advances/:advanceId/waive
+  // This endpoint is required to allow HR to waive (partially or fully) employee advance payments
+  throw new Error(
+    'Backend endpoint not implemented. Please implement POST /hr/advances/:advanceId/waive | نقطة النهاية الخلفية غير مطبقة. يرجى تنفيذ POST /hr/advances/:advanceId/waive'
+  )
 }
 
 // Issue clearance letter

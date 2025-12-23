@@ -52,6 +52,7 @@ import {
 } from '@/components/ui/tooltip'
 import { Calendar as CalendarComponent } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
   useLockDates,
   useUpdateLockDate,
@@ -73,10 +74,14 @@ export function LockDateSettings({ className, isAdmin = false }: LockDateSetting
   const [reason, setReason] = React.useState('')
   const [calendarOpen, setCalendarOpen] = React.useState(false)
 
-  const { data: config, isLoading } = useLockDates()
-  const { data: history } = useLockDateHistory()
+  // Disable all queries since backend is not implemented
+  const { data: config, isLoading, error } = useLockDates(false)
+  const { data: history } = useLockDateHistory(undefined, undefined, undefined, false)
   const updateLock = useUpdateLockDate()
   const clearLock = useClearLockDate()
+
+  // Feature is not implemented - disable all interactions
+  const isFeatureDisabled = true
 
   const handleUpdateLock = async () => {
     if (!editingLock || !newDate) return
@@ -132,16 +137,21 @@ export function LockDateSettings({ className, isAdmin = false }: LockDateSetting
     }
   }
 
-  if (isLoading) {
-    return (
-      <div className={cn('flex items-center justify-center p-8', className)}>
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-      </div>
-    )
-  }
-
   return (
     <div className={cn('space-y-6', className)}>
+      {/* Coming Soon Alert */}
+      <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950/20">
+        <AlertTriangle className="h-4 w-4 text-blue-600" />
+        <AlertTitle className="text-blue-900 dark:text-blue-100">
+          {isArabic ? 'الميزة قيد التطوير' : 'Feature Under Development'}
+        </AlertTitle>
+        <AlertDescription className="text-blue-800 dark:text-blue-200">
+          {isArabic
+            ? 'ميزة تواريخ القفل غير متاحة حالياً. نحن نعمل على تطويرها وستكون متاحة قريباً. شكراً لصبركم.'
+            : 'The Lock Dates feature is not yet available. We are currently working on it and it will be available soon. Thank you for your patience.'}
+        </AlertDescription>
+      </Alert>
+
       {/* Lock Types */}
       <Card>
         <CardHeader>
@@ -160,7 +170,7 @@ export function LockDateSettings({ className, isAdmin = false }: LockDateSetting
             {LOCK_TYPE_CONFIGS.map((lockConfig) => {
               const lockDate = getLockDate(lockConfig.key)
               const isLocked = !!lockDate
-              const isDisabled = lockConfig.requiresAdmin && !isAdmin
+              const isDisabled = isFeatureDisabled || (lockConfig.requiresAdmin && !isAdmin)
 
               return (
                 <div

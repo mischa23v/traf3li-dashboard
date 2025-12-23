@@ -180,7 +180,8 @@ const permissionService = {
   },
 
   /**
-   * Get relation tuples for a namespace/object (deprecated - use getResourceRelations)
+   * Get relation tuples for a namespace/object
+   * @deprecated Use getResourceRelations() instead. This method will be removed in a future version.
    */
   getRelationTuples: async (params?: {
     namespace?: string
@@ -190,11 +191,20 @@ const permissionService = {
     limit?: number
     offset?: number
   }): Promise<RelationTupleListResponse['data']> => {
+    console.warn(
+      '⚠️ DEPRECATED: getRelationTuples() is deprecated and will be removed in a future version.\n' +
+      'Please migrate to getResourceRelations(namespace, object) instead.\n' +
+      'تحذير: getRelationTuples() قديم وسيتم إزالته في إصدار مستقبلي.\n' +
+      'يرجى الترحيل إلى getResourceRelations(namespace, object) بدلاً من ذلك.'
+    )
     try {
       const response = await apiClient.get('/permissions/relations', { params })
       return response.data.data || response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      const errorMessage = handleApiError(error) ||
+        'Failed to fetch relation tuples from API | فشل في جلب علاقات الصلاحيات من الواجهة البرمجية'
+      console.error('Error in getRelationTuples():', errorMessage)
+      throw new Error(errorMessage)
     }
   },
 

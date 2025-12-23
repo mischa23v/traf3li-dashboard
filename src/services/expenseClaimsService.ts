@@ -1,5 +1,22 @@
 import api from './api'
 
+/**
+ * ⚠️ WARNING: Backend Endpoint Mismatch
+ *
+ * This service uses /hr/expense-claims/* endpoints which DO NOT exist in the backend.
+ * The actual backend has only /api/expenses/* endpoints (see expenseService.ts).
+ *
+ * These endpoints will fail with 404 errors until backend implements them:
+ * - POST /hr/expense-claims
+ * - GET /hr/expense-claims
+ * - GET /hr/expense-claims/:id
+ * - PATCH /hr/expense-claims/:id
+ * - DELETE /hr/expense-claims/:id
+ * - And all other expense claim endpoints
+ *
+ * For working expense functionality, use expenseService.ts instead.
+ */
+
 // ==================== TYPES & ENUMS ====================
 
 // Expense Category
@@ -544,63 +561,186 @@ export interface ExpenseClaimStats {
   }
 }
 
+// ==================== ERROR MESSAGES (BILINGUAL) ====================
+
+const ERROR_MESSAGES = {
+  ENDPOINT_NOT_IMPLEMENTED: {
+    en: 'Expense claims feature is not yet implemented in the backend',
+    ar: 'ميزة مطالبات المصروفات غير مطبقة بعد في الخادم'
+  },
+  FETCH_FAILED: {
+    en: 'Failed to fetch expense claims',
+    ar: 'فشل في جلب مطالبات المصروفات'
+  },
+  CREATE_FAILED: {
+    en: 'Failed to create expense claim',
+    ar: 'فشل في إنشاء مطالبة المصروف'
+  },
+  UPDATE_FAILED: {
+    en: 'Failed to update expense claim',
+    ar: 'فشل في تحديث مطالبة المصروف'
+  },
+  DELETE_FAILED: {
+    en: 'Failed to delete expense claim',
+    ar: 'فشل في حذف مطالبة المصروف'
+  },
+  SUBMIT_FAILED: {
+    en: 'Failed to submit expense claim',
+    ar: 'فشل في تقديم مطالبة المصروف'
+  },
+  APPROVE_FAILED: {
+    en: 'Failed to approve expense claim',
+    ar: 'فشل في الموافقة على مطالبة المصروف'
+  },
+  REJECT_FAILED: {
+    en: 'Failed to reject expense claim',
+    ar: 'فشل في رفض مطالبة المصروف'
+  },
+  PAYMENT_FAILED: {
+    en: 'Failed to process payment',
+    ar: 'فشل في معالجة الدفع'
+  },
+  RECEIPT_UPLOAD_FAILED: {
+    en: 'Failed to upload receipt',
+    ar: 'فشل في رفع الإيصال'
+  },
+  NOT_FOUND: {
+    en: 'Expense claim not found',
+    ar: 'مطالبة المصروف غير موجودة'
+  },
+  NETWORK_ERROR: {
+    en: 'Network error. Please check your connection',
+    ar: 'خطأ في الشبكة. يرجى التحقق من اتصالك'
+  },
+  INVALID_DATA: {
+    en: 'Invalid expense claim data',
+    ar: 'بيانات مطالبة المصروف غير صالحة'
+  }
+}
+
+/**
+ * Format bilingual error message
+ */
+const formatBilingualError = (errorKey: keyof typeof ERROR_MESSAGES, details?: string): string => {
+  const message = ERROR_MESSAGES[errorKey]
+  const bilingual = `${message.en} | ${message.ar}`
+  return details ? `${bilingual}\n${details}` : bilingual
+}
+
+/**
+ * Handle API error with bilingual messages
+ */
+const handleExpenseClaimError = (error: any, errorKey: keyof typeof ERROR_MESSAGES): never => {
+  // If it's a 404, it's likely the endpoint doesn't exist
+  if (error?.status === 404) {
+    throw new Error(formatBilingualError('ENDPOINT_NOT_IMPLEMENTED'))
+  }
+
+  // If error already has a message, use it
+  if (error?.message) {
+    throw new Error(error.message)
+  }
+
+  // If it's a network error
+  if (error?.status === 0 || error?.code === 'CANCELLED' || error?.code === 'NETWORK_ERROR') {
+    throw new Error(formatBilingualError('NETWORK_ERROR'))
+  }
+
+  // If it's a 400 (validation error)
+  if (error?.status === 400) {
+    const details = error?.errors?.map((e: any) => `${e.field}: ${e.message}`).join(', ')
+    throw new Error(formatBilingualError('INVALID_DATA', details))
+  }
+
+  // Default error
+  throw new Error(formatBilingualError(errorKey))
+}
+
 // ==================== API FUNCTIONS ====================
 
 // Get all expense claims
 export const getExpenseClaims = async (filters?: ExpenseClaimFilters): Promise<ExpenseClaimResponse> => {
-  const params = new URLSearchParams()
-  if (filters?.status) params.append('status', filters.status)
-  if (filters?.expenseType) params.append('expenseType', filters.expenseType)
-  if (filters?.category) params.append('category', filters.category)
-  if (filters?.department) params.append('department', filters.department)
-  if (filters?.employeeId) params.append('employeeId', filters.employeeId)
-  if (filters?.dateFrom) params.append('dateFrom', filters.dateFrom)
-  if (filters?.dateTo) params.append('dateTo', filters.dateTo)
-  if (filters?.minAmount) params.append('minAmount', filters.minAmount.toString())
-  if (filters?.maxAmount) params.append('maxAmount', filters.maxAmount.toString())
-  if (filters?.isBillable !== undefined) params.append('isBillable', filters.isBillable.toString())
-  if (filters?.clientId) params.append('clientId', filters.clientId)
-  if (filters?.search) params.append('search', filters.search)
-  if (filters?.page) params.append('page', filters.page.toString())
-  if (filters?.limit) params.append('limit', filters.limit.toString())
+  try {
+    const params = new URLSearchParams()
+    if (filters?.status) params.append('status', filters.status)
+    if (filters?.expenseType) params.append('expenseType', filters.expenseType)
+    if (filters?.category) params.append('category', filters.category)
+    if (filters?.department) params.append('department', filters.department)
+    if (filters?.employeeId) params.append('employeeId', filters.employeeId)
+    if (filters?.dateFrom) params.append('dateFrom', filters.dateFrom)
+    if (filters?.dateTo) params.append('dateTo', filters.dateTo)
+    if (filters?.minAmount) params.append('minAmount', filters.minAmount.toString())
+    if (filters?.maxAmount) params.append('maxAmount', filters.maxAmount.toString())
+    if (filters?.isBillable !== undefined) params.append('isBillable', filters.isBillable.toString())
+    if (filters?.clientId) params.append('clientId', filters.clientId)
+    if (filters?.search) params.append('search', filters.search)
+    if (filters?.page) params.append('page', filters.page.toString())
+    if (filters?.limit) params.append('limit', filters.limit.toString())
 
-  const response = await api.get(`/hr/expense-claims?${params.toString()}`)
-  return response.data
+    const response = await api.get(`/hr/expense-claims?${params.toString()}`)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'FETCH_FAILED')
+  }
 }
 
 // Get single expense claim
 export const getExpenseClaim = async (claimId: string): Promise<ExpenseClaimRecord> => {
-  const response = await api.get(`/hr/expense-claims/${claimId}`)
-  return response.data
+  try {
+    const response = await api.get(`/hr/expense-claims/${claimId}`)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'FETCH_FAILED')
+  }
 }
 
 // Create expense claim
 export const createExpenseClaim = async (data: CreateExpenseClaimData): Promise<ExpenseClaimRecord> => {
-  const response = await api.post('/hr/expense-claims', data)
-  return response.data
+  try {
+    const response = await api.post('/hr/expense-claims', data)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'CREATE_FAILED')
+  }
 }
 
 // Update expense claim
 export const updateExpenseClaim = async (claimId: string, data: UpdateExpenseClaimData): Promise<ExpenseClaimRecord> => {
-  const response = await api.patch(`/hr/expense-claims/${claimId}`, data)
-  return response.data
+  try {
+    const response = await api.patch(`/hr/expense-claims/${claimId}`, data)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'UPDATE_FAILED')
+  }
 }
 
 // Delete expense claim
 export const deleteExpenseClaim = async (claimId: string): Promise<void> => {
-  await api.delete(`/hr/expense-claims/${claimId}`)
+  try {
+    await api.delete(`/hr/expense-claims/${claimId}`)
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'DELETE_FAILED')
+  }
 }
 
 // Get expense claim stats
 export const getExpenseClaimStats = async (): Promise<ExpenseClaimStats> => {
-  const response = await api.get('/hr/expense-claims/stats')
-  return response.data
+  try {
+    const response = await api.get('/hr/expense-claims/stats')
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'FETCH_FAILED')
+  }
 }
 
 // Submit expense claim
 export const submitExpenseClaim = async (claimId: string): Promise<ExpenseClaimRecord> => {
-  const response = await api.post(`/hr/expense-claims/${claimId}/submit`)
-  return response.data
+  try {
+    const response = await api.post(`/hr/expense-claims/${claimId}/submit`)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'SUBMIT_FAILED')
+  }
 }
 
 // Approve expense claim
@@ -608,8 +748,12 @@ export const approveExpenseClaim = async (claimId: string, data: {
   approvedAmount?: number
   comments?: string
 }): Promise<ExpenseClaimRecord> => {
-  const response = await api.post(`/hr/expense-claims/${claimId}/approve`, data)
-  return response.data
+  try {
+    const response = await api.post(`/hr/expense-claims/${claimId}/approve`, data)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'APPROVE_FAILED')
+  }
 }
 
 // Reject expense claim
@@ -617,8 +761,12 @@ export const rejectExpenseClaim = async (claimId: string, data: {
   reason: string
   comments?: string
 }): Promise<ExpenseClaimRecord> => {
-  const response = await api.post(`/hr/expense-claims/${claimId}/reject`, data)
-  return response.data
+  try {
+    const response = await api.post(`/hr/expense-claims/${claimId}/reject`, data)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'REJECT_FAILED')
+  }
 }
 
 // Request changes
@@ -626,8 +774,12 @@ export const requestClaimChanges = async (claimId: string, data: {
   changesRequested: string
   lineItemIds?: string[]
 }): Promise<ExpenseClaimRecord> => {
-  const response = await api.post(`/hr/expense-claims/${claimId}/request-changes`, data)
-  return response.data
+  try {
+    const response = await api.post(`/hr/expense-claims/${claimId}/request-changes`, data)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'UPDATE_FAILED')
+  }
 }
 
 // Process payment
@@ -640,8 +792,12 @@ export const processClaimPayment = async (claimId: string, data: {
     iban: string
   }
 }): Promise<ExpenseClaimRecord> => {
-  const response = await api.post(`/hr/expense-claims/${claimId}/process-payment`, data)
-  return response.data
+  try {
+    const response = await api.post(`/hr/expense-claims/${claimId}/process-payment`, data)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'PAYMENT_FAILED')
+  }
 }
 
 // Confirm payment
@@ -651,8 +807,12 @@ export const confirmClaimPayment = async (claimId: string, data: {
   amountPaid: number
   notes?: string
 }): Promise<ExpenseClaimRecord> => {
-  const response = await api.post(`/hr/expense-claims/${claimId}/confirm-payment`, data)
-  return response.data
+  try {
+    const response = await api.post(`/hr/expense-claims/${claimId}/confirm-payment`, data)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'PAYMENT_FAILED')
+  }
 }
 
 // Add line item
@@ -669,8 +829,12 @@ export const addLineItem = async (claimId: string, data: {
   clientId?: string
   caseId?: string
 }): Promise<ExpenseClaimRecord> => {
-  const response = await api.post(`/hr/expense-claims/${claimId}/line-items`, data)
-  return response.data
+  try {
+    const response = await api.post(`/hr/expense-claims/${claimId}/line-items`, data)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'UPDATE_FAILED')
+  }
 }
 
 // Update line item
@@ -686,33 +850,53 @@ export const updateLineItem = async (claimId: string, lineItemId: string, data: 
   clientId?: string
   caseId?: string
 }): Promise<ExpenseClaimRecord> => {
-  const response = await api.patch(`/hr/expense-claims/${claimId}/line-items/${lineItemId}`, data)
-  return response.data
+  try {
+    const response = await api.patch(`/hr/expense-claims/${claimId}/line-items/${lineItemId}`, data)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'UPDATE_FAILED')
+  }
 }
 
 // Delete line item
 export const deleteLineItem = async (claimId: string, lineItemId: string): Promise<ExpenseClaimRecord> => {
-  const response = await api.delete(`/hr/expense-claims/${claimId}/line-items/${lineItemId}`)
-  return response.data
+  try {
+    const response = await api.delete(`/hr/expense-claims/${claimId}/line-items/${lineItemId}`)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'DELETE_FAILED')
+  }
 }
 
 // Upload receipt
 export const uploadReceipt = async (claimId: string, data: FormData): Promise<Receipt> => {
-  const response = await api.post(`/hr/expense-claims/${claimId}/receipts`, data, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  })
-  return response.data
+  try {
+    const response = await api.post(`/hr/expense-claims/${claimId}/receipts`, data, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'RECEIPT_UPLOAD_FAILED')
+  }
 }
 
 // Delete receipt
 export const deleteReceipt = async (claimId: string, receiptId: string): Promise<void> => {
-  await api.delete(`/hr/expense-claims/${claimId}/receipts/${receiptId}`)
+  try {
+    await api.delete(`/hr/expense-claims/${claimId}/receipts/${receiptId}`)
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'DELETE_FAILED')
+  }
 }
 
 // Verify receipt
 export const verifyReceipt = async (claimId: string, receiptId: string): Promise<Receipt> => {
-  const response = await api.post(`/hr/expense-claims/${claimId}/receipts/${receiptId}/verify`)
-  return response.data
+  try {
+    const response = await api.post(`/hr/expense-claims/${claimId}/receipts/${receiptId}/verify`)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'UPDATE_FAILED')
+  }
 }
 
 // Reconcile corporate card transaction
@@ -720,8 +904,12 @@ export const reconcileCardTransaction = async (claimId: string, data: {
   transactionId: string
   lineItemId: string
 }): Promise<ExpenseClaimRecord> => {
-  const response = await api.post(`/hr/expense-claims/${claimId}/reconcile-card`, data)
-  return response.data
+  try {
+    const response = await api.post(`/hr/expense-claims/${claimId}/reconcile-card`, data)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'UPDATE_FAILED')
+  }
 }
 
 // Check policy compliance
@@ -734,16 +922,24 @@ export const checkPolicyCompliance = async (claimId: string): Promise<{
     lineItemId?: string
   }>
 }> => {
-  const response = await api.post(`/hr/expense-claims/${claimId}/check-compliance`)
-  return response.data
+  try {
+    const response = await api.post(`/hr/expense-claims/${claimId}/check-compliance`)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'FETCH_FAILED')
+  }
 }
 
 // Approve exception
 export const approveException = async (claimId: string, data: {
   exceptionReason: string
 }): Promise<ExpenseClaimRecord> => {
-  const response = await api.post(`/hr/expense-claims/${claimId}/approve-exception`, data)
-  return response.data
+  try {
+    const response = await api.post(`/hr/expense-claims/${claimId}/approve-exception`, data)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'APPROVE_FAILED')
+  }
 }
 
 // Mark as billable
@@ -752,8 +948,12 @@ export const markAsBillable = async (claimId: string, data: {
   clientId: string
   caseId?: string
 }): Promise<ExpenseClaimRecord> => {
-  const response = await api.post(`/hr/expense-claims/${claimId}/mark-billable`, data)
-  return response.data
+  try {
+    const response = await api.post(`/hr/expense-claims/${claimId}/mark-billable`, data)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'UPDATE_FAILED')
+  }
 }
 
 // Create invoice for billable
@@ -761,20 +961,32 @@ export const createBillableInvoice = async (claimId: string): Promise<{
   invoiceNumber: string
   invoiceUrl: string
 }> => {
-  const response = await api.post(`/hr/expense-claims/${claimId}/create-invoice`)
-  return response.data
+  try {
+    const response = await api.post(`/hr/expense-claims/${claimId}/create-invoice`)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'CREATE_FAILED')
+  }
 }
 
 // Bulk delete
 export const bulkDeleteExpenseClaims = async (ids: string[]): Promise<{ deleted: number }> => {
-  const response = await api.post('/hr/expense-claims/bulk-delete', { ids })
-  return response.data
+  try {
+    const response = await api.post('/hr/expense-claims/bulk-delete', { ids })
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'DELETE_FAILED')
+  }
 }
 
 // Get employee expense claims
 export const getEmployeeExpenseClaims = async (employeeId: string): Promise<ExpenseClaimRecord[]> => {
-  const response = await api.get(`/hr/expense-claims/by-employee/${employeeId}`)
-  return response.data
+  try {
+    const response = await api.get(`/hr/expense-claims/by-employee/${employeeId}`)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'FETCH_FAILED')
+  }
 }
 
 // Get pending approvals
@@ -787,8 +999,12 @@ export const getPendingClaimApprovals = async (): Promise<Array<{
   lineItemsCount: number
   submissionDate: string
 }>> => {
-  const response = await api.get('/hr/expense-claims/pending-approvals')
-  return response.data
+  try {
+    const response = await api.get('/hr/expense-claims/pending-approvals')
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'FETCH_FAILED')
+  }
 }
 
 // Get pending payments
@@ -800,8 +1016,12 @@ export const getPendingPayments = async (): Promise<Array<{
   approvalDate: string
   paymentMethod?: PaymentMethod
 }>> => {
-  const response = await api.get('/hr/expense-claims/pending-payments')
-  return response.data
+  try {
+    const response = await api.get('/hr/expense-claims/pending-payments')
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'FETCH_FAILED')
+  }
 }
 
 // Get mileage rates
@@ -811,8 +1031,12 @@ export const getMileageRates = async (): Promise<{
   rental: number
   effectiveDate: string
 }> => {
-  const response = await api.get('/hr/expense-claims/mileage-rates')
-  return response.data
+  try {
+    const response = await api.get('/hr/expense-claims/mileage-rates')
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'FETCH_FAILED')
+  }
 }
 
 // Get expense policies
@@ -827,8 +1051,12 @@ export const getExpensePolicies = async (): Promise<{
     allowedTravelClasses: TravelClass[]
   }
 }> => {
-  const response = await api.get('/hr/expense-claims/policies')
-  return response.data
+  try {
+    const response = await api.get('/hr/expense-claims/policies')
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'FETCH_FAILED')
+  }
 }
 
 // Get corporate card transactions
@@ -837,30 +1065,42 @@ export const getCorporateCardTransactions = async (employeeId: string, filters?:
   dateTo?: string
   unreconciled?: boolean
 }): Promise<CorporateCardTransaction[]> => {
-  const params = new URLSearchParams()
-  if (filters?.dateFrom) params.append('dateFrom', filters.dateFrom)
-  if (filters?.dateTo) params.append('dateTo', filters.dateTo)
-  if (filters?.unreconciled) params.append('unreconciled', 'true')
+  try {
+    const params = new URLSearchParams()
+    if (filters?.dateFrom) params.append('dateFrom', filters.dateFrom)
+    if (filters?.dateTo) params.append('dateTo', filters.dateTo)
+    if (filters?.unreconciled) params.append('unreconciled', 'true')
 
-  const response = await api.get(`/hr/expense-claims/corporate-card/${employeeId}?${params.toString()}`)
-  return response.data
+    const response = await api.get(`/hr/expense-claims/corporate-card/${employeeId}?${params.toString()}`)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'FETCH_FAILED')
+  }
 }
 
 // Duplicate claim
 export const duplicateExpenseClaim = async (claimId: string): Promise<ExpenseClaimRecord> => {
-  const response = await api.post(`/hr/expense-claims/${claimId}/duplicate`)
-  return response.data
+  try {
+    const response = await api.post(`/hr/expense-claims/${claimId}/duplicate`)
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'CREATE_FAILED')
+  }
 }
 
 // Export claims
 export const exportExpenseClaims = async (filters?: ExpenseClaimFilters): Promise<Blob> => {
-  const params = new URLSearchParams()
-  if (filters?.status) params.append('status', filters.status)
-  if (filters?.dateFrom) params.append('dateFrom', filters.dateFrom)
-  if (filters?.dateTo) params.append('dateTo', filters.dateTo)
+  try {
+    const params = new URLSearchParams()
+    if (filters?.status) params.append('status', filters.status)
+    if (filters?.dateFrom) params.append('dateFrom', filters.dateFrom)
+    if (filters?.dateTo) params.append('dateTo', filters.dateTo)
 
-  const response = await api.get(`/hr/expense-claims/export?${params.toString()}`, {
-    responseType: 'blob'
-  })
-  return response.data
+    const response = await api.get(`/hr/expense-claims/export?${params.toString()}`, {
+      responseType: 'blob'
+    })
+    return response.data
+  } catch (error: any) {
+    handleExpenseClaimError(error, 'FETCH_FAILED')
+  }
 }
