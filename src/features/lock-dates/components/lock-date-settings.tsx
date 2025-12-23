@@ -139,16 +139,16 @@ export function LockDateSettings({ className, isAdmin = false }: LockDateSetting
 
   return (
     <div className={cn('space-y-6', className)}>
-      {/* Coming Soon Alert */}
+      {/* Coming Soon Alert - [BACKEND-PENDING] */}
       <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950/20">
         <AlertTriangle className="h-4 w-4 text-blue-600" />
         <AlertTitle className="text-blue-900 dark:text-blue-100">
-          {isArabic ? 'الميزة قيد التطوير' : 'Feature Under Development'}
+          {isArabic ? '[قيد الانتظار] الميزة قيد التطوير | [BACKEND-PENDING] Feature Under Development' : '[BACKEND-PENDING] Feature Under Development | [قيد الانتظار] الميزة قيد التطوير'}
         </AlertTitle>
         <AlertDescription className="text-blue-800 dark:text-blue-200">
           {isArabic
-            ? 'ميزة تواريخ القفل غير متاحة حالياً. نحن نعمل على تطويرها وستكون متاحة قريباً. شكراً لصبركم.'
-            : 'The Lock Dates feature is not yet available. We are currently working on it and it will be available soon. Thank you for your patience.'}
+            ? 'ميزة تواريخ القفل غير متاحة حالياً. نحن نعمل على تطويرها وستكون متاحة قريباً. شكراً لصبركم. | [BACKEND-PENDING] The Lock Dates feature is not yet available. We are currently working on it and it will be available soon.'
+            : '[BACKEND-PENDING] The Lock Dates feature is not yet available. We are currently working on it and it will be available soon. Thank you for your patience. | ميزة تواريخ القفل غير متاحة حالياً. نحن نعمل على تطويرها وستكون متاحة قريباً.'}
         </AlertDescription>
       </Alert>
 

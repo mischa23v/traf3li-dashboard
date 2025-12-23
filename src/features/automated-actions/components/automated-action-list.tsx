@@ -116,11 +116,11 @@ export function AutomatedActionList({
 
   return (
     <div className={cn('space-y-4', className)}>
-      {/* Coming Soon Alert */}
+      {/* Coming Soon Alert - [BACKEND-PENDING] */}
       <Alert variant="default" className="border-amber-500 bg-amber-50 dark:bg-amber-950/20">
         <AlertTriangle className="h-4 w-4 text-amber-600" />
         <AlertTitle className="text-amber-900 dark:text-amber-100">
-          {isArabic ? 'قريباً | Coming Soon' : 'Coming Soon | قريباً'}
+          {isArabic ? '[قيد الانتظار] قريباً | [BACKEND-PENDING] Coming Soon' : '[BACKEND-PENDING] Coming Soon | [قيد الانتظار] قريباً'}
         </AlertTitle>
         <AlertDescription className="text-amber-800 dark:text-amber-200">
           {isArabic ? (
@@ -128,15 +128,15 @@ export function AutomatedActionList({
               هذه الميزة قيد التطوير حالياً. واجهة برمجة التطبيقات الخلفية للإجراءات التلقائية غير مطبقة بعد.
               <br />
               <span className="text-sm">
-                This feature is currently under development. The automated actions backend API is not yet implemented.
+                [BACKEND-PENDING] This feature is currently under development. The automated actions backend API is not yet implemented.
               </span>
             </>
           ) : (
             <>
-              This feature is currently under development. The automated actions backend API is not yet implemented.
+              [BACKEND-PENDING] This feature is currently under development. The automated actions backend API is not yet implemented.
               <br />
               <span className="text-sm">
-                هذه الميزة قيد التطوير حالياً. واجهة برمجة التطبيقات الخلفية للإجراءات التلقائية غير مطبقة بعد.
+                [قيد الانتظار] هذه الميزة قيد التطوير حالياً. واجهة برمجة التطبيقات الخلفية للإجراءات التلقائية غير مطبقة بعد.
               </span>
             </>
           )}
@@ -157,7 +157,7 @@ export function AutomatedActionList({
           </p>
         </div>
         {onCreate && (
-          <Button onClick={onCreate} disabled title={isArabic ? 'قريباً - الميزة قيد التطوير' : 'Coming Soon - Feature under development'}>
+          <Button onClick={onCreate} disabled title={isArabic ? '[قيد الانتظار] قريباً - الميزة قيد التطوير' : '[BACKEND-PENDING] Coming Soon - Feature under development'}>
             <Plus className="h-4 w-4 me-2" />
             {isArabic ? 'إجراء جديد' : 'New Action'}
           </Button>
@@ -175,7 +175,7 @@ export function AutomatedActionList({
                 : 'No automated actions yet'}
             </p>
             {onCreate && (
-              <Button onClick={onCreate} disabled title={isArabic ? 'قريباً - الميزة قيد التطوير' : 'Coming Soon - Feature under development'}>
+              <Button onClick={onCreate} disabled title={isArabic ? '[قيد الانتظار] قريباً - الميزة قيد التطوير' : '[BACKEND-PENDING] Coming Soon - Feature under development'}>
                 <Plus className="h-4 w-4 me-2" />
                 {isArabic ? 'إنشاء إجراء' : 'Create Action'}
               </Button>
