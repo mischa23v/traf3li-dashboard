@@ -11,6 +11,8 @@
  * - Tiered timeouts (auth: 5s, normal: 10s, upload: 120s)
  * - Request cancellation on navigation
  * - Idempotency keys for financial operations
+ * - Dual token authentication (access + refresh tokens)
+ * - Automatic token refresh on 401
  */
 
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios'
@@ -59,6 +61,122 @@ export async function initDeviceFingerprint(): Promise<string> {
     }
   }
   return cachedDeviceFingerprint
+}
+
+// ==================== TOKEN MANAGEMENT ====================
+
+/**
+ * Token storage keys
+ */
+const TOKEN_KEYS = {
+  ACCESS: 'accessToken',
+  REFRESH: 'refreshToken',
+} as const
+
+/**
+ * Get access token from localStorage
+ */
+export const getAccessToken = (): string | null => {
+  return localStorage.getItem(TOKEN_KEYS.ACCESS)
+}
+
+/**
+ * Get refresh token from localStorage
+ */
+export const getRefreshToken = (): string | null => {
+  return localStorage.getItem(TOKEN_KEYS.REFRESH)
+}
+
+/**
+ * Store tokens in localStorage
+ */
+export const storeTokens = (accessToken: string, refreshToken: string): void => {
+  localStorage.setItem(TOKEN_KEYS.ACCESS, accessToken)
+  localStorage.setItem(TOKEN_KEYS.REFRESH, refreshToken)
+}
+
+/**
+ * Clear tokens from localStorage
+ */
+export const clearTokens = (): void => {
+  localStorage.removeItem(TOKEN_KEYS.ACCESS)
+  localStorage.removeItem(TOKEN_KEYS.REFRESH)
+}
+
+/**
+ * Check if we have valid tokens stored
+ */
+export const hasTokens = (): boolean => {
+  return !!getAccessToken() && !!getRefreshToken()
+}
+
+// ==================== TOKEN REFRESH MECHANISM ====================
+
+/**
+ * Token refresh state management
+ * Prevents multiple concurrent refresh attempts
+ */
+let isRefreshing = false
+let failedQueue: Array<{
+  resolve: (value: any) => void
+  reject: (error: any) => void
+  config: InternalAxiosRequestConfig
+}> = []
+
+/**
+ * Process queued requests after token refresh
+ */
+const processQueue = (error: any = null): void => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error)
+    } else {
+      // Retry the request with new token
+      const newToken = getAccessToken()
+      if (newToken && prom.config.headers) {
+        prom.config.headers.set('Authorization', `Bearer ${newToken}`)
+      }
+      prom.resolve(apiClient(prom.config))
+    }
+  })
+  failedQueue = []
+}
+
+/**
+ * Refresh the access token using the refresh token
+ * Returns true if refresh was successful, false otherwise
+ */
+const refreshAccessToken = async (): Promise<boolean> => {
+  const refreshToken = getRefreshToken()
+  if (!refreshToken) {
+    return false
+  }
+
+  try {
+    // Use a separate axios instance to avoid interceptor loops
+    const response = await axios.post(
+      `${API_BASE_URL_NO_VERSION}/auth/refresh`,
+      { refreshToken },
+      {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(cachedDeviceFingerprint && { 'X-Device-Fingerprint': cachedDeviceFingerprint }),
+        },
+      }
+    )
+
+    if (response.data.accessToken && response.data.refreshToken) {
+      storeTokens(response.data.accessToken, response.data.refreshToken)
+      return true
+    }
+
+    return false
+  } catch {
+    // Refresh failed - clear tokens
+    clearTokens()
+    return false
+  }
 }
 
 // API Base URL - Change based on environment
@@ -178,6 +296,12 @@ apiClientNoVersion.interceptors.request.use(
       if (csrfToken) {
         config.headers.set('X-CSRF-Token', csrfToken)
       }
+    }
+
+    // Add Authorization header with access token (dual token auth)
+    const accessToken = getAccessToken()
+    if (accessToken) {
+      config.headers.set('Authorization', `Bearer ${accessToken}`)
     }
 
     // Add device fingerprint for session binding (NCA ECC 2-1-4)
@@ -357,7 +481,7 @@ apiClientNoVersion.interceptors.response.use(
 
 /**
  * Request Interceptor
- * Adds tiered timeouts, request cancellation, deduplication, circuit breaker, idempotency, and CSRF token handling
+ * Adds tiered timeouts, request cancellation, deduplication, circuit breaker, idempotency, CSRF token, and Authorization handling
  */
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
@@ -368,6 +492,12 @@ apiClient.interceptors.request.use(
       if (csrfToken) {
         config.headers.set('X-CSRF-Token', csrfToken)
       }
+    }
+
+    // Add Authorization header with access token (dual token auth)
+    const accessToken = getAccessToken()
+    if (accessToken) {
+      config.headers.set('Authorization', `Bearer ${accessToken}`)
     }
 
     // Add device fingerprint for session binding (NCA ECC 2-1-4)
@@ -627,20 +757,21 @@ apiClient.interceptors.response.use(
       return Promise.reject(rateLimitError)
     }
 
-    // Handle 401 Unauthorized - Check for session timeout codes
+    // Handle 401 Unauthorized - Token refresh logic
     if (error.response?.status === 401) {
       const errorCode = error.response?.data?.code
       const reason = error.response?.data?.reason
 
-      // Handle specific session timeout codes
+      // Handle specific session timeout codes (no refresh possible)
       if (errorCode === 'SESSION_IDLE_TIMEOUT' || errorCode === 'SESSION_ABSOLUTE_TIMEOUT') {
         const isIdleTimeout = reason === 'idle_timeout' || errorCode === 'SESSION_IDLE_TIMEOUT'
         const message = isIdleTimeout
           ? 'انتهت جلستك بسبب عدم النشاط'
           : 'انتهت جلستك. يرجى تسجيل الدخول مرة أخرى'
 
-        // Clear auth state
+        // Clear all auth state
         localStorage.removeItem('user')
+        clearTokens()
 
         import('sonner').then(({ toast }) => {
           toast.warning(message, {
@@ -663,13 +794,115 @@ apiClient.interceptors.response.use(
         })
       }
 
-      // Log other 401s but don't redirect - let auth system handle it
-      console.warn('[API] 401 Unauthorized:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        message: error.response?.data?.message,
-        timestamp: new Date().toISOString(),
-      })
+      // Don't try to refresh if:
+      // 1. Already tried once (_retry flag set)
+      // 2. This is a refresh token request itself
+      // 3. No refresh token available
+      const isRefreshRequest = originalRequest?.url?.includes('/auth/refresh')
+      if (originalRequest?._retry || isRefreshRequest || !getRefreshToken()) {
+        // Log and let auth system handle it
+        console.warn('[API] 401 Unauthorized (no refresh possible):', {
+          url: error.config?.url,
+          method: error.config?.method,
+          hasRefreshToken: !!getRefreshToken(),
+          isRetry: !!originalRequest?._retry,
+          isRefreshRequest,
+          timestamp: new Date().toISOString(),
+        })
+
+        // If refresh failed, clear tokens and redirect to sign-in
+        if (isRefreshRequest) {
+          clearTokens()
+          localStorage.removeItem('user')
+
+          import('sonner').then(({ toast }) => {
+            toast.error('انتهت صلاحية الجلسة | Session expired', {
+              description: 'يرجى تسجيل الدخول مرة أخرى | Please log in again',
+              duration: 3000,
+            })
+          })
+
+          setTimeout(() => {
+            window.location.href = '/sign-in?reason=session_expired'
+          }, 2000)
+        }
+
+        return Promise.reject({
+          status: 401,
+          message: error.response?.data?.message || 'Unauthorized',
+          code: errorCode,
+          error: true,
+          reason,
+        })
+      }
+
+      // Mark this request as a retry attempt
+      originalRequest._retry = true
+
+      // If already refreshing, queue this request
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject, config: originalRequest })
+        })
+      }
+
+      // Start refresh process
+      isRefreshing = true
+
+      try {
+        const refreshSuccess = await refreshAccessToken()
+
+        if (refreshSuccess) {
+          // Update the original request with new token
+          const newToken = getAccessToken()
+          if (newToken && originalRequest.headers) {
+            originalRequest.headers.set('Authorization', `Bearer ${newToken}`)
+          }
+
+          // Process queued requests
+          processQueue()
+
+          // Retry the original request
+          return apiClient(originalRequest)
+        } else {
+          // Refresh failed - reject all queued requests and redirect to login
+          processQueue(new Error('Token refresh failed'))
+
+          clearTokens()
+          localStorage.removeItem('user')
+
+          import('sonner').then(({ toast }) => {
+            toast.error('انتهت صلاحية الجلسة | Session expired', {
+              description: 'يرجى تسجيل الدخول مرة أخرى | Please log in again',
+              duration: 3000,
+            })
+          })
+
+          setTimeout(() => {
+            window.location.href = '/sign-in?reason=session_expired'
+          }, 2000)
+
+          return Promise.reject({
+            status: 401,
+            message: 'Session expired',
+            error: true,
+          })
+        }
+      } catch (refreshError) {
+        // Refresh failed - reject all queued requests
+        processQueue(refreshError)
+
+        clearTokens()
+        localStorage.removeItem('user')
+
+        return Promise.reject({
+          status: 401,
+          message: 'Token refresh failed',
+          error: true,
+        })
+      } finally {
+        isRefreshing = false
+      }
     }
 
     // Handle 400 with "Unauthorized" message
@@ -896,7 +1129,7 @@ export const getCacheSize = () => {
 }
 
 /**
- * Reset all API state (pending requests, circuit breakers, idempotency keys)
+ * Reset all API state (pending requests, circuit breakers, idempotency keys, tokens)
  * Call this on logout to ensure clean state
  */
 export const resetApiState = () => {
@@ -904,6 +1137,10 @@ export const resetApiState = () => {
   clearPendingRequests()
   resetAllCircuits()
   clearAllIdempotencyKeys()
+  clearTokens() // Clear access and refresh tokens
+  // Reset token refresh state
+  isRefreshing = false
+  failedQueue = []
 }
 
 // Re-export circuit breaker utilities for monitoring

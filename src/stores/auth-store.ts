@@ -280,3 +280,11 @@ export const selectPlanLevel = (state: AuthState) => getPlanLevel(state.user?.pl
  */
 export const selectHasFeature = (featureName: string) =>
   (state: AuthState) => hasFeature(state.user, featureName)
+
+/**
+ * Email verification selectors
+ */
+export const selectIsEmailVerified = (state: AuthState) =>
+  state.user?.isEmailVerified === true
+export const selectEmailVerifiedAt = (state: AuthState) =>
+  state.user?.emailVerifiedAt
