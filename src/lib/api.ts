@@ -42,6 +42,7 @@ import {
 } from './request-cancellation'
 import { generateDeviceFingerprint, getStoredFingerprint, storeDeviceFingerprint } from './device-fingerprint'
 import { sanitizeUrlParam } from '@/utils/redirectValidation'
+import { sanitizeErrorMessage } from '@/utils/error-sanitizer'
 
 // Cached device fingerprint for request headers
 let cachedDeviceFingerprint: string | null = null
@@ -60,6 +61,16 @@ export async function initDeviceFingerprint(): Promise<string> {
     }
   }
   return cachedDeviceFingerprint
+}
+
+/**
+ * Generate a unique request ID for tracking
+ * Format: timestamp-random (e.g., 1703000000000-abc123)
+ */
+function generateRequestId(): string {
+  const timestamp = Date.now()
+  const random = Math.random().toString(36).substring(2, 9)
+  return `${timestamp}-${random}`
 }
 
 // API Base URL - Change based on environment
@@ -87,8 +98,9 @@ let cachedCsrfToken: string | null = null
  * Extract CSRF token from cookies or use cached token
  * The cookie is NOT httpOnly, so JavaScript can read it
  * Falls back to cached token from response headers for cross-origin requests
+ * Exported for use in non-axios requests (e.g., streaming fetch)
  */
-const getCsrfToken = (): string => {
+export const getCsrfToken = (): string => {
   const cookies = document.cookie
 
   // Try cookie first (primary method)
@@ -174,6 +186,8 @@ const shouldBypassCircuitBreaker = (url: string): boolean => {
 apiClientNoVersion.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const method = config.method?.toLowerCase()
+
+    // Add CSRF token to mutating requests
     if (method && ['post', 'put', 'patch', 'delete'].includes(method)) {
       const csrfToken = getCsrfToken()
       if (csrfToken) {
@@ -184,6 +198,11 @@ apiClientNoVersion.interceptors.request.use(
     // Add device fingerprint for session binding (NCA ECC 2-1-4)
     if (cachedDeviceFingerprint) {
       config.headers.set('X-Device-Fingerprint', cachedDeviceFingerprint)
+    }
+
+    // Add unique request ID for tracking and debugging
+    if (!config.headers.get('X-Request-ID')) {
+      config.headers.set('X-Request-ID', generateRequestId())
     }
 
     // Firm ID is now in JWT token (no need to send as header)
@@ -322,7 +341,8 @@ apiClientNoVersion.interceptors.response.use(
         }
       }
 
-      const message = error.response?.data?.message || `طلبات كثيرة جداً. يرجى الانتظار ${formatRetryAfter(retryAfter)}.`
+      const rawMessage = error.response?.data?.message || `طلبات كثيرة جداً. يرجى الانتظار ${formatRetryAfter(retryAfter)}.`
+      const message = sanitizeErrorMessage(rawMessage)
 
       if (!originalRequest._rateLimitToastShown) {
         originalRequest._rateLimitToastShown = true
@@ -341,8 +361,11 @@ apiClientNoVersion.interceptors.response.use(
     // Let the auth service decide what to do based on the specific endpoint
     // Support both nested error object (error.error.message) and root-level message
     const errorObj = error.response?.data?.error
-    const errorMessage = errorObj?.messageAr || errorObj?.message || error.response?.data?.message || 'حدث خطأ غير متوقع'
+    const rawErrorMessage = errorObj?.messageAr || errorObj?.message || error.response?.data?.message || 'حدث خطأ غير متوقع'
     const errorCode = errorObj?.code || error.response?.data?.code
+
+    // Sanitize error message to prevent XSS attacks
+    const errorMessage = sanitizeErrorMessage(rawErrorMessage)
 
     return Promise.reject({
       status: error.response?.status || 500,
@@ -362,8 +385,9 @@ apiClientNoVersion.interceptors.response.use(
  */
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Add CSRF token to mutating requests
     const method = config.method?.toLowerCase()
+
+    // Add CSRF token to mutating requests
     if (method && ['post', 'put', 'patch', 'delete'].includes(method)) {
       const csrfToken = getCsrfToken()
       if (csrfToken) {
@@ -374,6 +398,11 @@ apiClient.interceptors.request.use(
     // Add device fingerprint for session binding (NCA ECC 2-1-4)
     if (cachedDeviceFingerprint) {
       config.headers.set('X-Device-Fingerprint', cachedDeviceFingerprint)
+    }
+
+    // Add unique request ID for tracking and debugging
+    if (!config.headers.get('X-Request-ID')) {
+      config.headers.set('X-Request-ID', generateRequestId())
     }
 
     // Firm ID is now in JWT token (no need to send as header)
@@ -562,7 +591,8 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 423) {
       const data = error.response?.data
       const remainingTime = data?.remainingTime || 15
-      const message = data?.message || `الحساب مقفل مؤقتاً. حاول مرة أخرى بعد ${remainingTime} دقيقة`
+      const rawMessage = data?.message || `الحساب مقفل مؤقتاً. حاول مرة أخرى بعد ${remainingTime} دقيقة`
+      const message = sanitizeErrorMessage(rawMessage)
 
       import('sonner').then(({ toast }) => {
         toast.error(message, {
@@ -600,7 +630,8 @@ apiClient.interceptors.response.use(
         }
       }
 
-      const message = error.response?.data?.message || `طلبات كثيرة جداً. يرجى الانتظار ${formatRetryAfter(retryAfter)}.`
+      const rawMessage = error.response?.data?.message || `طلبات كثيرة جداً. يرجى الانتظار ${formatRetryAfter(retryAfter)}.`
+      const message = sanitizeErrorMessage(rawMessage)
 
       // Only show toast once (not on retries)
       if (!originalRequest._rateLimitToastShown) {
@@ -695,7 +726,7 @@ apiClient.interceptors.response.use(
 
     // Handle 403 Forbidden - Permission denied (including departed users) and CSRF errors
     if (error.response?.status === 403) {
-      const message = error.response?.data?.message
+      const rawMessage = error.response?.data?.message
       const errorCode = error.response?.data?.code
 
       // Check for CSRF token errors - reload page to get new token
@@ -722,7 +753,8 @@ apiClient.interceptors.response.use(
 
       // Check for Arabic permission messages from departed user blocking
       // These messages indicate the user doesn't have permission to access a resource
-      if (message?.includes('ليس لديك صلاحية')) {
+      if (rawMessage?.includes('ليس لديك صلاحية')) {
+        const message = sanitizeErrorMessage(rawMessage)
         // Import toast dynamically to avoid circular dependencies
         import('sonner').then(({ toast }) => {
           toast.error(message, {
@@ -738,18 +770,21 @@ apiClient.interceptors.response.use(
       const errors = error.response?.data?.errors
       // Support both nested error object and root-level message
       const errorObj = error.response?.data?.error
-      const message = errorObj?.messageAr || errorObj?.message || error.response?.data?.message
+      const rawMessage = errorObj?.messageAr || errorObj?.message || error.response?.data?.message
 
       // Show validation errors as toast messages
       if (errors && Array.isArray(errors)) {
         import('sonner').then(({ toast }) => {
           errors.forEach((err: { field: string; message: string }) => {
-            toast.error(`${err.field}: ${err.message}`, {
+            const sanitizedField = sanitizeErrorMessage(err.field || '')
+            const sanitizedMessage = sanitizeErrorMessage(err.message || '')
+            toast.error(`${sanitizedField}: ${sanitizedMessage}`, {
               duration: 4000,
             })
           })
         })
-      } else if (message) {
+      } else if (rawMessage) {
+        const message = sanitizeErrorMessage(rawMessage)
         // Show generic validation message
         import('sonner').then(({ toast }) => {
           toast.error(message, {
@@ -771,8 +806,11 @@ apiClient.interceptors.response.use(
     // Return formatted error with requestId and validation errors
     // Support both nested error object (error.error.message) and root-level message
     const errorObj = error.response?.data?.error
-    const errorMessage = errorObj?.messageAr || errorObj?.message || error.response?.data?.message || 'حدث خطأ غير متوقع'
+    const rawErrorMessage = errorObj?.messageAr || errorObj?.message || error.response?.data?.message || 'حدث خطأ غير متوقع'
     const errorCode = errorObj?.code || error.response?.data?.code
+
+    // Sanitize error message to prevent XSS attacks
+    const errorMessage = sanitizeErrorMessage(rawErrorMessage)
 
     const formattedError = {
       status: error.response?.status || 500,

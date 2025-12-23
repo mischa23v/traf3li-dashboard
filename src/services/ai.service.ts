@@ -5,7 +5,7 @@
  * for AI capabilities powered by Workers AI
  */
 
-import api from '@/lib/api';
+import api, { getCsrfToken } from '@/lib/api';
 
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
@@ -68,22 +68,6 @@ export async function sendChatMessage(
   } catch (error: any) {
     throw new Error(error.message || 'Failed to send chat message');
   }
-}
-
-/**
- * Get CSRF token from cookies
- */
-function getCsrfToken(): string {
-  const cookies = document.cookie;
-  const match = cookies.match(/csrf-token=([^;]+)/);
-  if (match && match[1]) {
-    return match[1];
-  }
-  const xsrfMatch = cookies.match(/XSRF-TOKEN=([^;]+)/);
-  if (xsrfMatch && xsrfMatch[1]) {
-    return xsrfMatch[1];
-  }
-  return '';
 }
 
 /**

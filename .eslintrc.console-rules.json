@@ -1,0 +1,53 @@
+{
+  "rules": {
+    "no-console": [
+      "error",
+      {
+        "allow": []
+      }
+    ],
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "CallExpression[callee.object.name='console'][callee.property.name!=/^(error|warn|log|info|debug)$/]",
+        "message": "Unexpected console method. Use logger utility from @/utils/logger instead."
+      },
+      {
+        "selector": "CallExpression[callee.object.name='console'][callee.property.name='log']",
+        "message": "console.log() is not allowed. Use logger.debug() from @/utils/logger instead."
+      },
+      {
+        "selector": "CallExpression[callee.object.name='console'][callee.property.name='error']",
+        "message": "console.error() is not allowed. Use logger.error() from @/utils/logger instead."
+      },
+      {
+        "selector": "CallExpression[callee.object.name='console'][callee.property.name='warn']",
+        "message": "console.warn() is not allowed. Use logger.warn() from @/utils/logger instead."
+      },
+      {
+        "selector": "CallExpression[callee.object.name='console'][callee.property.name='info']",
+        "message": "console.info() is not allowed. Use logger.info() from @/utils/logger instead."
+      },
+      {
+        "selector": "CallExpression[callee.object.name='console'][callee.property.name='debug']",
+        "message": "console.debug() is not allowed. Use logger.debug() from @/utils/logger instead."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/__tests__/**",
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/*.spec.ts",
+        "**/*.spec.tsx",
+        "**/console-logger.ts"
+      ],
+      "rules": {
+        "no-console": "off",
+        "no-restricted-syntax": "off"
+      }
+    }
+  ]
+}
