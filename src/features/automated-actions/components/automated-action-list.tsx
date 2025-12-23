@@ -30,6 +30,11 @@ import {
   CardContent,
 } from '@/components/ui/card'
 import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from '@/components/ui/alert'
+import {
   Table,
   TableBody,
   TableCell,
@@ -111,6 +116,33 @@ export function AutomatedActionList({
 
   return (
     <div className={cn('space-y-4', className)}>
+      {/* Coming Soon Alert */}
+      <Alert variant="default" className="border-amber-500 bg-amber-50 dark:bg-amber-950/20">
+        <AlertTriangle className="h-4 w-4 text-amber-600" />
+        <AlertTitle className="text-amber-900 dark:text-amber-100">
+          {isArabic ? 'قريباً | Coming Soon' : 'Coming Soon | قريباً'}
+        </AlertTitle>
+        <AlertDescription className="text-amber-800 dark:text-amber-200">
+          {isArabic ? (
+            <>
+              هذه الميزة قيد التطوير حالياً. واجهة برمجة التطبيقات الخلفية للإجراءات التلقائية غير مطبقة بعد.
+              <br />
+              <span className="text-sm">
+                This feature is currently under development. The automated actions backend API is not yet implemented.
+              </span>
+            </>
+          ) : (
+            <>
+              This feature is currently under development. The automated actions backend API is not yet implemented.
+              <br />
+              <span className="text-sm">
+                هذه الميزة قيد التطوير حالياً. واجهة برمجة التطبيقات الخلفية للإجراءات التلقائية غير مطبقة بعد.
+              </span>
+            </>
+          )}
+        </AlertDescription>
+      </Alert>
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -125,7 +157,7 @@ export function AutomatedActionList({
           </p>
         </div>
         {onCreate && (
-          <Button onClick={onCreate}>
+          <Button onClick={onCreate} disabled title={isArabic ? 'قريباً - الميزة قيد التطوير' : 'Coming Soon - Feature under development'}>
             <Plus className="h-4 w-4 me-2" />
             {isArabic ? 'إجراء جديد' : 'New Action'}
           </Button>
@@ -143,7 +175,7 @@ export function AutomatedActionList({
                 : 'No automated actions yet'}
             </p>
             {onCreate && (
-              <Button onClick={onCreate}>
+              <Button onClick={onCreate} disabled title={isArabic ? 'قريباً - الميزة قيد التطوير' : 'Coming Soon - Feature under development'}>
                 <Plus className="h-4 w-4 me-2" />
                 {isArabic ? 'إنشاء إجراء' : 'Create Action'}
               </Button>
