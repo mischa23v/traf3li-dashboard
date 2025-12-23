@@ -4810,6 +4810,127 @@
     "delete": "حذف",
     "edit": "تعديل",
     "processing": "جاري المعالجة...",
-    "enter": "أدخل"
+    "enter": "أدخل",
+    "view": "عرض",
+    "leads": "عملاء محتملين",
+    "overdue": "متأخر"
+  },
+  "mlScoring": {
+    "badge": "مدعوم بالذكاء الاصطناعي",
+    "title": "تقييم العملاء المحتملين",
+    "conversion": "تحويل",
+    "confidence": "درجة الثقة",
+    "expectedValue": "القيمة المتوقعة",
+    "slaDeadline": "موعد الاستجابة",
+    "assignedTo": "مسند إلى",
+    "keyIndicators": "المؤشرات الرئيسية",
+    "refreshScore": "تحديث التقييم",
+    "model": "النموذج",
+    "lastScored": "آخر تقييم",
+    "scoreCalculated": "تم حساب التقييم بنجاح",
+    "scoreCalculationFailed": "فشل في حساب التقييم",
+    "batchPartialSuccess": "تم حساب {{success}} تقييم، فشل {{failed}}",
+    "batchSuccess": "تم حساب {{count}} تقييم",
+    "batchFailed": "فشل الحساب الجماعي",
+    "contactRecorded": "تم تسجيل التواصل بنجاح",
+    "contactFailed": "فشل في تسجيل التواصل",
+    "leadAssigned": "تم إسناد العميل المحتمل بنجاح",
+    "assignFailed": "فشل في إسناد العميل المحتمل",
+    "modelTrained": "تم تدريب النموذج بنجاح",
+    "trainingFailed": "فشل تدريب النموذج",
+    "dataExported": "تم تصدير بيانات التدريب",
+    "exportFailed": "فشل التصدير",
+    "noData": "لا توجد بيانات متاحة",
+    "loadError": "فشل في تحميل البيانات",
+    "priorityQueue": "قائمة الأولويات",
+    "leads": "عملاء محتملين",
+    "overdue": "متأخر",
+    "emptyQueue": "لا يوجد عملاء في القائمة",
+    "emptyQueueDesc": "عمل رائع! تم التواصل مع جميع العملاء المحتملين.",
+    "viewAll": "عرض جميع العملاء",
+    "keyStrengths": "نقاط القوة",
+    "areasOfConcern": "نقاط الاهتمام",
+    "recommendedActions": "الإجراءات الموصى بها",
+    "noStrengths": "لم يتم تحديد نقاط قوة",
+    "noConcerns": "لم يتم تحديد مخاوف",
+    "noActions": "لا توجد إجراءات موصى بها",
+    "factorImpact": "تحليل تأثير العوامل",
+    "baseValue": "القيمة الأساسية",
+    "positiveFactors": "العوامل الإيجابية",
+    "negativeFactors": "العوامل السلبية",
+    "nav": {
+      "analytics": "تحليلات ML",
+      "queue": "قائمة الأولويات",
+      "sla": "لوحة الاستجابة"
+    },
+    "features": {
+      "engagement": "التفاعل",
+      "responseSpeed": "سرعة الاستجابة",
+      "meetingReliability": "موثوقية الاجتماعات",
+      "activityTrend": "اتجاه النشاط"
+    },
+    "filters": {
+      "all": "الكل",
+      "mine": "عملائي",
+      "unassigned": "غير مسند",
+      "overdue": "متأخر",
+      "allTiers": "جميع المستويات"
+    },
+    "tiers": {
+      "hot": "ساخن",
+      "warm": "دافئ",
+      "cool": "بارد",
+      "nurture": "رعاية"
+    },
+    "actions": {
+      "call": "اتصال",
+      "email": "بريد إلكتروني",
+      "meeting": "اجتماع",
+      "whatsapp": "واتساب",
+      "viewDetails": "عرض التفاصيل",
+      "assign": "إسناد لممثل مبيعات",
+      "retrain": "إعادة تدريب النموذج"
+    },
+    "sla": {
+      "title": "أداء الاستجابة",
+      "successRate": "معدل نجاح الاستجابة",
+      "currentBreaches": "التجاوزات الحالية",
+      "avgResponseTime": "متوسط وقت الاستجابة",
+      "byTier": "الأداء حسب مستوى الأولوية",
+      "tier": "المستوى",
+      "target": "الهدف",
+      "avgResponse": "متوسط الاستجابة",
+      "activeBreaches": "تجاوزات الاستجابة النشطة",
+      "breachedAt": "تم التجاوز",
+      "moreBreaches": "و {{count}} أخرى...",
+      "noBreaches": "لا توجد تجاوزات نشطة",
+      "allOnTrack": "جميع العملاء المحتملين على المسار الصحيح!",
+      "loadError": "فشل في تحميل مقاييس الاستجابة"
+    },
+    "stats": {
+      "accuracy": "الدقة",
+      "precision": "الإحكام",
+      "recall": "الاستدعاء",
+      "f1Score": "درجة F1"
+    },
+    "lastTrained": "آخر تدريب",
+    "charts": {
+      "featureImportance": "أهمية العوامل",
+      "scoreDistribution": "توزيع التقييمات"
+    },
+    "modelInfo": {
+      "title": "معلومات النموذج",
+      "version": "الإصدار",
+      "auc": "درجة AUC",
+      "trainingData": "بيانات التدريب",
+      "samples": "عينة",
+      "lastTrained": "آخر تدريب"
+    },
+    "quickStats": {
+      "title": "إحصائيات سريعة",
+      "totalScored": "إجمالي التقييمات",
+      "avgScore": "متوسط التقييم",
+      "conversionRate": "معدل التحويل"
+    }
   }
 }
