@@ -273,8 +273,8 @@ export const useUpdateDocument = () => {
     },
     onSuccess: () => {
       toast({
-        title: t('status.success'),
-        description: t('status.updatedSuccessfully'),
+        title: t('status.success', 'Success | نجح'),
+        description: t('status.updatedSuccessfully', 'Updated successfully | تم التحديث بنجاح'),
       })
     },
     onError: (error: any, { id }, context) => {
@@ -286,10 +286,15 @@ export const useUpdateDocument = () => {
       if (context?.previousDoc) {
         queryClient.setQueryData(documentsKeys.detail(id), context.previousDoc)
       }
+
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message ||
+        t('documents.updateError', 'Failed to update document | فشل تحديث المستند')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description: error.response?.data?.message || t('common.unknownError'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
     },
     onSettled: async (_, __, { id }) => {
@@ -309,8 +314,8 @@ export const useDeleteDocument = () => {
     // Update cache on success (Stable & Correct)
     onSuccess: (_, id) => {
       toast({
-        title: t('status.success'),
-        description: t('status.deletedSuccessfully'),
+        title: t('status.success', 'Success | نجح'),
+        description: t('status.deletedSuccessfully', 'Deleted successfully | تم الحذف بنجاح'),
       })
 
       // Optimistically remove document from all lists
@@ -335,10 +340,14 @@ export const useDeleteDocument = () => {
       })
     },
     onError: (error: any) => {
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message ||
+        t('documents.deleteError', 'Failed to delete document | فشل حذف المستند')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description: error.response?.data?.message || t('common.unknownError'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
     },
     onSettled: async () => {
@@ -358,15 +367,19 @@ export const useBulkDeleteDocuments = () => {
     mutationFn: (ids: string[]) => documentsService.bulkDeleteDocuments(ids),
     onSuccess: () => {
       toast({
-        title: t('status.success'),
-        description: t('documents.bulkDeleteSuccess'),
+        title: t('status.success', 'Success | نجح'),
+        description: t('documents.bulkDeleteSuccess', 'Documents deleted successfully | تم حذف المستندات بنجاح'),
       })
     },
     onError: (error: any) => {
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message ||
+        t('documents.bulkDeleteError', 'Failed to delete documents | فشل حذف المستندات')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description: error.response?.data?.message || t('common.unknownError'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
     },
     onSettled: async () => {
@@ -462,15 +475,19 @@ export const useRestoreDocumentVersion = () => {
     }) => documentsService.restoreDocumentVersion(documentId, versionId),
     onSuccess: () => {
       toast({
-        title: t('status.success'),
-        description: t('documents.versionRestoreSuccess'),
+        title: t('status.success', 'Success | نجح'),
+        description: t('documents.versionRestoreSuccess', 'Version restored successfully | تم استعادة الإصدار بنجاح'),
       })
     },
     onError: (error: any) => {
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message ||
+        t('documents.versionRestoreError', 'Failed to restore version | فشلت استعادة الإصدار')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description: error.response?.data?.message || t('common.unknownError'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
     },
     onSettled: async (_, __, { documentId }) => {
@@ -504,10 +521,14 @@ export const useDownloadDocument = () => {
       window.URL.revokeObjectURL(url)
     },
     onError: (error: any) => {
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message ||
+        t('documents.downloadError', 'Failed to download document | فشل تنزيل المستند')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description: error.response?.data?.message || t('documents.downloadError'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
     },
   })
@@ -522,10 +543,14 @@ export const useDocumentPreviewUrl = () => {
       return documentsService.getPreviewUrl(id)
     },
     onError: (error: any) => {
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message ||
+        t('documents.previewError', 'Failed to get preview URL | فشل الحصول على رابط المعاينة')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description: error.response?.data?.message || t('documents.previewError', 'Failed to get preview URL'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
     },
   })
@@ -540,10 +565,14 @@ export const useDocumentDownloadUrl = () => {
       return documentsService.getDownloadUrl(id, 'attachment')
     },
     onError: (error: any) => {
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message ||
+        t('documents.downloadError', 'Failed to download document | فشل تنزيل المستند')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description: error.response?.data?.message || t('documents.downloadError'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
     },
   })
@@ -558,15 +587,19 @@ export const useShareDocument = () => {
       documentsService.shareDocument(id, expiresIn),
     onSuccess: () => {
       toast({
-        title: t('status.success'),
-        description: t('documents.shareSuccess'),
+        title: t('status.success', 'Success | نجح'),
+        description: t('documents.shareSuccess', 'Share link generated successfully | تم إنشاء رابط المشاركة بنجاح'),
       })
     },
     onError: (error: any) => {
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message ||
+        t('documents.shareError', 'Failed to generate share link | فشل إنشاء رابط المشاركة')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description: error.response?.data?.message || t('common.unknownError'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
     },
   })
@@ -581,15 +614,19 @@ export const useRevokeShareLink = () => {
     mutationFn: (id: string) => documentsService.revokeShareLink(id),
     onSuccess: () => {
       toast({
-        title: t('status.success'),
-        description: t('documents.shareRevoked'),
+        title: t('status.success', 'Success | نجح'),
+        description: t('documents.shareRevoked', 'Share link revoked successfully | تم إلغاء رابط المشاركة بنجاح'),
       })
     },
     onError: (error: any) => {
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message ||
+        t('documents.shareRevokeError', 'Failed to revoke share link | فشل إلغاء رابط المشاركة')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description: error.response?.data?.message || t('common.unknownError'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
     },
     onSettled: async (_, __, id) => {
@@ -599,6 +636,7 @@ export const useRevokeShareLink = () => {
 }
 
 // Encrypt document
+// [BACKEND-PENDING] This feature may not be fully implemented on the backend
 export const useEncryptDocument = () => {
   const queryClient = useQueryClient()
   const { t } = useTranslation()
@@ -607,16 +645,26 @@ export const useEncryptDocument = () => {
     mutationFn: (id: string) => documentsService.encryptDocument(id),
     onSuccess: () => {
       toast({
-        title: t('status.success'),
-        description: t('documents.encryptSuccess'),
+        title: t('status.success', 'Success | نجح'),
+        description: t('documents.encryptSuccess', 'Document encrypted successfully | تم تشفير المستند بنجاح'),
       })
     },
     onError: (error: any) => {
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message ||
+        t('documents.encryptError', 'Failed to encrypt document. This feature may not be fully implemented. | فشل تشفير المستند. قد لا يتم تنفيذ هذه الميزة بالكامل.')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description: error.response?.data?.message || t('common.unknownError'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
+
+      // Log backend-pending warning
+      console.warn(
+        '[BACKEND-PENDING] Document encryption failed. ' +
+        'This endpoint may not be fully implemented. Consider using S3-level encryption.'
+      )
     },
     onSettled: async (_, __, id) => {
       await queryClient.invalidateQueries({ queryKey: documentsKeys.all })
@@ -626,17 +674,34 @@ export const useEncryptDocument = () => {
 }
 
 // Decrypt document
+// [BACKEND-PENDING] This feature may not be fully implemented on the backend
 export const useDecryptDocument = () => {
   const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (id: string) => documentsService.decryptDocument(id),
+    onSuccess: () => {
+      toast({
+        title: t('status.success', 'Success | نجح'),
+        description: t('documents.decryptSuccess', 'Document decrypted successfully | تم فك تشفير المستند بنجاح'),
+      })
+    },
     onError: (error: any) => {
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message ||
+        t('documents.decryptError', 'Failed to decrypt document. This feature may not be fully implemented. | فشل فك تشفير المستند. قد لا يتم تنفيذ هذه الميزة بالكامل.')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description: error.response?.data?.message || t('documents.decryptError'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
+
+      // Log backend-pending warning
+      console.warn(
+        '[BACKEND-PENDING] Document decryption failed. ' +
+        'This endpoint may not be fully implemented. Consider using S3-level encryption/decryption.'
+      )
     },
   })
 }
@@ -656,15 +721,19 @@ export const useMoveDocumentToCase = () => {
     }) => documentsService.moveDocumentToCase(documentId, caseId),
     onSuccess: () => {
       toast({
-        title: t('status.success'),
-        description: t('documents.moveSuccess'),
+        title: t('status.success', 'Success | نجح'),
+        description: t('documents.moveSuccess', 'Document moved successfully | تم نقل المستند بنجاح'),
       })
     },
     onError: (error: any) => {
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message ||
+        t('documents.moveError', 'Failed to move document | فشل نقل المستند')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description: error.response?.data?.message || t('common.unknownError'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
     },
     onSettled: async (_, __, { documentId, caseId }) => {

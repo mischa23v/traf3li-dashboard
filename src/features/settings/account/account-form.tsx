@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2 } from 'lucide-react'
+import { Loader2, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -30,6 +30,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { DatePicker } from '@/components/date-picker'
 import { useSettings, useUpdateAccountSettings } from '@/hooks/useSettings'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -56,7 +57,7 @@ const LoadingSkeleton = memo(function LoadingSkeleton() {
 
 export function AccountForm() {
   const { t } = useTranslation()
-  const { data: settings, isLoading: loadingSettings } = useSettings()
+  const { data: settings, isLoading: loadingSettings, error: settingsError } = useSettings()
   const { mutate: updateSettings, isPending } = useUpdateAccountSettings()
 
   const accountFormSchema = useMemo(() => z.object({
@@ -106,6 +107,16 @@ export function AccountForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+        {/* [BACKEND-PENDING] Settings endpoints alert */}
+        {settingsError && (
+          <Alert variant='destructive'>
+            <AlertCircle className='h-4 w-4' />
+            <AlertDescription>
+              <strong>Backend Pending:</strong> The settings endpoints are not yet fully implemented. Some features may not work as expected. | <strong>في انتظار الخادم:</strong> نقاط نهاية الإعدادات لم يتم تنفيذها بالكامل بعد. قد لا تعمل بعض الميزات كما هو متوقع.
+            </AlertDescription>
+          </Alert>
+        )}
+
         <FormField
           control={form.control}
           name='name'

@@ -258,6 +258,9 @@ export function CalendarView() {
 
     // --- Error State ---
     if (isError) {
+        const errorMsg = error?.message || 'حدث خطأ أثناء تحميل البيانات | An error occurred while loading data'
+        const isBackendPending = errorMsg.includes('[BACKEND-PENDING]')
+
         return (
             <>
                 <Header className="bg-navy shadow-none relative">
@@ -278,11 +281,26 @@ export function CalendarView() {
 
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
                     <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
-                        <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <AlertCircle className="h-8 w-8 text-red-500" aria-hidden="true" />
+                        <div className={`w-16 h-16 ${isBackendPending ? 'bg-orange-50' : 'bg-red-50'} rounded-full flex items-center justify-center mx-auto mb-4`}>
+                            <AlertCircle className={`h-8 w-8 ${isBackendPending ? 'text-orange-500' : 'text-red-500'}`} aria-hidden="true" />
                         </div>
-                        <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل التقويم</h3>
-                        <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">
+                            {isBackendPending ? '[بانتظار التطبيق] فشل تحميل التقويم' : 'فشل تحميل التقويم'}
+                        </h3>
+                        <p className="text-slate-500 mb-4">{errorMsg}</p>
+                        {isBackendPending && (
+                            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6 text-right max-w-2xl mx-auto">
+                                <p className="text-sm text-orange-800 mb-2">
+                                    <strong className="font-bold">⚠️ هذه الميزة بانتظار تطبيق الخادم</strong>
+                                </p>
+                                <p className="text-xs text-orange-700 leading-relaxed">
+                                    يستخدم التقويم حاليًا نقاط نهاية محسّنة غير مطبقة بعد في الخادم.
+                                    يرجى الاتصال بفريق التطوير لتطبيق النقاط النهائية المطلوبة
+                                    (مثل /calendar/grid-summary و /calendar/grid-items)
+                                    أو استخدام التقويم القديم مؤقتًا.
+                                </p>
+                            </div>
+                        )}
                         <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
                             <Loader2 className="ms-2 h-4 w-4" />
                             إعادة المحاولة

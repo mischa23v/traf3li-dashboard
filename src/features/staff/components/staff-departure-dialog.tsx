@@ -57,13 +57,13 @@ export function StaffDepartureDialog() {
     setIsSubmitting(true)
     try {
       await firmService.processDeparture(firmId, currentRow._id, data)
-      toast.success('تمت معالجة مغادرة الموظف بنجاح')
+      toast.success('Member departure processed successfully | تمت معالجة مغادرة الموظف بنجاح')
       queryClient.invalidateQueries({ queryKey: ['staff'] })
       queryClient.invalidateQueries({ queryKey: ['team'] })
       setOpen(null)
       form.reset()
     } catch (error: any) {
-      toast.error(error.message || 'فشل في معالجة المغادرة')
+      toast.error(error.message || 'Failed to process departure | فشل في معالجة المغادرة')
     } finally {
       setIsSubmitting(false)
     }

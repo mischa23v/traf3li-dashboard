@@ -172,6 +172,9 @@ export function CasesListView() {
     return f
   }, [statusFilter, categoryFilter])
 
+  // ✅ API CALLS - All endpoints are IMPLEMENTED
+  // - useCases() → GET /api/cases/ (with optional filters)
+  // - useCaseStatistics() → Local calculation (no API call)
   const { data: casesData, isLoading, isError, error, refetch } = useCases(filters)
   const statistics = useCaseStatistics(casesData?.cases)
 
@@ -429,18 +432,25 @@ export function CasesListView() {
                 <Alert className="border-red-200 bg-red-50">
                   <AlertCircle className="h-4 w-4 text-red-600" aria-hidden="true" />
                   <AlertDescription className="text-red-800">
-                    <div className="flex items-center justify-between">
-                      <span>
-                        {t('cases.loadError', 'حدث خطأ أثناء تحميل القضايا')}: {error?.message || t('common.unknownError', 'خطأ غير معروف')}
-                      </span>
-                      <Button
-                        onClick={() => refetch()}
-                        variant="outline"
-                        size="sm"
-                        className="border-red-300 text-red-700 hover:bg-red-100"
-                      >
-                        {t('common.retry', 'إعادة المحاولة')}
-                      </Button>
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <p className="font-semibold mb-1">
+                            {t('cases.loadError', 'فشل تحميل القضايا')} | Failed to load cases
+                          </p>
+                          <p className="text-sm text-red-700">
+                            {error?.message || t('common.unknownError', 'حدث خطأ غير معروف. يرجى المحاولة مرة أخرى. | An unknown error occurred. Please try again.')}
+                          </p>
+                        </div>
+                        <Button
+                          onClick={() => refetch()}
+                          variant="outline"
+                          size="sm"
+                          className="border-red-300 text-red-700 hover:bg-red-100 flex-shrink-0 ms-4"
+                        >
+                          {t('common.retry', 'إعادة المحاولة')} | Retry
+                        </Button>
+                      </div>
                     </div>
                   </AlertDescription>
                 </Alert>

@@ -3,7 +3,116 @@
  * Handles all integration/API-related operations
  */
 
-import apiClient, { handleApiError } from '@/lib/api'
+import apiClient, { handleApiError, ApiError } from '@/lib/api'
+
+/**
+ * API Error Handler with Bilingual Messages
+ * Returns formatted error messages in both English and Arabic
+ */
+interface BilingualError {
+  messageEn: string
+  messageAr: string
+  status?: number
+  code?: string
+}
+
+/**
+ * Handle API errors with proper bilingual messages
+ */
+const handleIntegrationError = (error: any, context: string): BilingualError => {
+  // Network or timeout errors
+  if (!error.response && (error.message === 'Network Error' || error.code === 'ECONNABORTED')) {
+    return {
+      messageEn: `Network error: Unable to connect to the server. Please check your internet connection.`,
+      messageAr: `خطأ في الشبكة: تعذر الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت.`,
+      status: 0,
+      code: 'NETWORK_ERROR'
+    }
+  }
+
+  const status = error.response?.status || error.status || 500
+  const apiError = error as ApiError
+
+  // Handle specific HTTP status codes
+  switch (status) {
+    case 404:
+      return {
+        messageEn: `Integrations API endpoint not found. This feature may not be available on the backend yet.`,
+        messageAr: `نقطة نهاية واجهة برمجة التطبيقات للتكاملات غير موجودة. قد لا تكون هذه الميزة متاحة على الخادم بعد.`,
+        status,
+        code: 'ENDPOINT_NOT_FOUND'
+      }
+
+    case 400:
+      return {
+        messageEn: error.message || `Invalid request: Please check your integration settings.`,
+        messageAr: `طلب غير صالح: يرجى التحقق من إعدادات التكامل.`,
+        status,
+        code: apiError.code || 'BAD_REQUEST'
+      }
+
+    case 401:
+      return {
+        messageEn: `Unauthorized: Please log in again to access integrations.`,
+        messageAr: `غير مصرح: يرجى تسجيل الدخول مرة أخرى للوصول إلى التكاملات.`,
+        status,
+        code: 'UNAUTHORIZED'
+      }
+
+    case 403:
+      return {
+        messageEn: `Access denied: You don't have permission to access integrations.`,
+        messageAr: `تم رفض الوصول: ليس لديك صلاحية للوصول إلى التكاملات.`,
+        status,
+        code: 'FORBIDDEN'
+      }
+
+    case 429:
+      return {
+        messageEn: `Too many requests: Please wait a moment before trying again.`,
+        messageAr: `طلبات كثيرة جداً: يرجى الانتظار لحظة قبل المحاولة مرة أخرى.`,
+        status,
+        code: 'RATE_LIMITED'
+      }
+
+    case 500:
+    case 502:
+    case 503:
+    case 504:
+      return {
+        messageEn: `Server error: The integrations service is temporarily unavailable. Please try again later.`,
+        messageAr: `خطأ في الخادم: خدمة التكاملات غير متاحة مؤقتاً. يرجى المحاولة مرة أخرى لاحقاً.`,
+        status,
+        code: 'SERVER_ERROR'
+      }
+
+    default:
+      // Use the error message from API if available
+      const message = error.message || apiError.message || 'Unknown error occurred'
+      return {
+        messageEn: `Failed to ${context}: ${message}`,
+        messageAr: `فشل في ${getContextAr(context)}: ${message}`,
+        status,
+        code: apiError.code || 'UNKNOWN_ERROR'
+      }
+  }
+}
+
+/**
+ * Helper to get Arabic context translation
+ */
+const getContextAr = (context: string): string => {
+  const contextMap: Record<string, string> = {
+    'load integrations': 'تحميل التكاملات',
+    'load integration': 'تحميل التكامل',
+    'get status': 'الحصول على الحالة',
+    'connect': 'الاتصال',
+    'disconnect': 'قطع الاتصال',
+    'update settings': 'تحديث الإعدادات',
+    'test connection': 'اختبار الاتصال'
+  }
+  return contextMap[context] || context
+}
 
 /**
  * Integration Status
@@ -70,10 +179,28 @@ const integrationsService = {
   getIntegrations: async (): Promise<Integration[]> => {
     try {
       const response = await apiClient.get('/integrations')
-      return response.data.data || response.data.integrations
+      return response.data.data || response.data.integrations || []
     } catch (error: any) {
-      // Return mock data for now
-      return getMockIntegrations()
+      const bilingualError = handleIntegrationError(error, 'load integrations')
+
+      // If endpoint doesn't exist (404), return mock data with a console warning
+      if (bilingualError.code === 'ENDPOINT_NOT_FOUND') {
+        console.warn(
+          `[Integrations API] ${bilingualError.messageEn}\n` +
+          `[Integrations API] ${bilingualError.messageAr}\n` +
+          `Returning mock data for development.`
+        )
+        return getMockIntegrations()
+      }
+
+      // For other errors, throw with bilingual message
+      const errorMessage = `${bilingualError.messageEn} | ${bilingualError.messageAr}`
+      const err = new Error(errorMessage) as any
+      err.messageEn = bilingualError.messageEn
+      err.messageAr = bilingualError.messageAr
+      err.status = bilingualError.status
+      err.code = bilingualError.code
+      throw err
     }
   },
 
@@ -84,10 +211,28 @@ const integrationsService = {
   getIntegrationsByCategory: async (category: IntegrationCategory): Promise<Integration[]> => {
     try {
       const response = await apiClient.get(`/integrations?category=${category}`)
-      return response.data.data || response.data.integrations
+      return response.data.data || response.data.integrations || []
     } catch (error: any) {
-      // Return mock data for now
-      return getMockIntegrations().filter(int => int.category === category)
+      const bilingualError = handleIntegrationError(error, 'load integrations')
+
+      // If endpoint doesn't exist (404), return mock data with a console warning
+      if (bilingualError.code === 'ENDPOINT_NOT_FOUND') {
+        console.warn(
+          `[Integrations API] ${bilingualError.messageEn}\n` +
+          `[Integrations API] ${bilingualError.messageAr}\n` +
+          `Returning filtered mock data for development.`
+        )
+        return getMockIntegrations().filter(int => int.category === category)
+      }
+
+      // For other errors, throw with bilingual message
+      const errorMessage = `${bilingualError.messageEn} | ${bilingualError.messageAr}`
+      const err = new Error(errorMessage) as any
+      err.messageEn = bilingualError.messageEn
+      err.messageAr = bilingualError.messageAr
+      err.status = bilingualError.status
+      err.code = bilingualError.code
+      throw err
     }
   },
 
@@ -100,7 +245,29 @@ const integrationsService = {
       const response = await apiClient.get(`/integrations/${id}`)
       return response.data.data || response.data.integration
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      const bilingualError = handleIntegrationError(error, 'load integration')
+
+      // If endpoint doesn't exist (404), try to find in mock data
+      if (bilingualError.code === 'ENDPOINT_NOT_FOUND') {
+        const mockIntegration = getMockIntegrations().find(int => int.id === id)
+        if (mockIntegration) {
+          console.warn(
+            `[Integrations API] ${bilingualError.messageEn}\n` +
+            `[Integrations API] ${bilingualError.messageAr}\n` +
+            `Returning mock data for integration: ${id}`
+          )
+          return mockIntegration
+        }
+      }
+
+      // Throw with bilingual message
+      const errorMessage = `${bilingualError.messageEn} | ${bilingualError.messageAr}`
+      const err = new Error(errorMessage) as any
+      err.messageEn = bilingualError.messageEn
+      err.messageAr = bilingualError.messageAr
+      err.status = bilingualError.status
+      err.code = bilingualError.code
+      throw err
     }
   },
 
@@ -113,7 +280,29 @@ const integrationsService = {
       const response = await apiClient.get(`/integrations/${id}/status`)
       return response.data.status
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      const bilingualError = handleIntegrationError(error, 'get status')
+
+      // If endpoint doesn't exist (404), return mock status
+      if (bilingualError.code === 'ENDPOINT_NOT_FOUND') {
+        const mockIntegration = getMockIntegrations().find(int => int.id === id)
+        if (mockIntegration) {
+          console.warn(
+            `[Integrations API] ${bilingualError.messageEn}\n` +
+            `[Integrations API] ${bilingualError.messageAr}\n` +
+            `Returning mock status for integration: ${id}`
+          )
+          return mockIntegration.status
+        }
+      }
+
+      // Throw with bilingual message
+      const errorMessage = `${bilingualError.messageEn} | ${bilingualError.messageAr}`
+      const err = new Error(errorMessage) as any
+      err.messageEn = bilingualError.messageEn
+      err.messageAr = bilingualError.messageAr
+      err.status = bilingualError.status
+      err.code = bilingualError.code
+      throw err
     }
   },
 
@@ -129,7 +318,16 @@ const integrationsService = {
       })
       return response.data.data || response.data.integration
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      const bilingualError = handleIntegrationError(error, 'connect')
+
+      // Throw with bilingual message
+      const errorMessage = `${bilingualError.messageEn} | ${bilingualError.messageAr}`
+      const err = new Error(errorMessage) as any
+      err.messageEn = bilingualError.messageEn
+      err.messageAr = bilingualError.messageAr
+      err.status = bilingualError.status
+      err.code = bilingualError.code
+      throw err
     }
   },
 
@@ -141,7 +339,16 @@ const integrationsService = {
     try {
       await apiClient.post(`/integrations/${id}/disconnect`)
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      const bilingualError = handleIntegrationError(error, 'disconnect')
+
+      // Throw with bilingual message
+      const errorMessage = `${bilingualError.messageEn} | ${bilingualError.messageAr}`
+      const err = new Error(errorMessage) as any
+      err.messageEn = bilingualError.messageEn
+      err.messageAr = bilingualError.messageAr
+      err.status = bilingualError.status
+      err.code = bilingualError.code
+      throw err
     }
   },
 
@@ -154,7 +361,16 @@ const integrationsService = {
       const response = await apiClient.put(`/integrations/${id}/settings`, settings)
       return response.data.data || response.data.integration
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      const bilingualError = handleIntegrationError(error, 'update settings')
+
+      // Throw with bilingual message
+      const errorMessage = `${bilingualError.messageEn} | ${bilingualError.messageAr}`
+      const err = new Error(errorMessage) as any
+      err.messageEn = bilingualError.messageEn
+      err.messageAr = bilingualError.messageAr
+      err.status = bilingualError.status
+      err.code = bilingualError.code
+      throw err
     }
   },
 
@@ -167,7 +383,16 @@ const integrationsService = {
       const response = await apiClient.post(`/integrations/${id}/test`)
       return response.data.success
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      const bilingualError = handleIntegrationError(error, 'test connection')
+
+      // Throw with bilingual message
+      const errorMessage = `${bilingualError.messageEn} | ${bilingualError.messageAr}`
+      const err = new Error(errorMessage) as any
+      err.messageEn = bilingualError.messageEn
+      err.messageAr = bilingualError.messageAr
+      err.status = bilingualError.status
+      err.code = bilingualError.code
+      throw err
     }
   },
 }

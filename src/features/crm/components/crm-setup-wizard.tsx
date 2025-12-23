@@ -274,11 +274,11 @@ export default function CRMSetupWizard() {
         if (parsed.currentStep) {
           setCurrentStep(parsed.currentStep)
         }
-        toast.info('تم استعادة التقدم السابق', {
-          description: 'يمكنك متابعة الإعداد من حيث توقفت'
+        toast.info('تم استعادة التقدم السابق | Previous Progress Restored', {
+          description: 'يمكنك متابعة الإعداد من حيث توقفت | You can continue setup from where you left off'
         })
       } catch (error) {
-        console.error('Failed to load saved progress:', error)
+        console.error('[BACKEND-PENDING] Failed to load saved progress:', error)
       }
     }
   }, [])
@@ -307,8 +307,8 @@ export default function CRMSetupWizard() {
   }
 
   const skipStep = () => {
-    toast.info('تم تخطي الخطوة', {
-      description: 'يمكنك إعداد هذا لاحقاً من الإعدادات'
+    toast.info('تم تخطي الخطوة | Step Skipped', {
+      description: 'يمكنك إعداد هذا لاحقاً من الإعدادات | You can configure this later from settings'
     })
     nextStep()
   }
@@ -321,26 +321,62 @@ export default function CRMSetupWizard() {
   const completeSetup = async () => {
     setIsSubmitting(true)
     try {
-      // TODO: Implement API calls to save CRM settings
+      // [BACKEND-PENDING] Implement API calls to save CRM settings
       // This would include:
-      // 1. Create lead sources
-      // 2. Create sales stages
-      // 3. Create lost reasons
-      // 4. Create territories
-      // 5. Create customer groups
-      // 6. Create sales persons
-      // 7. Update CRM settings
-      // 8. Create first lead (if provided)
-      // 9. Create first case (if provided)
+      // 1. POST /api/crm/lead-sources - Create lead sources
+      // 2. POST /api/crm/sales-stages - Create sales stages
+      // 3. POST /api/crm/lost-reasons - Create lost reasons
+      // 4. POST /api/crm/territories - Create territories
+      // 5. POST /api/crm/customer-groups - Create customer groups
+      // 6. POST /api/crm/sales-persons - Create sales persons
+      // 7. PUT /api/settings/crm - Update CRM settings (appointment settings, working hours, etc.)
+      // 8. POST /api/crm/leads - Create first lead (if provided)
+      // 9. POST /api/crm/cases - Create first case (if provided)
 
-      // Simulate API call
+      // [BACKEND-PENDING] Example API implementation:
+      // try {
+      //   // 1. Create lead sources
+      //   await apiClient.post('/crm/lead-sources', wizardData.leadSources)
+      //
+      //   // 2. Create sales stages
+      //   await apiClient.post('/crm/sales-stages', wizardData.salesStages)
+      //
+      //   // 3. Update CRM settings including appointment configuration
+      //   await apiClient.put('/settings/crm', {
+      //     appointmentSettings: {
+      //       enabled: wizardData.appointmentEnabled,
+      //       defaultDuration: wizardData.appointmentDuration,
+      //       advanceBookingDays: wizardData.advanceBookingDays,
+      //       workingHours: wizardData.workingHours,
+      //     },
+      //     communicationSettings: {
+      //       autoLogEmails: wizardData.autoLogEmails,
+      //       autoLogCalls: wizardData.autoLogCalls,
+      //       autoLogWhatsApp: wizardData.autoLogWhatsApp,
+      //     },
+      //     // ... other settings
+      //   })
+      //
+      //   // 4. Create first lead if provided
+      //   if (wizardData.firstLead.firstName && wizardData.firstLead.email) {
+      //     await apiClient.post('/crm/leads', wizardData.firstLead)
+      //   }
+      // } catch (apiError: any) {
+      //   throw new Error(
+      //     `Failed to complete CRM setup | فشل في إكمال إعداد CRM: ${apiError.message}`
+      //   )
+      // }
+
+      // Simulate API call (remove when backend is ready)
+      console.log('[BACKEND-PENDING] CRM Setup Data to be sent:', wizardData)
       await new Promise(resolve => setTimeout(resolve, 2000))
 
       // Clear localStorage
       localStorage.removeItem(STORAGE_KEY)
 
-      toast.success('تم إكمال إعداد نظام CRM بنجاح!', {
-        description: 'يمكنك الآن البدء في إدارة العملاء المحتملين والحالات'
+      // Bilingual success message
+      toast.success('تم إكمال إعداد نظام CRM بنجاح! | CRM Setup Completed Successfully!', {
+        description: 'يمكنك الآن البدء في إدارة العملاء المحتملين والحالات | You can now start managing leads and cases'
       })
 
       // Navigate to CRM overview
@@ -349,9 +385,10 @@ export default function CRMSetupWizard() {
       }, 1500)
 
     } catch (error: any) {
-      console.error('Setup failed:', error)
-      toast.error('فشل إكمال الإعداد', {
-        description: error.message || 'حدث خطأ أثناء حفظ الإعدادات'
+      console.error('[BACKEND-PENDING] Setup failed:', error)
+      // Bilingual error message
+      toast.error('فشل إكمال الإعداد | Setup Failed', {
+        description: error.message || 'حدث خطأ أثناء حفظ الإعدادات | An error occurred while saving settings'
       })
     } finally {
       setIsSubmitting(false)

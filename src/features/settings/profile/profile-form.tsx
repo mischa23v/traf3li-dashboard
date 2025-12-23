@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useCallback, memo } from 'react'
+import { useEffect, useMemo, useCallback, memo, useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -23,8 +24,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useAuthStore } from '@/stores/auth-store'
 import { Skeleton } from '@/components/ui/skeleton'
+import usersService from '@/services/usersService'
 
 const REGIONS = ['الرياض', 'مكة المكرمة', 'المدينة المنورة', 'القصيم', 'الشرقية', 'عسير', 'تبوك', 'حائل', 'الحدود الشمالية', 'جازان', 'نجران', 'الباحة', 'الجوف']
 const NATIONALITIES = ['سعودي', 'إماراتي', 'كويتي', 'قطري', 'بحريني', 'عماني', 'يمني', 'عراقي', 'سوري', 'لبناني', 'أردني', 'فلسطيني', 'مصري', 'سوداني', 'ليبي', 'تونسي', 'جزائري', 'مغربي', 'هندي', 'باكستاني', 'بنغلاديشي', 'فلبيني', 'إندونيسي', 'بريطاني', 'فرنسي', 'ألماني', 'أمريكي', 'كندي']
@@ -44,7 +47,9 @@ const LoadingSkeleton = memo(function LoadingSkeleton() {
 export function ProfileForm() {
   const { t } = useTranslation()
   const user = useAuthStore((state) => state.user)
+  const checkAuth = useAuthStore((state) => state.checkAuth)
   const isLoading = !user
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const profileFormSchema = useMemo(() => z.object({
     firstName: z
@@ -107,10 +112,34 @@ export function ProfileForm() {
   }, [user, form])
 
   // Memoize submit handler to prevent recreation on every render
-  const onSubmit = useCallback((data: ProfileFormValues) => {
-    // TODO: Implement profile update API call
-    console.log('Profile update:', data)
-  }, [])
+  const onSubmit = useCallback(async (data: ProfileFormValues) => {
+    if (!user?._id) {
+      toast.error('User not found. Please login again. | المستخدم غير موجود. يرجى تسجيل الدخول مرة أخرى.')
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      await usersService.updateUserProfile(user._id, {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        phone: data.phone,
+        description: data.bio,
+        // Note: nationality, region, city are not yet supported by the backend
+        // [BACKEND-PENDING] Additional profile fields (nationality, region, city)
+      })
+
+      // Refresh user data in auth store
+      await checkAuth()
+
+      toast.success('Profile updated successfully | تم تحديث الملف الشخصي بنجاح')
+    } catch (error: any) {
+      // Error message is already bilingual from usersService
+      toast.error(error.message || 'Failed to update profile. Please try again. | فشل في تحديث الملف الشخصي. يرجى المحاولة مرة أخرى.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }, [user, checkAuth])
 
   if (isLoading) {
     return <LoadingSkeleton />
@@ -119,6 +148,13 @@ export function ProfileForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+        {/* Backend Pending Alert */}
+        <Alert>
+          <AlertDescription>
+            <strong>{t('common.note') || 'Note'}:</strong> {t('settings.profile.backendPendingNote') || 'The nationality, region, and city fields are currently displayed but not saved. These features are pending backend implementation.'} | <strong>ملاحظة:</strong> حقول الجنسية والمنطقة والمدينة معروضة حالياً لكن لا يتم حفظها. هذه الميزات في انتظار التطبيق من جانب الخادم.
+          </AlertDescription>
+        </Alert>
+
         {/* First Name & Last Name */}
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <FormField
@@ -337,8 +373,15 @@ export function ProfileForm() {
           </ul>
         </div>
 
-        <Button type='submit'>
-          {t('settings.profile.updateProfile')}
+        <Button type='submit' disabled={isSubmitting}>
+          {isSubmitting ? (
+            <>
+              <Loader2 className='me-2 h-4 w-4 animate-spin' />
+              {t('settings.profile.updating') || 'Updating...'}
+            </>
+          ) : (
+            t('settings.profile.updateProfile')
+          )}
         </Button>
       </form>
     </Form>

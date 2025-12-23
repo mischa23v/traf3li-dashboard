@@ -576,6 +576,22 @@ export function CaseDetailsView() {
 
   const handleUpdateHearing = async () => {
     if (!editingHearing?._id || !hearingDate || !hearingLocation) return
+
+    // [BACKEND-PENDING] Show alert about unimplemented endpoint
+    alert(
+      '⚠️ [BACKEND-PENDING] تحديث الجلسة غير متاح حالياً\n' +
+      '⚠️ [BACKEND-PENDING] Update Hearing Not Available\n\n' +
+      'نقطة النهاية: PATCH /api/cases/:id/hearings/:hearingId غير مطبقة في الخادم.\n' +
+      'Endpoint: PATCH /api/cases/:id/hearings/:hearingId is not implemented in backend.\n\n' +
+      'البديل: استخدم خيار "تحديث القضية" لتعديل معلومات الجلسة.\n' +
+      'Alternative: Use "Update Case" option to modify hearing information.'
+    )
+
+    // Endpoint not implemented - do not proceed
+    return
+
+    // Code below is commented out until backend implements the endpoint
+    /*
     await updateHearingMutation.mutateAsync({
       caseId,
       hearingId: editingHearing._id,
@@ -590,12 +606,33 @@ export function CaseDetailsView() {
     setHearingNotes('')
     setEditingHearing(null)
     setIsEditHearingOpen(false)
+    */
   }
 
   const handleDeleteHearing = async () => {
     if (!deleteHearingId) return
+
+    // [BACKEND-PENDING] Show alert about unimplemented endpoint
+    alert(
+      '⚠️ [BACKEND-PENDING] حذف الجلسة غير متاح حالياً\n' +
+      '⚠️ [BACKEND-PENDING] Delete Hearing Not Available\n\n' +
+      'نقطة النهاية: DELETE /api/cases/:id/hearings/:hearingId غير مطبقة في الخادم.\n' +
+      'Endpoint: DELETE /api/cases/:id/hearings/:hearingId is not implemented in backend.\n\n' +
+      'البديل: استخدم خيار "تحديث القضية" لإزالة معلومات الجلسة.\n' +
+      'Alternative: Use "Update Case" option to remove hearing information.'
+    )
+
+    // Close the dialog
+    setDeleteHearingId(null)
+
+    // Endpoint not implemented - do not proceed
+    return
+
+    // Code below is commented out until backend implements the endpoint
+    /*
     await deleteHearingMutation.mutateAsync({ caseId, hearingId: deleteHearingId })
     setDeleteHearingId(null)
+    */
   }
 
   // Claim handlers

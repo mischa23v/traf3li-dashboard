@@ -22,10 +22,11 @@ export const useUpdateAccountSettings = () => {
     mutationFn: (data: UpdateAccountSettings) =>
       settingsService.updateAccountSettings(data),
     onSuccess: () => {
-      toast.success('تم تحديث إعدادات الحساب بنجاح')
+      toast.success('Account settings updated successfully | تم تحديث إعدادات الحساب بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث إعدادات الحساب')
+      // Error message is already bilingual from the service
+      toast.error(error.message)
     },
     onSettled: async () => {
       // Delay to allow DB propagation
@@ -42,10 +43,11 @@ export const useUpdateAppearanceSettings = () => {
     mutationFn: (data: UpdateAppearanceSettings) =>
       settingsService.updateAppearanceSettings(data),
     onSuccess: () => {
-      toast.success('تم تحديث إعدادات المظهر بنجاح')
+      toast.success('Appearance settings updated successfully | تم تحديث إعدادات المظهر بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث إعدادات المظهر')
+      // Error message is already bilingual from the service
+      toast.error(error.message)
     },
     onSettled: async () => {
       // Delay to allow DB propagation
@@ -62,10 +64,11 @@ export const useUpdateDisplaySettings = () => {
     mutationFn: (data: UpdateDisplaySettings) =>
       settingsService.updateDisplaySettings(data),
     onSuccess: () => {
-      toast.success('تم تحديث إعدادات العرض بنجاح')
+      toast.success('Display settings updated successfully | تم تحديث إعدادات العرض بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث إعدادات العرض')
+      // Error message is already bilingual from the service
+      toast.error(error.message)
     },
     onSettled: async () => {
       // Delay to allow DB propagation
@@ -82,10 +85,11 @@ export const useUpdateNotificationSettings = () => {
     mutationFn: (data: UpdateNotificationSettings) =>
       settingsService.updateNotificationSettings(data),
     onSuccess: () => {
-      toast.success('تم تحديث إعدادات الإشعارات بنجاح')
+      toast.success('Notification settings updated successfully | تم تحديث إعدادات الإشعارات بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث إعدادات الإشعارات')
+      // Error message is already bilingual from the service
+      toast.error(error.message)
     },
     onSettled: async () => {
       // Delay to allow DB propagation

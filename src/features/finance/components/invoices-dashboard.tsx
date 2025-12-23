@@ -4,6 +4,7 @@ import {
     FileText, AlertCircle, CheckCircle, Bell, Loader2,
     Calendar, ChevronLeft, ChevronRight, Download, X
 } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
@@ -232,11 +233,15 @@ export default function InvoicesDashboard() {
                         <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
                             <AlertCircle className="h-8 w-8 text-red-500" aria-hidden="true" />
                         </div>
-                        <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل الفواتير</h3>
-                        <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">
+                            فشل تحميل الفواتير | Failed to Load Invoices
+                        </h3>
+                        <p className="text-slate-500 mb-6">
+                            {error?.message || 'حدث خطأ أثناء تحميل البيانات | An error occurred while loading data'}
+                        </p>
                         <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
                             <Loader2 className="ms-2 h-4 w-4" aria-hidden="true" />
-                            إعادة المحاولة
+                            إعادة المحاولة | Retry
                         </Button>
                     </div>
                 </Main>
@@ -529,11 +534,25 @@ export default function InvoicesDashboard() {
                                                         <DropdownMenuContent align="end">
                                                             <DropdownMenuItem asChild>
                                                                 <Link to="/dashboard/finance/invoices/$invoiceId" params={{ invoiceId: inv._id }}>
-                                                                    عرض الفاتورة
+                                                                    عرض الفاتورة | View Invoice
                                                                 </Link>
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem>تحميل PDF</DropdownMenuItem>
-                                                            <DropdownMenuItem>إرسال تذكير</DropdownMenuItem>
+                                                            <DropdownMenuItem
+                                                                onClick={() => {
+                                                                    // [BACKEND-PENDING] Invoice PDF export functionality
+                                                                    toast.info('قريباً: سيتم تفعيل تحميل الفواتير بصيغة PDF | Coming Soon: Invoice PDF download will be activated')
+                                                                }}
+                                                            >
+                                                                تحميل PDF | Download PDF [BACKEND-PENDING]
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem
+                                                                onClick={() => {
+                                                                    // [BACKEND-PENDING] Invoice reminder functionality
+                                                                    toast.info('قريباً: سيتم تفعيل إرسال التذكيرات | Coming Soon: Send reminder will be activated')
+                                                                }}
+                                                            >
+                                                                إرسال تذكير | Send Reminder [BACKEND-PENDING]
+                                                            </DropdownMenuItem>
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>
                                                 </div>

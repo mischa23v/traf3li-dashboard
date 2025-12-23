@@ -154,8 +154,9 @@ export const useCreateAccount = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.accounts() })
       toast.success('تم إنشاء الحساب بنجاح')
     },
-    onError: () => {
-      toast.error('فشل في إنشاء الحساب')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to create account | فشل في إنشاء الحساب'
+      toast.error(message)
     },
   })
 }
@@ -169,8 +170,9 @@ export const useUpdateAccount = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.accounts() })
       toast.success('تم تحديث الحساب بنجاح')
     },
-    onError: () => {
-      toast.error('فشل في تحديث الحساب')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to update account | فشل في تحديث الحساب'
+      toast.error(message)
     },
   })
 }
@@ -183,8 +185,9 @@ export const useDeleteAccount = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.accounts() })
       toast.success('تم حذف الحساب بنجاح')
     },
-    onError: () => {
-      toast.error('فشل في حذف الحساب')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to delete account | فشل في حذف الحساب'
+      toast.error(message)
     },
   })
 }
@@ -235,8 +238,9 @@ export const useCreateJournalEntry = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.journalEntries() })
       toast.success('تم إنشاء القيد بنجاح')
     },
-    onError: () => {
-      toast.error('فشل في إنشاء القيد')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to create journal entry | فشل في إنشاء القيد'
+      toast.error(message)
     },
   })
 }
@@ -249,8 +253,9 @@ export const useCreateSimpleJournalEntry = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.journalEntries() })
       toast.success('تم إنشاء القيد بنجاح')
     },
-    onError: () => {
-      toast.error('فشل في إنشاء القيد')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to create journal entry | فشل في إنشاء القيد'
+      toast.error(message)
     },
   })
 }
@@ -264,8 +269,9 @@ export const usePostJournalEntry = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.glEntries() })
       toast.success('تم ترحيل القيد بنجاح')
     },
-    onError: () => {
-      toast.error('فشل في ترحيل القيد')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to post journal entry | فشل في ترحيل القيد'
+      toast.error(message)
     },
   })
 }
@@ -278,8 +284,9 @@ export const useVoidJournalEntry = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.journalEntries() })
       toast.success('تم إلغاء القيد بنجاح')
     },
-    onError: () => {
-      toast.error('فشل في إلغاء القيد')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to void journal entry | فشل في إلغاء القيد'
+      toast.error(message)
     },
   })
 }
@@ -292,8 +299,9 @@ export const useDeleteJournalEntry = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.journalEntries() })
       toast.success('تم حذف القيد بنجاح')
     },
-    onError: () => {
-      toast.error('فشل في حذف القيد')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to delete journal entry | فشل في حذف القيد'
+      toast.error(message)
     },
   })
 }
@@ -360,8 +368,9 @@ export const useCreateFiscalYear = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.fiscalPeriods() })
       toast.success('تم إنشاء السنة المالية بنجاح')
     },
-    onError: () => {
-      toast.error('فشل في إنشاء السنة المالية')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to create fiscal year | فشل في إنشاء السنة المالية'
+      toast.error(message)
     },
   })
 }
@@ -374,8 +383,9 @@ export const useOpenFiscalPeriod = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.fiscalPeriods() })
       toast.success('تم فتح الفترة المالية')
     },
-    onError: () => {
-      toast.error('فشل في فتح الفترة المالية')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to open fiscal period | فشل في فتح الفترة المالية'
+      toast.error(message)
     },
   })
 }
@@ -388,8 +398,9 @@ export const useCloseFiscalPeriod = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.fiscalPeriods() })
       toast.success('تم إغلاق الفترة المالية')
     },
-    onError: () => {
-      toast.error('فشل في إغلاق الفترة المالية')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to close fiscal period | فشل في إغلاق الفترة المالية'
+      toast.error(message)
     },
   })
 }
@@ -402,8 +413,9 @@ export const useReopenFiscalPeriod = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.fiscalPeriods() })
       toast.success('تم إعادة فتح الفترة المالية')
     },
-    onError: () => {
-      toast.error('فشل في إعادة فتح الفترة المالية')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to reopen fiscal period | فشل في إعادة فتح الفترة المالية'
+      toast.error(message)
     },
   })
 }
@@ -416,8 +428,9 @@ export const useLockFiscalPeriod = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.fiscalPeriods() })
       toast.success('تم قفل الفترة المالية نهائياً')
     },
-    onError: () => {
-      toast.error('فشل في قفل الفترة المالية')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to lock fiscal period | فشل في قفل الفترة المالية'
+      toast.error(message)
     },
   })
 }
@@ -431,8 +444,9 @@ export const useYearEndClosing = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.journalEntries() })
       toast.success('تم إغلاق نهاية السنة بنجاح')
     },
-    onError: () => {
-      toast.error('فشل في إغلاق نهاية السنة')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to close year-end | فشل في إغلاق نهاية السنة'
+      toast.error(message)
     },
   })
 }
@@ -473,8 +487,9 @@ export const useCreateRecurringTransaction = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.recurring() })
       toast.success('تم إنشاء المعاملة المتكررة بنجاح')
     },
-    onError: () => {
-      toast.error('فشل في إنشاء المعاملة المتكررة')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to create recurring transaction | فشل في إنشاء المعاملة المتكررة'
+      toast.error(message)
     },
   })
 }
@@ -488,8 +503,9 @@ export const useUpdateRecurringTransaction = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.recurring() })
       toast.success('تم تحديث المعاملة المتكررة')
     },
-    onError: () => {
-      toast.error('فشل في تحديث المعاملة المتكررة')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to update recurring transaction | فشل في تحديث المعاملة المتكررة'
+      toast.error(message)
     },
   })
 }
@@ -502,8 +518,9 @@ export const usePauseRecurringTransaction = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.recurring() })
       toast.success('تم إيقاف المعاملة المتكررة مؤقتاً')
     },
-    onError: () => {
-      toast.error('فشل في إيقاف المعاملة المتكررة')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to pause recurring transaction | فشل في إيقاف المعاملة المتكررة'
+      toast.error(message)
     },
   })
 }
@@ -516,8 +533,9 @@ export const useResumeRecurringTransaction = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.recurring() })
       toast.success('تم استئناف المعاملة المتكررة')
     },
-    onError: () => {
-      toast.error('فشل في استئناف المعاملة المتكررة')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to resume recurring transaction | فشل في استئناف المعاملة المتكررة'
+      toast.error(message)
     },
   })
 }
@@ -530,8 +548,9 @@ export const useCancelRecurringTransaction = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.recurring() })
       toast.success('تم إلغاء المعاملة المتكررة')
     },
-    onError: () => {
-      toast.error('فشل في إلغاء المعاملة المتكررة')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to cancel recurring transaction | فشل في إلغاء المعاملة المتكررة'
+      toast.error(message)
     },
   })
 }
@@ -544,8 +563,9 @@ export const useGenerateRecurringTransaction = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.recurring() })
       toast.success('تم إنشاء المعاملة بنجاح')
     },
-    onError: () => {
-      toast.error('فشل في إنشاء المعاملة')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to generate transaction | فشل في إنشاء المعاملة'
+      toast.error(message)
     },
   })
 }
@@ -558,8 +578,9 @@ export const useDeleteRecurringTransaction = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.recurring() })
       toast.success('تم حذف المعاملة المتكررة')
     },
-    onError: () => {
-      toast.error('فشل في حذف المعاملة المتكررة')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to delete recurring transaction | فشل في حذف المعاملة المتكررة'
+      toast.error(message)
     },
   })
 }
@@ -599,8 +620,9 @@ export const useCreatePriceLevel = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.priceLevels() })
       toast.success('تم إنشاء مستوى السعر بنجاح')
     },
-    onError: () => {
-      toast.error('فشل في إنشاء مستوى السعر')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to create price level | فشل في إنشاء مستوى السعر'
+      toast.error(message)
     },
   })
 }
@@ -614,8 +636,9 @@ export const useUpdatePriceLevel = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.priceLevels() })
       toast.success('تم تحديث مستوى السعر')
     },
-    onError: () => {
-      toast.error('فشل في تحديث مستوى السعر')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to update price level | فشل في تحديث مستوى السعر'
+      toast.error(message)
     },
   })
 }
@@ -628,8 +651,9 @@ export const useDeletePriceLevel = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.priceLevels() })
       toast.success('تم حذف مستوى السعر')
     },
-    onError: () => {
-      toast.error('فشل في حذف مستوى السعر')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to delete price level | فشل في حذف مستوى السعر'
+      toast.error(message)
     },
   })
 }
@@ -642,8 +666,9 @@ export const useSetDefaultPriceLevel = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.priceLevels() })
       toast.success('تم تعيين المستوى الافتراضي')
     },
-    onError: () => {
-      toast.error('فشل في تعيين المستوى الافتراضي')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to set default price level | فشل في تعيين المستوى الافتراضي'
+      toast.error(message)
     },
   })
 }
@@ -675,8 +700,9 @@ export const useCreateBill = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.bills() })
       toast.success('تم إنشاء الفاتورة بنجاح')
     },
-    onError: () => {
-      toast.error('فشل في إنشاء الفاتورة')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to create bill | فشل في إنشاء الفاتورة'
+      toast.error(message)
     },
   })
 }
@@ -690,8 +716,9 @@ export const useUpdateBill = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.bills() })
       toast.success('تم تحديث الفاتورة')
     },
-    onError: () => {
-      toast.error('فشل في تحديث الفاتورة')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to update bill | فشل في تحديث الفاتورة'
+      toast.error(message)
     },
   })
 }
@@ -704,8 +731,9 @@ export const useApproveBill = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.bills() })
       toast.success('تم اعتماد الفاتورة')
     },
-    onError: () => {
-      toast.error('فشل في اعتماد الفاتورة')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to approve bill | فشل في اعتماد الفاتورة'
+      toast.error(message)
     },
   })
 }
@@ -720,8 +748,9 @@ export const usePayBill = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.glEntries() })
       toast.success('تم تسجيل الدفع بنجاح')
     },
-    onError: () => {
-      toast.error('فشل في تسجيل الدفع')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to record payment | فشل في تسجيل الدفع'
+      toast.error(message)
     },
   })
 }
@@ -735,8 +764,9 @@ export const usePostBillToGL = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.glEntries() })
       toast.success('تم ترحيل الفاتورة للقيود')
     },
-    onError: () => {
-      toast.error('فشل في ترحيل الفاتورة')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to post bill to GL | فشل في ترحيل الفاتورة'
+      toast.error(message)
     },
   })
 }
@@ -749,8 +779,9 @@ export const useDeleteBill = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.bills() })
       toast.success('تم حذف الفاتورة')
     },
-    onError: () => {
-      toast.error('فشل في حذف الفاتورة')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to delete bill | فشل في حذف الفاتورة'
+      toast.error(message)
     },
   })
 }
@@ -791,8 +822,9 @@ export const useCreateDebitNote = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.bills() })
       toast.success('تم إنشاء إشعار الخصم بنجاح')
     },
-    onError: () => {
-      toast.error('فشل في إنشاء إشعار الخصم')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to create debit note | فشل في إنشاء إشعار الخصم'
+      toast.error(message)
     },
   })
 }
@@ -806,8 +838,9 @@ export const useUpdateDebitNote = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.debitNotes() })
       toast.success('تم تحديث إشعار الخصم')
     },
-    onError: () => {
-      toast.error('فشل في تحديث إشعار الخصم')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to update debit note | فشل في تحديث إشعار الخصم'
+      toast.error(message)
     },
   })
 }
@@ -821,8 +854,9 @@ export const useApproveDebitNote = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.debitNotes() })
       toast.success('تم اعتماد إشعار الخصم')
     },
-    onError: () => {
-      toast.error('فشل في اعتماد إشعار الخصم')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to approve debit note | فشل في اعتماد إشعار الخصم'
+      toast.error(message)
     },
   })
 }
@@ -838,8 +872,9 @@ export const useApplyDebitNote = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.glEntries() })
       toast.success('تم تطبيق إشعار الخصم')
     },
-    onError: () => {
-      toast.error('فشل في تطبيق إشعار الخصم')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to apply debit note | فشل في تطبيق إشعار الخصم'
+      toast.error(message)
     },
   })
 }
@@ -853,8 +888,9 @@ export const useCancelDebitNote = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.debitNotes() })
       toast.success('تم إلغاء إشعار الخصم')
     },
-    onError: () => {
-      toast.error('فشل في إلغاء إشعار الخصم')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to cancel debit note | فشل في إلغاء إشعار الخصم'
+      toast.error(message)
     },
   })
 }
@@ -867,8 +903,9 @@ export const useDeleteDebitNote = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.debitNotes() })
       toast.success('تم حذف إشعار الخصم')
     },
-    onError: () => {
-      toast.error('فشل في حذف إشعار الخصم')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to delete debit note | فشل في حذف إشعار الخصم'
+      toast.error(message)
     },
   })
 }
@@ -888,8 +925,9 @@ export const useExportDebitNotes = () => {
       window.URL.revokeObjectURL(url)
       toast.success('تم تصدير إشعارات الخصم بنجاح')
     },
-    onError: () => {
-      toast.error('فشل في تصدير إشعارات الخصم')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to export debit notes | فشل في تصدير إشعارات الخصم'
+      toast.error(message)
     },
   })
 }
@@ -921,8 +959,9 @@ export const useCreateVendor = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.vendors() })
       toast.success('تم إنشاء المورد بنجاح')
     },
-    onError: () => {
-      toast.error('فشل في إنشاء المورد')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to create vendor | فشل في إنشاء المورد'
+      toast.error(message)
     },
   })
 }
@@ -936,8 +975,9 @@ export const useUpdateVendor = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.vendors() })
       toast.success('تم تحديث المورد')
     },
-    onError: () => {
-      toast.error('فشل في تحديث المورد')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to update vendor | فشل في تحديث المورد'
+      toast.error(message)
     },
   })
 }
@@ -950,8 +990,9 @@ export const useDeleteVendor = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.vendors() })
       toast.success('تم حذف المورد')
     },
-    onError: () => {
-      toast.error('فشل في حذف المورد')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to delete vendor | فشل في حذف المورد'
+      toast.error(message)
     },
   })
 }
@@ -991,8 +1032,9 @@ export const useCreateRetainer = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.retainers() })
       toast.success('تم إنشاء حساب الأمانة بنجاح')
     },
-    onError: () => {
-      toast.error('فشل في إنشاء حساب الأمانة')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to create retainer account | فشل في إنشاء حساب الأمانة'
+      toast.error(message)
     },
   })
 }
@@ -1007,8 +1049,9 @@ export const useDepositToRetainer = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.glEntries() })
       toast.success('تم إيداع المبلغ بنجاح')
     },
-    onError: () => {
-      toast.error('فشل في إيداع المبلغ')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to deposit amount | فشل في إيداع المبلغ'
+      toast.error(message)
     },
   })
 }
@@ -1023,8 +1066,9 @@ export const useConsumeFromRetainer = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.glEntries() })
       toast.success('تم السحب من حساب الأمانة')
     },
-    onError: () => {
-      toast.error('فشل في السحب من حساب الأمانة')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to withdraw from retainer account | فشل في السحب من حساب الأمانة'
+      toast.error(message)
     },
   })
 }
@@ -1065,8 +1109,9 @@ export const useCreateLead = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.leads() })
       toast.success('تم إنشاء العميل المحتمل بنجاح')
     },
-    onError: () => {
-      toast.error('فشل في إنشاء العميل المحتمل')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to create lead | فشل في إنشاء العميل المحتمل'
+      toast.error(message)
     },
   })
 }
@@ -1080,8 +1125,9 @@ export const useUpdateLead = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.leads() })
       toast.success('تم تحديث العميل المحتمل')
     },
-    onError: () => {
-      toast.error('فشل في تحديث العميل المحتمل')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to update lead | فشل في تحديث العميل المحتمل'
+      toast.error(message)
     },
   })
 }
@@ -1094,8 +1140,9 @@ export const useDeleteLead = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.leads() })
       toast.success('تم حذف العميل المحتمل')
     },
-    onError: () => {
-      toast.error('فشل في حذف العميل المحتمل')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to delete lead | فشل في حذف العميل المحتمل'
+      toast.error(message)
     },
   })
 }
@@ -1109,8 +1156,9 @@ export const useConvertLead = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.leads() })
       toast.success('تم تحويل العميل المحتمل إلى عميل فعلي')
     },
-    onError: () => {
-      toast.error('فشل في تحويل العميل المحتمل')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to convert lead | فشل في تحويل العميل المحتمل'
+      toast.error(message)
     },
   })
 }
@@ -1124,8 +1172,9 @@ export const useUpdateLeadStage = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.leads() })
       toast.success('تم تحديث مرحلة العميل المحتمل')
     },
-    onError: () => {
-      toast.error('فشل في تحديث مرحلة العميل المحتمل')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to update lead stage | فشل في تحديث مرحلة العميل المحتمل'
+      toast.error(message)
     },
   })
 }
@@ -1139,8 +1188,9 @@ export const useAddLeadActivity = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.leads() })
       toast.success('تم إضافة النشاط')
     },
-    onError: () => {
-      toast.error('فشل في إضافة النشاط')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to add activity | فشل في إضافة النشاط'
+      toast.error(message)
     },
   })
 }
@@ -1205,8 +1255,9 @@ export const usePostInvoiceToGL = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.glEntries() })
       toast.success('تم ترحيل الفاتورة للقيود')
     },
-    onError: () => {
-      toast.error('فشل في ترحيل الفاتورة')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to post bill to GL | فشل في ترحيل الفاتورة'
+      toast.error(message)
     },
   })
 }
@@ -1224,8 +1275,9 @@ export const useRecordPaymentForInvoice = () => {
       queryClient.invalidateQueries({ queryKey: accountingKeys.glEntries() })
       toast.success('تم تسجيل الدفع وترحيله للقيود')
     },
-    onError: () => {
-      toast.error('فشل في تسجيل الدفع')
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to record payment | فشل في تسجيل الدفع'
+      toast.error(message)
     },
   })
 }

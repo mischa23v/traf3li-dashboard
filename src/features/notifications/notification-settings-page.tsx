@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Settings, Bell, Mail, Smartphone, Clock } from 'lucide-react'
+import { Settings, Bell, Mail, Smartphone, Clock, AlertTriangle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useNotificationSettings, useUpdateNotificationSettings } from '@/hooks/useNotifications'
 import type { NotificationSettings } from '@/types/notification'
 
@@ -120,6 +121,21 @@ export function NotificationSettingsPage() {
           </div>
         ) : (
           <>
+            {/* Backend Pending Alert */}
+            <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-950/20">
+              <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-500" />
+              <AlertDescription className="text-amber-800 dark:text-amber-200">
+                <strong>[BACKEND-PENDING]</strong>{' '}
+                {t('notifications.settings.backendPendingWarning',
+                  'Notification settings are currently stored locally. Server synchronization will be available soon.'
+                )}{' '}
+                |{' '}
+                {t('notifications.settings.backendPendingWarningAr',
+                  'يتم حفظ إعدادات الإشعارات محلياً حالياً. ستتوفر المزامنة مع الخادم قريباً.'
+                )}
+              </AlertDescription>
+            </Alert>
+          </>
             {/* Email Notifications */}
             <Card>
               <CardHeader>

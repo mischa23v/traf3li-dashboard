@@ -75,7 +75,15 @@ async function fetchButtonCount(
 
     return 0
   } catch (error) {
-    console.error(`Error fetching count for ${entityType}.${buttonId}:`, error)
+    // [BACKEND-PENDING] Special handling for unimplemented endpoints
+    if (entityType === 'case' && buttonId === 'hearings') {
+      console.warn(
+        `⚠️ [BACKEND-PENDING] نقطة نهاية عدد الجلسات غير مطبقة | Hearings count endpoint not implemented\n` +
+        `Expected: GET /cases/${entityId}/hearings/count`
+      )
+    } else {
+      console.error(`Error fetching count for ${entityType}.${buttonId}:`, error)
+    }
     return 0
   }
 }
@@ -99,7 +107,7 @@ function getCountEndpoint(
       activities: `/clients/${entityId}/activities/count`,
     },
     case: {
-      hearings: `/cases/${entityId}/hearings/count`,
+      hearings: `/cases/${entityId}/hearings/count`, // ⚠️ [BACKEND-PENDING] Endpoint may not be implemented
       documents: `/cases/${entityId}/documents/count`,
       invoices: `/cases/${entityId}/invoices/count`,
       tasks: `/cases/${entityId}/tasks/count`,

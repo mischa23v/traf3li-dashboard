@@ -30,13 +30,13 @@ export function StaffReinstateDialog() {
     setIsSubmitting(true)
     try {
       await firmService.reinstateMember(firmId, currentRow._id)
-      toast.success('تمت إعادة تفعيل الموظف بنجاح')
+      toast.success('Member reinstated successfully | تمت إعادة تفعيل الموظف بنجاح')
       queryClient.invalidateQueries({ queryKey: ['staff'] })
       queryClient.invalidateQueries({ queryKey: ['team'] })
       queryClient.invalidateQueries({ queryKey: ['departed'] })
       setOpen(null)
     } catch (error: any) {
-      toast.error(error.message || 'فشل في إعادة تفعيل الموظف')
+      toast.error(error.message || 'Failed to reinstate member | فشل في إعادة تفعيل الموظف')
     } finally {
       setIsSubmitting(false)
     }

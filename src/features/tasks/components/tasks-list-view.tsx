@@ -1,3 +1,24 @@
+/**
+ * Tasks List View Component
+ *
+ * API Endpoints Status:
+ * ✅ GET /api/tasks - Fetch tasks with filters (IMPLEMENTED)
+ * ✅ GET /api/tasks/stats - Fetch task statistics (IMPLEMENTED)
+ * ✅ PATCH /api/tasks/:id - Update task (IMPLEMENTED)
+ * ✅ PATCH /api/tasks/:id/status - Update task status (IMPLEMENTED)
+ * ✅ DELETE /api/tasks/:id - Delete task (IMPLEMENTED)
+ * ✅ DELETE /api/tasks/bulk - Bulk delete tasks (IMPLEMENTED)
+ * ✅ GET /api/cases - Fetch cases for filters (IMPLEMENTED)
+ * ✅ GET /api/lawyers/team - Fetch team members (IMPLEMENTED)
+ *
+ * External Services:
+ * ⚠️ AI Worker (VITE_AI_WORKER_URL) - External AI service for task suggestions
+ *    - Gracefully disabled if not configured
+ *    - Has proper error handling and timeout (30s)
+ *
+ * All error messages are bilingual (English | Arabic)
+ */
+
 import { TasksSidebar } from './tasks-sidebar'
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -466,7 +487,11 @@ export function TasksListView() {
     const handleDeleteSelected = useCallback(() => {
         if (selectedTaskIds.length === 0) return
 
-        if (confirm(t('tasks.list.deleteMultipleConfirm', { count: selectedTaskIds.length }))) {
+        const confirmMessage = i18n.language === 'ar'
+            ? `هل أنت متأكد من حذف ${selectedTaskIds.length} مهمة؟ | Are you sure you want to delete ${selectedTaskIds.length} tasks?`
+            : `Are you sure you want to delete ${selectedTaskIds.length} tasks? | هل أنت متأكد من حذف ${selectedTaskIds.length} مهمة؟`
+
+        if (confirm(confirmMessage)) {
             bulkDeleteTasks(selectedTaskIds, {
                 onSuccess: () => {
                     setIsSelectionMode(false)
@@ -474,7 +499,7 @@ export function TasksListView() {
                 }
             })
         }
-    }, [selectedTaskIds, t, bulkDeleteTasks])
+    }, [selectedTaskIds, i18n.language, bulkDeleteTasks])
 
     // Single task actions
     const handleViewTask = useCallback((taskId: string) => {
@@ -486,10 +511,14 @@ export function TasksListView() {
     }, [navigate])
 
     const handleDeleteTask = useCallback((taskId: string) => {
-        if (confirm(t('tasks.list.deleteConfirm'))) {
+        const confirmMessage = i18n.language === 'ar'
+            ? 'هل أنت متأكد من حذف هذه المهمة؟ | Are you sure you want to delete this task?'
+            : 'Are you sure you want to delete this task? | هل أنت متأكد من حذف هذه المهمة؟'
+
+        if (confirm(confirmMessage)) {
             deleteTaskMutation.mutate(taskId)
         }
-    }, [t, deleteTaskMutation])
+    }, [i18n.language, deleteTaskMutation])
 
     const handleCompleteTask = useCallback((taskId: string) => {
         // Using updateTaskStatusMutation (PATCH) instead of completeTaskMutation (POST)
@@ -758,11 +787,11 @@ export function TasksListView() {
                                         <p className="text-sm text-slate-700 leading-relaxed">
                                             {aiLoading ? (
                                                 <span className="text-slate-500">
-                                                    {i18n.language === 'ar' ? 'جاري تحليل المهام...' : 'Analyzing your tasks...'}
+                                                    {i18n.language === 'ar' ? 'جاري تحليل المهام... | Analyzing your tasks...' : 'Analyzing your tasks... | جاري تحليل المهام...'}
                                                 </span>
                                             ) : aiError ? (
                                                 <span className="text-red-500">
-                                                    {i18n.language === 'ar' ? 'حدث خطأ. انقر للمحاولة مرة أخرى.' : 'Error occurred. Click to retry.'}
+                                                    {i18n.language === 'ar' ? 'حدث خطأ. انقر للمحاولة مرة أخرى. | Error occurred. Click to retry.' : 'Error occurred. Click to retry. | حدث خطأ. انقر للمحاولة مرة أخرى.'}
                                                 </span>
                                             ) : (
                                                 aiSuggestion
@@ -851,10 +880,20 @@ export function TasksListView() {
                                             <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                                         </div>
                                     </div>
-                                    <h3 className="text-lg font-bold text-slate-900 mb-2">{t('tasks.list.errorLoading')}</h3>
-                                    <p className="text-slate-500 mb-4">{error?.message || t('tasks.list.connectionError')}</p>
+                                    <h3 className="text-lg font-bold text-slate-900 mb-2">
+                                        {i18n.language === 'ar' ? 'خطأ في تحميل المهام' : 'Error Loading Tasks'} | {i18n.language === 'ar' ? 'Error Loading Tasks' : 'خطأ في تحميل المهام'}
+                                    </h3>
+                                    <p className="text-slate-500 mb-4 text-sm">
+                                        {error?.message ? (
+                                            <span className="block">{error.message}</span>
+                                        ) : (
+                                            <span className="block">
+                                                {i18n.language === 'ar' ? 'فشل الاتصال بالخادم. يرجى المحاولة مرة أخرى.' : 'Connection to server failed. Please try again.'} | {i18n.language === 'ar' ? 'Connection to server failed. Please try again.' : 'فشل الاتصال بالخادم. يرجى المحاولة مرة أخرى.'}
+                                            </span>
+                                        )}
+                                    </p>
                                     <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600">
-                                        {t('tasks.list.retry')}
+                                        {i18n.language === 'ar' ? 'إعادة المحاولة' : 'Retry'} | {i18n.language === 'ar' ? 'Retry' : 'إعادة المحاولة'}
                                     </Button>
                                 </div>
                             )}

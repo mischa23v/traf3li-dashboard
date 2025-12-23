@@ -342,13 +342,23 @@ const documentsService = {
   },
 
   // Encrypt document
+  // [BACKEND-PENDING] Endpoint may not be fully implemented - S3-level encryption preferred
   encryptDocument: async (id: string): Promise<Document> => {
+    console.warn(
+      '[BACKEND-PENDING] POST /documents/:id/encrypt - This endpoint may not be fully implemented. ' +
+      'Consider using S3-level encryption for better security and performance.'
+    )
     const response = await api.post(`/documents/${id}/encrypt`)
     return response.data
   },
 
   // Decrypt document
+  // [BACKEND-PENDING] Endpoint may not be fully implemented - S3-level encryption preferred
   decryptDocument: async (id: string): Promise<Blob> => {
+    console.warn(
+      '[BACKEND-PENDING] POST /documents/:id/decrypt - This endpoint may not be fully implemented. ' +
+      'Decryption should be handled at S3 level with proper key management.'
+    )
     const response = await api.post(`/documents/${id}/decrypt`, {
       responseType: 'blob',
     })

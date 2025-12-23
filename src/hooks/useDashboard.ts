@@ -182,6 +182,12 @@ export const useTasksChart = (months = 12, isTabActive = true) => {
 
 // ==================== LAWYER-FOCUSED HOOKS ====================
 
+/**
+ * Get upcoming hearings
+ * ⚠️ [BACKEND-PENDING] This endpoint is not implemented in backend yet
+ * GET /dashboard/hearings/upcoming
+ * Returns empty data until backend implements the endpoint
+ */
 export const useUpcomingHearings = (days = 7) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 

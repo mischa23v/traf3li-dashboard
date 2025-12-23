@@ -1206,6 +1206,7 @@ const tasksService = {
 
   /**
    * Add task dependency
+   * ⚠️ WARNING: This endpoint is NOT documented in backend API
    */
   addDependency: async (taskId: string, dependencyTaskId: string, type: 'blocks' | 'blocked_by'): Promise<Task> => {
     try {
@@ -1215,31 +1216,75 @@ const tasksService = {
       })
       return response.data.task || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      if (error?.response?.status === 404) {
+        throw new Error(
+          bilingualError(
+            'Task dependencies feature is not available yet',
+            'ميزة تبعيات المهام غير متاحة بعد'
+          )
+        )
+      }
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to add task dependency: ${errorMsg}`,
+          `فشل في إضافة تبعية المهمة: ${errorMsg}`
+        )
+      )
     }
   },
 
   /**
    * Remove task dependency
+   * ⚠️ WARNING: This endpoint is NOT documented in backend API
    */
   removeDependency: async (taskId: string, dependencyTaskId: string): Promise<Task> => {
     try {
       const response = await apiClient.delete(`/tasks/${taskId}/dependencies/${dependencyTaskId}`)
       return response.data.task || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      if (error?.response?.status === 404) {
+        throw new Error(
+          bilingualError(
+            'Task dependencies feature is not available yet',
+            'ميزة تبعيات المهام غير متاحة بعد'
+          )
+        )
+      }
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to remove task dependency: ${errorMsg}`,
+          `فشل في إزالة تبعية المهمة: ${errorMsg}`
+        )
+      )
     }
   },
 
   /**
    * Get tasks that can be dependencies (not creating circular refs)
+   * ⚠️ WARNING: This endpoint is NOT documented in backend API
    */
   getAvailableDependencies: async (taskId: string): Promise<Task[]> => {
     try {
       const response = await apiClient.get(`/tasks/${taskId}/available-dependencies`)
       return response.data.tasks || response.data.data || []
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      if (error?.response?.status === 404) {
+        throw new Error(
+          bilingualError(
+            'Task dependencies feature is not available yet',
+            'ميزة تبعيات المهام غير متاحة بعد'
+          )
+        )
+      }
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to get available dependencies: ${errorMsg}`,
+          `فشل في الحصول على التبعيات المتاحة: ${errorMsg}`
+        )
+      )
     }
   },
 
@@ -1247,49 +1292,109 @@ const tasksService = {
 
   /**
    * Add workflow rule to task
+   * ⚠️ WARNING: This endpoint is NOT documented in backend API
    */
   addWorkflowRule: async (taskId: string, rule: Omit<WorkflowRule, '_id' | 'createdAt' | 'createdBy'>): Promise<Task> => {
     try {
       const response = await apiClient.post(`/tasks/${taskId}/workflow-rules`, rule)
       return response.data.task || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      if (error?.response?.status === 404) {
+        throw new Error(
+          bilingualError(
+            'Workflow rules feature is not available yet',
+            'ميزة قواعد سير العمل غير متاحة بعد'
+          )
+        )
+      }
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to add workflow rule: ${errorMsg}`,
+          `فشل في إضافة قاعدة سير العمل: ${errorMsg}`
+        )
+      )
     }
   },
 
   /**
    * Update workflow rule
+   * ⚠️ WARNING: This endpoint is NOT documented in backend API
    */
   updateWorkflowRule: async (taskId: string, ruleId: string, rule: Partial<WorkflowRule>): Promise<Task> => {
     try {
       const response = await apiClient.patch(`/tasks/${taskId}/workflow-rules/${ruleId}`, rule)
       return response.data.task || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      if (error?.response?.status === 404) {
+        throw new Error(
+          bilingualError(
+            'Workflow rules feature is not available yet',
+            'ميزة قواعد سير العمل غير متاحة بعد'
+          )
+        )
+      }
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to update workflow rule: ${errorMsg}`,
+          `فشل في تحديث قاعدة سير العمل: ${errorMsg}`
+        )
+      )
     }
   },
 
   /**
    * Delete workflow rule
+   * ⚠️ WARNING: This endpoint is NOT documented in backend API
    */
   deleteWorkflowRule: async (taskId: string, ruleId: string): Promise<Task> => {
     try {
       const response = await apiClient.delete(`/tasks/${taskId}/workflow-rules/${ruleId}`)
       return response.data.task || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      if (error?.response?.status === 404) {
+        throw new Error(
+          bilingualError(
+            'Workflow rules feature is not available yet',
+            'ميزة قواعد سير العمل غير متاحة بعد'
+          )
+        )
+      }
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to delete workflow rule: ${errorMsg}`,
+          `فشل في حذف قاعدة سير العمل: ${errorMsg}`
+        )
+      )
     }
   },
 
   /**
    * Toggle workflow rule active status
+   * ⚠️ WARNING: This endpoint is NOT documented in backend API
    */
   toggleWorkflowRule: async (taskId: string, ruleId: string): Promise<Task> => {
     try {
       const response = await apiClient.post(`/tasks/${taskId}/workflow-rules/${ruleId}/toggle`)
       return response.data.task || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      if (error?.response?.status === 404) {
+        throw new Error(
+          bilingualError(
+            'Workflow rules feature is not available yet',
+            'ميزة قواعد سير العمل غير متاحة بعد'
+          )
+        )
+      }
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to toggle workflow rule: ${errorMsg}`,
+          `فشل في تبديل قاعدة سير العمل: ${errorMsg}`
+        )
+      )
     }
   },
 
@@ -1297,13 +1402,28 @@ const tasksService = {
 
   /**
    * Update task outcome (for court cases, deadlines, etc.)
+   * ⚠️ WARNING: This endpoint is NOT documented in backend API
    */
   updateOutcome: async (taskId: string, outcome: TaskOutcome): Promise<Task> => {
     try {
       const response = await apiClient.patch(`/tasks/${taskId}/outcome`, outcome)
       return response.data.task || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      if (error?.response?.status === 404) {
+        throw new Error(
+          bilingualError(
+            'Task outcome feature is not available yet',
+            'ميزة نتيجة المهمة غير متاحة بعد'
+          )
+        )
+      }
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to update task outcome: ${errorMsg}`,
+          `فشل في تحديث نتيجة المهمة: ${errorMsg}`
+        )
+      )
     }
   },
 
@@ -1311,13 +1431,28 @@ const tasksService = {
 
   /**
    * Update time/budget estimate
+   * ⚠️ WARNING: This endpoint is NOT documented in backend API
    */
   updateEstimate: async (taskId: string, estimate: TimeBudget): Promise<Task> => {
     try {
       const response = await apiClient.patch(`/tasks/${taskId}/estimate`, estimate)
       return response.data.task || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      if (error?.response?.status === 404) {
+        throw new Error(
+          bilingualError(
+            'Time estimate feature is not available yet. Use estimatedMinutes field when creating/updating tasks.',
+            'ميزة تقدير الوقت غير متاحة بعد. استخدم حقل estimatedMinutes عند إنشاء/تحديث المهام.'
+          )
+        )
+      }
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to update time estimate: ${errorMsg}`,
+          `فشل في تحديث تقدير الوقت: ${errorMsg}`
+        )
+      )
     }
   },
 
@@ -1631,6 +1766,7 @@ const tasksService = {
 
   /**
    * Create a new document with TipTap content
+   * ⚠️ WARNING: This endpoint is NOT documented in backend API
    */
   createDocument: async (
     taskId: string,
@@ -1647,12 +1783,27 @@ const tasksService = {
       })
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      if (error?.response?.status === 404) {
+        throw new Error(
+          bilingualError(
+            'Document editor feature is not available yet. Use attachments instead.',
+            'ميزة محرر المستندات غير متاحة بعد. استخدم المرفقات بدلاً من ذلك.'
+          )
+        )
+      }
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to create document: ${errorMsg}`,
+          `فشل في إنشاء المستند: ${errorMsg}`
+        )
+      )
     }
   },
 
   /**
    * Get a document
+   * ⚠️ WARNING: This endpoint is NOT documented in backend API
    * Returns null document if not found (404)
    */
   getDocument: async (taskId: string, documentId: string): Promise<{ document: TaskDocument | null }> => {
@@ -1660,16 +1811,23 @@ const tasksService = {
       const response = await apiClient.get(`/tasks/${taskId}/documents/${documentId}`)
       return response.data
     } catch (error: any) {
-      // Handle 404 gracefully
+      // Handle 404 gracefully - endpoint not implemented
       if (error?.response?.status === 404) {
         return { document: null }
       }
-      throw new Error(handleApiError(error))
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to get document: ${errorMsg}`,
+          `فشل في الحصول على المستند: ${errorMsg}`
+        )
+      )
     }
   },
 
   /**
    * Update a document
+   * ⚠️ WARNING: This endpoint is NOT documented in backend API
    */
   updateDocument: async (
     taskId: string,
@@ -1683,12 +1841,27 @@ const tasksService = {
       })
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      if (error?.response?.status === 404) {
+        throw new Error(
+          bilingualError(
+            'Document editor feature is not available yet',
+            'ميزة محرر المستندات غير متاحة بعد'
+          )
+        )
+      }
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to update document: ${errorMsg}`,
+          `فشل في تحديث المستند: ${errorMsg}`
+        )
+      )
     }
   },
 
   /**
    * Delete a document
+   * Note: Uses attachments endpoint as fallback
    */
   deleteDocument: async (taskId: string, documentId: string): Promise<void> => {
     try {
@@ -1699,12 +1872,19 @@ const tasksService = {
       if (error?.response?.status === 404 || error?.status === 404 || error?.status === '404') {
         return
       }
-      throw new Error(handleApiError(error))
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to delete document: ${errorMsg}`,
+          `فشل في حذف المستند: ${errorMsg}`
+        )
+      )
     }
   },
 
   /**
    * Get all documents for a task
+   * ⚠️ WARNING: This endpoint is NOT documented in backend API
    * Returns empty array if endpoint not implemented (404)
    */
   getDocuments: async (taskId: string): Promise<{ documents: TaskDocument[] }> => {
@@ -1716,7 +1896,13 @@ const tasksService = {
       if (error?.response?.status === 404) {
         return { documents: [] }
       }
-      throw new Error(handleApiError(error))
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to get documents: ${errorMsg}`,
+          `فشل في الحصول على المستندات: ${errorMsg}`
+        )
+      )
     }
   },
 
@@ -1724,6 +1910,7 @@ const tasksService = {
 
   /**
    * Upload voice memo
+   * ⚠️ WARNING: This endpoint is NOT documented in backend API
    */
   uploadVoiceMemo: async (
     taskId: string,
@@ -1742,12 +1929,27 @@ const tasksService = {
       })
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      if (error?.response?.status === 404) {
+        throw new Error(
+          bilingualError(
+            'Voice memo feature is not available yet. Use regular attachments instead.',
+            'ميزة المذكرات الصوتية غير متاحة بعد. استخدم المرفقات العادية بدلاً من ذلك.'
+          )
+        )
+      }
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to upload voice memo: ${errorMsg}`,
+          `فشل في تحميل المذكرة الصوتية: ${errorMsg}`
+        )
+      )
     }
   },
 
   /**
    * Update voice memo transcription
+   * ⚠️ WARNING: This endpoint is NOT documented in backend API
    */
   updateVoiceMemoTranscription: async (
     taskId: string,
@@ -1760,18 +1962,47 @@ const tasksService = {
       })
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      if (error?.response?.status === 404) {
+        throw new Error(
+          bilingualError(
+            'Voice memo transcription feature is not available yet',
+            'ميزة نسخ المذكرات الصوتية غير متاحة بعد'
+          )
+        )
+      }
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to update voice memo transcription: ${errorMsg}`,
+          `فشل في تحديث نسخ المذكرة الصوتية: ${errorMsg}`
+        )
+      )
     }
   },
 
   /**
    * Delete voice memo
+   * ⚠️ WARNING: This endpoint is NOT documented in backend API
    */
   deleteVoiceMemo: async (taskId: string, memoId: string): Promise<void> => {
     try {
       await apiClient.delete(`/tasks/${taskId}/voice-memos/${memoId}`)
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      if (error?.response?.status === 404) {
+        throw new Error(
+          bilingualError(
+            'Voice memo feature is not available yet',
+            'ميزة المذكرات الصوتية غير متاحة بعد'
+          )
+        )
+      }
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to delete voice memo: ${errorMsg}`,
+          `فشل في حذف المذكرة الصوتية: ${errorMsg}`
+        )
+      )
     }
   },
 }

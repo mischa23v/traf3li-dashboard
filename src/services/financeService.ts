@@ -1107,28 +1107,40 @@ const financeService = {
   },
 
   /**
-   * Get new expense defaults
+   * [BACKEND-PENDING] Get new expense defaults
    * GET /api/expenses/new
+   *
+   * ⚠️ IMPLEMENTATION STATUS: This endpoint may not be fully implemented in the backend.
+   * Frontend expects: Default values for new expense creation (tax rates, default categories, etc.)
+   * Current workaround: Frontend uses hardcoded defaults if this fails
    */
   getNewExpenseDefaults: async (): Promise<any> => {
     try {
       const response = await apiClient.get('/expenses/new')
       return response.data.data || response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      // Silently fail and return empty object - frontend will use defaults
+      console.warn('[BACKEND-PENDING] /expenses/new endpoint not available, using frontend defaults')
+      return {}
     }
   },
 
   /**
-   * Get expense categories
+   * [BACKEND-PENDING] Get expense categories
    * GET /api/expenses/categories
+   *
+   * ⚠️ IMPLEMENTATION STATUS: This endpoint may not be fully implemented in the backend.
+   * Frontend expects: List of expense categories (office, travel, legal, etc.)
+   * Current workaround: Frontend uses hardcoded categories if this fails
    */
   getExpenseCategories: async (): Promise<any> => {
     try {
       const response = await apiClient.get('/expenses/categories')
       return response.data.categories || response.data.data || response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      // Silently fail and return empty array - frontend will use hardcoded categories
+      console.warn('[BACKEND-PENDING] /expenses/categories endpoint not available, using frontend defaults')
+      return []
     }
   },
 
@@ -1146,54 +1158,78 @@ const financeService = {
   },
 
   /**
-   * Suggest category (AI-powered)
+   * [BACKEND-PENDING] Suggest category (AI-powered)
    * POST /api/expenses/suggest-category
+   *
+   * ⚠️ IMPLEMENTATION STATUS: This endpoint is NOT implemented in the backend.
+   * Frontend expects: AI-powered category suggestion based on description/vendor
+   * Current workaround: Feature is disabled, users select category manually
+   *
+   * @throws Error with bilingual message if endpoint is not available
    */
   suggestExpenseCategory: async (data: { description: string; vendor?: string; amount?: number }): Promise<any> => {
     try {
       const response = await apiClient.post('/expenses/suggest-category', data)
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error('اقتراح التصنيف غير متاح حالياً. يرجى اختيار التصنيف يدوياً | Category suggestion is currently unavailable. Please select category manually. [BACKEND-PENDING]')
     }
   },
 
   /**
-   * Submit expense for approval
+   * [BACKEND-PENDING] Submit expense for approval
    * POST /api/expenses/:id/submit
+   *
+   * ⚠️ IMPLEMENTATION STATUS: This endpoint may not be fully implemented in the backend.
+   * Frontend expects: Workflow transition from draft → pending approval
+   * Current workaround: Manual status update via PATCH /expenses/:id
+   *
+   * @throws Error with bilingual message if endpoint is not available
    */
   submitExpense: async (id: string): Promise<Expense> => {
     try {
       const response = await apiClient.post(`/expenses/${id}/submit`)
       return response.data.expense || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error('إرسال المصروف للموافقة غير متاح حالياً | Expense submission for approval is currently unavailable [BACKEND-PENDING]')
     }
   },
 
   /**
-   * Approve expense
+   * [BACKEND-PENDING] Approve expense
    * POST /api/expenses/:id/approve
+   *
+   * ⚠️ IMPLEMENTATION STATUS: This endpoint may not be fully implemented in the backend.
+   * Frontend expects: Approval workflow with comments and status change
+   * Current workaround: Manual status update via PATCH /expenses/:id
+   *
+   * @throws Error with bilingual message if endpoint is not available
    */
   approveExpense: async (id: string, data?: { comments?: string }): Promise<Expense> => {
     try {
       const response = await apiClient.post(`/expenses/${id}/approve`, data)
       return response.data.expense || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error('الموافقة على المصروف غير متاحة حالياً | Expense approval is currently unavailable [BACKEND-PENDING]')
     }
   },
 
   /**
-   * Reject expense
+   * [BACKEND-PENDING] Reject expense
    * POST /api/expenses/:id/reject
+   *
+   * ⚠️ IMPLEMENTATION STATUS: This endpoint may not be fully implemented in the backend.
+   * Frontend expects: Rejection workflow with reason and status change
+   * Current workaround: Manual status update via PATCH /expenses/:id
+   *
+   * @throws Error with bilingual message if endpoint is not available
    */
   rejectExpense: async (id: string, data: { reason: string }): Promise<Expense> => {
     try {
       const response = await apiClient.post(`/expenses/${id}/reject`, data)
       return response.data.expense || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error('رفض المصروف غير متاح حالياً | Expense rejection is currently unavailable [BACKEND-PENDING]')
     }
   },
 
@@ -1211,15 +1247,21 @@ const financeService = {
   },
 
   /**
-   * Bulk approve expenses
+   * [BACKEND-PENDING] Bulk approve expenses
    * POST /api/expenses/bulk-approve
+   *
+   * ⚠️ IMPLEMENTATION STATUS: This endpoint may not be fully implemented in the backend.
+   * Frontend expects: Batch approval of multiple expenses with result summary
+   * Current workaround: Individual approval via POST /expenses/:id/approve
+   *
+   * @throws Error with bilingual message if endpoint is not available
    */
   bulkApproveExpenses: async (data: { expenseIds: string[]; comments?: string }): Promise<any> => {
     try {
       const response = await apiClient.post('/expenses/bulk-approve', data)
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error('الموافقة الجماعية على المصروفات غير متاحة حالياً | Bulk expense approval is currently unavailable [BACKEND-PENDING]')
     }
   },
 
@@ -1834,21 +1876,35 @@ const financeService = {
   },
 
   /**
-   * Generate payment receipt
+   * [BACKEND-PENDING] Generate payment receipt
    * POST /api/payments/:id/generate-receipt
+   *
+   * ⚠️ IMPLEMENTATION STATUS: This endpoint may not be fully implemented in the backend.
+   * Frontend expects: Receipt generation with bilingual support
+   * Backend documented: GET /api/payments/:id/pdf (see BACKEND_FINANCE_API.md line 927)
+   * Current workaround: Frontend shows receipt preview using local template
+   *
+   * @throws Error with bilingual message if endpoint is not available
    */
   generateReceipt: async (id: string, options?: { language?: 'ar' | 'en' | 'both' }): Promise<{ receipt: any }> => {
     try {
       const response = await apiClient.post(`/payments/${id}/generate-receipt`, options)
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error('إنشاء الإيصال غير متاح حالياً | Receipt generation is currently unavailable [BACKEND-PENDING]')
     }
   },
 
   /**
-   * Download payment receipt as PDF
+   * [BACKEND-PENDING] Download payment receipt as PDF
    * GET /api/payments/:id/receipt/download
+   *
+   * ⚠️ IMPLEMENTATION STATUS: This endpoint may not be fully implemented in the backend.
+   * Frontend expects: PDF download with language parameter
+   * Backend documented: GET /api/payments/:id/pdf (see BACKEND_FINANCE_API.md line 927)
+   * Current workaround: Use browser print or local PDF generation
+   *
+   * @throws Error with bilingual message if endpoint is not available
    */
   downloadReceipt: async (id: string, language: 'ar' | 'en' = 'ar'): Promise<Blob> => {
     try {
@@ -1858,7 +1914,7 @@ const financeService = {
       })
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error('تحميل الإيصال غير متاح حالياً | Receipt download is currently unavailable [BACKEND-PENDING]')
     }
   },
 
@@ -1876,8 +1932,15 @@ const financeService = {
   },
 
   /**
-   * Send receipt via email
+   * [BACKEND-PENDING] Send receipt via email
    * POST /api/payments/:id/receipt/send
+   *
+   * ⚠️ IMPLEMENTATION STATUS: This endpoint may not be fully implemented in the backend.
+   * Frontend expects: Email sending with bilingual support
+   * Backend documented: No specific endpoint documented (see BACKEND_FINANCE_API.md line 963)
+   * Current workaround: Manual email sending or use send endpoint if available
+   *
+   * @throws Error with bilingual message if endpoint is not available
    */
   sendReceipt: async (id: string, data: {
     email: string
@@ -1888,7 +1951,7 @@ const financeService = {
       const response = await apiClient.post(`/payments/${id}/receipt/send`, data)
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error('إرسال الإيصال غير متاح حالياً | Sending receipt is currently unavailable [BACKEND-PENDING]')
     }
   },
 

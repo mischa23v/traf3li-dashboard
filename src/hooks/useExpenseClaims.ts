@@ -1,3 +1,18 @@
+/**
+ * ⚠️ WARNING: Backend Endpoint Mismatch | تحذير: عدم تطابق نقاط النهاية
+ *
+ * EN: This hook uses /hr/expense-claims/* endpoints which DO NOT exist in the backend.
+ * All mutations will fail with 404 errors until backend implements these endpoints.
+ * The expenseClaimsService.ts has bilingual error handling for these failures.
+ *
+ * AR: تستخدم هذه الدالة نقاط النهاية /hr/expense-claims/* التي لا توجد في الخادم.
+ * جميع الطلبات ستفشل بأخطاء 404 حتى يتم تنفيذ هذه النقاط في الخادم.
+ * يحتوي expenseClaimsService.ts على معالجة أخطاء ثنائية اللغة لهذه الحالات.
+ *
+ * @deprecated These endpoints are not implemented in the backend
+ * @deprecated نقاط النهاية هذه غير مطبقة في الخادم
+ */
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   getExpenseClaims,
@@ -151,10 +166,22 @@ export const useCorporateCardTransactions = (employeeId: string, filters?: {
 }
 
 // Create expense claim
+/**
+ * @deprecated Backend endpoint not implemented - POST /hr/expense-claims
+ * @deprecated نقطة النهاية غير مطبقة في الخادم
+ */
 export const useCreateExpenseClaim = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: CreateExpenseClaimData) => createExpenseClaim(data),
+    mutationFn: (data: CreateExpenseClaimData) => {
+      console.warn(
+        '⚠️  ENDPOINT NOT IMPLEMENTED | نقطة النهاية غير مطبقة\n' +
+        'useCreateExpenseClaim() calls POST /hr/expense-claims which does not exist in the backend.\n' +
+        'useCreateExpenseClaim() تستدعي POST /hr/expense-claims التي لا توجد في الخادم.\n' +
+        'This request will fail with 404 error. | سيفشل هذا الطلب بخطأ 404.'
+      )
+      return createExpenseClaim(data)
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: expenseClaimKeys.lists() })
       queryClient.invalidateQueries({ queryKey: expenseClaimKeys.stats() })
@@ -163,11 +190,22 @@ export const useCreateExpenseClaim = () => {
 }
 
 // Update expense claim
+/**
+ * @deprecated Backend endpoint not implemented - PATCH /hr/expense-claims/:id
+ * @deprecated نقطة النهاية غير مطبقة في الخادم
+ */
 export const useUpdateExpenseClaim = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ claimId, data }: { claimId: string; data: UpdateExpenseClaimData }) =>
-      updateExpenseClaim(claimId, data),
+    mutationFn: ({ claimId, data }: { claimId: string; data: UpdateExpenseClaimData }) => {
+      console.warn(
+        '⚠️  ENDPOINT NOT IMPLEMENTED | نقطة النهاية غير مطبقة\n' +
+        'useUpdateExpenseClaim() calls PATCH /hr/expense-claims/:id which does not exist in the backend.\n' +
+        'useUpdateExpenseClaim() تستدعي PATCH /hr/expense-claims/:id التي لا توجد في الخادم.\n' +
+        'This request will fail with 404 error. | سيفشل هذا الطلب بخطأ 404.'
+      )
+      return updateExpenseClaim(claimId, data)
+    },
     onSuccess: (_, { claimId }) => {
       queryClient.invalidateQueries({ queryKey: expenseClaimKeys.detail(claimId) })
       queryClient.invalidateQueries({ queryKey: expenseClaimKeys.lists() })
@@ -176,10 +214,22 @@ export const useUpdateExpenseClaim = () => {
 }
 
 // Delete expense claim
+/**
+ * @deprecated Backend endpoint not implemented - DELETE /hr/expense-claims/:id
+ * @deprecated نقطة النهاية غير مطبقة في الخادم
+ */
 export const useDeleteExpenseClaim = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (claimId: string) => deleteExpenseClaim(claimId),
+    mutationFn: (claimId: string) => {
+      console.warn(
+        '⚠️  ENDPOINT NOT IMPLEMENTED | نقطة النهاية غير مطبقة\n' +
+        'useDeleteExpenseClaim() calls DELETE /hr/expense-claims/:id which does not exist in the backend.\n' +
+        'useDeleteExpenseClaim() تستدعي DELETE /hr/expense-claims/:id التي لا توجد في الخادم.\n' +
+        'This request will fail with 404 error. | سيفشل هذا الطلب بخطأ 404.'
+      )
+      return deleteExpenseClaim(claimId)
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: expenseClaimKeys.lists() })
       queryClient.invalidateQueries({ queryKey: expenseClaimKeys.stats() })
@@ -188,10 +238,22 @@ export const useDeleteExpenseClaim = () => {
 }
 
 // Submit expense claim
+/**
+ * @deprecated Backend endpoint not implemented - POST /hr/expense-claims/:id/submit
+ * @deprecated نقطة النهاية غير مطبقة في الخادم
+ */
 export const useSubmitExpenseClaim = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (claimId: string) => submitExpenseClaim(claimId),
+    mutationFn: (claimId: string) => {
+      console.warn(
+        '⚠️  ENDPOINT NOT IMPLEMENTED | نقطة النهاية غير مطبقة\n' +
+        'useSubmitExpenseClaim() calls POST /hr/expense-claims/:id/submit which does not exist in the backend.\n' +
+        'useSubmitExpenseClaim() تستدعي POST /hr/expense-claims/:id/submit التي لا توجد في الخادم.\n' +
+        'This request will fail with 404 error. | سيفشل هذا الطلب بخطأ 404.'
+      )
+      return submitExpenseClaim(claimId)
+    },
     onSuccess: (_, claimId) => {
       queryClient.invalidateQueries({ queryKey: expenseClaimKeys.detail(claimId) })
       queryClient.invalidateQueries({ queryKey: expenseClaimKeys.lists() })
@@ -201,13 +263,25 @@ export const useSubmitExpenseClaim = () => {
 }
 
 // Approve expense claim
+/**
+ * @deprecated Backend endpoint not implemented - POST /hr/expense-claims/:id/approve
+ * @deprecated نقطة النهاية غير مطبقة في الخادم
+ */
 export const useApproveExpenseClaim = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ claimId, data }: {
       claimId: string
       data: { approvedAmount?: number; comments?: string }
-    }) => approveExpenseClaim(claimId, data),
+    }) => {
+      console.warn(
+        '⚠️  ENDPOINT NOT IMPLEMENTED | نقطة النهاية غير مطبقة\n' +
+        'useApproveExpenseClaim() calls POST /hr/expense-claims/:id/approve which does not exist in the backend.\n' +
+        'useApproveExpenseClaim() تستدعي POST /hr/expense-claims/:id/approve التي لا توجد في الخادم.\n' +
+        'This request will fail with 404 error. | سيفشل هذا الطلب بخطأ 404.'
+      )
+      return approveExpenseClaim(claimId, data)
+    },
     onSuccess: (_, { claimId }) => {
       queryClient.invalidateQueries({ queryKey: expenseClaimKeys.detail(claimId) })
       queryClient.invalidateQueries({ queryKey: expenseClaimKeys.lists() })
@@ -250,6 +324,10 @@ export const useRequestClaimChanges = () => {
 }
 
 // Process payment
+/**
+ * @deprecated Backend endpoint not implemented - POST /hr/expense-claims/:id/process-payment
+ * @deprecated نقطة النهاية غير مطبقة في الخادم
+ */
 export const useProcessClaimPayment = () => {
   const queryClient = useQueryClient()
   return useMutation({
@@ -264,7 +342,15 @@ export const useProcessClaimPayment = () => {
           iban: string
         }
       }
-    }) => processClaimPayment(claimId, data),
+    }) => {
+      console.warn(
+        '⚠️  ENDPOINT NOT IMPLEMENTED | نقطة النهاية غير مطبقة\n' +
+        'useProcessClaimPayment() calls POST /hr/expense-claims/:id/process-payment which does not exist in the backend.\n' +
+        'useProcessClaimPayment() تستدعي POST /hr/expense-claims/:id/process-payment التي لا توجد في الخادم.\n' +
+        'This request will fail with 404 error. | سيفشل هذا الطلب بخطأ 404.'
+      )
+      return processClaimPayment(claimId, data)
+    },
     onSuccess: (_, { claimId }) => {
       queryClient.invalidateQueries({ queryKey: expenseClaimKeys.detail(claimId) })
       queryClient.invalidateQueries({ queryKey: expenseClaimKeys.lists() })

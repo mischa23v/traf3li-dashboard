@@ -42,7 +42,7 @@ import type {
 } from '@/types/crmSettings'
 
 /**
- * TODO: Backend Integration Required
+ * [BACKEND-PENDING] Backend Integration Required
  *
  * These are placeholder hooks that need to be replaced with actual API integration:
  *
@@ -63,17 +63,26 @@ const useCRMSettings = () => {
     return {
         data: null,
         isLoading: false,
+        error: null, // [BACKEND-PENDING] Will contain error details when API is connected
     }
 }
 
 const useUpdateCRMSettings = () => {
     return {
         mutateAsync: async (data: any) => {
-            console.log('Update CRM Settings (Placeholder - No backend connected):', data)
-            // TODO: Replace with actual API call
+            console.log('[BACKEND-PENDING] Update CRM Settings (Placeholder - No backend connected):', data)
+            // [BACKEND-PENDING] Replace with actual API call to PUT /api/settings/crm
+            // Example bilingual error handling:
+            // try {
+            //   const response = await apiClient.put('/settings/crm', data)
+            //   return response.data
+            // } catch (error) {
+            //   throw new Error('Failed to update CRM settings | فشل في تحديث إعدادات CRM')
+            // }
             return Promise.resolve(data)
         },
         isPending: false,
+        error: null, // [BACKEND-PENDING] Will contain error details when API is connected
     }
 }
 
@@ -198,11 +207,21 @@ export default function CRMSettings() {
                         <p className="text-slate-500">تخصيص إعدادات العملاء المحتملين، القضايا، العروض، والمواعيد</p>
                     </div>
 
-                    {/* Backend Integration Notice */}
-                    <Alert className="mb-6 border-amber-200 bg-amber-50" dir="rtl">
+                    {/* Backend Integration Notice - Bilingual */}
+                    <Alert className="mb-6 border-amber-200 bg-amber-50">
                         <AlertCircle className="h-4 w-4 text-amber-600" />
                         <AlertDescription className="text-amber-800">
-                            <strong>ملاحظة:</strong> هذه الصفحة قيد التطوير حالياً. التغييرات التي تجريها سيتم حفظها محلياً ولن يتم إرسالها إلى الخادم حتى يتم ربط واجهة برمجة التطبيقات (API).
+                            <div className="space-y-2">
+                                <p dir="rtl">
+                                    <strong>[BACKEND-PENDING]</strong> هذه الصفحة قيد التطوير حالياً. التغييرات التي تجريها سيتم حفظها محلياً ولن يتم إرسالها إلى الخادم حتى يتم ربط واجهة برمجة التطبيقات (API).
+                                </p>
+                                <p dir="ltr" className="text-sm opacity-90">
+                                    <strong>[BACKEND-PENDING]</strong> This page is under development. Changes will be saved locally and won't be sent to the server until the API is connected.
+                                </p>
+                                <p className="text-xs mt-2 font-mono" dir="ltr">
+                                    Required endpoints: GET/PUT /api/settings/crm
+                                </p>
+                            </div>
                         </AlertDescription>
                     </Alert>
 

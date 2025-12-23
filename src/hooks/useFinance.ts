@@ -55,7 +55,7 @@ export const useCreateInvoice = () => {
       financeService.createInvoice(data),
     // Update cache on success (Stable & Correct)
     onSuccess: (data) => {
-      toast.success('تم إنشاء الفاتورة بنجاح')
+      toast.success('Invoice created successfully | تم إنشاء الفاتورة بنجاح')
 
       // Track analytics event
       Analytics.invoiceCreated(data.total || data.amount || 0, data.currency || 'SAR')
@@ -78,7 +78,7 @@ export const useCreateInvoice = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إنشاء الفاتورة')
+      toast.error(error.message || 'Failed to create invoice | فشل إنشاء الفاتورة')
     },
     onSettled: async () => {
       // Delay to allow DB propagation
@@ -95,10 +95,10 @@ export const useUpdateInvoice = () => {
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateInvoiceData> }) =>
       financeService.updateInvoice(id, data),
     onSuccess: () => {
-      toast.success('تم تحديث الفاتورة بنجاح')
+      toast.success('Invoice updated successfully | تم تحديث الفاتورة بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث الفاتورة')
+      toast.error(error.message || 'Failed to update invoice | فشل تحديث الفاتورة')
     },
     onSettled: async (_, __, { id }) => {
       await queryClient.invalidateQueries({ queryKey: ['invoices'] })
@@ -113,13 +113,13 @@ export const useSendInvoice = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.sendInvoice(id),
     onSuccess: (data) => {
-      toast.success('تم إرسال الفاتورة بنجاح')
+      toast.success('Invoice sent successfully | تم إرسال الفاتورة بنجاح')
 
       // Track analytics event
       Analytics.invoiceSent(data?.total || data?.amount || 0)
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إرسال الفاتورة')
+      toast.error(error.message || 'Failed to send invoice | فشل إرسال الفاتورة')
     },
     onSettled: async (_, __, id) => {
       await queryClient.invalidateQueries({ queryKey: ['invoices'] })
@@ -200,7 +200,7 @@ export const useCreateCreditNote = () => {
     mutationFn: (data: CreateCreditNoteData) =>
       financeService.createCreditNote(data),
     onSuccess: (data) => {
-      toast.success('تم إنشاء إشعار الدائن بنجاح')
+      toast.success('Credit note created successfully | تم إنشاء إشعار الدائن بنجاح')
 
       // Manually update the cache
       queryClient.setQueriesData({ queryKey: ['creditNotes'] }, (old: any) => {
@@ -220,7 +220,7 @@ export const useCreateCreditNote = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إنشاء إشعار الدائن')
+      toast.error(error.message || 'Failed to create credit note | فشل إنشاء إشعار الدائن')
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -237,10 +237,10 @@ export const useUpdateCreditNote = () => {
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateCreditNoteData> }) =>
       financeService.updateCreditNote(id, data),
     onSuccess: () => {
-      toast.success('تم تحديث إشعار الدائن بنجاح')
+      toast.success('Credit note updated successfully | تم تحديث إشعار الدائن بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث إشعار الدائن')
+      toast.error(error.message || 'Failed to update credit note | فشل تحديث إشعار الدائن')
     },
     onSettled: async (_, __, { id }) => {
       await queryClient.invalidateQueries({ queryKey: ['creditNotes'] })
@@ -255,7 +255,7 @@ export const useDeleteCreditNote = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.deleteCreditNote(id),
     onSuccess: (_, id) => {
-      toast.success('تم حذف إشعار الدائن بنجاح')
+      toast.success('Credit note deleted successfully | تم حذف إشعار الدائن بنجاح')
 
       queryClient.setQueriesData({ queryKey: ['creditNotes'] }, (old: any) => {
         if (!old) return old
@@ -273,7 +273,7 @@ export const useDeleteCreditNote = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل حذف إشعار الدائن')
+      toast.error(error.message || 'Failed to delete credit note | فشل حذف إشعار الدائن')
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -288,10 +288,10 @@ export const useIssueCreditNote = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.issueCreditNote(id),
     onSuccess: () => {
-      toast.success('تم إصدار إشعار الدائن بنجاح')
+      toast.success('Credit note issued successfully | تم إصدار إشعار الدائن بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إصدار إشعار الدائن')
+      toast.error(error.message || 'Failed to issue credit note | فشل إصدار إشعار الدائن')
     },
     onSettled: async (_, __, id) => {
       await queryClient.invalidateQueries({ queryKey: ['creditNotes'] })
@@ -306,10 +306,10 @@ export const useApplyCreditNote = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.applyCreditNote(id),
     onSuccess: () => {
-      toast.success('تم تطبيق إشعار الدائن بنجاح')
+      toast.success('Credit note applied successfully | تم تطبيق إشعار الدائن بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تطبيق إشعار الدائن')
+      toast.error(error.message || 'Failed to apply credit note | فشل تطبيق إشعار الدائن')
     },
     onSettled: async (_, __, id) => {
       await queryClient.invalidateQueries({ queryKey: ['creditNotes'] })
@@ -326,10 +326,10 @@ export const useVoidCreditNote = () => {
     mutationFn: ({ id, reason }: { id: string; reason?: string }) =>
       financeService.voidCreditNote(id, reason),
     onSuccess: () => {
-      toast.success('تم إلغاء إشعار الدائن بنجاح')
+      toast.success('Credit note voided successfully | تم إلغاء إشعار الدائن بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إلغاء إشعار الدائن')
+      toast.error(error.message || 'Failed to void credit note | فشل إلغاء إشعار الدائن')
     },
     onSettled: async (_, __, { id }) => {
       await queryClient.invalidateQueries({ queryKey: ['creditNotes'] })
@@ -354,10 +354,10 @@ export const useSubmitCreditNoteToZATCA = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.submitCreditNoteToZATCA(id),
     onSuccess: () => {
-      toast.success('تم إرسال إشعار الدائن إلى هيئة الزكاة والضريبة والجمارك')
+      toast.success('Credit note submitted to ZATCA successfully | تم إرسال إشعار الدائن إلى هيئة الزكاة والضريبة والجمارك')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إرسال إشعار الدائن إلى هيئة الزكاة والضريبة والجمارك')
+      toast.error(error.message || 'Failed to submit credit note to ZATCA | فشل إرسال إشعار الدائن إلى هيئة الزكاة والضريبة والجمارك')
     },
     onSettled: async (_, __, id) => {
       await queryClient.invalidateQueries({ queryKey: ['creditNotes'] })
@@ -378,10 +378,10 @@ export const useExportCreditNotePdf = () => {
       a.click()
       document.body.removeChild(a)
       window.URL.revokeObjectURL(url)
-      toast.success('تم تحميل إشعار الدائن بنجاح')
+      toast.success('Credit note downloaded successfully | تم تحميل إشعار الدائن بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحميل إشعار الدائن')
+      toast.error(error.message || 'Failed to download credit note | فشل تحميل إشعار الدائن')
     },
   })
 }
@@ -413,7 +413,7 @@ export const useCreateExpense = () => {
       financeService.createExpense(data),
     // Update cache on success (Stable & Correct)
     onSuccess: (data) => {
-      toast.success('تم إنشاء المصروف بنجاح')
+      toast.success('Expense created successfully | تم إنشاء المصروف بنجاح')
 
       // Manually update the cache
       queryClient.setQueriesData({ queryKey: ['expenses'] }, (old: any) => {
@@ -433,7 +433,7 @@ export const useCreateExpense = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إنشاء المصروف')
+      toast.error(error.message || 'Failed to create expense | فشل إنشاء المصروف')
     },
     onSettled: async () => {
       // Delay to allow DB propagation
@@ -450,10 +450,10 @@ export const useUpdateExpense = () => {
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateExpenseData> }) =>
       financeService.updateExpense(id, data),
     onSuccess: () => {
-      toast.success('تم تحديث المصروف بنجاح')
+      toast.success('Expense updated successfully | تم تحديث المصروف بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث المصروف')
+      toast.error(error.message || 'Failed to update expense | فشل تحديث المصروف')
     },
     onSettled: async (_, __, { id }) => {
       await queryClient.invalidateQueries({ queryKey: ['expenses'] })
@@ -469,10 +469,10 @@ export const useUploadReceipt = () => {
     mutationFn: ({ id, file }: { id: string; file: File }) =>
       financeService.uploadReceipt(id, file),
     onSuccess: () => {
-      toast.success('تم رفع الإيصال بنجاح')
+      toast.success('Receipt uploaded successfully | تم رفع الإيصال بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل رفع الإيصال')
+      toast.error(error.message || 'Failed to upload receipt | فشل رفع الإيصال')
     },
     onSettled: async (_, __, { id }) => {
       return await queryClient.invalidateQueries({ queryKey: ['expenses', id] })
@@ -516,10 +516,10 @@ export const useStartTimer = () => {
       description: string
     }) => financeService.startTimer(data),
     onSuccess: () => {
-      toast.success('تم بدء المؤقت بنجاح')
+      toast.success('Timer started successfully | تم بدء المؤقت بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل بدء المؤقت')
+      toast.error(error.message || 'Failed to start timer | فشل بدء المؤقت')
     },
     onSettled: async () => {
       return await queryClient.invalidateQueries({ queryKey: ['timer'] })
@@ -533,10 +533,10 @@ export const usePauseTimer = () => {
   return useMutation({
     mutationFn: () => financeService.pauseTimer(),
     onSuccess: () => {
-      toast.success('تم إيقاف المؤقت مؤقتاً')
+      toast.success('Timer paused successfully | تم إيقاف المؤقت مؤقتاً')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إيقاف المؤقت')
+      toast.error(error.message || 'Failed to pause timer | فشل إيقاف المؤقت')
     },
     onSettled: async () => {
       return await queryClient.invalidateQueries({ queryKey: ['timer'] })
@@ -550,10 +550,10 @@ export const useResumeTimer = () => {
   return useMutation({
     mutationFn: () => financeService.resumeTimer(),
     onSuccess: () => {
-      toast.success('تم استئناف المؤقت')
+      toast.success('Timer resumed successfully | تم استئناف المؤقت')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل استئناف المؤقت')
+      toast.error(error.message || 'Failed to resume timer | فشل استئناف المؤقت')
     },
     onSettled: async () => {
       return await queryClient.invalidateQueries({ queryKey: ['timer'] })
@@ -568,10 +568,10 @@ export const useStopTimer = () => {
     mutationFn: (data: { notes?: string; isBillable?: boolean }) =>
       financeService.stopTimer(data),
     onSuccess: () => {
-      toast.success('تم إيقاف المؤقت وإنشاء إدخال الوقت')
+      toast.success('Timer stopped and time entry created successfully | تم إيقاف المؤقت وإنشاء إدخال الوقت')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إيقاف المؤقت')
+      toast.error(error.message || 'Failed to stop timer | فشل إيقاف المؤقت')
     },
     onSettled: async () => {
       await queryClient.invalidateQueries({ queryKey: ['timer'] })
@@ -597,7 +597,7 @@ export const useCreateTimeEntry = () => {
       financeService.createTimeEntry(data),
     // Update cache on success (Stable & Correct)
     onSuccess: (data, variables) => {
-      toast.success('تم إنشاء إدخال الوقت بنجاح')
+      toast.success('Time entry created successfully | تم إنشاء إدخال الوقت بنجاح')
 
       // Track analytics - KEY USER ACTIVATION METRIC
       Analytics.timeEntryLogged(variables.hours || data.hours || 0, variables.caseId || data.caseId)
@@ -620,7 +620,7 @@ export const useCreateTimeEntry = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إنشاء إدخال الوقت')
+      toast.error(error.message || 'Failed to create time entry | فشل إنشاء إدخال الوقت')
     },
     onSettled: async () => {
       // Delay to allow DB propagation
@@ -660,10 +660,10 @@ export const useLockTimeEntry = () => {
     mutationFn: ({ id, reason }: { id: string; reason: 'approved' | 'billed' | 'period_closed' | 'manual' }) =>
       financeService.lockTimeEntry(id, reason),
     onSuccess: () => {
-      toast.success('تم قفل سجل الوقت بنجاح')
+      toast.success('Time entry locked successfully | تم قفل سجل الوقت بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل قفل سجل الوقت')
+      toast.error(error.message || 'Failed to lock time entry | فشل قفل سجل الوقت')
     },
     onSettled: async (_, __, { id }) => {
       await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
@@ -679,10 +679,10 @@ export const useUnlockTimeEntry = () => {
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       financeService.unlockTimeEntry(id, reason),
     onSuccess: () => {
-      toast.success('تم إلغاء قفل سجل الوقت بنجاح')
+      toast.success('Time entry unlocked successfully | تم إلغاء قفل سجل الوقت بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إلغاء قفل سجل الوقت')
+      toast.error(error.message || 'Failed to unlock time entry | فشل إلغاء قفل سجل الوقت')
     },
     onSettled: async (_, __, { id }) => {
       await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
@@ -701,14 +701,14 @@ export const useBulkLockTimeEntries = () => {
     }) => financeService.bulkLockTimeEntries(data),
     onSuccess: (result) => {
       if (result.locked > 0) {
-        toast.success(`تم قفل ${result.locked} سجل بنجاح`)
+        toast.success(`${result.locked} entries locked successfully | تم قفل ${result.locked} سجل بنجاح`)
       }
       if (result.failed > 0) {
-        toast.error(`فشل قفل ${result.failed} سجل`)
+        toast.error(`Failed to lock ${result.failed} entries | فشل قفل ${result.failed} سجل`)
       }
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل عملية القفل الجماعية')
+      toast.error(error.message || 'Bulk lock operation failed | فشل عملية القفل الجماعية')
     },
     onSettled: async () => {
       return await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
@@ -736,14 +736,14 @@ export const useLockTimeEntriesByDateRange = () => {
     }) => financeService.lockTimeEntriesByDateRange(data),
     onSuccess: (result) => {
       if (result.locked > 0) {
-        toast.success(`تم قفل ${result.locked} سجل للفترة المحددة`)
+        toast.success(`${result.locked} entries locked for the period | تم قفل ${result.locked} سجل للفترة المحددة`)
       }
       if (result.failed > 0) {
-        toast.error(`فشل قفل ${result.failed} سجل`)
+        toast.error(`Failed to lock ${result.failed} entries | فشل قفل ${result.failed} سجل`)
       }
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل قفل السجلات حسب الفترة')
+      toast.error(error.message || 'Failed to lock entries by date range | فشل قفل السجلات حسب الفترة')
     },
     onSettled: async () => {
       return await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
@@ -769,13 +769,13 @@ export const useCreatePayment = () => {
     mutationFn: (data: CreatePaymentData) =>
       financeService.createPayment(data),
     onSuccess: (result, data) => {
-      toast.success('تم إنشاء الدفعة بنجاح')
+      toast.success('Payment created successfully | تم إنشاء الدفعة بنجاح')
 
       // Track analytics event
       Analytics.paymentReceived(data.amount || result?.amount || 0, data.method || 'bank_transfer')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إنشاء الدفعة')
+      toast.error(error.message || 'Failed to create payment | فشل إنشاء الدفعة')
     },
     onSettled: async () => {
       await queryClient.invalidateQueries({ queryKey: ['payments'] })
@@ -798,10 +798,10 @@ export const useCompletePayment = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.completePayment(id),
     onSuccess: () => {
-      toast.success('تم إكمال الدفعة بنجاح')
+      toast.success('Payment completed successfully | تم إكمال الدفعة بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إكمال الدفعة')
+      toast.error(error.message || 'Failed to complete payment | فشل إكمال الدفعة')
     },
     onSettled: async () => {
       await queryClient.invalidateQueries({ queryKey: ['payments'] })
@@ -817,10 +817,10 @@ export const useRecordPaymentForInvoice = () => {
     mutationFn: ({ invoiceId, data }: { invoiceId: string; data: any }) =>
       financeService.recordPaymentForInvoice(invoiceId, data),
     onSuccess: () => {
-      toast.success('تم تسجيل الدفعة بنجاح')
+      toast.success('Payment recorded successfully | تم تسجيل الدفعة بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تسجيل الدفعة')
+      toast.error(error.message || 'Failed to record payment | فشل تسجيل الدفعة')
     },
     onSettled: async () => {
       await queryClient.invalidateQueries({ queryKey: ['payments'] })
@@ -1181,7 +1181,7 @@ export const useDeleteInvoice = () => {
     mutationFn: (id: string) => financeService.deleteInvoice(id),
     // Update cache on success (Stable & Correct)
     onSuccess: (_, id) => {
-      toast.success('تم حذف الفاتورة بنجاح')
+      toast.success('Invoice deleted successfully | تم حذف الفاتورة بنجاح')
 
       // Manually update the cache
       queryClient.setQueriesData({ queryKey: ['invoices'] }, (old: any) => {
@@ -1201,12 +1201,100 @@ export const useDeleteInvoice = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل حذف الفاتورة')
+      toast.error(error.message || 'Failed to delete invoice | فشل حذف الفاتورة')
     },
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
       return await queryClient.invalidateQueries({ queryKey: ['invoices'], refetchType: 'all' })
+    },
+  })
+}
+
+/**
+ * @deprecated Use useRecordPaymentForInvoice instead
+ * The /invoices/:id/mark-paid endpoint is deprecated.
+ * Use /invoices/:id/record-payment instead (via useRecordPaymentForInvoice hook)
+ *
+ * @deprecated استخدم useRecordPaymentForInvoice بدلاً من ذلك
+ * نقطة النهاية /invoices/:id/mark-paid قديمة
+ * استخدم /invoices/:id/record-payment بدلاً من ذلك (عبر دالة useRecordPaymentForInvoice)
+ */
+export const useMarkInvoicePaid = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ invoiceId, paymentDetails }: {
+      invoiceId: string
+      paymentDetails: { paymentMethod: string; transactionId?: string; amount?: number }
+    }) => {
+      // Deprecation warning
+      console.warn(
+        '⚠️  DEPRECATED | تحذير: نقطة نهاية قديمة\n' +
+        'useMarkInvoicePaid() is deprecated. Use useRecordPaymentForInvoice() instead.\n' +
+        'useMarkInvoicePaid() قديمة. استخدم useRecordPaymentForInvoice() بدلاً من ذلك.\n' +
+        'Endpoint: POST /invoices/:id/mark-paid (deprecated) → POST /invoices/:id/record-payment (current)'
+      )
+
+      // Use the correct endpoint
+      return financeService.recordPayment(invoiceId, {
+        amount: paymentDetails.amount || 0,
+        paymentDate: new Date().toISOString(),
+        paymentMethod: paymentDetails.paymentMethod,
+        reference: paymentDetails.transactionId
+      })
+    },
+    onSuccess: () => {
+      toast.success('Payment recorded successfully | تم تسجيل الدفعة بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to record payment | فشل تسجيل الدفعة')
+    },
+    onSettled: async (_, __, { invoiceId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      return await queryClient.invalidateQueries({ queryKey: ['invoices', invoiceId] })
+    },
+  })
+}
+
+/**
+ * @deprecated Use exportInvoicePdf from financeService directly
+ * The /invoices/:id/download endpoint is deprecated.
+ * Use /invoices/:id/pdf instead
+ *
+ * @deprecated استخدم exportInvoicePdf من financeService مباشرة
+ * نقطة النهاية /invoices/:id/download قديمة
+ * استخدم /invoices/:id/pdf بدلاً من ذلك
+ */
+export const useDownloadInvoicePDF = () => {
+  return useMutation({
+    mutationFn: async (invoiceId: string) => {
+      // Deprecation warning
+      console.warn(
+        '⚠️  DEPRECATED | تحذير: نقطة نهاية قديمة\n' +
+        'useDownloadInvoicePDF() is deprecated. Use exportInvoicePdf() from financeService instead.\n' +
+        'useDownloadInvoicePDF() قديمة. استخدم exportInvoicePdf() من financeService بدلاً من ذلك.\n' +
+        'Endpoint: GET /invoices/:id/download (deprecated) → GET /invoices/:id/pdf (current)'
+      )
+
+      // Use the correct endpoint
+      const blob = await financeService.exportInvoicePdf(invoiceId)
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', `invoice-${invoiceId}.pdf`)
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    },
+    onSuccess: () => {
+      toast.success('Invoice downloaded successfully | تم تحميل الفاتورة بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to download invoice | فشل تحميل الفاتورة')
     },
   })
 }

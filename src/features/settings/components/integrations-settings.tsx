@@ -96,11 +96,28 @@ export function IntegrationsSettings() {
   }
 
   if (isError) {
+    // Extract bilingual error message
+    let errorMessage = t('integrations.loadError')
+
+    if (error) {
+      const err = error as any
+      // Check for bilingual error properties
+      if (err.messageEn && err.messageAr) {
+        errorMessage = isRTL ? err.messageAr : err.messageEn
+      } else if (err.message && typeof err.message === 'string' && err.message.includes(' | ')) {
+        // Check for combined bilingual message format: "English | Arabic"
+        const [en, ar] = err.message.split(' | ')
+        errorMessage = isRTL ? ar : en
+      } else if (err.message) {
+        errorMessage = err.message
+      }
+    }
+
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          {error instanceof Error ? error.message : t('integrations.loadError')}
+          {errorMessage}
         </AlertDescription>
       </Alert>
     )
