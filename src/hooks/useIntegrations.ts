@@ -9,6 +9,29 @@ import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 
 /**
+ * Helper to extract bilingual error message from error object
+ */
+const getBilingualErrorMessage = (error: any, i18nLanguage: string): string => {
+  // Check if error has bilingual properties
+  if (error?.messageEn && error?.messageAr) {
+    return i18nLanguage === 'ar' ? error.messageAr : error.messageEn
+  }
+
+  // Check if error message contains both languages (format: "English | Arabic")
+  if (error?.message && typeof error.message === 'string' && error.message.includes(' | ')) {
+    const [en, ar] = error.message.split(' | ')
+    return i18nLanguage === 'ar' ? ar : en
+  }
+
+  // Fallback to error message or generic message
+  return error?.message || error?.toString() || (
+    i18nLanguage === 'ar'
+      ? 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.'
+      : 'An unexpected error occurred. Please try again.'
+  )
+}
+
+/**
  * Hook to fetch all integrations
  */
 export const useIntegrations = () => {
@@ -59,15 +82,16 @@ export const useIntegrationStatus = (id: string) => {
  */
 export const useConnectIntegration = () => {
   const queryClient = useQueryClient()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   return useMutation({
     mutationFn: (data: ConnectIntegrationData) => integrationsService.connectIntegration(data),
     onSuccess: () => {
       toast.success(t('integrations.connectSuccess'))
     },
-    onError: (error: Error) => {
-      toast.error(error.message || t('integrations.connectError'))
+    onError: (error: any) => {
+      const errorMessage = getBilingualErrorMessage(error, i18n.language)
+      toast.error(errorMessage)
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 500))
@@ -81,15 +105,16 @@ export const useConnectIntegration = () => {
  */
 export const useDisconnectIntegration = () => {
   const queryClient = useQueryClient()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   return useMutation({
     mutationFn: (id: string) => integrationsService.disconnectIntegration(id),
     onSuccess: () => {
       toast.success(t('integrations.disconnectSuccess'))
     },
-    onError: (error: Error) => {
-      toast.error(error.message || t('integrations.disconnectError'))
+    onError: (error: any) => {
+      const errorMessage = getBilingualErrorMessage(error, i18n.language)
+      toast.error(errorMessage)
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 500))
@@ -103,7 +128,7 @@ export const useDisconnectIntegration = () => {
  */
 export const useUpdateIntegrationSettings = () => {
   const queryClient = useQueryClient()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   return useMutation({
     mutationFn: ({ id, settings }: { id: string; settings: Partial<IntegrationSettings> }) =>
@@ -111,8 +136,9 @@ export const useUpdateIntegrationSettings = () => {
     onSuccess: () => {
       toast.success(t('integrations.updateSuccess'))
     },
-    onError: (error: Error) => {
-      toast.error(error.message || t('integrations.updateError'))
+    onError: (error: any) => {
+      const errorMessage = getBilingualErrorMessage(error, i18n.language)
+      toast.error(errorMessage)
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 500))
@@ -125,7 +151,7 @@ export const useUpdateIntegrationSettings = () => {
  * Hook to test integration connection
  */
 export const useTestIntegration = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   return useMutation({
     mutationFn: (id: string) => integrationsService.testIntegration(id),
@@ -136,8 +162,9 @@ export const useTestIntegration = () => {
         toast.error(t('integrations.testError'))
       }
     },
-    onError: (error: Error) => {
-      toast.error(error.message || t('integrations.testError'))
+    onError: (error: any) => {
+      const errorMessage = getBilingualErrorMessage(error, i18n.language)
+      toast.error(errorMessage)
     },
   })
 }

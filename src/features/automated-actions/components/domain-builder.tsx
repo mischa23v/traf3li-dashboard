@@ -5,7 +5,7 @@
 
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Plus, X, GripVertical } from 'lucide-react'
+import { Plus, X, GripVertical, AlertTriangle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,6 +16,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from '@/components/ui/alert'
 import type { ModelField, DomainOperator, FilterDomain, DomainCondition } from '@/types/automatedAction'
 
 interface DomainBuilderProps {
@@ -123,6 +128,33 @@ export function DomainBuilder({ fields, value, onChange, className }: DomainBuil
 
   return (
     <div className={cn('space-y-3', className)}>
+      {/* Coming Soon Alert */}
+      <Alert variant="default" className="border-amber-500 bg-amber-50 dark:bg-amber-950/20">
+        <AlertTriangle className="h-4 w-4 text-amber-600" />
+        <AlertTitle className="text-amber-900 dark:text-amber-100">
+          {isArabic ? 'قريباً | Coming Soon' : 'Coming Soon | قريباً'}
+        </AlertTitle>
+        <AlertDescription className="text-amber-800 dark:text-amber-200">
+          {isArabic ? (
+            <>
+              هذه الميزة قيد التطوير حالياً. واجهة برمجة التطبيقات الخلفية للإجراءات التلقائية غير مطبقة بعد.
+              <br />
+              <span className="text-sm">
+                This feature is currently under development. The automated actions backend API is not yet implemented.
+              </span>
+            </>
+          ) : (
+            <>
+              This feature is currently under development. The automated actions backend API is not yet implemented.
+              <br />
+              <span className="text-sm">
+                هذه الميزة قيد التطوير حالياً. واجهة برمجة التطبيقات الخلفية للإجراءات التلقائية غير مطبقة بعد.
+              </span>
+            </>
+          )}
+        </AlertDescription>
+      </Alert>
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <h4 className="text-sm font-medium">

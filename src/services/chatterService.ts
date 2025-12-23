@@ -2,9 +2,21 @@
  * Chatter Service
  * Handles followers, activities, and file attachments for record communication
  * Based on Odoo's mail.followers and mail.activity models
+ *
+ * ⚠️ IMPLEMENTATION STATUS: [BACKEND-PENDING]
+ * These endpoints are documented but their implementation status is UNCONFIRMED.
+ * The backend may not have fully implemented all chatter-related endpoints.
+ *
+ * EXPECTED API ENDPOINTS:
+ * Followers: /api/chatter/followers/* - [BACKEND-PENDING]
+ * Activities: /api/chatter/activities/* - [BACKEND-PENDING]
+ * Attachments: /api/chatter/attachments/* - [BACKEND-PENDING]
+ *
+ * If you encounter 404 or unexpected errors, the backend implementation may be incomplete.
  */
 
-import apiClient from '@/lib/api'
+import apiClient, { handleApiError } from '@/lib/api'
+import { toast } from 'sonner'
 import type { ThreadResModel } from '@/types/message'
 
 // ==================== TYPES ====================
@@ -132,6 +144,7 @@ export interface ActivitiesResponse {
  * Get followers for a record
  *
  * @endpoint GET /chatter/followers/:resModel/:resId
+ * ⚠️ [BACKEND-PENDING] - Implementation status unknown
  * @description Retrieves all followers for a specific record
  * @param resModel - The resource model type (e.g., 'Lead', 'Client')
  * @param resId - The ID of the record
@@ -141,21 +154,42 @@ export const getFollowers = async (
   resModel: ThreadResModel,
   resId: string
 ): Promise<FollowersResponse> => {
-  const response = await apiClient.get(`/chatter/followers/${resModel}/${resId}`)
-  return response.data?.data || response.data
+  try {
+    const response = await apiClient.get(`/chatter/followers/${resModel}/${resId}`)
+    return response.data?.data || response.data
+  } catch (error: any) {
+    const errorMsg = handleApiError(error)
+    if (error?.response?.status === 404) {
+      toast.error('[BACKEND-PENDING] Followers not implemented | المتابعون غير متاحين')
+    } else {
+      toast.error('Failed to load followers | فشل تحميل المتابعين')
+    }
+    throw new Error(errorMsg)
+  }
 }
 
 /**
  * Add a follower to a record
  *
  * @endpoint POST /chatter/followers
+ * ⚠️ [BACKEND-PENDING] - Implementation status unknown
  * @description Creates a new follower relationship for a record
  * @param data - Follower data including userId, resModel, resId, and preferences
  * @returns Promise containing the created follower record
  */
 export const addFollower = async (data: CreateFollowerData): Promise<Follower> => {
-  const response = await apiClient.post('/chatter/followers', data)
-  return response.data?.data || response.data
+  try {
+    const response = await apiClient.post('/chatter/followers', data)
+    return response.data?.data || response.data
+  } catch (error: any) {
+    const errorMsg = handleApiError(error)
+    if (error?.response?.status === 404) {
+      toast.error('[BACKEND-PENDING] Add follower not implemented | إضافة المتابع غير متاحة')
+    } else {
+      toast.error('Failed to add follower | فشل إضافة المتابع')
+    }
+    throw new Error(errorMsg)
+  }
 }
 
 /**
@@ -214,6 +248,7 @@ export const isFollowing = async (
  * Toggle follow status for current user
  *
  * @endpoint POST /chatter/followers/:resModel/:resId/toggle
+ * ⚠️ [BACKEND-PENDING] - Implementation status unknown
  * @description Toggles the current user's follow status for a record (follow if not following, unfollow if following)
  * @param resModel - The resource model type (e.g., 'Lead', 'Client')
  * @param resId - The ID of the record
@@ -223,8 +258,18 @@ export const toggleFollow = async (
   resModel: ThreadResModel,
   resId: string
 ): Promise<{ following: boolean; follower?: Follower }> => {
-  const response = await apiClient.post(`/chatter/followers/${resModel}/${resId}/toggle`)
-  return response.data?.data || response.data
+  try {
+    const response = await apiClient.post(`/chatter/followers/${resModel}/${resId}/toggle`)
+    return response.data?.data || response.data
+  } catch (error: any) {
+    const errorMsg = handleApiError(error)
+    if (error?.response?.status === 404) {
+      toast.error('[BACKEND-PENDING] Follow toggle not implemented | تبديل المتابعة غير متاح')
+    } else {
+      toast.error('Failed to toggle follow | فشل تبديل المتابعة')
+    }
+    throw new Error(errorMsg)
+  }
 }
 
 // ==================== ACTIVITIES ====================
@@ -233,18 +278,32 @@ export const toggleFollow = async (
  * Get activity types
  *
  * @endpoint GET /chatter/activity-types
+ * ⚠️ [BACKEND-PENDING] - Implementation status unknown
  * @description Retrieves all available activity types (e.g., Call, Meeting, Email)
  * @returns Promise containing an array of activity types
  */
 export const getActivityTypes = async (): Promise<ActivityType[]> => {
-  const response = await apiClient.get('/chatter/activity-types')
-  return response.data?.data || response.data
+  try {
+    const response = await apiClient.get('/chatter/activity-types')
+    return response.data?.data || response.data
+  } catch (error: any) {
+    const errorMsg = handleApiError(error)
+    if (error?.response?.status === 404) {
+      toast.error(
+        '[BACKEND-PENDING] Activity types not implemented | أنواع الأنشطة غير متاحة'
+      )
+    } else {
+      toast.error('Failed to load activity types | فشل تحميل أنواع الأنشطة')
+    }
+    throw new Error(errorMsg)
+  }
 }
 
 /**
  * Get scheduled activities for a record
  *
  * @endpoint GET /chatter/activities/:resModel/:resId
+ * ⚠️ [BACKEND-PENDING] - Implementation status unknown
  * @description Retrieves all scheduled activities for a specific record, optionally filtered by state
  * @param resModel - The resource model type (e.g., 'Lead', 'Client')
  * @param resId - The ID of the record
@@ -256,13 +315,23 @@ export const getActivities = async (
   resId: string,
   state?: string
 ): Promise<ActivitiesResponse> => {
-  const params = new URLSearchParams()
-  if (state) params.append('state', state)
+  try {
+    const params = new URLSearchParams()
+    if (state) params.append('state', state)
 
-  const response = await apiClient.get(
-    `/chatter/activities/${resModel}/${resId}?${params.toString()}`
-  )
-  return response.data?.data || response.data
+    const response = await apiClient.get(
+      `/chatter/activities/${resModel}/${resId}?${params.toString()}`
+    )
+    return response.data?.data || response.data
+  } catch (error: any) {
+    const errorMsg = handleApiError(error)
+    if (error?.response?.status === 404) {
+      toast.error('[BACKEND-PENDING] Activities not implemented | الأنشطة غير متاحة')
+    } else {
+      toast.error('Failed to load activities | فشل تحميل الأنشطة')
+    }
+    throw new Error(errorMsg)
+  }
 }
 
 /**
@@ -290,6 +359,7 @@ export const getMyActivities = async (
  * Schedule a new activity
  *
  * @endpoint POST /chatter/activities
+ * ⚠️ [BACKEND-PENDING] - Implementation status unknown
  * @description Creates a new scheduled activity for a record
  * @param data - Activity data including type, record reference, summary, due date, and assigned user
  * @returns Promise containing the created activity
@@ -297,8 +367,20 @@ export const getMyActivities = async (
 export const scheduleActivity = async (
   data: CreateActivityData
 ): Promise<ScheduledActivity> => {
-  const response = await apiClient.post('/chatter/activities', data)
-  return response.data?.data || response.data
+  try {
+    const response = await apiClient.post('/chatter/activities', data)
+    return response.data?.data || response.data
+  } catch (error: any) {
+    const errorMsg = handleApiError(error)
+    if (error?.response?.status === 404) {
+      toast.error(
+        '[BACKEND-PENDING] Schedule activity not implemented | جدولة النشاط غير متاحة'
+      )
+    } else {
+      toast.error('Failed to schedule activity | فشل جدولة النشاط')
+    }
+    throw new Error(errorMsg)
+  }
 }
 
 /**
@@ -355,6 +437,7 @@ export const cancelActivity = async (activityId: string): Promise<void> => {
  * Upload file attachment
  *
  * @endpoint POST /chatter/attachments
+ * ⚠️ [BACKEND-PENDING] - Implementation status unknown
  * @description Uploads a single file attachment to a record
  * @param file - The file to upload
  * @param resModel - The resource model type (e.g., 'Lead', 'Client')
@@ -366,17 +449,27 @@ export const uploadAttachment = async (
   resModel: ThreadResModel,
   resId: string
 ): Promise<FileAttachment> => {
-  const formData = new FormData()
-  formData.append('file', file)
-  formData.append('resModel', resModel)
-  formData.append('resId', resId)
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('resModel', resModel)
+    formData.append('resId', resId)
 
-  const response = await apiClient.post('/chatter/attachments', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  })
-  return response.data?.data || response.data
+    const response = await apiClient.post('/chatter/attachments', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    return response.data?.data || response.data
+  } catch (error: any) {
+    const errorMsg = handleApiError(error)
+    if (error?.response?.status === 404) {
+      toast.error('[BACKEND-PENDING] File upload not implemented | رفع الملفات غير متاح')
+    } else {
+      toast.error('Failed to upload file | فشل رفع الملف')
+    }
+    throw new Error(errorMsg)
+  }
 }
 
 /**
@@ -413,6 +506,7 @@ export const uploadAttachments = async (
  * Get attachments for a record
  *
  * @endpoint GET /chatter/attachments/:resModel/:resId
+ * ⚠️ [BACKEND-PENDING] - Implementation status unknown
  * @description Retrieves all file attachments for a specific record
  * @param resModel - The resource model type (e.g., 'Lead', 'Client')
  * @param resId - The ID of the record
@@ -422,8 +516,18 @@ export const getAttachments = async (
   resModel: ThreadResModel,
   resId: string
 ): Promise<FileAttachment[]> => {
-  const response = await apiClient.get(`/chatter/attachments/${resModel}/${resId}`)
-  return response.data?.data || response.data
+  try {
+    const response = await apiClient.get(`/chatter/attachments/${resModel}/${resId}`)
+    return response.data?.data || response.data
+  } catch (error: any) {
+    const errorMsg = handleApiError(error)
+    if (error?.response?.status === 404) {
+      toast.error('[BACKEND-PENDING] Attachments not implemented | المرفقات غير متاحة')
+    } else {
+      toast.error('Failed to load attachments | فشل تحميل المرفقات')
+    }
+    throw new Error(errorMsg)
+  }
 }
 
 /**

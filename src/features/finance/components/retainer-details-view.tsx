@@ -182,8 +182,8 @@ export default function RetainerDetailsView() {
                         </Button>
                         <Card className="border-0 shadow-sm rounded-3xl p-12 text-center">
                             <AlertCircle className="h-16 w-16 text-rose-400 mx-auto mb-4" aria-hidden="true" />
-                            <h3 className="text-xl font-bold text-navy mb-2">فشل تحميل حساب الأمانة</h3>
-                            <p className="text-slate-500">{error?.message || 'حساب الأمانة غير موجود'}</p>
+                            <h3 className="text-xl font-bold text-navy mb-2">Failed to Load Retainer Account | فشل تحميل حساب الأمانة</h3>
+                            <p className="text-slate-500">{error?.message || 'Retainer account not found | حساب الأمانة غير موجود'}</p>
                         </Card>
                     </div>
                 </Main>

@@ -47,7 +47,22 @@ function PdfTemplatesContent() {
   }, [open, setOpen])
 
   // Fetch data for stats display
-  // TODO: Replace with dedicated stats endpoint that returns totals across all pages
+  // TODO: Replace with dedicated stats endpoint
+  //
+  // NEEDED ENDPOINT: GET /api/pdf-templates/stats
+  // Should return:
+  // {
+  //   total: number,
+  //   byCategory: { invoice: number, contract: number, ... },
+  //   defaultTemplates: number,
+  //   activeTemplates: number
+  // }
+  //
+  // CURRENT WORKAROUND: Fetching all templates with high limit (1000) and
+  // calculating stats client-side (see lines 75-90). This is inefficient as it:
+  // - Transfers unnecessary data (full template objects instead of just counts)
+  // - Doesn't scale beyond 1000 templates
+  // - Increases bundle size and memory usage
   const { data } = usePdfmeTemplates({
     page: 1,
     limit: 1000, // Get a large number to calculate accurate stats

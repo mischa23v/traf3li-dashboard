@@ -1,4 +1,4 @@
-import api from '@/lib/api'
+import api, { handleApiError } from '@/lib/api'
 
 // ==================== ENUMS ====================
 
@@ -1105,39 +1105,64 @@ export type UpdateReportInput = Partial<CreateReportInput>
 export const reportsApi = {
   // Get all reports
   getAll: async (filters?: ReportFilters): Promise<Report[]> => {
-    const params = new URLSearchParams()
-    if (filters) {
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          params.append(key, String(value))
-        }
-      })
+    try {
+      const params = new URLSearchParams()
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            params.append(key, String(value))
+          }
+        })
+      }
+      const response = await api.get(`/reports?${params.toString()}`)
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch reports | فشل في جلب التقارير:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch reports | فشل في جلب التقارير')
     }
-    const response = await api.get(`/reports?${params.toString()}`)
-    return response.data
   },
 
   // Get single report
   getById: async (id: string): Promise<Report> => {
-    const response = await api.get(`/reports/${id}`)
-    return response.data
+    try {
+      const response = await api.get(`/reports/${id}`)
+      return response.data
+    } catch (error) {
+      console.error(`Failed to fetch report ${id} | فشل في جلب التقرير ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to fetch report | فشل في جلب التقرير')
+    }
   },
 
   // Get report templates
   getTemplates: async (): Promise<Report[]> => {
-    const response = await api.get('/reports/templates')
-    return response.data
+    try {
+      const response = await api.get('/reports/templates')
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch report templates | فشل في جلب قوالب التقارير:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch report templates | فشل في جلب قوالب التقارير')
+    }
   },
 
   // Generate report
   generate: async (data: any): Promise<Report> => {
-    const response = await api.post('/reports/generate', data)
-    return response.data
+    try {
+      const response = await api.post('/reports/generate', data)
+      return response.data
+    } catch (error) {
+      console.error('Failed to generate report | فشل في إنشاء التقرير:', error)
+      throw new Error(handleApiError(error) || 'Failed to generate report | فشل في إنشاء التقرير')
+    }
   },
 
   // Delete report
   delete: async (id: string): Promise<void> => {
-    await api.delete(`/reports/${id}`)
+    try {
+      await api.delete(`/reports/${id}`)
+    } catch (error) {
+      console.error(`Failed to delete report ${id} | فشل في حذف التقرير ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to delete report | فشل في حذف التقرير')
+    }
   },
 
   // Schedule report
@@ -1148,60 +1173,115 @@ export const reportsApi = {
     time: string
     distributionList?: DistributionRecipient[]
   }): Promise<Report> => {
-    const response = await api.post(`/reports/${id}/schedule`, schedule)
-    return response.data
+    try {
+      const response = await api.post(`/reports/${id}/schedule`, schedule)
+      return response.data
+    } catch (error) {
+      console.error(`Failed to schedule report ${id} | فشل في جدولة التقرير ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to schedule report | فشل في جدولة التقرير')
+    }
   },
 
   // Unschedule report
   unscheduleReport: async (id: string): Promise<void> => {
-    await api.delete(`/reports/${id}/schedule`)
+    try {
+      await api.delete(`/reports/${id}/schedule`)
+    } catch (error) {
+      console.error(`Failed to unschedule report ${id} | فشل في إلغاء جدولة التقرير ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to unschedule report | فشل في إلغاء جدولة التقرير')
+    }
   },
 
   // Financial/Accounting Reports
   getProfitLossReport: async (params?: Record<string, any>): Promise<any> => {
-    const response = await api.get('/reports/profit-loss', { params })
-    return response.data
+    try {
+      const response = await api.get('/reports/profit-loss', { params })
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch profit & loss report | فشل في جلب تقرير الأرباح والخسائر:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch profit & loss report | فشل في جلب تقرير الأرباح والخسائر')
+    }
   },
 
   getBalanceSheetReport: async (params?: Record<string, any>): Promise<any> => {
-    const response = await api.get('/reports/balance-sheet', { params })
-    return response.data
+    try {
+      const response = await api.get('/reports/balance-sheet', { params })
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch balance sheet report | فشل في جلب تقرير الميزانية العمومية:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch balance sheet report | فشل في جلب تقرير الميزانية العمومية')
+    }
   },
 
   getCaseProfitabilityReport: async (params?: Record<string, any>): Promise<any> => {
-    const response = await api.get('/reports/case-profitability', { params })
-    return response.data
+    try {
+      const response = await api.get('/reports/case-profitability', { params })
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch case profitability report | فشل في جلب تقرير ربحية القضايا:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch case profitability report | فشل في جلب تقرير ربحية القضايا')
+    }
   },
 
   getARAgingReport: async (params?: Record<string, any>): Promise<any> => {
-    const response = await api.get('/reports/ar-aging', { params })
-    return response.data
+    try {
+      const response = await api.get('/reports/ar-aging', { params })
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch AR aging report | فشل في جلب تقرير أعمار الذمم المدينة:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch AR aging report | فشل في جلب تقرير أعمار الذمم المدينة')
+    }
   },
 
   getTrialBalanceReport: async (params?: Record<string, any>): Promise<any> => {
-    const response = await api.get('/reports/trial-balance', { params })
-    return response.data
+    try {
+      const response = await api.get('/reports/trial-balance', { params })
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch trial balance report | فشل في جلب تقرير ميزان المراجعة:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch trial balance report | فشل في جلب تقرير ميزان المراجعة')
+    }
   },
 
   // Direct Report Endpoints
   getAccountsAgingReport: async (params?: Record<string, any>): Promise<any> => {
-    const response = await api.get('/reports/accounts-aging', { params })
-    return response.data
+    try {
+      const response = await api.get('/reports/accounts-aging', { params })
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch accounts aging report | فشل في جلب تقرير أعمار الحسابات:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch accounts aging report | فشل في جلب تقرير أعمار الحسابات')
+    }
   },
 
   getRevenueByClientReport: async (params?: Record<string, any>): Promise<any> => {
-    const response = await api.get('/reports/revenue-by-client', { params })
-    return response.data
+    try {
+      const response = await api.get('/reports/revenue-by-client', { params })
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch revenue by client report | فشل في جلب تقرير الإيرادات حسب العميل:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch revenue by client report | فشل في جلب تقرير الإيرادات حسب العميل')
+    }
   },
 
   getOutstandingInvoicesReport: async (params?: Record<string, any>): Promise<any> => {
-    const response = await api.get('/reports/outstanding-invoices', { params })
-    return response.data
+    try {
+      const response = await api.get('/reports/outstanding-invoices', { params })
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch outstanding invoices report | فشل في جلب تقرير الفواتير المستحقة:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch outstanding invoices report | فشل في جلب تقرير الفواتير المستحقة')
+    }
   },
 
   getTimeEntriesReport: async (params?: Record<string, any>): Promise<any> => {
-    const response = await api.get('/reports/time-entries', { params })
-    return response.data
+    try {
+      const response = await api.get('/reports/time-entries', { params })
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch time entries report | فشل في جلب تقرير سجلات الوقت:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch time entries report | فشل في جلب تقرير سجلات الوقت')
+    }
   },
 
   // Export report (generic)
@@ -1210,8 +1290,13 @@ export const reportsApi = {
     fileName: string
     format: OutputFormat
   }> => {
-    const response = await api.post('/reports/export', { format, parameters })
-    return response.data
+    try {
+      const response = await api.post('/reports/export', { format, parameters })
+      return response.data
+    } catch (error) {
+      console.error('Failed to export report | فشل في تصدير التقرير:', error)
+      throw new Error(handleApiError(error) || 'Failed to export report | فشل في تصدير التقرير')
+    }
   }
 }
 
@@ -1226,77 +1311,142 @@ export const analyticsReportsApi = {
     bySection: Record<string, number>
     recentExecutions: Array<{ reportId: string; reportName: string; executedAt: string }>
   }> => {
-    const response = await api.get('/analytics-reports/stats')
-    return response.data
+    try {
+      const response = await api.get('/analytics-reports/stats')
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch analytics reports stats | فشل في جلب إحصائيات تقارير التحليلات:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch analytics reports stats | فشل في جلب إحصائيات تقارير التحليلات')
+    }
   },
 
   getFavorites: async (): Promise<Report[]> => {
-    const response = await api.get('/analytics-reports/favorites')
-    return response.data
+    try {
+      const response = await api.get('/analytics-reports/favorites')
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch favorite reports | فشل في جلب التقارير المفضلة:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch favorite reports | فشل في جلب التقارير المفضلة')
+    }
   },
 
   getPinnedReports: async (): Promise<Report[]> => {
-    const response = await api.get('/analytics-reports/pinned')
-    return response.data
+    try {
+      const response = await api.get('/analytics-reports/pinned')
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch pinned reports | فشل في جلب التقارير المثبتة:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch pinned reports | فشل في جلب التقارير المثبتة')
+    }
   },
 
   getTemplates: async (): Promise<Report[]> => {
-    const response = await api.get('/analytics-reports/templates')
-    return response.data
+    try {
+      const response = await api.get('/analytics-reports/templates')
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch analytics report templates | فشل في جلب قوالب تقارير التحليلات:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch analytics report templates | فشل في جلب قوالب تقارير التحليلات')
+    }
   },
 
   // Section-specific reports
   getBySection: async (section: ReportSection): Promise<Report[]> => {
-    const response = await api.get(`/analytics-reports/section/${section}`)
-    return response.data
+    try {
+      const response = await api.get(`/analytics-reports/section/${section}`)
+      return response.data
+    } catch (error) {
+      console.error(`Failed to fetch reports for section ${section} | فشل في جلب تقارير القسم ${section}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to fetch section reports | فشل في جلب تقارير القسم')
+    }
   },
 
   // Create from template
   createFromTemplate: async (templateId: string, data?: any): Promise<Report> => {
-    const response = await api.post(`/analytics-reports/from-template/${templateId}`, data)
-    return response.data
+    try {
+      const response = await api.post(`/analytics-reports/from-template/${templateId}`, data)
+      return response.data
+    } catch (error) {
+      console.error(`Failed to create report from template ${templateId} | فشل في إنشاء تقرير من القالب ${templateId}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to create report from template | فشل في إنشاء تقرير من القالب')
+    }
   },
 
   // CRUD Operations
   getAll: async (filters?: ReportFilters): Promise<Report[]> => {
-    const params = new URLSearchParams()
-    if (filters) {
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          params.append(key, String(value))
-        }
-      })
+    try {
+      const params = new URLSearchParams()
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            params.append(key, String(value))
+          }
+        })
+      }
+      const response = await api.get(`/analytics-reports?${params.toString()}`)
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch analytics reports | فشل في جلب تقارير التحليلات:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch analytics reports | فشل في جلب تقارير التحليلات')
     }
-    const response = await api.get(`/analytics-reports?${params.toString()}`)
-    return response.data
   },
 
   create: async (data: CreateReportInput): Promise<Report> => {
-    const response = await api.post('/analytics-reports', data)
-    return response.data
+    try {
+      const response = await api.post('/analytics-reports', data)
+      return response.data
+    } catch (error) {
+      console.error('Failed to create analytics report | فشل في إنشاء تقرير التحليلات:', error)
+      throw new Error(handleApiError(error) || 'Failed to create analytics report | فشل في إنشاء تقرير التحليلات')
+    }
   },
 
   bulkDelete: async (ids: string[]): Promise<void> => {
-    await api.post('/analytics-reports/bulk-delete', { ids })
+    try {
+      await api.post('/analytics-reports/bulk-delete', { ids })
+    } catch (error) {
+      console.error('Failed to bulk delete analytics reports | فشل في حذف تقارير التحليلات بالجملة:', error)
+      throw new Error(handleApiError(error) || 'Failed to bulk delete analytics reports | فشل في حذف تقارير التحليلات بالجملة')
+    }
   },
 
   getById: async (id: string): Promise<Report> => {
-    const response = await api.get(`/analytics-reports/${id}`)
-    return response.data
+    try {
+      const response = await api.get(`/analytics-reports/${id}`)
+      return response.data
+    } catch (error) {
+      console.error(`Failed to fetch analytics report ${id} | فشل في جلب تقرير التحليلات ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to fetch analytics report | فشل في جلب تقرير التحليلات')
+    }
   },
 
   update: async (id: string, data: UpdateReportInput): Promise<Report> => {
-    const response = await api.patch(`/analytics-reports/${id}`, data)
-    return response.data
+    try {
+      const response = await api.patch(`/analytics-reports/${id}`, data)
+      return response.data
+    } catch (error) {
+      console.error(`Failed to update analytics report ${id} | فشل في تحديث تقرير التحليلات ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to update analytics report | فشل في تحديث تقرير التحليلات')
+    }
   },
 
   updatePut: async (id: string, data: UpdateReportInput): Promise<Report> => {
-    const response = await api.put(`/analytics-reports/${id}`, data)
-    return response.data
+    try {
+      const response = await api.put(`/analytics-reports/${id}`, data)
+      return response.data
+    } catch (error) {
+      console.error(`Failed to update analytics report ${id} | فشل في تحديث تقرير التحليلات ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to update analytics report | فشل في تحديث تقرير التحليلات')
+    }
   },
 
   delete: async (id: string): Promise<void> => {
-    await api.delete(`/analytics-reports/${id}`)
+    try {
+      await api.delete(`/analytics-reports/${id}`)
+    } catch (error) {
+      console.error(`Failed to delete analytics report ${id} | فشل في حذف تقرير التحليلات ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to delete analytics report | فشل في حذف تقرير التحليلات')
+    }
   },
 
   // Report Execution
@@ -1308,13 +1458,23 @@ export const analyticsReportsApi = {
       generatedAt: string
     }
   }> => {
-    const response = await api.post(`/analytics-reports/${id}/run`, { parameters })
-    return response.data
+    try {
+      const response = await api.post(`/analytics-reports/${id}/run`, { parameters })
+      return response.data
+    } catch (error) {
+      console.error(`Failed to run analytics report ${id} | فشل في تشغيل تقرير التحليلات ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to run analytics report | فشل في تشغيل تقرير التحليلات')
+    }
   },
 
   cloneReport: async (id: string, newName?: string): Promise<Report> => {
-    const response = await api.post(`/analytics-reports/${id}/clone`, { newName })
-    return response.data
+    try {
+      const response = await api.post(`/analytics-reports/${id}/clone`, { newName })
+      return response.data
+    } catch (error) {
+      console.error(`Failed to clone analytics report ${id} | فشل في نسخ تقرير التحليلات ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to clone analytics report | فشل في نسخ تقرير التحليلات')
+    }
   },
 
   exportReport: async (id: string, format: OutputFormat, parameters?: Record<string, any>): Promise<{
@@ -1322,19 +1482,34 @@ export const analyticsReportsApi = {
     fileName: string
     format: OutputFormat
   }> => {
-    const response = await api.post(`/analytics-reports/${id}/export`, { format, parameters })
-    return response.data
+    try {
+      const response = await api.post(`/analytics-reports/${id}/export`, { format, parameters })
+      return response.data
+    } catch (error) {
+      console.error(`Failed to export analytics report ${id} | فشل في تصدير تقرير التحليلات ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to export analytics report | فشل في تصدير تقرير التحليلات')
+    }
   },
 
   // Favorites & Pinning
   toggleFavorite: async (id: string): Promise<Report> => {
-    const response = await api.post(`/analytics-reports/${id}/favorite`)
-    return response.data
+    try {
+      const response = await api.post(`/analytics-reports/${id}/favorite`)
+      return response.data
+    } catch (error) {
+      console.error(`Failed to toggle favorite for report ${id} | فشل في تبديل المفضلة للتقرير ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to toggle favorite | فشل في تبديل المفضلة')
+    }
   },
 
   togglePinned: async (id: string): Promise<Report> => {
-    const response = await api.post(`/analytics-reports/${id}/pin`)
-    return response.data
+    try {
+      const response = await api.post(`/analytics-reports/${id}/pin`)
+      return response.data
+    } catch (error) {
+      console.error(`Failed to toggle pin for report ${id} | فشل في تبديل التثبيت للتقرير ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to toggle pin | فشل في تبديل التثبيت')
+    }
   },
 
   // Scheduling
@@ -1345,12 +1520,22 @@ export const analyticsReportsApi = {
     time: string
     distributionList?: DistributionRecipient[]
   }): Promise<Report> => {
-    const response = await api.post(`/analytics-reports/${id}/schedule`, schedule)
-    return response.data
+    try {
+      const response = await api.post(`/analytics-reports/${id}/schedule`, schedule)
+      return response.data
+    } catch (error) {
+      console.error(`Failed to schedule analytics report ${id} | فشل في جدولة تقرير التحليلات ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to schedule analytics report | فشل في جدولة تقرير التحليلات')
+    }
   },
 
   unscheduleReport: async (id: string): Promise<void> => {
-    await api.delete(`/analytics-reports/${id}/schedule`)
+    try {
+      await api.delete(`/analytics-reports/${id}/schedule`)
+    } catch (error) {
+      console.error(`Failed to unschedule analytics report ${id} | فشل في إلغاء جدولة تقرير التحليلات ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to unschedule analytics report | فشل في إلغاء جدولة تقرير التحليلات')
+    }
   }
 }
 
@@ -1359,84 +1544,159 @@ export const analyticsReportsApi = {
 export const savedReportsApi = {
   // Saved Reports
   getReports: async (filters?: Record<string, any>): Promise<any[]> => {
-    const params = new URLSearchParams()
-    if (filters) {
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          params.append(key, String(value))
-        }
-      })
+    try {
+      const params = new URLSearchParams()
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            params.append(key, String(value))
+          }
+        })
+      }
+      const response = await api.get(`/saved-reports/reports?${params.toString()}`)
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch saved reports | فشل في جلب التقارير المحفوظة:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch saved reports | فشل في جلب التقارير المحفوظة')
     }
-    const response = await api.get(`/saved-reports/reports?${params.toString()}`)
-    return response.data
   },
 
   createReport: async (data: any): Promise<any> => {
-    const response = await api.post('/saved-reports/reports', data)
-    return response.data
+    try {
+      const response = await api.post('/saved-reports/reports', data)
+      return response.data
+    } catch (error) {
+      console.error('Failed to create saved report | فشل في إنشاء التقرير المحفوظ:', error)
+      throw new Error(handleApiError(error) || 'Failed to create saved report | فشل في إنشاء التقرير المحفوظ')
+    }
   },
 
   getReport: async (id: string): Promise<any> => {
-    const response = await api.get(`/saved-reports/reports/${id}`)
-    return response.data
+    try {
+      const response = await api.get(`/saved-reports/reports/${id}`)
+      return response.data
+    } catch (error) {
+      console.error(`Failed to fetch saved report ${id} | فشل في جلب التقرير المحفوظ ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to fetch saved report | فشل في جلب التقرير المحفوظ')
+    }
   },
 
   updateReport: async (id: string, data: any): Promise<any> => {
-    const response = await api.patch(`/saved-reports/reports/${id}`, data)
-    return response.data
+    try {
+      const response = await api.patch(`/saved-reports/reports/${id}`, data)
+      return response.data
+    } catch (error) {
+      console.error(`Failed to update saved report ${id} | فشل في تحديث التقرير المحفوظ ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to update saved report | فشل في تحديث التقرير المحفوظ')
+    }
   },
 
   deleteReport: async (id: string): Promise<void> => {
-    await api.delete(`/saved-reports/reports/${id}`)
+    try {
+      await api.delete(`/saved-reports/reports/${id}`)
+    } catch (error) {
+      console.error(`Failed to delete saved report ${id} | فشل في حذف التقرير المحفوظ ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to delete saved report | فشل في حذف التقرير المحفوظ')
+    }
   },
 
   runReport: async (id: string, parameters?: Record<string, any>): Promise<any> => {
-    const response = await api.post(`/saved-reports/reports/${id}/run`, { parameters })
-    return response.data
+    try {
+      const response = await api.post(`/saved-reports/reports/${id}/run`, { parameters })
+      return response.data
+    } catch (error) {
+      console.error(`Failed to run saved report ${id} | فشل في تشغيل التقرير المحفوظ ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to run saved report | فشل في تشغيل التقرير المحفوظ')
+    }
   },
 
   duplicateReport: async (id: string, newName?: string): Promise<any> => {
-    const response = await api.post(`/saved-reports/reports/${id}/duplicate`, { newName })
-    return response.data
+    try {
+      const response = await api.post(`/saved-reports/reports/${id}/duplicate`, { newName })
+      return response.data
+    } catch (error) {
+      console.error(`Failed to duplicate saved report ${id} | فشل في تكرار التقرير المحفوظ ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to duplicate saved report | فشل في تكرار التقرير المحفوظ')
+    }
   },
 
   // Dashboard Widgets
   getDefaultWidgets: async (): Promise<any[]> => {
-    const response = await api.get('/saved-reports/widgets/defaults')
-    return response.data
+    try {
+      const response = await api.get('/saved-reports/widgets/defaults')
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch default widgets | فشل في جلب الودجات الافتراضية:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch default widgets | فشل في جلب الودجات الافتراضية')
+    }
   },
 
   updateLayout: async (layout: any[]): Promise<void> => {
-    await api.patch('/saved-reports/widgets/layout', { layout })
+    try {
+      await api.patch('/saved-reports/widgets/layout', { layout })
+    } catch (error) {
+      console.error('Failed to update widget layout | فشل في تحديث تخطيط الودجات:', error)
+      throw new Error(handleApiError(error) || 'Failed to update widget layout | فشل في تحديث تخطيط الودجات')
+    }
   },
 
   getWidgets: async (): Promise<any[]> => {
-    const response = await api.get('/saved-reports/widgets')
-    return response.data
+    try {
+      const response = await api.get('/saved-reports/widgets')
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch widgets | فشل في جلب الودجات:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch widgets | فشل في جلب الودجات')
+    }
   },
 
   createWidget: async (data: any): Promise<any> => {
-    const response = await api.post('/saved-reports/widgets', data)
-    return response.data
+    try {
+      const response = await api.post('/saved-reports/widgets', data)
+      return response.data
+    } catch (error) {
+      console.error('Failed to create widget | فشل في إنشاء الودجة:', error)
+      throw new Error(handleApiError(error) || 'Failed to create widget | فشل في إنشاء الودجة')
+    }
   },
 
   getWidget: async (id: string): Promise<any> => {
-    const response = await api.get(`/saved-reports/widgets/${id}`)
-    return response.data
+    try {
+      const response = await api.get(`/saved-reports/widgets/${id}`)
+      return response.data
+    } catch (error) {
+      console.error(`Failed to fetch widget ${id} | فشل في جلب الودجة ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to fetch widget | فشل في جلب الودجة')
+    }
   },
 
   updateWidget: async (id: string, data: any): Promise<any> => {
-    const response = await api.patch(`/saved-reports/widgets/${id}`, data)
-    return response.data
+    try {
+      const response = await api.patch(`/saved-reports/widgets/${id}`, data)
+      return response.data
+    } catch (error) {
+      console.error(`Failed to update widget ${id} | فشل في تحديث الودجة ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to update widget | فشل في تحديث الودجة')
+    }
   },
 
   deleteWidget: async (id: string): Promise<void> => {
-    await api.delete(`/saved-reports/widgets/${id}`)
+    try {
+      await api.delete(`/saved-reports/widgets/${id}`)
+    } catch (error) {
+      console.error(`Failed to delete widget ${id} | فشل في حذف الودجة ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to delete widget | فشل في حذف الودجة')
+    }
   },
 
   getWidgetData: async (id: string, params?: Record<string, any>): Promise<any> => {
-    const response = await api.get(`/saved-reports/widgets/${id}/data`, { params })
-    return response.data
+    try {
+      const response = await api.get(`/saved-reports/widgets/${id}/data`, { params })
+      return response.data
+    } catch (error) {
+      console.error(`Failed to fetch widget data ${id} | فشل في جلب بيانات الودجة ${id}:`, error)
+      throw new Error(handleApiError(error) || 'Failed to fetch widget data | فشل في جلب بيانات الودجة')
+    }
   }
 }
 
@@ -1445,8 +1705,13 @@ export const savedReportsApi = {
 export const metricsApi = {
   // Get Prometheus-format metrics
   getMetrics: async (): Promise<string> => {
-    const response = await api.get('/metrics')
-    return response.data
+    try {
+      const response = await api.get('/metrics')
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch metrics | فشل في جلب المقاييس:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch metrics | فشل في جلب المقاييس')
+    }
   },
 
   // Get metrics in JSON format
@@ -1479,8 +1744,13 @@ export const metricsApi = {
       loadAverage: number[]
     }
   }> => {
-    const response = await api.get('/metrics/json')
-    return response.data
+    try {
+      const response = await api.get('/metrics/json')
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch metrics in JSON format | فشل في جلب المقاييس بصيغة JSON:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch metrics in JSON format | فشل في جلب المقاييس بصيغة JSON')
+    }
   },
 
   // Get performance metrics
@@ -1495,8 +1765,13 @@ export const metricsApi = {
       }
     }
   }> => {
-    const response = await api.get('/metrics/performance')
-    return response.data
+    try {
+      const response = await api.get('/metrics/performance')
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch performance metrics | فشل في جلب مقاييس الأداء:', error)
+      throw new Error(handleApiError(error) || 'Failed to fetch performance metrics | فشل في جلب مقاييس الأداء')
+    }
   },
 
   // Reset metrics
@@ -1504,7 +1779,12 @@ export const metricsApi = {
     success: boolean
     message: string
   }> => {
-    const response = await api.post('/metrics/reset')
-    return response.data
+    try {
+      const response = await api.post('/metrics/reset')
+      return response.data
+    } catch (error) {
+      console.error('Failed to reset metrics | فشل في إعادة تعيين المقاييس:', error)
+      throw new Error(handleApiError(error) || 'Failed to reset metrics | فشل في إعادة تعيين المقاييس')
+    }
   }
 }

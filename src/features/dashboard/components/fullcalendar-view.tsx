@@ -645,6 +645,9 @@ export function FullCalendarView() {
 
   // Error state
   if (isError) {
+    const errorMsg = (error as Error)?.message || ''
+    const isBackendPending = errorMsg.includes('[BACKEND-PENDING]')
+
     return (
       <>
         <Header className="bg-navy shadow-none relative">
@@ -661,14 +664,38 @@ export function FullCalendarView() {
         <Main fluid className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
           <Card className="rounded-3xl border-0 shadow-lg">
             <CardContent className="p-12 text-center">
-              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <AlertCircle className="h-8 w-8 text-red-500" aria-hidden="true" />
+              <div className={`w-16 h-16 ${isBackendPending ? 'bg-orange-50' : 'bg-red-50'} rounded-full flex items-center justify-center mx-auto mb-4`}>
+                <AlertCircle className={`h-8 w-8 ${isBackendPending ? 'text-orange-500' : 'text-red-500'}`} aria-hidden="true" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل التقويم</h3>
-              <p className="text-slate-500 mb-6">{(error as Error)?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
+              <h3 className="text-xl font-bold text-slate-900 mb-2">
+                {isBackendPending ? (
+                  <>
+                    {isRTL ? '[بانتظار التطبيق] فشل تحميل التقويم' : '[BACKEND-PENDING] Failed to load calendar'}
+                  </>
+                ) : (
+                  <>
+                    {isRTL ? 'فشل تحميل التقويم' : 'Failed to load calendar'}
+                  </>
+                )}
+              </h3>
+              <p className="text-slate-500 mb-4">{errorMsg}</p>
+              {isBackendPending && (
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6 text-right">
+                  <p className="text-sm text-orange-800 mb-2">
+                    <strong className="font-bold">
+                      {isRTL ? '⚠️ هذه الميزة بانتظار تطبيق الخادم' : '⚠️ This feature is pending backend implementation'}
+                    </strong>
+                  </p>
+                  <p className="text-xs text-orange-700">
+                    {isRTL
+                      ? 'يستخدم التقويم حاليًا نقاط نهاية محسّنة غير مطبقة بعد في الخادم. يرجى الاتصال بفريق التطوير لتطبيق النقاط النهائية المطلوبة أو استخدام التقويم القديم مؤقتًا.'
+                      : 'The calendar is currently using optimized endpoints that are not yet implemented in the backend. Please contact the development team to implement the required endpoints or use the legacy calendar temporarily.'}
+                  </p>
+                </div>
+              )}
               <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
                 <RefreshCw className="ms-2 h-4 w-4" />
-                إعادة المحاولة
+                {isRTL ? 'إعادة المحاولة' : 'Retry'}
               </Button>
             </CardContent>
           </Card>

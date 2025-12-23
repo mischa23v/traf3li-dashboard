@@ -362,16 +362,58 @@ export interface ReminderFilters {
 
 /**
  * Snooze Options
+ *
+ * MIGRATION GUIDE - Snooze Options Interface
+ * ===========================================
+ *
+ * ✅ MODERN OPTIONS (use these in new code):
+ * ------------------------------------------
+ * @property snoozeMinutes - Number of minutes to snooze (mutually exclusive with snoozeUntil)
+ * @property snoozeUntil - Specific datetime as ISO string (mutually exclusive with snoozeMinutes)
+ * @property snoozeReason - Optional reason for snoozing
+ *
+ * ❌ LEGACY OPTIONS (deprecated, maintained for backward compatibility):
+ * -----------------------------------------------------------------------
+ * @deprecated minutes - Use snoozeMinutes instead
+ * @deprecated hours - Use snoozeMinutes (convert: hours * 60)
+ * @deprecated days - Use snoozeMinutes (convert: days * 1440)
+ * @deprecated until - Use snoozeUntil instead
+ * @deprecated reason - Use snoozeReason instead
+ *
+ * MIGRATION PATH:
+ * ---------------
+ * Step 1: Replace legacy options with modern equivalents
+ * Step 2: Test thoroughly
+ * Step 3: Remove legacy option usage from codebase
+ *
+ * EXAMPLE USAGE:
+ * --------------
+ * // ✅ Modern (correct):
+ * { snoozeMinutes: 30 }
+ * { snoozeMinutes: 120, snoozeReason: 'In a meeting' }
+ * { snoozeUntil: '2024-12-31T10:00:00Z' }
+ *
+ * // ❌ Legacy (deprecated, will show warnings in dev mode):
+ * { minutes: 30 }
+ * { hours: 2 }
+ * { until: '2024-12-31T10:00:00Z', reason: 'Busy' }
  */
 export interface SnoozeOptions {
-  snoozeMinutes?: number // OR use snoozeUntil
-  snoozeUntil?: string // Specific datetime ISO string
-  snoozeReason?: string
-  // Legacy options (for convenience)
+  // ✅ Modern options (preferred)
+  snoozeMinutes?: number // Number of minutes to snooze (OR use snoozeUntil)
+  snoozeUntil?: string // Specific datetime ISO string (OR use snoozeMinutes)
+  snoozeReason?: string // Optional reason for snoozing
+
+  // ❌ Legacy options (deprecated - maintained for backward compatibility)
+  /** @deprecated Use snoozeMinutes instead */
   minutes?: number
+  /** @deprecated Use snoozeMinutes (convert: hours * 60) */
   hours?: number
+  /** @deprecated Use snoozeMinutes (convert: days * 1440) */
   days?: number
+  /** @deprecated Use snoozeUntil instead */
   until?: string
+  /** @deprecated Use snoozeReason instead */
   reason?: string
 }
 
@@ -520,32 +562,113 @@ const remindersService = {
 
   /**
    * Snooze reminder
+   *
+   * @param id - Reminder ID
+   * @param options - Snooze options
+   *
+   * MIGRATION GUIDE - Transitioning from Legacy to Modern Snooze Options
+   * =====================================================================
+   *
+   * ✅ MODERN API (use these in new code):
+   * --------------------------------------
+   *   - snoozeMinutes: number     → Number of minutes to snooze
+   *   - snoozeUntil: string       → ISO datetime string for specific time
+   *   - snoozeReason: string      → Optional reason for snoozing
+   *
+   * ❌ LEGACY API (deprecated, avoid in new code):
+   * -----------------------------------------------
+   *   - minutes: number           → Use snoozeMinutes instead
+   *   - hours: number             → Use snoozeMinutes (convert: hours * 60)
+   *   - days: number              → Use snoozeMinutes (convert: days * 1440)
+   *   - until: string             → Use snoozeUntil instead
+   *   - reason: string            → Use snoozeReason instead
+   *
+   * MIGRATION EXAMPLES:
+   * -------------------
+   * ❌ Before (Legacy):
+   *    snoozeReminder(id, { minutes: 30 })
+   *    snoozeReminder(id, { hours: 2 })
+   *    snoozeReminder(id, { days: 1 })
+   *    snoozeReminder(id, { until: '2024-12-31T10:00:00Z', reason: 'Busy' })
+   *
+   * ✅ After (Modern):
+   *    snoozeReminder(id, { snoozeMinutes: 30 })
+   *    snoozeReminder(id, { snoozeMinutes: 120 })
+   *    snoozeReminder(id, { snoozeMinutes: 1440 })
+   *    snoozeReminder(id, { snoozeUntil: '2024-12-31T10:00:00Z', snoozeReason: 'Busy' })
+   *
+   * BACKWARD COMPATIBILITY:
+   * -----------------------
+   * Legacy options are automatically converted to modern format internally.
+   * This ensures existing code continues to work during migration period.
+   * However, new code should always use modern options.
+   *
+   * WHY MIGRATE?
+   * ------------
+   * - Modern options are more explicit and clear
+   * - Consistent naming across the API
+   * - Better TypeScript type safety
+   * - Easier to maintain and debug
+   * - Aligns with backend API expectations
    */
   snoozeReminder: async (id: string, options: SnoozeOptions): Promise<Reminder> => {
     try {
+      // Validate input
+      if (!id) {
+        throw new Error('Reminder ID is required | معرف التذكير مطلوب')
+      }
+
       // Convert legacy options to new API format
+      // This conversion logic is kept for backward compatibility with existing code
       const payload: { snoozeMinutes?: number; snoozeUntil?: string; snoozeReason?: string } = {}
 
+      // Modern options (preferred) ✅
       if (options.snoozeMinutes) {
         payload.snoozeMinutes = options.snoozeMinutes
       } else if (options.snoozeUntil) {
         payload.snoozeUntil = options.snoozeUntil
-      } else if (options.minutes) {
+      }
+      // Legacy options (deprecated - maintained for backward compatibility) ⚠️
+      else if (options.minutes) {
+        // Legacy 'minutes' → Modern 'snoozeMinutes'
         payload.snoozeMinutes = options.minutes
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('⚠️ [DEPRECATED] Using legacy "minutes" option. Please migrate to "snoozeMinutes".')
+        }
       } else if (options.hours) {
+        // Legacy 'hours' → Modern 'snoozeMinutes' (converted)
         payload.snoozeMinutes = options.hours * 60
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('⚠️ [DEPRECATED] Using legacy "hours" option. Please migrate to "snoozeMinutes".')
+        }
       } else if (options.days) {
+        // Legacy 'days' → Modern 'snoozeMinutes' (converted)
         payload.snoozeMinutes = options.days * 24 * 60
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('⚠️ [DEPRECATED] Using legacy "days" option. Please migrate to "snoozeMinutes".')
+        }
       } else if (options.until) {
+        // Legacy 'until' → Modern 'snoozeUntil'
         payload.snoozeUntil = options.until
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('⚠️ [DEPRECATED] Using legacy "until" option. Please migrate to "snoozeUntil".')
+        }
+      } else {
+        throw new Error('Snooze duration or datetime is required | مدة التأجيل أو التاريخ مطلوب')
       }
 
+      // Legacy reason field (deprecated - use snoozeReason instead)
       payload.snoozeReason = options.snoozeReason || options.reason
+      if (options.reason && !options.snoozeReason && process.env.NODE_ENV === 'development') {
+        console.warn('⚠️ [DEPRECATED] Using legacy "reason" option. Please migrate to "snoozeReason".')
+      }
 
       const response = await apiClient.post(`/reminders/${id}/snooze`, payload)
       return response.data.reminder || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      // Bilingual error message: English | Arabic
+      const errorMessage = handleApiError(error)
+      throw new Error(errorMessage || 'Failed to snooze reminder | فشل تأجيل التذكير')
     }
   },
 
@@ -562,32 +685,51 @@ const remindersService = {
   },
 
   /**
-   * Quick snooze options
+   * Quick snooze helper functions
+   *
+   * MIGRATION NOTE: These functions have been updated to use modern snooze options.
+   * ================================================================================
+   * ✅ Modern API (currently used):
+   *   - snoozeMinutes: number of minutes
+   *   - snoozeUntil: ISO datetime string
+   *   - snoozeReason: optional reason
+   *
+   * ❌ Legacy API (deprecated, no longer used):
+   *   - minutes, hours, days: use snoozeMinutes
+   *   - until: use snoozeUntil
+   *   - reason: use snoozeReason
+   *
+   * These helpers are safe to use - they've been migrated to modern options.
    */
   snooze15Minutes: async (id: string): Promise<Reminder> => {
-    return remindersService.snoozeReminder(id, { minutes: 15 })
+    // ✅ Updated to modern API (snoozeMinutes instead of legacy 'minutes')
+    return remindersService.snoozeReminder(id, { snoozeMinutes: 15 })
   },
 
   snooze1Hour: async (id: string): Promise<Reminder> => {
-    return remindersService.snoozeReminder(id, { hours: 1 })
+    // ✅ Updated to modern API (snoozeMinutes instead of legacy 'hours')
+    return remindersService.snoozeReminder(id, { snoozeMinutes: 60 })
   },
 
   snooze1Day: async (id: string): Promise<Reminder> => {
-    return remindersService.snoozeReminder(id, { days: 1 })
+    // ✅ Updated to modern API (snoozeMinutes instead of legacy 'days')
+    return remindersService.snoozeReminder(id, { snoozeMinutes: 1440 })
   },
 
   snoozeUntilTomorrow: async (id: string): Promise<Reminder> => {
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
     tomorrow.setHours(9, 0, 0, 0) // 9 AM tomorrow
-    return remindersService.snoozeReminder(id, { until: tomorrow.toISOString() })
+    // ✅ Updated to modern API (snoozeUntil instead of legacy 'until')
+    return remindersService.snoozeReminder(id, { snoozeUntil: tomorrow.toISOString() })
   },
 
   snoozeUntilNextWeek: async (id: string): Promise<Reminder> => {
     const nextWeek = new Date()
     nextWeek.setDate(nextWeek.getDate() + 7)
     nextWeek.setHours(9, 0, 0, 0)
-    return remindersService.snoozeReminder(id, { until: nextWeek.toISOString() })
+    // ✅ Updated to modern API (snoozeUntil instead of legacy 'until')
+    return remindersService.snoozeReminder(id, { snoozeUntil: nextWeek.toISOString() })
   },
 
   // ==================== Delegation ====================

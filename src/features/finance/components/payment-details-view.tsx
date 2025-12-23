@@ -73,10 +73,10 @@ export default function PaymentDetailsView() {
         try {
             setIsGeneratingReceipt(true)
             await financeService.generateReceipt(paymentId)
-            toast.success('تم إنشاء الإيصال بنجاح')
+            toast.success('تم إنشاء الإيصال بنجاح | Receipt generated successfully')
             setShowReceiptPreview(true)
         } catch (error: any) {
-            toast.error(error.message || 'فشل إنشاء الإيصال')
+            toast.error(error.message || 'فشل إنشاء الإيصال | Failed to generate receipt [BACKEND-PENDING]')
         } finally {
             setIsGeneratingReceipt(false)
         }
@@ -102,9 +102,9 @@ export default function PaymentDetailsView() {
             a.click()
             window.URL.revokeObjectURL(url)
             document.body.removeChild(a)
-            toast.success('تم تحميل الإيصال بنجاح')
+            toast.success('تم تحميل الإيصال بنجاح | Receipt downloaded successfully')
         } catch (error: any) {
-            toast.error(error.message || 'فشل تحميل الإيصال')
+            toast.error(error.message || 'فشل تحميل الإيصال | Failed to download receipt [BACKEND-PENDING]')
         } finally {
             setIsDownloadingReceipt(false)
         }
@@ -112,7 +112,7 @@ export default function PaymentDetailsView() {
 
     const handleSendReceipt = async () => {
         if (!receiptEmail) {
-            toast.error('يرجى إدخال البريد الإلكتروني')
+            toast.error('يرجى إدخال البريد الإلكتروني | Please enter an email address')
             return
         }
 
@@ -123,12 +123,12 @@ export default function PaymentDetailsView() {
                 language: receiptLanguage,
                 message: receiptMessage
             })
-            toast.success('تم إرسال الإيصال بنجاح')
+            toast.success('تم إرسال الإيصال بنجاح | Receipt sent successfully')
             setShowSendReceiptDialog(false)
             setReceiptEmail('')
             setReceiptMessage('')
         } catch (error: any) {
-            toast.error(error.message || 'فشل إرسال الإيصال')
+            toast.error(error.message || 'فشل إرسال الإيصال | Failed to send receipt [BACKEND-PENDING]')
         } finally {
             setIsSendingReceipt(false)
         }

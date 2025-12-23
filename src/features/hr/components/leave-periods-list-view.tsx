@@ -95,12 +95,12 @@ export function LeavePeriodsListView() {
     if (periodToDelete) {
       deleteMutation.mutate(periodToDelete._id, {
         onSuccess: () => {
-          toast.success('تم حذف الفترة بنجاح')
+          toast.success('Period deleted successfully | تم حذف الفترة بنجاح')
           setDeleteDialogOpen(false)
           setPeriodToDelete(null)
         },
         onError: (error: any) => {
-          toast.error(error?.message || 'حدث خطأ في حذف الفترة')
+          toast.error(error?.message || 'Failed to delete period | حدث خطأ في حذف الفترة')
         },
       })
     }
@@ -110,10 +110,10 @@ export function LeavePeriodsListView() {
     const mutation = period.isActive ? deactivateMutation : activateMutation
     mutation.mutate(period._id, {
       onSuccess: () => {
-        toast.success(period.isActive ? 'تم تعطيل الفترة بنجاح' : 'تم تفعيل الفترة بنجاح')
+        toast.success(period.isActive ? 'Period deactivated successfully | تم تعطيل الفترة بنجاح' : 'Period activated successfully | تم تفعيل الفترة بنجاح')
       },
       onError: (error: any) => {
-        toast.error(error?.message || 'حدث خطأ في تغيير حالة الفترة')
+        toast.error(error?.message || 'Failed to change period status | حدث خطأ في تغيير حالة الفترة')
       },
     })
   }

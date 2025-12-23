@@ -19,6 +19,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
   ArrowRight,
   Download,
@@ -28,6 +29,7 @@ import {
   Users,
   Briefcase,
   DollarSign,
+  InfoIcon,
 } from 'lucide-react'
 import { useTimeEntriesReport, useExportReport } from '@/hooks/useFinance'
 import { useCasesAndClients } from '@/hooks/useCasesAndClients'
@@ -65,7 +67,8 @@ export function TimeEntriesReport() {
     )
   }
 
-  // Mock data for demonstration
+  // [BACKEND-PENDING] Mock data for demonstration - Replace with actual API data
+  // بيانات وهمية للعرض - استبدلها ببيانات API الحقيقية
   const mockReport = {
     summary: {
       totalHours: 245.5,
@@ -97,6 +100,24 @@ export function TimeEntriesReport() {
 
   return (
     <div className="space-y-6">
+      {/* [BACKEND-PENDING] Warning Banner */}
+      <Alert className="border-amber-300 bg-amber-50">
+        <InfoIcon className="h-5 w-5 text-amber-600" />
+        <AlertTitle className="text-amber-900 font-bold">
+          Using Mock Data | استخدام بيانات وهمية
+        </AlertTitle>
+        <AlertDescription className="text-amber-800">
+          <p className="text-sm">
+            <strong>[BACKEND-PENDING]</strong> This report is currently displaying mock data for demonstration purposes.
+            The actual report API endpoint may return different data structure.
+          </p>
+          <p className="text-sm mt-2">
+            <strong>[الخلفية معلقة]</strong> يعرض هذا التقرير حالياً بيانات وهمية لأغراض العرض.
+            قد يُرجع نقطة نهاية API الفعلية للتقرير بنية بيانات مختلفة.
+          </p>
+        </AlertDescription>
+      </Alert>
+
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm text-foreground/70">
           <span>المالية</span>

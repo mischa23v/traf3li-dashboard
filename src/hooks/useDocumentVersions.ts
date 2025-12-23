@@ -118,17 +118,19 @@ export const useUploadVersion = () => {
     }) => documentVersionService.uploadVersion(documentId, data, onProgress),
     onSuccess: (_, { documentId }) => {
       toast({
-        title: t('status.success'),
-        description: t('documents.versionUploadSuccess', 'Version uploaded successfully'),
+        title: t('status.success', 'Success | نجح'),
+        description: t('documents.versionUploadSuccess', 'Version uploaded successfully | تم رفع الإصدار بنجاح'),
       })
     },
     onError: (error: any) => {
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message ||
+        t('documents.versionUploadError', 'Failed to upload version | فشل رفع الإصدار')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description:
-          error.response?.data?.message ||
-          t('documents.versionUploadError', 'Failed to upload version'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
     },
     onSettled: async (_, __, { documentId }) => {
@@ -153,12 +155,14 @@ export const useDownloadVersion = () => {
       fileName: string
     }) => documentVersionService.downloadVersion(documentId, versionId, fileName),
     onError: (error: any) => {
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message ||
+        t('documents.downloadError', 'Failed to download version | فشل تنزيل الإصدار')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description:
-          error.response?.data?.message ||
-          t('documents.downloadError', 'Failed to download version'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
     },
   })
@@ -172,12 +176,14 @@ export const useVersionDownloadUrl = () => {
     mutationFn: ({ documentId, versionId }: { documentId: string; versionId: string }) =>
       documentVersionService.getVersionDownloadUrl(documentId, versionId),
     onError: (error: any) => {
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message ||
+        t('documents.downloadUrlError', 'Failed to get download URL | فشل الحصول على رابط التنزيل')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description:
-          error.response?.data?.message ||
-          t('documents.downloadError', 'Failed to get download URL'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
     },
   })
@@ -191,12 +197,14 @@ export const useVersionPreviewUrl = () => {
     mutationFn: ({ documentId, versionId }: { documentId: string; versionId: string }) =>
       documentVersionService.getVersionPreviewUrl(documentId, versionId),
     onError: (error: any) => {
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message ||
+        t('documents.previewError', 'Failed to get preview URL | فشل الحصول على رابط المعاينة')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description:
-          error.response?.data?.message ||
-          t('documents.previewError', 'Failed to get preview URL'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
     },
   })
@@ -212,17 +220,19 @@ export const useRestoreVersion = () => {
       documentVersionService.restoreVersion(documentId, versionId),
     onSuccess: (_, { documentId }) => {
       toast({
-        title: t('status.success'),
-        description: t('documents.versionRestoreSuccess', 'Version restored successfully'),
+        title: t('status.success', 'Success | نجح'),
+        description: t('documents.versionRestoreSuccess', 'Version restored successfully | تم استعادة الإصدار بنجاح'),
       })
     },
     onError: (error: any) => {
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message ||
+        t('documents.versionRestoreError', 'Failed to restore version | فشلت استعادة الإصدار')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description:
-          error.response?.data?.message ||
-          t('documents.versionRestoreError', 'Failed to restore version'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
     },
     onSettled: async (_, __, { documentId }) => {
@@ -242,17 +252,19 @@ export const useDeleteVersion = () => {
       documentVersionService.deleteVersion(documentId, versionId),
     onSuccess: (_, { documentId }) => {
       toast({
-        title: t('status.success'),
-        description: t('documents.versionDeleteSuccess', 'Version deleted successfully'),
+        title: t('status.success', 'Success | نجح'),
+        description: t('documents.versionDeleteSuccess', 'Version deleted successfully | تم حذف الإصدار بنجاح'),
       })
     },
     onError: (error: any) => {
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message ||
+        t('documents.versionDeleteError', 'Failed to delete version | فشل حذف الإصدار')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description:
-          error.response?.data?.message ||
-          t('documents.versionDeleteError', 'Failed to delete version'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
     },
     onSettled: async (_, __, { documentId }) => {
@@ -271,20 +283,22 @@ export const useDeleteOldVersions = () => {
       documentVersionService.deleteOldVersions(documentId, keepCount),
     onSuccess: (data, { documentId }) => {
       toast({
-        title: t('status.success'),
+        title: t('status.success', 'Success | نجح'),
         description: t(
           'documents.oldVersionsDeleted',
-          `${data.deletedCount} old versions deleted`
+          `${data.deletedCount} old versions deleted | تم حذف ${data.deletedCount} إصدارات قديمة`
         ),
       })
     },
     onError: (error: any) => {
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message ||
+        t('documents.oldVersionsDeleteError', 'Failed to delete old versions | فشل حذف الإصدارات القديمة')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description:
-          error.response?.data?.message ||
-          t('documents.versionDeleteError', 'Failed to delete old versions'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
     },
     onSettled: async (_, __, { documentId }) => {
@@ -310,15 +324,19 @@ export const useUpdateVersionMetadata = () => {
     }) => documentVersionService.updateVersionMetadata(documentId, versionId, data),
     onSuccess: (_, { documentId }) => {
       toast({
-        title: t('status.success'),
-        description: t('status.updatedSuccessfully', 'Updated successfully'),
+        title: t('status.success', 'Success | نجح'),
+        description: t('status.updatedSuccessfully', 'Updated successfully | تم التحديث بنجاح'),
       })
     },
     onError: (error: any) => {
+      // Extract bilingual error message if available
+      const errorMessage = error.response?.data?.message ||
+        t('documents.versionUpdateError', 'Failed to update version metadata | فشل تحديث بيانات الإصدار')
+
       toast({
         variant: 'destructive',
-        title: t('status.error'),
-        description: error.response?.data?.message || t('common.unknownError'),
+        title: t('status.error', 'Error | خطأ'),
+        description: errorMessage,
       })
     },
     onSettled: async (_, __, { documentId, versionId }) => {

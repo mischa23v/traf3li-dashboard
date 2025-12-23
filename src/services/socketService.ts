@@ -9,8 +9,9 @@ import { io, Socket } from 'socket.io-client'
 import type { SocketSessionExpiredEvent, SocketForceLogoutEvent } from '@/types/api'
 
 const SOCKET_URL =
-  import.meta.env.VITE_API_URL?.replace('/api', '') ||
-  'https://traf3li-backend.onrender.com'
+  import.meta.env.VITE_WS_URL ||
+  import.meta.env.VITE_API_URL?.replace('/api', '').replace('https://', 'wss://') ||
+  'wss://api.traf3li.com'
 
 class SocketService {
   private socket: Socket | null = null

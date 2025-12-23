@@ -46,7 +46,7 @@ export const useCreateExpensePolicy = () => {
     mutationFn: (data: CreateExpensePolicyData) =>
       expensePoliciesService.createExpensePolicy(data),
     onSuccess: (data) => {
-      toast.success('تم إنشاء السياسة بنجاح')
+      toast.success('Policy created successfully | تم إنشاء السياسة بنجاح')
 
       // Update cache
       queryClient.setQueriesData({ queryKey: ['expense-policies'] }, (old: any) => {
@@ -62,7 +62,7 @@ export const useCreateExpensePolicy = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إنشاء السياسة')
+      toast.error(error.message || 'Failed to create policy | فشل إنشاء السياسة')
     },
     onSettled: async () => {
       await queryClient.invalidateQueries({ queryKey: ['expense-policies'] })
@@ -77,7 +77,7 @@ export const useUpdateExpensePolicy = () => {
     mutationFn: ({ id, data }: { id: string; data: UpdateExpensePolicyData }) =>
       expensePoliciesService.updateExpensePolicy(id, data),
     onSuccess: (data, variables) => {
-      toast.success('تم تحديث السياسة بنجاح')
+      toast.success('Policy updated successfully | تم تحديث السياسة بنجاح')
 
       // Update cache
       queryClient.setQueriesData({ queryKey: ['expense-policies'] }, (old: any) => {
@@ -97,7 +97,7 @@ export const useUpdateExpensePolicy = () => {
       queryClient.setQueryData(['expense-policy', variables.id], data)
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث السياسة')
+      toast.error(error.message || 'Failed to update policy | فشل تحديث السياسة')
     },
     onSettled: async (_, __, variables) => {
       await queryClient.invalidateQueries({ queryKey: ['expense-policies'] })
@@ -112,7 +112,7 @@ export const useDeleteExpensePolicy = () => {
   return useMutation({
     mutationFn: (id: string) => expensePoliciesService.deleteExpensePolicy(id),
     onSuccess: (_, id) => {
-      toast.success('تم حذف السياسة بنجاح')
+      toast.success('Policy deleted successfully | تم حذف السياسة بنجاح')
 
       // Update cache
       queryClient.setQueriesData({ queryKey: ['expense-policies'] }, (old: any) => {
@@ -128,7 +128,7 @@ export const useDeleteExpensePolicy = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل حذف السياسة')
+      toast.error(error.message || 'Failed to delete policy | فشل حذف السياسة')
     },
     onSettled: async () => {
       await queryClient.invalidateQueries({ queryKey: ['expense-policies'] })
@@ -142,7 +142,7 @@ export const useSetDefaultExpensePolicy = () => {
   return useMutation({
     mutationFn: (id: string) => expensePoliciesService.setDefaultPolicy(id),
     onSuccess: (data) => {
-      toast.success('تم تعيين السياسة الافتراضية بنجاح')
+      toast.success('Default policy set successfully | تم تعيين السياسة الافتراضية بنجاح')
 
       // Update cache - set all to non-default except the selected one
       queryClient.setQueriesData({ queryKey: ['expense-policies'] }, (old: any) => {
@@ -160,7 +160,7 @@ export const useSetDefaultExpensePolicy = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تعيين السياسة الافتراضية')
+      toast.error(error.message || 'Failed to set default policy | فشل تعيين السياسة الافتراضية')
     },
     onSettled: async () => {
       await queryClient.invalidateQueries({ queryKey: ['expense-policies'] })
@@ -175,7 +175,11 @@ export const useTogglePolicyStatus = () => {
   return useMutation({
     mutationFn: (id: string) => expensePoliciesService.togglePolicyStatus(id),
     onSuccess: (data) => {
-      toast.success(data.isActive ? 'تم تفعيل السياسة' : 'تم تعطيل السياسة')
+      toast.success(
+        data.isActive
+          ? 'Policy activated successfully | تم تفعيل السياسة'
+          : 'Policy deactivated successfully | تم تعطيل السياسة'
+      )
 
       // Update cache
       queryClient.setQueriesData({ queryKey: ['expense-policies'] }, (old: any) => {
@@ -192,7 +196,7 @@ export const useTogglePolicyStatus = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تغيير حالة السياسة')
+      toast.error(error.message || 'Failed to toggle policy status | فشل تغيير حالة السياسة')
     },
     onSettled: async () => {
       await queryClient.invalidateQueries({ queryKey: ['expense-policies'] })
@@ -207,7 +211,7 @@ export const useDuplicateExpensePolicy = () => {
     mutationFn: ({ id, newName, newNameAr }: { id: string; newName: string; newNameAr: string }) =>
       expensePoliciesService.duplicatePolicy(id, newName, newNameAr),
     onSuccess: (data) => {
-      toast.success('تم نسخ السياسة بنجاح')
+      toast.success('Policy duplicated successfully | تم نسخ السياسة بنجاح')
 
       // Update cache
       queryClient.setQueriesData({ queryKey: ['expense-policies'] }, (old: any) => {
@@ -223,7 +227,7 @@ export const useDuplicateExpensePolicy = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل نسخ السياسة')
+      toast.error(error.message || 'Failed to duplicate policy | فشل نسخ السياسة')
     },
     onSettled: async () => {
       await queryClient.invalidateQueries({ queryKey: ['expense-policies'] })
@@ -236,13 +240,15 @@ export const useCheckCompliance = () => {
     mutationFn: (claimId: string) => expensePoliciesService.checkCompliance(claimId),
     onSuccess: (data) => {
       if (data.compliant) {
-        toast.success('المطالبة متوافقة مع السياسة')
+        toast.success('Claim is compliant with policy | المطالبة متوافقة مع السياسة')
       } else {
-        toast.warning(`تم العثور على ${data.violations.length} مخالفة`)
+        toast.warning(
+          `Found ${data.violations.length} violations | تم العثور على ${data.violations.length} مخالفة`
+        )
       }
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل التحقق من التوافق')
+      toast.error(error.message || 'Failed to check compliance | فشل التحقق من التوافق')
     },
   })
 }

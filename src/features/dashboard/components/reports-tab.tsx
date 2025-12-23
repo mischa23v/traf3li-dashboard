@@ -1,5 +1,5 @@
 import { memo, useMemo } from 'react'
-import { Scale, TrendingUp, ListTodo, Loader2 } from 'lucide-react'
+import { Scale, TrendingUp, ListTodo, Loader2, AlertTriangle } from 'lucide-react'
 import {
   Card,
   CardContent,
@@ -7,6 +7,7 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import type { ReportsTabProps, CasesChartData, RevenueChartData, TasksChartData } from '../types'
 
 export const ReportsTab = memo(function ReportsTab({
@@ -40,6 +41,7 @@ interface CasesChartCardProps {
   casesChartLoading: boolean
 }
 
+// [BACKEND-PENDING] Cases Chart endpoint not implemented: /reports/cases-chart
 const CasesChartCard = memo(function CasesChartCard({
   t,
   casesChart,
@@ -47,6 +49,9 @@ const CasesChartCard = memo(function CasesChartCard({
 }: CasesChartCardProps) {
   const data = useMemo(() => casesChart?.data?.slice(-12) || [], [casesChart?.data])
   const maxValue = useMemo(() => Math.max(...data.map((d: CasesChartData) => d.total), 1), [data])
+
+  // Check if backend returned empty data (endpoint not available)
+  const isBackendPending = !casesChartLoading && (!casesChart?.data || casesChart.data.length === 0)
 
   return (
     <Card className="rounded-3xl border-slate-100 shadow-sm">
@@ -62,6 +67,17 @@ const CasesChartCard = memo(function CasesChartCard({
           <div className="flex items-center justify-center py-16">
             <Loader2 className="h-6 w-6 animate-spin text-navy" />
           </div>
+        ) : isBackendPending ? (
+          <Alert className="border-amber-200 bg-amber-50">
+            <AlertTriangle className="h-4 w-4 text-amber-600" />
+            <AlertDescription className="text-sm text-amber-800">
+              <strong className="font-semibold">Backend Pending | الخلفية قيد التطوير</strong>
+              <br />
+              Cases chart endpoint is not yet implemented. Historical case data reporting is coming soon.
+              <br />
+              نقطة نهاية تقرير القضايا غير متوفرة حالياً. تقارير البيانات التاريخية للقضايا قيد التطوير.
+            </AlertDescription>
+          </Alert>
         ) : (
           <div className="space-y-4">
             {/* Simple Bar Chart Visualization */}
@@ -125,6 +141,7 @@ interface RevenueChartCardProps {
   revenueChartLoading: boolean
 }
 
+// [BACKEND-PENDING] Revenue Chart endpoint not implemented: /reports/revenue-chart
 const RevenueChartCard = memo(function RevenueChartCard({
   t,
   revenueChart,
@@ -132,6 +149,9 @@ const RevenueChartCard = memo(function RevenueChartCard({
 }: RevenueChartCardProps) {
   const data = useMemo(() => revenueChart?.data?.slice(-12) || [], [revenueChart?.data])
   const maxValue = useMemo(() => Math.max(...data.map((d: RevenueChartData) => d.revenue), 1), [data])
+
+  // Check if backend returned empty data (endpoint not available)
+  const isBackendPending = !revenueChartLoading && (!revenueChart?.data || revenueChart.data.length === 0)
 
   return (
     <Card className="rounded-3xl border-slate-100 shadow-sm">
@@ -147,6 +167,17 @@ const RevenueChartCard = memo(function RevenueChartCard({
           <div className="flex items-center justify-center py-16">
             <Loader2 className="h-6 w-6 animate-spin text-navy" />
           </div>
+        ) : isBackendPending ? (
+          <Alert className="border-amber-200 bg-amber-50">
+            <AlertTriangle className="h-4 w-4 text-amber-600" />
+            <AlertDescription className="text-sm text-amber-800">
+              <strong className="font-semibold">Backend Pending | الخلفية قيد التطوير</strong>
+              <br />
+              Revenue chart endpoint is not yet implemented. Historical revenue data reporting is coming soon.
+              <br />
+              نقطة نهاية تقرير الإيرادات غير متوفرة حالياً. تقارير البيانات التاريخية للإيرادات قيد التطوير.
+            </AlertDescription>
+          </Alert>
         ) : (
           <div className="space-y-4">
             {/* Simple Bar Chart Visualization */}
@@ -198,12 +229,16 @@ interface TasksChartCardProps {
   tasksChartLoading: boolean
 }
 
+// [BACKEND-PENDING] Tasks Chart endpoint not implemented: /reports/tasks-chart
 const TasksChartCard = memo(function TasksChartCard({
   t,
   tasksChart,
   tasksChartLoading,
 }: TasksChartCardProps) {
   const data = useMemo(() => tasksChart?.data?.slice(-12) || [], [tasksChart?.data])
+
+  // Check if backend returned empty data (endpoint not available)
+  const isBackendPending = !tasksChartLoading && (!tasksChart?.data || tasksChart.data.length === 0)
 
   return (
     <Card className="rounded-3xl border-slate-100 shadow-sm">
@@ -219,6 +254,17 @@ const TasksChartCard = memo(function TasksChartCard({
           <div className="flex items-center justify-center py-16">
             <Loader2 className="h-6 w-6 animate-spin text-navy" />
           </div>
+        ) : isBackendPending ? (
+          <Alert className="border-amber-200 bg-amber-50">
+            <AlertTriangle className="h-4 w-4 text-amber-600" />
+            <AlertDescription className="text-sm text-amber-800">
+              <strong className="font-semibold">Backend Pending | الخلفية قيد التطوير</strong>
+              <br />
+              Tasks chart endpoint is not yet implemented. Historical task data reporting is coming soon.
+              <br />
+              نقطة نهاية تقرير المهام غير متوفرة حالياً. تقارير البيانات التاريخية للمهام قيد التطوير.
+            </AlertDescription>
+          </Alert>
         ) : (
           <div className="space-y-4">
             {/* Simple Bar Chart Visualization */}

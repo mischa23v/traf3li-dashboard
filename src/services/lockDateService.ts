@@ -22,7 +22,6 @@
  * API service for fiscal period management and date locking
  */
 
-import apiClient from '@/lib/api'
 import type {
   LockDateConfig,
   LockType,
@@ -38,125 +37,147 @@ import type {
 
 /**
  * Get current lock date configuration
+ *
+ * ⚠️ NOT IMPLEMENTED: Backend endpoint does not exist
  */
 export const getLockDates = async (): Promise<LockDateConfig> => {
-  const response = await apiClient.get('/lock-dates')
-  return response.data?.data || response.data
+  throw new Error(
+    'Lock dates feature is not yet available. Backend endpoint not implemented. | ' +
+    'ميزة تواريخ القفل غير متاحة حالياً. نقطة النهاية الخلفية غير مطبقة.'
+  )
 }
 
 /**
  * Update a specific lock date
+ *
+ * ⚠️ NOT IMPLEMENTED: Backend endpoint does not exist
  */
 export const updateLockDate = async (
   lockType: LockType,
   data: UpdateLockDateData
 ): Promise<LockDateConfig> => {
-  const response = await apiClient.patch(`/lock-dates/${lockType}`, data)
-  return response.data?.data || response.data
+  throw new Error(
+    'Lock dates feature is not yet available. Backend endpoint not implemented. | ' +
+    'ميزة تواريخ القفل غير متاحة حالياً. نقطة النهاية الخلفية غير مطبقة.'
+  )
 }
 
 /**
  * Clear a lock date (set to null)
+ *
+ * ⚠️ NOT IMPLEMENTED: Backend endpoint does not exist
  */
 export const clearLockDate = async (lockType: LockType): Promise<LockDateConfig> => {
-  const response = await apiClient.delete(`/lock-dates/${lockType}`)
-  return response.data?.data || response.data
+  throw new Error(
+    'Lock dates feature is not yet available. Backend endpoint not implemented. | ' +
+    'ميزة تواريخ القفل غير متاحة حالياً. نقطة النهاية الخلفية غير مطبقة.'
+  )
 }
 
 // ==================== PERIOD LOCKING ====================
 
 /**
  * Lock a fiscal period
+ *
+ * ⚠️ NOT IMPLEMENTED: Backend endpoint does not exist
  */
 export const lockPeriod = async (data: LockPeriodData): Promise<LockDateConfig> => {
-  const response = await apiClient.post('/lock-dates/periods/lock', data)
-  return response.data?.data || response.data
+  throw new Error(
+    'Lock dates feature is not yet available. Backend endpoint not implemented. | ' +
+    'ميزة تواريخ القفل غير متاحة حالياً. نقطة النهاية الخلفية غير مطبقة.'
+  )
 }
 
 /**
  * Reopen a locked period
+ *
+ * ⚠️ NOT IMPLEMENTED: Backend endpoint does not exist
  */
 export const reopenPeriod = async (data: ReopenPeriodData): Promise<LockDateConfig> => {
-  const response = await apiClient.post('/lock-dates/periods/reopen', data)
-  return response.data?.data || response.data
+  throw new Error(
+    'Lock dates feature is not yet available. Backend endpoint not implemented. | ' +
+    'ميزة تواريخ القفل غير متاحة حالياً. نقطة النهاية الخلفية غير مطبقة.'
+  )
 }
 
 /**
  * Get list of fiscal periods with lock status
+ *
+ * ⚠️ NOT IMPLEMENTED: Backend endpoint does not exist
  */
 export const getFiscalPeriods = async (year?: number): Promise<FiscalPeriod[]> => {
-  const params = new URLSearchParams()
-  if (year) params.append('year', String(year))
-
-  const response = await apiClient.get(`/lock-dates/periods?${params.toString()}`)
-  return response.data?.data || response.data
+  throw new Error(
+    'Lock dates feature is not yet available. Backend endpoint not implemented. | ' +
+    'ميزة تواريخ القفل غير متاحة حالياً. نقطة النهاية الخلفية غير مطبقة.'
+  )
 }
 
 // ==================== LOCK CHECKING ====================
 
 /**
  * Check if a date is locked
+ *
+ * ⚠️ NOT IMPLEMENTED: Backend endpoint does not exist
  */
 export const checkDateLocked = async (
   date: string,
   lockType?: LockType
 ): Promise<LockCheckResult> => {
-  const params = new URLSearchParams()
-  params.append('date', date)
-  if (lockType) params.append('lock_type', lockType)
-
-  const response = await apiClient.post('/lock-dates/check', { date, lock_type: lockType })
-  return response.data?.data || response.data
+  throw new Error(
+    'Lock dates feature is not yet available. Backend endpoint not implemented. | ' +
+    'ميزة تواريخ القفل غير متاحة حالياً. نقطة النهاية الخلفية غير مطبقة.'
+  )
 }
 
 /**
  * Check if a date range has any locked dates
+ *
+ * ⚠️ NOT IMPLEMENTED: Backend endpoint does not exist
  */
 export const checkDateRangeLocked = async (
   startDate: string,
   endDate: string,
   lockType?: LockType
 ): Promise<LockCheckResult> => {
-  const response = await apiClient.post('/lock-dates/check-range', {
-    start_date: startDate,
-    end_date: endDate,
-    lock_type: lockType,
-  })
-  return response.data?.data || response.data
+  throw new Error(
+    'Lock dates feature is not yet available. Backend endpoint not implemented. | ' +
+    'ميزة تواريخ القفل غير متاحة حالياً. نقطة النهاية الخلفية غير مطبقة.'
+  )
 }
 
 // ==================== HISTORY ====================
 
 /**
  * Get lock date change history
+ *
+ * ⚠️ NOT IMPLEMENTED: Backend endpoint does not exist
  */
 export const getLockDateHistory = async (
   lockType?: LockType,
   page?: number,
   limit?: number
 ): Promise<LockDateHistory> => {
-  const params = new URLSearchParams()
-  if (lockType) params.append('lock_type', lockType)
-  if (page) params.append('page', String(page))
-  if (limit) params.append('limit', String(limit))
-
-  const response = await apiClient.get(`/lock-dates/history?${params.toString()}`)
-  return response.data?.data || response.data
+  throw new Error(
+    'Lock dates feature is not yet available. Backend endpoint not implemented. | ' +
+    'ميزة تواريخ القفل غير متاحة حالياً. نقطة النهاية الخلفية غير مطبقة.'
+  )
 }
 
 // ==================== FISCAL YEAR ====================
 
 /**
  * Update fiscal year end date
+ *
+ * ⚠️ NOT IMPLEMENTED: Backend endpoint does not exist
  */
 export const updateFiscalYearEnd = async (
   month: number,
   day: number
 ): Promise<LockDateConfig> => {
-  const response = await apiClient.patch('/lock-dates/fiscal-year-end', {
-    fiscalYearEnd: { month, day },
-  })
-  return response.data?.data || response.data
+  throw new Error(
+    'Lock dates feature is not yet available. Backend endpoint not implemented. | ' +
+    'ميزة تواريخ القفل غير متاحة حالياً. نقطة النهاية الخلفية غير مطبقة.'
+  )
 }
 
 // ==================== SERVICE OBJECT ====================

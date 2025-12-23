@@ -1,5 +1,50 @@
+/**
+ * HR Service
+ * Handles all HR/employee management API calls
+ * Base route: /api/hr
+ *
+ * ⚠️ WARNING: HR endpoints are not yet implemented in the backend
+ * All endpoints in this service are [BACKEND-PENDING]
+ *
+ * The backend currently supports legal practice management (cases, clients, invoices),
+ * but does not have HR module implementation yet. These endpoints will need to be
+ * created in the backend before this service can function properly.
+ *
+ * Expected backend endpoints to implement:
+ * - GET/POST /hr/employees - Employee CRUD
+ * - GET /hr/employees/stats - Employee statistics
+ * - POST /hr/employees/bulk-delete - Bulk operations
+ * - GET /hr/options - Form options
+ * - POST/DELETE /hr/employees/:id/allowances - Allowance management
+ * - POST/DELETE /hr/employees/:id/documents - Document management
+ */
+
 import { apiClient } from '@/lib/api'
 import { isValidObjectId } from '@/utils/validation-patterns'
+
+/**
+ * Helper function to throw bilingual error message for not-yet-implemented endpoints
+ */
+const throwNotImplementedError = (operation: string, endpoint: string): never => {
+  throw new Error(
+    `❌ Backend Not Implemented | الخلفية غير مطبقة\n\n` +
+    `EN: The HR backend endpoint '${endpoint}' is not yet implemented. ` +
+    `This operation (${operation}) cannot be performed until the backend endpoint is created.\n\n` +
+    `AR: نقطة نهاية الموارد البشرية '${endpoint}' غير مطبقة بعد. ` +
+    `لا يمكن تنفيذ هذه العملية (${operation}) حتى يتم إنشاء نقطة النهاية الخلفية.`
+  )
+}
+
+/**
+ * Helper function to format bilingual error messages for API errors
+ */
+const formatBilingualError = (error: any, operation: string): string => {
+  const defaultMsg = `فشلت العملية | Operation failed: ${operation}`
+  if (error.response?.data?.message) {
+    return `${error.response.data.message} | ${defaultMsg}`
+  }
+  return `${error.message || 'خطأ غير معروف | Unknown error'} | ${defaultMsg}`
+}
 
 // ==================== ENUMS & TYPES ====================
 
@@ -358,114 +403,270 @@ export interface EmployeeStats {
 const hrService = {
   // ==================== EMPLOYEES ====================
 
+  /**
+   * Get all employees with optional filtering
+   * GET /api/hr/employees
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message when API call fails
+   */
   getEmployees: async (filters?: EmployeeFilters): Promise<EmployeesResponse> => {
-    const params = new URLSearchParams()
-    if (filters) {
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
-          if (Array.isArray(value)) {
-            value.forEach(v => params.append(key, v))
-          } else {
-            params.append(key, String(value))
+    // TODO: [BACKEND-PENDING] Backend needs to implement GET /hr/employees with filtering, pagination, sorting
+    try {
+      const params = new URLSearchParams()
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            if (Array.isArray(value)) {
+              value.forEach(v => params.append(key, v))
+            } else {
+              params.append(key, String(value))
+            }
           }
-        }
-      })
+        })
+      }
+      const response = await apiClient.get(`/hr/employees?${params.toString()}`)
+      return response.data
+    } catch (error: any) {
+      throw new Error(formatBilingualError(error, 'getEmployees'))
     }
-    const response = await apiClient.get(`/hr/employees?${params.toString()}`)
-    return response.data
   },
 
+  /**
+   * Get single employee by ID
+   * GET /api/hr/employees/:id
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message when API call fails or ID is invalid
+   */
   getEmployee: async (id: string): Promise<Employee> => {
+    // TODO: [BACKEND-PENDING] Backend needs to implement GET /hr/employees/:id
     if (!isValidObjectId(id)) {
-      throw new Error('معرّف الموظف غير صالح / Invalid employee ID')
+      throw new Error('معرّف الموظف غير صالح | Invalid employee ID')
     }
-    const response = await apiClient.get(`/hr/employees/${id}`)
-    return response.data
+    try {
+      const response = await apiClient.get(`/hr/employees/${id}`)
+      return response.data
+    } catch (error: any) {
+      throw new Error(formatBilingualError(error, 'getEmployee'))
+    }
   },
 
+  /**
+   * Create new employee
+   * POST /api/hr/employees
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message when API call fails
+   */
   createEmployee: async (data: CreateEmployeeData): Promise<Employee> => {
-    const response = await apiClient.post('/hr/employees', data)
-    // Handle different response structures: direct employee, { employee: ... }, or { data: ... }
-    return response.data?.employee || response.data?.data || response.data
+    // TODO: [BACKEND-PENDING] Backend needs to implement POST /hr/employees
+    try {
+      const response = await apiClient.post('/hr/employees', data)
+      // Handle different response structures: direct employee, { employee: ... }, or { data: ... }
+      return response.data?.employee || response.data?.data || response.data
+    } catch (error: any) {
+      throw new Error(formatBilingualError(error, 'createEmployee'))
+    }
   },
 
+  /**
+   * Update employee by ID
+   * PUT /api/hr/employees/:id
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message when API call fails or ID is invalid
+   */
   updateEmployee: async (id: string, data: UpdateEmployeeData): Promise<Employee> => {
+    // TODO: [BACKEND-PENDING] Backend needs to implement PUT /hr/employees/:id
     if (!isValidObjectId(id)) {
-      throw new Error('معرّف الموظف غير صالح / Invalid employee ID')
+      throw new Error('معرّف الموظف غير صالح | Invalid employee ID')
     }
-    const response = await apiClient.put(`/hr/employees/${id}`, data)
-    return response.data
+    try {
+      const response = await apiClient.put(`/hr/employees/${id}`, data)
+      return response.data
+    } catch (error: any) {
+      throw new Error(formatBilingualError(error, 'updateEmployee'))
+    }
   },
 
+  /**
+   * Delete employee by ID
+   * DELETE /api/hr/employees/:id
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message when API call fails or ID is invalid
+   */
   deleteEmployee: async (id: string): Promise<void> => {
+    // TODO: [BACKEND-PENDING] Backend needs to implement DELETE /hr/employees/:id
     if (!isValidObjectId(id)) {
-      throw new Error('معرّف الموظف غير صالح / Invalid employee ID')
+      throw new Error('معرّف الموظف غير صالح | Invalid employee ID')
     }
-    await apiClient.delete(`/hr/employees/${id}`)
+    try {
+      await apiClient.delete(`/hr/employees/${id}`)
+    } catch (error: any) {
+      throw new Error(formatBilingualError(error, 'deleteEmployee'))
+    }
   },
 
+  /**
+   * Get employee statistics
+   * GET /api/hr/employees/stats
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message when API call fails
+   */
   getEmployeeStats: async (): Promise<EmployeeStats> => {
-    const response = await apiClient.get('/hr/employees/stats')
-    return response.data
+    // TODO: [BACKEND-PENDING] Backend needs to implement GET /hr/employees/stats
+    try {
+      const response = await apiClient.get('/hr/employees/stats')
+      return response.data
+    } catch (error: any) {
+      throw new Error(formatBilingualError(error, 'getEmployeeStats'))
+    }
   },
 
+  /**
+   * Bulk delete employees
+   * POST /api/hr/employees/bulk-delete
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message when API call fails
+   */
   bulkDeleteEmployees: async (ids: string[]): Promise<void> => {
-    await apiClient.post('/hr/employees/bulk-delete', { ids })
+    // TODO: [BACKEND-PENDING] Backend needs to implement POST /hr/employees/bulk-delete
+    try {
+      await apiClient.post('/hr/employees/bulk-delete', { ids })
+    } catch (error: any) {
+      throw new Error(formatBilingualError(error, 'bulkDeleteEmployees'))
+    }
   },
 
   // ==================== FORM OPTIONS ====================
 
+  /**
+   * Get form options for dropdowns (departments, positions, etc.)
+   * GET /api/hr/options
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message when API call fails
+   */
   getFormOptions: async (): Promise<any> => {
-    const response = await apiClient.get('/hr/options')
-    return response.data
+    // TODO: [BACKEND-PENDING] Backend needs to implement GET /hr/options
+    try {
+      const response = await apiClient.get('/hr/options')
+      return response.data
+    } catch (error: any) {
+      throw new Error(formatBilingualError(error, 'getFormOptions'))
+    }
   },
 
   // ==================== ALLOWANCES ====================
 
+  /**
+   * Add allowance to employee
+   * POST /api/hr/employees/:id/allowances
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message when API call fails or ID is invalid
+   */
   addAllowance: async (id: string, data: Allowance): Promise<Employee> => {
+    // TODO: [BACKEND-PENDING] Backend needs to implement POST /hr/employees/:id/allowances
     if (!isValidObjectId(id)) {
-      throw new Error('معرّف الموظف غير صالح / Invalid employee ID')
+      throw new Error('معرّف الموظف غير صالح | Invalid employee ID')
     }
-    const response = await apiClient.post(`/hr/employees/${id}/allowances`, data)
-    return response.data
+    try {
+      const response = await apiClient.post(`/hr/employees/${id}/allowances`, data)
+      return response.data
+    } catch (error: any) {
+      throw new Error(formatBilingualError(error, 'addAllowance'))
+    }
   },
 
+  /**
+   * Remove allowance from employee
+   * DELETE /api/hr/employees/:id/allowances/:allowanceId
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message when API call fails or ID is invalid
+   */
   removeAllowance: async (id: string, allowanceId: string): Promise<Employee> => {
+    // TODO: [BACKEND-PENDING] Backend needs to implement DELETE /hr/employees/:id/allowances/:allowanceId
     if (!isValidObjectId(id)) {
-      throw new Error('معرّف الموظف غير صالح / Invalid employee ID')
+      throw new Error('معرّف الموظف غير صالح | Invalid employee ID')
     }
-    const response = await apiClient.delete(`/hr/employees/${id}/allowances/${allowanceId}`)
-    return response.data
+    try {
+      const response = await apiClient.delete(`/hr/employees/${id}/allowances/${allowanceId}`)
+      return response.data
+    } catch (error: any) {
+      throw new Error(formatBilingualError(error, 'removeAllowance'))
+    }
   },
 
   // ==================== DOCUMENTS ====================
 
+  /**
+   * Upload document for employee
+   * POST /api/hr/employees/:id/documents
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message when API call fails or ID is invalid
+   */
   uploadDocument: async (employeeId: string, file: File, documentType: DocumentType): Promise<EmployeeDocument> => {
+    // TODO: [BACKEND-PENDING] Backend needs to implement POST /hr/employees/:id/documents with file upload support
     if (!isValidObjectId(employeeId)) {
-      throw new Error('معرّف الموظف غير صالح / Invalid employee ID')
+      throw new Error('معرّف الموظف غير صالح | Invalid employee ID')
     }
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('documentType', documentType)
-    const response = await apiClient.post(`/hr/employees/${employeeId}/documents`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
-    return response.data
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('documentType', documentType)
+      const response = await apiClient.post(`/hr/employees/${employeeId}/documents`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+      return response.data
+    } catch (error: any) {
+      throw new Error(formatBilingualError(error, 'uploadDocument'))
+    }
   },
 
+  /**
+   * Delete employee document
+   * DELETE /api/hr/employees/:id/documents/:documentId
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message when API call fails or ID is invalid
+   */
   deleteDocument: async (employeeId: string, documentId: string): Promise<void> => {
+    // TODO: [BACKEND-PENDING] Backend needs to implement DELETE /hr/employees/:id/documents/:documentId
     if (!isValidObjectId(employeeId)) {
-      throw new Error('معرّف الموظف غير صالح / Invalid employee ID')
+      throw new Error('معرّف الموظف غير صالح | Invalid employee ID')
     }
-    await apiClient.delete(`/hr/employees/${employeeId}/documents/${documentId}`)
+    try {
+      await apiClient.delete(`/hr/employees/${employeeId}/documents/${documentId}`)
+    } catch (error: any) {
+      throw new Error(formatBilingualError(error, 'deleteDocument'))
+    }
   },
 
+  /**
+   * Verify employee document
+   * PATCH /api/hr/employees/:id/documents/:documentId/verify
+   *
+   * ⚠️ [BACKEND-PENDING] This endpoint is not yet implemented in the backend
+   * @throws Error with bilingual message when API call fails or ID is invalid
+   */
   verifyDocument: async (employeeId: string, documentId: string): Promise<EmployeeDocument> => {
+    // TODO: [BACKEND-PENDING] Backend needs to implement PATCH /hr/employees/:id/documents/:documentId/verify
     if (!isValidObjectId(employeeId)) {
-      throw new Error('معرّف الموظف غير صالح / Invalid employee ID')
+      throw new Error('معرّف الموظف غير صالح | Invalid employee ID')
     }
-    const response = await apiClient.patch(`/hr/employees/${employeeId}/documents/${documentId}/verify`)
-    return response.data
+    try {
+      const response = await apiClient.patch(`/hr/employees/${employeeId}/documents/${documentId}/verify`)
+      return response.data
+    } catch (error: any) {
+      throw new Error(formatBilingualError(error, 'verifyDocument'))
+    }
   },
 }
 

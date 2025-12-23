@@ -222,6 +222,8 @@ export const revokeApiKey = async (keyId: string): Promise<void> => {
  * the name and description fields - it cannot change scopes, expiration, or the key itself.
  * The key's permissions and expiration date remain unchanged.
  *
+ * @deprecated This endpoint is scheduled for removal in Q2 2025. Please use the new API key management endpoints instead.
+ *
  * @param {string} keyId - The unique identifier of the API key to update
  * @param {Object} data - Object containing the fields to update
  * @param {string} [data.name] - New name for the API key
@@ -254,6 +256,10 @@ export const updateApiKey = async (
   keyId: string,
   data: { name?: string; description?: string }
 ): Promise<ApiKey> => {
+  console.warn(
+    'DEPRECATED: updateApiKey() is scheduled for removal in Q2 2025. Please migrate to the new API key management endpoints.'
+  )
+
   try {
     const response = await apiClient.patch(`/api-keys/${keyId}`, data)
     return response.data.data

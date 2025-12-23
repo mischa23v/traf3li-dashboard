@@ -1,9 +1,105 @@
 /**
  * Cases Service
  * Handles all case-related API calls matching the backend API
+ *
+ * ⚠️ IMPORTANT: Some endpoints are not yet implemented in the backend.
+ * These endpoints will throw bilingual error messages when called.
+ * See individual function documentation for implementation status.
  */
 
 import apiClient, { handleApiError } from '@/lib/api'
+import { formatBilingualError } from '@/lib/bilingualErrorHandler'
+
+/**
+ * Bilingual error messages for case operations
+ */
+const CASE_ERRORS = {
+  NOT_IMPLEMENTED: {
+    en: 'This feature is not available yet. Please contact support.',
+    ar: 'هذه الميزة غير متاحة حالياً. يرجى التواصل مع الدعم.',
+  },
+  CASE_NOT_FOUND: {
+    en: 'Case not found.',
+    ar: 'القضية غير موجودة.',
+  },
+  CASE_CREATE_FAILED: {
+    en: 'Failed to create case. Please try again.',
+    ar: 'فشل إنشاء القضية. يرجى المحاولة مرة أخرى.',
+  },
+  CASE_UPDATE_FAILED: {
+    en: 'Failed to update case. Please try again.',
+    ar: 'فشل تحديث القضية. يرجى المحاولة مرة أخرى.',
+  },
+  CASE_DELETE_FAILED: {
+    en: 'Failed to delete case. Please try again.',
+    ar: 'فشل حذف القضية. يرجى المحاولة مرة أخرى.',
+  },
+  NOTE_OPERATION_FAILED: {
+    en: 'Failed to perform note operation. Please try again.',
+    ar: 'فشل تنفيذ عملية الملاحظة. يرجى المحاولة مرة أخرى.',
+  },
+  DOCUMENT_OPERATION_FAILED: {
+    en: 'Failed to perform document operation. Please try again.',
+    ar: 'فشل تنفيذ عملية المستند. يرجى المحاولة مرة أخرى.',
+  },
+  HEARING_OPERATION_FAILED: {
+    en: 'Failed to perform hearing operation. Please try again.',
+    ar: 'فشل تنفيذ عملية الجلسة. يرجى المحاولة مرة أخرى.',
+  },
+  CLAIM_OPERATION_FAILED: {
+    en: 'Failed to perform claim operation. Please try again.',
+    ar: 'فشل تنفيذ عملية المطالبة. يرجى المحاولة مرة أخرى.',
+  },
+  TIMELINE_OPERATION_FAILED: {
+    en: 'Failed to perform timeline operation. Please try again.',
+    ar: 'فشل تنفيذ عملية الجدول الزمني. يرجى المحاولة مرة أخرى.',
+  },
+  PIPELINE_OPERATION_FAILED: {
+    en: 'Failed to perform pipeline operation. Please try again.',
+    ar: 'فشل تنفيذ عملية المسار. يرجى المحاولة مرة أخرى.',
+  },
+  STATISTICS_FETCH_FAILED: {
+    en: 'Failed to fetch statistics. Please try again.',
+    ar: 'فشل جلب الإحصائيات. يرجى المحاولة مرة أخرى.',
+  },
+  AUDIT_FETCH_FAILED: {
+    en: 'Failed to fetch audit history. Please try again.',
+    ar: 'فشل جلب سجل المراجعة. يرجى المحاولة مرة أخرى.',
+  },
+  RICH_DOCUMENT_OPERATION_FAILED: {
+    en: 'Failed to perform document operation. Please try again.',
+    ar: 'فشل تنفيذ عملية المستند. يرجى المحاولة مرة أخرى.',
+  },
+  UPLOAD_FAILED: {
+    en: 'Failed to upload file to storage.',
+    ar: 'فشل رفع الملف إلى التخزين.',
+  },
+} as const
+
+/**
+ * Throws a bilingual error for not implemented endpoints
+ */
+function throwNotImplemented(feature: string): never {
+  throw new Error(formatBilingualError({
+    en: `${feature} is not implemented yet. ${CASE_ERRORS.NOT_IMPLEMENTED.en}`,
+    ar: `${feature} غير متاح حالياً. ${CASE_ERRORS.NOT_IMPLEMENTED.ar}`,
+  }))
+}
+
+/**
+ * Enhanced error handler with bilingual messages
+ */
+function handleCaseError(error: any, operation: keyof typeof CASE_ERRORS): never {
+  const errorMessage = CASE_ERRORS[operation]
+  const apiError = handleApiError(error)
+
+  // If we have a specific API error message, use it; otherwise use our bilingual message
+  if (apiError && typeof apiError === 'string' && apiError.length > 0) {
+    throw new Error(apiError)
+  }
+
+  throw new Error(formatBilingualError(errorMessage))
+}
 
 // ==================== TYPES ====================
 
@@ -808,7 +904,7 @@ interface PipelineStagesResponse {
 const casesService = {
   /**
    * Get all cases with optional filters
-   * GET /api/cases/
+   * ✅ IMPLEMENTED - GET /api/cases/
    */
   getCases: async (filters?: CaseFilters): Promise<{ cases: Case[]; total: number; pagination?: PaginationInfo }> => {
     try {
@@ -838,163 +934,152 @@ const casesService = {
         pagination: response.data.pagination,
       }
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      handleCaseError(error, 'CASE_NOT_FOUND')
     }
   },
 
   /**
    * Get single case by ID
-   * GET /api/cases/:id
+   * ✅ IMPLEMENTED - GET /api/cases/:id
    */
   getCase: async (id: string): Promise<Case> => {
     try {
       const response = await apiClient.get<CaseResponse>(`/cases/${id}`)
       return response.data.case
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      handleCaseError(error, 'CASE_NOT_FOUND')
     }
   },
 
   /**
    * Create new case (external client)
-   * POST /api/cases/
+   * ✅ IMPLEMENTED - POST /api/cases/
    */
   createCase: async (data: CreateCaseData): Promise<Case> => {
     try {
       const response = await apiClient.post<CaseResponse>('/cases', data)
       return response.data.case
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      handleCaseError(error, 'CASE_CREATE_FAILED')
     }
   },
 
   /**
    * Create case from platform contract
-   * POST /api/cases/
+   * ✅ IMPLEMENTED - POST /api/cases/
    */
   createCaseFromContract: async (data: CreateCaseFromContractData): Promise<Case> => {
     try {
       const response = await apiClient.post<CaseResponse>('/cases', data)
       return response.data.case
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      handleCaseError(error, 'CASE_CREATE_FAILED')
     }
   },
 
   /**
    * Update case
-   * PATCH /api/cases/:id
+   * ✅ IMPLEMENTED - PATCH /api/cases/:id
    */
   updateCase: async (id: string, data: UpdateCaseData): Promise<Case> => {
     try {
       const response = await apiClient.patch<CaseResponse>(`/cases/${id}`, data)
       return response.data.case
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      handleCaseError(error, 'CASE_UPDATE_FAILED')
     }
   },
 
   /**
    * Add note to case
-   * POST /api/cases/:id/note
+   * ✅ IMPLEMENTED - POST /api/cases/:id/note
    */
   addNote: async (id: string, data: AddNoteData): Promise<Case> => {
     try {
       const response = await apiClient.post<CaseResponse>(`/cases/${id}/note`, data)
       return response.data.case
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      handleCaseError(error, 'NOTE_OPERATION_FAILED')
     }
   },
 
   /**
    * Add document to case
-   * POST /api/cases/:id/document
+   * ✅ IMPLEMENTED - POST /api/cases/:id/document
    */
   addDocument: async (id: string, data: AddDocumentData): Promise<Case> => {
     try {
       const response = await apiClient.post<CaseResponse>(`/cases/${id}/document`, data)
       return response.data.case
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      handleCaseError(error, 'DOCUMENT_OPERATION_FAILED')
     }
   },
 
   /**
    * Add hearing to case
-   * POST /api/cases/:id/hearing
+   * ✅ IMPLEMENTED - POST /api/cases/:id/hearing
    */
   addHearing: async (id: string, data: AddHearingData): Promise<Case> => {
     try {
       const response = await apiClient.post<CaseResponse>(`/cases/${id}/hearing`, data)
       return response.data.case
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      handleCaseError(error, 'HEARING_OPERATION_FAILED')
     }
   },
 
   /**
    * Add claim to case
-   * POST /api/cases/:id/claim
+   * ❌ NOT IMPLEMENTED - POST /api/cases/:id/claim
+   * Backend endpoint does not exist yet. Use updateCase() to update claims array instead.
    */
   addClaim: async (id: string, data: AddClaimData): Promise<Case> => {
-    try {
-      const response = await apiClient.post<CaseResponse>(`/cases/${id}/claim`, data)
-      return response.data.case
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Add Claim | إضافة مطالبة')
   },
 
   /**
    * Update case progress
-   * PATCH /api/cases/:id/progress
+   * ❌ NOT IMPLEMENTED - PATCH /api/cases/:id/progress
+   * Backend endpoint does not exist yet. Use updateCase() with progress field instead.
    */
   updateProgress: async (id: string, progress: number): Promise<Case> => {
-    try {
-      const response = await apiClient.patch<CaseResponse>(`/cases/${id}/progress`, { progress })
-      return response.data.case
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Update Progress | تحديث التقدم')
   },
 
   /**
    * Update case status
-   * PATCH /api/cases/:id/status
+   * ✅ IMPLEMENTED - PATCH /api/cases/:id/status
    */
   updateStatus: async (id: string, status: CaseStatus): Promise<Case> => {
     try {
       const response = await apiClient.patch<CaseResponse>(`/cases/${id}/status`, { status })
       return response.data.case
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      handleCaseError(error, 'CASE_UPDATE_FAILED')
     }
   },
 
   /**
    * Update case outcome
-   * PATCH /api/cases/:id/outcome
+   * ✅ IMPLEMENTED - PATCH /api/cases/:id/outcome
    */
   updateOutcome: async (id: string, outcome: CaseOutcome): Promise<Case> => {
     try {
       const response = await apiClient.patch<CaseResponse>(`/cases/${id}/outcome`, { outcome })
       return response.data.case
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      handleCaseError(error, 'CASE_UPDATE_FAILED')
     }
   },
 
   /**
-   * Delete case (if supported)
-   * DELETE /api/cases/:id
+   * Delete case
+   * ❌ NOT IMPLEMENTED - DELETE /api/cases/:id
+   * Backend endpoint does not exist yet.
    */
   deleteCase: async (id: string): Promise<void> => {
-    try {
-      await apiClient.delete(`/cases/${id}`)
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Delete Case | حذف القضية')
   },
 
   /**
@@ -1042,205 +1127,143 @@ const casesService = {
 
   /**
    * Get case statistics from API
-   * GET /api/cases/statistics
+   * ❌ NOT IMPLEMENTED - GET /api/cases/statistics
+   * Use calculateStatistics() with local cases array instead.
    */
   getStatistics: async (): Promise<CaseStatistics> => {
-    try {
-      const response = await apiClient.get<StatisticsResponse>('/cases/statistics')
-      return response.data.statistics
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Get Statistics | جلب الإحصائيات')
   },
 
   // ==================== NOTES CRUD ====================
 
   /**
    * Update note in case
-   * PATCH /api/cases/:id/notes/:noteId
+   * ❌ NOT IMPLEMENTED - PATCH /api/cases/:id/notes/:noteId
+   * Backend endpoint does not exist yet. Use updateCase() to modify notes array instead.
    */
   updateNote: async (caseId: string, noteId: string, data: UpdateNoteData): Promise<Case> => {
-    try {
-      const response = await apiClient.patch<CaseResponse>(`/cases/${caseId}/notes/${noteId}`, data)
-      return response.data.case
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Update Note | تحديث الملاحظة')
   },
 
   /**
    * Delete note from case
-   * DELETE /api/cases/:id/notes/:noteId
+   * ❌ NOT IMPLEMENTED - DELETE /api/cases/:id/notes/:noteId
+   * Backend endpoint does not exist yet. Use updateCase() to modify notes array instead.
    */
   deleteNote: async (caseId: string, noteId: string): Promise<Case> => {
-    try {
-      const response = await apiClient.delete<CaseResponse>(`/cases/${caseId}/notes/${noteId}`)
-      return response.data.case
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Delete Note | حذف الملاحظة')
   },
 
   // ==================== HEARINGS CRUD ====================
 
   /**
    * Update hearing in case
-   * PATCH /api/cases/:id/hearings/:hearingId
+   * ❌ NOT IMPLEMENTED - PATCH /api/cases/:id/hearings/:hearingId
+   * Backend endpoint does not exist yet. Use updateCase() to modify hearings array instead.
    */
   updateHearing: async (caseId: string, hearingId: string, data: UpdateHearingData): Promise<Case> => {
-    try {
-      const response = await apiClient.patch<CaseResponse>(`/cases/${caseId}/hearings/${hearingId}`, data)
-      return response.data.case
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Update Hearing | تحديث الجلسة')
   },
 
   /**
    * Delete hearing from case
-   * DELETE /api/cases/:id/hearings/:hearingId
+   * ❌ NOT IMPLEMENTED - DELETE /api/cases/:id/hearings/:hearingId
+   * Backend endpoint does not exist yet. Use updateCase() to modify hearings array instead.
    */
   deleteHearing: async (caseId: string, hearingId: string): Promise<Case> => {
-    try {
-      const response = await apiClient.delete<CaseResponse>(`/cases/${caseId}/hearings/${hearingId}`)
-      return response.data.case
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Delete Hearing | حذف الجلسة')
   },
 
   // ==================== CLAIMS CRUD ====================
 
   /**
    * Update claim in case
-   * PATCH /api/cases/:id/claims/:claimId
+   * ❌ NOT IMPLEMENTED - PATCH /api/cases/:id/claims/:claimId
+   * Backend endpoint does not exist yet. Use updateCase() to modify claims array instead.
    */
   updateClaim: async (caseId: string, claimId: string, data: UpdateClaimData): Promise<Case> => {
-    try {
-      const response = await apiClient.patch<CaseResponse>(`/cases/${caseId}/claims/${claimId}`, data)
-      return response.data.case
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Update Claim | تحديث المطالبة')
   },
 
   /**
    * Delete claim from case
-   * DELETE /api/cases/:id/claims/:claimId
+   * ❌ NOT IMPLEMENTED - DELETE /api/cases/:id/claims/:claimId
+   * Backend endpoint does not exist yet. Use updateCase() to modify claims array instead.
    */
   deleteClaim: async (caseId: string, claimId: string): Promise<Case> => {
-    try {
-      const response = await apiClient.delete<CaseResponse>(`/cases/${caseId}/claims/${claimId}`)
-      return response.data.case
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Delete Claim | حذف المطالبة')
   },
 
   // ==================== TIMELINE CRUD ====================
 
   /**
    * Add timeline event to case
-   * POST /api/cases/:id/timeline
+   * ❌ NOT IMPLEMENTED - POST /api/cases/:id/timeline
+   * Backend endpoint does not exist yet. Use updateCase() to modify timeline array instead.
    */
   addTimelineEvent: async (caseId: string, data: AddTimelineEventData): Promise<Case> => {
-    try {
-      const response = await apiClient.post<CaseResponse>(`/cases/${caseId}/timeline`, data)
-      return response.data.case
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Add Timeline Event | إضافة حدث للجدول الزمني')
   },
 
   /**
    * Update timeline event in case
-   * PATCH /api/cases/:id/timeline/:eventId
+   * ❌ NOT IMPLEMENTED - PATCH /api/cases/:id/timeline/:eventId
+   * Backend endpoint does not exist yet. Use updateCase() to modify timeline array instead.
    */
   updateTimelineEvent: async (caseId: string, eventId: string, data: UpdateTimelineEventData): Promise<Case> => {
-    try {
-      const response = await apiClient.patch<CaseResponse>(`/cases/${caseId}/timeline/${eventId}`, data)
-      return response.data.case
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Update Timeline Event | تحديث حدث الجدول الزمني')
   },
 
   /**
    * Delete timeline event from case
-   * DELETE /api/cases/:id/timeline/:eventId
+   * ❌ NOT IMPLEMENTED - DELETE /api/cases/:id/timeline/:eventId
+   * Backend endpoint does not exist yet. Use updateCase() to modify timeline array instead.
    */
   deleteTimelineEvent: async (caseId: string, eventId: string): Promise<Case> => {
-    try {
-      const response = await apiClient.delete<CaseResponse>(`/cases/${caseId}/timeline/${eventId}`)
-      return response.data.case
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Delete Timeline Event | حذف حدث الجدول الزمني')
   },
 
   // ==================== DOCUMENT MANAGEMENT ====================
 
   /**
    * Get presigned URL for document upload
-   * POST /api/cases/:id/documents/upload-url
+   * ❌ NOT IMPLEMENTED - POST /api/cases/:id/documents/upload-url
+   * Backend endpoint does not exist yet. Use addDocument() with direct URLs instead.
    */
   getDocumentUploadUrl: async (caseId: string, data: GetUploadUrlData): Promise<UploadUrlResponse> => {
-    try {
-      const response = await apiClient.post<UploadUrlApiResponse>(`/cases/${caseId}/documents/upload-url`, data)
-      return {
-        uploadUrl: response.data.uploadUrl,
-        fileKey: response.data.fileKey,
-        bucket: response.data.bucket,
-      }
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Get Document Upload URL | الحصول على رابط رفع المستند')
   },
 
   /**
    * Confirm document upload (save metadata to DB)
-   * POST /api/cases/:id/documents/confirm
+   * ❌ NOT IMPLEMENTED - POST /api/cases/:id/documents/confirm
+   * Backend endpoint does not exist yet. Use addDocument() directly instead.
    */
   confirmDocumentUpload: async (caseId: string, data: ConfirmUploadData): Promise<Case> => {
-    try {
-      const response = await apiClient.post<CaseResponse>(`/cases/${caseId}/documents/confirm`, data)
-      return response.data.case
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Confirm Document Upload | تأكيد رفع المستند')
   },
 
   /**
    * Get presigned URL for document download
-   * GET /api/cases/:id/documents/:docId/download
+   * ❌ NOT IMPLEMENTED - GET /api/cases/:id/documents/:docId/download
+   * Backend endpoint does not exist yet. Documents are stored directly in case.documents array.
    */
   getDocumentDownloadUrl: async (caseId: string, docId: string): Promise<{ downloadUrl: string; filename: string }> => {
-    try {
-      const response = await apiClient.get<DownloadUrlResponse>(`/cases/${caseId}/documents/${docId}/download`)
-      return {
-        downloadUrl: response.data.downloadUrl,
-        filename: response.data.filename,
-      }
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Get Document Download URL | الحصول على رابط تحميل المستند')
   },
 
   /**
    * Delete document from case
-   * DELETE /api/cases/:id/documents/:docId
+   * ❌ NOT IMPLEMENTED - DELETE /api/cases/:id/documents/:docId
+   * Backend endpoint does not exist yet. Use updateCase() to modify documents array instead.
    */
   deleteDocument: async (caseId: string, docId: string): Promise<Case> => {
-    try {
-      const response = await apiClient.delete<CaseResponse>(`/cases/${caseId}/documents/${docId}`)
-      return response.data.case
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Delete Document | حذف المستند')
   },
 
   /**
    * Upload file directly to S3 using presigned URL
+   * ⚠️ UTILITY FUNCTION - Works if presigned URL is provided
    */
   uploadFileToS3: async (uploadUrl: string, file: File): Promise<void> => {
     try {
@@ -1252,7 +1275,7 @@ const casesService = {
         },
       })
     } catch (error: any) {
-      throw new Error('Failed to upload file to storage')
+      throw new Error(formatBilingualError(CASE_ERRORS.UPLOAD_FAILED))
     }
   },
 
@@ -1260,22 +1283,19 @@ const casesService = {
 
   /**
    * Get audit history for case
-   * GET /api/cases/:id/audit
+   * ❌ NOT IMPLEMENTED - GET /api/cases/:id/audit
+   * Backend endpoint does not exist yet.
    */
   getAuditHistory: async (caseId: string): Promise<AuditLogEntry[]> => {
-    try {
-      const response = await apiClient.get<AuditLogResponse>(`/cases/${caseId}/audit`)
-      return response.data.logs || []
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Get Audit History | سجل المراجعة')
   },
 
   // ==================== RICH DOCUMENTS (CKEditor) ====================
+  // ⚠️ All rich document endpoints are NOT IMPLEMENTED in backend
 
   /**
    * Create rich document (CKEditor content)
-   * POST /api/cases/:id/rich-documents
+   * ❌ NOT IMPLEMENTED - POST /api/cases/:id/rich-documents
    */
   createRichDocument: async (caseId: string, data: {
     title: string
@@ -1283,43 +1303,28 @@ const casesService = {
     category?: string
     tags?: string[]
   }): Promise<any> => {
-    try {
-      const response = await apiClient.post(`/cases/${caseId}/rich-documents`, data)
-      return response.data.document || response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Create Rich Document | إنشاء مستند منسق')
   },
 
   /**
    * Get all rich documents for a case
-   * GET /api/cases/:id/rich-documents
+   * ❌ NOT IMPLEMENTED - GET /api/cases/:id/rich-documents
    */
   getRichDocuments: async (caseId: string): Promise<any[]> => {
-    try {
-      const response = await apiClient.get(`/cases/${caseId}/rich-documents`)
-      return response.data.documents || response.data.data || []
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Get Rich Documents | جلب المستندات المنسقة')
   },
 
   /**
    * Get single rich document
-   * GET /api/cases/:id/rich-documents/:docId
+   * ❌ NOT IMPLEMENTED - GET /api/cases/:id/rich-documents/:docId
    */
   getRichDocument: async (caseId: string, docId: string): Promise<any> => {
-    try {
-      const response = await apiClient.get(`/cases/${caseId}/rich-documents/${docId}`)
-      return response.data.document || response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Get Rich Document | جلب المستند المنسق')
   },
 
   /**
    * Update rich document
-   * PATCH /api/cases/:id/rich-documents/:docId
+   * ❌ NOT IMPLEMENTED - PATCH /api/cases/:id/rich-documents/:docId
    */
   updateRichDocument: async (caseId: string, docId: string, data: {
     title?: string
@@ -1327,115 +1332,72 @@ const casesService = {
     category?: string
     tags?: string[]
   }): Promise<any> => {
-    try {
-      const response = await apiClient.patch(`/cases/${caseId}/rich-documents/${docId}`, data)
-      return response.data.document || response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Update Rich Document | تحديث المستند المنسق')
   },
 
   /**
    * Delete rich document
-   * DELETE /api/cases/:id/rich-documents/:docId
+   * ❌ NOT IMPLEMENTED - DELETE /api/cases/:id/rich-documents/:docId
    */
   deleteRichDocument: async (caseId: string, docId: string): Promise<void> => {
-    try {
-      await apiClient.delete(`/cases/${caseId}/rich-documents/${docId}`)
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Delete Rich Document | حذف المستند المنسق')
   },
 
   /**
    * Get rich document version history
-   * GET /api/cases/:id/rich-documents/:docId/versions
+   * ❌ NOT IMPLEMENTED - GET /api/cases/:id/rich-documents/:docId/versions
    */
   getRichDocumentVersions: async (caseId: string, docId: string): Promise<any[]> => {
-    try {
-      const response = await apiClient.get(`/cases/${caseId}/rich-documents/${docId}/versions`)
-      return response.data.versions || response.data.data || []
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Get Rich Document Versions | جلب إصدارات المستند')
   },
 
   /**
    * Restore rich document to a previous version
-   * POST /api/cases/:id/rich-documents/:docId/versions/:versionNumber/restore
+   * ❌ NOT IMPLEMENTED - POST /api/cases/:id/rich-documents/:docId/versions/:versionNumber/restore
    */
   restoreRichDocumentVersion: async (caseId: string, docId: string, versionNumber: number): Promise<any> => {
-    try {
-      const response = await apiClient.post(`/cases/${caseId}/rich-documents/${docId}/versions/${versionNumber}/restore`)
-      return response.data.document || response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Restore Rich Document Version | استعادة إصدار المستند')
   },
 
   /**
    * Export rich document to PDF
-   * GET /api/cases/:id/rich-documents/:docId/export/pdf
+   * ❌ NOT IMPLEMENTED - GET /api/cases/:id/rich-documents/:docId/export/pdf
    */
   exportRichDocumentToPdf: async (caseId: string, docId: string): Promise<Blob> => {
-    try {
-      const response = await apiClient.get(`/cases/${caseId}/rich-documents/${docId}/export/pdf`, {
-        responseType: 'blob'
-      })
-      return response.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Export to PDF | تصدير إلى PDF')
   },
 
   /**
    * Export rich document to LaTeX
-   * GET /api/cases/:id/rich-documents/:docId/export/latex
+   * ❌ NOT IMPLEMENTED - GET /api/cases/:id/rich-documents/:docId/export/latex
    */
   exportRichDocumentToLatex: async (caseId: string, docId: string): Promise<Blob> => {
-    try {
-      const response = await apiClient.get(`/cases/${caseId}/rich-documents/${docId}/export/latex`, {
-        responseType: 'blob'
-      })
-      return response.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Export to LaTeX | تصدير إلى LaTeX')
   },
 
   /**
    * Export rich document to Markdown
-   * GET /api/cases/:id/rich-documents/:docId/export/markdown
+   * ❌ NOT IMPLEMENTED - GET /api/cases/:id/rich-documents/:docId/export/markdown
    */
   exportRichDocumentToMarkdown: async (caseId: string, docId: string): Promise<Blob> => {
-    try {
-      const response = await apiClient.get(`/cases/${caseId}/rich-documents/${docId}/export/markdown`, {
-        responseType: 'blob'
-      })
-      return response.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Export to Markdown | تصدير إلى Markdown')
   },
 
   /**
    * Get rich document HTML preview
-   * GET /api/cases/:id/rich-documents/:docId/preview
+   * ❌ NOT IMPLEMENTED - GET /api/cases/:id/rich-documents/:docId/preview
    */
   getRichDocumentPreview: async (caseId: string, docId: string): Promise<{ html: string }> => {
-    try {
-      const response = await apiClient.get(`/cases/${caseId}/rich-documents/${docId}/preview`)
-      return response.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Get Document Preview | عرض المستند')
   },
 
   // ==================== PIPELINE ====================
+  // ⚠️ All pipeline endpoints are NOT IMPLEMENTED in backend
 
   /**
    * Get cases for pipeline view
-   * GET /api/cases/pipeline
+   * ❌ NOT IMPLEMENTED - GET /api/cases/pipeline
+   * Use getCases() to fetch cases and transform them for pipeline view instead.
    */
   getPipelineCases: async (filters?: {
     category?: CaseCategory
@@ -1445,79 +1407,43 @@ const casesService = {
     page?: number
     limit?: number
   }): Promise<{ cases: CasePipelineCard[]; count: number; pagination?: PaginationInfo }> => {
-    try {
-      const params = new URLSearchParams()
-      if (filters?.category) params.append('category', filters.category)
-      if (filters?.status) params.append('status', filters.status)
-      if (filters?.stage) params.append('stage', filters.stage)
-      if (filters?.lawyerId) params.append('lawyerId', filters.lawyerId)
-      if (filters?.page) params.append('page', filters.page.toString())
-      if (filters?.limit) params.append('limit', filters.limit.toString())
-
-      const queryString = params.toString()
-      const url = queryString ? `/cases/pipeline?${queryString}` : '/cases/pipeline'
-
-      const response = await apiClient.get<PipelineCasesResponse>(url)
-      const cases = response.data.data?.cases || response.data.cases || []
-      const count = response.data.data?.count || response.data.count || cases.length
-      const pagination = response.data.data?.pagination || response.data.pagination
-
-      return { cases, count, pagination }
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Get Pipeline Cases | جلب قضايا المسار')
   },
 
   /**
    * Get pipeline statistics
-   * GET /api/cases/pipeline/statistics
+   * ❌ NOT IMPLEMENTED - GET /api/cases/pipeline/statistics
+   * Use calculateStatistics() with filtered cases instead.
    */
   getPipelineStatistics: async (): Promise<PipelineStatistics> => {
-    try {
-      const response = await apiClient.get<PipelineStatisticsResponse>('/cases/pipeline/statistics')
-      return response.data.data || response.data.statistics!
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Get Pipeline Statistics | إحصائيات المسار')
   },
 
   /**
    * Get valid stages for a case category
-   * GET /api/cases/pipeline/stages/:category
+   * ❌ NOT IMPLEMENTED - GET /api/cases/pipeline/stages/:category
+   * Define stages in frontend configuration instead.
    */
   getPipelineStages: async (category: CaseCategory): Promise<PipelineStage[]> => {
-    try {
-      const response = await apiClient.get<PipelineStagesResponse>(`/cases/pipeline/stages/${category}`)
-      return response.data.data?.stages || response.data.stages || []
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Get Pipeline Stages | مراحل المسار')
   },
 
   /**
    * Move case to a new stage
-   * PATCH /api/cases/:id/stage
+   * ❌ NOT IMPLEMENTED - PATCH /api/cases/:id/stage
+   * Use updateCase() to update case stage/status instead.
    */
   moveCaseToStage: async (caseId: string, data: MoveCaseToStageData): Promise<Case> => {
-    try {
-      const response = await apiClient.patch<CaseResponse>(`/cases/${caseId}/stage`, data)
-      return response.data.case
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('Move Case to Stage | نقل القضية إلى مرحلة')
   },
 
   /**
    * End case with outcome
-   * PATCH /api/cases/:id/end
+   * ❌ NOT IMPLEMENTED - PATCH /api/cases/:id/end
+   * Use updateStatus() and updateOutcome() instead.
    */
   endCase: async (caseId: string, data: EndCaseData): Promise<Case> => {
-    try {
-      const response = await apiClient.patch<CaseResponse>(`/cases/${caseId}/end`, data)
-      return response.data.case
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    throwNotImplemented('End Case | إنهاء القضية')
   },
 }
 

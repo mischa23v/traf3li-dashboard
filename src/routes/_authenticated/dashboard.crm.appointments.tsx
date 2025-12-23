@@ -19,6 +19,7 @@ import {
   XCircle,
   AlertCircle,
 } from 'lucide-react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -42,7 +43,66 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-// Mock data for appointments
+/**
+ * [BACKEND-PENDING] Appointment API Integration Required
+ *
+ * Required Endpoints:
+ * 1. GET /api/crm/appointments - Fetch all appointments with filters
+ *    Query params: status, type, assignedTo, dateFrom, dateTo
+ *
+ * 2. POST /api/crm/appointments - Create new appointment
+ *    Body: { scheduledTime, duration, customerName, customerEmail, customerPhone,
+ *            locationType, assignedTo, appointmentWith, partyId, ... }
+ *
+ * 3. PUT /api/crm/appointments/:id - Update appointment
+ *    Body: Same as POST
+ *
+ * 4. PATCH /api/crm/appointments/:id/status - Update appointment status
+ *    Body: { status: 'confirmed' | 'cancelled' | 'completed' | 'no_show' }
+ *
+ * 5. DELETE /api/crm/appointments/:id - Cancel/Delete appointment
+ *
+ * 6. GET /api/crm/appointments/stats - Fetch appointment statistics
+ *
+ * 7. POST /api/crm/appointments/:id/reschedule - Reschedule appointment
+ *    Body: { newScheduledTime: Date }
+ *
+ * Example React Query hooks to implement:
+ *
+ * const useAppointments = (filters) => {
+ *   return useQuery({
+ *     queryKey: ['appointments', filters],
+ *     queryFn: async () => {
+ *       const response = await apiClient.get('/crm/appointments', { params: filters })
+ *       return response.data
+ *     },
+ *     onError: (error) => {
+ *       toast.error('فشل تحميل المواعيد | Failed to load appointments', {
+ *         description: error.message
+ *       })
+ *     }
+ *   })
+ * }
+ *
+ * const useCreateAppointment = () => {
+ *   return useMutation({
+ *     mutationFn: async (data) => {
+ *       const response = await apiClient.post('/crm/appointments', data)
+ *       return response.data
+ *     },
+ *     onSuccess: () => {
+ *       toast.success('تم إنشاء الموعد بنجاح | Appointment created successfully')
+ *     },
+ *     onError: (error) => {
+ *       toast.error('فشل إنشاء الموعد | Failed to create appointment', {
+ *         description: error.message
+ *       })
+ *     }
+ *   })
+ * }
+ */
+
+// [BACKEND-PENDING] Mock data for appointments - Replace with actual API data
 const mockAppointments = [
   {
     id: '1',
@@ -164,6 +224,24 @@ function AppointmentsPage() {
       </Header>
 
       <Main className='p-6 lg:p-8'>
+        {/* Backend Integration Notice - Bilingual */}
+        <Alert className="mb-6 border-amber-200 bg-amber-50">
+          <AlertCircle className="h-4 w-4 text-amber-600" />
+          <AlertDescription className="text-amber-800">
+            <div className="space-y-2">
+              <p dir="rtl">
+                <strong>[BACKEND-PENDING]</strong> هذه الصفحة تستخدم بيانات تجريبية حالياً. سيتم ربطها بواجهة برمجة التطبيقات (API) قريباً لعرض وإدارة المواعيد الفعلية.
+              </p>
+              <p dir="ltr" className="text-sm opacity-90">
+                <strong>[BACKEND-PENDING]</strong> This page currently uses mock data. It will be connected to the API soon to display and manage actual appointments.
+              </p>
+              <p className="text-xs mt-2 font-mono" dir="ltr">
+                Required endpoints: GET/POST/PUT/DELETE /api/crm/appointments
+              </p>
+            </div>
+          </AlertDescription>
+        </Alert>
+
         {/* Header */}
         <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6'>
           <div>
@@ -174,13 +252,19 @@ function AppointmentsPage() {
               {t('crm.appointments.description', 'إدارة وجدولة مواعيد العملاء المحتملين')}
             </p>
           </div>
-          <Button className='gap-2'>
+          <Button
+            className='gap-2'
+            onClick={() => {
+              // [BACKEND-PENDING] Replace with actual appointment creation dialog
+              console.log('[BACKEND-PENDING] Open appointment creation dialog')
+            }}
+          >
             <Plus className='h-4 w-4' />
             {t('crm.appointments.newAppointment', 'موعد جديد')}
           </Button>
         </div>
 
-        {/* Stats */}
+        {/* Stats - [BACKEND-PENDING] Replace with GET /api/crm/appointments/stats */}
         <div className='grid gap-4 md:grid-cols-4 mb-6'>
           <Card>
             <CardHeader className='flex flex-row items-center justify-between pb-2'>
@@ -190,6 +274,7 @@ function AppointmentsPage() {
               <Calendar className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
+              {/* [BACKEND-PENDING] Replace with actual data */}
               <div className='text-2xl font-bold'>3</div>
             </CardContent>
           </Card>
@@ -201,6 +286,7 @@ function AppointmentsPage() {
               <AlertCircle className='h-4 w-4 text-yellow-500' />
             </CardHeader>
             <CardContent>
+              {/* [BACKEND-PENDING] Replace with actual data */}
               <div className='text-2xl font-bold'>5</div>
             </CardContent>
           </Card>
@@ -212,6 +298,7 @@ function AppointmentsPage() {
               <CheckCircle2 className='h-4 w-4 text-green-500' />
             </CardHeader>
             <CardContent>
+              {/* [BACKEND-PENDING] Replace with actual data */}
               <div className='text-2xl font-bold'>12</div>
             </CardContent>
           </Card>
@@ -223,6 +310,7 @@ function AppointmentsPage() {
               <CheckCircle2 className='h-4 w-4 text-blue-500' />
             </CardHeader>
             <CardContent>
+              {/* [BACKEND-PENDING] Replace with actual data */}
               <div className='text-2xl font-bold'>28</div>
             </CardContent>
           </Card>
@@ -329,16 +417,40 @@ function AppointmentsPage() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align='end'>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    // [BACKEND-PENDING] PUT /api/crm/appointments/:id
+                                    console.log('[BACKEND-PENDING] Edit appointment:', appointment.id)
+                                  }}
+                                >
                                   {t('common.edit', 'تعديل')}
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    // [BACKEND-PENDING] PATCH /api/crm/appointments/:id/status
+                                    // Body: { status: 'confirmed' }
+                                    console.log('[BACKEND-PENDING] Confirm appointment:', appointment.id)
+                                  }}
+                                >
                                   {t('crm.appointments.confirm', 'تأكيد')}
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    // [BACKEND-PENDING] POST /api/crm/appointments/:id/reschedule
+                                    // Body: { newScheduledTime: Date }
+                                    console.log('[BACKEND-PENDING] Reschedule appointment:', appointment.id)
+                                  }}
+                                >
                                   {t('crm.appointments.reschedule', 'إعادة جدولة')}
                                 </DropdownMenuItem>
-                                <DropdownMenuItem className='text-destructive'>
+                                <DropdownMenuItem
+                                  className='text-destructive'
+                                  onClick={() => {
+                                    // [BACKEND-PENDING] PATCH /api/crm/appointments/:id/status
+                                    // Body: { status: 'cancelled' }
+                                    console.log('[BACKEND-PENDING] Cancel appointment:', appointment.id)
+                                  }}
+                                >
                                   {t('crm.appointments.cancel', 'إلغاء')}
                                 </DropdownMenuItem>
                               </DropdownMenuContent>

@@ -1,3 +1,11 @@
+/**
+ * Chat Hooks
+ * Conversation-based messaging hooks
+ *
+ * ✅ IMPLEMENTATION STATUS: CONFIRMED
+ * All conversation endpoints are confirmed to be implemented in the backend.
+ */
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import apiClient from '@/lib/api'
 

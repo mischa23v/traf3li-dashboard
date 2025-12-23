@@ -323,8 +323,8 @@ export default function HRSetupWizard() {
         if (parsed.currentStep) {
           setCurrentStep(parsed.currentStep)
         }
-        toast.info('تم استعادة التقدم السابق', {
-          description: 'يمكنك متابعة الإعداد من حيث توقفت'
+        toast.info('Previous progress restored | تم استعادة التقدم السابق', {
+          description: 'You can continue setup from where you left off | يمكنك متابعة الإعداد من حيث توقفت'
         })
       } catch (error) {
         console.error('Failed to load saved progress:', error)
@@ -368,8 +368,8 @@ export default function HRSetupWizard() {
   }
 
   const skipStep = () => {
-    toast.info('تم تخطي الخطوة', {
-      description: 'يمكنك إعداد هذا لاحقاً من الإعدادات'
+    toast.info('Step skipped | تم تخطي الخطوة', {
+      description: 'You can configure this later from settings | يمكنك إعداد هذا لاحقاً من الإعدادات'
     })
     nextStep()
   }
@@ -439,8 +439,8 @@ export default function HRSetupWizard() {
       // Clear localStorage
       localStorage.removeItem(STORAGE_KEY)
 
-      toast.success('تم إكمال إعداد نظام الموارد البشرية بنجاح!', {
-        description: 'يمكنك الآن البدء في إدارة الموظفين'
+      toast.success('HR system setup completed successfully! | تم إكمال إعداد نظام الموارد البشرية بنجاح!', {
+        description: 'You can now start managing employees | يمكنك الآن البدء في إدارة الموظفين'
       })
 
       // Navigate to HR overview
@@ -450,8 +450,8 @@ export default function HRSetupWizard() {
 
     } catch (error: any) {
       console.error('Setup failed:', error)
-      toast.error('فشل إكمال الإعداد', {
-        description: error.message || 'حدث خطأ أثناء حفظ الإعدادات'
+      toast.error('Failed to complete setup | فشل إكمال الإعداد', {
+        description: error.message || 'An error occurred while saving settings | حدث خطأ أثناء حفظ الإعدادات'
       })
     } finally {
       setIsSubmitting(false)

@@ -73,14 +73,40 @@ export const useRevokeApiKey = () => {
 
 /**
  * Hook to update API key metadata
+ *
+ * @deprecated [BACKEND-PENDING] This endpoint is scheduled for removal in Q2 2025.
+ * The backend API endpoint /api-keys/:id (PATCH) will be removed.
+ *
+ * Migration Plan:
+ * - Delete old API key and create a new one with updated settings
+ * - Use useRevokeApiKey() + useCreateApiKey() instead
+ *
+ * Current Status: Not used in any components (safe to remove after migration period)
  */
 export const useUpdateApiKey = () => {
   const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
-    mutationFn: ({ keyId, data }: { keyId: string; data: { name?: string; description?: string } }) =>
-      apiKeysService.updateApiKey(keyId, data),
+    mutationFn: ({ keyId, data }: { keyId: string; data: { name?: string; description?: string } }) => {
+      // [BACKEND-PENDING] Show deprecation warning to users
+      console.warn(
+        '⚠️ DEPRECATED FEATURE: Updating API keys will be removed in Q2 2025. ' +
+        'Please delete and recreate the API key instead.\n' +
+        'تحذير: تحديث مفاتيح API سيتم إزالته في الربع الثاني من 2025. ' +
+        'يرجى حذف وإعادة إنشاء مفتاح API بدلاً من ذلك.'
+      )
+
+      // Show user-facing toast warning
+      toast.warning(
+        t('apiKeys.deprecationWarning') ||
+        'This feature will be removed soon. Please delete and recreate your API key instead. | ' +
+        'ستتم إزالة هذه الميزة قريباً. يرجى حذف وإعادة إنشاء مفتاح API الخاص بك.',
+        { duration: 8000 }
+      )
+
+      return apiKeysService.updateApiKey(keyId, data)
+    },
     onSuccess: () => {
       toast.success(t('apiKeys.updateSuccess'))
     },

@@ -1,21 +1,21 @@
 /**
  * Automated Action Service
  *
- * ⚠️ BACKEND STATUS: NOT IMPLEMENTED
+ * ⚠️⚠️⚠️ CRITICAL WARNING - BACKEND NOT IMPLEMENTED ⚠️⚠️⚠️
  *
- * This service defines the frontend API client for automated actions/workflows.
- * The backend endpoints are NOT YET IMPLEMENTED. This is frontend-ready code
- * awaiting backend development.
+ * This service is FRONTEND-ONLY scaffolding. All functions throw errors because
+ * the backend API endpoints DO NOT EXIST yet.
  *
- * Expected endpoints:
+ * DO NOT attempt to use these functions until backend endpoints are implemented:
  * - GET /automated-actions
  * - POST /automated-actions
  * - POST /automated-actions/:id/toggle
  * - POST /automated-actions/:id/test
  * - etc.
+ *
+ * Status: AWAITING BACKEND DEVELOPMENT
  */
 
-import apiClient from '@/lib/api'
 import type {
   AutomatedAction,
   AutomatedActionFilters,
@@ -30,175 +30,160 @@ import type {
   ModelField,
 } from '@/types/automatedAction'
 
+/**
+ * Helper function to throw bilingual error message
+ */
+const throwNotImplementedError = (operation: string): never => {
+  throw new Error(
+    `❌ Backend Not Implemented | الخلفية غير مطبقة\n\n` +
+    `EN: The automated actions backend API is not yet implemented. ` +
+    `This operation (${operation}) cannot be performed until the backend endpoints are created.\n\n` +
+    `AR: واجهة برمجة التطبيقات الخلفية للإجراءات التلقائية غير مطبقة بعد. ` +
+    `لا يمكن تنفيذ هذه العملية (${operation}) حتى يتم إنشاء نقاط النهاية الخلفية.`
+  )
+}
+
 // ==================== AUTOMATED ACTIONS ====================
 
 /**
  * Get all automated actions
+ * ⚠️ THROWS ERROR - Backend not implemented
  */
 export const getAutomatedActions = async (
   filters?: AutomatedActionFilters
 ): Promise<AutomatedActionResponse> => {
-  const params = new URLSearchParams()
-
-  if (filters?.model_name) params.append('model_name', filters.model_name)
-  if (filters?.trigger) params.append('trigger', filters.trigger)
-  if (filters?.action_type) params.append('action_type', filters.action_type)
-  if (filters?.isActive !== undefined) params.append('isActive', String(filters.isActive))
-  if (filters?.search) params.append('search', filters.search)
-  if (filters?.page) params.append('page', String(filters.page))
-  if (filters?.limit) params.append('limit', String(filters.limit))
-
-  const response = await apiClient.get(`/automated-actions?${params.toString()}`)
-  return response.data
+  throwNotImplementedError('getAutomatedActions')
 }
 
 /**
  * Get a single automated action by ID
+ * ⚠️ THROWS ERROR - Backend not implemented
  */
 export const getAutomatedActionById = async (id: string): Promise<AutomatedAction> => {
-  const response = await apiClient.get(`/automated-actions/${id}`)
-  return response.data?.data || response.data
+  throwNotImplementedError('getAutomatedActionById')
 }
 
 /**
  * Create a new automated action
+ * ⚠️ THROWS ERROR - Backend not implemented
  */
 export const createAutomatedAction = async (
   data: CreateAutomatedActionData
 ): Promise<AutomatedAction> => {
-  const response = await apiClient.post('/automated-actions', data)
-  return response.data?.data || response.data
+  throwNotImplementedError('createAutomatedAction')
 }
 
 /**
  * Update an automated action
+ * ⚠️ THROWS ERROR - Backend not implemented
  */
 export const updateAutomatedAction = async (
   id: string,
   data: UpdateAutomatedActionData
 ): Promise<AutomatedAction> => {
-  const response = await apiClient.patch(`/automated-actions/${id}`, data)
-  return response.data?.data || response.data
+  throwNotImplementedError('updateAutomatedAction')
 }
 
 /**
  * Delete an automated action
+ * ⚠️ THROWS ERROR - Backend not implemented
  */
 export const deleteAutomatedAction = async (id: string): Promise<void> => {
-  await apiClient.delete(`/automated-actions/${id}`)
+  throwNotImplementedError('deleteAutomatedAction')
 }
 
 /**
  * Toggle automated action active status
+ * ⚠️ THROWS ERROR - Backend not implemented
  */
 export const toggleAutomatedAction = async (id: string): Promise<AutomatedAction> => {
-  const response = await apiClient.post(`/automated-actions/${id}/toggle`)
-  return response.data?.data || response.data
+  throwNotImplementedError('toggleAutomatedAction')
 }
 
 /**
  * Test an automated action against a record
+ * ⚠️ THROWS ERROR - Backend not implemented
  */
 export const testAutomatedAction = async (
   id: string,
   data: TestActionData
 ): Promise<TestActionResult> => {
-  const response = await apiClient.post(`/automated-actions/${id}/test`, data)
-  return response.data?.data || response.data
+  throwNotImplementedError('testAutomatedAction')
 }
 
 /**
  * Duplicate an automated action
+ * ⚠️ THROWS ERROR - Backend not implemented
  */
 export const duplicateAutomatedAction = async (id: string): Promise<AutomatedAction> => {
-  const response = await apiClient.post(`/automated-actions/${id}/duplicate`)
-  return response.data?.data || response.data
+  throwNotImplementedError('duplicateAutomatedAction')
 }
 
 // ==================== EXECUTION LOGS ====================
 
 /**
  * Get execution logs for an automated action
+ * ⚠️ THROWS ERROR - Backend not implemented
  */
 export const getAutomatedActionLogs = async (
   actionId: string,
   filters?: Omit<AutomatedActionLogFilters, 'action_id'>
 ): Promise<{ logs: AutomatedActionLog[]; total: number; hasMore: boolean }> => {
-  const params = new URLSearchParams()
-  params.append('action_id', actionId)
-
-  if (filters?.model_name) params.append('model_name', filters.model_name)
-  if (filters?.record_id) params.append('record_id', filters.record_id)
-  if (filters?.status) params.append('status', filters.status)
-  if (filters?.date_from) params.append('date_from', filters.date_from)
-  if (filters?.date_to) params.append('date_to', filters.date_to)
-  if (filters?.page) params.append('page', String(filters.page))
-  if (filters?.limit) params.append('limit', String(filters.limit))
-
-  const response = await apiClient.get(`/automated-actions/${actionId}/logs?${params.toString()}`)
-  return response.data?.data || response.data
+  throwNotImplementedError('getAutomatedActionLogs')
 }
 
 /**
  * Get all execution logs (admin view)
+ * ⚠️ THROWS ERROR - Backend not implemented
  */
 export const getAllActionLogs = async (
   filters?: AutomatedActionLogFilters
 ): Promise<{ logs: AutomatedActionLog[]; total: number; hasMore: boolean }> => {
-  const params = new URLSearchParams()
-
-  if (filters?.action_id) params.append('action_id', filters.action_id)
-  if (filters?.model_name) params.append('model_name', filters.model_name)
-  if (filters?.record_id) params.append('record_id', filters.record_id)
-  if (filters?.status) params.append('status', filters.status)
-  if (filters?.date_from) params.append('date_from', filters.date_from)
-  if (filters?.date_to) params.append('date_to', filters.date_to)
-  if (filters?.page) params.append('page', String(filters.page))
-  if (filters?.limit) params.append('limit', String(filters.limit))
-
-  const response = await apiClient.get(`/automated-actions/logs?${params.toString()}`)
-  return response.data?.data || response.data
+  throwNotImplementedError('getAllActionLogs')
 }
 
 // ==================== MODEL METADATA ====================
 
 /**
  * Get available models for automation
+ * ⚠️ THROWS ERROR - Backend not implemented
  */
 export const getAvailableModels = async (): Promise<AvailableModel[]> => {
-  const response = await apiClient.get('/automated-actions/models')
-  return response.data?.data || response.data
+  throwNotImplementedError('getAvailableModels')
 }
 
 /**
  * Get fields for a specific model
+ * ⚠️ THROWS ERROR - Backend not implemented
  */
 export const getModelFields = async (modelName: string): Promise<ModelField[]> => {
-  const response = await apiClient.get(`/automated-actions/models/${modelName}/fields`)
-  return response.data?.data || response.data
+  throwNotImplementedError('getModelFields')
 }
 
 // ==================== BULK OPERATIONS ====================
 
 /**
  * Enable multiple automated actions
+ * ⚠️ THROWS ERROR - Backend not implemented
  */
 export const enableAutomatedActions = async (ids: string[]): Promise<void> => {
-  await apiClient.post('/automated-actions/bulk/enable', { ids })
+  throwNotImplementedError('enableAutomatedActions')
 }
 
 /**
  * Disable multiple automated actions
+ * ⚠️ THROWS ERROR - Backend not implemented
  */
 export const disableAutomatedActions = async (ids: string[]): Promise<void> => {
-  await apiClient.post('/automated-actions/bulk/disable', { ids })
+  throwNotImplementedError('disableAutomatedActions')
 }
 
 /**
  * Delete multiple automated actions
+ * ⚠️ THROWS ERROR - Backend not implemented
  */
 export const deleteAutomatedActions = async (ids: string[]): Promise<void> => {
-  await apiClient.post('/automated-actions/bulk/delete', { ids })
+  throwNotImplementedError('deleteAutomatedActions')
 }
 
 // ==================== SERVICE OBJECT ====================

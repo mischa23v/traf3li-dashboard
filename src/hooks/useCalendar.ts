@@ -304,6 +304,19 @@ export interface SidebarData {
   upcomingReminders: Reminder[]
 }
 
+/**
+ * [BACKEND-PENDING] Get sidebar data for dashboard
+ *
+ * ⚠️ [BACKEND-PENDING] WARNING: This endpoint (/calendar/sidebar-data) does NOT exist in the backend yet!
+ * ⚠️ [BACKEND-PENDING] تحذير: هذه النقطة النهائية (/calendar/sidebar-data) غير موجودة في الخادم بعد!
+ *
+ * Required Implementation:
+ * - Endpoint: GET /calendar/sidebar-data
+ * - Query params: startDate, endDate, reminderDays
+ * - Returns: { calendarEvents: CalendarEvent[], upcomingReminders: Reminder[] }
+ *
+ * Workaround: Use separate endpoints for events and reminders until this is implemented
+ */
 export const useSidebarData = (isEnabled = true) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const today = new Date()
@@ -313,14 +326,19 @@ export const useSidebarData = (isEnabled = true) => {
   return useQuery<SidebarData>({
     queryKey: ['sidebar', 'data', today.toISOString().split('T')[0]],
     queryFn: async () => {
-      const response = await apiClient.get('/calendar/sidebar-data', {
-        params: {
-          startDate: today.toISOString(),
-          endDate: endDate.toISOString(),
-          reminderDays: 7
-        }
-      })
-      return response.data
+      try {
+        const response = await apiClient.get('/calendar/sidebar-data', {
+          params: {
+            startDate: today.toISOString(),
+            endDate: endDate.toISOString(),
+            reminderDays: 7
+          }
+        })
+        return response.data
+      } catch (error: any) {
+        console.error('[Calendar Hook] [BACKEND-PENDING] Sidebar Data Error:', error?.message || '[BACKEND-PENDING] Failed to fetch sidebar data. This endpoint is not implemented yet. | [BACKEND-PENDING] فشل في جلب بيانات الشريط الجانبي. هذه النقطة النهائية غير مطبقة بعد.')
+        throw error
+      }
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,

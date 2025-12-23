@@ -118,11 +118,16 @@ export function ExpenseDetailsView() {
                         <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
                             <AlertCircle className="h-8 w-8 text-red-500" aria-hidden="true" />
                         </div>
-                        <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل تفاصيل المصروف</h3>
-                        <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">
+                            فشل تحميل تفاصيل المصروف | Failed to Load Expense Details
+                        </h3>
+                        <p className="text-slate-500 mb-6 space-y-1">
+                            <span className="block">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</span>
+                            <span className="block text-sm">{error?.message || 'An error occurred while loading data'}</span>
+                        </p>
                         <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
                             <Loader2 className="ms-2 h-4 w-4" aria-hidden="true" />
-                            إعادة المحاولة
+                            إعادة المحاولة | Retry
                         </Button>
                     </div>
                 </Main>

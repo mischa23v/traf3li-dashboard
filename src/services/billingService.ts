@@ -2,13 +2,30 @@
  * Billing Service
  * Handles subscription, payment methods, and billing history operations
  *
- * ⚠️ STRIPE INTEGRATION STATUS: INCOMPLETE (STUB IMPLEMENTATION)
+ * ⚠️ CRITICAL: MOST ENDPOINTS IN THIS SERVICE DO NOT EXIST IN THE BACKEND ⚠️
+ * ⚠️ تحذير: معظم نقاط النهاية في هذه الخدمة غير موجودة في الخادم ⚠️
  *
- * This service defines the API contract for billing operations, but the backend
- * Stripe integration is not yet fully implemented. Current implementation serves
- * as a stub/interface definition for future development.
+ * This service is a STUB IMPLEMENTATION defining the API contract for future
+ * Stripe-based subscription billing. The backend has NOT implemented these endpoints.
  *
- * EXPECTED BACKEND ENDPOINTS:
+ * ENDPOINTS THAT ACTUALLY EXIST (from /docs/API_ENDPOINTS_ACTUAL.md):
+ * ✅ GET    /billing/rates                    - Get billing rates
+ * ✅ GET    /billing/groups                   - Get billing groups
+ * ✅ GET    /billing/time-entries             - Get time entries
+ * ✅ GET    /billing/statistics               - Get billing statistics
+ * ✅ POST   /billing/rates                    - Create billing rate
+ * ✅ PATCH  /billing/groups/:id               - Update billing group
+ *
+ * ENDPOINTS THAT DO NOT EXIST (will return 404):
+ * ❌ All subscription endpoints (/billing/subscription/*)
+ * ❌ All payment method endpoints (/billing/payment-methods/*)
+ * ❌ All invoice endpoints (/billing/invoices/*)
+ *
+ * These non-existent endpoints are documented below for future implementation.
+ * All methods include bilingual error messages (English | Arabic) when endpoints
+ * return 404 errors.
+ *
+ * EXPECTED BACKEND ENDPOINTS (NOT YET IMPLEMENTED):
  *
  * Subscription Management:
  * - GET    /billing/subscription              - Get current subscription details
@@ -217,74 +234,141 @@ const billingService = {
 
   /**
    * Get current subscription details
+   *
+   * ⚠️ ENDPOINT NOT IMPLEMENTED
+   * Backend endpoint `/billing/subscription` does not exist.
+   * This will return a 404 error until backend implementation is complete.
    */
   getSubscription: async (): Promise<Subscription> => {
     try {
       const response = await apiClient.get('/billing/subscription')
       return response.data
-    } catch (error) {
-      throw handleApiError(error)
+    } catch (error: any) {
+      // Check if endpoint doesn't exist
+      if (error?.status === 404) {
+        throw new Error(
+          'Subscription endpoint not implemented | نقطة نهاية الاشتراك غير مطبقة\n' +
+          'The backend endpoint /billing/subscription has not been implemented yet. | ' +
+          'نقطة النهاية /billing/subscription لم يتم تطبيقها بعد.'
+        )
+      }
+      throw new Error(handleApiError(error))
     }
   },
 
   /**
    * Get usage metrics for current plan
+   *
+   * ⚠️ ENDPOINT NOT IMPLEMENTED
+   * Backend endpoint `/billing/usage` does not exist.
+   * This will return a 404 error until backend implementation is complete.
    */
   getUsageMetrics: async (): Promise<UsageMetrics> => {
     try {
       const response = await apiClient.get('/billing/usage')
       return response.data
-    } catch (error) {
-      throw handleApiError(error)
+    } catch (error: any) {
+      if (error?.status === 404) {
+        throw new Error(
+          'Usage metrics endpoint not implemented | نقطة نهاية مقاييس الاستخدام غير مطبقة\n' +
+          'The backend endpoint /billing/usage has not been implemented yet. | ' +
+          'نقطة النهاية /billing/usage لم يتم تطبيقها بعد.'
+        )
+      }
+      throw new Error(handleApiError(error))
     }
   },
 
   /**
    * Change subscription plan
+   *
+   * ⚠️ ENDPOINT NOT IMPLEMENTED
+   * Backend endpoint `/billing/subscription/change-plan` does not exist.
+   * This will return a 404 error until backend implementation is complete.
    */
   changePlan: async (data: ChangePlanData): Promise<Subscription> => {
     try {
       const response = await apiClient.post('/billing/subscription/change-plan', data)
       return response.data
-    } catch (error) {
-      throw handleApiError(error)
+    } catch (error: any) {
+      if (error?.status === 404) {
+        throw new Error(
+          'Change plan endpoint not implemented | نقطة نهاية تغيير الخطة غير مطبقة\n' +
+          'The backend endpoint /billing/subscription/change-plan has not been implemented yet. | ' +
+          'نقطة النهاية /billing/subscription/change-plan لم يتم تطبيقها بعد.'
+        )
+      }
+      throw new Error(handleApiError(error))
     }
   },
 
   /**
    * Cancel subscription (at end of current period)
+   *
+   * ⚠️ ENDPOINT NOT IMPLEMENTED
+   * Backend endpoint `/billing/subscription/cancel` does not exist.
+   * This will return a 404 error until backend implementation is complete.
    */
   cancelSubscription: async (): Promise<Subscription> => {
     try {
       const response = await apiClient.post('/billing/subscription/cancel')
       return response.data
-    } catch (error) {
-      throw handleApiError(error)
+    } catch (error: any) {
+      if (error?.status === 404) {
+        throw new Error(
+          'Cancel subscription endpoint not implemented | نقطة نهاية إلغاء الاشتراك غير مطبقة\n' +
+          'The backend endpoint /billing/subscription/cancel has not been implemented yet. | ' +
+          'نقطة النهاية /billing/subscription/cancel لم يتم تطبيقها بعد.'
+        )
+      }
+      throw new Error(handleApiError(error))
     }
   },
 
   /**
    * Reactivate canceled subscription
+   *
+   * ⚠️ ENDPOINT NOT IMPLEMENTED
+   * Backend endpoint `/billing/subscription/reactivate` does not exist.
+   * This will return a 404 error until backend implementation is complete.
    */
   reactivateSubscription: async (): Promise<Subscription> => {
     try {
       const response = await apiClient.post('/billing/subscription/reactivate')
       return response.data
-    } catch (error) {
-      throw handleApiError(error)
+    } catch (error: any) {
+      if (error?.status === 404) {
+        throw new Error(
+          'Reactivate subscription endpoint not implemented | نقطة نهاية إعادة تفعيل الاشتراك غير مطبقة\n' +
+          'The backend endpoint /billing/subscription/reactivate has not been implemented yet. | ' +
+          'نقطة النهاية /billing/subscription/reactivate لم يتم تطبيقها بعد.'
+        )
+      }
+      throw new Error(handleApiError(error))
     }
   },
 
   /**
    * Get upcoming invoice preview
+   *
+   * ⚠️ ENDPOINT NOT IMPLEMENTED
+   * Backend endpoint `/billing/subscription/upcoming-invoice` does not exist.
+   * This will return a 404 error until backend implementation is complete.
    */
   getUpcomingInvoice: async (planId?: PlanId): Promise<UpcomingInvoice> => {
     try {
       const params = planId ? { plan: planId } : {}
       const response = await apiClient.get('/billing/subscription/upcoming-invoice', { params })
       return response.data
-    } catch (error) {
-      throw handleApiError(error)
+    } catch (error: any) {
+      if (error?.status === 404) {
+        throw new Error(
+          'Upcoming invoice endpoint not implemented | نقطة نهاية الفاتورة القادمة غير مطبقة\n' +
+          'The backend endpoint /billing/subscription/upcoming-invoice has not been implemented yet. | ' +
+          'نقطة النهاية /billing/subscription/upcoming-invoice لم يتم تطبيقها بعد.'
+        )
+      }
+      throw new Error(handleApiError(error))
     }
   },
 
@@ -292,13 +376,24 @@ const billingService = {
 
   /**
    * Get all payment methods
+   *
+   * ⚠️ ENDPOINT NOT IMPLEMENTED
+   * Backend endpoint `/billing/payment-methods` does not exist.
+   * This will return a 404 error until backend implementation is complete.
    */
   getPaymentMethods: async (): Promise<PaymentMethod[]> => {
     try {
       const response = await apiClient.get('/billing/payment-methods')
       return response.data
-    } catch (error) {
-      throw handleApiError(error)
+    } catch (error: any) {
+      if (error?.status === 404) {
+        throw new Error(
+          'Payment methods endpoint not implemented | نقطة نهاية طرق الدفع غير مطبقة\n' +
+          'The backend endpoint /billing/payment-methods has not been implemented yet. | ' +
+          'نقطة النهاية /billing/payment-methods لم يتم تطبيقها بعد.'
+        )
+      }
+      throw new Error(handleApiError(error))
     }
   },
 
@@ -335,31 +430,60 @@ const billingService = {
     try {
       const response = await apiClient.post('/billing/payment-methods', data)
       return response.data
-    } catch (error) {
-      throw handleApiError(error)
+    } catch (error: any) {
+      if (error?.status === 404) {
+        throw new Error(
+          'Add payment method endpoint not implemented | نقطة نهاية إضافة طريقة الدفع غير مطبقة\n' +
+          'The backend endpoint POST /billing/payment-methods has not been implemented yet. | ' +
+          'نقطة النهاية POST /billing/payment-methods لم يتم تطبيقها بعد.'
+        )
+      }
+      throw new Error(handleApiError(error))
     }
   },
 
   /**
    * Set default payment method
+   *
+   * ⚠️ ENDPOINT NOT IMPLEMENTED
+   * Backend endpoint `/billing/payment-methods/:id/set-default` does not exist.
+   * This will return a 404 error until backend implementation is complete.
    */
   setDefaultPaymentMethod: async (id: string): Promise<PaymentMethod> => {
     try {
       const response = await apiClient.patch(`/billing/payment-methods/${id}/set-default`)
       return response.data
-    } catch (error) {
-      throw handleApiError(error)
+    } catch (error: any) {
+      if (error?.status === 404) {
+        throw new Error(
+          'Set default payment method endpoint not implemented | نقطة نهاية تعيين طريقة الدفع الافتراضية غير مطبقة\n' +
+          'The backend endpoint /billing/payment-methods/:id/set-default has not been implemented yet. | ' +
+          'نقطة النهاية /billing/payment-methods/:id/set-default لم يتم تطبيقها بعد.'
+        )
+      }
+      throw new Error(handleApiError(error))
     }
   },
 
   /**
    * Remove payment method
+   *
+   * ⚠️ ENDPOINT NOT IMPLEMENTED
+   * Backend endpoint `/billing/payment-methods/:id` (DELETE) does not exist.
+   * This will return a 404 error until backend implementation is complete.
    */
   removePaymentMethod: async (id: string): Promise<void> => {
     try {
       await apiClient.delete(`/billing/payment-methods/${id}`)
-    } catch (error) {
-      throw handleApiError(error)
+    } catch (error: any) {
+      if (error?.status === 404) {
+        throw new Error(
+          'Remove payment method endpoint not implemented | نقطة نهاية إزالة طريقة الدفع غير مطبقة\n' +
+          'The backend endpoint DELETE /billing/payment-methods/:id has not been implemented yet. | ' +
+          'نقطة النهاية DELETE /billing/payment-methods/:id لم يتم تطبيقها بعد.'
+        )
+      }
+      throw new Error(handleApiError(error))
     }
   },
 
@@ -384,8 +508,16 @@ const billingService = {
     try {
       const response = await apiClient.post('/billing/payment-methods/setup-intent')
       return response.data
-    } catch (error) {
-      throw handleApiError(error)
+    } catch (error: any) {
+      if (error?.status === 404) {
+        throw new Error(
+          'Setup intent endpoint not implemented | نقطة نهاية إعداد النية غير مطبقة\n' +
+          'The backend endpoint POST /billing/payment-methods/setup-intent has not been implemented yet. | ' +
+          'نقطة النهاية POST /billing/payment-methods/setup-intent لم يتم تطبيقها بعد.\n' +
+          'This requires Stripe integration on the backend. | يتطلب ذلك دمج Stripe في الخادم.'
+        )
+      }
+      throw new Error(handleApiError(error))
     }
   },
 
@@ -393,30 +525,58 @@ const billingService = {
 
   /**
    * Get billing history with pagination and filters
+   *
+   * ⚠️ ENDPOINT NOT IMPLEMENTED
+   * Backend endpoint `/billing/invoices` does not exist.
+   * This will return a 404 error until backend implementation is complete.
    */
   getBillingHistory: async (filters?: BillingHistoryFilters): Promise<BillingHistoryResponse> => {
     try {
       const response = await apiClient.get('/billing/invoices', { params: filters })
       return response.data
-    } catch (error) {
-      throw handleApiError(error)
+    } catch (error: any) {
+      if (error?.status === 404) {
+        throw new Error(
+          'Billing history endpoint not implemented | نقطة نهاية سجل الفواتير غير مطبقة\n' +
+          'The backend endpoint /billing/invoices has not been implemented yet. | ' +
+          'نقطة النهاية /billing/invoices لم يتم تطبيقها بعد.\n' +
+          'Note: This is different from regular invoices. These are subscription billing invoices. | ' +
+          'ملاحظة: هذه تختلف عن الفواتير العادية. هذه فواتير الاشتراك.'
+        )
+      }
+      throw new Error(handleApiError(error))
     }
   },
 
   /**
    * Get single invoice by ID
+   *
+   * ⚠️ ENDPOINT NOT IMPLEMENTED
+   * Backend endpoint `/billing/invoices/:id` does not exist.
+   * This will return a 404 error until backend implementation is complete.
    */
   getInvoice: async (id: string): Promise<Invoice> => {
     try {
       const response = await apiClient.get(`/billing/invoices/${id}`)
       return response.data
-    } catch (error) {
-      throw handleApiError(error)
+    } catch (error: any) {
+      if (error?.status === 404) {
+        throw new Error(
+          'Get invoice endpoint not implemented | نقطة نهاية الحصول على الفاتورة غير مطبقة\n' +
+          'The backend endpoint /billing/invoices/:id has not been implemented yet. | ' +
+          'نقطة النهاية /billing/invoices/:id لم يتم تطبيقها بعد.'
+        )
+      }
+      throw new Error(handleApiError(error))
     }
   },
 
   /**
    * Download invoice PDF
+   *
+   * ⚠️ ENDPOINT NOT IMPLEMENTED
+   * Backend endpoint `/billing/invoices/:id/download` does not exist.
+   * This will return a 404 error until backend implementation is complete.
    */
   downloadInvoice: async (id: string): Promise<Blob> => {
     try {
@@ -424,20 +584,39 @@ const billingService = {
         responseType: 'blob',
       })
       return response.data
-    } catch (error) {
-      throw handleApiError(error)
+    } catch (error: any) {
+      if (error?.status === 404) {
+        throw new Error(
+          'Download invoice endpoint not implemented | نقطة نهاية تحميل الفاتورة غير مطبقة\n' +
+          'The backend endpoint /billing/invoices/:id/download has not been implemented yet. | ' +
+          'نقطة النهاية /billing/invoices/:id/download لم يتم تطبيقها بعد.'
+        )
+      }
+      throw new Error(handleApiError(error))
     }
   },
 
   /**
    * Pay outstanding invoice
+   *
+   * ⚠️ ENDPOINT NOT IMPLEMENTED
+   * Backend endpoint `/billing/invoices/:id/pay` does not exist.
+   * This will return a 404 error until backend implementation is complete.
    */
   payInvoice: async (id: string): Promise<Invoice> => {
     try {
       const response = await apiClient.post(`/billing/invoices/${id}/pay`)
       return response.data
-    } catch (error) {
-      throw handleApiError(error)
+    } catch (error: any) {
+      if (error?.status === 404) {
+        throw new Error(
+          'Pay invoice endpoint not implemented | نقطة نهاية دفع الفاتورة غير مطبقة\n' +
+          'The backend endpoint /billing/invoices/:id/pay has not been implemented yet. | ' +
+          'نقطة النهاية /billing/invoices/:id/pay لم يتم تطبيقها بعد.\n' +
+          'This requires Stripe integration on the backend. | يتطلب ذلك دمج Stripe في الخادم.'
+        )
+      }
+      throw new Error(handleApiError(error))
     }
   },
 }

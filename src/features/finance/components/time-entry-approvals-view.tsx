@@ -47,8 +47,11 @@ import { ProductivityHero } from '@/components/productivity-hero'
 import { FinanceSidebar } from './finance-sidebar'
 import { toast } from 'sonner'
 import { useLockTimeEntry } from '@/hooks/useFinance'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { InfoIcon } from 'lucide-react'
 
-// Mock hook - will be replaced with real implementation
+// [BACKEND-PENDING] Mock hook - will be replaced with real implementation
+// الخطاف الوهمي - سيتم استبداله بالتنفيذ الحقيقي
 const usePendingTimeEntries = () => {
     return {
         data: { data: [], pagination: { total: 0 } },
@@ -59,36 +62,77 @@ const usePendingTimeEntries = () => {
     }
 }
 
+// [BACKEND-PENDING] Mock hook - needs backend endpoint implementation
+// الخطاف الوهمي - يحتاج إلى تنفيذ نقطة النهاية الخلفية
 const useApproveTimeEntry = () => ({
-    mutate: (id: string) => toast.success('تمت الموافقة على السجل'),
+    mutate: (id: string) => {
+        toast.error(
+            'Feature not available | الميزة غير متاحة\n' +
+            '[BACKEND-PENDING] Approval endpoint not implemented | نقطة نهاية الموافقة غير منفذة'
+        )
+    },
     mutateAsync: async (id: string) => {
-        toast.success('تمت الموافقة على السجل')
-        return { _id: id }
+        toast.error(
+            'Feature not available | الميزة غير متاحة\n' +
+            '[BACKEND-PENDING] Approval endpoint not implemented | نقطة نهاية الموافقة غير منفذة'
+        )
+        throw new Error('[BACKEND-PENDING] Time entry approval endpoint not implemented')
     },
     isPending: false
 })
 
+// [BACKEND-PENDING] Mock hook - needs backend endpoint implementation
+// الخطاف الوهمي - يحتاج إلى تنفيذ نقطة النهاية الخلفية
 const useRejectTimeEntry = () => ({
-    mutate: (data: { id: string; reason: string }) => toast.success('تم رفض السجل'),
-    isPending: false
-})
-
-const useBulkApproveTimeEntries = () => ({
-    mutate: (ids: string[]) => toast.success(`تمت الموافقة على ${ids.length} سجل`),
-    mutateAsync: async (ids: string[]) => {
-        toast.success(`تمت الموافقة على ${ids.length} سجل`)
-        return ids
+    mutate: (data: { id: string; reason: string }) => {
+        toast.error(
+            'Feature not available | الميزة غير متاحة\n' +
+            '[BACKEND-PENDING] Rejection endpoint not implemented | نقطة نهاية الرفض غير منفذة'
+        )
     },
     isPending: false
 })
 
-const useBulkRejectTimeEntries = () => ({
-    mutate: (data: { ids: string[]; reason: string }) => toast.success(`تم رفض ${data.ids.length} سجل`),
+// [BACKEND-PENDING] Mock hook - needs backend endpoint implementation
+// الخطاف الوهمي - يحتاج إلى تنفيذ نقطة النهاية الخلفية
+const useBulkApproveTimeEntries = () => ({
+    mutate: (ids: string[]) => {
+        toast.error(
+            'Feature not available | الميزة غير متاحة\n' +
+            '[BACKEND-PENDING] Bulk approval endpoint not implemented | نقطة نهاية الموافقة الجماعية غير منفذة'
+        )
+    },
+    mutateAsync: async (ids: string[]) => {
+        toast.error(
+            'Feature not available | الميزة غير متاحة\n' +
+            '[BACKEND-PENDING] Bulk approval endpoint not implemented | نقطة نهاية الموافقة الجماعية غير منفذة'
+        )
+        throw new Error('[BACKEND-PENDING] Bulk time entry approval endpoint not implemented')
+    },
     isPending: false
 })
 
+// [BACKEND-PENDING] Mock hook - needs backend endpoint implementation
+// الخطاف الوهمي - يحتاج إلى تنفيذ نقطة النهاية الخلفية
+const useBulkRejectTimeEntries = () => ({
+    mutate: (data: { ids: string[]; reason: string }) => {
+        toast.error(
+            'Feature not available | الميزة غير متاحة\n' +
+            '[BACKEND-PENDING] Bulk rejection endpoint not implemented | نقطة نهاية الرفض الجماعي غير منفذة'
+        )
+    },
+    isPending: false
+})
+
+// [BACKEND-PENDING] Mock hook - needs backend endpoint implementation
+// الخطاف الوهمي - يحتاج إلى تنفيذ نقطة النهاية الخلفية
 const useRequestTimeEntryChanges = () => ({
-    mutate: (data: { id: string; comments: string }) => toast.success('تم طلب التعديلات'),
+    mutate: (data: { id: string; comments: string }) => {
+        toast.error(
+            'Feature not available | الميزة غير متاحة\n' +
+            '[BACKEND-PENDING] Request changes endpoint not implemented | نقطة نهاية طلب التعديلات غير منفذة'
+        )
+    },
     isPending: false
 })
 
@@ -336,6 +380,38 @@ export default function TimeEntryApprovalsView() {
             </Header>
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+
+                {/* [BACKEND-PENDING] Feature Implementation Warning */}
+                <Alert variant="destructive" className="border-amber-300 bg-amber-50">
+                    <InfoIcon className="h-5 w-5 text-amber-600" />
+                    <AlertTitle className="text-amber-900 font-bold">
+                        Feature Under Development | الميزة قيد التطوير
+                    </AlertTitle>
+                    <AlertDescription className="text-amber-800">
+                        <div className="space-y-2">
+                            <p className="font-semibold">
+                                [BACKEND-PENDING] Time entry approval workflows are not yet implemented.
+                            </p>
+                            <p className="text-sm">
+                                The following API endpoints need to be implemented:
+                            </p>
+                            <ul className="list-disc list-inside text-sm space-y-1 ms-4">
+                                <li>GET /api/time-tracking/entries/pending-approval</li>
+                                <li>POST /api/time-tracking/entries/:id/approve</li>
+                                <li>POST /api/time-tracking/entries/:id/reject</li>
+                                <li>POST /api/time-tracking/entries/bulk-approve</li>
+                                <li>POST /api/time-tracking/entries/bulk-reject</li>
+                                <li>POST /api/time-tracking/entries/:id/request-changes</li>
+                            </ul>
+                            <p className="font-semibold mt-3">
+                                [الخلفية معلقة] سير عمل الموافقة على سجلات الوقت غير منفذة بعد.
+                            </p>
+                            <p className="text-sm">
+                                نقاط النهاية التالية بحاجة إلى التنفيذ في الخادم الخلفي.
+                            </p>
+                        </div>
+                    </AlertDescription>
+                </Alert>
 
                 {/* HERO CARD */}
                 <ProductivityHero badge="الموافقات" title="موافقات سجلات الوقت" type="time-tracking" />

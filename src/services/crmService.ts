@@ -2,9 +2,15 @@
  * CRM Service
  * Handles all CRM-related API calls (Leads, Pipelines, Referrals, Activities)
  * Includes Najiz (Ministry of Justice) integration support
+ *
+ * ERROR HANDLING:
+ * - All errors return bilingual messages (English | Arabic)
+ * - Sensitive backend details are not exposed to users
+ * - Endpoint mismatches are handled gracefully with user-friendly messages
  */
 
-import apiClient, { handleApiError } from '@/lib/api'
+import apiClient from '@/lib/api'
+import { throwBilingualError } from '@/lib/bilingualErrorHandler'
 import type {
   // Lead types
   Lead,
@@ -82,7 +88,7 @@ export const leadService = {
       const response = await apiClient.get('/leads', { params: filters })
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -96,7 +102,7 @@ export const leadService = {
       const response = await apiClient.get(`/leads/${id}`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'LEAD_NOT_FOUND')
     }
   },
 
@@ -109,7 +115,7 @@ export const leadService = {
       // Backend returns: { success, message, data: { lead, automation } }
       return response.data.data?.lead || response.data.data || response.data.lead
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'LEAD_CREATE_FAILED')
     }
   },
 
@@ -122,7 +128,7 @@ export const leadService = {
       // Backend returns: { success, message, data: lead }
       return response.data.data || response.data.lead
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'LEAD_UPDATE_FAILED')
     }
   },
 
@@ -133,7 +139,7 @@ export const leadService = {
     try {
       await apiClient.delete(`/leads/${id}`)
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'LEAD_DELETE_FAILED')
     }
   },
 
@@ -149,7 +155,7 @@ export const leadService = {
       // Backend returns: { success, message, data: lead }
       return response.data.data || response.data.lead
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'LEAD_UPDATE_FAILED')
     }
   },
 
@@ -165,7 +171,7 @@ export const leadService = {
       // Backend returns: { success, message, data: lead }
       return response.data.data || response.data.lead
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'LEAD_UPDATE_FAILED')
     }
   },
 
@@ -179,7 +185,7 @@ export const leadService = {
       const response = await apiClient.get(`/leads/${id}/conversion-preview`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'LEAD_NOT_FOUND')
     }
   },
 
@@ -193,7 +199,7 @@ export const leadService = {
       const response = await apiClient.post(`/leads/${id}/convert`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'LEAD_UPDATE_FAILED')
     }
   },
 
@@ -208,7 +214,7 @@ export const leadService = {
       const response = await apiClient.get('/leads/stats', { params })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -223,7 +229,7 @@ export const leadService = {
       const response = await apiClient.get(url)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -237,7 +243,7 @@ export const leadService = {
       })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -254,7 +260,7 @@ export const leadService = {
       })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'LEAD_NOT_FOUND')
     }
   },
 
@@ -269,7 +275,7 @@ export const leadService = {
       const response = await apiClient.post(`/leads/${id}/activities`, data)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'ACTIVITY_NOT_FOUND')
     }
   },
 
@@ -285,63 +291,87 @@ export const leadService = {
       // Backend returns: { success, message, data: lead }
       return response.data.data || response.data.lead
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'LEAD_UPDATE_FAILED')
     }
   },
 
   // ═══════════════════════════════════════════════════════════════
-  // NAJIZ VERIFICATION ENDPOINTS
+  // NAJIZ VERIFICATION ENDPOINTS [BACKEND-PENDING]
+  // ═══════════════════════════════════════════════════════════════
+  // ⚠️ WARNING: These endpoints are NOT YET IMPLEMENTED in the backend
+  // ⚠️ تحذير: هذه النقاط النهائية لم يتم تنفيذها بعد في الخادم
+  // These will return 404 errors until backend implementation is complete
   // ═══════════════════════════════════════════════════════════════
 
   /**
-   * Verify company with Wathq API (Saudi CR verification)
+   * [BACKEND-PENDING] Verify company with Wathq API (Saudi CR verification)
    * POST /api/leads/:id/verify/wathq
+   *
+   * @throws Will show user-friendly bilingual error message
+   * English: "This feature is not available yet. Please contact support."
+   * Arabic: "هذه الميزة غير متاحة حالياً. يرجى التواصل مع الدعم."
    */
   verifyWithWathq: async (id: string, data?: any): Promise<{ verified: boolean; data?: any }> => {
     try {
       const response = await apiClient.post(`/leads/${id}/verify/wathq`, data)
       return response.data.data || response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      // Will automatically show bilingual error for 404 endpoint not implemented
+      throwBilingualError(error, 'LEAD_UPDATE_FAILED')
     }
   },
 
   /**
-   * Verify identity with Absher/NIC (National ID verification)
+   * [BACKEND-PENDING] Verify identity with Absher/NIC (National ID verification)
    * POST /api/leads/:id/verify/absher
+   *
+   * @throws Will show user-friendly bilingual error message
+   * English: "This feature is not available yet. Please contact support."
+   * Arabic: "هذه الميزة غير متاحة حالياً. يرجى التواصل مع الدعم."
    */
   verifyWithAbsher: async (id: string, data?: { nationalId?: string }): Promise<{ verified: boolean; data?: any }> => {
     try {
       const response = await apiClient.post(`/leads/${id}/verify/absher`, data)
       return response.data.data || response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      // Will automatically show bilingual error for 404 endpoint not implemented
+      throwBilingualError(error, 'LEAD_UPDATE_FAILED')
     }
   },
 
   /**
-   * Verify national address with Saudi Post
+   * [BACKEND-PENDING] Verify national address with Saudi Post
    * POST /api/leads/:id/verify/address
+   *
+   * @throws Will show user-friendly bilingual error message
+   * English: "This feature is not available yet. Please contact support."
+   * Arabic: "هذه الميزة غير متاحة حالياً. يرجى التواصل مع الدعم."
    */
   verifyNationalAddress: async (id: string, address?: NationalAddress): Promise<{ verified: boolean; data?: any }> => {
     try {
       const response = await apiClient.post(`/leads/${id}/verify/address`, address)
       return response.data.data || response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      // Will automatically show bilingual error for 404 endpoint not implemented
+      throwBilingualError(error, 'LEAD_UPDATE_FAILED')
     }
   },
 
   /**
-   * Run conflict check for a lead
+   * [BACKEND-PENDING] Run conflict check for a lead
    * POST /api/leads/:id/conflict-check
+   *
+   * @throws Will show user-friendly bilingual error message
+   * English: "This feature is not available yet. Please contact support."
+   * Arabic: "هذه الميزة غير متاحة حالياً. يرجى التواصل مع الدعم."
    */
   runConflictCheck: async (id: string, data: any): Promise<any> => {
     try {
       const response = await apiClient.post(`/leads/${id}/conflict-check`, data)
       return response.data.data || response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      // Will automatically show bilingual error for 404 endpoint not implemented
+      throwBilingualError(error)
     }
   },
 }
@@ -379,7 +409,7 @@ export const pipelineService = {
       const response = await apiClient.get('/crm-pipelines', { params })
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -393,7 +423,7 @@ export const pipelineService = {
       const response = await apiClient.get(`/crm-pipelines/${id}`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -406,7 +436,7 @@ export const pipelineService = {
       // Backend returns: { success, message, data: pipeline }
       return response.data.data || response.data.pipeline
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -422,7 +452,7 @@ export const pipelineService = {
       // Backend returns: { success, message, data: pipeline }
       return response.data.data || response.data.pipeline
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -433,7 +463,7 @@ export const pipelineService = {
     try {
       await apiClient.delete(`/crm-pipelines/${id}`)
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -446,7 +476,7 @@ export const pipelineService = {
       // Backend returns: { success, message, data: pipeline }
       return response.data.data || response.data.pipeline
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -466,7 +496,7 @@ export const pipelineService = {
       // Backend returns: { success, message, data: pipeline }
       return response.data.data || response.data.pipeline
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -477,7 +507,7 @@ export const pipelineService = {
     try {
       await apiClient.delete(`/crm-pipelines/${id}/stages/${stageId}`)
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -496,7 +526,7 @@ export const pipelineService = {
       // Backend returns: { success, message, data: pipeline }
       return response.data.data || response.data.pipeline
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -508,7 +538,7 @@ export const pipelineService = {
       const response = await apiClient.get(`/crm-pipelines/${id}/stats`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -521,7 +551,7 @@ export const pipelineService = {
       // Backend returns: { success, message, data: pipeline }
       return response.data.data || response.data.pipeline
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -540,7 +570,7 @@ export const pipelineService = {
       // Backend returns: { success, message, data: pipeline }
       return response.data.data || response.data.pipeline
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 }
@@ -559,7 +589,7 @@ export const referralService = {
       const response = await apiClient.get('/referrals', { params: filters })
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -571,7 +601,7 @@ export const referralService = {
       const response = await apiClient.get(`/referrals/${id}`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -584,7 +614,7 @@ export const referralService = {
       // Backend returns: { success, message, data: referral }
       return response.data.data || response.data.referral
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -600,7 +630,7 @@ export const referralService = {
       // Backend returns: { success, message, data: referral }
       return response.data.data || response.data.referral
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -611,7 +641,7 @@ export const referralService = {
     try {
       await apiClient.delete(`/referrals/${id}`)
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -626,7 +656,7 @@ export const referralService = {
       const response = await apiClient.get('/referrals/stats', { params })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -640,7 +670,7 @@ export const referralService = {
       })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -656,7 +686,7 @@ export const referralService = {
       // Backend returns: { success, message, data: referral }
       return response.data.data || response.data.referral
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -676,7 +706,7 @@ export const referralService = {
       // Backend returns: { success, message, data: referral }
       return response.data.data || response.data.referral
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -692,7 +722,7 @@ export const referralService = {
       // Backend returns: { success, message, data: referral }
       return response.data.data || response.data.referral
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -709,7 +739,7 @@ export const referralService = {
       })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 }
@@ -728,7 +758,7 @@ export const crmActivityService = {
       const response = await apiClient.get('/crm-activities', { params })
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -740,7 +770,7 @@ export const crmActivityService = {
       const response = await apiClient.get(`/crm-activities/${id}`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -753,7 +783,7 @@ export const crmActivityService = {
       // Backend returns: { success, message, data: activity }
       return response.data.data || response.data.activity
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -769,7 +799,7 @@ export const crmActivityService = {
       // Backend returns: { success, message, data: activity }
       return response.data.data || response.data.activity
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -780,7 +810,7 @@ export const crmActivityService = {
     try {
       await apiClient.delete(`/crm-activities/${id}`)
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -798,7 +828,7 @@ export const crmActivityService = {
       })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -813,7 +843,7 @@ export const crmActivityService = {
       const response = await apiClient.get('/crm-activities/stats', { params })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -832,7 +862,7 @@ export const crmActivityService = {
       )
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -850,7 +880,7 @@ export const crmActivityService = {
       })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -868,7 +898,7 @@ export const crmActivityService = {
       // Backend returns: { success, message, data: activity }
       return response.data.data || response.data.activity
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -881,7 +911,7 @@ export const crmActivityService = {
       // Backend returns: { success, message, data: activity }
       return response.data.data || response.data.activity
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -894,7 +924,7 @@ export const crmActivityService = {
       // Backend returns: { success, message, data: activity }
       return response.data.data || response.data.activity
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -907,7 +937,7 @@ export const crmActivityService = {
       // Backend returns: { success, message, data: activity }
       return response.data.data || response.data.activity
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -920,7 +950,7 @@ export const crmActivityService = {
       // Backend returns: { success, message, data: activity }
       return response.data.data || response.data.activity
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 }

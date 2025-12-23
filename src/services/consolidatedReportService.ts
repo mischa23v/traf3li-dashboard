@@ -285,7 +285,7 @@ const consolidatedReportService = {
       )
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error) || 'Failed to generate consolidated profit & loss report | فشل في إنشاء تقرير الأرباح والخسائر الموحد')
     }
   },
 
@@ -325,7 +325,7 @@ const consolidatedReportService = {
       )
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error) || 'Failed to generate consolidated balance sheet | فشل في إنشاء الميزانية العمومية الموحدة')
     }
   },
 
@@ -372,7 +372,7 @@ const consolidatedReportService = {
       )
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error) || 'Failed to fetch inter-company transactions | فشل في جلب المعاملات بين الشركات')
     }
   },
 
@@ -414,7 +414,7 @@ const consolidatedReportService = {
       })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error) || 'Failed to generate company comparisons | فشل في إنشاء مقارنة الشركات')
     }
   },
 
@@ -440,7 +440,7 @@ const consolidatedReportService = {
       )
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error) || 'Failed to fetch elimination rules | فشل في جلب قواعد الإلغاء')
     }
   },
 
@@ -472,7 +472,7 @@ const consolidatedReportService = {
       )
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error) || 'Failed to create elimination rule | فشل في إنشاء قاعدة الإلغاء')
     }
   },
 
@@ -502,7 +502,7 @@ const consolidatedReportService = {
       )
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error) || 'Failed to update elimination rule | فشل في تحديث قاعدة الإلغاء')
     }
   },
 
@@ -524,7 +524,7 @@ const consolidatedReportService = {
     try {
       await apiClient.delete(`/reports/consolidated/elimination-rules/${id}`)
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error) || 'Failed to delete elimination rule | فشل في حذف قاعدة الإلغاء')
     }
   },
 
@@ -567,7 +567,7 @@ const consolidatedReportService = {
       )
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error) || 'Failed to fetch exchange rates | فشل في جلب أسعار الصرف')
     }
   },
 
@@ -598,7 +598,7 @@ const consolidatedReportService = {
       )
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error) || 'Failed to set exchange rate | فشل في تعيين سعر الصرف')
     }
   },
 
@@ -634,7 +634,7 @@ const consolidatedReportService = {
       )
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error) || 'Failed to fetch consolidation summary | فشل في جلب ملخص الدمج')
     }
   },
 
@@ -679,7 +679,7 @@ const consolidatedReportService = {
       )
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error) || 'Failed to export consolidated report | فشل في تصدير التقرير الموحد')
     }
   },
 }

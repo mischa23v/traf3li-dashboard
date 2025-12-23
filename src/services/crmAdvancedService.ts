@@ -1,9 +1,15 @@
 /**
  * Advanced CRM Service
  * Handles email marketing, lead scoring, and WhatsApp integration API calls
+ *
+ * ERROR HANDLING:
+ * - All errors return bilingual messages (English | Arabic)
+ * - Sensitive backend details are not exposed to users
+ * - Endpoint mismatches are handled gracefully with user-friendly messages
  */
 
-import apiClient, { handleApiError } from '@/lib/api'
+import apiClient from '@/lib/api'
+import { throwBilingualError } from '@/lib/bilingualErrorHandler'
 import type {
   // Email Template types
   EmailTemplate,
@@ -51,7 +57,7 @@ export const emailTemplateService = {
       })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -63,7 +69,7 @@ export const emailTemplateService = {
       const response = await apiClient.get(`/email-marketing/templates/${id}`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -75,7 +81,7 @@ export const emailTemplateService = {
       const response = await apiClient.post('/email-marketing/templates', data)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -87,7 +93,7 @@ export const emailTemplateService = {
       const response = await apiClient.put(`/email-marketing/templates/${id}`, data)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -98,7 +104,7 @@ export const emailTemplateService = {
     try {
       await apiClient.delete(`/email-marketing/templates/${id}`)
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -115,7 +121,7 @@ export const emailTemplateService = {
       })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -129,7 +135,7 @@ export const emailTemplateService = {
       })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 }
@@ -148,7 +154,7 @@ export const emailCampaignService = {
       const response = await apiClient.get('/email-marketing/campaigns', { params: filters })
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -160,7 +166,7 @@ export const emailCampaignService = {
       const response = await apiClient.get(`/email-marketing/campaigns/${id}`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -172,7 +178,7 @@ export const emailCampaignService = {
       const response = await apiClient.post('/email-marketing/campaigns', data)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -184,7 +190,7 @@ export const emailCampaignService = {
       const response = await apiClient.put(`/email-marketing/campaigns/${id}`, data)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -195,7 +201,7 @@ export const emailCampaignService = {
     try {
       await apiClient.delete(`/email-marketing/campaigns/${id}`)
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -207,7 +213,7 @@ export const emailCampaignService = {
       const response = await apiClient.post(`/email-marketing/campaigns/${id}/send`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -222,7 +228,7 @@ export const emailCampaignService = {
       })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -234,7 +240,7 @@ export const emailCampaignService = {
       const response = await apiClient.post(`/email-marketing/campaigns/${id}/pause`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -246,7 +252,7 @@ export const emailCampaignService = {
       const response = await apiClient.post(`/email-marketing/campaigns/${id}/resume`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -258,7 +264,7 @@ export const emailCampaignService = {
       const response = await apiClient.get(`/email-marketing/campaigns/${id}/analytics`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -275,7 +281,7 @@ export const emailCampaignService = {
       const response = await apiClient.post(`/email-marketing/campaigns/${id}/ab-test`, config)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -291,7 +297,7 @@ export const emailCampaignService = {
       const response = await apiClient.get(`/email-marketing/campaigns/${id}/ab-test/results`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -305,7 +311,7 @@ export const emailCampaignService = {
       })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 }
@@ -322,7 +328,7 @@ export const dripCampaignService = {
       const response = await apiClient.get('/email-marketing/drip-campaigns')
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -334,7 +340,7 @@ export const dripCampaignService = {
       const response = await apiClient.get(`/email-marketing/drip-campaigns/${id}`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -346,7 +352,7 @@ export const dripCampaignService = {
       const response = await apiClient.post('/email-marketing/drip-campaigns', data)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -358,7 +364,7 @@ export const dripCampaignService = {
       const response = await apiClient.put(`/email-marketing/drip-campaigns/${id}`, data)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -369,7 +375,7 @@ export const dripCampaignService = {
     try {
       await apiClient.delete(`/email-marketing/drip-campaigns/${id}`)
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -381,7 +387,7 @@ export const dripCampaignService = {
       const response = await apiClient.post(`/email-marketing/drip-campaigns/${id}/activate`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -393,7 +399,7 @@ export const dripCampaignService = {
       const response = await apiClient.post(`/email-marketing/drip-campaigns/${id}/pause`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -404,7 +410,7 @@ export const dripCampaignService = {
     try {
       await apiClient.post(`/email-marketing/drip-campaigns/${id}/enroll`, { subscriberId })
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -415,7 +421,7 @@ export const dripCampaignService = {
     try {
       await apiClient.post(`/email-marketing/drip-campaigns/${id}/remove`, { subscriberId })
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 }
@@ -438,7 +444,7 @@ export const subscriberService = {
       const response = await apiClient.get('/email-marketing/subscribers', { params })
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -450,7 +456,7 @@ export const subscriberService = {
       const response = await apiClient.get(`/email-marketing/subscribers/${id}`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -470,7 +476,7 @@ export const subscriberService = {
       const response = await apiClient.post('/email-marketing/subscribers', data)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -492,7 +498,7 @@ export const subscriberService = {
       })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -503,7 +509,7 @@ export const subscriberService = {
     try {
       await apiClient.post(`/email-marketing/subscribers/${id}/unsubscribe`, { reason })
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -515,7 +521,7 @@ export const subscriberService = {
       const response = await apiClient.post(`/email-marketing/subscribers/${id}/tags`, { tags })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -529,7 +535,7 @@ export const subscriberService = {
       })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 }
@@ -546,7 +552,7 @@ export const segmentService = {
       const response = await apiClient.get('/email-marketing/segments')
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -558,7 +564,7 @@ export const segmentService = {
       const response = await apiClient.get(`/email-marketing/segments/${id}`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -570,7 +576,7 @@ export const segmentService = {
       const response = await apiClient.post('/email-marketing/segments', data)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -582,7 +588,7 @@ export const segmentService = {
       const response = await apiClient.put(`/email-marketing/segments/${id}`, data)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -593,7 +599,7 @@ export const segmentService = {
     try {
       await apiClient.delete(`/email-marketing/segments/${id}`)
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -607,7 +613,7 @@ export const segmentService = {
       })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -619,7 +625,7 @@ export const segmentService = {
       const response = await apiClient.post(`/email-marketing/segments/${id}/refresh`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 }
@@ -640,7 +646,7 @@ export const leadScoringService = {
       const response = await apiClient.get('/lead-scoring/config')
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -652,7 +658,7 @@ export const leadScoringService = {
       const response = await apiClient.put('/lead-scoring/config', data)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -668,7 +674,7 @@ export const leadScoringService = {
       const response = await apiClient.post(`/lead-scoring/calculate/${leadId}`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -680,7 +686,7 @@ export const leadScoringService = {
       const response = await apiClient.post('/lead-scoring/calculate-all')
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -692,7 +698,7 @@ export const leadScoringService = {
       const response = await apiClient.post('/lead-scoring/calculate-batch', { leadIds })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -718,7 +724,7 @@ export const leadScoringService = {
         pagination: response.data.data.pagination
       }
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -730,7 +736,7 @@ export const leadScoringService = {
       const response = await apiClient.get('/lead-scoring/leaderboard', { params: { limit } })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -742,7 +748,7 @@ export const leadScoringService = {
       const response = await apiClient.get('/lead-scoring/distribution')
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -754,7 +760,7 @@ export const leadScoringService = {
       const response = await apiClient.get('/lead-scoring/top-leads', { params: { limit } })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -766,7 +772,7 @@ export const leadScoringService = {
       const response = await apiClient.get(`/lead-scoring/by-grade/${grade}`, { params })
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -783,7 +789,7 @@ export const leadScoringService = {
       const response = await apiClient.get(`/lead-scoring/insights/${leadId}`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -802,7 +808,7 @@ export const leadScoringService = {
       const response = await apiClient.get('/lead-scoring/trends', { params })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -819,7 +825,7 @@ export const leadScoringService = {
       const response = await apiClient.get('/lead-scoring/conversion-analysis')
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -835,7 +841,7 @@ export const leadScoringService = {
       const response = await apiClient.post('/lead-scoring/track/email-open', data)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -847,7 +853,7 @@ export const leadScoringService = {
       const response = await apiClient.post('/lead-scoring/track/email-click', data)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -859,7 +865,7 @@ export const leadScoringService = {
       const response = await apiClient.post('/lead-scoring/track/document-view', data)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -871,7 +877,7 @@ export const leadScoringService = {
       const response = await apiClient.post('/lead-scoring/track/website-visit', data)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -883,7 +889,7 @@ export const leadScoringService = {
       const response = await apiClient.post('/lead-scoring/track/form-submit', data)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -895,7 +901,7 @@ export const leadScoringService = {
       const response = await apiClient.post('/lead-scoring/track/meeting', data)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -907,7 +913,7 @@ export const leadScoringService = {
       const response = await apiClient.post('/lead-scoring/track/call', data)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -923,7 +929,7 @@ export const leadScoringService = {
       const response = await apiClient.post('/lead-scoring/process-decay')
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 }
@@ -977,7 +983,7 @@ export const whatsAppService = {
 
       return { data: conversations, pagination }
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -992,7 +998,7 @@ export const whatsAppService = {
       const response = await apiClient.get(`/whatsapp/conversations/${id}`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -1025,7 +1031,7 @@ export const whatsAppService = {
       const response = await apiClient.post('/whatsapp/messages/send', normalizedData)
       return response.data.data || response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -1037,7 +1043,7 @@ export const whatsAppService = {
       const response = await apiClient.post('/whatsapp/send/template', data)
       return response.data.data || response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -1048,7 +1054,7 @@ export const whatsAppService = {
     try {
       await apiClient.post(`/whatsapp/conversations/${conversationId}/read`)
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -1062,7 +1068,7 @@ export const whatsAppService = {
       })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -1074,7 +1080,7 @@ export const whatsAppService = {
       const response = await apiClient.post(`/whatsapp/conversations/${conversationId}/close`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -1088,7 +1094,7 @@ export const whatsAppService = {
       const responseData = response.data
       return responseData.data || responseData.templates || []
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -1100,7 +1106,7 @@ export const whatsAppService = {
       const response = await apiClient.post('/whatsapp/templates', data)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -1112,7 +1118,7 @@ export const whatsAppService = {
       const response = await apiClient.get(`/whatsapp/templates/${id}/status`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -1124,7 +1130,7 @@ export const whatsAppService = {
       const response = await apiClient.post('/whatsapp/broadcasts', data)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -1136,7 +1142,7 @@ export const whatsAppService = {
       const response = await apiClient.get('/whatsapp/broadcasts')
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -1148,7 +1154,7 @@ export const whatsAppService = {
       const response = await apiClient.post(`/whatsapp/broadcasts/${id}/send`)
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 }

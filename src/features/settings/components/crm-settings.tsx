@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react'
 import {
     Users, Briefcase, FileText, Mail, Calendar, Hash,
-    MapPin, UserCheck, ArrowRight, Save, Loader2
+    MapPin, UserCheck, ArrowRight, Save, Loader2, AlertCircle
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
     Select,
     SelectContent,
@@ -40,23 +41,48 @@ import type {
     ConversionSettings,
 } from '@/types/crmSettings'
 
-// TODO: Create these hooks when backend service is implemented
-// For now, using placeholder hooks
+/**
+ * [BACKEND-PENDING] Backend Integration Required
+ *
+ * These are placeholder hooks that need to be replaced with actual API integration:
+ *
+ * 1. useCRMSettings:
+ *    - Should fetch CRM settings from: GET /api/settings/crm
+ *    - Handle loading states and error cases
+ *    - Use React Query or similar for caching
+ *
+ * 2. useUpdateCRMSettings:
+ *    - Should update CRM settings via: PUT /api/settings/crm
+ *    - Handle success/error notifications
+ *    - Invalidate cache on successful update
+ *
+ * Reference: /docs/api/settings-endpoints.md
+ * Backend issue: #TBD (create issue in backend repository)
+ */
 const useCRMSettings = () => {
     return {
         data: null,
         isLoading: false,
+        error: null, // [BACKEND-PENDING] Will contain error details when API is connected
     }
 }
 
 const useUpdateCRMSettings = () => {
     return {
         mutateAsync: async (data: any) => {
-            console.log('Update CRM Settings:', data)
-            // TODO: Implement actual API call
+            console.log('[BACKEND-PENDING] Update CRM Settings (Placeholder - No backend connected):', data)
+            // [BACKEND-PENDING] Replace with actual API call to PUT /api/settings/crm
+            // Example bilingual error handling:
+            // try {
+            //   const response = await apiClient.put('/settings/crm', data)
+            //   return response.data
+            // } catch (error) {
+            //   throw new Error('Failed to update CRM settings | فشل في تحديث إعدادات CRM')
+            // }
             return Promise.resolve(data)
         },
         isPending: false,
+        error: null, // [BACKEND-PENDING] Will contain error details when API is connected
     }
 }
 
@@ -180,6 +206,24 @@ export default function CRMSettings() {
                         <h1 className="text-2xl font-bold text-navy">إعدادات إدارة علاقات العملاء (CRM)</h1>
                         <p className="text-slate-500">تخصيص إعدادات العملاء المحتملين، القضايا، العروض، والمواعيد</p>
                     </div>
+
+                    {/* Backend Integration Notice - Bilingual */}
+                    <Alert className="mb-6 border-amber-200 bg-amber-50">
+                        <AlertCircle className="h-4 w-4 text-amber-600" />
+                        <AlertDescription className="text-amber-800">
+                            <div className="space-y-2">
+                                <p dir="rtl">
+                                    <strong>[BACKEND-PENDING]</strong> هذه الصفحة قيد التطوير حالياً. التغييرات التي تجريها سيتم حفظها محلياً ولن يتم إرسالها إلى الخادم حتى يتم ربط واجهة برمجة التطبيقات (API).
+                                </p>
+                                <p dir="ltr" className="text-sm opacity-90">
+                                    <strong>[BACKEND-PENDING]</strong> This page is under development. Changes will be saved locally and won't be sent to the server until the API is connected.
+                                </p>
+                                <p className="text-xs mt-2 font-mono" dir="ltr">
+                                    Required endpoints: GET/PUT /api/settings/crm
+                                </p>
+                            </div>
+                        </AlertDescription>
+                    </Alert>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <Tabs defaultValue="leads" dir="rtl" className="w-full">

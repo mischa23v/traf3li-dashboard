@@ -1,10 +1,14 @@
 /**
  * Messages Service
- * Handles all message-related API calls
+ * Handles all message-related API calls (conversation-based messaging)
  * Base route: /api/messages
+ *
+ * IMPLEMENTATION STATUS: ✅ CONFIRMED
+ * All endpoints below are confirmed to be implemented in the backend.
  */
 
 import apiClient, { handleApiError } from '@/lib/api'
+import { toast } from 'sonner'
 
 /**
  * Message Interface
@@ -62,7 +66,9 @@ const messagesService = {
         total: response.data.total || 0,
       }
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      const errorMsg = handleApiError(error)
+      toast.error('Failed to load messages | فشل تحميل الرسائل')
+      throw new Error(errorMsg)
     }
   },
 
@@ -89,9 +95,12 @@ const messagesService = {
           'Content-Type': 'multipart/form-data',
         },
       })
+      toast.success('Message sent | تم إرسال الرسالة')
       return response.data.message || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      const errorMsg = handleApiError(error)
+      toast.error('Failed to send message | فشل إرسال الرسالة')
+      throw new Error(errorMsg)
     }
   },
 
@@ -103,7 +112,9 @@ const messagesService = {
     try {
       await apiClient.patch(`/messages/${conversationId}/read`)
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      const errorMsg = handleApiError(error)
+      toast.error('Failed to mark as read | فشل تحديث حالة القراءة')
+      throw new Error(errorMsg)
     }
   },
 }

@@ -42,6 +42,24 @@ import {
 } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
+/**
+ * VersionUploadDialog Component
+ *
+ * @deprecated This component uses documentVersionService.uploadVersion() which uses direct upload.
+ *
+ * MIGRATION NOTE:
+ * The underlying useUploadVersion hook uses documentVersionService.uploadVersion(),
+ * which uploads files directly through the API server using FormData.
+ *
+ * For better performance and scalability, consider migrating to an S3-based upload flow
+ * similar to the main document upload:
+ * 1. Get presigned S3 URL from backend
+ * 2. Upload directly to S3
+ * 3. Confirm upload with backend
+ *
+ * The documentVersionService may need to be updated to support this pattern.
+ * Users will see a warning notification when using this component (if the hook is updated).
+ */
 interface VersionUploadDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void

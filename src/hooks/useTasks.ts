@@ -23,6 +23,32 @@ import tasksService, {
 import { apiClient } from '@/lib/api'
 import { useAuthStore } from '@/stores/auth-store'
 
+// ==================== Helper Functions ====================
+
+/**
+ * Create bilingual error message
+ * @param enMsg English message
+ * @param arMsg Arabic message
+ */
+const bilingualError = (enMsg: string, arMsg: string): string => {
+  return `${enMsg} | ${arMsg}`
+}
+
+/**
+ * Log deprecation warning for unimplemented endpoints
+ * @param feature Feature name
+ * @param endpoint Endpoint path
+ */
+const logDeprecationWarning = (feature: string, endpoint: string): void => {
+  console.warn(
+    `⚠️ DEPRECATION WARNING | تحذير عدم التوفر:\n` +
+    `Feature: ${feature}\n` +
+    `Endpoint: ${endpoint}\n` +
+    `Status: Not documented in backend API - may not be implemented yet\n` +
+    `الحالة: غير موثق في واجهة برمجة التطبيقات الخلفية - قد لا يكون مطبقاً بعد`
+  )
+}
+
 // ==================== Cache Configuration ====================
 // Cache data for 30 minutes to reduce API calls
 // Data is refreshed automatically when tasks are created/updated/deleted
@@ -138,7 +164,7 @@ export const useCreateTask = () => {
     mutationFn: (data: CreateTaskData) => tasksService.createTask(data),
     // Update cache with real server data on success (Stable & Correct)
     onSuccess: (data) => {
-      toast.success('تم إنشاء المهمة بنجاح')
+      toast.success('تم إنشاء المهمة بنجاح | Task created successfully')
 
       // Manually update the cache with the REAL task from server
       // This avoids "flickering" and "missing fields" issues
@@ -163,7 +189,7 @@ export const useCreateTask = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إنشاء المهمة')
+      toast.error(error.message || bilingualError('Failed to create task', 'فشل إنشاء المهمة'))
     },
   })
 }
@@ -300,7 +326,7 @@ export const useUpdateTask = () => {
       return { previousQueries, previousTask }
     },
     onSuccess: () => {
-      toast.success('تم تحديث المهمة بنجاح')
+      toast.success('تم تحديث المهمة بنجاح | Task updated successfully')
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
     },
     onError: (error: Error, { id }, context) => {
@@ -312,7 +338,7 @@ export const useUpdateTask = () => {
       if (context?.previousTask) {
         queryClient.setQueryData(['tasks', id], context.previousTask)
       }
-      toast.error(error.message || 'فشل تحديث المهمة')
+      toast.error(error.message || bilingualError('Failed to update task', 'فشل تحديث المهمة'))
     },
     onSettled: async (_, __, { id }) => {
       await queryClient.invalidateQueries({ queryKey: ['tasks'] })
@@ -330,7 +356,7 @@ export const useDeleteTask = () => {
     // Optimistic update - remove task from list immediately
     // Update cache on success (Stable & Correct)
     onSuccess: (_, id) => {
-      toast.success('تم حذف المهمة بنجاح')
+      toast.success('تم حذف المهمة بنجاح | Task deleted successfully')
 
       // Optimistically remove task from all lists
       queryClient.setQueriesData({ queryKey: ['tasks'] }, (old: any) => {
@@ -354,7 +380,7 @@ export const useDeleteTask = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل حذف المهمة')
+      toast.error(error.message || bilingualError('Failed to delete task', 'فشل حذف المهمة'))
     },
   })
 }
@@ -371,10 +397,10 @@ export const useUpdateTaskStatus = () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
       queryClient.invalidateQueries({ queryKey: ['tasks', id] })
       queryClient.invalidateQueries({ queryKey: ['calendar'] })
-      toast.success('تم تحديث حالة المهمة')
+      toast.success('تم تحديث حالة المهمة | Task status updated')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث الحالة')
+      toast.error(error.message || bilingualError('Failed to update status', 'فشل تحديث الحالة'))
     },
   })
 }
@@ -389,10 +415,10 @@ export const useCompleteTask = () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
       queryClient.invalidateQueries({ queryKey: ['tasks', id] })
       queryClient.invalidateQueries({ queryKey: ['calendar'] })
-      toast.success('تم إكمال المهمة بنجاح')
+      toast.success('تم إكمال المهمة بنجاح | Task completed successfully')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إكمال المهمة')
+      toast.error(error.message || bilingualError('Failed to complete task', 'فشل إكمال المهمة'))
     },
   })
 }
@@ -406,10 +432,10 @@ export const useReopenTask = () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
       queryClient.invalidateQueries({ queryKey: ['tasks', id] })
       queryClient.invalidateQueries({ queryKey: ['calendar'] })
-      toast.success('تم إعادة فتح المهمة')
+      toast.success('تم إعادة فتح المهمة | Task reopened')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إعادة فتح المهمة')
+      toast.error(error.message || bilingualError('Failed to reopen task', 'فشل إعادة فتح المهمة'))
     },
   })
 }
@@ -418,16 +444,19 @@ export const useUpdateTaskProgress = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, progress, autoCalculate }: { id: string; progress?: number; autoCalculate?: boolean }) =>
-      tasksService.updateProgress(id, progress, autoCalculate),
+    mutationFn: ({ id, progress, autoCalculate }: { id: string; progress?: number; autoCalculate?: boolean }) => {
+      // Log deprecation warning for undocumented endpoint
+      logDeprecationWarning('Task Progress Update', 'PATCH /tasks/:id/progress')
+      return tasksService.updateProgress(id, progress, autoCalculate)
+    },
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
       queryClient.invalidateQueries({ queryKey: ['tasks', id] })
       queryClient.invalidateQueries({ queryKey: ['calendar'] })
-      toast.success('تم تحديث تقدم المهمة')
+      toast.success('تم تحديث تقدم المهمة | Task progress updated')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث التقدم')
+      toast.error(error.message || bilingualError('Failed to update progress', 'فشل تحديث التقدم'))
     },
   })
 }
@@ -464,10 +493,10 @@ export const useAddSubtask = () => {
       if (context?.previousTask) {
         queryClient.setQueryData(['tasks', taskId], context.previousTask)
       }
-      toast.error(error.message || 'فشل إضافة المهمة الفرعية')
+      toast.error(error.message || bilingualError('Failed to add subtask', 'فشل إضافة المهمة الفرعية'))
     },
     onSuccess: () => {
-      toast.success('تم إضافة المهمة الفرعية')
+      toast.success('تم إضافة المهمة الفرعية | Subtask added')
     },
     onSettled: (_, __, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
@@ -500,7 +529,7 @@ export const useUpdateSubtask = () => {
       if (context?.previousTask) {
         queryClient.setQueryData(['tasks', taskId], context.previousTask)
       }
-      toast.error(error.message || 'فشل تحديث المهمة الفرعية')
+      toast.error(error.message || bilingualError('Failed to update subtask', 'فشل تحديث المهمة الفرعية'))
     },
     onSettled: (_, __, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
@@ -534,7 +563,7 @@ export const useToggleSubtask = () => {
       if (context?.previousTask) {
         queryClient.setQueryData(['tasks', taskId], context.previousTask)
       }
-      toast.error(error.message || 'فشل تحديث المهمة الفرعية')
+      toast.error(error.message || bilingualError('Failed to toggle subtask', 'فشل تحديث المهمة الفرعية'))
     },
     onSettled: (_, __, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
@@ -566,10 +595,10 @@ export const useDeleteSubtask = () => {
       if (context?.previousTask) {
         queryClient.setQueryData(['tasks', taskId], context.previousTask)
       }
-      toast.error(error.message || 'فشل حذف المهمة الفرعية')
+      toast.error(error.message || bilingualError('Failed to delete subtask', 'فشل حذف المهمة الفرعية'))
     },
     onSuccess: () => {
-      toast.success('تم حذف المهمة الفرعية')
+      toast.success('تم حذف المهمة الفرعية | Subtask deleted')
     },
     onSettled: (_, __, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
@@ -587,7 +616,7 @@ export const useReorderSubtasks = () => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إعادة ترتيب المهام الفرعية')
+      toast.error(error.message || bilingualError('Failed to reorder subtasks', 'فشل إعادة ترتيب المهام الفرعية'))
     },
   })
 }
@@ -602,10 +631,10 @@ export const useStartTimeTracking = () => {
     onSuccess: (_, taskId) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'time-tracking'] })
-      toast.success('تم بدء تتبع الوقت')
+      toast.success('تم بدء تتبع الوقت | Time tracking started')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل بدء تتبع الوقت')
+      toast.error(error.message || bilingualError('Failed to start time tracking', 'فشل بدء تتبع الوقت'))
     },
   })
 }
@@ -619,10 +648,10 @@ export const useStopTimeTracking = () => {
     onSuccess: (_, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'time-tracking'] })
-      toast.success('تم إيقاف تتبع الوقت')
+      toast.success('تم إيقاف تتبع الوقت | Time tracking stopped')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إيقاف تتبع الوقت')
+      toast.error(error.message || bilingualError('Failed to stop time tracking', 'فشل إيقاف تتبع الوقت'))
     },
   })
 }
@@ -636,10 +665,10 @@ export const useAddTimeEntry = () => {
     onSuccess: (_, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'time-tracking'] })
-      toast.success('تم إضافة وقت يدوي')
+      toast.success('تم إضافة وقت يدوي | Manual time added')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إضافة الوقت')
+      toast.error(error.message || bilingualError('Failed to add time entry', 'فشل إضافة الوقت'))
     },
   })
 }
@@ -677,10 +706,10 @@ export const useAddComment = () => {
       if (context?.previousTask) {
         queryClient.setQueryData(['tasks', taskId], context.previousTask)
       }
-      toast.error(error.message || 'فشل إضافة التعليق')
+      toast.error(error.message || bilingualError('Failed to add comment', 'فشل إضافة التعليق'))
     },
     onSuccess: () => {
-      toast.success('تم إضافة التعليق')
+      toast.success('تم إضافة التعليق | Comment added')
     },
     onSettled: (_, __, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
@@ -713,10 +742,10 @@ export const useUpdateComment = () => {
       if (context?.previousTask) {
         queryClient.setQueryData(['tasks', taskId], context.previousTask)
       }
-      toast.error(error.message || 'فشل تحديث التعليق')
+      toast.error(error.message || bilingualError('Failed to update comment', 'فشل تحديث التعليق'))
     },
     onSuccess: () => {
-      toast.success('تم تحديث التعليق')
+      toast.success('تم تحديث التعليق | Comment updated')
     },
     onSettled: (_, __, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
@@ -748,10 +777,10 @@ export const useDeleteComment = () => {
       if (context?.previousTask) {
         queryClient.setQueryData(['tasks', taskId], context.previousTask)
       }
-      toast.error(error.message || 'فشل حذف التعليق')
+      toast.error(error.message || bilingualError('Failed to delete comment', 'فشل حذف التعليق'))
     },
     onSuccess: () => {
-      toast.success('تم حذف التعليق')
+      toast.success('تم حذف التعليق | Comment deleted')
     },
     onSettled: (_, __, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
@@ -769,7 +798,7 @@ export const useUploadTaskAttachment = () => {
       tasksService.uploadAttachment(id, file, onProgress),
     // Update cache on success (Stable & Correct)
     onSuccess: (data, { id: taskId }) => {
-      toast.success('تم رفع المرفق بنجاح')
+      toast.success('تم رفع المرفق بنجاح | Attachment uploaded successfully')
 
       // Manually update the cache
       queryClient.setQueryData(['tasks', taskId], (old: any) => {
@@ -785,7 +814,7 @@ export const useUploadTaskAttachment = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل رفع المرفق')
+      toast.error(error.message || bilingualError('Failed to upload attachment', 'فشل رفع المرفق'))
     },
     onSettled: async (_, __, { id }) => {
       // Removed invalidation to prevent flickering (race condition)
@@ -811,7 +840,7 @@ export const useDeleteTaskAttachment = () => {
     },
     // Update cache on success (Stable & Correct)
     onSuccess: (_, { taskId, attachmentId }) => {
-      toast.success('تم حذف المرفق')
+      toast.success('تم حذف المرفق | Attachment deleted')
 
       // Manually update the cache
       queryClient.setQueryData(['tasks', taskId], (old: any) => {
@@ -827,7 +856,7 @@ export const useDeleteTaskAttachment = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل حذف المرفق')
+      toast.error(error.message || bilingualError('Failed to delete attachment', 'فشل حذف المرفق'))
     },
     onSettled: async (_, __, { taskId }) => {
       // Removed invalidation to prevent flickering (race condition)
@@ -841,7 +870,7 @@ export const useGetAttachmentDownloadUrl = () => {
     mutationFn: ({ taskId, attachmentId }: { taskId: string; attachmentId: string }) =>
       tasksService.getAttachmentDownloadUrl(taskId, attachmentId),
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل الحصول على رابط التحميل')
+      toast.error(error.message || bilingualError('Failed to get download URL', 'فشل الحصول على رابط التحميل'))
     },
   })
 }
@@ -891,7 +920,7 @@ export const useAttachmentVersionDownload = () => {
       return { downloadUrl }
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحميل النسخة')
+      toast.error(error.message || bilingualError('Failed to download version', 'فشل تحميل النسخة'))
     },
   })
 }
@@ -906,10 +935,10 @@ export const useCreateFromTemplate = () => {
       tasksService.createFromTemplate(templateId, overrides),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      toast.success('تم إنشاء المهمة من القالب')
+      toast.success('تم إنشاء المهمة من القالب | Task created from template')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إنشاء المهمة من القالب')
+      toast.error(error.message || bilingualError('Failed to create task from template', 'فشل إنشاء المهمة من القالب'))
     },
   })
 }
@@ -922,10 +951,10 @@ export const useSaveAsTemplate = () => {
       tasksService.saveAsTemplate(taskId, templateName),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks', 'templates'] })
-      toast.success('تم حفظ المهمة كقالب')
+      toast.success('تم حفظ المهمة كقالب | Task saved as template')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل حفظ القالب')
+      toast.error(error.message || bilingualError('Failed to save template', 'فشل حفظ القالب'))
     },
   })
 }
@@ -939,13 +968,13 @@ export const useBulkUpdateTasks = () => {
     mutationFn: ({ taskIds, data }) => tasksService.bulkUpdate(taskIds, data),
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      toast.success(`تم تحديث ${result.success} مهمة`)
+      toast.success(bilingualError(`${result.success} tasks updated`, `تم تحديث ${result.success} مهمة`))
       if (result.failed > 0) {
-        toast.warning(`فشل تحديث ${result.failed} مهمة`)
+        toast.warning(bilingualError(`${result.failed} tasks failed to update`, `فشل تحديث ${result.failed} مهمة`))
       }
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل التحديث الجماعي')
+      toast.error(error.message || bilingualError('Failed to bulk update tasks', 'فشل التحديث الجماعي'))
     },
   })
 }
@@ -957,13 +986,13 @@ export const useBulkDeleteTasks = () => {
     mutationFn: (taskIds) => tasksService.bulkDelete(taskIds),
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      toast.success(`تم حذف ${result.success} مهمة`)
+      toast.success(bilingualError(`${result.success} tasks deleted`, `تم حذف ${result.success} مهمة`))
       if (result.failed > 0) {
-        toast.warning(`فشل حذف ${result.failed} مهمة`)
+        toast.warning(bilingualError(`${result.failed} tasks failed to delete`, `فشل حذف ${result.failed} مهمة`))
       }
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل الحذف الجماعي')
+      toast.error(error.message || bilingualError('Failed to bulk delete tasks', 'فشل الحذف الجماعي'))
     },
   })
 }
@@ -975,13 +1004,13 @@ export const useBulkCompleteTasks = () => {
     mutationFn: (taskIds) => tasksService.bulkComplete(taskIds),
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      toast.success(`تم إكمال ${result.success} مهمة`)
+      toast.success(bilingualError(`${result.success} tasks completed`, `تم إكمال ${result.success} مهمة`))
       if (result.failed > 0) {
-        toast.warning(`فشل إكمال ${result.failed} مهمة`)
+        toast.warning(bilingualError(`${result.failed} tasks failed to complete`, `فشل إكمال ${result.failed} مهمة`))
       }
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل الإكمال الجماعي')
+      toast.error(error.message || bilingualError('Failed to bulk complete tasks', 'فشل الإكمال الجماعي'))
     },
   })
 }
@@ -993,13 +1022,13 @@ export const useBulkAssignTasks = () => {
     mutationFn: ({ taskIds, assignedTo }) => tasksService.bulkAssign(taskIds, assignedTo),
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      toast.success(`تم تعيين ${result.success} مهمة`)
+      toast.success(bilingualError(`${result.success} tasks assigned`, `تم تعيين ${result.success} مهمة`))
       if (result.failed > 0) {
-        toast.warning(`فشل تعيين ${result.failed} مهمة`)
+        toast.warning(bilingualError(`${result.failed} tasks failed to assign`, `فشل تعيين ${result.failed} مهمة`))
       }
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل التعيين الجماعي')
+      toast.error(error.message || bilingualError('Failed to bulk assign tasks', 'فشل التعيين الجماعي'))
     },
   })
 }
@@ -1013,13 +1042,13 @@ export const useImportTasks = () => {
     mutationFn: (file: File) => tasksService.importTasks(file),
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      toast.success(`تم استيراد ${result.imported} مهمة بنجاح`)
+      toast.success(bilingualError(`${result.imported} tasks imported successfully`, `تم استيراد ${result.imported} مهمة بنجاح`))
       if (result.failed > 0) {
-        toast.warning(`فشل استيراد ${result.failed} مهمة`)
+        toast.warning(bilingualError(`${result.failed} tasks failed to import`, `فشل استيراد ${result.failed} مهمة`))
       }
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل استيراد المهام')
+      toast.error(error.message || bilingualError('Failed to import tasks', 'فشل استيراد المهام'))
     },
   })
 }
@@ -1037,10 +1066,10 @@ export const useExportTasks = () => {
       a.click()
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
-      toast.success('تم تصدير المهام بنجاح')
+      toast.success('تم تصدير المهام بنجاح | Tasks exported successfully')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تصدير المهام')
+      toast.error(error.message || bilingualError('Failed to export tasks', 'فشل تصدير المهام'))
     },
   })
 }
@@ -1055,10 +1084,10 @@ export const useSkipRecurrence = () => {
     onSuccess: (_, taskId) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      toast.success('تم تخطي الموعد التالي')
+      toast.success('تم تخطي الموعد التالي | Next occurrence skipped')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تخطي الموعد')
+      toast.error(error.message || bilingualError('Failed to skip occurrence', 'فشل تخطي الموعد'))
     },
   })
 }
@@ -1071,10 +1100,10 @@ export const useStopRecurrence = () => {
     onSuccess: (_, taskId) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      toast.success('تم إيقاف التكرار')
+      toast.success('تم إيقاف التكرار | Recurrence stopped')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إيقاف التكرار')
+      toast.error(error.message || bilingualError('Failed to stop recurrence', 'فشل إيقاف التكرار'))
     },
   })
 }
@@ -1082,6 +1111,11 @@ export const useStopRecurrence = () => {
 // ==================== Dependency Hooks ====================
 
 export const useAvailableDependencies = (taskId: string) => {
+  // Log deprecation warning for undocumented query
+  if (taskId) {
+    logDeprecationWarning('Task Dependencies - Available', 'GET /tasks/:id/available-dependencies')
+  }
+
   return useQuery({
     queryKey: ['tasks', taskId, 'available-dependencies'],
     queryFn: () => tasksService.getAvailableDependencies(taskId),
@@ -1093,15 +1127,18 @@ export const useAddDependency = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ taskId, dependencyTaskId, type }: { taskId: string; dependencyTaskId: string; type: 'blocks' | 'blocked_by' }) =>
-      tasksService.addDependency(taskId, dependencyTaskId, type),
+    mutationFn: ({ taskId, dependencyTaskId, type }: { taskId: string; dependencyTaskId: string; type: 'blocks' | 'blocked_by' }) => {
+      // Log deprecation warning for undocumented endpoint
+      logDeprecationWarning('Task Dependencies - Add', 'POST /tasks/:id/dependencies')
+      return tasksService.addDependency(taskId, dependencyTaskId, type)
+    },
     onSuccess: (_, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      toast.success('تم إضافة التبعية بنجاح')
+      toast.success('تم إضافة التبعية بنجاح | Dependency added successfully')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إضافة التبعية')
+      toast.error(error.message || bilingualError('Failed to add dependency', 'فشل إضافة التبعية'))
     },
   })
 }
@@ -1110,15 +1147,18 @@ export const useRemoveDependency = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ taskId, dependencyTaskId }: { taskId: string; dependencyTaskId: string }) =>
-      tasksService.removeDependency(taskId, dependencyTaskId),
+    mutationFn: ({ taskId, dependencyTaskId }: { taskId: string; dependencyTaskId: string }) => {
+      // Log deprecation warning for undocumented endpoint
+      logDeprecationWarning('Task Dependencies - Remove', 'DELETE /tasks/:id/dependencies/:dependencyId')
+      return tasksService.removeDependency(taskId, dependencyTaskId)
+    },
     onSuccess: (_, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      toast.success('تم إزالة التبعية')
+      toast.success('تم إزالة التبعية | Dependency removed')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إزالة التبعية')
+      toast.error(error.message || bilingualError('Failed to remove dependency', 'فشل إزالة التبعية'))
     },
   })
 }
@@ -1129,14 +1169,17 @@ export const useAddWorkflowRule = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ taskId, rule }: { taskId: string; rule: Omit<WorkflowRule, '_id' | 'createdAt' | 'createdBy'> }) =>
-      tasksService.addWorkflowRule(taskId, rule),
+    mutationFn: ({ taskId, rule }: { taskId: string; rule: Omit<WorkflowRule, '_id' | 'createdAt' | 'createdBy'> }) => {
+      // Log deprecation warning for undocumented endpoint
+      logDeprecationWarning('Workflow Rules - Add', 'POST /tasks/:id/workflow-rules')
+      return tasksService.addWorkflowRule(taskId, rule)
+    },
     onSuccess: (_, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      toast.success('تم إضافة قاعدة العمل بنجاح')
+      toast.success('تم إضافة قاعدة العمل بنجاح | Workflow rule added successfully')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إضافة قاعدة العمل')
+      toast.error(error.message || bilingualError('Failed to add workflow rule', 'فشل إضافة قاعدة العمل'))
     },
   })
 }
@@ -1145,14 +1188,17 @@ export const useUpdateWorkflowRule = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ taskId, ruleId, rule }: { taskId: string; ruleId: string; rule: Partial<WorkflowRule> }) =>
-      tasksService.updateWorkflowRule(taskId, ruleId, rule),
+    mutationFn: ({ taskId, ruleId, rule }: { taskId: string; ruleId: string; rule: Partial<WorkflowRule> }) => {
+      // Log deprecation warning for undocumented endpoint
+      logDeprecationWarning('Workflow Rules - Update', 'PATCH /tasks/:id/workflow-rules/:ruleId')
+      return tasksService.updateWorkflowRule(taskId, ruleId, rule)
+    },
     onSuccess: (_, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      toast.success('تم تحديث قاعدة العمل')
+      toast.success('تم تحديث قاعدة العمل | Workflow rule updated')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث قاعدة العمل')
+      toast.error(error.message || bilingualError('Failed to update workflow rule', 'فشل تحديث قاعدة العمل'))
     },
   })
 }
@@ -1161,14 +1207,17 @@ export const useDeleteWorkflowRule = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ taskId, ruleId }: { taskId: string; ruleId: string }) =>
-      tasksService.deleteWorkflowRule(taskId, ruleId),
+    mutationFn: ({ taskId, ruleId }: { taskId: string; ruleId: string }) => {
+      // Log deprecation warning for undocumented endpoint
+      logDeprecationWarning('Workflow Rules - Delete', 'DELETE /tasks/:id/workflow-rules/:ruleId')
+      return tasksService.deleteWorkflowRule(taskId, ruleId)
+    },
     onSuccess: (_, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      toast.success('تم حذف قاعدة العمل')
+      toast.success('تم حذف قاعدة العمل | Workflow rule deleted')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل حذف قاعدة العمل')
+      toast.error(error.message || bilingualError('Failed to delete workflow rule', 'فشل حذف قاعدة العمل'))
     },
   })
 }
@@ -1177,14 +1226,17 @@ export const useToggleWorkflowRule = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ taskId, ruleId }: { taskId: string; ruleId: string }) =>
-      tasksService.toggleWorkflowRule(taskId, ruleId),
+    mutationFn: ({ taskId, ruleId }: { taskId: string; ruleId: string }) => {
+      // Log deprecation warning for undocumented endpoint
+      logDeprecationWarning('Workflow Rules - Toggle', 'POST /tasks/:id/workflow-rules/:ruleId/toggle')
+      return tasksService.toggleWorkflowRule(taskId, ruleId)
+    },
     onSuccess: (_, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      toast.success('تم تغيير حالة قاعدة العمل')
+      toast.success('تم تغيير حالة قاعدة العمل | Workflow rule status toggled')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تغيير حالة قاعدة العمل')
+      toast.error(error.message || bilingualError('Failed to toggle workflow rule', 'فشل تغيير حالة قاعدة العمل'))
     },
   })
 }
@@ -1195,15 +1247,18 @@ export const useUpdateOutcome = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ taskId, outcome }: { taskId: string; outcome: TaskOutcome }) =>
-      tasksService.updateOutcome(taskId, outcome),
+    mutationFn: ({ taskId, outcome }: { taskId: string; outcome: TaskOutcome }) => {
+      // Log deprecation warning for undocumented endpoint
+      logDeprecationWarning('Task Outcome', 'PATCH /tasks/:id/outcome')
+      return tasksService.updateOutcome(taskId, outcome)
+    },
     onSuccess: (_, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      toast.success('تم تحديث نتيجة المهمة')
+      toast.success('تم تحديث نتيجة المهمة | Task outcome updated')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث النتيجة')
+      toast.error(error.message || bilingualError('Failed to update outcome', 'فشل تحديث النتيجة'))
     },
   })
 }
@@ -1214,15 +1269,18 @@ export const useUpdateEstimate = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ taskId, estimate }: { taskId: string; estimate: TimeBudget }) =>
-      tasksService.updateEstimate(taskId, estimate),
+    mutationFn: ({ taskId, estimate }: { taskId: string; estimate: TimeBudget }) => {
+      // Log deprecation warning for undocumented endpoint
+      logDeprecationWarning('Task Estimate', 'PATCH /tasks/:id/estimate')
+      return tasksService.updateEstimate(taskId, estimate)
+    },
     onSuccess: (_, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'time-tracking'] })
-      toast.success('تم تحديث التقدير')
+      toast.success('تم تحديث التقدير | Estimate updated')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث التقدير')
+      toast.error(error.message || bilingualError('Failed to update estimate', 'فشل تحديث التقدير'))
     },
   })
 }
@@ -1238,6 +1296,11 @@ export const useTimeTrackingDetails = (taskId: string) => {
 // ==================== Document Hooks (TipTap Editor) ====================
 
 export const useDocuments = (taskId: string) => {
+  // Log deprecation warning for undocumented query
+  if (taskId) {
+    logDeprecationWarning('Task Documents - List', 'GET /tasks/:id/documents')
+  }
+
   return useQuery({
     queryKey: ['tasks', taskId, 'documents'],
     queryFn: async () => {
@@ -1249,6 +1312,11 @@ export const useDocuments = (taskId: string) => {
 }
 
 export const useDocument = (taskId: string, documentId: string) => {
+  // Log deprecation warning for undocumented query
+  if (taskId && documentId) {
+    logDeprecationWarning('Task Documents - Get', 'GET /tasks/:id/documents/:documentId')
+  }
+
   return useQuery({
     queryKey: ['tasks', taskId, 'documents', documentId],
     queryFn: () => tasksService.getDocument(taskId, documentId),
@@ -1265,10 +1333,14 @@ export const useCreateDocument = () => {
       title: string
       content: string
       contentJson?: any
-    }) => tasksService.createDocument(taskId, title, content, contentJson),
+    }) => {
+      // Log deprecation warning for undocumented endpoint
+      logDeprecationWarning('Task Documents - Create', 'POST /tasks/:id/documents')
+      return tasksService.createDocument(taskId, title, content, contentJson)
+    },
     // Update cache on success (Stable & Correct)
     onSuccess: (data, { taskId }) => {
-      toast.success('تم إنشاء المستند')
+      toast.success('تم إنشاء المستند | Document created')
 
       // Manually update the cache
       queryClient.setQueryData(['tasks', taskId, 'documents'], (old: any) => {
@@ -1299,7 +1371,7 @@ export const useCreateDocument = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إنشاء المستند')
+      toast.error(error.message || bilingualError('Failed to create document', 'فشل إنشاء المستند'))
     },
     onSettled: (_, __, { taskId }) => {
       // Removed invalidation to prevent flickering (race condition)
@@ -1316,9 +1388,13 @@ export const useUpdateDocument = () => {
       taskId: string
       documentId: string
       data: { title?: string; content?: string; contentJson?: any }
-    }) => tasksService.updateDocument(taskId, documentId, data),
+    }) => {
+      // Log deprecation warning for undocumented endpoint
+      logDeprecationWarning('Task Documents - Update', 'PATCH /tasks/:id/documents/:documentId')
+      return tasksService.updateDocument(taskId, documentId, data)
+    },
     onSuccess: (data, { taskId, documentId }) => {
-      toast.success('تم حفظ المستند')
+      toast.success('تم حفظ المستند | Document saved')
 
       // Manually update the list cache
       queryClient.setQueryData(['tasks', taskId, 'documents'], (old: any) => {
@@ -1341,7 +1417,7 @@ export const useUpdateDocument = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل حفظ المستند')
+      toast.error(error.message || bilingualError('Failed to save document', 'فشل حفظ المستند'))
     },
     // Use onSettled with await to ensure mutation stays pending until refetch completes
     onSettled: async (_, __, { taskId, documentId }) => {
@@ -1359,6 +1435,9 @@ export const useDeleteDocument = () => {
 
   return useMutation({
     mutationFn: async ({ taskId, documentId }: { taskId: string; documentId: string }) => {
+      // Log deprecation warning for undocumented endpoint
+      logDeprecationWarning('Task Documents - Delete', 'DELETE /tasks/:id/documents/:documentId')
+
       try {
         return await tasksService.deleteDocument(taskId, documentId)
       } catch (error: any) {
@@ -1371,7 +1450,7 @@ export const useDeleteDocument = () => {
     },
     // Update cache on success (Stable & Correct)
     onSuccess: (_, { taskId, documentId }) => {
-      toast.success('تم حذف المستند')
+      toast.success('تم حذف المستند | Document deleted')
 
       // Manually update the cache
       queryClient.setQueryData(['tasks', taskId, 'documents'], (old: any) => {
@@ -1390,7 +1469,7 @@ export const useDeleteDocument = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل حذف المستند')
+      toast.error(error.message || bilingualError('Failed to delete document', 'فشل حذف المستند'))
     },
     onSettled: (_, __, { taskId }) => {
       // Removed invalidation to prevent flickering (race condition)
@@ -1405,13 +1484,16 @@ export const useUploadVoiceMemo = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ taskId, file, duration }: { taskId: string; file: Blob; duration: number }) =>
-      tasksService.uploadVoiceMemo(taskId, file, duration),
+    mutationFn: ({ taskId, file, duration }: { taskId: string; file: Blob; duration: number }) => {
+      // Log deprecation warning for undocumented endpoint
+      logDeprecationWarning('Voice Memos - Upload', 'POST /tasks/:id/voice-memos')
+      return tasksService.uploadVoiceMemo(taskId, file, duration)
+    },
     onSuccess: (_, { taskId }) => {
-      toast.success('تم رفع المذكرة الصوتية')
+      toast.success('تم رفع المذكرة الصوتية | Voice memo uploaded')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل رفع المذكرة الصوتية')
+      toast.error(error.message || bilingualError('Failed to upload voice memo', 'فشل رفع المذكرة الصوتية'))
     },
     onSettled: async (_, __, { taskId }) => {
       // Delay to allow DB propagation
@@ -1429,13 +1511,17 @@ export const useUpdateVoiceMemoTranscription = () => {
       taskId: string
       memoId: string
       transcription: string
-    }) => tasksService.updateVoiceMemoTranscription(taskId, memoId, transcription),
+    }) => {
+      // Log deprecation warning for undocumented endpoint
+      logDeprecationWarning('Voice Memos - Update Transcription', 'PATCH /tasks/:id/voice-memos/:memoId/transcription')
+      return tasksService.updateVoiceMemoTranscription(taskId, memoId, transcription)
+    },
     onSuccess: (_, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      toast.success('تم تحديث النص')
+      toast.success('تم تحديث النص | Transcription updated')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث النص')
+      toast.error(error.message || bilingualError('Failed to update transcription', 'فشل تحديث النص'))
     },
   })
 }
@@ -1444,13 +1530,16 @@ export const useDeleteVoiceMemo = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ taskId, memoId }: { taskId: string; memoId: string }) =>
-      tasksService.deleteVoiceMemo(taskId, memoId),
+    mutationFn: ({ taskId, memoId }: { taskId: string; memoId: string }) => {
+      // Log deprecation warning for undocumented endpoint
+      logDeprecationWarning('Voice Memos - Delete', 'DELETE /tasks/:id/voice-memos/:memoId')
+      return tasksService.deleteVoiceMemo(taskId, memoId)
+    },
     onSuccess: (_, { taskId }) => {
-      toast.success('تم حذف المذكرة الصوتية')
+      toast.success('تم حذف المذكرة الصوتية | Voice memo deleted')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل حذف المذكرة الصوتية')
+      toast.error(error.message || bilingualError('Failed to delete voice memo', 'فشل حذف المذكرة الصوتية'))
     },
     onSettled: async (_, __, { taskId }) => {
       // Delay to allow DB propagation

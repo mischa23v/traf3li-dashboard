@@ -1,6 +1,10 @@
 /**
  * Message/Chatter Hooks
  * React Query hooks for threaded discussions and messaging
+ *
+ * ⚠️ IMPLEMENTATION STATUS: [BACKEND-PENDING]
+ * These endpoints may not be fully implemented in the backend.
+ * Error handling includes bilingual user-facing alerts.
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'

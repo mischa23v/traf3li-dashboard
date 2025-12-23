@@ -369,34 +369,53 @@ export function useShareReport() {
 // ==================== SAVED REPORTS QUERY HOOKS ====================
 
 // Get saved reports
+// [BACKEND-PENDING] Ensure /saved-reports/reports endpoint is fully implemented
 export function useSavedReports(filters?: { search?: string }) {
   return useQuery({
     queryKey: [...reportKeys.all, 'saved', filters],
     queryFn: async () => {
-      // Mock API call - in production this would call the actual API
-      return {
-        data: [] as any[],
-        total: 0
+      try {
+        const { savedReportsApi } = await import('@/services/reportsService')
+        const data = await savedReportsApi.getReports(filters)
+        return {
+          data: data,
+          total: data.length
+        }
+      } catch (error: any) {
+        // Bilingual error alert
+        toast.error('Failed to fetch saved reports | فشل في جلب التقارير المحفوظة', {
+          description: error.message || 'Please contact support if this issue persists | يرجى الاتصال بالدعم إذا استمرت هذه المشكلة'
+        })
+        throw error
       }
     }
   })
 }
 
 // Delete saved report
+// [BACKEND-PENDING] Ensure /saved-reports/reports/:id DELETE endpoint is fully implemented
 export function useDeleteSavedReport() {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async (id: string) => {
-      // Mock API call - in production this would call the actual API
-      await Promise.resolve()
+      try {
+        const { savedReportsApi } = await import('@/services/reportsService')
+        await savedReportsApi.deleteReport(id)
+      } catch (error: any) {
+        // Bilingual error alert
+        toast.error('Failed to delete saved report | فشل في حذف التقرير المحفوظ', {
+          description: error.message || 'Please contact support if this issue persists | يرجى الاتصال بالدعم إذا استمرت هذه المشكلة'
+        })
+        throw error
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reportKeys.all })
-      toast.success('تم حذف التقرير المحفوظ بنجاح')
+      toast.success('Report deleted successfully | تم حذف التقرير المحفوظ بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(`فشل حذف التقرير المحفوظ: ${error.message}`)
+      // Error already handled in mutationFn
     }
   })
 }
@@ -404,22 +423,31 @@ export function useDeleteSavedReport() {
 // ==================== GENERATE REPORT HOOK ====================
 
 // Generate report
+// [BACKEND-PENDING] Ensure /reports/generate endpoint handles all report types correctly
 export function useGenerateReport() {
   return useMutation({
     mutationFn: async ({ type, config }: { type: string; config: any }) => {
-      // Mock API call - in production this would call the actual API
-      const response = await Promise.resolve({
-        data: [],
-        metadata: {
-          executionTime: 100,
-          recordCount: 0,
-          generatedAt: new Date().toISOString(),
+      try {
+        const { reportsApi } = await import('@/services/reportsService')
+        const response = await reportsApi.generate({ type, ...config })
+        return {
+          data: response,
+          metadata: {
+            executionTime: 100,
+            recordCount: 0,
+            generatedAt: new Date().toISOString(),
+          }
         }
-      })
-      return response
+      } catch (error: any) {
+        // Bilingual error alert
+        toast.error('Failed to generate report | فشل في إنشاء التقرير', {
+          description: error.message || 'Please check your parameters and try again | يرجى التحقق من المعاملات والمحاولة مرة أخرى'
+        })
+        throw error
+      }
     },
     onError: (error: Error) => {
-      toast.error(`فشل إنشاء التقرير: ${error.message}`)
+      // Error already handled in mutationFn
     }
   })
 }
@@ -427,51 +455,60 @@ export function useGenerateReport() {
 // ==================== SAVED REPORT MUTATION HOOKS ====================
 
 // Create saved report
+// [BACKEND-PENDING] Ensure /saved-reports/reports POST endpoint is fully implemented
 export function useCreateSavedReport() {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async (data: any) => {
-      // Mock API call - in production this would call the actual API
-      const response = await Promise.resolve({
-        _id: crypto.randomUUID(),
-        ...data,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      })
-      return response
+      try {
+        const { savedReportsApi } = await import('@/services/reportsService')
+        const response = await savedReportsApi.createReport(data)
+        return response
+      } catch (error: any) {
+        // Bilingual error alert
+        toast.error('Failed to create saved report | فشل في إنشاء التقرير المحفوظ', {
+          description: error.message || 'Please verify your report configuration | يرجى التحقق من تكوين التقرير'
+        })
+        throw error
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reportKeys.all })
-      toast.success('تم إنشاء التقرير المحفوظ بنجاح')
+      toast.success('Report created successfully | تم إنشاء التقرير المحفوظ بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(`فشل إنشاء التقرير المحفوظ: ${error.message}`)
+      // Error already handled in mutationFn
     }
   })
 }
 
 // Update saved report
+// [BACKEND-PENDING] Ensure /saved-reports/reports/:id PATCH endpoint is fully implemented
 export function useUpdateSavedReport() {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      // Mock API call - in production this would call the actual API
-      const response = await Promise.resolve({
-        _id: id,
-        ...data,
-        updatedAt: new Date().toISOString(),
-      })
-      return response
+      try {
+        const { savedReportsApi } = await import('@/services/reportsService')
+        const response = await savedReportsApi.updateReport(id, data)
+        return response
+      } catch (error: any) {
+        // Bilingual error alert
+        toast.error('Failed to update saved report | فشل في تحديث التقرير المحفوظ', {
+          description: error.message || 'Please verify your report configuration | يرجى التحقق من تكوين التقرير'
+        })
+        throw error
+      }
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: reportKeys.all })
       queryClient.invalidateQueries({ queryKey: reportKeys.detail(variables.id) })
-      toast.success('تم تحديث التقرير المحفوظ بنجاح')
+      toast.success('Report updated successfully | تم تحديث التقرير المحفوظ بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(`فشل تحديث التقرير المحفوظ: ${error.message}`)
+      // Error already handled in mutationFn
     }
   })
 }

@@ -56,10 +56,11 @@ export const useCreateBankFeed = () => {
     mutationFn: (data: CreateBankFeedData) => bankFeedService.createFeed(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bank-feeds'] })
-      toast.success('تم إضافة الحساب البنكي بنجاح')
+      toast.success('Bank account added successfully | تم إضافة الحساب البنكي بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل في إضافة الحساب')
+      console.error('[useCreateBankFeed Error]:', error.message)
+      toast.error(error.message || 'Failed to add account | فشل في إضافة الحساب')
     },
   })
 }
@@ -72,10 +73,11 @@ export const useUpdateBankFeed = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['bank-feeds'] })
       queryClient.invalidateQueries({ queryKey: ['bank-feed', variables.id] })
-      toast.success('تم تحديث الحساب بنجاح')
+      toast.success('Account updated successfully | تم تحديث الحساب بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل في التحديث')
+      console.error('[useUpdateBankFeed Error]:', error.message)
+      toast.error(error.message || 'Failed to update | فشل في التحديث')
     },
   })
 }
@@ -86,10 +88,11 @@ export const useDeleteBankFeed = () => {
     mutationFn: (id: string) => bankFeedService.deleteFeed(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bank-feeds'] })
-      toast.success('تم حذف الحساب بنجاح')
+      toast.success('Account deleted successfully | تم حذف الحساب بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل في الحذف')
+      console.error('[useDeleteBankFeed Error]:', error.message)
+      toast.error(error.message || 'Failed to delete | فشل في الحذف')
     },
   })
 }
@@ -101,10 +104,11 @@ export const useFetchTransactions = () => {
     onSuccess: (data, id) => {
       queryClient.invalidateQueries({ queryKey: ['bank-feed', id] })
       queryClient.invalidateQueries({ queryKey: ['bank-transactions', id] })
-      toast.success(`تم استيراد ${data.imported} معاملة`)
+      toast.success(`${data.imported} transactions imported | تم استيراد ${data.imported} معاملة`)
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل في جلب المعاملات')
+      console.error('[useFetchTransactions Error]:', error.message)
+      toast.error(error.message || 'Failed to fetch transactions | فشل في جلب المعاملات')
     },
   })
 }
@@ -125,13 +129,14 @@ export const useImportCSV = () => {
     }) => bankFeedService.importCSV(id, file, columnMapping, dateFormat),
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['bank-transactions', variables.id] })
-      toast.success(`تم استيراد ${data.imported} معاملة بنجاح`)
+      toast.success(`${data.imported} transactions imported successfully | تم استيراد ${data.imported} معاملة بنجاح`)
       if (data.duplicates > 0) {
-        toast.info(`تم تخطي ${data.duplicates} معاملة مكررة`)
+        toast.info(`${data.duplicates} duplicate transactions skipped | تم تخطي ${data.duplicates} معاملة مكررة`)
       }
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل في استيراد الملف')
+      console.error('[useImportCSV Error]:', error.message)
+      toast.error(error.message || 'Failed to import file | فشل في استيراد الملف')
     },
   })
 }
@@ -143,10 +148,11 @@ export const useImportOFX = () => {
       bankFeedService.importOFX(id, file),
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['bank-transactions', variables.id] })
-      toast.success(`تم استيراد ${data.imported} معاملة`)
+      toast.success(`${data.imported} transactions imported | تم استيراد ${data.imported} معاملة`)
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل في استيراد الملف')
+      console.error('[useImportOFX Error]:', error.message)
+      toast.error(error.message || 'Failed to import file | فشل في استيراد الملف')
     },
   })
 }
@@ -178,10 +184,11 @@ export const useCreateMatch = () => {
     mutationFn: (data: CreateMatchData) => matchingService.createMatch(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bank-transactions'] })
-      toast.success('تم المطابقة بنجاح')
+      toast.success('Match created successfully | تم المطابقة بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل في المطابقة')
+      console.error('[useCreateMatch Error]:', error.message)
+      toast.error(error.message || 'Failed to create match | فشل في المطابقة')
     },
   })
 }
@@ -192,13 +199,14 @@ export const useAutoMatchAll = () => {
     mutationFn: (accountId: string) => matchingService.autoMatchAll(accountId),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['bank-transactions'] })
-      toast.success(`تم مطابقة ${data.matched} معاملة تلقائياً`)
+      toast.success(`${data.matched} transactions auto-matched | تم مطابقة ${data.matched} معاملة تلقائياً`)
       if (data.suggestions > 0) {
-        toast.info(`${data.suggestions} اقتراح للمراجعة`)
+        toast.info(`${data.suggestions} suggestions for review | ${data.suggestions} اقتراح للمراجعة`)
       }
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل في المطابقة التلقائية')
+      console.error('[useAutoMatchAll Error]:', error.message)
+      toast.error(error.message || 'Failed to auto-match | فشل في المطابقة التلقائية')
     },
   })
 }
@@ -209,10 +217,11 @@ export const useConfirmMatch = () => {
     mutationFn: (matchId: string) => matchingService.confirmMatch(matchId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bank-transactions'] })
-      toast.success('تم تأكيد المطابقة')
+      toast.success('Match confirmed | تم تأكيد المطابقة')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل في التأكيد')
+      console.error('[useConfirmMatch Error]:', error.message)
+      toast.error(error.message || 'Failed to confirm | فشل في التأكيد')
     },
   })
 }
@@ -223,10 +232,11 @@ export const useRejectMatch = () => {
     mutationFn: (matchId: string) => matchingService.rejectMatch(matchId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bank-transactions'] })
-      toast.success('تم رفض المطابقة')
+      toast.success('Match rejected | تم رفض المطابقة')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل في الرفض')
+      console.error('[useRejectMatch Error]:', error.message)
+      toast.error(error.message || 'Failed to reject | فشل في الرفض')
     },
   })
 }
@@ -237,25 +247,38 @@ export const useUnmatch = () => {
     mutationFn: (matchId: string) => matchingService.unmatch(matchId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bank-transactions'] })
-      toast.success('تم إلغاء المطابقة')
+      toast.success('Match removed | تم إلغاء المطابقة')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل في الإلغاء')
+      console.error('[useUnmatch Error]:', error.message)
+      toast.error(error.message || 'Failed to unmatch | فشل في الإلغاء')
     },
   })
 }
 
 export const useExcludeTransaction = () => {
+  // DEPRECATED: This endpoint is not implemented in the backend
+  console.warn(
+    '[DEPRECATED] useExcludeTransaction: This endpoint is not implemented. ' +
+    'Use clear/unclear transaction methods instead. | ' +
+    '[منتهي الصلاحية] useExcludeTransaction: نقطة النهاية غير متوفرة. ' +
+    'استخدم طرق تصفية/عدم تصفية المعاملات بدلاً من ذلك.'
+  )
+
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ transactionId, reason }: { transactionId: string; reason: string }) =>
       matchingService.excludeTransaction(transactionId, reason),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bank-transactions'] })
-      toast.success('تم استثناء المعاملة')
+      toast.success('Transaction excluded | تم استثناء المعاملة')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل في الاستثناء')
+      console.error('[useExcludeTransaction Error]:', error.message)
+      toast.error(
+        error.message ||
+        'Failed to exclude transaction. Endpoint not implemented. | فشل في استثناء المعاملة. نقطة النهاية غير متوفرة.'
+      )
     },
   })
 }
@@ -279,10 +302,11 @@ export const useCreateMatchingRule = () => {
     mutationFn: (data: CreateMatchingRuleData) => matchingRulesService.createRule(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['matching-rules'] })
-      toast.success('تم إنشاء القاعدة بنجاح')
+      toast.success('Rule created successfully | تم إنشاء القاعدة بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل في إنشاء القاعدة')
+      console.error('[useCreateMatchingRule Error]:', error.message)
+      toast.error(error.message || 'Failed to create rule | فشل في إنشاء القاعدة')
     },
   })
 }
@@ -294,10 +318,11 @@ export const useUpdateMatchingRule = () => {
       matchingRulesService.updateRule(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['matching-rules'] })
-      toast.success('تم تحديث القاعدة')
+      toast.success('Rule updated | تم تحديث القاعدة')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل في التحديث')
+      console.error('[useUpdateMatchingRule Error]:', error.message)
+      toast.error(error.message || 'Failed to update rule | فشل في التحديث')
     },
   })
 }
@@ -308,24 +333,37 @@ export const useDeleteMatchingRule = () => {
     mutationFn: (id: string) => matchingRulesService.deleteRule(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['matching-rules'] })
-      toast.success('تم حذف القاعدة')
+      toast.success('Rule deleted | تم حذف القاعدة')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل في الحذف')
+      console.error('[useDeleteMatchingRule Error]:', error.message)
+      toast.error(error.message || 'Failed to delete rule | فشل في الحذف')
     },
   })
 }
 
 export const useToggleMatchingRule = () => {
+  // DEPRECATED: This endpoint is not implemented in the backend
+  console.warn(
+    '[DEPRECATED] useToggleMatchingRule: This endpoint is not implemented. ' +
+    'Use useUpdateMatchingRule() with { isActive: true/false } instead. | ' +
+    '[منتهي الصلاحية] useToggleMatchingRule: نقطة النهاية غير متوفرة. ' +
+    'استخدم useUpdateMatchingRule() مع { isActive: true/false } بدلاً من ذلك.'
+  )
+
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => matchingRulesService.toggleRule(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['matching-rules'] })
-      toast.success('تم تغيير حالة القاعدة')
+      toast.success('Rule status updated | تم تغيير حالة القاعدة')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل في التغيير')
+      console.error('[useToggleMatchingRule Error]:', error.message)
+      toast.error(
+        error.message ||
+        'Failed to toggle rule. Use updateRule() instead. | فشل في تبديل الحالة. استخدم updateRule() بدلاً من ذلك.'
+      )
     },
   })
 }
@@ -338,16 +376,35 @@ export const useReconciliationReport = (
   accountId: string,
   params?: { startDate?: string; endDate?: string }
 ) => {
+  // NOTE: This uses /bank-reconciliation/status/:accountId endpoint as dedicated report endpoint is not available
+  if (accountId) {
+    console.warn(
+      '[INFO] useReconciliationReport: Using /bank-reconciliation/status/:accountId endpoint. ' +
+      'Dedicated report endpoint is not available. | ' +
+      '[معلومة] useReconciliationReport: يستخدم نقطة النهاية /bank-reconciliation/status/:accountId. ' +
+      'نقطة نهاية التقرير المخصصة غير متوفرة.'
+    )
+  }
+
   return useQuery({
     queryKey: ['reconciliation-report', accountId, params],
     queryFn: () => reconciliationReportService.getReport(accountId, params),
     enabled: !!accountId,
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
+    retry: 1,
   })
 }
 
 export const useExportReconciliationReport = () => {
+  // DEPRECATED: This endpoint is not implemented in the backend
+  console.warn(
+    '[DEPRECATED] useExportReconciliationReport: This endpoint is not implemented. ' +
+    'Report export functionality is not available in the backend. | ' +
+    '[منتهي الصلاحية] useExportReconciliationReport: نقطة النهاية غير متوفرة. ' +
+    'وظيفة تصدير التقارير غير متوفرة في الخادم.'
+  )
+
   return useMutation({
     mutationFn: ({ accountId, format }: { accountId: string; format: 'pdf' | 'xlsx' }) =>
       reconciliationReportService.exportReport(accountId, format),
@@ -358,10 +415,14 @@ export const useExportReconciliationReport = () => {
       a.download = `reconciliation-report.${variables.format}`
       a.click()
       window.URL.revokeObjectURL(url)
-      toast.success('تم تصدير التقرير')
+      toast.success('Report exported | تم تصدير التقرير')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل في التصدير')
+      console.error('[useExportReconciliationReport Error]:', error.message)
+      toast.error(
+        error.message ||
+        'Failed to export report. Endpoint not implemented. | فشل في تصدير التقرير. نقطة النهاية غير متوفرة.'
+      )
     },
   })
 }
@@ -380,10 +441,21 @@ export const useExchangeRates = () => {
 }
 
 export const useExchangeRate = (fromCurrency: string, toCurrency: string) => {
+  // NOTE: This uses workaround - fetches all rates and filters
+  if (fromCurrency && toCurrency) {
+    console.warn(
+      '[INFO] useExchangeRate: Using workaround. Fetches all rates and filters by currency pair. ' +
+      'Dedicated endpoint not available. Consider using useExchangeRates() instead. | ' +
+      '[معلومة] useExchangeRate: يستخدم طريقة بديلة. يجلب جميع الأسعار ويصفي حسب زوج العملات. ' +
+      'نقطة النهاية المخصصة غير متوفرة. استخدم useExchangeRates() بدلاً من ذلك.'
+    )
+  }
+
   return useQuery({
     queryKey: ['exchange-rate', fromCurrency, toCurrency],
     queryFn: () => currencyService.getRate(fromCurrency, toCurrency),
     enabled: !!fromCurrency && !!toCurrency,
+    retry: 1,
   })
 }
 
@@ -392,12 +464,23 @@ export const useRateHistory = (
   toCurrency: string,
   params?: { startDate?: string; endDate?: string }
 ) => {
+  // DEPRECATED: This endpoint is not implemented in the backend
+  if (fromCurrency && toCurrency) {
+    console.warn(
+      '[DEPRECATED] useRateHistory: This endpoint is not implemented. ' +
+      'Exchange rate history is not available in the backend. | ' +
+      '[منتهي الصلاحية] useRateHistory: نقطة النهاية غير متوفرة. ' +
+      'سجل أسعار الصرف غير متوفر في الخادم.'
+    )
+  }
+
   return useQuery({
     queryKey: ['rate-history', fromCurrency, toCurrency, params],
     queryFn: () => currencyService.getRateHistory(fromCurrency, toCurrency, params),
     enabled: !!fromCurrency && !!toCurrency,
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
+    retry: false,
   })
 }
 
@@ -413,10 +496,11 @@ export const useRefreshRates = () => {
     mutationFn: () => currencyService.refreshRates(),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['exchange-rates'] })
-      toast.success(`تم تحديث ${data.updated} سعر صرف`)
+      toast.success(`${data.updated} exchange rates updated | تم تحديث ${data.updated} سعر صرف`)
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل في تحديث الأسعار')
+      console.error('[useRefreshRates Error]:', error.message)
+      toast.error(error.message || 'Failed to update rates | فشل في تحديث الأسعار')
     },
   })
 }
@@ -435,10 +519,11 @@ export const useSetExchangeRate = () => {
     }) => currencyService.setRate(fromCurrency, toCurrency, rate),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['exchange-rates'] })
-      toast.success('تم تحديث سعر الصرف')
+      toast.success('Exchange rate updated | تم تحديث سعر الصرف')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل في التحديث')
+      console.error('[useSetExchangeRate Error]:', error.message)
+      toast.error(error.message || 'Failed to update rate | فشل في التحديث')
     },
   })
 }
@@ -454,15 +539,27 @@ export const useCurrencySettings = () => {
 }
 
 export const useUpdateCurrencySettings = () => {
+  // DEPRECATED: This endpoint is not implemented in the backend
+  console.warn(
+    '[DEPRECATED] useUpdateCurrencySettings: This endpoint is not implemented. ' +
+    'Currency settings update is not available in the backend. | ' +
+    '[منتهي الصلاحية] useUpdateCurrencySettings: نقطة النهاية غير متوفرة. ' +
+    'تحديث إعدادات العملات غير متوفر في الخادم.'
+  )
+
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: Partial<CurrencySettings>) => currencyService.updateSettings(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['currency-settings'] })
-      toast.success('تم تحديث الإعدادات')
+      toast.success('Settings updated | تم تحديث الإعدادات')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل في التحديث')
+      console.error('[useUpdateCurrencySettings Error]:', error.message)
+      toast.error(
+        error.message ||
+        'Failed to update settings. Endpoint not implemented. | فشل في تحديث الإعدادات. نقطة النهاية غير متوفرة.'
+      )
     },
   })
 }

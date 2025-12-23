@@ -4,7 +4,8 @@
  * Includes Najiz (Ministry of Justice) integration fields
  */
 
-import apiClient, { handleApiError } from '@/lib/api'
+import apiClient from '@/lib/api'
+import { throwBilingualError } from '@/lib/bilingualErrorHandler'
 import type {
   ArabicName,
   NationalAddress,
@@ -345,7 +346,7 @@ const clientsService = {
       const response = await apiClient.get('/clients', { params: filters })
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 
@@ -381,7 +382,7 @@ const clientsService = {
         },
       }
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'CLIENT_NOT_FOUND')
     }
   },
 
@@ -393,7 +394,7 @@ const clientsService = {
       const response = await apiClient.post('/clients', data)
       return response.data.client || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'CLIENT_CREATE_FAILED')
     }
   },
 
@@ -405,7 +406,7 @@ const clientsService = {
       const response = await apiClient.put(`/clients/${id}`, data)
       return response.data.client || response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'CLIENT_UPDATE_FAILED')
     }
   },
 
@@ -416,7 +417,7 @@ const clientsService = {
     try {
       await apiClient.delete(`/clients/${id}`)
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'CLIENT_DELETE_FAILED')
     }
   },
 
@@ -430,7 +431,7 @@ const clientsService = {
       })
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'CLIENT_SEARCH_FAILED')
     }
   },
 
@@ -442,7 +443,7 @@ const clientsService = {
       const response = await apiClient.get('/clients/stats')
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'CLIENT_STATS_FAILED')
     }
   },
 
@@ -456,7 +457,7 @@ const clientsService = {
       })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'CLIENT_STATS_FAILED')
     }
   },
 
@@ -470,7 +471,7 @@ const clientsService = {
       })
       return response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'CLIENT_DELETE_FAILED')
     }
   },
 
@@ -483,7 +484,7 @@ const clientsService = {
       const response = await apiClient.get(`/clients/${id}/cases`)
       return response.data.data || response.data.cases || []
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'CLIENT_NOT_FOUND')
     }
   },
 
@@ -496,7 +497,7 @@ const clientsService = {
       const response = await apiClient.get(`/clients/${id}/invoices`)
       return response.data.data || response.data.invoices || []
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'CLIENT_NOT_FOUND')
     }
   },
 
@@ -509,7 +510,7 @@ const clientsService = {
       const response = await apiClient.get(`/clients/${id}/payments`)
       return response.data.data || response.data.payments || []
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'CLIENT_NOT_FOUND')
     }
   },
 
@@ -522,7 +523,7 @@ const clientsService = {
       const response = await apiClient.get(`/clients/${id}/billing-info`)
       return response.data.data || response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'CLIENT_NOT_FOUND')
     }
   },
 
@@ -535,7 +536,7 @@ const clientsService = {
       const response = await apiClient.post(`/clients/${id}/verify/wathq`, data)
       return response.data.data || response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'CLIENT_VERIFICATION_FAILED')
     }
   },
 
@@ -548,7 +549,7 @@ const clientsService = {
       const response = await apiClient.get(`/clients/${id}/wathq/${dataType}`)
       return response.data.data || response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'CLIENT_VERIFICATION_FAILED')
     }
   },
 
@@ -561,7 +562,7 @@ const clientsService = {
       const response = await apiClient.post(`/clients/${id}/verify/absher`, data)
       return response.data.data || response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'CLIENT_VERIFICATION_FAILED')
     }
   },
 
@@ -574,7 +575,7 @@ const clientsService = {
       const response = await apiClient.post(`/clients/${id}/verify/address`, address)
       return response.data.data || response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'CLIENT_VERIFICATION_FAILED')
     }
   },
 
@@ -595,7 +596,7 @@ const clientsService = {
       })
       return response.data.data || response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'CLIENT_ATTACHMENT_FAILED')
     }
   },
 
@@ -607,7 +608,7 @@ const clientsService = {
     try {
       await apiClient.delete(`/clients/${id}/attachments/${attachmentId}`)
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'CLIENT_ATTACHMENT_FAILED')
     }
   },
 
@@ -620,7 +621,7 @@ const clientsService = {
       const response = await apiClient.post(`/clients/${id}/conflict-check`, data)
       return response.data.data || response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'CLIENT_CONFLICT_CHECK_FAILED')
     }
   },
 
@@ -633,7 +634,7 @@ const clientsService = {
       const response = await apiClient.patch(`/clients/${id}/status`, { status })
       return response.data.data || response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'CLIENT_UPDATE_FAILED')
     }
   },
 
@@ -646,7 +647,7 @@ const clientsService = {
       const response = await apiClient.patch(`/clients/${id}/flags`, flags)
       return response.data.data || response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error, 'CLIENT_UPDATE_FAILED')
     }
   },
 
@@ -659,7 +660,7 @@ const clientsService = {
       const response = await apiClient.get('/clients/regions')
       return response.data.data || response.data.regions || []
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throwBilingualError(error)
     }
   },
 }

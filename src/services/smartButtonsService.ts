@@ -46,27 +46,100 @@ export type SupportedModel =
   | 'timeEntry'
   | 'event'
 
+// ════════════════════════════════════════════════════════════
+// BILINGUAL ERROR MESSAGES
+// ════════════════════════════════════════════════════════════
+
+const MESSAGES = {
+  getCounts: {
+    warning: {
+      en: '[DEPRECATED] smartButtonsService.getCounts() is not implemented.',
+      ar: '[مهمل] smartButtonsService.getCounts() غير مطبق.',
+    },
+    endpoint: {
+      en: (model: string, recordId: string) => `Endpoint /smart-buttons/${model}/${recordId}/counts does not exist in the backend.`,
+      ar: (model: string, recordId: string) => `نقطة النهاية /smart-buttons/${model}/${recordId}/counts غير موجودة في الخادم.`,
+    },
+    solution: {
+      en: 'Use useSmartButtonCounts hook instead.',
+      ar: 'استخدم useSmartButtonCounts بدلاً من ذلك.',
+    },
+    error: {
+      en: 'Smart buttons service is deprecated. Please use entity-specific endpoints via useSmartButtonCounts hook.',
+      ar: 'خدمة الأزرار الذكية مهملة. الرجاء استخدام نقاط النهاية الخاصة بالكيانات عبر useSmartButtonCounts.',
+    }
+  },
+  getBatchCounts: {
+    warning: {
+      en: '[DEPRECATED] smartButtonsService.getBatchCounts() is not implemented.',
+      ar: '[مهمل] smartButtonsService.getBatchCounts() غير مطبق.',
+    },
+    endpoint: {
+      en: (model: string) => `Endpoint /smart-buttons/${model}/batch-counts does not exist in the backend.`,
+      ar: (model: string) => `نقطة النهاية /smart-buttons/${model}/batch-counts غير موجودة في الخادم.`,
+    },
+    solution: {
+      en: 'Use useSmartButtonCounts hook instead.',
+      ar: 'استخدم useSmartButtonCounts بدلاً من ذلك.',
+    },
+    error: {
+      en: 'Smart buttons batch service is deprecated. Please use entity-specific endpoints via useSmartButtonCounts hook.',
+      ar: 'خدمة الأزرار الذكية الجماعية مهملة. الرجاء استخدام نقاط النهاية الخاصة بالكيانات عبر useSmartButtonCounts.',
+    }
+  }
+}
+
 // API Service
 export const smartButtonsService = {
   /**
    * Get related record counts for a specific record
    * GET /api/smart-buttons/:model/:recordId/counts
+   * @deprecated This endpoint is not implemented in the backend
+   *
+   * تحذير: نقطة النهاية هذه غير مطبقة في الخادم
    */
   async getCounts(model: SupportedModel, recordId: string): Promise<SmartButtonCounts> {
-    const response = await apiClient.get(`/smart-buttons/${model}/${recordId}/counts`)
-    return response.data.data
+    const msg = MESSAGES.getCounts
+
+    // Bilingual warning
+    console.warn(
+      `${msg.warning.en} ${msg.endpoint.en(model, recordId)} ${msg.solution.en}\n` +
+      `${msg.warning.ar} ${msg.endpoint.ar(model, recordId)} ${msg.solution.ar}`
+    )
+
+    // Bilingual error
+    const error = new Error(
+      `${msg.error.en} | ${msg.error.ar}`
+    )
+    error.name = 'DeprecatedEndpointError'
+    throw error
   },
 
   /**
    * Get counts for multiple records at once (batch)
    * POST /api/smart-buttons/:model/batch-counts
+   * @deprecated This endpoint is not implemented in the backend
+   *
+   * تحذير: نقطة النهاية هذه غير مطبقة في الخادم
    */
   async getBatchCounts(
     model: SupportedModel,
     recordIds: string[]
   ): Promise<Record<string, SmartButtonCounts>> {
-    const response = await apiClient.post(`/smart-buttons/${model}/batch-counts`, { recordIds })
-    return response.data.data
+    const msg = MESSAGES.getBatchCounts
+
+    // Bilingual warning
+    console.warn(
+      `${msg.warning.en} ${msg.endpoint.en(model)} ${msg.solution.en}\n` +
+      `${msg.warning.ar} ${msg.endpoint.ar(model)} ${msg.solution.ar}`
+    )
+
+    // Bilingual error
+    const error = new Error(
+      `${msg.error.en} | ${msg.error.ar}`
+    )
+    error.name = 'DeprecatedEndpointError'
+    throw error
   },
 }
 

@@ -1,6 +1,10 @@
 /**
  * Chatter Hooks
  * React Query hooks for followers, activities, and file attachments
+ *
+ * ⚠️ IMPLEMENTATION STATUS: [BACKEND-PENDING]
+ * These endpoints may not be fully implemented in the backend.
+ * Error handling includes bilingual user-facing alerts.
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -85,10 +89,10 @@ export function useAddFollower() {
       queryClient.invalidateQueries({
         queryKey: chatterKeys.isFollowing(variables.resModel, variables.resId),
       })
-      toast.success('Follower added successfully')
+      toast.success('Follower added | تمت إضافة المتابع')
     },
     onError: () => {
-      toast.error('Failed to add follower')
+      // Error already handled by service with bilingual message
     },
   })
 }
@@ -106,10 +110,10 @@ export function useRemoveFollower() {
       queryClient.invalidateQueries({
         queryKey: chatterKeys.all,
       })
-      toast.success('Follower removed successfully')
+      toast.success('Follower removed | تمت إزالة المتابع')
     },
     onError: () => {
-      toast.error('Failed to remove follower')
+      // Error already handled by service with bilingual message
     },
   })
 }
@@ -132,10 +136,10 @@ export function useUpdateFollowerPreferences() {
       queryClient.invalidateQueries({
         queryKey: chatterKeys.all,
       })
-      toast.success('Notification preferences updated')
+      toast.success('Preferences updated | تم تحديث التفضيلات')
     },
     onError: () => {
-      toast.error('Failed to update preferences')
+      // Error already handled by service with bilingual message
     },
   })
 }
@@ -156,10 +160,14 @@ export function useToggleFollow() {
       queryClient.invalidateQueries({
         queryKey: chatterKeys.isFollowing(variables.resModel, variables.resId),
       })
-      toast.success(result.following ? 'Now following' : 'Unfollowed')
+      toast.success(
+        result.following
+          ? 'Now following | تتم المتابعة الآن'
+          : 'Unfollowed | تم إلغاء المتابعة'
+      )
     },
     onError: () => {
-      toast.error('Failed to update follow status')
+      // Error already handled by service with bilingual message
     },
   })
 }
@@ -226,10 +234,10 @@ export function useScheduleActivity() {
       queryClient.invalidateQueries({
         queryKey: chatterKeys.myActivities(),
       })
-      toast.success('Activity scheduled successfully')
+      toast.success('Activity scheduled | تم جدولة النشاط')
     },
     onError: () => {
-      toast.error('Failed to schedule activity')
+      // Error already handled by service with bilingual message
     },
   })
 }
@@ -247,10 +255,10 @@ export function useUpdateActivity() {
       queryClient.invalidateQueries({
         queryKey: chatterKeys.all,
       })
-      toast.success('Activity updated successfully')
+      toast.success('Activity updated | تم تحديث النشاط')
     },
     onError: () => {
-      toast.error('Failed to update activity')
+      // Error already handled by service with bilingual message
     },
   })
 }
@@ -268,10 +276,10 @@ export function useMarkActivityDone() {
       queryClient.invalidateQueries({
         queryKey: chatterKeys.all,
       })
-      toast.success('Activity marked as done')
+      toast.success('Activity completed | تم إنجاز النشاط')
     },
     onError: () => {
-      toast.error('Failed to mark activity as done')
+      // Error already handled by service with bilingual message
     },
   })
 }
@@ -288,10 +296,10 @@ export function useCancelActivity() {
       queryClient.invalidateQueries({
         queryKey: chatterKeys.all,
       })
-      toast.success('Activity cancelled')
+      toast.success('Activity cancelled | تم إلغاء النشاط')
     },
     onError: () => {
-      toast.error('Failed to cancel activity')
+      // Error already handled by service with bilingual message
     },
   })
 }
@@ -331,10 +339,10 @@ export function useUploadAttachment() {
       queryClient.invalidateQueries({
         queryKey: chatterKeys.attachments(variables.resModel, variables.resId),
       })
-      toast.success('File uploaded successfully')
+      toast.success('File uploaded | تم رفع الملف')
     },
     onError: () => {
-      toast.error('Failed to upload file')
+      // Error already handled by service with bilingual message
     },
   })
 }
@@ -359,10 +367,10 @@ export function useUploadAttachments() {
       queryClient.invalidateQueries({
         queryKey: chatterKeys.attachments(variables.resModel, variables.resId),
       })
-      toast.success(`${newAttachments.length} file(s) uploaded successfully`)
+      toast.success(`${newAttachments.length} files uploaded | تم رفع ${newAttachments.length} ملف`)
     },
     onError: () => {
-      toast.error('Failed to upload files')
+      // Error already handled by service with bilingual message
     },
   })
 }
@@ -379,10 +387,10 @@ export function useDeleteAttachment() {
       queryClient.invalidateQueries({
         queryKey: chatterKeys.all,
       })
-      toast.success('Attachment deleted')
+      toast.success('Attachment deleted | تم حذف المرفق')
     },
     onError: () => {
-      toast.error('Failed to delete attachment')
+      // Error already handled by service with bilingual message
     },
   })
 }

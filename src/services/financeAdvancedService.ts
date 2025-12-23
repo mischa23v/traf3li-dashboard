@@ -256,9 +256,11 @@ export const matchingService = {
    */
   excludeTransaction: async (transactionId: string, reason: string): Promise<void> => {
     try {
-      // Note: This endpoint is not implemented in the backend
-      // The backend uses clear/unclear transaction on reconciliation instead
-      throw new Error('Endpoint not available - use reconciliation clear/unclear instead')
+      // Note: Backend uses clear/unclear instead of exclude
+      throw new Error(
+        'Endpoint not implemented. Use clear/unclear transaction methods instead. | ' +
+        'نقطة النهاية غير متوفرة. استخدم طرق تصفية/عدم تصفية المعاملات بدلاً من ذلك.'
+      )
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -286,8 +288,11 @@ export const matchingRulesService = {
    */
   getRule: async (id: string): Promise<MatchingRule> => {
     try {
-      // Note: This endpoint is not implemented in the backend
-      throw new Error('Endpoint not available - use getRules() to fetch all rules')
+      // Note: Use getRules() to fetch all rules instead
+      throw new Error(
+        'Endpoint not implemented. Use getRules() to fetch all rules and filter by ID. | ' +
+        'نقطة النهاية غير متوفرة. استخدم getRules() لجلب جميع القواعد ثم قم بالتصفية حسب المعرف.'
+      )
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -333,8 +338,11 @@ export const matchingRulesService = {
    */
   toggleRule: async (id: string): Promise<MatchingRule> => {
     try {
-      // Note: This endpoint is not implemented in the backend
-      throw new Error('Endpoint not available - update the rule to change its active status')
+      // Note: Use updateRule() to toggle instead
+      throw new Error(
+        'Endpoint not implemented. Use updateRule() with { isActive: true/false } to toggle status. | ' +
+        'نقطة النهاية غير متوفرة. استخدم updateRule() مع { isActive: true/false } لتبديل الحالة.'
+      )
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -345,8 +353,11 @@ export const matchingRulesService = {
    */
   reorderRules: async (ruleIds: string[]): Promise<void> => {
     try {
-      // Note: This endpoint is not implemented in the backend
-      throw new Error('Endpoint not available')
+      // Note: Not implemented in backend
+      throw new Error(
+        'Endpoint not implemented. Rule reordering is not supported by the backend. | ' +
+        'نقطة النهاية غير متوفرة. إعادة ترتيب القواعد غير مدعومة من قبل الخادم.'
+      )
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -366,14 +377,18 @@ export const reconciliationReportService = {
     endDate?: string
   }): Promise<ReconciliationReport> => {
     try {
-      // Note: This endpoint is not implemented in the backend
-      // Use /bank-reconciliation/status/:accountId instead
+      // Note: Use /bank-reconciliation/status/:accountId instead
+      // Dedicated report endpoint not available - using status endpoint
       const response = await apiClient.get(`/bank-reconciliation/status/${accountId}`, {
         params
       })
       return response.data.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      throw new Error(
+        handleApiError(error) +
+        ' | Note: Use /bank-reconciliation/status/:accountId endpoint for reconciliation data. | ' +
+        'ملاحظة: استخدم نقطة النهاية /bank-reconciliation/status/:accountId للحصول على بيانات التسوية.'
+      )
     }
   },
 
@@ -382,8 +397,11 @@ export const reconciliationReportService = {
    */
   exportReport: async (accountId: string, format: 'pdf' | 'xlsx'): Promise<Blob> => {
     try {
-      // Note: This endpoint is not implemented in the backend
-      throw new Error('Endpoint not available')
+      // Note: Not implemented in backend
+      throw new Error(
+        'Endpoint not implemented. Report export functionality is not available in the backend. | ' +
+        'نقطة النهاية غير متوفرة. وظيفة تصدير التقارير غير متوفرة في الخادم.'
+      )
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -412,7 +430,7 @@ export const currencyService = {
    */
   getRate: async (fromCurrency: string, toCurrency: string): Promise<ExchangeRate> => {
     try {
-      // Note: This endpoint is not implemented in the backend
+      // Note: Use /currency/rates to get all rates instead
       // The backend only has /currency/rates (get all)
       const response = await apiClientNoVersion.get('/currency/rates')
       const rates = response.data.data || []
@@ -420,7 +438,10 @@ export const currencyService = {
         r.fromCurrency === fromCurrency && r.toCurrency === toCurrency
       )
       if (!rate) {
-        throw new Error(`Exchange rate for ${fromCurrency} to ${toCurrency} not found`)
+        throw new Error(
+          `Exchange rate for ${fromCurrency} to ${toCurrency} not found. Use getRates() to get all rates. | ` +
+          `سعر الصرف من ${fromCurrency} إلى ${toCurrency} غير موجود. استخدم getRates() للحصول على جميع الأسعار.`
+        )
       }
       return rate
     } catch (error: any) {
@@ -437,8 +458,11 @@ export const currencyService = {
     params?: { startDate?: string; endDate?: string }
   ): Promise<ExchangeRateHistory[]> => {
     try {
-      // Note: This endpoint is not implemented in the backend
-      throw new Error('Endpoint not available')
+      // Note: Not implemented in backend
+      throw new Error(
+        'Endpoint not implemented. Exchange rate history is not available in the backend. | ' +
+        'نقطة النهاية غير متوفرة. سجل أسعار الصرف غير متوفر في الخادم.'
+      )
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import {
   getPayrollRuns,
   getPayrollRun,
@@ -225,46 +226,125 @@ export const useUnholdEmployee = () => {
   })
 }
 
-// Exclude employee
+/**
+ * Exclude employee from payroll run
+ * @deprecated Backend endpoint not implemented - POST /payroll-runs/:id/employees/:empId/exclude
+ * This hook will throw an error when called. Use alternative methods for excluding employees.
+ * TODO: [BACKEND-PENDING] Implement POST /payroll-runs/:id/employees/:empId/exclude endpoint
+ */
 export const useExcludeEmployee = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ runId, employeeId, reason }: { runId: string; employeeId: string; reason: string }) =>
-      excludeEmployee(runId, employeeId, reason),
+    mutationFn: ({ runId, employeeId, reason }: { runId: string; employeeId: string; reason: string }) => {
+      console.warn(
+        '[DEPRECATED] useExcludeEmployee: Backend endpoint not implemented | [منتهي الصلاحية] استخدام استبعاد الموظف: نقطة النهاية غير مطبقة',
+        '\nEndpoint: POST /payroll-runs/:id/employees/:empId/exclude',
+        '\nEmployee ID:', employeeId,
+        '\nReason:', reason
+      )
+      return excludeEmployee(runId, employeeId, reason)
+    },
     onSuccess: (_, { runId }) => {
       queryClient.invalidateQueries({ queryKey: payrollRunKeys.detail(runId) })
+    },
+    onError: (error) => {
+      console.error(
+        '[ERROR] Failed to exclude employee | [خطأ] فشل استبعاد الموظف:',
+        error instanceof Error ? error.message : 'Unknown error | خطأ غير معروف'
+      )
+      // Show bilingual user-facing error alert
+      toast.error(
+        'Feature not available | الميزة غير متاحة',
+        {
+          description: 'Employee exclusion is not yet implemented. Please contact support. | استبعاد الموظف غير مطبق حالياً. يرجى التواصل مع الدعم الفني.',
+        }
+      )
     },
   })
 }
 
-// Include employee
+/**
+ * Include employee back in payroll run
+ * @deprecated Backend endpoint not implemented - POST /payroll-runs/:id/employees/:empId/include
+ * This hook will throw an error when called. Use alternative methods for including employees.
+ * TODO: [BACKEND-PENDING] Implement POST /payroll-runs/:id/employees/:empId/include endpoint
+ */
 export const useIncludeEmployee = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ runId, employeeId }: { runId: string; employeeId: string }) =>
-      includeEmployee(runId, employeeId),
+    mutationFn: ({ runId, employeeId }: { runId: string; employeeId: string }) => {
+      console.warn(
+        '[DEPRECATED] useIncludeEmployee: Backend endpoint not implemented | [منتهي الصلاحية] استخدام تضمين الموظف: نقطة النهاية غير مطبقة',
+        '\nEndpoint: POST /payroll-runs/:id/employees/:empId/include',
+        '\nEmployee ID:', employeeId
+      )
+      return includeEmployee(runId, employeeId)
+    },
     onSuccess: (_, { runId }) => {
       queryClient.invalidateQueries({ queryKey: payrollRunKeys.detail(runId) })
+    },
+    onError: (error) => {
+      console.error(
+        '[ERROR] Failed to include employee | [خطأ] فشل تضمين الموظف:',
+        error instanceof Error ? error.message : 'Unknown error | خطأ غير معروف'
+      )
+      // Show bilingual user-facing error alert
+      toast.error(
+        'Feature not available | الميزة غير متاحة',
+        {
+          description: 'Employee inclusion is not yet implemented. Please contact support. | تضمين الموظف غير مطبق حالياً. يرجى التواصل مع الدعم الفني.',
+        }
+      )
     },
   })
 }
 
-// Recalculate employee
+/**
+ * Recalculate single employee in payroll run
+ * @deprecated Backend endpoint not implemented - POST /payroll-runs/:id/employees/:empId/recalculate
+ * This hook will throw an error when called. Use the full payroll run recalculation instead.
+ * TODO: [BACKEND-PENDING] Implement POST /payroll-runs/:id/employees/:empId/recalculate endpoint
+ */
 export const useRecalculateEmployee = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ runId, employeeId }: { runId: string; employeeId: string }) =>
-      recalculateEmployee(runId, employeeId),
+    mutationFn: ({ runId, employeeId }: { runId: string; employeeId: string }) => {
+      console.warn(
+        '[DEPRECATED] useRecalculateEmployee: Backend endpoint not implemented | [منتهي الصلاحية] استخدام إعادة حساب الموظف: نقطة النهاية غير مطبقة',
+        '\nEndpoint: POST /payroll-runs/:id/employees/:empId/recalculate',
+        '\nEmployee ID:', employeeId,
+        '\nSuggestion: Use useCalculatePayrollRun() to recalculate the entire payroll run | اقتراح: استخدم إعادة حساب جميع الموظفين'
+      )
+      return recalculateEmployee(runId, employeeId)
+    },
     onSuccess: (_, { runId }) => {
       queryClient.invalidateQueries({ queryKey: payrollRunKeys.detail(runId) })
+    },
+    onError: (error) => {
+      console.error(
+        '[ERROR] Failed to recalculate employee | [خطأ] فشل إعادة حساب الموظف:',
+        error instanceof Error ? error.message : 'Unknown error | خطأ غير معروف'
+      )
+      // Show bilingual user-facing error alert
+      toast.error(
+        'Feature not available | الميزة غير متاحة',
+        {
+          description: 'Individual employee recalculation is not yet implemented. Please recalculate the entire payroll run instead. | إعادة حساب الموظف الفردي غير مطبق حالياً. يرجى إعادة حساب دورة الرواتب بالكامل.',
+        }
+      )
     },
   })
 }
 
-// Export payroll run report
+/**
+ * Export payroll run report
+ * @deprecated Backend endpoint not implemented - GET /payroll-runs/:id/export
+ * This hook will throw an error when called. Report export functionality is not yet available.
+ * TODO: [BACKEND-PENDING] Implement GET /payroll-runs/:id/export endpoint with support for multiple formats
+ */
 export const useExportPayrollRunReport = () => {
   return useMutation({
     mutationFn: ({
@@ -275,6 +355,27 @@ export const useExportPayrollRunReport = () => {
       runId: string
       reportType: 'summary' | 'detailed' | 'bank_file' | 'wps_sif' | 'journal_entry'
       format: 'pdf' | 'excel' | 'csv'
-    }) => exportPayrollRunReport(runId, reportType, format),
+    }) => {
+      console.warn(
+        '[DEPRECATED] useExportPayrollRunReport: Backend endpoint not implemented | [منتهي الصلاحية] استخدام تصدير تقرير الرواتب: نقطة النهاية غير مطبقة',
+        '\nEndpoint: GET /payroll-runs/:id/export',
+        '\nReport Type:', reportType,
+        '\nFormat:', format
+      )
+      return exportPayrollRunReport(runId, reportType, format)
+    },
+    onError: (error) => {
+      console.error(
+        '[ERROR] Failed to export payroll run report | [خطأ] فشل تصدير تقرير الرواتب:',
+        error instanceof Error ? error.message : 'Unknown error | خطأ غير معروف'
+      )
+      // Show bilingual user-facing error alert
+      toast.error(
+        'Export not available | التصدير غير متاح',
+        {
+          description: 'Payroll report export is not yet implemented. Please contact support. | تصدير تقرير الرواتب غير مطبق حالياً. يرجى التواصل مع الدعم الفني.',
+        }
+      )
+    },
   })
 }

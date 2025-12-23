@@ -128,7 +128,7 @@ export const useCreateStaff = () => {
   return useMutation({
     mutationFn: (data: CreateStaffData) => staffService.createStaff(data),
     onSuccess: (data) => {
-      toast.success('تم إضافة عضو الفريق بنجاح')
+      toast.success('Team member added successfully | تم إضافة عضو الفريق بنجاح')
       // Optimistically update the cache
       queryClient.setQueriesData({ queryKey: ['staff'] }, (old: any) => {
         if (!old) return old
@@ -137,7 +137,7 @@ export const useCreateStaff = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إضافة عضو الفريق')
+      toast.error(error.message || 'Failed to add team member | فشل إضافة عضو الفريق')
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -158,7 +158,7 @@ export const useUpdateStaff = () => {
       data: UpdateStaffData
     }) => staffService.updateStaff(staffId, data),
     onSuccess: (data) => {
-      toast.success('تم تحديث بيانات عضو الفريق بنجاح')
+      toast.success('Team member updated successfully | تم تحديث بيانات عضو الفريق بنجاح')
       // Update specific staff member in cache
       queryClient.setQueryData(['staff', data.id], data)
       // Update list cache
@@ -171,7 +171,7 @@ export const useUpdateStaff = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث بيانات عضو الفريق')
+      toast.error(error.message || 'Failed to update team member | فشل تحديث بيانات عضو الفريق')
     },
     onSettled: async (_, __, variables) => {
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -187,7 +187,7 @@ export const useDeleteStaff = () => {
   return useMutation({
     mutationFn: (staffId: string) => staffService.deleteStaff(staffId),
     onSuccess: (_, staffId) => {
-      toast.success('تم حذف عضو الفريق بنجاح')
+      toast.success('Team member deleted successfully | تم حذف عضو الفريق بنجاح')
       // Remove from cache
       queryClient.setQueriesData({ queryKey: ['staff'] }, (old: any) => {
         if (!old) return old
@@ -198,7 +198,7 @@ export const useDeleteStaff = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل حذف عضو الفريق')
+      toast.error(error.message || 'Failed to delete team member | فشل حذف عضو الفريق')
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -213,7 +213,7 @@ export const useBulkDeleteStaff = () => {
   return useMutation({
     mutationFn: (staffIds: string[]) => staffService.bulkDeleteStaff(staffIds),
     onSuccess: (_, staffIds) => {
-      toast.success('تم حذف أعضاء الفريق بنجاح')
+      toast.success('Team members deleted successfully | تم حذف أعضاء الفريق بنجاح')
       // Remove from cache
       queryClient.setQueriesData({ queryKey: ['staff'] }, (old: any) => {
         if (!old) return old
@@ -224,7 +224,7 @@ export const useBulkDeleteStaff = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل حذف أعضاء الفريق')
+      toast.error(error.message || 'Failed to delete team members | فشل حذف أعضاء الفريق')
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -244,15 +244,15 @@ export const useInviteStaff = () => {
   return useMutation({
     mutationFn: async (data: InviteStaffData) => {
       if (!firmId) {
-        throw new Error('لم يتم العثور على معرف المكتب')
+        throw new Error('Firm ID not found | لم يتم العثور على معرف المكتب')
       }
       return firmService.inviteTeamMember(firmId, data)
     },
     onSuccess: () => {
-      toast.success('تم إرسال الدعوة بنجاح')
+      toast.success('Invitation sent successfully | تم إرسال الدعوة بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إرسال الدعوة')
+      toast.error(error.message || 'Failed to send invitation | فشل إرسال الدعوة')
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))

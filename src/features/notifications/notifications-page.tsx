@@ -18,6 +18,7 @@ import {
   XCircle,
   AlertTriangle,
   Info,
+  AlertCircle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -35,6 +36,7 @@ import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Header } from '@/components/layout/header'
 import { NotificationItem } from '@/components/notifications/notification-item'
 import {
@@ -236,6 +238,23 @@ export function NotificationsPage() {
       </Header>
 
       <div className="flex-1 space-y-4 p-4 md:p-6 lg:p-8">
+        {/* Backend Pending Alert - Shown when using bulk operations */}
+        {selectedIds.size > 1 && (
+          <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950/20">
+            <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-500" />
+            <AlertDescription className="text-blue-800 dark:text-blue-200 text-sm">
+              <strong>[BACKEND-PENDING]</strong>{' '}
+              {t('notifications.bulkOperationWarning',
+                'Bulk operations are processed individually. Server-side bulk processing will improve performance soon.'
+              )}{' '}
+              |{' '}
+              {t('notifications.bulkOperationWarningAr',
+                'تتم معالجة العمليات الجماعية بشكل فردي. ستتحسن الأداء قريباً بالمعالجة الجماعية من جانب الخادم.'
+              )}
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Stats Cards - Optimized with memoized values */}
         <div className="grid gap-4 md:grid-cols-4">
           <Card>

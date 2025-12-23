@@ -156,12 +156,31 @@ const documentsService = {
     return response.data
   },
 
-  // Upload new document (legacy/direct upload)
+  /**
+   * Upload new document (legacy/direct upload)
+   *
+   * @deprecated This method uses direct upload and is kept for backward compatibility.
+   * For new implementations, please use the S3-based upload flow:
+   * 1. Call getUploadUrl() to get a presigned S3 URL
+   * 2. Upload the file directly to S3 using the presigned URL
+   * 3. Call confirmUpload() to finalize the document record
+   *
+   * @example
+   * // Preferred S3-based approach:
+   * const { uploadUrl, documentId } = await documentsService.getUploadUrl(file.name, file.type, metadata)
+   * await fetch(uploadUrl, { method: 'PUT', body: file })
+   * const document = await documentsService.confirmUpload(documentId)
+   */
   uploadDocument: async (
     file: File,
     metadata: CreateDocumentData,
     onProgress?: (progress: number) => void
   ): Promise<Document> => {
+    console.warn(
+      'documentsService.uploadDocument() is deprecated. ' +
+      'Please use the S3-based upload flow (getUploadUrl + confirmUpload) for better performance and scalability.'
+    )
+
     const formData = new FormData()
     formData.append('file', file)
     formData.append('category', metadata.category)
@@ -323,13 +342,23 @@ const documentsService = {
   },
 
   // Encrypt document
+  // [BACKEND-PENDING] Endpoint may not be fully implemented - S3-level encryption preferred
   encryptDocument: async (id: string): Promise<Document> => {
+    console.warn(
+      '[BACKEND-PENDING] POST /documents/:id/encrypt - This endpoint may not be fully implemented. ' +
+      'Consider using S3-level encryption for better security and performance.'
+    )
     const response = await api.post(`/documents/${id}/encrypt`)
     return response.data
   },
 
   // Decrypt document
+  // [BACKEND-PENDING] Endpoint may not be fully implemented - S3-level encryption preferred
   decryptDocument: async (id: string): Promise<Blob> => {
+    console.warn(
+      '[BACKEND-PENDING] POST /documents/:id/decrypt - This endpoint may not be fully implemented. ' +
+      'Decryption should be handled at S3 level with proper key management.'
+    )
     const response = await api.post(`/documents/${id}/decrypt`, {
       responseType: 'blob',
     })

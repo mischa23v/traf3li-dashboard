@@ -13,8 +13,10 @@ import {
   TrendingUp,
   Loader2,
   CheckSquare,
+  AlertTriangle,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import type { AnalyticsTabProps } from '../types'
 
 export const AnalyticsTab = memo(function AnalyticsTab({
@@ -42,7 +44,15 @@ interface CRMCardProps {
   crmLoading: boolean
 }
 
+// [BACKEND-PENDING] CRM Stats endpoint not implemented: /dashboard/crm-stats
 const CRMCard = memo(function CRMCard({ t, crmStats, crmLoading }: CRMCardProps) {
+  // Check if backend returned default empty data (endpoint not available)
+  const isBackendPending = !crmLoading && crmStats &&
+    crmStats.totalClients === 0 &&
+    crmStats.newClientsThisMonth === 0 &&
+    crmStats.activeLeads === 0 &&
+    crmStats.conversionRate === 0
+
   return (
     <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all">
       <CardHeader className="pb-2">
@@ -56,6 +66,17 @@ const CRMCard = memo(function CRMCard({ t, crmStats, crmLoading }: CRMCardProps)
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-navy" />
           </div>
+        ) : isBackendPending ? (
+          <Alert className="border-amber-200 bg-amber-50">
+            <AlertTriangle className="h-4 w-4 text-amber-600" />
+            <AlertDescription className="text-sm text-amber-800">
+              <strong className="font-semibold">Backend Pending | الخلفية قيد التطوير</strong>
+              <br />
+              CRM statistics endpoint is not yet implemented. This feature is coming soon.
+              <br />
+              نقطة نهاية إحصائيات إدارة العملاء غير متوفرة حالياً. هذه الميزة قيد التطوير.
+            </AlertDescription>
+          </Alert>
         ) : (
           <div className="space-y-4">
             <StatRow
@@ -99,11 +120,20 @@ interface FinanceCardProps {
   financeStatsLoading: boolean
 }
 
+// [BACKEND-PENDING] Finance Stats endpoint not implemented: /dashboard/finance-stats
+// NOTE: Use /dashboard/financial-summary instead for basic finance data
 const FinanceCard = memo(function FinanceCard({
   t,
   financeStats,
   financeStatsLoading,
 }: FinanceCardProps) {
+  // Check if backend returned default empty data (endpoint not available)
+  const isBackendPending = !financeStatsLoading && financeStats &&
+    financeStats.totalRevenue === 0 &&
+    financeStats.expenses === 0 &&
+    financeStats.profitMargin === 0 &&
+    financeStats.pendingInvoicesCount === 0
+
   return (
     <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all">
       <CardHeader className="pb-2">
@@ -117,6 +147,17 @@ const FinanceCard = memo(function FinanceCard({
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-navy" />
           </div>
+        ) : isBackendPending ? (
+          <Alert className="border-amber-200 bg-amber-50">
+            <AlertTriangle className="h-4 w-4 text-amber-600" />
+            <AlertDescription className="text-sm text-amber-800">
+              <strong className="font-semibold">Backend Pending | الخلفية قيد التطوير</strong>
+              <br />
+              Finance statistics endpoint is not yet implemented. Use the Finance Summary in Overview tab instead.
+              <br />
+              نقطة نهاية الإحصائيات المالية غير متوفرة حالياً. استخدم الملخص المالي في تبويب النظرة العامة بدلاً من ذلك.
+            </AlertDescription>
+          </Alert>
         ) : (
           <div className="space-y-4">
             <StatRow
