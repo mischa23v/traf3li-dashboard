@@ -296,57 +296,81 @@ export const leadService = {
   },
 
   // ═══════════════════════════════════════════════════════════════
-  // NAJIZ VERIFICATION ENDPOINTS
+  // NAJIZ VERIFICATION ENDPOINTS [BACKEND-PENDING]
+  // ═══════════════════════════════════════════════════════════════
+  // ⚠️ WARNING: These endpoints are NOT YET IMPLEMENTED in the backend
+  // ⚠️ تحذير: هذه النقاط النهائية لم يتم تنفيذها بعد في الخادم
+  // These will return 404 errors until backend implementation is complete
   // ═══════════════════════════════════════════════════════════════
 
   /**
-   * Verify company with Wathq API (Saudi CR verification)
+   * [BACKEND-PENDING] Verify company with Wathq API (Saudi CR verification)
    * POST /api/leads/:id/verify/wathq
+   *
+   * @throws Will show user-friendly bilingual error message
+   * English: "This feature is not available yet. Please contact support."
+   * Arabic: "هذه الميزة غير متاحة حالياً. يرجى التواصل مع الدعم."
    */
   verifyWithWathq: async (id: string, data?: any): Promise<{ verified: boolean; data?: any }> => {
     try {
       const response = await apiClient.post(`/leads/${id}/verify/wathq`, data)
       return response.data.data || response.data
     } catch (error: any) {
+      // Will automatically show bilingual error for 404 endpoint not implemented
       throwBilingualError(error, 'LEAD_UPDATE_FAILED')
     }
   },
 
   /**
-   * Verify identity with Absher/NIC (National ID verification)
+   * [BACKEND-PENDING] Verify identity with Absher/NIC (National ID verification)
    * POST /api/leads/:id/verify/absher
+   *
+   * @throws Will show user-friendly bilingual error message
+   * English: "This feature is not available yet. Please contact support."
+   * Arabic: "هذه الميزة غير متاحة حالياً. يرجى التواصل مع الدعم."
    */
   verifyWithAbsher: async (id: string, data?: { nationalId?: string }): Promise<{ verified: boolean; data?: any }> => {
     try {
       const response = await apiClient.post(`/leads/${id}/verify/absher`, data)
       return response.data.data || response.data
     } catch (error: any) {
+      // Will automatically show bilingual error for 404 endpoint not implemented
       throwBilingualError(error, 'LEAD_UPDATE_FAILED')
     }
   },
 
   /**
-   * Verify national address with Saudi Post
+   * [BACKEND-PENDING] Verify national address with Saudi Post
    * POST /api/leads/:id/verify/address
+   *
+   * @throws Will show user-friendly bilingual error message
+   * English: "This feature is not available yet. Please contact support."
+   * Arabic: "هذه الميزة غير متاحة حالياً. يرجى التواصل مع الدعم."
    */
   verifyNationalAddress: async (id: string, address?: NationalAddress): Promise<{ verified: boolean; data?: any }> => {
     try {
       const response = await apiClient.post(`/leads/${id}/verify/address`, address)
       return response.data.data || response.data
     } catch (error: any) {
+      // Will automatically show bilingual error for 404 endpoint not implemented
       throwBilingualError(error, 'LEAD_UPDATE_FAILED')
     }
   },
 
   /**
-   * Run conflict check for a lead
+   * [BACKEND-PENDING] Run conflict check for a lead
    * POST /api/leads/:id/conflict-check
+   *
+   * @throws Will show user-friendly bilingual error message
+   * English: "This feature is not available yet. Please contact support."
+   * Arabic: "هذه الميزة غير متاحة حالياً. يرجى التواصل مع الدعم."
    */
   runConflictCheck: async (id: string, data: any): Promise<any> => {
     try {
       const response = await apiClient.post(`/leads/${id}/conflict-check`, data)
       return response.data.data || response.data
     } catch (error: any) {
+      // Will automatically show bilingual error for 404 endpoint not implemented
       throwBilingualError(error)
     }
   },
