@@ -21,7 +21,7 @@ function sendToAnalytics(metric: Metric, options?: { debug?: boolean }) {
     speed: getConnectionSpeed(),
   }
 
-  if (options?.debug) {
+  if (options?.debug && import.meta.env.DEV) {
     console.log('[Web Vitals]', metric.name, metric.value)
   }
 

@@ -29,6 +29,7 @@ import { API_DOMAIN, API_URL } from '@/lib/api'
 import { toast } from 'sonner'
 import { VoiceMemoRecorder, VoiceMemoPlayer, isVoiceMemo } from './voice-memo-recorder'
 import { AttachmentVersionsDialog } from './attachment-versions-dialog'
+import { validateFile, FILE_TYPES, SIZE_LIMITS, sanitizeFilename } from '@/lib/file-validation'
 
 // Lazy load DocumentEditorDialog - contains TipTap editor (~150KB)
 const DocumentEditorDialog = lazy(() => import('./document-editor-dialog').then(mod => ({ default: mod.DocumentEditorDialog })))
@@ -177,6 +178,29 @@ export function TaskDetailsView() {
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
         if (!file) return
+
+        // Validate file
+        const allowedTypes = [
+            ...FILE_TYPES.DOCUMENTS,
+            ...FILE_TYPES.SPREADSHEETS,
+            ...FILE_TYPES.PRESENTATIONS,
+            ...FILE_TYPES.IMAGES,
+            ...FILE_TYPES.ARCHIVES,
+            ...FILE_TYPES.AUDIO,
+        ]
+        const validation = validateFile(file, {
+            allowedTypes,
+            maxSize: SIZE_LIMITS.DOCUMENT,
+        })
+
+        if (!validation.valid) {
+            toast.error(validation.errorAr || validation.error)
+            if (fileInputRef.current) {
+                fileInputRef.current.value = ''
+            }
+            return
+        }
+
         uploadAttachmentMutation.mutate(
             { id: taskId, file },
             {

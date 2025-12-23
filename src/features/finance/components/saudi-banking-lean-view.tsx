@@ -50,6 +50,7 @@ import {
 } from '@/hooks/useSaudiBanking'
 import { format } from 'date-fns'
 import { arSA } from 'date-fns/locale'
+import { maskIBAN } from '@/utils/data-masking'
 
 // Sidebar Component
 function LeanSidebar({ onConnectBank }: { onConnectBank: () => void }) {
@@ -357,7 +358,7 @@ export function SaudiBankingLeanView() {
                                                                         حساب {account.type === 'CURRENT' ? 'جاري' : account.type === 'SAVINGS' ? 'توفير' : 'ائتماني'}
                                                                     </h4>
                                                                     <p className="text-sm text-slate-500 font-mono" dir="ltr">
-                                                                        {account.iban}
+                                                                        {maskIBAN(account.iban)}
                                                                     </p>
                                                                 </div>
                                                             </div>

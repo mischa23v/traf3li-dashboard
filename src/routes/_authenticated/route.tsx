@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { AuthenticatedLayout } from '@/components/layout/authenticated-layout'
 import { useAuthStore } from '@/stores/auth-store'
+import { safeRedirect } from '@/utils/redirectValidation'
 
 export const Route = createFileRoute('/_authenticated')({
   beforeLoad: async ({ location }) => {
@@ -10,10 +11,12 @@ export const Route = createFileRoute('/_authenticated')({
     // Don't block on API call - verify in background instead
     if (!isAuthenticated) {
       // No cached auth - must redirect to sign in
+      // Validate redirect URL to prevent open redirect attacks
+      const validatedRedirect = safeRedirect(location.href, '/')
       throw redirect({
         to: '/sign-in',
         search: {
-          redirect: location.href,
+          redirect: validatedRedirect,
         },
       })
     }
@@ -21,10 +24,12 @@ export const Route = createFileRoute('/_authenticated')({
     // Check if user has MFA pending verification
     // Redirect to MFA challenge page if MFA verification is required
     if (user?.mfaPending) {
+      // Validate redirect URL to prevent open redirect attacks
+      const validatedRedirect = safeRedirect(location.href, '/')
       throw redirect({
         to: '/mfa-challenge',
         search: {
-          redirect: location.href,
+          redirect: validatedRedirect,
         },
       })
     }

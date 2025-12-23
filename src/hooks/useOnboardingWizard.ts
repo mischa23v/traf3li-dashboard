@@ -47,7 +47,9 @@ export const useSaveWizardProgress = () => {
       queryClient.invalidateQueries({ queryKey: onboardingWizardKeys.status() })
     },
     onError: (error: Error) => {
-      console.error('Failed to save wizard progress:', error)
+      if (import.meta.env.DEV) {
+        console.error('Failed to save wizard progress:', error)
+      }
       // Silent failure - we don't want to interrupt the user experience
     },
   })

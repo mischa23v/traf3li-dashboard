@@ -9,6 +9,7 @@ import {
   InputOTPSlot,
   InputOTPSeparator,
 } from '@/components/ui/input-otp'
+import { safeRedirect } from '@/utils/redirectValidation'
 
 // ============================================
 // SVG ICONS
@@ -140,7 +141,8 @@ export function OtpLogin({ purpose = 'login' }: OtpLoginProps) {
 
         // Navigate after short delay
         setTimeout(() => {
-          const redirectTo = (search as any)?.redirect || '/'
+          // Validate redirect URL to prevent open redirect attacks
+          const redirectTo = safeRedirect((search as any)?.redirect, '/')
           navigate({ to: redirectTo })
         }, 500)
       }

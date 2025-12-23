@@ -144,6 +144,7 @@ function OTPInput({ value, onChange, error, disabled }: { value: string; onChang
           onFocus={() => handleFocus(index)}
           onBlur={() => setFocusedIndex(-1)}
           disabled={disabled}
+          autoComplete="off"
           className={`w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold rounded-xl border-2 bg-slate-50 outline-none transition-all ${
             error
               ? 'border-red-400 bg-red-50 text-red-600'
@@ -172,6 +173,7 @@ function OTPInput({ value, onChange, error, disabled }: { value: string; onChang
           onFocus={() => handleFocus(index)}
           onBlur={() => setFocusedIndex(-1)}
           disabled={disabled}
+          autoComplete="off"
           className={`w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold rounded-xl border-2 bg-slate-50 outline-none transition-all ${
             error
               ? 'border-red-400 bg-red-50 text-red-600'

@@ -28,6 +28,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { validateFile, FILE_TYPES, SIZE_LIMITS } from '@/lib/file-validation'
 import { Separator } from '@/components/ui/separator'
 import { usePermissions } from '@/hooks/use-permissions'
 import { toast } from 'sonner'
@@ -181,10 +182,22 @@ export default function EnterpriseSettings() {
 
     const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
-        if (file) {
-            // Simulate upload
-            toast.success(isRTL ? 'تم رفع الشعار بنجاح' : 'Logo uploaded successfully')
+        if (!file) return
+
+        // Validate file
+        const validation = validateFile(file, {
+            allowedTypes: FILE_TYPES.IMAGES,
+            maxSize: SIZE_LIMITS.LOGO,
+        })
+
+        if (!validation.valid) {
+            toast.error(validation.errorAr || validation.error)
+            e.target.value = ''
+            return
         }
+
+        // Simulate upload
+        toast.success(isRTL ? 'تم رفع الشعار بنجاح' : 'Logo uploaded successfully')
     }
 
     const handleSaveSecuritySettings = async () => {
@@ -603,7 +616,7 @@ export default function EnterpriseSettings() {
                                             <input
                                                 type="file"
                                                 id="logo-upload"
-                                                accept="image/*"
+                                                accept=".jpg,.jpeg,.png,.gif,.webp,.svg"
                                                 className="hidden"
                                                 onChange={handleLogoUpload}
                                             />

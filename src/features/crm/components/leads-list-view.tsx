@@ -41,6 +41,7 @@ import type { Lead, LeadStatus } from '@/types/crm'
 import { SalesSidebar } from './sales-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { VirtualList } from '@/components/virtual-list'
+import { maskPhone, maskEmail } from '@/utils/data-masking'
 
 // Status labels are now handled via i18n in the component
 
@@ -299,13 +300,13 @@ export function LeadsListView() {
                                   {lead.phone && (
                                     <span className="flex items-center gap-1">
                                       <Phone className="h-3 w-3" aria-hidden="true" />
-                                      {lead.phone}
+                                      {maskPhone(lead.phone)}
                                     </span>
                                   )}
                                   {lead.email && (
                                     <span className="flex items-center gap-1">
                                       <Mail className="h-3 w-3" aria-hidden="true" />
-                                      {lead.email}
+                                      {maskEmail(lead.email)}
                                     </span>
                                   )}
                                   {lead.organizationId && typeof lead.organizationId === 'object' && (

@@ -86,6 +86,7 @@ import { SalesSidebar } from './sales-sidebar'
 import { PipelineAutomationDialog } from './pipeline-automation-dialog'
 import { cn } from '@/lib/utils'
 import type { PipelineAutoAction } from '@/types/crm'
+import { maskPhone, maskEmail } from '@/utils/data-masking'
 
 // Static style for RTL direction
 const rtlStyle = { direction: 'rtl' as const }
@@ -257,13 +258,13 @@ const LeadCard = memo(function LeadCard({
         {lead.phone && (
           <div className="flex items-center gap-2">
             <Phone className="h-3 w-3" aria-hidden="true" />
-            <span dir="ltr">{lead.phone}</span>
+            <span dir="ltr">{maskPhone(lead.phone)}</span>
           </div>
         )}
         {lead.email && (
           <div className="flex items-center gap-2 truncate">
             <Mail className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
-            <span className="truncate" dir="ltr">{lead.email}</span>
+            <span className="truncate" dir="ltr">{maskEmail(lead.email)}</span>
           </div>
         )}
         {lead.organizationId && typeof lead.organizationId === 'object' && (

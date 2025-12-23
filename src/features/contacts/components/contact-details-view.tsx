@@ -30,6 +30,7 @@ import {
   Building2,
   Shield,
   Star,
+import { maskNationalID } from '@/utils/data-masking'
   Briefcase,
   Tag,
   CheckCircle,
@@ -584,19 +585,19 @@ export function ContactDetailsView() {
                               {contact.nationalId && (
                                 <div className="p-4 bg-slate-50 rounded-xl">
                                   <p className="text-xs text-slate-500 mb-1">رقم الهوية الوطنية<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></p>
-                                  <p className="font-medium text-navy" dir="ltr">{contact.nationalId}</p>
+                                  <p className="font-medium text-navy" dir="ltr">{maskNationalID(contact.nationalId)}</p>
                                 </div>
                               )}
                               {contact.iqamaNumber && (
                                 <div className="p-4 bg-slate-50 rounded-xl">
                                   <p className="text-xs text-slate-500 mb-1">رقم الإقامة</p>
-                                  <p className="font-medium text-navy" dir="ltr">{contact.iqamaNumber}</p>
+                                  <p className="font-medium text-navy" dir="ltr">{maskNationalID(contact.iqamaNumber)}</p>
                                 </div>
                               )}
                               {contact.passportNumber && (
                                 <div className="p-4 bg-slate-50 rounded-xl">
                                   <p className="text-xs text-slate-500 mb-1">رقم جواز السفر<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></p>
-                                  <p className="font-medium text-navy" dir="ltr">{contact.passportNumber}</p>
+                                  <p className="font-medium text-navy" dir="ltr">{maskNationalID(contact.passportNumber)}</p>
                                 </div>
                               )}
                               {contact.passportCountry && (

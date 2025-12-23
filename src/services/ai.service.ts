@@ -5,6 +5,8 @@
  * for AI capabilities powered by Workers AI
  */
 
+import api from '@/lib/api';
+
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
@@ -60,18 +62,28 @@ const AI_BASE = '/api/ai';
 export async function sendChatMessage(
   request: ChatRequest
 ): Promise<ChatResponse> {
-  const response = await fetch(`${AI_BASE}/chat`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(request),
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Failed to send chat message');
+  try {
+    const response = await api.post(`${AI_BASE}/chat`, request);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.message || 'Failed to send chat message');
   }
+}
 
-  return response.json();
+/**
+ * Get CSRF token from cookies
+ */
+function getCsrfToken(): string {
+  const cookies = document.cookie;
+  const match = cookies.match(/csrf-token=([^;]+)/);
+  if (match && match[1]) {
+    return match[1];
+  }
+  const xsrfMatch = cookies.match(/XSRF-TOKEN=([^;]+)/);
+  if (xsrfMatch && xsrfMatch[1]) {
+    return xsrfMatch[1];
+  }
+  return '';
 }
 
 /**
@@ -80,10 +92,21 @@ export async function sendChatMessage(
 export async function* streamChatMessage(
   request: Omit<ChatRequest, 'stream'>
 ): AsyncGenerator<string, void, unknown> {
+  const csrfToken = getCsrfToken();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  // Add CSRF token for POST request (CSRF protection)
+  if (csrfToken) {
+    headers['X-CSRF-Token'] = csrfToken;
+  }
+
   const response = await fetch(`${AI_BASE}/chat`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify({ ...request, stream: true }),
+    credentials: 'include', // Include cookies for session/auth
   });
 
   if (!response.ok) {
@@ -130,34 +153,24 @@ export async function* streamChatMessage(
 export async function summarizeText(
   request: SummarizeRequest
 ): Promise<SummarizeResponse> {
-  const response = await fetch(`${AI_BASE}/summarize`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(request),
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Failed to summarize text');
+  try {
+    const response = await api.post(`${AI_BASE}/summarize`, request);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.message || 'Failed to summarize text');
   }
-
-  return response.json();
 }
 
 /**
  * Get available AI models
  */
 export async function getAvailableModels(): Promise<ModelsResponse> {
-  const response = await fetch(`${AI_BASE}/models`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch models');
+  try {
+    const response = await api.get(`${AI_BASE}/models`);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.message || 'Failed to fetch models');
   }
-
-  return response.json();
 }
 
 /**

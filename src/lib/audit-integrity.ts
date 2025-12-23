@@ -84,7 +84,9 @@ function saveIntegrityChain(chain: IntegrityChain): void {
     localStorage.setItem(CHAIN_STORAGE_KEY, JSON.stringify(chain))
   } catch {
     // Storage full - in production, send to backend
-    console.warn('[Audit Integrity] Storage full, chain not persisted locally')
+    if (import.meta.env.DEV) {
+      console.warn('[Audit Integrity] Storage full, chain not persisted locally')
+    }
   }
 }
 

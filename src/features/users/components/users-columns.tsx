@@ -8,6 +8,7 @@ import { LongText } from '@/components/long-text'
 import { callTypes, roles } from '../data/data'
 import { type User } from '../data/schema'
 import { DataTableRowActions } from './data-table-row-actions'
+import { maskPhone } from '@/utils/data-masking'
 
 // Memoized cell components for better performance
 const UsernameCell = memo(({ username }: { username: string }) => (
@@ -113,7 +114,7 @@ export const usersColumns: ColumnDef<User>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Phone Number' />
     ),
-    cell: ({ row }) => <div>{row.getValue('phoneNumber')}</div>,
+    cell: ({ row }) => <div dir='ltr'>{maskPhone(row.getValue('phoneNumber'))}</div>,
     enableSorting: false,
   },
   {

@@ -47,7 +47,9 @@ export async function getActiveSessions(): Promise<SessionsResponse> {
     return response.data
   } catch (error: any) {
     // Return empty array on error to prevent UI crash
-    console.error('Failed to fetch sessions:', error)
+    if (import.meta.env.DEV) {
+      console.error('Failed to fetch sessions:', error)
+    }
     return {
       success: false,
       data: {

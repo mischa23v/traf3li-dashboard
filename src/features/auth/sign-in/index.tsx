@@ -133,6 +133,12 @@ export function SignIn() {
     return () => clearInterval(timer);
   }, [waitTime]);
 
+  // Validate redirect URL to prevent open redirect attacks
+  const isValidRedirect = (url: string): boolean => {
+    if (!url || url.startsWith('//') || url.includes('://')) return false;
+    return url.startsWith('/');
+  };
+
   // Get login identifier
   const getLoginIdentifier = useCallback((username: string): string => {
     return username.toLowerCase().trim();
@@ -206,7 +212,7 @@ export function SignIn() {
 
       // Navigate to redirect URL or dashboard
       // No firm check needed - lawyers without firm are treated as solo lawyers
-      const redirectTo = (search as any).redirect || '/';
+      const redirectTo = isValidRedirect((search as any).redirect) ? (search as any).redirect : '/';
 
       // Check if MFA verification is required
       if (currentUser?.mfaEnabled || currentUser?.mfaPending) {

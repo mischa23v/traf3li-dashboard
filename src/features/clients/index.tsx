@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
+import { maskPhone, maskEmail } from '@/utils/data-masking'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -485,13 +486,13 @@ function ClientsContent() {
                                 {client.phone && (
                                   <div className="flex items-center gap-2 text-sm text-slate-600">
                                     <Phone className="h-4 w-4 text-slate-400" />
-                                    <span dir="ltr">{client.phone}</span>
+                                    <span dir="ltr">{maskPhone(client.phone)}</span>
                                   </div>
                                 )}
                                 {client.email && (
                                   <div className="flex items-center gap-2 text-sm text-slate-600">
                                     <Mail className="h-4 w-4 text-slate-400" />
-                                    <span className="truncate max-w-[200px]" dir="ltr">{client.email}</span>
+                                    <span className="truncate max-w-[200px]" dir="ltr">{maskEmail(client.email)}</span>
                                   </div>
                                 )}
                                 {client.city && (

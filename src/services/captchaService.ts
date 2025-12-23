@@ -49,7 +49,9 @@ export async function verifyCaptchaToken(
     )
     return response.data
   } catch (error: any) {
-    console.error('CAPTCHA verification failed:', error)
+    if (import.meta.env.DEV) {
+      console.error('CAPTCHA verification failed:', error)
+    }
     throw new Error(
       error?.response?.data?.message || 'Failed to verify CAPTCHA'
     )
@@ -68,7 +70,9 @@ export async function getCaptchaSettings(): Promise<CaptchaSettings> {
 
     return response.data
   } catch (error: any) {
-    console.warn('Failed to fetch CAPTCHA settings, using cached or default:', error)
+    if (import.meta.env.DEV) {
+      console.warn('Failed to fetch CAPTCHA settings, using cached or default:', error)
+    }
 
     // Try to get cached settings
     const cached = localStorage.getItem(CAPTCHA_SETTINGS_KEY)
@@ -106,7 +110,9 @@ export async function updateCaptchaSettings(
 
     return response.data
   } catch (error: any) {
-    console.error('Failed to update CAPTCHA settings:', error)
+    if (import.meta.env.DEV) {
+      console.error('Failed to update CAPTCHA settings:', error)
+    }
     throw new Error(
       error?.response?.data?.message || 'Failed to update CAPTCHA settings'
     )
@@ -126,7 +132,9 @@ export async function checkCaptchaRequired(
     )
     return response.data
   } catch (error: any) {
-    console.warn('Failed to check CAPTCHA requirement:', error)
+    if (import.meta.env.DEV) {
+      console.warn('Failed to check CAPTCHA requirement:', error)
+    }
 
     // Default to not required on error
     return { required: false }

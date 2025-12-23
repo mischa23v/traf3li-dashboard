@@ -191,6 +191,7 @@ export function MFAVerificationModal({
                 }}
                 placeholder="XXXX-XXXX"
                 disabled={isLoading}
+                autoComplete="off"
                 autoFocus
                 className={cn(
                   'w-full rounded-md border px-3 py-2 text-center font-mono text-lg tracking-widest',

@@ -10,6 +10,7 @@ import { clientStatusColors, clientStatuses, contactMethods, identityTypes, veri
 import { type Client } from '../data/schema'
 import { DataTableRowActions } from './data-table-row-actions'
 import { useTranslation } from 'react-i18next'
+import { maskPhone, maskEmail } from '@/utils/data-masking'
 
 // Helper to get display name for a client
 const getDisplayName = (client: Client): string => {
@@ -131,7 +132,7 @@ export const useClientsColumns = (): ColumnDef<Client>[] => {
       ),
       cell: ({ row }) => (
         <div className='w-fit ps-2 text-nowrap' dir='ltr'>
-          {row.getValue('phone')}
+          {maskPhone(row.getValue('phone'))}
         </div>
       ),
     },
@@ -141,7 +142,7 @@ export const useClientsColumns = (): ColumnDef<Client>[] => {
         <DataTableColumnHeader column={column} title={t('clients.columns.email')} />
       ),
       cell: ({ row }) => (
-        <div className='w-fit ps-2 text-nowrap'>{row.getValue('email') || '-'}</div>
+        <div className='w-fit ps-2 text-nowrap'>{maskEmail(row.getValue('email')) || '-'}</div>
       ),
     },
     {

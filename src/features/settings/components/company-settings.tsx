@@ -17,6 +17,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { useCompanySettings, useUpdateCompanySettings, useUpdateCompanyLogo } from '@/hooks/useBillingSettings'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
+import { validateFile, FILE_TYPES, SIZE_LIMITS } from '@/lib/file-validation'
 
 export default function CompanySettings() {
     const { data: companyData, isLoading, isError } = useCompanySettings()
@@ -87,9 +88,21 @@ export default function CompanySettings() {
 
     const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
-        if (file) {
-            await updateLogoMutation.mutateAsync(file)
+        if (!file) return
+
+        // Validate file
+        const validation = validateFile(file, {
+            allowedTypes: FILE_TYPES.IMAGES,
+            maxSize: SIZE_LIMITS.LOGO,
+        })
+
+        if (!validation.valid) {
+            toast.error(validation.errorAr || validation.error)
+            e.target.value = ''
+            return
         }
+
+        await updateLogoMutation.mutateAsync(file)
     }
 
     if (isLoading) {
@@ -159,7 +172,7 @@ export default function CompanySettings() {
                                         <input
                                             type="file"
                                             id="logo-upload"
-                                            accept="image/*"
+                                            accept=".jpg,.jpeg,.png,.gif,.webp,.svg"
                                             className="hidden"
                                             onChange={handleLogoUpload}
                                         />
@@ -425,6 +438,7 @@ export default function CompanySettings() {
                                             value={formData.iban}
                                             onChange={handleChange}
                                             placeholder="SA0000000000000000000000"
+                                            autoComplete="off"
                                             dir="ltr"
                                         />
                                     </div>
@@ -436,6 +450,7 @@ export default function CompanySettings() {
                                             value={formData.bankAccountNumber}
                                             onChange={handleChange}
                                             placeholder="0000000000"
+                                            autoComplete="off"
                                             dir="ltr"
                                         />
                                     </div>

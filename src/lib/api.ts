@@ -41,6 +41,7 @@ import {
   isAbortError,
 } from './request-cancellation'
 import { generateDeviceFingerprint, getStoredFingerprint, storeDeviceFingerprint } from './device-fingerprint'
+import { sanitizeUrlParam } from '@/utils/redirectValidation'
 
 // Cached device fingerprint for request headers
 let cachedDeviceFingerprint: string | null = null
@@ -110,7 +111,7 @@ const getCsrfToken = (): string => {
   }
 
   // Debug logging for CSRF token issues (only log once per session to avoid spam)
-  if (!getCsrfToken.hasLoggedWarning) {
+  if (!getCsrfToken.hasLoggedWarning && import.meta.env.DEV) {
     getCsrfToken.hasLoggedWarning = true
     const availableCookies = cookies ? cookies.split(';').map(c => c.trim().split('=')[0]).filter(Boolean) : []
     console.warn('[CSRF] No csrf-token found. Available cookies:', availableCookies,
@@ -649,9 +650,10 @@ apiClient.interceptors.response.use(
           })
         })
 
-        // Redirect to login with reason
+        // Redirect to login with reason (sanitized to prevent injection)
         setTimeout(() => {
-          window.location.href = `/sign-in?reason=${reason || 'session_expired'}`
+          const sanitizedReason = sanitizeUrlParam(reason || 'session_expired')
+          window.location.href = `/sign-in?reason=${sanitizedReason}`
         }, 2000)
 
         return Promise.reject({
@@ -664,12 +666,14 @@ apiClient.interceptors.response.use(
       }
 
       // Log other 401s but don't redirect - let auth system handle it
-      console.warn('[API] 401 Unauthorized:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        message: error.response?.data?.message,
-        timestamp: new Date().toISOString(),
-      })
+      if (import.meta.env.DEV) {
+        console.warn('[API] 401 Unauthorized:', {
+          url: error.config?.url,
+          method: error.config?.method,
+          message: error.response?.data?.message,
+          timestamp: new Date().toISOString(),
+        })
+      }
     }
 
     // Handle 400 with "Unauthorized" message
@@ -677,12 +681,14 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 400) {
       const message = error.response?.data?.message?.toLowerCase() || ''
       if (message.includes('unauthorized') || message.includes('access denied') || message.includes('relogin')) {
-        console.warn('[API] 400 with auth message:', {
-          url: error.config?.url,
-          method: error.config?.method,
-          message: error.response?.data?.message,
-          timestamp: new Date().toISOString(),
-        })
+        if (import.meta.env.DEV) {
+          console.warn('[API] 400 with auth message:', {
+            url: error.config?.url,
+            method: error.config?.method,
+            message: error.response?.data?.message,
+            timestamp: new Date().toISOString(),
+          })
+        }
         // Don't clear localStorage or redirect - let auth system handle it
       }
     }

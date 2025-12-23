@@ -38,6 +38,8 @@ import { FinanceSidebar } from './finance-sidebar'
 import { useCreateExpense } from '@/hooks/useFinance'
 import { useCases, useClients } from '@/hooks/useCasesAndClients'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { validateFile, FILE_TYPES, SIZE_LIMITS } from '@/lib/file-validation'
+import { toast } from 'sonner'
 
 // Expense categories matching the interface with icons
 const expenseCategories = [
@@ -274,27 +276,60 @@ export function CreateExpenseView() {
     // Handle receipt upload
     const handleReceiptUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
-        if (file) {
-            const reader = new FileReader()
-            reader.onload = () => {
-                setReceiptImage(reader.result as string)
-            }
-            reader.readAsDataURL(file)
+        if (!file) return
+
+        // Validate file
+        const allowedTypes = [...FILE_TYPES.IMAGES, ...FILE_TYPES.DOCUMENTS]
+        const validation = validateFile(file, {
+            allowedTypes,
+            maxSize: SIZE_LIMITS.ATTACHMENT,
+        })
+
+        if (!validation.valid) {
+            toast.error(validation.errorAr || validation.error)
+            e.target.value = ''
+            return
         }
+
+        const reader = new FileReader()
+        reader.onload = () => {
+            setReceiptImage(reader.result as string)
+        }
+        reader.readAsDataURL(file)
     }
 
     // Handle attachment upload
     const handleAttachmentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files
-        if (files) {
-            const newAttachments = Array.from(files).map(file => ({
-                type: 'other',
-                filename: file.name,
-                url: URL.createObjectURL(file),
-                size: file.size,
-            }))
-            setAttachments(prev => [...prev, ...newAttachments])
+        if (!files || files.length === 0) return
+
+        const allowedTypes = [...FILE_TYPES.IMAGES, ...FILE_TYPES.DOCUMENTS, ...FILE_TYPES.SPREADSHEETS]
+        const validAttachments: any[] = []
+
+        Array.from(files).forEach(file => {
+            const validation = validateFile(file, {
+                allowedTypes,
+                maxSize: SIZE_LIMITS.ATTACHMENT,
+            })
+
+            if (!validation.valid) {
+                toast.error(`${file.name}: ${validation.errorAr || validation.error}`)
+            } else {
+                validAttachments.push({
+                    type: 'other',
+                    filename: file.name,
+                    url: URL.createObjectURL(file),
+                    size: file.size,
+                })
+            }
+        })
+
+        if (validAttachments.length > 0) {
+            setAttachments(prev => [...prev, ...validAttachments])
         }
+
+        // Reset input
+        e.target.value = ''
     }
 
     // Remove attachment
@@ -690,7 +725,7 @@ export function CreateExpenseView() {
                                     <div className="space-y-4">
                                         <Input
                                             type="file"
-                                            accept="image/*,.pdf"
+                                            accept=".jpg,.jpeg,.png,.webp,.pdf"
                                             onChange={handleReceiptUpload}
                                             className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 file:text-emerald-600 file:bg-emerald-50 file:border-0 file:rounded-lg file:me-4 file:px-4 file:py-2 hover:file:bg-emerald-100"
                                         />
@@ -1604,7 +1639,7 @@ export function CreateExpenseView() {
 
                                                 <Input
                                                     type="file"
-                                                    accept="*"
+                                                    accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.xls,.xlsx"
                                                     multiple
                                                     onChange={handleAttachmentUpload}
                                                     className="rounded-xl border-slate-200 file:text-slate-600 file:bg-slate-50 file:border-0 file:rounded-lg file:me-4 file:px-4 file:py-2 hover:file:bg-slate-100"

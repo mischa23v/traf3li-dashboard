@@ -684,6 +684,7 @@ export function CreateClientView() {
                                                     "rounded-xl border-slate-200",
                                                     nationalId && !isValidNationalId(nationalId) && "border-red-500"
                                                 )}
+                                                autoComplete="off"
                                                 dir="ltr"
                                                 maxLength={10}
                                             />

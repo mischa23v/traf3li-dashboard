@@ -533,21 +533,20 @@ export function SignUpForm() {
       setLoading(true);
       try {
         const isLawyer = formData.userType === 'lawyer';
-        const payload = { 
-          username: formData.username, 
-          email: formData.email, 
-          password: formData.password, 
-          phone: formData.phone, 
-          firstName: formData.firstName, 
-          lastName: formData.lastName, 
-          description: formData.bio || null, 
-          isSeller: isLawyer, 
-          role: isLawyer ? 'lawyer' : 'client', 
-          lawyerMode: isLawyer ? formData.lawyerMode : null, 
-          country: 'Saudi Arabia', 
-          nationality: formData.nationality || null, 
-          region: formData.region || null, 
-          city: formData.city || null 
+        const payload = {
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          phone: formData.phone,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          description: formData.bio || null,
+          isSeller: isLawyer,
+          lawyerMode: isLawyer ? formData.lawyerMode : null,
+          country: 'Saudi Arabia',
+          nationality: formData.nationality || null,
+          region: formData.region || null,
+          city: formData.city || null
         };
         
         // Dashboard lawyer fields

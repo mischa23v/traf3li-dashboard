@@ -564,10 +564,8 @@ const firmService = {
         { firmId }
       )
 
-      // Store the new token
-      if (response.data.data.token) {
-        localStorage.setItem('token', response.data.data.token)
-      }
+      // Token is securely stored in httpOnly cookie by the backend
+      // No client-side token storage needed to prevent XSS vulnerabilities
 
       return response.data.data
     } catch (error: any) {

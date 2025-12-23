@@ -29,12 +29,11 @@ export interface ErrorHandlerResult {
 
 /**
  * Clear all local authentication state
+ * Note: Tokens are stored in httpOnly cookies and managed by the backend
  */
 export function clearLocalAuthState(): void {
   localStorage.removeItem('user')
-  localStorage.removeItem('token')
   sessionStorage.removeItem('user')
-  sessionStorage.removeItem('token')
 }
 
 /**

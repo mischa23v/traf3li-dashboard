@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
+import { maskAccountNumber } from '@/utils/data-masking'
 import {
     Select,
     SelectContent,
@@ -41,6 +42,7 @@ import {
     useCaseProfitabilityReport,
 } from '@/hooks/useAccounting'
 import { formatSAR } from '@/lib/currency'
+import { maskPhone } from '@/utils/data-masking'
 import { format, startOfMonth, endOfMonth, startOfYear, endOfYear, startOfQuarter, endOfQuarter, subMonths } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
 
@@ -1068,7 +1070,7 @@ export function FullReportsView() {
                                                     </h2>
                                                     <div className="company-details text-sm text-slate-500 space-y-1">
                                                         {companyData?.address && <p>{isRTL ? companyData.addressAr || companyData.address : companyData.address}</p>}
-                                                        {companyData?.phone && <p>{companyData.phone}</p>}
+                                                        {companyData?.phone && <p>{maskPhone(companyData.phone)}</p>}
                                                         {companyData?.vatNumber && (
                                                             <p>{isRTL ? 'الرقم الضريبي: ' : 'VAT: '}{companyData.vatNumber}</p>
                                                         )}
@@ -1361,7 +1363,7 @@ function TrialBalanceContent({ data, isRTL, formatCurrency }: {
                 <tbody>
                     {data.accounts?.map((item: any, idx: number) => (
                         <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50">
-                            <td className="py-2 px-4 text-slate-600 font-mono text-sm">{item.accountNumber}</td>
+                            <td className="py-2 px-4 text-slate-600 font-mono text-sm">{maskAccountNumber(item.accountNumber)}</td>
                             <td className="py-2 px-4 text-slate-700">{isRTL ? item.accountAr : item.account}</td>
                             <td className={`py-2 px-4 ${isRTL ? 'text-start' : 'text-end'} font-medium text-emerald-600`}>
                                 {item.debit > 0 ? formatCurrency(item.debit) : '-'}

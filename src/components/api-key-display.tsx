@@ -29,7 +29,9 @@ export function ApiKeyDisplay({ apiKey, className, showLabel = true }: ApiKeyDis
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch (err) {
-      console.error('Failed to copy API key:', err)
+      if (import.meta.env.DEV) {
+        console.error('Failed to copy API key:', err)
+      }
     }
   }
 
@@ -110,7 +112,9 @@ export function CreatedKeyDisplay({ apiKey, onClose }: CreatedKeyDisplayProps) {
       await navigator.clipboard.writeText(apiKey)
       setCopied(true)
     } catch (err) {
-      console.error('Failed to copy API key:', err)
+      if (import.meta.env.DEV) {
+        console.error('Failed to copy API key:', err)
+      }
     }
   }
 

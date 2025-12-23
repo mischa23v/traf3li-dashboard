@@ -30,6 +30,7 @@ import { clientStatusColors, contactMethods } from '../data/data'
 import { type Client } from '../data/schema'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
+import { maskPhone, maskEmail, maskNationalID } from '@/utils/data-masking'
 
 type ClientViewDialogProps = {
   open: boolean
@@ -107,7 +108,7 @@ export function ClientsViewDialog({
                     {t('clients.form.phone')}<Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" />
                   </p>
                   <p className='font-medium' dir='ltr'>
-                    {currentRow.phone}
+                    {maskPhone(currentRow.phone)}
                   </p>
                 </div>
               </div>
@@ -119,7 +120,7 @@ export function ClientsViewDialog({
                       {t('clients.form.alternatePhone')}<Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" />
                     </p>
                     <p className='font-medium' dir='ltr'>
-                      {currentRow.alternatePhone}
+                      {maskPhone(currentRow.alternatePhone)}
                     </p>
                   </div>
                 </div>
@@ -132,7 +133,7 @@ export function ClientsViewDialog({
                       {t('clients.form.email')}<Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" />
                     </p>
                     <p className='font-medium' dir='ltr'>
-                      {currentRow.email}
+                      {maskEmail(currentRow.email)}
                     </p>
                   </div>
                 </div>
@@ -165,7 +166,7 @@ export function ClientsViewDialog({
                     <p className='text-sm text-muted-foreground'>
                       {t('clients.form.nationalId')}<Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" />
                     </p>
-                    <p className='font-medium'>{currentRow.nationalId}</p>
+                    <p className='font-medium'>{maskNationalID(currentRow.nationalId)}</p>
                   </div>
                 </div>
               </div>

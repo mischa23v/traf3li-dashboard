@@ -275,9 +275,6 @@ export function usePlanFeatures(): UsePlanFeaturesReturn {
     setUpgradeFeature(feature || null)
 
     // TODO: Implement modal or navigation to upgrade page
-    // For now, just log to console
-    console.log('Upgrade prompt requested', { feature })
-
     // Example implementation:
     // - Show modal with upgrade benefits
     // - Highlight the required plan for the feature

@@ -265,6 +265,7 @@ export function OtpInput({ email, onVerify, onResend, className }: OtpInputProps
             onKeyDown={(e) => handleKeyDown(index, e)}
             onPaste={index === 0 ? handlePaste : undefined}
             disabled={isVerifying || isSending}
+            autoComplete="off"
             className={cn(
               'w-12 h-14 text-center text-2xl font-semibold',
               'border-2 rounded-lg',

@@ -53,7 +53,9 @@ async function fetchButtonCount(
     const endpoint = getCountEndpoint(entityType, entityId, buttonId)
 
     if (!endpoint) {
-      console.warn(`No endpoint configured for ${entityType}.${buttonId}`)
+      if (import.meta.env.DEV) {
+        console.warn(`No endpoint configured for ${entityType}.${buttonId}`)
+      }
       return 0
     }
 
@@ -75,7 +77,9 @@ async function fetchButtonCount(
 
     return 0
   } catch (error) {
-    console.error(`Error fetching count for ${entityType}.${buttonId}:`, error)
+    if (import.meta.env.DEV) {
+      console.error(`Error fetching count for ${entityType}.${buttonId}:`, error)
+    }
     return 0
   }
 }
@@ -236,7 +240,9 @@ export function useSmartButtonCountsBatch(
 
         return response.data as Record<string, number>
       } catch (error) {
-        console.error('Batch count fetch failed:', error)
+        if (import.meta.env.DEV) {
+          console.error('Batch count fetch failed:', error)
+        }
 
         // Fallback to individual fetches
         const counts: Record<string, number> = {}

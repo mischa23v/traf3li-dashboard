@@ -79,7 +79,9 @@ export const CaptchaChallenge = forwardRef<CaptchaChallengeRef, CaptchaChallenge
       ) {
         hasAutoExecuted.current = true
         captcha.execute().catch((err) => {
-          console.error('Auto-execute CAPTCHA failed:', err)
+          if (import.meta.env.DEV) {
+            console.error('Auto-execute CAPTCHA failed:', err)
+          }
         })
       }
     }, [autoExecute, captcha.isReady, mode, captcha.execute])

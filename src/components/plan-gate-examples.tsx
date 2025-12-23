@@ -100,7 +100,7 @@ export function ConditionalButtonExample() {
       <h2>Settings</h2>
 
       {hasAuditLogs && (
-        <Button onClick={() => console.log('View audit logs')}>
+        <Button onClick={() => {/* View audit logs functionality */}}>
           View Audit Logs
         </Button>
       )}
@@ -159,8 +159,8 @@ export function UpgradePromptVariantsExample() {
         requiredPlan="enterprise"
         variant="modal"
         open={false} // Control with state
-        onClose={() => console.log('Modal closed')}
-        onUpgrade={() => console.log('Upgrade clicked')}
+        onClose={() => {/* Handle modal close */}}
+        onUpgrade={() => {/* Handle upgrade click */}}
       />
     </div>
   )

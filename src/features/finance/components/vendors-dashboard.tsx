@@ -28,6 +28,7 @@ import { useVendors } from '@/hooks/useAccounting'
 import { FinanceSidebar } from './finance-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { formatCurrency } from '@/lib/currency'
+import { maskEmail, maskPhone } from '@/utils/data-masking'
 import { VendorsActionDialog } from './vendors-action-dialog'
 import { VendorsDeleteDialog } from './vendors-delete-dialog'
 import { type Vendor } from '@/services/accountingService'
@@ -362,13 +363,13 @@ export default function VendorsDashboard() {
                                                                 {vendor.email && (
                                                                     <span className="flex items-center gap-1">
                                                                         <Mail className="h-3 w-3" aria-hidden="true" />
-                                                                        {vendor.email}
+                                                                        {maskEmail(vendor.email)}
                                                                     </span>
                                                                 )}
                                                                 {vendor.phone && (
                                                                     <span className="flex items-center gap-1">
                                                                         <Phone className="h-3 w-3" aria-hidden="true" />
-                                                                        {vendor.phone}
+                                                                        {maskPhone(vendor.phone)}
                                                                     </span>
                                                                 )}
                                                             </div>

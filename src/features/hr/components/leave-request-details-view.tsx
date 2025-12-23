@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { maskNationalID } from '@/utils/data-masking'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -467,7 +468,7 @@ export function LeaveRequestDetailsView() {
                                     </div>
                                     <div className="flex justify-between py-2 border-b">
                                         <span className="text-slate-500">رقم الهوية</span>
-                                        <span className="font-medium text-navy">{request.nationalId}</span>
+                                        <span className="font-medium text-navy">{maskNationalID(request.nationalId)}</span>
                                     </div>
                                     {request.department && (
                                         <div className="flex justify-between py-2 border-b">

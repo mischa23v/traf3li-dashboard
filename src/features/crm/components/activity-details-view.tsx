@@ -48,6 +48,7 @@ import type { ActivityType, ActivityStatus } from '@/types/crm'
 import { format } from 'date-fns'
 import { ar } from 'date-fns/locale'
 import { SalesSidebar } from './sales-sidebar'
+import { maskPhone } from '@/utils/data-masking'
 
 const typeLabels: Record<ActivityType, string> = {
   call: 'مكالمة',
@@ -368,7 +369,7 @@ export function ActivityDetailsView() {
                         {activity.callData.phoneNumber && (
                           <div className="p-3 bg-slate-50 rounded-xl">
                             <p className="text-xs text-slate-500 mb-1">الرقم</p>
-                            <p className="font-medium text-navy" dir="ltr">{activity.callData.phoneNumber}</p>
+                            <p className="font-medium text-navy" dir="ltr">{maskPhone(activity.callData.phoneNumber)}</p>
                           </div>
                         )}
                         {activity.callData.duration && (

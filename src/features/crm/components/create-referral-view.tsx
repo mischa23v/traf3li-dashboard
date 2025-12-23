@@ -1005,6 +1005,7 @@ export function CreateReferralView() {
                           placeholder="SA..."
                           className="rounded-xl"
                           dir="ltr"
+                          autoComplete="off"
                           value={formData.iban}
                           onChange={(e) => handleChange('iban', e.target.value)}
                         />

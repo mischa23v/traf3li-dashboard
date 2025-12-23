@@ -52,6 +52,7 @@ import type { ReferralStatus, ReferralType, ReferredLead } from '@/types/crm'
 import { formatDistanceToNow, format } from 'date-fns'
 import { ar } from 'date-fns/locale'
 import { SalesSidebar } from './sales-sidebar'
+import { maskPhone, maskEmail } from '@/utils/data-masking'
 
 const statusLabels: Record<ReferralStatus, string> = {
   active: 'نشط',
@@ -366,7 +367,7 @@ export function ReferralDetailsView() {
                                     <Phone className="h-5 w-5 text-green-500" aria-hidden="true" />
                                     <div>
                                       <p className="text-xs text-slate-500">الهاتف</p>
-                                      <p className="font-medium text-navy" dir="ltr">{referral.externalSource.phone}</p>
+                                      <p className="font-medium text-navy" dir="ltr">{maskPhone(referral.externalSource.phone)}</p>
                                     </div>
                                   </div>
                                 )}
@@ -375,7 +376,7 @@ export function ReferralDetailsView() {
                                     <Mail className="h-5 w-5 text-blue-500" aria-hidden="true" />
                                     <div>
                                       <p className="text-xs text-slate-500">البريد</p>
-                                      <p className="font-medium text-navy">{referral.externalSource.email}</p>
+                                      <p className="font-medium text-navy">{maskEmail(referral.externalSource.email)}</p>
                                     </div>
                                   </div>
                                 )}

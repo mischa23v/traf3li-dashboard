@@ -104,7 +104,9 @@ async function logAccountLockout(identifier: string, lockedUntil: Date): Promise
     })
   } catch (error) {
     // Audit logging failure shouldn't prevent rate limiting
-    console.error('Failed to log account lockout:', error)
+    if (import.meta.env.DEV) {
+      console.error('Failed to log account lockout:', error)
+    }
   }
 }
 
@@ -131,7 +133,9 @@ async function logFailedAttempt(
     })
   } catch (error) {
     // Audit logging failure shouldn't prevent rate limiting
-    console.error('Failed to log failed attempt:', error)
+    if (import.meta.env.DEV) {
+      console.error('Failed to log failed attempt:', error)
+    }
   }
 }
 

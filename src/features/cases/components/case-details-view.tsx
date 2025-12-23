@@ -1,6 +1,9 @@
 import { useState, useMemo } from 'react'
+import { maskNationalID, maskPhone } from '@/utils/data-masking'
 import { Link, useParams, Outlet, useLocation } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { validateFile, FILE_TYPES, SIZE_LIMITS } from '@/lib/file-validation'
+import { toast } from 'sonner'
 import {
   FileText,
   Calendar,
@@ -689,6 +692,26 @@ export function CaseDetailsView() {
   }
 
   // Document handlers
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file
+    const allowedTypes = [...FILE_TYPES.DOCUMENTS, ...FILE_TYPES.IMAGES]
+    const validation = validateFile(file, {
+      allowedTypes,
+      maxSize: SIZE_LIMITS.DOCUMENT,
+    })
+
+    if (!validation.valid) {
+      toast.error(validation.errorAr || validation.error)
+      e.target.value = ''
+      return
+    }
+
+    setUploadFile(file)
+  }
+
   const handleUploadDocument = async () => {
     if (!uploadFile || !uploadCategory) return
     await uploadDocMutation.mutateAsync({
@@ -989,16 +1012,16 @@ export function CaseDetailsView() {
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         {/* Phone */}
                         {(caseData.clientPhone || (caseData.plaintiff?.type === 'individual' && 'phone' in caseData.plaintiff && caseData.plaintiff.phone)) && (
-                          <div className="flex items-center gap-1 text-slate-500">
+                          <div className="flex items-center gap-1 text-slate-500" dir="ltr">
                             <Phone className="h-3 w-3" aria-hidden="true" />
-                            {caseData.clientPhone || (caseData.plaintiff?.type === 'individual' && 'phone' in caseData.plaintiff ? caseData.plaintiff.phone : '')}
+                            {maskPhone(caseData.clientPhone || (caseData.plaintiff?.type === 'individual' && 'phone' in caseData.plaintiff ? caseData.plaintiff.phone : ''))}
                           </div>
                         )}
                         {/* National ID */}
                         {caseData.plaintiff?.type === 'individual' && 'nationalId' in caseData.plaintiff && caseData.plaintiff.nationalId && (
                           <div className="flex items-center gap-1 text-slate-500">
                             <User className="h-3 w-3" aria-hidden="true" />
-                            رقم الهوية: {caseData.plaintiff.nationalId}
+                            رقم الهوية: {maskNationalID(caseData.plaintiff.nationalId)}
                           </div>
                         )}
                         {/* Unified National Number */}
@@ -1078,16 +1101,16 @@ export function CaseDetailsView() {
                         <div className="grid grid-cols-2 gap-2 text-xs">
                           {/* Phone */}
                           {caseData.defendant?.type === 'individual' && 'phone' in caseData.defendant && caseData.defendant.phone && (
-                            <div className="flex items-center gap-1 text-slate-500">
+                            <div className="flex items-center gap-1 text-slate-500" dir="ltr">
                               <Phone className="h-3 w-3" aria-hidden="true" />
-                              {caseData.defendant.phone}
+                              {maskPhone(caseData.defendant.phone)}
                             </div>
                           )}
                           {/* National ID */}
                           {caseData.defendant?.type === 'individual' && 'nationalId' in caseData.defendant && caseData.defendant.nationalId && (
                             <div className="flex items-center gap-1 text-slate-500">
                               <User className="h-3 w-3" aria-hidden="true" />
-                              رقم الهوية: {caseData.defendant.nationalId}
+                              رقم الهوية: {maskNationalID(caseData.defendant.nationalId)}
                             </div>
                           )}
                           {/* Unified National Number */}
@@ -1734,8 +1757,8 @@ export function CaseDetailsView() {
                                   id="file-upload"
                                   type="file"
                                   className="hidden"
-                                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.tiff"
-                                  onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                  onChange={handleFileSelect}
                                 />
                               </div>
 

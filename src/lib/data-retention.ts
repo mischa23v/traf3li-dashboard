@@ -94,7 +94,9 @@ function saveRetentionState(state: RetentionState): void {
   try {
     localStorage.setItem(RETENTION_STORAGE_KEY, JSON.stringify(state))
   } catch {
-    console.warn('[Data Retention] Failed to save retention state')
+    if (import.meta.env.DEV) {
+      console.warn('[Data Retention] Failed to save retention state')
+    }
   }
 }
 

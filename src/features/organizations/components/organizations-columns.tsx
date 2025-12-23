@@ -9,6 +9,7 @@ import { organizationStatusColors, organizationTypes, organizationSizes } from '
 import { type Organization } from '../data/schema'
 import { OrganizationsRowActions } from './data-table-row-actions'
 import { useTranslation } from 'react-i18next'
+import { maskEmail } from '@/utils/data-masking'
 
 export function useOrganizationsColumns(): ColumnDef<Organization>[] {
   const { t, i18n } = useTranslation()
@@ -112,7 +113,7 @@ export function useOrganizationsColumns(): ColumnDef<Organization>[] {
         if (!email) return <span className='text-muted-foreground'>-</span>
         return (
           <span className='text-sm' dir='ltr'>
-            {email}
+            {maskEmail(email)}
           </span>
         )
       },

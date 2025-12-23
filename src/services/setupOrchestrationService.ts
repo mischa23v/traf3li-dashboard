@@ -142,7 +142,9 @@ class SetupOrchestrationService {
       const response = await apiClient.get<SetupOrchestrationStatus>('/setup-orchestration/status')
       return response.data
     } catch (error) {
-      console.error('Failed to fetch setup status:', error)
+      if (import.meta.env.DEV) {
+        console.error('Failed to fetch setup status:', error)
+      }
       // Return default status if API fails
       return {
         overallProgress: 0,
@@ -186,7 +188,9 @@ class SetupOrchestrationService {
     try {
       await apiClient.post(`/setup-orchestration/modules/${module}/complete`)
     } catch (error) {
-      console.error(`Failed to mark ${module} as complete:`, error)
+      if (import.meta.env.DEV) {
+        console.error(`Failed to mark ${module} as complete:`, error)
+      }
       throw error
     }
   }
@@ -214,7 +218,9 @@ class SetupOrchestrationService {
     try {
       await apiClient.post(`/setup-orchestration/modules/${module}/skip`)
     } catch (error) {
-      console.error(`Failed to mark ${module} as skipped:`, error)
+      if (import.meta.env.DEV) {
+        console.error(`Failed to mark ${module} as skipped:`, error)
+      }
       throw error
     }
   }
@@ -254,7 +260,9 @@ class SetupOrchestrationService {
     try {
       await apiClient.post(`/setup-orchestration/modules/${progress.module}/progress`, progress)
     } catch (error) {
-      console.error(`Failed to save ${progress.module} progress:`, error)
+      if (import.meta.env.DEV) {
+        console.error(`Failed to save ${progress.module} progress:`, error)
+      }
       throw error
     }
   }
@@ -283,7 +291,9 @@ class SetupOrchestrationService {
       const response = await apiClient.get<SetupProgress>(`/setup-orchestration/modules/${module}/progress`)
       return response.data
     } catch (error) {
-      console.error(`Failed to fetch ${module} progress:`, error)
+      if (import.meta.env.DEV) {
+        console.error(`Failed to fetch ${module} progress:`, error)
+      }
       return null
     }
   }
@@ -321,7 +331,9 @@ class SetupOrchestrationService {
 
       return incompleteModules[0] || null
     } catch (error) {
-      console.error('Failed to get next incomplete module:', error)
+      if (import.meta.env.DEV) {
+        console.error('Failed to get next incomplete module:', error)
+      }
       return null
     }
   }
@@ -353,7 +365,9 @@ class SetupOrchestrationService {
     try {
       await apiClient.post('/setup-orchestration/reset')
     } catch (error) {
-      console.error('Failed to reset setup progress:', error)
+      if (import.meta.env.DEV) {
+        console.error('Failed to reset setup progress:', error)
+      }
       throw error
     }
   }
@@ -384,7 +398,9 @@ class SetupOrchestrationService {
       const status = await this.getSetupStatus()
       return status.hasCriticalSetupPending
     } catch (error) {
-      console.error('Failed to check setup reminder:', error)
+      if (import.meta.env.DEV) {
+        console.error('Failed to check setup reminder:', error)
+      }
       return false
     }
   }

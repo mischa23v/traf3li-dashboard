@@ -1,4 +1,5 @@
 import { HRSidebar } from './hr-sidebar'
+import { maskNationalID } from '@/utils/data-masking'
 import { useState } from 'react'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
@@ -379,7 +380,7 @@ export function OffboardingDetailsView() {
                             </div>
                             <div className="flex justify-between">
                               <span className="text-slate-500">رقم الهوية</span>
-                              <span className="font-medium">{offboarding.nationalId}</span>
+                              <span className="font-medium">{maskNationalID(offboarding.nationalId)}</span>
                             </div>
                             <div className="flex justify-between">
                               <span className="text-slate-500">المسمى الوظيفي</span>

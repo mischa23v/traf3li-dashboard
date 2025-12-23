@@ -30,6 +30,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import type { ThreadResModel } from '@/types/message'
+import { validateFile, FILE_TYPES, SIZE_LIMITS } from '@/lib/file-validation'
+import { toast } from 'sonner'
 
 interface ChatterInputProps {
   resModel: ThreadResModel
@@ -126,9 +128,34 @@ export function ChatterInput({
   // Handle file selection
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
-    if (files.length > 0) {
-      setAttachments((prev) => [...prev, ...files])
+    if (files.length === 0) return
+
+    // Validate files
+    const allowedTypes = [
+      ...FILE_TYPES.IMAGES,
+      ...FILE_TYPES.DOCUMENTS,
+      ...FILE_TYPES.SPREADSHEETS,
+      ...FILE_TYPES.TEXT,
+    ]
+
+    const validFiles: File[] = []
+    for (const file of files) {
+      const validation = validateFile(file, {
+        allowedTypes,
+        maxSize: SIZE_LIMITS.ATTACHMENT,
+      })
+
+      if (!validation.valid) {
+        toast.error(`${file.name}: ${validation.errorAr || validation.error}`)
+      } else {
+        validFiles.push(file)
+      }
     }
+
+    if (validFiles.length > 0) {
+      setAttachments((prev) => [...prev, ...validFiles])
+    }
+
     // Reset input
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
@@ -299,7 +326,7 @@ export function ChatterInput({
             multiple
             className="hidden"
             onChange={handleFileSelect}
-            accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+            accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.txt"
           />
 
           {/* Mention Helper */}

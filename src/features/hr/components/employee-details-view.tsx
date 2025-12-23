@@ -26,6 +26,7 @@ import { arSA } from 'date-fns/locale'
 import type { EmploymentStatus, EmploymentType, ContractType } from '@/services/hrService'
 import { EducationSection } from '@/components/hr/employees/EducationSection'
 import { WorkHistorySection } from '@/components/hr/employees/WorkHistorySection'
+import { maskIBAN, maskPhone, maskEmail, maskNationalID } from '@/utils/data-masking'
 
 export function EmployeeDetailsView() {
     const { employeeId } = useParams({ strict: false }) as { employeeId: string }
@@ -277,7 +278,7 @@ export function EmployeeDetailsView() {
                                                         <CardContent className="space-y-3">
                                                             <div className="flex justify-between text-sm">
                                                                 <span className="text-slate-500">رقم الهوية<Lock className="h-3 w-3 text-slate-500 inline ms-1" /></span>
-                                                                <span className="font-medium text-slate-900">{employee.personalInfo?.nationalId || 'غير محدد'}</span>
+                                                                <span className="font-medium text-slate-900">{employee.personalInfo?.nationalId ? maskNationalID(employee.personalInfo.nationalId) : 'غير محدد'}</span>
                                                             </div>
                                                             <div className="flex justify-between text-sm">
                                                                 <span className="text-slate-500">الجنسية</span>
@@ -318,11 +319,11 @@ export function EmployeeDetailsView() {
                                                         <CardContent className="space-y-3">
                                                             <div className="flex justify-between text-sm">
                                                                 <span className="text-slate-500">الجوال<Lock className="h-3 w-3 text-slate-500 inline ms-1" /></span>
-                                                                <span className="font-medium text-slate-900" dir="ltr">{employee.personalInfo?.mobile || 'غير محدد'}</span>
+                                                                <span className="font-medium text-slate-900" dir="ltr">{employee.personalInfo?.mobile ? maskPhone(employee.personalInfo.mobile) : 'غير محدد'}</span>
                                                             </div>
                                                             <div className="flex justify-between text-sm">
                                                                 <span className="text-slate-500">البريد الإلكتروني<Lock className="h-3 w-3 text-slate-500 inline ms-1" /></span>
-                                                                <span className="font-medium text-slate-900" dir="ltr">{employee.personalInfo?.email || 'غير محدد'}</span>
+                                                                <span className="font-medium text-slate-900" dir="ltr">{employee.personalInfo?.email ? maskEmail(employee.personalInfo.email) : 'غير محدد'}</span>
                                                             </div>
                                                             <div className="flex justify-between text-sm">
                                                                 <span className="text-slate-500">المدينة</span>
@@ -356,7 +357,7 @@ export function EmployeeDetailsView() {
                                                             </div>
                                                             <div>
                                                                 <span className="text-sm text-slate-500 block">رقم الهاتف<Lock className="h-3 w-3 text-slate-500 inline ms-1" /></span>
-                                                                <span className="font-medium text-slate-900" dir="ltr">{employee.personalInfo?.emergencyContact?.phone || 'غير محدد'}</span>
+                                                                <span className="font-medium text-slate-900" dir="ltr">{employee.personalInfo?.emergencyContact?.phone ? maskPhone(employee.personalInfo.emergencyContact.phone) : 'غير محدد'}</span>
                                                             </div>
                                                         </div>
                                                     </CardContent>
@@ -538,7 +539,7 @@ export function EmployeeDetailsView() {
                                                             </div>
                                                             <div>
                                                                 <span className="text-sm text-slate-500 block">رقم الآيبان (IBAN)<Lock className="h-3 w-3 text-slate-500 inline ms-1" /></span>
-                                                                <span className="font-medium text-slate-900" dir="ltr">{employee.compensation?.bankDetails?.iban || 'غير محدد'}</span>
+                                                                <span className="font-medium text-slate-900" dir="ltr">{employee.compensation?.bankDetails?.iban ? maskIBAN(employee.compensation.bankDetails.iban) : 'غير محدد'}</span>
                                                             </div>
                                                         </div>
                                                     </CardContent>

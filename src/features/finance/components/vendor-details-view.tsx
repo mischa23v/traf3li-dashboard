@@ -21,6 +21,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { useVendor, useDeleteVendor, useBills } from '@/hooks/useAccounting'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { FinanceSidebar } from './finance-sidebar'
+import { maskIBAN, maskAccountNumber, maskEmail, maskPhone } from '@/utils/data-masking'
 
 export default function VendorDetailsView() {
     const { vendorId } = useParams({ from: '/_authenticated/dashboard/finance/vendors/$vendorId' })
@@ -241,7 +242,7 @@ export default function VendorDetailsView() {
                                                     <Mail className="h-4 w-4" aria-hidden="true" />
                                                     البريد الإلكتروني<Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
                                                 </p>
-                                                <p className="font-medium text-navy">{vendor.email}</p>
+                                                <p className="font-medium text-navy">{maskEmail(vendor.email)}</p>
                                             </div>
                                         )}
                                         {vendor.phone && (
@@ -250,7 +251,7 @@ export default function VendorDetailsView() {
                                                     <Phone className="h-4 w-4" aria-hidden="true" />
                                                     رقم الهاتف<Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
                                                 </p>
-                                                <p className="font-medium text-navy">{vendor.phone}</p>
+                                                <p className="font-medium text-navy">{maskPhone(vendor.phone)}</p>
                                             </div>
                                         )}
                                         {vendor.category && (
@@ -329,13 +330,13 @@ export default function VendorDetailsView() {
                                             {vendor.bankAccountNumber && (
                                                 <div>
                                                     <p className="text-sm text-slate-500 mb-1">رقم الحساب<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></p>
-                                                    <p className="font-medium text-navy font-mono">{vendor.bankAccountNumber}</p>
+                                                    <p className="font-medium text-navy font-mono">{maskAccountNumber(vendor.bankAccountNumber)}</p>
                                                 </div>
                                             )}
                                             {vendor.iban && (
                                                 <div className="col-span-2">
                                                     <p className="text-sm text-slate-500 mb-1">رقم الآيبان (IBAN)<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></p>
-                                                    <p className="font-medium text-navy font-mono">{vendor.iban}</p>
+                                                    <p className="font-medium text-navy font-mono">{maskIBAN(vendor.iban)}</p>
                                                 </div>
                                             )}
                                         </div>

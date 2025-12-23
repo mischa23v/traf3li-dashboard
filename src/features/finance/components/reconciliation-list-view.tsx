@@ -17,6 +17,7 @@ import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { Input } from '@/components/ui/input'
+import { maskAccountNumber } from '@/utils/data-masking'
 import {
     Search, Bell, Building2, Plus, MoreHorizontal, ChevronLeft,
     Eye, Trash2, Edit3, SortAsc, X, CheckCircle2, XCircle, Clock, ArrowRightLeft,
@@ -474,7 +475,7 @@ export function ReconciliationListView() {
                                                         {getStatusBadge(account.status)}
                                                         {getConnectionBadge(account.isConnected)}
                                                     </div>
-                                                    <p className="text-slate-500 text-sm">{account.bankName} • {account.accountNumber}</p>
+                                                    <p className="text-slate-500 text-sm">{account.bankName} • {maskAccountNumber(account.accountNumber)}</p>
                                                 </div>
                                             </div>
                                             <DropdownMenu>

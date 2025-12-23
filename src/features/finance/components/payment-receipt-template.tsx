@@ -482,8 +482,7 @@ export function useReceiptTemplate() {
     }
 
     const downloadAsPDF = async () => {
-        // Integrate with html2canvas or jsPDF
-        console.log('Download as PDF functionality - integrate with library')
+        // TODO: Integrate with html2canvas or jsPDF
     }
 
     return {

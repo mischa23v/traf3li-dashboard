@@ -16,6 +16,16 @@ import { verifyMFA, verifyBackupCode } from '@/services/mfa.service'
 import { useAuthStore } from '@/stores/auth-store'
 
 /**
+ * Validates redirect URLs to prevent open redirect vulnerabilities
+ * Only allows relative paths that start with '/'
+ * Blocks absolute URLs and protocol-relative URLs
+ */
+const isValidRedirect = (url: string): boolean => {
+  if (!url || url.startsWith('//') || url.includes('://')) return false
+  return url.startsWith('/')
+}
+
+/**
  * MFA Challenge Page
  * Shown after successful password login when MFA is enabled
  * NCA ECC 2-1-3 Compliance
@@ -38,8 +48,9 @@ export function MFAChallenge() {
   const [useBackupCode, setUseBackupCode] = useState(false)
   const [backupCode, setBackupCode] = useState('')
 
-  // Get redirect URL from search params
-  const redirectTo = (search as any)?.redirect || '/'
+  // Get redirect URL from search params with validation to prevent open redirect
+  const rawRedirect = (search as any)?.redirect || '/'
+  const redirectTo = isValidRedirect(rawRedirect) ? rawRedirect : '/'
   // Get userId - either from user object or from search params (set during login)
   const userId = user?._id || (search as any)?.userId || ''
 
@@ -271,6 +282,7 @@ export function MFAChallenge() {
                         className="w-full h-12 px-4 text-center font-mono text-lg tracking-wider rounded-xl border border-slate-200 bg-slate-50 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
                         maxLength={10}
                         disabled={isLoading}
+                        autoComplete="off"
                         autoFocus
                       />
                     </div>

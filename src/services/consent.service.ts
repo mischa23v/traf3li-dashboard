@@ -187,7 +187,9 @@ export async function syncConsentsWithBackend(): Promise<void> {
       updateConsents(localConsents as Record<ConsentCategory, boolean>)
     }
   } catch (error) {
-    console.warn('[Consent Service] Failed to sync consents with backend:', error)
+    if (import.meta.env.DEV) {
+      console.warn('[Consent Service] Failed to sync consents with backend:', error)
+    }
   }
 }
 

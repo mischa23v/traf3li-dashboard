@@ -7,6 +7,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { format, formatDistanceToNow } from 'date-fns'
 import { ar, enUS } from 'date-fns/locale'
+import DOMPurify from 'dompurify'
 import {
   MessageSquare,
   StickyNote,
@@ -273,7 +274,7 @@ function MessageItem({ message, isArabic, onToggleStar, onDelete, onEdit }: Mess
           {message.body && (
             <div
               className="prose prose-sm max-w-none dark:prose-invert text-sm"
-              dangerouslySetInnerHTML={{ __html: renderMentions(message.body) }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(renderMentions(message.body)) }}
             />
           )}
 

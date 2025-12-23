@@ -336,6 +336,7 @@ export function OffboardingCreateView() {
                       onChange={(e) => setNationalId(e.target.value)}
                       placeholder="رقم الهوية الوطنية أو الإقامة"
                       className="h-11 rounded-xl"
+                      autoComplete="off"
                     />
                   </div>
                   <div className="space-y-2">

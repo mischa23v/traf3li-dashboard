@@ -195,10 +195,11 @@ export function TasksListView() {
         } catch (err) {
             // Don't set error state if request was aborted (user navigated away or refreshed)
             if (err instanceof Error && err.name === 'AbortError') {
-                console.log('AI suggestion request aborted')
                 return
             }
-            console.error('AI suggestion error:', err)
+            if (import.meta.env.DEV) {
+                console.error('AI suggestion error:', err)
+            }
             setAiError(true)
         } finally {
             clearTimeout(timeoutId)

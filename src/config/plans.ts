@@ -475,7 +475,9 @@ export function getAllPlans(): PlanConfig[] {
 export function hasFeature(userPlan: PlanId, feature: FeatureId): boolean {
   const featureConfig = FEATURES[feature];
   if (!featureConfig) {
-    console.warn(`Unknown feature: ${feature}`);
+    if (import.meta.env.DEV) {
+      console.warn(`Unknown feature: ${feature}`);
+    }
     return false;
   }
   return featureConfig.plans.includes(userPlan);

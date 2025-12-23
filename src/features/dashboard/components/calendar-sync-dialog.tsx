@@ -35,6 +35,7 @@ import { Separator } from '@/components/ui/separator'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { toast } from 'sonner'
 import eventsService from '@/services/eventsService'
+import { validateFile, FILE_TYPES, SIZE_LIMITS } from '@/lib/file-validation'
 
 interface CalendarProvider {
   id: string
@@ -196,6 +197,25 @@ export function CalendarSyncDialog({ open, onOpenChange }: CalendarSyncDialogPro
   }
 
   // Import from ICS file
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file
+    const validation = validateFile(file, {
+      allowedTypes: FILE_TYPES.CALENDAR,
+      maxSize: 5 * 1024 * 1024, // 5MB
+    })
+
+    if (!validation.valid) {
+      toast.error(validation.errorAr || validation.error)
+      e.target.value = ''
+      return
+    }
+
+    setImportFile(file)
+  }
+
   const handleImport = async () => {
     if (!importFile) {
       toast.error('يرجى اختيار ملف للاستيراد')
@@ -432,7 +452,7 @@ END:VCALENDAR`
                   <Input
                     type="file"
                     accept=".ics,.ical"
-                    onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+                    onChange={handleFileSelect}
                     className="text-sm"
                   />
                   <Button

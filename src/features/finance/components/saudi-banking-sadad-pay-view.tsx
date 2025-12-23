@@ -33,6 +33,7 @@ import {
     type SADADBiller,
     type SADADBill
 } from '@/hooks/useSaudiBanking'
+import { maskIBAN } from '@/utils/data-masking'
 
 // Biller category icons
 const categoryIcons: Record<string, any> = {
@@ -428,7 +429,7 @@ export function SaudiBankingSADADPayView() {
                                                         <SelectItem key={acc.iban} value={acc.iban}>
                                                             <div>
                                                                 <p className="font-medium">{acc.name}</p>
-                                                                <p className="text-xs text-slate-500 font-mono">{acc.iban}</p>
+                                                                <p className="text-xs text-slate-500 font-mono">{maskIBAN(acc.iban)}</p>
                                                             </div>
                                                         </SelectItem>
                                                     ))}

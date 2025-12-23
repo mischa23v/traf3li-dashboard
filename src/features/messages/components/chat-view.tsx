@@ -20,6 +20,8 @@ import {
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { useConversations, useMessages, useSendMessage, useMarkAsRead } from '@/hooks/useChat'
 import { useAuthStore } from '@/stores/auth-store'
+import { validateFile, FILE_TYPES, SIZE_LIMITS } from '@/lib/file-validation'
+import { toast } from 'sonner'
 
 export function ChatView() {
     const [activeChat, setActiveChat] = useState<string | null>(null)
@@ -84,8 +86,32 @@ export function ChatView() {
 
     // Handle file selection
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            setSelectedFiles(Array.from(e.target.files))
+        if (!e.target.files) return
+
+        const files = Array.from(e.target.files)
+        const allowedTypes = [...FILE_TYPES.IMAGES, ...FILE_TYPES.DOCUMENTS, ...FILE_TYPES.TEXT]
+        const validFiles: File[] = []
+
+        for (const file of files) {
+            const validation = validateFile(file, {
+                allowedTypes,
+                maxSize: SIZE_LIMITS.ATTACHMENT,
+            })
+
+            if (!validation.valid) {
+                toast.error(`${file.name}: ${validation.errorAr || validation.error}`)
+            } else {
+                validFiles.push(file)
+            }
+        }
+
+        if (validFiles.length > 0) {
+            setSelectedFiles(validFiles)
+        }
+
+        // Reset input
+        if (e.target) {
+            e.target.value = ''
         }
     }
 

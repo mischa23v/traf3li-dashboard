@@ -225,6 +225,7 @@ export function ClientsActionDialog({
                         <FormControl>
                           <Input
                             placeholder={t('clients.form.nationalIdPlaceholder')}
+                            autoComplete="off"
                             {...field}
                           />
                         </FormControl>

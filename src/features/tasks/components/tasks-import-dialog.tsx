@@ -21,6 +21,9 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { FILE_TYPES, SIZE_LIMITS, sanitizeFilename } from '@/lib/file-validation'
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 
 const formSchema = z.object({
   file: z
@@ -29,8 +32,12 @@ const formSchema = z.object({
       message: 'يرجى رفع ملف',
     })
     .refine(
-      (files) => ['text/csv'].includes(files?.[0]?.type),
+      (files) => FILE_TYPES.CSV.includes(files?.[0]?.type),
       'يرجى رفع ملف بصيغة CSV.'
+    )
+    .refine(
+      (files) => files?.[0]?.size <= MAX_FILE_SIZE,
+      'حجم الملف يتجاوز الحد الأقصى 10 ميجابايت'
     ),
 })
 
@@ -55,7 +62,7 @@ export function TasksImportDialog({
 
     if (file && file[0]) {
       const fileDetails = {
-        name: file[0].name,
+        name: sanitizeFilename(file[0].name),
         size: file[0].size,
         type: file[0].type,
       }
@@ -88,7 +95,7 @@ export function TasksImportDialog({
                 <FormItem className='my-2'>
                   <FormLabel>الملف</FormLabel>
                   <FormControl>
-                    <Input type='file' {...fileRef} className='h-8 py-0' />
+                    <Input type='file' accept='.csv' {...fileRef} className='h-8 py-0' />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

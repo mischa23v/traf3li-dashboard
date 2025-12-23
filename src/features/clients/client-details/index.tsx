@@ -51,6 +51,7 @@ import { ProductivityHero } from '@/components/productivity-hero'
 import { ClientsSidebar } from '../components/clients-sidebar'
 import { SmartButton, SmartButtonGroup, getSmartButtons, resolveNavigationPath } from '@/components/smart-button'
 import { useSmartButtonCounts } from '@/hooks/useSmartButtonCounts'
+import { maskPhone, maskEmail, maskNationalID } from '@/utils/data-masking'
 
 const route = getRouteApi('/_authenticated/dashboard/clients/$clientId')
 
@@ -381,7 +382,7 @@ export function ClientDetails() {
                                   </div>
                                   <div>
                                     <p className="text-xs text-slate-500">{t('clients.form.phone')}</p>
-                                    <p className="font-medium text-slate-900" dir="ltr">{client.phone}</p>
+                                    <p className="font-medium text-slate-900" dir="ltr">{maskPhone(client.phone)}</p>
                                   </div>
                                 </div>
                               )}
@@ -392,7 +393,7 @@ export function ClientDetails() {
                                   </div>
                                   <div>
                                     <p className="text-xs text-slate-500">{t('clients.form.email')}</p>
-                                    <p className="font-medium text-slate-900" dir="ltr">{client.email}</p>
+                                    <p className="font-medium text-slate-900" dir="ltr">{maskEmail(client.email)}</p>
                                   </div>
                                 </div>
                               )}
@@ -403,7 +404,7 @@ export function ClientDetails() {
                                   </div>
                                   <div>
                                     <p className="text-xs text-slate-500">{t('clients.form.alternatePhone')}</p>
-                                    <p className="font-medium text-slate-900" dir="ltr">{client.alternatePhone}</p>
+                                    <p className="font-medium text-slate-900" dir="ltr">{maskPhone(client.alternatePhone)}</p>
                                   </div>
                                 </div>
                               )}
@@ -457,7 +458,7 @@ export function ClientDetails() {
                                     </div>
                                     <div>
                                       <p className="text-xs text-slate-500">{t('clients.form.nationalId')}</p>
-                                      <p className="font-medium text-slate-900" dir="ltr">{client.nationalId}</p>
+                                      <p className="font-medium text-slate-900" dir="ltr">{maskNationalID(client.nationalId)}</p>
                                     </div>
                                   </div>
                                 )}
@@ -469,7 +470,7 @@ export function ClientDetails() {
                                     </div>
                                     <div>
                                       <p className="text-xs text-slate-500">{t('clients.form.iqamaNumber')}</p>
-                                      <p className="font-medium text-slate-900" dir="ltr">{client.iqamaNumber}</p>
+                                      <p className="font-medium text-slate-900" dir="ltr">{maskNationalID(client.iqamaNumber)}</p>
                                     </div>
                                   </div>
                                 )}
@@ -481,7 +482,7 @@ export function ClientDetails() {
                                     </div>
                                     <div>
                                       <p className="text-xs text-slate-500">{t('clients.form.gccId')}</p>
-                                      <p className="font-medium text-slate-900" dir="ltr">{client.gccId}</p>
+                                      <p className="font-medium text-slate-900" dir="ltr">{maskNationalID(client.gccId)}</p>
                                       {client.gccCountry && (
                                         <p className="text-xs text-slate-500">{client.gccCountry}</p>
                                       )}
@@ -496,7 +497,7 @@ export function ClientDetails() {
                                     </div>
                                     <div>
                                       <p className="text-xs text-slate-500">{t('clients.form.passportNumber')}</p>
-                                      <p className="font-medium text-slate-900" dir="ltr">{client.passportNumber}</p>
+                                      <p className="font-medium text-slate-900" dir="ltr">{maskNationalID(client.passportNumber)}</p>
                                       {client.passportCountry && (
                                         <p className="text-xs text-slate-500">{client.passportCountry}</p>
                                       )}

@@ -66,6 +66,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import type { LeadStatus, CrmActivity } from '@/types/crm'
 import { formatDistanceToNow, format } from 'date-fns'
 import { ar } from 'date-fns/locale'
+import { maskNationalID } from '@/utils/data-masking'
 import { SalesSidebar } from './sales-sidebar'
 
 const statusLabels: Record<LeadStatus, string> = {
@@ -450,7 +451,7 @@ export function LeadDetailsView() {
                                     </div>
                                     <div>
                                       <p className="text-xs text-slate-500">رقم الهوية الوطنية</p>
-                                      <p className="font-medium text-navy" dir="ltr">{lead.nationalId}</p>
+                                      <p className="font-medium text-navy" dir="ltr">{maskNationalID(lead.nationalId)}</p>
                                     </div>
                                   </div>
                                 )}
@@ -461,7 +462,7 @@ export function LeadDetailsView() {
                                     </div>
                                     <div>
                                       <p className="text-xs text-slate-500">رقم الإقامة</p>
-                                      <p className="font-medium text-navy" dir="ltr">{lead.iqamaNumber}</p>
+                                      <p className="font-medium text-navy" dir="ltr">{maskNationalID(lead.iqamaNumber)}</p>
                                     </div>
                                   </div>
                                 )}
@@ -472,7 +473,7 @@ export function LeadDetailsView() {
                                     </div>
                                     <div>
                                       <p className="text-xs text-slate-500">رقم جواز السفر</p>
-                                      <p className="font-medium text-navy" dir="ltr">{lead.passportNumber}</p>
+                                      <p className="font-medium text-navy" dir="ltr">{maskNationalID(lead.passportNumber)}</p>
                                       {lead.passportCountry && (
                                         <p className="text-xs text-slate-400">{lead.passportCountry}</p>
                                       )}

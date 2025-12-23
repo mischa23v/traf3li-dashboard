@@ -138,7 +138,9 @@ function saveConsentState(state: ConsentState): void {
     state.lastUpdated = new Date().toISOString()
     localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(state))
   } catch {
-    console.warn('[Consent Manager] Failed to save consent state')
+    if (import.meta.env.DEV) {
+      console.warn('[Consent Manager] Failed to save consent state')
+    }
   }
 }
 

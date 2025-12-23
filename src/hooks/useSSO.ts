@@ -11,6 +11,7 @@ import ssoService, {
   SaveProviderRequest,
   TestConnectionRequest,
 } from '@/services/ssoService'
+import { isValidOAuthUrl } from '@/utils/redirectValidation'
 
 // ==================== QUERY KEYS ====================
 
@@ -189,6 +190,12 @@ export const useInitiateSSOLogin = () => {
   return useMutation({
     mutationFn: (provider: 'google' | 'microsoft' | 'custom') => ssoService.initiateSSOLogin(provider),
     onSuccess: (response) => {
+      // Validate authorization URL to prevent open redirect attacks
+      if (!isValidOAuthUrl(response.authorizationUrl)) {
+        toast.error(isRTL ? 'عنوان URL غير صالح للمصادقة' : 'Invalid OAuth authorization URL')
+        console.error('[SSO] Invalid authorization URL:', response.authorizationUrl)
+        return
+      }
       // Redirect to SSO provider's authorization URL
       window.location.href = response.authorizationUrl
     },

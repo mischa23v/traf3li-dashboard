@@ -301,6 +301,14 @@ export function parseMentions(body: string): ParsedMention[] {
 }
 
 /**
+ * Escape HTML special characters to prevent XSS
+ * @param str - String to escape
+ * @returns HTML-safe string
+ */
+const escapeHtml = (str: string): string =>
+  str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c] || c))
+
+/**
  * Convert mention syntax to HTML for display
  *
  * @param body - Message body with mention syntax
@@ -313,6 +321,10 @@ export function parseMentions(body: string): ParsedMention[] {
 export function renderMentions(body: string): string {
   return body.replace(
     MENTION_REGEX,
-    '<span class="mention" data-user-id="$2">@$1</span>'
+    (_, displayName, userId) => {
+      const safeDisplayName = escapeHtml(displayName)
+      const safeUserId = escapeHtml(userId)
+      return `<span class="mention" data-user-id="${safeUserId}">@${safeDisplayName}</span>`
+    }
   )
 }

@@ -161,7 +161,9 @@ export function useCaptcha(options: UseCaptchaOptions): UseCaptchaReturn {
             window.grecaptcha.reset(widgetId)
           }
         } catch (err) {
-          console.error('Error removing CAPTCHA widget:', err)
+          if (import.meta.env.DEV) {
+            console.error('Error removing CAPTCHA widget:', err)
+          }
         }
       }
     }
@@ -322,7 +324,9 @@ export function useCaptcha(options: UseCaptchaOptions): UseCaptchaReturn {
         window.hcaptcha.reset(widgetId)
       }
     } catch (err) {
-      console.error('Error resetting CAPTCHA:', err)
+      if (import.meta.env.DEV) {
+        console.error('Error resetting CAPTCHA:', err)
+      }
     }
   }, [provider, widgetId])
 

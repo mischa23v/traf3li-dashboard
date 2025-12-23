@@ -24,6 +24,7 @@ import {
 import { format } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 import type { PaymentStatus } from '@/services/payrollService'
+import { maskIBAN } from '@/utils/data-masking'
 
 const MONTHS = [
     { value: 1, label: 'يناير' },
@@ -528,7 +529,7 @@ export function PayrollDetailsView() {
                                                                 </div>
                                                                 <div>
                                                                     <span className="text-sm text-slate-500 block">رقم الآيبان<Lock className="h-3 w-3 text-foreground/70 inline ms-1" /></span>
-                                                                    <span className="font-medium text-slate-900" dir="ltr">{slipData.payment.iban}</span>
+                                                                    <span className="font-medium text-slate-900" dir="ltr">{maskIBAN(slipData.payment.iban)}</span>
                                                                 </div>
                                                             </div>
                                                         )}

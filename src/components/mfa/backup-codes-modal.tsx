@@ -65,7 +65,9 @@ export function BackupCodesModal({
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch (err) {
-      console.error('Failed to copy backup codes:', err)
+      if (import.meta.env.DEV) {
+        console.error('Failed to copy backup codes:', err)
+      }
     }
   }
 

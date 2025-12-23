@@ -49,7 +49,9 @@ export const useLogAuditEvent = () => {
     },
     onError: (error: Error) => {
       // Silent fail for audit logs - don't disrupt user experience
-      console.error('[Audit] Failed to log event:', error.message)
+      if (import.meta.env.DEV) {
+        console.error('[Audit] Failed to log event:', error.message)
+      }
     },
   })
 }
@@ -68,7 +70,9 @@ export const useLogAuditEventsBatch = () => {
       queryClient.invalidateQueries({ queryKey: auditKeys.all })
     },
     onError: (error: Error) => {
-      console.error('[Audit] Failed to log batch events:', error.message)
+      if (import.meta.env.DEV) {
+        console.error('[Audit] Failed to log batch events:', error.message)
+      }
     },
   })
 }
@@ -268,7 +272,9 @@ export const useLogAction = () => {
     }
   ) => {
     if (!user) {
-      console.warn('[Audit] Cannot log action: No user context')
+      if (import.meta.env.DEV) {
+        console.warn('[Audit] Cannot log action: No user context')
+      }
       return
     }
 

@@ -320,6 +320,7 @@ export function SaudiBankingWPSCreateView() {
                                             value={establishment.iban}
                                             onChange={(e) => setEstablishment({ ...establishment, iban: e.target.value })}
                                             className="rounded-xl font-mono"
+                                            autoComplete="off"
                                             dir="ltr"
                                         />
                                     </div>
@@ -421,6 +422,7 @@ export function SaudiBankingWPSCreateView() {
                                                         value={emp.molId}
                                                         onChange={(e) => updateEmployee(index, 'molId', e.target.value)}
                                                         className="rounded-lg"
+                                                        autoComplete="off"
                                                         maxLength={10}
                                                     />
                                                 </div>
@@ -446,6 +448,7 @@ export function SaudiBankingWPSCreateView() {
                                                         value={emp.iban}
                                                         onChange={(e) => updateEmployee(index, 'iban', e.target.value)}
                                                         className="rounded-lg font-mono"
+                                                        autoComplete="off"
                                                         dir="ltr"
                                                     />
                                                 </div>

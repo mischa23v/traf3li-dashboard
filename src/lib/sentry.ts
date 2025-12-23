@@ -21,7 +21,9 @@ export const initSentry = async () => {
     })
   } catch {
     // @sentry/react not installed - Sentry disabled
-    console.debug('Sentry not available - install @sentry/react to enable error tracking')
+    if (import.meta.env.DEV) {
+      console.debug('Sentry not available - install @sentry/react to enable error tracking')
+    }
   }
 }
 

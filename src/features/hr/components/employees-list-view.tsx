@@ -16,7 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
-import { Search, Bell, AlertCircle, Users, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, Edit3, SortAsc, Filter, X, Building2, Phone, Mail, MapPin, Briefcase, Calendar, UserCog } from 'lucide-react'
+import { Search, Bell, AlertCircle, Users, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, Edit3, SortAsc, Filter, X, Building2, Phone, Mail, MapPin, Briefcase, Calendar, UserCog, Lock } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import { arSA } from 'date-fns/locale'
@@ -37,6 +37,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import type { Employee, EmploymentStatus, EmploymentType } from '@/services/hrService'
 import { VirtualList } from '@/components/virtual-list'
+import { maskPhone, maskEmail } from '@/utils/data-masking'
 
 export function EmployeesListView() {
     const navigate = useNavigate()
@@ -503,13 +504,15 @@ export function EmployeesListView() {
                                                                 {employee.mobile && (
                                                                     <span className="flex items-center gap-1">
                                                                         <Phone className="h-4 w-4" aria-hidden="true" />
-                                                                        {employee.mobile}
+                                                                        <Lock className="h-3 w-3" aria-hidden="true" />
+                                                                        {maskPhone(employee.mobile)}
                                                                     </span>
                                                                 )}
                                                                 {employee.email && (
                                                                     <span className="flex items-center gap-1">
                                                                         <Mail className="h-4 w-4" aria-hidden="true" />
-                                                                        {employee.email}
+                                                                        <Lock className="h-3 w-3" aria-hidden="true" />
+                                                                        {maskEmail(employee.email)}
                                                                     </span>
                                                                 )}
                                                             </div>

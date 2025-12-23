@@ -10,6 +10,7 @@ import { contactStatusColors, contactTypes, contactCategories } from '../data/da
 import { type Contact } from '../data/schema'
 import { ContactsRowActions } from './data-table-row-actions'
 import { useTranslation } from 'react-i18next'
+import { maskPhone, maskEmail } from '@/utils/data-masking'
 
 // Match clients-columns pattern exactly - NO useMemo
 // The `t` function changes reference on every render, causing useMemo with [t] dependency to trigger infinite loops
@@ -124,7 +125,7 @@ export function useContactsColumns(): ColumnDef<Contact>[] {
         if (!email) return <span className='text-muted-foreground'>-</span>
         return (
           <span className='text-sm' dir='ltr'>
-            {email}
+            {maskEmail(email)}
           </span>
         )
       },
@@ -139,7 +140,7 @@ export function useContactsColumns(): ColumnDef<Contact>[] {
         if (!phone) return <span className='text-muted-foreground'>-</span>
         return (
           <span className='font-medium' dir='ltr'>
-            {phone}
+            {maskPhone(phone)}
           </span>
         )
       },

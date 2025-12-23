@@ -44,6 +44,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ClientsSidebar } from '@/features/clients/components/clients-sidebar'
 import { useTranslation } from 'react-i18next'
+import { maskIBAN } from '@/utils/data-masking'
 
 const ORG_TYPE_LABELS: Record<string, string> = {
   llc: 'شركة ذات مسؤولية محدودة',
@@ -463,7 +464,7 @@ export function OrganizationDetailsView() {
                               {organization.iban && (
                                 <div className="p-4 bg-slate-50 rounded-xl">
                                   <p className="text-xs text-slate-500 mb-1">IBAN</p>
-                                  <p className="font-medium text-navy" dir="ltr">{organization.iban}</p>
+                                  <p className="font-medium text-navy" dir="ltr">{maskIBAN(organization.iban)}</p>
                                 </div>
                               )}
                               {organization.accountHolderName && (

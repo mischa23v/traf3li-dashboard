@@ -368,6 +368,7 @@ export function VendorsActionDialog({
                           <Input
                             placeholder="رقم الحساب"
                             dir='ltr'
+                            autoComplete="off"
                             {...field}
                           />
                         </FormControl>
@@ -385,6 +386,7 @@ export function VendorsActionDialog({
                           <Input
                             placeholder="SA00 0000 0000 0000 0000 0000"
                             dir='ltr'
+                            autoComplete="off"
                             {...field}
                           />
                         </FormControl>

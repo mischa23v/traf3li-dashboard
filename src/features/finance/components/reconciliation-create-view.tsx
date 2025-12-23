@@ -241,6 +241,7 @@ export function ReconciliationCreateView() {
                                                         value={apiKey}
                                                         onChange={(e) => setApiKey(e.target.value)}
                                                         className="rounded-xl font-mono"
+                                                        autoComplete="off"
                                                     />
                                                 </div>
                                             </div>

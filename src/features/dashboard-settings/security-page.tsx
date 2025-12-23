@@ -261,6 +261,7 @@ export function SecurityPage() {
                           type={showCurrentPassword ? 'text' : 'password'}
                           value={currentPassword}
                           onChange={(e) => setCurrentPassword(e.target.value)}
+                          autoComplete="current-password"
                         />
                         <Button
                           type="button"
@@ -280,6 +281,7 @@ export function SecurityPage() {
                           type={showNewPassword ? 'text' : 'password'}
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
+                          autoComplete="new-password"
                         />
                         <Button
                           type="button"
@@ -298,6 +300,7 @@ export function SecurityPage() {
                         type="password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
+                        autoComplete="new-password"
                       />
                     </div>
                   </div>
@@ -526,6 +529,7 @@ export function SecurityPage() {
                 type="password"
                 value={disablePassword}
                 onChange={(e) => setDisablePassword(e.target.value)}
+                autoComplete="current-password"
               />
             </div>
           </div>

@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { maskAccountNumber } from '@/utils/data-masking'
 import {
     Select,
     SelectContent,
@@ -392,7 +393,7 @@ export function ReconciliationDetailsView() {
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     <div>
                                         <div className="text-xs text-slate-500 mb-1">رقم الحساب</div>
-                                        <div className="font-mono text-sm font-medium">{bankFeed.accountNumber}</div>
+                                        <div className="font-mono text-sm font-medium">{maskAccountNumber(bankFeed.accountNumber)}</div>
                                     </div>
                                     <div>
                                         <div className="text-xs text-slate-500 mb-1">نوع الحساب</div>

@@ -9,6 +9,7 @@ import { staffStatusColors, staffStatuses, staffRoles } from '../data/data'
 import { type Staff } from '../data/schema'
 import { DataTableRowActions } from './data-table-row-actions'
 import { useTranslation } from 'react-i18next'
+import { maskEmail } from '@/utils/data-masking'
 
 export const useStaffColumns = (): ColumnDef<Staff>[] => {
   const { t } = useTranslation()
@@ -76,7 +77,7 @@ export const useStaffColumns = (): ColumnDef<Staff>[] => {
       ),
       cell: ({ row }) => (
         <div className='w-fit ps-2 text-nowrap' dir='ltr'>
-          {row.getValue('email')}
+          {maskEmail(row.getValue('email'))}
         </div>
       ),
     },

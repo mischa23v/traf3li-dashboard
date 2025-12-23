@@ -7,6 +7,7 @@
 
 import { io, Socket } from 'socket.io-client'
 import type { SocketSessionExpiredEvent, SocketForceLogoutEvent } from '@/types/api'
+import { sanitizeUrlParam } from '@/utils/redirectValidation'
 
 const SOCKET_URL =
   import.meta.env.VITE_API_URL?.replace('/api', '') ||
@@ -100,7 +101,8 @@ class SocketService {
       if (import.meta.env.DEV) {
         console.log('[Socket] Session expired:', data.reason)
       }
-      window.location.href = `/sign-in?reason=${data.reason || 'session_expired'}`
+      const sanitizedReason = sanitizeUrlParam(data.reason || 'session_expired')
+      window.location.href = `/sign-in?reason=${sanitizedReason}`
     })
 
     // Handle forced logout (e.g., account locked, permission revoked)
@@ -108,7 +110,8 @@ class SocketService {
       if (import.meta.env.DEV) {
         console.log('[Socket] Forced logout:', data.reason)
       }
-      window.location.href = `/sign-in?reason=${data.reason || 'forced'}`
+      const sanitizedReason = sanitizeUrlParam(data.reason || 'forced')
+      window.location.href = `/sign-in?reason=${sanitizedReason}`
     })
 
     // Handle account locked notification

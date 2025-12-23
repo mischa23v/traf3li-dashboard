@@ -75,7 +75,9 @@ export function useMarkModuleComplete() {
       toast.error('فشل حفظ الإعداد', {
         description: `حدث خطأ أثناء حفظ إعداد ${config.name}`,
       })
-      console.error('Failed to mark module as complete:', error)
+      if (import.meta.env.DEV) {
+        console.error('Failed to mark module as complete:', error)
+      }
     },
   })
 }
@@ -104,7 +106,9 @@ export function useMarkModuleSkipped() {
       toast.error('فشل تخطي الإعداد', {
         description: `حدث خطأ أثناء تخطي إعداد ${config.name}`,
       })
-      console.error('Failed to mark module as skipped:', error)
+      if (import.meta.env.DEV) {
+        console.error('Failed to mark module as skipped:', error)
+      }
     },
   })
 }
@@ -126,7 +130,9 @@ export function useSaveModuleProgress() {
       queryClient.invalidateQueries({ queryKey: setupOrchestrationKeys.status() })
     },
     onError: (error, progress) => {
-      console.error('Failed to save module progress:', error)
+      if (import.meta.env.DEV) {
+        console.error('Failed to save module progress:', error)
+      }
     },
   })
 }
@@ -206,7 +212,9 @@ export function useResetSetupProgress() {
       toast.error('فشلت إعادة التعيين', {
         description: 'حدث خطأ أثناء إعادة تعيين التقدم',
       })
-      console.error('Failed to reset setup progress:', error)
+      if (import.meta.env.DEV) {
+        console.error('Failed to reset setup progress:', error)
+      }
     },
   })
 }
