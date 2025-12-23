@@ -1,6 +1,24 @@
 /**
  * Consolidated Report Service
  * Handles multi-company consolidated reporting with currency conversion and inter-company eliminations
+ *
+ * Backend Routes (IMPLEMENTED):
+ * ✅ POST   /reports/consolidated/profit-loss       - Generate consolidated P&L report
+ * ✅ POST   /reports/consolidated/balance-sheet     - Generate consolidated balance sheet
+ * ✅ POST   /reports/consolidated/summary           - Get consolidation summary metrics
+ * ✅ POST   /reports/consolidated/export            - Export report (PDF/Excel/CSV)
+ * ✅ GET    /reports/consolidated/inter-company-transactions  - List inter-company transactions
+ * ✅ POST   /reports/consolidated/comparisons       - Get company metric comparisons
+ * ✅ GET    /reports/consolidated/elimination-rules           - List all elimination rules
+ * ✅ POST   /reports/consolidated/elimination-rules           - Create elimination rule
+ * ✅ PUT    /reports/consolidated/elimination-rules/:id       - Update elimination rule
+ * ✅ DELETE /reports/consolidated/elimination-rules/:id       - Delete elimination rule
+ * ✅ GET    /reports/consolidated/exchange-rates    - Get currency conversion rates
+ * ✅ POST   /reports/consolidated/exchange-rates    - Set manual exchange rate
+ *
+ * Enhanced Endpoints (IMPLEMENTED):
+ * ✅ GET    /consolidated-reports/auto-eliminations   - Auto-calculate IC eliminations
+ * ✅ GET    /consolidated-reports/full-statement      - Complete consolidated package
  */
 
 import apiClient, { handleApiError } from '@/lib/api'
@@ -680,6 +698,106 @@ const consolidatedReportService = {
       return response.data
     } catch (error: any) {
       throw new Error(handleApiError(error) || 'Failed to export consolidated report | فشل في تصدير التقرير الموحد')
+    }
+  },
+
+  // ==================== ENHANCED ENDPOINTS ====================
+
+  /**
+   * Auto-calculate inter-company eliminations
+   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * GET /api/consolidated-reports/auto-eliminations
+   *
+   * Automatically identifies and calculates inter-company eliminations
+   * based on configured rules and transaction patterns.
+   */
+  getAutoEliminations: async (
+    firmIds: string[],
+    startDate: string,
+    endDate: string
+  ): Promise<{
+    eliminations: InterCompanyTransaction[]
+    summary: {
+      totalTransactions: number
+      totalAmount: number
+      byType: { type: string; count: number; amount: number }[]
+    }
+    suggestedRules: Partial<EliminationRule>[]
+  }> => {
+    try {
+      const params = new URLSearchParams()
+      params.append('firmIds', firmIds.join(','))
+      params.append('startDate', startDate)
+      params.append('endDate', endDate)
+
+      const response = await apiClient.get(`/consolidated-reports/auto-eliminations?${params.toString()}`)
+      return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(
+        handleApiError(error) || 'Failed to calculate auto-eliminations | فشل في حساب الإلغاءات التلقائية'
+      )
+    }
+  },
+
+  /**
+   * Get complete consolidated statement package
+   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * GET /api/consolidated-reports/full-statement
+   *
+   * Returns a complete consolidated financial package including:
+   * - Balance Sheet
+   * - Profit & Loss
+   * - Elimination Schedule
+   * - Key Financial Ratios
+   */
+  getFullStatement: async (params: {
+    firmIds: string[]
+    startDate: string
+    endDate: string
+    baseCurrency?: string
+    includeEliminationSchedule?: boolean
+    includeRatios?: boolean
+  }): Promise<{
+    balanceSheet: ConsolidatedBalanceSheet
+    profitLoss: ConsolidatedProfitLoss
+    eliminationSchedule: {
+      entries: InterCompanyTransaction[]
+      summary: {
+        totalEliminated: number
+        byCategory: { category: string; amount: number }[]
+      }
+    }
+    ratios: {
+      currentRatio: number
+      quickRatio: number
+      debtToEquity: number
+      returnOnAssets: number
+      returnOnEquity: number
+      grossProfitMargin: number
+      netProfitMargin: number
+      assetTurnover: number
+    }
+    generatedAt: string
+  }> => {
+    try {
+      const queryParams = new URLSearchParams()
+      queryParams.append('firmIds', params.firmIds.join(','))
+      queryParams.append('startDate', params.startDate)
+      queryParams.append('endDate', params.endDate)
+      if (params.baseCurrency) queryParams.append('baseCurrency', params.baseCurrency)
+      if (params.includeEliminationSchedule !== undefined) {
+        queryParams.append('includeEliminationSchedule', String(params.includeEliminationSchedule))
+      }
+      if (params.includeRatios !== undefined) {
+        queryParams.append('includeRatios', String(params.includeRatios))
+      }
+
+      const response = await apiClient.get(`/consolidated-reports/full-statement?${queryParams.toString()}`)
+      return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(
+        handleApiError(error) || 'Failed to fetch full statement | فشل في جلب البيان الكامل'
+      )
     }
   },
 }

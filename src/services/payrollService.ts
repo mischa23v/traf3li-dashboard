@@ -1,4 +1,32 @@
+/**
+ * Payroll Service
+ * Handles all payroll-related API calls
+ * Base route: /api/payroll (salary slips)
+ * Base route: /api/hr/payroll-runs (payroll runs management)
+ *
+ * Salary Slip Routes (IMPLEMENTED):
+ * ✅ GET    /payroll                    - Get all salary slips
+ * ✅ GET    /payroll/:id                - Get single salary slip
+ * ✅ POST   /payroll                    - Create salary slip
+ * ✅ PUT    /payroll/:id                - Update salary slip
+ * ✅ DELETE /payroll/:id                - Delete salary slip
+ * ✅ POST   /payroll/:id/approve        - Approve salary slip
+ * ✅ POST   /payroll/:id/pay            - Mark as paid
+ * ✅ GET    /payroll/stats              - Get payroll statistics
+ * ✅ POST   /payroll/generate           - Generate bulk payroll
+ * ✅ POST   /payroll/approve            - Bulk approve
+ * ✅ POST   /payroll/pay                - Bulk pay
+ * ✅ POST   /payroll/wps/submit         - Submit to WPS
+ *
+ * Payroll Run Routes (IMPLEMENTED):
+ * ✅ POST   /hr/payroll-runs/:id/employees/:empId/exclude     - Exclude employee
+ * ✅ POST   /hr/payroll-runs/:id/employees/:empId/include     - Re-include employee
+ * ✅ POST   /hr/payroll-runs/:id/employees/:empId/recalculate - Recalculate employee
+ * ✅ GET    /hr/payroll-runs/:id/export                       - Export payroll report
+ */
+
 import { apiClient } from '@/lib/api'
+import { handleApiError } from '@/lib/api'
 
 // ==================== ENUMS & TYPES ====================
 
@@ -191,6 +219,63 @@ export interface SalarySlipsResponse {
     }
 }
 
+// ==================== PAYROLL RUN TYPES ====================
+
+export type PayrollRunStatus = 'draft' | 'processing' | 'completed' | 'cancelled'
+
+export interface PayrollRunEmployee {
+    employeeId: string
+    employeeName: string
+    employeeNameAr?: string
+    employeeNumber: string
+    department?: string
+    basicSalary: number
+    totalEarnings: number
+    totalDeductions: number
+    netPay: number
+    status: PaymentStatus
+    isExcluded: boolean
+    exclusionReason?: string
+    excludedAt?: string
+    excludedBy?: string
+}
+
+export interface PayrollRun {
+    _id: string
+    runId: string
+    runNumber: string
+    month: number
+    year: number
+    calendarType: CalendarType
+    periodStart: string
+    periodEnd: string
+    paymentDate: string
+    status: PayrollRunStatus
+    employees: PayrollRunEmployee[]
+    totalEmployees: number
+    excludedCount: number
+    totalGross: number
+    totalDeductions: number
+    totalNetPay: number
+    processedAt?: string
+    processedBy?: string
+    createdAt: string
+    updatedAt: string
+}
+
+export interface ExcludeEmployeeData {
+    reason: string
+}
+
+export interface RecalculateResult {
+    employee: PayrollRunEmployee
+    previousNetPay: number
+    newNetPay: number
+    difference: number
+}
+
+export type ExportFormat = 'csv' | 'json' | 'xlsx' | 'pdf'
+
 // ==================== API FUNCTIONS ====================
 
 export const payrollService = {
@@ -294,6 +379,77 @@ export const payrollService = {
     submitToWPS: async (ids: string[]): Promise<{ success: boolean; reference: string }> => {
         const response = await apiClient.post('/payroll/wps/submit', { ids })
         return response.data
+    },
+
+    // ==================== PAYROLL RUN MANAGEMENT ====================
+
+    /**
+     * Exclude employee from payroll run
+     * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+     * POST /api/hr/payroll-runs/:id/employees/:empId/exclude
+     */
+    excludeEmployee: async (runId: string, employeeId: string, data: ExcludeEmployeeData): Promise<PayrollRun> => {
+        try {
+            const response = await apiClient.post(`/hr/payroll-runs/${runId}/employees/${employeeId}/exclude`, data)
+            return response.data.payrollRun || response.data
+        } catch (error: any) {
+            throw new Error(
+                `Failed to exclude employee from payroll | فشل استبعاد الموظف من كشف الرواتب: ${handleApiError(error)}`
+            )
+        }
+    },
+
+    /**
+     * Re-include employee in payroll run
+     * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+     * POST /api/hr/payroll-runs/:id/employees/:empId/include
+     */
+    includeEmployee: async (runId: string, employeeId: string): Promise<PayrollRun> => {
+        try {
+            const response = await apiClient.post(`/hr/payroll-runs/${runId}/employees/${employeeId}/include`)
+            return response.data.payrollRun || response.data
+        } catch (error: any) {
+            throw new Error(
+                `Failed to include employee in payroll | فشل إضافة الموظف إلى كشف الرواتب: ${handleApiError(error)}`
+            )
+        }
+    },
+
+    /**
+     * Recalculate employee in payroll run
+     * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+     * POST /api/hr/payroll-runs/:id/employees/:empId/recalculate
+     */
+    recalculateEmployee: async (runId: string, employeeId: string): Promise<RecalculateResult> => {
+        try {
+            const response = await apiClient.post(`/hr/payroll-runs/${runId}/employees/${employeeId}/recalculate`)
+            return response.data
+        } catch (error: any) {
+            throw new Error(
+                `Failed to recalculate employee payroll | فشل إعادة حساب راتب الموظف: ${handleApiError(error)}`
+            )
+        }
+    },
+
+    /**
+     * Export payroll run report
+     * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+     * GET /api/hr/payroll-runs/:id/export?format=csv|json|xlsx|pdf
+     *
+     * Returns a Blob for file download
+     */
+    exportPayrollRun: async (runId: string, format: ExportFormat = 'csv'): Promise<Blob> => {
+        try {
+            const response = await apiClient.get(`/hr/payroll-runs/${runId}/export`, {
+                params: { format },
+                responseType: 'blob',
+            })
+            return response.data
+        } catch (error: any) {
+            throw new Error(
+                `Failed to export payroll report | فشل تصدير تقرير الرواتب: ${handleApiError(error)}`
+            )
+        }
     },
 }
 
