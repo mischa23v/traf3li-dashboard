@@ -1,9 +1,16 @@
 /**
  * Authentication Service
  * Handles all authentication-related API calls
+ *
+ * Supports:
+ * - Password-based login with dual tokens (access + refresh)
+ * - Magic link authentication (passwordless)
+ * - OTP-based authentication
+ * - Email verification
+ * - Token refresh
  */
 
-import { apiClientNoVersion, handleApiError } from '@/lib/api'
+import { apiClientNoVersion, handleApiError, storeTokens, clearTokens, resetApiState } from '@/lib/api'
 
 // Auth routes are NOT versioned - they're at /api/auth/*, not /api/v1/auth/*
 // So we use apiClientNoVersion (baseURL: https://api.traf3li.com/api)
@@ -120,6 +127,9 @@ export interface User {
   mfaMethod?: 'totp' | 'sms' | 'email' | null
   mfaRequired?: boolean
   mfaPending?: boolean // True when login succeeded but MFA verification is needed
+  // Email verification fields
+  isEmailVerified?: boolean
+  emailVerifiedAt?: string | null
   createdAt: string
   updatedAt: string
 }
@@ -196,12 +206,46 @@ export interface OTPStatusResponse {
 }
 
 /**
- * API Response Interface
+ * Magic Link Request Data
+ */
+export interface MagicLinkData {
+  email: string
+}
+
+/**
+ * Magic Link Response
+ */
+export interface MagicLinkResponse {
+  success: boolean
+  message: string
+  expiresIn?: number // seconds until link expires
+}
+
+/**
+ * Magic Link Verification Data
+ */
+export interface MagicLinkVerifyData {
+  token: string
+}
+
+/**
+ * Email Verification Response
+ */
+export interface EmailVerificationResponse {
+  success: boolean
+  message: string
+}
+
+/**
+ * API Response Interface with optional tokens
  */
 interface AuthResponse {
   error: boolean
   message: string
   user?: User
+  // Dual token authentication
+  accessToken?: string
+  refreshToken?: string
 }
 
 /**
@@ -288,7 +332,8 @@ const logAuthEvent = import.meta.env.DEV
 const authService = {
   /**
    * Login user
-   * Backend sets HttpOnly cookie automatically
+   * Backend returns access and refresh tokens for dual token auth
+   * Also sets HttpOnly cookie for backward compatibility
    */
   login: async (credentials: LoginCredentials): Promise<User> => {
     try {
@@ -303,6 +348,11 @@ const authService = {
 
       if (response.data.error || !response.data.user) {
         throw new Error(response.data.message || 'فشل تسجيل الدخول')
+      }
+
+      // Store dual tokens if provided
+      if (response.data.accessToken && response.data.refreshToken) {
+        storeTokens(response.data.accessToken, response.data.refreshToken)
       }
 
       // Normalize user data to ensure firmId is set
@@ -351,7 +401,7 @@ const authService = {
 
   /**
    * Logout user
-   * Clears HttpOnly cookie, localStorage, AND memory cache
+   * Clears tokens, HttpOnly cookie, localStorage, AND memory cache
    *
    * IMPORTANT: This is the ONLY place that should clear auth state.
    * getCurrentUser() should NEVER clear localStorage/memory - only logout() does.
@@ -370,6 +420,8 @@ const authService = {
     // Clear time-based request cache so next auth check makes a fresh request
     lastAuthRequestTime = 0
     lastAuthRequestResult = null
+    // Clear tokens and reset all API state (includes token refresh queue)
+    resetApiState()
   },
 
   /**
@@ -763,6 +815,11 @@ const authService = {
         throw new Error(response.data.message || 'فشل التحقق من رمز OTP')
       }
 
+      // Store dual tokens if provided
+      if (response.data.accessToken && response.data.refreshToken) {
+        storeTokens(response.data.accessToken, response.data.refreshToken)
+      }
+
       // Normalize user data to ensure firmId is set
       const user = normalizeUser(response.data.user)
 
@@ -826,6 +883,165 @@ const authService = {
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
+  },
+
+  // ==================== MAGIC LINK AUTHENTICATION ====================
+
+  /**
+   * Send magic link to email for passwordless authentication
+   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * POST /api/auth/magic-link/send
+   */
+  sendMagicLink: async (data: MagicLinkData): Promise<MagicLinkResponse> => {
+    try {
+      const response = await authApi.post<{
+        success: boolean
+        message: string
+        expiresIn?: number
+      }>('/auth/magic-link/send', data)
+
+      return {
+        success: response.data.success,
+        message: response.data.message,
+        expiresIn: response.data.expiresIn,
+      }
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Verify magic link token and login
+   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * POST /api/auth/magic-link/verify
+   */
+  verifyMagicLink: async (data: MagicLinkVerifyData): Promise<User> => {
+    try {
+      const response = await authApi.post<AuthResponse>(
+        '/auth/magic-link/verify',
+        data
+      )
+
+      if (response.data.error || !response.data.user) {
+        throw new Error(
+          response.data.message || 'فشل التحقق من رابط الدخول | Magic link verification failed'
+        )
+      }
+
+      // Store dual tokens if provided
+      if (response.data.accessToken && response.data.refreshToken) {
+        storeTokens(response.data.accessToken, response.data.refreshToken)
+      }
+
+      // Normalize user data to ensure firmId is set
+      const user = normalizeUser(response.data.user)
+
+      // Store user data in localStorage
+      localStorage.setItem('user', JSON.stringify(user))
+
+      // Also keep in memory as backup
+      memoryCachedUser = user
+
+      // Mark successful authentication
+      lastSuccessfulAuth = Date.now()
+      consecutive401Count = 0
+      logAuthEvent('VERIFY_MAGIC_LINK_SUCCESS', {
+        username: user.username,
+        userId: user._id,
+      })
+
+      return user
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ==================== EMAIL VERIFICATION ====================
+
+  /**
+   * Send email verification link to user's email
+   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * POST /api/auth/email/send-verification
+   */
+  sendVerificationEmail: async (): Promise<EmailVerificationResponse> => {
+    try {
+      const response = await authApi.post<{
+        success: boolean
+        message: string
+      }>('/auth/email/send-verification')
+
+      return {
+        success: response.data.success,
+        message: response.data.message,
+      }
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Verify email using token from verification link
+   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * POST /api/auth/email/verify
+   */
+  verifyEmail: async (token: string): Promise<EmailVerificationResponse> => {
+    try {
+      const response = await authApi.post<{
+        success: boolean
+        message: string
+      }>('/auth/email/verify', { token })
+
+      // If verification successful, update cached user
+      if (response.data.success) {
+        const cachedUser = authService.getCachedUser()
+        if (cachedUser) {
+          const updatedUser = {
+            ...cachedUser,
+            isEmailVerified: true,
+            emailVerifiedAt: new Date().toISOString(),
+          }
+          localStorage.setItem('user', JSON.stringify(updatedUser))
+          memoryCachedUser = updatedUser
+        }
+      }
+
+      return {
+        success: response.data.success,
+        message: response.data.message,
+      }
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Resend email verification link
+   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * POST /api/auth/email/resend-verification
+   */
+  resendVerificationEmail: async (): Promise<EmailVerificationResponse> => {
+    try {
+      const response = await authApi.post<{
+        success: boolean
+        message: string
+      }>('/auth/email/resend-verification')
+
+      return {
+        success: response.data.success,
+        message: response.data.message,
+      }
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Check if current user's email is verified
+   * Helper method that returns cached value
+   */
+  isEmailVerified: (): boolean => {
+    const user = authService.getCachedUser()
+    return user?.isEmailVerified === true
   },
 }
 
