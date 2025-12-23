@@ -4827,6 +4827,127 @@
     "delete": "Delete",
     "edit": "Edit",
     "processing": "Processing...",
-    "enter": "Enter"
+    "enter": "Enter",
+    "view": "View",
+    "leads": "leads",
+    "overdue": "overdue"
+  },
+  "mlScoring": {
+    "badge": "AI-Powered",
+    "title": "ML Lead Scoring",
+    "conversion": "Conversion",
+    "confidence": "Confidence",
+    "expectedValue": "Expected Value",
+    "slaDeadline": "SLA Deadline",
+    "assignedTo": "Assigned to",
+    "keyIndicators": "Key Indicators",
+    "refreshScore": "Refresh Score",
+    "model": "Model",
+    "lastScored": "Last scored",
+    "scoreCalculated": "Score calculated successfully",
+    "scoreCalculationFailed": "Failed to calculate score",
+    "batchPartialSuccess": "Calculated {{success}} scores, {{failed}} failed",
+    "batchSuccess": "Calculated {{count}} scores",
+    "batchFailed": "Batch calculation failed",
+    "contactRecorded": "Contact recorded successfully",
+    "contactFailed": "Failed to record contact",
+    "leadAssigned": "Lead assigned successfully",
+    "assignFailed": "Failed to assign lead",
+    "modelTrained": "Model trained successfully",
+    "trainingFailed": "Model training failed",
+    "dataExported": "Training data exported",
+    "exportFailed": "Export failed",
+    "noData": "No data available",
+    "loadError": "Failed to load data",
+    "priorityQueue": "Priority Queue",
+    "leads": "leads",
+    "overdue": "overdue",
+    "emptyQueue": "No leads in queue",
+    "emptyQueueDesc": "Great job! All leads have been contacted.",
+    "viewAll": "View All Leads",
+    "keyStrengths": "Key Strengths",
+    "areasOfConcern": "Areas of Concern",
+    "recommendedActions": "Recommended Actions",
+    "noStrengths": "No strengths identified",
+    "noConcerns": "No concerns identified",
+    "noActions": "No actions recommended",
+    "factorImpact": "Factor Impact Analysis",
+    "baseValue": "Base Value",
+    "positiveFactors": "Positive Factors",
+    "negativeFactors": "Negative Factors",
+    "nav": {
+      "analytics": "ML Analytics",
+      "queue": "Priority Queue",
+      "sla": "SLA Dashboard"
+    },
+    "features": {
+      "engagement": "Engagement",
+      "responseSpeed": "Response Speed",
+      "meetingReliability": "Meeting Reliability",
+      "activityTrend": "Activity Trend"
+    },
+    "filters": {
+      "all": "All",
+      "mine": "My Leads",
+      "unassigned": "Unassigned",
+      "overdue": "Overdue",
+      "allTiers": "All Tiers"
+    },
+    "tiers": {
+      "hot": "Hot",
+      "warm": "Warm",
+      "cool": "Cool",
+      "nurture": "Nurture"
+    },
+    "actions": {
+      "call": "Call",
+      "email": "Email",
+      "meeting": "Meeting",
+      "whatsapp": "WhatsApp",
+      "viewDetails": "View Details",
+      "assign": "Assign to Rep",
+      "retrain": "Retrain Model"
+    },
+    "sla": {
+      "title": "SLA Performance",
+      "successRate": "SLA Success Rate",
+      "currentBreaches": "Current Breaches",
+      "avgResponseTime": "Avg Response Time",
+      "byTier": "Performance by Priority Tier",
+      "tier": "Tier",
+      "target": "Target",
+      "avgResponse": "Avg Response",
+      "activeBreaches": "Active SLA Breaches",
+      "breachedAt": "Breached",
+      "moreBreaches": "And {{count}} more...",
+      "noBreaches": "No Active Breaches",
+      "allOnTrack": "All leads are on track with SLA!",
+      "loadError": "Failed to load SLA metrics"
+    },
+    "stats": {
+      "accuracy": "Accuracy",
+      "precision": "Precision",
+      "recall": "Recall",
+      "f1Score": "F1 Score"
+    },
+    "lastTrained": "Last trained",
+    "charts": {
+      "featureImportance": "Feature Importance",
+      "scoreDistribution": "Score Distribution"
+    },
+    "modelInfo": {
+      "title": "Model Information",
+      "version": "Version",
+      "auc": "AUC Score",
+      "trainingData": "Training Data",
+      "samples": "samples",
+      "lastTrained": "Last Trained"
+    },
+    "quickStats": {
+      "title": "Quick Stats",
+      "totalScored": "Total Scored",
+      "avgScore": "Average Score",
+      "conversionRate": "Conversion Rate"
+    }
   }
 }
