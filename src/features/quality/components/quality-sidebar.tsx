@@ -1,6 +1,6 @@
 /**
  * Quality Sidebar
- * Quick actions and widgets for quality management
+ * Complete navigation and widgets for quality management
  */
 
 import { Link } from '@tanstack/react-router'
@@ -9,25 +9,27 @@ import {
   ClipboardCheck,
   Plus,
   FileText,
-  BarChart3,
   Settings,
   AlertTriangle,
   CheckCircle2,
   XCircle,
+  Clock,
+  List,
 } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Progress } from '@/components/ui/progress'
 
-import { useQualityStats, useActions } from '@/hooks/use-quality'
+import { useQualityStats, useActions, useInspections } from '@/hooks/use-quality'
 
 export function QualitySidebar() {
   const { t } = useTranslation()
   const { data: stats, isLoading: loadingStats } = useQualityStats()
   const { data: openActions, isLoading: loadingActions } = useActions({ status: 'open' })
+  const { data: pendingInspections, isLoading: loadingPending } = useInspections({ status: 'pending' })
+  const { data: failedInspections, isLoading: loadingFailed } = useInspections({ status: 'failed' })
 
   return (
     <div className="space-y-6">
@@ -35,7 +37,7 @@ export function QualitySidebar() {
       <Card className="rounded-3xl">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
-            <ClipboardCheck className="w-5 h-5 text-emerald-600" />
+            <Plus className="w-5 h-5 text-emerald-600" />
             {t('quality.quickActions', 'إجراءات سريعة')}
           </CardTitle>
         </CardHeader>
@@ -43,66 +45,161 @@ export function QualitySidebar() {
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
             <Link to="/dashboard/quality/create">
               <Plus className="w-4 h-4 ml-2" />
-              {t('quality.createInspection', 'إنشاء فحص')}
+              {t('quality.newInspection', 'فحص جديد')}
               <kbd className="mr-auto bg-muted px-2 py-0.5 rounded text-xs">⌘N</kbd>
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/quality/templates">
+            <Link to="/dashboard/quality/templates/create">
               <FileText className="w-4 h-4 ml-2" />
-              {t('quality.templates', 'قوالب الفحص')}
+              {t('quality.newTemplate', 'قالب جديد')}
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/quality/actions">
+            <Link to="/dashboard/quality/actions/create">
               <AlertTriangle className="w-4 h-4 ml-2" />
-              {t('quality.actions', 'الإجراءات التصحيحية')}
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/quality/reports">
-              <BarChart3 className="w-4 h-4 ml-2" />
-              {t('quality.reports', 'التقارير')}
+              {t('quality.newAction', 'إجراء جديد')}
             </Link>
           </Button>
         </CardContent>
       </Card>
 
-      {/* Pass/Fail Rate */}
-      {stats && (
-        <Card className="rounded-3xl">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-emerald-600" />
-              {t('quality.passFailRate', 'نسبة النجاح/الفشل')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="flex items-center gap-1">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  {t('quality.passRate', 'نسبة النجاح')}
-                </span>
-                <span className="font-bold text-emerald-600">{stats.passRate || 0}%</span>
-              </div>
-              <Progress value={stats.passRate || 0} className="h-2" />
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="flex items-center gap-1">
-                  <XCircle className="w-4 h-4 text-red-500" />
-                  {t('quality.failRate', 'نسبة الفشل')}
-                </span>
-                <span className="font-bold text-red-600">{stats.failRate || 0}%</span>
-              </div>
-              <Progress value={stats.failRate || 0} className="h-2 bg-red-100 [&>div]:bg-red-500" />
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Navigation Links */}
+      <Card className="rounded-3xl">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <List className="w-5 h-5 text-emerald-600" />
+            {t('quality.navigation', 'التنقل')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/quality">
+              <ClipboardCheck className="w-4 h-4 ml-2" />
+              {t('quality.inspections', 'الفحوصات')}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/quality/templates">
+              <FileText className="w-4 h-4 ml-2" />
+              {t('quality.templates', 'القوالب')}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/quality/actions">
+              <AlertTriangle className="w-4 h-4 ml-2" />
+              {t('quality.actions', 'الإجراءات')}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/quality/settings">
+              <Settings className="w-4 h-4 ml-2" />
+              {t('quality.settings', 'الإعدادات')}
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
 
-      {/* Open Actions */}
+      {/* Pending Inspections Widget */}
+      <Card className="rounded-3xl border-blue-200 bg-blue-50">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2 text-blue-700">
+            <Clock className="w-5 h-5" />
+            {t('quality.pendingInspections', 'فحوصات معلقة')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loadingPending ? (
+            <div className="space-y-2">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          ) : !pendingInspections || pendingInspections.length === 0 ? (
+            <p className="text-sm text-blue-600">
+              {t('quality.noPendingInspections', 'لا توجد فحوصات معلقة')}
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {pendingInspections.slice(0, 5).map((inspection) => (
+                <Link
+                  key={inspection._id}
+                  to={`/dashboard/quality/${inspection._id}`}
+                  className="flex items-center justify-between p-2 rounded-lg hover:bg-blue-100 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-blue-600" />
+                    <span className="text-sm font-medium text-blue-800 truncate max-w-[150px]">
+                      {inspection.title || inspection.templateName}
+                    </span>
+                  </div>
+                  <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-300">
+                    {t('quality.pending', 'معلق')}
+                  </Badge>
+                </Link>
+              ))}
+              {pendingInspections.length > 5 && (
+                <Button asChild variant="ghost" size="sm" className="w-full text-blue-700">
+                  <Link to="/dashboard/quality?status=pending">
+                    {t('quality.viewAll', 'عرض الكل')} ({pendingInspections.length})
+                  </Link>
+                </Button>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Failed Inspections Widget */}
+      <Card className="rounded-3xl border-red-200 bg-red-50">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2 text-red-700">
+            <XCircle className="w-5 h-5" />
+            {t('quality.failedInspections', 'فحوصات فاشلة')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loadingFailed ? (
+            <div className="space-y-2">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          ) : !failedInspections || failedInspections.length === 0 ? (
+            <div className="flex items-center gap-2 text-sm text-emerald-600">
+              <CheckCircle2 className="w-4 h-4" />
+              {t('quality.noFailedInspections', 'لا توجد فحوصات فاشلة')}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {failedInspections.slice(0, 5).map((inspection) => (
+                <Link
+                  key={inspection._id}
+                  to={`/dashboard/quality/${inspection._id}`}
+                  className="flex items-center justify-between p-2 rounded-lg hover:bg-red-100 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <XCircle className="w-4 h-4 text-red-600" />
+                    <span className="text-sm font-medium text-red-800 truncate max-w-[150px]">
+                      {inspection.title || inspection.templateName}
+                    </span>
+                  </div>
+                  <Badge variant="outline" className="bg-red-100 text-red-700 border-red-300">
+                    {t('quality.failed', 'فاشل')}
+                  </Badge>
+                </Link>
+              ))}
+              {failedInspections.length > 5 && (
+                <Button asChild variant="ghost" size="sm" className="w-full text-red-700">
+                  <Link to="/dashboard/quality?status=failed">
+                    {t('quality.viewAll', 'عرض الكل')} ({failedInspections.length})
+                  </Link>
+                </Button>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Open Actions Widget */}
       <Card className="rounded-3xl border-amber-200 bg-amber-50">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2 text-amber-700">
@@ -148,18 +245,6 @@ export function QualitySidebar() {
               )}
             </div>
           )}
-        </CardContent>
-      </Card>
-
-      {/* Settings Link */}
-      <Card className="rounded-3xl">
-        <CardContent className="p-4">
-          <Button asChild variant="ghost" className="w-full justify-start">
-            <Link to="/dashboard/settings/quality">
-              <Settings className="w-4 h-4 ml-2" />
-              {t('quality.settings', 'إعدادات الجودة')}
-            </Link>
-          </Button>
         </CardContent>
       </Card>
     </div>

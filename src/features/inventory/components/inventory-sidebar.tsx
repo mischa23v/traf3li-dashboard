@@ -17,6 +17,9 @@ import {
   TrendingUp,
   TrendingDown,
   Boxes,
+  ListChecks,
+  Clock,
+  AlertCircle,
 } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -50,27 +53,93 @@ export function InventorySidebar({ context = 'items' }: InventorySidebarProps) {
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
             <Link to="/dashboard/inventory/create">
               <Plus className="w-4 h-4 ml-2" />
-              {t('inventory.addItem', 'إضافة صنف')}
+              {t('inventory.newItem', 'صنف جديد')}
               <kbd className="mr-auto bg-muted px-2 py-0.5 rounded text-xs">⌘N</kbd>
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/inventory/stock-entry/create">
-              <ArrowRightLeft className="w-4 h-4 ml-2" />
-              {t('inventory.stockEntry', 'حركة مخزون')}
-              <kbd className="mr-auto bg-muted px-2 py-0.5 rounded text-xs">⌘E</kbd>
+            <Link to="/dashboard/inventory/warehouses/create">
+              <Plus className="w-4 h-4 ml-2" />
+              {t('inventory.newWarehouse', 'مستودع جديد')}
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/inventory/stock-entries/create">
+              <Plus className="w-4 h-4 ml-2" />
+              {t('inventory.newStockEntry', 'حركة مخزون جديدة')}
+              <kbd className="mr-auto bg-muted px-2 py-0.5 rounded text-xs">⌘E</kbd>
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Navigation Links */}
+      <Card className="rounded-3xl">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <ListChecks className="w-5 h-5 text-blue-600" />
+            {t('inventory.navigation', 'التنقل')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/inventory">
+              <Package className="w-4 h-4 ml-2" />
+              {t('inventory.items', 'الأصناف')}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
             <Link to="/dashboard/inventory/warehouses">
               <Warehouse className="w-4 h-4 ml-2" />
               {t('inventory.warehouses', 'المستودعات')}
             </Link>
           </Button>
-          <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/inventory/reports">
-              <BarChart3 className="w-4 h-4 ml-2" />
-              {t('inventory.reports', 'التقارير')}
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/inventory/stock-entries">
+              <ArrowRightLeft className="w-4 h-4 ml-2" />
+              {t('inventory.stockEntries', 'حركات المخزون')}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/inventory/stock-ledger">
+              <FileText className="w-4 h-4 ml-2" />
+              {t('inventory.stockLedger', 'دفتر المخزون')}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/inventory/settings">
+              <Settings className="w-4 h-4 ml-2" />
+              {t('inventory.settings', 'الإعدادات')}
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Reports Section */}
+      <Card className="rounded-3xl">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <BarChart3 className="w-5 h-5 text-purple-600" />
+            {t('inventory.reports', 'التقارير')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/inventory/reports/stock-balance">
+              <TrendingUp className="w-4 h-4 ml-2" />
+              {t('inventory.stockBalance', 'رصيد المخزون')}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/inventory/reports/stock-aging">
+              <Clock className="w-4 h-4 ml-2" />
+              {t('inventory.stockAging', 'أعمار المخزون')}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/inventory/reports/item-shortage">
+              <AlertCircle className="w-4 h-4 ml-2" />
+              {t('inventory.itemShortage', 'نقص الأصناف')}
             </Link>
           </Button>
         </CardContent>
@@ -210,17 +279,6 @@ export function InventorySidebar({ context = 'items' }: InventorySidebarProps) {
         </Card>
       )}
 
-      {/* Settings Link */}
-      <Card className="rounded-3xl">
-        <CardContent className="p-4">
-          <Button asChild variant="ghost" className="w-full justify-start">
-            <Link to="/dashboard/settings/inventory">
-              <Settings className="w-4 h-4 ml-2" />
-              {t('inventory.settings', 'إعدادات المخزون')}
-            </Link>
-          </Button>
-        </CardContent>
-      </Card>
     </div>
   )
 }

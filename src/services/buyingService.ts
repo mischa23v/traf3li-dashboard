@@ -20,6 +20,7 @@ import type {
   MaterialRequest,
   CreateMaterialRequestData,
   RequestForQuotation,
+  RfqFilters,
   SupplierQuotation,
   BuyingSettings,
   BuyingStats,
@@ -266,6 +267,64 @@ const buyingService = {
       return response.data.request || response.data.data
     } catch (error: any) {
       throw new Error(bilingualError(`Failed to create material request: ${handleApiError(error)}`, `فشل في إنشاء طلب المواد`))
+    }
+  },
+
+  // ==================== RFQs (REQUEST FOR QUOTATION) ====================
+
+  getRfqs: async (filters?: RfqFilters): Promise<{ rfqs: RequestForQuotation[]; total: number }> => {
+    try {
+      const response = await apiClient.get('/buying/rfqs', { params: filters })
+      return {
+        rfqs: response.data.rfqs || response.data.data || [],
+        total: response.data.total || 0,
+      }
+    } catch (error: any) {
+      throw new Error(bilingualError(`Failed to fetch RFQs: ${handleApiError(error)}`, `فشل في جلب طلبات عروض الأسعار`))
+    }
+  },
+
+  getRfq: async (id: string): Promise<RequestForQuotation> => {
+    try {
+      const response = await apiClient.get(`/buying/rfqs/${id}`)
+      return response.data.rfq || response.data.data
+    } catch (error: any) {
+      throw new Error(bilingualError(`Failed to fetch RFQ: ${handleApiError(error)}`, `فشل في جلب طلب عرض السعر`))
+    }
+  },
+
+  createRfq: async (data: any): Promise<RequestForQuotation> => {
+    try {
+      const response = await apiClient.post('/buying/rfqs', data)
+      return response.data.rfq || response.data.data
+    } catch (error: any) {
+      throw new Error(bilingualError(`Failed to create RFQ: ${handleApiError(error)}`, `فشل في إنشاء طلب عرض السعر`))
+    }
+  },
+
+  updateRfq: async (id: string, data: any): Promise<RequestForQuotation> => {
+    try {
+      const response = await apiClient.put(`/buying/rfqs/${id}`, data)
+      return response.data.rfq || response.data.data
+    } catch (error: any) {
+      throw new Error(bilingualError(`Failed to update RFQ: ${handleApiError(error)}`, `فشل في تحديث طلب عرض السعر`))
+    }
+  },
+
+  submitRfq: async (id: string): Promise<RequestForQuotation> => {
+    try {
+      const response = await apiClient.post(`/buying/rfqs/${id}/submit`)
+      return response.data.rfq || response.data.data
+    } catch (error: any) {
+      throw new Error(bilingualError(`Failed to submit RFQ: ${handleApiError(error)}`, `فشل في إرسال طلب عرض السعر`))
+    }
+  },
+
+  deleteRfq: async (id: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/buying/rfqs/${id}`)
+    } catch (error: any) {
+      throw new Error(bilingualError(`Failed to delete RFQ: ${handleApiError(error)}`, `فشل في حذف طلب عرض السعر`))
     }
   },
 

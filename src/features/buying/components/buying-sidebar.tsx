@@ -16,12 +16,18 @@ import {
   TrendingUp,
   Clock,
   AlertTriangle,
+  MessageSquare,
+  ClipboardList,
+  FolderOpen,
+  PieChart,
+  Award,
 } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Separator } from '@/components/ui/separator'
 
 import { useBuyingStats, usePendingPurchaseOrders } from '@/hooks/use-buying'
 
@@ -42,29 +48,96 @@ export function BuyingSidebar() {
         </CardHeader>
         <CardContent className="space-y-2">
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/buying/suppliers/create">
+            <Link to="/dashboard/buying/create">
               <Plus className="w-4 h-4 ml-2" />
-              {t('buying.addSupplier', 'إضافة مورد')}
+              {t('buying.newSupplier', 'مورد جديد')}
               <kbd className="mr-auto bg-muted px-2 py-0.5 rounded text-xs">⌘N</kbd>
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
             <Link to="/dashboard/buying/purchase-orders/create">
               <FileText className="w-4 h-4 ml-2" />
-              {t('buying.createPurchaseOrder', 'إنشاء أمر شراء')}
+              {t('buying.newPurchaseOrder', 'أمر شراء جديد')}
               <kbd className="mr-auto bg-muted px-2 py-0.5 rounded text-xs">⌘O</kbd>
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/buying/material-requests/create">
+              <Package className="w-4 h-4 ml-2" />
+              {t('buying.newMaterialRequest', 'طلب مواد جديد')}
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/buying/rfq/create">
+              <MessageSquare className="w-4 h-4 ml-2" />
+              {t('buying.newRFQ', 'طلب عرض سعر جديد')}
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Navigation Links */}
+      <Card className="rounded-3xl">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <FolderOpen className="w-5 h-5 text-blue-600" />
+            {t('buying.navigation', 'التنقل')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-1">
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/buying">
+              <Users className="w-4 h-4 ml-2" />
+              {t('buying.suppliers', 'الموردين')}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/buying/purchase-orders">
+              <ClipboardList className="w-4 h-4 ml-2" />
+              {t('buying.purchaseOrders', 'أوامر الشراء')}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
             <Link to="/dashboard/buying/material-requests">
               <Package className="w-4 h-4 ml-2" />
               {t('buying.materialRequests', 'طلبات المواد')}
             </Link>
           </Button>
-          <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/buying/reports">
-              <BarChart3 className="w-4 h-4 ml-2" />
-              {t('buying.reports', 'التقارير')}
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/buying/rfq">
+              <MessageSquare className="w-4 h-4 ml-2" />
+              {t('buying.rfq', 'طلبات عروض الأسعار')}
+            </Link>
+          </Button>
+          <Separator className="my-2" />
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/buying/settings">
+              <Settings className="w-4 h-4 ml-2" />
+              {t('buying.settings', 'الإعدادات')}
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Reports Section */}
+      <Card className="rounded-3xl border-purple-200 bg-purple-50/50">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2 text-purple-700">
+            <BarChart3 className="w-5 h-5" />
+            {t('buying.reports', 'التقارير')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-1">
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl hover:bg-purple-100">
+            <Link to="/dashboard/buying/reports/analytics">
+              <PieChart className="w-4 h-4 ml-2 text-purple-600" />
+              <span className="text-purple-900">{t('buying.purchaseAnalytics', 'تحليلات المشتريات')}</span>
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl hover:bg-purple-100">
+            <Link to="/dashboard/buying/reports/supplier-performance">
+              <Award className="w-4 h-4 ml-2 text-purple-600" />
+              <span className="text-purple-900">{t('buying.supplierPerformance', 'أداء الموردين')}</span>
             </Link>
           </Button>
         </CardContent>
@@ -145,18 +218,6 @@ export function BuyingSidebar() {
           </CardContent>
         </Card>
       )}
-
-      {/* Settings Link */}
-      <Card className="rounded-3xl">
-        <CardContent className="p-4">
-          <Button asChild variant="ghost" className="w-full justify-start">
-            <Link to="/dashboard/settings/buying">
-              <Settings className="w-4 h-4 ml-2" />
-              {t('buying.settings', 'إعدادات المشتريات')}
-            </Link>
-          </Button>
-        </CardContent>
-      </Card>
     </div>
   )
 }
