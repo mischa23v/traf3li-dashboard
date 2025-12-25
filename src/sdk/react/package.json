@@ -16,13 +16,16 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts --external react",
-    "dev": "tsup src/index.ts --format cjs,esm --dts --external react --watch",
+    "build": "tsup src/index.ts --format cjs,esm --external react --external @traf3li/auth-core",
+    "build:dts": "tsup src/index.ts --format cjs,esm --dts --external react --external @traf3li/auth-core",
+    "dev": "tsup src/index.ts --format cjs,esm --external react --watch",
     "clean": "rm -rf dist"
   },
+  "dependencies": {
+    "@traf3li/auth-core": "file:../core"
+  },
   "peerDependencies": {
-    "react": ">=18.0.0",
-    "@traf3li/auth-core": "^1.0.0"
+    "react": ">=18.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.0",
