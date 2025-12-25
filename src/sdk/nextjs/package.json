@@ -31,15 +31,18 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts src/middleware/index.ts src/server/index.ts src/api/index.ts --format cjs,esm --dts --external react --external next",
-    "dev": "tsup src/index.ts src/middleware/index.ts src/server/index.ts src/api/index.ts --format cjs,esm --dts --external react --external next --watch",
+    "build": "tsup src/index.ts src/middleware/index.ts src/server/index.ts src/api/index.ts --format cjs,esm --external react --external next --external @traf3li/auth-core --external @traf3li/auth-react",
+    "build:dts": "tsup src/index.ts src/middleware/index.ts src/server/index.ts src/api/index.ts --format cjs,esm --dts --external react --external next --external @traf3li/auth-core --external @traf3li/auth-react",
+    "dev": "tsup src/index.ts src/middleware/index.ts src/server/index.ts src/api/index.ts --format cjs,esm --external react --external next --watch",
     "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@traf3li/auth-core": "file:../core",
+    "@traf3li/auth-react": "file:../react"
   },
   "peerDependencies": {
     "next": ">=13.0.0",
-    "react": ">=18.0.0",
-    "@traf3li/auth-core": "^1.0.0",
-    "@traf3li/auth-react": "^1.0.0"
+    "react": ">=18.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.0",

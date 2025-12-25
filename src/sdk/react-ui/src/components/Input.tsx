@@ -115,8 +115,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               // Size
               sizeStyles[size],
               // Padding adjustments for addons
-              leftAddon && 'ps-10',
-              hasRightContent && 'pe-10',
+              !!leftAddon && 'ps-10',
+              !!hasRightContent && 'pe-10',
               // Custom classes
               className
             )}
