@@ -166,6 +166,13 @@ export function useBuyingStats() {
   })
 }
 
+export function usePendingPurchaseOrders() {
+  return useQuery({
+    queryKey: buyingKeys.purchaseOrdersList({ status: 'submitted' }),
+    queryFn: () => buyingService.getPurchaseOrders({ status: 'submitted' }),
+  })
+}
+
 export function useBuyingSettings() {
   return useQuery({
     queryKey: buyingKeys.settings(),
