@@ -35,6 +35,7 @@ import { Route as errors500RouteImport } from './routes/(errors)/500'
 import { Route as errors404RouteImport } from './routes/(errors)/404'
 import { Route as errors403RouteImport } from './routes/(errors)/403'
 import { Route as errors401RouteImport } from './routes/(errors)/401'
+import { Route as authVerifyEmailRouteImport } from './routes/(auth)/verify-email'
 import { Route as authTermsRouteImport } from './routes/(auth)/terms'
 import { Route as authSignUpRouteImport } from './routes/(auth)/sign-up'
 import { Route as authSignIn2RouteImport } from './routes/(auth)/sign-in-2'
@@ -44,6 +45,7 @@ import { Route as authOtpLoginRouteImport } from './routes/(auth)/otp-login'
 import { Route as authOtpRouteImport } from './routes/(auth)/otp'
 import { Route as authNoFirmRouteImport } from './routes/(auth)/no-firm'
 import { Route as authMfaChallengeRouteImport } from './routes/(auth)/mfa-challenge'
+import { Route as authMagicLinkRouteImport } from './routes/(auth)/magic-link'
 import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
 import { Route as authConflictPolicyRouteImport } from './routes/(auth)/conflict-policy'
 import { Route as ClerkAuthenticatedRouteRouteImport } from './routes/clerk/_authenticated/route'
@@ -71,6 +73,7 @@ import { Route as AuthenticatedDashboardSetupOrchestratorRouteImport } from './r
 import { Route as AuthenticatedDashboardNotionRouteImport } from './routes/_authenticated/dashboard.notion'
 import { Route as AuthenticatedDashboardHelpRouteImport } from './routes/_authenticated/dashboard.help'
 import { Route as AuthenticatedDashboardCalendarRouteImport } from './routes/_authenticated/dashboard.calendar'
+import { Route as authSignUpCompleteProfileRouteImport } from './routes/(auth)/sign-up.complete-profile'
 import { Route as AuthenticatedDashboardTagsIndexRouteImport } from './routes/_authenticated/dashboard.tags.index'
 import { Route as AuthenticatedDashboardSupportIndexRouteImport } from './routes/_authenticated/dashboard.support.index'
 import { Route as AuthenticatedDashboardSubcontractingIndexRouteImport } from './routes/_authenticated/dashboard.subcontracting.index'
@@ -551,6 +554,11 @@ const errors401Route = errors401RouteImport.update({
   path: '/401',
   getParentRoute: () => rootRouteImport,
 } as any)
+const authVerifyEmailRoute = authVerifyEmailRouteImport.update({
+  id: '/(auth)/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const authTermsRoute = authTermsRouteImport.update({
   id: '/(auth)/terms',
   path: '/terms',
@@ -594,6 +602,11 @@ const authNoFirmRoute = authNoFirmRouteImport.update({
 const authMfaChallengeRoute = authMfaChallengeRouteImport.update({
   id: '/(auth)/mfa-challenge',
   path: '/mfa-challenge',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authMagicLinkRoute = authMagicLinkRouteImport.update({
+  id: '/(auth)/magic-link',
+  path: '/magic-link',
   getParentRoute: () => rootRouteImport,
 } as any)
 const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
@@ -746,6 +759,12 @@ const AuthenticatedDashboardCalendarRoute =
     id: '/dashboard/calendar',
     path: '/dashboard/calendar',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const authSignUpCompleteProfileRoute =
+  authSignUpCompleteProfileRouteImport.update({
+    id: '/complete-profile',
+    path: '/complete-profile',
+    getParentRoute: () => authSignUpRoute,
   } as any)
 const AuthenticatedDashboardTagsIndexRoute =
   AuthenticatedDashboardTagsIndexRouteImport.update({
@@ -2874,6 +2893,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/conflict-policy': typeof authConflictPolicyRoute
   '/forgot-password': typeof authForgotPasswordRoute
+  '/magic-link': typeof authMagicLinkRoute
   '/mfa-challenge': typeof authMfaChallengeRoute
   '/no-firm': typeof authNoFirmRoute
   '/otp': typeof authOtpRoute
@@ -2881,14 +2901,16 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof authPrivacyRoute
   '/sign-in': typeof authSignInRoute
   '/sign-in-2': typeof authSignIn2Route
-  '/sign-up': typeof authSignUpRoute
+  '/sign-up': typeof authSignUpRouteWithChildren
   '/terms': typeof authTermsRoute
+  '/verify-email': typeof authVerifyEmailRoute
   '/401': typeof errors401Route
   '/403': typeof errors403Route
   '/404': typeof errors404Route
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
+  '/sign-up/complete-profile': typeof authSignUpCompleteProfileRoute
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/dashboard/help': typeof AuthenticatedDashboardHelpRoute
   '/dashboard/notion': typeof AuthenticatedDashboardNotionRoute
@@ -3284,6 +3306,7 @@ export interface FileRoutesByTo {
   '/time-entries': typeof TimeEntriesRoute
   '/conflict-policy': typeof authConflictPolicyRoute
   '/forgot-password': typeof authForgotPasswordRoute
+  '/magic-link': typeof authMagicLinkRoute
   '/mfa-challenge': typeof authMfaChallengeRoute
   '/no-firm': typeof authNoFirmRoute
   '/otp': typeof authOtpRoute
@@ -3291,14 +3314,16 @@ export interface FileRoutesByTo {
   '/privacy': typeof authPrivacyRoute
   '/sign-in': typeof authSignInRoute
   '/sign-in-2': typeof authSignIn2Route
-  '/sign-up': typeof authSignUpRoute
+  '/sign-up': typeof authSignUpRouteWithChildren
   '/terms': typeof authTermsRoute
+  '/verify-email': typeof authVerifyEmailRoute
   '/401': typeof errors401Route
   '/403': typeof errors403Route
   '/404': typeof errors404Route
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
+  '/sign-up/complete-profile': typeof authSignUpCompleteProfileRoute
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/dashboard/help': typeof AuthenticatedDashboardHelpRoute
   '/dashboard/notion': typeof AuthenticatedDashboardNotionRoute
@@ -3691,6 +3716,7 @@ export interface FileRoutesById {
   '/clerk/_authenticated': typeof ClerkAuthenticatedRouteRouteWithChildren
   '/(auth)/conflict-policy': typeof authConflictPolicyRoute
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
+  '/(auth)/magic-link': typeof authMagicLinkRoute
   '/(auth)/mfa-challenge': typeof authMfaChallengeRoute
   '/(auth)/no-firm': typeof authNoFirmRoute
   '/(auth)/otp': typeof authOtpRoute
@@ -3698,14 +3724,16 @@ export interface FileRoutesById {
   '/(auth)/privacy': typeof authPrivacyRoute
   '/(auth)/sign-in': typeof authSignInRoute
   '/(auth)/sign-in-2': typeof authSignIn2Route
-  '/(auth)/sign-up': typeof authSignUpRoute
+  '/(auth)/sign-up': typeof authSignUpRouteWithChildren
   '/(auth)/terms': typeof authTermsRoute
+  '/(auth)/verify-email': typeof authVerifyEmailRoute
   '/(errors)/401': typeof errors401Route
   '/(errors)/403': typeof errors403Route
   '/(errors)/404': typeof errors404Route
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/(auth)/sign-up/complete-profile': typeof authSignUpCompleteProfileRoute
   '/_authenticated/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/_authenticated/dashboard/help': typeof AuthenticatedDashboardHelpRoute
   '/_authenticated/dashboard/notion': typeof AuthenticatedDashboardNotionRoute
@@ -4104,6 +4132,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/conflict-policy'
     | '/forgot-password'
+    | '/magic-link'
     | '/mfa-challenge'
     | '/no-firm'
     | '/otp'
@@ -4113,12 +4142,14 @@ export interface FileRouteTypes {
     | '/sign-in-2'
     | '/sign-up'
     | '/terms'
+    | '/verify-email'
     | '/401'
     | '/403'
     | '/404'
     | '/500'
     | '/503'
     | '/'
+    | '/sign-up/complete-profile'
     | '/dashboard/calendar'
     | '/dashboard/help'
     | '/dashboard/notion'
@@ -4514,6 +4545,7 @@ export interface FileRouteTypes {
     | '/time-entries'
     | '/conflict-policy'
     | '/forgot-password'
+    | '/magic-link'
     | '/mfa-challenge'
     | '/no-firm'
     | '/otp'
@@ -4523,12 +4555,14 @@ export interface FileRouteTypes {
     | '/sign-in-2'
     | '/sign-up'
     | '/terms'
+    | '/verify-email'
     | '/401'
     | '/403'
     | '/404'
     | '/500'
     | '/503'
     | '/'
+    | '/sign-up/complete-profile'
     | '/dashboard/calendar'
     | '/dashboard/help'
     | '/dashboard/notion'
@@ -4920,6 +4954,7 @@ export interface FileRouteTypes {
     | '/clerk/_authenticated'
     | '/(auth)/conflict-policy'
     | '/(auth)/forgot-password'
+    | '/(auth)/magic-link'
     | '/(auth)/mfa-challenge'
     | '/(auth)/no-firm'
     | '/(auth)/otp'
@@ -4929,12 +4964,14 @@ export interface FileRouteTypes {
     | '/(auth)/sign-in-2'
     | '/(auth)/sign-up'
     | '/(auth)/terms'
+    | '/(auth)/verify-email'
     | '/(errors)/401'
     | '/(errors)/403'
     | '/(errors)/404'
     | '/(errors)/500'
     | '/(errors)/503'
     | '/_authenticated/'
+    | '/(auth)/sign-up/complete-profile'
     | '/_authenticated/dashboard/calendar'
     | '/_authenticated/dashboard/help'
     | '/_authenticated/dashboard/notion'
@@ -5332,6 +5369,7 @@ export interface RootRouteChildren {
   TimeEntriesRoute: typeof TimeEntriesRoute
   authConflictPolicyRoute: typeof authConflictPolicyRoute
   authForgotPasswordRoute: typeof authForgotPasswordRoute
+  authMagicLinkRoute: typeof authMagicLinkRoute
   authMfaChallengeRoute: typeof authMfaChallengeRoute
   authNoFirmRoute: typeof authNoFirmRoute
   authOtpRoute: typeof authOtpRoute
@@ -5339,8 +5377,9 @@ export interface RootRouteChildren {
   authPrivacyRoute: typeof authPrivacyRoute
   authSignInRoute: typeof authSignInRoute
   authSignIn2Route: typeof authSignIn2Route
-  authSignUpRoute: typeof authSignUpRoute
+  authSignUpRoute: typeof authSignUpRouteWithChildren
   authTermsRoute: typeof authTermsRoute
+  authVerifyEmailRoute: typeof authVerifyEmailRoute
   errors401Route: typeof errors401Route
   errors403Route: typeof errors403Route
   errors404Route: typeof errors404Route
@@ -5532,6 +5571,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof errors401RouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(auth)/verify-email': {
+      id: '/(auth)/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof authVerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(auth)/terms': {
       id: '/(auth)/terms'
       path: '/terms'
@@ -5593,6 +5639,13 @@ declare module '@tanstack/react-router' {
       path: '/mfa-challenge'
       fullPath: '/mfa-challenge'
       preLoaderRoute: typeof authMfaChallengeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/magic-link': {
+      id: '/(auth)/magic-link'
+      path: '/magic-link'
+      fullPath: '/magic-link'
+      preLoaderRoute: typeof authMagicLinkRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(auth)/forgot-password': {
@@ -5783,6 +5836,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/calendar'
       preLoaderRoute: typeof AuthenticatedDashboardCalendarRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/(auth)/sign-up/complete-profile': {
+      id: '/(auth)/sign-up/complete-profile'
+      path: '/complete-profile'
+      fullPath: '/sign-up/complete-profile'
+      preLoaderRoute: typeof authSignUpCompleteProfileRouteImport
+      parentRoute: typeof authSignUpRoute
     }
     '/_authenticated/dashboard/tags/': {
       id: '/_authenticated/dashboard/tags/'
@@ -9645,6 +9705,18 @@ const ClerkRouteRouteWithChildren = ClerkRouteRoute._addFileChildren(
   ClerkRouteRouteChildren,
 )
 
+interface authSignUpRouteChildren {
+  authSignUpCompleteProfileRoute: typeof authSignUpCompleteProfileRoute
+}
+
+const authSignUpRouteChildren: authSignUpRouteChildren = {
+  authSignUpCompleteProfileRoute: authSignUpCompleteProfileRoute,
+}
+
+const authSignUpRouteWithChildren = authSignUpRoute._addFileChildren(
+  authSignUpRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   ClerkRouteRoute: ClerkRouteRouteWithChildren,
@@ -9668,6 +9740,7 @@ const rootRouteChildren: RootRouteChildren = {
   TimeEntriesRoute: TimeEntriesRoute,
   authConflictPolicyRoute: authConflictPolicyRoute,
   authForgotPasswordRoute: authForgotPasswordRoute,
+  authMagicLinkRoute: authMagicLinkRoute,
   authMfaChallengeRoute: authMfaChallengeRoute,
   authNoFirmRoute: authNoFirmRoute,
   authOtpRoute: authOtpRoute,
@@ -9675,8 +9748,9 @@ const rootRouteChildren: RootRouteChildren = {
   authPrivacyRoute: authPrivacyRoute,
   authSignInRoute: authSignInRoute,
   authSignIn2Route: authSignIn2Route,
-  authSignUpRoute: authSignUpRoute,
+  authSignUpRoute: authSignUpRouteWithChildren,
   authTermsRoute: authTermsRoute,
+  authVerifyEmailRoute: authVerifyEmailRoute,
   errors401Route: errors401Route,
   errors403Route: errors403Route,
   errors404Route: errors404Route,
