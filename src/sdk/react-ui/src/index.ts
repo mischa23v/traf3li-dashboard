@@ -39,3 +39,9 @@ export type {
   SecurityDashboardProps,
 } from './components/SecurityDashboard';
 export type { ApiKey, CreateApiKeyData, ApiKeyManagerProps } from './components/ApiKeyManager';
+
+// Enterprise SSO types
+export type {
+  SSOProvider as UISSOProvider,
+  EnterpriseSSOLoginProps
+} from './components/EnterpriseSSOLogin';

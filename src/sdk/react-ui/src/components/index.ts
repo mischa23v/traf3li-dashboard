@@ -37,5 +37,8 @@ export * from './LinkedAccountsManager';
 export * from './SecurityDashboard';
 export * from './ApiKeyManager';
 
+// Enterprise SSO
+export * from './EnterpriseSSOLogin';
+
 // Layouts
 export * from './AuthLayout';
