@@ -1,5 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import otpService from '@/services/otpService';
+import passwordService from '@/services/passwordService';
+import { PasswordStrengthIndicator } from '@/components/auth/password-strength-indicator';
 
 // ============================================
 // SVG ICONS
@@ -215,6 +219,9 @@ export function ForgotPassword() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  // Reset token from OTP verification
+  const [resetToken, setResetToken] = useState('');
+
   // Countdown timer for resend
   useEffect(() => {
     if (step === 'otp' && resendTimer > 0 && !canResend) {
@@ -248,14 +255,20 @@ export function ForgotPassword() {
     setApiError('');
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Call API to send OTP for password reset
+      await otpService.sendOtp({ email, purpose: 'password_reset' });
 
-      // Simulate: any valid email format works
+      toast.success(isRtl ? 'تم إرسال رمز التحقق' : 'Verification code sent');
       setStep('otp');
       setResendTimer(60);
       setCanResend(false);
-    } catch (error) {
-      setApiError(t('forgotPassword.errors.genericError'));
+    } catch (error: any) {
+      if (error.isRateLimited) {
+        setApiError(isRtl ? `يرجى الانتظار ${error.waitTime} ثانية` : `Please wait ${error.waitTime} seconds`);
+        setResendTimer(error.waitTime);
+      } else {
+        setApiError(error.message || t('forgotPassword.errors.genericError'));
+      }
     } finally {
       setIsLoading(false);
     }
@@ -274,17 +287,37 @@ export function ForgotPassword() {
     setOtpError('');
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Call API to verify OTP
+      const response = await otpService.verifyOtp({
+        email,
+        otp,
+        purpose: 'password_reset',
+      });
 
-      // TEST: "123456" is the correct OTP
-      if (otp === '123456') {
+      if (response.success) {
+        // Store the reset token if returned
+        if ((response as any).resetToken) {
+          setResetToken((response as any).resetToken);
+        }
+        toast.success(isRtl ? 'تم التحقق بنجاح' : 'Verification successful');
         setStep('newPassword');
       } else {
         setOtpError(t('forgotPassword.errors.invalidOtp'));
-        setTimeout(() => setOtp(''), 500);
+        setOtp('');
       }
-    } catch (err) {
-      setOtpError(t('forgotPassword.errors.genericError'));
+    } catch (error: any) {
+      if (error.isInvalidOtp) {
+        if (error.attemptsLeft === 0) {
+          setOtpError(isRtl ? 'انتهت المحاولات. يرجى طلب رمز جديد' : 'No attempts left. Please request a new code');
+        } else {
+          setOtpError(isRtl
+            ? `رمز غير صحيح. المحاولات المتبقية: ${error.attemptsLeft}`
+            : `Invalid code. Attempts left: ${error.attemptsLeft}`);
+        }
+        setOtp('');
+      } else {
+        setOtpError(error.message || t('forgotPassword.errors.genericError'));
+      }
     } finally {
       setIsLoading(false);
     }
@@ -313,12 +346,22 @@ export function ForgotPassword() {
     }
 
     setIsLoading(true);
+    setApiError('');
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Call API to reset password
+      // If we have a reset token, use it; otherwise use email-based reset
+      if (resetToken) {
+        await passwordService.resetPassword(resetToken, newPassword);
+      } else {
+        // Some backends may support email+password reset after OTP verification
+        await passwordService.resetPassword(email, newPassword);
+      }
+
+      toast.success(isRtl ? 'تم تغيير كلمة المرور بنجاح' : 'Password changed successfully');
       setStep('success');
-    } catch (error) {
-      setApiError(t('forgotPassword.errors.genericError'));
+    } catch (error: any) {
+      setApiError(error.message || t('forgotPassword.errors.genericError'));
     } finally {
       setIsLoading(false);
     }
@@ -328,10 +371,26 @@ export function ForgotPassword() {
   const handleResend = async () => {
     if (!canResend) return;
 
-    setCanResend(false);
-    setResendTimer(60);
-    setOtp('');
+    setIsLoading(true);
     setOtpError('');
+
+    try {
+      await otpService.resendOtp({ email, purpose: 'password_reset' });
+      toast.success(isRtl ? 'تم إعادة إرسال الرمز' : 'Code resent');
+      setCanResend(false);
+      setResendTimer(60);
+      setOtp('');
+    } catch (error: any) {
+      if (error.isRateLimited) {
+        setOtpError(isRtl ? `يرجى الانتظار ${error.waitTime} ثانية` : `Please wait ${error.waitTime} seconds`);
+        setResendTimer(error.waitTime);
+        setCanResend(false);
+      } else {
+        setOtpError(error.message || (isRtl ? 'فشل في إعادة الإرسال' : 'Failed to resend'));
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // ============================================
@@ -431,6 +490,14 @@ export function ForgotPassword() {
                   </div>
                   {errors.newPassword && (
                     <p className="text-red-500 text-xs mt-1">{errors.newPassword}</p>
+                  )}
+                  {newPassword && (
+                    <PasswordStrengthIndicator
+                      password={newPassword}
+                      showRequirements={true}
+                      showFeedback={false}
+                      className="mt-2"
+                    />
                   )}
                 </div>
 
