@@ -8,12 +8,12 @@ import { useTranslation } from 'react-i18next'
 import {
   GitBranch,
   Plus,
-  BarChart3,
   Settings,
   Package,
-  Users,
-  Layers,
   FileText,
+  List,
+  PackageCheck,
+  Boxes,
 } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -40,68 +40,52 @@ export function SubcontractingSidebar() {
         </CardHeader>
         <CardContent className="space-y-2">
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/subcontracting/orders/create">
+            <Link to="/dashboard/subcontracting/create">
               <Plus className="w-4 h-4 ml-2" />
-              {t('subcontracting.createOrder', 'إنشاء أمر')}
+              {t('subcontracting.newOrder', 'أمر جديد')}
               <kbd className="mr-auto bg-muted px-2 py-0.5 rounded text-xs">⌘N</kbd>
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/subcontracting/receipts">
-              <Package className="w-4 h-4 ml-2" />
-              {t('subcontracting.receipts', 'إيصالات الاستلام')}
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/subcontracting/boms">
-              <Layers className="w-4 h-4 ml-2" />
-              {t('subcontracting.boms', 'قوائم المواد')}
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/subcontracting/reports">
-              <BarChart3 className="w-4 h-4 ml-2" />
-              {t('subcontracting.reports', 'التقارير')}
+            <Link to="/dashboard/subcontracting/receipts/create">
+              <PackageCheck className="w-4 h-4 ml-2" />
+              {t('subcontracting.newReceipt', 'إيصال استلام جديد')}
             </Link>
           </Button>
         </CardContent>
       </Card>
 
-      {/* Top Subcontractors */}
-      {stats?.topSubcontractors && stats.topSubcontractors.length > 0 && (
-        <Card className="rounded-3xl">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Users className="w-5 h-5 text-emerald-600" />
-              {t('subcontracting.topSubcontractors', 'أفضل المصنعين')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {stats.topSubcontractors.slice(0, 5).map((subcontractor, index) => (
-                <div
-                  key={subcontractor.supplierId}
-                  className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs font-bold">
-                      {index + 1}
-                    </span>
-                    <span className="text-sm font-medium truncate max-w-[120px]">
-                      {subcontractor.supplierName}
-                    </span>
-                  </div>
-                  <Badge variant="outline">
-                    {subcontractor.totalOrders} {t('subcontracting.orders', 'أوامر')}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Navigation Links */}
+      <Card className="rounded-3xl">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <List className="w-5 h-5 text-emerald-600" />
+            {t('subcontracting.navigation', 'التنقل')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/subcontracting">
+              <FileText className="w-4 h-4 ml-2" />
+              {t('subcontracting.orders', 'أوامر التصنيع')}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/subcontracting/receipts">
+              <Package className="w-4 h-4 ml-2" />
+              {t('subcontracting.receipts', 'إيصالات الاستلام')}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/subcontracting/settings">
+              <Settings className="w-4 h-4 ml-2" />
+              {t('subcontracting.settings', 'الإعدادات')}
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
 
-      {/* Pending Orders */}
+      {/* Pending Orders Widget */}
       <Card className="rounded-3xl border-amber-200 bg-amber-50">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2 text-amber-700">
@@ -140,7 +124,7 @@ export function SubcontractingSidebar() {
               ))}
               {pendingOrders.orders.length > 5 && (
                 <Button asChild variant="ghost" size="sm" className="w-full text-amber-700">
-                  <Link to="/dashboard/subcontracting/orders?status=submitted">
+                  <Link to="/dashboard/subcontracting?status=submitted">
                     {t('subcontracting.viewAll', 'عرض الكل')} ({pendingOrders.orders.length})
                   </Link>
                 </Button>
@@ -150,15 +134,77 @@ export function SubcontractingSidebar() {
         </CardContent>
       </Card>
 
-      {/* Settings Link */}
-      <Card className="rounded-3xl">
-        <CardContent className="p-4">
-          <Button asChild variant="ghost" className="w-full justify-start">
-            <Link to="/dashboard/settings/subcontracting">
-              <Settings className="w-4 h-4 ml-2" />
-              {t('subcontracting.settings', 'إعدادات التصنيع الخارجي')}
-            </Link>
-          </Button>
+      {/* Pending Receipts Widget */}
+      <Card className="rounded-3xl border-blue-200 bg-blue-50">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2 text-blue-700">
+            <PackageCheck className="w-5 h-5" />
+            {t('subcontracting.pendingReceipts', 'إيصالات معلقة')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loadingStats ? (
+            <div className="space-y-2">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-4">
+              <div className="text-3xl font-bold text-blue-700">
+                {stats?.stats?.pendingReceipts || 0}
+              </div>
+              <p className="text-sm text-blue-600 mt-1">
+                {t('subcontracting.awaitingReceipt', 'في انتظار الاستلام')}
+              </p>
+              <Button asChild variant="ghost" size="sm" className="mt-3 text-blue-700">
+                <Link to="/dashboard/subcontracting/receipts?status=pending">
+                  {t('subcontracting.viewReceipts', 'عرض الإيصالات')}
+                </Link>
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Materials at Subcontractor Widget */}
+      <Card className="rounded-3xl border-purple-200 bg-purple-50">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2 text-purple-700">
+            <Boxes className="w-5 h-5" />
+            {t('subcontracting.materialsAtSubcontractor', 'مواد عند المصنع')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loadingStats ? (
+            <div className="space-y-2">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-2 rounded-lg bg-purple-100/50">
+                <span className="text-sm font-medium text-purple-700">
+                  {t('subcontracting.totalValue', 'القيمة الإجمالية')}
+                </span>
+                <Badge variant="outline" className="bg-purple-100 text-purple-700 border-purple-300">
+                  {stats?.stats?.materialsValue?.toLocaleString('ar-SA') || 0} {t('common.sar', 'ر.س')}
+                </Badge>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-purple-100/50">
+                <span className="text-sm font-medium text-purple-700">
+                  {t('subcontracting.totalItems', 'عدد الأصناف')}
+                </span>
+                <Badge variant="outline" className="bg-purple-100 text-purple-700 border-purple-300">
+                  {stats?.stats?.materialsCount || 0}
+                </Badge>
+              </div>
+              <Button asChild variant="ghost" size="sm" className="w-full text-purple-700">
+                <Link to="/dashboard/subcontracting/materials">
+                  {t('subcontracting.viewMaterials', 'عرض المواد')}
+                </Link>
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -12,9 +12,10 @@ import {
   Settings,
   Wrench,
   TrendingDown,
-  ArrowRightLeft,
   FolderOpen,
   AlertTriangle,
+  Package,
+  Calendar,
 } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -43,125 +44,162 @@ export function AssetsSidebar() {
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
             <Link to="/dashboard/assets/create">
               <Plus className="w-4 h-4 ml-2" />
-              {t('assets.addAsset', 'إضافة أصل')}
+              {t('assets.newAsset', 'أصل جديد')}
               <kbd className="mr-auto bg-muted px-2 py-0.5 rounded text-xs">⌘N</kbd>
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/assets/categories">
+            <Link to="/dashboard/assets/categories/create">
               <FolderOpen className="w-4 h-4 ml-2" />
-              {t('assets.categories', 'فئات الأصول')}
+              {t('assets.newCategory', 'فئة جديدة')}
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/assets/movements">
-              <ArrowRightLeft className="w-4 h-4 ml-2" />
-              {t('assets.movements', 'حركات الأصول')}
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/assets/depreciation">
-              <TrendingDown className="w-4 h-4 ml-2" />
-              {t('assets.depreciation', 'الإهلاك')}
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/assets/reports">
-              <BarChart3 className="w-4 h-4 ml-2" />
-              {t('assets.reports', 'التقارير')}
+            <Link to="/dashboard/assets/maintenance/create">
+              <Calendar className="w-4 h-4 ml-2" />
+              {t('assets.scheduleMaintenance', 'جدولة صيانة')}
             </Link>
           </Button>
         </CardContent>
       </Card>
 
-      {/* Asset Value Summary */}
-      {stats && (
+      {/* Navigation Links */}
+      <Card className="rounded-3xl">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Package className="w-5 h-5 text-emerald-600" />
+            {t('assets.navigation', 'التنقل')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/assets">
+              <Building2 className="w-4 h-4 ml-2" />
+              {t('assets.assets', 'الأصول')}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/assets/categories">
+              <FolderOpen className="w-4 h-4 ml-2" />
+              {t('assets.categories', 'الفئات')}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/assets/maintenance">
+              <Wrench className="w-4 h-4 ml-2" />
+              {t('assets.maintenance', 'الصيانة')}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/assets/settings">
+              <Settings className="w-4 h-4 ml-2" />
+              {t('assets.settings', 'الإعدادات')}
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Total Assets Value Widget */}
+      {loadingStats ? (
         <Card className="rounded-3xl">
+          <CardContent className="p-4">
+            <Skeleton className="h-20 w-full" />
+          </CardContent>
+        </Card>
+      ) : stats && (
+        <Card className="rounded-3xl bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-emerald-600" />
-              {t('assets.valueSummary', 'ملخص القيمة')}
+            <CardTitle className="text-lg flex items-center gap-2 text-emerald-700">
+              <BarChart3 className="w-5 h-5" />
+              {t('assets.totalAssetsValue', 'إجمالي قيمة الأصول')}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent>
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">{t('assets.grossValue', 'القيمة الإجمالية')}</span>
-                <span className="font-bold">{new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(stats.totalValue || 0)}</span>
+                <span className="text-sm text-emerald-700">{t('assets.grossValue', 'القيمة الإجمالية')}</span>
+                <span className="font-bold text-emerald-900">{new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(stats.totalValue || 0)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">{t('assets.totalDepreciation', 'إجمالي الإهلاك')}</span>
+                <span className="text-sm text-emerald-700">{t('assets.totalDepreciation', 'إجمالي الإهلاك')}</span>
                 <span className="font-bold text-red-600">-{new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(stats.totalDepreciation || 0)}</span>
               </div>
-              <div className="border-t pt-2 flex justify-between">
-                <span className="text-sm font-medium">{t('assets.netValue', 'صافي القيمة')}</span>
-                <span className="font-bold text-emerald-600">{new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(stats.netValue || 0)}</span>
+              <div className="border-t border-emerald-200 pt-2 flex justify-between">
+                <span className="text-sm font-medium text-emerald-700">{t('assets.netValue', 'صافي القيمة')}</span>
+                <span className="font-bold text-emerald-600 text-lg">{new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(stats.netValue || 0)}</span>
               </div>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Upcoming Maintenance */}
+      {/* Overdue Maintenance Widget */}
       <Card className="rounded-3xl border-amber-200 bg-amber-50">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2 text-amber-700">
-            <Wrench className="w-5 h-5" />
-            {t('assets.upcomingMaintenance', 'صيانة قادمة')}
+            <AlertTriangle className="w-5 h-5" />
+            {t('assets.overdueMaintenance', 'صيانة متأخرة')}
             {stats?.overdueMaintenance && stats.overdueMaintenance > 0 && (
               <Badge variant="destructive" className="mr-2">{stats.overdueMaintenance}</Badge>
             )}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {loadingMaintenance ? (
-            <div className="space-y-2">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
+          {loadingStats ? (
+            <Skeleton className="h-16 w-full" />
+          ) : stats?.overdueMaintenance && stats.overdueMaintenance > 0 ? (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-amber-700">{t('assets.overdueItems', 'عناصر متأخرة')}</span>
+                <span className="text-2xl font-bold text-amber-800">{stats.overdueMaintenance}</span>
+              </div>
+              <Button asChild variant="outline" size="sm" className="w-full text-amber-700 border-amber-300 hover:bg-amber-100">
+                <Link to="/dashboard/assets/maintenance?filter=overdue">
+                  {t('assets.viewOverdue', 'عرض المتأخرات')}
+                </Link>
+              </Button>
             </div>
-          ) : !upcomingMaintenance || upcomingMaintenance.length === 0 ? (
-            <p className="text-sm text-amber-600">
-              {t('assets.noUpcomingMaintenance', 'لا توجد صيانة مجدولة')}
-            </p>
           ) : (
-            <div className="space-y-2">
-              {upcomingMaintenance.slice(0, 5).map((schedule, index) => (
-                <div
-                  key={schedule._id || index}
-                  className="flex items-center justify-between p-2 rounded-lg hover:bg-amber-100 transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    <Wrench className="w-4 h-4 text-amber-600" />
-                    <span className="text-sm font-medium text-amber-800 truncate max-w-[150px]">
-                      {schedule.maintenanceType}
-                    </span>
-                  </div>
-                  <Badge variant="outline" className="bg-amber-100 text-amber-700 border-amber-300">
-                    {schedule.maintenanceDate}
-                  </Badge>
-                </div>
-              ))}
-              {upcomingMaintenance.length > 5 && (
-                <Button asChild variant="ghost" size="sm" className="w-full text-amber-700">
-                  <Link to="/dashboard/assets/maintenance">
-                    {t('assets.viewAll', 'عرض الكل')} ({upcomingMaintenance.length})
-                  </Link>
-                </Button>
-              )}
+            <div className="text-center py-4">
+              <p className="text-sm text-amber-600">{t('assets.noOverdueMaintenance', 'لا توجد صيانة متأخرة')}</p>
+              <p className="text-xs text-amber-500 mt-1">{t('assets.allOnTrack', 'كل شيء على المسار الصحيح')}</p>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Settings Link */}
-      <Card className="rounded-3xl">
-        <CardContent className="p-4">
-          <Button asChild variant="ghost" className="w-full justify-start">
-            <Link to="/dashboard/settings/assets">
-              <Settings className="w-4 h-4 ml-2" />
-              {t('assets.settings', 'إعدادات الأصول')}
-            </Link>
-          </Button>
+      {/* Depreciation This Month Widget */}
+      <Card className="rounded-3xl bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2 text-blue-700">
+            <TrendingDown className="w-5 h-5" />
+            {t('assets.depreciationThisMonth', 'إهلاك هذا الشهر')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loadingStats ? (
+            <Skeleton className="h-16 w-full" />
+          ) : stats ? (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-blue-700">{t('assets.monthlyDepreciation', 'الإهلاك الشهري')}</span>
+                <span className="text-2xl font-bold text-blue-800">
+                  {new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(stats.monthlyDepreciation || 0)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-blue-600">{t('assets.ytdDepreciation', 'الإهلاك منذ بداية العام')}</span>
+                <span className="font-medium text-blue-700">
+                  {new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(stats.ytdDepreciation || 0)}
+                </span>
+              </div>
+              <Button asChild variant="outline" size="sm" className="w-full text-blue-700 border-blue-300 hover:bg-blue-100">
+                <Link to="/dashboard/assets/depreciation">
+                  {t('assets.viewDepreciation', 'عرض تفاصيل الإهلاك')}
+                </Link>
+              </Button>
+            </div>
+          ) : null}
         </CardContent>
       </Card>
     </div>

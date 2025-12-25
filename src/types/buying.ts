@@ -578,6 +578,17 @@ export interface PurchaseOrderFilters {
   limit?: number
 }
 
+export interface RfqFilters {
+  status?: RfqStatus | 'all' | 'expired'
+  search?: string
+  dateFrom?: string
+  dateTo?: string
+  sortBy?: 'transactionDate' | 'createdAt'
+  sortOrder?: 'asc' | 'desc'
+  page?: number
+  limit?: number
+}
+
 export interface BuyingStats {
   totalSuppliers: number
   activeSuppliers: number

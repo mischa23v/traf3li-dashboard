@@ -12,6 +12,8 @@ import type {
   SupplierFilters,
   CreatePurchaseOrderData,
   PurchaseOrderFilters,
+  CreateMaterialRequestData,
+  RfqFilters,
 } from '@/types/buying'
 
 export const buyingKeys = {
@@ -26,6 +28,11 @@ export const buyingKeys = {
   purchaseReceipts: () => [...buyingKeys.all, 'purchase-receipts'] as const,
   purchaseInvoices: () => [...buyingKeys.all, 'purchase-invoices'] as const,
   materialRequests: () => [...buyingKeys.all, 'material-requests'] as const,
+  materialRequestsList: (filters?: any) => [...buyingKeys.materialRequests(), 'list', filters] as const,
+  materialRequestDetail: (id: string) => [...buyingKeys.materialRequests(), 'detail', id] as const,
+  rfqs: () => [...buyingKeys.all, 'rfqs'] as const,
+  rfqsList: (filters?: RfqFilters) => [...buyingKeys.rfqs(), 'list', filters] as const,
+  rfqDetail: (id: string) => [...buyingKeys.rfqs(), 'detail', id] as const,
   stats: () => [...buyingKeys.all, 'stats'] as const,
   settings: () => [...buyingKeys.all, 'settings'] as const,
 }
@@ -157,6 +164,100 @@ export function useApprovePurchaseOrder() {
   })
 }
 
+export function useCancelPurchaseOrder() {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: (id: string) => buyingService.cancelPurchaseOrder(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: buyingKeys.purchaseOrders() })
+      toast.success(t('buying.poCancelled', 'تم إلغاء أمر الشراء بنجاح'))
+    },
+    onError: (error: Error) => toast.error(error.message),
+  })
+}
+
+export function useDeletePurchaseOrder() {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: (id: string) => buyingService.deletePurchaseOrder(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: buyingKeys.purchaseOrders() })
+      toast.success(t('buying.poDeleted', 'تم حذف أمر الشراء بنجاح'))
+    },
+    onError: (error: Error) => toast.error(error.message),
+  })
+}
+
+// ==================== PURCHASE RECEIPTS HOOKS ====================
+
+export function usePurchaseReceipts(filters?: any) {
+  return useQuery({
+    queryKey: [...buyingKeys.purchaseReceipts(), 'list', filters],
+    queryFn: () => buyingService.getPurchaseReceipts(filters),
+  })
+}
+
+export function usePurchaseReceipt(id: string) {
+  return useQuery({
+    queryKey: [...buyingKeys.purchaseReceipts(), 'detail', id],
+    queryFn: () => buyingService.getPurchaseReceipt(id),
+    enabled: !!id,
+  })
+}
+
+// ==================== PURCHASE INVOICES HOOKS ====================
+
+export function usePurchaseInvoices(filters?: any) {
+  return useQuery({
+    queryKey: [...buyingKeys.purchaseInvoices(), 'list', filters],
+    queryFn: () => buyingService.getPurchaseInvoices(filters),
+  })
+}
+
+export function usePurchaseInvoice(id: string) {
+  return useQuery({
+    queryKey: [...buyingKeys.purchaseInvoices(), 'detail', id],
+    queryFn: () => buyingService.getPurchaseInvoice(id),
+    enabled: !!id,
+  })
+}
+
+// ==================== MATERIAL REQUEST HOOKS ====================
+
+export function useMaterialRequests(filters?: any) {
+  return useQuery({
+    queryKey: buyingKeys.materialRequestsList(filters),
+    queryFn: () => buyingService.getMaterialRequests(filters),
+  })
+}
+
+export function useMaterialRequest(id: string) {
+  return useQuery({
+    queryKey: buyingKeys.materialRequestDetail(id),
+    queryFn: () => buyingService.getMaterialRequest(id),
+    enabled: !!id,
+  })
+}
+
+export function useCreateMaterialRequest() {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: (data: CreateMaterialRequestData) =>
+      buyingService.createMaterialRequest(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: buyingKeys.materialRequests() })
+      toast.success(t('buying.materialRequestCreated', 'تم إنشاء طلب المواد بنجاح'))
+    },
+    onError: (error: Error) => toast.error(error.message),
+  })
+}
+
 // ==================== STATS HOOKS ====================
 
 export function useBuyingStats() {
@@ -190,6 +291,84 @@ export function useUpdateBuyingSettings() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: buyingKeys.settings() })
       toast.success(t('buying.settingsUpdated', 'تم تحديث إعدادات المشتريات بنجاح'))
+    },
+    onError: (error: Error) => toast.error(error.message),
+  })
+}
+
+// ==================== RFQ HOOKS ====================
+
+export function useRfqs(filters?: RfqFilters) {
+  return useQuery({
+    queryKey: buyingKeys.rfqsList(filters),
+    queryFn: () => buyingService.getRfqs(filters),
+  })
+}
+
+export function useRfq(id: string) {
+  return useQuery({
+    queryKey: buyingKeys.rfqDetail(id),
+    queryFn: () => buyingService.getRfq(id),
+    enabled: !!id,
+  })
+}
+
+export function useCreateRfq() {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: (data: Parameters<typeof buyingService.createRfq>[0]) =>
+      buyingService.createRfq(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: buyingKeys.rfqs() })
+      toast.success(t('buying.rfqCreated', 'تم إنشاء طلب عرض السعر بنجاح'))
+    },
+    onError: (error: Error) => toast.error(error.message),
+  })
+}
+
+export function useDeleteRfq() {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: (id: string) => buyingService.deleteRfq(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: buyingKeys.rfqs() })
+      toast.success(t('buying.rfqDeleted', 'تم حذف طلب عرض السعر بنجاح'))
+    },
+    onError: (error: Error) => toast.error(error.message),
+  })
+}
+
+// ==================== MATERIAL REQUESTS HOOKS ====================
+
+export function useMaterialRequests(filters?: any) {
+  return useQuery({
+    queryKey: [...buyingKeys.materialRequests(), 'list', filters],
+    queryFn: () => buyingService.getMaterialRequests(filters),
+  })
+}
+
+export function useMaterialRequest(id: string) {
+  return useQuery({
+    queryKey: [...buyingKeys.materialRequests(), 'detail', id],
+    queryFn: () => buyingService.getMaterialRequest(id),
+    enabled: !!id,
+  })
+}
+
+export function useCreateMaterialRequest() {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: (data: Parameters<typeof buyingService.createMaterialRequest>[0]) =>
+      buyingService.createMaterialRequest(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: buyingKeys.materialRequests() })
+      toast.success(t('buying.materialRequest.created', 'تم إنشاء طلب المواد بنجاح'))
     },
     onError: (error: Error) => toast.error(error.message),
   })

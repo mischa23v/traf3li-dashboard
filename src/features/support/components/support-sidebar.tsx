@@ -43,22 +43,97 @@ export function SupportSidebar() {
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
             <Link to="/dashboard/support/create">
               <Plus className="w-4 h-4 ml-2" />
-              {t('support.createTicket', 'إنشاء تذكرة')}
+              {t('support.newTicket', 'تذكرة جديدة')}
               <kbd className="mr-auto bg-muted px-2 py-0.5 rounded text-xs">⌘N</kbd>
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/support/slas">
+            <Link to="/dashboard/support/sla/create">
               <Clock className="w-4 h-4 ml-2" />
-              {t('support.manageSLAs', 'إدارة SLAs')}
+              {t('support.newSLA', 'SLA جديد')}
             </Link>
           </Button>
-          <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/support/reports">
-              <BarChart3 className="w-4 h-4 ml-2" />
-              {t('support.reports', 'التقارير')}
+        </CardContent>
+      </Card>
+
+      {/* Navigation Links */}
+      <Card className="rounded-3xl">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <FileText className="w-5 h-5 text-blue-600" />
+            {t('support.navigation', 'التنقل')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/support">
+              <MessageSquare className="w-4 h-4 ml-2" />
+              {t('support.tickets', 'التذاكر')}
             </Link>
           </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/support/sla">
+              <Clock className="w-4 h-4 ml-2" />
+              {t('support.sla', 'SLA')}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/support/settings">
+              <Settings className="w-4 h-4 ml-2" />
+              {t('support.settings', 'الإعدادات')}
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Open Tickets Widget */}
+      <Card className="rounded-3xl border-blue-200 bg-gradient-to-br from-blue-50 to-white">
+        <CardContent className="p-4">
+          {loadingStats ? (
+            <Skeleton className="h-16 w-full" />
+          ) : (
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">{t('support.openTickets', 'التذاكر المفتوحة')}</p>
+                <p className="text-3xl font-bold text-blue-600">{stats?.openTickets || 0}</p>
+              </div>
+              <MessageSquare className="w-12 h-12 text-blue-400 opacity-50" />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Overdue Tickets Widget */}
+      <Card className="rounded-3xl border-orange-200 bg-gradient-to-br from-orange-50 to-white">
+        <CardContent className="p-4">
+          {loadingStats ? (
+            <Skeleton className="h-16 w-full" />
+          ) : (
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">{t('support.overdueTickets', 'التذاكر المتأخرة')}</p>
+                <p className="text-3xl font-bold text-orange-600">{stats?.overdueTickets || 0}</p>
+              </div>
+              <AlertTriangle className="w-12 h-12 text-orange-400 opacity-50" />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* SLA Breaches Widget */}
+      <Card className="rounded-3xl border-red-200 bg-gradient-to-br from-red-50 to-white">
+        <CardContent className="p-4">
+          {loadingStats ? (
+            <Skeleton className="h-16 w-full" />
+          ) : (
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">{t('support.slaBreaches', 'خروقات SLA')}</p>
+                <p className="text-3xl font-bold text-red-600">{stats?.slaBreaches || 0}</p>
+              </div>
+              <Clock className="w-12 h-12 text-red-400 opacity-50" />
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -133,18 +208,6 @@ export function SupportSidebar() {
           </CardContent>
         </Card>
       )}
-
-      {/* Settings Link */}
-      <Card className="rounded-3xl">
-        <CardContent className="p-4">
-          <Button asChild variant="ghost" className="w-full justify-start">
-            <Link to="/dashboard/settings/support">
-              <Settings className="w-4 h-4 ml-2" />
-              {t('support.settings', 'إعدادات الدعم')}
-            </Link>
-          </Button>
-        </CardContent>
-      </Card>
     </div>
   )
 }

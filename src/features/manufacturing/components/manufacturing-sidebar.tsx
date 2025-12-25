@@ -15,20 +15,22 @@ import {
   ClipboardList,
   Layers,
   PlayCircle,
+  Navigation,
+  TrendingUp,
+  Clock,
 } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Progress } from '@/components/ui/progress'
 
 import { useManufacturingStats, useWorkOrders } from '@/hooks/use-manufacturing'
 
 export function ManufacturingSidebar() {
   const { t } = useTranslation()
   const { data: stats, isLoading: loadingStats } = useManufacturingStats()
-  const { data: inProgressOrders, isLoading: loadingInProgress } = useWorkOrders({ status: 'in_progress' })
+  const { data: activeOrders, isLoading: loadingActive } = useWorkOrders({ status: 'in_progress' })
 
   return (
     <div className="space-y-6">
@@ -36,97 +38,98 @@ export function ManufacturingSidebar() {
       <Card className="rounded-3xl">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
-            <Factory className="w-5 h-5 text-emerald-600" />
+            <Plus className="w-5 h-5 text-emerald-600" />
             {t('manufacturing.quickActions', 'إجراءات سريعة')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/manufacturing/work-orders/create">
+            <Link to="/dashboard/manufacturing/create">
               <Plus className="w-4 h-4 ml-2" />
-              {t('manufacturing.createWorkOrder', 'إنشاء أمر عمل')}
-              <kbd className="mr-auto bg-muted px-2 py-0.5 rounded text-xs">⌘N</kbd>
+              {t('manufacturing.newWorkOrder', 'أمر عمل جديد')}
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/manufacturing/boms">
+            <Link to="/dashboard/manufacturing/bom/create">
               <Layers className="w-4 h-4 ml-2" />
-              {t('manufacturing.boms', 'قوائم المواد')}
+              {t('manufacturing.newBOM', 'قائمة مواد جديدة')}
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/manufacturing/workstations">
+            <Link to="/dashboard/manufacturing/workstations/create">
               <Cog className="w-4 h-4 ml-2" />
-              {t('manufacturing.workstations', 'محطات العمل')}
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/manufacturing/job-cards">
-              <ClipboardList className="w-4 h-4 ml-2" />
-              {t('manufacturing.jobCards', 'بطاقات العمل')}
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/manufacturing/reports">
-              <BarChart3 className="w-4 h-4 ml-2" />
-              {t('manufacturing.reports', 'التقارير')}
+              {t('manufacturing.newWorkstation', 'محطة عمل جديدة')}
             </Link>
           </Button>
         </CardContent>
       </Card>
 
-      {/* Production Efficiency */}
-      {stats && (
-        <Card className="rounded-3xl">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-emerald-600" />
-              {t('manufacturing.efficiency', 'كفاءة الإنتاج')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-emerald-600 mb-2">{stats.productionEfficiency || 0}%</div>
-              <Progress value={stats.productionEfficiency || 0} className="h-3" />
-            </div>
-            <div className="grid grid-cols-2 gap-4 pt-4">
-              <div className="text-center p-3 rounded-xl bg-muted/50">
-                <div className="text-lg font-bold text-blue-600">{stats.totalBOMs || 0}</div>
-                <div className="text-xs text-muted-foreground">{t('manufacturing.totalBOMs', 'قوائم المواد')}</div>
-              </div>
-              <div className="text-center p-3 rounded-xl bg-muted/50">
-                <div className="text-lg font-bold text-purple-600">{stats.totalWorkstations || 0}</div>
-                <div className="text-xs text-muted-foreground">{t('manufacturing.workstations', 'محطات العمل')}</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Navigation Links */}
+      <Card className="rounded-3xl">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Navigation className="w-5 h-5 text-blue-600" />
+            {t('manufacturing.navigation', 'التنقل')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/manufacturing">
+              <Factory className="w-4 h-4 ml-2" />
+              {t('manufacturing.workOrders', 'أوامر العمل')}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/manufacturing/bom">
+              <Layers className="w-4 h-4 ml-2" />
+              {t('manufacturing.billOfMaterials', 'قوائم المواد')}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/manufacturing/workstations">
+              <Cog className="w-4 h-4 ml-2" />
+              {t('manufacturing.workstations', 'محطات العمل')}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/manufacturing/job-cards">
+              <ClipboardList className="w-4 h-4 ml-2" />
+              {t('manufacturing.jobCards', 'بطاقات العمل')}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to="/dashboard/manufacturing/settings">
+              <Settings className="w-4 h-4 ml-2" />
+              {t('manufacturing.settings', 'الإعدادات')}
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
 
-      {/* In Progress Orders */}
+      {/* Active Work Orders Widget */}
       <Card className="rounded-3xl border-blue-200 bg-blue-50">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2 text-blue-700">
             <PlayCircle className="w-5 h-5" />
-            {t('manufacturing.inProgressOrders', 'أوامر قيد التنفيذ')}
+            {t('manufacturing.activeWorkOrders', 'أوامر العمل النشطة')}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {loadingInProgress ? (
+          {loadingActive ? (
             <div className="space-y-2">
               <Skeleton className="h-10 w-full" />
               <Skeleton className="h-10 w-full" />
             </div>
-          ) : !inProgressOrders?.workOrders || inProgressOrders.workOrders.length === 0 ? (
+          ) : !activeOrders?.workOrders || activeOrders.workOrders.length === 0 ? (
             <p className="text-sm text-blue-600">
-              {t('manufacturing.noInProgressOrders', 'لا توجد أوامر قيد التنفيذ')}
+              {t('manufacturing.noActiveOrders', 'لا توجد أوامر نشطة')}
             </p>
           ) : (
             <div className="space-y-2">
-              {inProgressOrders.workOrders.slice(0, 5).map((order) => (
+              {activeOrders.workOrders.slice(0, 5).map((order) => (
                 <Link
                   key={order._id}
-                  to={`/dashboard/manufacturing/work-orders/${order._id}`}
+                  to={`/dashboard/manufacturing/${order._id}`}
                   className="flex items-center justify-between p-2 rounded-lg hover:bg-blue-100 transition-colors"
                 >
                   <div className="flex items-center gap-2">
@@ -140,10 +143,10 @@ export function ManufacturingSidebar() {
                   </Badge>
                 </Link>
               ))}
-              {inProgressOrders.workOrders.length > 5 && (
+              {activeOrders.workOrders.length > 5 && (
                 <Button asChild variant="ghost" size="sm" className="w-full text-blue-700">
-                  <Link to="/dashboard/manufacturing/work-orders?status=in_progress">
-                    {t('manufacturing.viewAll', 'عرض الكل')} ({inProgressOrders.workOrders.length})
+                  <Link to="/dashboard/manufacturing?status=in_progress">
+                    {t('manufacturing.viewAll', 'عرض الكل')} ({activeOrders.workOrders.length})
                   </Link>
                 </Button>
               )}
@@ -152,15 +155,71 @@ export function ManufacturingSidebar() {
         </CardContent>
       </Card>
 
-      {/* Settings Link */}
-      <Card className="rounded-3xl">
-        <CardContent className="p-4">
-          <Button asChild variant="ghost" className="w-full justify-start">
-            <Link to="/dashboard/settings/manufacturing">
-              <Settings className="w-4 h-4 ml-2" />
-              {t('manufacturing.settings', 'إعدادات التصنيع')}
-            </Link>
-          </Button>
+      {/* Pending Job Cards Widget */}
+      <Card className="rounded-3xl border-amber-200 bg-amber-50">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2 text-amber-700">
+            <Clock className="w-5 h-5" />
+            {t('manufacturing.pendingJobCards', 'بطاقات العمل المعلقة')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loadingStats ? (
+            <Skeleton className="h-16 w-full" />
+          ) : (
+            <div className="text-center">
+              <div className="text-4xl font-bold text-amber-600 mb-2">
+                {stats?.pendingJobCards || 0}
+              </div>
+              <div className="text-sm text-amber-700">
+                {t('manufacturing.cardsAwaitingAction', 'بطاقات في انتظار الإجراء')}
+              </div>
+              <Button asChild variant="ghost" size="sm" className="w-full mt-3 text-amber-700">
+                <Link to="/dashboard/manufacturing/job-cards?status=pending">
+                  {t('manufacturing.viewPending', 'عرض المعلقة')}
+                </Link>
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Production Today Widget */}
+      <Card className="rounded-3xl border-emerald-200 bg-emerald-50">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2 text-emerald-700">
+            <TrendingUp className="w-5 h-5" />
+            {t('manufacturing.productionToday', 'الإنتاج اليوم')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loadingStats ? (
+            <Skeleton className="h-16 w-full" />
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-emerald-700">
+                  {t('manufacturing.completedOrders', 'أوامر مكتملة')}
+                </span>
+                <span className="text-2xl font-bold text-emerald-600">
+                  {stats?.completedToday || 0}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-emerald-700">
+                  {t('manufacturing.producedQty', 'الكمية المنتجة')}
+                </span>
+                <span className="text-2xl font-bold text-emerald-600">
+                  {stats?.producedToday || 0}
+                </span>
+              </div>
+              <Button asChild variant="ghost" size="sm" className="w-full text-emerald-700">
+                <Link to="/dashboard/manufacturing?date=today">
+                  {t('manufacturing.viewDetails', 'عرض التفاصيل')}
+                </Link>
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
