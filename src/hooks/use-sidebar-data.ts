@@ -13,6 +13,13 @@ import {
   UserCog,
   UserPlus,
   Lightbulb,
+  Package,
+  ShoppingCart,
+  Headphones,
+  ClipboardCheck,
+  Factory,
+  Building2,
+  GitBranch,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 import { usePermissionsStore } from '@/stores/permissions-store'
@@ -392,6 +399,195 @@ export function useSidebarData(): SidebarData {
               title: 'sidebar.nav.fullReports',
               url: '/dashboard/finance/full-reports',
               module: 'reports',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      title: 'sidebar.nav.inventoryGroup',
+      items: [
+        {
+          title: 'sidebar.nav.inventory',
+          icon: Package,
+          items: [
+            {
+              title: 'sidebar.nav.items',
+              url: '/dashboard/inventory',
+            },
+            {
+              title: 'sidebar.nav.warehouses',
+              url: '/dashboard/inventory/warehouses',
+            },
+            {
+              title: 'sidebar.nav.stockEntries',
+              url: '/dashboard/inventory/stock-entries',
+            },
+            {
+              title: 'sidebar.nav.stockLedger',
+              url: '/dashboard/inventory/stock-ledger',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      title: 'sidebar.nav.buyingGroup',
+      items: [
+        {
+          title: 'sidebar.nav.buying',
+          icon: ShoppingCart,
+          items: [
+            {
+              title: 'sidebar.nav.suppliers',
+              url: '/dashboard/buying',
+            },
+            {
+              title: 'sidebar.nav.purchaseOrders',
+              url: '/dashboard/buying/purchase-orders',
+            },
+            {
+              title: 'sidebar.nav.materialRequests',
+              url: '/dashboard/buying/material-requests',
+            },
+            {
+              title: 'sidebar.nav.purchaseReceipts',
+              url: '/dashboard/buying/purchase-receipts',
+            },
+            {
+              title: 'sidebar.nav.rfqs',
+              url: '/dashboard/buying/rfqs',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      title: 'sidebar.nav.manufacturingGroup',
+      items: [
+        {
+          title: 'sidebar.nav.manufacturing',
+          icon: Factory,
+          items: [
+            {
+              title: 'sidebar.nav.workOrders',
+              url: '/dashboard/manufacturing',
+            },
+            {
+              title: 'sidebar.nav.boms',
+              url: '/dashboard/manufacturing/boms',
+            },
+            {
+              title: 'sidebar.nav.workstations',
+              url: '/dashboard/manufacturing/workstations',
+            },
+            {
+              title: 'sidebar.nav.jobCards',
+              url: '/dashboard/manufacturing/job-cards',
+            },
+            {
+              title: 'sidebar.nav.productionPlans',
+              url: '/dashboard/manufacturing/production-plans',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      title: 'sidebar.nav.qualityGroup',
+      items: [
+        {
+          title: 'sidebar.nav.quality',
+          icon: ClipboardCheck,
+          items: [
+            {
+              title: 'sidebar.nav.qualityInspections',
+              url: '/dashboard/quality',
+            },
+            {
+              title: 'sidebar.nav.qualityTemplates',
+              url: '/dashboard/quality/templates',
+            },
+            {
+              title: 'sidebar.nav.qualityActions',
+              url: '/dashboard/quality/actions',
+            },
+            {
+              title: 'sidebar.nav.ncrs',
+              url: '/dashboard/quality/ncrs',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      title: 'sidebar.nav.assetsGroup',
+      items: [
+        {
+          title: 'sidebar.nav.assets',
+          icon: Building2,
+          items: [
+            {
+              title: 'sidebar.nav.assetsList',
+              url: '/dashboard/assets',
+            },
+            {
+              title: 'sidebar.nav.assetCategories',
+              url: '/dashboard/assets/categories',
+            },
+            {
+              title: 'sidebar.nav.depreciation',
+              url: '/dashboard/assets/depreciation',
+            },
+            {
+              title: 'sidebar.nav.assetMaintenance',
+              url: '/dashboard/assets/maintenance',
+            },
+            {
+              title: 'sidebar.nav.assetMovements',
+              url: '/dashboard/assets/movements',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      title: 'sidebar.nav.subcontractingGroup',
+      items: [
+        {
+          title: 'sidebar.nav.subcontracting',
+          icon: GitBranch,
+          items: [
+            {
+              title: 'sidebar.nav.subcontractingOrders',
+              url: '/dashboard/subcontracting',
+            },
+            {
+              title: 'sidebar.nav.subcontractingReceipts',
+              url: '/dashboard/subcontracting/receipts',
+            },
+            {
+              title: 'sidebar.nav.subcontractingBoms',
+              url: '/dashboard/subcontracting/boms',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      title: 'sidebar.nav.supportGroup',
+      items: [
+        {
+          title: 'sidebar.nav.support',
+          icon: Headphones,
+          items: [
+            {
+              title: 'sidebar.nav.tickets',
+              url: '/dashboard/support',
+            },
+            {
+              title: 'sidebar.nav.slas',
+              url: '/dashboard/support/slas',
             },
           ],
         },
