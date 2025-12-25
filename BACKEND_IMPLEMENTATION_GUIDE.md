@@ -1,5 +1,30 @@
 # Traf3li Dashboard - Backend Implementation Guide
 
+> ⚠️ **IMPORTANT NOTICE** (December 25, 2025)
+>
+> This document contains **LEGACY CONTENT** that may be outdated or inconsistent with the current frontend code.
+>
+> ### For ERPNext-Style Modules (Verified & Accurate):
+> **Use: [`docs/ERPNEXT_MODULES_BACKEND_GUIDE.md`](./docs/ERPNEXT_MODULES_BACKEND_GUIDE.md)**
+>
+> The ERPNext modules guide has been verified against the actual frontend types, services, and hooks:
+> - Inventory (Items, Warehouses, Stock Entries)
+> - Buying (Suppliers, Purchase Orders, Material Requests, RFQs)
+> - Support (Tickets, SLAs)
+> - Quality (Inspections, Templates, Actions)
+> - Manufacturing (BOMs, Work Orders, Job Cards)
+> - Assets (Asset Management, Depreciation, Maintenance)
+> - Subcontracting (Orders, Receipts)
+>
+> ### For Core Legal ERP Modules (Needs Verification):
+> The sections below cover core modules but **have not been verified** against the current frontend.
+> Before implementing, cross-reference with:
+> - `src/types/*.ts` - Frontend type definitions
+> - `src/services/*.ts` - API service calls
+> - `src/hooks/*.ts` - React Query hooks
+
+---
+
 ## Overview
 
 This document provides comprehensive backend implementation details for the Traf3li Legal ERP Dashboard. The frontend is built with React 19, TypeScript, and TanStack Router. The backend should be built with Node.js, Express, and MongoDB.
