@@ -3,7 +3,10 @@ import { useNavigate } from '@tanstack/react-router'
 import {
   Building2, User, Briefcase, CheckCircle2, ChevronRight, ChevronLeft,
   Loader2, Check, Upload, X, Sparkles, Rocket, Target, Users,
-  FileText, TrendingUp, Calculator, Scale, UserCog
+  FileText, TrendingUp, Calculator, Scale, UserCog, Package,
+  ShoppingCart, Factory, ClipboardCheck, Headphones, Building,
+  GitBranch, Warehouse, Tags, Ruler, DollarSign, Calendar,
+  Settings, AlertCircle, Shield, LifeBuoy, Archive
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -23,6 +26,10 @@ import type { WizardData, WizardCompanyInfo, WizardUserProfile, WizardModuleSele
 // ==================== TYPES ====================
 
 const STORAGE_KEY = 'initial-onboarding-wizard-progress'
+
+interface ModuleConfig {
+  [key: string]: any
+}
 
 // ==================== DEFAULT DATA ====================
 
@@ -51,6 +58,13 @@ const defaultWizardData: WizardData = {
     finance: true,
     crm: true,
     cases: true,
+    inventory: false,
+    buying: false,
+    manufacturing: false,
+    quality: false,
+    support: false,
+    assets: false,
+    subcontracting: false,
   },
   completed: false,
   currentStep: 1,
@@ -122,6 +136,76 @@ const MODULES = [
     color: 'bg-amber-500',
     recommended: false,
   },
+  {
+    key: 'inventory' as const,
+    icon: Package,
+    nameAr: 'إدارة المخزون',
+    nameEn: 'Inventory Management',
+    descriptionAr: 'إدارة المستودعات، الأصناف، وحدات القياس والمخزون',
+    descriptionEn: 'Manage warehouses, items, UOMs and stock',
+    color: 'bg-indigo-500',
+    recommended: false,
+  },
+  {
+    key: 'buying' as const,
+    icon: ShoppingCart,
+    nameAr: 'المشتريات',
+    nameEn: 'Buying',
+    descriptionAr: 'إدارة الموردين، طلبات الشراء، الاستلام والدفع',
+    descriptionEn: 'Manage suppliers, purchase orders, receipts and payments',
+    color: 'bg-cyan-500',
+    recommended: false,
+  },
+  {
+    key: 'manufacturing' as const,
+    icon: Factory,
+    nameAr: 'التصنيع',
+    nameEn: 'Manufacturing',
+    descriptionAr: 'إدارة الإنتاج، محطات العمل، قوائم المواد وأوامر العمل',
+    descriptionEn: 'Manage production, workstations, BOMs and work orders',
+    color: 'bg-orange-500',
+    recommended: false,
+  },
+  {
+    key: 'quality' as const,
+    icon: ClipboardCheck,
+    nameAr: 'إدارة الجودة',
+    nameEn: 'Quality Management',
+    descriptionAr: 'إدارة الفحوصات، القوالب، المعايير ومراقبة الجودة',
+    descriptionEn: 'Manage inspections, templates, parameters and QC',
+    color: 'bg-teal-500',
+    recommended: false,
+  },
+  {
+    key: 'support' as const,
+    icon: Headphones,
+    nameAr: 'الدعم الفني',
+    nameEn: 'Support',
+    descriptionAr: 'إدارة التذاكر، اتفاقيات مستوى الخدمة والدعم الفني',
+    descriptionEn: 'Manage tickets, SLAs and technical support',
+    color: 'bg-pink-500',
+    recommended: false,
+  },
+  {
+    key: 'assets' as const,
+    icon: Building,
+    nameAr: 'إدارة الأصول',
+    nameEn: 'Asset Management',
+    descriptionAr: 'إدارة الأصول، الإهلاك، الصيانة والفئات',
+    descriptionEn: 'Manage assets, depreciation, maintenance and categories',
+    color: 'bg-slate-500',
+    recommended: false,
+  },
+  {
+    key: 'subcontracting' as const,
+    icon: GitBranch,
+    nameAr: 'التعاقد من الباطن',
+    nameEn: 'Subcontracting',
+    descriptionAr: 'إدارة التعاقدات من الباطن، المواد والعمليات الخارجية',
+    descriptionEn: 'Manage subcontracting, materials and external processes',
+    color: 'bg-violet-500',
+    recommended: false,
+  },
 ]
 
 // ==================== COMPONENT ====================
@@ -132,6 +216,7 @@ export default function InitialSetupWizard() {
   const [wizardData, setWizardData] = useState<WizardData>(defaultWizardData)
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const [moduleConfig, setModuleConfig] = useState<ModuleConfig>({})
 
   const totalSteps = 5
 
@@ -151,6 +236,9 @@ export default function InitialSetupWizard() {
         if (parsed.currentStep) {
           setCurrentStep(parsed.currentStep)
         }
+        if (parsed.moduleConfig) {
+          setModuleConfig(parsed.moduleConfig)
+        }
       } catch (error) {
         console.error('Failed to load saved progress:', error)
       }
@@ -159,7 +247,7 @@ export default function InitialSetupWizard() {
 
   // Save progress to localStorage and database
   useEffect(() => {
-    const dataToSave = { ...wizardData, currentStep }
+    const dataToSave = { ...wizardData, currentStep, moduleConfig }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave))
 
     // Debounce the database save
@@ -168,7 +256,7 @@ export default function InitialSetupWizard() {
     }, 1000)
 
     return () => clearTimeout(timeoutId)
-  }, [wizardData, currentStep])
+  }, [wizardData, currentStep, moduleConfig])
 
   const handleInputChange = <K extends keyof WizardData>(
     section: K,
@@ -179,6 +267,16 @@ export default function InitialSetupWizard() {
       ...prev,
       [section]: {
         ...prev[section],
+        [field]: value,
+      },
+    }))
+  }
+
+  const handleModuleConfigChange = (moduleKey: string, field: string, value: any) => {
+    setModuleConfig(prev => ({
+      ...prev,
+      [moduleKey]: {
+        ...prev[moduleKey],
         [field]: value,
       },
     }))
@@ -672,7 +770,7 @@ export default function InitialSetupWizard() {
               <p className="text-slate-600">اختر الوحدات التي تحتاجها لعملك</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[600px] overflow-y-auto px-2">
               {MODULES.map((module) => {
                 const Icon = module.icon
                 const isSelected = wizardData.modules[module.key]
@@ -709,7 +807,7 @@ export default function InitialSetupWizard() {
                           </div>
                         </div>
                         <div
-                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all shrink-0 ${
                             isSelected
                               ? 'border-emerald-500 bg-emerald-500'
                               : 'border-slate-300'

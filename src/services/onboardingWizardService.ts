@@ -28,6 +28,13 @@ export interface WizardModuleSelection {
   finance: boolean
   crm: boolean
   cases: boolean
+  inventory: boolean
+  buying: boolean
+  manufacturing: boolean
+  quality: boolean
+  support: boolean
+  assets: boolean
+  subcontracting: boolean
 }
 
 export interface WizardData {
