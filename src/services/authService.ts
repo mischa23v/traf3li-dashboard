@@ -140,6 +140,7 @@ export interface User {
 export interface LoginCredentials {
   username: string // Can be username OR email
   password: string
+  captchaToken?: string
 }
 
 /**
@@ -155,6 +156,9 @@ export interface RegisterData {
   isSeller?: boolean
   description?: string
   image?: string
+  firstName?: string
+  lastName?: string
+  captchaToken?: string
 }
 
 /**

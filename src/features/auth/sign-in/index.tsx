@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, Link, useSearch } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -11,6 +11,14 @@ import {
 } from '@/lib/login-throttle';
 import { getLogoutReasonMessage } from '@/constants/errorCodes';
 import { SSOLoginButtons } from '@/components/auth/sso-login-buttons';
+import {
+  InvisibleCaptcha,
+  CaptchaChallengeRef,
+} from '@/components/auth/captcha-challenge';
+import {
+  defaultCaptchaConfig,
+  getCaptchaSiteKey,
+} from '@/components/auth/captcha-config';
 
 // ============================================
 // SVG ICONS
@@ -97,6 +105,13 @@ export function SignIn() {
   const [rateLimitError, setRateLimitError] = useState<string | null>(null);
   const [waitTime, setWaitTime] = useState<number>(0);
   const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null);
+
+  // CAPTCHA state
+  const captchaRef = useRef<CaptchaChallengeRef>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaEnabled = defaultCaptchaConfig.enabled;
+  const captchaProvider = defaultCaptchaConfig.provider;
+  const captchaSiteKey = getCaptchaSiteKey(captchaProvider);
 
   // Login form data
   const [formData, setFormData] = useState({
@@ -192,10 +207,24 @@ export function SignIn() {
     setRateLimitError(null);
 
     try {
+      // Execute CAPTCHA if enabled
+      let token = captchaToken;
+      if (captchaEnabled && captchaRef.current && !token) {
+        try {
+          token = await captchaRef.current.execute();
+          setCaptchaToken(token);
+        } catch (captchaError) {
+          setApiError(isRTL ? 'فشل التحقق الأمني. يرجى المحاولة مرة أخرى.' : 'Security verification failed. Please try again.');
+          setIsLoading(false);
+          return;
+        }
+      }
+
       // Call backend auth service
       await login({
         username: formData.usernameOrEmail,
         password: formData.password,
+        captchaToken: token || undefined,
       });
 
       // Record successful login - clears throttle data
@@ -260,6 +289,11 @@ export function SignIn() {
       }
 
       setApiError(err.message || t('common.error'));
+      // Reset CAPTCHA on error so user can try again
+      if (captchaRef.current) {
+        captchaRef.current.reset();
+        setCaptchaToken(null);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -391,6 +425,24 @@ export function SignIn() {
                   <p className="text-red-500 text-xs mt-1">{errors.password}</p>
                 )}
               </div>
+
+              {/* Invisible CAPTCHA */}
+              {captchaEnabled && captchaProvider !== 'none' && captchaSiteKey && (
+                <InvisibleCaptcha
+                  ref={captchaRef}
+                  provider={captchaProvider}
+                  siteKey={captchaSiteKey}
+                  action="login"
+                  onSuccess={(token) => setCaptchaToken(token)}
+                  onError={(error) => {
+                    console.error('CAPTCHA error:', error);
+                    setApiError(isRTL ? 'فشل التحقق الأمني' : 'Security verification failed');
+                  }}
+                  onExpired={() => {
+                    setCaptchaToken(null);
+                  }}
+                />
+              )}
 
               {/* Submit Button */}
               <button

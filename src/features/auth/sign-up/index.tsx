@@ -1,8 +1,16 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate, Link } from '@tanstack/react-router';
 import { toast } from 'sonner';
 import authService from '@/services/authService';
 import { PasswordStrengthIndicator } from '@/components/auth/password-strength-indicator';
+import {
+  InvisibleCaptcha,
+  CaptchaChallengeRef,
+} from '@/components/auth/captcha-challenge';
+import {
+  defaultCaptchaConfig,
+  getCaptchaSiteKey,
+} from '@/components/auth/captcha-config';
 
 // ============================================
 // SVG ICONS
@@ -171,6 +179,13 @@ export function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState('');
 
+  // CAPTCHA state
+  const captchaRef = useRef<CaptchaChallengeRef>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaEnabled = defaultCaptchaConfig.enabled;
+  const captchaProvider = defaultCaptchaConfig.provider;
+  const captchaSiteKey = getCaptchaSiteKey(captchaProvider);
+
   const [formData, setFormData] = useState({
     userType: '',
     lawyerMode: '',
@@ -314,7 +329,20 @@ export function SignUp() {
     setApiError('');
 
     try {
-      // Prepare registration data
+      // Execute CAPTCHA if enabled
+      let token = captchaToken;
+      if (captchaEnabled && captchaRef.current && !token) {
+        try {
+          token = await captchaRef.current.execute();
+          setCaptchaToken(token);
+        } catch (captchaError) {
+          setApiError('فشل التحقق الأمني. يرجى المحاولة مرة أخرى.');
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // Prepare registration data with firstName and lastName
       const registrationData = {
         username: formData.username,
         email: formData.email,
@@ -324,6 +352,9 @@ export function SignUp() {
         role: formData.userType as 'client' | 'lawyer',
         isSeller: formData.userType === 'lawyer',
         description: formData.bio || undefined,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        captchaToken: token || undefined,
       };
 
       // Call registration API
@@ -338,6 +369,11 @@ export function SignUp() {
       const errorMessage = error.message || 'فشل إنشاء الحساب';
       setApiError(errorMessage);
       toast.error(errorMessage);
+      // Reset CAPTCHA on error so user can try again
+      if (captchaRef.current) {
+        captchaRef.current.reset();
+        setCaptchaToken(null);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -921,6 +957,24 @@ export function SignUp() {
                     </div>
                   )}
                 </div>
+              )}
+
+              {/* Invisible CAPTCHA - only on final step */}
+              {currentStep === totalSteps && captchaEnabled && captchaProvider !== 'none' && captchaSiteKey && (
+                <InvisibleCaptcha
+                  ref={captchaRef}
+                  provider={captchaProvider}
+                  siteKey={captchaSiteKey}
+                  action="register"
+                  onSuccess={(token) => setCaptchaToken(token)}
+                  onError={(error) => {
+                    console.error('CAPTCHA error:', error);
+                    setApiError('فشل التحقق الأمني');
+                  }}
+                  onExpired={() => {
+                    setCaptchaToken(null);
+                  }}
+                />
               )}
 
             </div>
