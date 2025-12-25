@@ -341,35 +341,3 @@ export function useDeleteRfq() {
     onError: (error: Error) => toast.error(error.message),
   })
 }
-
-// ==================== MATERIAL REQUESTS HOOKS ====================
-
-export function useMaterialRequests(filters?: any) {
-  return useQuery({
-    queryKey: [...buyingKeys.materialRequests(), 'list', filters],
-    queryFn: () => buyingService.getMaterialRequests(filters),
-  })
-}
-
-export function useMaterialRequest(id: string) {
-  return useQuery({
-    queryKey: [...buyingKeys.materialRequests(), 'detail', id],
-    queryFn: () => buyingService.getMaterialRequest(id),
-    enabled: !!id,
-  })
-}
-
-export function useCreateMaterialRequest() {
-  const queryClient = useQueryClient()
-  const { t } = useTranslation()
-
-  return useMutation({
-    mutationFn: (data: Parameters<typeof buyingService.createMaterialRequest>[0]) =>
-      buyingService.createMaterialRequest(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: buyingKeys.materialRequests() })
-      toast.success(t('buying.materialRequest.created', 'تم إنشاء طلب المواد بنجاح'))
-    },
-    onError: (error: Error) => toast.error(error.message),
-  })
-}
