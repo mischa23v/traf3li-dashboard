@@ -37,14 +37,14 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   const [showWelcomeModal, setShowWelcomeModal] = useState(false)
 
   useEffect(() => {
-    // Only check onboarding status if not loading and user hasn't completed onboarding
-    if (!isLoadingStatus && onboardingStatus && !onboardingStatus.completed) {
-      // Check if user is on the onboarding routes already
-      const currentPath = window.location.pathname
-      if (!currentPath.includes('/onboarding')) {
-        setShowWelcome(true)
-      }
-    }
+    // TEMPORARILY DISABLED - Startup wizard disabled for testing
+    // TODO: Re-enable when wizard is fixed
+    // if (!isLoadingStatus && onboardingStatus && !onboardingStatus.completed) {
+    //   const currentPath = window.location.pathname
+    //   if (!currentPath.includes('/onboarding')) {
+    //     setShowWelcome(true)
+    //   }
+    // }
   }, [isLoadingStatus, onboardingStatus])
 
   // Show welcome modal on first visit (after wizard is completed)
