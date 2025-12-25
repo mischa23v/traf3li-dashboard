@@ -4726,3 +4726,1414 @@ db.employeeSkillMaps.createIndex({ employeeId: 1, skillId: 1 }, { unique: true }
 10. Vehicles
 11. Skills & Skill Map
 12. HR Setup Wizard
+
+---
+
+# ERPNext-Style Modules - Backend Implementation Guide
+
+**Added:** December 25, 2025
+
+This section covers the 7 new ERPNext-style modules that were added to the frontend. These require backend API implementation.
+
+---
+
+## Module Overview
+
+| Module | Collections | Key Features |
+|--------|-------------|--------------|
+| **Inventory** | items, warehouses, stockEntries, stockLedger | Stock management, multi-warehouse, batch/serial tracking |
+| **Buying** | suppliers, purchaseOrders, materialRequests, rfqs | Procurement, supplier management, RFQ workflow |
+| **Support** | tickets, ticketCommunications, slas | Helpdesk, SLA tracking, ticket workflow |
+| **Quality** | qualityInspections, templates, parameters, actions | Quality control, inspection templates, corrective actions |
+| **Manufacturing** | billOfMaterials, workstations, workOrders, jobCards | Production planning, BOM management, job tracking |
+| **Assets** | assets, assetCategories, depreciationEntries, maintenanceSchedules | Fixed asset lifecycle, depreciation, maintenance |
+| **Subcontracting** | subcontractingOrders, subcontractingReceipts | Outsourced manufacturing, material tracking |
+
+---
+
+## 1. Inventory Module
+
+### Collections
+
+#### `items` Collection
+```javascript
+{
+  _id: ObjectId,
+  itemId: String,           // Auto-generated: "ITM-YYYYMMDD-XXXX"
+  itemCode: String,         // Unique, user-defined
+  name: String,             // Required
+  nameAr: String,           // Arabic name
+  description: String,
+  descriptionAr: String,
+  itemType: String,         // "product" | "service" | "consumable" | "fixed_asset"
+  status: String,           // "active" | "inactive" | "discontinued"
+  itemGroup: String,        // Category/group
+  brand: String,
+
+  // Stock Settings
+  isStockItem: Boolean,     // Default: true for products
+  defaultWarehouse: ObjectId,
+  defaultUom: String,       // Default: "Units"
+  weightPerUnit: Number,
+  weightUom: String,        // "kg" | "lb" | "g"
+
+  // Pricing
+  standardRate: Number,     // Standard selling rate
+  valuationRate: Number,    // Cost rate
+  valuationMethod: String,  // "fifo" | "moving_average" | "lifo"
+
+  // Inventory Levels
+  openingStock: Number,
+  safetyStock: Number,      // Minimum stock level
+  reorderLevel: Number,     // When to reorder
+  reorderQty: Number,       // How much to reorder
+
+  // Tax & Accounting
+  taxCategory: String,
+  hsnCode: String,
+  defaultIncomeAccount: String,
+  defaultExpenseAccount: String,
+
+  // Tracking
+  hasBatchNo: Boolean,
+  hasSerialNo: Boolean,
+  shelfLifeDays: Number,
+  warrantyMonths: Number,
+
+  // Media
+  image: String,
+
+  // Metadata
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date,
+  isDeleted: Boolean
+}
+```
+
+#### `warehouses` Collection
+```javascript
+{
+  _id: ObjectId,
+  warehouseId: String,      // Auto-generated: "WH-YYYYMMDD-XXXX"
+  name: String,             // Required, unique
+  nameAr: String,
+  warehouseType: String,    // "stores" | "transit" | "manufacturing" | "rejected"
+  parentWarehouse: ObjectId,
+
+  // Location
+  address: {
+    addressLine1: String,
+    addressLine2: String,
+    city: String,
+    state: String,
+    country: String,
+    postalCode: String,
+    latitude: Number,
+    longitude: Number
+  },
+
+  // Contact
+  phone: String,
+  email: String,
+  contactPerson: String,
+
+  // Settings
+  isGroup: Boolean,
+  disabled: Boolean,
+
+  company: ObjectId,
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### `stockEntries` Collection
+```javascript
+{
+  _id: ObjectId,
+  stockEntryId: String,     // Auto-generated: "SE-YYYYMMDD-XXXX"
+  stockEntryType: String,   // "receipt" | "issue" | "transfer" | "manufacture" | "repack"
+  purpose: String,
+
+  postingDate: Date,
+  postingTime: String,
+
+  fromWarehouse: ObjectId,
+  toWarehouse: ObjectId,
+
+  items: [{
+    itemId: ObjectId,
+    itemCode: String,
+    itemName: String,
+    quantity: Number,
+    uom: String,
+    basicRate: Number,
+    amount: Number,
+    batchNo: String,
+    serialNo: String,
+    sourceWarehouse: ObjectId,
+    targetWarehouse: ObjectId
+  }],
+
+  totalQuantity: Number,
+  totalAmount: Number,
+  status: String,           // "draft" | "submitted" | "cancelled"
+
+  referenceType: String,
+  referenceId: ObjectId,
+  remarks: String,
+
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### `stockLedger` Collection
+```javascript
+{
+  _id: ObjectId,
+  itemId: ObjectId,
+  warehouseId: ObjectId,
+  postingDate: Date,
+  postingTime: String,
+
+  actualQty: Number,        // Positive for in, negative for out
+  qtyAfterTransaction: Number,
+  incomingRate: Number,
+  outgoingRate: Number,
+  valuationRate: Number,
+  stockValue: Number,
+  stockValueDifference: Number,
+
+  voucherType: String,
+  voucherId: ObjectId,
+  voucherNo: String,
+
+  batchNo: String,
+  serialNo: String,
+  company: ObjectId,
+  createdAt: Date
+}
+```
+
+### API Endpoints
+
+```
+# Items
+GET    /api/inventory/items              # List with filters (status, itemType, search)
+GET    /api/inventory/items/:id
+POST   /api/inventory/items
+PUT    /api/inventory/items/:id
+DELETE /api/inventory/items/:id          # Soft delete
+GET    /api/inventory/items/:id/stock    # Stock by warehouse
+
+# Warehouses
+GET    /api/inventory/warehouses
+GET    /api/inventory/warehouses/:id
+POST   /api/inventory/warehouses
+PUT    /api/inventory/warehouses/:id
+DELETE /api/inventory/warehouses/:id
+GET    /api/inventory/warehouses/:id/stock  # All items in warehouse
+
+# Stock Entries
+GET    /api/inventory/stock-entries
+GET    /api/inventory/stock-entries/:id
+POST   /api/inventory/stock-entries
+PUT    /api/inventory/stock-entries/:id
+POST   /api/inventory/stock-entries/:id/submit   # Updates stock ledger
+POST   /api/inventory/stock-entries/:id/cancel   # Reverses stock
+
+# Stock Ledger (Read-only)
+GET    /api/inventory/stock-ledger
+GET    /api/inventory/stock-ledger/balance
+
+# Stats
+GET    /api/inventory/stats
+# Returns: { totalItems, activeItems, totalWarehouses, lowStockItems, outOfStockItems, totalStockValue }
+```
+
+---
+
+## 2. Buying Module
+
+### Collections
+
+#### `suppliers` Collection
+```javascript
+{
+  _id: ObjectId,
+  supplierId: String,       // Auto-generated: "SUP-YYYYMMDD-XXXX"
+  supplierName: String,
+  supplierNameAr: String,
+  supplierType: String,     // "company" | "individual"
+  status: String,           // "active" | "inactive" | "blocked"
+
+  primaryContact: String,
+  email: String,
+  phone: String,
+  mobile: String,
+  website: String,
+
+  address: {
+    addressLine1: String,
+    addressLine2: String,
+    city: String,
+    state: String,
+    country: String,
+    postalCode: String
+  },
+
+  taxId: String,
+  paymentTerms: String,
+  currency: String,
+  priceList: String,
+
+  bankAccounts: [{
+    bankName: String,
+    accountNumber: String,
+    iban: String,
+    swiftCode: String,
+    isDefault: Boolean
+  }],
+
+  supplierGroup: String,
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### `purchaseOrders` Collection
+```javascript
+{
+  _id: ObjectId,
+  purchaseOrderId: String,  // Auto-generated: "PO-YYYYMMDD-XXXX"
+  supplierId: ObjectId,
+  supplierName: String,
+  supplierAddress: Object,
+
+  transactionDate: Date,
+  requiredByDate: Date,
+  status: String,           // "draft" | "submitted" | "approved" | "received" | "billed" | "cancelled" | "closed"
+
+  items: [{
+    itemId: ObjectId,
+    itemCode: String,
+    itemName: String,
+    description: String,
+    quantity: Number,
+    receivedQty: Number,
+    uom: String,
+    rate: Number,
+    amount: Number,
+    taxRate: Number,
+    taxAmount: Number,
+    warehouse: ObjectId,
+    requiredDate: Date
+  }],
+
+  totalQty: Number,
+  totalAmount: Number,
+  taxAmount: Number,
+  discountAmount: Number,
+  grandTotal: Number,
+
+  currency: String,
+  exchangeRate: Number,
+  paymentTerms: String,
+  termsAndConditions: String,
+
+  materialRequestId: ObjectId,
+  remarks: String,
+
+  approvedBy: ObjectId,
+  approvedAt: Date,
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### `materialRequests` Collection
+```javascript
+{
+  _id: ObjectId,
+  materialRequestId: String, // Auto-generated: "MR-YYYYMMDD-XXXX"
+  requestType: String,      // "purchase" | "transfer" | "material_issue" | "manufacture"
+  purpose: String,
+
+  transactionDate: Date,
+  requiredDate: Date,
+  status: String,           // "draft" | "submitted" | "ordered" | "transferred" | "issued" | "cancelled"
+
+  items: [{
+    itemId: ObjectId,
+    itemCode: String,
+    itemName: String,
+    quantity: Number,
+    orderedQty: Number,
+    receivedQty: Number,
+    uom: String,
+    warehouse: ObjectId,
+    sourceWarehouse: ObjectId,
+    targetWarehouse: ObjectId
+  }],
+
+  purchaseOrderIds: [ObjectId],
+  remarks: String,
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### `rfqs` Collection
+```javascript
+{
+  _id: ObjectId,
+  rfqId: String,            // Auto-generated: "RFQ-YYYYMMDD-XXXX"
+  transactionDate: Date,
+  requiredDate: Date,
+  status: String,           // "draft" | "submitted" | "quoted" | "ordered" | "cancelled"
+
+  suppliers: [{
+    supplierId: ObjectId,
+    supplierName: String,
+    email: String,
+    sent: Boolean,
+    sentAt: Date,
+    quotationReceived: Boolean,
+    quotationId: ObjectId
+  }],
+
+  items: [{
+    itemId: ObjectId,
+    itemCode: String,
+    itemName: String,
+    quantity: Number,
+    uom: String,
+    requiredDate: Date
+  }],
+
+  messageForSupplier: String,
+  termsAndConditions: String,
+  materialRequestId: ObjectId,
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### API Endpoints
+
+```
+# Suppliers
+GET    /api/buying/suppliers
+GET    /api/buying/suppliers/:id
+POST   /api/buying/suppliers
+PUT    /api/buying/suppliers/:id
+DELETE /api/buying/suppliers/:id
+GET    /api/buying/suppliers/:id/orders
+
+# Purchase Orders
+GET    /api/buying/purchase-orders
+GET    /api/buying/purchase-orders/:id
+POST   /api/buying/purchase-orders
+PUT    /api/buying/purchase-orders/:id
+POST   /api/buying/purchase-orders/:id/submit
+POST   /api/buying/purchase-orders/:id/approve
+POST   /api/buying/purchase-orders/:id/cancel
+POST   /api/buying/purchase-orders/:id/close
+
+# Material Requests
+GET    /api/buying/material-requests
+GET    /api/buying/material-requests/:id
+POST   /api/buying/material-requests
+PUT    /api/buying/material-requests/:id
+POST   /api/buying/material-requests/:id/submit
+POST   /api/buying/material-requests/:id/cancel
+
+# RFQs
+GET    /api/buying/rfqs
+GET    /api/buying/rfqs/:id
+POST   /api/buying/rfqs
+PUT    /api/buying/rfqs/:id
+POST   /api/buying/rfqs/:id/submit
+POST   /api/buying/rfqs/:id/send
+
+# Stats
+GET    /api/buying/stats
+```
+
+---
+
+## 3. Support Module
+
+### Collections
+
+#### `tickets` Collection
+```javascript
+{
+  _id: ObjectId,
+  ticketId: String,         // Auto-generated: "TKT-YYYYMMDD-XXXX"
+  ticketNumber: String,     // Sequential: "00001"
+
+  subject: String,
+  description: String,
+  status: String,           // "open" | "replied" | "resolved" | "closed" | "on_hold"
+  priority: String,         // "low" | "medium" | "high" | "urgent"
+  ticketType: String,       // "question" | "problem" | "feature_request" | "incident" | "service_request"
+
+  customerId: ObjectId,
+  customerName: String,
+  customerEmail: String,
+
+  assignedTo: ObjectId,
+  assignedTeam: String,
+
+  slaId: ObjectId,
+  slaStatus: String,        // "within_sla" | "warning" | "breached"
+  responseDeadline: Date,
+  resolutionDeadline: Date,
+  firstResponseAt: Date,
+  resolvedAt: Date,
+
+  category: String,
+  subcategory: String,
+  tags: [String],
+
+  referenceType: String,
+  referenceId: ObjectId,
+  communicationCount: Number,
+
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date,
+  closedAt: Date,
+  closedBy: ObjectId
+}
+```
+
+#### `ticketCommunications` Collection
+```javascript
+{
+  _id: ObjectId,
+  ticketId: ObjectId,
+  content: String,
+  contentText: String,
+  communicationType: String, // "reply" | "comment" | "note" | "system"
+  isInternal: Boolean,
+
+  senderId: ObjectId,
+  senderType: String,       // "user" | "customer" | "system"
+  senderName: String,
+  senderEmail: String,
+
+  sentViaEmail: Boolean,
+  emailMessageId: String,
+
+  attachments: [{
+    name: String,
+    url: String,
+    size: Number,
+    mimeType: String
+  }],
+
+  createdAt: Date
+}
+```
+
+#### `slas` Collection
+```javascript
+{
+  _id: ObjectId,
+  slaId: String,
+  name: String,
+  nameAr: String,
+  description: String,
+  isDefault: Boolean,
+  isActive: Boolean,
+
+  priority: String,
+  ticketType: String,
+
+  firstResponseTime: Number,  // hours
+  resolutionTime: Number,     // hours
+
+  supportHours: {
+    enabled: Boolean,
+    timezone: String,
+    schedule: [{
+      day: Number,
+      startTime: String,
+      endTime: String
+    }]
+  },
+
+  excludeHolidays: Boolean,
+  holidayList: [Date],
+
+  escalationRules: [{
+    afterHours: Number,
+    action: String,
+    notifyUsers: [ObjectId],
+    reassignTo: ObjectId
+  }],
+
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### API Endpoints
+
+```
+# Tickets
+GET    /api/support/tickets
+GET    /api/support/tickets/:id
+POST   /api/support/tickets
+PUT    /api/support/tickets/:id
+POST   /api/support/tickets/:id/assign
+POST   /api/support/tickets/:id/resolve
+POST   /api/support/tickets/:id/close
+POST   /api/support/tickets/:id/reopen
+
+# Communications
+GET    /api/support/tickets/:id/communications
+POST   /api/support/tickets/:id/communications
+
+# SLAs
+GET    /api/support/slas
+GET    /api/support/slas/:id
+POST   /api/support/slas
+PUT    /api/support/slas/:id
+DELETE /api/support/slas/:id
+
+# Stats
+GET    /api/support/stats
+```
+
+---
+
+## 4. Quality Module
+
+### Collections
+
+#### `qualityInspections` Collection
+```javascript
+{
+  _id: ObjectId,
+  inspectionId: String,     // Auto-generated: "QI-YYYYMMDD-XXXX"
+  inspectionNumber: String,
+  inspectionType: String,   // "incoming" | "outgoing" | "in_process"
+
+  referenceType: String,
+  referenceId: ObjectId,
+  referenceNumber: String,
+
+  itemId: ObjectId,
+  itemCode: String,
+  itemName: String,
+  sampleSize: Number,
+
+  templateId: ObjectId,
+  templateName: String,
+
+  readings: [{
+    parameterId: ObjectId,
+    parameterName: String,
+    specification: String,
+    acceptableMin: Number,
+    acceptableMax: Number,
+    reading: Number,
+    status: String          // "accepted" | "rejected"
+  }],
+
+  status: String,           // "pending" | "accepted" | "rejected" | "partially_accepted"
+  inspectedBy: ObjectId,
+  inspectionDate: Date,
+  remarks: String,
+
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### `qualityInspectionTemplates` Collection
+```javascript
+{
+  _id: ObjectId,
+  templateId: String,
+  name: String,
+  nameAr: String,
+  description: String,
+  itemGroup: String,
+
+  parameters: [{
+    parameterId: ObjectId,
+    parameterName: String,
+    specification: String,
+    acceptableMin: Number,
+    acceptableMax: Number,
+    isMandatory: Boolean
+  }],
+
+  isActive: Boolean,
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### `qualityActions` Collection
+```javascript
+{
+  _id: ObjectId,
+  actionId: String,         // Auto-generated: "QA-YYYYMMDD-XXXX"
+  actionType: String,       // "corrective" | "preventive"
+
+  referenceType: String,
+  referenceId: ObjectId,
+
+  description: String,
+  rootCause: String,
+  actionTaken: String,
+
+  status: String,           // "open" | "in_progress" | "resolved" | "closed"
+  priority: String,
+
+  assignedTo: ObjectId,
+  dueDate: Date,
+  completedAt: Date,
+
+  verifiedBy: ObjectId,
+  verifiedAt: Date,
+  verificationRemarks: String,
+
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### API Endpoints
+
+```
+# Inspections
+GET    /api/quality/inspections
+GET    /api/quality/inspections/:id
+POST   /api/quality/inspections
+PUT    /api/quality/inspections/:id
+POST   /api/quality/inspections/:id/submit
+
+# Templates
+GET    /api/quality/templates
+GET    /api/quality/templates/:id
+POST   /api/quality/templates
+PUT    /api/quality/templates/:id
+DELETE /api/quality/templates/:id
+
+# Parameters
+GET    /api/quality/parameters
+POST   /api/quality/parameters
+PUT    /api/quality/parameters/:id
+
+# Actions
+GET    /api/quality/actions
+GET    /api/quality/actions/:id
+POST   /api/quality/actions
+PUT    /api/quality/actions/:id
+POST   /api/quality/actions/:id/complete
+POST   /api/quality/actions/:id/verify
+
+# Stats
+GET    /api/quality/stats
+```
+
+---
+
+## 5. Manufacturing Module
+
+### Collections
+
+#### `billOfMaterials` Collection
+```javascript
+{
+  _id: ObjectId,
+  bomId: String,            // Auto-generated: "BOM-YYYYMMDD-XXXX"
+  bomNumber: String,
+
+  itemId: ObjectId,
+  itemCode: String,
+  itemName: String,
+  bomType: String,          // "standard" | "template" | "subcontract"
+
+  quantity: Number,
+  uom: String,
+
+  items: [{
+    itemId: ObjectId,
+    itemCode: String,
+    itemName: String,
+    quantity: Number,
+    uom: String,
+    rate: Number,
+    amount: Number,
+    warehouse: ObjectId,
+    includeInManufacturing: Boolean
+  }],
+
+  operations: [{
+    operationId: ObjectId,
+    operationName: String,
+    workstationId: ObjectId,
+    workstationName: String,
+    timeInMinutes: Number,
+    operatingCost: Number,
+    sequence: Number
+  }],
+
+  rawMaterialCost: Number,
+  operatingCost: Number,
+  totalCost: Number,
+
+  isActive: Boolean,
+  isDefault: Boolean,
+
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### `workstations` Collection
+```javascript
+{
+  _id: ObjectId,
+  workstationId: String,
+  name: String,
+  nameAr: String,
+  description: String,
+  workstationType: String,
+
+  productionCapacity: Number,
+  capacityUnit: String,
+
+  hourlyRate: Number,
+  electricityRate: Number,
+  consumableCost: Number,
+
+  workingHours: {
+    hoursPerShift: Number,
+    shiftsPerDay: Number,
+    workingDays: [Number]
+  },
+
+  status: String,           // "active" | "inactive" | "under_maintenance"
+  warehouse: ObjectId,
+
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### `workOrders` Collection
+```javascript
+{
+  _id: ObjectId,
+  workOrderId: String,      // Auto-generated: "WO-YYYYMMDD-XXXX"
+
+  itemId: ObjectId,
+  itemCode: String,
+  itemName: String,
+  bomId: ObjectId,
+
+  qtyToProduce: Number,
+  qtyProduced: Number,
+
+  plannedStartDate: Date,
+  plannedEndDate: Date,
+  actualStartDate: Date,
+  actualEndDate: Date,
+
+  status: String,           // "draft" | "submitted" | "not_started" | "in_progress" | "completed" | "stopped" | "cancelled"
+
+  sourceWarehouse: ObjectId,
+  targetWarehouse: ObjectId,
+  wipWarehouse: ObjectId,
+
+  requiredItems: [{
+    itemId: ObjectId,
+    itemCode: String,
+    itemName: String,
+    requiredQty: Number,
+    consumedQty: Number,
+    uom: String,
+    warehouse: ObjectId
+  }],
+
+  operations: [{
+    operationName: String,
+    workstationId: ObjectId,
+    status: String,
+    plannedTime: Number,
+    actualTime: Number,
+    sequence: Number
+  }],
+
+  plannedOperatingCost: Number,
+  actualOperatingCost: Number,
+
+  salesOrderId: ObjectId,
+  productionPlanId: ObjectId,
+
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### `jobCards` Collection
+```javascript
+{
+  _id: ObjectId,
+  jobCardId: String,        // Auto-generated: "JC-YYYYMMDD-XXXX"
+
+  workOrderId: ObjectId,
+  workOrderNumber: String,
+
+  operationId: String,
+  operationName: String,
+  workstationId: ObjectId,
+  workstationName: String,
+  sequence: Number,
+
+  itemId: ObjectId,
+  itemCode: String,
+  itemName: String,
+
+  forQuantity: Number,
+  completedQty: Number,
+  rejectedQty: Number,
+
+  status: String,           // "draft" | "open" | "work_in_progress" | "completed" | "cancelled"
+
+  plannedStartTime: Date,
+  plannedEndTime: Date,
+  actualStartTime: Date,
+  actualEndTime: Date,
+  totalTimeInMins: Number,
+
+  employeeId: ObjectId,
+  employeeName: String,
+
+  timeLogs: [{
+    fromTime: Date,
+    toTime: Date,
+    timeInMins: Number,
+    completedQty: Number,
+    employeeId: ObjectId,
+    employeeName: String
+  }],
+
+  qualityInspectionId: ObjectId,
+  remarks: String,
+
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### API Endpoints
+
+```
+# BOMs
+GET    /api/manufacturing/boms
+GET    /api/manufacturing/boms/:id
+POST   /api/manufacturing/boms
+PUT    /api/manufacturing/boms/:id
+DELETE /api/manufacturing/boms/:id
+POST   /api/manufacturing/boms/:id/duplicate
+
+# Workstations
+GET    /api/manufacturing/workstations
+GET    /api/manufacturing/workstations/:id
+POST   /api/manufacturing/workstations
+PUT    /api/manufacturing/workstations/:id
+DELETE /api/manufacturing/workstations/:id
+
+# Work Orders
+GET    /api/manufacturing/work-orders
+GET    /api/manufacturing/work-orders/:id
+POST   /api/manufacturing/work-orders
+PUT    /api/manufacturing/work-orders/:id
+POST   /api/manufacturing/work-orders/:id/start
+POST   /api/manufacturing/work-orders/:id/complete
+POST   /api/manufacturing/work-orders/:id/stop
+POST   /api/manufacturing/work-orders/:id/cancel
+
+# Job Cards
+GET    /api/manufacturing/job-cards
+GET    /api/manufacturing/job-cards/:id
+POST   /api/manufacturing/job-cards
+PUT    /api/manufacturing/job-cards/:id
+POST   /api/manufacturing/job-cards/:id/start
+POST   /api/manufacturing/job-cards/:id/complete
+POST   /api/manufacturing/job-cards/:id/time-log
+
+# Stats
+GET    /api/manufacturing/stats
+```
+
+---
+
+## 6. Assets Module
+
+### Collections
+
+#### `assets` Collection
+```javascript
+{
+  _id: ObjectId,
+  assetId: String,          // Auto-generated: "AST-YYYYMMDD-XXXX"
+  assetNumber: String,
+
+  assetName: String,
+  assetNameAr: String,
+
+  assetCategory: ObjectId,
+  categoryName: String,
+  itemId: ObjectId,
+  itemCode: String,
+
+  location: String,
+  custodian: ObjectId,
+  custodianName: String,
+  department: String,
+
+  purchaseDate: Date,
+  purchaseInvoiceId: ObjectId,
+  supplierId: ObjectId,
+  supplierName: String,
+
+  grossPurchaseAmount: Number,
+  assetValue: Number,
+
+  depreciationMethod: String,
+  totalDepreciation: Number,
+  expectedValueAfterUsefulLife: Number,
+  usefulLifeYears: Number,
+  depreciationStartDate: Date,
+  nextDepreciationDate: Date,
+
+  status: String,           // "draft" | "submitted" | "partially_depreciated" | "fully_depreciated" | "sold" | "scrapped" | "in_maintenance"
+
+  warrantyExpiryDate: Date,
+  insuranceDetails: String,
+  insuranceExpiryDate: Date,
+
+  serialNumber: String,
+  modelNumber: String,
+  manufacturer: String,
+
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### `assetCategories` Collection
+```javascript
+{
+  _id: ObjectId,
+  categoryId: String,
+  name: String,
+  nameAr: String,
+  description: String,
+  parentCategory: ObjectId,
+
+  depreciationMethod: String,
+  usefulLifeYears: Number,
+  depreciationPercentage: Number,
+
+  fixedAssetAccount: String,
+  depreciationExpenseAccount: String,
+  accumulatedDepreciationAccount: String,
+
+  isActive: Boolean,
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### `maintenanceSchedules` Collection
+```javascript
+{
+  _id: ObjectId,
+  scheduleId: String,
+
+  assetId: ObjectId,
+  assetName: String,
+
+  maintenanceType: String,  // "preventive" | "breakdown" | "calibration"
+  description: String,
+
+  frequency: String,        // "daily" | "weekly" | "monthly" | "quarterly" | "yearly"
+  dueDate: Date,
+  lastMaintenanceDate: Date,
+  nextMaintenanceDate: Date,
+
+  status: String,           // "planned" | "overdue" | "completed" | "cancelled"
+
+  assignedTo: ObjectId,
+  assignedTeam: String,
+
+  completedDate: Date,
+  completedBy: ObjectId,
+  maintenanceNotes: String,
+  cost: Number,
+
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### API Endpoints
+
+```
+# Assets
+GET    /api/assets
+GET    /api/assets/:id
+POST   /api/assets
+PUT    /api/assets/:id
+DELETE /api/assets/:id
+POST   /api/assets/:id/depreciate
+POST   /api/assets/:id/sell
+POST   /api/assets/:id/scrap
+GET    /api/assets/:id/depreciation-schedule
+
+# Categories
+GET    /api/assets/categories
+GET    /api/assets/categories/:id
+POST   /api/assets/categories
+PUT    /api/assets/categories/:id
+DELETE /api/assets/categories/:id
+
+# Maintenance
+GET    /api/assets/maintenance
+GET    /api/assets/maintenance/:id
+POST   /api/assets/maintenance
+PUT    /api/assets/maintenance/:id
+POST   /api/assets/maintenance/:id/complete
+
+# Stats
+GET    /api/assets/stats
+```
+
+---
+
+## 7. Subcontracting Module
+
+### Collections
+
+#### `subcontractingOrders` Collection
+```javascript
+{
+  _id: ObjectId,
+  subcontractingOrderId: String,  // Auto-generated: "SCO-YYYYMMDD-XXXX"
+  orderNumber: String,
+
+  supplierId: ObjectId,
+  supplierName: String,
+
+  serviceItems: [{
+    serviceDescription: String,
+    quantity: Number,
+    rate: Number,
+    amount: Number
+  }],
+
+  suppliedItems: [{
+    itemId: ObjectId,
+    itemCode: String,
+    itemName: String,
+    quantity: Number,
+    rate: Number,
+    transferredQty: Number,
+    consumedQty: Number,
+    returnedQty: Number,
+    warehouse: ObjectId
+  }],
+
+  finishedItems: [{
+    itemId: ObjectId,
+    itemCode: String,
+    itemName: String,
+    quantity: Number,
+    receivedQty: Number,
+    warehouse: ObjectId,
+    bomId: ObjectId
+  }],
+
+  orderDate: Date,
+  expectedDeliveryDate: Date,
+  actualDeliveryDate: Date,
+
+  status: String,           // "draft" | "submitted" | "partially_received" | "completed" | "cancelled"
+
+  totalServiceCost: Number,
+  totalMaterialCost: Number,
+  totalCost: Number,
+
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### `subcontractingReceipts` Collection
+```javascript
+{
+  _id: ObjectId,
+  receiptId: String,        // Auto-generated: "SCR-YYYYMMDD-XXXX"
+
+  subcontractingOrderId: ObjectId,
+  orderNumber: String,
+  supplierId: ObjectId,
+  supplierName: String,
+
+  receiptDate: Date,
+
+  receivedItems: [{
+    itemId: ObjectId,
+    itemCode: String,
+    itemName: String,
+    receivedQty: Number,
+    acceptedQty: Number,
+    rejectedQty: Number,
+    rejectionReason: String,
+    warehouse: ObjectId,
+    qualityInspectionId: ObjectId
+  }],
+
+  consumedMaterials: [{
+    itemId: ObjectId,
+    itemCode: String,
+    itemName: String,
+    consumedQty: Number
+  }],
+
+  returnedMaterials: [{
+    itemId: ObjectId,
+    itemCode: String,
+    itemName: String,
+    returnedQty: Number,
+    warehouse: ObjectId
+  }],
+
+  status: String,           // "draft" | "submitted" | "cancelled"
+
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### API Endpoints
+
+```
+# Orders
+GET    /api/subcontracting/orders
+GET    /api/subcontracting/orders/:id
+POST   /api/subcontracting/orders
+PUT    /api/subcontracting/orders/:id
+POST   /api/subcontracting/orders/:id/submit
+POST   /api/subcontracting/orders/:id/cancel
+
+# Receipts
+GET    /api/subcontracting/receipts
+GET    /api/subcontracting/receipts/:id
+POST   /api/subcontracting/receipts
+PUT    /api/subcontracting/receipts/:id
+POST   /api/subcontracting/receipts/:id/submit
+
+# Stats
+GET    /api/subcontracting/stats
+```
+
+---
+
+## Common Utilities
+
+### ID Generation Helper
+```javascript
+async function generateId(prefix, Model) {
+  const date = new Date();
+  const dateStr = date.toISOString().slice(0, 10).replace(/-/g, '');
+  const idField = `${prefix.toLowerCase()}Id`;
+
+  const lastDoc = await Model
+    .findOne({ [idField]: new RegExp(`^${prefix}-${dateStr}`) })
+    .sort({ createdAt: -1 });
+
+  let sequence = 1;
+  if (lastDoc) {
+    const lastSequence = parseInt(lastDoc[idField].split('-')[2], 10);
+    sequence = lastSequence + 1;
+  }
+
+  return `${prefix}-${dateStr}-${String(sequence).padStart(4, '0')}`;
+}
+
+// Usage:
+const itemId = await generateId('ITM', Item);  // "ITM-20251225-0001"
+const poId = await generateId('PO', PurchaseOrder);  // "PO-20251225-0001"
+```
+
+### Soft Delete Middleware
+```javascript
+// Add to each schema
+schema.add({
+  isDeleted: { type: Boolean, default: false },
+  deletedAt: Date,
+  deletedBy: { type: ObjectId, ref: 'User' }
+});
+
+// Query middleware to exclude deleted
+schema.pre(/^find/, function() {
+  this.where({ isDeleted: { $ne: true } });
+});
+```
+
+### Pagination Helper
+```javascript
+async function paginate(Model, query, options = {}) {
+  const page = parseInt(options.page) || 1;
+  const limit = Math.min(parseInt(options.limit) || 20, 100);
+  const skip = (page - 1) * limit;
+  const sort = options.sort || { createdAt: -1 };
+
+  const [data, total] = await Promise.all([
+    Model.find(query).sort(sort).skip(skip).limit(limit),
+    Model.countDocuments(query)
+  ]);
+
+  return {
+    data,
+    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }
+  };
+}
+```
+
+---
+
+## Database Indexes
+
+```javascript
+// Inventory
+db.items.createIndex({ itemCode: 1 }, { unique: true });
+db.items.createIndex({ name: 1 });
+db.items.createIndex({ status: 1 });
+db.warehouses.createIndex({ name: 1 }, { unique: true });
+db.stockEntries.createIndex({ stockEntryId: 1 }, { unique: true });
+db.stockEntries.createIndex({ status: 1, postingDate: -1 });
+db.stockLedger.createIndex({ itemId: 1, warehouseId: 1, postingDate: -1 });
+
+// Buying
+db.suppliers.createIndex({ supplierId: 1 }, { unique: true });
+db.purchaseOrders.createIndex({ purchaseOrderId: 1 }, { unique: true });
+db.purchaseOrders.createIndex({ supplierId: 1, status: 1 });
+db.materialRequests.createIndex({ materialRequestId: 1 }, { unique: true });
+db.rfqs.createIndex({ rfqId: 1 }, { unique: true });
+
+// Support
+db.tickets.createIndex({ ticketId: 1 }, { unique: true });
+db.tickets.createIndex({ ticketNumber: 1 }, { unique: true });
+db.tickets.createIndex({ status: 1, priority: 1 });
+db.tickets.createIndex({ assignedTo: 1 });
+db.ticketCommunications.createIndex({ ticketId: 1, createdAt: -1 });
+
+// Quality
+db.qualityInspections.createIndex({ inspectionId: 1 }, { unique: true });
+db.qualityInspections.createIndex({ status: 1, itemId: 1 });
+db.qualityActions.createIndex({ actionId: 1 }, { unique: true });
+
+// Manufacturing
+db.billOfMaterials.createIndex({ bomId: 1 }, { unique: true });
+db.billOfMaterials.createIndex({ itemId: 1, isActive: 1 });
+db.workOrders.createIndex({ workOrderId: 1 }, { unique: true });
+db.workOrders.createIndex({ status: 1 });
+db.jobCards.createIndex({ jobCardId: 1 }, { unique: true });
+db.jobCards.createIndex({ workOrderId: 1 });
+
+// Assets
+db.assets.createIndex({ assetId: 1 }, { unique: true });
+db.assets.createIndex({ assetNumber: 1 }, { unique: true });
+db.assets.createIndex({ status: 1 });
+db.maintenanceSchedules.createIndex({ assetId: 1, status: 1 });
+
+// Subcontracting
+db.subcontractingOrders.createIndex({ subcontractingOrderId: 1 }, { unique: true });
+db.subcontractingReceipts.createIndex({ receiptId: 1 }, { unique: true });
+```
+
+---
+
+## Implementation Priority for New Modules
+
+**Phase 1 (Week 1-2):**
+1. Inventory Module (Items, Warehouses, Stock Entries)
+2. Buying Module (Suppliers, Purchase Orders)
+
+**Phase 2 (Week 3-4):**
+3. Support Module (Tickets, SLAs)
+4. Quality Module (Inspections, Actions)
+
+**Phase 3 (Week 5-6):**
+5. Manufacturing Module (BOMs, Work Orders, Job Cards)
+6. Assets Module (Assets, Categories, Maintenance)
+
+**Phase 4 (Week 7):**
+7. Subcontracting Module (Orders, Receipts)
+8. Settings for all modules
+
+---
+
+## Frontend Reference Files
+
+The frontend components that use these APIs are located at:
+- Types: `src/types/{module}.ts`
+- Services: `src/services/{module}Service.ts`
+- Hooks: `src/hooks/use-{module}.ts`
+- Components: `src/features/{module}/components/`
+- Routes: `src/routes/_authenticated/dashboard.{module}*.tsx`
