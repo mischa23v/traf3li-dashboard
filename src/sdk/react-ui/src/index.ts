@@ -27,3 +27,15 @@ export type { MFASetupMethod } from './components/MFASetup';
 export type { Session as SessionType } from './components/SessionManager';
 export type { UserProfileData } from './components/UserProfile';
 export type { SignupFormData } from './components/SignupForm';
+
+// Security & Advanced Auth types
+export type { PasskeyCredential, PasskeySetupProps } from './components/PasskeySetup';
+export type { BackupCodesDisplayProps } from './components/BackupCodesDisplay';
+export type { LinkedAccount, AvailableProvider, LinkedAccountsManagerProps } from './components/LinkedAccountsManager';
+export type {
+  LoginHistoryEntry,
+  SecurityEvent,
+  SecurityStats,
+  SecurityDashboardProps,
+} from './components/SecurityDashboard';
+export type { ApiKey, CreateApiKeyData, ApiKeyManagerProps } from './components/ApiKeyManager';

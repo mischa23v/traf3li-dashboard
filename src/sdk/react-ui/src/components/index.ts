@@ -30,5 +30,12 @@ export * from './GoogleOneTapButton';
 export * from './SessionManager';
 export * from './UserProfile';
 
+// Security & Advanced Auth
+export * from './PasskeySetup';
+export * from './BackupCodesDisplay';
+export * from './LinkedAccountsManager';
+export * from './SecurityDashboard';
+export * from './ApiKeyManager';
+
 // Layouts
 export * from './AuthLayout';
