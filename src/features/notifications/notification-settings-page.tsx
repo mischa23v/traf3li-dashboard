@@ -135,7 +135,7 @@ export function NotificationSettingsPage() {
                 )}
               </AlertDescription>
             </Alert>
-          </>
+
             {/* Email Notifications */}
             <Card>
               <CardHeader>
