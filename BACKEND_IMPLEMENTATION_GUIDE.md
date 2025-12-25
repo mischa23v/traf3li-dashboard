@@ -16,12 +16,21 @@
 > - Assets (Asset Management, Depreciation, Maintenance)
 > - Subcontracting (Orders, Receipts)
 >
-> ### For Core Legal ERP Modules (Needs Verification):
-> The sections below cover core modules but **have not been verified** against the current frontend.
-> Before implementing, cross-reference with:
-> - `src/types/*.ts` - Frontend type definitions
-> - `src/services/*.ts` - API service calls
-> - `src/hooks/*.ts` - React Query hooks
+> ### For Core Legal ERP Modules (Verified & Accurate):
+> **Use: [`docs/CORE_MODULES_BACKEND_GUIDE.md`](./docs/CORE_MODULES_BACKEND_GUIDE.md)**
+>
+> The Core modules guide has been verified against the actual frontend types, services, and hooks:
+> - Authentication (Login, Register, OTP, Magic Link, MFA)
+> - Users (Profile, Roles, Permissions, Firm/Tenant)
+> - Clients (Individual, Company, Najiz Integration)
+> - Cases (Full Case Management, Pipeline, Documents)
+> - Invoices (ZATCA, Payments, Approval Workflow)
+> - HR (Employees, Leave, Payroll, Attendance)
+> - CRM (Leads, Pipelines, Referrals, Activities)
+>
+> ### Legacy Content Below:
+> The sections below are **LEGACY CONTENT** and may be outdated.
+> Always use the verified guides above for accurate implementation.
 
 ---
 
