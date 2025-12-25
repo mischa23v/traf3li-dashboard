@@ -265,10 +265,6 @@ export function SignIn() {
     }
   };
 
-  // Handle Google Login
-  const handleGoogleLogin = () => {
-  };
-
   return (
     <div className="min-h-screen bg-[#F8F9FA]" dir="rtl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <div className="min-h-screen flex items-center justify-center p-6">

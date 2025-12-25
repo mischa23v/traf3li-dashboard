@@ -64,9 +64,10 @@ export const useOAuthCallback = () => {
 
       if (data.isNewUser) {
         toast.success('مرحباً بك!', {
-          description: 'تم إنشاء حسابك بنجاح',
+          description: 'يرجى إكمال بيانات حسابك',
         })
-        navigate({ to: '/onboarding' })
+        // Redirect new OAuth users to complete their profile and select role
+        navigate({ to: '/sign-up/complete-profile' })
       } else {
         toast.success('تم تسجيل الدخول بنجاح')
         navigate({ to: '/dashboard' })
