@@ -53,6 +53,36 @@ export type {
   UseApiKeysReturn,
 } from './hooks/useApiKeys';
 
+// Enterprise SSO Hooks
+export { useEnterpriseSSO } from './hooks/useEnterpriseSSO';
+export type {
+  SSOProvider,
+  SSOConnection,
+  LDAPConfig,
+  SAMLConfig,
+  UseEnterpriseSSOReturn,
+} from './hooks/useEnterpriseSSO';
+
+// Webhooks Hook
+export { useWebhooks } from './hooks/useWebhooks';
+export type {
+  Webhook,
+  WebhookEvent,
+  WebhookDelivery,
+  CreateWebhookData,
+  UseWebhooksReturn,
+} from './hooks/useWebhooks';
+
+// Permissions/RBAC Hook
+export { usePermissions } from './hooks/usePermissions';
+export type {
+  Permission,
+  Role,
+  UserPermissions,
+  PermissionCheck,
+  UsePermissionsReturn,
+} from './hooks/usePermissions';
+
 // Guards
 export { AuthGuard } from './components/AuthGuard';
 export { withAuth } from './hoc/withAuth';
