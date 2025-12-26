@@ -17,6 +17,7 @@
 
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios'
 import { API_CONFIG, getApiUrl, getTimeoutForUrl } from '@/config/api'
+import { captureApiCall } from './api-debug'
 import {
   generateRequestKey,
   getPendingRequest,
@@ -358,6 +359,9 @@ apiClientNoVersion.interceptors.request.use(
       }
     }
 
+    // Debug: Log API call source location (enable with localStorage.setItem('API_DEBUG', 'true'))
+    captureApiCall(method || 'GET', url, API_BASE_URL_NO_VERSION)
+
     return config
   },
   (error: AxiosError) => Promise.reject(error)
@@ -556,6 +560,9 @@ apiClient.interceptors.request.use(
     }
 
     // Note: No axios-level cache - TanStack Query handles caching with stale-while-revalidate
+
+    // Debug: Log API call source location (enable with localStorage.setItem('API_DEBUG', 'true'))
+    captureApiCall(method || 'GET', url, API_BASE_URL)
 
     return config
   },
