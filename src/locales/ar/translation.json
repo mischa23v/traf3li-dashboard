@@ -274,6 +274,89 @@
         "complete": "مكتمل",
         "securityNotice": "هذا التأخير يساعد في حماية الحسابات من محاولات الوصول غير المصرح بها."
       }
+    },
+    "signUp": {
+      "checking": "جاري التحقق...",
+      "available": "متاح",
+      "taken": "مستخدم بالفعل",
+      "select": "اختر",
+      "showPassword": "إظهار كلمة المرور",
+      "hidePassword": "إخفاء كلمة المرور",
+      "showConfirmPassword": "إظهار تأكيد كلمة المرور",
+      "hideConfirmPassword": "إخفاء تأكيد كلمة المرور",
+      "errors": {
+        "required": "هذا الحقل مطلوب",
+        "emailTaken": "البريد الإلكتروني مستخدم بالفعل",
+        "usernameTaken": "اسم المستخدم مستخدم بالفعل",
+        "phoneTaken": "رقم الجوال مستخدم بالفعل",
+        "minLength3": "يجب أن يكون 3 أحرف على الأقل",
+        "minLength8": "يجب أن يكون 8 أحرف على الأقل",
+        "invalidEmail": "البريد الإلكتروني غير صالح",
+        "invalidPhone": "رقم الجوال غير صالح",
+        "passwordMismatch": "كلمات المرور غير متطابقة",
+        "pleaseAgree": "يرجى الموافقة",
+        "pleaseSelect": "يرجى الاختيار",
+        "selectAtLeastOneCourt": "يرجى اختيار محكمة واحدة على الأقل",
+        "selectAtLeastOneSpecialization": "يرجى اختيار تخصص واحد على الأقل",
+        "selectAtLeastOneLanguage": "يرجى اختيار لغة واحدة على الأقل",
+        "selectAtLeastOnePricing": "يرجى اختيار نموذج تسعير واحد على الأقل",
+        "firmNameRequired": "اسم المكتب مطلوب",
+        "licenseNumberRequired": "رقم الترخيص مطلوب",
+        "firmPhoneRequired": "رقم هاتف المكتب مطلوب",
+        "firmAddressRequired": "عنوان المكتب مطلوب",
+        "invitationCodeRequired": "كود الدعوة مطلوب",
+        "invalidInvitationCode": "كود الدعوة غير صالح",
+        "generalError": "حدث خطأ، يرجى المحاولة مرة أخرى"
+      },
+      "success": {
+        "title": "تم إنشاء الحساب بنجاح",
+        "lawyerMessage": "يمكنك الآن البدء في إدارة قضاياك واستقبال العملاء.",
+        "clientMessage": "يمكنك الآن البحث عن محامٍ مناسب لقضيتك.",
+        "registeredAs": "تم التسجيل باسم",
+        "signIn": "تسجيل الدخول",
+        "emailConfirmation": "سيتم إرسال رسالة تأكيد على البريد الإلكتروني"
+      },
+      "step0": {
+        "title": "إنشاء حساب جديد",
+        "subtitle": "اختر نوع الحساب",
+        "client": "عميل",
+        "clientDesc": "البحث عن محامٍ",
+        "lawyer": "محامي",
+        "lawyerDesc": "تقديم الخدمات القانونية",
+        "usageType": "نوع الاستخدام",
+        "marketplaceDashboard": "السوق + لوحة التحكم",
+        "marketplaceDashboardDesc": "استقبال عملاء جدد وإدارة القضايا",
+        "dashboardOnly": "لوحة التحكم فقط",
+        "dashboardOnlyDesc": "إدارة القضايا الحالية",
+        "howToWork": "كيف تريد العمل؟",
+        "soloLawyer": "محامي مستقل",
+        "soloLawyerDesc": "العمل بشكل مستقل بدون مكتب",
+        "createFirm": "إنشاء مكتب جديد",
+        "createFirmDesc": "إنشاء مكتب محاماة وإدارة الفريق",
+        "joinFirm": "الانضمام لمكتب",
+        "joinFirmDesc": "لدي كود دعوة للانضمام لمكتب",
+        "haveAccount": "لديك حساب بالفعل؟",
+        "signIn": "تسجيل الدخول"
+      },
+      "fields": {
+        "firstName": "الاسم الأول",
+        "lastName": "اسم العائلة",
+        "username": "اسم المستخدم",
+        "email": "البريد الإلكتروني",
+        "phone": "رقم الجوال",
+        "password": "كلمة المرور",
+        "confirmPassword": "تأكيد كلمة المرور",
+        "nationality": "الجنسية",
+        "region": "المنطقة",
+        "city": "المدينة",
+        "invitationCode": "كود الدعوة"
+      },
+      "placeholders": {
+        "invitationCode": "أدخل كود الدعوة من المكتب"
+      },
+      "hints": {
+        "invitationCode": "يمكنك الحصول على كود الدعوة من مدير المكتب"
+      }
     }
   },
   "settings": {
