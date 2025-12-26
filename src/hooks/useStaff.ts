@@ -13,7 +13,7 @@ export interface CreateStaffData {
   phone?: string
   role: 'owner' | 'admin' | 'partner' | 'lawyer' | 'paralegal' | 'secretary' | 'accountant' | 'departed'
   specialization?: string
-  status?: 'active' | 'inactive' | 'departed' | 'suspended' | 'pending' | 'pending_approval'
+  status?: 'active' | 'departed' | 'suspended' | 'pending' | 'pending_approval'
 }
 
 // Invitation data interface
