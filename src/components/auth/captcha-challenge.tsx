@@ -1,12 +1,13 @@
 /**
  * CAPTCHA Challenge Component
- * Wrapper for CAPTCHA providers (reCAPTCHA v2/v3, hCaptcha)
+ * Wrapper for CAPTCHA providers (reCAPTCHA v2/v3, hCaptcha, Cloudflare Turnstile)
  * Supports both visible (checkbox) and invisible modes
  * RTL layout support for Arabic
  */
 
-import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
+import { useEffect, useRef, forwardRef, useImperativeHandle, useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile'
 import { useCaptcha } from '@/hooks/useCaptcha'
 import { CaptchaProvider } from './captcha-config'
 import { cn } from '@/lib/utils'
@@ -53,9 +54,16 @@ export const CaptchaChallenge = forwardRef<CaptchaChallengeRef, CaptchaChallenge
     const containerRef = useRef<HTMLDivElement>(null)
     const hasAutoExecuted = useRef(false)
 
+    // Turnstile-specific refs and state
+    const turnstileRef = useRef<TurnstileInstance>(null)
+    const [turnstileToken, setTurnstileToken] = useState<string>('')
+    const [turnstileReady, setTurnstileReady] = useState(false)
+    const [turnstileError, setTurnstileError] = useState<Error | null>(null)
+
+    // Use useCaptcha hook for non-Turnstile providers
     const captcha = useCaptcha({
-      provider,
-      siteKey,
+      provider: provider === 'turnstile' ? 'none' : provider,
+      siteKey: provider === 'turnstile' ? '' : siteKey,
       mode,
       action,
       onSuccess,
@@ -63,15 +71,57 @@ export const CaptchaChallenge = forwardRef<CaptchaChallengeRef, CaptchaChallenge
       onExpired,
     })
 
+    // Turnstile handlers
+    const handleTurnstileSuccess = useCallback((token: string) => {
+      setTurnstileToken(token)
+      setTurnstileReady(true)
+      onSuccess?.(token)
+    }, [onSuccess])
+
+    const handleTurnstileError = useCallback(() => {
+      const err = new Error('Turnstile verification failed')
+      setTurnstileError(err)
+      onError?.(err)
+    }, [onError])
+
+    const handleTurnstileExpire = useCallback(() => {
+      setTurnstileToken('')
+      onExpired?.()
+    }, [onExpired])
+
     // Expose methods to parent via ref
     useImperativeHandle(ref, () => ({
-      execute: captcha.execute,
-      reset: captcha.reset,
+      execute: async () => {
+        if (provider === 'turnstile') {
+          // Turnstile auto-executes, just return the token if available
+          if (turnstileToken) {
+            return turnstileToken
+          }
+          // If no token yet, try to get one
+          const token = turnstileRef.current?.getResponse()
+          if (token) {
+            setTurnstileToken(token)
+            return token
+          }
+          throw new Error('Turnstile token not available')
+        }
+        return captcha.execute()
+      },
+      reset: () => {
+        if (provider === 'turnstile') {
+          turnstileRef.current?.reset()
+          setTurnstileToken('')
+          setTurnstileError(null)
+        } else {
+          captcha.reset()
+        }
+      },
     }))
 
-    // Auto-execute invisible CAPTCHA if requested
+    // Auto-execute invisible CAPTCHA if requested (non-Turnstile)
     useEffect(() => {
       if (
+        provider !== 'turnstile' &&
         autoExecute &&
         !hasAutoExecuted.current &&
         captcha.isReady &&
@@ -82,9 +132,69 @@ export const CaptchaChallenge = forwardRef<CaptchaChallengeRef, CaptchaChallenge
           console.error('Auto-execute CAPTCHA failed:', err)
         })
       }
-    }, [autoExecute, captcha.isReady, mode, captcha.execute])
+    }, [provider, autoExecute, captcha.isReady, mode, captcha.execute])
 
-    // Don't render anything for v3 or invisible mode
+    // Render Turnstile widget
+    if (provider === 'turnstile') {
+      return (
+        <div
+          className={cn(
+            'captcha-challenge-container',
+            isRtl ? 'rtl' : 'ltr',
+            className
+          )}
+          dir={isRtl ? 'rtl' : 'ltr'}
+        >
+          {/* Error State */}
+          {turnstileError && (
+            <Alert variant='destructive' className='mb-4'>
+              <AlertCircle className='h-4 w-4' />
+              <AlertDescription>
+                {isRtl
+                  ? 'فشل التحقق. يرجى المحاولة مرة أخرى.'
+                  : 'Verification failed. Please try again.'}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <div className='flex flex-col items-center gap-2'>
+            <div className='flex items-center gap-2 text-xs text-muted-foreground'>
+              <Shield className='h-3 w-3' />
+              <span>
+                {isRtl
+                  ? 'محمي بواسطة Cloudflare'
+                  : 'Protected by Cloudflare'}
+              </span>
+            </div>
+
+            {/* Turnstile Widget */}
+            <Turnstile
+              ref={turnstileRef}
+              siteKey={siteKey}
+              onSuccess={handleTurnstileSuccess}
+              onError={handleTurnstileError}
+              onExpire={handleTurnstileExpire}
+              options={{
+                theme: 'auto',
+                size: mode === 'invisible' ? 'invisible' : 'normal',
+                language: isRtl ? 'ar' : 'en',
+                action,
+              }}
+            />
+
+            {mode !== 'invisible' && !turnstileToken && (
+              <p className='text-xs text-muted-foreground'>
+                {isRtl
+                  ? 'يرجى إكمال التحقق للمتابعة'
+                  : 'Please complete verification to continue'}
+              </p>
+            )}
+          </div>
+        </div>
+      )
+    }
+
+    // Don't render anything for v3 or invisible mode (non-Turnstile)
     if (provider === 'recaptcha-v3' || mode === 'invisible') {
       return null
     }
@@ -170,6 +280,8 @@ function getProviderName(provider: CaptchaProvider): string {
       return 'reCAPTCHA'
     case 'hcaptcha':
       return 'hCaptcha'
+    case 'turnstile':
+      return 'Cloudflare'
     default:
       return ''
   }
