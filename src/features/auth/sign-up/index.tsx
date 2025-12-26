@@ -355,6 +355,9 @@ export function SignUp() {
         firstName: formData.firstName,
         lastName: formData.lastName,
         captchaToken: token || undefined,
+        // Set lawyerWorkMode for lawyers - defaults to 'solo' (independent lawyer)
+        // Backend will set isSoloLawyer: true when lawyerWorkMode is 'solo'
+        ...(formData.userType === 'lawyer' && { lawyerWorkMode: 'solo' }),
       };
 
       // Call registration API

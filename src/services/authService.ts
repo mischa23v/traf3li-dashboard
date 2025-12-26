@@ -159,6 +159,19 @@ export interface RegisterData {
   firstName?: string
   lastName?: string
   captchaToken?: string
+  /** Lawyer work mode - determines if solo lawyer or firm member
+   * 'solo' - Independent lawyer (sets isSoloLawyer: true)
+   * 'create_firm' - Create new firm (requires firmData)
+   * 'join_firm' - Join existing firm (requires invitationCode)
+   */
+  lawyerWorkMode?: 'solo' | 'create_firm' | 'join_firm'
+  /** Firm data for creating a new firm (when lawyerWorkMode is 'create_firm') */
+  firmData?: {
+    name: string
+    licenseNumber?: string
+  }
+  /** Invitation code for joining a firm (when lawyerWorkMode is 'join_firm') */
+  invitationCode?: string
 }
 
 /**
