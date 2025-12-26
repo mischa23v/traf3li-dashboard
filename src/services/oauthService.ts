@@ -208,8 +208,9 @@ const oauthService = {
   ): Promise<{ user: User; isNewUser: boolean }> => {
     try {
       const response = await authApi.post<OAuthCallbackResponse>(
-        `/auth/sso/${provider}/callback`,
+        '/auth/sso/callback',
         {
+          provider,
           code,
           state,
         }
