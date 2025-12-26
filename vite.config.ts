@@ -55,9 +55,32 @@ export default defineConfig({
     },
   },
   build: {
-    sourcemap: 'hidden', // Hidden source maps for Sentry (not exposed in browser)
+    // Full source maps exposed for debugging - traces minified code back to source
+    // Shows exact file:line:column for every API call in browser DevTools
+    sourcemap: true,
+    // Disable minification in debug mode for readable code (set to 'esbuild' for production)
+    minify: process.env.DEBUG_BUILD === 'true' ? false : 'esbuild',
     rollupOptions: {
       output: {
+        // Readable chunk names that show the source module
+        chunkFileNames: (chunkInfo) => {
+          // Keep manual chunk names readable
+          if (chunkInfo.name && !chunkInfo.name.startsWith('_')) {
+            return `assets/${chunkInfo.name}-[hash].js`;
+          }
+          // For dynamic imports, use the first module name
+          const id = chunkInfo.facadeModuleId || Object.keys(chunkInfo.modules)[0] || '';
+          const match = id.match(/src\/(.+?)\.(ts|tsx)$/);
+          if (match) {
+            const name = match[1].replace(/\//g, '-');
+            return `assets/${name}-[hash].js`;
+          }
+          return 'assets/[name]-[hash].js';
+        },
+        // Entry files keep their names
+        entryFileNames: 'assets/[name]-[hash].js',
+        // Assets (CSS, images) keep readable names
+        assetFileNames: 'assets/[name]-[hash].[ext]',
         manualChunks: {
           // Core vendor dependencies
           'vendor-react': ['react', 'react-dom', 'react-hook-form'],
