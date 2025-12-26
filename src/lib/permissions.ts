@@ -151,6 +151,20 @@ export function canExportData(permissions: UserPermissions | null): boolean {
 }
 
 /**
+ * Check if user can access HR module
+ * @param permissions - User's permissions object
+ * @returns boolean - Whether the user can access HR
+ */
+export function canAccessHR(permissions: UserPermissions | null): boolean {
+  if (!permissions) return false
+  return (
+    isAdminOrOwner(permissions) ||
+    hasSpecialPermission(permissions, 'canAccessHR') ||
+    canView(permissions, 'hr')
+  )
+}
+
+/**
  * Get the permission level for a module
  * @param permissions - User's permissions object
  * @param module - The module to check

@@ -12,8 +12,7 @@ import {
   UserMinus,
   Clock,
   Ban,
-  TrendingUp,
-  HeartHandshake,
+  HourglassIcon,
 } from 'lucide-react'
 import { type StaffStatus, type StaffRole, type DepartureReason } from './schema'
 
@@ -23,6 +22,7 @@ export const staffStatusColors = new Map<StaffStatus, string>([
   ['departed', 'bg-amber-100/30 text-amber-900 dark:text-amber-200 border-amber-200'],
   ['suspended', 'bg-red-100/30 text-red-900 dark:text-red-200 border-red-200'],
   ['pending', 'bg-blue-100/30 text-blue-900 dark:text-blue-200 border-blue-200'],
+  ['pending_approval', 'bg-purple-100/30 text-purple-900 dark:text-purple-200 border-purple-200'],
 ])
 
 export const staffStatuses = [
@@ -55,6 +55,12 @@ export const staffStatuses = [
     labelEn: 'Pending',
     value: 'pending' as const,
     icon: Clock,
+  },
+  {
+    label: 'بانتظار الموافقة',
+    labelEn: 'Pending Approval',
+    value: 'pending_approval' as const,
+    icon: HourglassIcon,
   },
 ] as const
 
@@ -100,30 +106,6 @@ export const staffRoles = [
     labelEn: 'Accountant',
     value: 'accountant' as StaffRole,
     icon: Calculator,
-  },
-  {
-    label: 'موظف مبيعات',
-    labelEn: 'Sales',
-    value: 'sales' as StaffRole,
-    icon: TrendingUp,
-  },
-  {
-    label: 'مدير المبيعات',
-    labelEn: 'Sales Manager',
-    value: 'sales_manager' as StaffRole,
-    icon: TrendingUp,
-  },
-  {
-    label: 'موظف موارد بشرية',
-    labelEn: 'HR',
-    value: 'hr' as StaffRole,
-    icon: HeartHandshake,
-  },
-  {
-    label: 'مدير الموارد البشرية',
-    labelEn: 'HR Manager',
-    value: 'hr_manager' as StaffRole,
-    icon: HeartHandshake,
   },
   {
     label: 'موظف مغادر',

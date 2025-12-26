@@ -65,23 +65,23 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ClientsSidebar } from '@/features/clients/components/clients-sidebar'
 
 const ROLE_LABELS: Record<string, { label: string; color: string }> = {
-  partner: { label: 'شريك', color: 'bg-purple-100 text-purple-700' },
-  senior_associate: { label: 'محامي أول', color: 'bg-blue-100 text-blue-700' },
-  associate: { label: 'محامي', color: 'bg-emerald-100 text-emerald-700' },
-  junior_associate: { label: 'محامي مبتدئ', color: 'bg-teal-100 text-teal-700' },
-  paralegal: { label: 'مساعد قانوني', color: 'bg-orange-100 text-orange-700' },
-  legal_secretary: { label: 'سكرتير قانوني', color: 'bg-pink-100 text-pink-700' },
+  owner: { label: 'مالك', color: 'bg-purple-100 text-purple-700' },
   admin: { label: 'إداري', color: 'bg-gray-100 text-gray-700' },
-  intern: { label: 'متدرب', color: 'bg-yellow-100 text-yellow-700' },
-  of_counsel: { label: 'مستشار', color: 'bg-indigo-100 text-indigo-700' },
+  partner: { label: 'شريك', color: 'bg-blue-100 text-blue-700' },
+  lawyer: { label: 'محامي', color: 'bg-emerald-100 text-emerald-700' },
+  paralegal: { label: 'مساعد قانوني', color: 'bg-orange-100 text-orange-700' },
+  secretary: { label: 'سكرتير', color: 'bg-pink-100 text-pink-700' },
+  accountant: { label: 'محاسب', color: 'bg-teal-100 text-teal-700' },
+  departed: { label: 'مغادر', color: 'bg-red-100 text-red-700' },
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   active: { label: 'نشط', color: 'bg-emerald-100 text-emerald-700' },
   inactive: { label: 'غير نشط', color: 'bg-gray-100 text-gray-700' },
-  on_leave: { label: 'في إجازة', color: 'bg-blue-100 text-blue-700' },
-  terminated: { label: 'منتهي', color: 'bg-red-100 text-red-700' },
-  probation: { label: 'فترة تجربة', color: 'bg-yellow-100 text-yellow-700' },
+  departed: { label: 'مغادر', color: 'bg-red-100 text-red-700' },
+  suspended: { label: 'معلق', color: 'bg-orange-100 text-orange-700' },
+  pending: { label: 'قيد الانتظار', color: 'bg-yellow-100 text-yellow-700' },
+  pending_approval: { label: 'في انتظار الموافقة', color: 'bg-blue-100 text-blue-700' },
 }
 
 const EMPLOYMENT_TYPE_LABELS: Record<string, string> = {

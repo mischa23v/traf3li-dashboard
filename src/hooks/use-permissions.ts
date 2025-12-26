@@ -17,6 +17,7 @@ import {
   isAdminOrOwner as isAdminOrOwnerHelper,
   canManageTeam as canManageTeamHelper,
   canViewFinances as canViewFinancesHelper,
+  canAccessHR as canAccessHRHelper,
   getAccessibleModules,
   getPermissionLevel,
 } from '@/lib/permissions'
@@ -86,6 +87,11 @@ export function usePermissions() {
     [permissions]
   )
 
+  const canAccessHR = useCallback(
+    () => canAccessHRHelper(permissions),
+    [permissions]
+  )
+
   const getModuleLevel = useCallback(
     (module: ModuleKey) => getPermissionLevel(permissions, module),
     [permissions]
@@ -113,6 +119,7 @@ export function usePermissions() {
     isAdminOrOwner,
     canManageTeam,
     canViewFinances,
+    canAccessHR,
 
     // Utility
     getModuleLevel,

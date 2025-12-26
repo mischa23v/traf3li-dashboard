@@ -55,18 +55,14 @@ import { usePermissions } from '@/hooks/use-permissions'
 // ==================== CONSTANTS ====================
 
 const STAFF_ROLES = [
-    { value: 'owner', label: 'مالك / شريك مؤسس', icon: Star },
-    { value: 'partner', label: 'شريك', icon: Users },
-    { value: 'senior_associate', label: 'محامي أول', icon: Scale },
-    { value: 'associate', label: 'محامي', icon: Scale },
-    { value: 'junior_associate', label: 'محامي مبتدئ', icon: Scale },
-    { value: 'paralegal', label: 'مساعد قانوني', icon: Briefcase },
-    { value: 'legal_secretary', label: 'سكرتير قانوني', icon: FileText },
+    { value: 'owner', label: 'مالك', icon: Star },
     { value: 'admin', label: 'إداري', icon: Building },
+    { value: 'partner', label: 'شريك', icon: Users },
+    { value: 'lawyer', label: 'محامي', icon: Scale },
+    { value: 'paralegal', label: 'مساعد قانوني', icon: Briefcase },
+    { value: 'secretary', label: 'سكرتير', icon: FileText },
     { value: 'accountant', label: 'محاسب', icon: DollarSign },
-    { value: 'it', label: 'تقنية معلومات', icon: Shield },
-    { value: 'intern', label: 'متدرب', icon: GraduationCap },
-    { value: 'other', label: 'أخرى', icon: User },
+    { value: 'departed', label: 'مغادر', icon: User },
 ]
 
 const EMPLOYMENT_TYPES = [
@@ -125,8 +121,10 @@ const EDUCATION_LEVELS = [
 const STAFF_STATUSES = [
     { value: 'active', label: 'نشط', color: 'bg-emerald-500' },
     { value: 'inactive', label: 'غير نشط', color: 'bg-gray-500' },
-    { value: 'on_leave', label: 'في إجازة', color: 'bg-yellow-500' },
-    { value: 'terminated', label: 'منتهي', color: 'bg-red-500' },
+    { value: 'departed', label: 'مغادر', color: 'bg-red-500' },
+    { value: 'suspended', label: 'معلق', color: 'bg-orange-500' },
+    { value: 'pending', label: 'قيد الانتظار', color: 'bg-yellow-500' },
+    { value: 'pending_approval', label: 'في انتظار الموافقة', color: 'bg-blue-500' },
 ]
 
 const BILLING_TYPES = [
@@ -182,7 +180,7 @@ export function CreateStaffView() {
         country: 'المملكة العربية السعودية',
 
         // Employment
-        role: 'associate',
+        role: 'lawyer',
         employmentType: 'full_time',
         department: '',
         title: '',

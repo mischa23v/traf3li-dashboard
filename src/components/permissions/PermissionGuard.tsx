@@ -44,7 +44,7 @@ interface RoleGuardProps extends BasePermissionGuardProps {
 
 interface SpecialPermissionGuardProps extends BasePermissionGuardProps {
   /** Special permission to check */
-  permission: 'canApproveInvoices' | 'canManageRetainers' | 'canExportData' | 'canDeleteRecords' | 'canViewFinance' | 'canManageTeam'
+  permission: 'canApproveInvoices' | 'canManageRetainers' | 'canExportData' | 'canDeleteRecords' | 'canViewFinance' | 'canManageTeam' | 'canAccessHR'
 }
 
 // ==================== COMPONENTS ====================
