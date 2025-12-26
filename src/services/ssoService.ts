@@ -393,13 +393,11 @@ export const testSSOConnection = async (data: TestConnectionRequest): Promise<Te
 export const initiateSSOLogin = async (provider: SSOProvider): Promise<SSOLoginInitiateResponse> => {
   try {
     console.log(`[SSO] Initiating login for provider: ${provider}`)
-    const response = await apiClient.get(`/auth/sso/${provider}/authorize`)
-    console.log('[SSO] Full response:', response)
-    console.log('[SSO] response.data:', response.data)
-    console.log('[SSO] response.data.data:', response.data?.data)
-    const result = response.data.data || response.data
-    console.log('[SSO] Returning:', result)
-    return result
+    // Use POST /api/auth/sso/initiate endpoint with provider in body
+    const response = await apiClient.post('/auth/sso/initiate', { provider })
+    console.log('[SSO] Response:', response.data)
+    // Response format: { error: false, authorizationUrl: "https://..." }
+    return response.data
   } catch (error) {
     console.error('[SSO] Error initiating login:', error)
     throw handleApiError(error)
