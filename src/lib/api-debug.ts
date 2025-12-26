@@ -2,8 +2,9 @@
  * API Debug Utility
  * Traces API calls back to their source code location
  *
- * Enable with: localStorage.setItem('API_DEBUG', 'true')
- * Disable with: localStorage.removeItem('API_DEBUG')
+ * ENABLED BY DEFAULT - shows source location for every API call
+ * Disable with: localStorage.setItem('API_DEBUG', 'false')
+ * Re-enable with: localStorage.removeItem('API_DEBUG')
  *
  * Shows in console:
  * - Full URL being called
@@ -31,29 +32,31 @@ const recentCalls: ApiCallTrace[] = []
 const MAX_STORED_CALLS = 100
 
 /**
- * Check if API debugging is enabled
+ * Check if API debugging is enabled (ENABLED BY DEFAULT)
  */
 export const isApiDebugEnabled = (): boolean => {
   if (typeof window === 'undefined') return false
-  return localStorage.getItem('API_DEBUG') === 'true'
+  // Enabled by default - only disabled if explicitly set to 'false'
+  return localStorage.getItem('API_DEBUG') !== 'false'
 }
 
 /**
  * Enable API debugging
  */
 export const enableApiDebug = () => {
-  localStorage.setItem('API_DEBUG', 'true')
+  localStorage.removeItem('API_DEBUG')
   console.log('%c🔍 API Debug ENABLED', 'color: #00ff00; font-weight: bold; font-size: 14px')
   console.log('All API calls will now show their source location.')
-  console.log('To disable: localStorage.removeItem("API_DEBUG")')
+  console.log('To disable: apiDebug.disable()')
 }
 
 /**
  * Disable API debugging
  */
 export const disableApiDebug = () => {
-  localStorage.removeItem('API_DEBUG')
+  localStorage.setItem('API_DEBUG', 'false')
   console.log('%c🔍 API Debug DISABLED', 'color: #ff6600; font-weight: bold; font-size: 14px')
+  console.log('To re-enable: apiDebug.enable()')
 }
 
 /**
@@ -317,15 +320,17 @@ if (typeof window !== 'undefined') {
     printFailedEndpoints,
   }
 
-  // Auto-show help on page load if debug is enabled
-  if (isApiDebugEnabled()) {
-    setTimeout(() => {
-      console.log('%c🔍 API Debug Mode Active', 'color: #00ff00; font-weight: bold; font-size: 14px')
+  // Auto-show help on page load (debug is enabled by default)
+  setTimeout(() => {
+    if (isApiDebugEnabled()) {
+      console.log('%c🔍 API Debug Mode Active (enabled by default)', 'color: #00ff00; font-weight: bold; font-size: 14px')
+      console.log('Every API call will show its source file and line number.')
+      console.log('')
       console.log('Commands available:')
-      console.log('  apiDebug.printSummary()      - Show all API calls grouped by endpoint')
+      console.log('  apiDebug.printSummary()         - Show all API calls grouped by endpoint')
       console.log('  apiDebug.printFailedEndpoints() - Show failing endpoints with source')
-      console.log('  apiDebug.getRecentCalls()    - Get raw call data')
-      console.log('  apiDebug.disable()           - Turn off debug mode')
-    }, 1000)
-  }
+      console.log('  apiDebug.getRecentCalls()       - Get raw call data')
+      console.log('  apiDebug.disable()              - Turn off debug mode')
+    }
+  }, 1000)
 }
