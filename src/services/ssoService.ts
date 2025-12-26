@@ -34,16 +34,16 @@
  * - POST   /settings/sso/test-connection        - Test provider connection
  *
  * ### SSO Authentication
- * - POST   /auth/sso/:provider/initiate         - Start OAuth flow
- * - GET    /auth/sso/enabled-providers          - Get enabled providers for login
+ * - GET    /auth/sso/:provider/authorize        - Start OAuth flow (get authorization URL)
+ * - GET    /auth/sso/providers                  - Get enabled providers for login
  * - GET    /auth/sso/:provider/callback         - OAuth callback (handled by backend)
  *
  * ## NOT Implemented
  *
  * The following account linking features are NOT currently implemented:
- * - POST   /auth/sso/:provider/link             - Link SSO account to existing user
- * - DELETE /auth/sso/:provider/unlink           - Unlink SSO account from user
- * - GET    /auth/sso/linked-accounts            - List user's linked SSO accounts
+ * - POST   /auth/sso/link                       - Link SSO account to existing user
+ * - DELETE /auth/sso/unlink/:provider          - Unlink SSO account from user
+ * - GET    /auth/sso/linked                    - List user's linked SSO accounts
  *
  * These features would allow users to:
  * - Link multiple SSO providers to a single account
@@ -369,7 +369,7 @@ export const testSSOConnection = async (data: TestConnectionRequest): Promise<Te
 /**
  * Initiate SSO login flow
  *
- * @endpoint POST /auth/sso/:provider/initiate
+ * @endpoint GET /auth/sso/:provider/authorize
  * @param {SSOProvider} provider - The SSO provider to use ('google' | 'microsoft' | 'custom')
  * @returns {Promise<SSOLoginInitiateResponse>} Authorization URL and state parameter
  * @throws {Error} API error with message
@@ -392,8 +392,8 @@ export const testSSOConnection = async (data: TestConnectionRequest): Promise<Te
  */
 export const initiateSSOLogin = async (provider: SSOProvider): Promise<SSOLoginInitiateResponse> => {
   try {
-    const response = await apiClient.post(`/auth/sso/${provider}/initiate`)
-    return response.data.data
+    const response = await apiClient.get(`/auth/sso/${provider}/authorize`)
+    return response.data.data || response.data
   } catch (error) {
     throw handleApiError(error)
   }
@@ -402,7 +402,7 @@ export const initiateSSOLogin = async (provider: SSOProvider): Promise<SSOLoginI
 /**
  * Get enabled SSO providers for login page
  *
- * @endpoint GET /auth/sso/enabled-providers
+ * @endpoint GET /auth/sso/providers
  * @returns {Promise<SSOProviderConfig[]>} List of enabled SSO providers (public endpoint)
  * @throws {Error} API error with message
  *
@@ -419,8 +419,8 @@ export const initiateSSOLogin = async (provider: SSOProvider): Promise<SSOLoginI
  */
 export const getEnabledSSOProviders = async (): Promise<SSOProviderConfig[]> => {
   try {
-    const response = await apiClient.get('/auth/sso/enabled-providers')
-    return response.data.data
+    const response = await apiClient.get('/auth/sso/providers')
+    return response.data.data || response.data.providers || []
   } catch (error) {
     throw handleApiError(error)
   }
