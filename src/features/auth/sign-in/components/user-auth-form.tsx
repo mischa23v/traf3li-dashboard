@@ -269,6 +269,20 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       }
     } catch (error: any) {
       const status = error?.status || error?.response?.status
+      const errorCode = error?.response?.data?.code || error?.code
+
+      // Handle CAPTCHA_REQUIRED response from backend
+      if (errorCode === 'CAPTCHA_REQUIRED') {
+        setShowCaptcha(true)
+        toast({
+          title: isArabic ? 'التحقق مطلوب' : 'Verification Required',
+          description: isArabic
+            ? 'يرجى إكمال التحقق للمتابعة.'
+            : 'Please complete the verification to continue.',
+          variant: 'default',
+        })
+        return
+      }
 
       // Handle server-side 429 rate limit - DON'T count as failed attempt
       // 429 means "slow down", not "wrong password"
@@ -481,8 +495,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               </div>
             )}
 
-            {/* CAPTCHA Challenge */}
-            {showCaptcha && captchaConfig && captchaConfig.enabled && captchaConfig.siteKey && (
+            {/* CAPTCHA Challenge - shows when backend requires it or after failed attempts */}
+            {showCaptcha && captchaConfig && captchaConfig.siteKey && (
               <CaptchaChallenge
                 ref={captchaRef}
                 provider={captchaConfig.provider}
