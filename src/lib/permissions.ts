@@ -275,6 +275,7 @@ export function getDefaultPermissionsForRole(role: FirmRole): UserPermissions {
       canDeleteRecords: false,
       canViewFinance: false,
       canManageTeam: false,
+      canAccessHR: false,
     },
     restrictions: null,
   }

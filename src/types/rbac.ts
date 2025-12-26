@@ -26,6 +26,7 @@ export type FirmMemberStatus =
   | 'departed'
   | 'suspended'
   | 'pending'
+  | 'pending_approval'
 
 /**
  * Permission Levels (ordered from least to most access)

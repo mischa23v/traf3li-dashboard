@@ -187,21 +187,19 @@ export type UserRole =
   | 'owner'
   | 'admin'
   | 'partner'
-  | 'senior_lawyer'
   | 'lawyer'
   | 'paralegal'
   | 'secretary'
   | 'accountant'
-  | 'intern'
+  | 'departed'
 
 export const USER_ROLES: { value: UserRole; label: string; labelEn: string }[] = [
-  { value: 'owner', label: 'مالك', labelEn: 'Owner' },
-  { value: 'admin', label: 'مسؤول', labelEn: 'Admin' },
+  { value: 'owner', label: 'المالك', labelEn: 'Owner' },
+  { value: 'admin', label: 'مدير النظام', labelEn: 'Admin' },
   { value: 'partner', label: 'شريك', labelEn: 'Partner' },
-  { value: 'senior_lawyer', label: 'محامي أول', labelEn: 'Senior Lawyer' },
   { value: 'lawyer', label: 'محامي', labelEn: 'Lawyer' },
   { value: 'paralegal', label: 'مساعد قانوني', labelEn: 'Paralegal' },
   { value: 'secretary', label: 'سكرتير', labelEn: 'Secretary' },
   { value: 'accountant', label: 'محاسب', labelEn: 'Accountant' },
-  { value: 'intern', label: 'متدرب', labelEn: 'Intern' },
+  { value: 'departed', label: 'موظف مغادر', labelEn: 'Departed' },
 ]

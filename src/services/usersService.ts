@@ -93,7 +93,7 @@ export interface TeamMember {
   phone: string
   image?: string
   firmRole?: 'owner' | 'admin' | 'partner' | 'lawyer' | 'paralegal' | 'secretary' | 'accountant' | 'departed'
-  firmStatus?: 'active' | 'departed' | 'suspended' | 'pending'
+  firmStatus?: 'active' | 'departed' | 'suspended' | 'pending' | 'pending_approval'
   createdAt: string
 }
 
