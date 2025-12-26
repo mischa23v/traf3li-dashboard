@@ -34,8 +34,8 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://vercel.live; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.traf3li.com wss://api.traf3li.com https://*.sentry.io https://cloudflareinsights.com https://vercel.live wss://vercel.live; frame-src https://vercel.live; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; upgrade-insecure-requests;",
-          "comment": "CSP restricts resource loading. See /src/lib/security-headers.ts for domain documentation. unsafe-eval removed for security. unsafe-inline required for some React libraries."
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://vercel.live https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://js.hcaptcha.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.traf3li.com wss://api.traf3li.com https://*.sentry.io https://cloudflareinsights.com https://vercel.live wss://vercel.live https://www.google-analytics.com https://www.googletagmanager.com; frame-src https://vercel.live https://www.google.com https://js.hcaptcha.com; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; upgrade-insecure-requests;",
+          "comment": "CSP restricts resource loading. See /src/lib/security-headers.ts for domain documentation. unsafe-eval removed for security. unsafe-inline required for some React libraries. GTM/GA domains added for analytics."
         }
       ]
     },

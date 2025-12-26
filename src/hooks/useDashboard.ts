@@ -14,6 +14,15 @@ import { useAuthStore } from '@/stores/auth-store'
 // ==================== DASHBOARD SUMMARY (GOLD STANDARD) ====================
 // Single API call for all dashboard data - replaces 7 separate calls
 
+// Default fallback values for dashboard summary when API fails
+const DEFAULT_DASHBOARD_SUMMARY: DashboardSummary = {
+  caseStats: { total: 0, active: 0, closed: 0, pending: 0 },
+  taskStats: { total: 0, byStatus: { todo: 0, in_progress: 0, completed: 0, cancelled: 0 } },
+  reminderStats: { total: 0, byStatus: { pending: 0, completed: 0, snoozed: 0 } },
+  todayEvents: [],
+  financialSummary: { totalRevenue: 0, totalExpenses: 0, pendingAmount: 0, overdueAmount: 0 },
+}
+
 export const useDashboardSummary = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
@@ -25,6 +34,8 @@ export const useDashboardSummary = () => {
     enabled: isAuthenticated,
     retry: false, // NO retry on 429 - prevents rate limit cascade
     refetchOnWindowFocus: false, // Don't refetch on tab focus
+    // Provide placeholder data to prevent UI crashes when backend returns 500
+    placeholderData: DEFAULT_DASHBOARD_SUMMARY,
   })
 }
 
@@ -63,6 +74,8 @@ export const useTodayEvents = (isEnabled = true) => {
     staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: isAuthenticated && isEnabled, // Only fetch when authenticated and enabled
     retry: false, // NO retry on 429 - prevents rate limit cascade
+    // Provide empty array when API fails to prevent UI crashes
+    placeholderData: [],
   })
 }
 
@@ -75,6 +88,8 @@ export const useFinancialSummary = (isEnabled = true) => {
     staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: isAuthenticated && isEnabled, // Only fetch when authenticated and enabled
     retry: false, // NO retry on 429 - prevents rate limit cascade
+    // Provide zero values when API fails to prevent UI crashes
+    placeholderData: { totalRevenue: 0, totalExpenses: 0, pendingAmount: 0, overdueAmount: 0 },
   })
 }
 

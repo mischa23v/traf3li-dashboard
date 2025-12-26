@@ -83,6 +83,8 @@ export const useUpcomingTasks = (days: number = 7, enabled: boolean = true) => {
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
     enabled,
+    // Provide empty array when API fails to prevent UI crashes
+    placeholderData: [],
   })
 }
 
@@ -93,6 +95,8 @@ export const useOverdueTasks = (enabled: boolean = true) => {
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
     enabled,
+    // Provide empty array when API fails to prevent UI crashes
+    placeholderData: [],
   })
 }
 
@@ -103,6 +107,8 @@ export const useDueTodayTasks = (enabled: boolean = true) => {
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
     enabled,
+    // Provide empty array when API fails to prevent UI crashes
+    placeholderData: [],
   })
 }
 
@@ -113,6 +119,18 @@ export const useMyTasks = (filters?: Omit<TaskFilters, 'assignedTo'>) => {
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
   })
+}
+
+// Default fallback values for task stats when API fails
+const DEFAULT_TASK_STATS: TaskStats = {
+  total: 0,
+  byStatus: { todo: 0, in_progress: 0, completed: 0, cancelled: 0 },
+  highPriority: 0,
+  upcoming: 0,
+  overdue: 0,
+  totalHours: 0,
+  billableHours: 0,
+  notBilled: 0,
 }
 
 export const useTaskStats = (enabledOrFilters?: boolean | { caseId?: string; assignedTo?: string; dateFrom?: string; dateTo?: string }) => {
@@ -127,6 +145,8 @@ export const useTaskStats = (enabledOrFilters?: boolean | { caseId?: string; ass
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
     enabled,
+    // Provide default stats when API fails to prevent UI crashes
+    placeholderData: DEFAULT_TASK_STATS,
   })
 }
 
