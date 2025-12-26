@@ -61,6 +61,7 @@ export type SpecialPermissionKey =
   | 'canDeleteRecords'
   | 'canViewFinance'
   | 'canManageTeam'
+  | 'canAccessHR'
 
 /**
  * Departure Reasons

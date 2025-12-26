@@ -6,6 +6,7 @@ const staffStatusSchema = z.union([
   z.literal('departed'),
   z.literal('suspended'),
   z.literal('pending'),
+  z.literal('pending_approval'),
 ])
 export type StaffStatus = z.infer<typeof staffStatusSchema>
 
@@ -17,10 +18,6 @@ const staffRoleSchema = z.union([
   z.literal('paralegal'),
   z.literal('secretary'),
   z.literal('accountant'),
-  z.literal('sales'),
-  z.literal('sales_manager'),
-  z.literal('hr'),
-  z.literal('hr_manager'),
   z.literal('departed'),
 ])
 export type StaffRole = z.infer<typeof staffRoleSchema>

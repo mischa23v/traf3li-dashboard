@@ -354,6 +354,32 @@ export function TeamManagementGate({
 }
 
 /**
+ * HR Access Gate
+ * Shows content only if user can access HR module
+ */
+export function HRGate({
+  children,
+  fallback,
+  showDeniedMessage,
+}: PermissionGateProps) {
+  const { t } = useTranslation()
+  const { hasSpecial, isLoading } = usePermissions()
+
+  if (isLoading) {
+    return null
+  }
+
+  if (!hasSpecial('canAccessHR')) {
+    if (showDeniedMessage) {
+      return <AccessDenied message={t('permissionGate.noHRAccess')} />
+    }
+    return fallback ? <>{fallback}</> : null
+  }
+
+  return <>{children}</>
+}
+
+/**
  * Conditional Disable Wrapper
  * Renders children with disabled styling if user doesn't have permission
  */
