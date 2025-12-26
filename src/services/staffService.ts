@@ -18,7 +18,7 @@ export interface StaffMember {
   department?: string
   position?: string
   hireDate?: string
-  status: 'active' | 'inactive' | 'on-leave'
+  status: 'active' | 'departed' | 'suspended' | 'pending' | 'pending_approval'
   avatar?: string
   createdAt: string
   updatedAt: string
@@ -40,8 +40,10 @@ export interface StaffFilters {
 export interface StaffStats {
   total: number
   active: number
-  inactive: number
-  onLeave: number
+  departed: number
+  suspended: number
+  pending: number
+  pendingApproval: number
   byDepartment?: Record<string, number>
   byRole?: Record<string, number>
 }

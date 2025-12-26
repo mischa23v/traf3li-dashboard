@@ -120,7 +120,6 @@ const EDUCATION_LEVELS = [
 
 const STAFF_STATUSES = [
     { value: 'active', label: 'نشط', color: 'bg-emerald-500' },
-    { value: 'inactive', label: 'غير نشط', color: 'bg-gray-500' },
     { value: 'departed', label: 'مغادر', color: 'bg-red-500' },
     { value: 'suspended', label: 'معلق', color: 'bg-orange-500' },
     { value: 'pending', label: 'قيد الانتظار', color: 'bg-yellow-500' },
