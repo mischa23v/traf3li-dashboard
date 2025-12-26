@@ -189,8 +189,13 @@ export const useInitiateSSOLogin = () => {
   return useMutation({
     mutationFn: (provider: 'google' | 'microsoft' | 'custom') => ssoService.initiateSSOLogin(provider),
     onSuccess: (response) => {
-      // Redirect to SSO provider's authorization URL
-      window.location.href = response.authorizationUrl
+      // Check if authorizationUrl exists before redirecting
+      if (response?.authorizationUrl) {
+        window.location.href = response.authorizationUrl
+      } else {
+        toast.error(isRTL ? 'فشل الحصول على رابط تسجيل الدخول. يرجى المحاولة مرة أخرى.' : 'Failed to get login URL. Please try again.')
+        console.error('SSO initiate response missing authorizationUrl:', response)
+      }
     },
     onError: (error: Error) => {
       toast.error(error.message || (isRTL ? 'فشل بدء تسجيل الدخول' : 'Failed to initiate login'))
