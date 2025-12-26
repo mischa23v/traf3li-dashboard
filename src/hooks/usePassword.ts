@@ -41,10 +41,12 @@ export function useForgotPassword() {
     mutationFn: ({
       email,
       captchaToken,
+      captchaProvider,
     }: {
       email: string
       captchaToken?: string
-    }) => passwordService.forgotPassword(email, captchaToken),
+      captchaProvider?: string
+    }) => passwordService.forgotPassword({ email, captchaToken, captchaProvider }),
     onSuccess: () => {
       toast.success(t('auth.resetEmailSent', 'تم إرسال رابط إعادة التعيين إلى بريدك'))
     },

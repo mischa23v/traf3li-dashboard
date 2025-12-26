@@ -53,21 +53,24 @@ const passwordService = {
   /**
    * Request password reset email
    *
-   * @param email - User email
-   * @param captchaToken - Optional CAPTCHA token
+   * @param params - Forgot password parameters
+   * @param params.email - User email
+   * @param params.captchaToken - CAPTCHA token (required by backend)
+   * @param params.captchaProvider - CAPTCHA provider (default: 'turnstile')
    */
-  forgotPassword: async (
-    email: string,
+  forgotPassword: async (params: {
+    email: string
     captchaToken?: string
-  ): Promise<{ success: boolean; message: string }> => {
+    captchaProvider?: string
+  }): Promise<{ success: boolean; message: string }> => {
     try {
       const response = await authApi.post<{
         success: boolean
         message: string
       }>('/auth/forgot-password', {
-        email,
-        captchaToken,
-        captchaProvider: captchaToken ? 'recaptcha' : undefined,
+        email: params.email,
+        captchaToken: params.captchaToken,
+        captchaProvider: params.captchaToken ? (params.captchaProvider || 'turnstile') : undefined,
       })
       return response.data
     } catch (error: any) {
