@@ -271,10 +271,11 @@ const oauthService = {
     returnUrl: string = '/settings/security'
   ): Promise<void> => {
     try {
-      const response = await authApi.get<{ authUrl: string }>(
-        `/auth/sso/${provider}/link`,
+      const response = await authApi.post<{ authUrl: string }>(
+        '/auth/sso/link',
         {
-          params: { returnUrl },
+          provider,
+          returnUrl,
         }
       )
 
@@ -291,7 +292,7 @@ const oauthService = {
    */
   unlinkProvider: async (provider: OAuthProvider): Promise<void> => {
     try {
-      await authApi.delete(`/auth/sso/${provider}/unlink`)
+      await authApi.delete(`/auth/sso/unlink/${provider}`)
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -320,11 +321,15 @@ const oauthService = {
     try {
       const response = await authApi.get<{
         providers: OAuthProvider[]
-      }>('/auth/sso/available')
+      }>('/auth/sso/providers')
 
-      return OAUTH_PROVIDERS.filter((p) =>
-        response.data.providers.includes(p.id)
-      )
+      const providers = response.data.providers || response.data
+      if (Array.isArray(providers)) {
+        return OAUTH_PROVIDERS.filter((p) =>
+          providers.includes(p.id) || providers.some((pr: any) => pr.id === p.id || pr.provider === p.id)
+        )
+      }
+      return OAUTH_PROVIDERS
     } catch {
       // Fallback to all providers if endpoint doesn't exist
       return OAUTH_PROVIDERS
