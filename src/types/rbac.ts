@@ -26,6 +26,7 @@ export type FirmMemberStatus =
   | 'departed'
   | 'suspended'
   | 'pending'
+  | 'pending_approval'
 
 /**
  * Permission Levels (ordered from least to most access)
@@ -250,6 +251,7 @@ export const STATUS_LABELS: Record<FirmMemberStatus, string> = {
   departed: 'مغادر',
   suspended: 'معلق',
   pending: 'معلق',
+  pending_approval: 'في انتظار الموافقة',
 }
 
 /**
@@ -260,6 +262,7 @@ export const STATUS_LABELS_EN: Record<FirmMemberStatus, string> = {
   departed: 'Departed',
   suspended: 'Suspended',
   pending: 'Pending',
+  pending_approval: 'Pending Approval',
 }
 
 /**

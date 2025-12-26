@@ -98,7 +98,7 @@ export interface User {
   firmId?: string
   firm?: UserFirm | null
   firmRole?: 'owner' | 'admin' | 'partner' | 'lawyer' | 'paralegal' | 'secretary' | 'accountant' | 'departed'
-  firmStatus?: 'active' | 'departed' | 'suspended' | 'pending' | null
+  firmStatus?: 'active' | 'departed' | 'suspended' | 'pending' | 'pending_approval' | null
   // Tenant for multi-tenant support
   tenant?: UserTenant | null
   // Permissions returned directly from login (for solo lawyers)

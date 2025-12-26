@@ -3,8 +3,8 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Staff } from '@/features/staff'
 
 // Stable fallback arrays to prevent infinite re-renders
-const EMPTY_STATUS_ARRAY: ('active' | 'inactive' | 'suspended')[] = []
-const EMPTY_ROLE_ARRAY: ('lawyer' | 'paralegal' | 'secretary' | 'accountant' | 'admin' | 'intern')[] = []
+const EMPTY_STATUS_ARRAY: ('active' | 'departed' | 'suspended' | 'pending' | 'pending_approval')[] = []
+const EMPTY_ROLE_ARRAY: ('owner' | 'admin' | 'partner' | 'lawyer' | 'paralegal' | 'secretary' | 'accountant' | 'departed')[] = []
 
 const staffSearchSchema = z.object({
   page: z.number().optional().catch(1),
@@ -14,8 +14,10 @@ const staffSearchSchema = z.object({
     .array(
       z.union([
         z.literal('active'),
-        z.literal('inactive'),
+        z.literal('departed'),
         z.literal('suspended'),
+        z.literal('pending'),
+        z.literal('pending_approval'),
       ])
     )
     .optional()
@@ -23,12 +25,14 @@ const staffSearchSchema = z.object({
   role: z
     .array(
       z.union([
+        z.literal('owner'),
+        z.literal('admin'),
+        z.literal('partner'),
         z.literal('lawyer'),
         z.literal('paralegal'),
         z.literal('secretary'),
         z.literal('accountant'),
-        z.literal('admin'),
-        z.literal('intern'),
+        z.literal('departed'),
       ])
     )
     .optional()

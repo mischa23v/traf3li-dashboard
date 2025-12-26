@@ -11,9 +11,9 @@ export interface CreateStaffData {
   lastName: string
   email: string
   phone?: string
-  role: 'admin' | 'lawyer' | 'paralegal' | 'assistant'
+  role: 'owner' | 'admin' | 'partner' | 'lawyer' | 'paralegal' | 'secretary' | 'accountant' | 'departed'
   specialization?: string
-  status?: 'active' | 'inactive'
+  status?: 'active' | 'inactive' | 'departed' | 'suspended' | 'pending' | 'pending_approval'
 }
 
 // Invitation data interface

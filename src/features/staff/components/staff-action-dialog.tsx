@@ -34,9 +34,9 @@ const editFormSchema = z.object({
   lastName: z.string().min(2, 'الاسم الأخير مطلوب'),
   email: z.string().email('البريد الإلكتروني غير صالح'),
   phone: z.string().optional(),
-  role: z.enum(['admin', 'lawyer', 'paralegal', 'assistant']),
+  role: z.enum(['owner', 'admin', 'partner', 'lawyer', 'paralegal', 'secretary', 'accountant', 'departed']),
   specialization: z.string().optional(),
-  status: z.enum(['active', 'inactive']).default('active'),
+  status: z.enum(['active', 'departed', 'suspended', 'pending', 'pending_approval']).default('active'),
 })
 
 // Schema for inviting new staff
@@ -44,7 +44,7 @@ const inviteFormSchema = z.object({
   firstName: z.string().min(2, 'الاسم الأول مطلوب'),
   lastName: z.string().min(2, 'الاسم الأخير مطلوب'),
   email: z.string().email('البريد الإلكتروني غير صالح'),
-  role: z.enum(['admin', 'lawyer', 'paralegal', 'assistant']),
+  role: z.enum(['owner', 'admin', 'partner', 'lawyer', 'paralegal', 'secretary', 'accountant', 'departed']),
 })
 
 type EditStaffForm = z.infer<typeof editFormSchema>

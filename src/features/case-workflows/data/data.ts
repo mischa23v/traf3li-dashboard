@@ -85,12 +85,13 @@ export function getColorLabel(color: string, isArabic: boolean): string {
  * Approver Role Options
  */
 export const approverRoles = [
-  { value: 'admin', label: 'Administrator', labelAr: 'مدير' },
-  { value: 'lawyer', label: 'Lawyer', labelAr: 'محامي' },
-  { value: 'senior_lawyer', label: 'Senior Lawyer', labelAr: 'محامي أول' },
+  { value: 'owner', label: 'Owner', labelAr: 'المالك' },
+  { value: 'admin', label: 'Administrator', labelAr: 'مدير النظام' },
   { value: 'partner', label: 'Partner', labelAr: 'شريك' },
-  { value: 'manager', label: 'Manager', labelAr: 'مدير قسم' },
-  { value: 'supervisor', label: 'Supervisor', labelAr: 'مشرف' },
+  { value: 'lawyer', label: 'Lawyer', labelAr: 'محامي' },
+  { value: 'paralegal', label: 'Paralegal', labelAr: 'مساعد قانوني' },
+  { value: 'secretary', label: 'Secretary', labelAr: 'سكرتير' },
+  { value: 'accountant', label: 'Accountant', labelAr: 'محاسب' },
 ] as const
 
 /**
