@@ -158,15 +158,6 @@ export const CaptchaChallenge = forwardRef<CaptchaChallengeRef, CaptchaChallenge
           )}
 
           <div className='flex flex-col items-center gap-2'>
-            <div className='flex items-center gap-2 text-xs text-muted-foreground'>
-              <Shield className='h-3 w-3' />
-              <span>
-                {isRtl
-                  ? 'محمي بواسطة Cloudflare'
-                  : 'Protected by Cloudflare'}
-              </span>
-            </div>
-
             {/* Turnstile Widget */}
             <Turnstile
               ref={turnstileRef}
@@ -233,15 +224,6 @@ export const CaptchaChallenge = forwardRef<CaptchaChallengeRef, CaptchaChallenge
         {/* CAPTCHA Container */}
         {captcha.isReady && !captcha.error && (
           <div className='flex flex-col items-center gap-2'>
-            <div className='flex items-center gap-2 text-xs text-muted-foreground'>
-              <Shield className='h-3 w-3' />
-              <span>
-                {isRtl
-                  ? 'محمي بواسطة ' + getProviderName(provider)
-                  : 'Protected by ' + getProviderName(provider)}
-              </span>
-            </div>
-
             {/* CAPTCHA Widget Container */}
             <div
               ref={containerRef}

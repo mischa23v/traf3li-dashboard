@@ -64,14 +64,54 @@ export function SSOLoginButtons({ disabled = false, className = '' }: SSOLoginBu
   const { data: providers, isLoading } = useEnabledSSOProviders()
   const initiateSSOLogin = useInitiateSSOLogin()
 
-  // Don't render anything if loading or no providers
-  if (isLoading || !providers || providers.length === 0) {
-    return null
-  }
-
   // Handle SSO login click
   const handleSSOLogin = (provider: SSOProvider) => {
     initiateSSOLogin.mutate(provider)
+  }
+
+  // Always include Google as a default provider if not already in the list
+  const hasGoogle = providers?.some(p => p.provider === 'google')
+  const allProviders = providers || []
+
+  // If no Google in the list from backend, add it as default
+  const displayProviders = hasGoogle ? allProviders : [
+    {
+      _id: 'google-default',
+      provider: 'google' as SSOProvider,
+      displayName: 'Google',
+      displayNameAr: 'جوجل',
+      enabled: true,
+      status: 'active' as const,
+      clientId: '',
+      redirectUri: '',
+    },
+    ...allProviders
+  ]
+
+  // Show loading state briefly but still render buttons
+  if (isLoading) {
+    return (
+      <>
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-slate-200" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-white px-4 text-slate-500">{t('auth.signIn.orContinueWith')}</span>
+          </div>
+        </div>
+        <div className={`space-y-3 ${className}`}>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full h-12 rounded-xl border-2 border-slate-200 bg-white text-[#0f172a] font-medium flex items-center justify-center gap-3"
+            disabled
+          >
+            <Loader2 className="h-5 w-5 animate-spin" />
+          </Button>
+        </div>
+      </>
+    )
   }
 
   return (
@@ -87,7 +127,7 @@ export function SSOLoginButtons({ disabled = false, className = '' }: SSOLoginBu
       </div>
 
       <div className={`space-y-3 ${className}`}>
-        {providers.map((provider) => {
+        {displayProviders.map((provider) => {
         const displayName = isRTL ? provider.displayNameAr : provider.displayName
         const fallbackName = getDefaultProviderName(provider.provider, isRTL)
         const buttonText = `${isRTL ? 'تسجيل الدخول باستخدام' : 'Sign in with'} ${displayName || fallbackName}`

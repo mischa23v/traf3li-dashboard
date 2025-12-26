@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Check, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -76,13 +76,44 @@ export function usePasswordStrength(password: string): PasswordStrengthResult {
 interface PasswordStrengthProps {
   password: string
   className?: string
+  /** Auto-hide when all requirements are met (default: true) */
+  autoHide?: boolean
+  /** Delay in ms before auto-hiding (default: 1500) */
+  autoHideDelay?: number
 }
 
-export function PasswordStrength({ password, className }: PasswordStrengthProps) {
-  const { t } = useTranslation()
+export function PasswordStrength({
+  password,
+  className,
+  autoHide = true,
+  autoHideDelay = 1500
+}: PasswordStrengthProps) {
+  const { t, i18n } = useTranslation()
   const strength = usePasswordStrength(password)
+  const [isHidden, setIsHidden] = useState(false)
+  const isRTL = i18n.language === 'ar'
 
-  if (!password) return null
+  // Check if all requirements are met
+  const allRequirementsMet = strength.level === 'strong' &&
+    strength.requirements.minLength &&
+    strength.requirements.hasUppercase &&
+    strength.requirements.hasLowercase &&
+    strength.requirements.hasNumber &&
+    strength.requirements.hasSpecialChar
+
+  // Auto-hide when all requirements are met
+  useEffect(() => {
+    if (autoHide && allRequirementsMet) {
+      const timer = setTimeout(() => {
+        setIsHidden(true)
+      }, autoHideDelay)
+      return () => clearTimeout(timer)
+    } else {
+      setIsHidden(false)
+    }
+  }, [autoHide, allRequirementsMet, autoHideDelay])
+
+  if (!password || isHidden) return null
 
   const requirementsList = [
     {
@@ -113,7 +144,14 @@ export function PasswordStrength({ password, className }: PasswordStrengthProps)
   ]
 
   return (
-    <div className={cn('space-y-3', className)}>
+    <div
+      className={cn(
+        'space-y-3 transition-all duration-300',
+        allRequirementsMet && 'opacity-80',
+        className
+      )}
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
       {/* Strength indicator */}
       <div className="space-y-2">
         <div className="flex items-center justify-between text-sm">
@@ -139,16 +177,19 @@ export function PasswordStrength({ password, className }: PasswordStrengthProps)
         />
       </div>
 
-      {/* Requirements checklist */}
+      {/* Requirements checklist - RTL aware */}
       <div className="space-y-1.5">
         {requirementsList.map((requirement) => (
           <div
             key={requirement.key}
-            className="flex items-center gap-2 text-sm"
+            className={cn(
+              'flex items-center gap-2 text-sm',
+              isRTL && 'flex-row'
+            )}
           >
             <div
               className={cn(
-                'flex h-4 w-4 items-center justify-center rounded-full',
+                'flex h-4 w-4 items-center justify-center rounded-full shrink-0',
                 requirement.met
                   ? 'bg-green-500 text-white'
                   : 'bg-slate-200 text-slate-400'
@@ -162,7 +203,8 @@ export function PasswordStrength({ password, className }: PasswordStrengthProps)
             </div>
             <span
               className={cn(
-                requirement.met ? 'text-slate-700' : 'text-slate-500'
+                requirement.met ? 'text-slate-700' : 'text-slate-500',
+                isRTL && 'text-right'
               )}
             >
               {requirement.label}

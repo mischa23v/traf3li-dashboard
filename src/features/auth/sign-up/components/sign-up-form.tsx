@@ -1,6 +1,10 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { getRouteApi } from '@tanstack/react-router';
 import { apiClientNoVersion } from '@/lib/api';
+
+// Route API for accessing search params (OAuth pre-fill)
+const routeApi = getRouteApi('/(auth)/sign-up');
 
 // Auth routes are NOT versioned - they're at /api/auth/*, not /api/v1/auth/*
 const authApi = apiClientNoVersion;
@@ -285,6 +289,37 @@ export function SignUpForm() {
     agreedPrivacy: false,
     agreedConflict: false,
   });
+
+  // OAuth pre-fill from URL search params
+  const searchParams = routeApi.useSearch();
+  const [oAuthData, setOAuthData] = useState<{
+    isOAuthUser: boolean;
+    provider: string;
+    emailVerified: boolean;
+  }>({
+    isOAuthUser: false,
+    provider: '',
+    emailVerified: false,
+  });
+
+  // Pre-fill form data from OAuth search params on mount
+  useEffect(() => {
+    if (searchParams?.email && searchParams?.oauthVerified === 'true') {
+      setFormData(prev => ({
+        ...prev,
+        email: searchParams.email || '',
+        firstName: searchParams.firstName || '',
+        lastName: searchParams.lastName || '',
+      }));
+      setOAuthData({
+        isOAuthUser: true,
+        provider: searchParams.oauthProvider || 'google',
+        emailVerified: true,
+      });
+      // Mark email as verified/available since it's from OAuth
+      setAvailability(prev => ({ ...prev, email: 'available' }));
+    }
+  }, [searchParams]);
 
   // Real-time availability validation
   type AvailabilityStatus = 'idle' | 'checking' | 'available' | 'taken';
@@ -804,13 +839,49 @@ export function SignUpForm() {
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <label className="block text-sm font-medium text-[#0f172a]">{t('auth.signUp.fields.email', 'Email')} <span className="text-red-500">*</span></label>
-                      <AvailabilityIndicator status={availability.email} />
+                      {oAuthData.emailVerified ? (
+                        <span className="flex items-center gap-1 text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
+                          <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                          {isRTL
+                            ? `تم التحقق بواسطة ${oAuthData.provider === 'google' ? 'جوجل' : oAuthData.provider === 'microsoft' ? 'مايكروسوفت' : oAuthData.provider}`
+                            : `Verified by ${oAuthData.provider === 'google' ? 'Google' : oAuthData.provider === 'microsoft' ? 'Microsoft' : oAuthData.provider}`
+                          }
+                        </span>
+                      ) : (
+                        <AvailabilityIndicator status={availability.email} />
+                      )}
                     </div>
                     <div className="relative">
-                      <div className="absolute end-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Mail /></div>
-                      <input type="email" value={formData.email} onChange={(e) => updateField('email', e.target.value)} className={`w-full h-12 pe-12 ps-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.email || availability.email === 'taken' ? 'border-red-400' : availability.email === 'available' ? 'border-green-400' : 'border-slate-200 focus:border-[#0f172a]'}`} dir="ltr" style={{ textAlign: 'left' }} />
+                      <div className={`absolute end-4 top-1/2 -translate-y-1/2 ${oAuthData.emailVerified ? 'text-emerald-500' : 'text-slate-500'}`}>
+                        {oAuthData.emailVerified ? <Icons.Shield /> : <Icons.Mail />}
+                      </div>
+                      <input
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => !oAuthData.emailVerified && updateField('email', e.target.value)}
+                        readOnly={oAuthData.emailVerified}
+                        className={`w-full h-12 pe-12 ps-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${
+                          oAuthData.emailVerified
+                            ? 'border-emerald-300 bg-emerald-50/50 cursor-not-allowed'
+                            : errors.email || availability.email === 'taken'
+                              ? 'border-red-400'
+                              : availability.email === 'available'
+                                ? 'border-green-400'
+                                : 'border-slate-200 focus:border-[#0f172a]'
+                        }`}
+                        dir="ltr"
+                        style={{ textAlign: 'left' }}
+                      />
                     </div>
                     {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                    {oAuthData.emailVerified && (
+                      <p className="text-emerald-600 text-xs mt-1">
+                        {isRTL
+                          ? 'البريد الإلكتروني محمي ولا يمكن تغييره'
+                          : 'Email is verified and cannot be changed'
+                        }
+                      </p>
+                    )}
                   </div>
                   {/* Phone field for client and dashboard lawyer (moved from step 2) */}
                   {(formData.userType === 'client' || formData.lawyerMode === 'dashboard') && (

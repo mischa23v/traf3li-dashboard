@@ -180,6 +180,7 @@ import { Route as AuthenticatedDashboardAssetsMaintenanceRouteImport } from './r
 import { Route as AuthenticatedDashboardAssetsCreateRouteImport } from './routes/_authenticated/dashboard.assets.create'
 import { Route as AuthenticatedDashboardAssetsCategoriesRouteImport } from './routes/_authenticated/dashboard.assets.categories'
 import { Route as AuthenticatedDashboardAssetsAssetIdRouteImport } from './routes/_authenticated/dashboard.assets.$assetId'
+import { Route as authAuthCallbackProviderRouteImport } from './routes/(auth)/auth.callback.$provider'
 import { Route as AuthenticatedDashboardTasksReportsIndexRouteImport } from './routes/_authenticated/dashboard.tasks.reports.index'
 import { Route as AuthenticatedDashboardTasksRemindersIndexRouteImport } from './routes/_authenticated/dashboard.tasks.reminders.index'
 import { Route as AuthenticatedDashboardTasksEventsIndexRouteImport } from './routes/_authenticated/dashboard.tasks.events.index'
@@ -1401,6 +1402,12 @@ const AuthenticatedDashboardAssetsAssetIdRoute =
     id: '/dashboard/assets/$assetId',
     path: '/dashboard/assets/$assetId',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const authAuthCallbackProviderRoute =
+  authAuthCallbackProviderRouteImport.update({
+    id: '/(auth)/auth/callback/$provider',
+    path: '/auth/callback/$provider',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const AuthenticatedDashboardTasksReportsIndexRoute =
   AuthenticatedDashboardTasksReportsIndexRouteImport.update({
@@ -2933,6 +2940,7 @@ export interface FileRoutesByFullPath {
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/auth/callback/$provider': typeof authAuthCallbackProviderRoute
   '/dashboard/assets/$assetId': typeof AuthenticatedDashboardAssetsAssetIdRoute
   '/dashboard/assets/categories': typeof AuthenticatedDashboardAssetsCategoriesRouteWithChildren
   '/dashboard/assets/create': typeof AuthenticatedDashboardAssetsCreateRoute
@@ -3346,6 +3354,7 @@ export interface FileRoutesByTo {
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/auth/callback/$provider': typeof authAuthCallbackProviderRoute
   '/dashboard/assets/$assetId': typeof AuthenticatedDashboardAssetsAssetIdRoute
   '/dashboard/assets/create': typeof AuthenticatedDashboardAssetsCreateRoute
   '/dashboard/assets/settings': typeof AuthenticatedDashboardAssetsSettingsRoute
@@ -3756,6 +3765,7 @@ export interface FileRoutesById {
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
+  '/(auth)/auth/callback/$provider': typeof authAuthCallbackProviderRoute
   '/_authenticated/dashboard/assets/$assetId': typeof AuthenticatedDashboardAssetsAssetIdRoute
   '/_authenticated/dashboard/assets/categories': typeof AuthenticatedDashboardAssetsCategoriesRouteWithChildren
   '/_authenticated/dashboard/assets/create': typeof AuthenticatedDashboardAssetsCreateRoute
@@ -4172,6 +4182,7 @@ export interface FileRouteTypes {
     | '/help-center'
     | '/settings/'
     | '/users'
+    | '/auth/callback/$provider'
     | '/dashboard/assets/$assetId'
     | '/dashboard/assets/categories'
     | '/dashboard/assets/create'
@@ -4585,6 +4596,7 @@ export interface FileRouteTypes {
     | '/help-center'
     | '/settings'
     | '/users'
+    | '/auth/callback/$provider'
     | '/dashboard/assets/$assetId'
     | '/dashboard/assets/create'
     | '/dashboard/assets/settings'
@@ -4994,6 +5006,7 @@ export interface FileRouteTypes {
     | '/_authenticated/help-center/'
     | '/_authenticated/settings/'
     | '/_authenticated/users/'
+    | '/(auth)/auth/callback/$provider'
     | '/_authenticated/dashboard/assets/$assetId'
     | '/_authenticated/dashboard/assets/categories'
     | '/_authenticated/dashboard/assets/create'
@@ -5385,6 +5398,7 @@ export interface RootRouteChildren {
   errors404Route: typeof errors404Route
   errors500Route: typeof errors500Route
   errors503Route: typeof errors503Route
+  authAuthCallbackProviderRoute: typeof authAuthCallbackProviderRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -6585,6 +6599,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/assets/$assetId'
       preLoaderRoute: typeof AuthenticatedDashboardAssetsAssetIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/(auth)/auth/callback/$provider': {
+      id: '/(auth)/auth/callback/$provider'
+      path: '/auth/callback/$provider'
+      fullPath: '/auth/callback/$provider'
+      preLoaderRoute: typeof authAuthCallbackProviderRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/tasks/reports/': {
       id: '/_authenticated/dashboard/tasks/reports/'
@@ -9756,6 +9777,7 @@ const rootRouteChildren: RootRouteChildren = {
   errors404Route: errors404Route,
   errors500Route: errors500Route,
   errors503Route: errors503Route,
+  authAuthCallbackProviderRoute: authAuthCallbackProviderRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
