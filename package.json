@@ -35,6 +35,7 @@
     "@fullcalendar/react": "^6.1.19",
     "@fullcalendar/timegrid": "^6.1.19",
     "@hookform/resolvers": "^5.2.2",
+    "@marsidev/react-turnstile": "^1.4.0",
     "@mathieuc/tradingview": "^3.5.2",
     "@pdfme/common": "^5.5.7",
     "@pdfme/schemas": "^5.5.7",

@@ -4,7 +4,7 @@
  * Site keys should be configured in environment variables
  */
 
-export type CaptchaProvider = 'recaptcha-v2' | 'recaptcha-v3' | 'hcaptcha' | 'none'
+export type CaptchaProvider = 'recaptcha-v2' | 'recaptcha-v3' | 'hcaptcha' | 'turnstile' | 'none'
 export type CaptchaMode = 'checkbox' | 'invisible'
 
 export interface CaptchaConfig {
@@ -22,6 +22,7 @@ export interface CaptchaSettings {
   recaptchaV2SiteKey?: string
   recaptchaV3SiteKey?: string
   hcaptchaSiteKey?: string
+  turnstileSiteKey?: string
   provider: CaptchaProvider
   mode: CaptchaMode
   threshold: number
@@ -36,9 +37,9 @@ export interface CaptchaSettings {
  * Can be overridden by settings from backend or local storage
  */
 export const defaultCaptchaConfig: CaptchaConfig = {
-  provider: import.meta.env.VITE_CAPTCHA_PROVIDER || 'recaptcha-v3',
-  mode: import.meta.env.VITE_CAPTCHA_MODE || 'invisible',
-  siteKey: import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY || '',
+  provider: (import.meta.env.VITE_CAPTCHA_PROVIDER as CaptchaProvider) || 'turnstile',
+  mode: (import.meta.env.VITE_CAPTCHA_MODE as CaptchaMode) || 'invisible',
+  siteKey: import.meta.env.VITE_TURNSTILE_SITE_KEY || import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY || '',
   threshold: parseFloat(import.meta.env.VITE_RECAPTCHA_THRESHOLD || '0.5'),
   enabled: import.meta.env.VITE_CAPTCHA_ENABLED === 'true',
   requireAfterFailedAttempts: parseInt(
@@ -64,6 +65,8 @@ export function getCaptchaSiteKey(
         return settings.recaptchaV3SiteKey || ''
       case 'hcaptcha':
         return settings.hcaptchaSiteKey || ''
+      case 'turnstile':
+        return settings.turnstileSiteKey || ''
       default:
         return ''
     }
@@ -77,6 +80,8 @@ export function getCaptchaSiteKey(
       return import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY || ''
     case 'hcaptcha':
       return import.meta.env.VITE_HCAPTCHA_SITE_KEY || ''
+    case 'turnstile':
+      return import.meta.env.VITE_TURNSTILE_SITE_KEY || ''
     default:
       return ''
   }
@@ -92,6 +97,8 @@ export function getCaptchaScriptUrl(provider: CaptchaProvider, siteKey: string):
       return `https://www.google.com/recaptcha/api.js?render=${provider === 'recaptcha-v3' ? siteKey : 'explicit'}`
     case 'hcaptcha':
       return 'https://js.hcaptcha.com/1/api.js'
+    case 'turnstile':
+      return 'https://challenges.cloudflare.com/turnstile/v0/api.js'
     default:
       return ''
   }
@@ -104,6 +111,7 @@ export const CAPTCHA_PROVIDER_LABELS: Record<CaptchaProvider, string> = {
   'recaptcha-v2': 'reCAPTCHA v2',
   'recaptcha-v3': 'reCAPTCHA v3',
   hcaptcha: 'hCaptcha',
+  turnstile: 'Cloudflare Turnstile',
   none: 'None',
 }
 
