@@ -18,6 +18,11 @@ export const CSP_DOMAINS = {
     'https://cdn.jsdelivr.net', // CDN for open source libraries
     'https://static.cloudflareinsights.com', // Cloudflare analytics
     'https://vercel.live', // Vercel preview comments
+    'https://www.googletagmanager.com', // Google Tag Manager
+    'https://www.google-analytics.com', // Google Analytics
+    'https://www.google.com', // Google services (reCAPTCHA)
+    'https://www.gstatic.com', // Google static assets
+    'https://js.hcaptcha.com', // hCaptcha
   ],
 
   // Style sources - External stylesheets
@@ -38,11 +43,15 @@ export const CSP_DOMAINS = {
     'https://cloudflareinsights.com', // Analytics
     'https://vercel.live', // Preview comments
     'wss://vercel.live', // Preview comments WebSocket
+    'https://www.google-analytics.com', // Google Analytics data
+    'https://www.googletagmanager.com', // GTM data
   ],
 
   // Frame sources - Allowed iframe sources
   frames: [
     'https://vercel.live', // Preview comments
+    'https://www.google.com', // Google reCAPTCHA
+    'https://js.hcaptcha.com', // hCaptcha widget
   ],
 
   // Development-only domains

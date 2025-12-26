@@ -42,11 +42,12 @@ export default defineConfig({
       // Content Security Policy (dev version with HMR support)
       'Content-Security-Policy': [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://js.hcaptcha.com",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "font-src 'self' data: https://fonts.gstatic.com",
         "img-src 'self' data: https: blob:",
-        "connect-src 'self' https://api.traf3li.com wss://api.traf3li.com https://*.sentry.io https://*.workers.dev ws://localhost:* http://localhost:*",
+        "connect-src 'self' https://api.traf3li.com wss://api.traf3li.com https://*.sentry.io https://*.workers.dev ws://localhost:* http://localhost:* https://www.google-analytics.com https://www.googletagmanager.com",
+        "frame-src https://www.google.com https://js.hcaptcha.com",
         "frame-ancestors 'none'",
         "form-action 'self'",
         "base-uri 'self'",

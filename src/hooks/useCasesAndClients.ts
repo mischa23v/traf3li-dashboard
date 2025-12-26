@@ -1183,25 +1183,38 @@ export const useUpdateCaseProgress = () => {
  * Backend needs to implement: GET /api/cases/statistics
  * Alternative: Use useCaseStatistics() with local cases array instead.
  * @param enabled - Whether to enable the query (defaults to true)
+ *
+ * NOTE: This hook now returns default values and does NOT make API calls
+ * because the backend endpoint does not exist. When the backend implements
+ * GET /api/cases/statistics, this can be re-enabled.
  */
 export const useCaseStatisticsFromAPI = (enabled: boolean = true) => {
+  // Return default statistics without making API call
+  // The endpoint doesn't exist in backend, so we provide sensible defaults
+  const defaultStats = {
+    total: 0,
+    active: 0,
+    closed: 0,
+    won: 0,
+    lost: 0,
+    settled: 0,
+    onHold: 0,
+    highPriority: 0,
+    totalClaimAmount: 0,
+    avgProgress: 0,
+  }
+
   return useQuery({
     queryKey: ['cases', 'statistics'],
     queryFn: () => {
-      console.warn(
-        '⚠️ DEPRECATED ENDPOINT | نقطة نهاية قديمة\n' +
-        'useCaseStatisticsFromAPI() calls an unimplemented backend endpoint.\n' +
-        'يستدعي useCaseStatisticsFromAPI() نقطة نهاية غير مطبقة في الخادم.\n' +
-        'Expected endpoint: GET /api/cases/statistics\n' +
-        'النقطة المتوقعة: GET /api/cases/statistics\n' +
-        'Alternative: Use useCaseStatistics() with local cases array\n' +
-        'البديل: استخدم useCaseStatistics() مع مصفوفة القضايا المحلية'
-      )
-      return casesService.getStatistics()
+      // Return default values instead of calling non-existent endpoint
+      return Promise.resolve(defaultStats)
     },
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
     enabled,
+    // Provide initial data so the hook always has a value
+    initialData: defaultStats,
   })
 }
 
