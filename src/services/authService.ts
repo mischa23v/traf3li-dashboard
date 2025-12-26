@@ -147,31 +147,63 @@ export interface LoginCredentials {
  * Register Data Interface
  */
 export interface RegisterData {
-  username: string
+  // Required fields
   email: string
   password: string
-  phone: string
-  country?: string
-  role?: 'client' | 'lawyer'
-  isSeller?: boolean
-  description?: string
-  image?: string
-  firstName?: string
-  lastName?: string
-  captchaToken?: string
-  /** Lawyer work mode - determines if solo lawyer or firm member
-   * 'solo' - Independent lawyer (sets isSoloLawyer: true)
-   * 'create_firm' - Create new firm (requires firmData)
-   * 'join_firm' - Join existing firm (requires invitationCode)
-   */
+  firstName: string
+  lastName: string
+
+  // Role - set isSeller: true for lawyers
+  isSeller: boolean
+
+  // Lawyer Work Mode (required if isSeller: true)
   lawyerWorkMode?: 'solo' | 'create_firm' | 'join_firm'
-  /** Firm data for creating a new firm (when lawyerWorkMode is 'create_firm') */
+
+  // Optional fields
+  username?: string
+  phone?: string
+  country?: string // Default: "Saudi Arabia"
+  nationality?: string
+  region?: string
+  city?: string
+  image?: string
+  description?: string
+  captchaToken?: string
+  role?: 'client' | 'lawyer'
+
+  // If lawyerWorkMode is 'create_firm'
   firmData?: {
-    name: string
-    licenseNumber?: string
+    name: string // Required
+    licenseNumber: string // Required
+    nameEn?: string
+    email?: string
+    phone?: string
+    region?: string
+    city?: string
+    address?: string
+    website?: string
+    description?: string
+    specializations?: string[]
   }
-  /** Invitation code for joining a firm (when lawyerWorkMode is 'join_firm') */
-  invitationCode?: string
+
+  // If lawyerWorkMode is 'join_firm'
+  invitationCode?: string // Required for join_firm
+
+  // Lawyer Profile (optional, for lawyers)
+  isLicensed?: boolean
+  licenseNumber?: string
+  yearsOfExperience?: number
+  workType?: string
+  firmName?: string
+  specializations?: string[]
+  languages?: string[]
+  courts?: Record<string, { selected?: boolean; caseCount?: string }>
+  isRegisteredKhebra?: boolean
+  serviceType?: string
+  pricingModel?: string[]
+  hourlyRateMin?: number
+  hourlyRateMax?: number
+  acceptsRemote?: boolean
 }
 
 /**
