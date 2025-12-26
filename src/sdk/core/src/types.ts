@@ -50,7 +50,7 @@ export type FirmRole =
   | 'accountant'
   | 'departed';
 
-export type FirmStatus = 'active' | 'departed' | 'suspended' | 'pending' | null;
+export type FirmStatus = 'active' | 'departed' | 'suspended' | 'pending' | 'pending_approval' | null;
 
 export type LawyerWorkMode = 'solo' | 'firm_owner' | 'firm_member' | null;
 

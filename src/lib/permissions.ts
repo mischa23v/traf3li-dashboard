@@ -308,6 +308,7 @@ export function getDefaultPermissionsForRole(role: FirmRole): UserPermissions {
           canDeleteRecords: true,
           canViewFinance: true,
           canManageTeam: true,
+          canAccessHR: true,
         },
       }
 
@@ -337,6 +338,7 @@ export function getDefaultPermissionsForRole(role: FirmRole): UserPermissions {
           canDeleteRecords: false,
           canViewFinance: true,
           canManageTeam: false,
+          canAccessHR: false,
         },
       }
 
@@ -366,6 +368,7 @@ export function getDefaultPermissionsForRole(role: FirmRole): UserPermissions {
           canDeleteRecords: false,
           canViewFinance: false,
           canManageTeam: false,
+          canAccessHR: false,
         },
       }
 
@@ -395,6 +398,7 @@ export function getDefaultPermissionsForRole(role: FirmRole): UserPermissions {
           canDeleteRecords: false,
           canViewFinance: false,
           canManageTeam: false,
+          canAccessHR: false,
         },
       }
 
@@ -424,6 +428,7 @@ export function getDefaultPermissionsForRole(role: FirmRole): UserPermissions {
           canDeleteRecords: false,
           canViewFinance: false,
           canManageTeam: false,
+          canAccessHR: false,
         },
       }
 
@@ -453,6 +458,7 @@ export function getDefaultPermissionsForRole(role: FirmRole): UserPermissions {
           canDeleteRecords: false,
           canViewFinance: true,
           canManageTeam: false,
+          canAccessHR: true,
         },
       }
 

@@ -251,6 +251,7 @@ export const STATUS_LABELS: Record<FirmMemberStatus, string> = {
   departed: 'مغادر',
   suspended: 'معلق',
   pending: 'معلق',
+  pending_approval: 'في انتظار الموافقة',
 }
 
 /**
@@ -261,6 +262,7 @@ export const STATUS_LABELS_EN: Record<FirmMemberStatus, string> = {
   departed: 'Departed',
   suspended: 'Suspended',
   pending: 'Pending',
+  pending_approval: 'Pending Approval',
 }
 
 /**
