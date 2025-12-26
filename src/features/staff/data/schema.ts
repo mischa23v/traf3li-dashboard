@@ -2,7 +2,6 @@ import { z } from 'zod'
 
 const staffStatusSchema = z.union([
   z.literal('active'),
-  z.literal('inactive'),
   z.literal('departed'),
   z.literal('suspended'),
   z.literal('pending'),

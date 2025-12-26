@@ -90,6 +90,7 @@ export interface UserPermissions {
     canDeleteRecords?: boolean;
     canViewFinance?: boolean;
     canManageTeam?: boolean;
+    canAccessHR?: boolean;
     canCreateFirm?: boolean;
     canJoinFirm?: boolean;
     [key: string]: boolean | undefined;

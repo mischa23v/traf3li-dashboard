@@ -21,7 +21,7 @@ export interface Lawyer {
   role: 'owner' | 'admin' | 'partner' | 'lawyer' | 'paralegal' | 'secretary' | 'accountant' | 'departed'
   avatar?: string
   specialization?: string
-  status: 'active' | 'inactive' | 'departed' | 'suspended' | 'pending' | 'pending_approval'
+  status: 'active' | 'departed' | 'suspended' | 'pending' | 'pending_approval'
   createdAt: string
 }
 

@@ -77,7 +77,6 @@ const ROLE_LABELS: Record<string, { label: string; color: string }> = {
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   active: { label: 'نشط', color: 'bg-emerald-100 text-emerald-700' },
-  inactive: { label: 'غير نشط', color: 'bg-gray-100 text-gray-700' },
   departed: { label: 'مغادر', color: 'bg-red-100 text-red-700' },
   suspended: { label: 'معلق', color: 'bg-orange-100 text-orange-700' },
   pending: { label: 'قيد الانتظار', color: 'bg-yellow-100 text-yellow-700' },

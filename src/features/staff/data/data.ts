@@ -18,7 +18,6 @@ import { type StaffStatus, type StaffRole, type DepartureReason } from './schema
 
 export const staffStatusColors = new Map<StaffStatus, string>([
   ['active', 'bg-teal-100/30 text-teal-900 dark:text-teal-200 border-teal-200'],
-  ['inactive', 'bg-neutral-300/40 border-neutral-300'],
   ['departed', 'bg-amber-100/30 text-amber-900 dark:text-amber-200 border-amber-200'],
   ['suspended', 'bg-red-100/30 text-red-900 dark:text-red-200 border-red-200'],
   ['pending', 'bg-blue-100/30 text-blue-900 dark:text-blue-200 border-blue-200'],
@@ -31,12 +30,6 @@ export const staffStatuses = [
     labelEn: 'Active',
     value: 'active' as const,
     icon: UserCheck,
-  },
-  {
-    label: 'غير نشط',
-    labelEn: 'Inactive',
-    value: 'inactive' as const,
-    icon: UserX,
   },
   {
     label: 'مغادر',
