@@ -73,7 +73,7 @@ function SADADSidebar() {
                     <p className="text-sm text-slate-500 mb-4">
                         ادفع فواتيرك بسهولة عبر نظام سداد
                     </p>
-                    <Link to="/dashboard/finance/saudi-banking/sadad/pay">
+                    <Link to={ROUTES.dashboard.finance.saudiBanking.sadad.pay}>
                         <Button className="w-full bg-purple-500 hover:bg-purple-600 rounded-xl shadow-lg shadow-purple-500/20">
                             <Plus className="h-4 w-4 ms-2" />
                             دفع فاتورة جديدة
@@ -304,7 +304,7 @@ export function SaudiBankingSADADView() {
 
                 {/* Breadcrumb */}
                 <div className="flex items-center gap-2 text-sm">
-                    <Link to="/dashboard/finance/saudi-banking" className="text-slate-500 hover:text-emerald-600">
+                    <Link to={ROUTES.dashboard.finance.saudiBanking.index} className="text-slate-500 hover:text-emerald-600">
                         الخدمات المصرفية
                     </Link>
                     <ChevronLeft className="h-4 w-4 text-slate-400" />
@@ -333,7 +333,7 @@ export function SaudiBankingSADADView() {
                                                 الجهات المفوترة
                                             </TabsTrigger>
                                         </TabsList>
-                                        <Link to="/dashboard/finance/saudi-banking/sadad/pay">
+                                        <Link to={ROUTES.dashboard.finance.saudiBanking.sadad.pay}>
                                             <Button className="bg-purple-500 hover:bg-purple-600 rounded-xl">
                                                 <Plus className="h-4 w-4 ms-2" />
                                                 دفع فاتورة
@@ -364,7 +364,7 @@ export function SaudiBankingSADADView() {
                                                 <Receipt className="h-12 w-12 text-slate-300 mx-auto mb-4" />
                                                 <h3 className="text-lg font-bold text-navy mb-2">لا توجد مدفوعات</h3>
                                                 <p className="text-slate-500 mb-4">ابدأ بدفع أول فاتورة</p>
-                                                <Link to="/dashboard/finance/saudi-banking/sadad/pay">
+                                                <Link to={ROUTES.dashboard.finance.saudiBanking.sadad.pay}>
                                                     <Button className="bg-purple-500 hover:bg-purple-600">
                                                         <Plus className="h-4 w-4 ms-2" />
                                                         دفع فاتورة

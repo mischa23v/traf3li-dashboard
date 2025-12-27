@@ -1,29 +1,8 @@
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
 import { z } from 'zod'
 import { useCreateLeavePeriod, useUpdateLeavePeriod, useAllocateLeavesForPeriod } from '@/hooks/useLeavePeriod'
-import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
-import { Loader2, Calendar } from 'lucide-react'
+import { GenericFormDialog } from '@/components/generic-form-dialog'
+import type { FormSectionConfig } from '@/components/generic-form-dialog'
 import { toast } from 'sonner'
 import type { LeavePeriod, CreateLeavePeriodData } from '@/services/leavePeriodService'
 
@@ -61,23 +40,104 @@ export function LeavePeriodDialog({ open, onOpenChange, period }: LeavePeriodDia
   const updateMutation = useUpdateLeavePeriod()
   const allocateMutation = useAllocateLeavesForPeriod()
 
-  const form = useForm<LeavePeriodFormData>({
-    resolver: zodResolver(leavePeriodSchema),
-    defaultValues: {
-      name: '',
-      nameAr: '',
-      fromDate: '',
-      toDate: '',
-      company: '',
-      isActive: false,
-      autoAllocateLeaves: false,
-      allocateOnDayOfPeriodStart: false,
+  // Define form sections
+  const sections: FormSectionConfig[] = [
+    {
+      title: 'المعلومات الأساسية',
+      titleAr: 'المعلومات الأساسية',
+      columns: 2,
+      fields: [
+        {
+          name: 'name',
+          type: 'text',
+          label: 'اسم الفترة (إنجليزي)',
+          labelAr: 'اسم الفترة (إنجليزي)',
+          placeholder: '2024 Annual Leave Period',
+          required: true,
+        },
+        {
+          name: 'nameAr',
+          type: 'text',
+          label: 'اسم الفترة (عربي)',
+          labelAr: 'اسم الفترة (عربي)',
+          placeholder: 'فترة الإجازات السنوية 2024',
+          required: true,
+        },
+      ],
     },
-  })
+    {
+      title: 'التواريخ',
+      titleAr: 'التواريخ',
+      columns: 2,
+      fields: [
+        {
+          name: 'fromDate',
+          type: 'date',
+          label: 'تاريخ البداية',
+          labelAr: 'تاريخ البداية',
+          description: 'بداية فترة الإجازات',
+          descriptionAr: 'بداية فترة الإجازات',
+          required: true,
+        },
+        {
+          name: 'toDate',
+          type: 'date',
+          label: 'تاريخ النهاية',
+          labelAr: 'تاريخ النهاية',
+          description: 'نهاية فترة الإجازات',
+          descriptionAr: 'نهاية فترة الإجازات',
+          required: true,
+        },
+      ],
+    },
+    {
+      fields: [
+        {
+          name: 'company',
+          type: 'text',
+          label: 'الشركة (اختياري)',
+          labelAr: 'الشركة (اختياري)',
+          placeholder: 'اسم الشركة',
+          description: 'اترك فارغاً لتطبيق الفترة على جميع الشركات',
+          descriptionAr: 'اترك فارغاً لتطبيق الفترة على جميع الشركات',
+        },
+      ],
+    },
+    {
+      title: 'الإعدادات',
+      titleAr: 'الإعدادات',
+      fields: [
+        {
+          name: 'isActive',
+          type: 'switch',
+          label: 'تفعيل الفترة',
+          labelAr: 'تفعيل الفترة',
+          description: 'جعل هذه الفترة نشطة للموظفين',
+          descriptionAr: 'جعل هذه الفترة نشطة للموظفين',
+        },
+        {
+          name: 'autoAllocateLeaves',
+          type: 'switch',
+          label: 'التخصيص التلقائي',
+          labelAr: 'التخصيص التلقائي',
+          description: 'تخصيص الإجازات تلقائياً للموظفين',
+          descriptionAr: 'تخصيص الإجازات تلقائياً للموظفين',
+        },
+        {
+          name: 'allocateOnDayOfPeriodStart',
+          type: 'switch',
+          label: 'التخصيص في يوم البداية',
+          labelAr: 'التخصيص في يوم البداية',
+          description: 'تخصيص الإجازات في اليوم الأول من الفترة',
+          descriptionAr: 'تخصيص الإجازات في اليوم الأول من الفترة',
+        },
+      ],
+    },
+  ]
 
-  useEffect(() => {
-    if (period) {
-      form.reset({
+  // Prepare default values
+  const defaultValues = period
+    ? {
         name: period.name,
         nameAr: period.nameAr,
         fromDate: period.fromDate.split('T')[0],
@@ -86,9 +146,8 @@ export function LeavePeriodDialog({ open, onOpenChange, period }: LeavePeriodDia
         isActive: period.isActive,
         autoAllocateLeaves: period.autoAllocateLeaves,
         allocateOnDayOfPeriodStart: period.allocateOnDayOfPeriodStart,
-      })
-    } else {
-      form.reset({
+      }
+    : {
         name: '',
         nameAr: '',
         fromDate: '',
@@ -97,11 +156,9 @@ export function LeavePeriodDialog({ open, onOpenChange, period }: LeavePeriodDia
         isActive: false,
         autoAllocateLeaves: false,
         allocateOnDayOfPeriodStart: false,
-      })
-    }
-  }, [period, form])
+      }
 
-  const onSubmit = async (data: LeavePeriodFormData) => {
+  const handleSubmit = async (data: LeavePeriodFormData) => {
     const submitData: CreateLeavePeriodData = {
       name: data.name,
       nameAr: data.nameAr,
@@ -113,251 +170,65 @@ export function LeavePeriodDialog({ open, onOpenChange, period }: LeavePeriodDia
       allocateOnDayOfPeriodStart: data.allocateOnDayOfPeriodStart,
     }
 
-    try {
-      if (isEdit && period) {
-        await updateMutation.mutateAsync({
-          id: period._id,
-          data: submitData,
-        })
-        toast.success('تم تحديث الفترة بنجاح')
-      } else {
-        const newPeriod = await createMutation.mutateAsync(submitData)
-        toast.success('تم إنشاء الفترة بنجاح')
+    if (isEdit && period) {
+      await updateMutation.mutateAsync({
+        id: period._id,
+        data: submitData,
+      })
+      toast.success('تم تحديث الفترة بنجاح')
+    } else {
+      const newPeriod = await createMutation.mutateAsync(submitData)
+      toast.success('تم إنشاء الفترة بنجاح')
 
-        // If allocate now is checked, allocate leaves for the period
-        if (allocateNow && newPeriod._id) {
-          try {
-            const result = await allocateMutation.mutateAsync({
-              periodId: newPeriod._id,
-              data: {},
-            })
-            toast.success(
-              `تم تخصيص الإجازات بنجاح لـ ${result.employeesProcessed} موظف`,
-              {
-                description: `تم إنشاء ${result.allocationsCreated} تخصيص إجازة`,
-              }
-            )
-          } catch (error: any) {
-            toast.error('حدث خطأ في تخصيص الإجازات', {
-              description: error?.message,
-            })
-          }
+      // If allocate now is checked, allocate leaves for the period
+      if (allocateNow && newPeriod._id) {
+        try {
+          const result = await allocateMutation.mutateAsync({
+            periodId: newPeriod._id,
+            data: {},
+          })
+          toast.success(
+            `تم تخصيص الإجازات بنجاح لـ ${result.employeesProcessed} موظف`,
+            {
+              description: `تم إنشاء ${result.allocationsCreated} تخصيص إجازة`,
+            }
+          )
+        } catch (error: any) {
+          toast.error('حدث خطأ في تخصيص الإجازات', {
+            description: error?.message,
+          })
         }
       }
-      onOpenChange(false)
-    } catch (error: any) {
-      toast.error(error?.message || 'حدث خطأ')
     }
   }
 
   const isPending = createMutation.isPending || updateMutation.isPending || allocateMutation.isPending
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-navy flex items-center gap-2">
-            <Calendar className="w-5 h-5" />
-            {isEdit ? 'تعديل فترة الإجازات' : 'إنشاء فترة إجازات جديدة'}
-          </DialogTitle>
-          <DialogDescription>
-            {isEdit
-              ? 'قم بتعديل تفاصيل فترة الإجازات'
-              : 'قم بإنشاء فترة إجازات جديدة لتخصيص الإجازات للموظفين'}
-          </DialogDescription>
-        </DialogHeader>
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>اسم الفترة (إنجليزي)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="2024 Annual Leave Period" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="nameAr"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>اسم الفترة (عربي)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="فترة الإجازات السنوية 2024" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="fromDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>تاريخ البداية</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormDescription>بداية فترة الإجازات</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="toDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>تاريخ النهاية</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormDescription>نهاية فترة الإجازات</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="company"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>الشركة (اختياري)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="اسم الشركة" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    اترك فارغاً لتطبيق الفترة على جميع الشركات
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="space-y-4 rounded-lg border border-slate-200 p-4">
-              <h4 className="text-sm font-medium text-navy">الإعدادات</h4>
-
-              <FormField
-                control={form.control}
-                name="isActive"
-                render={({ field }) => (
-                  <FormItem className="flex items-center justify-between rounded-lg border border-slate-100 p-3">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-sm font-medium">تفعيل الفترة</FormLabel>
-                      <FormDescription className="text-xs">
-                        جعل هذه الفترة نشطة للموظفين
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="autoAllocateLeaves"
-                render={({ field }) => (
-                  <FormItem className="flex items-center justify-between rounded-lg border border-slate-100 p-3">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-sm font-medium">التخصيص التلقائي</FormLabel>
-                      <FormDescription className="text-xs">
-                        تخصيص الإجازات تلقائياً للموظفين
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="allocateOnDayOfPeriodStart"
-                render={({ field }) => (
-                  <FormItem className="flex items-center justify-between rounded-lg border border-slate-100 p-3">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-sm font-medium">التخصيص في يوم البداية</FormLabel>
-                      <FormDescription className="text-xs">
-                        تخصيص الإجازات في اليوم الأول من الفترة
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={!form.watch('autoAllocateLeaves')}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              {!isEdit && (
-                <div className="flex items-center justify-between rounded-lg border border-emerald-100 bg-emerald-50/50 p-3">
-                  <div className="space-y-0.5">
-                    <p className="text-sm font-medium text-emerald-900">تخصيص الإجازات الآن</p>
-                    <p className="text-xs text-emerald-700">
-                      تخصيص الإجازات مباشرة بعد إنشاء الفترة
-                    </p>
-                  </div>
-                  <Switch
-                    checked={allocateNow}
-                    onCheckedChange={setAllocateNow}
-                  />
-                </div>
-              )}
-            </div>
-
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={isPending}
-              >
-                إلغاء
-              </Button>
-              <Button
-                type="submit"
-                disabled={isPending}
-                className="bg-emerald-500 hover:bg-emerald-600"
-              >
-                {isPending ? (
-                  <>
-                    <Loader2 className="w-4 h-4 ms-1 animate-spin" />
-                    جاري الحفظ...
-                  </>
-                ) : (
-                  isEdit ? 'حفظ التعديلات' : 'إنشاء الفترة'
-                )}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+    <GenericFormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={isEdit ? 'تعديل فترة الإجازات' : 'إنشاء فترة إجازات جديدة'}
+      titleAr={isEdit ? 'تعديل فترة الإجازات' : 'إنشاء فترة إجازات جديدة'}
+      description={
+        isEdit
+          ? 'قم بتعديل تفاصيل فترة الإجازات'
+          : 'قم بإنشاء فترة إجازات جديدة لتخصيص الإجازات للموظفين'
+      }
+      descriptionAr={
+        isEdit
+          ? 'قم بتعديل تفاصيل فترة الإجازات'
+          : 'قم بإنشاء فترة إجازات جديدة لتخصيص الإجازات للموظفين'
+      }
+      schema={leavePeriodSchema}
+      sections={sections}
+      defaultValues={defaultValues}
+      onSubmit={handleSubmit}
+      isLoading={isPending}
+      mode={isEdit ? 'edit' : 'create'}
+      submitLabel={isEdit ? 'حفظ التعديلات' : 'إنشاء الفترة'}
+      submitLabelAr={isEdit ? 'حفظ التعديلات' : 'إنشاء الفترة'}
+      maxWidth="lg"
+    />
   )
 }

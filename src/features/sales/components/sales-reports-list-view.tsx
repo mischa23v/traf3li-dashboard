@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import { Link } from '@tanstack/react-router'
 import {
+import { useTranslation } from 'react-i18next'
   FileBarChart,
   Plus,
   Search,
@@ -53,6 +54,7 @@ import {
   reportStatusLabels,
   categoriesBySection,
 } from '@/services/reportsService'
+import { ROUTES } from '@/constants/routes'
 
 const salesCategories = categoriesBySection[ReportSection.SALES]
 
@@ -70,6 +72,8 @@ const categoryIcons: Partial<Record<ReportCategory, React.ElementType>> = {
 }
 
 export function SalesReportsListView() {
+  const { t } = useTranslation()
+
   const [searchQuery, setSearchQuery] = useState('')
     // Debounced search handler
     const debouncedSetSearch = useDebouncedCallback(
@@ -97,12 +101,12 @@ export function SalesReportsListView() {
   })
 
   const handleDelete = async (id: string) => {
-    if (confirm('هل أنت متأكد من حذف هذا التقرير؟')) {
+    if (confirm(t('sales.reports.deleteConfirm'))) {
       try {
         await deleteReport.mutateAsync(id)
-        toast.success('تم حذف التقرير بنجاح')
+        toast.success(t('sales.reports.delete'))
       } catch {
-        toast.error('فشل في حذف التقرير')
+        toast.error(t('sales.reports.delete'))
       }
     }
   }
@@ -110,9 +114,9 @@ export function SalesReportsListView() {
   const handleGenerate = async (id: string) => {
     try {
       await generateReport.mutateAsync(id)
-      toast.success('تم إنشاء التقرير بنجاح')
+      toast.success(t('sales.reports.createReport'))
     } catch {
-      toast.error('فشل في إنشاء التقرير')
+      toast.error(t('sales.reports.createReport'))
     }
   }
 
@@ -150,7 +154,7 @@ export function SalesReportsListView() {
             تحديث
           </Button>
           <Button asChild className="bg-emerald-500 hover:bg-emerald-600 rounded-xl">
-            <Link to="/dashboard/sales/reports/new">
+            <Link to={ROUTES.dashboard.sales.reports.new}>
               <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
               تقرير جديد
             </Link>
@@ -219,7 +223,7 @@ export function SalesReportsListView() {
             <div className="relative">
               <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
               <Input
-                placeholder="بحث في التقارير..."
+                placeholder=t('sales.reports.searchReports')
                 defaultValue={searchQuery}
                 onChange={(e) => debouncedSetSearch(e.target.value)}
                 className="pe-10 rounded-xl"
@@ -229,7 +233,7 @@ export function SalesReportsListView() {
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
             <SelectTrigger className="w-[180px] rounded-xl">
               <Filter className="h-4 w-4 ms-2" aria-hidden="true" />
-              <SelectValue placeholder="الفئة" />
+              <SelectValue placeholder=t('sales.reports.category') />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">جميع الفئات</SelectItem>
@@ -242,7 +246,7 @@ export function SalesReportsListView() {
           </Select>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-[180px] rounded-xl">
-              <SelectValue placeholder="الحالة" />
+              <SelectValue placeholder=t('sales.reports.status') />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">جميع الحالات</SelectItem>
@@ -277,7 +281,7 @@ export function SalesReportsListView() {
             <h3 className="text-lg font-medium text-slate-900 mb-1">لا توجد تقارير</h3>
             <p className="text-slate-500 mb-4">ابدأ بإنشاء تقرير جديد لتحليل بيانات المبيعات</p>
             <Button asChild className="bg-emerald-500 hover:bg-emerald-600 rounded-xl">
-              <Link to="/dashboard/sales/reports/new">
+              <Link to={ROUTES.dashboard.sales.reports.new}>
                 <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
                 إنشاء تقرير
               </Link>
@@ -307,7 +311,7 @@ export function SalesReportsListView() {
                         </div>
                         <div>
                           <Link
-                            to={`/dashboard/sales/reports/${report._id}`}
+                            to={ROUTES.dashboard.sales.reports.detail(report._id)}
                             className="font-medium text-navy hover:text-emerald-600 transition-colors"
                           >
                             {report.name}
@@ -341,7 +345,7 @@ export function SalesReportsListView() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem asChild>
-                            <Link to={`/dashboard/sales/reports/${report._id}`}>
+                            <Link to={ROUTES.dashboard.sales.reports.detail(report._id)}>
                               <Eye className="h-4 w-4 ms-2" />
                               عرض التقرير
                             </Link>

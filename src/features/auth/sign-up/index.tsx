@@ -11,6 +11,7 @@ import {
   defaultCaptchaConfig,
   getCaptchaSiteKey,
 } from '@/components/auth/captcha-config';
+import { ROUTES } from '@/constants/routes';
 
 // ============================================
 // SVG ICONS
@@ -410,7 +411,7 @@ export function SignUp() {
               </div>
 
               <button
-                onClick={() => navigate({ to: '/sign-in' })}
+                onClick={() => navigate({ to: ROUTES.auth.signIn })}
                 className="w-full py-4 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
               >
                 تسجيل الدخول
@@ -510,7 +511,7 @@ export function SignUp() {
 
             <p className="text-center text-slate-500 mt-6">
               لديك حساب بالفعل؟{' '}
-              <a href="/sign-in" className="text-emerald-600 hover:text-emerald-700 font-bold">تسجيل الدخول</a>
+              <a href={ROUTES.auth.signIn} className="text-emerald-600 hover:text-emerald-700 font-bold">تسجيل الدخول</a>
             </p>
           </div>
         </div>
@@ -1019,7 +1020,7 @@ export function SignUp() {
 
           <p className="text-center text-slate-500 mt-6">
             لديك حساب بالفعل؟{' '}
-            <a href="/sign-in" className="text-emerald-600 font-bold">تسجيل الدخول</a>
+            <a href={ROUTES.auth.signIn} className="text-emerald-600 font-bold">تسجيل الدخول</a>
           </p>
         </div>
       </div>

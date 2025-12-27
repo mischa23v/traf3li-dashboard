@@ -78,7 +78,7 @@ export function AutomatedActionList({
   onEdit,
   onCreate,
 }: AutomatedActionListProps) {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
   const [logsDialogOpen, setLogsDialogOpen] = React.useState(false)
   const [selectedAction, setSelectedAction] = React.useState<AutomatedAction | null>(null)
@@ -120,26 +120,14 @@ export function AutomatedActionList({
       <Alert variant="default" className="border-amber-500 bg-amber-50 dark:bg-amber-950/20">
         <AlertTriangle className="h-4 w-4 text-amber-600" />
         <AlertTitle className="text-amber-900 dark:text-amber-100">
-          {isArabic ? '[قيد الانتظار] قريباً | [BACKEND-PENDING] Coming Soon' : '[BACKEND-PENDING] Coming Soon | [قيد الانتظار] قريباً'}
+          {t('automatedActions.backendPendingAlt')}
         </AlertTitle>
         <AlertDescription className="text-amber-800 dark:text-amber-200">
-          {isArabic ? (
-            <>
-              هذه الميزة قيد التطوير حالياً. واجهة برمجة التطبيقات الخلفية للإجراءات التلقائية غير مطبقة بعد.
-              <br />
-              <span className="text-sm">
-                [BACKEND-PENDING] This feature is currently under development. The automated actions backend API is not yet implemented.
-              </span>
-            </>
-          ) : (
-            <>
-              [BACKEND-PENDING] This feature is currently under development. The automated actions backend API is not yet implemented.
-              <br />
-              <span className="text-sm">
-                [قيد الانتظار] هذه الميزة قيد التطوير حالياً. واجهة برمجة التطبيقات الخلفية للإجراءات التلقائية غير مطبقة بعد.
-              </span>
-            </>
-          )}
+          {t('automatedActions.backendPendingDesc')}
+          <br />
+          <span className="text-sm">
+            {t('automatedActions.backendPendingDescAr')}
+          </span>
         </AlertDescription>
       </Alert>
 
@@ -148,18 +136,16 @@ export function AutomatedActionList({
         <div>
           <h2 className="text-xl font-semibold flex items-center gap-2">
             <Zap className="h-5 w-5" />
-            {isArabic ? 'الإجراءات التلقائية' : 'Automated Actions'}
+            {t('automatedActions.title')}
           </h2>
           <p className="text-sm text-muted-foreground">
-            {isArabic
-              ? 'أتمتة سير العمل بناءً على أحداث معينة'
-              : 'Automate workflows based on specific events'}
+            {t('automatedActions.description')}
           </p>
         </div>
         {onCreate && (
-          <Button onClick={onCreate} disabled title={isArabic ? '[قيد الانتظار] قريباً - الميزة قيد التطوير' : '[BACKEND-PENDING] Coming Soon - Feature under development'}>
+          <Button onClick={onCreate} disabled title={t('automatedActions.comingSoonTooltip')}>
             <Plus className="h-4 w-4 me-2" />
-            {isArabic ? 'إجراء جديد' : 'New Action'}
+            {t('automatedActions.newAction')}
           </Button>
         )}
       </div>
@@ -170,14 +156,12 @@ export function AutomatedActionList({
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Zap className="h-12 w-12 text-muted-foreground mb-4" />
             <p className="text-muted-foreground mb-4">
-              {isArabic
-                ? 'لا توجد إجراءات تلقائية'
-                : 'No automated actions yet'}
+              {t('automatedActions.noActions')}
             </p>
             {onCreate && (
-              <Button onClick={onCreate} disabled title={isArabic ? '[قيد الانتظار] قريباً - الميزة قيد التطوير' : '[BACKEND-PENDING] Coming Soon - Feature under development'}>
+              <Button onClick={onCreate} disabled title={t('automatedActions.comingSoonTooltip')}>
                 <Plus className="h-4 w-4 me-2" />
-                {isArabic ? 'إنشاء إجراء' : 'Create Action'}
+                {t('automatedActions.createAction')}
               </Button>
             )}
           </CardContent>
@@ -188,12 +172,12 @@ export function AutomatedActionList({
             <TableHeader>
               <TableRow>
                 <TableHead className="w-12"></TableHead>
-                <TableHead>{isArabic ? 'الاسم' : 'Name'}</TableHead>
-                <TableHead>{isArabic ? 'النموذج' : 'Model'}</TableHead>
-                <TableHead>{isArabic ? 'المشغّل' : 'Trigger'}</TableHead>
-                <TableHead>{isArabic ? 'الإجراء' : 'Action'}</TableHead>
-                <TableHead>{isArabic ? 'التشغيلات' : 'Runs'}</TableHead>
-                <TableHead>{isArabic ? 'آخر تشغيل' : 'Last Run'}</TableHead>
+                <TableHead>{t('automatedActions.name')}</TableHead>
+                <TableHead>{t('automatedActions.model')}</TableHead>
+                <TableHead>{t('automatedActions.trigger')}</TableHead>
+                <TableHead>{t('automatedActions.action')}</TableHead>
+                <TableHead>{t('automatedActions.runs')}</TableHead>
+                <TableHead>{t('automatedActions.lastRun')}</TableHead>
                 <TableHead className="w-12"></TableHead>
               </TableRow>
             </TableHeader>
@@ -257,7 +241,7 @@ export function AutomatedActionList({
                         <span className="text-sm">{action.run_count}</span>
                         {action.error_count > 0 && (
                           <Badge variant="destructive" className="text-xs">
-                            {action.error_count} {isArabic ? 'خطأ' : 'errors'}
+                            {action.error_count} {t('automatedActions.errors')}
                           </Badge>
                         )}
                       </div>
@@ -284,16 +268,16 @@ export function AutomatedActionList({
                           {onEdit && (
                             <DropdownMenuItem onClick={() => onEdit(action)}>
                               <Edit className="h-4 w-4 me-2" />
-                              {isArabic ? 'تعديل' : 'Edit'}
+                              {t('automatedActions.edit')}
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem onClick={() => handleViewLogs(action)}>
                             <History className="h-4 w-4 me-2" />
-                            {isArabic ? 'سجل التشغيل' : 'View Logs'}
+                            {t('automatedActions.viewLogs')}
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => duplicateAction.mutate(action._id)}>
                             <Copy className="h-4 w-4 me-2" />
-                            {isArabic ? 'نسخ' : 'Duplicate'}
+                            {t('automatedActions.duplicate')}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
@@ -301,7 +285,7 @@ export function AutomatedActionList({
                             onClick={() => deleteAction.mutate(action._id)}
                           >
                             <Trash2 className="h-4 w-4 me-2" />
-                            {isArabic ? 'حذف' : 'Delete'}
+                            {t('automatedActions.delete')}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -320,7 +304,7 @@ export function AutomatedActionList({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <History className="h-5 w-5" />
-              {isArabic ? 'سجل التشغيل' : 'Execution Logs'}
+              {t('automatedActions.executionLogs')}
             </DialogTitle>
             <DialogDescription>
               {selectedAction && (isArabic ? selectedAction.nameAr : selectedAction.name)}
@@ -373,14 +357,14 @@ export function AutomatedActionList({
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                 <History className="h-8 w-8 mb-2" />
-                <p>{isArabic ? 'لا توجد سجلات' : 'No logs yet'}</p>
+                <p>{t('automatedActions.noLogs')}</p>
               </div>
             )}
           </ScrollArea>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setLogsDialogOpen(false)}>
-              {isArabic ? 'إغلاق' : 'Close'}
+              {t('automatedActions.close')}
             </Button>
           </DialogFooter>
         </DialogContent>

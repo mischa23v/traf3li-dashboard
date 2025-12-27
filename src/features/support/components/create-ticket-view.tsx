@@ -44,6 +44,7 @@ import { useCreateTicket } from '@/hooks/use-support'
 import { useClients } from '@/hooks/useClients'
 import { useTeamMembers } from '@/hooks/useUsers'
 import { cn } from '@/lib/utils'
+import { ROUTES } from '@/constants/routes'
 import type { TicketType, TicketPriority, TicketStatus } from '@/types/support'
 
 // ==================== CONSTANTS ====================
@@ -138,14 +139,14 @@ export function CreateTicketView() {
 
     createTicket(ticketData, {
       onSuccess: () => {
-        navigate({ to: '/dashboard/support' })
+        navigate({ to: ROUTES.dashboard.support.list })
       },
     })
   }
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الدعم الفني', href: '/dashboard/support', isActive: true },
+    { title: 'نظرة عامة', href: ROUTES.dashboard.home, isActive: false },
+    { title: 'الدعم الفني', href: ROUTES.dashboard.support.list, isActive: true },
   ]
 
   return (
@@ -424,7 +425,7 @@ export function CreateTicketView() {
 
               {/* ACTION BUTTONS */}
               <div className="flex items-center justify-between pt-6 border-t border-slate-200">
-                <Link to="/dashboard/support">
+                <Link to={ROUTES.dashboard.support.list}>
                   <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy rounded-xl">
                     <X className="ms-2 h-4 w-4" aria-hidden="true" />
                     إلغاء

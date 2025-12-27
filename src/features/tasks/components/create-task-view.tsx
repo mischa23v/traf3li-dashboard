@@ -28,6 +28,7 @@ import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { TasksSidebar } from './tasks-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useCreateTask, useTaskTemplates, useCreateFromTemplate } from '@/hooks/useTasks'
@@ -249,7 +250,7 @@ export function CreateTaskView() {
 
         createTaskMutation.mutate(taskData, {
             onSuccess: () => {
-                navigate({ to: '/dashboard/tasks/list' })
+                navigate({ to: ROUTES.dashboard.tasks.list })
             }
         })
     }
@@ -257,16 +258,16 @@ export function CreateTaskView() {
     const handleUseTemplate = (templateId: string) => {
         createFromTemplateMutation.mutate({ templateId }, {
             onSuccess: () => {
-                navigate({ to: '/dashboard/tasks/list' })
+                navigate({ to: ROUTES.dashboard.tasks.list })
             }
         })
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'المهام', href: '/dashboard/tasks/list', isActive: true },
-        { title: 'القضايا', href: '/dashboard/cases', isActive: false },
-        { title: 'العملاء', href: '/dashboard/clients', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.home, isActive: false },
+        { title: 'المهام', href: ROUTES.dashboard.tasks.list, isActive: true },
+        { title: 'القضايا', href: ROUTES.dashboard.cases.list, isActive: false },
+        { title: 'العملاء', href: ROUTES.dashboard.clients.list, isActive: false },
     ]
 
     return (
@@ -879,7 +880,7 @@ export function CreateTaskView() {
 
                                 {/* Submit */}
                                 <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
-                                    <Link to="/dashboard/tasks/list">
+                                    <Link to={ROUTES.dashboard.tasks.list}>
                                         <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
                                             إلغاء
                                         </Button>

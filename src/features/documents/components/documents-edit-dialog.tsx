@@ -43,8 +43,7 @@ export function DocumentsEditDialog({
   onOpenChange,
   currentRow,
 }: DocumentsEditDialogProps) {
-  const { t, i18n } = useTranslation()
-  const isArabic = i18n.language === 'ar'
+  const { t } = useTranslation()
 
   const updateDocument = useUpdateDocument()
 
@@ -109,7 +108,7 @@ export function DocumentsEditDialog({
                     <SelectContent>
                       {categoryOptions.map((option) => (
                         <SelectItem key={option.value} value={option.value}>
-                          {isArabic ? option.labelAr : option.label}
+                          {t(`documents.categories.${option.value}`)}
                         </SelectItem>
                       ))}
                     </SelectContent>

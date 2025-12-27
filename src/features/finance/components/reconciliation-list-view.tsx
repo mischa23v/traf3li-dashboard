@@ -442,7 +442,7 @@ export function ReconciliationListView() {
                                             {isRTL ? 'ابدأ بإضافة حساب بنكي جديد للتسوية' : 'Start by adding a new bank account for reconciliation'}
                                         </p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                                            <Link to="/dashboard/finance/reconciliation/new">
+                                            <Link to={ROUTES.dashboard.finance.reconciliation.new}>
                                                 <Plus className="w-4 h-4 me-2" aria-hidden="true" />
                                                 {isRTL ? 'إضافة حساب بنكي' : 'Add Bank Account'}
                                             </Link>

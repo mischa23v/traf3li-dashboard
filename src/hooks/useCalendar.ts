@@ -5,6 +5,7 @@
 
 import { useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
 import { useCallback } from 'react'
+import { CACHE_TIMES } from '@/config'
 import calendarService, { CalendarFilters, ListFilters, CalendarEvent } from '@/services/calendarService'
 import { Reminder } from '@/services/remindersService'
 import { apiClientNoVersion as apiClient } from '@/lib/api'
@@ -13,8 +14,8 @@ import { useAuthStore } from '@/stores/auth-store'
 // ==================== Cache Configuration ====================
 // Cache data for 30 minutes to reduce API calls
 // Data is refreshed automatically when tasks/reminders/events are created/updated/deleted
-const CALENDAR_STALE_TIME = 30 * 60 * 1000 // 30 minutes
-const CALENDAR_GC_TIME = 60 * 60 * 1000 // 1 hour (keep in cache)
+const CALENDAR_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
+const CALENDAR_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour (keep in cache)
 
 /**
  * Get unified calendar view
@@ -156,10 +157,10 @@ export const usePrefetchAdjacentMonths = (currentDate: Date) => {
 // ==================== Optimized Calendar Hooks ====================
 
 // Shorter cache times for optimized endpoints (backend handles caching)
-const GRID_STALE_TIME = 1 * 60 * 1000 // 1 minute
-const GRID_ITEMS_STALE_TIME = 2 * 60 * 1000 // 2 minutes
-const ITEM_DETAILS_STALE_TIME = 5 * 60 * 1000 // 5 minutes
-const LIST_STALE_TIME = 1 * 60 * 1000 // 1 minute
+const GRID_STALE_TIME = CACHE_TIMES.CALENDAR.GRID // 1 minute
+const GRID_ITEMS_STALE_TIME = CACHE_TIMES.CALENDAR.ITEMS // 2 minutes
+const ITEM_DETAILS_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes
+const LIST_STALE_TIME = CACHE_TIMES.CALENDAR.GRID // 1 minute
 
 /**
  * Get grid summary - counts per day for calendar badges

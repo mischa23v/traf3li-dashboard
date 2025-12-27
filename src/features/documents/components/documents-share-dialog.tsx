@@ -90,12 +90,12 @@ export function DocumentsShareDialog({
   }
 
   const expiryOptions = [
-    { value: '1', label: isArabic ? '1 ساعة' : '1 hour' },
-    { value: '6', label: isArabic ? '6 ساعات' : '6 hours' },
-    { value: '24', label: isArabic ? '24 ساعة' : '24 hours' },
-    { value: '72', label: isArabic ? '3 أيام' : '3 days' },
-    { value: '168', label: isArabic ? '7 أيام' : '7 days' },
-    { value: '720', label: isArabic ? '30 يوم' : '30 days' },
+    { value: '1', label: t('documents.expiryOptions.oneHour') },
+    { value: '6', label: t('documents.expiryOptions.sixHours') },
+    { value: '24', label: t('documents.expiryOptions.twentyFourHours') },
+    { value: '72', label: t('documents.expiryOptions.threeDays') },
+    { value: '168', label: t('documents.expiryOptions.sevenDays') },
+    { value: '720', label: t('documents.expiryOptions.thirtyDays') },
   ]
 
   return (

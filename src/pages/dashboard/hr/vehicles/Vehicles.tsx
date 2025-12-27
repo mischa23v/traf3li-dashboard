@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useVehicles, useVehicleStats, useBulkDeleteVehicles } from '@/hooks/useVehicle'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -106,7 +107,7 @@ export function Vehicles() {
   }
 
   const handleViewVehicle = (vehicleId: string) => {
-    navigate({ to: `/dashboard/hr/vehicles/${vehicleId}` })
+    navigate({ to: ROUTES.dashboard.hr.vehicles.detail(vehicleId) })
   }
 
   const handleSelectVehicle = (vehicleId: string) => {
@@ -330,7 +331,7 @@ export function Vehicles() {
                 <SelectItem value="all">{t('hr.vehicles.filters.allStatuses', 'All Statuses')}</SelectItem>
                 {Object.entries(VEHICLE_STATUS_LABELS).map(([key, label]) => (
                   <SelectItem key={key} value={key}>
-                    {isRTL ? label.ar : label.en}
+                    {t(`vehicles.status.${key}`, label.en)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -344,7 +345,7 @@ export function Vehicles() {
                 <SelectItem value="all">{t('hr.vehicles.filters.allTypes', 'All Types')}</SelectItem>
                 {Object.entries(VEHICLE_TYPE_LABELS).map(([key, label]) => (
                   <SelectItem key={key} value={key}>
-                    {isRTL ? label.ar : label.en}
+                    {t(`vehicles.type.${key}`, label.en)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -358,7 +359,7 @@ export function Vehicles() {
                 <SelectItem value="all">{t('hr.vehicles.filters.allFuelTypes', 'All Fuel Types')}</SelectItem>
                 {Object.entries(FUEL_TYPE_LABELS).map(([key, label]) => (
                   <SelectItem key={key} value={key}>
-                    {isRTL ? label.ar : label.en}
+                    {t(`vehicles.fuelType.${key}`, label.en)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -372,7 +373,7 @@ export function Vehicles() {
                 <SelectItem value="all">{t('hr.vehicles.filters.allAssignments', 'All Types')}</SelectItem>
                 {Object.entries(ASSIGNMENT_TYPE_LABELS).map(([key, label]) => (
                   <SelectItem key={key} value={key}>
-                    {isRTL ? label.ar : label.en}
+                    {t(`vehicles.assignmentType.${key}`, label.en)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -436,7 +437,7 @@ export function Vehicles() {
                                 {vehicle.make} {vehicle.model}
                               </h3>
                               <Badge className={getColorClasses(VEHICLE_STATUS_LABELS[vehicle.status].color)}>
-                                {isRTL ? VEHICLE_STATUS_LABELS[vehicle.status].ar : VEHICLE_STATUS_LABELS[vehicle.status].en}
+                                {t(`vehicles.status.${vehicle.status}`, VEHICLE_STATUS_LABELS[vehicle.status].en)}
                               </Badge>
                             </div>
                             <p className="text-sm text-muted-foreground">{vehicle.licensePlate}</p>
@@ -469,7 +470,7 @@ export function Vehicles() {
                       <div className="mt-4 space-y-2">
                         <div className="flex items-center gap-2 text-sm">
                           <Car className="h-4 w-4 text-muted-foreground" />
-                          <span>{vehicle.year} • {isRTL ? VEHICLE_TYPE_LABELS[vehicle.vehicleType].ar : VEHICLE_TYPE_LABELS[vehicle.vehicleType].en}</span>
+                          <span>{vehicle.year} • {t(`vehicles.type.${vehicle.vehicleType}`, VEHICLE_TYPE_LABELS[vehicle.vehicleType].en)}</span>
                         </div>
                         {vehicle.assignedToName && (
                           <div className="flex items-center gap-2 text-sm">

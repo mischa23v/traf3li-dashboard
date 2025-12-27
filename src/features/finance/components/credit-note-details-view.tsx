@@ -174,7 +174,7 @@ export function CreditNoteDetailsView() {
       <div className="flex flex-col items-center justify-center py-12">
         <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
         <h3 className="text-lg font-semibold mb-2">لم يتم العثور على إشعار الدائن</h3>
-        <Link to="/dashboard/finance/credit-notes">
+        <Link to={ROUTES.dashboard.finance.creditNotes.list}>
           <Button variant="outline">
             <ArrowLeft className="h-4 w-4 ms-2" />
             العودة إلى القائمة
@@ -192,7 +192,7 @@ export function CreditNoteDetailsView() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <Link to="/dashboard/finance/credit-notes">
+            <Link to={ROUTES.dashboard.finance.creditNotes.list}>
               <Button variant="ghost" size="icon">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
@@ -216,7 +216,7 @@ export function CreditNoteDetailsView() {
         <div className="flex flex-wrap gap-2">
           {creditNote.status === 'draft' && (
             <>
-              <Link to="/dashboard/finance/credit-notes/$creditNoteId/edit" params={{ creditNoteId }}>
+              <Link to={ROUTES.dashboard.finance.creditNotes.edit(creditNoteId)}>
                 <Button variant="outline" size="sm">
                   <Edit className="h-4 w-4 me-2" />
                   تعديل
@@ -275,8 +275,7 @@ export function CreditNoteDetailsView() {
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">الفاتورة الأصلية</p>
                   <Link
-                    to="/dashboard/finance/invoices/$invoiceId"
-                    params={{ invoiceId: creditNote.originalInvoiceId }}
+                    to={ROUTES.dashboard.finance.invoices.detail(creditNote.originalInvoiceId )}
                     className="font-medium hover:underline"
                   >
                     {creditNote.originalInvoice}

@@ -7,6 +7,7 @@ import { useState, useMemo, useCallback, useRef, useEffect, lazy, Suspense } fro
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { PERF_DEBUG, perfLog } from '@/lib/perf-debug'
+import { ROUTES } from '@/constants/routes'
 import type FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
@@ -99,7 +100,7 @@ const CALENDAR_PLUGINS = [dayGridPlugin, timeGridPlugin, listPlugin, interaction
 // Navigation links - stable reference
 const TOP_NAV_LINKS = [
   { title: 'الرئيسية', href: '/', isActive: false, disabled: false },
-  { title: 'التقويم', href: '/dashboard/calendar', isActive: true, disabled: false },
+  { title: 'التقويم', href: ROUTES.dashboard.calendar, isActive: true, disabled: false },
   { title: 'المهام', href: '/dashboard/tasks', isActive: false, disabled: false },
 ]
 

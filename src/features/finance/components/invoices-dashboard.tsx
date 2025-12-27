@@ -43,6 +43,7 @@ import { useInvoices, useOverdueInvoices, useExportReport } from '@/hooks/useFin
 import { useClients } from '@/hooks/useCasesAndClients'
 import { FinanceSidebar } from './finance-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { ROUTES } from '@/constants/routes'
 
 export default function InvoicesDashboard() {
     const [activeTab, setActiveTab] = useState('all')
@@ -149,13 +150,13 @@ export default function InvoicesDashboard() {
     }, [invoicesData, overdueData])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: true },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
-        { title: 'كشف الحساب', href: '/dashboard/finance/statements', isActive: false },
-        { title: 'المعاملات', href: '/dashboard/finance/transactions', isActive: false },
-        { title: 'تتبع الوقت', href: '/dashboard/finance/time-tracking', isActive: false },
-        { title: 'نشاط الحساب', href: '/dashboard/finance/activity', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: true },
+        { title: 'المصروفات', href: ROUTES.dashboard.finance.expenses.list, isActive: false },
+        { title: 'كشف الحساب', href: ROUTES.dashboard.finance.statements.list, isActive: false },
+        { title: 'المعاملات', href: ROUTES.dashboard.finance.transactions.list, isActive: false },
+        { title: 'تتبع الوقت', href: ROUTES.dashboard.finance.timeTracking.list, isActive: false },
+        { title: 'نشاط الحساب', href: ROUTES.dashboard.finance.activity.list, isActive: false },
     ]
 
     // LOADING STATE
@@ -298,7 +299,7 @@ export default function InvoicesDashboard() {
                                     <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد فواتير بعد</h3>
                                     <p className="text-slate-500 mb-6">ابدأ بإنشاء أول فاتورة لعملائك</p>
                                     <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white px-8">
-                                        <Link to="/dashboard/finance/invoices/new">
+                                        <Link to={ROUTES.dashboard.finance.invoices.new}>
                                             <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                                             إنشاء فاتورة جديدة
                                         </Link>
@@ -533,7 +534,7 @@ export default function InvoicesDashboard() {
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end">
                                                             <DropdownMenuItem asChild>
-                                                                <Link to="/dashboard/finance/invoices/$invoiceId" params={{ invoiceId: inv._id }}>
+                                                                <Link to={ROUTES.dashboard.finance.invoices.detail(inv._id)}>
                                                                     عرض الفاتورة | View Invoice
                                                                 </Link>
                                                             </DropdownMenuItem>

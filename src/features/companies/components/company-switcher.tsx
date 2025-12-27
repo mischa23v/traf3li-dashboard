@@ -48,7 +48,7 @@ export function CompanySwitcher({
   showManageButton = true,
   showAddButton = true,
 }: CompanySwitcherProps) {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const isArabic = i18n.language === 'ar'
 
   const {
@@ -125,7 +125,7 @@ export function CompanySwitcher({
       <div className={cn('flex items-center gap-2', className)}>
         <Button variant="outline" size="sm" disabled>
           <Building2 className="h-4 w-4" />
-          {isArabic ? 'لا توجد شركة نشطة' : 'No Active Company'}
+          {t('companies.switcher.noActiveCompany')}
         </Button>
       </div>
     )
@@ -138,7 +138,7 @@ export function CompanySwitcher({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          aria-label={isArabic ? 'اختر شركة' : 'Select company'}
+          aria-label={t('companies.switcher.selectCompany')}
           className={cn(
             'min-w-[200px] justify-between',
             isSwitching && 'opacity-50 cursor-wait',
@@ -181,7 +181,7 @@ export function CompanySwitcher({
       >
         {/* Multi-select toggle */}
         <DropdownMenuLabel className="flex items-center justify-between">
-          <span>{isArabic ? 'الشركات' : 'Companies'}</span>
+          <span>{t('companies.switcher.companies')}</span>
           <Button
             variant="ghost"
             size="sm"
@@ -195,14 +195,14 @@ export function CompanySwitcher({
               <>
                 <CheckSquare className="h-3.5 w-3.5" />
                 <span className={cn(isArabic ? 'mr-1.5' : 'ml-1.5')}>
-                  {isArabic ? 'تحديد متعدد' : 'Multi-select'}
+                  {t('companies.switcher.multiSelect')}
                 </span>
               </>
             ) : (
               <>
                 <Square className="h-3.5 w-3.5" />
                 <span className={cn(isArabic ? 'mr-1.5' : 'ml-1.5')}>
-                  {isArabic ? 'تحديد واحد' : 'Single select'}
+                  {t('companies.switcher.singleSelect')}
                 </span>
               </>
             )}
@@ -221,7 +221,7 @@ export function CompanySwitcher({
                 className="flex-1 h-7 text-xs"
                 onClick={selectAllCompanies}
               >
-                {isArabic ? 'تحديد الكل' : 'Select All'}
+                {t('companies.switcher.selectAll')}
               </Button>
               <Button
                 variant="outline"
@@ -229,7 +229,7 @@ export function CompanySwitcher({
                 className="flex-1 h-7 text-xs"
                 onClick={clearSelectedCompanies}
               >
-                {isArabic ? 'إلغاء الكل' : 'Clear All'}
+                {t('companies.switcher.clearAll')}
               </Button>
             </div>
             <DropdownMenuSeparator />
@@ -264,7 +264,7 @@ export function CompanySwitcher({
           <>
             {rootCompanies.length > 0 && <DropdownMenuSeparator />}
             <DropdownMenuLabel className="text-xs text-muted-foreground">
-              {isArabic ? 'الشركات الفرعية' : 'Child Companies'}
+              {t('companies.switcher.childCompanies')}
             </DropdownMenuLabel>
             {childCompanies.map((company) => (
               <CompanyMenuItem
@@ -293,14 +293,14 @@ export function CompanySwitcher({
         {showAddButton && onAddClick && (
           <DropdownMenuItem onClick={onAddClick}>
             <Plus className={cn('h-4 w-4', isArabic ? 'ml-2' : 'mr-2')} />
-            {isArabic ? 'إضافة شركة' : 'Add Company'}
+            {t('companies.switcher.addCompany')}
           </DropdownMenuItem>
         )}
 
         {showManageButton && onManageClick && canManageCompany(activeFirmId!) && (
           <DropdownMenuItem onClick={onManageClick}>
             <Settings className={cn('h-4 w-4', isArabic ? 'ml-2' : 'mr-2')} />
-            {isArabic ? 'إدارة الشركات' : 'Manage Companies'}
+            {t('companies.switcher.manageCompanies')}
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>

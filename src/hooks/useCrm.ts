@@ -4,7 +4,9 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   leadService,
   pipelineService,
@@ -37,9 +39,9 @@ import type {
 // ==================== Cache Configuration ====================
 // Cache data for 30 minutes to reduce API calls
 // Data is refreshed automatically when mutations occur
-const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
-const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour (keep in cache)
-const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
+const STATS_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour (keep in cache)
+const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
 
 // ═══════════════════════════════════════════════════════════════
 // LEAD HOOKS
@@ -166,7 +168,7 @@ export const useCreateLead = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['leads'], refetchType: 'all' })
+      return await invalidateCache.leads.all()
     },
   })
 }
@@ -187,8 +189,8 @@ export const useUpdateLead = () => {
       toast.error(error.message || 'فشل تحديث العميل المحتمل')
     },
     onSettled: async (_, __, { leadId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['leads'] })
-      return await queryClient.invalidateQueries({ queryKey: ['leads', leadId] })
+      await invalidateCache.leads.all()
+      return await invalidateCache.leads.detail(leadId)
     },
   })
 }
@@ -232,7 +234,7 @@ export const useDeleteLead = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['leads'], refetchType: 'all' })
+      return await invalidateCache.leads.all()
     },
   })
 }
@@ -262,8 +264,8 @@ export const useUpdateLeadStatus = () => {
       toast.error(error.message || 'فشل تحديث الحالة')
     },
     onSettled: async (_, __, { leadId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['leads'] })
-      return await queryClient.invalidateQueries({ queryKey: ['leads', leadId] })
+      await invalidateCache.leads.all()
+      return await invalidateCache.leads.detail(leadId)
     },
   })
 }
@@ -288,8 +290,8 @@ export const useMoveLeadToStage = () => {
       toast.error(error.message || 'فشل نقل العميل المحتمل')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['leads'] })
-      return await queryClient.invalidateQueries({ queryKey: ['leads', 'pipeline'] })
+      await invalidateCache.leads.all()
+      return await invalidateCache.leads.pipeline()
     },
   })
 }
@@ -321,8 +323,8 @@ export const useConvertLead = () => {
       toast.error(error.message || 'فشل تحويل العميل المحتمل')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['leads'] })
-      return await queryClient.invalidateQueries({ queryKey: ['clients'] })
+      await invalidateCache.leads.all()
+      return await invalidateCache.clients.all()
     },
   })
 }
@@ -350,7 +352,7 @@ export const useScheduleFollowUp = () => {
       toast.error(error.message || 'فشل جدولة المتابعة')
     },
     onSettled: async (_, __, { leadId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['leads', leadId] })
+      await invalidateCache.leads.detail(leadId)
       return await queryClient.invalidateQueries({ queryKey: ['leads', 'follow-up'] })
     },
   })
@@ -377,8 +379,8 @@ export const useLogLeadActivity = () => {
       toast.error(error.message || 'فشل تسجيل النشاط')
     },
     onSettled: async (_, __, { leadId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['leads', leadId] })
-      return await queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+      await invalidateCache.leads.detail(leadId)
+      return await invalidateCache.activities.timeline()
     },
   })
 }
@@ -452,7 +454,7 @@ export const useCreatePipeline = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['pipelines'], refetchType: 'all' })
+      return await invalidateCache.pipelines.all()
     },
   })
 }
@@ -478,10 +480,8 @@ export const useUpdatePipeline = () => {
       toast.error(error.message || 'فشل تحديث مسار المبيعات')
     },
     onSettled: async (_, __, { pipelineId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['pipelines'] })
-      return await queryClient.invalidateQueries({
-        queryKey: ['pipelines', pipelineId],
-      })
+      await invalidateCache.pipelines.all()
+      return await invalidateCache.pipelines.detail(pipelineId)
     },
   })
 }
@@ -512,7 +512,7 @@ export const useDeletePipeline = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['pipelines'], refetchType: 'all' })
+      return await invalidateCache.pipelines.all()
     },
   })
 }
@@ -538,9 +538,7 @@ export const useAddPipelineStage = () => {
       toast.error(error.message || 'فشل إضافة المرحلة')
     },
     onSettled: async (_, __, { pipelineId }) => {
-      return await queryClient.invalidateQueries({
-        queryKey: ['pipelines', pipelineId],
-      })
+      return await invalidateCache.pipelines.detail(pipelineId)
     },
   })
 }
@@ -568,9 +566,7 @@ export const useUpdatePipelineStage = () => {
       toast.error(error.message || 'فشل تحديث المرحلة')
     },
     onSettled: async (_, __, { pipelineId }) => {
-      return await queryClient.invalidateQueries({
-        queryKey: ['pipelines', pipelineId],
-      })
+      return await invalidateCache.pipelines.detail(pipelineId)
     },
   })
 }
@@ -596,9 +592,7 @@ export const useRemovePipelineStage = () => {
       toast.error(error.message || 'فشل حذف المرحلة')
     },
     onSettled: async (_, __, { pipelineId }) => {
-      return await queryClient.invalidateQueries({
-        queryKey: ['pipelines', pipelineId],
-      })
+      return await invalidateCache.pipelines.detail(pipelineId)
     },
   })
 }
@@ -621,9 +615,7 @@ export const useReorderPipelineStages = () => {
       toast.error(error.message || 'فشل إعادة ترتيب المراحل')
     },
     onSettled: async (_, __, { pipelineId }) => {
-      return await queryClient.invalidateQueries({
-        queryKey: ['pipelines', pipelineId],
-      })
+      return await invalidateCache.pipelines.detail(pipelineId)
     },
   })
 }
@@ -644,7 +636,7 @@ export const useSetDefaultPipeline = () => {
       toast.error(error.message || 'فشل تعيين مسار المبيعات الافتراضي')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['pipelines'] })
+      return await invalidateCache.pipelines.all()
     },
   })
 }
@@ -670,7 +662,7 @@ export const useDuplicatePipeline = () => {
       toast.error(error.message || 'فشل نسخ مسار المبيعات')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['pipelines'] })
+      return await invalidateCache.pipelines.all()
     },
   })
 }
@@ -770,7 +762,7 @@ export const useCreateReferral = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['referrals'], refetchType: 'all' })
+      return await invalidateCache.referrals.all()
     },
   })
 }
@@ -796,10 +788,8 @@ export const useUpdateReferral = () => {
       toast.error(error.message || 'فشل تحديث مصدر الإحالة')
     },
     onSettled: async (_, __, { referralId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['referrals'] })
-      return await queryClient.invalidateQueries({
-        queryKey: ['referrals', referralId],
-      })
+      await invalidateCache.referrals.all()
+      return await invalidateCache.referrals.detail(referralId)
     },
   })
 }
@@ -840,7 +830,7 @@ export const useDeleteReferral = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['referrals'], refetchType: 'all' })
+      return await invalidateCache.referrals.all()
     },
   })
 }
@@ -866,10 +856,8 @@ export const useUpdateReferralStatus = () => {
       toast.error(error.message || 'فشل تحديث حالة الإحالة')
     },
     onSettled: async (_, __, { referralId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['referrals'] })
-      return await queryClient.invalidateQueries({
-        queryKey: ['referrals', referralId],
-      })
+      await invalidateCache.referrals.all()
+      return await invalidateCache.referrals.detail(referralId)
     },
   })
 }
@@ -893,10 +881,8 @@ export const useMarkReferralPaid = () => {
       toast.error(error.message || 'فشل تأكيد الدفع')
     },
     onSettled: async (_, __, referralId) => {
-      await queryClient.invalidateQueries({ queryKey: ['referrals'] })
-      return await queryClient.invalidateQueries({
-        queryKey: ['referrals', referralId],
-      })
+      await invalidateCache.referrals.all()
+      return await invalidateCache.referrals.detail(referralId)
     },
   })
 }
@@ -924,9 +910,7 @@ export const useAddLeadReferral = () => {
       toast.error(error.message || 'فشل ربط العميل المحتمل')
     },
     onSettled: async (_, __, { referralId }) => {
-      return await queryClient.invalidateQueries({
-        queryKey: ['referrals', referralId],
-      })
+      return await invalidateCache.referrals.detail(referralId)
     },
   })
 }
@@ -954,9 +938,7 @@ export const useMarkReferralConverted = () => {
       toast.error(error.message || 'فشل تسجيل التحويل')
     },
     onSettled: async (_, __, { referralId }) => {
-      await queryClient.invalidateQueries({
-        queryKey: ['referrals', referralId],
-      })
+      await invalidateCache.referrals.detail(referralId)
       return await queryClient.invalidateQueries({ queryKey: ['referrals', 'stats'] })
     },
   })
@@ -983,9 +965,7 @@ export const useRecordReferralPayment = () => {
       toast.error(error.message || 'فشل تسجيل الدفعة')
     },
     onSettled: async (_, __, { referralId }) => {
-      await queryClient.invalidateQueries({
-        queryKey: ['referrals', referralId],
-      })
+      await invalidateCache.referrals.detail(referralId)
       return await queryClient.invalidateQueries({ queryKey: ['referrals', 'stats'] })
     },
   })
@@ -1122,8 +1102,8 @@ export const useCreateActivity = () => {
       toast.error(error.message || 'فشل إنشاء النشاط')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['activities'] })
-      return await queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+      await invalidateCache.activities.all()
+      return await invalidateCache.activities.timeline()
     },
   })
 }
@@ -1149,11 +1129,9 @@ export const useUpdateActivity = () => {
       toast.error(error.message || 'فشل تحديث النشاط')
     },
     onSettled: async (_, __, { activityId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['activities'] })
-      await queryClient.invalidateQueries({
-        queryKey: ['activities', activityId],
-      })
-      return await queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+      await invalidateCache.activities.all()
+      await invalidateCache.activities.detail(activityId)
+      return await invalidateCache.activities.timeline()
     },
   })
 }
@@ -1174,8 +1152,8 @@ export const useDeleteActivity = () => {
       toast.error(error.message || 'فشل حذف النشاط')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['activities'] })
-      return await queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+      await invalidateCache.activities.all()
+      return await invalidateCache.activities.timeline()
     },
   })
 }
@@ -1201,11 +1179,9 @@ export const useUpdateActivityStatus = () => {
       toast.error(error.message || 'فشل تحديث حالة النشاط')
     },
     onSettled: async (_, __, { activityId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['activities'] })
-      await queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
-      return await queryClient.invalidateQueries({
-        queryKey: ['activities', activityId],
-      })
+      await invalidateCache.activities.all()
+      await invalidateCache.activities.timeline()
+      return await invalidateCache.activities.detail(activityId)
     },
   })
 }
@@ -1231,8 +1207,8 @@ export const useCompleteTask = () => {
       toast.error(error.message || 'فشل إكمال المهمة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['activities'] })
-      return await queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+      await invalidateCache.activities.all()
+      return await invalidateCache.activities.timeline()
     },
   })
 }
@@ -1252,8 +1228,8 @@ export const useLogCall = () => {
       toast.error(error.message || 'فشل تسجيل المكالمة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['activities'] })
-      return await queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+      await invalidateCache.activities.all()
+      return await invalidateCache.activities.timeline()
     },
   })
 }
@@ -1273,8 +1249,8 @@ export const useLogEmail = () => {
       toast.error(error.message || 'فشل تسجيل البريد الإلكتروني')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['activities'] })
-      return await queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+      await invalidateCache.activities.all()
+      return await invalidateCache.activities.timeline()
     },
   })
 }
@@ -1294,8 +1270,8 @@ export const useLogMeeting = () => {
       toast.error(error.message || 'فشل تسجيل الاجتماع')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['activities'] })
-      return await queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+      await invalidateCache.activities.all()
+      return await invalidateCache.activities.timeline()
     },
   })
 }
@@ -1315,8 +1291,8 @@ export const useAddNote = () => {
       toast.error(error.message || 'فشل إضافة الملاحظة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['activities'] })
-      return await queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+      await invalidateCache.activities.all()
+      return await invalidateCache.activities.timeline()
     },
   })
 }

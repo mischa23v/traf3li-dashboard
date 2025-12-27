@@ -25,6 +25,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { usePermissionsStore } from '@/stores/permissions-store'
 import type { ModuleKey } from '@/types/rbac'
 import { canView } from '@/lib/permissions'
+import { ROUTES } from '@/constants/routes'
 
 type NavItem = {
   title: string
@@ -885,15 +886,15 @@ export function useSidebarData(): SidebarData {
           items: [
             {
               title: 'sidebar.nav.profile',
-              url: '/dashboard/settings/profile',
+              url: ROUTES.dashboard.settings.profile,
             },
             {
               title: 'sidebar.nav.security',
-              url: '/dashboard/settings/security',
+              url: ROUTES.dashboard.settings.security,
             },
             {
               title: 'sidebar.nav.preferences',
-              url: '/dashboard/settings/preferences',
+              url: ROUTES.dashboard.settings.preferences,
             },
             {
               title: 'sidebar.nav.apps',
@@ -911,7 +912,7 @@ export function useSidebarData(): SidebarData {
             // CRM Settings
             {
               title: 'sidebar.nav.crmSettings',
-              url: '/dashboard/settings/crm',
+              url: ROUTES.dashboard.settings.crm,
               module: 'leads',
             },
           ],

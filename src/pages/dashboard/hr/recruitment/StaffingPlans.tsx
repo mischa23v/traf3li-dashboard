@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   Plus,
   Search,
@@ -108,11 +109,11 @@ export default function StaffingPlansPage() {
   }
 
   const handleView = (plan: StaffingPlan) => {
-    navigate(`/dashboard/hr/recruitment/staffing-plans/${plan._id}`)
+    navigate(ROUTES.dashboard.hr.recruitment.staffingPlans.detail(plan._id))
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm(isArabic ? 'هل أنت متأكد من حذف هذه الخطة؟' : 'Are you sure you want to delete this plan?')) {
+    if (confirm(t('hr.recruitment.staffingPlans.confirmDelete'))) {
       await deleteMutation.mutateAsync(id)
     }
   }
@@ -160,12 +161,10 @@ export default function StaffingPlansPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            {isArabic ? 'خطط التوظيف' : 'Staffing Plans'}
+            {t('hr.recruitment.staffingPlans.title')}
           </h1>
           <p className="text-muted-foreground">
-            {isArabic
-              ? 'إدارة خطط التوظيف وتخطيط القوى العاملة حسب الأقسام'
-              : 'Manage staffing plans and workforce planning by department'}
+            {t('hr.recruitment.staffingPlans.description')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -173,21 +172,21 @@ export default function StaffingPlansPage() {
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
                 <Download className="mr-2 h-4 w-4" />
-                {isArabic ? 'تصدير' : 'Export'}
+                {t('hr.recruitment.staffingPlans.export')}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem onClick={() => handleExport('excel')}>
-                {isArabic ? 'تصدير Excel' : 'Export Excel'}
+                {t('hr.recruitment.staffingPlans.exportExcel')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleExport('pdf')}>
-                {isArabic ? 'تصدير PDF' : 'Export PDF'}
+                {t('hr.recruitment.staffingPlans.exportPDF')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <Button onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" />
-            {isArabic ? 'خطة جديدة' : 'New Plan'}
+            {t('hr.recruitment.staffingPlans.newPlan')}
           </Button>
         </div>
       </div>
@@ -197,14 +196,14 @@ export default function StaffingPlansPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'إجمالي الخطط' : 'Total Plans'}
+              {t('hr.recruitment.staffingPlans.stats.totalPlans')}
             </CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.totalPlans || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {stats?.activePlans || 0} {isArabic ? 'نشط' : 'active'}
+              {stats?.activePlans || 0} {t('hr.recruitment.staffingPlans.stats.active')}
             </p>
           </CardContent>
         </Card>
@@ -212,14 +211,14 @@ export default function StaffingPlansPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'إجمالي الشواغر' : 'Total Vacancies'}
+              {t('hr.recruitment.staffingPlans.stats.totalVacancies')}
             </CardTitle>
             <Users className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.totalVacancies || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {isArabic ? 'وظائف شاغرة' : 'vacant positions'}
+              {t('hr.recruitment.staffingPlans.stats.vacantPositions')}
             </p>
           </CardContent>
         </Card>
@@ -227,7 +226,7 @@ export default function StaffingPlansPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'الميزانية المقدرة' : 'Estimated Budget'}
+              {t('hr.recruitment.staffingPlans.stats.estimatedBudget')}
             </CardTitle>
             <DollarSign className="h-4 w-4 text-green-600" />
           </CardHeader>
@@ -240,7 +239,7 @@ export default function StaffingPlansPage() {
               }).format(stats?.totalBudget || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
-              {isArabic ? 'ميزانية التوظيف' : 'hiring budget'}
+              {t('hr.recruitment.staffingPlans.stats.hiringBudget')}
             </p>
           </CardContent>
         </Card>
@@ -248,7 +247,7 @@ export default function StaffingPlansPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'حسب القسم' : 'By Department'}
+              {t('hr.recruitment.staffingPlans.stats.byDepartment')}
             </CardTitle>
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -257,7 +256,7 @@ export default function StaffingPlansPage() {
               {stats?.byDepartment?.length || 0}
             </div>
             <p className="text-xs text-muted-foreground">
-              {isArabic ? 'أقسام مختلفة' : 'different departments'}
+              {t('hr.recruitment.staffingPlans.stats.differentDepartments')}
             </p>
           </CardContent>
         </Card>
@@ -266,7 +265,7 @@ export default function StaffingPlansPage() {
       {/* Filters & Search */}
       <Card>
         <CardHeader>
-          <CardTitle>{isArabic ? 'البحث والتصفية' : 'Search & Filter'}</CardTitle>
+          <CardTitle>{t('hr.recruitment.staffingPlans.filter.searchAndFilter')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-4 sm:flex-row">
@@ -274,7 +273,7 @@ export default function StaffingPlansPage() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder={isArabic ? 'البحث عن خطة...' : 'Search plans...'}
+                  placeholder={t('hr.recruitment.staffingPlans.filter.searchPlans')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9"
@@ -286,13 +285,13 @@ export default function StaffingPlansPage() {
               onValueChange={(value) => setSelectedStatus(value as PlanStatus | 'all')}
             >
               <SelectTrigger className="w-full sm:w-[200px]">
-                <SelectValue placeholder={isArabic ? 'الحالة' : 'Status'} />
+                <SelectValue placeholder={t('hr.recruitment.staffingPlans.filter.status')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{isArabic ? 'الكل' : 'All'}</SelectItem>
-                <SelectItem value="draft">{isArabic ? 'مسودة' : 'Draft'}</SelectItem>
-                <SelectItem value="active">{isArabic ? 'نشط' : 'Active'}</SelectItem>
-                <SelectItem value="closed">{isArabic ? 'مغلق' : 'Closed'}</SelectItem>
+                <SelectItem value="all">{t('hr.recruitment.staffingPlans.filter.all')}</SelectItem>
+                <SelectItem value="draft">{t('hr.recruitment.staffingPlans.filter.draft')}</SelectItem>
+                <SelectItem value="active">{t('hr.recruitment.staffingPlans.filter.active')}</SelectItem>
+                <SelectItem value="closed">{t('hr.recruitment.staffingPlans.filter.closed')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -302,11 +301,9 @@ export default function StaffingPlansPage() {
       {/* Plans Table */}
       <Card>
         <CardHeader>
-          <CardTitle>{isArabic ? 'خطط التوظيف' : 'Staffing Plans'}</CardTitle>
+          <CardTitle>{t('hr.recruitment.staffingPlans.title')}</CardTitle>
           <CardDescription>
-            {isArabic
-              ? `${plans.length} خطة توظيف`
-              : `${plans.length} staffing plans`}
+            {plans.length} {t('hr.recruitment.staffingPlans.title').toLowerCase()}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -320,28 +317,26 @@ export default function StaffingPlansPage() {
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <FileText className="mb-4 h-12 w-12 text-muted-foreground" />
               <h3 className="text-lg font-semibold">
-                {isArabic ? 'لا توجد خطط توظيف' : 'No staffing plans'}
+                {t('hr.recruitment.staffingPlans.empty.noPlans')}
               </h3>
               <p className="text-sm text-muted-foreground">
-                {isArabic
-                  ? 'قم بإنشاء خطة توظيف جديدة للبدء'
-                  : 'Create a new staffing plan to get started'}
+                {t('hr.recruitment.staffingPlans.empty.createToGetStarted')}
               </p>
               <Button onClick={handleCreate} className="mt-4">
                 <Plus className="mr-2 h-4 w-4" />
-                {isArabic ? 'خطة جديدة' : 'New Plan'}
+                {t('hr.recruitment.staffingPlans.newPlan')}
               </Button>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{isArabic ? 'اسم الخطة' : 'Plan Name'}</TableHead>
-                  <TableHead>{isArabic ? 'الفترة' : 'Period'}</TableHead>
-                  <TableHead>{isArabic ? 'الحالة' : 'Status'}</TableHead>
-                  <TableHead className="text-center">{isArabic ? 'الشواغر' : 'Vacancies'}</TableHead>
-                  <TableHead className="text-right">{isArabic ? 'الميزانية' : 'Budget'}</TableHead>
-                  <TableHead className="text-right">{isArabic ? 'الإجراءات' : 'Actions'}</TableHead>
+                  <TableHead>{t('hr.recruitment.staffingPlans.table.planName')}</TableHead>
+                  <TableHead>{t('hr.recruitment.staffingPlans.table.period')}</TableHead>
+                  <TableHead>{t('hr.recruitment.staffingPlans.table.status')}</TableHead>
+                  <TableHead className="text-center">{t('hr.recruitment.staffingPlans.table.vacancies')}</TableHead>
+                  <TableHead className="text-right">{t('hr.recruitment.staffingPlans.table.budget')}</TableHead>
+                  <TableHead className="text-right">{t('hr.recruitment.staffingPlans.table.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -354,7 +349,7 @@ export default function StaffingPlansPage() {
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {plan.staffingPlanDetails?.length || 0}{' '}
-                          {isArabic ? 'تفاصيل' : 'details'}
+                          {t('hr.recruitment.staffingPlans.table.details')}
                         </div>
                       </div>
                     </TableCell>
@@ -388,31 +383,31 @@ export default function StaffingPlansPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>
-                            {isArabic ? 'الإجراءات' : 'Actions'}
+                            {t('hr.recruitment.staffingPlans.table.actions')}
                           </DropdownMenuLabel>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={() => handleView(plan)}>
                             <Eye className="mr-2 h-4 w-4" />
-                            {isArabic ? 'عرض' : 'View'}
+                            {t('hr.recruitment.staffingPlans.actions.view')}
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleEdit(plan)}>
                             <Edit className="mr-2 h-4 w-4" />
-                            {isArabic ? 'تعديل' : 'Edit'}
+                            {t('hr.recruitment.staffingPlans.actions.edit')}
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleDuplicate(plan._id)}>
                             <Copy className="mr-2 h-4 w-4" />
-                            {isArabic ? 'نسخ' : 'Duplicate'}
+                            {t('hr.recruitment.staffingPlans.actions.duplicate')}
                           </DropdownMenuItem>
                           {plan.status === 'draft' && (
                             <DropdownMenuItem onClick={() => handleActivate(plan._id)}>
                               <CheckCircle2 className="mr-2 h-4 w-4" />
-                              {isArabic ? 'تفعيل' : 'Activate'}
+                              {t('hr.recruitment.staffingPlans.actions.activate')}
                             </DropdownMenuItem>
                           )}
                           {plan.status === 'active' && (
                             <DropdownMenuItem onClick={() => handleClose(plan._id)}>
                               <XCircle className="mr-2 h-4 w-4" />
-                              {isArabic ? 'إغلاق' : 'Close'}
+                              {t('hr.recruitment.staffingPlans.actions.close')}
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuSeparator />
@@ -421,7 +416,7 @@ export default function StaffingPlansPage() {
                             className="text-destructive"
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
-                            {isArabic ? 'حذف' : 'Delete'}
+                            {t('hr.recruitment.staffingPlans.actions.delete')}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

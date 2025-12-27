@@ -65,10 +65,11 @@ import {
   useWarehouses,
 } from '@/hooks/use-inventory'
 import { InventorySidebar } from './inventory-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.inventory', href: '/dashboard/inventory' },
+  { title: 'sidebar.nav.inventory', href: ROUTES.dashboard.inventory.list },
 ]
 
 export function WarehouseDetailsView() {
@@ -89,7 +90,7 @@ export function WarehouseDetailsView() {
 
   const handleDelete = async () => {
     await deleteWarehouseMutation.mutateAsync(warehouseId)
-    navigate({ to: '/dashboard/inventory' })
+    navigate({ to: ROUTES.dashboard.inventory.list })
   }
 
   const getStatusBadge = (disabled: boolean) => {
@@ -229,7 +230,7 @@ export function WarehouseDetailsView() {
                 {t('inventory.warehouseNotFound', 'المستودع غير موجود')}
               </h3>
               <Button
-                onClick={() => navigate({ to: '/dashboard/inventory' })}
+                onClick={() => navigate({ to: ROUTES.dashboard.inventory.list })}
                 className="rounded-xl"
               >
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -582,7 +583,7 @@ export function WarehouseDetailsView() {
                               key={bin._id}
                               className="cursor-pointer hover:bg-muted/50"
                               onClick={() =>
-                                navigate({ to: `/dashboard/inventory/${bin.itemId}` })
+                                navigate({ to: ROUTES.dashboard.inventory.detail(bin.itemId) })
                               }
                             >
                               <TableCell className="font-mono text-sm">
@@ -656,7 +657,7 @@ export function WarehouseDetailsView() {
                               className="cursor-pointer hover:bg-muted/50"
                               onClick={() =>
                                 navigate({
-                                  to: `/dashboard/inventory/stock-entries/${entry._id}`,
+                                  to: ROUTES.dashboard.inventory.stockEntries.detail(entry._id),
                                 })
                               }
                             >
@@ -741,7 +742,7 @@ export function WarehouseDetailsView() {
                               className="cursor-pointer hover:bg-muted/50"
                               onClick={() =>
                                 navigate({
-                                  to: `/dashboard/inventory/warehouses/${child._id}`,
+                                  to: ROUTES.dashboard.inventory.warehouses.detail(child._id),
                                 })
                               }
                             >

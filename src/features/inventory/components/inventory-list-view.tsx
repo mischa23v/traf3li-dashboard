@@ -70,10 +70,11 @@ import {
 import { useItems, useDeleteItem, useInventoryStats, useItemGroups } from '@/hooks/use-inventory'
 import type { Item, ItemFilters, ItemType, ItemStatus } from '@/types/inventory'
 import { InventorySidebar } from './inventory-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.inventory', href: '/dashboard/inventory' },
+  { title: 'sidebar.nav.inventory', href: ROUTES.dashboard.inventory.list },
 ]
 
 export function InventoryListView() {
@@ -229,7 +230,7 @@ export function InventoryListView() {
                     </SelectContent>
                   </Select>
                   <Button asChild className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
-                    <Link to="/dashboard/inventory/create">
+                    <Link to={ROUTES.dashboard.inventory.create}>
                       <Plus className="w-4 h-4 ml-2" />
                       {t('inventory.addItem', 'إضافة صنف')}
                     </Link>
@@ -257,7 +258,7 @@ export function InventoryListView() {
                     <h3 className="text-lg font-medium mb-2">{t('inventory.noItems', 'لا توجد أصناف')}</h3>
                     <p className="text-muted-foreground mb-4">{t('inventory.noItemsDesc', 'ابدأ بإضافة صنف جديد')}</p>
                     <Button asChild className="rounded-xl">
-                      <Link to="/dashboard/inventory/create">
+                      <Link to={ROUTES.dashboard.inventory.create}>
                         <Plus className="w-4 h-4 ml-2" />
                         {t('inventory.addItem', 'إضافة صنف')}
                       </Link>
@@ -280,7 +281,7 @@ export function InventoryListView() {
                         <TableRow
                           key={item._id}
                           className="cursor-pointer hover:bg-muted/50"
-                          onClick={() => navigate({ to: `/dashboard/inventory/${item._id}` })}
+                          onClick={() => navigate({ to: ROUTES.dashboard.inventory.detail(item._id) })}
                         >
                           <TableCell className="font-mono text-sm">{item.itemCode}</TableCell>
                           <TableCell>
@@ -311,7 +312,7 @@ export function InventoryListView() {
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation()
-                                  navigate({ to: `/dashboard/inventory/${item._id}` })
+                                  navigate({ to: ROUTES.dashboard.inventory.detail(item._id) })
                                 }}>
                                   <Eye className="w-4 h-4 ml-2" />
                                   {t('common.view', 'عرض')}

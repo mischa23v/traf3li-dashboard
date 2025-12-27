@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuthStore } from '@/stores/auth-store'
 import { usePermissionsStore } from '@/stores/permissions-store'
+import { ROUTES } from '@/constants/routes'
 
 export function NoFirmPage() {
   const { t, i18n } = useTranslation()
@@ -26,7 +27,7 @@ export function NoFirmPage() {
 
   const handleLogout = async () => {
     await logout()
-    window.location.href = '/sign-in'
+    window.location.href = ROUTES.auth.signIn
   }
 
   return (

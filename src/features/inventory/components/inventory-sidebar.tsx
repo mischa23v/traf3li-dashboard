@@ -26,6 +26,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ROUTES } from '@/constants/routes'
 
 import { useLowStockItems, useInventoryStats, useWarehouses } from '@/hooks/use-inventory'
 
@@ -51,20 +52,20 @@ export function InventorySidebar({ context = 'items' }: InventorySidebarProps) {
         </CardHeader>
         <CardContent className="space-y-2">
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/inventory/create">
+            <Link to={ROUTES.dashboard.inventory.create}>
               <Plus className="w-4 h-4 ml-2" />
               {t('inventory.newItem', 'صنف جديد')}
               <kbd className="mr-auto bg-muted px-2 py-0.5 rounded text-xs">⌘N</kbd>
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/inventory/warehouses/create">
+            <Link to={ROUTES.dashboard.inventory.warehouses.create}>
               <Plus className="w-4 h-4 ml-2" />
               {t('inventory.newWarehouse', 'مستودع جديد')}
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/inventory/stock-entries/create">
+            <Link to={ROUTES.dashboard.inventory.stockEntries.create}>
               <Plus className="w-4 h-4 ml-2" />
               {t('inventory.newStockEntry', 'حركة مخزون جديدة')}
               <kbd className="mr-auto bg-muted px-2 py-0.5 rounded text-xs">⌘E</kbd>
@@ -83,31 +84,31 @@ export function InventorySidebar({ context = 'items' }: InventorySidebarProps) {
         </CardHeader>
         <CardContent className="space-y-2">
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/inventory">
+            <Link to={ROUTES.dashboard.inventory.list}>
               <Package className="w-4 h-4 ml-2" />
               {t('inventory.items', 'الأصناف')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/inventory/warehouses">
+            <Link to={ROUTES.dashboard.inventory.warehouses.list}>
               <Warehouse className="w-4 h-4 ml-2" />
               {t('inventory.warehouses', 'المستودعات')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/inventory/stock-entries">
+            <Link to={ROUTES.dashboard.inventory.stockEntries.list}>
               <ArrowRightLeft className="w-4 h-4 ml-2" />
               {t('inventory.stockEntries', 'حركات المخزون')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/inventory/stock-ledger">
+            <Link to={ROUTES.dashboard.inventory.stockLedger}>
               <FileText className="w-4 h-4 ml-2" />
               {t('inventory.stockLedger', 'دفتر المخزون')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/inventory/settings">
+            <Link to={ROUTES.dashboard.inventory.settings}>
               <Settings className="w-4 h-4 ml-2" />
               {t('inventory.settings', 'الإعدادات')}
             </Link>
@@ -125,19 +126,19 @@ export function InventorySidebar({ context = 'items' }: InventorySidebarProps) {
         </CardHeader>
         <CardContent className="space-y-2">
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/inventory/reports/stock-balance">
+            <Link to={`${ROUTES.dashboard.inventory.list}/reports/stock-balance`}>
               <TrendingUp className="w-4 h-4 ml-2" />
               {t('inventory.stockBalance', 'رصيد المخزون')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/inventory/reports/stock-aging">
+            <Link to={`${ROUTES.dashboard.inventory.list}/reports/stock-aging`}>
               <Clock className="w-4 h-4 ml-2" />
               {t('inventory.stockAging', 'أعمار المخزون')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/inventory/reports/item-shortage">
+            <Link to={`${ROUTES.dashboard.inventory.list}/reports/item-shortage`}>
               <AlertCircle className="w-4 h-4 ml-2" />
               {t('inventory.itemShortage', 'نقص الأصناف')}
             </Link>
@@ -168,7 +169,7 @@ export function InventorySidebar({ context = 'items' }: InventorySidebarProps) {
               {lowStockItems.slice(0, 5).map((item) => (
                 <Link
                   key={item._id}
-                  to={`/dashboard/inventory/${item._id}`}
+                  to={ROUTES.dashboard.inventory.detail(item._id)}
                   className="flex items-center justify-between p-2 rounded-lg hover:bg-amber-100 transition-colors"
                 >
                   <div className="flex items-center gap-2">
@@ -184,7 +185,7 @@ export function InventorySidebar({ context = 'items' }: InventorySidebarProps) {
               ))}
               {lowStockItems.length > 5 && (
                 <Button asChild variant="ghost" size="sm" className="w-full text-amber-700">
-                  <Link to="/dashboard/inventory?status=low_stock">
+                  <Link to={`${ROUTES.dashboard.inventory.list}?status=low_stock`}>
                     {t('inventory.viewAll', 'عرض الكل')} ({lowStockItems.length})
                   </Link>
                 </Button>
@@ -215,7 +216,7 @@ export function InventorySidebar({ context = 'items' }: InventorySidebarProps) {
                 {t('inventory.noWarehouses', 'لا توجد مستودعات')}
               </p>
               <Button asChild size="sm" variant="outline" className="rounded-xl">
-                <Link to="/dashboard/inventory/warehouses/create">
+                <Link to={ROUTES.dashboard.inventory.warehouses.create}>
                   <Plus className="w-4 h-4 ml-1" />
                   {t('inventory.addWarehouse', 'إضافة مستودع')}
                 </Link>
@@ -226,7 +227,7 @@ export function InventorySidebar({ context = 'items' }: InventorySidebarProps) {
               {warehouses.slice(0, 4).map((warehouse) => (
                 <Link
                   key={warehouse._id}
-                  to={`/dashboard/inventory/warehouses/${warehouse._id}`}
+                  to={ROUTES.dashboard.inventory.warehouses.detail(warehouse._id)}
                   className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex items-center gap-2">
@@ -243,7 +244,7 @@ export function InventorySidebar({ context = 'items' }: InventorySidebarProps) {
                 </Link>
               ))}
               <Button asChild variant="ghost" size="sm" className="w-full">
-                <Link to="/dashboard/inventory/warehouses">
+                <Link to={ROUTES.dashboard.inventory.warehouses.list}>
                   {t('inventory.manageWarehouses', 'إدارة المستودعات')}
                 </Link>
               </Button>

@@ -7,7 +7,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
+import { CACHE_TIMES } from '@/config'
 import { Analytics } from '@/lib/analytics'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import casesService, {
   CaseFilters,
   CreateCaseData,
@@ -46,9 +48,9 @@ import eventsService from '@/services/eventsService'
 import remindersService from '@/services/remindersService'
 
 // ==================== Cache Configuration ====================
-const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
-const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
-const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
+const STATS_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour
+const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
 
 // ==================== CASES ====================
 
@@ -142,7 +144,7 @@ export const useCreateCase = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['cases'], refetchType: 'all' })
+      return await invalidateCache.cases.all()
     },
   })
 }
@@ -170,8 +172,8 @@ export const useUpdateCase = () => {
       toast.error(error.message || t('cases.updateError', 'فشل تحديث القضية | Failed to update case'))
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['cases'] })
-      return await queryClient.invalidateQueries({ queryKey: ['cases', id] })
+      await invalidateCache.cases.all()
+      return await invalidateCache.cases.detail(id)
     },
   })
 }
@@ -224,7 +226,7 @@ export const useDeleteCase = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['cases'], refetchType: 'all' })
+      return await invalidateCache.cases.all()
     },
   })
 }
@@ -246,7 +248,7 @@ export const useAddCaseNote = () => {
       toast.error(error.message || t('cases.noteAddError', 'فشل إضافة الملاحظة | Failed to add note'))
     },
     onSettled: async (_, __, { id }) => {
-      return await queryClient.invalidateQueries({ queryKey: ['cases', id] })
+      return await invalidateCache.cases.detail(id)
     },
   })
 }
@@ -268,7 +270,7 @@ export const useAddCaseDocument = () => {
       toast.error(error.message || t('cases.documentAddError', 'فشل إضافة المستند | Failed to add document'))
     },
     onSettled: async (_, __, { id }) => {
-      return await queryClient.invalidateQueries({ queryKey: ['cases', id] })
+      return await invalidateCache.cases.detail(id)
     },
   })
 }
@@ -338,11 +340,11 @@ export const useAddCaseHearing = () => {
       toast.error(error.message || t('cases.hearingAddError', 'فشل إضافة الجلسة | Failed to add hearing'))
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['cases', id] })
-      await queryClient.invalidateQueries({ queryKey: ['cases'] })
-      await queryClient.invalidateQueries({ queryKey: ['calendar'] })
-      await queryClient.invalidateQueries({ queryKey: ['events'] })
-      return await queryClient.invalidateQueries({ queryKey: ['reminders'] })
+      await invalidateCache.cases.detail(id)
+      await invalidateCache.cases.all()
+      await invalidateCache.calendar.all()
+      await invalidateCache.events.all()
+      return await invalidateCache.reminders.all()
     },
   })
 }
@@ -378,7 +380,7 @@ export const useAddCaseClaim = () => {
       toast.error(error.message || t('cases.claimAddError', 'فشل إضافة المطالبة | Failed to add claim'))
     },
     onSettled: async (_, __, { id }) => {
-      return await queryClient.invalidateQueries({ queryKey: ['cases', id] })
+      return await invalidateCache.cases.detail(id)
     },
   })
 }
@@ -400,8 +402,8 @@ export const useUpdateCaseStatus = () => {
       toast.error(error.message || t('cases.statusUpdateError', 'فشل تحديث حالة القضية | Failed to update case status'))
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['cases'] })
-      return await queryClient.invalidateQueries({ queryKey: ['cases', id] })
+      await invalidateCache.cases.all()
+      return await invalidateCache.cases.detail(id)
     },
   })
 }
@@ -423,8 +425,8 @@ export const useUpdateCaseOutcome = () => {
       toast.error(error.message || t('cases.outcomeUpdateError', 'فشل تحديث نتيجة القضية | Failed to update case outcome'))
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['cases'] })
-      return await queryClient.invalidateQueries({ queryKey: ['cases', id] })
+      await invalidateCache.cases.all()
+      return await invalidateCache.cases.detail(id)
     },
   })
 }
@@ -487,7 +489,7 @@ export const useCreateClient = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['clients'], refetchType: 'all' })
+      return await invalidateCache.clients.all()
     },
   })
 }
@@ -506,8 +508,8 @@ export const useUpdateClient = () => {
       toast.error(error.message || t('clients.updateError', 'فشل تحديث العميل | Failed to update client'))
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['clients'] })
-      return await queryClient.invalidateQueries({ queryKey: ['clients', id] })
+      await invalidateCache.clients.all()
+      return await invalidateCache.clients.detail(id)
     },
   })
 }
@@ -545,7 +547,7 @@ export const useDeleteClient = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['clients'], refetchType: 'all' })
+      return await invalidateCache.clients.all()
     },
   })
 }
@@ -652,7 +654,7 @@ export const useUpdateCaseNote = () => {
       toast.error(error.message || t('cases.noteUpdateError', 'فشل تحديث الملاحظة | Failed to update note'))
     },
     onSettled: async (_, __, { caseId }) => {
-      return await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      return await invalidateCache.cases.detail(caseId)
     },
   })
 }
@@ -688,7 +690,7 @@ export const useDeleteCaseNote = () => {
       toast.error(error.message || t('cases.noteDeleteError', 'فشل حذف الملاحظة | Failed to delete note'))
     },
     onSettled: async (_, __, { caseId }) => {
-      return await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      return await invalidateCache.cases.detail(caseId)
     },
   })
 }
@@ -727,10 +729,10 @@ export const useUpdateCaseHearing = () => {
       toast.error(error.message || t('cases.hearingUpdateError', 'فشل تحديث الجلسة | Failed to update hearing'))
     },
     onSettled: async (_, __, { caseId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
-      await queryClient.invalidateQueries({ queryKey: ['cases'] })
-      await queryClient.invalidateQueries({ queryKey: ['calendar'] })
-      return await queryClient.invalidateQueries({ queryKey: ['events'] })
+      await invalidateCache.cases.detail(caseId)
+      await invalidateCache.cases.all()
+      await invalidateCache.calendar.all()
+      return await invalidateCache.events.all()
     },
   })
 }
@@ -767,10 +769,10 @@ export const useDeleteCaseHearing = () => {
       toast.error(error.message || t('cases.hearingDeleteError', 'فشل حذف الجلسة | Failed to delete hearing'))
     },
     onSettled: async (_, __, { caseId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
-      await queryClient.invalidateQueries({ queryKey: ['cases'] })
-      await queryClient.invalidateQueries({ queryKey: ['calendar'] })
-      return await queryClient.invalidateQueries({ queryKey: ['events'] })
+      await invalidateCache.cases.detail(caseId)
+      await invalidateCache.cases.all()
+      await invalidateCache.calendar.all()
+      return await invalidateCache.events.all()
     },
   })
 }
@@ -808,7 +810,7 @@ export const useUpdateCaseClaim = () => {
       toast.error(error.message || t('cases.claimUpdateError', 'فشل تحديث المطالبة | Failed to update claim'))
     },
     onSettled: async (_, __, { caseId }) => {
-      return await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      return await invalidateCache.cases.detail(caseId)
     },
   })
 }
@@ -844,7 +846,7 @@ export const useDeleteCaseClaim = () => {
       toast.error(error.message || t('cases.claimDeleteError', 'فشل حذف المطالبة | Failed to delete claim'))
     },
     onSettled: async (_, __, { caseId }) => {
-      return await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      return await invalidateCache.cases.detail(caseId)
     },
   })
 }
@@ -882,7 +884,7 @@ export const useAddCaseTimelineEvent = () => {
       toast.error(error.message || t('cases.timelineAddError', 'فشل إضافة الحدث | Failed to add timeline event'))
     },
     onSettled: async (_, __, { caseId }) => {
-      return await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      return await invalidateCache.cases.detail(caseId)
     },
   })
 }
@@ -918,7 +920,7 @@ export const useUpdateCaseTimelineEvent = () => {
       toast.error(error.message || t('cases.timelineUpdateError', 'فشل تحديث الحدث | Failed to update timeline event'))
     },
     onSettled: async (_, __, { caseId }) => {
-      return await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      return await invalidateCache.cases.detail(caseId)
     },
   })
 }
@@ -954,7 +956,7 @@ export const useDeleteCaseTimelineEvent = () => {
       toast.error(error.message || t('cases.timelineDeleteError', 'فشل حذف الحدث | Failed to delete timeline event'))
     },
     onSettled: async (_, __, { caseId }) => {
-      return await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      return await invalidateCache.cases.detail(caseId)
     },
   })
 }
@@ -1028,7 +1030,7 @@ export const useUploadCaseDocument = () => {
       toast.error(error.message || t('cases.documentUploadError', 'فشل رفع المستند | Failed to upload document'))
     },
     onSettled: async (_, __, { caseId }) => {
-      return await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      return await invalidateCache.cases.detail(caseId)
     },
   })
 }
@@ -1105,7 +1107,7 @@ export const useDeleteCaseDocument = () => {
       toast.error(error.message || t('cases.documentDeleteError', 'فشل حذف المستند | Failed to delete document'))
     },
     onSettled: async (_, __, { caseId }) => {
-      return await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      return await invalidateCache.cases.detail(caseId)
     },
   })
 }
@@ -1168,8 +1170,8 @@ export const useUpdateCaseProgress = () => {
       toast.error(error.message || t('cases.progressUpdateError', 'فشل تحديث تقدم القضية | Failed to update case progress'))
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['cases'] })
-      return await queryClient.invalidateQueries({ queryKey: ['cases', id] })
+      await invalidateCache.cases.all()
+      return await invalidateCache.cases.detail(id)
     },
   })
 }
@@ -1353,9 +1355,9 @@ export const useMoveCaseToStage = () => {
       toast.error(error.message || t('cases.stageUpdateError', 'فشل نقل القضية | Failed to move case'))
     },
     onSettled: async (_, __, { caseId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['cases', 'pipeline'] })
-      await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
-      return await queryClient.invalidateQueries({ queryKey: ['cases'] })
+      await invalidateCache.cases.pipeline()
+      await invalidateCache.cases.detail(caseId)
+      return await invalidateCache.cases.all()
     },
   })
 }
@@ -1391,9 +1393,9 @@ export const useEndCase = () => {
       toast.error(error.message || t('cases.endCaseError', 'فشل إنهاء القضية | Failed to end case'))
     },
     onSettled: async (_, __, { caseId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['cases', 'pipeline'] })
-      await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
-      return await queryClient.invalidateQueries({ queryKey: ['cases'] })
+      await invalidateCache.cases.pipeline()
+      await invalidateCache.cases.detail(caseId)
+      return await invalidateCache.cases.all()
     },
   })
 }

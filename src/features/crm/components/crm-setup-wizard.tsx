@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   Target, GitBranch, XCircle, MapPin, Users, UserCheck, Calendar,
   Mail, Hash, UserPlus, Briefcase, CheckCircle2, ChevronRight, ChevronLeft,
@@ -381,7 +382,7 @@ export default function CRMSetupWizard() {
 
       // Navigate to CRM overview
       setTimeout(() => {
-        navigate({ to: '/dashboard/crm/leads' })
+        navigate({ to: ROUTES.dashboard.crm.leads.list })
       }, 1500)
 
     } catch (error: any) {
@@ -396,8 +397,8 @@ export default function CRMSetupWizard() {
   }
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/crm/leads', isActive: false },
-    { title: 'معالج إعداد CRM', href: '/dashboard/crm/setup-wizard', isActive: true },
+    { title: 'نظرة عامة', href: ROUTES.dashboard.crm.leads.list, isActive: false },
+    { title: 'معالج إعداد CRM', href: ROUTES.dashboard.crm.setupWizard, isActive: true },
   ]
 
   const renderStepContent = () => {

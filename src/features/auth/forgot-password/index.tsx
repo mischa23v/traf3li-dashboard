@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import otpService from '@/services/otpService';
 import passwordService from '@/services/passwordService';
 import { PasswordStrengthIndicator } from '@/components/auth/password-strength-indicator';
+import { ROUTES } from '@/constants/routes';
 
 // ============================================
 // SVG ICONS
@@ -412,7 +413,7 @@ export function ForgotPassword() {
               </p>
 
               <button
-                onClick={() => window.location.href = '/sign-in'}
+                onClick={() => window.location.href = ROUTES.auth.signIn}
                 className="w-full py-4 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
               >
                 {t('forgotPassword.success.signIn')}
@@ -746,7 +747,7 @@ export function ForgotPassword() {
             <div className="px-6 py-4 bg-slate-50 border-t border-slate-100">
               <p className="text-center text-sm text-slate-500">
                 {t('forgotPassword.email.remembered')}{' '}
-                <a href="/sign-in" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                <a href={ROUTES.auth.signIn} className="text-emerald-600 hover:text-emerald-700 font-medium">
                   {t('forgotPassword.email.signIn')}
                 </a>
               </p>
@@ -756,7 +757,7 @@ export function ForgotPassword() {
           {/* Sign Up Link */}
           <p className="text-center text-slate-500 mt-6">
             {t('forgotPassword.email.noAccount')}{' '}
-            <a href="/sign-up" className="text-emerald-600 hover:text-emerald-700 font-bold">
+            <a href={ROUTES.auth.signUp} className="text-emerald-600 hover:text-emerald-700 font-bold">
               {t('forgotPassword.email.createAccount')}
             </a>
           </p>

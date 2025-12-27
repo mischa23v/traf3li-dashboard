@@ -91,7 +91,7 @@ export function SkillDialog({ open, onOpenChange, skill }: SkillDialogProps) {
     e.preventDefault()
 
     if (!name.trim() || !nameAr.trim()) {
-      toast.error(isArabic ? 'الرجاء إدخال اسم المهارة' : 'Please enter skill name')
+      toast.error(t('hr.dialogs.skill.skillNameRequired'))
       return
     }
 
@@ -111,15 +111,15 @@ export function SkillDialog({ open, onOpenChange, skill }: SkillDialogProps) {
 
       if (skill) {
         await updateMutation.mutateAsync({ skillId: skill._id, data })
-        toast.success(isArabic ? 'تم تحديث المهارة بنجاح' : 'Skill updated successfully')
+        toast.success(t('hr.dialogs.skill.skillUpdated'))
       } else {
         await createMutation.mutateAsync(data)
-        toast.success(isArabic ? 'تم إنشاء المهارة بنجاح' : 'Skill created successfully')
+        toast.success(t('hr.dialogs.skill.skillCreated'))
       }
 
       onOpenChange(false)
     } catch (error) {
-      toast.error(isArabic ? 'حدث خطأ' : 'An error occurred')
+      toast.error(t('hr.dialogs.skill.error'))
     }
   }
 
@@ -154,17 +154,11 @@ export function SkillDialog({ open, onOpenChange, skill }: SkillDialogProps) {
         <DialogHeader>
           <DialogTitle>
             {skill
-              ? isArabic
-                ? 'تعديل المهارة'
-                : 'Edit Skill'
-              : isArabic
-              ? 'إضافة مهارة جديدة'
-              : 'Add New Skill'}
+              ? t('hr.dialogs.skill.editTitle')
+              : t('hr.dialogs.skill.addTitle')}
           </DialogTitle>
           <DialogDescription>
-            {isArabic
-              ? 'أدخل معلومات المهارة ومستويات الكفاءة'
-              : 'Enter skill information and proficiency levels'}
+            {t('hr.dialogs.skill.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -174,27 +168,27 @@ export function SkillDialog({ open, onOpenChange, skill }: SkillDialogProps) {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="name">
-                  {isArabic ? 'اسم المهارة (بالإنجليزية)' : 'Skill Name (English)'}
+                  {t('hr.dialogs.skill.skillNameEN')}
                   <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g., JavaScript"
+                  placeholder={t('hr.dialogs.skill.skillNameENPlaceholder')}
                   required
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="nameAr">
-                  {isArabic ? 'اسم المهارة (بالعربية)' : 'Skill Name (Arabic)'}
+                  {t('hr.dialogs.skill.skillNameAR')}
                   <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="nameAr"
                   value={nameAr}
                   onChange={(e) => setNameAr(e.target.value)}
-                  placeholder="مثال: جافاسكريبت"
+                  placeholder={t('hr.dialogs.skill.skillNameARPlaceholder')}
                   required
                   dir="rtl"
                 />
@@ -203,7 +197,7 @@ export function SkillDialog({ open, onOpenChange, skill }: SkillDialogProps) {
 
             <div className="space-y-2">
               <Label htmlFor="category">
-                {isArabic ? 'الفئة' : 'Category'}
+                {t('hr.dialogs.skill.category')}
               </Label>
               <Select value={category} onValueChange={(value) => setCategory(value as SkillCategory)}>
                 <SelectTrigger id="category">
@@ -222,25 +216,25 @@ export function SkillDialog({ open, onOpenChange, skill }: SkillDialogProps) {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="description">
-                  {isArabic ? 'الوصف (بالإنجليزية)' : 'Description (English)'}
+                  {t('hr.dialogs.skill.descriptionEN')}
                 </Label>
                 <Textarea
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Describe the skill..."
+                  placeholder={t('hr.dialogs.skill.descriptionENPlaceholder')}
                   rows={3}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="descriptionAr">
-                  {isArabic ? 'الوصف (بالعربية)' : 'Description (Arabic)'}
+                  {t('hr.dialogs.skill.descriptionAR')}
                 </Label>
                 <Textarea
                   id="descriptionAr"
                   value={descriptionAr}
                   onChange={(e) => setDescriptionAr(e.target.value)}
-                  placeholder="وصف المهارة..."
+                  placeholder={t('hr.dialogs.skill.descriptionARPlaceholder')}
                   rows={3}
                   dir="rtl"
                 />
@@ -253,12 +247,10 @@ export function SkillDialog({ open, onOpenChange, skill }: SkillDialogProps) {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="requiresCertification">
-                  {isArabic ? 'يتطلب شهادة' : 'Requires Certification'}
+                  {t('hr.dialogs.skill.requiresCertification')}
                 </Label>
                 <div className="text-sm text-muted-foreground">
-                  {isArabic
-                    ? 'هل تتطلب هذه المهارة شهادة رسمية؟'
-                    : 'Does this skill require an official certification?'}
+                  {t('hr.dialogs.skill.requiresCertificationDescription')}
                 </div>
               </div>
               <Switch
@@ -272,24 +264,24 @@ export function SkillDialog({ open, onOpenChange, skill }: SkillDialogProps) {
               <div className="grid grid-cols-2 gap-4 pl-6 border-l-2 border-amber-200">
                 <div className="space-y-2">
                   <Label htmlFor="certificationName">
-                    {isArabic ? 'اسم الشهادة (بالإنجليزية)' : 'Certification Name (English)'}
+                    {t('hr.dialogs.skill.certificationNameEN')}
                   </Label>
                   <Input
                     id="certificationName"
                     value={certificationName}
                     onChange={(e) => setCertificationName(e.target.value)}
-                    placeholder="e.g., AWS Certified Developer"
+                    placeholder={t('hr.dialogs.skill.certificationNameENPlaceholder')}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="certificationNameAr">
-                    {isArabic ? 'اسم الشهادة (بالعربية)' : 'Certification Name (Arabic)'}
+                    {t('hr.dialogs.skill.certificationNameAR')}
                   </Label>
                   <Input
                     id="certificationNameAr"
                     value={certificationNameAr}
                     onChange={(e) => setCertificationNameAr(e.target.value)}
-                    placeholder="مثال: شهادة AWS للمطورين"
+                    placeholder={t('hr.dialogs.skill.certificationNameARPlaceholder')}
                     dir="rtl"
                   />
                 </div>
@@ -301,7 +293,7 @@ export function SkillDialog({ open, onOpenChange, skill }: SkillDialogProps) {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Label>
-                {isArabic ? 'مستويات الكفاءة' : 'Proficiency Levels'}
+                {t('hr.dialogs.skill.proficiencyLevels')}
               </Label>
               <Button
                 type="button"
@@ -310,7 +302,7 @@ export function SkillDialog({ open, onOpenChange, skill }: SkillDialogProps) {
                 onClick={addProficiencyLevel}
               >
                 <Plus className="h-4 w-4 mr-2" />
-                {isArabic ? 'إضافة مستوى' : 'Add Level'}
+                {t('hr.dialogs.skill.addLevel')}
               </Button>
             </div>
 
@@ -375,12 +367,10 @@ export function SkillDialog({ open, onOpenChange, skill }: SkillDialogProps) {
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="isActive">
-                {isArabic ? 'نشط' : 'Active'}
+                {t('hr.dialogs.skill.active')}
               </Label>
               <div className="text-sm text-muted-foreground">
-                {isArabic
-                  ? 'هل هذه المهارة نشطة ومتاحة للاستخدام؟'
-                  : 'Is this skill active and available for use?'}
+                {t('hr.dialogs.skill.activeDescription')}
               </div>
             </div>
             <Switch
@@ -392,19 +382,15 @@ export function SkillDialog({ open, onOpenChange, skill }: SkillDialogProps) {
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              {isArabic ? 'إلغاء' : 'Cancel'}
+              {t('hr.dialogs.skill.cancel')}
             </Button>
             <Button
               type="submit"
               disabled={createMutation.isPending || updateMutation.isPending}
             >
               {skill
-                ? isArabic
-                  ? 'تحديث'
-                  : 'Update'
-                : isArabic
-                ? 'إنشاء'
-                : 'Create'}
+                ? t('hr.dialogs.skill.update')
+                : t('hr.dialogs.skill.create')}
             </Button>
           </DialogFooter>
         </form>

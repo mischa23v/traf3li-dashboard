@@ -118,7 +118,7 @@ export default function EmployeeSkillsPage() {
         <Card>
           <CardContent className="py-8">
             <div className="text-center text-muted-foreground">
-              {isArabic ? 'لا توجد بيانات مهارات للموظف' : 'No skill data found for employee'}
+              {t('skills.employeeSkills.noDataFound')}
             </div>
           </CardContent>
         </Card>
@@ -146,7 +146,7 @@ export default function EmployeeSkillsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'إجمالي المهارات' : 'Total Skills'}
+              {t('skills.employeeSkills.totalSkills')}
             </CardTitle>
             <Award className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -158,7 +158,7 @@ export default function EmployeeSkillsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'متوسط الكفاءة' : 'Avg Proficiency'}
+              {t('skills.employeeSkills.avgProficiency')}
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -171,14 +171,14 @@ export default function EmployeeSkillsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'التدريبات' : 'Trainings'}
+              {t('skills.employeeSkills.trainings')}
             </CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{skillMap.trainings.length}</div>
             <p className="text-xs text-muted-foreground">
-              {isArabic ? 'مكتملة' : 'completed'}
+              {t('skills.employeeSkills.completed')}
             </p>
           </CardContent>
         </Card>
@@ -186,14 +186,14 @@ export default function EmployeeSkillsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'التوصيات' : 'Recommendations'}
+              {t('skills.employeeSkills.recommendations')}
             </CardTitle>
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{recommendations?.totalRecommendations || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {isArabic ? 'تدريبات موصى بها' : 'training suggestions'}
+              {t('skills.employeeSkills.trainingSuggestions')}
             </p>
           </CardContent>
         </Card>
@@ -203,7 +203,7 @@ export default function EmployeeSkillsPage() {
       {skillsByCategory.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>{isArabic ? 'المهارات حسب الفئة' : 'Skills by Category'}</CardTitle>
+            <CardTitle>{t('skills.employeeSkills.skillsByCategory')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -220,7 +220,7 @@ export default function EmployeeSkillsPage() {
                           {isArabic ? categoryLabel.ar : categoryLabel.en}
                         </Badge>
                         <span className="text-sm text-muted-foreground">
-                          {cat.count} {isArabic ? 'مهارات' : 'skills'}
+                          {cat.count} {t('skills.employeeSkills.skills')}
                         </span>
                       </div>
                       <span className="text-sm font-medium">
@@ -240,13 +240,13 @@ export default function EmployeeSkillsPage() {
       <Tabs defaultValue="skills" className="space-y-4">
         <TabsList>
           <TabsTrigger value="skills">
-            {isArabic ? 'المهارات' : 'Skills'}
+            {t('skills.employeeSkills.skillsTab')}
           </TabsTrigger>
           <TabsTrigger value="trainings">
-            {isArabic ? 'التدريبات' : 'Trainings'}
+            {t('skills.employeeSkills.trainings')}
           </TabsTrigger>
           <TabsTrigger value="recommendations">
-            {isArabic ? 'التوصيات' : 'Recommendations'}
+            {t('skills.employeeSkills.recommendations')}
           </TabsTrigger>
         </TabsList>
 
@@ -255,10 +255,10 @@ export default function EmployeeSkillsPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>{isArabic ? 'المهارات' : 'Skills'}</CardTitle>
+                <CardTitle>{t('skills.employeeSkills.skillsTab')}</CardTitle>
                 <Button size="sm">
                   <Plus className="h-4 w-4 mr-2" />
-                  {isArabic ? 'إضافة مهارة' : 'Add Skill'}
+                  {t('skills.employeeSkills.addSkill')}
                 </Button>
               </div>
             </CardHeader>
@@ -266,19 +266,19 @@ export default function EmployeeSkillsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{isArabic ? 'المهارة' : 'Skill'}</TableHead>
-                    <TableHead>{isArabic ? 'الفئة' : 'Category'}</TableHead>
-                    <TableHead>{isArabic ? 'الكفاءة' : 'Proficiency'}</TableHead>
-                    <TableHead>{isArabic ? 'آخر تقييم' : 'Last Evaluation'}</TableHead>
-                    <TableHead>{isArabic ? 'المُقيّم' : 'Evaluated By'}</TableHead>
-                    <TableHead className="text-right">{isArabic ? 'الإجراءات' : 'Actions'}</TableHead>
+                    <TableHead>{t('skills.employeeSkills.skill')}</TableHead>
+                    <TableHead>{t('skills.employeeSkills.category')}</TableHead>
+                    <TableHead>{t('skills.employeeSkills.proficiency')}</TableHead>
+                    <TableHead>{t('skills.employeeSkills.lastEvaluation')}</TableHead>
+                    <TableHead>{t('skills.employeeSkills.evaluatedBy')}</TableHead>
+                    <TableHead className="text-right">{t('skills.employeeSkills.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {skillMap.skills.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                        {isArabic ? 'لا توجد مهارات' : 'No skills found'}
+                        {t('skills.employeeSkills.noSkillsFound')}
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -294,7 +294,7 @@ export default function EmployeeSkillsPage() {
                               {skill.certificationId && (
                                 <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
                                   <Award className="h-3 w-3" />
-                                  {isArabic ? 'شهادة' : 'Certified'}
+                                  {t('skills.employeeSkills.certified')}
                                 </div>
                               )}
                             </div>
@@ -352,7 +352,7 @@ export default function EmployeeSkillsPage() {
                                 onClick={() => handleEvaluate(skill)}
                               >
                                 <Edit className="h-3 w-3 mr-1" />
-                                {isArabic ? 'تقييم' : 'Evaluate'}
+                                {t('skills.employeeSkills.evaluate')}
                               </Button>
                               <Button
                                 size="sm"
@@ -377,12 +377,12 @@ export default function EmployeeSkillsPage() {
         <TabsContent value="trainings" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>{isArabic ? 'التدريبات المكتملة' : 'Completed Trainings'}</CardTitle>
+              <CardTitle>{t('skills.employeeSkills.completedTrainings')}</CardTitle>
             </CardHeader>
             <CardContent>
               {skillMap.trainings.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
-                  {isArabic ? 'لا توجد تدريبات' : 'No trainings found'}
+                  {t('skills.employeeSkills.noTrainingsFound')}
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -426,17 +426,15 @@ export default function EmployeeSkillsPage() {
         <TabsContent value="recommendations" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>{isArabic ? 'توصيات التدريب' : 'Training Recommendations'}</CardTitle>
+              <CardTitle>{t('skills.employeeSkills.trainingRecommendations')}</CardTitle>
               <CardDescription>
-                {isArabic
-                  ? 'التدريبات الموصى بها بناءً على فجوات المهارات'
-                  : 'Recommended trainings based on skill gaps'}
+                {t('skills.employeeSkills.recommendedTrainingsDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {!recommendations || recommendations.recommendations.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
-                  {isArabic ? 'لا توجد توصيات' : 'No recommendations found'}
+                  {t('skills.employeeSkills.noRecommendationsFound')}
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -460,7 +458,7 @@ export default function EmployeeSkillsPage() {
                       {rec.suggestedTrainings.length > 0 && (
                         <div className="space-y-2">
                           <div className="text-sm font-medium">
-                            {isArabic ? 'التدريبات المقترحة:' : 'Suggested Trainings:'}
+                            {t('skills.employeeSkills.suggestedTrainings')}
                           </div>
                           {rec.suggestedTrainings.map((training, idx) => (
                             <div
@@ -507,20 +505,18 @@ export default function EmployeeSkillsPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {isArabic ? 'تأكيد الحذف' : 'Confirm Deletion'}
+              {t('skills.employeeSkills.confirmDeletion')}
             </DialogTitle>
             <DialogDescription>
-              {isArabic
-                ? 'هل أنت متأكد من إزالة هذه المهارة من ملف الموظف؟'
-                : 'Are you sure you want to remove this skill from the employee profile?'}
+              {t('skills.employeeSkills.confirmRemoveSkillMessage')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-              {isArabic ? 'إلغاء' : 'Cancel'}
+              {t('skills.employeeSkills.cancel')}
             </Button>
             <Button variant="destructive" onClick={confirmRemove}>
-              {isArabic ? 'حذف' : 'Delete'}
+              {t('skills.employeeSkills.delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

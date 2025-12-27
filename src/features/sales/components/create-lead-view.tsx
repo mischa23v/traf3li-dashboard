@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import {
+import { useTranslation } from 'react-i18next'
     ArrowRight, Save, User, Phone, Mail, Building,
     DollarSign, Calendar, FileText, Target, Loader2
 } from 'lucide-react'
@@ -23,31 +24,34 @@ import { ProductivityHero } from '@/components/productivity-hero'
 import { useCreateLead, useUpdateLead, useLead } from '@/hooks/useAccounting'
 import { useStaff } from '@/hooks/useStaff'
 import type { LeadSource } from '@/services/accountingService'
+import { ROUTES } from '@/constants/routes'
 
-const SOURCE_OPTIONS: { value: LeadSource; label: string }[] = [
-    { value: 'website', label: 'الموقع الإلكتروني' },
-    { value: 'referral', label: 'إحالة' },
-    { value: 'social_media', label: 'وسائل التواصل' },
-    { value: 'advertisement', label: 'إعلان' },
-    { value: 'cold_call', label: 'اتصال مباشر' },
-    { value: 'walk_in', label: 'زيارة شخصية' },
-    { value: 'other', label: 'أخرى' },
+const getSourceOptions = (t: any) => [
+  { value: 'website' as LeadSource, label: t('sales.leads.sources.website') },
+  { value: 'referral' as LeadSource, label: t('sales.leads.sources.referral') },
+  { value: 'social_media' as LeadSource, label: t('sales.leads.sources.social_media') },
+  { value: 'advertisement' as LeadSource, label: t('sales.leads.sources.advertisement') },
+  { value: 'cold_call' as LeadSource, label: t('sales.leads.sources.cold_call') },
+  { value: 'walk_in' as LeadSource, label: t('sales.leads.sources.walk_in') },
+  { value: 'other' as LeadSource, label: t('sales.leads.sources.other') },
 ]
 
-const CASE_TYPES = [
-    { value: 'labor', label: 'قضية عمالية' },
-    { value: 'commercial', label: 'قضية تجارية' },
-    { value: 'civil', label: 'قضية مدنية' },
-    { value: 'criminal', label: 'قضية جنائية' },
-    { value: 'family', label: 'قضية أسرية' },
-    { value: 'administrative', label: 'قضية إدارية' },
+const getCaseTypes = (t: any) => [
+  { value: 'labor', label: t('sales.leads.caseTypes.labor') },
+  { value: 'commercial', label: t('sales.leads.caseTypes.commercial') },
+  { value: 'civil', label: t('sales.leads.caseTypes.civil') },
+  { value: 'criminal', label: t('sales.leads.caseTypes.criminal') },
+  { value: 'family', label: t('sales.leads.caseTypes.family') },
+  { value: 'administrative', label: t('sales.leads.caseTypes.administrative') },
 ]
 
 interface CreateLeadViewProps {
     editMode?: boolean
 }
 
-export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
+export function CreateLeadView({
+  const { t } = useTranslation()
+ editMode = false }: CreateLeadViewProps) {
     const navigate = useNavigate()
     const params = editMode ? useParams({ from: '/_authenticated/dashboard/sales/leads/$leadId/edit' }) : null
     const leadId = params?.leadId
@@ -101,21 +105,21 @@ export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
                 { id: leadId, data: leadData },
                 {
                     onSuccess: () => {
-                        navigate({ to: `/dashboard/sales/leads/${leadId}` })
+                        navigate({ to: ROUTES.dashboard.sales.leads.list })
                     }
                 }
             )
         } else {
             createLeadMutation.mutate(leadData, {
                 onSuccess: () => {
-                    navigate({ to: '/dashboard/sales/leads' })
+                    navigate({ to: ROUTES.dashboard.sales.leads.list })
                 }
             })
         }
     }
 
     const topNav = [
-        { title: 'العملاء المحتملين', href: '/dashboard/sales/leads', isActive: true },
+        { title: 'العملاء المحتملين', href: ROUTES.dashboard.sales.leads.list, isActive: true },
     ]
 
     if (editMode && isLoadingLead) {
@@ -149,13 +153,13 @@ export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden">
                 {/* HERO CARD */}
                 <ProductivityHero
-                    badge="إدارة العملاء المحتملين"
-                    title={editMode ? "تعديل عميل محتمل" : "إضافة عميل محتمل جديد"}
+                    badge=t('sales.leads.management')
+                    title={editMode ? t('sales.leads.editLead') : t('sales.leads.addLead')}
                     type="clients"
                     listMode={true}
                     hideButtons={true}
                 >
-                    <Link to={editMode && leadId ? `/dashboard/sales/leads/${leadId}` : "/dashboard/sales/leads"}>
+                    <Link to={ROUTES.dashboard.sales.leads.list}>
                         <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
                             <ArrowRight className="w-5 h-5" />
                         </Button>
@@ -237,7 +241,7 @@ export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
                                             الشركة
                                         </label>
                                         <Input
-                                            placeholder="اسم الشركة"
+                                            placeholder=t('sales.leads.form.companyName')
                                             className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
                                             value={formData.company}
                                             onChange={(e) => handleChange('company', e.target.value)}
@@ -263,10 +267,10 @@ export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
                                                 required
                                             >
                                                 <SelectTrigger className="rounded-xl border-slate-200">
-                                                    <SelectValue placeholder="اختر المصدر" />
+                                                    <SelectValue placeholder=t('sales.leads.form.selectSource') />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    {SOURCE_OPTIONS.map(option => (
+                                                    {getSourceOptions(t).map(option => (
                                                         <SelectItem key={option.value} value={option.value}>
                                                             {option.label}
                                                         </SelectItem>
@@ -284,7 +288,7 @@ export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
                                                 onValueChange={(value) => handleChange('assignedTo', value)}
                                             >
                                                 <SelectTrigger className="rounded-xl border-slate-200">
-                                                    <SelectValue placeholder="اختر موظف" />
+                                                    <SelectValue placeholder=t('sales.leads.form.selectStaff') />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {staffData?.map((staff: any) => (
@@ -353,10 +357,10 @@ export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
                                             onValueChange={(value) => handleChange('caseType', value)}
                                         >
                                             <SelectTrigger className="rounded-xl border-slate-200">
-                                                <SelectValue placeholder="اختر نوع القضية" />
+                                                <SelectValue placeholder=t('sales.leads.selectCaseType') />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {CASE_TYPES.map(type => (
+                                                {getCaseTypes(t).map(type => (
                                                     <SelectItem key={type.value} value={type.value}>
                                                         {type.label}
                                                     </SelectItem>
@@ -370,7 +374,7 @@ export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
                                             الوصف
                                         </label>
                                         <Textarea
-                                            placeholder="اكتب وصف القضية أو احتياجات العميل..."
+                                            placeholder=t('sales.leads.form.descriptionPlaceholder')
                                             className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 min-h-[100px]"
                                             value={formData.description}
                                             onChange={(e) => handleChange('description', e.target.value)}
@@ -382,7 +386,7 @@ export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
                                             ملاحظات
                                         </label>
                                         <Textarea
-                                            placeholder="ملاحظات إضافية..."
+                                            placeholder=t('sales.leads.form.notesPlaceholder')
                                             className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 min-h-[100px]"
                                             value={formData.notes}
                                             onChange={(e) => handleChange('notes', e.target.value)}
@@ -401,13 +405,13 @@ export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
                                             <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                         )}
                                         <Save className="w-5 h-5 ms-2" aria-hidden="true" />
-                                        {editMode ? 'حفظ التغييرات' : 'إنشاء عميل محتمل'}
+                                        {editMode ? t('sales.leads.form.saveChanges') : t('sales.leads.form.create')}
                                     </Button>
                                     <Button
                                         type="button"
                                         variant="outline"
                                         className="rounded-xl px-8 py-6"
-                                        onClick={() => navigate({ to: editMode && leadId ? `/dashboard/sales/leads/${leadId}` : '/dashboard/sales/leads' })}
+                                        onClick={() => navigate({ to: ROUTES.dashboard.sales.leads.list })}
                                     >
                                         إلغاء
                                     </Button>

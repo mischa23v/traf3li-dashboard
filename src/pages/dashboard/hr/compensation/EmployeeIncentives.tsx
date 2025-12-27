@@ -256,6 +256,11 @@ export default function EmployeeIncentivesPage() {
     }
   }
 
+  // Get localized field value
+  const getLocalizedValue = (value: string, valueAr?: string) => {
+    return isArabic && valueAr ? valueAr : value
+  }
+
   // Format currency
   const formatCurrency = (amount: number, currency: string = 'SAR') => {
     return new Intl.NumberFormat(isArabic ? 'ar-SA' : 'en-US', {
@@ -410,7 +415,7 @@ export default function EmployeeIncentivesPage() {
                   <SelectItem value="all">{t('hr.incentives.all', 'All')}</SelectItem>
                   {Object.entries(incentiveTypeLabels).map(([value, label]) => (
                     <SelectItem key={value} value={value}>
-                      {isArabic ? label.ar : label.en}
+                      {t(`hr.compensation.incentives.types.${value}`)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -427,7 +432,7 @@ export default function EmployeeIncentivesPage() {
                   <SelectItem value="all">{t('hr.incentives.all', 'All')}</SelectItem>
                   {Object.entries(incentiveStatusLabels).map(([value, label]) => (
                     <SelectItem key={value} value={value}>
-                      {isArabic ? label.ar : label.en}
+                      {t(`hr.compensation.incentives.statuses.${value}`)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -497,7 +502,7 @@ export default function EmployeeIncentivesPage() {
                       <TableCell>
                         <div>
                           <div className="font-medium">
-                            {isArabic ? incentive.employeeNameAr : incentive.employeeName}
+                            {getLocalizedValue(incentive.employeeName, incentive.employeeNameAr)}
                           </div>
                           {incentive.employeeNumber && (
                             <div className="text-sm text-muted-foreground">
@@ -508,23 +513,19 @@ export default function EmployeeIncentivesPage() {
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline">
-                          {isArabic
-                            ? incentiveTypeLabels[incentive.incentiveType].ar
-                            : incentiveTypeLabels[incentive.incentiveType].en}
+                          {t(`hr.compensation.incentives.types.${incentive.incentiveType}`)}
                         </Badge>
                       </TableCell>
                       <TableCell className="font-semibold">
                         {formatCurrency(incentive.incentiveAmount, incentive.currency)}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate">
-                        {isArabic ? incentive.incentiveReasonAr : incentive.incentiveReason}
+                        {getLocalizedValue(incentive.incentiveReason, incentive.incentiveReasonAr)}
                       </TableCell>
                       <TableCell>{formatDate(incentive.payrollDate)}</TableCell>
                       <TableCell>
                         <Badge variant={getStatusVariant(incentive.status)}>
-                          {isArabic
-                            ? incentiveStatusLabels[incentive.status].ar
-                            : incentiveStatusLabels[incentive.status].en}
+                          {t(`hr.compensation.incentives.statuses.${incentive.status}`)}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">

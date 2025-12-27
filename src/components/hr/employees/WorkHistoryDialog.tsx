@@ -1,11 +1,7 @@
-import { useState, useEffect } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Switch } from '@/components/ui/switch'
-import { Loader2, CheckCircle, Briefcase, Lock } from 'lucide-react'
+import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
+import * as z from 'zod'
+import { GenericFormDialog, FormSectionConfig } from '@/components/generic-form-dialog'
 import type { ExternalWorkHistory } from '@/services/hrService'
 
 interface WorkHistoryDialogProps {
@@ -16,328 +12,307 @@ interface WorkHistoryDialogProps {
   isLoading?: boolean
 }
 
-export function WorkHistoryDialog({ open, onOpenChange, workHistory, onSave, isLoading }: WorkHistoryDialogProps) {
-  const [companyName, setCompanyName] = useState('')
-  const [companyNameAr, setCompanyNameAr] = useState('')
-  const [designation, setDesignation] = useState('')
-  const [designationAr, setDesignationAr] = useState('')
-  const [fromDate, setFromDate] = useState('')
-  const [toDate, setToDate] = useState('')
-  const [salary, setSalary] = useState<number | undefined>(undefined)
-  const [currency, setCurrency] = useState('SAR')
-  const [address, setAddress] = useState('')
-  const [contactPerson, setContactPerson] = useState('')
-  const [contactPhone, setContactPhone] = useState('')
-  const [reasonForLeaving, setReasonForLeaving] = useState('')
-  const [verified, setVerified] = useState(false)
+// Form validation schema
+const workHistoryFormSchema = z.object({
+  companyName: z.string().min(1, 'Company name is required'),
+  companyNameAr: z.string().min(1, 'اسم الشركة مطلوب'),
+  designation: z.string().min(1, 'Designation is required'),
+  designationAr: z.string().min(1, 'المسمى الوظيفي مطلوب'),
+  fromDate: z.string().min(1, 'From date is required'),
+  toDate: z.string().min(1, 'To date is required'),
+  salary: z.number().optional(),
+  currency: z.string().default('SAR'),
+  address: z.string().optional(),
+  contactPerson: z.string().optional(),
+  contactPhone: z.string().optional(),
+  reasonForLeaving: z.string().optional(),
+  verified: z.boolean().default(false),
+})
 
-  // Calculate total experience
-  const calculateExperience = (from: string, to: string): string => {
-    if (!from || !to) return ''
+type WorkHistoryFormValues = z.infer<typeof workHistoryFormSchema>
 
-    const fromDate = new Date(from)
-    const toDate = new Date(to)
+// Calculate total experience helper
+const calculateExperience = (from: string, to: string): string => {
+  if (!from || !to) return ''
 
-    const diffMs = toDate.getTime() - fromDate.getTime()
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+  const fromDate = new Date(from)
+  const toDate = new Date(to)
 
-    const years = Math.floor(diffDays / 365)
-    const months = Math.floor((diffDays % 365) / 30)
+  const diffMs = toDate.getTime() - fromDate.getTime()
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
 
-    if (years > 0 && months > 0) {
-      return `${years} سنة ${months} شهر`
-    } else if (years > 0) {
-      return `${years} سنة`
-    } else if (months > 0) {
-      return `${months} شهر`
-    } else {
-      return `${diffDays} يوم`
-    }
+  const years = Math.floor(diffDays / 365)
+  const months = Math.floor((diffDays % 365) / 30)
+
+  if (years > 0 && months > 0) {
+    return `${years} سنة ${months} شهر`
+  } else if (years > 0) {
+    return `${years} سنة`
+  } else if (months > 0) {
+    return `${months} شهر`
+  } else {
+    return `${diffDays} يوم`
   }
+}
 
-  useEffect(() => {
+export function WorkHistoryDialog({
+  open,
+  onOpenChange,
+  workHistory,
+  onSave,
+  isLoading
+}: WorkHistoryDialogProps) {
+  const { i18n } = useTranslation()
+  const isArabic = i18n.language === 'ar'
+  const isEditMode = !!workHistory
+
+  // Prepare default values
+  const defaultValues: Partial<WorkHistoryFormValues> = useMemo(() => {
     if (workHistory) {
-      setCompanyName(workHistory.companyName)
-      setCompanyNameAr(workHistory.companyNameAr)
-      setDesignation(workHistory.designation)
-      setDesignationAr(workHistory.designationAr)
-      setFromDate(workHistory.fromDate.split('T')[0])
-      setToDate(workHistory.toDate.split('T')[0])
-      setSalary(workHistory.salary)
-      setCurrency(workHistory.currency || 'SAR')
-      setAddress(workHistory.address || '')
-      setContactPerson(workHistory.contactPerson || '')
-      setContactPhone(workHistory.contactPhone || '')
-      setReasonForLeaving(workHistory.reasonForLeaving || '')
-      setVerified(workHistory.verified)
-    } else {
-      // Reset form
-      setCompanyName('')
-      setCompanyNameAr('')
-      setDesignation('')
-      setDesignationAr('')
-      setFromDate('')
-      setToDate('')
-      setSalary(undefined)
-      setCurrency('SAR')
-      setAddress('')
-      setContactPerson('')
-      setContactPhone('')
-      setReasonForLeaving('')
-      setVerified(false)
+      return {
+        companyName: workHistory.companyName,
+        companyNameAr: workHistory.companyNameAr,
+        designation: workHistory.designation,
+        designationAr: workHistory.designationAr,
+        fromDate: workHistory.fromDate.split('T')[0],
+        toDate: workHistory.toDate.split('T')[0],
+        salary: workHistory.salary,
+        currency: workHistory.currency || 'SAR',
+        address: workHistory.address || '',
+        contactPerson: workHistory.contactPerson || '',
+        contactPhone: workHistory.contactPhone || '',
+        reasonForLeaving: workHistory.reasonForLeaving || '',
+        verified: workHistory.verified,
+      }
     }
-  }, [workHistory, open])
+    return {
+      companyName: '',
+      companyNameAr: '',
+      designation: '',
+      designationAr: '',
+      fromDate: '',
+      toDate: '',
+      salary: undefined,
+      currency: 'SAR',
+      address: '',
+      contactPerson: '',
+      contactPhone: '',
+      reasonForLeaving: '',
+      verified: false,
+    }
+  }, [workHistory])
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-
-    const totalExperience = calculateExperience(fromDate, toDate)
+  // Submit handler
+  const handleSubmit = async (data: WorkHistoryFormValues) => {
+    const totalExperience = calculateExperience(data.fromDate, data.toDate)
 
     const historyData: Omit<ExternalWorkHistory, 'historyId'> = {
-      companyName,
-      companyNameAr,
-      designation,
-      designationAr,
-      fromDate,
-      toDate,
-      salary,
-      currency,
+      companyName: data.companyName,
+      companyNameAr: data.companyNameAr,
+      designation: data.designation,
+      designationAr: data.designationAr,
+      fromDate: data.fromDate,
+      toDate: data.toDate,
+      salary: data.salary,
+      currency: data.currency,
       totalExperience,
-      address,
-      contactPerson,
-      contactPhone,
-      reasonForLeaving,
-      verified,
-      verificationDate: verified ? new Date().toISOString() : undefined,
+      address: data.address,
+      contactPerson: data.contactPerson,
+      contactPhone: data.contactPhone,
+      reasonForLeaving: data.reasonForLeaving,
+      verified: data.verified,
+      verificationDate: data.verified ? new Date().toISOString() : undefined,
     }
 
     onSave(historyData)
   }
 
-  const totalExperience = calculateExperience(fromDate, toDate)
+  // Form sections configuration
+  const formSections: FormSectionConfig[] = [
+    {
+      title: 'Company Information',
+      titleAr: 'معلومات الشركة',
+      columns: 2,
+      fields: [
+        {
+          name: 'companyNameAr',
+          type: 'text',
+          label: 'Company Name (Arabic)',
+          labelAr: 'اسم الشركة (عربي)',
+          placeholder: 'شركة المحاماة السعودية',
+          required: true,
+        },
+        {
+          name: 'companyName',
+          type: 'text',
+          label: 'Company Name (English)',
+          labelAr: 'اسم الشركة (إنجليزي)',
+          placeholder: 'Saudi Law Firm',
+          required: true,
+        },
+      ],
+    },
+    {
+      title: 'Position Information',
+      titleAr: 'معلومات الوظيفة',
+      columns: 2,
+      fields: [
+        {
+          name: 'designationAr',
+          type: 'text',
+          label: 'Designation (Arabic)',
+          labelAr: 'المسمى الوظيفي (عربي)',
+          placeholder: 'محامي أول',
+          required: true,
+        },
+        {
+          name: 'designation',
+          type: 'text',
+          label: 'Designation (English)',
+          labelAr: 'المسمى الوظيفي (إنجليزي)',
+          placeholder: 'Senior Attorney',
+          required: true,
+        },
+      ],
+    },
+    {
+      title: 'Employment Period',
+      titleAr: 'فترة العمل',
+      columns: 2,
+      fields: [
+        {
+          name: 'fromDate',
+          type: 'date',
+          label: 'From Date',
+          labelAr: 'من تاريخ',
+          required: true,
+        },
+        {
+          name: 'toDate',
+          type: 'date',
+          label: 'To Date',
+          labelAr: 'إلى تاريخ',
+          required: true,
+        },
+      ],
+    },
+    {
+      title: 'Compensation',
+      titleAr: 'التعويضات',
+      columns: 2,
+      fields: [
+        {
+          name: 'salary',
+          type: 'number',
+          label: 'Salary',
+          labelAr: 'الراتب',
+          placeholder: '15000',
+          min: 0,
+          step: 100,
+          colSpan: 1,
+        },
+        {
+          name: 'currency',
+          type: 'select',
+          label: 'Currency',
+          labelAr: 'العملة',
+          required: true,
+          options: [
+            { value: 'SAR', label: 'Saudi Riyal', labelAr: 'ريال سعودي' },
+            { value: 'USD', label: 'US Dollar', labelAr: 'دولار أمريكي' },
+            { value: 'EUR', label: 'Euro', labelAr: 'يورو' },
+            { value: 'AED', label: 'UAE Dirham', labelAr: 'درهم إماراتي' },
+            { value: 'KWD', label: 'Kuwaiti Dinar', labelAr: 'دينار كويتي' },
+          ],
+        },
+      ],
+    },
+    {
+      title: 'Additional Information',
+      titleAr: 'معلومات إضافية',
+      columns: 1,
+      fields: [
+        {
+          name: 'address',
+          type: 'text',
+          label: 'Company Address',
+          labelAr: 'عنوان الشركة',
+          placeholder: 'الرياض، المملكة العربية السعودية',
+        },
+      ],
+    },
+    {
+      title: 'Reference Contact',
+      titleAr: 'بيانات المرجع',
+      columns: 2,
+      fields: [
+        {
+          name: 'contactPerson',
+          type: 'text',
+          label: 'Reference Name',
+          labelAr: 'اسم المرجع',
+          placeholder: 'اسم المدير أو المشرف',
+        },
+        {
+          name: 'contactPhone',
+          type: 'tel',
+          label: 'Reference Phone',
+          labelAr: 'رقم هاتف المرجع',
+          placeholder: '+966 5XXXXXXXX',
+          description: 'Confidential - for verification purposes only',
+          descriptionAr: 'سري - لأغراض التحقق فقط',
+        },
+      ],
+    },
+    {
+      title: 'Leaving Information',
+      titleAr: 'معلومات ترك العمل',
+      columns: 1,
+      fields: [
+        {
+          name: 'reasonForLeaving',
+          type: 'textarea',
+          label: 'Reason for Leaving',
+          labelAr: 'سبب ترك العمل',
+          placeholder: 'اذكر سبب ترك العمل (اختياري)',
+          rows: 3,
+        },
+      ],
+    },
+    {
+      title: 'Verification',
+      titleAr: 'التحقق',
+      columns: 1,
+      fields: [
+        {
+          name: 'verified',
+          type: 'switch',
+          label: 'Verified',
+          labelAr: 'تم التحقق من الخبرة',
+          description: 'Has this work history been verified?',
+          descriptionAr: 'هل تم التحقق من صحة هذه الخبرة؟',
+        },
+      ],
+    },
+  ]
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-navy flex items-center gap-2">
-            <Briefcase className="w-6 h-6 text-blue-500" />
-            {workHistory ? 'تعديل الخبرة الوظيفية' : 'إضافة خبرة وظيفية'}
-          </DialogTitle>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Company Name */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-navy font-medium">
-                اسم الشركة (عربي) <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                value={companyNameAr}
-                onChange={(e) => setCompanyNameAr(e.target.value)}
-                placeholder="شركة المحاماة السعودية"
-                required
-                className="h-11 rounded-xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-navy font-medium">
-                اسم الشركة (إنجليزي) <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-                placeholder="Saudi Law Firm"
-                required
-                className="h-11 rounded-xl"
-                dir="ltr"
-              />
-            </div>
-          </div>
-
-          {/* Designation */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-navy font-medium">
-                المسمى الوظيفي (عربي) <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                value={designationAr}
-                onChange={(e) => setDesignationAr(e.target.value)}
-                placeholder="محامي أول"
-                required
-                className="h-11 rounded-xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-navy font-medium">
-                المسمى الوظيفي (إنجليزي) <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                value={designation}
-                onChange={(e) => setDesignation(e.target.value)}
-                placeholder="Senior Attorney"
-                required
-                className="h-11 rounded-xl"
-                dir="ltr"
-              />
-            </div>
-          </div>
-
-          {/* Dates */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-navy font-medium">
-                من تاريخ <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                type="date"
-                value={fromDate}
-                onChange={(e) => setFromDate(e.target.value)}
-                required
-                className="h-11 rounded-xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-navy font-medium">
-                إلى تاريخ <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                type="date"
-                value={toDate}
-                onChange={(e) => setToDate(e.target.value)}
-                required
-                className="h-11 rounded-xl"
-              />
-            </div>
-          </div>
-
-          {/* Total Experience Display */}
-          {totalExperience && (
-            <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
-              <div className="flex items-center gap-2">
-                <Briefcase className="w-5 h-5 text-blue-500" />
-                <div>
-                  <span className="text-sm text-blue-700">مدة الخبرة: </span>
-                  <span className="font-bold text-blue-800">{totalExperience}</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Salary */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="md:col-span-2 space-y-2">
-              <Label className="text-navy font-medium">الراتب</Label>
-              <Input
-                type="number"
-                value={salary || ''}
-                onChange={(e) => setSalary(e.target.value ? parseFloat(e.target.value) : undefined)}
-                min={0}
-                step={100}
-                placeholder="15000"
-                className="h-11 rounded-xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-navy font-medium">العملة</Label>
-              <Input
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-                placeholder="SAR"
-                className="h-11 rounded-xl"
-              />
-            </div>
-          </div>
-
-          {/* Address */}
-          <div className="space-y-2">
-            <Label className="text-navy font-medium">عنوان الشركة</Label>
-            <Input
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="الرياض، المملكة العربية السعودية"
-              className="h-11 rounded-xl"
-            />
-          </div>
-
-          {/* Contact Details */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-navy font-medium">اسم المرجع</Label>
-              <Input
-                value={contactPerson}
-                onChange={(e) => setContactPerson(e.target.value)}
-                placeholder="اسم المدير أو المشرف"
-                className="h-11 rounded-xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-navy font-medium">
-                رقم هاتف المرجع
-                <Lock className="h-3 w-3 text-slate-500 inline ms-1" />
-              </Label>
-              <Input
-                value={contactPhone}
-                onChange={(e) => setContactPhone(e.target.value)}
-                placeholder="+966 5XXXXXXXX"
-                className="h-11 rounded-xl"
-                dir="ltr"
-              />
-            </div>
-          </div>
-
-          {/* Reason for Leaving */}
-          <div className="space-y-2">
-            <Label className="text-navy font-medium">سبب ترك العمل</Label>
-            <Textarea
-              value={reasonForLeaving}
-              onChange={(e) => setReasonForLeaving(e.target.value)}
-              placeholder="اذكر سبب ترك العمل (اختياري)"
-              className="min-h-[80px] rounded-xl"
-              rows={3}
-            />
-          </div>
-
-          {/* Verification */}
-          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-            <div>
-              <Label className="text-navy font-medium">تم التحقق من الخبرة</Label>
-              <p className="text-sm text-slate-500">هل تم التحقق من صحة هذه الخبرة؟</p>
-            </div>
-            <Switch checked={verified} onCheckedChange={setVerified} />
-          </div>
-
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="rounded-xl"
-            >
-              إلغاء
-            </Button>
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="h-4 w-4 ms-2 animate-spin" />
-                  جاري الحفظ...
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="h-4 w-4 ms-2" />
-                  حفظ
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <GenericFormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={isEditMode ? 'Edit Work History' : 'Add Work History'}
+      titleAr={isEditMode ? 'تعديل الخبرة الوظيفية' : 'إضافة خبرة وظيفية'}
+      description="Enter the external work experience details"
+      descriptionAr="أدخل تفاصيل الخبرة الوظيفية الخارجية"
+      schema={workHistoryFormSchema}
+      sections={formSections}
+      defaultValues={defaultValues}
+      onSubmit={handleSubmit}
+      isLoading={isLoading}
+      mode={isEditMode ? 'edit' : 'create'}
+      submitLabel="Save"
+      submitLabelAr="حفظ"
+      maxWidth="3xl"
+    />
   )
 }

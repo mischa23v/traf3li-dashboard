@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
 import { Loader2 } from 'lucide-react'
+import { ROUTES } from '@/constants/routes'
 
 // ============================================
 // SVG ICONS
@@ -120,9 +121,9 @@ export function CompleteOAuthProfile() {
 
       // Navigate based on role
       if (formData.userType === 'lawyer' && formData.lawyerMode === 'marketplace') {
-        navigate({ to: '/dashboard' })
+        navigate({ to: ROUTES.dashboard.home })
       } else {
-        navigate({ to: '/dashboard' })
+        navigate({ to: ROUTES.dashboard.home })
       }
     } catch (error: any) {
       toast.error(error.message || (isRTL ? 'حدث خطأ' : 'An error occurred'))

@@ -116,7 +116,7 @@ export default function StatementsHistoryDashboard() {
                             </p>
                             <div className="flex gap-3">
                                 <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
-                                    <Link to="/dashboard/finance/statements/new">
+                                    <Link to={ROUTES.dashboard.finance.statements.new}>
                                         <Plus className="ms-2 h-5 w-5" aria-hidden="true" />
                                         إنشاء كشف جديد
                                     </Link>
@@ -219,7 +219,7 @@ export default function StatementsHistoryDashboard() {
                                         <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد كشوف حساب</h3>
                                         <p className="text-slate-500 mb-6">ابدأ بإنشاء كشف حساب جديد للعملاء</p>
                                         <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white px-8">
-                                            <Link to="/dashboard/finance/statements/new">
+                                            <Link to={ROUTES.dashboard.finance.statements.new}>
                                                 <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                                                 إنشاء كشف جديد
                                             </Link>
@@ -260,7 +260,7 @@ export default function StatementsHistoryDashboard() {
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
                                                         <DropdownMenuItem asChild>
-                                                            <Link to="/dashboard/finance/statements/$statementId" params={{ statementId: st._id }}>
+                                                            <Link to={ROUTES.dashboard.finance.statements.detail(st._id )}>
                                                                 عرض الكشف
                                                             </Link>
                                                         </DropdownMenuItem>

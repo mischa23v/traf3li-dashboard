@@ -201,7 +201,7 @@ function BlockItem({
             onKeyDown={handleKeyDown}
             onFocus={onFocus}
             onBlur={onBlur}
-            placeholder={isArabic ? 'عنوان رئيسي' : 'Heading 1'}
+            placeholder={t('caseNotion.placeholders.heading1')}
             className="text-3xl font-bold border-0 p-0 resize-none bg-transparent focus:ring-0 min-h-[48px]"
             disabled={readOnly}
           />
@@ -216,7 +216,7 @@ function BlockItem({
             onKeyDown={handleKeyDown}
             onFocus={onFocus}
             onBlur={onBlur}
-            placeholder={isArabic ? 'عنوان فرعي' : 'Heading 2'}
+            placeholder={t('caseNotion.placeholders.heading2')}
             className="text-2xl font-semibold border-0 p-0 resize-none bg-transparent focus:ring-0 min-h-[40px]"
             disabled={readOnly}
           />
@@ -231,7 +231,7 @@ function BlockItem({
             onKeyDown={handleKeyDown}
             onFocus={onFocus}
             onBlur={onBlur}
-            placeholder={isArabic ? 'عنوان ثالث' : 'Heading 3'}
+            placeholder={t('caseNotion.placeholders.heading3')}
             className="text-xl font-medium border-0 p-0 resize-none bg-transparent focus:ring-0 min-h-[36px]"
             disabled={readOnly}
           />
@@ -248,7 +248,7 @@ function BlockItem({
               onKeyDown={handleKeyDown}
               onFocus={onFocus}
               onBlur={onBlur}
-              placeholder={isArabic ? 'عنصر قائمة' : 'List item'}
+              placeholder={t('caseNotion.placeholders.listItem')}
               className="flex-1 border-0 p-0 resize-none bg-transparent focus:ring-0 min-h-[24px]"
               disabled={readOnly}
             />
@@ -266,7 +266,7 @@ function BlockItem({
               onKeyDown={handleKeyDown}
               onFocus={onFocus}
               onBlur={onBlur}
-              placeholder={isArabic ? 'عنصر قائمة' : 'List item'}
+              placeholder={t('caseNotion.placeholders.listItem')}
               className="flex-1 border-0 p-0 resize-none bg-transparent focus:ring-0 min-h-[24px]"
               disabled={readOnly}
             />
@@ -292,7 +292,7 @@ function BlockItem({
               onKeyDown={handleKeyDown}
               onFocus={onFocus}
               onBlur={onBlur}
-              placeholder={isArabic ? 'مهمة' : 'To-do'}
+              placeholder={t('caseNotion.placeholders.todo')}
               className={cn(
                 'flex-1 border-0 p-0 resize-none bg-transparent focus:ring-0 min-h-[24px]',
                 block.checked && 'line-through text-slate-400'
@@ -321,7 +321,7 @@ function BlockItem({
                 onKeyDown={handleKeyDown}
                 onFocus={onFocus}
                 onBlur={onBlur}
-                placeholder={isArabic ? 'عنوان قابل للطي' : 'Toggle heading'}
+                placeholder={t('caseNotion.placeholders.toggleHeading')}
                 className="flex-1 border-0 p-0 resize-none bg-transparent focus:ring-0 min-h-[24px] font-medium"
                 disabled={readOnly}
               />
@@ -344,7 +344,7 @@ function BlockItem({
               onKeyDown={handleKeyDown}
               onFocus={onFocus}
               onBlur={onBlur}
-              placeholder={isArabic ? 'اقتباس' : 'Quote'}
+              placeholder={t('caseNotion.placeholders.quote')}
               className="border-0 p-0 resize-none bg-transparent focus:ring-0 min-h-[24px] italic text-slate-600 dark:text-slate-400"
               disabled={readOnly}
             />
@@ -371,7 +371,7 @@ function BlockItem({
               onKeyDown={handleKeyDown}
               onFocus={onFocus}
               onBlur={onBlur}
-              placeholder={isArabic ? 'تنبيه' : 'Callout'}
+              placeholder={t('caseNotion.placeholders.callout')}
               className="flex-1 border-0 p-0 resize-none bg-transparent focus:ring-0 min-h-[24px]"
               disabled={readOnly}
             />
@@ -390,7 +390,7 @@ function BlockItem({
               onChange={(e) => handleTextChange(e.target.value)}
               onFocus={onFocus}
               onBlur={onBlur}
-              placeholder={isArabic ? 'كود' : 'Code'}
+              placeholder={t('caseNotion.placeholders.code')}
               className="w-full border-0 p-0 resize-none bg-transparent focus:ring-0 min-h-[60px] font-mono text-slate-100"
               disabled={readOnly}
             />
@@ -399,9 +399,7 @@ function BlockItem({
 
       case 'party_statement':
         const partyLabel = block.partyType
-          ? isArabic
-            ? partyTypeLabels[block.partyType].ar
-            : partyTypeLabels[block.partyType].en
+          ? t(`caseNotion.partyTypes.${block.partyType}`)
           : ''
         return (
           <div
@@ -434,7 +432,7 @@ function BlockItem({
               onKeyDown={handleKeyDown}
               onFocus={onFocus}
               onBlur={onBlur}
-              placeholder={isArabic ? 'أقوال الطرف...' : 'Party statement...'}
+              placeholder={t('caseNotion.placeholders.partyStatement')}
               className="border-0 p-0 resize-none bg-transparent focus:ring-0 min-h-[60px]"
               disabled={readOnly}
             />
@@ -443,9 +441,7 @@ function BlockItem({
 
       case 'evidence_item':
         const evidenceLabel = block.evidenceType
-          ? isArabic
-            ? evidenceTypeLabels[block.evidenceType].ar
-            : evidenceTypeLabels[block.evidenceType].en
+          ? t(`caseNotion.evidenceTypes.${block.evidenceType}`)
           : ''
         return (
           <div className="rounded-lg border border-emerald-200 bg-emerald-50/50 p-4">
@@ -465,7 +461,7 @@ function BlockItem({
               onKeyDown={handleKeyDown}
               onFocus={onFocus}
               onBlur={onBlur}
-              placeholder={isArabic ? 'وصف الدليل...' : 'Evidence description...'}
+              placeholder={t('caseNotion.placeholders.evidenceDescription')}
               className="border-0 p-0 resize-none bg-transparent focus:ring-0 min-h-[40px]"
               disabled={readOnly}
             />
@@ -478,10 +474,10 @@ function BlockItem({
             <div className="flex items-center gap-2 mb-2">
               <Scale size={14} className="text-blue-600" />
               <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs">
-                {block.citationType === 'law' && (isArabic ? 'قانون' : 'Law')}
-                {block.citationType === 'regulation' && (isArabic ? 'لائحة' : 'Regulation')}
-                {block.citationType === 'case_precedent' && (isArabic ? 'سابقة قضائية' : 'Case Precedent')}
-                {block.citationType === 'legal_principle' && (isArabic ? 'مبدأ قانوني' : 'Legal Principle')}
+                {block.citationType === 'law' && t('caseNotion.citationTypes.law')}
+                {block.citationType === 'regulation' && t('caseNotion.citationTypes.regulation')}
+                {block.citationType === 'case_precedent' && t('caseNotion.citationTypes.case_precedent')}
+                {block.citationType === 'legal_principle' && t('caseNotion.citationTypes.legal_principle')}
               </Badge>
               {block.citationReference && (
                 <span className="text-xs text-blue-600 font-mono">
@@ -496,7 +492,7 @@ function BlockItem({
               onKeyDown={handleKeyDown}
               onFocus={onFocus}
               onBlur={onBlur}
-              placeholder={isArabic ? 'نص الاستشهاد...' : 'Citation text...'}
+              placeholder={t('caseNotion.placeholders.citationText')}
               className="border-0 p-0 resize-none bg-transparent focus:ring-0 min-h-[40px]"
               disabled={readOnly}
             />
@@ -529,7 +525,7 @@ function BlockItem({
                 onKeyDown={handleKeyDown}
                 onFocus={onFocus}
                 onBlur={onBlur}
-                placeholder={isArabic ? 'وصف الحدث...' : 'Event description...'}
+                placeholder={t('caseNotion.placeholders.eventDescription')}
                 className="border-0 p-0 resize-none bg-transparent focus:ring-0 min-h-[24px]"
                 disabled={readOnly}
               />
@@ -546,7 +542,7 @@ function BlockItem({
             onKeyDown={handleKeyDown}
             onFocus={onFocus}
             onBlur={onBlur}
-            placeholder={isArabic ? 'اكتب هنا...' : 'Type here...'}
+            placeholder={t('caseNotion.placeholders.typeHere')}
             className="border-0 p-0 resize-none bg-transparent focus:ring-0 min-h-[24px]"
             disabled={readOnly}
           />
@@ -585,14 +581,11 @@ function BlockItem({
               <div className="grid gap-1">
                 {/* Basic blocks */}
                 <div className="px-2 py-1 text-xs font-semibold text-slate-500 uppercase">
-                  {isArabic ? 'أساسي' : 'Basic'}
+                  {t('caseNotion.sectionLabels.basic')}
                 </div>
                 {(['text', 'heading_1', 'heading_2', 'heading_3', 'bulleted_list', 'numbered_list', 'todo'] as BlockType[]).map(
                   (type) => {
                     const TypeIcon = blockTypeIcons[type]
-                    const label = isArabic
-                      ? blockTypeLabels[type].ar
-                      : blockTypeLabels[type].en
                     return (
                       <Button
                         key={type}
@@ -605,7 +598,7 @@ function BlockItem({
                         }}
                       >
                         <TypeIcon size={14} className="me-2 text-slate-500" />
-                        {label}
+                        {t(`caseNotion.blockTypes.${type}`)}
                       </Button>
                     )
                   }
@@ -613,14 +606,11 @@ function BlockItem({
 
                 {/* Legal blocks */}
                 <div className="px-2 py-1 mt-2 text-xs font-semibold text-slate-500 uppercase">
-                  {isArabic ? 'قانوني' : 'Legal'}
+                  {t('caseNotion.sectionLabels.legal')}
                 </div>
                 {(['party_statement', 'evidence_item', 'legal_citation', 'timeline_entry'] as BlockType[]).map(
                   (type) => {
                     const TypeIcon = blockTypeIcons[type]
-                    const label = isArabic
-                      ? blockTypeLabels[type].ar
-                      : blockTypeLabels[type].en
                     return (
                       <Button
                         key={type}
@@ -633,7 +623,7 @@ function BlockItem({
                         }}
                       >
                         <TypeIcon size={14} className="me-2 text-slate-500" />
-                        {label}
+                        {t(`caseNotion.blockTypes.${type}`)}
                       </Button>
                     )
                   }
@@ -641,14 +631,11 @@ function BlockItem({
 
                 {/* Advanced blocks */}
                 <div className="px-2 py-1 mt-2 text-xs font-semibold text-slate-500 uppercase">
-                  {isArabic ? 'متقدم' : 'Advanced'}
+                  {t('caseNotion.sectionLabels.advanced')}
                 </div>
                 {(['quote', 'callout', 'code', 'divider', 'toggle'] as BlockType[]).map(
                   (type) => {
                     const TypeIcon = blockTypeIcons[type]
-                    const label = isArabic
-                      ? blockTypeLabels[type].ar
-                      : blockTypeLabels[type].en
                     return (
                       <Button
                         key={type}
@@ -661,7 +648,7 @@ function BlockItem({
                         }}
                       >
                         <TypeIcon size={14} className="me-2 text-slate-500" />
-                        {label}
+                        {t(`caseNotion.blockTypes.${type}`)}
                       </Button>
                     )
                   }
@@ -698,38 +685,35 @@ function BlockItem({
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem onClick={onDelete}>
               <Trash2 size={14} className="me-2" />
-              {isArabic ? 'حذف' : 'Delete'}
+              {t('caseNotion.actionLabels.delete')}
             </DropdownMenuItem>
             <DropdownMenuItem>
               <Copy size={14} className="me-2" />
-              {isArabic ? 'نسخ' : 'Duplicate'}
+              {t('caseNotion.actionLabels.duplicate')}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onMoveUp} disabled={isFirst}>
               <ArrowUp size={14} className="me-2" />
-              {isArabic ? 'نقل للأعلى' : 'Move up'}
+              {t('caseNotion.actionLabels.moveUp')}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={onMoveDown} disabled={isLast}>
               <ArrowDown size={14} className="me-2" />
-              {isArabic ? 'نقل للأسفل' : 'Move down'}
+              {t('caseNotion.actionLabels.moveDown')}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>
                 <Type size={14} className="me-2" />
-                {isArabic ? 'تحويل إلى' : 'Turn into'}
+                {t('caseNotion.actionLabels.turnInto')}
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent className="w-48">
                 {(['text', 'heading_1', 'heading_2', 'bulleted_list', 'numbered_list', 'todo', 'quote'] as BlockType[]).map(
                   (type) => {
                     const TypeIcon = blockTypeIcons[type]
-                    const label = isArabic
-                      ? blockTypeLabels[type].ar
-                      : blockTypeLabels[type].en
                     return (
                       <DropdownMenuItem key={type}>
                         <TypeIcon size={14} className="me-2" />
-                        {label}
+                        {t(`caseNotion.blockTypes.${type}`)}
                       </DropdownMenuItem>
                     )
                   }
@@ -739,7 +723,7 @@ function BlockItem({
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <MessageCircle size={14} className="me-2" />
-              {isArabic ? 'إضافة تعليق' : 'Add comment'}
+              {t('caseNotion.actionLabels.addComment')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -907,7 +891,7 @@ export function BlockEditor({
       <div className="min-h-[200px] flex items-center justify-center">
         <div className="text-center">
           <p className="text-slate-500 mb-4">
-            {isArabic ? 'ابدأ الكتابة هنا...' : 'Start writing here...'}
+            {t('caseNotion.whiteboard.startWriting')}
           </p>
           {!readOnly && (
             <Button
@@ -920,7 +904,7 @@ export function BlockEditor({
               ) : (
                 <Plus size={14} className="me-2" />
               )}
-              {isArabic ? 'إضافة محتوى' : 'Add content'}
+              {t('caseNotion.whiteboard.addContent')}
             </Button>
           )}
         </div>

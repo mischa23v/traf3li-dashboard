@@ -88,17 +88,17 @@ export function SupplierDetailsView() {
 
   const topNav = [
     {
-      title: isArabic ? 'نظرة عامة' : 'Overview',
+      title: t('buying.common.overview'),
       href: '/dashboard/buying/overview',
       isActive: false
     },
     {
-      title: isArabic ? 'الموردين' : 'Suppliers',
+      title: t('buying.suppliers'),
       href: '/dashboard/buying/suppliers',
       isActive: true
     },
     {
-      title: isArabic ? 'أوامر الشراء' : 'Purchase Orders',
+      title: t('buying.purchaseOrder.purchaseOrders'),
       href: '/dashboard/buying/purchase-orders',
       isActive: false
     },
@@ -131,15 +131,15 @@ export function SupplierDetailsView() {
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       active: {
-        label: isArabic ? 'نشط' : 'Active',
+        label: t('buying.statusActive'),
         className: 'bg-emerald-100 text-emerald-700'
       },
       inactive: {
-        label: isArabic ? 'غير نشط' : 'Inactive',
+        label: t('buying.statusInactive'),
         className: 'bg-gray-100 text-gray-700'
       },
       blocked: {
-        label: isArabic ? 'محظور' : 'Blocked',
+        label: t('buying.statusBlocked'),
         className: 'bg-red-100 text-red-700'
       },
     }
@@ -149,21 +149,21 @@ export function SupplierDetailsView() {
 
   const getSupplierTypeLabel = (type: string) => {
     const types = {
-      company: isArabic ? 'شركة' : 'Company',
-      individual: isArabic ? 'فرد' : 'Individual',
+      company: t('buying.company'),
+      individual: t('buying.individual'),
     }
     return types[type as keyof typeof types] || type
   }
 
   const getPOStatusBadge = (status: string) => {
     const statusConfig = {
-      draft: { label: isArabic ? 'مسودة' : 'Draft', className: 'bg-gray-100 text-gray-700' },
-      submitted: { label: isArabic ? 'مقدم' : 'Submitted', className: 'bg-blue-100 text-blue-700' },
-      approved: { label: isArabic ? 'معتمد' : 'Approved', className: 'bg-purple-100 text-purple-700' },
-      received: { label: isArabic ? 'مستلم' : 'Received', className: 'bg-teal-100 text-teal-700' },
-      billed: { label: isArabic ? 'مفوتر' : 'Billed', className: 'bg-emerald-100 text-emerald-700' },
-      cancelled: { label: isArabic ? 'ملغى' : 'Cancelled', className: 'bg-red-100 text-red-700' },
-      closed: { label: isArabic ? 'مغلق' : 'Closed', className: 'bg-slate-100 text-slate-700' },
+      draft: { label: t('buying.poStatus.draft'), className: 'bg-gray-100 text-gray-700' },
+      submitted: { label: t('buying.poStatus.submitted'), className: 'bg-blue-100 text-blue-700' },
+      approved: { label: t('buying.poStatus.approved'), className: 'bg-purple-100 text-purple-700' },
+      received: { label: t('buying.poStatus.received'), className: 'bg-teal-100 text-teal-700' },
+      billed: { label: t('buying.poStatus.billed'), className: 'bg-emerald-100 text-emerald-700' },
+      cancelled: { label: t('buying.poStatus.cancelled'), className: 'bg-red-100 text-red-700' },
+      closed: { label: t('buying.poStatus.closed'), className: 'bg-slate-100 text-slate-700' },
     }
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.draft
     return <Badge className={config.className}>{config.label}</Badge>
@@ -214,16 +214,16 @@ export function SupplierDetailsView() {
             <Button asChild variant="ghost" className="mb-6">
               <Link to="/dashboard/buying/suppliers">
                 <ArrowLeft className="h-4 w-4 me-2" />
-                {isArabic ? 'العودة للموردين' : 'Back to Suppliers'}
+                {t('buying.navigation.backToSuppliers')}
               </Link>
             </Button>
             <Card className="border-0 shadow-sm rounded-3xl p-12 text-center">
               <AlertCircle className="h-16 w-16 text-rose-400 mx-auto mb-4" aria-hidden="true" />
               <h3 className="text-xl font-bold text-navy mb-2">
-                {isArabic ? 'فشل تحميل المورد' : 'Failed to Load Supplier'}
+                {t('buying.supplier.failedToLoad')}
               </h3>
               <p className="text-slate-500">
-                {error?.message || (isArabic ? 'المورد غير موجود' : 'Supplier not found')}
+                {error?.message || t('buying.supplier.notFound')}
               </p>
             </Card>
           </div>
@@ -256,14 +256,14 @@ export function SupplierDetailsView() {
             <Button asChild variant="ghost" className="text-slate-600 hover:text-navy">
               <Link to="/dashboard/buying/suppliers">
                 <ArrowLeft className="h-4 w-4 me-2" />
-                {isArabic ? 'العودة للموردين' : 'Back to Suppliers'}
+                {t('buying.navigation.backToSuppliers')}
               </Link>
             </Button>
             <div className="flex gap-2">
               <Button asChild variant="outline">
                 <Link to={`/dashboard/buying/suppliers/${supplierId}/edit`}>
                   <Edit className="h-4 w-4 me-2" aria-hidden="true" />
-                  {isArabic ? 'تعديل' : 'Edit'}
+                  {t('buying.common.edit')}
                 </Link>
               </Button>
               <Button
@@ -272,14 +272,14 @@ export function SupplierDetailsView() {
                 onClick={() => setShowDeleteDialog(true)}
               >
                 <Trash2 className="h-4 w-4 me-2" aria-hidden="true" />
-                {isArabic ? 'حذف' : 'Delete'}
+                {t('buying.common.delete')}
               </Button>
             </div>
           </div>
 
           {/* Supplier Header */}
           <ProductivityHero
-            badge={isArabic ? 'المورد' : 'Supplier'}
+            badge={t('buying.supplier.supplier')}
             title={isArabic && supplier.nameAr ? supplier.nameAr : supplier.name}
             type="buying"
             listMode={true}
@@ -304,12 +304,12 @@ export function SupplierDetailsView() {
                           "
                         >
                           {tab === 'overview'
-                            ? isArabic ? 'نظرة عامة' : 'Overview'
+                            ? t('buying.common.overview')
                             : tab === 'purchase-orders'
-                              ? isArabic ? 'أوامر الشراء' : 'Purchase Orders'
+                              ? t('buying.purchaseOrder.purchaseOrders')
                               : tab === 'payments'
-                                ? isArabic ? 'المدفوعات' : 'Payments'
-                                : isArabic ? 'المستندات' : 'Documents'}
+                                ? t('buying.common.payments')
+                                : t('buying.common.documents')}
                         </TabsTrigger>
                       ))}
                     </TabsList>
@@ -323,28 +323,28 @@ export function SupplierDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <Building2 className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'معلومات المورد' : 'Supplier Information'}
+                            {t('buying.supplier.supplierInformation')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'الاسم' : 'Name'}
+                                {t('buying.supplier.name')}
                               </p>
                               <p className="font-medium text-navy">{supplier.name}</p>
                             </div>
                             {supplier.nameAr && (
                               <div>
                                 <p className="text-sm text-slate-500 mb-1">
-                                  {isArabic ? 'الاسم بالعربية' : 'Arabic Name'}
+                                  {t('buying.supplier.arabicName')}
                                 </p>
                                 <p className="font-medium text-navy">{supplier.nameAr}</p>
                               </div>
                             )}
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'النوع' : 'Type'}
+                                {t('buying.supplier.type')}
                               </p>
                               <Badge variant="outline">
                                 {getSupplierTypeLabel(supplier.supplierType)}
@@ -352,21 +352,21 @@ export function SupplierDetailsView() {
                             </div>
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'الحالة' : 'Status'}
+                                {t('buying.common.status')}
                               </p>
                               {getStatusBadge(supplier.status)}
                             </div>
                             {supplier.supplierGroup && (
                               <div>
                                 <p className="text-sm text-slate-500 mb-1">
-                                  {isArabic ? 'المجموعة' : 'Group'}
+                                  {t('buying.supplier.group')}
                                 </p>
                                 <p className="font-medium text-navy">{supplier.supplierGroup}</p>
                               </div>
                             )}
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'العملة' : 'Currency'}
+                                {t('buying.currency')}
                               </p>
                               <p className="font-medium text-navy">{supplier.currency}</p>
                             </div>
@@ -379,7 +379,7 @@ export function SupplierDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <Phone className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'معلومات الاتصال' : 'Contact Information'}
+                            {t('buying.contactInfo')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
@@ -388,7 +388,7 @@ export function SupplierDetailsView() {
                               <div>
                                 <p className="text-sm text-slate-500 mb-1 flex items-center gap-1">
                                   <Mail className="h-4 w-4" aria-hidden="true" />
-                                  {isArabic ? 'البريد الإلكتروني' : 'Email'}
+                                  {t('buying.email')}
                                   <Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
                                 </p>
                                 <p className="font-medium text-navy">{supplier.email}</p>
@@ -398,7 +398,7 @@ export function SupplierDetailsView() {
                               <div>
                                 <p className="text-sm text-slate-500 mb-1 flex items-center gap-1">
                                   <Phone className="h-4 w-4" aria-hidden="true" />
-                                  {isArabic ? 'الهاتف' : 'Phone'}
+                                  {t('buying.phone')}
                                   <Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
                                 </p>
                                 <p className="font-medium text-navy" dir="ltr">
@@ -409,7 +409,7 @@ export function SupplierDetailsView() {
                             {supplier.mobile && (
                               <div>
                                 <p className="text-sm text-slate-500 mb-1">
-                                  {isArabic ? 'الجوال' : 'Mobile'}
+                                  {t('buying.mobile')}
                                 </p>
                                 <p className="font-medium text-navy" dir="ltr">
                                   {supplier.mobile}
@@ -419,7 +419,7 @@ export function SupplierDetailsView() {
                             {supplier.fax && (
                               <div>
                                 <p className="text-sm text-slate-500 mb-1">
-                                  {isArabic ? 'الفاكس' : 'Fax'}
+                                  {t('buying.supplier.fax')}
                                 </p>
                                 <p className="font-medium text-navy">{supplier.fax}</p>
                               </div>
@@ -428,7 +428,7 @@ export function SupplierDetailsView() {
                               <div className="col-span-2">
                                 <p className="text-sm text-slate-500 mb-1 flex items-center gap-1">
                                   <Globe className="h-4 w-4" aria-hidden="true" />
-                                  {isArabic ? 'الموقع الإلكتروني' : 'Website'}
+                                  {t('buying.website')}
                                 </p>
                                 <a
                                   href={supplier.website}
@@ -450,7 +450,7 @@ export function SupplierDetailsView() {
                           <CardHeader className="border-b border-slate-100">
                             <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                               <MapPin className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                              {isArabic ? 'معلومات العنوان' : 'Address Information'}
+                              {t('buying.addressInfo')}
                             </CardTitle>
                           </CardHeader>
                           <CardContent className="p-6">
@@ -458,7 +458,7 @@ export function SupplierDetailsView() {
                               {supplier.address && (
                                 <div className="col-span-2">
                                   <p className="text-sm text-slate-500 mb-1">
-                                    {isArabic ? 'العنوان' : 'Address'}
+                                    {t('buying.address')}
                                   </p>
                                   <p className="font-medium text-navy">{supplier.address}</p>
                                 </div>
@@ -466,7 +466,7 @@ export function SupplierDetailsView() {
                               {supplier.city && (
                                 <div>
                                   <p className="text-sm text-slate-500 mb-1">
-                                    {isArabic ? 'المدينة' : 'City'}
+                                    {t('buying.city')}
                                   </p>
                                   <p className="font-medium text-navy">{supplier.city}</p>
                                 </div>
@@ -474,7 +474,7 @@ export function SupplierDetailsView() {
                               {supplier.region && (
                                 <div>
                                   <p className="text-sm text-slate-500 mb-1">
-                                    {isArabic ? 'المنطقة' : 'Region'}
+                                    {t('buying.region')}
                                   </p>
                                   <p className="font-medium text-navy">{supplier.region}</p>
                                 </div>
@@ -482,7 +482,7 @@ export function SupplierDetailsView() {
                               {supplier.country && (
                                 <div>
                                   <p className="text-sm text-slate-500 mb-1">
-                                    {isArabic ? 'الدولة' : 'Country'}
+                                    {t('buying.country')}
                                   </p>
                                   <p className="font-medium text-navy">{supplier.country}</p>
                                 </div>
@@ -490,7 +490,7 @@ export function SupplierDetailsView() {
                               {supplier.postalCode && (
                                 <div>
                                   <p className="text-sm text-slate-500 mb-1">
-                                    {isArabic ? 'الرمز البريدي' : 'Postal Code'}
+                                    {t('buying.postalCode')}
                                   </p>
                                   <p className="font-medium text-navy">{supplier.postalCode}</p>
                                 </div>
@@ -506,7 +506,7 @@ export function SupplierDetailsView() {
                           <CardHeader className="border-b border-slate-100">
                             <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                               <Hash className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                              {isArabic ? 'الضرائب والتسجيل' : 'Tax & Registration'}
+                              {t('buying.supplier.taxAndRegistration')}
                             </CardTitle>
                           </CardHeader>
                           <CardContent className="p-6">
@@ -514,7 +514,7 @@ export function SupplierDetailsView() {
                               {supplier.taxId && (
                                 <div>
                                   <p className="text-sm text-slate-500 mb-1">
-                                    {isArabic ? 'الرقم الضريبي' : 'Tax ID'}
+                                    {t('buying.taxId')}
                                   </p>
                                   <p className="font-medium text-navy font-mono">
                                     {supplier.taxId}
@@ -524,7 +524,7 @@ export function SupplierDetailsView() {
                               {supplier.crNumber && (
                                 <div>
                                   <p className="text-sm text-slate-500 mb-1">
-                                    {isArabic ? 'السجل التجاري' : 'CR Number'}
+                                    {t('buying.supplier.crNumber')}
                                   </p>
                                   <p className="font-medium text-navy font-mono">
                                     {supplier.crNumber}
@@ -534,7 +534,7 @@ export function SupplierDetailsView() {
                               {supplier.vatNumber && (
                                 <div className="col-span-2">
                                   <p className="text-sm text-slate-500 mb-1">
-                                    {isArabic ? 'الرقم الضريبي (VAT)' : 'VAT Number'}
+                                    {t('buying.supplier.vatNumber')}
                                   </p>
                                   <p className="font-medium text-navy font-mono">
                                     {supplier.vatNumber}
@@ -552,7 +552,7 @@ export function SupplierDetailsView() {
                           <CardHeader className="border-b border-slate-100">
                             <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                               <CreditCard className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                              {isArabic ? 'المعلومات البنكية' : 'Banking Details'}
+                              {t('buying.supplier.bankingDetails')}
                             </CardTitle>
                           </CardHeader>
                           <CardContent className="p-6">
@@ -560,7 +560,7 @@ export function SupplierDetailsView() {
                               {supplier.bankName && (
                                 <div>
                                   <p className="text-sm text-slate-500 mb-1">
-                                    {isArabic ? 'اسم البنك' : 'Bank Name'}
+                                    {t('buying.bankName')}
                                   </p>
                                   <p className="font-medium text-navy">{supplier.bankName}</p>
                                 </div>
@@ -568,7 +568,7 @@ export function SupplierDetailsView() {
                               {supplier.bankAccountNo && (
                                 <div>
                                   <p className="text-sm text-slate-500 mb-1">
-                                    {isArabic ? 'رقم الحساب' : 'Account Number'}
+                                    {t('buying.supplier.accountNumber')}
                                     <Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
                                   </p>
                                   <p className="font-medium text-navy font-mono">
@@ -579,7 +579,7 @@ export function SupplierDetailsView() {
                               {supplier.iban && (
                                 <div className="col-span-2">
                                   <p className="text-sm text-slate-500 mb-1">
-                                    {isArabic ? 'رقم الآيبان (IBAN)' : 'IBAN'}
+                                    {t('buying.iban')}
                                     <Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
                                   </p>
                                   <p className="font-medium text-navy font-mono">
@@ -598,7 +598,7 @@ export function SupplierDetailsView() {
                           <CardHeader className="border-b border-slate-100">
                             <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                               <DollarSign className="h-5 w-5 text-brand-blue" />
-                              {isArabic ? 'شروط الدفع' : 'Payment Terms'}
+                              {t('buying.paymentTerms')}
                             </CardTitle>
                           </CardHeader>
                           <CardContent className="p-6">
@@ -612,7 +612,7 @@ export function SupplierDetailsView() {
                         <Card className="border-none shadow-sm bg-white rounded-2xl">
                           <CardHeader className="border-b border-slate-100">
                             <CardTitle className="text-lg font-bold text-navy">
-                              {isArabic ? 'ملاحظات' : 'Notes'}
+                              {t('buying.notes')}
                             </CardTitle>
                           </CardHeader>
                           <CardContent className="p-6">
@@ -630,7 +630,7 @@ export function SupplierDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <Package className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'أوامر الشراء' : 'Purchase Orders'}
+                            {t('buying.purchaseOrder.purchaseOrders')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
@@ -649,16 +649,16 @@ export function SupplierDetailsView() {
                                 <TableHeader>
                                   <TableRow>
                                     <TableHead>
-                                      {isArabic ? 'رقم الطلب' : 'PO Number'}
+                                      {t('buying.purchaseOrder.poNumber')}
                                     </TableHead>
                                     <TableHead>
-                                      {isArabic ? 'التاريخ' : 'Date'}
+                                      {t('buying.common.date')}
                                     </TableHead>
                                     <TableHead>
-                                      {isArabic ? 'الإجمالي' : 'Total'}
+                                      {t('buying.common.total')}
                                     </TableHead>
                                     <TableHead>
-                                      {isArabic ? 'الحالة' : 'Status'}
+                                      {t('buying.common.status')}
                                     </TableHead>
                                   </TableRow>
                                 </TableHeader>
@@ -692,16 +692,14 @@ export function SupplierDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <Receipt className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'المدفوعات' : 'Payments'}
+                            {t('buying.common.payments')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
                           <div className="text-center py-12 text-slate-500">
                             <Receipt className="h-12 w-12 mx-auto mb-4 opacity-20" aria-hidden="true" />
                             <p>
-                              {isArabic
-                                ? 'لا توجد مدفوعات مسجلة'
-                                : 'No payments recorded'}
+                              {t('buying.common.noPayments')}
                             </p>
                           </div>
                         </CardContent>
@@ -714,16 +712,14 @@ export function SupplierDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <FileText className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'المستندات' : 'Documents'}
+                            {t('buying.common.documents')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
                           <div className="text-center py-12 text-slate-500">
                             <FileText className="h-12 w-12 mx-auto mb-4 opacity-20" aria-hidden="true" />
                             <p>
-                              {isArabic
-                                ? 'لا توجد مستندات مرفقة'
-                                : 'No documents attached'}
+                              {t('buying.common.noDocuments')}
                             </p>
                           </div>
                         </CardContent>
@@ -745,7 +741,7 @@ export function SupplierDetailsView() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {isArabic ? 'تأكيد الحذف' : 'Confirm Deletion'}
+              {t('buying.dialogs.confirmDeletion')}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {isArabic
@@ -755,7 +751,7 @@ export function SupplierDetailsView() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>
-              {isArabic ? 'إلغاء' : 'Cancel'}
+              {t('buying.common.cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
@@ -765,10 +761,10 @@ export function SupplierDetailsView() {
               {deleteSupplierMutation.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 me-2 animate-spin" aria-hidden="true" />
-                  {isArabic ? 'جاري الحذف...' : 'Deleting...'}
+                  {t('buying.common.deleting')}
                 </>
               ) : (
-                isArabic ? 'حذف' : 'Delete'
+                t('buying.common.delete')
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

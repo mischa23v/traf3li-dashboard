@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from '@tanstack/react-router'
 import {
+import { useTranslation } from 'react-i18next'
   FileBarChart,
   ArrowRight,
   Save,
@@ -36,6 +37,7 @@ import {
   categoriesBySection,
   dataModulesBySection,
 } from '@/services/reportsService'
+import { ROUTES } from '@/constants/routes'
 
 const salesCategories = categoriesBySection[ReportSection.SALES]
 const salesDataModules = dataModulesBySection[ReportSection.SALES]
@@ -53,21 +55,23 @@ const categoryIcons: Partial<Record<ReportCategory, React.ElementType>> = {
   [ReportCategory.SALES_TARGETS]: TrendingUp,
 }
 
-const dateRangeOptions = [
-  { value: 'today', label: 'اليوم' },
-  { value: 'yesterday', label: 'أمس' },
-  { value: 'last7days', label: 'آخر 7 أيام' },
-  { value: 'last30days', label: 'آخر 30 يوم' },
-  { value: 'thisMonth', label: 'هذا الشهر' },
-  { value: 'lastMonth', label: 'الشهر الماضي' },
-  { value: 'thisQuarter', label: 'هذا الربع' },
-  { value: 'lastQuarter', label: 'الربع الماضي' },
-  { value: 'thisYear', label: 'هذا العام' },
-  { value: 'lastYear', label: 'العام الماضي' },
-  { value: 'custom', label: 'نطاق مخصص' },
+const getDateRangeOptions = (t: any) => [
+  { value: 'today', label: t('sales.reports.dateRanges.today') },
+  { value: 'yesterday', label: t('sales.reports.dateRanges.yesterday') },
+  { value: 'last7days', label: t('sales.reports.dateRanges.last7days') },
+  { value: 'last30days', label: t('sales.reports.dateRanges.last30days') },
+  { value: 'thisMonth', label: t('sales.reports.dateRanges.thisMonth') },
+  { value: 'lastMonth', label: t('sales.reports.dateRanges.lastMonth') },
+  { value: 'thisQuarter', label: t('sales.reports.dateRanges.thisQuarter') },
+  { value: 'lastQuarter', label: t('sales.reports.dateRanges.lastQuarter') },
+  { value: 'thisYear', label: t('sales.reports.dateRanges.thisYear') },
+  { value: 'lastYear', label: t('sales.reports.dateRanges.lastYear') },
+  { value: 'custom', label: t('sales.reports.dateRanges.custom') },
 ]
 
 export function SalesReportsCreateView() {
+  const { t } = useTranslation()
+
   const navigate = useNavigate()
   const createReport = useCreateReport()
 
@@ -91,7 +95,7 @@ export function SalesReportsCreateView() {
     e.preventDefault()
 
     if (!formData.name || !formData.category) {
-      toast.error('يرجى ملء جميع الحقول المطلوبة')
+      toast.error(t('sales.reports.reportNameRequired'))
       return
     }
 
@@ -118,7 +122,7 @@ export function SalesReportsCreateView() {
         } : undefined,
       })
       toast.success('تم إنشاء التقرير بنجاح')
-      navigate({ to: '/dashboard/sales/reports' })
+      navigate({ to: ROUTES.dashboard.sales.reports.list })
     } catch {
       toast.error('فشل في إنشاء التقرير')
     }
@@ -138,7 +142,7 @@ export function SalesReportsCreateView() {
       {/* Header */}
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" asChild className="rounded-xl">
-          <Link to="/dashboard/sales/reports">
+          <Link to={ROUTES.dashboard.sales.reports.list}>
             <ArrowRight className="h-5 w-5" />
           </Link>
         </Button>
@@ -161,7 +165,7 @@ export function SalesReportsCreateView() {
                   id="name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="مثال: تقرير المبيعات الشهري"
+                  placeholder=t('sales.reports.reportNamePlaceholder')
                   className="rounded-xl"
                   required
                 />
@@ -172,7 +176,7 @@ export function SalesReportsCreateView() {
                   id="description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="وصف مختصر للتقرير..."
+                  placeholder=t('sales.reports.descriptionPlaceholder')
                   className="rounded-xl min-h-[100px]"
                 />
               </div>
@@ -183,7 +187,7 @@ export function SalesReportsCreateView() {
                   onValueChange={(value) => setFormData({ ...formData, category: value as ReportCategory })}
                 >
                   <SelectTrigger className="rounded-xl">
-                    <SelectValue placeholder="اختر فئة التقرير" />
+                    <SelectValue placeholder=t('sales.reports.selectCategory') />
                   </SelectTrigger>
                   <SelectContent>
                     {salesCategories.map((cat) => {
@@ -218,7 +222,7 @@ export function SalesReportsCreateView() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {dateRangeOptions.map((option) => (
+                  {getDateRangeOptions(t).map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>
@@ -378,13 +382,13 @@ export function SalesReportsCreateView() {
               disabled={createReport.isPending}
             >
               <Save className="h-4 w-4 ms-2" aria-hidden="true" />
-              {createReport.isPending ? 'جارٍ الإنشاء...' : 'إنشاء التقرير'}
+              {createReport.isPending ? t('sales.reports.creating') : t('sales.reports.createReport')}
             </Button>
             <Button
               type="button"
               variant="outline"
               className="w-full rounded-xl h-12"
-              onClick={() => navigate({ to: '/dashboard/sales/reports' })}
+              onClick={() => navigate({ to: ROUTES.dashboard.sales.reports.list })}
             >
               إلغاء
             </Button>

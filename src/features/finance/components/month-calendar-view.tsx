@@ -152,19 +152,19 @@ export function MonthCalendarView() {
           <span className="text-foreground">التقويم الشهري</span>
         </div>
         <div className="flex gap-2">
-          <Link to="/dashboard/finance/time-tracking">
+          <Link to={ROUTES.dashboard.finance.timeTracking.list}>
             <Button variant="outline" size="sm">
               <List className="h-4 w-4 ms-2" />
               القائمة
             </Button>
           </Link>
-          <Link to="/dashboard/finance/time-tracking/weekly">
+          <Link to={ROUTES.dashboard.finance.timeTracking.weekly}>
             <Button variant="outline" size="sm">
               <Calendar className="h-4 w-4 ms-2" aria-hidden="true" />
               أسبوعي
             </Button>
           </Link>
-          <Link to="/dashboard/finance/time-tracking/new">
+          <Link to={ROUTES.dashboard.finance.timeTracking.new}>
             <Button size="sm">
               <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
               إضافة إدخال

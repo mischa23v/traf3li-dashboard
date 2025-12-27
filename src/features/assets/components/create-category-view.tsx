@@ -43,12 +43,13 @@ import { Separator } from '@/components/ui/separator'
 import { useCreateAssetCategory, useAssetCategories } from '@/hooks/use-assets'
 import type { DepreciationMethod } from '@/types/assets'
 import { AssetsSidebar } from './assets-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'assets.assets', href: '/dashboard/assets' },
-  { title: 'assets.categories', href: '/dashboard/assets/categories' },
-  { title: 'assets.createCategory', href: '/dashboard/assets/categories/create' },
+  { title: 'assets.assets', href: ROUTES.dashboard.assets.list },
+  { title: 'assets.categories', href: ROUTES.dashboard.assets.categories.list },
+  { title: 'assets.createCategory', href: ROUTES.dashboard.assets.categories.create },
 ]
 
 const DEPRECIATION_METHODS: { value: DepreciationMethod; label: string; labelEn: string }[] = [
@@ -155,7 +156,7 @@ export function CreateCategoryView() {
       }
 
       await createCategoryMutation.mutateAsync(categoryData as any)
-      navigate({ to: '/dashboard/assets/categories' })
+      navigate({ to: ROUTES.dashboard.assets.categories.list })
     } catch (error) {
       // Error handled by mutation
     }
@@ -529,7 +530,7 @@ export function CreateCategoryView() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate({ to: '/dashboard/assets/categories' })}
+                  onClick={() => navigate({ to: ROUTES.dashboard.assets.categories.list })}
                   className="rounded-xl order-2 sm:order-1"
                 >
                   <X className="w-4 h-4 ml-2" />

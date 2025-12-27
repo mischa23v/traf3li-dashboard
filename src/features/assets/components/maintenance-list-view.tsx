@@ -68,11 +68,12 @@ import {
 } from '@/hooks/use-assets'
 import type { MaintenanceSchedule, MaintenanceStatus } from '@/types/assets'
 import { AssetsSidebar } from './assets-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.assets', href: '/dashboard/assets' },
-  { title: 'assets.maintenance', href: '/dashboard/assets/maintenance' },
+  { title: 'sidebar.nav.assets', href: ROUTES.dashboard.assets.list },
+  { title: 'assets.maintenance', href: ROUTES.dashboard.assets.maintenance.list },
 ]
 
 // Extended interface for maintenance with asset details
@@ -203,7 +204,7 @@ export function MaintenanceListView() {
   const handleStartMaintenance = (schedule: MaintenanceScheduleExtended) => {
     // Navigate to maintenance start/edit page
     if (schedule._id) {
-      navigate({ to: `/dashboard/assets/maintenance/${schedule._id}/start` })
+      navigate({ to: ROUTES.dashboard.assets.maintenance.start(schedule._id) })
     }
   }
 
@@ -385,7 +386,7 @@ export function MaintenanceListView() {
                       />
                     </div>
                     <Button asChild className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
-                      <Link to="/dashboard/assets/maintenance/create">
+                      <Link to={ROUTES.dashboard.assets.maintenance.create}>
                         <Plus className="w-4 h-4 ml-2" />
                         {t('assets.maintenance.scheduleMaintenance', 'جدولة صيانة')}
                       </Link>
@@ -459,7 +460,7 @@ export function MaintenanceListView() {
                       {t('assets.maintenance.noSchedulesDesc', 'ابدأ بجدولة صيانة جديدة')}
                     </p>
                     <Button asChild className="rounded-xl">
-                      <Link to="/dashboard/assets/maintenance/create">
+                      <Link to={ROUTES.dashboard.assets.maintenance.create}>
                         <Plus className="w-4 h-4 ml-2" />
                         {t('assets.maintenance.scheduleMaintenance', 'جدولة صيانة')}
                       </Link>
@@ -498,7 +499,7 @@ export function MaintenanceListView() {
                             className="cursor-pointer hover:bg-muted/50"
                             onClick={() => {
                               if (schedule._id) {
-                                navigate({ to: `/dashboard/assets/maintenance/${schedule._id}` })
+                                navigate({ to: ROUTES.dashboard.assets.maintenance.detail(schedule._id) })
                               }
                             }}
                           >
@@ -543,7 +544,7 @@ export function MaintenanceListView() {
                                     onClick={(e) => {
                                       e.stopPropagation()
                                       if (schedule._id) {
-                                        navigate({ to: `/dashboard/assets/maintenance/${schedule._id}` })
+                                        navigate({ to: ROUTES.dashboard.assets.maintenance.detail(schedule._id) })
                                       }
                                     }}
                                   >
@@ -566,7 +567,7 @@ export function MaintenanceListView() {
                                           e.stopPropagation()
                                           if (schedule._id) {
                                             navigate({
-                                              to: `/dashboard/assets/maintenance/${schedule._id}/edit`,
+                                              to: ROUTES.dashboard.assets.maintenance.edit(schedule._id),
                                             })
                                           }
                                         }}

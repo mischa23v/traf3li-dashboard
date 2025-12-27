@@ -245,7 +245,7 @@ export function WeeklyTimeEntriesView() {
                                     تصدير
                                 </Button>
                                 <Button asChild className="bg-white text-purple-700 hover:bg-purple-50 rounded-xl shadow-lg">
-                                    <Link to="/dashboard/finance/time-tracking/new">
+                                    <Link to={ROUTES.dashboard.finance.timeTracking.new}>
                                         <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                         إضافة سجل
                                     </Link>
@@ -271,7 +271,7 @@ export function WeeklyTimeEntriesView() {
                             {formatDate(weekDates[0], 'full')} - {formatDate(weekDates[6], 'full')}
                         </div>
                         <div className="flex items-center gap-2">
-                            <Link to="/dashboard/finance/time-tracking">
+                            <Link to={ROUTES.dashboard.finance.timeTracking.list}>
                                 <Button variant="outline" className="rounded-xl">
                                     العرض العادي
                                 </Button>
@@ -311,7 +311,7 @@ export function WeeklyTimeEntriesView() {
                                     <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد سجلات لهذا الأسبوع</h3>
                                     <p className="text-slate-500 mb-4">ابدأ بتسجيل وقتك</p>
                                     <Button asChild className="bg-purple-600 hover:bg-purple-700">
-                                        <Link to="/dashboard/finance/time-tracking/new">
+                                        <Link to={ROUTES.dashboard.finance.timeTracking.new}>
                                             <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                             إضافة سجل جديد
                                         </Link>

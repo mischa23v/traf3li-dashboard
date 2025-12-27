@@ -313,28 +313,28 @@ export function BlockDetailPanel({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="text">
-                    {isArabic ? blockTypeLabels.text.ar : blockTypeLabels.text.en}
+                    {t('caseNotion.blockTypes.text')}
                   </SelectItem>
                   <SelectItem value="heading_1">
-                    {isArabic ? blockTypeLabels.heading_1.ar : blockTypeLabels.heading_1.en}
+                    {t('caseNotion.blockTypes.heading_1')}
                   </SelectItem>
                   <SelectItem value="heading_2">
-                    {isArabic ? blockTypeLabels.heading_2.ar : blockTypeLabels.heading_2.en}
+                    {t('caseNotion.blockTypes.heading_2')}
                   </SelectItem>
                   <SelectItem value="todo">
-                    {isArabic ? blockTypeLabels.todo.ar : blockTypeLabels.todo.en}
+                    {t('caseNotion.blockTypes.todo')}
                   </SelectItem>
                   <SelectItem value="party_statement">
-                    {isArabic ? blockTypeLabels.party_statement.ar : blockTypeLabels.party_statement.en}
+                    {t('caseNotion.blockTypes.party_statement')}
                   </SelectItem>
                   <SelectItem value="evidence_item">
-                    {isArabic ? blockTypeLabels.evidence_item.ar : blockTypeLabels.evidence_item.en}
+                    {t('caseNotion.blockTypes.evidence_item')}
                   </SelectItem>
                   <SelectItem value="legal_citation">
-                    {isArabic ? blockTypeLabels.legal_citation.ar : blockTypeLabels.legal_citation.en}
+                    {t('caseNotion.blockTypes.legal_citation')}
                   </SelectItem>
                   <SelectItem value="timeline_entry">
-                    {isArabic ? blockTypeLabels.timeline_entry.ar : blockTypeLabels.timeline_entry.en}
+                    {t('caseNotion.blockTypes.timeline_entry')}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -356,9 +356,9 @@ export function BlockDetailPanel({
                     <SelectValue placeholder={t('common.select', 'Select...')} />
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.entries(partyTypeLabels).map(([key, labels]) => (
+                    {Object.keys(partyTypeLabels).map((key) => (
                       <SelectItem key={key} value={key}>
-                        {isArabic ? labels.ar : labels.en}
+                        {t(`caseNotion.partyTypes.${key}`)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -381,9 +381,9 @@ export function BlockDetailPanel({
                     <SelectValue placeholder={t('common.select', 'Select...')} />
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.entries(evidenceTypeLabels).map(([key, labels]) => (
+                    {Object.keys(evidenceTypeLabels).map((key) => (
                       <SelectItem key={key} value={key}>
-                        {isArabic ? labels.ar : labels.en}
+                        {t(`caseNotion.evidenceTypes.${key}`)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -430,7 +430,7 @@ export function BlockDetailPanel({
                       blockColor === key && 'ring-2 ring-emerald-500 ring-offset-2',
                       readOnly && 'opacity-50 cursor-not-allowed'
                     )}
-                    title={isArabic ? config.ar : config.en}
+                    title={t(`caseNotion.blockColors.${key}`)}
                   />
                 ))}
               </div>
@@ -459,7 +459,7 @@ export function BlockDetailPanel({
                     <SelectItem key={key} value={key}>
                       <div className="flex items-center gap-2">
                         <div className={cn('w-2 h-2 rounded-full', config.bg)} />
-                        {isArabic ? config.ar : config.en}
+                        {t(`caseNotion.blockPriorities.${key}`)}
                       </div>
                     </SelectItem>
                   ))}

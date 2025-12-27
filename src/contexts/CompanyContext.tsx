@@ -71,7 +71,7 @@ export function CompanyProvider({ children }: CompanyProviderProps) {
     isLoading: isLoadingActive,
     refetch: refetchActive,
   } = useQuery({
-    queryKey: ['company', 'active'],
+    queryKey: ['firm', 'active'],
     queryFn: () => companyService.getActiveCompany(),
     retry: 1,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -83,7 +83,7 @@ export function CompanyProvider({ children }: CompanyProviderProps) {
     isLoading: isLoadingAccessible,
     refetch: refetchAccessible,
   } = useQuery({
-    queryKey: ['companies', 'accessible'],
+    queryKey: ['firms', 'accessible'],
     queryFn: () => companyService.getUserAccessibleCompanies(),
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
@@ -91,12 +91,19 @@ export function CompanyProvider({ children }: CompanyProviderProps) {
   // Switch company mutation
   const switchMutation = useMutation({
     mutationFn: (firmId: string) => companyService.switchCompany(firmId),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       // Invalidate active company query
-      queryClient.invalidateQueries({ queryKey: ['company', 'active'] })
+      queryClient.invalidateQueries({ queryKey: ['firm', 'active'] })
 
-      // Invalidate all data queries since company context changed
-      queryClient.invalidateQueries()
+      // Invalidate company-specific data queries, but preserve static/config data
+      await queryClient.invalidateQueries({
+        predicate: (query) => {
+          const key = query.queryKey[0]
+          // Don't invalidate static/config data that doesn't change with company context
+          const excludeKeys = ['settings', 'plans', 'permissions', 'user']
+          return !excludeKeys.includes(key as string)
+        },
+      })
 
       // Update local storage
       localStorage.setItem('activeFirmId', data.firmId)

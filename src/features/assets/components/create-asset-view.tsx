@@ -44,11 +44,12 @@ import { useStaff } from '@/hooks/useStaff'
 import { useItems } from '@/hooks/use-inventory'
 import type { CreateAssetData, DepreciationMethod } from '@/types/assets'
 import { AssetsSidebar } from './assets-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'assets.assets', href: '/dashboard/assets' },
-  { title: 'assets.createAsset', href: '/dashboard/assets/create' },
+  { title: 'assets.assets', href: ROUTES.dashboard.assets.list },
+  { title: 'assets.createAsset', href: ROUTES.dashboard.assets.create },
 ]
 
 const DEPRECIATION_METHODS: { value: DepreciationMethod; label: string; labelEn: string }[] = [
@@ -121,7 +122,7 @@ export function CreateAssetView() {
 
     try {
       await createAssetMutation.mutateAsync(formData)
-      navigate({ to: '/dashboard/assets' })
+      navigate({ to: ROUTES.dashboard.assets.list })
     } catch (error) {
       // Error handled by mutation
     }
@@ -610,7 +611,7 @@ export function CreateAssetView() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate({ to: '/dashboard/assets' })}
+                  onClick={() => navigate({ to: ROUTES.dashboard.assets.list })}
                   className="rounded-xl"
                 >
                   <X className="w-4 h-4 ml-2" />

@@ -31,6 +31,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { DynamicIsland } from '@/components/dynamic-island'
+import { ROUTES } from '@/constants/routes'
 
 export function PreferencesPage() {
   const { i18n } = useTranslation()
@@ -48,9 +49,9 @@ export function PreferencesPage() {
   const [timeFormat, setTimeFormat] = useState('12')
 
   const topNav = [
-    { title: isRTL ? 'الملف الشخصي' : 'Profile', href: '/dashboard/settings/profile', isActive: false },
-    { title: isRTL ? 'الأمان' : 'Security', href: '/dashboard/settings/security', isActive: false },
-    { title: isRTL ? 'التفضيلات' : 'Preferences', href: '/dashboard/settings/preferences', isActive: true },
+    { title: isRTL ? 'الملف الشخصي' : 'Profile', href: ROUTES.dashboard.settings.profile, isActive: false },
+    { title: isRTL ? 'الأمان' : 'Security', href: ROUTES.dashboard.settings.security, isActive: false },
+    { title: isRTL ? 'التفضيلات' : 'Preferences', href: ROUTES.dashboard.settings.preferences, isActive: true },
   ]
 
   const handleLanguageChange = (value: string) => {

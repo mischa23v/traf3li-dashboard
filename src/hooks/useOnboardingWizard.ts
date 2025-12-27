@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
 import onboardingWizardService, {
   type WizardData,
@@ -9,8 +10,8 @@ import onboardingWizardService, {
 } from '@/services/onboardingWizardService'
 
 // ==================== Cache Configuration ====================
-const STATUS_STALE_TIME = 5 * 60 * 1000 // 5 minutes
-const STATUS_GC_TIME = 10 * 60 * 1000 // 10 minutes
+const STATUS_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes
+const STATUS_GC_TIME = 2 * CACHE_TIMES.MEDIUM // 10 minutes
 
 // Query Keys
 export const onboardingWizardKeys = {

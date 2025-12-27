@@ -137,7 +137,7 @@ export default function QuoteDetailsView() {
                 <Main className="bg-[#f8f9fa] p-6 lg:p-8">
                     <div className="max-w-5xl mx-auto">
                         <Button asChild variant="ghost" className="mb-6">
-                            <Link to="/dashboard/finance/quotes">
+                            <Link to={ROUTES.dashboard.finance.quotes.list}>
                                 <ArrowRight className="h-4 w-4 ms-2" />
                                 العودة لعروض الأسعار
                             </Link>
@@ -208,7 +208,7 @@ export default function QuoteDetailsView() {
                                 </Button>
                             )}
                             <Button asChild variant="outline" className="bg-white/10 text-white hover:bg-white/20 border-0 backdrop-blur-sm">
-                                <Link to="/dashboard/finance/quotes/$quoteId/edit" params={{ quoteId: quote._id }}>
+                                <Link to={ROUTES.dashboard.finance.quotes.edit(quote._id )}>
                                     <Edit className="h-4 w-4 ms-2" aria-hidden="true" />
                                     تعديل
                                 </Link>
@@ -377,8 +377,7 @@ export default function QuoteDetailsView() {
                                         <div>
                                             <p className="text-sm text-slate-500 mb-1">تم التحويل لفاتورة</p>
                                             <Link
-                                                to="/dashboard/finance/invoices/$invoiceId"
-                                                params={{ invoiceId: typeof quote.invoiceId === 'string' ? quote.invoiceId : quote.invoiceId._id }}
+                                                to={ROUTES.dashboard.finance.invoices.detail(typeof quote.invoiceId === 'string' ? quote.invoiceId : quote.invoiceId._id )}
                                                 className="text-brand-blue hover:underline"
                                             >
                                                 عرض الفاتورة

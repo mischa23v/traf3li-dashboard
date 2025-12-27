@@ -353,7 +353,7 @@ export function CurrencyListView() {
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد أسعار صرف</h3>
                                         <p className="text-slate-500 mb-4">ابدأ بإضافة سعر صرف جديد</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                                            <Link to="/dashboard/finance/currency/new">
+                                            <Link to={ROUTES.dashboard.finance.currency.new}>
                                                 <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 إضافة سعر صرف
                                             </Link>

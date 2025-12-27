@@ -4,6 +4,7 @@ import {
     FileText, DollarSign, Plus, Trash2, Briefcase, Loader2, Percent, Send
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { TAX_CONFIG } from '@/config'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -75,7 +76,7 @@ export default function CreateQuoteView() {
         }
 
         const afterDiscount = subtotal - discountAmount
-        const vatRate = 0.15 // 15% Saudi VAT
+        const vatRate = TAX_CONFIG.SAUDI_VAT_RATE // 15% Saudi VAT
         const vatAmount = afterDiscount * vatRate
         const totalAmount = afterDiscount + vatAmount
 
@@ -177,7 +178,7 @@ export default function CreateQuoteView() {
                             type="finance"
                             hideButtons={true}
                         >
-                            <Link to="/dashboard/finance/quotes">
+                            <Link to={ROUTES.dashboard.finance.quotes.list}>
                                 <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
                                     <ArrowRight className="w-5 h-5" />
                                 </Button>
@@ -480,7 +481,7 @@ export default function CreateQuoteView() {
                                 </div>
 
                                 <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
-                                    <Link to="/dashboard/finance/quotes">
+                                    <Link to={ROUTES.dashboard.finance.quotes.list}>
                                         <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
                                             إلغاء
                                         </Button>

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { ROUTES } from '@/constants/routes'
 import { useTranslation } from 'react-i18next'
 import {
     Download, Filter, Calendar, TrendingUp, Trophy,
@@ -236,8 +237,8 @@ export function LeadOwnerEfficiencyReport() {
 
     const topNav = [
         { title: isRTL ? 'نظرة عامة' : 'Overview', href: '/dashboard/overview', isActive: false },
-        { title: isRTL ? 'العملاء المحتملين' : 'Leads', href: '/dashboard/crm/leads', isActive: false },
-        { title: isRTL ? 'تقارير CRM' : 'CRM Reports', href: '/dashboard/crm/reports', isActive: true },
+        { title: isRTL ? 'العملاء المحتملين' : 'Leads', href: ROUTES.dashboard.crm.leads.list, isActive: false },
+        { title: isRTL ? 'تقارير CRM' : 'CRM Reports', href: ROUTES.dashboard.crm.reports.list, isActive: true },
     ]
 
     const getRankBadge = (rank: number) => {

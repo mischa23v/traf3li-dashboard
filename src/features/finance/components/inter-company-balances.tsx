@@ -1,5 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
+import { useLanguage } from '@/hooks/useLanguage'
 import {
   Building2, TrendingUp, TrendingDown, ArrowRight,
   FileText, RefreshCw, Download, Filter
@@ -47,7 +49,9 @@ import type { InterCompanyBalance } from '@/services/interCompanyService'
 
 export default function InterCompanyBalances() {
   const navigate = useNavigate()
-  const [isArabic, setIsArabic] = useState(true)
+  const { t } = useTranslation()
+  const { language } = useLanguage()
+  const isArabic = language === 'ar'
   const [selectedCurrency, setSelectedCurrency] = useState<string>('SAR')
   const [selectedBalance, setSelectedBalance] = useState<InterCompanyBalance | null>(null)
   const [showTransactionsDialog, setShowTransactionsDialog] = useState(false)
@@ -62,10 +66,10 @@ export default function InterCompanyBalances() {
   const exportMutation = useExportInterCompanyReport()
 
   const topNav = [
-    { title: isArabic ? 'المالية' : 'Finance', href: '/finance' },
-    { title: isArabic ? 'المعاملات بين الشركات' : 'Inter-Company', href: '/finance/inter-company' },
+    { title: t('finance.interCompany.nav.finance'), href: '/finance' },
+    { title: t('finance.interCompany.nav.interCompany'), href: '/finance/inter-company' },
     {
-      title: isArabic ? 'الأرصدة بين الشركات' : 'Inter-Company Balances',
+      title: t('finance.interCompany.nav.balances'),
       isCurrentPage: true
     },
   ]
@@ -161,22 +165,22 @@ export default function InterCompanyBalances() {
             {netBalance > 0 ? (
               <>
                 <TrendingUp className="h-3 w-3 text-green-600" />
-                {isArabic ? 'مستحق' : 'Receivable'}
+                {t('finance.interCompany.balances.receivable')}
               </>
             ) : netBalance < 0 ? (
               <>
                 <TrendingDown className="h-3 w-3 text-red-600" />
-                {isArabic ? 'مستحق الدفع' : 'Payable'}
+                {t('finance.interCompany.balances.payable')}
               </>
             ) : (
-              <span>{isArabic ? 'متوازن' : 'Balanced'}</span>
+              <span>{t('finance.interCompany.balances.balanced')}</span>
             )}
           </div>
 
           {/* Transaction Count */}
           {balance.transactionCount > 0 && (
             <Badge variant="outline" className="text-xs">
-              {balance.transactionCount} {isArabic ? 'معاملة' : 'trans.'}
+              {balance.transactionCount} {t('finance.interCompany.balances.trans')}
             </Badge>
           )}
         </div>
@@ -227,19 +231,17 @@ export default function InterCompanyBalances() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-3xl font-bold">
-                {isArabic ? 'الأرصدة بين الشركات' : 'Inter-Company Balances'}
+                {t('finance.interCompany.balances.title')}
               </h1>
               <p className="text-muted-foreground mt-2">
-                {isArabic
-                  ? 'عرض ماتريكس للأرصدة المستحقة بين الشركات في المجموعة'
-                  : 'Matrix view of outstanding balances between group companies'
+                {t('finance.interCompany.balances.subtitle')
                 }
               </p>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => refetch()}>
                 <RefreshCw className="h-4 w-4 mr-2" />
-                {isArabic ? 'تحديث' : 'Refresh'}
+                {t('finance.interCompany.balances.refresh')}
               </Button>
               <Select value={selectedCurrency} onValueChange={setSelectedCurrency}>
                 <SelectTrigger className="w-32">
@@ -261,7 +263,7 @@ export default function InterCompanyBalances() {
                 disabled={exportMutation.isPending}
               >
                 <Download className="h-4 w-4 mr-2" />
-                {isArabic ? 'تصدير' : 'Export'}
+                {t('finance.interCompany.balances.export')}
               </Button>
             </div>
           </div>
@@ -271,7 +273,7 @@ export default function InterCompanyBalances() {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium">
-                  {isArabic ? 'إجمالي المستحقات' : 'Total Receivables'}
+                  {t('finance.interCompany.balances.totalReceivables')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -287,7 +289,7 @@ export default function InterCompanyBalances() {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium">
-                  {isArabic ? 'إجمالي المستحق الدفع' : 'Total Payables'}
+                  {t('finance.interCompany.balances.totalPayables')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -303,7 +305,7 @@ export default function InterCompanyBalances() {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium">
-                  {isArabic ? 'صافي الرصيد' : 'Net Balance'}
+                  {t('finance.interCompany.balances.netBalance')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -326,12 +328,10 @@ export default function InterCompanyBalances() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Building2 className="h-5 w-5" />
-                {isArabic ? 'مصفوفة الأرصدة' : 'Balance Matrix'}
+                {t('finance.interCompany.balances.balanceMatrix')}
               </CardTitle>
               <CardDescription>
-                {isArabic
-                  ? 'اضغط على أي خلية لعرض المعاملات التفصيلية'
-                  : 'Click on any cell to view detailed transactions'
+                {t('finance.interCompany.balances.clickToView')
                 }
               </CardDescription>
             </CardHeader>
@@ -341,7 +341,7 @@ export default function InterCompanyBalances() {
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-40 font-bold">
-                        {isArabic ? 'من / إلى' : 'From / To'}
+                        {t('finance.interCompany.balances.fromTo')}
                       </TableHead>
                       {companies.map(company => (
                         <TableHead key={company._id} className="text-center min-w-32">
@@ -354,7 +354,7 @@ export default function InterCompanyBalances() {
                         </TableHead>
                       ))}
                       <TableHead className="text-center font-bold min-w-32">
-                        {isArabic ? 'الإجمالي' : 'Total'}
+                        {t('finance.interCompany.balances.total')}
                       </TableHead>
                     </TableRow>
                   </TableHeader>
@@ -395,8 +395,8 @@ export default function InterCompanyBalances() {
                             </div>
                             <div className="text-xs text-muted-foreground">
                               {companyTotals[sourceCompany._id]?.net >= 0
-                                ? (isArabic ? 'مستحق' : 'Receivable')
-                                : (isArabic ? 'مستحق الدفع' : 'Payable')
+                                ? (t('finance.interCompany.balances.receivable'))
+                                : (t('finance.interCompany.balances.payable'))
                               }
                             </div>
                           </div>
@@ -412,7 +412,7 @@ export default function InterCompanyBalances() {
           {/* Last Updated */}
           {balanceMatrix?.lastUpdated && (
             <p className="text-sm text-muted-foreground mt-4 text-center">
-              {isArabic ? 'آخر تحديث:' : 'Last updated:'}{' '}
+              {t('finance.interCompany.balances.lastUpdated')}{' '}
               {formatDate(balanceMatrix.lastUpdated)}
             </p>
           )}
@@ -424,7 +424,7 @@ export default function InterCompanyBalances() {
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {isArabic ? 'المعاملات بين الشركتين' : 'Transactions Between Companies'}
+              {t('finance.interCompany.balances.transactionsBetween')}
             </DialogTitle>
             <DialogDescription>
               {selectedBalance && (
@@ -458,11 +458,11 @@ export default function InterCompanyBalances() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{isArabic ? 'التاريخ' : 'Date'}</TableHead>
-                    <TableHead>{isArabic ? 'النوع' : 'Type'}</TableHead>
-                    <TableHead>{isArabic ? 'الوصف' : 'Description'}</TableHead>
-                    <TableHead className="text-right">{isArabic ? 'المبلغ' : 'Amount'}</TableHead>
-                    <TableHead>{isArabic ? 'الحالة' : 'Status'}</TableHead>
+                    <TableHead>{t('finance.interCompany.balances.date')}</TableHead>
+                    <TableHead>{t('finance.interCompany.balances.type')}</TableHead>
+                    <TableHead>{t('finance.interCompany.balances.description')}</TableHead>
+                    <TableHead className="text-right">{t('finance.interCompany.balances.amount')}</TableHead>
+                    <TableHead>{t('finance.interCompany.balances.status')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

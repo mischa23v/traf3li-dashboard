@@ -27,6 +27,7 @@ import {
   ClipboardCheck,
   ArrowRightLeft,
 } from 'lucide-react'
+import { ROUTES } from '@/constants/routes'
 
 // Layout Components
 import { Header } from '@/components/layout/header'
@@ -99,18 +100,18 @@ export function SubcontractingOrderDetailsView() {
 
   const topNav = [
     {
-      title: isArabic ? 'نظرة عامة' : 'Overview',
-      href: '/dashboard/subcontracting/overview',
+      title: t('subcontracting.overview'),
+      href: ROUTES.dashboard.home,
       isActive: false
     },
     {
-      title: isArabic ? 'أوامر التصنيع' : 'Subcontracting Orders',
-      href: '/dashboard/subcontracting',
+      title: t('subcontracting.subcontractingOrders'),
+      href: ROUTES.dashboard.subcontracting.list,
       isActive: true
     },
     {
-      title: isArabic ? 'إيصالات الاستلام' : 'Receipts',
-      href: '/dashboard/subcontracting/receipts',
+      title: t('subcontracting.receipts'),
+      href: ROUTES.dashboard.subcontracting.receipts.list,
       isActive: false
     },
   ]
@@ -134,7 +135,7 @@ export function SubcontractingOrderDetailsView() {
   const handleDelete = () => {
     deleteOrderMutation.mutate(orderId, {
       onSuccess: () => {
-        navigate({ to: '/dashboard/subcontracting' })
+        navigate({ to: ROUTES.dashboard.subcontracting.list })
       },
     })
   }
@@ -154,27 +155,27 @@ export function SubcontractingOrderDetailsView() {
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       draft: {
-        label: isArabic ? 'مسودة' : 'Draft',
+        label: t('subcontracting.status.draft'),
         className: 'bg-gray-100 text-gray-700',
         icon: Clock
       },
       submitted: {
-        label: isArabic ? 'مقدم' : 'Submitted',
+        label: t('subcontracting.status.submitted'),
         className: 'bg-blue-100 text-blue-700',
         icon: Send
       },
       partially_received: {
-        label: isArabic ? 'مستلم جزئياً' : 'Partially Received',
+        label: t('subcontracting.status.partiallyReceived'),
         className: 'bg-amber-100 text-amber-700',
         icon: Package
       },
       completed: {
-        label: isArabic ? 'مكتمل' : 'Completed',
+        label: t('subcontracting.status.completed'),
         className: 'bg-emerald-100 text-emerald-700',
         icon: CheckCircle
       },
       cancelled: {
-        label: isArabic ? 'ملغى' : 'Cancelled',
+        label: t('subcontracting.status.cancelled'),
         className: 'bg-red-100 text-red-700',
         icon: XCircle
       },
@@ -198,9 +199,9 @@ export function SubcontractingOrderDetailsView() {
 
   const getReceiptStatusBadge = (status: string) => {
     const statusConfig = {
-      draft: { label: isArabic ? 'مسودة' : 'Draft', className: 'bg-gray-100 text-gray-700' },
-      submitted: { label: isArabic ? 'مقدم' : 'Submitted', className: 'bg-emerald-100 text-emerald-700' },
-      cancelled: { label: isArabic ? 'ملغى' : 'Cancelled', className: 'bg-red-100 text-red-700' },
+      draft: { label: t('subcontracting.receiptStatus.draft'), className: 'bg-gray-100 text-gray-700' },
+      submitted: { label: t('subcontracting.receiptStatus.submitted'), className: 'bg-emerald-100 text-emerald-700' },
+      cancelled: { label: t('subcontracting.receiptStatus.cancelled'), className: 'bg-red-100 text-red-700' },
     }
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.draft
     return <Badge className={config.className}>{config.label}</Badge>
@@ -249,18 +250,18 @@ export function SubcontractingOrderDetailsView() {
         <Main fluid={true} className="bg-[#f8f9fa] p-6 lg:p-8">
           <div className="max-w-7xl mx-auto">
             <Button asChild variant="ghost" className="mb-6">
-              <Link to="/dashboard/subcontracting">
+              <Link to={ROUTES.dashboard.subcontracting.list}>
                 <ArrowLeft className="h-4 w-4 me-2" />
-                {isArabic ? 'العودة لأوامر التصنيع' : 'Back to Orders'}
+                {t('subcontracting.backToOrders')}
               </Link>
             </Button>
             <Card className="border-0 shadow-sm rounded-3xl p-12 text-center">
               <AlertCircle className="h-16 w-16 text-rose-400 mx-auto mb-4" aria-hidden="true" />
               <h3 className="text-xl font-bold text-navy mb-2">
-                {isArabic ? 'فشل تحميل الأمر' : 'Failed to Load Order'}
+                {t('subcontracting.failedToLoadOrder')}
               </h3>
               <p className="text-slate-500">
-                {error?.message || (isArabic ? 'الأمر غير موجود' : 'Order not found')}
+                {error?.message || t('subcontracting.orderNotFound')}
               </p>
             </Card>
           </div>
@@ -296,18 +297,18 @@ export function SubcontractingOrderDetailsView() {
           {/* Back Button & Actions */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <Button asChild variant="ghost" className="text-slate-600 hover:text-navy">
-              <Link to="/dashboard/subcontracting">
+              <Link to={ROUTES.dashboard.subcontracting.list}>
                 <ArrowLeft className="h-4 w-4 me-2" />
-                {isArabic ? 'العودة لأوامر التصنيع' : 'Back to Orders'}
+                {t('subcontracting.backToOrders')}
               </Link>
             </Button>
             <div className="flex gap-2 flex-wrap">
               {isDraft && (
                 <>
                   <Button asChild variant="outline">
-                    <Link to={`/dashboard/subcontracting/orders/${orderId}/edit`}>
+                    <Link to={ROUTES.dashboard.subcontracting.detail(orderId) + '/edit'}>
                       <Edit className="h-4 w-4 me-2" aria-hidden="true" />
-                      {isArabic ? 'تعديل' : 'Edit'}
+                      {t('subcontracting.edit')}
                     </Link>
                   </Button>
                   <Button
@@ -321,15 +322,15 @@ export function SubcontractingOrderDetailsView() {
                     ) : (
                       <Send className="h-4 w-4 me-2" aria-hidden="true" />
                     )}
-                    {isArabic ? 'تقديم' : 'Submit'}
+                    {t('subcontracting.submit')}
                   </Button>
                 </>
               )}
               {isSubmitted && (
                 <Button asChild variant="default" className="bg-brand-blue hover:bg-blue-600">
-                  <Link to={`/dashboard/subcontracting/receipts/create?orderId=${orderId}`}>
+                  <Link to={ROUTES.dashboard.subcontracting.receipts.create + `?orderId=${orderId}`}>
                     <Package className="h-4 w-4 me-2" aria-hidden="true" />
-                    {isArabic ? 'إنشاء إيصال استلام' : 'Create Receipt'}
+                    {t('subcontracting.createReceipt')}
                   </Link>
                 </Button>
               )}
@@ -340,7 +341,7 @@ export function SubcontractingOrderDetailsView() {
                   onClick={() => setShowCancelDialog(true)}
                 >
                   <XCircle className="h-4 w-4 me-2" aria-hidden="true" />
-                  {isArabic ? 'إلغاء' : 'Cancel'}
+                  {t('subcontracting.cancel')}
                 </Button>
               )}
               {isDraft && (
@@ -350,7 +351,7 @@ export function SubcontractingOrderDetailsView() {
                   onClick={() => setShowDeleteDialog(true)}
                 >
                   <Trash2 className="h-4 w-4 me-2" aria-hidden="true" />
-                  {isArabic ? 'حذف' : 'Delete'}
+                  {t('subcontracting.delete')}
                 </Button>
               )}
             </div>
@@ -358,7 +359,7 @@ export function SubcontractingOrderDetailsView() {
 
           {/* Order Header */}
           <ProductivityHero
-            badge={isArabic ? 'أمر تصنيع خارجي' : 'Subcontracting Order'}
+            badge={t('subcontracting.subcontractingOrderBadge')}
             title={order.orderNumber}
             type="subcontracting"
             listMode={true}
@@ -383,14 +384,14 @@ export function SubcontractingOrderDetailsView() {
                           "
                         >
                           {tab === 'overview'
-                            ? isArabic ? 'نظرة عامة' : 'Overview'
+                            ? t('subcontracting.overview')
                             : tab === 'service-items'
-                              ? isArabic ? 'الخدمات' : 'Service Items'
+                              ? t('subcontracting.serviceItems')
                               : tab === 'raw-materials'
-                                ? isArabic ? 'المواد الخام' : 'Raw Materials'
+                                ? t('subcontracting.rawMaterials')
                                 : tab === 'receipts'
-                                  ? isArabic ? 'الإيصالات' : 'Receipts'
-                                  : isArabic ? 'الجودة' : 'Quality'}
+                                  ? t('subcontracting.receipts')
+                                  : t('subcontracting.quality')}
                         </TabsTrigger>
                       ))}
                     </TabsList>
@@ -404,40 +405,40 @@ export function SubcontractingOrderDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <GitBranch className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'معلومات الأمر' : 'Order Information'}
+                            {t('subcontracting.orderInformation')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'رقم الأمر' : 'Order Number'}
+                                {t('subcontracting.orderNumber')}
                               </p>
                               <p className="font-medium text-navy font-mono">{order.orderNumber}</p>
                             </div>
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'الحالة' : 'Status'}
+                                {t('common.status')}
                               </p>
                               {getStatusBadge(order.status)}
                             </div>
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'تاريخ الأمر' : 'Order Date'}
+                                {t('subcontracting.orderDate')}
                               </p>
                               <p className="font-medium text-navy">{formatDate(order.orderDate)}</p>
                             </div>
                             {order.requiredDate && (
                               <div>
                                 <p className="text-sm text-slate-500 mb-1">
-                                  {isArabic ? 'التاريخ المطلوب' : 'Required Date'}
+                                  {t('subcontracting.requiredDate')}
                                 </p>
                                 <p className="font-medium text-navy">{formatDate(order.requiredDate)}</p>
                               </div>
                             )}
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'نسبة الاستلام' : 'Completion'}
+                                {t('subcontracting.completion')}
                               </p>
                               <div className="flex items-center gap-3">
                                 <Progress value={order.percentReceived || 0} className="flex-1" />
@@ -448,7 +449,7 @@ export function SubcontractingOrderDetailsView() {
                             </div>
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'العملة' : 'Currency'}
+                                {t('subcontracting.currency')}
                               </p>
                               <p className="font-medium text-navy">{order.currency}</p>
                             </div>
@@ -461,14 +462,14 @@ export function SubcontractingOrderDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <Building2 className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'معلومات المورد' : 'Supplier Information'}
+                            {t('subcontracting.supplierInformation')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
                           <div className="grid grid-cols-1 gap-4">
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'اسم المورد' : 'Supplier Name'}
+                                {t('subcontracting.supplierName')}
                               </p>
                               <p className="font-medium text-navy">
                                 {order.supplierName || order.supplierId}
@@ -477,7 +478,7 @@ export function SubcontractingOrderDetailsView() {
                             {order.supplierWarehouse && (
                               <div>
                                 <p className="text-sm text-slate-500 mb-1">
-                                  {isArabic ? 'مستودع المورد' : 'Supplier Warehouse'}
+                                  {t('subcontracting.supplierWarehouse')}
                                 </p>
                                 <p className="font-medium text-navy">{order.supplierWarehouse}</p>
                               </div>
@@ -492,7 +493,7 @@ export function SubcontractingOrderDetailsView() {
                           <CardHeader className="border-b border-slate-100">
                             <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                               <ArrowRightLeft className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                              {isArabic ? 'تقدم نقل المواد' : 'Material Transfer Progress'}
+                              {t('subcontracting.materialTransferProgress')}
                             </CardTitle>
                           </CardHeader>
                           <CardContent className="p-6">
@@ -503,9 +504,7 @@ export function SubcontractingOrderDetailsView() {
                               </span>
                             </div>
                             <p className="text-sm text-slate-500 mt-2">
-                              {isArabic
-                                ? 'نسبة المواد المنقولة إلى المورد'
-                                : 'Percentage of materials transferred to supplier'}
+                              {t('subcontracting.materialTransferPercentage')}
                             </p>
                           </CardContent>
                         </Card>
@@ -516,14 +515,14 @@ export function SubcontractingOrderDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <DollarSign className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'تفاصيل التكلفة' : 'Cost Breakdown'}
+                            {t('subcontracting.costBreakdown')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
                           <div className="space-y-4">
                             <div className="flex justify-between items-center">
                               <span className="text-slate-600">
-                                {isArabic ? 'تكلفة الخدمات' : 'Service Cost'}
+                                {t('subcontracting.serviceCost')}
                               </span>
                               <span className="font-medium text-navy">
                                 {formatCurrency(order.totalServiceCost)}
@@ -531,7 +530,7 @@ export function SubcontractingOrderDetailsView() {
                             </div>
                             <div className="flex justify-between items-center">
                               <span className="text-slate-600">
-                                {isArabic ? 'تكلفة المواد الخام' : 'Raw Material Cost'}
+                                {t('subcontracting.rawMaterialCost')}
                               </span>
                               <span className="font-medium text-navy">
                                 {formatCurrency(order.totalRawMaterialCost)}
@@ -540,7 +539,7 @@ export function SubcontractingOrderDetailsView() {
                             <div className="border-t border-slate-200 pt-4">
                               <div className="flex justify-between items-center">
                                 <span className="font-bold text-navy text-lg">
-                                  {isArabic ? 'الإجمالي' : 'Grand Total'}
+                                  {t('subcontracting.grandTotal')}
                                 </span>
                                 <span className="font-bold text-emerald-600 text-xl">
                                   {formatCurrency(order.grandTotal)}
@@ -557,7 +556,7 @@ export function SubcontractingOrderDetailsView() {
                           <CardHeader className="border-b border-slate-100">
                             <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                               <Package className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                              {isArabic ? 'المستودعات' : 'Warehouses'}
+                              {t('subcontracting.warehouses')}
                             </CardTitle>
                           </CardHeader>
                           <CardContent className="p-6">
@@ -565,7 +564,7 @@ export function SubcontractingOrderDetailsView() {
                               {order.rawMaterialWarehouse && (
                                 <div>
                                   <p className="text-sm text-slate-500 mb-1">
-                                    {isArabic ? 'مستودع المواد الخام' : 'Raw Material Warehouse'}
+                                    {t('subcontracting.rawMaterialWarehouse')}
                                   </p>
                                   <p className="font-medium text-navy">{order.rawMaterialWarehouse}</p>
                                 </div>
@@ -573,7 +572,7 @@ export function SubcontractingOrderDetailsView() {
                               {order.finishedGoodsWarehouse && (
                                 <div>
                                   <p className="text-sm text-slate-500 mb-1">
-                                    {isArabic ? 'مستودع المنتجات النهائية' : 'Finished Goods Warehouse'}
+                                    {t('subcontracting.finishedGoodsWarehouse')}
                                   </p>
                                   <p className="font-medium text-navy">{order.finishedGoodsWarehouse}</p>
                                 </div>
@@ -588,7 +587,7 @@ export function SubcontractingOrderDetailsView() {
                         <Card className="border-none shadow-sm bg-white rounded-2xl">
                           <CardHeader className="border-b border-slate-100">
                             <CardTitle className="text-lg font-bold text-navy">
-                              {isArabic ? 'ملاحظات' : 'Remarks'}
+                              {t('subcontracting.remarks')}
                             </CardTitle>
                           </CardHeader>
                           <CardContent className="p-6">
@@ -606,7 +605,7 @@ export function SubcontractingOrderDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <Layers className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'الخدمات' : 'Service Items'}
+                            {t('subcontracting.serviceItems')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
@@ -614,9 +613,7 @@ export function SubcontractingOrderDetailsView() {
                             <div className="text-center py-12 text-slate-500">
                               <Layers className="h-12 w-12 mx-auto mb-4 opacity-20" aria-hidden="true" />
                               <p>
-                                {isArabic
-                                  ? 'لا توجد خدمات مضافة'
-                                  : 'No service items added'}
+                                {t('subcontracting.noServiceItemsAdded')}
                               </p>
                             </div>
                           ) : (
@@ -625,22 +622,22 @@ export function SubcontractingOrderDetailsView() {
                                 <TableHeader>
                                   <TableRow>
                                     <TableHead>
-                                      {isArabic ? 'رمز الصنف' : 'Item Code'}
+                                      {t('subcontracting.itemCode')}
                                     </TableHead>
                                     <TableHead>
-                                      {isArabic ? 'اسم الصنف' : 'Item Name'}
+                                      {t('subcontracting.itemName')}
                                     </TableHead>
                                     <TableHead className="text-center">
-                                      {isArabic ? 'الكمية' : 'Quantity'}
+                                      {t('subcontracting.quantity')}
                                     </TableHead>
                                     <TableHead>
-                                      {isArabic ? 'الوحدة' : 'UOM'}
+                                      {t('subcontracting.uom')}
                                     </TableHead>
                                     <TableHead className="text-end">
-                                      {isArabic ? 'السعر' : 'Rate'}
+                                      {t('subcontracting.rate')}
                                     </TableHead>
                                     <TableHead className="text-end">
-                                      {isArabic ? 'المبلغ' : 'Amount'}
+                                      {t('subcontracting.amount')}
                                     </TableHead>
                                   </TableRow>
                                 </TableHeader>
@@ -665,7 +662,7 @@ export function SubcontractingOrderDetailsView() {
                                   ))}
                                   <TableRow className="bg-slate-50 font-bold">
                                     <TableCell colSpan={5} className="text-end">
-                                      {isArabic ? 'الإجمالي' : 'Total'}
+                                      {t('subcontracting.total')}
                                     </TableCell>
                                     <TableCell className="text-end text-emerald-600">
                                       {formatCurrency(order.totalServiceCost)}
@@ -685,7 +682,7 @@ export function SubcontractingOrderDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <Package className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'المواد الخام' : 'Raw Materials'}
+                            {t('subcontracting.rawMaterials')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
@@ -693,9 +690,7 @@ export function SubcontractingOrderDetailsView() {
                             <div className="text-center py-12 text-slate-500">
                               <Package className="h-12 w-12 mx-auto mb-4 opacity-20" aria-hidden="true" />
                               <p>
-                                {isArabic
-                                  ? 'لا توجد مواد خام'
-                                  : 'No raw materials'}
+                                {t('subcontracting.noRawMaterials')}
                               </p>
                             </div>
                           ) : (
@@ -704,25 +699,25 @@ export function SubcontractingOrderDetailsView() {
                                 <TableHeader>
                                   <TableRow>
                                     <TableHead>
-                                      {isArabic ? 'رمز الصنف' : 'Item Code'}
+                                      {t('subcontracting.itemCode')}
                                     </TableHead>
                                     <TableHead>
-                                      {isArabic ? 'اسم الصنف' : 'Item Name'}
+                                      {t('subcontracting.itemName')}
                                     </TableHead>
                                     <TableHead className="text-center">
-                                      {isArabic ? 'المطلوب' : 'Required'}
+                                      {t('subcontracting.required')}
                                     </TableHead>
                                     <TableHead className="text-center">
-                                      {isArabic ? 'المنقول' : 'Transferred'}
+                                      {t('subcontracting.transferred')}
                                     </TableHead>
                                     <TableHead className="text-center">
-                                      {isArabic ? 'المستهلك' : 'Consumed'}
+                                      {t('subcontracting.consumed')}
                                     </TableHead>
                                     <TableHead className="text-center">
-                                      {isArabic ? 'المرتجع' : 'Returned'}
+                                      {t('subcontracting.returned')}
                                     </TableHead>
                                     <TableHead>
-                                      {isArabic ? 'الوحدة' : 'UOM'}
+                                      {t('subcontracting.uom')}
                                     </TableHead>
                                   </TableRow>
                                 </TableHeader>
@@ -760,13 +755,13 @@ export function SubcontractingOrderDetailsView() {
                         <CardHeader className="border-b border-slate-100 flex flex-row items-center justify-between">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <FileText className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'إيصالات الاستلام' : 'Subcontracting Receipts'}
+                            {t('subcontracting.subcontractingReceipts')}
                           </CardTitle>
                           {isSubmitted && (
                             <Button asChild size="sm" className="bg-brand-blue hover:bg-blue-600">
-                              <Link to={`/dashboard/subcontracting/receipts/create?orderId=${orderId}`}>
+                              <Link to={ROUTES.dashboard.subcontracting.receipts.create + `?orderId=${orderId}`}>
                                 <Plus className="h-4 w-4 me-2" aria-hidden="true" />
-                                {isArabic ? 'إيصال جديد' : 'New Receipt'}
+                                {t('subcontracting.newReceipt')}
                               </Link>
                             </Button>
                           )}
@@ -776,9 +771,7 @@ export function SubcontractingOrderDetailsView() {
                             <div className="text-center py-12 text-slate-500">
                               <FileText className="h-12 w-12 mx-auto mb-4 opacity-20" aria-hidden="true" />
                               <p>
-                                {isArabic
-                                  ? 'لا توجد إيصالات استلام'
-                                  : 'No receipts created'}
+                                {t('subcontracting.noReceiptsCreated')}
                               </p>
                             </div>
                           ) : (
@@ -787,19 +780,19 @@ export function SubcontractingOrderDetailsView() {
                                 <TableHeader>
                                   <TableRow>
                                     <TableHead>
-                                      {isArabic ? 'رقم الإيصال' : 'Receipt Number'}
+                                      {t('subcontracting.receiptNumber')}
                                     </TableHead>
                                     <TableHead>
-                                      {isArabic ? 'تاريخ الإضافة' : 'Posting Date'}
+                                      {t('subcontracting.postingDate')}
                                     </TableHead>
                                     <TableHead className="text-center">
-                                      {isArabic ? 'الكمية' : 'Total Qty'}
+                                      {t('subcontracting.totalQty')}
                                     </TableHead>
                                     <TableHead className="text-end">
-                                      {isArabic ? 'المبلغ' : 'Total Amount'}
+                                      {t('subcontracting.totalAmount')}
                                     </TableHead>
                                     <TableHead>
-                                      {isArabic ? 'الحالة' : 'Status'}
+                                      {t('common.status')}
                                     </TableHead>
                                   </TableRow>
                                 </TableHeader>
@@ -808,7 +801,7 @@ export function SubcontractingOrderDetailsView() {
                                     <TableRow key={receipt._id}>
                                       <TableCell className="font-medium font-mono">
                                         <Link
-                                          to={`/dashboard/subcontracting/receipts/${receipt._id}`}
+                                          to={ROUTES.dashboard.subcontracting.receipts.list + `/${receipt._id}`}
                                           className="text-brand-blue hover:underline"
                                         >
                                           {receipt.receiptNumber}
@@ -836,16 +829,14 @@ export function SubcontractingOrderDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <ClipboardCheck className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'فحص الجودة' : 'Quality Inspection'}
+                            {t('subcontracting.qualityInspection')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
                           <div className="text-center py-12 text-slate-500">
                             <ClipboardCheck className="h-12 w-12 mx-auto mb-4 opacity-20" aria-hidden="true" />
                             <p>
-                              {isArabic
-                                ? 'لا توجد نتائج فحص جودة'
-                                : 'No quality inspection results'}
+                              {t('subcontracting.noQualityInspectionResults')}
                             </p>
                           </div>
                         </CardContent>
@@ -867,17 +858,15 @@ export function SubcontractingOrderDetailsView() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {isArabic ? 'تأكيد الحذف' : 'Confirm Deletion'}
+              {t('subcontracting.deleteConfirmTitle')}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {isArabic
-                ? 'هل أنت متأكد من حذف هذا الأمر؟ لا يمكن التراجع عن هذا الإجراء.'
-                : 'Are you sure you want to delete this order? This action cannot be undone.'}
+              {t('subcontracting.deleteConfirmDesc')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>
-              {isArabic ? 'إلغاء' : 'Cancel'}
+              {t('subcontracting.cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
@@ -887,10 +876,10 @@ export function SubcontractingOrderDetailsView() {
               {deleteOrderMutation.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 me-2 animate-spin" aria-hidden="true" />
-                  {isArabic ? 'جاري الحذف...' : 'Deleting...'}
+                  {t('subcontracting.deleting')}
                 </>
               ) : (
-                isArabic ? 'حذف' : 'Delete'
+                t('subcontracting.delete')
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -902,17 +891,15 @@ export function SubcontractingOrderDetailsView() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {isArabic ? 'تأكيد الإلغاء' : 'Confirm Cancellation'}
+              {t('subcontracting.confirmCancellation')}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {isArabic
-                ? 'هل أنت متأكد من إلغاء هذا الأمر؟ يمكنك إعادة تقديمه لاحقاً.'
-                : 'Are you sure you want to cancel this order? You can resubmit it later.'}
+              {t('subcontracting.confirmCancellationDesc')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>
-              {isArabic ? 'رجوع' : 'Back'}
+              {t('subcontracting.back')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleCancel}
@@ -922,10 +909,10 @@ export function SubcontractingOrderDetailsView() {
               {cancelOrderMutation.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 me-2 animate-spin" aria-hidden="true" />
-                  {isArabic ? 'جاري الإلغاء...' : 'Cancelling...'}
+                  {t('subcontracting.cancelling')}
                 </>
               ) : (
-                isArabic ? 'إلغاء الأمر' : 'Cancel Order'
+                t('subcontracting.cancelOrder')
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

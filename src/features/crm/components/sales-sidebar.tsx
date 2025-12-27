@@ -12,6 +12,7 @@ import { useCalendar } from '@/hooks/useCalendar'
 import { useUpcomingReminders } from '@/hooks/useRemindersAndEvents'
 import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
+import { ROUTES } from '@/constants/routes'
 
 interface SalesSidebarProps {
     context?: 'leads' | 'pipeline' | 'referrals' | 'activities' | 'email-marketing' | 'lead-scoring' | 'whatsapp'
@@ -68,32 +69,32 @@ export function SalesSidebar({
 
     const links = {
         leads: {
-            create: '/dashboard/crm/leads/new',
-            viewAll: '/dashboard/crm/leads'
+            create: ROUTES.dashboard.crm.leads.new,
+            viewAll: ROUTES.dashboard.crm.leads.list
         },
         pipeline: {
-            create: '/dashboard/crm/leads/new',
-            viewAll: '/dashboard/crm/pipeline'
+            create: ROUTES.dashboard.crm.leads.new,
+            viewAll: ROUTES.dashboard.crm.pipeline
         },
         referrals: {
-            create: '/dashboard/crm/referrals/new',
-            viewAll: '/dashboard/crm/referrals'
+            create: ROUTES.dashboard.crm.referrals.new,
+            viewAll: ROUTES.dashboard.crm.referrals.list
         },
         activities: {
-            create: '/dashboard/crm/activities/new',
-            viewAll: '/dashboard/crm/activities'
+            create: ROUTES.dashboard.crm.activities.new,
+            viewAll: ROUTES.dashboard.crm.activities.list
         },
         'email-marketing': {
-            create: '/dashboard/crm/email-marketing/new',
-            viewAll: '/dashboard/crm/email-marketing'
+            create: ROUTES.dashboard.crm.emailMarketing.new,
+            viewAll: ROUTES.dashboard.crm.emailMarketing.list
         },
         'lead-scoring': {
             create: '',
-            viewAll: '/dashboard/crm/lead-scoring'
+            viewAll: ROUTES.dashboard.crm.leadScoring.list
         },
         'whatsapp': {
-            create: '/dashboard/crm/whatsapp/start',
-            viewAll: '/dashboard/crm/whatsapp'
+            create: ROUTES.dashboard.crm.whatsapp.start,
+            viewAll: ROUTES.dashboard.crm.whatsapp.list
         }
     }
 
@@ -360,7 +361,7 @@ export function SalesSidebar({
                             </div>
 
                             <Button asChild variant="ghost" className="w-full mt-6 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 group cursor-pointer">
-                                <Link to="/dashboard/calendar">
+                                <Link to={ROUTES.dashboard.calendar}>
                                     <span>{t('sidebar.calendar.viewFullSchedule')}</span>
                                     <ChevronRight className="w-4 h-4 me-2 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1 rtl:rotate-180" aria-hidden="true" />
                                 </Link>
@@ -387,7 +388,7 @@ export function SalesSidebar({
                                         return (
                                             <Link
                                                 key={reminder._id}
-                                                to={`/dashboard/tasks/reminders/${reminder._id}`}
+                                                to={ROUTES.dashboard.tasks.reminders.detail(reminder._id)}
                                                 className="flex gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:shadow-md transition-all cursor-pointer group"
                                             >
                                                 <div className={cn(
@@ -426,7 +427,7 @@ export function SalesSidebar({
                                 </>
                             )}
                             <Button asChild variant="ghost" className="w-full text-xs text-slate-500 hover:text-emerald-600 hover:bg-emerald-50">
-                                <Link to="/dashboard/tasks/reminders">
+                                <Link to={ROUTES.dashboard.tasks.reminders.list}>
                                     {t('sidebar.notifications.viewAll')}
                                 </Link>
                             </Button>

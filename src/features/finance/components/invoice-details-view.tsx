@@ -143,7 +143,7 @@ export function InvoiceDetailsView() {
                 </Header>
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
                     <div className="max-w-[1600px] mx-auto mb-6">
-                        <Link to="/dashboard/finance/invoices" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
+                        <Link to={ROUTES.dashboard.finance.invoices.list} className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
                             <ArrowLeft className="h-4 w-4 ms-2" aria-hidden="true" />
                             العودة إلى الفواتير
                         </Link>
@@ -191,7 +191,7 @@ export function InvoiceDetailsView() {
                 </Header>
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
                     <div className="max-w-[1600px] mx-auto mb-6">
-                        <Link to="/dashboard/finance/invoices" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
+                        <Link to={ROUTES.dashboard.finance.invoices.list} className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
                             <ArrowLeft className="h-4 w-4 ms-2" aria-hidden="true" />
                             العودة إلى الفواتير
                         </Link>
@@ -203,7 +203,7 @@ export function InvoiceDetailsView() {
                         <h3 className="text-xl font-bold text-slate-900 mb-2">الفاتورة غير موجودة</h3>
                         <p className="text-slate-500 mb-6">لم نتمكن من العثور على الفاتورة المطلوبة</p>
                         <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white px-8">
-                            <Link to="/dashboard/finance/invoices">
+                            <Link to={ROUTES.dashboard.finance.invoices.list}>
                                 <ArrowLeft className="ms-2 h-4 w-4" aria-hidden="true" />
                                 العودة إلى قائمة الفواتير
                             </Link>
@@ -241,7 +241,7 @@ export function InvoiceDetailsView() {
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 <div className="max-w-[1600px] mx-auto mb-6">
-                    <Link to="/dashboard/finance/invoices" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
+                    <Link to={ROUTES.dashboard.finance.invoices.list} className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
                         <ArrowLeft className="h-4 w-4 ms-2" aria-hidden="true" />
                         العودة إلى الفواتير
                     </Link>

@@ -22,6 +22,7 @@ import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 
 import { useSubcontractingStats, useSubcontractingOrders } from '@/hooks/use-subcontracting'
+import { ROUTES } from '@/constants/routes'
 
 export function SubcontractingSidebar() {
   const { t } = useTranslation()
@@ -40,14 +41,14 @@ export function SubcontractingSidebar() {
         </CardHeader>
         <CardContent className="space-y-2">
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/subcontracting/create">
+            <Link to={ROUTES.dashboard.subcontracting.create}>
               <Plus className="w-4 h-4 ml-2" />
               {t('subcontracting.newOrder', 'أمر جديد')}
               <kbd className="mr-auto bg-muted px-2 py-0.5 rounded text-xs">⌘N</kbd>
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/subcontracting/receipts/create">
+            <Link to={ROUTES.dashboard.subcontracting.receipts.create}>
               <PackageCheck className="w-4 h-4 ml-2" />
               {t('subcontracting.newReceipt', 'إيصال استلام جديد')}
             </Link>
@@ -65,19 +66,19 @@ export function SubcontractingSidebar() {
         </CardHeader>
         <CardContent className="space-y-2">
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/subcontracting">
+            <Link to={ROUTES.dashboard.subcontracting.list}>
               <FileText className="w-4 h-4 ml-2" />
               {t('subcontracting.orders', 'أوامر التصنيع')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/subcontracting/receipts">
+            <Link to={ROUTES.dashboard.subcontracting.receipts.list}>
               <Package className="w-4 h-4 ml-2" />
               {t('subcontracting.receipts', 'إيصالات الاستلام')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/subcontracting/settings">
+            <Link to={ROUTES.dashboard.subcontracting.settings}>
               <Settings className="w-4 h-4 ml-2" />
               {t('subcontracting.settings', 'الإعدادات')}
             </Link>
@@ -108,7 +109,7 @@ export function SubcontractingSidebar() {
               {pendingOrders.orders.slice(0, 5).map((order) => (
                 <Link
                   key={order._id}
-                  to={`/dashboard/subcontracting/orders/${order._id}`}
+                  to={ROUTES.dashboard.subcontracting.detail(order._id)}
                   className="flex items-center justify-between p-2 rounded-lg hover:bg-amber-100 transition-colors"
                 >
                   <div className="flex items-center gap-2">
@@ -124,7 +125,7 @@ export function SubcontractingSidebar() {
               ))}
               {pendingOrders.orders.length > 5 && (
                 <Button asChild variant="ghost" size="sm" className="w-full text-amber-700">
-                  <Link to="/dashboard/subcontracting?status=submitted">
+                  <Link to={ROUTES.dashboard.subcontracting.list + '?status=submitted'}>
                     {t('subcontracting.viewAll', 'عرض الكل')} ({pendingOrders.orders.length})
                   </Link>
                 </Button>
@@ -157,7 +158,7 @@ export function SubcontractingSidebar() {
                 {t('subcontracting.awaitingReceipt', 'في انتظار الاستلام')}
               </p>
               <Button asChild variant="ghost" size="sm" className="mt-3 text-blue-700">
-                <Link to="/dashboard/subcontracting/receipts?status=pending">
+                <Link to={ROUTES.dashboard.subcontracting.receipts.list + '?status=pending'}>
                   {t('subcontracting.viewReceipts', 'عرض الإيصالات')}
                 </Link>
               </Button>
@@ -199,7 +200,7 @@ export function SubcontractingSidebar() {
                 </Badge>
               </div>
               <Button asChild variant="ghost" size="sm" className="w-full text-purple-700">
-                <Link to="/dashboard/subcontracting/materials">
+                <Link to={ROUTES.dashboard.subcontracting.list + '/materials'}>
                   {t('subcontracting.viewMaterials', 'عرض المواد')}
                 </Link>
               </Button>

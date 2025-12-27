@@ -42,6 +42,7 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { useAuthStore } from '@/stores/auth-store'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ROUTES } from '@/constants/routes'
 
 const REGIONS = ['الرياض', 'مكة المكرمة', 'المدينة المنورة', 'القصيم', 'الشرقية', 'عسير', 'تبوك', 'حائل', 'الحدود الشمالية', 'جازان', 'نجران', 'الباحة', 'الجوف']
 const NATIONALITIES = ['سعودي', 'إماراتي', 'كويتي', 'قطري', 'بحريني', 'عماني', 'يمني', 'عراقي', 'سوري', 'لبناني', 'أردني', 'فلسطيني', 'مصري', 'سوداني', 'ليبي', 'تونسي', 'جزائري', 'مغربي', 'هندي', 'باكستاني', 'بنغلاديشي', 'فلبيني', 'إندونيسي', 'بريطاني', 'فرنسي', 'ألماني', 'أمريكي', 'كندي']
@@ -107,9 +108,9 @@ export function ProfilePage() {
   }, [user, form])
 
   const topNav = [
-    { title: isRTL ? 'الملف الشخصي' : 'Profile', href: '/dashboard/settings/profile', isActive: true },
-    { title: isRTL ? 'الأمان' : 'Security', href: '/dashboard/settings/security', isActive: false },
-    { title: isRTL ? 'التفضيلات' : 'Preferences', href: '/dashboard/settings/preferences', isActive: false },
+    { title: isRTL ? 'الملف الشخصي' : 'Profile', href: ROUTES.dashboard.settings.profile, isActive: true },
+    { title: isRTL ? 'الأمان' : 'Security', href: ROUTES.dashboard.settings.security, isActive: false },
+    { title: isRTL ? 'التفضيلات' : 'Preferences', href: ROUTES.dashboard.settings.preferences, isActive: false },
   ]
 
   function onSubmit(data: ProfileFormValues) {

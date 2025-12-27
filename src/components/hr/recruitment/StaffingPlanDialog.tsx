@@ -147,17 +147,11 @@ export function StaffingPlanDialog({
         <DialogHeader>
           <DialogTitle>
             {plan
-              ? isArabic
-                ? 'تعديل خطة التوظيف'
-                : 'Edit Staffing Plan'
-              : isArabic
-              ? 'خطة توظيف جديدة'
-              : 'New Staffing Plan'}
+              ? t('hr.dialogs.staffingPlan.editTitle')
+              : t('hr.dialogs.staffingPlan.newTitle')}
           </DialogTitle>
           <DialogDescription>
-            {isArabic
-              ? 'أدخل تفاصيل خطة التوظيف. سيتم حساب الشواغر تلقائياً.'
-              : 'Enter the staffing plan details. Vacancies will be calculated automatically.'}
+            {t('hr.dialogs.staffingPlan.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -171,15 +165,11 @@ export function StaffingPlanDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      {isArabic ? 'اسم الخطة' : 'Plan Name'} *
+                      {t('hr.dialogs.staffingPlan.planName')} *
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder={
-                          isArabic
-                            ? 'خطة التوظيف السنوية 2024'
-                            : 'Annual Staffing Plan 2024'
-                        }
+                        placeholder={t('hr.dialogs.staffingPlan.planNamePlaceholder')}
                         {...field}
                       />
                     </FormControl>
@@ -193,14 +183,10 @@ export function StaffingPlanDialog({
                 name="nameAr"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{isArabic ? 'الاسم بالعربية' : 'Arabic Name'}</FormLabel>
+                    <FormLabel>{t('hr.dialogs.staffingPlan.arabicName')}</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder={
-                          isArabic
-                            ? 'خطة التوظيف السنوية 2024'
-                            : 'خطة التوظيف السنوية 2024'
-                        }
+                        placeholder={t('hr.dialogs.staffingPlan.planNamePlaceholder')}
                         {...field}
                       />
                     </FormControl>
@@ -216,10 +202,10 @@ export function StaffingPlanDialog({
               name="company"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{isArabic ? 'الشركة' : 'Company'}</FormLabel>
+                  <FormLabel>{t('hr.dialogs.staffingPlan.company')}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={isArabic ? 'اسم الشركة' : 'Company name'}
+                      placeholder={t('hr.dialogs.staffingPlan.companyPlaceholder')}
                       {...field}
                     />
                   </FormControl>
@@ -236,7 +222,7 @@ export function StaffingPlanDialog({
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <FormLabel>
-                      {isArabic ? 'من تاريخ' : 'From Date'} *
+                      {t('hr.dialogs.staffingPlan.fromDate')} *
                     </FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
@@ -253,7 +239,7 @@ export function StaffingPlanDialog({
                                 locale: isArabic ? ar : undefined,
                               })
                             ) : (
-                              <span>{isArabic ? 'اختر التاريخ' : 'Pick a date'}</span>
+                              <span>{t('hr.dialogs.staffingPlan.pickDate')}</span>
                             )}
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
@@ -279,7 +265,7 @@ export function StaffingPlanDialog({
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <FormLabel>
-                      {isArabic ? 'إلى تاريخ' : 'To Date'} *
+                      {t('hr.dialogs.staffingPlan.toDate')} *
                     </FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
@@ -296,7 +282,7 @@ export function StaffingPlanDialog({
                                 locale: isArabic ? ar : undefined,
                               })
                             ) : (
-                              <span>{isArabic ? 'اختر التاريخ' : 'Pick a date'}</span>
+                              <span>{t('hr.dialogs.staffingPlan.pickDate')}</span>
                             )}
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
@@ -323,7 +309,7 @@ export function StaffingPlanDialog({
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{isArabic ? 'الحالة' : 'Status'}</FormLabel>
+                  <FormLabel>{t('hr.dialogs.staffingPlan.status')}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -332,13 +318,13 @@ export function StaffingPlanDialog({
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="draft">
-                        {isArabic ? 'مسودة' : 'Draft'}
+                        {t('hr.dialogs.staffingPlan.statusDraft')}
                       </SelectItem>
                       <SelectItem value="active">
-                        {isArabic ? 'نشط' : 'Active'}
+                        {t('hr.dialogs.staffingPlan.statusActive')}
                       </SelectItem>
                       <SelectItem value="closed">
-                        {isArabic ? 'مغلق' : 'Closed'}
+                        {t('hr.dialogs.staffingPlan.statusClosed')}
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -354,14 +340,10 @@ export function StaffingPlanDialog({
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{isArabic ? 'الملاحظات' : 'Notes'}</FormLabel>
+                    <FormLabel>{t('hr.dialogs.staffingPlan.notes')}</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder={
-                          isArabic
-                            ? 'أدخل أي ملاحظات...'
-                            : 'Enter any notes...'
-                        }
+                        placeholder={t('hr.dialogs.staffingPlan.notesPlaceholder')}
                         rows={3}
                         {...field}
                       />
@@ -377,11 +359,11 @@ export function StaffingPlanDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      {isArabic ? 'الملاحظات بالعربية' : 'Notes (Arabic)'}
+                      {t('hr.dialogs.staffingPlan.notesAr')}
                     </FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder={isArabic ? 'ملاحظات...' : 'Notes...'}
+                        placeholder={t('hr.dialogs.staffingPlan.notesArPlaceholder')}
                         rows={3}
                         {...field}
                       />
@@ -398,23 +380,17 @@ export function StaffingPlanDialog({
                 variant="outline"
                 onClick={() => onOpenChange(false)}
               >
-                {isArabic ? 'إلغاء' : 'Cancel'}
+                {t('hr.dialogs.staffingPlan.cancel')}
               </Button>
               <Button
                 type="submit"
                 disabled={createMutation.isPending || updateMutation.isPending}
               >
                 {createMutation.isPending || updateMutation.isPending
-                  ? isArabic
-                    ? 'جاري الحفظ...'
-                    : 'Saving...'
+                  ? t('hr.dialogs.staffingPlan.saving')
                   : plan
-                  ? isArabic
-                    ? 'تحديث'
-                    : 'Update'
-                  : isArabic
-                  ? 'إنشاء'
-                  : 'Create'}
+                  ? t('hr.dialogs.staffingPlan.update')
+                  : t('hr.dialogs.staffingPlan.create')}
               </Button>
             </DialogFooter>
           </form>

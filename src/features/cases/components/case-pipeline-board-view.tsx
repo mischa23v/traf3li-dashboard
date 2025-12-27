@@ -26,6 +26,7 @@ import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { Progress } from '@/components/ui/progress'
+import { ROUTES } from '@/constants/routes'
 import {
   Search, Bell, AlertCircle, MoreHorizontal,
   Eye, Scale, MapPin, FileText, User,
@@ -174,7 +175,7 @@ const CaseCard = memo(function CaseCard({
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to={`/dashboard/cases/${caseItem._id}/notion`}>
+                <Link to={ROUTES.dashboard.cases.notion(caseItem._id)}>
                   <Lightbulb className="h-4 w-4 ms-2 text-purple-500" />
                   {t('casePipeline.brainstorm', 'العصف الذهني')}
                 </Link>
@@ -412,11 +413,11 @@ export function CasePipelineBoardView() {
 
   // Navigation handlers
   const handleOpenCase = useCallback((caseId: string) => {
-    navigate({ to: `/dashboard/cases/${caseId}` as any })
+    navigate({ to: ROUTES.dashboard.cases.detail(caseId) as any })
   }, [navigate])
 
   const handleOpenPipeline = useCallback((caseId: string) => {
-    navigate({ to: `/dashboard/cases/${caseId}/pipeline` as any })
+    navigate({ to: ROUTES.dashboard.cases.casePipeline(caseId) as any })
   }, [navigate])
 
   // Calculate stage totals
@@ -431,9 +432,9 @@ export function CasePipelineBoardView() {
 
   const topNav = [
     { title: t('casePipeline.nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },
-    { title: t('casePipeline.nav.cases', 'القضايا'), href: '/dashboard/cases', isActive: false },
-    { title: t('casePipeline.nav.pipeline', 'مسار القضايا'), href: '/dashboard/cases/pipeline', isActive: true },
-    { title: t('casePipeline.nav.brainstorm', 'العصف الذهني'), href: '/dashboard/notion', isActive: false },
+    { title: t('casePipeline.nav.cases', 'القضايا'), href: ROUTES.dashboard.cases.list, isActive: false },
+    { title: t('casePipeline.nav.pipeline', 'مسار القضايا'), href: ROUTES.dashboard.cases.pipeline, isActive: true },
+    { title: t('casePipeline.nav.brainstorm', 'العصف الذهني'), href: ROUTES.dashboard.notion, isActive: false },
   ]
 
   return (
@@ -505,7 +506,7 @@ export function CasePipelineBoardView() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate({ to: '/dashboard/cases/pipeline/list' as any })}
+                onClick={() => navigate({ to: ROUTES.dashboard.cases.pipeline as any })}
                 className="rounded-lg px-3"
               >
                 <List className="h-4 w-4 ms-2" />
@@ -538,7 +539,7 @@ export function CasePipelineBoardView() {
             )}
 
             <Button asChild className="bg-emerald-500 hover:bg-emerald-600 rounded-xl">
-              <Link to="/dashboard/cases/create">
+              <Link to={ROUTES.dashboard.cases.new}>
                 <Plus className="h-4 w-4 ms-2" />
                 {t('casePipeline.board.newCase', 'قضية جديدة')}
               </Link>

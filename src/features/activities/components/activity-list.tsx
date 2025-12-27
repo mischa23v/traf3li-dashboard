@@ -77,7 +77,7 @@ export function ActivityList({
   maxItems,
   className,
 }: ActivityListProps) {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const isArabic = i18n.language === 'ar'
   const [feedbackDialogOpen, setFeedbackDialogOpen] = React.useState(false)
   const [selectedActivity, setSelectedActivity] = React.useState<OdooActivity | null>(null)
@@ -141,35 +141,35 @@ export function ActivityList({
         return (
           <Badge variant="destructive" className="gap-1">
             <AlertTriangle className="h-3 w-3" />
-            {isArabic ? 'متأخر' : 'Overdue'}
+            {t('odooActivities.overdue')}
           </Badge>
         )
       case 'today':
         return (
           <Badge variant="outline" className="gap-1 border-orange-500 text-orange-600">
             <Clock className="h-3 w-3" />
-            {isArabic ? 'اليوم' : 'Today'}
+            {t('odooActivities.today')}
           </Badge>
         )
       case 'done':
         return (
           <Badge variant="outline" className="gap-1 border-green-500 text-green-600">
             <Check className="h-3 w-3" />
-            {isArabic ? 'مكتمل' : 'Done'}
+            {t('odooActivities.done')}
           </Badge>
         )
       case 'cancelled':
         return (
           <Badge variant="secondary" className="gap-1">
             <X className="h-3 w-3" />
-            {isArabic ? 'ملغى' : 'Cancelled'}
+            {t('odooActivities.cancelled')}
           </Badge>
         )
       default:
         return (
           <Badge variant="outline" className="gap-1">
             <Calendar className="h-3 w-3" />
-            {isArabic ? 'مخطط' : 'Planned'}
+            {t('odooActivities.planned')}
           </Badge>
         )
     }
@@ -186,7 +186,7 @@ export function ActivityList({
   if (!displayedActivities?.length) {
     return (
       <div className={cn('text-center text-muted-foreground p-4', className)}>
-        {isArabic ? 'لا توجد أنشطة' : 'No activities'}
+        {t('odooActivities.noActivities')}
       </div>
     )
   }
@@ -289,7 +289,7 @@ export function ActivityList({
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => handleMarkDone(activity)}>
                       <Check className="h-4 w-4 me-2" />
-                      {isArabic ? 'إتمام' : 'Mark as Done'}
+                      {t('odooActivities.markDone')}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
@@ -297,7 +297,7 @@ export function ActivityList({
                       onClick={() => handleCancel(activity._id)}
                     >
                       <X className="h-4 w-4 me-2" />
-                      {isArabic ? 'إلغاء' : 'Cancel'}
+                      {t('odooActivities.cancel')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -312,27 +312,25 @@ export function ActivityList({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {isArabic ? 'إتمام النشاط' : 'Complete Activity'}
+              {t('odooActivities.completeActivity')}
             </DialogTitle>
             <DialogDescription>
-              {isArabic
-                ? 'أضف ملاحظات حول النتيجة (اختياري)'
-                : 'Add feedback about the outcome (optional)'}
+              {t('odooActivities.addFeedbackDescription')}
             </DialogDescription>
           </DialogHeader>
           <Textarea
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
-            placeholder={isArabic ? 'النتيجة أو الملاحظات...' : 'Outcome or notes...'}
+            placeholder={t('odooActivities.feedbackPlaceholder')}
             rows={3}
           />
           <DialogFooter>
             <Button variant="outline" onClick={() => setFeedbackDialogOpen(false)}>
-              {isArabic ? 'إلغاء' : 'Cancel'}
+              {t('odooActivities.cancel')}
             </Button>
             <Button onClick={handleConfirmDone} disabled={markDone.isPending}>
               {markDone.isPending && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
-              {isArabic ? 'إتمام' : 'Complete'}
+              {t('odooActivities.complete')}
             </Button>
           </DialogFooter>
         </DialogContent>

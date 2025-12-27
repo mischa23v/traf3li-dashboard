@@ -66,16 +66,16 @@ const topNav = [
 ]
 
 const REFERENCE_TYPES = [
-  { value: 'purchase_receipt', label: 'إيصال شراء', labelEn: 'Purchase Receipt' },
-  { value: 'delivery_note', label: 'مذكرة تسليم', labelEn: 'Delivery Note' },
-  { value: 'stock_entry', label: 'قيد مخزون', labelEn: 'Stock Entry' },
-  { value: 'production', label: 'إنتاج', labelEn: 'Production' },
+  { value: 'purchase_receipt', translationKey: 'quality.referenceType.purchaseReceipt' },
+  { value: 'delivery_note', translationKey: 'quality.referenceType.deliveryNote' },
+  { value: 'stock_entry', translationKey: 'quality.referenceType.stockEntry' },
+  { value: 'production', translationKey: 'quality.referenceType.production' },
 ] as const
 
-const INSPECTION_TYPES: { value: InspectionType; label: string; labelEn: string }[] = [
-  { value: 'incoming', label: 'وارد', labelEn: 'Incoming' },
-  { value: 'outgoing', label: 'صادر', labelEn: 'Outgoing' },
-  { value: 'in_process', label: 'قيد الإنتاج', labelEn: 'In Process' },
+const INSPECTION_TYPES: { value: InspectionType; translationKey: string }[] = [
+  { value: 'incoming', translationKey: 'quality.type.incoming' },
+  { value: 'outgoing', translationKey: 'quality.type.outgoing' },
+  { value: 'in_process', translationKey: 'quality.type.inProcess' },
 ]
 
 export function CreateInspectionView() {
@@ -252,7 +252,7 @@ export function CreateInspectionView() {
                         <SelectContent>
                           {REFERENCE_TYPES.map((type) => (
                             <SelectItem key={type.value} value={type.value}>
-                              {type.label} ({type.labelEn})
+                              {t(type.translationKey)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -320,7 +320,7 @@ export function CreateInspectionView() {
                         <SelectContent>
                           {INSPECTION_TYPES.map((type) => (
                             <SelectItem key={type.value} value={type.value}>
-                              {type.label} ({type.labelEn})
+                              {t(type.translationKey)}
                             </SelectItem>
                           ))}
                         </SelectContent>

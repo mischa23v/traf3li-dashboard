@@ -86,7 +86,7 @@ export function CreateAccountActivityView() {
                         <div className="bg-emerald-950 rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20 flex flex-col md:flex-row items-center justify-between gap-8">
                             <div className="relative z-10 max-w-lg">
                                 <div className="flex items-center gap-4 mb-4">
-                                    <Link to="/dashboard/finance/activity">
+                                    <Link to={ROUTES.dashboard.finance.activity.list}>
                                         <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
                                             <ArrowRight className="w-5 h-5" />
                                         </Button>
@@ -219,7 +219,7 @@ export function CreateAccountActivityView() {
                                 </div>
 
                                 <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
-                                    <Link to="/dashboard/finance/activity">
+                                    <Link to={ROUTES.dashboard.finance.activity.list}>
                                         <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
                                             إلغاء
                                         </Button>

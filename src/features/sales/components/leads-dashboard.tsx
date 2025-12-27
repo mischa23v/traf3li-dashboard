@@ -26,6 +26,7 @@ import {
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { ar } from 'date-fns/locale'
+import { useTranslation } from 'react-i18next'
 import {
   useLeads,
   useLead,
@@ -73,15 +74,7 @@ import { cn } from '@/lib/utils'
 
 // ==================== CONSTANTS ====================
 
-const STAGE_LABELS: Record<LeadStage, string> = {
-  new: 'جديد',
-  contacted: 'تم التواصل',
-  qualified: 'مؤهل',
-  proposal: 'عرض مقدم',
-  negotiation: 'مفاوضة',
-  won: 'مكتسب',
-  lost: 'مفقود',
-}
+const getStageLabel = (stage: LeadStage, t: any) => t(`sales.leads.stages.${stage}`)
 
 const STAGE_COLORS: Record<LeadStage, string> = {
   new: 'bg-blue-500',
@@ -93,33 +86,19 @@ const STAGE_COLORS: Record<LeadStage, string> = {
   lost: 'bg-red-500',
 }
 
-const SOURCE_LABELS: Record<LeadSource, string> = {
-  website: 'الموقع الإلكتروني',
-  referral: 'إحالة',
-  social_media: 'وسائل التواصل',
-  advertisement: 'إعلان',
-  cold_call: 'اتصال مباشر',
-  walk_in: 'زيارة شخصية',
-  other: 'أخرى',
-}
+const getSourceLabel = (source: LeadSource, t: any) => t(`sales.leads.sources.${source}`)
 
-const CASE_TYPES = [
-  { value: 'labor', label: 'قضايا عمالية' },
-  { value: 'commercial', label: 'قضايا تجارية' },
-  { value: 'civil', label: 'قضايا مدنية' },
-  { value: 'criminal', label: 'قضايا جنائية' },
-  { value: 'family', label: 'قضايا أسرية' },
-  { value: 'administrative', label: 'قضايا إدارية' },
-  { value: 'other', label: 'أخرى' },
+const getCaseTypes = (t: any) => [
+  { value: 'labor', label: t('sales.leads.caseTypes.laborPlural') },
+  { value: 'commercial', label: t('sales.leads.caseTypes.commercialPlural') },
+  { value: 'civil', label: t('sales.leads.caseTypes.civilPlural') },
+  { value: 'criminal', label: t('sales.leads.caseTypes.criminalPlural') },
+  { value: 'family', label: t('sales.leads.caseTypes.familyPlural') },
+  { value: 'administrative', label: t('sales.leads.caseTypes.administrativePlural') },
+  { value: 'other', label: t('sales.leads.caseTypes.other') },
 ]
 
-const ACTIVITY_TYPE_LABELS = {
-  call: 'مكالمة',
-  email: 'بريد إلكتروني',
-  meeting: 'اجتماع',
-  note: 'ملاحظة',
-  task: 'مهمة',
-}
+const getActivityTypeLabel = (type: string, t: any) => t(`sales.leads.activities.types.${type}`)
 
 // ==================== COMPONENTS ====================
 
@@ -144,6 +123,7 @@ function LeadCard({
   onDragStart,
   onDragEnd,
 }: LeadCardProps) {
+  const { t } = useTranslation()
   const canConvert = ['qualified', 'proposal', 'negotiation'].includes(lead.stage)
 
   return (
@@ -238,7 +218,7 @@ function LeadCard({
 
       {lead.source && (
         <Badge variant="secondary" className="mt-2 text-xs">
-          {SOURCE_LABELS[lead.source]}
+          {getSourceLabel(lead.source, t)}
         </Badge>
       )}
     </Card>
@@ -258,6 +238,7 @@ function ConvertLeadDialog({
   onOpenChange,
   onConfirm,
 }: ConvertLeadDialogProps) {
+  const { t } = useTranslation()
   const [createCase, setCreateCase] = useState(false)
   const [caseType, setCaseType] = useState('')
 
@@ -318,10 +299,10 @@ function ConvertLeadDialog({
                   <label className="text-sm text-slate-600">نوع القضية</label>
                   <Select value={caseType} onValueChange={setCaseType}>
                     <SelectTrigger>
-                      <SelectValue placeholder="اختر نوع القضية" />
+                      <SelectValue placeholder=t('sales.leads.selectCaseType') />
                     </SelectTrigger>
                     <SelectContent>
-                      {CASE_TYPES.map((type) => (
+                      {getCaseTypes(t).map((type) => (
                         <SelectItem key={type.value} value={type.value}>
                           {type.label}
                         </SelectItem>
@@ -373,6 +354,7 @@ function LeadFormDialog({
   onSubmit,
   initialData,
 }: LeadFormDialogProps) {
+  const { t } = useTranslation()
   const { data: staffData } = useStaff()
   const staff = staffData?.data || []
 
@@ -402,7 +384,7 @@ function LeadFormDialog({
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {initialData ? 'تعديل عميل محتمل' : 'عميل محتمل جديد'}
+            {initialData ? t('sales.leads.editLead') : t('sales.leads.newLead')}
           </DialogTitle>
         </DialogHeader>
 
@@ -506,7 +488,7 @@ function LeadFormDialog({
                 }
               >
                 <SelectTrigger className="rounded-xl">
-                  <SelectValue placeholder="اختر موظف" />
+                  <SelectValue placeholder=t('sales.leads.form.selectStaff') />
                 </SelectTrigger>
                 <SelectContent>
                   {staff.map((member: any) => (
@@ -556,10 +538,10 @@ function LeadFormDialog({
               }
             >
               <SelectTrigger className="rounded-xl">
-                <SelectValue placeholder="اختر نوع القضية" />
+                <SelectValue placeholder=t('sales.leads.selectCaseType') />
               </SelectTrigger>
               <SelectContent>
-                {CASE_TYPES.map((type) => (
+                {getCaseTypes(t).map((type) => (
                   <SelectItem key={type.value} value={type.value}>
                     {type.label}
                   </SelectItem>
@@ -626,6 +608,7 @@ function ActivityDialog({
   onOpenChange,
   onSubmit,
 }: ActivityDialogProps) {
+  const { t } = useTranslation()
   const [activityData, setActivityData] = useState({
     type: 'note' as LeadActivity['type'],
     description: '',
@@ -739,6 +722,7 @@ function ActivityDialog({
 // ==================== MAIN COMPONENT ====================
 
 export function LeadsDashboard() {
+  const { t } = useTranslation()
   const [selectedStage, setSelectedStage] = useState<LeadStage | 'all'>('all')
   const [searchQuery, setSearchQuery] = useState('')
     // Debounced search handler
@@ -865,7 +849,7 @@ export function LeadsDashboard() {
   }
 
   const handleDelete = (leadId: string) => {
-    if (confirm('هل أنت متأكد من حذف هذا العميل المحتمل؟')) {
+    if (confirm(t('sales.leads.deleteConfirm'))) {
       deleteLead.mutate(leadId)
     }
   }
@@ -968,7 +952,7 @@ export function LeadsDashboard() {
             <div className="relative flex-1">
               <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
               <Input
-                placeholder="بحث عن عملاء محتملين..."
+                placeholder=t('sales.leads.searchLeads')
                 defaultValue={searchQuery}
                 onChange={(e) => debouncedSetSearch(e.target.value)}
                 className="pe-10 rounded-xl"
@@ -995,7 +979,7 @@ export function LeadsDashboard() {
             >
               الكل ({stats.totalLeads})
             </Button>
-            {Object.entries(STAGE_LABELS).map(([stage, label]) => (
+            {(Object.keys({ new: '', contacted: '', qualified: '', proposal: '', negotiation: '', won: '', lost: '' }) as LeadStage[]).map((stage) => (
               <Button
                 key={stage}
                 size="sm"
@@ -1003,7 +987,7 @@ export function LeadsDashboard() {
                 onClick={() => setSelectedStage(stage as LeadStage)}
                 className="rounded-full"
               >
-                {label} ({stats.byStage[stage as LeadStage] || 0})
+                {getStageLabel(stage, t)} ({stats.byStage[stage as LeadStage] || 0})
               </Button>
             ))}
           </div>
@@ -1019,7 +1003,7 @@ export function LeadsDashboard() {
         // Pipeline View
         <div className="overflow-x-auto pb-4">
           <div className="flex gap-4 min-w-max">
-            {Object.entries(STAGE_LABELS).map(([stage, label]) => {
+            {(Object.keys({ new: '', contacted: '', qualified: '', proposal: '', negotiation: '', won: '', lost: '' }) as LeadStage[]).map((stage) => {
               const stageLeads = leadsByStage[stage as LeadStage]
               const stageValue = stageLeads.reduce(
                 (sum, lead) => sum + (lead.estimatedValue || 0),

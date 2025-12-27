@@ -264,11 +264,11 @@ export function SaudiBankingWPSCreateView() {
 
                 {/* Breadcrumb */}
                 <div className="flex items-center gap-2 text-sm">
-                    <Link to="/dashboard/finance/saudi-banking" className="text-slate-500 hover:text-emerald-600">
+                    <Link to={ROUTES.dashboard.finance.saudiBanking.index} className="text-slate-500 hover:text-emerald-600">
                         الخدمات المصرفية
                     </Link>
                     <ChevronLeft className="h-4 w-4 text-slate-400" />
-                    <Link to="/dashboard/finance/saudi-banking/wps" className="text-slate-500 hover:text-emerald-600">
+                    <Link to={ROUTES.dashboard.finance.saudiBanking.wps.index} className="text-slate-500 hover:text-emerald-600">
                         WPS
                     </Link>
                     <ChevronLeft className="h-4 w-4 text-slate-400" />
@@ -536,7 +536,7 @@ export function SaudiBankingWPSCreateView() {
 
                         {/* Actions */}
                         <div className="flex gap-4 justify-end">
-                            <Link to="/dashboard/finance/saudi-banking/wps">
+                            <Link to={ROUTES.dashboard.finance.saudiBanking.wps.index}>
                                 <Button variant="outline" className="rounded-xl px-8">
                                     إلغاء
                                 </Button>

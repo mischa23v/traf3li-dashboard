@@ -66,10 +66,11 @@ import {
 } from '@/hooks/use-inventory'
 import type { StockEntryType } from '@/types/inventory'
 import { InventorySidebar } from './inventory-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.inventory', href: '/dashboard/inventory' },
+  { title: 'sidebar.nav.inventory', href: ROUTES.dashboard.inventory.list },
 ]
 
 export function StockEntryDetailsView() {
@@ -98,7 +99,7 @@ export function StockEntryDetailsView() {
 
   const handleDelete = async () => {
     await deleteMutation.mutateAsync(stockEntryId)
-    navigate({ to: '/dashboard/inventory/stock-entries' })
+    navigate({ to: ROUTES.dashboard.inventory.stockEntries.list })
   }
 
   const handlePrint = () => {
@@ -193,7 +194,7 @@ export function StockEntryDetailsView() {
             <CardContent className="p-12 text-center">
               <ArrowRightLeft className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium mb-2">{t('inventory.stockEntryNotFound', 'حركة المخزون غير موجودة')}</h3>
-              <Button onClick={() => navigate({ to: '/dashboard/inventory/stock-entries' })} className="rounded-xl">
+              <Button onClick={() => navigate({ to: ROUTES.dashboard.inventory.stockEntries.list })} className="rounded-xl">
                 <ArrowRight className="w-4 h-4 ml-2" />
                 {t('inventory.backToList', 'العودة للقائمة')}
               </Button>

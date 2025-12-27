@@ -29,6 +29,7 @@ import { API_DOMAIN, API_URL } from '@/lib/api'
 import { toast } from 'sonner'
 import { VoiceMemoRecorder, VoiceMemoPlayer, isVoiceMemo } from './voice-memo-recorder'
 import { AttachmentVersionsDialog } from './attachment-versions-dialog'
+import { ROUTES } from '@/constants/routes'
 
 // Lazy load DocumentEditorDialog - contains TipTap editor (~150KB)
 const DocumentEditorDialog = lazy(() => import('./document-editor-dialog').then(mod => ({ default: mod.DocumentEditorDialog })))
@@ -122,7 +123,7 @@ export function TaskDetailsView() {
     const handleDelete = () => {
         deleteTaskMutation.mutate(taskId, {
             onSuccess: () => {
-                navigate({ to: '/dashboard/tasks/list' })
+                navigate({ to: ROUTES.dashboard.tasks.list })
             }
         })
     }
@@ -489,10 +490,10 @@ export function TaskDetailsView() {
     }, [taskData])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'المهام', href: '/dashboard/tasks/list', isActive: true },
-        { title: 'القضايا', href: '/dashboard/cases', isActive: false },
-        { title: 'العملاء', href: '/dashboard/clients', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.home, isActive: false },
+        { title: 'المهام', href: ROUTES.dashboard.tasks.list, isActive: true },
+        { title: 'القضايا', href: ROUTES.dashboard.cases.list, isActive: false },
+        { title: 'العملاء', href: ROUTES.dashboard.clients.list, isActive: false },
     ]
 
     return (
@@ -567,7 +568,7 @@ export function TaskDetailsView() {
                         <h3 className="text-lg font-bold text-slate-900 mb-2">المهمة غير موجودة</h3>
                         <p className="text-slate-500 mb-4">لم يتم العثور على المهمة المطلوبة</p>
                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                            <Link to="/dashboard/tasks/list">
+                            <Link to={ROUTES.dashboard.tasks.list}>
                                 العودة إلى القائمة
                             </Link>
                         </Button>
@@ -584,7 +585,7 @@ export function TaskDetailsView() {
                         {(task.linkedEventId || task.eventId) && (
                             <div className="flex items-center justify-center gap-2">
                                 <Button
-                                    onClick={() => navigate({ to: '/dashboard/tasks/events/$eventId', params: { eventId: task.linkedEventId || task.eventId } })}
+                                    onClick={() => navigate({ to: ROUTES.dashboard.tasks.events.detail(task.linkedEventId || task.eventId) })}
                                     variant="outline"
                                     className="bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100 hover:border-purple-300 rounded-xl px-4 py-2 flex items-center gap-2"
                                 >
@@ -743,8 +744,7 @@ export function TaskDetailsView() {
                                                                 </div>
                                                                 {task.case._id ? (
                                                                     <Link
-                                                                        to="/dashboard/cases/$caseId"
-                                                                        params={{ caseId: task.case._id }}
+                                                                        to={ROUTES.dashboard.cases.detail(task.case._id)}
                                                                         className="text-blue-600 text-sm hover:underline inline-flex items-center gap-1"
                                                                     >
                                                                         <LinkIcon className="h-3 w-3" />
@@ -774,8 +774,7 @@ export function TaskDetailsView() {
                                                                 </div>
                                                                 {task.client._id ? (
                                                                     <Link
-                                                                        to="/dashboard/clients/$clientId"
-                                                                        params={{ clientId: task.client._id }}
+                                                                        to={ROUTES.dashboard.clients.detail(task.client._id)}
                                                                         className="text-blue-600 text-sm hover:underline inline-flex items-center gap-1"
                                                                     >
                                                                         <LinkIcon className="h-3 w-3" />

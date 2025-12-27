@@ -54,7 +54,7 @@ export function CompanyTreeView({
   canDelete = true,
   canAddChild = true,
 }: CompanyTreeViewProps) {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const isArabic = i18n.language === 'ar'
 
   const { data: treeData, isLoading, error } = useCompanyTree(rootFirmId)
@@ -63,7 +63,7 @@ export function CompanyTreeView({
     return (
       <Card className={className}>
         <CardHeader>
-          <CardTitle>{isArabic ? 'الهيكل التنظيمي للشركات' : 'Company Structure'}</CardTitle>
+          <CardTitle>{t('companies.treeView.title')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           {[1, 2, 3].map((i) => (
@@ -78,13 +78,13 @@ export function CompanyTreeView({
     return (
       <Card className={className}>
         <CardHeader>
-          <CardTitle>{isArabic ? 'الهيكل التنظيمي للشركات' : 'Company Structure'}</CardTitle>
+          <CardTitle>{t('companies.treeView.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <Building2 className="h-12 w-12 text-muted-foreground mb-4" />
             <p className="text-sm text-muted-foreground">
-              {isArabic ? 'فشل تحميل الهيكل التنظيمي' : 'Failed to load company structure'}
+              {t('companies.treeView.failedToLoad')}
             </p>
           </div>
         </CardContent>
@@ -96,13 +96,13 @@ export function CompanyTreeView({
     return (
       <Card className={className}>
         <CardHeader>
-          <CardTitle>{isArabic ? 'الهيكل التنظيمي للشركات' : 'Company Structure'}</CardTitle>
+          <CardTitle>{t('companies.treeView.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <Building2 className="h-12 w-12 text-muted-foreground mb-4" />
             <p className="text-sm text-muted-foreground">
-              {isArabic ? 'لا توجد شركات' : 'No companies found'}
+              {t('companies.treeView.noCompanies')}
             </p>
           </div>
         </CardContent>
@@ -113,7 +113,7 @@ export function CompanyTreeView({
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle>{isArabic ? 'الهيكل التنظيمي للشركات' : 'Company Structure'}</CardTitle>
+        <CardTitle>{t('companies.treeView.title')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-1">
@@ -129,6 +129,7 @@ export function CompanyTreeView({
               canDelete={canDelete}
               canAddChild={canAddChild}
               isArabic={isArabic}
+              t={t}
             />
           ))}
         </div>
@@ -149,6 +150,7 @@ interface CompanyTreeNodeProps {
   canDelete: boolean
   canAddChild: boolean
   isArabic: boolean
+  t: (key: string) => string
 }
 
 function CompanyTreeNode({
@@ -161,6 +163,7 @@ function CompanyTreeNode({
   canDelete,
   canAddChild,
   isArabic,
+  t,
 }: CompanyTreeNodeProps) {
   const [isExpanded, setIsExpanded] = React.useState(true)
 
@@ -240,12 +243,12 @@ function CompanyTreeNode({
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
           {node.userCount !== undefined && (
             <span>
-              {node.userCount} {isArabic ? 'مستخدم' : 'users'}
+              {node.userCount} {t('companies.treeView.users')}
             </span>
           )}
           {hasChildren && (
             <span>
-              {node.children.length} {isArabic ? 'فرع' : 'children'}
+              {node.children.length} {t('companies.treeView.children')}
             </span>
           )}
         </div>
@@ -259,24 +262,24 @@ function CompanyTreeNode({
               className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
             >
               <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">{isArabic ? 'الإجراءات' : 'Actions'}</span>
+              <span className="sr-only">{t('companies.treeView.actions')}</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align={isArabic ? 'start' : 'end'} dir={isArabic ? 'rtl' : 'ltr'}>
-            <DropdownMenuLabel>{isArabic ? 'الإجراءات' : 'Actions'}</DropdownMenuLabel>
+            <DropdownMenuLabel>{t('companies.treeView.actions')}</DropdownMenuLabel>
             <DropdownMenuSeparator />
 
             {canEdit && onEdit && (
               <DropdownMenuItem onClick={() => onEdit(node._id)}>
                 <Edit className={cn('h-4 w-4', isArabic ? 'ml-2' : 'mr-2')} />
-                {isArabic ? 'تعديل' : 'Edit'}
+                {t('companies.treeView.edit')}
               </DropdownMenuItem>
             )}
 
             {canAddChild && onAddChild && (
               <DropdownMenuItem onClick={() => onAddChild(node._id)}>
                 <Plus className={cn('h-4 w-4', isArabic ? 'ml-2' : 'mr-2')} />
-                {isArabic ? 'إضافة شركة فرعية' : 'Add Child Company'}
+                {t('companies.treeView.addChild')}
               </DropdownMenuItem>
             )}
 
@@ -288,7 +291,7 @@ function CompanyTreeNode({
                   className="text-destructive focus:text-destructive"
                 >
                   <Trash2 className={cn('h-4 w-4', isArabic ? 'ml-2' : 'mr-2')} />
-                  {isArabic ? 'حذف' : 'Delete'}
+                  {t('companies.treeView.delete')}
                 </DropdownMenuItem>
               </>
             )}
@@ -311,6 +314,7 @@ function CompanyTreeNode({
               canDelete={canDelete}
               canAddChild={canAddChild}
               isArabic={isArabic}
+              t={t}
             />
           ))}
         </div>

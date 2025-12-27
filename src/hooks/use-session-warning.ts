@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
 interface SessionWarning {
@@ -30,8 +31,25 @@ export function useSessionWarning(options: UseSessionWarningOptions = {}) {
     enableRefreshPrompt = true,
   } = options
 
+  const { t, i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
+
   const [warning, setWarning] = useState<SessionWarning | null>(null)
   const [showModal, setShowModal] = useState(false)
+
+  const refreshSession = useCallback(async () => {
+    try {
+      // Import dynamically to avoid circular deps
+      const { apiClient } = await import('@/lib/api')
+      await apiClient.post('/auth/refresh-activity')
+      setWarning(null)
+      setShowModal(false)
+
+      toast.success(isRTL ? 'تم تمديد الجلسة بنجاح' : 'Session extended successfully')
+    } catch (error) {
+      toast.error(isRTL ? 'فشل تمديد الجلسة' : 'Failed to extend session')
+    }
+  }, [isRTL])
 
   const handleWarning = useCallback((event: CustomEvent<SessionWarning>) => {
     const warningData = event.detail
@@ -53,19 +71,19 @@ export function useSessionWarning(options: UseSessionWarningOptions = {}) {
     if (showToast && warningData.remainingSeconds > 60) {
       const minutes = Math.ceil(warningData.remainingSeconds / 60)
       const message = warningData.isIdleWarning
-        ? `جلستك ستنتهي قريباً بسبب عدم النشاط (${minutes} دقيقة)`
-        : `جلستك ستنتهي خلال ${minutes} دقيقة`
+        ? (isRTL ? `جلستك ستنتهي قريباً بسبب عدم النشاط (${minutes} دقيقة)` : `Your session will expire soon due to inactivity (${minutes} minutes)`)
+        : (isRTL ? `جلستك ستنتهي خلال ${minutes} دقيقة` : `Your session will expire in ${minutes} minutes`)
 
       toast.warning(message, {
-        description: 'انقر على أي مكان للبقاء متصلاً',
+        description: isRTL ? 'انقر على أي مكان للبقاء متصلاً' : 'Click anywhere to stay logged in',
         duration: 10000,
         action: {
-          label: 'تمديد الجلسة',
+          label: isRTL ? 'تمديد الجلسة' : 'Extend Session',
           onClick: () => refreshSession(),
         },
       })
     }
-  }, [showToast, onWarning, onCritical, enableRefreshPrompt])
+  }, [showToast, onWarning, onCritical, enableRefreshPrompt, refreshSession, isRTL])
 
   useEffect(() => {
     const handler = (event: Event) => handleWarning(event as CustomEvent<SessionWarning>)
@@ -76,20 +94,6 @@ export function useSessionWarning(options: UseSessionWarningOptions = {}) {
       window.removeEventListener('session-expiry-warning', handler)
     }
   }, [handleWarning])
-
-  const refreshSession = useCallback(async () => {
-    try {
-      // Import dynamically to avoid circular deps
-      const { apiClient } = await import('@/lib/api')
-      await apiClient.post('/auth/refresh-activity')
-      setWarning(null)
-      setShowModal(false)
-
-      toast.success('تم تمديد الجلسة بنجاح')
-    } catch (error) {
-      toast.error('فشل تمديد الجلسة')
-    }
-  }, [])
 
   const dismissWarning = useCallback(() => {
     setWarning(null)

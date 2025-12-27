@@ -67,7 +67,7 @@ interface LockDateSettingsProps {
 }
 
 export function LockDateSettings({ className, isAdmin = false }: LockDateSettingsProps) {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const isArabic = i18n.language === 'ar'
   const [editingLock, setEditingLock] = React.useState<LockType | null>(null)
   const [newDate, setNewDate] = React.useState<Date | undefined>(undefined)
@@ -143,12 +143,10 @@ export function LockDateSettings({ className, isAdmin = false }: LockDateSetting
       <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950/20">
         <AlertTriangle className="h-4 w-4 text-blue-600" />
         <AlertTitle className="text-blue-900 dark:text-blue-100">
-          {isArabic ? '[قيد الانتظار] الميزة قيد التطوير | [BACKEND-PENDING] Feature Under Development' : '[BACKEND-PENDING] Feature Under Development | [قيد الانتظار] الميزة قيد التطوير'}
+          {t('lockDates.featurePendingTitle')}
         </AlertTitle>
         <AlertDescription className="text-blue-800 dark:text-blue-200">
-          {isArabic
-            ? 'ميزة تواريخ القفل غير متاحة حالياً. نحن نعمل على تطويرها وستكون متاحة قريباً. شكراً لصبركم. | [BACKEND-PENDING] The Lock Dates feature is not yet available. We are currently working on it and it will be available soon.'
-            : '[BACKEND-PENDING] The Lock Dates feature is not yet available. We are currently working on it and it will be available soon. Thank you for your patience. | ميزة تواريخ القفل غير متاحة حالياً. نحن نعمل على تطويرها وستكون متاحة قريباً.'}
+          {t('lockDates.featurePendingDesc')}
         </AlertDescription>
       </Alert>
 
@@ -157,12 +155,10 @@ export function LockDateSettings({ className, isAdmin = false }: LockDateSetting
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Lock className="h-5 w-5" />
-            {isArabic ? 'تواريخ القفل' : 'Lock Dates'}
+            {t('lockDates.title')}
           </CardTitle>
           <CardDescription>
-            {isArabic
-              ? 'تحكم في تواريخ القفل لمنع التعديلات على السجلات القديمة'
-              : 'Control lock dates to prevent modifications to old records'}
+            {t('lockDates.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -206,13 +202,11 @@ export function LockDateSettings({ className, isAdmin = false }: LockDateSetting
                               <TooltipTrigger>
                                 <Badge variant="outline" className="text-xs">
                                   <Shield className="h-3 w-3 me-1" />
-                                  {isArabic ? 'مسؤول' : 'Admin'}
+                                  {t('lockDates.admin')}
                                 </Badge>
                               </TooltipTrigger>
                               <TooltipContent>
-                                {isArabic
-                                  ? 'يتطلب صلاحيات مسؤول'
-                                  : 'Requires admin permissions'}
+                                {t('lockDates.requiresAdmin')}
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -233,12 +227,12 @@ export function LockDateSettings({ className, isAdmin = false }: LockDateSetting
                           })}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {isArabic ? 'مغلق حتى هذا التاريخ' : 'Locked until this date'}
+                          {t('lockDates.lockedUntil')}
                         </p>
                       </div>
                     ) : (
                       <p className="text-muted-foreground text-sm">
-                        {isArabic ? 'غير محدد' : 'Not set'}
+                        {t('lockDates.notSet')}
                       </p>
                     )}
 
@@ -253,7 +247,7 @@ export function LockDateSettings({ className, isAdmin = false }: LockDateSetting
                         }}
                       >
                         <Calendar className="h-4 w-4 me-1" />
-                        {isArabic ? 'تعديل' : 'Edit'}
+                        {t('lockDates.edit')}
                       </Button>
                       {lockDate && (
                         <Button
@@ -280,18 +274,18 @@ export function LockDateSettings({ className, isAdmin = false }: LockDateSetting
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <History className="h-5 w-5" />
-              {isArabic ? 'سجل التغييرات' : 'Change History'}
+              {t('lockDates.history')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{isArabic ? 'النوع' : 'Type'}</TableHead>
-                  <TableHead>{isArabic ? 'التاريخ السابق' : 'Previous Date'}</TableHead>
-                  <TableHead>{isArabic ? 'التاريخ الجديد' : 'New Date'}</TableHead>
-                  <TableHead>{isArabic ? 'بواسطة' : 'Changed By'}</TableHead>
-                  <TableHead>{isArabic ? 'التاريخ' : 'Date'}</TableHead>
+                  <TableHead>{t('lockDates.historyType')}</TableHead>
+                  <TableHead>{t('lockDates.historyPrevious')}</TableHead>
+                  <TableHead>{t('lockDates.historyNew')}</TableHead>
+                  <TableHead>{t('lockDates.historyBy')}</TableHead>
+                  <TableHead>{t('lockDates.historyDate')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -324,9 +318,7 @@ export function LockDateSettings({ className, isAdmin = false }: LockDateSetting
                       <TableCell>
                         {user
                           ? `${user.firstName} ${user.lastName}`
-                          : isArabic
-                          ? 'نظام'
-                          : 'System'}
+                          : t('common.system')}
                       </TableCell>
                       <TableCell>
                         {format(new Date(entry.changed_at), 'PPp', {
@@ -347,7 +339,7 @@ export function LockDateSettings({ className, isAdmin = false }: LockDateSetting
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {isArabic ? 'تعديل تاريخ القفل' : 'Update Lock Date'}
+              {t('lockDates.updateLockDate')}
             </DialogTitle>
             <DialogDescription>
               {editingLock &&
@@ -359,7 +351,7 @@ export function LockDateSettings({ className, isAdmin = false }: LockDateSetting
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>{isArabic ? 'تاريخ القفل' : 'Lock Date'}</Label>
+              <Label>{t('lockDates.lockDate')}</Label>
               <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                 <PopoverTrigger asChild>
                   <Button
@@ -372,9 +364,7 @@ export function LockDateSettings({ className, isAdmin = false }: LockDateSetting
                     <Calendar className="me-2 h-4 w-4" />
                     {newDate
                       ? format(newDate, 'PPP', { locale: isArabic ? ar : enUS })
-                      : isArabic
-                      ? 'اختر التاريخ'
-                      : 'Pick a date'}
+                      : t('lockDates.pickDate')}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -392,31 +382,29 @@ export function LockDateSettings({ className, isAdmin = false }: LockDateSetting
             </div>
 
             <div className="space-y-2">
-              <Label>{isArabic ? 'السبب (اختياري)' : 'Reason (Optional)'}</Label>
+              <Label>{t('lockDates.reasonOptional')}</Label>
               <Textarea
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                placeholder={isArabic ? 'أدخل سبب التغيير...' : 'Enter reason for change...'}
+                placeholder={t('lockDates.reasonPlaceholder')}
               />
             </div>
 
             <div className="flex items-start gap-2 p-3 bg-yellow-50 dark:bg-yellow-950 rounded-lg">
               <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5" />
               <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                {isArabic
-                  ? 'تغيير تاريخ القفل سيمنع أي تعديلات على السجلات قبل هذا التاريخ'
-                  : 'Changing the lock date will prevent any modifications to records before this date'}
+                {t('lockDates.warning')}
               </p>
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditingLock(null)}>
-              {isArabic ? 'إلغاء' : 'Cancel'}
+              {t('common.cancel')}
             </Button>
             <Button onClick={handleUpdateLock} disabled={!newDate || updateLock.isPending}>
               {updateLock.isPending && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
-              {isArabic ? 'حفظ' : 'Save'}
+              {t('common.save')}
             </Button>
           </DialogFooter>
         </DialogContent>

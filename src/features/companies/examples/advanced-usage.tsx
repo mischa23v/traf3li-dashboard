@@ -18,7 +18,7 @@ import { CompanySwitcher } from '../components/company-switcher'
 // ==================== EXAMPLE 1: CONSOLIDATED DASHBOARD ====================
 
 export function ConsolidatedDashboard() {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const isArabic = i18n.language === 'ar'
 
   const {
@@ -49,13 +49,11 @@ export function ConsolidatedDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            {isArabic ? 'لوحة المعلومات' : 'Dashboard'}
+            {t('companies.examples.dashboard')}
           </h1>
           <p className="text-muted-foreground">
             {isMultiSelectMode
-              ? isArabic
-                ? `عرض موحد لـ ${selectedFirmIds.length} شركات`
-                : `Consolidated view of ${selectedFirmIds.length} companies`
+              ? t('companies.examples.consolidatedView', { count: selectedFirmIds.length })
               : activeCompany?.nameAr || activeCompany?.name}
           </p>
         </div>
@@ -65,12 +63,8 @@ export function ConsolidatedDashboard() {
             onClick={toggleMultiSelect}
           >
             {isMultiSelectMode
-              ? isArabic
-                ? 'تعطيل العرض الموحد'
-                : 'Disable Consolidated View'
-              : isArabic
-              ? 'تفعيل العرض الموحد'
-              : 'Enable Consolidated View'}
+              ? t('companies.examples.disableConsolidated')
+              : t('companies.examples.enableConsolidated')}
           </Button>
           <CompanySwitcher />
         </div>
@@ -83,13 +77,11 @@ export function ConsolidatedDashboard() {
             <div className="flex items-center gap-2">
               <Building2 className="h-5 w-5 text-primary" />
               <span className="font-medium">
-                {isArabic
-                  ? `البيانات من ${selectedFirmIds.length} شركات`
-                  : `Data from ${selectedFirmIds.length} companies`}
+                {t('companies.examples.dataFrom', { count: selectedFirmIds.length })}
               </span>
             </div>
             <Badge variant="secondary">
-              {isArabic ? 'عرض موحد' : 'Consolidated'}
+              {t('companies.examples.consolidated')}
             </Badge>
           </CardContent>
         </Card>
@@ -98,23 +90,23 @@ export function ConsolidatedDashboard() {
       {/* Stats grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          title={isArabic ? 'الإيرادات' : 'Revenue'}
+          title={t('companies.examples.revenue')}
           value={`$${stats?.totalRevenue.toLocaleString() || 0}`}
           icon={<DollarSign className="h-4 w-4" />}
           trend={stats?.growth}
         />
         <StatCard
-          title={isArabic ? 'الموظفون' : 'Employees'}
+          title={t('companies.examples.employees')}
           value={stats?.totalEmployees || 0}
           icon={<Users className="h-4 w-4" />}
         />
         <StatCard
-          title={isArabic ? 'العملاء' : 'Customers'}
+          title={t('companies.examples.customers')}
           value={stats?.totalCustomers || 0}
           icon={<Building2 className="h-4 w-4" />}
         />
         <StatCard
-          title={isArabic ? 'النمو' : 'Growth'}
+          title={t('companies.examples.growth')}
           value={`${stats?.growth || 0}%`}
           icon={<TrendingUp className="h-4 w-4" />}
           trend={stats?.growth}
@@ -127,7 +119,7 @@ export function ConsolidatedDashboard() {
 // ==================== EXAMPLE 2: CROSS-COMPANY REPORTS ====================
 
 export function CrossCompanyReports() {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const isArabic = i18n.language === 'ar'
 
   const {
@@ -158,14 +150,14 @@ export function CrossCompanyReports() {
       <Card>
         <CardHeader>
           <CardTitle>
-            {isArabic ? 'مقارنة الشركات' : 'Company Comparison'}
+            {t('companies.examples.companyComparison')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {/* Company selector */}
           <div className="mb-6">
             <h3 className="text-sm font-medium mb-3">
-              {isArabic ? 'اختر الشركات للمقارنة' : 'Select Companies to Compare'}
+              {t('companies.examples.selectToCompare')}
             </h3>
             <div className="flex flex-wrap gap-2">
               {accessibleCompanies.map((company) => {
@@ -195,16 +187,16 @@ export function CrossCompanyReports() {
                 <thead>
                   <tr className="border-b bg-muted/50">
                     <th className="p-2 text-left font-medium">
-                      {isArabic ? 'الشركة' : 'Company'}
+                      {t('companies.examples.company')}
                     </th>
                     <th className="p-2 text-right font-medium">
-                      {isArabic ? 'الإيرادات' : 'Revenue'}
+                      {t('companies.examples.revenue')}
                     </th>
                     <th className="p-2 text-right font-medium">
-                      {isArabic ? 'المصروفات' : 'Expenses'}
+                      {t('companies.examples.expenses')}
                     </th>
                     <th className="p-2 text-right font-medium">
-                      {isArabic ? 'الربح' : 'Profit'}
+                      {t('companies.examples.profit')}
                     </th>
                   </tr>
                 </thead>
@@ -245,7 +237,7 @@ export function CrossCompanyReports() {
 // ==================== EXAMPLE 3: PARENT-CHILD HIERARCHY ====================
 
 export function HierarchicalView() {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const isArabic = i18n.language === 'ar'
 
   const {
@@ -284,7 +276,7 @@ export function HierarchicalView() {
       <Card>
         <CardHeader>
           <CardTitle>
-            {isArabic ? 'العرض الهرمي' : 'Hierarchical View'}
+            {t('companies.examples.hierarchicalView')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -302,13 +294,13 @@ export function HierarchicalView() {
                       : activeCompany?.name}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    {isArabic ? 'الشركة الرئيسية' : 'Parent Company'}
+                    {t('companies.examples.parentCompany')}
                   </p>
                 </div>
               </div>
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">
-                  {isArabic ? 'الإيرادات' : 'Revenue'}
+                  {t('companies.examples.revenue')}
                 </p>
                 <p className="text-lg font-semibold">
                   ${aggregatedData?.parent.revenue.toLocaleString() || 0}
@@ -321,7 +313,7 @@ export function HierarchicalView() {
           {childCompanies.length > 0 && (
             <div className="space-y-3">
               <h4 className="text-sm font-medium text-muted-foreground">
-                {isArabic ? 'الشركات الفرعية' : 'Child Companies'} (
+                {t('companies.examples.childCompanies')} (
                 {childCompanies.length})
               </h4>
               {childCompanies.map((child) => {
@@ -353,7 +345,7 @@ export function HierarchicalView() {
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {childData?.employees || 0}{' '}
-                          {isArabic ? 'موظف' : 'employees'}
+                          {t('companies.examples.employeesCount')}
                         </p>
                       </div>
                     </div>
@@ -365,7 +357,7 @@ export function HierarchicalView() {
 
           {childCompanies.length === 0 && (
             <p className="text-center text-muted-foreground py-8">
-              {isArabic ? 'لا توجد شركات فرعية' : 'No child companies'}
+              {t('companies.examples.noChildCompanies')}
             </p>
           )}
         </CardContent>
@@ -410,7 +402,7 @@ function StatCard({ title, value, icon, trend }: StatCardProps) {
 // ==================== EXAMPLE 4: PERMISSION-BASED RENDERING ====================
 
 export function PermissionBasedUI() {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const isArabic = i18n.language === 'ar'
 
   const {
@@ -428,14 +420,14 @@ export function PermissionBasedUI() {
     <Card>
       <CardHeader>
         <CardTitle>
-          {isArabic ? 'الصلاحيات والأدوار' : 'Permissions & Roles'}
+          {t('companies.examples.permissionsRoles')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Show user's role */}
         <div>
           <p className="text-sm text-muted-foreground mb-2">
-            {isArabic ? 'دورك' : 'Your Role'}
+            {t('companies.examples.yourRole')}
           </p>
           <Badge variant="secondary" className="capitalize">
             {access?.role || 'No access'}
@@ -446,12 +438,10 @@ export function PermissionBasedUI() {
         {isAdmin && (
           <div className="p-4 rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-950/20">
             <h4 className="font-medium mb-2">
-              {isArabic ? 'قسم المسؤولين فقط' : 'Admin Only Section'}
+              {t('companies.examples.adminOnly')}
             </h4>
             <p className="text-sm text-muted-foreground">
-              {isArabic
-                ? 'هذا المحتوى متاح للمسؤولين فقط'
-                : 'This content is only visible to admins'}
+              {t('companies.examples.adminContent')}
             </p>
           </div>
         )}
@@ -460,10 +450,10 @@ export function PermissionBasedUI() {
         {canManage && (
           <div className="flex gap-2">
             <Button size="sm">
-              {isArabic ? 'تعديل الإعدادات' : 'Edit Settings'}
+              {t('companies.examples.editSettings')}
             </Button>
             <Button size="sm" variant="outline">
-              {isArabic ? 'إدارة المستخدمين' : 'Manage Users'}
+              {t('companies.examples.manageUsers')}
             </Button>
           </div>
         )}
@@ -471,9 +461,7 @@ export function PermissionBasedUI() {
         {/* Read-only notice */}
         {!canManage && (
           <p className="text-sm text-muted-foreground">
-            {isArabic
-              ? 'ليس لديك صلاحيات الإدارة لهذه الشركة'
-              : "You don't have management permissions for this company"}
+            {t('companies.examples.noManagementPermission')}
           </p>
         )}
       </CardContent>

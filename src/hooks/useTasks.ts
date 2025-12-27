@@ -5,6 +5,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { CACHE_TIMES } from '@/config'
 import tasksService, {
   TaskFilters,
   CreateTaskData,
@@ -22,6 +23,7 @@ import tasksService, {
 } from '@/services/tasksService'
 import { apiClient } from '@/lib/api'
 import { useAuthStore } from '@/stores/auth-store'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ==================== Helper Functions ====================
 
@@ -52,9 +54,9 @@ const logDeprecationWarning = (feature: string, endpoint: string): void => {
 // ==================== Cache Configuration ====================
 // Cache data for 30 minutes to reduce API calls
 // Data is refreshed automatically when tasks are created/updated/deleted
-const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
-const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour (keep in cache)
-const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists (more dynamic)
+const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
+const STATS_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour (keep in cache)
+const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists (more dynamic)
 
 // ==================== Query Hooks ====================
 
@@ -347,7 +349,7 @@ export const useUpdateTask = () => {
     },
     onSuccess: () => {
       toast.success('تم تحديث المهمة بنجاح | Task updated successfully')
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      invalidateCache.tasks.all()
     },
     onError: (error: Error, { id }, context) => {
       if (context?.previousQueries) {
@@ -361,9 +363,9 @@ export const useUpdateTask = () => {
       toast.error(error.message || bilingualError('Failed to update task', 'فشل تحديث المهمة'))
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      await queryClient.invalidateQueries({ queryKey: ['tasks', id] })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      await invalidateCache.tasks.all()
+      await invalidateCache.tasks.detail(id)
+      return await invalidateCache.calendar.all()
     },
   })
 }
@@ -413,10 +415,10 @@ export const useUpdateTaskStatus = () => {
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: TaskStatus }) =>
       tasksService.updateStatus(id, status),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      queryClient.invalidateQueries({ queryKey: ['tasks', id] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    onSuccess: async (_, { id }) => {
+      await invalidateCache.tasks.all()
+      await invalidateCache.tasks.detail(id)
+      await invalidateCache.calendar.all()
       toast.success('تم تحديث حالة المهمة | Task status updated')
     },
     onError: (error: Error) => {
@@ -431,10 +433,10 @@ export const useCompleteTask = () => {
   return useMutation({
     mutationFn: ({ id, completionNotes }: { id: string; completionNotes?: string }) =>
       tasksService.completeTask(id, completionNotes),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      queryClient.invalidateQueries({ queryKey: ['tasks', id] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    onSuccess: async (_, { id }) => {
+      await invalidateCache.tasks.all()
+      await invalidateCache.tasks.detail(id)
+      await invalidateCache.calendar.all()
       toast.success('تم إكمال المهمة بنجاح | Task completed successfully')
     },
     onError: (error: Error) => {
@@ -448,10 +450,10 @@ export const useReopenTask = () => {
 
   return useMutation({
     mutationFn: (id: string) => tasksService.reopenTask(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      queryClient.invalidateQueries({ queryKey: ['tasks', id] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    onSuccess: async (_, id) => {
+      await invalidateCache.tasks.all()
+      await invalidateCache.tasks.detail(id)
+      await invalidateCache.calendar.all()
       toast.success('تم إعادة فتح المهمة | Task reopened')
     },
     onError: (error: Error) => {
@@ -469,10 +471,10 @@ export const useUpdateTaskProgress = () => {
       logDeprecationWarning('Task Progress Update', 'PATCH /tasks/:id/progress')
       return tasksService.updateProgress(id, progress, autoCalculate)
     },
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      queryClient.invalidateQueries({ queryKey: ['tasks', id] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    onSuccess: async (_, { id }) => {
+      await invalidateCache.tasks.all()
+      await invalidateCache.tasks.detail(id)
+      await invalidateCache.calendar.all()
       toast.success('تم تحديث تقدم المهمة | Task progress updated')
     },
     onError: (error: Error) => {
@@ -518,8 +520,8 @@ export const useAddSubtask = () => {
     onSuccess: () => {
       toast.success('تم إضافة المهمة الفرعية | Subtask added')
     },
-    onSettled: (_, __, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    onSettled: async (_, __, { taskId }) => {
+      await invalidateCache.tasks.detail(taskId)
     },
   })
 }
@@ -551,8 +553,8 @@ export const useUpdateSubtask = () => {
       }
       toast.error(error.message || bilingualError('Failed to update subtask', 'فشل تحديث المهمة الفرعية'))
     },
-    onSettled: (_, __, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    onSettled: async (_, __, { taskId }) => {
+      await invalidateCache.tasks.detail(taskId)
     },
   })
 }
@@ -585,8 +587,8 @@ export const useToggleSubtask = () => {
       }
       toast.error(error.message || bilingualError('Failed to toggle subtask', 'فشل تحديث المهمة الفرعية'))
     },
-    onSettled: (_, __, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    onSettled: async (_, __, { taskId }) => {
+      await invalidateCache.tasks.detail(taskId)
     },
   })
 }
@@ -620,8 +622,8 @@ export const useDeleteSubtask = () => {
     onSuccess: () => {
       toast.success('تم حذف المهمة الفرعية | Subtask deleted')
     },
-    onSettled: (_, __, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    onSettled: async (_, __, { taskId }) => {
+      await invalidateCache.tasks.detail(taskId)
     },
   })
 }
@@ -632,8 +634,8 @@ export const useReorderSubtasks = () => {
   return useMutation({
     mutationFn: ({ taskId, subtaskIds }: { taskId: string; subtaskIds: string[] }) =>
       tasksService.reorderSubtasks(taskId, subtaskIds),
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    onSuccess: async (_, { taskId }) => {
+      await invalidateCache.tasks.detail(taskId)
     },
     onError: (error: Error) => {
       toast.error(error.message || bilingualError('Failed to reorder subtasks', 'فشل إعادة ترتيب المهام الفرعية'))
@@ -648,9 +650,9 @@ export const useStartTimeTracking = () => {
 
   return useMutation({
     mutationFn: (taskId: string) => tasksService.startTimeTracking(taskId),
-    onSuccess: (_, taskId) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'time-tracking'] })
+    onSuccess: async (_, taskId) => {
+      await invalidateCache.tasks.detail(taskId)
+      await invalidateCache.tasks.timeTracking(taskId)
       toast.success('تم بدء تتبع الوقت | Time tracking started')
     },
     onError: (error: Error) => {
@@ -665,9 +667,9 @@ export const useStopTimeTracking = () => {
   return useMutation({
     mutationFn: ({ taskId, notes }: { taskId: string; notes?: string }) =>
       tasksService.stopTimeTracking(taskId, notes),
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'time-tracking'] })
+    onSuccess: async (_, { taskId }) => {
+      await invalidateCache.tasks.detail(taskId)
+      await invalidateCache.tasks.timeTracking(taskId)
       toast.success('تم إيقاف تتبع الوقت | Time tracking stopped')
     },
     onError: (error: Error) => {
@@ -682,9 +684,9 @@ export const useAddTimeEntry = () => {
   return useMutation({
     mutationFn: ({ taskId, data }: { taskId: string; data: { minutes: number; date: string; notes?: string } }) =>
       tasksService.addTimeEntry(taskId, data),
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'time-tracking'] })
+    onSuccess: async (_, { taskId }) => {
+      await invalidateCache.tasks.detail(taskId)
+      await invalidateCache.tasks.timeTracking(taskId)
       toast.success('تم إضافة وقت يدوي | Manual time added')
     },
     onError: (error: Error) => {
@@ -731,8 +733,8 @@ export const useAddComment = () => {
     onSuccess: () => {
       toast.success('تم إضافة التعليق | Comment added')
     },
-    onSettled: (_, __, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    onSettled: async (_, __, { taskId }) => {
+      await invalidateCache.tasks.detail(taskId)
     },
   })
 }
@@ -767,8 +769,8 @@ export const useUpdateComment = () => {
     onSuccess: () => {
       toast.success('تم تحديث التعليق | Comment updated')
     },
-    onSettled: (_, __, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    onSettled: async (_, __, { taskId }) => {
+      await invalidateCache.tasks.detail(taskId)
     },
   })
 }
@@ -802,8 +804,8 @@ export const useDeleteComment = () => {
     onSuccess: () => {
       toast.success('تم حذف التعليق | Comment deleted')
     },
-    onSettled: (_, __, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    onSettled: async (_, __, { taskId }) => {
+      await invalidateCache.tasks.detail(taskId)
     },
   })
 }
@@ -953,8 +955,8 @@ export const useCreateFromTemplate = () => {
   return useMutation({
     mutationFn: ({ templateId, overrides }: { templateId: string; overrides?: Partial<CreateTaskData> }) =>
       tasksService.createFromTemplate(templateId, overrides),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+    onSuccess: async () => {
+      await invalidateCache.tasks.all()
       toast.success('تم إنشاء المهمة من القالب | Task created from template')
     },
     onError: (error: Error) => {
@@ -969,8 +971,8 @@ export const useSaveAsTemplate = () => {
   return useMutation({
     mutationFn: ({ taskId, templateName }: { taskId: string; templateName: string }) =>
       tasksService.saveAsTemplate(taskId, templateName),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', 'templates'] })
+    onSuccess: async () => {
+      await invalidateCache.tasks.templates()
       toast.success('تم حفظ المهمة كقالب | Task saved as template')
     },
     onError: (error: Error) => {
@@ -986,8 +988,8 @@ export const useBulkUpdateTasks = () => {
 
   return useMutation<BulkOperationResult, Error, { taskIds: string[]; data: Partial<CreateTaskData> }>({
     mutationFn: ({ taskIds, data }) => tasksService.bulkUpdate(taskIds, data),
-    onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+    onSuccess: async (result) => {
+      await invalidateCache.tasks.all()
       toast.success(bilingualError(`${result.success} tasks updated`, `تم تحديث ${result.success} مهمة`))
       if (result.failed > 0) {
         toast.warning(bilingualError(`${result.failed} tasks failed to update`, `فشل تحديث ${result.failed} مهمة`))
@@ -1004,8 +1006,8 @@ export const useBulkDeleteTasks = () => {
 
   return useMutation<BulkOperationResult, Error, string[]>({
     mutationFn: (taskIds) => tasksService.bulkDelete(taskIds),
-    onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+    onSuccess: async (result) => {
+      await invalidateCache.tasks.all()
       toast.success(bilingualError(`${result.success} tasks deleted`, `تم حذف ${result.success} مهمة`))
       if (result.failed > 0) {
         toast.warning(bilingualError(`${result.failed} tasks failed to delete`, `فشل حذف ${result.failed} مهمة`))
@@ -1022,8 +1024,8 @@ export const useBulkCompleteTasks = () => {
 
   return useMutation<BulkOperationResult, Error, string[]>({
     mutationFn: (taskIds) => tasksService.bulkComplete(taskIds),
-    onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+    onSuccess: async (result) => {
+      await invalidateCache.tasks.all()
       toast.success(bilingualError(`${result.success} tasks completed`, `تم إكمال ${result.success} مهمة`))
       if (result.failed > 0) {
         toast.warning(bilingualError(`${result.failed} tasks failed to complete`, `فشل إكمال ${result.failed} مهمة`))
@@ -1040,8 +1042,8 @@ export const useBulkAssignTasks = () => {
 
   return useMutation<BulkOperationResult, Error, { taskIds: string[]; assignedTo: string }>({
     mutationFn: ({ taskIds, assignedTo }) => tasksService.bulkAssign(taskIds, assignedTo),
-    onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+    onSuccess: async (result) => {
+      await invalidateCache.tasks.all()
       toast.success(bilingualError(`${result.success} tasks assigned`, `تم تعيين ${result.success} مهمة`))
       if (result.failed > 0) {
         toast.warning(bilingualError(`${result.failed} tasks failed to assign`, `فشل تعيين ${result.failed} مهمة`))
@@ -1060,8 +1062,8 @@ export const useImportTasks = () => {
 
   return useMutation({
     mutationFn: (file: File) => tasksService.importTasks(file),
-    onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+    onSuccess: async (result) => {
+      await invalidateCache.tasks.all()
       toast.success(bilingualError(`${result.imported} tasks imported successfully`, `تم استيراد ${result.imported} مهمة بنجاح`))
       if (result.failed > 0) {
         toast.warning(bilingualError(`${result.failed} tasks failed to import`, `فشل استيراد ${result.failed} مهمة`))
@@ -1101,9 +1103,9 @@ export const useSkipRecurrence = () => {
 
   return useMutation({
     mutationFn: (taskId: string) => tasksService.skipRecurrence(taskId),
-    onSuccess: (_, taskId) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+    onSuccess: async (_, taskId) => {
+      await invalidateCache.tasks.detail(taskId)
+      await invalidateCache.tasks.all()
       toast.success('تم تخطي الموعد التالي | Next occurrence skipped')
     },
     onError: (error: Error) => {
@@ -1117,9 +1119,9 @@ export const useStopRecurrence = () => {
 
   return useMutation({
     mutationFn: (taskId: string) => tasksService.stopRecurrence(taskId),
-    onSuccess: (_, taskId) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+    onSuccess: async (_, taskId) => {
+      await invalidateCache.tasks.detail(taskId)
+      await invalidateCache.tasks.all()
       toast.success('تم إيقاف التكرار | Recurrence stopped')
     },
     onError: (error: Error) => {
@@ -1152,9 +1154,9 @@ export const useAddDependency = () => {
       logDeprecationWarning('Task Dependencies - Add', 'POST /tasks/:id/dependencies')
       return tasksService.addDependency(taskId, dependencyTaskId, type)
     },
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+    onSuccess: async (_, { taskId }) => {
+      await invalidateCache.tasks.detail(taskId)
+      await invalidateCache.tasks.all()
       toast.success('تم إضافة التبعية بنجاح | Dependency added successfully')
     },
     onError: (error: Error) => {
@@ -1172,9 +1174,9 @@ export const useRemoveDependency = () => {
       logDeprecationWarning('Task Dependencies - Remove', 'DELETE /tasks/:id/dependencies/:dependencyId')
       return tasksService.removeDependency(taskId, dependencyTaskId)
     },
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+    onSuccess: async (_, { taskId }) => {
+      await invalidateCache.tasks.detail(taskId)
+      await invalidateCache.tasks.all()
       toast.success('تم إزالة التبعية | Dependency removed')
     },
     onError: (error: Error) => {
@@ -1194,8 +1196,8 @@ export const useAddWorkflowRule = () => {
       logDeprecationWarning('Workflow Rules - Add', 'POST /tasks/:id/workflow-rules')
       return tasksService.addWorkflowRule(taskId, rule)
     },
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    onSuccess: async (_, { taskId }) => {
+      await invalidateCache.tasks.detail(taskId)
       toast.success('تم إضافة قاعدة العمل بنجاح | Workflow rule added successfully')
     },
     onError: (error: Error) => {
@@ -1213,8 +1215,8 @@ export const useUpdateWorkflowRule = () => {
       logDeprecationWarning('Workflow Rules - Update', 'PATCH /tasks/:id/workflow-rules/:ruleId')
       return tasksService.updateWorkflowRule(taskId, ruleId, rule)
     },
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    onSuccess: async (_, { taskId }) => {
+      await invalidateCache.tasks.detail(taskId)
       toast.success('تم تحديث قاعدة العمل | Workflow rule updated')
     },
     onError: (error: Error) => {
@@ -1232,8 +1234,8 @@ export const useDeleteWorkflowRule = () => {
       logDeprecationWarning('Workflow Rules - Delete', 'DELETE /tasks/:id/workflow-rules/:ruleId')
       return tasksService.deleteWorkflowRule(taskId, ruleId)
     },
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    onSuccess: async (_, { taskId }) => {
+      await invalidateCache.tasks.detail(taskId)
       toast.success('تم حذف قاعدة العمل | Workflow rule deleted')
     },
     onError: (error: Error) => {
@@ -1251,8 +1253,8 @@ export const useToggleWorkflowRule = () => {
       logDeprecationWarning('Workflow Rules - Toggle', 'POST /tasks/:id/workflow-rules/:ruleId/toggle')
       return tasksService.toggleWorkflowRule(taskId, ruleId)
     },
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    onSuccess: async (_, { taskId }) => {
+      await invalidateCache.tasks.detail(taskId)
       toast.success('تم تغيير حالة قاعدة العمل | Workflow rule status toggled')
     },
     onError: (error: Error) => {
@@ -1272,9 +1274,9 @@ export const useUpdateOutcome = () => {
       logDeprecationWarning('Task Outcome', 'PATCH /tasks/:id/outcome')
       return tasksService.updateOutcome(taskId, outcome)
     },
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+    onSuccess: async (_, { taskId }) => {
+      await invalidateCache.tasks.detail(taskId)
+      await invalidateCache.tasks.all()
       toast.success('تم تحديث نتيجة المهمة | Task outcome updated')
     },
     onError: (error: Error) => {
@@ -1294,9 +1296,9 @@ export const useUpdateEstimate = () => {
       logDeprecationWarning('Task Estimate', 'PATCH /tasks/:id/estimate')
       return tasksService.updateEstimate(taskId, estimate)
     },
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'time-tracking'] })
+    onSuccess: async (_, { taskId }) => {
+      await invalidateCache.tasks.detail(taskId)
+      await invalidateCache.tasks.timeTracking(taskId)
       toast.success('تم تحديث التقدير | Estimate updated')
     },
     onError: (error: Error) => {
@@ -1443,7 +1445,7 @@ export const useUpdateDocument = () => {
     onSettled: async (_, __, { taskId, documentId }) => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      await invalidateCache.tasks.detail(taskId)
       await queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
       return await queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents', documentId] })
     },
@@ -1518,7 +1520,7 @@ export const useUploadVoiceMemo = () => {
     onSettled: async (_, __, { taskId }) => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['tasks', taskId], refetchType: 'all' })
+      return await invalidateCache.tasks.detail(taskId)
     },
   })
 }
@@ -1536,8 +1538,8 @@ export const useUpdateVoiceMemoTranscription = () => {
       logDeprecationWarning('Voice Memos - Update Transcription', 'PATCH /tasks/:id/voice-memos/:memoId/transcription')
       return tasksService.updateVoiceMemoTranscription(taskId, memoId, transcription)
     },
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    onSuccess: async (_, { taskId }) => {
+      await invalidateCache.tasks.detail(taskId)
       toast.success('تم تحديث النص | Transcription updated')
     },
     onError: (error: Error) => {
@@ -1564,7 +1566,7 @@ export const useDeleteVoiceMemo = () => {
     onSettled: async (_, __, { taskId }) => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['tasks', taskId], refetchType: 'all' })
+      return await invalidateCache.tasks.detail(taskId)
     },
   })
 }

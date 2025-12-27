@@ -1,6 +1,7 @@
 /**
  * Permissions Hook
  * Custom hook for accessing user permissions throughout the application
+ * Now uses the Zustand store as the single source of truth
  */
 
 import { useCallback, useEffect } from 'react'
@@ -8,13 +9,6 @@ import { usePermissionsStore } from '@/stores/permissions-store'
 import { useAuthStore } from '@/stores/auth-store'
 import type { ModuleKey, PermissionLevel, SpecialPermissionKey } from '@/types/rbac'
 import {
-  hasPermission as hasPermissionHelper,
-  canView as canViewHelper,
-  canEdit as canEditHelper,
-  canDelete as canDeleteHelper,
-  hasSpecialPermission as hasSpecialPermissionHelper,
-  isDepartedUser,
-  isAdminOrOwner as isAdminOrOwnerHelper,
   canManageTeam as canManageTeamHelper,
   canViewFinances as canViewFinancesHelper,
   canAccessHR as canAccessHRHelper,
@@ -25,13 +19,27 @@ import {
 /**
  * Main permissions hook
  * Provides access to user permissions and helper functions
+ * All permission checks use the Zustand store methods directly
  */
 export function usePermissions() {
+  // Get state from store
   const permissions = usePermissionsStore((state) => state.permissions)
   const isLoading = usePermissionsStore((state) => state.isLoading)
   const error = usePermissionsStore((state) => state.error)
   const noFirmAssociated = usePermissionsStore((state) => state.noFirmAssociated)
+
+  // Get actions from store
   const fetchPermissions = usePermissionsStore((state) => state.fetchPermissions)
+
+  // Get permission check methods from store (single source of truth)
+  const hasPermissionStore = usePermissionsStore((state) => state.hasPermission)
+  const canViewStore = usePermissionsStore((state) => state.canView)
+  const canEditStore = usePermissionsStore((state) => state.canEdit)
+  const canDeleteStore = usePermissionsStore((state) => state.canDelete)
+  const hasSpecialPermissionStore = usePermissionsStore((state) => state.hasSpecialPermission)
+  const isDepartedStore = usePermissionsStore((state) => state.isDeparted)
+  const isAdminOrOwnerStore = usePermissionsStore((state) => state.isAdminOrOwner)
+
   const user = useAuthStore((state) => state.user)
 
   // Fetch permissions on mount if user is authenticated and has a firm
@@ -41,42 +49,45 @@ export function usePermissions() {
     }
   }, [user, permissions, isLoading, fetchPermissions])
 
-  // Memoized helper functions
+  // Memoized wrappers for store methods
+  // These maintain the same interface as before but use the store methods
   const hasPermission = useCallback(
     (module: ModuleKey, level: PermissionLevel = 'view') => {
-      return hasPermissionHelper(permissions, module, level)
+      return hasPermissionStore(module, level)
     },
-    [permissions]
+    [hasPermissionStore]
   )
 
   const canView = useCallback(
-    (module: ModuleKey) => canViewHelper(permissions, module),
-    [permissions]
+    (module: ModuleKey) => canViewStore(module),
+    [canViewStore]
   )
 
   const canEdit = useCallback(
-    (module: ModuleKey) => canEditHelper(permissions, module),
-    [permissions]
+    (module: ModuleKey) => canEditStore(module),
+    [canEditStore]
   )
 
   const canDelete = useCallback(
-    (module: ModuleKey) => canDeleteHelper(permissions, module),
-    [permissions]
+    (module: ModuleKey) => canDeleteStore(module),
+    [canDeleteStore]
   )
 
   const hasSpecial = useCallback(
     (permission: SpecialPermissionKey) =>
-      hasSpecialPermissionHelper(permissions, permission),
-    [permissions]
+      hasSpecialPermissionStore(permission),
+    [hasSpecialPermissionStore]
   )
 
-  const isDeparted = useCallback(() => isDepartedUser(permissions), [permissions])
+  const isDeparted = useCallback(() => isDepartedStore(), [isDepartedStore])
 
   const isAdminOrOwner = useCallback(
-    () => isAdminOrOwnerHelper(permissions),
-    [permissions]
+    () => isAdminOrOwnerStore(),
+    [isAdminOrOwnerStore]
   )
 
+  // These helpers use the lib/permissions functions since they're not in the store
+  // They still use the permissions from the store, so there's only one source of truth for data
   const canManageTeam = useCallback(
     () => canManageTeamHelper(permissions),
     [permissions]
@@ -109,7 +120,7 @@ export function usePermissions() {
     // Actions
     fetchPermissions,
 
-    // Permission checks
+    // Permission checks (using store methods)
     hasPermission,
     canView,
     canEdit,

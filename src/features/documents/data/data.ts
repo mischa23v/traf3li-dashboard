@@ -11,54 +11,45 @@ import { type DocumentCategory } from './schema'
 // Category options
 export const categoryOptions: {
   value: DocumentCategory
-  label: string
-  labelAr: string
   icon: typeof FileText
   color: string
 }[] = [
   {
     value: 'contract',
-    label: 'Contract',
-    labelAr: 'عقد',
     icon: FileText,
     color: '#3B82F6', // Blue
   },
   {
     value: 'judgment',
-    label: 'Judgment',
-    labelAr: 'حكم',
     icon: Scale,
     color: '#8B5CF6', // Purple
   },
   {
     value: 'evidence',
-    label: 'Evidence',
-    labelAr: 'دليل',
     icon: FileSearch,
     color: '#F59E0B', // Amber
   },
   {
     value: 'correspondence',
-    label: 'Correspondence',
-    labelAr: 'مراسلات',
     icon: Mail,
     color: '#10B981', // Green
   },
   {
     value: 'pleading',
-    label: 'Pleading',
-    labelAr: 'مذكرة',
     icon: FileEdit,
     color: '#EF4444', // Red
   },
   {
     value: 'other',
-    label: 'Other',
-    labelAr: 'أخرى',
     icon: File,
     color: '#6B7280', // Gray
   },
 ]
+
+// Get category label using i18n
+export function getCategoryLabel(category: DocumentCategory): string {
+  return `documents.categories.${category}`
+}
 
 // Get category info
 export function getCategoryInfo(category: string) {
@@ -116,5 +107,11 @@ export const acceptedFileTypes = {
   'application/zip': ['.zip'],
 }
 
-// Max file size (50MB)
-export const MAX_FILE_SIZE = 50 * 1024 * 1024
+/**
+ * @deprecated Use FILE_LIMITS from '@/config' instead
+ *
+ * File size limits have been centralized to @/config/ui-constants.ts
+ * Use FILE_LIMITS.MAX_SIZE for general uploads (50MB)
+ * Use FILE_LIMITS.MAX_UPLOAD_SIZE for bulk uploads (100MB)
+ * Use FILE_LIMITS.RECOMMENDED for category-specific limits
+ */

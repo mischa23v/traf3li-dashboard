@@ -175,7 +175,7 @@ export default function RetainerDetailsView() {
                 <Main className="bg-[#f8f9fa] p-6 lg:p-8">
                     <div className="max-w-7xl mx-auto">
                         <Button asChild variant="ghost" className="mb-6">
-                            <Link to="/dashboard/finance/retainers">
+                            <Link to={ROUTES.dashboard.finance.retainers.list}>
                                 <ArrowRight className="h-4 w-4 ms-2" />
                                 العودة لحسابات الأمانة
                             </Link>
@@ -226,7 +226,7 @@ export default function RetainerDetailsView() {
                         {/* Back Button & Actions */}
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             <Button asChild variant="ghost" className="text-slate-600 hover:text-navy">
-                                <Link to="/dashboard/finance/retainers">
+                                <Link to={ROUTES.dashboard.finance.retainers.list}>
                                     <ArrowRight className="h-4 w-4 ms-2" />
                                     العودة لحسابات الأمانة
                                 </Link>

@@ -3,6 +3,7 @@ import {
     Save, Calendar, FileText, Plus, Trash2, Loader2, Percent, Hash, Building2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { TAX_CONFIG } from '@/config'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -98,7 +99,7 @@ export function CreateBillView({ mode = 'create' }: CreateBillViewProps) {
     // Calculate totals
     const calculations = useMemo(() => {
         const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.price), 0)
-        const vatRate = 0.15 // 15% Saudi VAT
+        const vatRate = TAX_CONFIG.SAUDI_VAT_RATE // 15% Saudi VAT
         const vatAmount = subtotal * vatRate
         const totalAmount = subtotal + vatAmount
 
@@ -218,7 +219,7 @@ export function CreateBillView({ mode = 'create' }: CreateBillViewProps) {
                                                     ))}
                                                     {(!vendorsData?.data || vendorsData.data.length === 0) && (
                                                         <SelectItem value="placeholder" disabled>
-                                                            لا توجد موردين - <Link to="/dashboard/finance/vendors/new" className="text-emerald-500">إضافة مورد</Link>
+                                                            لا توجد موردين - <Link to={ROUTES.dashboard.finance.vendors.new} className="text-emerald-500">إضافة مورد</Link>
                                                         </SelectItem>
                                                     )}
                                                 </SelectContent>
@@ -388,7 +389,7 @@ export function CreateBillView({ mode = 'create' }: CreateBillViewProps) {
                                 </div>
 
                                 <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
-                                    <Link to="/dashboard/finance/bills">
+                                    <Link to={ROUTES.dashboard.finance.bills.list}>
                                         <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
                                             إلغاء
                                         </Button>

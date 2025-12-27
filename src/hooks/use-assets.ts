@@ -6,6 +6,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import assetsService from '@/services/assetsService'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import type { AssetFilters, CreateAssetData, AssetCategory, AssetSettings } from '@/types/assets'
 
 // Query Keys
@@ -42,11 +43,10 @@ export function useAsset(id: string) {
 }
 
 export function useCreateAsset() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateAssetData) => assetsService.createAsset(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: assetsKeys.assets() })
+      invalidateCache.assets.all()
       toast.success('تم إنشاء الأصل بنجاح | Asset created successfully')
     },
     onError: () => {
@@ -56,12 +56,10 @@ export function useCreateAsset() {
 }
 
 export function useUpdateAsset() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateAssetData> }) => assetsService.updateAsset(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: assetsKeys.assets() })
-      queryClient.invalidateQueries({ queryKey: assetsKeys.assetDetail(id) })
+    onSuccess: () => {
+      invalidateCache.assets.all()
       toast.success('تم تحديث الأصل بنجاح | Asset updated successfully')
     },
     onError: () => {
@@ -71,11 +69,10 @@ export function useUpdateAsset() {
 }
 
 export function useDeleteAsset() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => assetsService.deleteAsset(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: assetsKeys.assets() })
+      invalidateCache.assets.all()
       toast.success('تم حذف الأصل بنجاح | Asset deleted successfully')
     },
     onError: () => {
@@ -85,12 +82,10 @@ export function useDeleteAsset() {
 }
 
 export function useSubmitAsset() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => assetsService.submitAsset(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: assetsKeys.assets() })
-      queryClient.invalidateQueries({ queryKey: assetsKeys.assetDetail(id) })
+    onSuccess: () => {
+      invalidateCache.assets.all()
       toast.success('تم تقديم الأصل | Asset submitted')
     },
     onError: () => {
@@ -100,12 +95,10 @@ export function useSubmitAsset() {
 }
 
 export function useSellAsset() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: { saleAmount: number; saleDate: string } }) => assetsService.sellAsset(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: assetsKeys.assets() })
-      queryClient.invalidateQueries({ queryKey: assetsKeys.assetDetail(id) })
+    onSuccess: () => {
+      invalidateCache.assets.all()
       toast.success('تم بيع الأصل بنجاح | Asset sold successfully')
     },
     onError: () => {
@@ -115,12 +108,10 @@ export function useSellAsset() {
 }
 
 export function useScrapAsset() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => assetsService.scrapAsset(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: assetsKeys.assets() })
-      queryClient.invalidateQueries({ queryKey: assetsKeys.assetDetail(id) })
+    onSuccess: () => {
+      invalidateCache.assets.all()
       toast.success('تم إتلاف الأصل | Asset scrapped')
     },
     onError: () => {
@@ -203,7 +194,7 @@ export function useProcessDepreciation() {
     mutationFn: ({ assetId, date }: { assetId: string; date: string }) => assetsService.processDepreciation(assetId, date),
     onSuccess: (_, { assetId }) => {
       queryClient.invalidateQueries({ queryKey: assetsKeys.depreciation(assetId) })
-      queryClient.invalidateQueries({ queryKey: assetsKeys.assetDetail(assetId) })
+      invalidateCache.assets.all()
       toast.success('تم معالجة الإهلاك بنجاح | Depreciation processed')
     },
     onError: () => {
@@ -221,11 +212,10 @@ export function useMaintenanceSchedules(filters?: { status?: string; assetId?: s
 }
 
 export function useCreateMaintenanceSchedule() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ assetId, data }: { assetId: string; data: any }) => assetsService.createMaintenanceSchedule(assetId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: assetsKeys.maintenance() })
+      invalidateCache.assets.maintenance()
       toast.success('تم إنشاء جدول الصيانة بنجاح | Maintenance schedule created')
     },
     onError: () => {
@@ -235,12 +225,11 @@ export function useCreateMaintenanceSchedule() {
 }
 
 export function useCompleteMaintenanceSchedule() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ assetId, scheduleId, data }: { assetId: string; scheduleId: string; data: any }) =>
       assetsService.completeMaintenanceSchedule(assetId, scheduleId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: assetsKeys.maintenance() })
+      invalidateCache.assets.maintenance()
       toast.success('تم إكمال الصيانة | Maintenance completed')
     },
     onError: () => {
@@ -258,11 +247,10 @@ export function useAssetMovements(filters?: { assetId?: string; movementType?: s
 }
 
 export function useCreateAssetMovement() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: any) => assetsService.createAssetMovement(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: assetsKeys.movements() })
+      invalidateCache.assets.movements()
       toast.success('تم تسجيل حركة الأصل بنجاح | Asset movement recorded')
     },
     onError: () => {
@@ -288,11 +276,10 @@ export function useAssetRepair(id: string) {
 }
 
 export function useCreateAssetRepair() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: any) => assetsService.createAssetRepair(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: assetsKeys.repairs() })
+      invalidateCache.assets.repairs()
       toast.success('تم إنشاء طلب الإصلاح بنجاح | Repair request created')
     },
     onError: () => {
@@ -306,7 +293,7 @@ export function useUpdateAssetRepair() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => assetsService.updateAssetRepair(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: assetsKeys.repairs() })
+      invalidateCache.assets.repairs()
       queryClient.invalidateQueries({ queryKey: assetsKeys.repairDetail(id) })
       toast.success('تم تحديث طلب الإصلاح بنجاح | Repair request updated')
     },
@@ -321,7 +308,7 @@ export function useCompleteAssetRepair() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => assetsService.completeAssetRepair(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: assetsKeys.repairs() })
+      invalidateCache.assets.repairs()
       queryClient.invalidateQueries({ queryKey: assetsKeys.repairDetail(id) })
       toast.success('تم إكمال الإصلاح بنجاح | Repair completed')
     },

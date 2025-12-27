@@ -14,6 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
+import { ROUTES } from '@/constants/routes'
 import {
   Search, Bell, AlertCircle, MoreHorizontal, ChevronLeft,
   Eye, Edit3, SortAsc, X, Scale, MapPin,
@@ -167,18 +168,18 @@ export function CasePipelineListView() {
   const handleOpenPipeline = useCallback((caseId: string) => {
     console.log('[CasePipelineListView] 🚀 Opening pipeline for case:', {
       caseId,
-      navigateTo: `/dashboard/cases/${caseId}/pipeline`,
+      navigateTo: ROUTES.dashboard.cases.casePipeline(caseId),
       timestamp: new Date().toISOString(),
     })
-    navigate({ to: `/dashboard/cases/${caseId}/pipeline` as any })
+    navigate({ to: ROUTES.dashboard.cases.casePipeline(caseId) as any })
   }, [navigate])
 
   const handleViewCase = useCallback((caseId: string) => {
     console.log('[CasePipelineListView] 🚀 Opening case details:', {
       caseId,
-      navigateTo: `/dashboard/cases/${caseId}`,
+      navigateTo: ROUTES.dashboard.cases.detail(caseId),
     })
-    navigate({ to: `/dashboard/cases/${caseId}` as any })
+    navigate({ to: ROUTES.dashboard.cases.detail(caseId) as any })
   }, [navigate])
 
   // Get status badge
@@ -219,9 +220,9 @@ export function CasePipelineListView() {
 
   const topNav = [
     { title: t('casePipeline.nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },
-    { title: t('casePipeline.nav.tasks', 'المهام'), href: '/dashboard/tasks/list', isActive: false },
-    { title: t('casePipeline.nav.cases', 'القضايا'), href: '/dashboard/cases', isActive: false },
-    { title: t('casePipeline.nav.pipeline', 'مسار القضايا'), href: '/dashboard/cases/pipeline', isActive: true },
+    { title: t('casePipeline.nav.tasks', 'المهام'), href: ROUTES.dashboard.tasks.list, isActive: false },
+    { title: t('casePipeline.nav.cases', 'القضايا'), href: ROUTES.dashboard.cases.list, isActive: false },
+    { title: t('casePipeline.nav.pipeline', 'مسار القضايا'), href: ROUTES.dashboard.cases.pipeline, isActive: true },
   ]
 
   // Calculate analytics for sidebar
@@ -381,7 +382,7 @@ export function CasePipelineListView() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => navigate({ to: '/dashboard/cases/pipeline' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.cases.pipelineBoard })}
                     className="rounded-lg px-3"
                   >
                     <Kanban className="h-4 w-4 ms-2" />
@@ -450,7 +451,7 @@ export function CasePipelineListView() {
                     <h3 className="text-lg font-bold text-slate-900 mb-2">{t('casePipeline.list.noCases', 'لا توجد قضايا')}</h3>
                     <p className="text-slate-500 mb-4">{t('casePipeline.list.noCasesDescription', 'أنشئ قضية جديدة لتتبع مسارها')}</p>
                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                      <Link to="/dashboard/cases/create">
+                      <Link to={ROUTES.dashboard.cases.new}>
                         {t('casePipeline.list.newCase', 'قضية جديدة')}
                       </Link>
                     </Button>
@@ -508,12 +509,12 @@ export function CasePipelineListView() {
                             <Eye className="h-4 w-4 ms-2" />
                             {t('casePipeline.list.viewCase', 'عرض القضية')}
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/cases/${caseItem.id}/notion` as any })}>
+                          <DropdownMenuItem onClick={() => navigate({ to: ROUTES.dashboard.cases.notion(caseItem.id) as any })}>
                             <Lightbulb className="h-4 w-4 ms-2 text-emerald-500" />
                             {t('casePipeline.list.brainstorm', 'العصف الذهني')}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/cases/${caseItem.id}/edit` as any })}>
+                          <DropdownMenuItem onClick={() => navigate({ to: ROUTES.dashboard.cases.detail(caseItem.id) as any })}>
                             <Edit3 className="h-4 w-4 ms-2 text-blue-500" />
                             {t('casePipeline.list.editCase', 'تعديل القضية')}
                           </DropdownMenuItem>
@@ -629,7 +630,7 @@ export function CasePipelineListView() {
 
               <div className="p-4 pt-0 text-center">
                 <Button asChild variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
-                  <Link to="/dashboard/cases">
+                  <Link to={ROUTES.dashboard.cases.list}>
                     {t('casePipeline.list.viewAllCases', 'عرض جميع القضايا')}
                     <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
                   </Link>

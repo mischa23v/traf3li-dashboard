@@ -67,10 +67,11 @@ import {
 import { useSubcontractingOrders, useDeleteSubcontractingOrder, useSubcontractingStats } from '@/hooks/use-subcontracting'
 import type { SubcontractingOrder, SubcontractingFilters, SubcontractingOrderStatus } from '@/types/subcontracting'
 import { SubcontractingSidebar } from './subcontracting-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
-  { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.subcontracting', href: '/dashboard/subcontracting' },
+  { title: 'sidebar.nav.overview', href: ROUTES.dashboard.home },
+  { title: 'sidebar.nav.subcontracting', href: ROUTES.dashboard.subcontracting.list },
 ]
 
 export function SubcontractingListView() {
@@ -199,7 +200,7 @@ export function SubcontractingListView() {
                     </SelectContent>
                   </Select>
                   <Button asChild className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
-                    <Link to="/dashboard/subcontracting/orders/create">
+                    <Link to={ROUTES.dashboard.subcontracting.create}>
                       <Plus className="w-4 h-4 ml-2" />
                       {t('subcontracting.createOrder', 'إنشاء أمر')}
                     </Link>
@@ -227,7 +228,7 @@ export function SubcontractingListView() {
                     <h3 className="text-lg font-medium mb-2">{t('subcontracting.noOrders', 'لا توجد أوامر')}</h3>
                     <p className="text-muted-foreground mb-4">{t('subcontracting.noOrdersDesc', 'ابدأ بإنشاء أمر تصنيع خارجي')}</p>
                     <Button asChild className="rounded-xl">
-                      <Link to="/dashboard/subcontracting/orders/create">
+                      <Link to={ROUTES.dashboard.subcontracting.create}>
                         <Plus className="w-4 h-4 ml-2" />
                         {t('subcontracting.createOrder', 'إنشاء أمر')}
                       </Link>
@@ -249,7 +250,7 @@ export function SubcontractingListView() {
                         <TableRow
                           key={order._id}
                           className="cursor-pointer hover:bg-muted/50"
-                          onClick={() => navigate({ to: `/dashboard/subcontracting/orders/${order._id}` })}
+                          onClick={() => navigate({ to: ROUTES.dashboard.subcontracting.detail(order._id) })}
                         >
                           <TableCell className="font-mono text-sm">{order.orderNumber}</TableCell>
                           <TableCell>
@@ -273,14 +274,14 @@ export function SubcontractingListView() {
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation()
-                                  navigate({ to: `/dashboard/subcontracting/orders/${order._id}` })
+                                  navigate({ to: ROUTES.dashboard.subcontracting.detail(order._id) })
                                 }}>
                                   <Eye className="w-4 h-4 ml-2" />
                                   {t('common.view', 'عرض')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation()
-                                  navigate({ to: `/dashboard/subcontracting/orders/${order._id}/edit` })
+                                  navigate({ to: ROUTES.dashboard.subcontracting.detail(order._id) + '/edit' })
                                 }}>
                                   <Edit className="w-4 h-4 ml-2" />
                                   {t('common.edit', 'تعديل')}

@@ -1,5 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
+import { useLanguage } from '@/hooks/useLanguage'
 import {
   Building2, CheckCircle2, XCircle, AlertTriangle,
   Play, Link2, Unlink, Plus, Save, FileText, Loader2
@@ -72,7 +74,9 @@ export default function InterCompanyReconciliation({
   mode = 'view'
 }: InterCompanyReconciliationProps) {
   const navigate = useNavigate()
-  const [isArabic, setIsArabic] = useState(true)
+  const { t } = useTranslation()
+  const { language } = useLanguage()
+  const isArabic = language === 'ar'
 
   // Create mode state
   const [sourceFirmId, setSourceFirmId] = useState('')
@@ -106,10 +110,10 @@ export default function InterCompanyReconciliation({
   const approveMutation = useApproveReconciliation()
 
   const topNav = [
-    { title: isArabic ? 'المالية' : 'Finance', href: '/finance' },
-    { title: isArabic ? 'المعاملات بين الشركات' : 'Inter-Company', href: '/finance/inter-company' },
+    { title: t('finance.interCompany.nav.finance'), href: '/finance' },
+    { title: t('finance.interCompany.nav.interCompany'), href: '/finance/inter-company' },
     {
-      title: isArabic ? 'التسوية' : 'Reconciliation',
+      title: t('finance.interCompany.nav.reconciliation'),
       isCurrentPage: true
     },
   ]
@@ -244,25 +248,25 @@ export default function InterCompanyReconciliation({
         <Main>
           <div className="container mx-auto p-6 max-w-3xl">
             <h1 className="text-3xl font-bold mb-6">
-              {isArabic ? 'تسوية جديدة بين الشركات' : 'New Inter-Company Reconciliation'}
+              {t('finance.interCompany.reconciliation.newTitle')}
             </h1>
 
             <form onSubmit={handleCreateReconciliation}>
               <Card>
                 <CardHeader>
-                  <CardTitle>{isArabic ? 'تفاصيل التسوية' : 'Reconciliation Details'}</CardTitle>
+                  <CardTitle>{t('finance.interCompany.reconciliation.details')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Companies */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="sourceCompany">
-                        {isArabic ? 'الشركة الأولى' : 'Source Company'}
+                        {t('finance.interCompany.reconciliation.sourceCompany')}
                         <span className="text-red-500">*</span>
                       </Label>
                       <Select value={sourceFirmId} onValueChange={setSourceFirmId} required>
                         <SelectTrigger id="sourceCompany">
-                          <SelectValue placeholder={isArabic ? 'اختر الشركة' : 'Select company'} />
+                          <SelectValue placeholder={t('finance.interCompany.reconciliation.selectCompany')} />
                         </SelectTrigger>
                         <SelectContent>
                           {companies?.map((company) => (
@@ -276,12 +280,12 @@ export default function InterCompanyReconciliation({
 
                     <div className="space-y-2">
                       <Label htmlFor="targetCompany">
-                        {isArabic ? 'الشركة الثانية' : 'Target Company'}
+                        {t('finance.interCompany.reconciliation.targetCompany')}
                         <span className="text-red-500">*</span>
                       </Label>
                       <Select value={targetFirmId} onValueChange={setTargetFirmId} required>
                         <SelectTrigger id="targetCompany">
-                          <SelectValue placeholder={isArabic ? 'اختر الشركة' : 'Select company'} />
+                          <SelectValue placeholder={t('finance.interCompany.reconciliation.selectCompany')} />
                         </SelectTrigger>
                         <SelectContent>
                           {companies
@@ -300,7 +304,7 @@ export default function InterCompanyReconciliation({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="periodStart">
-                        {isArabic ? 'من تاريخ' : 'Period Start'}
+                        {t('finance.interCompany.reconciliation.periodStart')}
                         <span className="text-red-500">*</span>
                       </Label>
                       <Input
@@ -314,7 +318,7 @@ export default function InterCompanyReconciliation({
 
                     <div className="space-y-2">
                       <Label htmlFor="periodEnd">
-                        {isArabic ? 'إلى تاريخ' : 'Period End'}
+                        {t('finance.interCompany.reconciliation.periodEnd')}
                         <span className="text-red-500">*</span>
                       </Label>
                       <Input
@@ -331,7 +335,7 @@ export default function InterCompanyReconciliation({
                   {/* Currency */}
                   <div className="space-y-2">
                     <Label htmlFor="currency">
-                      {isArabic ? 'العملة' : 'Currency'}
+                      {t('finance.interCompany.reconciliation.currency')}
                       <span className="text-red-500">*</span>
                     </Label>
                     <Select value={currency} onValueChange={setCurrency} required>
@@ -350,12 +354,12 @@ export default function InterCompanyReconciliation({
 
                   {/* Notes */}
                   <div className="space-y-2">
-                    <Label htmlFor="notes">{isArabic ? 'ملاحظات' : 'Notes'}</Label>
+                    <Label htmlFor="notes">{t('finance.interCompany.reconciliation.notes')}</Label>
                     <Textarea
                       id="notes"
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
-                      placeholder={isArabic ? 'ملاحظات إضافية...' : 'Additional notes...'}
+                      placeholder={t('finance.interCompany.reconciliation.additionalNotes')}
                       rows={3}
                     />
                   </div>
@@ -368,11 +372,11 @@ export default function InterCompanyReconciliation({
                   variant="outline"
                   onClick={() => navigate({ to: '/finance/inter-company' })}
                 >
-                  {isArabic ? 'إلغاء' : 'Cancel'}
+                  {t('finance.interCompany.reconciliation.cancel')}
                 </Button>
                 <Button type="submit" disabled={createMutation.isPending}>
                   <Save className="h-4 w-4 mr-2" />
-                  {isArabic ? 'إنشاء تسوية' : 'Create Reconciliation'}
+                  {t('finance.interCompany.reconciliation.createReconciliation')}
                 </Button>
               </div>
             </form>
@@ -430,7 +434,7 @@ export default function InterCompanyReconciliation({
             <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-3xl font-bold">
-                  {isArabic ? 'تسوية بين الشركات' : 'Inter-Company Reconciliation'}
+                  {t('finance.interCompany.reconciliation.title')}
                 </h1>
                 <Badge
                   variant={
@@ -462,17 +466,17 @@ export default function InterCompanyReconciliation({
                     ) : (
                       <Play className="h-4 w-4 mr-2" />
                     )}
-                    {isArabic ? 'مطابقة تلقائية' : 'Auto Match'}
+                    {t('finance.interCompany.reconciliation.autoMatch')}
                   </Button>
                   <Button onClick={handleComplete} disabled={completeMutation.isPending}>
                     <CheckCircle2 className="h-4 w-4 mr-2" />
-                    {isArabic ? 'إكمال' : 'Complete'}
+                    {t('finance.interCompany.reconciliation.complete')}
                   </Button>
                 </>
               ) : reconciliation.status === 'completed' ? (
                 <Button onClick={handleApprove} disabled={approveMutation.isPending}>
                   <CheckCircle2 className="h-4 w-4 mr-2" />
-                  {isArabic ? 'اعتماد' : 'Approve'}
+                  {t('finance.interCompany.reconciliation.approve')}
                 </Button>
               ) : null}
             </div>
@@ -484,7 +488,7 @@ export default function InterCompanyReconciliation({
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-600" />
-                  {isArabic ? 'متطابقة' : 'Matched'}
+                  {t('finance.interCompany.reconciliation.matched')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -499,7 +503,7 @@ export default function InterCompanyReconciliation({
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                  {isArabic ? 'غير متطابقة' : 'Unmatched'}
+                  {t('finance.interCompany.reconciliation.unmatched')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -511,7 +515,7 @@ export default function InterCompanyReconciliation({
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
                   <FileText className="h-4 w-4 text-blue-600" />
-                  {isArabic ? 'قيود تسوية' : 'Adjustments'}
+                  {t('finance.interCompany.reconciliation.adjustments')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -522,7 +526,7 @@ export default function InterCompanyReconciliation({
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium">
-                  {isArabic ? 'الفترة' : 'Period'}
+                  {t('finance.interCompany.reconciliation.period')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -539,13 +543,13 @@ export default function InterCompanyReconciliation({
           <Tabs defaultValue="matched" className="space-y-4">
             <TabsList>
               <TabsTrigger value="matched">
-                {isArabic ? 'متطابقة' : 'Matched'} ({stats.matched})
+                {t('finance.interCompany.reconciliation.matched')} ({stats.matched})
               </TabsTrigger>
               <TabsTrigger value="unmatched">
-                {isArabic ? 'غير متطابقة' : 'Unmatched'} ({stats.unmatched})
+                {t('finance.interCompany.reconciliation.unmatched')} ({stats.unmatched})
               </TabsTrigger>
               <TabsTrigger value="adjustments">
-                {isArabic ? 'قيود التسوية' : 'Adjustments'} ({stats.adjustments})
+                {t('finance.interCompany.reconciliation.adjustments')} ({stats.adjustments})
               </TabsTrigger>
             </TabsList>
 
@@ -553,11 +557,9 @@ export default function InterCompanyReconciliation({
             <TabsContent value="matched">
               <Card>
                 <CardHeader>
-                  <CardTitle>{isArabic ? 'المعاملات المتطابقة' : 'Matched Transactions'}</CardTitle>
+                  <CardTitle>{t('finance.interCompany.reconciliation.matchedTransactions')}</CardTitle>
                   <CardDescription>
-                    {isArabic
-                      ? 'المعاملات التي تمت مطابقتها بين الشركتين'
-                      : 'Transactions matched between the two companies'
+                    {t('finance.interCompany.reconciliation.matchedDesc')
                     }
                   </CardDescription>
                 </CardHeader>
@@ -565,10 +567,10 @@ export default function InterCompanyReconciliation({
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>{isArabic ? 'معاملة المصدر' : 'Source Txn'}</TableHead>
-                        <TableHead>{isArabic ? 'معاملة الهدف' : 'Target Txn'}</TableHead>
-                        <TableHead className="text-right">{isArabic ? 'المبلغ' : 'Amount'}</TableHead>
-                        <TableHead>{isArabic ? 'نوع المطابقة' : 'Match Type'}</TableHead>
+                        <TableHead>{t('finance.interCompany.reconciliation.sourceTxn')}</TableHead>
+                        <TableHead>{t('finance.interCompany.reconciliation.targetTxn')}</TableHead>
+                        <TableHead className="text-right">{t('finance.interCompany.reconciliation.amount')}</TableHead>
+                        <TableHead>{t('finance.interCompany.reconciliation.matchType')}</TableHead>
                         <TableHead></TableHead>
                       </TableRow>
                     </TableHeader>
@@ -614,7 +616,7 @@ export default function InterCompanyReconciliation({
                   <div className="flex justify-end">
                     <Button onClick={() => setShowManualMatchDialog(true)}>
                       <Link2 className="h-4 w-4 mr-2" />
-                      {isArabic ? 'مطابقة يدوية' : 'Manual Match'}
+                      {t('finance.interCompany.reconciliation.manualMatch')}
                     </Button>
                   </div>
                 )}
@@ -623,13 +625,13 @@ export default function InterCompanyReconciliation({
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-lg">
-                        {isArabic ? 'معاملات الشركة المصدرة' : 'Source Company Transactions'}
+                        {t('finance.interCompany.reconciliation.sourceTransactions')}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       {reconciliation.unmatchedSourceTransactions?.length === 0 ? (
                         <p className="text-center text-muted-foreground py-8">
-                          {isArabic ? 'لا توجد معاملات غير متطابقة' : 'No unmatched transactions'}
+                          {t('finance.interCompany.reconciliation.noUnmatchedTransactions')}
                         </p>
                       ) : (
                         <div className="space-y-2">
@@ -649,13 +651,13 @@ export default function InterCompanyReconciliation({
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-lg">
-                        {isArabic ? 'معاملات الشركة المستهدفة' : 'Target Company Transactions'}
+                        {t('finance.interCompany.reconciliation.targetTransactions')}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       {reconciliation.unmatchedTargetTransactions?.length === 0 ? (
                         <p className="text-center text-muted-foreground py-8">
-                          {isArabic ? 'لا توجد معاملات غير متطابقة' : 'No unmatched transactions'}
+                          {t('finance.interCompany.reconciliation.noUnmatchedTransactions')}
                         </p>
                       ) : (
                         <div className="space-y-2">
@@ -680,34 +682,32 @@ export default function InterCompanyReconciliation({
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
                   <div>
-                    <CardTitle>{isArabic ? 'قيود التسوية' : 'Adjustment Entries'}</CardTitle>
+                    <CardTitle>{t('finance.interCompany.reconciliation.adjustments')}</CardTitle>
                     <CardDescription>
-                      {isArabic
-                        ? 'قيود التسوية لمعالجة الفروقات'
-                        : 'Adjustment entries to resolve discrepancies'
+                      {t('finance.interCompany.reconciliation.adjustmentEntriesDesc')
                       }
                     </CardDescription>
                   </div>
                   {reconciliation.status !== 'approved' && (
                     <Button onClick={() => setShowAdjustmentDialog(true)}>
                       <Plus className="h-4 w-4 mr-2" />
-                      {isArabic ? 'قيد جديد' : 'New Entry'}
+                      {t('finance.interCompany.reconciliation.newEntry')}
                     </Button>
                   )}
                 </CardHeader>
                 <CardContent>
                   {reconciliation.adjustmentEntries?.length === 0 ? (
                     <p className="text-center text-muted-foreground py-8">
-                      {isArabic ? 'لا توجد قيود تسوية' : 'No adjustment entries'}
+                      {t('finance.interCompany.reconciliation.noAdjustmentEntries')}
                     </p>
                   ) : (
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>{isArabic ? 'النوع' : 'Type'}</TableHead>
-                          <TableHead>{isArabic ? 'السبب' : 'Reason'}</TableHead>
-                          <TableHead>{isArabic ? 'الوصف' : 'Description'}</TableHead>
-                          <TableHead className="text-right">{isArabic ? 'المبلغ' : 'Amount'}</TableHead>
+                          <TableHead>{t('finance.interCompany.reconciliation.type')}</TableHead>
+                          <TableHead>{t('finance.interCompany.reconciliation.reason')}</TableHead>
+                          <TableHead>{t('finance.interCompany.reconciliation.description')}</TableHead>
+                          <TableHead className="text-right">{t('finance.interCompany.reconciliation.amount')}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -742,22 +742,19 @@ export default function InterCompanyReconciliation({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {isArabic ? 'مطابقة يدوية' : 'Manual Match'}
+              {t('finance.interCompany.reconciliation.manualMatch')}
             </DialogTitle>
             <DialogDescription>
-              {isArabic
-                ? 'اختر معاملة من كل شركة للمطابقة'
-                : 'Select a transaction from each company to match'
-              }
+              {t('finance.interCompany.reconciliation.selectTransactionDesc')}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>{isArabic ? 'معاملة الشركة المصدرة' : 'Source Transaction'}</Label>
+              <Label>{t('finance.interCompany.reconciliation.sourceTransaction')}</Label>
               <Select value={selectedSourceTxn} onValueChange={setSelectedSourceTxn}>
                 <SelectTrigger>
-                  <SelectValue placeholder={isArabic ? 'اختر المعاملة' : 'Select transaction'} />
+                  <SelectValue placeholder={t('finance.interCompany.reconciliation.selectTransaction')} />
                 </SelectTrigger>
                 <SelectContent>
                   {reconciliation?.unmatchedSourceTransactions?.map((txnId: string) => (
@@ -770,10 +767,10 @@ export default function InterCompanyReconciliation({
             </div>
 
             <div className="space-y-2">
-              <Label>{isArabic ? 'معاملة الشركة المستهدفة' : 'Target Transaction'}</Label>
+              <Label>{t('finance.interCompany.reconciliation.targetTransaction')}</Label>
               <Select value={selectedTargetTxn} onValueChange={setSelectedTargetTxn}>
                 <SelectTrigger>
-                  <SelectValue placeholder={isArabic ? 'اختر المعاملة' : 'Select transaction'} />
+                  <SelectValue placeholder={t('finance.interCompany.reconciliation.selectTransaction')} />
                 </SelectTrigger>
                 <SelectContent>
                   {reconciliation?.unmatchedTargetTransactions?.map((txnId: string) => (
@@ -788,14 +785,14 @@ export default function InterCompanyReconciliation({
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowManualMatchDialog(false)}>
-              {isArabic ? 'إلغاء' : 'Cancel'}
+              {t('finance.interCompany.reconciliation.cancel')}
             </Button>
             <Button
               onClick={handleManualMatch}
               disabled={!selectedSourceTxn || !selectedTargetTxn || manualMatchMutation.isPending}
             >
               <Link2 className="h-4 w-4 mr-2" />
-              {isArabic ? 'مطابقة' : 'Match'}
+              {t('finance.interCompany.reconciliation.match')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -806,39 +803,37 @@ export default function InterCompanyReconciliation({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {isArabic ? 'قيد تسوية جديد' : 'New Adjustment Entry'}
+              {t('finance.interCompany.reconciliation.newAdjustmentEntry')}
             </DialogTitle>
             <DialogDescription>
-              {isArabic
-                ? 'إنشاء قيد تسوية لمعالجة الفروقات'
-                : 'Create an adjustment entry to resolve discrepancies'
+              {t('finance.interCompany.reconciliation.createAdjustmentDesc')
               }
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>{isArabic ? 'نوع التسوية' : 'Adjustment Type'}</Label>
+              <Label>{t('finance.interCompany.reconciliation.adjustmentType')}</Label>
               <Select value={adjustmentType} onValueChange={(v: any) => setAdjustmentType(v)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="source_adjustment">
-                    {isArabic ? 'تسوية الشركة المصدرة' : 'Source Adjustment'}
+                    {t('finance.interCompany.reconciliation.sourceAdjustment')}
                   </SelectItem>
                   <SelectItem value="target_adjustment">
-                    {isArabic ? 'تسوية الشركة المستهدفة' : 'Target Adjustment'}
+                    {t('finance.interCompany.reconciliation.targetAdjustment')}
                   </SelectItem>
                   <SelectItem value="exchange_rate_adjustment">
-                    {isArabic ? 'تسوية سعر الصرف' : 'Exchange Rate Adjustment'}
+                    {t('finance.interCompany.reconciliation.exchangeRateAdjustment')}
                   </SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label>{isArabic ? 'المبلغ' : 'Amount'}</Label>
+              <Label>{t('finance.interCompany.reconciliation.amount')}</Label>
               <Input
                 type="number"
                 step="0.01"
@@ -849,20 +844,20 @@ export default function InterCompanyReconciliation({
             </div>
 
             <div className="space-y-2">
-              <Label>{isArabic ? 'السبب' : 'Reason'}</Label>
+              <Label>{t('finance.interCompany.reconciliation.reason')}</Label>
               <Input
                 value={adjustmentReason}
                 onChange={(e) => setAdjustmentReason(e.target.value)}
-                placeholder={isArabic ? 'سبب التسوية' : 'Adjustment reason'}
+                placeholder={t('finance.interCompany.reconciliation.adjustmentReason')}
               />
             </div>
 
             <div className="space-y-2">
-              <Label>{isArabic ? 'الوصف' : 'Description'}</Label>
+              <Label>{t('finance.interCompany.reconciliation.description')}</Label>
               <Textarea
                 value={adjustmentDescription}
                 onChange={(e) => setAdjustmentDescription(e.target.value)}
-                placeholder={isArabic ? 'وصف تفصيلي...' : 'Detailed description...'}
+                placeholder={t('finance.interCompany.reconciliation.detailedDescription')}
                 rows={3}
               />
             </div>
@@ -870,14 +865,14 @@ export default function InterCompanyReconciliation({
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAdjustmentDialog(false)}>
-              {isArabic ? 'إلغاء' : 'Cancel'}
+              {t('finance.interCompany.reconciliation.cancel')}
             </Button>
             <Button
               onClick={handleCreateAdjustment}
               disabled={!adjustmentAmount || !adjustmentReason || createAdjustmentMutation.isPending}
             >
               <Save className="h-4 w-4 mr-2" />
-              {isArabic ? 'إنشاء قيد' : 'Create Entry'}
+              {t('finance.interCompany.reconciliation.createEntry')}
             </Button>
           </DialogFooter>
         </DialogContent>

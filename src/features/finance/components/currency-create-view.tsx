@@ -294,7 +294,7 @@ export function CurrencyCreateView() {
 
                             {/* ACTION BUTTONS */}
                             <div className="flex justify-between items-center pt-6 border-t border-slate-100">
-                                <Link to="/dashboard/finance/currency">
+                                <Link to={ROUTES.dashboard.finance.currency.list}>
                                     <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-700 rounded-xl">
                                         <X className="ms-2 h-4 w-4" aria-hidden="true" />
                                         إلغاء

@@ -81,18 +81,16 @@ export default function SkillMatrixPage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">
-            {isArabic ? 'مصفوفة المهارات' : 'Skill Matrix'}
+            {t('skills.matrix.title')}
           </h1>
           <p className="text-muted-foreground mt-1">
-            {isArabic
-              ? 'عرض شامل لمهارات الموظفين حسب القسم'
-              : 'Comprehensive view of employee skills by department'}
+            {t('skills.matrix.description')}
           </p>
         </div>
         <div className="flex gap-2">
           <Button onClick={handleExport} variant="outline" disabled={!matrix}>
             <Download className="h-4 w-4 mr-2" />
-            {isArabic ? 'تصدير' : 'Export'}
+            {t('skills.matrix.export')}
           </Button>
         </div>
       </div>
@@ -110,7 +108,7 @@ export default function SkillMatrixPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">
-                  {isArabic ? 'كل الأقسام' : 'All Departments'}
+                  {t('skills.matrix.allDepartments')}
                 </SelectItem>
                 {/* Add department options from API */}
               </SelectContent>
@@ -125,7 +123,7 @@ export default function SkillMatrixPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                {isArabic ? 'إجمالي الموظفين' : 'Total Employees'}
+                {t('skills.matrix.totalEmployees')}
               </CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -137,7 +135,7 @@ export default function SkillMatrixPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                {isArabic ? 'إجمالي المهارات' : 'Total Skills'}
+                {t('skills.matrix.totalSkills')}
               </CardTitle>
               <Award className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -149,14 +147,14 @@ export default function SkillMatrixPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                {isArabic ? 'متوسط الكفاءة' : 'Avg Proficiency'}
+                {t('skills.matrix.avgProficiency')}
               </CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{summary.avgProficiency.toFixed(1)}</div>
               <p className="text-xs text-muted-foreground">
-                {isArabic ? 'من 5' : 'out of 5'}
+                {t('skills.matrix.outOf5')}
               </p>
             </CardContent>
           </Card>
@@ -164,14 +162,14 @@ export default function SkillMatrixPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                {isArabic ? 'فجوات المهارات' : 'Skill Gaps'}
+                {t('skills.matrix.skillGaps')}
               </CardTitle>
               <AlertCircle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{summary.skillGaps.length}</div>
               <p className="text-xs text-muted-foreground">
-                {isArabic ? 'تحتاج إلى تطوير' : 'need development'}
+                {t('skills.matrix.needDevelopment')}
               </p>
             </CardContent>
           </Card>
@@ -182,11 +180,9 @@ export default function SkillMatrixPage() {
       {summary && summary.topSkills.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>{isArabic ? 'أهم المهارات' : 'Top Skills'}</CardTitle>
+            <CardTitle>{t('skills.matrix.topSkills')}</CardTitle>
             <CardDescription>
-              {isArabic
-                ? 'المهارات الأكثر شيوعاً في القسم'
-                : 'Most common skills in the department'}
+              {t('skills.matrix.topSkillsDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -196,7 +192,7 @@ export default function SkillMatrixPage() {
                   <div className="flex-1">
                     <div className="font-medium">{skill.skillName}</div>
                     <div className="text-sm text-muted-foreground">
-                      {skill.employeeCount} {isArabic ? 'موظف' : 'employees'}
+                      {skill.employeeCount} {t('skills.matrix.employees')}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -221,12 +217,10 @@ export default function SkillMatrixPage() {
       <Card>
         <CardHeader>
           <CardTitle>
-            {isArabic ? 'مصفوفة المهارات' : 'Skill Matrix'}
+            {t('skills.matrix.tableTitle')}
           </CardTitle>
           <CardDescription>
-            {isArabic
-              ? 'كفاءة كل موظف في المهارات المختلفة'
-              : 'Employee proficiency across different skills'}
+            {t('skills.matrix.tableDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -242,7 +236,7 @@ export default function SkillMatrixPage() {
                 <thead>
                   <tr className="border-b">
                     <th className="text-left p-3 font-medium sticky left-0 bg-white z-10">
-                      {isArabic ? 'الموظف' : 'Employee'}
+                      {t('skills.matrix.employee')}
                     </th>
                     {matrix.skills.map((skill) => (
                       <th
@@ -321,13 +315,13 @@ export default function SkillMatrixPage() {
               </table>
               {matrix.employees.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground">
-                  {isArabic ? 'لا توجد بيانات' : 'No data available'}
+                  {t('skills.matrix.noData')}
                 </div>
               )}
             </div>
           ) : (
             <div className="text-center py-8 text-muted-foreground">
-              {isArabic ? 'اختر قسماً لعرض المصفوفة' : 'Select a department to view the matrix'}
+              {t('skills.matrix.selectDepartment')}
             </div>
           )}
 
@@ -335,7 +329,7 @@ export default function SkillMatrixPage() {
           {matrix && (
             <div className="mt-6 pt-6 border-t">
               <div className="text-sm font-medium mb-3">
-                {isArabic ? 'مستويات الكفاءة' : 'Proficiency Levels'}
+                {t('skills.matrix.proficiencyLevels')}
               </div>
               <div className="flex flex-wrap gap-4">
                 {PROFICIENCY_LEVELS.map((level) => (

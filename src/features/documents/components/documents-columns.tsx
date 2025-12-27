@@ -83,14 +83,13 @@ export const columns: ColumnDef<Document>[] = [
     cell: ({ row }) => {
       const category = row.getValue('category') as string
       const info = getCategoryInfo(category)
-      const isArabic = i18n.language === 'ar'
 
       return (
         <Badge
           variant='outline'
           style={{ borderColor: info.color, color: info.color }}
         >
-          {isArabic ? info.labelAr : info.label}
+          {i18n.t(`documents.categories.${category}`)}
         </Badge>
       )
     },

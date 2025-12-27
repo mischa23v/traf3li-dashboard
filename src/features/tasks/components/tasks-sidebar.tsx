@@ -12,6 +12,7 @@ import { useCalendar } from '@/hooks/useCalendar'
 import { useUpcomingReminders } from '@/hooks/useRemindersAndEvents'
 import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA } from 'date-fns/locale'
+import { ROUTES } from '@/constants/routes'
 
 interface TasksSidebarProps {
     context?: 'tasks' | 'reminders' | 'events' | 'reports'
@@ -76,20 +77,20 @@ export function TasksSidebar({
 
     const links = {
         tasks: {
-            create: '/dashboard/tasks/new',
-            viewAll: '/dashboard/tasks/list'
+            create: ROUTES.dashboard.tasks.new,
+            viewAll: ROUTES.dashboard.tasks.list
         },
         reminders: {
-            create: '/dashboard/tasks/reminders/new',
-            viewAll: '/dashboard/tasks/reminders'
+            create: ROUTES.dashboard.tasks.reminders.new,
+            viewAll: ROUTES.dashboard.tasks.reminders.list
         },
         events: {
-            create: '/dashboard/tasks/events/new',
-            viewAll: '/dashboard/tasks/events'
+            create: ROUTES.dashboard.tasks.events.new,
+            viewAll: ROUTES.dashboard.tasks.events.list
         },
         reports: {
-            create: '/dashboard/tasks/reports/new',
-            viewAll: '/dashboard/tasks/reports'
+            create: ROUTES.dashboard.tasks.reports.new,
+            viewAll: ROUTES.dashboard.tasks.reports.list
         }
     }
 
@@ -119,7 +120,7 @@ export function TasksSidebar({
                         break
                     case 'e':
                         e.preventDefault()
-                        navigate({ to: '/dashboard/tasks/create', search: { editId: taskId } })
+                        navigate({ to: ROUTES.dashboard.tasks.new, search: { editId: taskId } })
                         break
                     case 'd':
                         e.preventDefault()
@@ -278,7 +279,7 @@ export function TasksSidebar({
 
                             {/* Edit Button */}
                             <Button asChild className="bg-white hover:bg-blue-50 text-blue-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
-                                <Link to="/dashboard/tasks/create" search={{ editId: taskId }}>
+                                <Link to={ROUTES.dashboard.tasks.new} search={{ editId: taskId }}>
                                     <Edit3 className="h-7 w-7" aria-hidden="true" />
                                     <span className="flex items-center gap-1.5 text-sm font-bold">
                                         <kbd className="text-[10px] font-mono bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded">E</kbd>
@@ -504,7 +505,7 @@ export function TasksSidebar({
                             </div>
 
                             <Button asChild variant="ghost" className="w-full mt-6 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 group cursor-pointer">
-                                <Link to="/dashboard/calendar">
+                                <Link to={ROUTES.dashboard.calendar}>
                                     <span>عرض الجدول الكامل</span>
                                     <ChevronRight className="w-4 h-4 me-2 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1 rtl:rotate-180" aria-hidden="true" />
                                 </Link>
@@ -531,7 +532,7 @@ export function TasksSidebar({
                                         return (
                                             <Link
                                                 key={reminder._id}
-                                                to={`/dashboard/tasks/reminders/${reminder._id}`}
+                                                to={ROUTES.dashboard.tasks.reminders.detail(reminder._id)}
                                                 className="flex gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:shadow-md transition-all cursor-pointer group"
                                             >
                                                 <div className={cn(
@@ -570,7 +571,7 @@ export function TasksSidebar({
                                 </>
                             )}
                             <Button asChild variant="ghost" className="w-full text-xs text-slate-500 hover:text-emerald-600 hover:bg-emerald-50">
-                                <Link to="/dashboard/tasks/reminders">
+                                <Link to={ROUTES.dashboard.tasks.reminders.list}>
                                     عرض كل التنبيهات
                                 </Link>
                             </Button>

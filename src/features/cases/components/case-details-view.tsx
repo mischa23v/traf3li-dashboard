@@ -48,6 +48,7 @@ import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { ROUTES } from '@/constants/routes'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -411,7 +412,7 @@ export function CaseDetailsView() {
 
   const topNav = [
     { title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },
-    { title: t('nav.cases', 'القضايا'), href: '/dashboard/cases', isActive: true },
+    { title: t('nav.cases', 'القضايا'), href: ROUTES.dashboard.cases.list, isActive: true },
   ]
 
   const formatCurrency = (amount: number) => {
@@ -853,7 +854,7 @@ export function CaseDetailsView() {
             <h4 className="text-lg font-bold text-navy mb-2">{t('cases.notFound', 'لم يتم العثور على القضية')}</h4>
             <p className="text-slate-500 mb-4">{t('cases.notFoundDescription', 'القضية المطلوبة غير موجودة أو تم حذفها')}</p>
             <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl">
-              <Link to="/dashboard/cases">
+              <Link to={ROUTES.dashboard.cases.list}>
                 <ArrowLeft className="ms-2 h-4 w-4" />
                 {t('cases.backToCases', 'العودة إلى القضايا')}
               </Link>
@@ -867,7 +868,7 @@ export function CaseDetailsView() {
             {/* HERO BANNER */}
             <ProductivityHero badge={getCategoryLabel(caseData.category)} title={caseData.title} type="cases" listMode={true} hideButtons={true}>
               <div className="flex gap-3">
-                <Link to="/dashboard/cases">
+                <Link to={ROUTES.dashboard.cases.list}>
                   <Button
                     variant="ghost"
                     className="bg-white/10 text-white hover:bg-white/20 rounded-xl h-10 px-4"
@@ -1242,7 +1243,7 @@ export function CaseDetailsView() {
                     </Dialog>
 
                     {/* CaseNotion - Case Brainstorm */}
-                    <Link to={`/dashboard/cases/${caseId}/notion`}>
+                    <Link to={ROUTES.dashboard.cases.notion(caseId)}>
                       <Button variant="outline" className="w-full justify-start bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200 hover:border-emerald-300 hover:from-emerald-100 hover:to-teal-100">
                         <Lightbulb className="h-4 w-4 ms-2 text-emerald-600" />
                         <span className="text-emerald-700">{t('cases.caseNotion', 'العصف الذهني')}</span>

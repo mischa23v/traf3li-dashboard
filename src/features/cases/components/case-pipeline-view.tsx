@@ -54,6 +54,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { ROUTES } from '@/constants/routes'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -230,9 +231,9 @@ export function CasePipelineView() {
 
   const topNav = [
     { title: t('casePipeline.nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },
-    { title: t('casePipeline.nav.cases', 'القضايا'), href: '/dashboard/cases', isActive: false },
-    { title: t('casePipeline.nav.pipeline', 'مسار القضايا'), href: '/dashboard/cases/pipeline', isActive: true },
-    { title: t('casePipeline.nav.brainstorm', 'العصف الذهني'), href: '/dashboard/notion', isActive: false },
+    { title: t('casePipeline.nav.cases', 'القضايا'), href: ROUTES.dashboard.cases.list, isActive: false },
+    { title: t('casePipeline.nav.pipeline', 'مسار القضايا'), href: ROUTES.dashboard.cases.pipeline, isActive: true },
+    { title: t('casePipeline.nav.brainstorm', 'العصف الذهني'), href: ROUTES.dashboard.notion, isActive: false },
   ]
 
   return (
@@ -365,13 +366,13 @@ export function CasePipelineView() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild>
-                              <Link to={`/dashboard/cases/${selectedCase._id}`}>
+                              <Link to={ROUTES.dashboard.cases.detail(selectedCase._id)}>
                                 <Scale className="h-4 w-4 ms-2" />
                                 {t('casePipeline.viewCase', 'عرض القضية')}
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                              <Link to={`/dashboard/cases/${selectedCase._id}/notion`}>
+                              <Link to={ROUTES.dashboard.cases.notion(selectedCase._id)}>
                                 <Lightbulb className="h-4 w-4 ms-2 text-emerald-500" />
                                 {t('casePipeline.openBrainstorm', 'العصف الذهني')}
                               </Link>

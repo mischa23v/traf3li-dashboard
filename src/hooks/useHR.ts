@@ -1,5 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
+import { CACHE_TIMES } from '@/config'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import hrService, {
   EmployeeFilters,
   CreateEmployeeData,
@@ -8,9 +11,9 @@ import hrService, {
 } from '@/services/hrService'
 
 // ==================== Cache Configuration ====================
-const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
-const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
-const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
+const STATS_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour
+const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
 
 // ==================== EMPLOYEES ====================
 
@@ -46,8 +49,6 @@ export const useEmployeeStats = () => {
 }
 
 export const useCreateEmployee = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateEmployeeData) => hrService.createEmployee(data),
     onSuccess: () => {
@@ -57,14 +58,12 @@ export const useCreateEmployee = () => {
       toast.error(error.message || 'فشل إضافة الموظف')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['employees'] })
+      await invalidateCache.staff.employees()
     },
   })
 }
 
 export const useUpdateEmployee = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateEmployeeData }) =>
       hrService.updateEmployee(id, data),
@@ -75,15 +74,15 @@ export const useUpdateEmployee = () => {
       toast.error(error.message || 'فشل تحديث بيانات الموظف')
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: ['employees'] })
-      await queryClient.invalidateQueries({ queryKey: ['employees', variables.id] })
+      await Promise.all([
+        invalidateCache.staff.employees(),
+        invalidateCache.staff.employee(variables.id)
+      ])
     },
   })
 }
 
 export const useDeleteEmployee = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => hrService.deleteEmployee(id),
     onSuccess: () => {
@@ -93,14 +92,12 @@ export const useDeleteEmployee = () => {
       toast.error(error.message || 'فشل حذف الموظف')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['employees'] })
+      await invalidateCache.staff.employees()
     },
   })
 }
 
 export const useBulkDeleteEmployees = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (ids: string[]) => hrService.bulkDeleteEmployees(ids),
     onSuccess: (_, variables) => {
@@ -110,7 +107,7 @@ export const useBulkDeleteEmployees = () => {
       toast.error(error.message || 'فشل حذف الموظفين')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['employees'] })
+      await invalidateCache.staff.employees()
     },
   })
 }
@@ -118,8 +115,6 @@ export const useBulkDeleteEmployees = () => {
 // ==================== DOCUMENTS ====================
 
 export const useUploadEmployeeDocument = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ employeeId, file, documentType }: { employeeId: string; file: File; documentType: DocumentType }) =>
       hrService.uploadDocument(employeeId, file, documentType),
@@ -130,14 +125,12 @@ export const useUploadEmployeeDocument = () => {
       toast.error(error.message || 'فشل رفع المستند')
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: ['employees', variables.employeeId] })
+      await invalidateCache.staff.employee(variables.employeeId)
     },
   })
 }
 
 export const useDeleteEmployeeDocument = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ employeeId, documentId }: { employeeId: string; documentId: string }) =>
       hrService.deleteDocument(employeeId, documentId),
@@ -148,14 +141,12 @@ export const useDeleteEmployeeDocument = () => {
       toast.error(error.message || 'فشل حذف المستند')
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: ['employees', variables.employeeId] })
+      await invalidateCache.staff.employee(variables.employeeId)
     },
   })
 }
 
 export const useVerifyEmployeeDocument = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ employeeId, documentId }: { employeeId: string; documentId: string }) =>
       hrService.verifyDocument(employeeId, documentId),
@@ -166,7 +157,7 @@ export const useVerifyEmployeeDocument = () => {
       toast.error(error.message || 'فشل التحقق من المستند')
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: ['employees', variables.employeeId] })
+      await invalidateCache.staff.employee(variables.employeeId)
     },
   })
 }

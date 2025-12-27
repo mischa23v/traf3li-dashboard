@@ -17,13 +17,14 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { Button } from '@/components/ui/button'
 import { Search, Bell } from 'lucide-react'
+import { ROUTES } from '@/constants/routes'
 
 export function LeadsPage() {
   const topNav = [
-    { title: 'العملاء المحتملين', href: '/dashboard/sales/leads', isActive: true },
+    { title: 'العملاء المحتملين', href: ROUTES.dashboard.sales.leads.list, isActive: true },
     { title: 'مسار المبيعات', href: '/dashboard/sales/pipeline', isActive: false },
     { title: 'الفرص', href: '/dashboard/sales/opportunities', isActive: false },
-    { title: 'التقارير', href: '/dashboard/sales/reports', isActive: false },
+    { title: 'التقارير', href: ROUTES.dashboard.sales.reports.list, isActive: false },
   ]
 
   return (

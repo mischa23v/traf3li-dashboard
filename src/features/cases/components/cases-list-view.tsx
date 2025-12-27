@@ -31,6 +31,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { useCases, useCaseStatistics } from '@/hooks/useCasesAndClients'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { ROUTES } from '@/constants/routes'
 import {
   Select,
   SelectContent,
@@ -196,7 +197,7 @@ export function CasesListView() {
 
   const topNav = [
     { title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },
-    { title: t('nav.cases', 'القضايا'), href: '/dashboard/cases', isActive: true },
+    { title: t('nav.cases', 'القضايا'), href: ROUTES.dashboard.cases.list, isActive: true },
   ]
 
   const getPriorityColor = useCallback((priority: CasePriority) => {
@@ -326,7 +327,7 @@ export function CasesListView() {
         {/* HERO BANNER */}
         <ProductivityHero badge="القضايا" title="القضايا" type="cases" hideButtons={true}>
           <div className="flex gap-3">
-            <Link to="/dashboard/cases/new">
+            <Link to={ROUTES.dashboard.cases.new}>
               <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-10 px-5 font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm">
                 <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                 {t('cases.newCase', 'قضية جديدة')}
@@ -398,7 +399,7 @@ export function CasesListView() {
                     asChild
                     className="rounded-lg px-3"
                   >
-                    <Link to="/dashboard/cases/kanban">
+                    <Link to={ROUTES.dashboard.cases.kanban}>
                       <Kanban className="h-4 w-4 ms-2" />
                       {t('cases.kanban.view', 'كانبان')}
                     </Link>
@@ -464,7 +465,7 @@ export function CasesListView() {
                   </div>
                   <h4 className="text-lg font-bold text-navy mb-2">{t('cases.noCases', 'لا توجد قضايا')}</h4>
                   <p className="text-slate-500 mb-4">{t('cases.noCasesDescription', 'لم يتم العثور على قضايا')}</p>
-                  <Link to="/dashboard/cases/new">
+                  <Link to={ROUTES.dashboard.cases.new}>
                     <Button className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl">
                       <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                       {t('cases.createNewCase', 'إنشاء قضية جديدة')}
@@ -500,8 +501,7 @@ export function CasesListView() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2 flex-wrap">
                             <Link
-                              to="/dashboard/cases/$caseId"
-                              params={{ caseId: caseItem._id }}
+                              to={ROUTES.dashboard.cases.detail(caseItem._id)}
                               className="hover:underline decoration-brand-blue underline-offset-4"
                             >
                               <h4 className="font-bold text-slate-900 text-lg group-hover:text-brand-blue transition-colors">
@@ -605,7 +605,7 @@ export function CasesListView() {
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
-                        <Link to="/dashboard/cases/$caseId" params={{ caseId: caseItem._id }}>
+                        <Link to={ROUTES.dashboard.cases.detail(caseItem._id)}>
                           <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-6 shadow-lg shadow-blue-600/20 font-medium text-sm transition-colors">
                             {t('cases.details', 'التفاصيل')}
                           </Button>

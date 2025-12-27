@@ -19,6 +19,7 @@ import {
     Download,
     Bell
 } from 'lucide-react'
+import { ROUTES } from '@/constants/routes'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -166,7 +167,7 @@ export function CasesView() {
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'القضايا', href: '/dashboard/cases', isActive: true },
+        { title: 'القضايا', href: ROUTES.dashboard.cases.list, isActive: true },
     ]
 
     return (
@@ -220,7 +221,7 @@ export function CasesView() {
                                         <span className="text-slate-500 text-sm">•</span>
                                         <span className="text-blue-200 text-sm font-mono">{caseData.id}</span>
                                     </div>
-                                    <Link to={`/dashboard/cases/${caseData.id}` as any} className="hover:underline decoration-emerald-400 underline-offset-4">
+                                    <Link to={ROUTES.dashboard.cases.detail(caseData.id)} className="hover:underline decoration-emerald-400 underline-offset-4">
                                         <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-2 hover:text-emerald-400 transition-colors">
                                             {caseData.title}
                                         </h1>

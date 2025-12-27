@@ -14,6 +14,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { verifyMFA, verifyBackupCode } from '@/services/mfa.service'
 import { useAuthStore } from '@/stores/auth-store'
+import { ROUTES } from '@/constants/routes'
 
 /**
  * MFA Challenge Page
@@ -46,7 +47,7 @@ export function MFAChallenge() {
   // If user is not in MFA pending state and no userId, redirect appropriately
   useEffect(() => {
     if (!user && !userId) {
-      navigate({ to: '/sign-in' })
+      navigate({ to: ROUTES.auth.signIn })
     } else if (user && !user.mfaPending) {
       // Already verified, go to dashboard
       navigate({ to: redirectTo })
@@ -155,7 +156,7 @@ export function MFAChallenge() {
   // Handle cancel/logout
   const handleCancel = async () => {
     await logout()
-    navigate({ to: '/sign-in' })
+    navigate({ to: ROUTES.auth.signIn })
   }
 
   // Auto-submit when code is complete

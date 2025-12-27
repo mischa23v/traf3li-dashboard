@@ -1,13 +1,14 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { TIMEOUTS } from '@/config'
 import { useAuthStore } from '@/stores/auth-store'
 
 /**
  * Session Timeout Configuration
  */
-const SESSION_TIMEOUT = 30 * 60 * 1000 // 30 minutes in milliseconds
-const WARNING_TIME = 5 * 60 * 1000 // 5 minutes before timeout
+const SESSION_TIMEOUT = TIMEOUTS.INACTIVITY // 30 minutes in milliseconds
+const WARNING_TIME = TIMEOUTS.SESSION_WARNING // 5 minutes before timeout
 const WARNING_THRESHOLD = SESSION_TIMEOUT - WARNING_TIME
 
 /**

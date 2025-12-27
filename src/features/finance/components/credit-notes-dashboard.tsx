@@ -214,7 +214,7 @@ export function CreditNotesDashboard() {
               </Select>
             </div>
 
-            <Link to="/dashboard/finance/credit-notes/new">
+            <Link to={ROUTES.dashboard.finance.creditNotes.new}>
               <Button>
                 <Plus className="h-4 w-4 ms-2" />
                 إنشاء إشعار دائن جديد
@@ -240,7 +240,7 @@ export function CreditNotesDashboard() {
               <p className="text-sm text-muted-foreground mb-4">
                 ابدأ بإنشاء إشعار دائن جديد
               </p>
-              <Link to="/dashboard/finance/credit-notes/new">
+              <Link to={ROUTES.dashboard.finance.creditNotes.new}>
                 <Button>
                   <Plus className="h-4 w-4 ms-2" />
                   إنشاء إشعار دائن
@@ -277,8 +277,7 @@ export function CreditNotesDashboard() {
                       <TableRow key={creditNote._id}>
                         <TableCell className="font-medium">
                           <Link
-                            to="/dashboard/finance/credit-notes/$creditNoteId"
-                            params={{ creditNoteId: creditNote._id }}
+                            to={ROUTES.dashboard.finance.creditNotes.detail(creditNote._id )}
                             className="hover:underline"
                           >
                             {creditNote.creditNoteNumber}
@@ -318,7 +317,7 @@ export function CreditNotesDashboard() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <Link to="/dashboard/finance/credit-notes/$creditNoteId" params={{ creditNoteId: creditNote._id }}>
+                              <Link to={ROUTES.dashboard.finance.creditNotes.detail(creditNote._id )}>
                                 <DropdownMenuItem>
                                   <Eye className="h-4 w-4 me-2" />
                                   عرض التفاصيل
@@ -326,7 +325,7 @@ export function CreditNotesDashboard() {
                               </Link>
                               {creditNote.status === 'draft' && (
                                 <>
-                                  <Link to="/dashboard/finance/credit-notes/$creditNoteId/edit" params={{ creditNoteId: creditNote._id }}>
+                                  <Link to={ROUTES.dashboard.finance.creditNotes.edit(creditNote._id )}>
                                     <DropdownMenuItem>
                                       <Edit className="h-4 w-4 me-2" />
                                       تعديل

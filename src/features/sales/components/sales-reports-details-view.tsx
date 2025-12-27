@@ -1,5 +1,6 @@
 import { Link, useParams } from '@tanstack/react-router'
 import {
+import { useTranslation } from 'react-i18next'
   ArrowRight,
   FileBarChart,
   Download,
@@ -31,6 +32,7 @@ import {
   reportStatusLabels,
   dataModuleLabels,
 } from '@/services/reportsService'
+import { ROUTES } from '@/constants/routes'
 
 const categoryIcons: Partial<Record<ReportCategory, React.ElementType>> = {
   [ReportCategory.SALES_OVERVIEW]: TrendingUp,
@@ -46,6 +48,8 @@ const categoryIcons: Partial<Record<ReportCategory, React.ElementType>> = {
 }
 
 export function SalesReportsDetailsView() {
+  const { t } = useTranslation()
+
   const { reportId } = useParams({ strict: false })
   const navigate = useNavigate()
   const { data: report, isLoading } = useReport(reportId!)
@@ -56,21 +60,21 @@ export function SalesReportsDetailsView() {
     if (!reportId) return
     try {
       await generateReport.mutateAsync(reportId)
-      toast.success('تم إنشاء التقرير بنجاح')
+      toast.success(t('sales.reports.createReport'))
     } catch {
-      toast.error('فشل في إنشاء التقرير')
+      toast.error(t('sales.reports.createReport'))
     }
   }
 
   const handleDelete = async () => {
     if (!reportId) return
-    if (confirm('هل أنت متأكد من حذف هذا التقرير؟')) {
+    if (confirm(t('sales.reports.deleteConfirm'))) {
       try {
         await deleteReport.mutateAsync(reportId)
-        toast.success('تم حذف التقرير بنجاح')
-        navigate({ to: '/dashboard/sales/reports' })
+        toast.success(t('sales.reports.delete'))
+        navigate({ to: ROUTES.dashboard.sales.reports.list })
       } catch {
-        toast.error('فشل في حذف التقرير')
+        toast.error(t('sales.reports.delete'))
       }
     }
   }
@@ -114,7 +118,7 @@ export function SalesReportsDetailsView() {
         <h3 className="text-lg font-medium text-slate-900 mb-1">التقرير غير موجود</h3>
         <p className="text-slate-500 mb-4">لم يتم العثور على التقرير المطلوب</p>
         <Button asChild className="rounded-xl">
-          <Link to="/dashboard/sales/reports">العودة للتقارير</Link>
+          <Link to={ROUTES.dashboard.sales.reports.list}>العودة للتقارير</Link>
         </Button>
       </div>
     )
@@ -128,7 +132,7 @@ export function SalesReportsDetailsView() {
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" asChild className="rounded-xl">
-            <Link to="/dashboard/sales/reports">
+            <Link to={ROUTES.dashboard.sales.reports.list}>
               <ArrowRight className="h-5 w-5" />
             </Link>
           </Button>
@@ -155,7 +159,7 @@ export function SalesReportsDetailsView() {
             disabled={generateReport.isPending}
           >
             <RefreshCw className={`h-4 w-4 ms-2 ${generateReport.isPending ? 'animate-spin' : ''}`} />
-            {generateReport.isPending ? 'جارٍ الإنشاء...' : 'إعادة إنشاء'}
+            {generateReport.isPending ? t('sales.reports.regenerating') : t('sales.reports.regenerate')}
           </Button>
           <Button variant="outline" className="rounded-xl">
             <Download className="h-4 w-4 ms-2" aria-hidden="true" />
@@ -207,7 +211,7 @@ export function SalesReportsDetailsView() {
             </div>
             <div>
               <p className="text-sm text-slate-500">أنشأه</p>
-              <p className="font-medium text-navy">{report.createdBy || 'غير محدد'}</p>
+              <p className="font-medium text-navy">{report.createdBy || t('sales.reports.notSpecified')}</p>
             </div>
           </div>
         </div>
@@ -370,19 +374,19 @@ export function SalesReportsDetailsView() {
                 <div>
                   <p className="text-sm text-slate-500 mb-1">تضمين الرسوم البيانية</p>
                   <p className="font-medium text-navy">
-                    {report.config?.includeCharts ? 'نعم' : 'لا'}
+                    {report.config?.includeCharts ? t('sales.reports.yes') : t('sales.reports.no')}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-slate-500 mb-1">تضمين الملخص</p>
                   <p className="font-medium text-navy">
-                    {report.config?.includeSummary ? 'نعم' : 'لا'}
+                    {report.config?.includeSummary ? t('sales.reports.yes') : t('sales.reports.no')}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-slate-500 mb-1">تضمين التفاصيل</p>
                   <p className="font-medium text-navy">
-                    {report.config?.includeDetails ? 'نعم' : 'لا'}
+                    {report.config?.includeDetails ? t('sales.reports.yes') : t('sales.reports.no')}
                   </p>
                 </div>
               </div>

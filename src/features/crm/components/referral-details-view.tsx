@@ -27,6 +27,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useReferral, useDeleteReferral, useUpdateReferral, useRecordReferralPayment } from '@/hooks/useCrm'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useParams, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -40,6 +41,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
@@ -105,7 +107,7 @@ export function ReferralDetailsView() {
   const handleDelete = () => {
     deleteReferralMutation.mutate(referralId, {
       onSuccess: () => {
-        navigate({ to: '/dashboard/crm/referrals' })
+        navigate({ to: ROUTES.dashboard.crm.referrals.list })
       },
     })
   }
@@ -118,10 +120,10 @@ export function ReferralDetailsView() {
   const referral = referralData?.referral
 
   const topNav = [
-    { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: false },
-    { title: 'مسار المبيعات', href: '/dashboard/crm/pipeline', isActive: false },
-    { title: 'الإحالات', href: '/dashboard/crm/referrals', isActive: true },
-    { title: 'سجل الأنشطة', href: '/dashboard/crm/activities', isActive: false },
+    { title: 'العملاء المحتملين', href: ROUTES.dashboard.crm.leads.list, isActive: false },
+    { title: 'مسار المبيعات', href: ROUTES.dashboard.crm.pipeline, isActive: false },
+    { title: 'الإحالات', href: ROUTES.dashboard.crm.referrals.list, isActive: true },
+    { title: 'سجل الأنشطة', href: ROUTES.dashboard.crm.activities.list, isActive: false },
   ]
 
   return (
@@ -168,7 +170,7 @@ export function ReferralDetailsView() {
         {/* Breadcrumb / Back Link */}
         <div className="mb-6">
           <Link
-            to="/dashboard/crm/referrals"
+            to={ROUTES.dashboard.crm.referrals.list}
             className="inline-flex items-center text-slate-500 hover:text-navy transition-colors"
           >
             <ArrowLeft className="h-4 w-4 ms-2" />
@@ -232,7 +234,7 @@ export function ReferralDetailsView() {
                 لم يتم العثور على مصدر الإحالة المطلوب
               </p>
               <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                <Link to="/dashboard/crm/referrals">العودة إلى القائمة</Link>
+                <Link to={ROUTES.dashboard.crm.referrals.list}>العودة إلى القائمة</Link>
               </Button>
             </div>
           </div>
@@ -244,7 +246,7 @@ export function ReferralDetailsView() {
             {/* Referral Hero Content */}
             <ProductivityHero badge="إدارة مصادر الإحالة" title={referral.nameAr || referral.name} type="referrals" listMode={true} hideButtons={true}>
               <div className="flex flex-wrap gap-3">
-                <Link to={`/dashboard/crm/referrals/${referralId}/edit`}>
+                <Link to={ROUTES.dashboard.crm.referrals.detail(referralId) + '/edit'}>
                   <Button
                     variant="outline"
                     className="border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm"

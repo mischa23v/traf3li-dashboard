@@ -5,6 +5,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Button } from '@/components/ui/button'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
@@ -45,7 +46,7 @@ export function WhatsAppStartConversation() {
       {
         onSuccess: () => {
           // Toast is shown in hook, just navigate
-          navigate({ to: '/dashboard/crm/whatsapp' })
+          navigate({ to: ROUTES.dashboard.crm.whatsapp.list })
         },
       }
     )
@@ -53,9 +54,9 @@ export function WhatsAppStartConversation() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: false },
-    { title: 'واتساب', href: '/dashboard/crm/whatsapp', isActive: true },
-    { title: 'التسويق بالبريد', href: '/dashboard/crm/email-marketing', isActive: false },
+    { title: 'العملاء المحتملين', href: ROUTES.dashboard.crm.leads.list, isActive: false },
+    { title: 'واتساب', href: ROUTES.dashboard.crm.whatsapp.list, isActive: true },
+    { title: 'التسويق بالبريد', href: ROUTES.dashboard.crm.emailMarketing.list, isActive: false },
   ]
 
   return (
@@ -103,7 +104,7 @@ export function WhatsAppStartConversation() {
             variant="ghost"
             className="h-10 px-4 text-slate-600 hover:text-navy hover:bg-white rounded-xl"
           >
-            <Link to="/dashboard/crm/whatsapp">
+            <Link to={ROUTES.dashboard.crm.whatsapp.list}>
               <ArrowRight className="h-4 w-4 ms-2 rtl:rotate-180" aria-hidden="true" />
               العودة للمحادثات
             </Link>
@@ -159,7 +160,7 @@ export function WhatsAppStartConversation() {
               <div className="flex items-center justify-end gap-3 pt-4">
                 <Button
                   variant="outline"
-                  onClick={() => navigate({ to: '/dashboard/crm/whatsapp' })}
+                  onClick={() => navigate({ to: ROUTES.dashboard.crm.whatsapp.list })}
                   className="h-12 px-6 rounded-xl"
                 >
                   إلغاء

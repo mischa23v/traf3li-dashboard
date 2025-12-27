@@ -168,7 +168,6 @@ export function PageAccessGuard({
 }: PageAccessGuardProps) {
   const location = useLocation()
   const { i18n } = useTranslation()
-  const isArabic = i18n.language === 'ar'
 
   const currentPath = path || location.pathname
   const { data: access, isLoading, error, refetch } = usePageAccess(currentPath)
@@ -194,8 +193,8 @@ export function PageAccessGuard({
 
   // Access denied - show lock screen if configured
   if (access?.lockScreen?.enabled) {
-    const title = isArabic ? access.lockScreen.title : access.lockScreen.titleEn
-    const message = isArabic ? access.lockScreen.message : access.lockScreen.messageEn
+    const title = i18n.language === 'ar' ? access.lockScreen.title : access.lockScreen.titleEn
+    const message = i18n.language === 'ar' ? access.lockScreen.message : access.lockScreen.messageEn
 
     return (
       <LockScreen

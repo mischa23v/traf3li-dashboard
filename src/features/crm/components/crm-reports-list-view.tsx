@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useReports, useReportStats, useBulkDeleteReports, useAddToFavorites, useRemoveFromFavorites } from '@/hooks/useReports'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -154,8 +155,8 @@ export function CrmReportsListView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: false },
-    { title: 'تقارير CRM', href: '/dashboard/crm/reports', isActive: true },
+    { title: 'العملاء المحتملين', href: ROUTES.dashboard.crm.leads.list, isActive: false },
+    { title: 'تقارير CRM', href: ROUTES.dashboard.crm.reports.list, isActive: true },
   ]
 
   return (
@@ -311,7 +312,7 @@ export function CrmReportsListView() {
                     </Button>
                     <Button
                       size="sm"
-                      onClick={() => navigate({ to: '/dashboard/crm/reports/new' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.crm.reports.new })}
                       className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
                     >
                       <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
@@ -356,7 +357,7 @@ export function CrmReportsListView() {
                   <FileText className="w-12 h-12 mx-auto text-slate-300" aria-hidden="true" />
                   <p className="mt-4 text-slate-500">لا توجد تقارير للعملاء والتواصل</p>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/crm/reports/new' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.crm.reports.new })}
                     className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
                     <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
@@ -426,7 +427,7 @@ export function CrmReportsListView() {
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/crm/reports/${report.reportId}` })}>
+                                    <DropdownMenuItem onClick={() => navigate({ to: ROUTES.dashboard.crm.reports.detail(report.reportId) })}>
                                       <Eye className="w-4 h-4 ms-2" />
                                       عرض التفاصيل
                                     </DropdownMenuItem>
@@ -439,7 +440,7 @@ export function CrmReportsListView() {
                                       تصدير
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/crm/reports/new?editId=${report.reportId}` })}>
+                                    <DropdownMenuItem onClick={() => navigate({ to: ROUTES.dashboard.crm.reports.new, search: { editId: report.reportId } })}>
                                       <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                                       تعديل
                                     </DropdownMenuItem>
@@ -492,7 +493,7 @@ export function CrmReportsListView() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => navigate({ to: `/dashboard/crm/reports/${report.reportId}` })}
+                                onClick={() => navigate({ to: ROUTES.dashboard.crm.reports.detail(report.reportId) })}
                                 className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl"
                               >
                                 عرض التفاصيل

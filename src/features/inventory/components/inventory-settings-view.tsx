@@ -55,6 +55,7 @@ import {
 } from '@/hooks/use-inventory'
 import type { ValuationMethod } from '@/types/inventory'
 import { Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 
 interface InventorySettingsFormData {
   // General Settings
@@ -657,7 +658,7 @@ export function InventorySettingsView() {
                       </p>
                     </div>
                     <Button asChild variant="outline" className="rounded-xl">
-                      <Link to="/dashboard/inventory/warehouses">
+                      <Link to={ROUTES.dashboard.inventory.warehouses.list}>
                         <Warehouse className="h-4 w-4 ml-2" />
                         {t('inventory.settings.manageWarehouses', 'إدارة المستودعات')}
                       </Link>

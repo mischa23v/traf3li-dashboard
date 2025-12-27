@@ -296,7 +296,7 @@ export default function TimeEntriesDashboard() {
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد سجلات وقت</h3>
                                         <p className="text-slate-500 mb-4">ابدأ بتتبع وقتك باستخدام المؤقت أو سجل الوقت يدوياً</p>
                                         <Button asChild className="bg-brand-blue hover:bg-blue-600">
-                                            <Link to="/dashboard/finance/time-tracking/new">
+                                            <Link to={ROUTES.dashboard.finance.timeTracking.new}>
                                                 <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 تسجيل يدوي
                                             </Link>
@@ -340,7 +340,7 @@ export default function TimeEntriesDashboard() {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuItem asChild>
-                                                        <Link to="/dashboard/finance/time-tracking/$entryId" params={{ entryId: entry.id }}>
+                                                        <Link to={ROUTES.dashboard.finance.timeTracking.detail(entry.id )}>
                                                             عرض التفاصيل
                                                         </Link>
                                                     </DropdownMenuItem>

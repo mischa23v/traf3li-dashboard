@@ -45,6 +45,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
+import { CANVAS } from '@/config'
 import type { Block } from '../../data/schema'
 import { blockColorLabels, blockPriorityLabels, blockTypeLabels } from '../../data/schema'
 
@@ -64,10 +65,10 @@ interface WhiteboardBlockProps {
   readOnly?: boolean
 }
 
-const MIN_WIDTH = 150
-const MIN_HEIGHT = 100
-const DEFAULT_WIDTH = 200
-const DEFAULT_HEIGHT = 150
+const MIN_WIDTH = CANVAS.BLOCK.MIN_WIDTH
+const MIN_HEIGHT = CANVAS.BLOCK.MIN_HEIGHT
+const DEFAULT_WIDTH = CANVAS.BLOCK.DEFAULT_WIDTH
+const DEFAULT_HEIGHT = CANVAS.BLOCK.DEFAULT_HEIGHT
 
 export function WhiteboardBlock({
   block,

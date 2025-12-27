@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { ROUTES } from '@/constants/routes'
 
 type SidebarNavProps = React.HTMLAttributes<HTMLElement> & {
   items: {
@@ -22,7 +23,7 @@ type SidebarNavProps = React.HTMLAttributes<HTMLElement> & {
 export const SidebarNav = memo(function SidebarNav({ className, items, ...props }: SidebarNavProps) {
   const { pathname } = useLocation()
   const navigate = useNavigate()
-  const [val, setVal] = useState(pathname ?? '/settings')
+  const [val, setVal] = useState(pathname ?? ROUTES.settings.index)
 
   // Memoize the select handler to prevent unnecessary re-renders
   const handleSelect = useCallback((e: string) => {

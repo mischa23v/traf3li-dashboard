@@ -108,17 +108,17 @@ export function PurchaseOrderDetailsView() {
 
   const topNav = [
     {
-      title: isArabic ? 'نظرة عامة' : 'Overview',
+      title: t('buying.common.overview'),
       href: '/dashboard/buying/overview',
       isActive: false
     },
     {
-      title: isArabic ? 'الموردين' : 'Suppliers',
+      title: t('buying.suppliers'),
       href: '/dashboard/buying/suppliers',
       isActive: false
     },
     {
-      title: isArabic ? 'أوامر الشراء' : 'Purchase Orders',
+      title: t('buying.purchaseOrder.purchaseOrders'),
       href: '/dashboard/buying/purchase-orders',
       isActive: true
     },
@@ -169,31 +169,31 @@ export function PurchaseOrderDetailsView() {
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       draft: {
-        label: isArabic ? 'مسودة' : 'Draft',
+        label: t('buying.poStatus.draft'),
         className: 'bg-gray-100 text-gray-700'
       },
       submitted: {
-        label: isArabic ? 'مقدم' : 'Submitted',
+        label: t('buying.poStatus.submitted'),
         className: 'bg-blue-100 text-blue-700'
       },
       approved: {
-        label: isArabic ? 'معتمد' : 'Approved',
+        label: t('buying.poStatus.approved'),
         className: 'bg-purple-100 text-purple-700'
       },
       received: {
-        label: isArabic ? 'مستلم' : 'Received',
+        label: t('buying.poStatus.received'),
         className: 'bg-teal-100 text-teal-700'
       },
       billed: {
-        label: isArabic ? 'مفوتر' : 'Billed',
+        label: t('buying.poStatus.billed'),
         className: 'bg-emerald-100 text-emerald-700'
       },
       cancelled: {
-        label: isArabic ? 'ملغى' : 'Cancelled',
+        label: t('buying.poStatus.cancelled'),
         className: 'bg-red-100 text-red-700'
       },
       closed: {
-        label: isArabic ? 'مغلق' : 'Closed',
+        label: t('buying.poStatus.closed'),
         className: 'bg-slate-100 text-slate-700'
       },
     }
@@ -203,9 +203,9 @@ export function PurchaseOrderDetailsView() {
 
   const getReceiptStatusBadge = (status: string) => {
     const statusConfig = {
-      draft: { label: isArabic ? 'مسودة' : 'Draft', className: 'bg-gray-100 text-gray-700' },
-      submitted: { label: isArabic ? 'مقدم' : 'Submitted', className: 'bg-emerald-100 text-emerald-700' },
-      cancelled: { label: isArabic ? 'ملغى' : 'Cancelled', className: 'bg-red-100 text-red-700' },
+      draft: { label: t('buying.poStatus.draft'), className: 'bg-gray-100 text-gray-700' },
+      submitted: { label: t('buying.poStatus.submitted'), className: 'bg-emerald-100 text-emerald-700' },
+      cancelled: { label: t('buying.poStatus.cancelled'), className: 'bg-red-100 text-red-700' },
     }
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.draft
     return <Badge className={config.className}>{config.label}</Badge>
@@ -213,12 +213,12 @@ export function PurchaseOrderDetailsView() {
 
   const getInvoiceStatusBadge = (status: string) => {
     const statusConfig = {
-      draft: { label: isArabic ? 'مسودة' : 'Draft', className: 'bg-gray-100 text-gray-700' },
-      submitted: { label: isArabic ? 'مقدم' : 'Submitted', className: 'bg-blue-100 text-blue-700' },
-      paid: { label: isArabic ? 'مدفوع' : 'Paid', className: 'bg-emerald-100 text-emerald-700' },
-      partially_paid: { label: isArabic ? 'مدفوع جزئياً' : 'Partially Paid', className: 'bg-amber-100 text-amber-700' },
-      overdue: { label: isArabic ? 'متأخر' : 'Overdue', className: 'bg-red-100 text-red-700' },
-      cancelled: { label: isArabic ? 'ملغى' : 'Cancelled', className: 'bg-slate-100 text-slate-700' },
+      draft: { label: t('buying.poStatus.draft'), className: 'bg-gray-100 text-gray-700' },
+      submitted: { label: t('buying.poStatus.submitted'), className: 'bg-blue-100 text-blue-700' },
+      paid: { label: t('buying.invoiceStatus.paid'), className: 'bg-emerald-100 text-emerald-700' },
+      partially_paid: { label: t('buying.invoiceStatus.partiallyPaid'), className: 'bg-amber-100 text-amber-700' },
+      overdue: { label: t('buying.invoiceStatus.overdue'), className: 'bg-red-100 text-red-700' },
+      cancelled: { label: t('buying.poStatus.cancelled'), className: 'bg-slate-100 text-slate-700' },
     }
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.draft
     return <Badge className={config.className}>{config.label}</Badge>
@@ -240,12 +240,12 @@ export function PurchaseOrderDetailsView() {
               disabled={submitMutation.isPending}
             >
               <CheckCircle className="h-4 w-4 me-2" aria-hidden="true" />
-              {isArabic ? 'ترحيل' : 'Submit'}
+              {t('buying.common.submit')}
             </Button>
             <Button asChild variant="outline">
               <Link to={`/dashboard/buying/purchase-orders/${purchaseOrderId}/edit`}>
                 <Edit className="h-4 w-4 me-2" aria-hidden="true" />
-                {isArabic ? 'تعديل' : 'Edit'}
+                {t('buying.common.edit')}
               </Link>
             </Button>
             <Button
@@ -254,7 +254,7 @@ export function PurchaseOrderDetailsView() {
               onClick={() => setShowDeleteDialog(true)}
             >
               <Trash2 className="h-4 w-4 me-2" aria-hidden="true" />
-              {isArabic ? 'حذف' : 'Delete'}
+              {t('buying.common.delete')}
             </Button>
           </>
         )}
@@ -268,7 +268,7 @@ export function PurchaseOrderDetailsView() {
               disabled={approveMutation.isPending}
             >
               <CheckCircle className="h-4 w-4 me-2" aria-hidden="true" />
-              {isArabic ? 'اعتماد' : 'Approve'}
+              {t('buying.common.approve')}
             </Button>
             <Button
               variant="outline"
@@ -277,7 +277,7 @@ export function PurchaseOrderDetailsView() {
               disabled={cancelMutation.isPending}
             >
               <XCircle className="h-4 w-4 me-2" aria-hidden="true" />
-              {isArabic ? 'رفض' : 'Reject'}
+              {t('buying.common.reject')}
             </Button>
           </>
         )}
@@ -288,7 +288,7 @@ export function PurchaseOrderDetailsView() {
             <Button asChild variant="default">
               <Link to={`/dashboard/buying/purchase-receipts/new?poId=${purchaseOrderId}`}>
                 <Truck className="h-4 w-4 me-2" aria-hidden="true" />
-                {isArabic ? 'إنشاء إيصال استلام' : 'Create Receipt'}
+                {t('buying.purchaseOrder.createReceipt')}
               </Link>
             </Button>
             <Button
@@ -298,7 +298,7 @@ export function PurchaseOrderDetailsView() {
               disabled={cancelMutation.isPending}
             >
               <XCircle className="h-4 w-4 me-2" aria-hidden="true" />
-              {isArabic ? 'إلغاء' : 'Cancel'}
+              {t('buying.common.cancel')}
             </Button>
           </>
         )}
@@ -308,7 +308,7 @@ export function PurchaseOrderDetailsView() {
           <Button asChild variant="default">
             <Link to={`/dashboard/buying/purchase-invoices/new?poId=${purchaseOrderId}`}>
               <FileText className="h-4 w-4 me-2" aria-hidden="true" />
-              {isArabic ? 'إنشاء فاتورة' : 'Create Invoice'}
+              {t('buying.purchaseOrder.createInvoice')}
             </Link>
           </Button>
         )}
@@ -318,11 +318,11 @@ export function PurchaseOrderDetailsView() {
           <>
             <Button variant="outline">
               <Printer className="h-4 w-4 me-2" aria-hidden="true" />
-              {isArabic ? 'طباعة' : 'Print'}
+              {t('buying.purchaseOrder.print')}
             </Button>
             <Button variant="outline">
               <Mail className="h-4 w-4 me-2" aria-hidden="true" />
-              {isArabic ? 'إرسال للمورد' : 'Email to Supplier'}
+              {t('buying.purchaseOrder.emailToSupplier')}
             </Button>
           </>
         )}
@@ -375,16 +375,16 @@ export function PurchaseOrderDetailsView() {
             <Button asChild variant="ghost" className="mb-6">
               <Link to="/dashboard/buying/purchase-orders">
                 <ArrowLeft className="h-4 w-4 me-2" />
-                {isArabic ? 'العودة لأوامر الشراء' : 'Back to Purchase Orders'}
+                {t('buying.navigation.backToPurchaseOrders')}
               </Link>
             </Button>
             <Card className="border-0 shadow-sm rounded-3xl p-12 text-center">
               <AlertCircle className="h-16 w-16 text-rose-400 mx-auto mb-4" aria-hidden="true" />
               <h3 className="text-xl font-bold text-navy mb-2">
-                {isArabic ? 'فشل تحميل أمر الشراء' : 'Failed to Load Purchase Order'}
+                {t('buying.purchaseOrder.failedToLoad')}
               </h3>
               <p className="text-slate-500">
-                {error?.message || (isArabic ? 'أمر الشراء غير موجود' : 'Purchase order not found')}
+                {error?.message || t('buying.purchaseOrder.notFound')}
               </p>
             </Card>
           </div>
@@ -417,7 +417,7 @@ export function PurchaseOrderDetailsView() {
             <Button asChild variant="ghost" className="text-slate-600 hover:text-navy">
               <Link to="/dashboard/buying/purchase-orders">
                 <ArrowLeft className="h-4 w-4 me-2" />
-                {isArabic ? 'العودة لأوامر الشراء' : 'Back to Purchase Orders'}
+                {t('buying.navigation.backToPurchaseOrders')}
               </Link>
             </Button>
             {renderActionButtons()}
@@ -425,7 +425,7 @@ export function PurchaseOrderDetailsView() {
 
           {/* Purchase Order Header */}
           <ProductivityHero
-            badge={isArabic ? 'أمر الشراء' : 'Purchase Order'}
+            badge={t('buying.purchaseOrder.purchaseOrder')}
             title={purchaseOrder.poNumber}
             type="buying"
             listMode={true}
@@ -450,14 +450,14 @@ export function PurchaseOrderDetailsView() {
                           "
                         >
                           {tab === 'overview'
-                            ? isArabic ? 'نظرة عامة' : 'Overview'
+                            ? t('buying.common.overview')
                             : tab === 'items'
-                              ? isArabic ? 'الأصناف' : 'Items'
+                              ? t('buying.purchaseOrder.items')
                               : tab === 'receipts'
-                                ? isArabic ? 'إيصالات الاستلام' : 'Receipts'
+                                ? t('buying.common.receipts')
                                 : tab === 'invoices'
-                                  ? isArabic ? 'الفواتير' : 'Invoices'
-                                  : isArabic ? 'الجدول الزمني' : 'Timeline'}
+                                  ? t('buying.common.invoices')
+                                  : t('buying.purchaseOrder.timeline')}
                         </TabsTrigger>
                       ))}
                     </TabsList>
@@ -471,26 +471,26 @@ export function PurchaseOrderDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <ShoppingCart className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'معلومات أمر الشراء' : 'Purchase Order Information'}
+                            {t('buying.purchaseOrder.purchaseOrderInformation')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'رقم الطلب' : 'PO Number'}
+                                {t('buying.purchaseOrder.poNumber')}
                               </p>
                               <p className="font-medium text-navy font-mono">{purchaseOrder.poNumber}</p>
                             </div>
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'الحالة' : 'Status'}
+                                {t('buying.common.status')}
                               </p>
                               {getStatusBadge(purchaseOrder.status)}
                             </div>
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'المورد' : 'Supplier'}
+                                {t('buying.supplier.supplier')}
                               </p>
                               <Link
                                 to={`/dashboard/buying/suppliers/${purchaseOrder.supplierId}`}
@@ -501,7 +501,7 @@ export function PurchaseOrderDetailsView() {
                             </div>
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'العملة' : 'Currency'}
+                                {t('buying.currency')}
                               </p>
                               <p className="font-medium text-navy">{purchaseOrder.currency}</p>
                             </div>
@@ -514,21 +514,21 @@ export function PurchaseOrderDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <Calendar className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'التواريخ' : 'Dates'}
+                            {t('buying.common.dates')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'تاريخ الطلب' : 'Order Date'}
+                                {t('buying.purchaseOrder.orderDate')}
                               </p>
                               <p className="font-medium text-navy">{formatDate(purchaseOrder.orderDate)}</p>
                             </div>
                             {purchaseOrder.requiredDate && (
                               <div>
                                 <p className="text-sm text-slate-500 mb-1">
-                                  {isArabic ? 'التاريخ المطلوب' : 'Required Date'}
+                                  {t('buying.purchaseOrder.requiredDate')}
                                 </p>
                                 <p className="font-medium text-navy">{formatDate(purchaseOrder.requiredDate)}</p>
                               </div>
@@ -536,7 +536,7 @@ export function PurchaseOrderDetailsView() {
                             {purchaseOrder.expectedDeliveryDate && (
                               <div>
                                 <p className="text-sm text-slate-500 mb-1">
-                                  {isArabic ? 'تاريخ التسليم المتوقع' : 'Expected Delivery Date'}
+                                  {t('buying.purchaseOrder.expectedDeliveryDate')}
                                 </p>
                                 <p className="font-medium text-navy">{formatDate(purchaseOrder.expectedDeliveryDate)}</p>
                               </div>
@@ -550,27 +550,27 @@ export function PurchaseOrderDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <DollarSign className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'الإجماليات' : 'Totals'}
+                            {t('buying.common.totals')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
                           <div className="space-y-4">
                             <div className="flex justify-between items-center">
                               <span className="text-slate-600">
-                                {isArabic ? 'إجمالي الكمية' : 'Total Quantity'}
+                                {t('buying.purchaseOrder.totalQuantity')}
                               </span>
                               <span className="font-medium text-navy">{purchaseOrder.totalQty}</span>
                             </div>
                             <div className="flex justify-between items-center">
                               <span className="text-slate-600">
-                                {isArabic ? 'المبلغ الإجمالي' : 'Total Amount'}
+                                {t('buying.purchaseOrder.totalAmount')}
                               </span>
                               <span className="font-medium text-navy">{formatCurrency(purchaseOrder.totalAmount)}</span>
                             </div>
                             {purchaseOrder.discountAmount && purchaseOrder.discountAmount > 0 && (
                               <div className="flex justify-between items-center">
                                 <span className="text-slate-600">
-                                  {isArabic ? 'الخصم' : 'Discount'}
+                                  {t('buying.purchaseOrder.discount')}
                                 </span>
                                 <span className="font-medium text-red-600">
                                   -{formatCurrency(purchaseOrder.discountAmount)}
@@ -580,7 +580,7 @@ export function PurchaseOrderDetailsView() {
                             {purchaseOrder.taxAmount && purchaseOrder.taxAmount > 0 && (
                               <div className="flex justify-between items-center">
                                 <span className="text-slate-600">
-                                  {isArabic ? 'الضريبة' : 'Tax'}
+                                  {t('buying.purchaseOrder.tax')}
                                 </span>
                                 <span className="font-medium text-navy">
                                   {formatCurrency(purchaseOrder.taxAmount)}
@@ -590,7 +590,7 @@ export function PurchaseOrderDetailsView() {
                             <div className="border-t pt-4">
                               <div className="flex justify-between items-center">
                                 <span className="text-lg font-bold text-navy">
-                                  {isArabic ? 'الإجمالي الكلي' : 'Grand Total'}
+                                  {t('buying.purchaseOrder.grandTotal')}
                                 </span>
                                 <span className="text-xl font-bold text-brand-blue">
                                   {formatCurrency(purchaseOrder.grandTotal)}
@@ -606,7 +606,7 @@ export function PurchaseOrderDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <TrendingUp className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'التقدم' : 'Progress'}
+                            {t('buying.purchaseOrder.progress')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
@@ -614,7 +614,7 @@ export function PurchaseOrderDetailsView() {
                             <div>
                               <div className="flex justify-between mb-2">
                                 <span className="text-sm text-slate-600">
-                                  {isArabic ? 'نسبة الاستلام' : 'Received'}
+                                  {t('buying.purchaseOrder.received')}
                                 </span>
                                 <span className="text-sm font-medium text-navy">
                                   {purchaseOrder.percentReceived}%
@@ -630,7 +630,7 @@ export function PurchaseOrderDetailsView() {
                             <div>
                               <div className="flex justify-between mb-2">
                                 <span className="text-sm text-slate-600">
-                                  {isArabic ? 'نسبة الفوترة' : 'Billed'}
+                                  {t('buying.purchaseOrder.billed')}
                                 </span>
                                 <span className="text-sm font-medium text-navy">
                                   {purchaseOrder.percentBilled}%
@@ -653,7 +653,7 @@ export function PurchaseOrderDetailsView() {
                           <CardHeader className="border-b border-slate-100">
                             <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                               <FileText className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                              {isArabic ? 'الشروط والأحكام' : 'Terms and Conditions'}
+                              {t('buying.purchaseOrder.termsAndConditions')}
                             </CardTitle>
                           </CardHeader>
                           <CardContent className="p-6">
@@ -669,7 +669,7 @@ export function PurchaseOrderDetailsView() {
                         <Card className="border-none shadow-sm bg-white rounded-2xl">
                           <CardHeader className="border-b border-slate-100">
                             <CardTitle className="text-lg font-bold text-navy">
-                              {isArabic ? 'ملاحظات' : 'Remarks'}
+                              {t('buying.purchaseOrder.remarks')}
                             </CardTitle>
                           </CardHeader>
                           <CardContent className="p-6">
@@ -687,7 +687,7 @@ export function PurchaseOrderDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <Package className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'الأصناف' : 'Items'}
+                            {t('buying.purchaseOrder.items')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
@@ -695,9 +695,7 @@ export function PurchaseOrderDetailsView() {
                             <div className="text-center py-12 text-slate-500">
                               <Package className="h-12 w-12 mx-auto mb-4 opacity-20" aria-hidden="true" />
                               <p>
-                                {isArabic
-                                  ? 'لا توجد أصناف في هذا الطلب'
-                                  : 'No items in this order'}
+                                {t('buying.purchaseOrder.noItems')}
                               </p>
                             </div>
                           ) : (
@@ -706,28 +704,28 @@ export function PurchaseOrderDetailsView() {
                                 <TableHeader>
                                   <TableRow>
                                     <TableHead>
-                                      {isArabic ? 'كود الصنف' : 'Item Code'}
+                                      {t('buying.purchaseOrder.itemCode')}
                                     </TableHead>
                                     <TableHead>
-                                      {isArabic ? 'اسم الصنف' : 'Item Name'}
+                                      {t('buying.purchaseOrder.itemName')}
                                     </TableHead>
                                     <TableHead className="text-center">
-                                      {isArabic ? 'الكمية' : 'Qty'}
+                                      {t('buying.purchaseOrder.qty')}
                                     </TableHead>
                                     <TableHead>
-                                      {isArabic ? 'الوحدة' : 'UOM'}
+                                      {t('buying.purchaseOrder.uom')}
                                     </TableHead>
                                     <TableHead className="text-end">
-                                      {isArabic ? 'السعر' : 'Rate'}
+                                      {t('buying.purchaseOrder.rate')}
                                     </TableHead>
                                     <TableHead className="text-end">
-                                      {isArabic ? 'المبلغ' : 'Amount'}
+                                      {t('buying.purchaseOrder.amount')}
                                     </TableHead>
                                     <TableHead className="text-center">
-                                      {isArabic ? 'المستلم' : 'Received'}
+                                      {t('buying.purchaseOrder.received')}
                                     </TableHead>
                                     <TableHead className="text-center">
-                                      {isArabic ? 'المفوتر' : 'Billed'}
+                                      {t('buying.purchaseOrder.billed')}
                                     </TableHead>
                                   </TableRow>
                                 </TableHeader>
@@ -774,7 +772,7 @@ export function PurchaseOrderDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <Truck className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'إيصالات الاستلام' : 'Purchase Receipts'}
+                            {t('buying.purchaseOrder.purchaseReceipts')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
@@ -782,9 +780,7 @@ export function PurchaseOrderDetailsView() {
                             <div className="text-center py-12 text-slate-500">
                               <Truck className="h-12 w-12 mx-auto mb-4 opacity-20" aria-hidden="true" />
                               <p>
-                                {isArabic
-                                  ? 'لا توجد إيصالات استلام لهذا الطلب'
-                                  : 'No purchase receipts for this order'}
+                                {t('buying.purchaseOrder.noReceipts')}
                               </p>
                             </div>
                           ) : (
@@ -793,16 +789,16 @@ export function PurchaseOrderDetailsView() {
                                 <TableHeader>
                                   <TableRow>
                                     <TableHead>
-                                      {isArabic ? 'رقم الإيصال' : 'Receipt Number'}
+                                      {t('buying.purchaseOrder.receiptNumber')}
                                     </TableHead>
                                     <TableHead>
-                                      {isArabic ? 'التاريخ' : 'Date'}
+                                      {t('buying.common.date')}
                                     </TableHead>
                                     <TableHead className="text-end">
-                                      {isArabic ? 'الإجمالي' : 'Total'}
+                                      {t('buying.common.total')}
                                     </TableHead>
                                     <TableHead>
-                                      {isArabic ? 'الحالة' : 'Status'}
+                                      {t('buying.common.status')}
                                     </TableHead>
                                   </TableRow>
                                 </TableHeader>
@@ -838,7 +834,7 @@ export function PurchaseOrderDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <FileText className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'فواتير الشراء' : 'Purchase Invoices'}
+                            {t('buying.purchaseOrder.purchaseInvoices')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
@@ -846,9 +842,7 @@ export function PurchaseOrderDetailsView() {
                             <div className="text-center py-12 text-slate-500">
                               <FileText className="h-12 w-12 mx-auto mb-4 opacity-20" aria-hidden="true" />
                               <p>
-                                {isArabic
-                                  ? 'لا توجد فواتير شراء لهذا الطلب'
-                                  : 'No purchase invoices for this order'}
+                                {t('buying.purchaseOrder.noInvoices')}
                               </p>
                             </div>
                           ) : (
@@ -857,22 +851,22 @@ export function PurchaseOrderDetailsView() {
                                 <TableHeader>
                                   <TableRow>
                                     <TableHead>
-                                      {isArabic ? 'رقم الفاتورة' : 'Invoice Number'}
+                                      {t('buying.purchaseOrder.invoiceNumber')}
                                     </TableHead>
                                     <TableHead>
-                                      {isArabic ? 'التاريخ' : 'Date'}
+                                      {t('buying.common.date')}
                                     </TableHead>
                                     <TableHead>
-                                      {isArabic ? 'تاريخ الاستحقاق' : 'Due Date'}
+                                      {t('buying.purchaseOrder.dueDate')}
                                     </TableHead>
                                     <TableHead className="text-end">
-                                      {isArabic ? 'الإجمالي' : 'Total'}
+                                      {t('buying.common.total')}
                                     </TableHead>
                                     <TableHead className="text-end">
-                                      {isArabic ? 'المتبقي' : 'Outstanding'}
+                                      {t('buying.purchaseOrder.outstanding')}
                                     </TableHead>
                                     <TableHead>
-                                      {isArabic ? 'الحالة' : 'Status'}
+                                      {t('buying.common.status')}
                                     </TableHead>
                                   </TableRow>
                                 </TableHeader>
@@ -912,7 +906,7 @@ export function PurchaseOrderDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <Clock className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'الجدول الزمني' : 'Timeline'}
+                            {t('buying.purchaseOrder.timeline')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
@@ -927,14 +921,14 @@ export function PurchaseOrderDetailsView() {
                               </div>
                               <div className="flex-1 pb-8">
                                 <p className="font-medium text-navy mb-1">
-                                  {isArabic ? 'تم الإنشاء' : 'Created'}
+                                  {t('buying.purchaseOrder.created')}
                                 </p>
                                 <p className="text-sm text-slate-500">
                                   {formatDate(purchaseOrder.createdAt)}
                                 </p>
                                 {purchaseOrder.createdBy && (
                                   <p className="text-sm text-slate-500">
-                                    {isArabic ? 'بواسطة:' : 'By:'} {purchaseOrder.createdBy}
+                                    {t('buying.purchaseOrder.by')} {purchaseOrder.createdBy}
                                   </p>
                                 )}
                               </div>
@@ -954,7 +948,7 @@ export function PurchaseOrderDetailsView() {
                                 </div>
                                 <div className="flex-1 pb-8">
                                   <p className="font-medium text-navy mb-1">
-                                    {isArabic ? 'تم الترحيل' : 'Submitted'}
+                                    {t('buying.purchaseOrder.submitted')}
                                   </p>
                                   <p className="text-sm text-slate-500">
                                     {formatDate(purchaseOrder.updatedAt)}
@@ -976,7 +970,7 @@ export function PurchaseOrderDetailsView() {
                                 </div>
                                 <div className="flex-1 pb-8">
                                   <p className="font-medium text-navy mb-1">
-                                    {isArabic ? 'تم الاعتماد' : 'Approved'}
+                                    {t('buying.purchaseOrder.approved')}
                                   </p>
                                   <p className="text-sm text-slate-500">
                                     {formatDate(purchaseOrder.updatedAt)}
@@ -996,7 +990,7 @@ export function PurchaseOrderDetailsView() {
                                 </div>
                                 <div className="flex-1 pb-8">
                                   <p className="font-medium text-navy mb-1">
-                                    {isArabic ? 'تم الاستلام' : 'Received'}
+                                    {t('buying.purchaseOrder.received')}
                                   </p>
                                   <p className="text-sm text-slate-500">
                                     {formatDate(purchaseOrder.updatedAt)}
@@ -1015,7 +1009,7 @@ export function PurchaseOrderDetailsView() {
                                 </div>
                                 <div className="flex-1">
                                   <p className="font-medium text-navy mb-1">
-                                    {isArabic ? 'تم الفوترة' : 'Billed'}
+                                    {t('buying.purchaseOrder.billed')}
                                   </p>
                                   <p className="text-sm text-slate-500">
                                     {formatDate(purchaseOrder.updatedAt)}
@@ -1034,7 +1028,7 @@ export function PurchaseOrderDetailsView() {
                                 </div>
                                 <div className="flex-1">
                                   <p className="font-medium text-navy mb-1">
-                                    {isArabic ? 'تم الإلغاء' : 'Cancelled'}
+                                    {t('buying.poStatus.cancelled')}
                                   </p>
                                   <p className="text-sm text-slate-500">
                                     {formatDate(purchaseOrder.updatedAt)}
@@ -1062,7 +1056,7 @@ export function PurchaseOrderDetailsView() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {isArabic ? 'تأكيد الحذف' : 'Confirm Deletion'}
+              {t('buying.dialogs.confirmDeletion')}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {isArabic
@@ -1072,7 +1066,7 @@ export function PurchaseOrderDetailsView() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>
-              {isArabic ? 'إلغاء' : 'Cancel'}
+              {t('buying.common.cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
@@ -1082,10 +1076,10 @@ export function PurchaseOrderDetailsView() {
               {deleteMutation.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 me-2 animate-spin" aria-hidden="true" />
-                  {isArabic ? 'جاري الحذف...' : 'Deleting...'}
+                  {t('buying.common.deleting')}
                 </>
               ) : (
-                isArabic ? 'حذف' : 'Delete'
+                t('buying.common.delete')
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -1097,10 +1091,10 @@ export function PurchaseOrderDetailsView() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {showActionDialog.action === 'submit' && (isArabic ? 'تأكيد الترحيل' : 'Confirm Submission')}
-              {showActionDialog.action === 'approve' && (isArabic ? 'تأكيد الاعتماد' : 'Confirm Approval')}
-              {showActionDialog.action === 'reject' && (isArabic ? 'تأكيد الرفض' : 'Confirm Rejection')}
-              {showActionDialog.action === 'cancel' && (isArabic ? 'تأكيد الإلغاء' : 'Confirm Cancellation')}
+              {showActionDialog.action === 'submit' && t('buying.dialogs.confirmSubmission')}
+              {showActionDialog.action === 'approve' && t('buying.dialogs.confirmApproval')}
+              {showActionDialog.action === 'reject' && t('buying.dialogs.confirmRejection')}
+              {showActionDialog.action === 'cancel' && t('buying.dialogs.confirmCancellation')}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {showActionDialog.action === 'submit' && (isArabic
@@ -1119,7 +1113,7 @@ export function PurchaseOrderDetailsView() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>
-              {isArabic ? 'إلغاء' : 'Cancel'}
+              {t('buying.common.cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleAction}
@@ -1137,14 +1131,14 @@ export function PurchaseOrderDetailsView() {
               {(submitMutation.isPending || approveMutation.isPending || cancelMutation.isPending) ? (
                 <>
                   <Loader2 className="h-4 w-4 me-2 animate-spin" aria-hidden="true" />
-                  {isArabic ? 'جاري المعالجة...' : 'Processing...'}
+                  {t('buying.common.processing')}
                 </>
               ) : (
                 <>
-                  {showActionDialog.action === 'submit' && (isArabic ? 'ترحيل' : 'Submit')}
-                  {showActionDialog.action === 'approve' && (isArabic ? 'اعتماد' : 'Approve')}
-                  {showActionDialog.action === 'reject' && (isArabic ? 'رفض' : 'Reject')}
-                  {showActionDialog.action === 'cancel' && (isArabic ? 'إلغاء' : 'Cancel')}
+                  {showActionDialog.action === 'submit' && t('buying.common.submit')}
+                  {showActionDialog.action === 'approve' && t('buying.common.approve')}
+                  {showActionDialog.action === 'reject' && t('buying.common.reject')}
+                  {showActionDialog.action === 'cancel' && t('buying.common.cancel')}
                 </>
               )}
             </AlertDialogAction>

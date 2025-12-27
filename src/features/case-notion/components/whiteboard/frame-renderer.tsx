@@ -23,6 +23,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
+import { CANVAS } from '@/config'
 import type { Block } from '../../data/schema'
 
 interface FrameRendererProps {
@@ -37,10 +38,10 @@ interface FrameRendererProps {
   readOnly?: boolean
 }
 
-const MIN_WIDTH = 300
-const MIN_HEIGHT = 200
-const DEFAULT_WIDTH = 600
-const DEFAULT_HEIGHT = 400
+const MIN_WIDTH = CANVAS.FRAME.MIN_WIDTH
+const MIN_HEIGHT = CANVAS.FRAME.MIN_HEIGHT
+const DEFAULT_WIDTH = CANVAS.FRAME.DEFAULT_WIDTH
+const DEFAULT_HEIGHT = CANVAS.FRAME.DEFAULT_HEIGHT
 
 // Frame background colors
 const FRAME_COLORS = {

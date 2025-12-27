@@ -4,5 +4,5 @@
  */
 
 export { ValidationErrors } from './ValidationErrors'
-export { ErrorModal } from './ErrorModal'
+export { ErrorModal } from '@/components/error-modal'
 export { ErrorDisplay } from './ErrorDisplay'

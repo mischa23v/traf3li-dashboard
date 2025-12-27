@@ -83,10 +83,11 @@ import {
 } from '@/hooks/use-inventory'
 import type { StockEntry, StockEntryFilters, StockEntryType } from '@/types/inventory'
 import { InventorySidebar } from './inventory-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.inventory', href: '/dashboard/inventory' },
+  { title: 'sidebar.nav.inventory', href: ROUTES.dashboard.inventory.list },
 ]
 
 export function StockEntryListView() {
@@ -360,7 +361,7 @@ export function StockEntryListView() {
                       </SelectContent>
                     </Select>
                     <Button asChild className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
-                      <Link to="/dashboard/inventory/stock-entries/create">
+                      <Link to={ROUTES.dashboard.inventory.stockEntries.create}>
                         <Plus className="w-4 h-4 ml-2" />
                         {t('inventory.stockEntry.addEntry', 'قيد جديد')}
                       </Link>
@@ -430,7 +431,7 @@ export function StockEntryListView() {
                       {t('inventory.stockEntry.noEntriesDesc', 'ابدأ بإنشاء قيد مخزون جديد')}
                     </p>
                     <Button asChild className="rounded-xl">
-                      <Link to="/dashboard/inventory/stock-entries/create">
+                      <Link to={ROUTES.dashboard.inventory.stockEntries.create}>
                         <Plus className="w-4 h-4 ml-2" />
                         {t('inventory.stockEntry.addEntry', 'قيد جديد')}
                       </Link>
@@ -470,7 +471,7 @@ export function StockEntryListView() {
                           <TableRow
                             key={entry._id}
                             className="cursor-pointer hover:bg-muted/50"
-                            onClick={() => navigate({ to: `/dashboard/inventory/stock-entries/${entry._id}` })}
+                            onClick={() => navigate({ to: ROUTES.dashboard.inventory.stockEntries.detail(entry._id) })}
                           >
                             <TableCell className="font-mono text-sm font-medium">
                               {entry.stockEntryId}
@@ -520,7 +521,7 @@ export function StockEntryListView() {
                                   <DropdownMenuItem
                                     onClick={(e) => {
                                       e.stopPropagation()
-                                      navigate({ to: `/dashboard/inventory/stock-entries/${entry._id}` })
+                                      navigate({ to: ROUTES.dashboard.inventory.stockEntries.detail(entry._id) })
                                     }}
                                   >
                                     <Eye className="w-4 h-4 ml-2" />

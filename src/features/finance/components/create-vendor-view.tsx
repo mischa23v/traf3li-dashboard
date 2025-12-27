@@ -367,7 +367,7 @@ export function CreateVendorView({ mode = 'create' }: CreateVendorViewProps) {
 
                                 {/* Form Actions */}
                                 <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
-                                    <Link to="/dashboard/finance/vendors">
+                                    <Link to={ROUTES.dashboard.finance.vendors.list}>
                                         <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
                                             إلغاء
                                         </Button>

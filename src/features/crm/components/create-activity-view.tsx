@@ -26,6 +26,7 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { SalesSidebar } from './sales-sidebar'
 import { useCreateActivity, useLeads } from '@/hooks/useCrm'
 import type { ActivityType, ActivityEntityType } from '@/types/crm'
@@ -143,16 +144,16 @@ export function CreateActivityView() {
 
     createActivityMutation.mutate(activityData, {
       onSuccess: () => {
-        navigate({ to: '/dashboard/crm/activities' })
+        navigate({ to: ROUTES.dashboard.crm.activities.list })
       }
     })
   }
 
   const topNav = [
-    { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: false },
-    { title: 'مسار المبيعات', href: '/dashboard/crm/pipeline', isActive: false },
-    { title: 'الإحالات', href: '/dashboard/crm/referrals', isActive: false },
-    { title: 'سجل الأنشطة', href: '/dashboard/crm/activities', isActive: true },
+    { title: 'العملاء المحتملين', href: ROUTES.dashboard.crm.leads.list, isActive: false },
+    { title: 'مسار المبيعات', href: ROUTES.dashboard.crm.pipeline, isActive: false },
+    { title: 'الإحالات', href: ROUTES.dashboard.crm.referrals.list, isActive: false },
+    { title: 'سجل الأنشطة', href: ROUTES.dashboard.crm.activities.list, isActive: true },
   ]
 
   const selectedType = ACTIVITY_TYPES.find(t => t.value === formData.type)
@@ -171,7 +172,7 @@ export function CreateActivityView() {
       <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
         {/* HERO CARD */}
         <ProductivityHero badge="إدارة النشاطات" title="تسجيل نشاط جديد" type="activities" listMode={true} hideButtons={true}>
-          <Link to="/dashboard/crm/activities">
+          <Link to={ROUTES.dashboard.crm.activities.list}>
             <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
               <ArrowRight className="w-5 h-5" />
             </Button>
@@ -481,7 +482,7 @@ export function CreateActivityView() {
 
                 {/* Submit */}
                 <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
-                  <Link to="/dashboard/crm/activities">
+                  <Link to={ROUTES.dashboard.crm.activities.list}>
                     <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
                       إلغاء
                     </Button>

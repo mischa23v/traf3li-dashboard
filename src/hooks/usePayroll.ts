@@ -1,12 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
+import { CACHE_TIMES } from '@/config'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import { payrollService } from '@/services/payrollService'
 import type { SalarySlipFilters, CreateSalarySlipData } from '@/services/payrollService'
 
 // ==================== Cache Configuration ====================
-const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
-const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
-const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
+const STATS_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour
+const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
 
 // Query Keys
 export const payrollKeys = {
@@ -63,90 +66,82 @@ export function usePayrollStats(month?: number, year?: number) {
 
 // Create salary slip
 export function useCreateSalarySlip() {
-    const queryClient = useQueryClient()
-
     return useMutation({
         mutationFn: (data: CreateSalarySlipData) => payrollService.createSalarySlip(data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: payrollKeys.all })
+            invalidateCache.payroll.all()
         },
     })
 }
 
 // Update salary slip
 export function useUpdateSalarySlip() {
-    const queryClient = useQueryClient()
-
     return useMutation({
         mutationFn: ({ id, data }: { id: string; data: Partial<CreateSalarySlipData> }) =>
             payrollService.updateSalarySlip(id, data),
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: payrollKeys.detail(variables.id) })
-            queryClient.invalidateQueries({ queryKey: payrollKeys.lists() })
+            Promise.all([
+                invalidateCache.payroll.detail(variables.id),
+                invalidateCache.payroll.all()
+            ])
         },
     })
 }
 
 // Delete salary slip
 export function useDeleteSalarySlip() {
-    const queryClient = useQueryClient()
-
     return useMutation({
         mutationFn: (id: string) => payrollService.deleteSalarySlip(id),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: payrollKeys.all })
+            invalidateCache.payroll.all()
         },
     })
 }
 
 // Approve salary slip
 export function useApproveSalarySlip() {
-    const queryClient = useQueryClient()
-
     return useMutation({
         mutationFn: (id: string) => payrollService.approveSalarySlip(id),
         onSuccess: (_, id) => {
-            queryClient.invalidateQueries({ queryKey: payrollKeys.detail(id) })
-            queryClient.invalidateQueries({ queryKey: payrollKeys.lists() })
+            Promise.all([
+                invalidateCache.payroll.detail(id),
+                invalidateCache.payroll.all()
+            ])
         },
     })
 }
 
 // Mark as paid
 export function useMarkAsPaid() {
-    const queryClient = useQueryClient()
-
     return useMutation({
         mutationFn: ({ id, transactionReference }: { id: string; transactionReference?: string }) =>
             payrollService.markAsPaid(id, transactionReference),
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: payrollKeys.detail(variables.id) })
-            queryClient.invalidateQueries({ queryKey: payrollKeys.lists() })
+            Promise.all([
+                invalidateCache.payroll.detail(variables.id),
+                invalidateCache.payroll.all()
+            ])
         },
     })
 }
 
 // Generate bulk payroll
 export function useGenerateBulkPayroll() {
-    const queryClient = useQueryClient()
-
     return useMutation({
         mutationFn: ({ month, year, employeeIds }: { month: number; year: number; employeeIds?: string[] }) =>
             payrollService.generateBulkPayroll(month, year, employeeIds),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: payrollKeys.all })
+            invalidateCache.payroll.all()
         },
     })
 }
 
 // Submit to WPS
 export function useSubmitToWPS() {
-    const queryClient = useQueryClient()
-
     return useMutation({
         mutationFn: (ids: string[]) => payrollService.submitToWPS(ids),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: payrollKeys.all })
+            invalidateCache.payroll.all()
         },
     })
 }

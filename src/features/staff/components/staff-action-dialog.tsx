@@ -27,24 +27,37 @@ import { staffStatuses, staffRoles, specializations } from '../data/data'
 import { type Staff } from '../data/schema'
 import { useUpdateStaff, useInviteStaff } from '@/hooks/useStaff'
 import { useTranslation } from 'react-i18next'
+import { fieldSchemas, compositeSchemas } from '@/lib/shared-schemas'
+
+// Reusable role enum from shared schemas
+const staffRoleEnum = z.enum([
+  'owner',
+  'admin',
+  'partner',
+  'lawyer',
+  'paralegal',
+  'secretary',
+  'accountant',
+  'departed',
+])
 
 // Schema for editing existing staff
 const editFormSchema = z.object({
-  firstName: z.string().min(2, 'الاسم الأول مطلوب'),
-  lastName: z.string().min(2, 'الاسم الأخير مطلوب'),
-  email: z.string().email('البريد الإلكتروني غير صالح'),
-  phone: z.string().optional(),
-  role: z.enum(['owner', 'admin', 'partner', 'lawyer', 'paralegal', 'secretary', 'accountant', 'departed']),
+  firstName: fieldSchemas.firstName,
+  lastName: fieldSchemas.lastName,
+  email: fieldSchemas.emailRequired,
+  phone: fieldSchemas.phone,
+  role: staffRoleEnum,
   specialization: z.string().optional(),
-  status: z.enum(['active', 'departed', 'suspended', 'pending', 'pending_approval']).default('active'),
+  status: fieldSchemas.staffStatus.default('active'),
 })
 
 // Schema for inviting new staff
 const inviteFormSchema = z.object({
-  firstName: z.string().min(2, 'الاسم الأول مطلوب'),
-  lastName: z.string().min(2, 'الاسم الأخير مطلوب'),
-  email: z.string().email('البريد الإلكتروني غير صالح'),
-  role: z.enum(['owner', 'admin', 'partner', 'lawyer', 'paralegal', 'secretary', 'accountant', 'departed']),
+  firstName: fieldSchemas.firstName,
+  lastName: fieldSchemas.lastName,
+  email: fieldSchemas.emailRequired,
+  role: staffRoleEnum,
 })
 
 type EditStaffForm = z.infer<typeof editFormSchema>

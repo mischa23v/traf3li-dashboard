@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { ROUTES } from '@/constants/routes'
 import {
     ArrowRight, Save, Calendar, Clock,
     Bell, FileText, AlertCircle, Loader2,
@@ -243,16 +244,16 @@ export function CreateReminderView() {
 
         createReminderMutation.mutate(reminderData, {
             onSuccess: () => {
-                navigate({ to: '/dashboard/tasks/reminders' })
+                navigate({ to: ROUTES.dashboard.tasks.reminders.list })
             }
         })
     }
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'المهام', href: '/dashboard/tasks/list', isActive: false },
-        { title: 'التذكيرات', href: '/dashboard/tasks/reminders', isActive: true },
-        { title: 'الأحداث', href: '/dashboard/tasks/events', isActive: false },
+        { title: 'المهام', href: ROUTES.dashboard.tasks.list, isActive: false },
+        { title: 'التذكيرات', href: ROUTES.dashboard.tasks.reminders.list, isActive: true },
+        { title: 'الأحداث', href: ROUTES.dashboard.tasks.events.list, isActive: false },
     ]
 
     return (

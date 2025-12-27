@@ -93,7 +93,7 @@ function conditionsToDomain(conditions: DomainCondition[]): FilterDomain {
 }
 
 export function DomainBuilder({ fields, value, onChange, className }: DomainBuilderProps) {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
 
   const [conditions, setConditions] = React.useState<DomainCondition[]>(
@@ -132,37 +132,25 @@ export function DomainBuilder({ fields, value, onChange, className }: DomainBuil
       <Alert variant="default" className="border-amber-500 bg-amber-50 dark:bg-amber-950/20">
         <AlertTriangle className="h-4 w-4 text-amber-600" />
         <AlertTitle className="text-amber-900 dark:text-amber-100">
-          {isArabic ? 'قريباً | Coming Soon' : 'Coming Soon | قريباً'}
+          {t('automatedActions.comingSoonAlt')}
         </AlertTitle>
         <AlertDescription className="text-amber-800 dark:text-amber-200">
-          {isArabic ? (
-            <>
-              هذه الميزة قيد التطوير حالياً. واجهة برمجة التطبيقات الخلفية للإجراءات التلقائية غير مطبقة بعد.
-              <br />
-              <span className="text-sm">
-                This feature is currently under development. The automated actions backend API is not yet implemented.
-              </span>
-            </>
-          ) : (
-            <>
-              This feature is currently under development. The automated actions backend API is not yet implemented.
-              <br />
-              <span className="text-sm">
-                هذه الميزة قيد التطوير حالياً. واجهة برمجة التطبيقات الخلفية للإجراءات التلقائية غير مطبقة بعد.
-              </span>
-            </>
-          )}
+          {t('automatedActions.comingSoonDesc')}
+          <br />
+          <span className="text-sm">
+            {t('automatedActions.comingSoonDescAr')}
+          </span>
         </AlertDescription>
       </Alert>
 
       {/* Header */}
       <div className="flex items-center justify-between">
         <h4 className="text-sm font-medium">
-          {isArabic ? 'الشروط' : 'Conditions'}
+          {t('automatedActions.conditions.title')}
         </h4>
         <Button variant="outline" size="sm" onClick={addCondition}>
           <Plus className="h-4 w-4 me-1" />
-          {isArabic ? 'إضافة شرط' : 'Add Condition'}
+          {t('automatedActions.conditions.addCondition')}
         </Button>
       </div>
 
@@ -170,13 +158,11 @@ export function DomainBuilder({ fields, value, onChange, className }: DomainBuil
       {conditions.length === 0 ? (
         <div className="text-center py-6 text-muted-foreground border-2 border-dashed rounded-lg">
           <p className="text-sm">
-            {isArabic
-              ? 'لا توجد شروط. سيتم تطبيق الإجراء على جميع السجلات.'
-              : 'No conditions. Action will apply to all records.'}
+            {t('automatedActions.conditions.noConditions')}
           </p>
           <Button variant="link" size="sm" onClick={addCondition} className="mt-2">
             <Plus className="h-4 w-4 me-1" />
-            {isArabic ? 'إضافة شرط' : 'Add Condition'}
+            {t('automatedActions.conditions.addCondition')}
           </Button>
         </div>
       ) : (
@@ -195,7 +181,7 @@ export function DomainBuilder({ fields, value, onChange, className }: DomainBuil
                 onValueChange={(val) => updateCondition(index, { field: val })}
               >
                 <SelectTrigger className="w-40">
-                  <SelectValue placeholder={isArabic ? 'اختر الحقل...' : 'Select field...'} />
+                  <SelectValue placeholder={t('automatedActions.conditions.selectField')} />
                 </SelectTrigger>
                 <SelectContent>
                   {fields?.map((field) => (
@@ -242,7 +228,7 @@ export function DomainBuilder({ fields, value, onChange, className }: DomainBuil
 
                     updateCondition(index, { value: val })
                   }}
-                  placeholder={isArabic ? 'القيمة...' : 'Value...'}
+                  placeholder={t('automatedActions.conditions.value')}
                   className="flex-1"
                 />
               )}
@@ -259,8 +245,8 @@ export function DomainBuilder({ fields, value, onChange, className }: DomainBuil
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="true">{isArabic ? 'نعم' : 'Yes'}</SelectItem>
-                    <SelectItem value="false">{isArabic ? 'لا' : 'No'}</SelectItem>
+                    <SelectItem value="true">{t('automatedActions.conditions.yes')}</SelectItem>
+                    <SelectItem value="false">{t('automatedActions.conditions.no')}</SelectItem>
                   </SelectContent>
                 </Select>
               )}

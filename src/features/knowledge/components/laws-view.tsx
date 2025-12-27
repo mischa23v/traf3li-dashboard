@@ -31,6 +31,7 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { KnowledgeSidebar } from './knowledge-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { ROUTES } from '@/constants/routes'
 
 // Mock laws data
 const mockLaws = [
@@ -124,9 +125,9 @@ export function LawsView() {
   }, [])
 
   const topNav = [
-    { title: isRTL ? 'القوانين' : 'Laws', href: '/dashboard/knowledge/laws', isActive: true },
-    { title: isRTL ? 'الأحكام' : 'Judgments', href: '/dashboard/knowledge/judgments', isActive: false },
-    { title: isRTL ? 'النماذج' : 'Forms', href: '/dashboard/knowledge/forms', isActive: false },
+    { title: t('knowledge.navigation.laws'), href: ROUTES.dashboard.knowledge.laws, isActive: true },
+    { title: t('knowledge.navigation.judgments'), href: ROUTES.dashboard.knowledge.judgments, isActive: false },
+    { title: t('knowledge.navigation.forms'), href: ROUTES.dashboard.knowledge.forms, isActive: false },
   ]
 
   const toggleBookmark = (lawId: string) => {
@@ -138,15 +139,16 @@ export function LawsView() {
   }
 
   const getCategoryBadge = (category: string) => {
-    const config: Record<string, { color: string; label: string; labelEn: string }> = {
-      labor: { color: 'bg-blue-100 text-blue-700', label: 'عمل', labelEn: 'Labor' },
-      commercial: { color: 'bg-emerald-100 text-emerald-700', label: 'تجاري', labelEn: 'Commercial' },
-      civil: { color: 'bg-purple-100 text-purple-700', label: 'مدني', labelEn: 'Civil' },
-      criminal: { color: 'bg-red-100 text-red-700', label: 'جنائي', labelEn: 'Criminal' },
-      administrative: { color: 'bg-amber-100 text-amber-700', label: 'إداري', labelEn: 'Administrative' },
+    const config: Record<string, { color: string }> = {
+      labor: { color: 'bg-blue-100 text-blue-700' },
+      commercial: { color: 'bg-emerald-100 text-emerald-700' },
+      civil: { color: 'bg-purple-100 text-purple-700' },
+      criminal: { color: 'bg-red-100 text-red-700' },
+      administrative: { color: 'bg-amber-100 text-amber-700' },
     }
-    const cat = config[category] || { color: 'bg-slate-100 text-slate-700', label: category, labelEn: category }
-    return <Badge className={`${cat.color} hover:${cat.color} border-0`}>{isRTL ? cat.label : cat.labelEn}</Badge>
+    const cat = config[category] || { color: 'bg-slate-100 text-slate-700' }
+    const label = t(`knowledge.laws.categoryBadges.${category}`, category)
+    return <Badge className={`${cat.color} hover:${cat.color} border-0`}>{label}</Badge>
   }
 
   const filteredLaws = mockLaws.filter(law => {
@@ -199,8 +201,8 @@ export function LawsView() {
       >
         {/* HERO CARD & STATS */}
         <ProductivityHero
-          badge={isRTL ? 'قاعدة المعرفة' : 'Knowledge Base'}
-          title={isRTL ? 'الأنظمة' : 'Laws'}
+          badge={t('knowledge.title')}
+          title={t('knowledge.laws.title')}
           type="laws"
         />
 
@@ -215,7 +217,7 @@ export function LawsView() {
                   <div className="relative flex-1">
                     <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                     <Input
-                      placeholder={isRTL ? 'بحث في الأنظمة...' : 'Search laws...'}
+                      placeholder={t('knowledge.laws.searchPlaceholder')}
                       defaultValue={searchQuery}
                       onChange={(e) => debouncedSetSearch(e.target.value)}
                       className="ps-10 rounded-xl border-slate-200"
@@ -228,7 +230,7 @@ export function LawsView() {
                     <SelectContent>
                       {categories.map((cat) => (
                         <SelectItem key={cat.value} value={cat.value}>
-                          {isRTL ? cat.label : cat.labelEn}
+                          {t(`knowledge.laws.categories.${cat.value}`)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -324,15 +326,15 @@ export function LawsView() {
                         <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-slate-500">
                           <span className="flex items-center bg-slate-50 px-2 py-1 rounded-lg">
                             <Calendar className="h-3.5 w-3.5 me-1 text-slate-500" aria-hidden="true" />
-                            {isRTL ? 'تاريخ الإصدار:' : 'Issued:'} {law.issueDate}
+                            {t('knowledge.laws.issued')} {law.issueDate}
                           </span>
                           <span className="flex items-center bg-slate-50 px-2 py-1 rounded-lg">
                             <Clock className="h-3.5 w-3.5 me-1 text-slate-500" aria-hidden="true" />
-                            {isRTL ? 'آخر تحديث:' : 'Updated:'} {law.lastUpdate}
+                            {t('knowledge.laws.updated')} {law.lastUpdate}
                           </span>
                           <span className="flex items-center bg-slate-50 px-2 py-1 rounded-lg">
                             <FileText className="h-3.5 w-3.5 me-1 text-slate-500" aria-hidden="true" />
-                            {law.articles} {isRTL ? 'مادة' : 'articles'}
+                            {law.articles} {t('knowledge.laws.articles')}
                           </span>
                         </div>
 
@@ -350,11 +352,11 @@ export function LawsView() {
                           <div className="flex items-center gap-2">
                             <Button variant="outline" size="sm" className="h-9 rounded-lg border-slate-200">
                               <Download className="h-4 w-4 me-1" aria-hidden="true" />
-                              {isRTL ? 'تحميل' : 'Download'}
+                              {t('knowledge.laws.download')}
                             </Button>
                             <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600 h-9 rounded-lg shadow-lg shadow-emerald-500/20">
                               <ExternalLink className="h-4 w-4 me-1" aria-hidden="true" />
-                              {isRTL ? 'عرض' : 'View'}
+                              {t('knowledge.laws.view')}
                             </Button>
                           </div>
                         </div>
@@ -373,13 +375,13 @@ export function LawsView() {
                     <Scale className="h-8 w-8 text-slate-300" />
                   </div>
                   <h3 className="text-lg font-bold text-navy">
-                    {isRTL ? 'لا توجد أنظمة مطابقة' : 'No matching laws found'}
+                    {t('knowledge.laws.noMatchingLaws')}
                   </h3>
                   <p className="text-slate-500 mt-1 max-w-xs mx-auto">
-                    {isRTL ? 'جرب تعديل معايير البحث' : 'Try adjusting your search criteria'}
+                    {t('knowledge.laws.adjustSearchCriteria')}
                   </p>
                   <Button variant="outline" className="mt-4 border-slate-200">
-                    {isRTL ? 'مسح الفلاتر' : 'Clear Filters'}
+                    {t('knowledge.laws.clearFilters')}
                   </Button>
                 </CardContent>
               </Card>

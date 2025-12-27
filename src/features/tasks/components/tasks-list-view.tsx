@@ -25,6 +25,7 @@ import { useTranslation } from 'react-i18next'
 import { useDebouncedCallback } from 'use-debounce'
 import { PERF_DEBUG, perfLog } from '@/lib/perf-debug'
 import { Main } from '@/components/layout/main'
+import { ROUTES } from '@/constants/routes'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
@@ -503,11 +504,11 @@ export function TasksListView() {
 
     // Single task actions
     const handleViewTask = useCallback((taskId: string) => {
-        navigate({ to: '/dashboard/tasks/$taskId', params: { taskId } })
+        navigate({ to: ROUTES.dashboard.tasks.detail(taskId) })
     }, [navigate])
 
     const handleEditTask = useCallback((taskId: string) => {
-        navigate({ to: '/dashboard/tasks/create', search: { editId: taskId } } as any)
+        navigate({ to: ROUTES.dashboard.tasks.new, search: { editId: taskId } } as any)
     }, [navigate])
 
     const handleDeleteTask = useCallback((taskId: string) => {
@@ -537,10 +538,10 @@ export function TasksListView() {
     }, [updateTaskMutation])
 
     const topNav = [
-        { title: t('tasks.nav.overview'), href: '/dashboard/overview', isActive: false },
-        { title: t('tasks.nav.tasks'), href: '/dashboard/tasks/list', isActive: true },
-        { title: t('tasks.nav.cases'), href: '/dashboard/cases', isActive: false },
-        { title: t('tasks.nav.clients'), href: '/dashboard/clients', isActive: false },
+        { title: t('tasks.nav.overview'), href: ROUTES.dashboard.home, isActive: false },
+        { title: t('tasks.nav.tasks'), href: ROUTES.dashboard.tasks.list, isActive: true },
+        { title: t('tasks.nav.cases'), href: ROUTES.dashboard.cases.list, isActive: false },
+        { title: t('tasks.nav.clients'), href: ROUTES.dashboard.clients.list, isActive: false },
     ]
 
     return (
@@ -909,7 +910,7 @@ export function TasksListView() {
                                     <h3 className="text-lg font-bold text-slate-900 mb-2">{t('tasks.list.noTasks')}</h3>
                                     <p className="text-slate-500 mb-4">{t('tasks.list.noTasksDescription')}</p>
                                     <GosiButton asChild className="bg-emerald-500 hover:bg-emerald-600">
-                                        <Link to="/dashboard/tasks/new">
+                                        <Link to={ROUTES.dashboard.tasks.new}>
                                             <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                             {t('tasks.list.newTask')}
                                         </Link>
@@ -923,7 +924,7 @@ export function TasksListView() {
                                 {visibleTasks.map((task, index) => (
                                         <div key={task.id} className="mb-2">
                                             <div
-                                                onClick={() => navigate({ to: '/dashboard/tasks/$taskId', params: { taskId: task.id } })}
+                                                onClick={() => navigate({ to: ROUTES.dashboard.tasks.detail(task.id) })}
                                                 style={{ animationDelay: `${index * 50}ms` }}
                                                 className={`
                                         animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-backwards
@@ -1011,7 +1012,7 @@ export function TasksListView() {
                                                         className="bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 rounded-full px-2 py-0.5 flex items-center gap-1 cursor-pointer transition-all text-[10px] font-bold"
                                                         onClick={(e) => {
                                                             e.stopPropagation()
-                                                            navigate({ to: '/dashboard/tasks/events/$eventId', params: { eventId: task.linkedEventId || task.eventId } } as any)
+                                                            navigate({ to: ROUTES.dashboard.tasks.events.detail(task.linkedEventId || task.eventId) })
                                                         }}
                                                     >
                                                         <Calendar className="h-3 w-3" />
@@ -1218,7 +1219,7 @@ export function TasksListView() {
                                             )}
                                         </div>
 
-                                        <Link to={`/dashboard/tasks/${task.id}` as any} className="hidden sm:inline-flex" onClick={(e) => e.stopPropagation()}>
+                                        <Link to={ROUTES.dashboard.tasks.detail(task.id)} className="hidden sm:inline-flex" onClick={(e) => e.stopPropagation()}>
                                             <GosiButton size="sm" className="bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white border-0 rounded-md px-3 h-6 text-[10px] transition-all group/btn">
                                                 {t('tasks.list.viewDetails')}
                                                 <ArrowRight className="w-3 h-3 ms-1 rtl:rotate-180 transition-transform group-hover/btn:translate-x-0.5 rtl:group-hover/btn:-translate-x-0.5" />
@@ -1248,7 +1249,7 @@ export function TasksListView() {
 
                                         {/* View All Tasks Link - always show at bottom */}
                                         <Link
-                                            to="/dashboard/tasks/list"
+                                            to={ROUTES.dashboard.tasks.list}
                                             className="flex items-center gap-2 text-sm font-bold text-emerald-600 hover:text-emerald-700 transition-colors group py-2"
                                         >
                                             {t('tasks.list.viewAllTasks', 'عرض جميع المهام')}

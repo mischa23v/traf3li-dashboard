@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
     Clock, Bell, MapPin, Calendar as CalendarIcon,
     Plus, CheckSquare, Trash2, List, X, ChevronRight, Loader2, AlertCircle
@@ -11,6 +12,7 @@ import { useCalendar } from '@/hooks/useCalendar'
 import { useUpcomingReminders } from '@/hooks/useRemindersAndEvents'
 import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA } from 'date-fns/locale'
+import { ROUTES } from '@/constants/routes'
 
 interface KnowledgeSidebarProps {
     context?: 'laws' | 'judgments' | 'forms'
@@ -27,6 +29,7 @@ export function KnowledgeSidebar({
     selectedCount = 0,
     onDeleteSelected
 }: KnowledgeSidebarProps) {
+    const { t } = useTranslation()
     const [activeTab, setActiveTab] = useState<'calendar' | 'notifications'>('calendar')
     const [selectedDate, setSelectedDate] = useState(new Date())
 
@@ -61,16 +64,16 @@ export function KnowledgeSidebar({
 
     const links = {
         laws: {
-            create: '/dashboard/knowledge/laws/new',
-            viewAll: '/dashboard/knowledge/laws'
+            create: `${ROUTES.dashboard.knowledge.laws}/new`,
+            viewAll: ROUTES.dashboard.knowledge.laws
         },
         judgments: {
-            create: '/dashboard/knowledge/judgments/new',
-            viewAll: '/dashboard/knowledge/judgments'
+            create: `${ROUTES.dashboard.knowledge.judgments}/new`,
+            viewAll: ROUTES.dashboard.knowledge.judgments
         },
         forms: {
-            create: '/dashboard/knowledge/forms/new',
-            viewAll: '/dashboard/knowledge/forms'
+            create: `${ROUTES.dashboard.knowledge.forms}/new`,
+            viewAll: ROUTES.dashboard.knowledge.forms
         }
     }
 
@@ -159,7 +162,7 @@ export function KnowledgeSidebar({
 
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6 relative z-10">
-                    <h3 className="font-bold text-lg text-white">إجراءات سريعة</h3>
+                    <h3 className="font-bold text-lg text-white">{t('knowledge.sidebar.quickActions')}</h3>
                 </div>
 
                 {/* Content */}
@@ -168,7 +171,7 @@ export function KnowledgeSidebar({
                     <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
                         <Link to={currentLinks.create}>
                             <Plus className="h-7 w-7" aria-hidden="true" />
-                            <span className="text-sm font-bold">إنشاء</span>
+                            <span className="text-sm font-bold">{t('knowledge.sidebar.create')}</span>
                         </Link>
                     </Button>
 
@@ -184,7 +187,7 @@ export function KnowledgeSidebar({
                         onClick={onToggleSelectionMode}
                     >
                         {isSelectionMode ? <X className="h-6 w-6" aria-hidden="true" /> : <CheckSquare className="h-6 w-6" />}
-                        <span className="text-sm font-bold">{isSelectionMode ? 'إلغاء' : 'تحديد'}</span>
+                        <span className="text-sm font-bold">{isSelectionMode ? t('knowledge.sidebar.cancel') : t('knowledge.sidebar.select')}</span>
                     </Button>
 
                     {/* Delete Button - White + Red Text + Glow */}
@@ -196,7 +199,7 @@ export function KnowledgeSidebar({
                     >
                         <Trash2 className="h-6 w-6" />
                         <span className="text-sm font-bold">
-                            {selectedCount > 0 ? `حذف (${selectedCount})` : 'حذف'}
+                            {selectedCount > 0 ? t('knowledge.sidebar.deleteWithCount', { count: selectedCount }) : t('knowledge.sidebar.delete')}
                         </span>
                     </Button>
 
@@ -204,7 +207,7 @@ export function KnowledgeSidebar({
                     <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
                         <Link to={currentLinks.viewAll}>
                             <List className="h-6 w-6" />
-                            <span className="text-sm font-bold">عرض جميع</span>
+                            <span className="text-sm font-bold">{t('knowledge.sidebar.viewAll')}</span>
                         </Link>
                     </Button>
                 </div>
@@ -231,7 +234,7 @@ export function KnowledgeSidebar({
                                     : "text-emerald-200 hover:text-white hover:bg-emerald-500/10"
                             )}
                         >
-                            التقويم
+                            {t('knowledge.sidebar.calendar')}
                         </button>
                         <button
                             onClick={() => setActiveTab('notifications')}
@@ -242,7 +245,7 @@ export function KnowledgeSidebar({
                                     : "text-emerald-200 hover:text-white hover:bg-emerald-500/10"
                             )}
                         >
-                            التنبيهات
+                            {t('knowledge.sidebar.notifications')}
                         </button>
                     </div>
                     {activeTab === 'calendar' && (
@@ -293,7 +296,7 @@ export function KnowledgeSidebar({
                                 ) : selectedDateEvents.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center py-8 text-slate-500">
                                         <CalendarIcon className="h-10 w-10 mb-2 opacity-20" />
-                                        <p className="text-xs font-medium">لا توجد أحداث لهذا اليوم</p>
+                                        <p className="text-xs font-medium">{t('knowledge.sidebar.noEventsToday')}</p>
                                     </div>
                                 ) : (
                                     <>
@@ -302,8 +305,8 @@ export function KnowledgeSidebar({
 
                                         {selectedDateEvents.map((event) => {
                                             const eventDate = event.startDate ? new Date(event.startDate) : null
-                                            const eventTime = eventDate ? eventDate.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', hour12: false }) : 'غير محدد'
-                                            const timePeriod = eventDate ? (eventDate.getHours() < 12 ? 'صباحاً' : 'مساءً') : ''
+                                            const eventTime = eventDate ? eventDate.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', hour12: false }) : t('knowledge.sidebar.notSpecified')
+                                            const timePeriod = eventDate ? (eventDate.getHours() < 12 ? t('knowledge.sidebar.morning') : t('knowledge.sidebar.evening')) : ''
                                             const colorClass = getEventColor(event)
 
                                             return (
@@ -320,7 +323,7 @@ export function KnowledgeSidebar({
                                                         {event.location && (
                                                             <div className="text-xs text-slate-500 flex items-center gap-1">
                                                                 <MapPin className="h-3 w-3" aria-hidden="true" />
-                                                                {typeof event.location === 'string' ? event.location : (event.location?.name || event.location?.address || 'عن بعد')}
+                                                                {typeof event.location === 'string' ? event.location : (event.location?.name || event.location?.address || t('knowledge.sidebar.remote'))}
                                                             </div>
                                                         )}
                                                     </div>
@@ -333,7 +336,7 @@ export function KnowledgeSidebar({
 
                             <Button asChild variant="ghost" className="w-full mt-6 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 group cursor-pointer">
                                 <Link to="/dashboard/calendar">
-                                    <span>عرض الجدول الكامل</span>
+                                    <span>{t('knowledge.sidebar.viewFullSchedule')}</span>
                                     <ChevronRight className="w-4 h-4 me-2 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1 rtl:rotate-180" aria-hidden="true" />
                                 </Link>
                             </Button>
@@ -347,7 +350,7 @@ export function KnowledgeSidebar({
                             ) : upcomingReminders.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-8 text-slate-500">
                                     <Bell className="h-10 w-10 mb-2 opacity-20" />
-                                    <p className="text-xs font-medium">لا توجد تنبيهات قادمة</p>
+                                    <p className="text-xs font-medium">{t('knowledge.sidebar.noUpcomingNotifications')}</p>
                                 </div>
                             ) : (
                                 <>
@@ -387,7 +390,7 @@ export function KnowledgeSidebar({
                                                         )}
                                                         {isOverdue && (
                                                             <Badge variant="destructive" className="text-[10px] px-1.5 py-0">
-                                                                متأخر
+                                                                {t('knowledge.sidebar.overdue')}
                                                             </Badge>
                                                         )}
                                                     </div>
@@ -399,7 +402,7 @@ export function KnowledgeSidebar({
                             )}
                             <Button asChild variant="ghost" className="w-full text-xs text-slate-500 hover:text-emerald-600 hover:bg-emerald-50">
                                 <Link to="/dashboard/tasks/reminders">
-                                    عرض كل التنبيهات
+                                    {t('knowledge.sidebar.viewAllNotifications')}
                                 </Link>
                             </Button>
                         </div>

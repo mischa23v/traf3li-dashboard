@@ -29,14 +29,14 @@ import {
 import { getCaptchaConfig } from '@/services/captchaService'
 import type { CaptchaConfig } from '@/components/auth/captcha-config'
 import passwordService from '@/services/passwordService'
+import { ROUTES } from '@/constants/routes'
 
 export function ForgotPasswordForm({
   className,
   ...props
 }: React.HTMLAttributes<HTMLFormElement>) {
   const navigate = useNavigate()
-  const { t, i18n } = useTranslation()
-  const isArabic = i18n.language === 'ar'
+  const { t } = useTranslation()
   const [isLoading, setIsLoading] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
 
@@ -50,10 +50,10 @@ export function ForgotPasswordForm({
       z.object({
         email: z
           .string()
-          .min(1, { message: isArabic ? 'يرجى إدخال البريد الإلكتروني' : 'Please enter your email' })
-          .email({ message: isArabic ? 'بريد إلكتروني غير صالح' : 'Invalid email address' }),
+          .min(1, { message: t('auth.forgotPassword.validation.emailRequired') })
+          .email({ message: t('auth.forgotPassword.validation.emailInvalid') }),
       }),
-    [isArabic]
+    [t]
   )
 
   const defaultValues = useMemo(() => ({ email: '' }), [])
@@ -84,14 +84,12 @@ export function ForgotPasswordForm({
     (error: Error) => {
       console.error('CAPTCHA error:', error)
       toast({
-        title: isArabic ? 'خطأ في التحقق' : 'Verification Error',
-        description: isArabic
-          ? 'فشل التحقق. يرجى المحاولة مرة أخرى.'
-          : 'Verification failed. Please try again.',
+        title: t('auth.toast.verificationError.title'),
+        description: t('auth.toast.verificationError.description'),
         variant: 'destructive',
       })
     },
-    [isArabic]
+    [t]
   )
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
@@ -102,10 +100,8 @@ export function ForgotPasswordForm({
         const token = await captchaRef.current?.execute()
         if (!token) {
           toast({
-            title: isArabic ? 'التحقق مطلوب' : 'Verification Required',
-            description: isArabic
-              ? 'يرجى إكمال التحقق للمتابعة.'
-              : 'Please complete the verification to continue.',
+            title: t('auth.toast.verificationRequired.title'),
+            description: t('auth.toast.verificationRequired.description'),
             variant: 'destructive',
           })
           return
@@ -128,14 +124,12 @@ export function ForgotPasswordForm({
 
       setEmailSent(true)
       toast({
-        title: isArabic ? 'تم إرسال البريد الإلكتروني' : 'Email Sent',
-        description: isArabic
-          ? 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني.'
-          : 'A password reset link has been sent to your email.',
+        title: t('auth.forgotPassword.emailSent'),
+        description: t('auth.forgotPassword.emailSentDescription'),
       })
 
       // Navigate to OTP page or show success
-      navigate({ to: '/otp' })
+      navigate({ to: ROUTES.auth.otp })
     } catch (error: any) {
       const errorCode = error?.response?.data?.code || error?.code
 
@@ -145,21 +139,19 @@ export function ForgotPasswordForm({
 
       if (errorCode === 'CAPTCHA_VERIFICATION_FAILED') {
         toast({
-          title: isArabic ? 'فشل التحقق' : 'Verification Failed',
-          description: isArabic
-            ? 'فشل التحقق الأمني. يرجى المحاولة مرة أخرى.'
-            : 'Security verification failed. Please try again.',
+          title: t('auth.forgotPassword.verificationFailed'),
+          description: t('auth.forgotPassword.verificationFailedDescription'),
           variant: 'destructive',
         })
         return
       }
 
       toast({
-        title: isArabic ? 'خطأ' : 'Error',
+        title: t('auth.forgotPassword.error'),
         description:
           error?.response?.data?.message ||
           error?.message ||
-          (isArabic ? 'حدث خطأ. يرجى المحاولة مرة أخرى.' : 'An error occurred. Please try again.'),
+          t('auth.forgotPassword.errorDescription'),
         variant: 'destructive',
       })
     } finally {
@@ -171,19 +163,17 @@ export function ForgotPasswordForm({
     return (
       <div className={cn('text-center', className)}>
         <h3 className='text-lg font-semibold'>
-          {isArabic ? 'تحقق من بريدك الإلكتروني' : 'Check your email'}
+          {t('auth.forgotPassword.checkEmail')}
         </h3>
         <p className='mt-2 text-sm text-muted-foreground'>
-          {isArabic
-            ? 'إذا كان هناك حساب مرتبط بهذا البريد الإلكتروني، فسنرسل لك تعليمات إعادة تعيين كلمة المرور.'
-            : "If an account exists with that email, we've sent password reset instructions."}
+          {t('auth.forgotPassword.checkEmailDescription')}
         </p>
         <Button
           variant='link'
           className='mt-4'
-          onClick={() => navigate({ to: '/sign-in' })}
+          onClick={() => navigate({ to: ROUTES.auth.signIn })}
         >
-          {isArabic ? 'العودة إلى تسجيل الدخول' : 'Back to login'}
+          {t('auth.forgotPassword.backToLogin')}
         </Button>
       </div>
     )
@@ -202,11 +192,11 @@ export function ForgotPasswordForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                {isArabic ? 'البريد الإلكتروني' : 'Email'}
+                {t('auth.forgotPassword.emailLabel')}
               </FormLabel>
               <FormControl>
                 <Input
-                  placeholder={isArabic ? 'أدخل بريدك الإلكتروني' : 'Enter your email'}
+                  placeholder={t('auth.forgotPassword.emailPlaceholder')}
                   type='email'
                   dir='auto'
                   {...field}
@@ -239,11 +229,11 @@ export function ForgotPasswordForm({
           {isLoading ? (
             <>
               <Loader2 className='me-2 h-4 w-4 animate-spin' />
-              {isArabic ? 'جاري الإرسال...' : 'Sending...'}
+              {t('auth.forgotPassword.sending')}
             </>
           ) : (
             <>
-              {isArabic ? 'متابعة' : 'Continue'}
+              {t('auth.forgotPassword.continue')}
               <ArrowRight className='ms-2 h-4 w-4' />
             </>
           )}
@@ -253,9 +243,9 @@ export function ForgotPasswordForm({
           type='button'
           variant='link'
           className='text-sm'
-          onClick={() => navigate({ to: '/sign-in' })}
+          onClick={() => navigate({ to: ROUTES.auth.signIn })}
         >
-          {isArabic ? 'العودة إلى تسجيل الدخول' : 'Back to login'}
+          {t('auth.forgotPassword.backToLogin')}
         </Button>
       </form>
     </Form>

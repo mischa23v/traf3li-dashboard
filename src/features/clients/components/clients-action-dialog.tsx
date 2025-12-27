@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
-import { validationPatterns, getErrorMessage } from '@/utils/validation-patterns'
+import { fieldSchemas } from '@/lib/shared-schemas'
 import {
   Dialog,
   DialogContent,
@@ -31,46 +31,20 @@ import { Lock } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 const formSchema = z.object({
-  fullNameArabic: z.string().min(2, 'الاسم مطلوب ويجب أن يكون حرفين على الأقل'),
-  email: z.string()
-    .optional()
-    .or(z.literal(''))
-    .refine(
-      (val) => !val || val === '' || validationPatterns.email.test(val),
-      { message: getErrorMessage('email', 'ar') }
-    ),
-  phone: z.string()
-    .min(1, 'رقم الهاتف مطلوب')
-    .refine(
-      (val) => !val || validationPatterns.phone.test(val),
-      { message: getErrorMessage('phone', 'ar') }
-    ),
-  alternatePhone: z.string()
-    .optional()
-    .refine(
-      (val) => !val || validationPatterns.phone.test(val),
-      { message: getErrorMessage('phone', 'ar') }
-    ),
-  nationalId: z.string()
-    .optional()
-    .refine(
-      (val) => !val || validationPatterns.nationalId.test(val),
-      { message: getErrorMessage('nationalId', 'ar') }
-    ),
-  companyName: z.string().optional(),
-  crNumber: z.string()
-    .optional()
-    .refine(
-      (val) => !val || validationPatterns.crNumber.test(val),
-      { message: getErrorMessage('crNumber', 'ar') }
-    ),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  country: z.string().default('SA'),
-  notes: z.string().optional(),
-  preferredContact: z.enum(['email', 'phone', 'sms', 'whatsapp']).default('phone'),
-  language: z.string().default('ar'),
-  status: z.enum(['active', 'inactive', 'archived', 'pending']).default('active'),
+  fullNameArabic: fieldSchemas.name,
+  email: fieldSchemas.email,
+  phone: fieldSchemas.phoneRequired,
+  alternatePhone: fieldSchemas.alternatePhone,
+  nationalId: fieldSchemas.nationalId,
+  companyName: fieldSchemas.companyNameOptional,
+  crNumber: fieldSchemas.crNumber,
+  address: fieldSchemas.street,
+  city: fieldSchemas.city,
+  country: fieldSchemas.country,
+  notes: fieldSchemas.notes,
+  preferredContact: fieldSchemas.preferredContactMethod.default('phone'),
+  language: fieldSchemas.preferredLanguage.default('ar'),
+  status: fieldSchemas.clientStatus.default('active'),
 })
 
 type ClientForm = z.infer<typeof formSchema>

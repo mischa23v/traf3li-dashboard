@@ -40,10 +40,11 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 import { useSupportSettings, useUpdateSupportSettings } from '@/hooks/use-support'
 import { SupportSidebar } from './support-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
-  { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.support', href: '/dashboard/support' },
+  { title: 'sidebar.nav.overview', href: ROUTES.dashboard.home },
+  { title: 'sidebar.nav.support', href: ROUTES.dashboard.support.list },
 ]
 
 // Default settings structure

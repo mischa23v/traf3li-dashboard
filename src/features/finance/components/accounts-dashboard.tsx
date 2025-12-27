@@ -197,7 +197,7 @@ export default function AccountsDashboard({ }: AccountsDashboardProps) {
                                 لم تكتمل عملية إعداد النظام المالي بعد. أكمل المعالج لتفعيل جميع المميزات المالية.
                             </p>
                             <div className="flex gap-3">
-                                <Link to="/dashboard/finance/setup-wizard">
+                                <Link to={ROUTES.dashboard.finance.setupWizard}>
                                     <Button className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl">
                                         <Sparkles className="w-4 h-4 ms-2" />
                                         أكمل الإعداد الآن

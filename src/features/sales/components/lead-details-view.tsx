@@ -1,4 +1,5 @@
 import {
+import { useTranslation } from 'react-i18next'
     ArrowRight, Edit, Phone, Mail, Building, User,
     Calendar, DollarSign, Target, TrendingUp,
     Activity, MessageSquare, Plus, CheckCircle,
@@ -25,6 +26,7 @@ import { useState } from 'react'
 import { format } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 import type { LeadStage, LeadActivity } from '@/services/accountingService'
+import { ROUTES } from '@/constants/routes'
 import {
     Dialog,
     DialogContent,
@@ -53,25 +55,19 @@ const STAGE_CONFIG: Record<LeadStage, { label: string; color: string; icon: Reac
     lost: { label: 'مفقود', color: 'bg-red-100 text-red-700 border-red-300', icon: XCircle },
 }
 
-const SOURCE_LABELS: Record<string, string> = {
-    website: 'الموقع الإلكتروني',
-    referral: 'إحالة',
-    social_media: 'وسائل التواصل',
-    advertisement: 'إعلان',
-    cold_call: 'اتصال مباشر',
-    walk_in: 'زيارة شخصية',
-    other: 'أخرى',
-}
+const getSourceLabel = (source: string, t: any) => t(`sales.leads.sources.${source}`)
 
-const ACTIVITY_TYPES = [
-    { value: 'call', label: 'مكالمة' },
-    { value: 'email', label: 'بريد إلكتروني' },
-    { value: 'meeting', label: 'اجتماع' },
-    { value: 'note', label: 'ملاحظة' },
-    { value: 'task', label: 'مهمة' },
+const getActivityTypes = (t: any) => [
+  { value: 'call', label: t('sales.leads.activities.types.call') },
+  { value: 'email', label: t('sales.leads.activities.types.email') },
+  { value: 'meeting', label: t('sales.leads.activities.types.meeting') },
+  { value: 'note', label: t('sales.leads.activities.types.note') },
+  { value: 'task', label: t('sales.leads.activities.types.task') },
 ]
 
 export default function LeadDetailsView() {
+  const { t } = useTranslation()
+
     const { leadId } = useParams({ from: '/_authenticated/dashboard/sales/leads/$leadId' })
     const navigate = useNavigate()
 
@@ -93,7 +89,7 @@ export default function LeadDetailsView() {
     const lead = leadData?.data
 
     const topNav = [
-        { title: 'العملاء المحتملين', href: '/dashboard/sales/leads', isActive: true },
+        { title: t('sales.leads.title'), href: ROUTES.dashboard.sales.leads.list, isActive: true },
     ]
 
     const formatCurrency = (amount: number) => {
@@ -105,7 +101,7 @@ export default function LeadDetailsView() {
     }
 
     const formatDate = (dateString?: string) => {
-        if (!dateString) return 'غير محدد'
+        if (!dateString) return t('sales.leads.details.notSpecified')
         return format(new Date(dateString), 'dd MMMM yyyy', { locale: arSA })
     }
 
@@ -143,7 +139,7 @@ export default function LeadDetailsView() {
         try {
             await convertLeadMutation.mutateAsync({ id: leadId })
             setShowConvertDialog(false)
-            navigate({ to: '/dashboard/sales/leads' })
+            navigate({ to: ROUTES.dashboard.sales.leads.list })
         } catch (error) {
         }
     }
@@ -191,7 +187,7 @@ export default function LeadDetailsView() {
                 <Main className="bg-[#f8f9fa] p-6 lg:p-8">
                     <div className="max-w-7xl mx-auto">
                         <Button asChild variant="ghost" className="mb-6">
-                            <Link to="/dashboard/sales/leads">
+                            <Link to={ROUTES.dashboard.sales.leads.list}>
                                 <ArrowRight className="h-4 w-4 ms-2" />
                                 العودة للعملاء المحتملين
                             </Link>
@@ -229,7 +225,7 @@ export default function LeadDetailsView() {
                     {/* Back Button & Actions */}
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                         <Button asChild variant="ghost" className="text-slate-600 hover:text-navy">
-                            <Link to="/dashboard/sales/leads">
+                            <Link to={ROUTES.dashboard.sales.leads.list}>
                                 <ArrowRight className="h-4 w-4 ms-2" />
                                 العودة للعملاء المحتملين
                             </Link>
@@ -259,7 +255,7 @@ export default function LeadDetailsView() {
                                 </Button>
                             )}
                             <Button asChild variant="outline">
-                                <Link to={`/dashboard/sales/leads/${leadId}/edit`}>
+                                <Link to={ROUTES.dashboard.sales.leads.list}>
                                     <Edit className="h-4 w-4 ms-2" aria-hidden="true" />
                                     تعديل
                                 </Link>
@@ -322,7 +318,7 @@ export default function LeadDetailsView() {
                                         <div>
                                             <p className="text-sm text-slate-500 mb-1">المصدر</p>
                                             <Badge variant="outline" className="font-normal">
-                                                {SOURCE_LABELS[lead.source] || lead.source}
+                                                {getSourceLabel(lead.source, t) || lead.source}
                                             </Badge>
                                         </div>
                                         <div>
@@ -426,7 +422,7 @@ export default function LeadDetailsView() {
                                                     <div className="flex-1">
                                                         <div className="flex items-center gap-2 mb-1">
                                                             <Badge variant="outline" className="text-xs">
-                                                                {ACTIVITY_TYPES.find(t => t.value === activity.type)?.label || activity.type}
+                                                                {getActivityTypes(t).find(t => t.value === activity.type)?.label || activity.type}
                                                             </Badge>
                                                             <span className="text-xs text-slate-500">
                                                                 {formatDate(activity.date)}
@@ -473,7 +469,7 @@ export default function LeadDetailsView() {
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {ACTIVITY_TYPES.map(type => (
+                                    {getActivityTypes(t).map(type => (
                                         <SelectItem key={type.value} value={type.value}>
                                             {type.label}
                                         </SelectItem>
@@ -495,7 +491,7 @@ export default function LeadDetailsView() {
                                 value={activityForm.description}
                                 onChange={(e) => setActivityForm(prev => ({ ...prev, description: e.target.value }))}
                                 rows={3}
-                                placeholder="اكتب وصف النشاط..."
+                                placeholder=t('sales.leads.activities.description')
                             />
                         </div>
                         <div>
@@ -503,7 +499,7 @@ export default function LeadDetailsView() {
                             <Input
                                 value={activityForm.outcome}
                                 onChange={(e) => setActivityForm(prev => ({ ...prev, outcome: e.target.value }))}
-                                placeholder="ما هي نتيجة هذا النشاط؟"
+                                placeholder=t('sales.leads.activities.outcomeQuestion')
                             />
                         </div>
                     </div>

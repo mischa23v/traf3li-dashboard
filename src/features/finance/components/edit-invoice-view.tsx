@@ -4,6 +4,7 @@ import {
     Plus, X, DollarSign, Percent, Loader2, User, Send, Mail
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { TAX_CONFIG } from '@/config'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
@@ -99,7 +100,7 @@ export function EditInvoiceView() {
             ? sub * (formData.discountValue / 100)
             : formData.discountValue
         const afterDiscount = sub - disc
-        const vat = afterDiscount * 0.15
+        const vat = afterDiscount * TAX_CONFIG.SAUDI_VAT_RATE
         return {
             subtotal: sub,
             discount: disc,
@@ -240,7 +241,7 @@ export function EditInvoiceView() {
                         <div className="bg-blue-950 rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-blue-900/20 flex flex-col md:flex-row items-center justify-between gap-8">
                             <div className="relative z-10 max-w-lg">
                                 <div className="flex items-center gap-4 mb-4">
-                                    <Link to="/dashboard/finance/invoices">
+                                    <Link to={ROUTES.dashboard.finance.invoices.list}>
                                         <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
                                             <ArrowRight className="w-5 h-5" />
                                         </Button>
@@ -521,7 +522,7 @@ export function EditInvoiceView() {
 
                                 {/* Actions */}
                                 <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
-                                    <Link to="/dashboard/finance/invoices/$invoiceId" params={{ invoiceId: invoiceId || '' }}>
+                                    <Link to={ROUTES.dashboard.finance.invoices.detail(invoiceId || '' )}>
                                         <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
                                             إلغاء
                                         </Button>

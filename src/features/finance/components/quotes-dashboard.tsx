@@ -43,6 +43,7 @@ import { useClients } from '@/hooks/useCasesAndClients'
 import type { QuoteStatus } from '@/services/quoteService'
 import { FinanceSidebar } from './finance-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { ROUTES } from '@/constants/routes'
 
 const statusConfig: Record<QuoteStatus, { label: string; color: string; bgColor: string; icon: React.ElementType }> = {
     draft: { label: 'مسودة', color: 'text-slate-700', bgColor: 'bg-slate-100', icon: FileText },
@@ -175,11 +176,11 @@ export default function QuotesDashboard() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'عروض الأسعار', href: '/dashboard/finance/quotes', isActive: true },
-        { title: 'المدفوعات', href: '/dashboard/finance/payments', isActive: false },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: false },
+        { title: 'عروض الأسعار', href: ROUTES.dashboard.finance.quotes.list, isActive: true },
+        { title: 'المدفوعات', href: ROUTES.dashboard.finance.payments.list, isActive: false },
+        { title: 'المصروفات', href: ROUTES.dashboard.finance.expenses.list, isActive: false },
     ]
 
     // LOADING STATE
@@ -268,7 +269,7 @@ export default function QuotesDashboard() {
                     >
                         <div className="flex gap-3">
                             <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
-                                <Link to="/dashboard/finance/quotes/new">
+                                <Link to={ROUTES.dashboard.finance.quotes.new}>
                                     <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                                     عرض سعر جديد
                                 </Link>
@@ -305,7 +306,7 @@ export default function QuotesDashboard() {
                                     <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد عروض أسعار بعد</h3>
                                     <p className="text-slate-500 mb-6">ابدأ بإنشاء أول عرض سعر لعملائك</p>
                                     <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white px-8">
-                                        <Link to="/dashboard/finance/quotes/new">
+                                        <Link to={ROUTES.dashboard.finance.quotes.new}>
                                             <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                                             إنشاء عرض سعر جديد
                                         </Link>
@@ -521,7 +522,7 @@ export default function QuotesDashboard() {
                                                             </DropdownMenuTrigger>
                                                             <DropdownMenuContent align="end">
                                                                 <DropdownMenuItem asChild>
-                                                                    <Link to="/dashboard/finance/quotes/$quoteId" params={{ quoteId: quote._id }}>
+                                                                    <Link to={ROUTES.dashboard.finance.quotes.detail(quote._id )}>
                                                                         عرض التفاصيل
                                                                     </Link>
                                                                 </DropdownMenuItem>

@@ -239,7 +239,7 @@ export function ReconciliationDetailsView() {
                 </Header>
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
                     <div className="max-w-[1600px] mx-auto mb-6">
-                        <Link to="/dashboard/finance/reconciliation" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
+                        <Link to={ROUTES.dashboard.finance.reconciliation.list} className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
                             <ArrowLeft className="h-4 w-4 ms-2" aria-hidden="true" />
                             العودة إلى التسوية البنكية
                         </Link>
@@ -281,7 +281,7 @@ export function ReconciliationDetailsView() {
                 </Header>
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
                     <div className="max-w-[1600px] mx-auto mb-6">
-                        <Link to="/dashboard/finance/reconciliation" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
+                        <Link to={ROUTES.dashboard.finance.reconciliation.list} className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
                             <ArrowLeft className="h-4 w-4 ms-2" aria-hidden="true" />
                             العودة إلى التسوية البنكية
                         </Link>
@@ -293,7 +293,7 @@ export function ReconciliationDetailsView() {
                         <h3 className="text-xl font-bold text-slate-900 mb-2">الحساب البنكي غير موجود</h3>
                         <p className="text-slate-500 mb-6">لم نتمكن من العثور على الحساب المطلوب</p>
                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                            <Link to="/dashboard/finance/reconciliation">
+                            <Link to={ROUTES.dashboard.finance.reconciliation.list}>
                                 العودة إلى قائمة الحسابات
                             </Link>
                         </Button>
@@ -336,7 +336,7 @@ export function ReconciliationDetailsView() {
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
                 <div className="max-w-[1600px] mx-auto mb-6">
-                    <Link to="/dashboard/finance/reconciliation" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
+                    <Link to={ROUTES.dashboard.finance.reconciliation.list} className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
                         <ArrowLeft className="h-4 w-4 ms-2" aria-hidden="true" />
                         العودة إلى التسوية البنكية
                     </Link>

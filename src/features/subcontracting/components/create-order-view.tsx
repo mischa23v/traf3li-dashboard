@@ -52,11 +52,12 @@ import { useSuppliers } from '@/hooks/use-buying'
 import { useItems, useWarehouses } from '@/hooks/use-inventory'
 import type { CreateSubcontractingOrderData, SubcontractingServiceItem, SubcontractingRawMaterial } from '@/types/subcontracting'
 import { SubcontractingSidebar } from './subcontracting-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
-  { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'subcontracting.subcontracting', href: '/dashboard/subcontracting' },
-  { title: 'subcontracting.createOrder', href: '/dashboard/subcontracting/orders/create' },
+  { title: 'sidebar.nav.overview', href: ROUTES.dashboard.home },
+  { title: 'subcontracting.subcontracting', href: ROUTES.dashboard.subcontracting.list },
+  { title: 'subcontracting.createOrder', href: ROUTES.dashboard.subcontracting.create },
 ]
 
 type ServiceItemRow = Omit<SubcontractingServiceItem, '_id'>
@@ -119,7 +120,7 @@ export function CreateSubcontractingOrderView() {
 
     try {
       await createOrderMutation.mutateAsync(formData)
-      navigate({ to: '/dashboard/subcontracting' })
+      navigate({ to: ROUTES.dashboard.subcontracting.list })
     } catch (error) {
       // Error handled by mutation
     }
@@ -688,7 +689,7 @@ export function CreateSubcontractingOrderView() {
                     type="button"
                     variant="ghost"
                     className="text-slate-500 hover:text-navy rounded-xl"
-                    onClick={() => navigate({ to: '/dashboard/subcontracting' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.subcontracting.list })}
                   >
                     <X className="w-4 h-4 ml-2" />
                     {t('common.cancel', 'إلغاء')}

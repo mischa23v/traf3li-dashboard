@@ -8,7 +8,7 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/layout/app-sidebar'
 import { SkipToMain } from '@/components/skip-to-main'
 import { OfflineIndicator } from '@/components/offline-indicator'
-import { SessionExpiryWarning } from '@/components/session-expiry-warning'
+import { SessionWarningModal } from '@/components/session-warning-modal'
 import { useOnboardingWizardStatus, useSkipWizard } from '@/hooks/useOnboardingWizard'
 import WelcomeScreen from '@/features/onboarding/components/welcome-screen'
 import InitialSetupWizard from '@/features/onboarding/components/initial-setup-wizard'
@@ -89,7 +89,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
       <LayoutProvider>
         <SidebarProvider defaultOpen={defaultOpen}>
           <OfflineIndicator />
-          <SessionExpiryWarning />
+          <SessionWarningModal />
           <SkipToMain />
           <AppSidebar />
           <SidebarInset

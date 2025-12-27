@@ -26,6 +26,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   DropdownMenu,
@@ -114,10 +115,10 @@ export function ReferralsListView() {
   }, [selectedReferralIds, deleteReferral])
 
   const topNav = [
-    { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: false },
-    { title: 'مسار المبيعات', href: '/dashboard/crm/pipeline', isActive: false },
-    { title: 'الإحالات', href: '/dashboard/crm/referrals', isActive: true },
-    { title: 'سجل الأنشطة', href: '/dashboard/crm/activities', isActive: false },
+    { title: 'العملاء المحتملين', href: ROUTES.dashboard.crm.leads.list, isActive: false },
+    { title: 'مسار المبيعات', href: ROUTES.dashboard.crm.pipeline, isActive: false },
+    { title: 'الإحالات', href: ROUTES.dashboard.crm.referrals.list, isActive: true },
+    { title: 'سجل الأنشطة', href: ROUTES.dashboard.crm.activities.list, isActive: false },
   ]
 
   const statusTabs = [
@@ -301,7 +302,7 @@ export function ReferralsListView() {
                     </h3>
                     <p className="text-slate-500 mb-4">ابدأ بإضافة مصدر إحالة جديد</p>
                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                      <Link to="/dashboard/crm/referrals/new">
+                      <Link to={ROUTES.dashboard.crm.referrals.new}>
                         <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                         مصدر إحالة جديد
                       </Link>
@@ -363,7 +364,7 @@ export function ReferralsListView() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild>
-                              <Link to={`/dashboard/crm/referrals/${referral._id}`}>
+                              <Link to={ROUTES.dashboard.crm.referrals.detail(referral._id)}>
                                 عرض التفاصيل
                               </Link>
                             </DropdownMenuItem>
@@ -412,7 +413,7 @@ export function ReferralsListView() {
                             </div>
                           )}
                         </div>
-                        <Link to={`/dashboard/crm/referrals/${referral._id}`}>
+                        <Link to={ROUTES.dashboard.crm.referrals.detail(referral._id)}>
                           <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
                             عرض التفاصيل
                           </Button>

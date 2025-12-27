@@ -458,8 +458,7 @@ export default function RecurringInvoiceDetails({ invoiceId }: RecurringInvoiceD
                   <div className="flex items-center gap-3">
                     <span className="font-medium">{formatCurrency(record.amount || invoice.total)}</span>
                     <Link
-                      to="/dashboard/finance/invoices/$invoiceId"
-                      params={{ invoiceId: record.invoiceId || record._id }}
+                      to={ROUTES.dashboard.finance.invoices.detail(record.invoiceId || record._id )}
                     >
                       <Button variant="outline" size="sm">
                         عرض

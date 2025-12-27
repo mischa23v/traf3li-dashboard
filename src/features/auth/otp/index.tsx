@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/card'
 import { AuthLayout } from '../auth-layout'
 import { OtpForm } from './components/otp-form'
+import { ROUTES } from '@/constants/routes'
 
 export function Otp() {
   return (
@@ -30,7 +31,7 @@ export function Otp() {
           <p className='text-muted-foreground px-8 text-center text-sm'>
             Haven't received it?{' '}
             <Link
-              to='/sign-in'
+              to={ROUTES.auth.signIn}
               className='hover:text-primary underline underline-offset-4'
             >
               Resend a new code.

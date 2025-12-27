@@ -4,7 +4,9 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   emailTemplateService,
   emailCampaignService,
@@ -31,9 +33,9 @@ import type {
 // ==================== Cache Configuration ====================
 // Cache data for 30 minutes to reduce API calls
 // Data is refreshed automatically when mutations occur
-const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
-const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour (keep in cache)
-const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
+const STATS_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour (keep in cache)
+const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
 
 // ═══════════════════════════════════════════════════════════════
 // EMAIL TEMPLATE HOOKS
@@ -64,7 +66,7 @@ export const useCreateEmailTemplate = () => {
   return useMutation({
     mutationFn: (data: CreateEmailTemplateData) => emailTemplateService.createTemplate(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['email-templates'] })
+      invalidateCache.settings.emailTemplates()
       toast.success('تم إنشاء القالب بنجاح')
     },
     onError: (error: Error) => {
@@ -79,7 +81,7 @@ export const useUpdateEmailTemplate = () => {
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateEmailTemplateData> }) =>
       emailTemplateService.updateTemplate(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['email-templates'] })
+      invalidateCache.settings.emailTemplates()
       queryClient.invalidateQueries({ queryKey: ['email-template', variables.id] })
       toast.success('تم تحديث القالب')
     },
@@ -94,7 +96,7 @@ export const useDeleteEmailTemplate = () => {
   return useMutation({
     mutationFn: (id: string) => emailTemplateService.deleteTemplate(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['email-templates'] })
+      invalidateCache.settings.emailTemplates()
       toast.success('تم حذف القالب')
     },
     onError: (error: Error) => {
@@ -139,7 +141,7 @@ export const useCreateEmailCampaign = () => {
   return useMutation({
     mutationFn: (data: CreateCampaignData) => emailCampaignService.createCampaign(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['email-campaigns'] })
+      invalidateCache.emailCampaigns.all()
       toast.success('تم إنشاء الحملة بنجاح')
     },
     onError: (error: Error) => {
@@ -153,7 +155,7 @@ export const useSendCampaign = () => {
   return useMutation({
     mutationFn: (id: string) => emailCampaignService.sendCampaign(id),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['email-campaigns'] })
+      invalidateCache.emailCampaigns.all()
       toast.success(`تم إرسال الحملة إلى ${data.sent} مستلم`)
     },
     onError: (error: Error) => {
@@ -168,7 +170,7 @@ export const useScheduleCampaign = () => {
     mutationFn: ({ id, sendAt, timezone }: { id: string; sendAt: Date; timezone: string }) =>
       emailCampaignService.scheduleCampaign(id, sendAt, timezone),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['email-campaigns'] })
+      invalidateCache.emailCampaigns.all()
       toast.success('تم جدولة الحملة بنجاح')
     },
     onError: (error: Error) => {
@@ -182,7 +184,7 @@ export const usePauseCampaign = () => {
   return useMutation({
     mutationFn: (id: string) => emailCampaignService.pauseCampaign(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['email-campaigns'] })
+      invalidateCache.emailCampaigns.all()
       toast.success('تم إيقاف الحملة مؤقتاً')
     },
     onError: (error: Error) => {
@@ -196,7 +198,7 @@ export const useResumeCampaign = () => {
   return useMutation({
     mutationFn: (id: string) => emailCampaignService.resumeCampaign(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['email-campaigns'] })
+      invalidateCache.emailCampaigns.all()
       toast.success('تم استئناف الحملة')
     },
     onError: (error: Error) => {
@@ -246,7 +248,7 @@ export const useCreateDripCampaign = () => {
   return useMutation({
     mutationFn: (data: CreateDripCampaignData) => dripCampaignService.createCampaign(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['drip-campaigns'] })
+      invalidateCache.emailCampaigns.dripCampaigns()
       toast.success('تم إنشاء حملة التنقيط')
     },
     onError: (error: Error) => {
@@ -260,7 +262,7 @@ export const useActivateDripCampaign = () => {
   return useMutation({
     mutationFn: (id: string) => dripCampaignService.activateCampaign(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['drip-campaigns'] })
+      invalidateCache.emailCampaigns.dripCampaigns()
       toast.success('تم تفعيل الحملة')
     },
     onError: (error: Error) => {
@@ -274,7 +276,7 @@ export const usePauseDripCampaign = () => {
   return useMutation({
     mutationFn: (id: string) => dripCampaignService.pauseCampaign(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['drip-campaigns'] })
+      invalidateCache.emailCampaigns.dripCampaigns()
       toast.success('تم إيقاف الحملة مؤقتاً')
     },
     onError: (error: Error) => {
@@ -309,7 +311,7 @@ export const useImportSubscribers = () => {
     mutationFn: ({ file, options }: { file: File; options?: { tags?: string[]; updateExisting?: boolean } }) =>
       subscriberService.importSubscribers(file, options),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['subscribers'] })
+      invalidateCache.emailCampaigns.subscribers()
       toast.success(`تم استيراد ${data.imported} مشترك`)
       if (data.updated > 0) toast.info(`تم تحديث ${data.updated} مشترك موجود`)
     },
@@ -325,7 +327,7 @@ export const useUnsubscribe = () => {
     mutationFn: ({ id, reason }: { id: string; reason?: string }) =>
       subscriberService.unsubscribe(id, reason),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['subscribers'] })
+      invalidateCache.emailCampaigns.subscribers()
       toast.success('تم إلغاء الاشتراك')
     },
     onError: (error: Error) => {
@@ -353,7 +355,7 @@ export const useCreateSegment = () => {
   return useMutation({
     mutationFn: (data: CreateSegmentData) => segmentService.createSegment(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['segments'] })
+      invalidateCache.emailCampaigns.segments()
       toast.success('تم إنشاء الشريحة')
     },
     onError: (error: Error) => {
@@ -402,7 +404,7 @@ export const useCalculateLeadScore = () => {
   return useMutation({
     mutationFn: (leadId: string) => leadScoringService.calculateScore(leadId),
     onSuccess: (_, leadId) => {
-      queryClient.invalidateQueries({ queryKey: ['lead-scores'] })
+      invalidateCache.leads.scoring()
       queryClient.invalidateQueries({ queryKey: ['lead-insights', leadId] })
       toast.success('تم حساب التقييم')
     },
@@ -417,7 +419,7 @@ export const useCalculateAllScores = () => {
   return useMutation({
     mutationFn: () => leadScoringService.calculateAllScores(),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['lead-scores'] })
+      invalidateCache.leads.scoring()
       toast.success(`تم حساب تقييم ${data.calculated} عميل محتمل`)
     },
     onError: (error: Error) => {
@@ -454,7 +456,7 @@ export const useTrackEmailOpen = () => {
       leadScoringService.trackEmailOpen(data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['lead-insights', variables.leadId] })
-      queryClient.invalidateQueries({ queryKey: ['lead-scores'] })
+      invalidateCache.leads.scoring()
     },
   })
 }
@@ -466,7 +468,7 @@ export const useTrackEmailClick = () => {
       leadScoringService.trackEmailClick(data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['lead-insights', variables.leadId] })
-      queryClient.invalidateQueries({ queryKey: ['lead-scores'] })
+      invalidateCache.leads.scoring()
     },
   })
 }
@@ -478,7 +480,7 @@ export const useTrackDocumentView = () => {
       leadScoringService.trackDocumentView(data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['lead-insights', variables.leadId] })
-      queryClient.invalidateQueries({ queryKey: ['lead-scores'] })
+      invalidateCache.leads.scoring()
     },
   })
 }
@@ -490,7 +492,7 @@ export const useTrackWebsiteVisit = () => {
       leadScoringService.trackWebsiteVisit(data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['lead-insights', variables.leadId] })
-      queryClient.invalidateQueries({ queryKey: ['lead-scores'] })
+      invalidateCache.leads.scoring()
     },
   })
 }
@@ -502,7 +504,7 @@ export const useTrackFormSubmit = () => {
       leadScoringService.trackFormSubmit(data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['lead-insights', variables.leadId] })
-      queryClient.invalidateQueries({ queryKey: ['lead-scores'] })
+      invalidateCache.leads.scoring()
     },
   })
 }
@@ -514,7 +516,7 @@ export const useTrackMeeting = () => {
       leadScoringService.trackMeeting(data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['lead-insights', variables.leadId] })
-      queryClient.invalidateQueries({ queryKey: ['lead-scores'] })
+      invalidateCache.leads.scoring()
     },
   })
 }
@@ -526,7 +528,7 @@ export const useTrackCall = () => {
       leadScoringService.trackCall(data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['lead-insights', variables.leadId] })
-      queryClient.invalidateQueries({ queryKey: ['lead-scores'] })
+      invalidateCache.leads.scoring()
     },
   })
 }
@@ -547,7 +549,7 @@ export const useUpdateLeadScoringConfig = () => {
   return useMutation({
     mutationFn: (data: Partial<LeadScoreConfig>) => leadScoringService.updateConfig(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['lead-scoring-config'] })
+      invalidateCache.leads.scoringConfig()
       toast.success('تم تحديث إعدادات التقييم')
     },
     onError: (error: Error) => {

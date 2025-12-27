@@ -5,7 +5,7 @@
  */
 
 import { ValidationErrors } from './ValidationErrors'
-import { ErrorModal } from './ErrorModal'
+import { ErrorModal } from '@/components/error-modal'
 
 interface ValidationError {
   field: string

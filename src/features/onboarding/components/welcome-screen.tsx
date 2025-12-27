@@ -2,6 +2,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { Sparkles, ArrowLeft, PlayCircle, BookOpen, Video, Phone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useTranslation } from 'react-i18next'
 
 export interface WelcomeScreenProps {
   userName?: string
@@ -17,6 +18,7 @@ export default function WelcomeScreen({
   onSkipWizard,
 }: WelcomeScreenProps) {
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center p-4">
@@ -27,31 +29,11 @@ export default function WelcomeScreen({
           </div>
 
           <h1 className="text-4xl font-bold text-navy mb-4">
-            {userName ? `مرحباً ${userName}!` : 'مرحباً بك!'}
-            <br />
-            <span className="text-2xl font-normal text-slate-600">
-              {userName ? `Welcome ${userName}!` : 'Welcome!'}
-            </span>
+            {userName ? t('onboarding.welcomeScreen.welcomeUser', { userName }) : t('onboarding.welcomeScreen.welcomeGuest')}
           </h1>
 
           <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-            {companyName ? (
-              <>
-                نحن سعداء بانضمام <span className="font-semibold text-emerald-600">{companyName}</span> إلى منصة ترافلي!
-                <br />
-                <span className="text-lg">
-                  We're excited to have <span className="font-semibold text-emerald-600">{companyName}</span> join the Traf3li platform!
-                </span>
-              </>
-            ) : (
-              <>
-                نحن سعداء بانضمامك إلى منصة ترافلي - منصتك الشاملة لإدارة الأعمال
-                <br />
-                <span className="text-lg">
-                  We're excited to have you join Traf3li - your all-in-one business management platform
-                </span>
-              </>
-            )}
+            {companyName ? t('onboarding.welcomeScreen.excitedCompany', { companyName }) : t('onboarding.welcomeScreen.excitedGeneral')}
           </p>
         </div>
 
@@ -64,14 +46,10 @@ export default function WelcomeScreen({
                 <PlayCircle className="w-8 h-8 text-white" />
               </div>
               <CardTitle className="text-2xl text-navy mb-2">
-                ابدأ الإعداد
-                <br />
-                <span className="text-lg font-normal text-slate-600">Start Setup</span>
+                {t('onboarding.welcomeScreen.startSetup')}
               </CardTitle>
               <CardDescription className="text-base">
-                دعنا نساعدك في إعداد حسابك في 5 دقائق فقط
-                <br />
-                <span className="text-sm">Let us help you set up your account in just 5 minutes</span>
+                {t('onboarding.welcomeScreen.startSetupDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
@@ -81,12 +59,10 @@ export default function WelcomeScreen({
                 className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg w-full"
               >
                 <PlayCircle className="w-5 h-5 me-2" />
-                ابدأ الآن
+                {t('onboarding.welcomeScreen.startNow')}
               </Button>
               <p className="text-xs text-slate-500 mt-4">
-                سنقوم بإرشادك خلال الخطوات الأساسية
-                <br />
-                We'll guide you through the essential steps
+                {t('onboarding.welcomeScreen.guideYou')}
               </p>
             </CardContent>
           </Card>
@@ -98,14 +74,10 @@ export default function WelcomeScreen({
                 <ArrowLeft className="w-8 h-8 text-white" />
               </div>
               <CardTitle className="text-2xl text-navy mb-2">
-                استكشف أولاً
-                <br />
-                <span className="text-lg font-normal text-slate-600">Explore First</span>
+                {t('onboarding.welcomeScreen.exploreFirst')}
               </CardTitle>
               <CardDescription className="text-base">
-                تخطي الإعداد واستكشف النظام بنفسك
-                <br />
-                <span className="text-sm">Skip setup and explore the system yourself</span>
+                {t('onboarding.welcomeScreen.exploreFirstDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
@@ -116,12 +88,10 @@ export default function WelcomeScreen({
                 className="rounded-xl w-full border-2 hover:bg-slate-50"
               >
                 <ArrowLeft className="w-5 h-5 me-2" />
-                تخطي الآن
+                {t('onboarding.welcomeScreen.skipNow')}
               </Button>
               <p className="text-xs text-slate-500 mt-4">
-                يمكنك إكمال الإعداد لاحقاً من الإعدادات
-                <br />
-                You can complete setup later from settings
+                {t('onboarding.welcomeScreen.setupLater')}
               </p>
             </CardContent>
           </Card>
@@ -130,9 +100,7 @@ export default function WelcomeScreen({
         {/* Help Resources */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
           <h3 className="text-lg font-bold text-navy mb-4 text-center">
-            مصادر المساعدة
-            <br />
-            <span className="text-base font-normal text-slate-600">Help Resources</span>
+            {t('onboarding.welcomeScreen.helpResources')}
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -142,9 +110,8 @@ export default function WelcomeScreen({
                 <BookOpen className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <h4 className="font-medium text-navy mb-1">التوثيق</h4>
-                <p className="text-xs text-slate-600">دليل شامل لاستخدام النظام</p>
-                <p className="text-xs text-slate-400">Comprehensive system guide</p>
+                <h4 className="font-medium text-navy mb-1">{t('onboarding.welcomeScreen.documentation')}</h4>
+                <p className="text-xs text-slate-600">{t('onboarding.welcomeScreen.documentationDesc')}</p>
               </div>
             </div>
 
@@ -154,9 +121,8 @@ export default function WelcomeScreen({
                 <Video className="w-5 h-5 text-purple-600" />
               </div>
               <div>
-                <h4 className="font-medium text-navy mb-1">فيديوهات تعليمية</h4>
-                <p className="text-xs text-slate-600">شروحات مصورة خطوة بخطوة</p>
-                <p className="text-xs text-slate-400">Step-by-step video guides</p>
+                <h4 className="font-medium text-navy mb-1">{t('onboarding.welcomeScreen.videoTutorials')}</h4>
+                <p className="text-xs text-slate-600">{t('onboarding.welcomeScreen.videoTutorialsDesc')}</p>
               </div>
             </div>
 
@@ -166,9 +132,8 @@ export default function WelcomeScreen({
                 <Phone className="w-5 h-5 text-green-600" />
               </div>
               <div>
-                <h4 className="font-medium text-navy mb-1">الدعم الفني</h4>
-                <p className="text-xs text-slate-600">فريقنا جاهز لمساعدتك</p>
-                <p className="text-xs text-slate-400">Our team is ready to help</p>
+                <h4 className="font-medium text-navy mb-1">{t('onboarding.welcomeScreen.support')}</h4>
+                <p className="text-xs text-slate-600">{t('onboarding.welcomeScreen.supportDesc')}</p>
               </div>
             </div>
           </div>
@@ -177,28 +142,26 @@ export default function WelcomeScreen({
         {/* Platform Features */}
         <div className="mt-8 text-center">
           <p className="text-sm text-slate-500 mb-4">
-            ما الذي يمكنك فعله مع ترافلي؟
-            <br />
-            What can you do with Traf3li?
+            {t('onboarding.welcomeScreen.whatCanYouDo')}
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <span className="px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
-              إدارة الموارد البشرية
+              {t('onboarding.welcomeScreen.platformFeatures.hr')}
             </span>
             <span className="px-4 py-2 bg-green-50 text-green-700 rounded-full text-sm font-medium">
-              المحاسبة والمالية
+              {t('onboarding.welcomeScreen.platformFeatures.accounting')}
             </span>
             <span className="px-4 py-2 bg-purple-50 text-purple-700 rounded-full text-sm font-medium">
-              إدارة علاقات العملاء
+              {t('onboarding.welcomeScreen.platformFeatures.crm')}
             </span>
             <span className="px-4 py-2 bg-amber-50 text-amber-700 rounded-full text-sm font-medium">
-              إدارة القضايا القانونية
+              {t('onboarding.welcomeScreen.platformFeatures.legalCases')}
             </span>
             <span className="px-4 py-2 bg-pink-50 text-pink-700 rounded-full text-sm font-medium">
-              التقارير والتحليلات
+              {t('onboarding.welcomeScreen.platformFeatures.reports')}
             </span>
             <span className="px-4 py-2 bg-cyan-50 text-cyan-700 rounded-full text-sm font-medium">
-              وأكثر من ذلك بكثير...
+              {t('onboarding.welcomeScreen.platformFeatures.more')}
             </span>
           </div>
         </div>

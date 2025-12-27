@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   ArrowLeft,
   Plus,
@@ -88,7 +89,7 @@ export default function StaffingPlanDetailPage() {
 
   // Handlers
   const handleBack = () => {
-    navigate({ to: '/dashboard/hr/recruitment/staffing-plans' })
+    navigate({ to: ROUTES.dashboard.hr.recruitment.staffingPlans.list })
   }
 
   const handleAddDetail = () => {
@@ -102,37 +103,37 @@ export default function StaffingPlanDetailPage() {
   }
 
   const handleDeleteDetail = async (detailId: string) => {
-    if (confirm(isArabic ? 'هل أنت متأكد من حذف هذه التفاصيل؟' : 'Are you sure you want to delete this detail?')) {
+    if (confirm(t('hr.recruitment.staffingPlans.confirmDeleteDetail'))) {
       await removeDetailMutation.mutateAsync({ planId: id!, detailId })
     }
   }
 
   const handleActivate = async () => {
-    if (confirm(isArabic ? 'هل تريد تفعيل هذه الخطة؟' : 'Do you want to activate this plan?')) {
+    if (confirm(t('hr.recruitment.staffingPlans.confirmActivate'))) {
       await activateMutation.mutateAsync(id!)
     }
   }
 
   const handleClose = async () => {
-    if (confirm(isArabic ? 'هل تريد إغلاق هذه الخطة؟' : 'Do you want to close this plan?')) {
+    if (confirm(t('hr.recruitment.staffingPlans.confirmClose'))) {
       await closeMutation.mutateAsync({ planId: id! })
     }
   }
 
   const handleApprove = async () => {
-    if (confirm(isArabic ? 'هل تريد اعتماد هذه الخطة؟' : 'Do you want to approve this plan?')) {
+    if (confirm(t('hr.recruitment.staffingPlans.confirmApprove'))) {
       await approveMutation.mutateAsync({ planId: id! })
     }
   }
 
   const handleCreateJobOpening = async (detailId: string) => {
-    if (confirm(isArabic ? 'إنشاء إعلان وظيفي من هذه التفاصيل؟' : 'Create job opening from this detail?')) {
+    if (confirm(t('hr.recruitment.staffingPlans.confirmCreateJobOpening'))) {
       await createJobOpeningMutation.mutateAsync({ planId: id!, detailId })
     }
   }
 
   const handleUnlinkJobOpening = async (detailId: string) => {
-    if (confirm(isArabic ? 'إلغاء ربط إعلان الوظيفة؟' : 'Unlink job opening?')) {
+    if (confirm(t('hr.recruitment.staffingPlans.confirmUnlinkJobOpening'))) {
       await unlinkJobOpeningMutation.mutateAsync({ planId: id!, detailId })
     }
   }
@@ -181,11 +182,11 @@ export default function StaffingPlanDetailPage() {
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <AlertCircle className="mb-4 h-12 w-12 text-muted-foreground" />
           <h3 className="text-lg font-semibold">
-            {isArabic ? 'لم يتم العثور على الخطة' : 'Plan not found'}
+            {t('hr.recruitment.staffingPlans.planNotFound')}
           </h3>
           <Button onClick={handleBack} className="mt-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            {isArabic ? 'العودة' : 'Go Back'}
+            {t('hr.recruitment.staffingPlans.goBack')}
           </Button>
         </div>
       </div>
@@ -219,17 +220,17 @@ export default function StaffingPlanDetailPage() {
             <>
               <Button variant="outline" onClick={handleApprove}>
                 <CheckCircle2 className="mr-2 h-4 w-4" />
-                {isArabic ? 'اعتماد' : 'Approve'}
+                {t('hr.recruitment.staffingPlans.actions.approve')}
               </Button>
               <Button onClick={handleActivate}>
-                {isArabic ? 'تفعيل' : 'Activate'}
+                {t('hr.recruitment.staffingPlans.actions.activate')}
               </Button>
             </>
           )}
           {plan.status === 'active' && (
             <Button variant="outline" onClick={handleClose}>
               <XCircle className="mr-2 h-4 w-4" />
-              {isArabic ? 'إغلاق' : 'Close'}
+              {t('hr.recruitment.staffingPlans.actions.close')}
             </Button>
           )}
         </div>
@@ -240,14 +241,14 @@ export default function StaffingPlanDetailPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'إجمالي الشواغر' : 'Total Vacancies'}
+              {t('hr.recruitment.staffingPlans.stats.totalVacancies')}
             </CardTitle>
             <Users className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{plan.totalVacancies || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {plan.totalCurrentCount || 0} {isArabic ? 'موظف حالي' : 'current employees'}
+              {plan.totalCurrentCount || 0} {t('hr.recruitment.staffingPlans.stats.currentEmployees')}
             </p>
           </CardContent>
         </Card>
@@ -255,7 +256,7 @@ export default function StaffingPlanDetailPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'الميزانية المقدرة' : 'Estimated Budget'}
+              {t('hr.recruitment.staffingPlans.stats.estimatedBudget')}
             </CardTitle>
             <DollarSign className="h-4 w-4 text-green-600" />
           </CardHeader>
@@ -273,7 +274,7 @@ export default function StaffingPlanDetailPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'تقدم الخطة' : 'Plan Progress'}
+              {t('hr.recruitment.staffingPlans.stats.planProgress')}
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-purple-600" />
           </CardHeader>
@@ -286,7 +287,7 @@ export default function StaffingPlanDetailPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'عدد المناصب' : 'Positions'}
+              {t('hr.recruitment.staffingPlans.stats.positions')}
             </CardTitle>
             <Briefcase className="h-4 w-4 text-orange-600" />
           </CardHeader>
@@ -295,7 +296,7 @@ export default function StaffingPlanDetailPage() {
               {plan.staffingPlanDetails?.length || 0}
             </div>
             <p className="text-xs text-muted-foreground">
-              {isArabic ? 'تفاصيل المناصب' : 'position details'}
+              {t('hr.recruitment.staffingPlans.stats.positionDetails')}
             </p>
           </CardContent>
         </Card>
@@ -304,13 +305,13 @@ export default function StaffingPlanDetailPage() {
       {/* Plan Information */}
       <Card>
         <CardHeader>
-          <CardTitle>{isArabic ? 'معلومات الخطة' : 'Plan Information'}</CardTitle>
+          <CardTitle>{t('hr.recruitment.staffingPlans.detail.planInformation')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <label className="text-sm font-medium text-muted-foreground">
-                {isArabic ? 'اسم الخطة' : 'Plan Name'}
+                {t('hr.recruitment.staffingPlans.table.planName')}
               </label>
               <p className="mt-1 text-sm">
                 {isArabic ? plan.nameAr || plan.name : plan.name}
@@ -318,7 +319,7 @@ export default function StaffingPlanDetailPage() {
             </div>
             <div>
               <label className="text-sm font-medium text-muted-foreground">
-                {isArabic ? 'الشركة' : 'Company'}
+                {t('hr.recruitment.staffingPlans.detail.company')}
               </label>
               <p className="mt-1 text-sm">{plan.company || '-'}</p>
             </div>
@@ -327,7 +328,7 @@ export default function StaffingPlanDetailPage() {
           {plan.approvedBy && (
             <div>
               <label className="text-sm font-medium text-muted-foreground">
-                {isArabic ? 'معتمد من قبل' : 'Approved By'}
+                {t('hr.recruitment.staffingPlans.detail.approvedBy')}
               </label>
               <p className="mt-1 text-sm">
                 {plan.approvedBy} - {formatDate(plan.approvedAt!)}
@@ -338,7 +339,7 @@ export default function StaffingPlanDetailPage() {
           {plan.notes && (
             <div>
               <label className="text-sm font-medium text-muted-foreground">
-                {isArabic ? 'الملاحظات' : 'Notes'}
+                {t('hr.recruitment.staffingPlans.detail.notes')}
               </label>
               <p className="mt-1 text-sm">
                 {isArabic ? plan.notesAr || plan.notes : plan.notes}
@@ -353,15 +354,15 @@ export default function StaffingPlanDetailPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>{isArabic ? 'تفاصيل المناصب' : 'Position Details'}</CardTitle>
+              <CardTitle>{t('hr.recruitment.staffingPlans.stats.positionDetails')}</CardTitle>
               <CardDescription>
                 {plan.staffingPlanDetails?.length || 0}{' '}
-                {isArabic ? 'منصب' : 'positions'}
+                {t('hr.recruitment.staffingPlans.stats.positions').toLowerCase()}
               </CardDescription>
             </div>
             <Button onClick={handleAddDetail}>
               <Plus className="mr-2 h-4 w-4" />
-              {isArabic ? 'إضافة منصب' : 'Add Position'}
+              {t('hr.recruitment.staffingPlans.detail.addPosition')}
             </Button>
           </div>
         </CardHeader>
@@ -370,31 +371,29 @@ export default function StaffingPlanDetailPage() {
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Briefcase className="mb-4 h-12 w-12 text-muted-foreground" />
               <h3 className="text-lg font-semibold">
-                {isArabic ? 'لا توجد تفاصيل مناصب' : 'No position details'}
+                {t('hr.recruitment.staffingPlans.empty.noPositionDetails')}
               </h3>
               <p className="text-sm text-muted-foreground">
-                {isArabic
-                  ? 'قم بإضافة تفاصيل المناصب للبدء'
-                  : 'Add position details to get started'}
+                {t('hr.recruitment.staffingPlans.empty.addPositionToGetStarted')}
               </p>
               <Button onClick={handleAddDetail} className="mt-4">
                 <Plus className="mr-2 h-4 w-4" />
-                {isArabic ? 'إضافة منصب' : 'Add Position'}
+                {t('hr.recruitment.staffingPlans.detail.addPosition')}
               </Button>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{isArabic ? 'القسم' : 'Department'}</TableHead>
-                  <TableHead>{isArabic ? 'المسمى الوظيفي' : 'Designation'}</TableHead>
-                  <TableHead className="text-center">{isArabic ? 'مخطط' : 'Planned'}</TableHead>
-                  <TableHead className="text-center">{isArabic ? 'حالي' : 'Current'}</TableHead>
-                  <TableHead className="text-center">{isArabic ? 'شواغر' : 'Vacancies'}</TableHead>
-                  <TableHead>{isArabic ? 'الأولوية' : 'Priority'}</TableHead>
-                  <TableHead className="text-right">{isArabic ? 'الميزانية' : 'Budget'}</TableHead>
-                  <TableHead>{isArabic ? 'إعلان الوظيفة' : 'Job Opening'}</TableHead>
-                  <TableHead className="text-right">{isArabic ? 'الإجراءات' : 'Actions'}</TableHead>
+                  <TableHead>{t('hr.recruitment.staffingPlans.table.department')}</TableHead>
+                  <TableHead>{t('hr.recruitment.staffingPlans.table.designation')}</TableHead>
+                  <TableHead className="text-center">{t('hr.recruitment.staffingPlans.table.planned')}</TableHead>
+                  <TableHead className="text-center">{t('hr.recruitment.staffingPlans.table.current')}</TableHead>
+                  <TableHead className="text-center">{t('hr.recruitment.staffingPlans.table.vacancies')}</TableHead>
+                  <TableHead>{t('hr.recruitment.staffingPlans.table.priority')}</TableHead>
+                  <TableHead className="text-right">{t('hr.recruitment.staffingPlans.table.budget')}</TableHead>
+                  <TableHead>{t('hr.recruitment.staffingPlans.table.jobOpening')}</TableHead>
+                  <TableHead className="text-right">{t('hr.recruitment.staffingPlans.table.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -451,7 +450,7 @@ export default function StaffingPlanDetailPage() {
                           onClick={() => handleCreateJobOpening(detail.detailId)}
                         >
                           <ExternalLink className="mr-1 h-3 w-3" />
-                          {isArabic ? 'إنشاء' : 'Create'}
+                          {t('hr.recruitment.staffingPlans.actions.create')}
                         </Button>
                       )}
                     </TableCell>
@@ -464,12 +463,12 @@ export default function StaffingPlanDetailPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>
-                            {isArabic ? 'الإجراءات' : 'Actions'}
+                            {t('hr.recruitment.staffingPlans.table.actions')}
                           </DropdownMenuLabel>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={() => handleEditDetail(detail)}>
                             <Edit className="mr-2 h-4 w-4" />
-                            {isArabic ? 'تعديل' : 'Edit'}
+                            {t('hr.recruitment.staffingPlans.actions.edit')}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
@@ -477,7 +476,7 @@ export default function StaffingPlanDetailPage() {
                             className="text-destructive"
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
-                            {isArabic ? 'حذف' : 'Delete'}
+                            {t('hr.recruitment.staffingPlans.actions.delete')}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

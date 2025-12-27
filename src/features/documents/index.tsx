@@ -13,6 +13,7 @@ import { DocumentsProvider } from './components/documents-provider'
 import { DocumentsTable } from './components/documents-table'
 import { DocumentsPrimaryButtons } from './components/documents-primary-buttons'
 import { useTranslation } from 'react-i18next'
+import { ROUTES } from '@/constants/routes'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { FileText, Lock, HardDrive, Calendar, Search, Bell, Scale } from 'lucide-react'
@@ -43,7 +44,7 @@ export default function Documents() {
 
   const topNav = [
     { title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },
-    { title: t('nav.cases', 'القضايا'), href: '/dashboard/cases', isActive: true },
+    { title: t('nav.cases', 'القضايا'), href: ROUTES.dashboard.cases.list, isActive: true },
   ]
 
   return (

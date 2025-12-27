@@ -67,10 +67,11 @@ import {
 import { useTickets, useDeleteTicket, useSupportStats } from '@/hooks/use-support'
 import type { Ticket, TicketFilters, TicketStatus, TicketPriority } from '@/types/support'
 import { SupportSidebar } from './support-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
-  { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.support', href: '/dashboard/support' },
+  { title: 'sidebar.nav.overview', href: ROUTES.dashboard.home },
+  { title: 'sidebar.nav.support', href: ROUTES.dashboard.support.list },
 ]
 
 export function SupportListView() {
@@ -224,7 +225,7 @@ export function SupportListView() {
                     </SelectContent>
                   </Select>
                   <Button asChild className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
-                    <Link to="/dashboard/support/create">
+                    <Link to={ROUTES.dashboard.support.create}>
                       <Plus className="w-4 h-4 ml-2" />
                       {t('support.createTicket', 'إنشاء تذكرة')}
                     </Link>
@@ -252,7 +253,7 @@ export function SupportListView() {
                     <h3 className="text-lg font-medium mb-2">{t('support.noTickets', 'لا توجد تذاكر')}</h3>
                     <p className="text-muted-foreground mb-4">{t('support.noTicketsDesc', 'ابدأ بإنشاء تذكرة جديدة')}</p>
                     <Button asChild className="rounded-xl">
-                      <Link to="/dashboard/support/create">
+                      <Link to={ROUTES.dashboard.support.create}>
                         <Plus className="w-4 h-4 ml-2" />
                         {t('support.createTicket', 'إنشاء تذكرة')}
                       </Link>
@@ -274,7 +275,7 @@ export function SupportListView() {
                         <TableRow
                           key={ticket._id}
                           className="cursor-pointer hover:bg-muted/50"
-                          onClick={() => navigate({ to: `/dashboard/support/${ticket._id}` })}
+                          onClick={() => navigate({ to: ROUTES.dashboard.support.detail(ticket._id) })}
                         >
                           <TableCell className="font-mono text-sm">{ticket.ticketNumber}</TableCell>
                           <TableCell>
@@ -293,14 +294,14 @@ export function SupportListView() {
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation()
-                                  navigate({ to: `/dashboard/support/${ticket._id}` })
+                                  navigate({ to: ROUTES.dashboard.support.detail(ticket._id) })
                                 }}>
                                   <Eye className="w-4 h-4 ml-2" />
                                   {t('common.view', 'عرض')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation()
-                                  navigate({ to: `/dashboard/support/${ticket._id}/edit` })
+                                  navigate({ to: `${ROUTES.dashboard.support.detail(ticket._id)}/edit` })
                                 }}>
                                   <Edit className="w-4 h-4 ml-2" />
                                   {t('common.edit', 'تعديل')}

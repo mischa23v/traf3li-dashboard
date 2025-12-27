@@ -24,6 +24,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ROUTES } from '@/constants/routes'
 
 import { useManufacturingStats, useWorkOrders } from '@/hooks/use-manufacturing'
 
@@ -44,19 +45,19 @@ export function ManufacturingSidebar() {
         </CardHeader>
         <CardContent className="space-y-2">
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/manufacturing/create">
+            <Link to={ROUTES.dashboard.manufacturing.create}>
               <Plus className="w-4 h-4 ml-2" />
               {t('manufacturing.newWorkOrder', 'أمر عمل جديد')}
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/manufacturing/bom/create">
+            <Link to={ROUTES.dashboard.manufacturing.bom.create}>
               <Layers className="w-4 h-4 ml-2" />
               {t('manufacturing.newBOM', 'قائمة مواد جديدة')}
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/manufacturing/workstations/create">
+            <Link to={ROUTES.dashboard.manufacturing.workstations.create}>
               <Cog className="w-4 h-4 ml-2" />
               {t('manufacturing.newWorkstation', 'محطة عمل جديدة')}
             </Link>
@@ -74,31 +75,31 @@ export function ManufacturingSidebar() {
         </CardHeader>
         <CardContent className="space-y-2">
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/manufacturing">
+            <Link to={ROUTES.dashboard.manufacturing.list}>
               <Factory className="w-4 h-4 ml-2" />
               {t('manufacturing.workOrders', 'أوامر العمل')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/manufacturing/bom">
+            <Link to={ROUTES.dashboard.manufacturing.bom.list}>
               <Layers className="w-4 h-4 ml-2" />
               {t('manufacturing.billOfMaterials', 'قوائم المواد')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/manufacturing/workstations">
+            <Link to={ROUTES.dashboard.manufacturing.workstations.list}>
               <Cog className="w-4 h-4 ml-2" />
               {t('manufacturing.workstations', 'محطات العمل')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/manufacturing/job-cards">
+            <Link to={ROUTES.dashboard.manufacturing.jobCards.list}>
               <ClipboardList className="w-4 h-4 ml-2" />
               {t('manufacturing.jobCards', 'بطاقات العمل')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/manufacturing/settings">
+            <Link to={ROUTES.dashboard.manufacturing.settings}>
               <Settings className="w-4 h-4 ml-2" />
               {t('manufacturing.settings', 'الإعدادات')}
             </Link>
@@ -129,7 +130,7 @@ export function ManufacturingSidebar() {
               {activeOrders.workOrders.slice(0, 5).map((order) => (
                 <Link
                   key={order._id}
-                  to={`/dashboard/manufacturing/${order._id}`}
+                  to={ROUTES.dashboard.manufacturing.detail(order._id)}
                   className="flex items-center justify-between p-2 rounded-lg hover:bg-blue-100 transition-colors"
                 >
                   <div className="flex items-center gap-2">
@@ -145,7 +146,7 @@ export function ManufacturingSidebar() {
               ))}
               {activeOrders.workOrders.length > 5 && (
                 <Button asChild variant="ghost" size="sm" className="w-full text-blue-700">
-                  <Link to="/dashboard/manufacturing?status=in_progress">
+                  <Link to={`${ROUTES.dashboard.manufacturing.list}?status=in_progress`}>
                     {t('manufacturing.viewAll', 'عرض الكل')} ({activeOrders.workOrders.length})
                   </Link>
                 </Button>
@@ -175,7 +176,7 @@ export function ManufacturingSidebar() {
                 {t('manufacturing.cardsAwaitingAction', 'بطاقات في انتظار الإجراء')}
               </div>
               <Button asChild variant="ghost" size="sm" className="w-full mt-3 text-amber-700">
-                <Link to="/dashboard/manufacturing/job-cards?status=pending">
+                <Link to={`${ROUTES.dashboard.manufacturing.jobCards.list}?status=pending`}>
                   {t('manufacturing.viewPending', 'عرض المعلقة')}
                 </Link>
               </Button>
@@ -214,7 +215,7 @@ export function ManufacturingSidebar() {
                 </span>
               </div>
               <Button asChild variant="ghost" size="sm" className="w-full text-emerald-700">
-                <Link to="/dashboard/manufacturing?date=today">
+                <Link to={`${ROUTES.dashboard.manufacturing.list}?date=today`}>
                   {t('manufacturing.viewDetails', 'عرض التفاصيل')}
                 </Link>
               </Button>

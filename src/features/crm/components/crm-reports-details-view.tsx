@@ -6,6 +6,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   useReport, useDeleteReport, useRunReport, useExportReport,
   useAddToFavorites, useRemoveFromFavorites, useDuplicateReport,
@@ -53,8 +54,8 @@ export function CrmReportsDetailsView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: false },
-    { title: 'تقارير CRM', href: '/dashboard/crm/reports', isActive: true },
+    { title: 'العملاء المحتملين', href: ROUTES.dashboard.crm.leads.list, isActive: false },
+    { title: 'تقارير CRM', href: ROUTES.dashboard.crm.reports.list, isActive: true },
   ]
 
   const getStatusColor = (status: ReportStatus) => {
@@ -126,7 +127,7 @@ export function CrmReportsDetailsView() {
     if (!reportId) return
     if (confirm('هل أنت متأكد من حذف هذا التقرير؟')) {
       await deleteMutation.mutateAsync(reportId)
-      navigate({ to: '/dashboard/crm/reports' })
+      navigate({ to: ROUTES.dashboard.crm.reports.list })
     }
   }
 
@@ -171,14 +172,14 @@ export function CrmReportsDetailsView() {
                 <CardContent className="p-8 text-center">
                   <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" aria-hidden="true" />
                   <p className="text-red-600">حدث خطأ في تحميل بيانات التقرير</p>
-                  <Button onClick={() => navigate({ to: '/dashboard/crm/reports' })} className="mt-4">العودة للقائمة</Button>
+                  <Button onClick={() => navigate({ to: ROUTES.dashboard.crm.reports.list })} className="mt-4">العودة للقائمة</Button>
                 </CardContent>
               </Card>
             ) : (
               <>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="icon" className="rounded-xl hover:bg-white" onClick={() => navigate({ to: '/dashboard/crm/reports' })}>
+                    <Button variant="ghost" size="icon" className="rounded-xl hover:bg-white" onClick={() => navigate({ to: ROUTES.dashboard.crm.reports.list })}>
                       <ArrowRight className="h-5 w-5" />
                     </Button>
                     <div>
@@ -212,7 +213,7 @@ export function CrmReportsDetailsView() {
                         <Button variant="outline" size="icon" className="rounded-xl"><MoreHorizontal className="w-4 h-4" /></Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/crm/reports/new?editId=${reportId}` })}><Edit className="w-4 h-4 ms-2" aria-hidden="true" />تعديل</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate({ to: ROUTES.dashboard.crm.reports.new, search: { editId: reportId } })}><Edit className="w-4 h-4 ms-2" aria-hidden="true" />تعديل</DropdownMenuItem>
                         <DropdownMenuItem onClick={handleDuplicate}><Copy className="w-4 h-4 ms-2" aria-hidden="true" />نسخ</DropdownMenuItem>
                         <DropdownMenuItem><Share2 className="w-4 h-4 ms-2" />مشاركة</DropdownMenuItem>
                         <DropdownMenuSeparator />
@@ -334,7 +335,7 @@ export function CrmReportsDetailsView() {
                         <CardContent className="p-8 text-center">
                           <Clock className="w-12 h-12 mx-auto text-slate-300 mb-4" aria-hidden="true" />
                           <p className="text-slate-500">لم يتم تفعيل الجدولة لهذا التقرير</p>
-                          <Button variant="outline" className="mt-4 rounded-xl" onClick={() => navigate({ to: `/dashboard/crm/reports/new?editId=${reportId}` })}>تفعيل الجدولة</Button>
+                          <Button variant="outline" className="mt-4 rounded-xl" onClick={() => navigate({ to: ROUTES.dashboard.crm.reports.new, search: { editId: reportId } })}>تفعيل الجدولة</Button>
                         </CardContent>
                       </Card>
                     )}

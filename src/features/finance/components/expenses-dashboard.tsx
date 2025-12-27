@@ -31,6 +31,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useExpenses, useExpenseStats } from '@/hooks/useFinance'
 import { FinanceSidebar } from './finance-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { ROUTES } from '@/constants/routes'
 
 // Category icon mapping
 const getCategoryIcon = (category: string) => {
@@ -119,10 +120,10 @@ export default function ExpensesDashboard() {
     }, [expenses])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: true },
-        { title: 'كشف الحساب', href: '/dashboard/finance/statements', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: false },
+        { title: 'المصروفات', href: ROUTES.dashboard.finance.expenses.list, isActive: true },
+        { title: 'كشف الحساب', href: ROUTES.dashboard.finance.statements.list, isActive: false },
     ]
 
     // LOADING STATE
@@ -247,7 +248,7 @@ export default function ExpensesDashboard() {
                                     <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد مصروفات بعد</h3>
                                     <p className="text-slate-500 mb-6">ابدأ بإضافة أول مصروف</p>
                                     <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white px-8">
-                                        <Link to="/dashboard/finance/expenses/new">
+                                        <Link to={ROUTES.dashboard.finance.expenses.new}>
                                             <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                                             إضافة مصروف جديد
                                         </Link>
@@ -355,7 +356,7 @@ export default function ExpensesDashboard() {
                                                             )}
                                                         </div>
                                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
-                                                            <Link to="/dashboard/finance/expenses/$expenseId" params={{ expenseId: expense.id }}>
+                                                            <Link to={ROUTES.dashboard.finance.expenses.detail(expense.id )}>
                                                                 عرض التفاصيل
                                                             </Link>
                                                         </Button>

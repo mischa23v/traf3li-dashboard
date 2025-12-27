@@ -5,6 +5,8 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { CACHE_TIMES } from '@/config'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   bankFeedService,
   matchingService,
@@ -24,9 +26,9 @@ import type {
 } from '@/types/finance-advanced'
 
 // ==================== Cache Configuration ====================
-const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
-const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
-const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
+const STATS_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour
+const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
 
 // ═══════════════════════════════════════════════════════════════
 // BANK FEED HOOKS
@@ -55,7 +57,7 @@ export const useCreateBankFeed = () => {
   return useMutation({
     mutationFn: (data: CreateBankFeedData) => bankFeedService.createFeed(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bank-feeds'] })
+      invalidateCache.financeAdvanced.bankFeeds()
       toast.success('Bank account added successfully | تم إضافة الحساب البنكي بنجاح')
     },
     onError: (error: Error) => {
@@ -71,8 +73,8 @@ export const useUpdateBankFeed = () => {
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateBankFeedData> }) =>
       bankFeedService.updateFeed(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['bank-feeds'] })
-      queryClient.invalidateQueries({ queryKey: ['bank-feed', variables.id] })
+      invalidateCache.financeAdvanced.bankFeeds()
+      invalidateCache.financeAdvanced.bankFeed(variables.id)
       toast.success('Account updated successfully | تم تحديث الحساب بنجاح')
     },
     onError: (error: Error) => {
@@ -87,7 +89,7 @@ export const useDeleteBankFeed = () => {
   return useMutation({
     mutationFn: (id: string) => bankFeedService.deleteFeed(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bank-feeds'] })
+      invalidateCache.financeAdvanced.bankFeeds()
       toast.success('Account deleted successfully | تم حذف الحساب بنجاح')
     },
     onError: (error: Error) => {
@@ -102,8 +104,8 @@ export const useFetchTransactions = () => {
   return useMutation({
     mutationFn: (id: string) => bankFeedService.fetchTransactions(id),
     onSuccess: (data, id) => {
-      queryClient.invalidateQueries({ queryKey: ['bank-feed', id] })
-      queryClient.invalidateQueries({ queryKey: ['bank-transactions', id] })
+      invalidateCache.financeAdvanced.bankFeed(id)
+      invalidateCache.financeAdvanced.bankTransactions(id)
       toast.success(`${data.imported} transactions imported | تم استيراد ${data.imported} معاملة`)
     },
     onError: (error: Error) => {
@@ -128,7 +130,7 @@ export const useImportCSV = () => {
       dateFormat: string
     }) => bankFeedService.importCSV(id, file, columnMapping, dateFormat),
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['bank-transactions', variables.id] })
+      invalidateCache.financeAdvanced.bankTransactions(variables.id)
       toast.success(`${data.imported} transactions imported successfully | تم استيراد ${data.imported} معاملة بنجاح`)
       if (data.duplicates > 0) {
         toast.info(`${data.duplicates} duplicate transactions skipped | تم تخطي ${data.duplicates} معاملة مكررة`)
@@ -147,7 +149,7 @@ export const useImportOFX = () => {
     mutationFn: ({ id, file }: { id: string; file: File }) =>
       bankFeedService.importOFX(id, file),
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['bank-transactions', variables.id] })
+      invalidateCache.financeAdvanced.bankTransactions(variables.id)
       toast.success(`${data.imported} transactions imported | تم استيراد ${data.imported} معاملة`)
     },
     onError: (error: Error) => {
@@ -183,7 +185,7 @@ export const useCreateMatch = () => {
   return useMutation({
     mutationFn: (data: CreateMatchData) => matchingService.createMatch(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bank-transactions'] })
+      invalidateCache.financeAdvanced.bankTransactions()
       toast.success('Match created successfully | تم المطابقة بنجاح')
     },
     onError: (error: Error) => {
@@ -198,7 +200,7 @@ export const useAutoMatchAll = () => {
   return useMutation({
     mutationFn: (accountId: string) => matchingService.autoMatchAll(accountId),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['bank-transactions'] })
+      invalidateCache.financeAdvanced.bankTransactions()
       toast.success(`${data.matched} transactions auto-matched | تم مطابقة ${data.matched} معاملة تلقائياً`)
       if (data.suggestions > 0) {
         toast.info(`${data.suggestions} suggestions for review | ${data.suggestions} اقتراح للمراجعة`)
@@ -216,7 +218,7 @@ export const useConfirmMatch = () => {
   return useMutation({
     mutationFn: (matchId: string) => matchingService.confirmMatch(matchId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bank-transactions'] })
+      invalidateCache.financeAdvanced.bankTransactions()
       toast.success('Match confirmed | تم تأكيد المطابقة')
     },
     onError: (error: Error) => {
@@ -231,7 +233,7 @@ export const useRejectMatch = () => {
   return useMutation({
     mutationFn: (matchId: string) => matchingService.rejectMatch(matchId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bank-transactions'] })
+      invalidateCache.financeAdvanced.bankTransactions()
       toast.success('Match rejected | تم رفض المطابقة')
     },
     onError: (error: Error) => {
@@ -246,7 +248,7 @@ export const useUnmatch = () => {
   return useMutation({
     mutationFn: (matchId: string) => matchingService.unmatch(matchId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bank-transactions'] })
+      invalidateCache.financeAdvanced.bankTransactions()
       toast.success('Match removed | تم إلغاء المطابقة')
     },
     onError: (error: Error) => {
@@ -270,7 +272,7 @@ export const useExcludeTransaction = () => {
     mutationFn: ({ transactionId, reason }: { transactionId: string; reason: string }) =>
       matchingService.excludeTransaction(transactionId, reason),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bank-transactions'] })
+      invalidateCache.financeAdvanced.bankTransactions()
       toast.success('Transaction excluded | تم استثناء المعاملة')
     },
     onError: (error: Error) => {
@@ -301,7 +303,7 @@ export const useCreateMatchingRule = () => {
   return useMutation({
     mutationFn: (data: CreateMatchingRuleData) => matchingRulesService.createRule(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['matching-rules'] })
+      invalidateCache.financeAdvanced.matchingRules()
       toast.success('Rule created successfully | تم إنشاء القاعدة بنجاح')
     },
     onError: (error: Error) => {
@@ -317,7 +319,7 @@ export const useUpdateMatchingRule = () => {
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateMatchingRuleData> }) =>
       matchingRulesService.updateRule(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['matching-rules'] })
+      invalidateCache.financeAdvanced.matchingRules()
       toast.success('Rule updated | تم تحديث القاعدة')
     },
     onError: (error: Error) => {
@@ -332,7 +334,7 @@ export const useDeleteMatchingRule = () => {
   return useMutation({
     mutationFn: (id: string) => matchingRulesService.deleteRule(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['matching-rules'] })
+      invalidateCache.financeAdvanced.matchingRules()
       toast.success('Rule deleted | تم حذف القاعدة')
     },
     onError: (error: Error) => {
@@ -355,7 +357,7 @@ export const useToggleMatchingRule = () => {
   return useMutation({
     mutationFn: (id: string) => matchingRulesService.toggleRule(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['matching-rules'] })
+      invalidateCache.financeAdvanced.matchingRules()
       toast.success('Rule status updated | تم تغيير حالة القاعدة')
     },
     onError: (error: Error) => {
@@ -495,7 +497,7 @@ export const useRefreshRates = () => {
   return useMutation({
     mutationFn: () => currencyService.refreshRates(),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['exchange-rates'] })
+      invalidateCache.financeAdvanced.exchangeRates()
       toast.success(`${data.updated} exchange rates updated | تم تحديث ${data.updated} سعر صرف`)
     },
     onError: (error: Error) => {
@@ -518,7 +520,7 @@ export const useSetExchangeRate = () => {
       rate: number
     }) => currencyService.setRate(fromCurrency, toCurrency, rate),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['exchange-rates'] })
+      invalidateCache.financeAdvanced.exchangeRates()
       toast.success('Exchange rate updated | تم تحديث سعر الصرف')
     },
     onError: (error: Error) => {
@@ -551,7 +553,7 @@ export const useUpdateCurrencySettings = () => {
   return useMutation({
     mutationFn: (data: Partial<CurrencySettings>) => currencyService.updateSettings(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['currency-settings'] })
+      invalidateCache.financeAdvanced.currencySettings()
       toast.success('Settings updated | تم تحديث الإعدادات')
     },
     onError: (error: Error) => {

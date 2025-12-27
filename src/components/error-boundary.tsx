@@ -65,11 +65,14 @@ interface ErrorFallbackProps {
 }
 
 export function ErrorFallback({ error, onReset, onGoHome, showHomeButton = true, className }: ErrorFallbackProps) {
+  // Determine language from document dir since this might be used before React context is available
   const isArabic = typeof document !== 'undefined' && document.documentElement.dir === 'rtl'
+
+  // Fallback texts if i18n is not available
   const texts = {
     title: isArabic ? 'حدث خطأ غير متوقع' : 'Something went wrong',
     description: isArabic ? 'نعتذر عن هذا الخطأ. يرجى المحاولة مرة أخرى.' : "We're sorry. Please try again.",
-    tryAgain: isArabic ? 'حاول مرة أخرى' : 'Try Again',
+    tryAgain: isArabic ? 'إعادة المحاولة' : 'Try Again',
     goHome: isArabic ? 'الصفحة الرئيسية' : 'Go Home',
   }
 

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { ROUTES } from '@/constants/routes'
 import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -203,18 +204,18 @@ export function ProspectsEngagedReport() {
       {/* Breadcrumb */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm text-foreground/70">
-          <span>{isArabic ? 'إدارة العملاء' : 'CRM'}</span>
+          <span>{t('crm.title')}</span>
           <ArrowRight className={`h-4 w-4 ${isArabic ? 'rotate-180' : ''}`} />
-          <span>{isArabic ? 'التقارير' : 'Reports'}</span>
+          <span>{t('crm.reports')}</span>
           <ArrowRight className={`h-4 w-4 ${isArabic ? 'rotate-180' : ''}`} />
           <span className="text-foreground">
-            {isArabic ? 'العملاء المحتملين المتفاعلين غير المحولين' : 'Prospects Engaged Not Converted'}
+            {t('crm.prospectsEngagedReport.title')}
           </span>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => setShowFilters(!showFilters)}>
             <Filter className={`h-4 w-4 ${isArabic ? 'ms-2' : 'me-2'}`} />
-            {isArabic ? 'فلترة' : 'Filter'}
+            {t('crm.prospectsEngagedReport.filter')}
           </Button>
           <Button variant="outline" size="sm" onClick={() => handleExport('csv')}>
             <Download className={`h-4 w-4 ${isArabic ? 'ms-2' : 'me-2'}`} />
@@ -233,7 +234,7 @@ export function ProspectsEngagedReport() {
           <CardContent className="pt-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="space-y-2">
-                <Label>{isArabic ? 'الأيام منذ آخر اتصال' : 'Days Since Contact'}</Label>
+                <Label>{t('crm.prospectsEngagedReport.daysSinceContact')}</Label>
                 <Input
                   type="number"
                   min="1"
@@ -242,7 +243,7 @@ export function ProspectsEngagedReport() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>{isArabic ? 'الحد الأدنى للتفاعلات' : 'Min Interactions'}</Label>
+                <Label>{t('crm.prospectsEngagedReport.minInteractions')}</Label>
                 <Input
                   type="number"
                   min="0"
@@ -251,7 +252,7 @@ export function ProspectsEngagedReport() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>{isArabic ? 'مصدر العميل' : 'Lead Source'}</Label>
+                <Label>{t('crm.prospectsEngagedReport.leadSource')}</Label>
                 <Select
                   value={filters.leadSource}
                   onValueChange={(value) => setFilters({ ...filters, leadSource: value })}
@@ -260,18 +261,18 @@ export function ProspectsEngagedReport() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">{isArabic ? 'جميع المصادر' : 'All Sources'}</SelectItem>
-                    <SelectItem value="website">{isArabic ? 'الموقع الإلكتروني' : 'Website'}</SelectItem>
-                    <SelectItem value="referral">{isArabic ? 'إحالة' : 'Referral'}</SelectItem>
-                    <SelectItem value="social">{isArabic ? 'وسائل التواصل' : 'Social Media'}</SelectItem>
-                    <SelectItem value="ads">{isArabic ? 'إعلانات' : 'Advertising'}</SelectItem>
-                    <SelectItem value="cold_call">{isArabic ? 'اتصال بارد' : 'Cold Call'}</SelectItem>
-                    <SelectItem value="event">{isArabic ? 'حدث' : 'Event'}</SelectItem>
+                    <SelectItem value="all">{t('crm.prospectsEngagedReport.allSources')}</SelectItem>
+                    <SelectItem value="website">{t('crm.leadSources.website')}</SelectItem>
+                    <SelectItem value="referral">{t('crm.leadSources.referral')}</SelectItem>
+                    <SelectItem value="social">{t('crm.leadSources.socialMedia')}</SelectItem>
+                    <SelectItem value="ads">{t('crm.leadSources.advertising')}</SelectItem>
+                    <SelectItem value="cold_call">{t('crm.leadSources.coldCall')}</SelectItem>
+                    <SelectItem value="event">{t('crm.leadSources.event')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>{isArabic ? 'مسؤول المبيعات' : 'Sales Person'}</Label>
+                <Label>{t('crm.prospectsEngagedReport.salesPerson')}</Label>
                 <Select
                   value={filters.assignedTo}
                   onValueChange={(value) => setFilters({ ...filters, assignedTo: value })}
@@ -280,7 +281,7 @@ export function ProspectsEngagedReport() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">{isArabic ? 'الجميع' : 'All'}</SelectItem>
+                    <SelectItem value="all">{t('crm.prospectsEngagedReport.all')}</SelectItem>
                     {/* In production, map through actual sales team members */}
                   </SelectContent>
                 </Select>
@@ -300,7 +301,7 @@ export function ProspectsEngagedReport() {
               </div>
               <div>
                 <p className="text-sm text-slate-600">
-                  {isArabic ? 'إجمالي العملاء' : 'Total Prospects'}
+                  {t('crm.prospectsEngagedReport.totalProspects')}
                 </p>
                 <p className="text-2xl font-bold">{summary.total}</p>
               </div>
@@ -316,7 +317,7 @@ export function ProspectsEngagedReport() {
               </div>
               <div>
                 <p className="text-sm text-slate-600">
-                  {isArabic ? 'قيمة عالية' : 'High Value'}
+                  {t('crm.prospectsEngagedReport.highValue')}
                 </p>
                 <p className="text-2xl font-bold text-emerald-600">{summary.highValue}</p>
               </div>
@@ -332,7 +333,7 @@ export function ProspectsEngagedReport() {
               </div>
               <div>
                 <p className="text-sm text-slate-600">
-                  {isArabic ? 'بحاجة لمتابعة' : 'Needs Follow-up'}
+                  {t('crm.prospectsEngagedReport.needsFollowup')}
                 </p>
                 <p className="text-2xl font-bold text-orange-600">{summary.needsFollowup}</p>
               </div>
@@ -348,7 +349,7 @@ export function ProspectsEngagedReport() {
               </div>
               <div>
                 <p className="text-sm text-slate-600">
-                  {isArabic ? 'متوسط التفاعلات' : 'Avg Interactions'}
+                  {t('crm.prospectsEngagedReport.avgInteractions')}
                 </p>
                 <p className="text-2xl font-bold">{summary.avgInteractions}</p>
               </div>
@@ -364,10 +365,10 @@ export function ProspectsEngagedReport() {
               </div>
               <div>
                 <p className="text-sm text-slate-600">
-                  {isArabic ? 'القيمة الإجمالية' : 'Total Value'}
+                  {t('crm.prospectsEngagedReport.totalValue')}
                 </p>
                 <p className="text-xl font-bold">
-                  {summary.totalValue.toLocaleString(isArabic ? 'ar-SA' : 'en-US')} {isArabic ? 'ر.س' : 'SAR'}
+                  {summary.totalValue.toLocaleString(isArabic ? 'ar-SA' : 'en-US')} {t('crm.prospectsEngagedReport.sar')}
                 </p>
               </div>
             </div>
@@ -386,7 +387,7 @@ export function ProspectsEngagedReport() {
                   onCheckedChange={handleSelectAll}
                 />
                 <span className="font-medium">
-                  {isArabic ? `تم تحديد ${selectedLeads.length} عميل` : `${selectedLeads.length} selected`}
+                  {isArabic ? t('crm.prospectsEngagedReport.selectedArabic', { count: selectedLeads.length }) : t('crm.prospectsEngagedReport.selected', { count: selectedLeads.length })}
                 </span>
               </div>
               <div className="flex gap-2">
@@ -396,7 +397,7 @@ export function ProspectsEngagedReport() {
                   onClick={() => handleBulkAction('assign')}
                 >
                   <UserPlus className={`h-4 w-4 ${isArabic ? 'ms-2' : 'me-2'}`} />
-                  {isArabic ? 'تعيين' : 'Assign'}
+                  {t('crm.prospectsEngagedReport.assign')}
                 </Button>
                 <Button
                   size="sm"
@@ -404,7 +405,7 @@ export function ProspectsEngagedReport() {
                   onClick={() => handleBulkAction('campaign')}
                 >
                   <Send className={`h-4 w-4 ${isArabic ? 'ms-2' : 'me-2'}`} />
-                  {isArabic ? 'إضافة لحملة' : 'Add to Campaign'}
+                  {t('crm.prospectsEngagedReport.addToCampaign')}
                 </Button>
                 <Button
                   size="sm"
@@ -412,7 +413,7 @@ export function ProspectsEngagedReport() {
                   onClick={() => handleBulkAction('followup')}
                 >
                   <Calendar className={`h-4 w-4 ${isArabic ? 'ms-2' : 'me-2'}`} />
-                  {isArabic ? 'جدولة متابعة' : 'Schedule Follow-up'}
+                  {t('crm.prospectsEngagedReport.scheduleFollowup')}
                 </Button>
                 <Button
                   size="sm"
@@ -421,7 +422,7 @@ export function ProspectsEngagedReport() {
                   onClick={() => handleBulkAction('disqualify')}
                 >
                   <XCircle className={`h-4 w-4 ${isArabic ? 'ms-2' : 'me-2'}`} />
-                  {isArabic ? 'استبعاد' : 'Disqualify'}
+                  {t('crm.prospectsEngagedReport.disqualify')}
                 </Button>
               </div>
             </div>
@@ -433,7 +434,7 @@ export function ProspectsEngagedReport() {
       <Card>
         <CardHeader>
           <CardTitle>
-            {isArabic ? 'العملاء المحتملين المتفاعلين' : 'Engaged Prospects'}
+            {t('crm.prospectsEngagedReport.engagedProspects')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -446,23 +447,23 @@ export function ProspectsEngagedReport() {
                     onCheckedChange={handleSelectAll}
                   />
                 </TableHead>
-                <TableHead>{isArabic ? 'الاسم' : 'Name'}</TableHead>
-                <TableHead>{isArabic ? 'الشركة' : 'Company'}</TableHead>
-                <TableHead>{isArabic ? 'البريد الإلكتروني' : 'Email'}</TableHead>
-                <TableHead>{isArabic ? 'الهاتف' : 'Phone'}</TableHead>
-                <TableHead>{isArabic ? 'المصدر' : 'Source'}</TableHead>
-                <TableHead>{isArabic ? 'آخر نشاط' : 'Last Activity'}</TableHead>
-                <TableHead>{isArabic ? 'الأيام منذ الاتصال' : 'Days Since Contact'}</TableHead>
-                <TableHead>{isArabic ? 'التفاعلات' : 'Interactions'}</TableHead>
-                <TableHead>{isArabic ? 'التقييم' : 'Score'}</TableHead>
-                <TableHead>{isArabic ? 'الإجراءات' : 'Actions'}</TableHead>
+                <TableHead>{t('crm.prospectsEngagedReport.name')}</TableHead>
+                <TableHead>{t('crm.prospectsEngagedReport.company')}</TableHead>
+                <TableHead>{t('crm.prospectsEngagedReport.email')}</TableHead>
+                <TableHead>{t('crm.prospectsEngagedReport.phone')}</TableHead>
+                <TableHead>{t('crm.prospectsEngagedReport.source')}</TableHead>
+                <TableHead>{t('crm.prospectsEngagedReport.lastActivity')}</TableHead>
+                <TableHead>{t('crm.prospectsEngagedReport.daysSinceContact')}</TableHead>
+                <TableHead>{t('crm.prospectsEngagedReport.interactions')}</TableHead>
+                <TableHead>{t('crm.prospectsEngagedReport.score')}</TableHead>
+                <TableHead>{t('crm.prospectsEngagedReport.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {engagedProspects.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={11} className="text-center py-8 text-slate-500">
-                    {isArabic ? 'لا توجد عملاء محتملين متفاعلين' : 'No engaged prospects found'}
+                    {t('crm.prospectsEngagedReport.noEngagedProspects')}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -503,7 +504,7 @@ export function ProspectsEngagedReport() {
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline" className="text-xs">
-                        {lead.source?.type || (isArabic ? 'غير محدد' : 'Unknown')}
+                        {lead.source?.type || t('crm.prospectsEngagedReport.unknown')}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-sm">
@@ -518,7 +519,7 @@ export function ProspectsEngagedReport() {
                     </TableCell>
                     <TableCell>
                       <span className={`font-medium ${getDaysSinceContactColor(lead.daysSinceContact)}`}>
-                        {lead.daysSinceContact || 0} {isArabic ? 'يوم' : 'days'}
+                        {lead.daysSinceContact || 0} {t('crm.prospectsEngagedReport.days')}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -541,20 +542,20 @@ export function ProspectsEngagedReport() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem>
                             <UserPlus className={`h-4 w-4 ${isArabic ? 'ms-2' : 'me-2'}`} />
-                            {isArabic ? 'تعيين' : 'Assign'}
+                            {t('crm.prospectsEngagedReport.assign')}
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                             <Calendar className={`h-4 w-4 ${isArabic ? 'ms-2' : 'me-2'}`} />
-                            {isArabic ? 'جدولة متابعة' : 'Schedule Follow-up'}
+                            {t('crm.prospectsEngagedReport.scheduleFollowup')}
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                             <Send className={`h-4 w-4 ${isArabic ? 'ms-2' : 'me-2'}`} />
-                            {isArabic ? 'إضافة لحملة' : 'Add to Campaign'}
+                            {t('crm.prospectsEngagedReport.addToCampaign')}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="text-red-600">
                             <XCircle className={`h-4 w-4 ${isArabic ? 'ms-2' : 'me-2'}`} />
-                            {isArabic ? 'استبعاد' : 'Mark Disqualified'}
+                            {t('crm.prospectsEngagedReport.markDisqualified')}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

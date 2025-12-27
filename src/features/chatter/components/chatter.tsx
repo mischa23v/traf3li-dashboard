@@ -48,7 +48,7 @@ interface ChatterProps {
 }
 
 export function Chatter({ resModel, resId, className, maxHeight = 400 }: ChatterProps) {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const isArabic = i18n.language === 'ar'
   const [activeTab, setActiveTab] = React.useState<'messages' | 'activities'>('messages')
   const [message, setMessage] = React.useState('')
@@ -120,7 +120,7 @@ export function Chatter({ resModel, resId, className, maxHeight = 400 }: Chatter
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
           >
             <MessageSquare className="h-4 w-4 me-2" />
-            {isArabic ? 'الرسائل' : 'Messages'}
+            {t('chatter.messages')}
             {allMessages.length > 0 && (
               <Badge variant="secondary" className="ms-2">
                 {allMessages.length}
@@ -132,7 +132,7 @@ export function Chatter({ resModel, resId, className, maxHeight = 400 }: Chatter
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
           >
             <StickyNote className="h-4 w-4 me-2" />
-            {isArabic ? 'الأنشطة' : 'Activities'}
+            {t('chatter.activities')}
           </TabsTrigger>
         </TabsList>
 
@@ -144,13 +144,9 @@ export function Chatter({ resModel, resId, className, maxHeight = 400 }: Chatter
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={
-                isArabic
-                  ? isInternal
-                    ? 'اكتب ملاحظة داخلية...'
-                    : 'اكتب رسالة...'
-                  : isInternal
-                  ? 'Write an internal note...'
-                  : 'Write a message...'
+                isInternal
+                  ? t('chatter.writeNote')
+                  : t('chatter.writeMessage')
               }
               className="min-h-[80px] resize-none"
             />
@@ -165,7 +161,7 @@ export function Chatter({ resModel, resId, className, maxHeight = 400 }: Chatter
                   )}
                 >
                   <StickyNote className="h-4 w-4 me-1" />
-                  {isArabic ? 'ملاحظة داخلية' : 'Internal Note'}
+                  {t('chatter.internalNote')}
                 </Button>
                 <Button variant="ghost" size="sm">
                   <Paperclip className="h-4 w-4" />
@@ -180,7 +176,7 @@ export function Chatter({ resModel, resId, className, maxHeight = 400 }: Chatter
                   <Loader2 className="h-4 w-4 me-2 animate-spin" />
                 )}
                 <Send className="h-4 w-4 me-2" />
-                {isArabic ? 'إرسال' : 'Send'}
+                {t('chatter.send')}
               </Button>
             </div>
           </div>
@@ -192,7 +188,7 @@ export function Chatter({ resModel, resId, className, maxHeight = 400 }: Chatter
                 <div className="flex flex-col items-center justify-center p-8 text-muted-foreground">
                   <MessageSquare className="h-8 w-8 mb-2" />
                   <p className="text-sm">
-                    {isArabic ? 'لا توجد رسائل' : 'No messages yet'}
+                    {t('chatter.noMessages')}
                   </p>
                 </div>
               ) : (
@@ -201,6 +197,7 @@ export function Chatter({ resModel, resId, className, maxHeight = 400 }: Chatter
                     key={msg._id}
                     message={msg}
                     isArabic={isArabic}
+                    t={t}
                     onToggleStar={() => toggleStar.mutate(msg._id)}
                     onDelete={() => deleteMessage.mutate(msg._id)}
                   />
@@ -212,9 +209,7 @@ export function Chatter({ resModel, resId, className, maxHeight = 400 }: Chatter
 
         <TabsContent value="activities" className="mt-0 p-4">
           <div className="text-center text-muted-foreground">
-            {isArabic
-              ? 'استخدم مكون الأنشطة المنفصل لإدارة الأنشطة'
-              : 'Use the separate Activities component to manage activities'}
+            {t('chatter.useActivitiesComponent')}
           </div>
         </TabsContent>
       </Tabs>
@@ -226,23 +221,24 @@ export function Chatter({ resModel, resId, className, maxHeight = 400 }: Chatter
 interface MessageItemProps {
   message: ThreadMessage
   isArabic: boolean
+  t: (key: string) => string
   onToggleStar: () => void
   onDelete: () => void
 }
 
-function MessageItem({ message, isArabic, onToggleStar, onDelete }: MessageItemProps) {
+function MessageItem({ message, isArabic, t, onToggleStar, onDelete }: MessageItemProps) {
   const author = typeof message.author_id === 'object' ? message.author_id : null
 
   const getMessageTypeLabel = () => {
     switch (message.message_type) {
       case 'notification':
-        return isArabic ? 'إشعار' : 'Notification'
+        return t('chatter.notification')
       case 'activity_done':
-        return isArabic ? 'نشاط مكتمل' : 'Activity Done'
+        return t('chatter.activityDone')
       case 'stage_change':
-        return isArabic ? 'تغيير مرحلة' : 'Stage Change'
+        return t('chatter.stageChange')
       case 'auto_log':
-        return isArabic ? 'تسجيل تلقائي' : 'Auto Log'
+        return t('chatter.autoLog')
       default:
         return null
     }
@@ -277,11 +273,11 @@ function MessageItem({ message, isArabic, onToggleStar, onDelete }: MessageItemP
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <span className="font-medium text-sm">
-                {author ? `${author.firstName} ${author.lastName}` : isArabic ? 'نظام' : 'System'}
+                {author ? `${author.firstName} ${author.lastName}` : t('chatter.system')}
               </span>
               {message.is_internal && (
                 <Badge variant="outline" className="text-xs bg-yellow-100 border-yellow-300">
-                  {isArabic ? 'داخلي' : 'Internal'}
+                  {t('chatter.internal')}
                 </Badge>
               )}
               {typeLabel && (
@@ -312,16 +308,12 @@ function MessageItem({ message, isArabic, onToggleStar, onDelete }: MessageItemP
                       )}
                     />
                     {message.is_starred
-                      ? isArabic
-                        ? 'إزالة من المميزة'
-                        : 'Unstar'
-                      : isArabic
-                      ? 'تمييز'
-                      : 'Star'}
+                      ? t('chatter.unstar')
+                      : t('chatter.star')}
                   </DropdownMenuItem>
                   <DropdownMenuItem className="text-destructive" onClick={onDelete}>
                     <Trash2 className="h-4 w-4 me-2" />
-                    {isArabic ? 'حذف' : 'Delete'}
+                    {t('chatter.delete')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -344,6 +336,7 @@ function MessageItem({ message, isArabic, onToggleStar, onDelete }: MessageItemP
                   key={idx}
                   tracking={tracking}
                   isArabic={isArabic}
+                  t={t}
                 />
               ))}
             </div>
@@ -370,7 +363,7 @@ function MessageItem({ message, isArabic, onToggleStar, onDelete }: MessageItemP
                   }}
                 >
                   <Paperclip className="h-3 w-3" />
-                  {typeof attachment === 'object' ? attachment.name : isArabic ? 'مرفق' : 'Attachment'}
+                  {typeof attachment === 'object' ? attachment.name : t('chatter.attachment')}
                 </span>
               ))}
             </div>
@@ -385,9 +378,10 @@ function MessageItem({ message, isArabic, onToggleStar, onDelete }: MessageItemP
 interface TrackingItemProps {
   tracking: TrackingValue
   isArabic: boolean
+  t: (key: string) => string
 }
 
-function TrackingItem({ tracking, isArabic }: TrackingItemProps) {
+function TrackingItem({ tracking, isArabic, t }: TrackingItemProps) {
   const getDisplayValue = (
     _type: string,
     char?: string,
@@ -402,7 +396,7 @@ function TrackingItem({ tracking, isArabic }: TrackingItemProps) {
     if (datetime !== undefined) {
       return format(new Date(datetime), 'PPp', { locale: isArabic ? ar : enUS })
     }
-    if (bool !== undefined) return bool ? (isArabic ? 'نعم' : 'Yes') : (isArabic ? 'لا' : 'No')
+    if (bool !== undefined) return bool ? t('chatter.yes') : t('chatter.no')
     return '-'
   }
 

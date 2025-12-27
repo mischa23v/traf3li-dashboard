@@ -58,10 +58,10 @@ const topNav = [
   { title: 'quality.createTemplate', href: '/dashboard/quality/templates/create' },
 ]
 
-const INSPECTION_TYPES: { value: InspectionType; label: string; labelEn: string }[] = [
-  { value: 'incoming', label: 'وارد', labelEn: 'Incoming' },
-  { value: 'outgoing', label: 'صادر', labelEn: 'Outgoing' },
-  { value: 'in_process', label: 'قيد الإنتاج', labelEn: 'In Process' },
+const INSPECTION_TYPES: { value: InspectionType; translationKey: string }[] = [
+  { value: 'incoming', translationKey: 'quality.type.incoming' },
+  { value: 'outgoing', translationKey: 'quality.type.outgoing' },
+  { value: 'in_process', translationKey: 'quality.type.inProcess' },
 ]
 
 interface TemplateParameter {
@@ -295,7 +295,7 @@ export function CreateTemplateView() {
                         <SelectContent>
                           {INSPECTION_TYPES.map((type) => (
                             <SelectItem key={type.value} value={type.value}>
-                              {type.label} ({type.labelEn})
+                              {t(type.translationKey)}
                             </SelectItem>
                           ))}
                         </SelectContent>

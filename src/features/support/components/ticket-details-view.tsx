@@ -69,6 +69,9 @@ import {
   useUpdateTicketStatus,
 } from '@/hooks/use-support'
 
+// Constants
+import { ROUTES } from '@/constants/routes'
+
 // Types
 import type { TicketStatus, TicketPriority, SlaStatus } from '@/types/support'
 
@@ -96,7 +99,7 @@ export function TicketDetailsView() {
   const handleDelete = () => {
     deleteTicketMutation.mutate(ticketId, {
       onSuccess: () => {
-        navigate({ to: '/dashboard/support' })
+        navigate({ to: ROUTES.dashboard.support.list })
       },
     })
   }
@@ -260,9 +263,9 @@ export function TicketDetailsView() {
   }, [ticketData, ticket, t])
 
   const topNav = [
-    { title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },
-    { title: t('nav.support', 'الدعم الفني'), href: '/dashboard/support', isActive: true },
-    { title: t('nav.tickets', 'التذاكر'), href: '/dashboard/support', isActive: false },
+    { title: t('nav.overview', 'نظرة عامة'), href: ROUTES.dashboard.home, isActive: false },
+    { title: t('nav.support', 'الدعم الفني'), href: ROUTES.dashboard.support.list, isActive: true },
+    { title: t('nav.tickets', 'التذاكر'), href: ROUTES.dashboard.support.list, isActive: false },
   ]
 
   return (
@@ -346,7 +349,7 @@ export function TicketDetailsView() {
             </h3>
             <p className="text-slate-500 mb-4">{t('support.notFoundDesc', 'لم يتم العثور على التذكرة المطلوبة')}</p>
             <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-              <Link to="/dashboard/support">{t('support.backToList', 'العودة إلى القائمة')}</Link>
+              <Link to={ROUTES.dashboard.support.list}>{t('support.backToList', 'العودة إلى القائمة')}</Link>
             </Button>
           </div>
         )}
@@ -768,7 +771,7 @@ export function TicketDetailsView() {
 
                       <Button
                         variant="outline"
-                        onClick={() => navigate({ to: `/dashboard/support/${ticketId}/edit` })}
+                        onClick={() => navigate({ to: `${ROUTES.dashboard.support.detail(ticketId)}/edit` })}
                         className="rounded-xl"
                       >
                         <Edit3 className="w-4 h-4 ms-2" aria-hidden="true" />

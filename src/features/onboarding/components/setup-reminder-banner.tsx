@@ -5,11 +5,13 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { useSetupOrchestrationStatus } from '@/hooks/useSetupOrchestration'
 import { cn } from '@/lib/utils'
+import { useTranslation } from 'react-i18next'
 
 export function SetupReminderBanner() {
   const navigate = useNavigate()
   const [isDismissed, setIsDismissed] = useState(false)
   const { data: status } = useSetupOrchestrationStatus()
+  const { t } = useTranslation()
 
   // Don't show if:
   // - Banner is dismissed
@@ -62,7 +64,7 @@ export function SetupReminderBanner() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-2">
                 <h3 className="font-medium text-sm">
-                  أكمل إعداد النظام ({incompleteCriticalModules.length} وحدات مطلوبة)
+                  {t('onboarding.reminderBanner.completeSetup', { count: incompleteCriticalModules.length })}
                 </h3>
                 <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">
                   {Math.round(status.overallProgress)}%
@@ -86,13 +88,13 @@ export function SetupReminderBanner() {
               onClick={handleStartSetup}
               className="text-white hover:bg-white/20 rounded-lg"
             >
-              متابعة الإعداد
+              {t('onboarding.reminderBanner.continueSetup')}
               <ArrowLeft className="w-4 h-4 ms-1" />
             </Button>
             <button
               onClick={handleDismiss}
               className="p-1 hover:bg-white/20 rounded-lg transition-colors"
-              aria-label="إغلاق"
+              aria-label={t('onboarding.reminderBanner.dismiss')}
             >
               <X className="w-5 h-5" />
             </button>

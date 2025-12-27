@@ -1,35 +1,5 @@
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useCreateVehicle, useUpdateVehicle } from '@/hooks/useVehicle'
-import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import type { Vehicle } from '@/services/vehicleService'
@@ -39,6 +9,8 @@ import {
   ASSIGNMENT_TYPE_LABELS,
   VEHICLE_STATUS_LABELS,
 } from '@/services/vehicleService'
+import { GenericFormDialog } from '@/components/generic-form-dialog'
+import type { FormSectionConfig } from '@/components/generic-form-dialog'
 
 const vehicleSchema = z.object({
   licensePlate: z.string().min(1, 'رقم اللوحة مطلوب'),
@@ -78,42 +50,274 @@ interface VehicleDialogProps {
 }
 
 export function VehicleDialog({ open, onOpenChange, vehicle }: VehicleDialogProps) {
-  const { t, i18n } = useTranslation()
+  const { i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const isEdit = !!vehicle
 
   const createMutation = useCreateVehicle()
   const updateMutation = useUpdateVehicle()
 
-  const form = useForm<VehicleFormData>({
-    resolver: zodResolver(vehicleSchema),
-    defaultValues: {
-      licensePlate: '',
-      make: '',
-      model: '',
-      year: new Date().getFullYear(),
-      color: '',
-      colorAr: '',
-      vehicleType: 'sedan',
-      fuelType: 'gasoline',
-      registrationNumber: '',
-      registrationExpiry: '',
-      insuranceNumber: '',
-      insuranceExpiry: '',
-      assignmentType: 'pool',
-      lastOdometerReading: 0,
-      odometerUnit: 'km',
-      purchaseDate: '',
-      purchaseValue: 0,
-      currentValue: 0,
-      location: '',
-      status: 'active',
-    },
-  })
+  // Convert label objects to options arrays
+  const vehicleTypeOptions = Object.entries(VEHICLE_TYPE_LABELS).map(([key, label]) => ({
+    value: key,
+    label: label.en,
+    labelAr: label.ar,
+  }))
 
-  useEffect(() => {
-    if (vehicle) {
-      form.reset({
+  const fuelTypeOptions = Object.entries(FUEL_TYPE_LABELS).map(([key, label]) => ({
+    value: key,
+    label: label.en,
+    labelAr: label.ar,
+  }))
+
+  const assignmentTypeOptions = Object.entries(ASSIGNMENT_TYPE_LABELS).map(([key, label]) => ({
+    value: key,
+    label: label.en,
+    labelAr: label.ar,
+  }))
+
+  const statusOptions = Object.entries(VEHICLE_STATUS_LABELS).map(([key, label]) => ({
+    value: key,
+    label: label.en,
+    labelAr: label.ar,
+  }))
+
+  // Build sections configuration
+  const sections: FormSectionConfig[] = [
+    // Basic Information
+    {
+      title: 'Basic Information',
+      titleAr: 'معلومات أساسية',
+      fields: [
+        {
+          name: 'licensePlate',
+          type: 'text',
+          label: 'License Plate',
+          labelAr: 'رقم اللوحة',
+          placeholder: 'ABC 1234',
+          placeholderAr: 'أ ب ج 1234',
+          required: true,
+        },
+        {
+          name: 'vehicleType',
+          type: 'select',
+          label: 'Vehicle Type',
+          labelAr: 'نوع المركبة',
+          required: true,
+          options: vehicleTypeOptions,
+        },
+        {
+          name: 'make',
+          type: 'text',
+          label: 'Make',
+          labelAr: 'الصنع',
+          placeholder: 'Toyota',
+          placeholderAr: 'تويوتا',
+          required: true,
+        },
+        {
+          name: 'model',
+          type: 'text',
+          label: 'Model',
+          labelAr: 'الموديل',
+          placeholder: 'Camry',
+          placeholderAr: 'كامري',
+          required: true,
+        },
+        {
+          name: 'year',
+          type: 'number',
+          label: 'Year',
+          labelAr: 'السنة',
+          required: true,
+          min: 1900,
+          max: new Date().getFullYear() + 1,
+        },
+        {
+          name: 'fuelType',
+          type: 'select',
+          label: 'Fuel Type',
+          labelAr: 'نوع الوقود',
+          required: true,
+          options: fuelTypeOptions,
+        },
+        {
+          name: 'color',
+          type: 'text',
+          label: 'Color (EN)',
+          labelAr: 'اللون (EN)',
+          placeholder: 'White',
+          required: true,
+        },
+        {
+          name: 'colorAr',
+          type: 'text',
+          label: 'Color (AR)',
+          labelAr: 'اللون (AR)',
+          placeholder: 'أبيض',
+          placeholderAr: 'أبيض',
+          required: true,
+        },
+      ],
+      columns: 2,
+    },
+    // Registration & Insurance
+    {
+      title: 'Registration & Insurance',
+      titleAr: 'التسجيل والتأمين',
+      fields: [
+        {
+          name: 'registrationNumber',
+          type: 'text',
+          label: 'Registration Number',
+          labelAr: 'رقم التسجيل',
+          required: true,
+        },
+        {
+          name: 'registrationExpiry',
+          type: 'date',
+          label: 'Registration Expiry',
+          labelAr: 'تاريخ انتهاء التسجيل',
+          required: true,
+        },
+        {
+          name: 'insuranceNumber',
+          type: 'text',
+          label: 'Insurance Number',
+          labelAr: 'رقم التأمين',
+          required: true,
+        },
+        {
+          name: 'insuranceExpiry',
+          type: 'date',
+          label: 'Insurance Expiry',
+          labelAr: 'تاريخ انتهاء التأمين',
+          required: true,
+        },
+      ],
+      columns: 2,
+    },
+    // Assignment & Location
+    {
+      title: 'Assignment & Location',
+      titleAr: 'الإسناد والموقع',
+      fields: [
+        {
+          name: 'assignmentType',
+          type: 'select',
+          label: 'Assignment Type',
+          labelAr: 'نوع الإسناد',
+          required: true,
+          options: assignmentTypeOptions,
+        },
+        {
+          name: 'location',
+          type: 'text',
+          label: 'Location',
+          labelAr: 'الموقع',
+          placeholder: 'Riyadh',
+          placeholderAr: 'الرياض',
+          required: true,
+        },
+        ...(isEdit
+          ? [
+              {
+                name: 'status' as const,
+                type: 'select' as const,
+                label: 'Status',
+                labelAr: 'الحالة',
+                options: statusOptions,
+              },
+            ]
+          : []),
+      ],
+      columns: 2,
+    },
+    // Odometer & Value
+    {
+      title: 'Odometer & Value',
+      titleAr: 'عداد المسافة والقيمة',
+      fields: [
+        {
+          name: 'lastOdometerReading',
+          type: 'number',
+          label: 'Odometer Reading',
+          labelAr: 'قراءة العداد',
+          required: true,
+          min: 0,
+        },
+        {
+          name: 'odometerUnit',
+          type: 'select',
+          label: 'Unit',
+          labelAr: 'وحدة القياس',
+          required: true,
+          options: [
+            { value: 'km', label: 'Kilometers', labelAr: 'كيلومتر' },
+            { value: 'miles', label: 'Miles', labelAr: 'ميل' },
+          ],
+        },
+        {
+          name: 'purchaseDate',
+          type: 'date',
+          label: 'Purchase Date',
+          labelAr: 'تاريخ الشراء',
+          required: true,
+        },
+        {
+          name: 'purchaseValue',
+          type: 'currency',
+          label: 'Purchase Value',
+          labelAr: 'قيمة الشراء',
+          required: true,
+          min: 0,
+        },
+        {
+          name: 'currentValue',
+          type: 'currency',
+          label: 'Current Value',
+          labelAr: 'القيمة الحالية',
+          required: true,
+          min: 0,
+        },
+      ],
+      columns: 2,
+    },
+  ]
+
+  // Add maintenance section only in edit mode
+  if (isEdit) {
+    sections.push({
+      title: 'Maintenance',
+      titleAr: 'الصيانة',
+      fields: [
+        {
+          name: 'lastServiceDate',
+          type: 'date',
+          label: 'Last Service Date',
+          labelAr: 'تاريخ آخر صيانة',
+        },
+        {
+          name: 'nextServiceDue',
+          type: 'date',
+          label: 'Next Service Due',
+          labelAr: 'تاريخ الصيانة التالية',
+        },
+        {
+          name: 'nextServiceOdometer',
+          type: 'number',
+          label: 'Service at Odometer',
+          labelAr: 'الصيانة عند قراءة العداد',
+          min: 0,
+        },
+      ],
+      columns: 2,
+    })
+  }
+
+  // Default values from vehicle prop or initial values
+  const defaultValues: Partial<VehicleFormData> = vehicle
+    ? {
         licensePlate: vehicle.licensePlate,
         make: vehicle.make,
         model: vehicle.model,
@@ -140,9 +344,8 @@ export function VehicleDialog({ open, onOpenChange, vehicle }: VehicleDialogProp
         lastServiceDate: vehicle.lastServiceDate ? vehicle.lastServiceDate.split('T')[0] : '',
         nextServiceDue: vehicle.nextServiceDue ? vehicle.nextServiceDue.split('T')[0] : '',
         nextServiceOdometer: vehicle.nextServiceOdometer,
-      })
-    } else {
-      form.reset({
+      }
+    : {
         licensePlate: '',
         make: '',
         model: '',
@@ -163,11 +366,10 @@ export function VehicleDialog({ open, onOpenChange, vehicle }: VehicleDialogProp
         currentValue: 0,
         location: '',
         status: 'active',
-      })
-    }
-  }, [vehicle, form])
+      }
 
-  const onSubmit = async (data: VehicleFormData) => {
+  // Handle form submission
+  const handleSubmit = async (data: VehicleFormData) => {
     try {
       if (isEdit) {
         await updateMutation.mutateAsync({
@@ -202,478 +404,31 @@ export function VehicleDialog({ open, onOpenChange, vehicle }: VehicleDialogProp
         await createMutation.mutateAsync(data)
         toast.success(isRTL ? 'تم إنشاء المركبة بنجاح' : 'Vehicle created successfully')
       }
-      onOpenChange(false)
     } catch (error) {
       toast.error(isRTL ? 'فشل في حفظ المركبة' : 'Failed to save vehicle')
+      throw error // Re-throw to prevent dialog from closing
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {isEdit
-              ? isRTL ? 'تعديل مركبة' : 'Edit Vehicle'
-              : isRTL ? 'إضافة مركبة' : 'Add Vehicle'}
-          </DialogTitle>
-          <DialogDescription>
-            {isEdit
-              ? isRTL ? 'تحديث معلومات المركبة' : 'Update vehicle information'
-              : isRTL ? 'إضافة مركبة جديدة إلى الأسطول' : 'Add a new vehicle to the fleet'}
-          </DialogDescription>
-        </DialogHeader>
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Basic Information */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold">{isRTL ? 'معلومات أساسية' : 'Basic Information'}</h3>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="licensePlate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isRTL ? 'رقم اللوحة' : 'License Plate'}</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder={isRTL ? 'أ ب ج 1234' : 'ABC 1234'} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="vehicleType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isRTL ? 'نوع المركبة' : 'Vehicle Type'}</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {Object.entries(VEHICLE_TYPE_LABELS).map(([key, label]) => (
-                            <SelectItem key={key} value={key}>
-                              {isRTL ? label.ar : label.en}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="make"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isRTL ? 'الصنع' : 'Make'}</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder={isRTL ? 'تويوتا' : 'Toyota'} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="model"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isRTL ? 'الموديل' : 'Model'}</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder={isRTL ? 'كامري' : 'Camry'} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="year"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isRTL ? 'السنة' : 'Year'}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          {...field}
-                          onChange={(e) => field.onChange(parseInt(e.target.value))}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="fuelType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isRTL ? 'نوع الوقود' : 'Fuel Type'}</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {Object.entries(FUEL_TYPE_LABELS).map(([key, label]) => (
-                            <SelectItem key={key} value={key}>
-                              {isRTL ? label.ar : label.en}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="color"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isRTL ? 'اللون (EN)' : 'Color (EN)'}</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="White" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="colorAr"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isRTL ? 'اللون (AR)' : 'Color (AR)'}</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="أبيض" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-
-            {/* Registration & Insurance */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold">{isRTL ? 'التسجيل والتأمين' : 'Registration & Insurance'}</h3>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="registrationNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isRTL ? 'رقم التسجيل' : 'Registration Number'}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="registrationExpiry"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isRTL ? 'تاريخ انتهاء التسجيل' : 'Registration Expiry'}</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="insuranceNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isRTL ? 'رقم التأمين' : 'Insurance Number'}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="insuranceExpiry"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isRTL ? 'تاريخ انتهاء التأمين' : 'Insurance Expiry'}</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-
-            {/* Assignment & Location */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold">{isRTL ? 'الإسناد والموقع' : 'Assignment & Location'}</h3>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="assignmentType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isRTL ? 'نوع الإسناد' : 'Assignment Type'}</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {Object.entries(ASSIGNMENT_TYPE_LABELS).map(([key, label]) => (
-                            <SelectItem key={key} value={key}>
-                              {isRTL ? label.ar : label.en}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isRTL ? 'الموقع' : 'Location'}</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder={isRTL ? 'الرياض' : 'Riyadh'} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {isEdit && (
-                  <FormField
-                    control={form.control}
-                    name="status"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{isRTL ? 'الحالة' : 'Status'}</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {Object.entries(VEHICLE_STATUS_LABELS).map(([key, label]) => (
-                              <SelectItem key={key} value={key}>
-                                {isRTL ? label.ar : label.en}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
-              </div>
-            </div>
-
-            {/* Odometer & Value */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold">{isRTL ? 'عداد المسافة والقيمة' : 'Odometer & Value'}</h3>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="lastOdometerReading"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isRTL ? 'قراءة العداد' : 'Odometer Reading'}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="odometerUnit"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isRTL ? 'وحدة القياس' : 'Unit'}</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="km">{isRTL ? 'كيلومتر' : 'Kilometers'}</SelectItem>
-                          <SelectItem value="miles">{isRTL ? 'ميل' : 'Miles'}</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="purchaseDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isRTL ? 'تاريخ الشراء' : 'Purchase Date'}</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="purchaseValue"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isRTL ? 'قيمة الشراء' : 'Purchase Value'}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="currentValue"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isRTL ? 'القيمة الحالية' : 'Current Value'}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-
-            {/* Maintenance (optional, only in edit) */}
-            {isEdit && (
-              <div className="space-y-4">
-                <h3 className="text-sm font-semibold">{isRTL ? 'الصيانة' : 'Maintenance'}</h3>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="lastServiceDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{isRTL ? 'تاريخ آخر صيانة' : 'Last Service Date'}</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="nextServiceDue"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{isRTL ? 'تاريخ الصيانة التالية' : 'Next Service Due'}</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="nextServiceOdometer"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{isRTL ? 'الصيانة عند قراءة العداد' : 'Service at Odometer'}</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
-                            value={field.value || ''}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-            )}
-
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                {isRTL ? 'إلغاء' : 'Cancel'}
-              </Button>
-              <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
-                {(createMutation.isPending || updateMutation.isPending) && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                {isEdit ? (isRTL ? 'تحديث' : 'Update') : (isRTL ? 'إنشاء' : 'Create')}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+    <GenericFormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={isEdit ? 'Edit Vehicle' : 'Add Vehicle'}
+      titleAr={isEdit ? 'تعديل مركبة' : 'إضافة مركبة'}
+      description={isEdit ? 'Update vehicle information' : 'Add a new vehicle to the fleet'}
+      descriptionAr={isEdit ? 'تحديث معلومات المركبة' : 'إضافة مركبة جديدة إلى الأسطول'}
+      schema={vehicleSchema}
+      sections={sections}
+      defaultValues={defaultValues}
+      onSubmit={handleSubmit}
+      isLoading={createMutation.isPending || updateMutation.isPending}
+      mode={isEdit ? 'edit' : 'create'}
+      submitLabel={isEdit ? 'Update' : 'Create'}
+      submitLabelAr={isEdit ? 'تحديث' : 'إنشاء'}
+      cancelLabel="Cancel"
+      cancelLabelAr="إلغاء"
+      maxWidth="3xl"
+    />
   )
 }
