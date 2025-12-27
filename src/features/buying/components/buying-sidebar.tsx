@@ -130,13 +130,13 @@ export function BuyingSidebar() {
         </CardHeader>
         <CardContent className="space-y-1">
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl hover:bg-purple-100">
-            <Link to="/dashboard/buying/reports/analytics">
+            <Link to={ROUTES.dashboard.buying.reports.analytics}>
               <PieChart className="w-4 h-4 ml-2 text-purple-600" />
               <span className="text-purple-900">{t('buying.purchaseAnalytics', 'تحليلات المشتريات')}</span>
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl hover:bg-purple-100">
-            <Link to="/dashboard/buying/reports/supplier-performance">
+            <Link to={ROUTES.dashboard.buying.reports.supplierPerformance}>
               <Award className="w-4 h-4 ml-2 text-purple-600" />
               <span className="text-purple-900">{t('buying.supplierPerformance', 'أداء الموردين')}</span>
             </Link>

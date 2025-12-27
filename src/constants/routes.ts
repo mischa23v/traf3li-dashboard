@@ -10,6 +10,47 @@
 
 export const ROUTES = {
   /**
+   * API Endpoints (for backend API calls)
+   */
+  api: {
+    /**
+     * Dashboard API endpoints
+     */
+    dashboard: {
+      heroStats: '/dashboard/hero-stats',
+      stats: '/dashboard/stats',
+      summary: '/dashboard/summary',
+      todayEvents: '/dashboard/today-events',
+      financialSummary: '/dashboard/financial-summary',
+      recentMessages: '/dashboard/recent-messages',
+      activity: '/dashboard/activity',
+      crmStats: '/dashboard/crm-stats',
+      hrStats: '/dashboard/hr-stats',
+      financeStats: '/dashboard/finance-stats',
+      hearingsUpcoming: '/dashboard/hearings/upcoming',
+      deadlinesUpcoming: '/dashboard/deadlines/upcoming',
+      timeEntriesSummary: '/dashboard/time-entries/summary',
+      documentsPending: '/dashboard/documents/pending',
+    },
+
+    /**
+     * Reports API endpoints
+     */
+    reports: {
+      casesChart: '/reports/cases-chart',
+      revenueChart: '/reports/revenue-chart',
+      tasksChart: '/reports/tasks-chart',
+    },
+
+    /**
+     * Messages API endpoints
+     */
+    messages: {
+      stats: '/messages/stats',
+    },
+  },
+
+  /**
    * Authentication and onboarding routes
    */
   auth: {
@@ -130,6 +171,7 @@ export const ROUTES = {
      */
     followups: {
       list: '/dashboard/followups',
+      new: '/dashboard/followups/new',
     },
 
     /**
@@ -331,6 +373,8 @@ export const ROUTES = {
       // Transactions
       transactions: {
         list: '/dashboard/finance/transactions',
+        new: '/dashboard/finance/transactions/new',
+        detail: (transactionId: string) => `/dashboard/finance/transactions/${transactionId}`,
       },
 
       // Transactions history
@@ -586,6 +630,20 @@ export const ROUTES = {
         detail: (grievanceId: string) => `/dashboard/hr/grievances/${grievanceId}`,
       },
 
+      // Salaries
+      salaries: {
+        list: '/dashboard/hr/salaries',
+        new: '/dashboard/hr/salaries/new',
+        detail: (salaryId: string) => `/dashboard/hr/salaries/${salaryId}`,
+      },
+
+      // Evaluations
+      evaluations: {
+        list: '/dashboard/hr/evaluations',
+        new: '/dashboard/hr/evaluations/new',
+        detail: (evaluationId: string) => `/dashboard/hr/evaluations/${evaluationId}`,
+      },
+
       // Skills
       skills: {
         list: '/dashboard/hr/skills',
@@ -792,6 +850,12 @@ export const ROUTES = {
         list: '/dashboard/buying/rfq',
         create: '/dashboard/buying/rfq/create',
       },
+
+      // Reports
+      reports: {
+        analytics: '/dashboard/buying/reports/analytics',
+        supplierPerformance: '/dashboard/buying/reports/supplier-performance',
+      },
     },
 
     /**
@@ -883,17 +947,32 @@ export const ROUTES = {
      * Knowledge base routes
      */
     knowledge: {
-      forms: '/dashboard/knowledge/forms',
-      judgments: '/dashboard/knowledge/judgments',
-      laws: '/dashboard/knowledge/laws',
+      forms: {
+        list: '/dashboard/knowledge/forms',
+        new: '/dashboard/knowledge/forms/new',
+        detail: (formId: string) => `/dashboard/knowledge/forms/${formId}`,
+      },
+      judgments: {
+        list: '/dashboard/knowledge/judgments',
+        new: '/dashboard/knowledge/judgments/new',
+        detail: (judgmentId: string) => `/dashboard/knowledge/judgments/${judgmentId}`,
+      },
+      laws: {
+        list: '/dashboard/knowledge/laws',
+        new: '/dashboard/knowledge/laws/new',
+        detail: (lawId: string) => `/dashboard/knowledge/laws/${lawId}`,
+      },
     },
 
     /**
      * Jobs/Services routes
      */
     jobs: {
+      list: '/dashboard/jobs',
+      new: '/dashboard/jobs/new',
       browse: '/dashboard/jobs/browse',
       myServices: '/dashboard/jobs/my-services',
+      detail: (jobId: string) => `/dashboard/jobs/${jobId}`,
     },
 
     /**
@@ -917,6 +996,8 @@ export const ROUTES = {
      */
     documents: {
       list: '/dashboard/documents',
+      new: '/dashboard/documents/new',
+      detail: (documentId: string) => `/dashboard/documents/${documentId}`,
     },
 
     /**

@@ -37,6 +37,7 @@
  */
 
 import apiClient, { handleApiError } from '@/lib/api'
+import { ROUTES } from '@/constants/routes'
 
 /**
  * Dashboard Summary Interface - Aggregated dashboard data in ONE call
@@ -247,7 +248,7 @@ export interface ChartResponse<T> {
  */
 export const getDashboardStats = async (): Promise<DashboardStats> => {
   try {
-    const response = await apiClient.get('/dashboard/hero-stats')
+    const response = await apiClient.get(ROUTES.api.dashboard.heroStats)
     return response.data.stats
   } catch (error) {
     const apiError = error as any
@@ -265,7 +266,7 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
  */
 export const getDashboardHeroStats = async (): Promise<DashboardHeroStats> => {
   try {
-    const response = await apiClient.get('/dashboard/hero-stats')
+    const response = await apiClient.get(ROUTES.api.dashboard.heroStats)
     const stats = response.data.stats as DashboardHeroStatsResponse
 
     // Transform to hero format
@@ -294,7 +295,7 @@ export const getDashboardHeroStats = async (): Promise<DashboardHeroStats> => {
  */
 export const getDashboardSummary = async (): Promise<DashboardSummary> => {
   try {
-    const response = await apiClient.get('/dashboard/summary')
+    const response = await apiClient.get(ROUTES.api.dashboard.summary)
     // Backend returns { success: true, data: { caseStats, taskStats, ... } }
     return response.data.data
   } catch (error) {
@@ -318,7 +319,7 @@ export const getDashboardSummary = async (): Promise<DashboardSummary> => {
  */
 export const getTodayEvents = async (): Promise<DashboardEvent[]> => {
   try {
-    const response = await apiClient.get('/dashboard/today-events')
+    const response = await apiClient.get(ROUTES.api.dashboard.todayEvents)
     return response.data.events || []
   } catch (error) {
     const apiError = error as any
@@ -336,7 +337,7 @@ export const getTodayEvents = async (): Promise<DashboardEvent[]> => {
 export const getFinancialSummary =
   async (): Promise<DashboardFinancialSummary> => {
     try {
-      const response = await apiClient.get('/dashboard/financial-summary')
+      const response = await apiClient.get(ROUTES.api.dashboard.financialSummary)
       return response.data.summary
     } catch (error) {
       const apiError = error as any
@@ -355,7 +356,7 @@ export const getRecentMessages = async (
   limit = 5
 ): Promise<DashboardRecentMessage[]> => {
   try {
-    const response = await apiClient.get('/dashboard/recent-messages', {
+    const response = await apiClient.get(ROUTES.api.dashboard.recentMessages, {
       params: { limit },
     })
     return response.data.messages || []
@@ -374,7 +375,7 @@ export const getRecentMessages = async (
  */
 export const getActivityOverview = async (): Promise<any> => {
   try {
-    const response = await apiClient.get('/dashboard/activity')
+    const response = await apiClient.get(ROUTES.api.dashboard.activity)
     return response.data.activity || response.data.data
   } catch (error) {
     const apiError = error as any
@@ -392,7 +393,7 @@ export const getActivityOverview = async (): Promise<any> => {
  */
 export const getDetailedDashboardStats = async (): Promise<any> => {
   try {
-    const response = await apiClient.get('/dashboard/stats')
+    const response = await apiClient.get(ROUTES.api.dashboard.stats)
     return response.data.stats || response.data.data
   } catch (error) {
     const apiError = error as any
@@ -412,7 +413,7 @@ export const getDetailedDashboardStats = async (): Promise<any> => {
  */
 export const getMessageStats = async (): Promise<MessageStats> => {
   try {
-    const response = await apiClient.get('/messages/stats')
+    const response = await apiClient.get(ROUTES.api.messages.stats)
     return response.data.data
   } catch (error) {
     const apiError = error as any
@@ -442,7 +443,7 @@ export const getMessageStats = async (): Promise<MessageStats> => {
  */
 export const getCRMStats = async (): Promise<CRMStats> => {
   try {
-    const response = await apiClient.get('/dashboard/crm-stats')
+    const response = await apiClient.get(ROUTES.api.dashboard.crmStats)
     return response.data.stats
   } catch (error) {
     const apiError = error as any
@@ -473,7 +474,7 @@ export const getCRMStats = async (): Promise<CRMStats> => {
  */
 export const getHRStats = async (): Promise<HRStats> => {
   try {
-    const response = await apiClient.get('/dashboard/hr-stats')
+    const response = await apiClient.get(ROUTES.api.dashboard.hrStats)
     return response.data.stats
   } catch (error) {
     const apiError = error as any
@@ -504,7 +505,7 @@ export const getHRStats = async (): Promise<HRStats> => {
  */
 export const getFinanceStats = async (): Promise<FinanceStats> => {
   try {
-    const response = await apiClient.get('/dashboard/finance-stats')
+    const response = await apiClient.get(ROUTES.api.dashboard.financeStats)
     return response.data.stats
   } catch (error) {
     const apiError = error as any
@@ -536,7 +537,7 @@ export const getFinanceStats = async (): Promise<FinanceStats> => {
  */
 export const getCasesChart = async (months = 12): Promise<ChartResponse<CasesChartData>> => {
   try {
-    const response = await apiClient.get('/reports/cases-chart', { params: { months } })
+    const response = await apiClient.get(ROUTES.api.reports.casesChart, { params: { months } })
     return response.data
   } catch (error) {
     const apiError = error as any
@@ -565,7 +566,7 @@ export const getCasesChart = async (months = 12): Promise<ChartResponse<CasesCha
  */
 export const getRevenueChart = async (months = 12): Promise<ChartResponse<RevenueChartData>> => {
   try {
-    const response = await apiClient.get('/reports/revenue-chart', { params: { months } })
+    const response = await apiClient.get(ROUTES.api.reports.revenueChart, { params: { months } })
     return response.data
   } catch (error) {
     const apiError = error as any
@@ -594,7 +595,7 @@ export const getRevenueChart = async (months = 12): Promise<ChartResponse<Revenu
  */
 export const getTasksChart = async (months = 12): Promise<ChartResponse<TasksChartData>> => {
   try {
-    const response = await apiClient.get('/reports/tasks-chart', { params: { months } })
+    const response = await apiClient.get(ROUTES.api.reports.tasksChart, { params: { months } })
     return response.data
   } catch (error) {
     const apiError = error as any
@@ -714,7 +715,7 @@ export interface PendingDocumentsResponse {
  */
 export const getUpcomingHearings = async (days = 7): Promise<UpcomingHearingsResponse> => {
   try {
-    const response = await apiClient.get('/dashboard/hearings/upcoming', { params: { days } })
+    const response = await apiClient.get(ROUTES.api.dashboard.hearingsUpcoming, { params: { days } })
     return response.data
   } catch (error) {
     const apiError = error as any
@@ -741,7 +742,7 @@ export const getUpcomingHearings = async (days = 7): Promise<UpcomingHearingsRes
  */
 export const getUpcomingDeadlines = async (days = 14): Promise<DeadlinesResponse> => {
   try {
-    const response = await apiClient.get('/dashboard/deadlines/upcoming', { params: { days } })
+    const response = await apiClient.get(ROUTES.api.dashboard.deadlinesUpcoming, { params: { days } })
     return response.data
   } catch (error) {
     const apiError = error as any
@@ -768,7 +769,7 @@ export const getUpcomingDeadlines = async (days = 14): Promise<DeadlinesResponse
  */
 export const getTimeEntrySummary = async (): Promise<TimeEntrySummary> => {
   try {
-    const response = await apiClient.get('/dashboard/time-entries/summary')
+    const response = await apiClient.get(ROUTES.api.dashboard.timeEntriesSummary)
     return response.data.summary
   } catch (error) {
     const apiError = error as any
@@ -798,7 +799,7 @@ export const getTimeEntrySummary = async (): Promise<TimeEntrySummary> => {
  */
 export const getPendingDocuments = async (): Promise<PendingDocumentsResponse> => {
   try {
-    const response = await apiClient.get('/dashboard/documents/pending')
+    const response = await apiClient.get(ROUTES.api.dashboard.documentsPending)
     return response.data
   } catch (error) {
     const apiError = error as any

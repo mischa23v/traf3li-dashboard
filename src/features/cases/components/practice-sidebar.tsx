@@ -86,7 +86,7 @@ export function PracticeSidebar({
             viewAll: ROUTES.dashboard.documents.list
         },
         followups: {
-            create: '/dashboard/followups/new',
+            create: ROUTES.dashboard.followups.new,
             viewAll: ROUTES.dashboard.followups.list
         },
         contacts: {
@@ -385,7 +385,7 @@ export function PracticeSidebar({
                                         return (
                                             <Link
                                                 key={reminder._id}
-                                                to={ROUTES.dashboard.tasks.reminderDetail(reminder._id)}
+                                                to={ROUTES.dashboard.tasks.reminders.detail(reminder._id)}
                                                 className="flex gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:shadow-md transition-all cursor-pointer group"
                                             >
                                                 <div className={cn(
@@ -424,7 +424,7 @@ export function PracticeSidebar({
                                 </>
                             )}
                             <Button asChild variant="ghost" className="w-full text-xs text-slate-500 hover:text-emerald-600 hover:bg-emerald-50">
-                                <Link to={ROUTES.dashboard.tasks.reminders}>
+                                <Link to={ROUTES.dashboard.tasks.reminders.list}>
                                     {t('sidebar.notifications.viewAll')}
                                 </Link>
                             </Button>

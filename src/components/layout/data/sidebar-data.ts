@@ -62,17 +62,17 @@ export const sidebarData: SidebarData = {
       items: [
         {
           title: 'Dashboard',
-          url: '/',
+          url: ROUTES.dashboard.home,
           icon: LayoutDashboard,
         },
         {
           title: 'Tasks',
-          url: '/tasks',
+          url: ROUTES.legacy.tasks,
           icon: CheckSquare,
         },
         {
           title: 'Task Details',
-          url: '/task-details',
+          url: ROUTES.legacy.taskDetails,
           icon: FileText,
         },
         {
@@ -87,44 +87,44 @@ export const sidebarData: SidebarData = {
         },
         {
           title: 'Apps',
-          url: '/apps',
+          url: ROUTES.apps.list,
           icon: Package,
         },
         {
           title: 'Account Statements',
-          url: '/account-statements',
+          url: ROUTES.legacy.accountStatements,
           icon: FileText,
         },
         {
           title: 'Account Activity',
-          url: '/account-activity',
+          url: ROUTES.legacy.accountActivity,
           icon: Activity,
         },
         {
           title: 'Time Entries',
-          url: '/time-entries',
+          url: ROUTES.legacy.timeEntries,
           icon: Clock,
         },
         {
           title: 'Generate Statement',
-          url: '/generate-statement',
+          url: ROUTES.legacy.generateStatement,
           icon: FilePlus,
         },
         {
           title: 'Statements History',
-          url: '/statements-history',
+          url: ROUTES.legacy.statementsHistory,
           icon: History,
         },
 
         {
           title: 'Chats',
-          url: '/chats',
+          url: ROUTES.chats.list,
           badge: '3',
           icon: MessagesSquare,
         },
         {
           title: 'Users',
-          url: '/users',
+          url: ROUTES.users.list,
           icon: Users,
         },
         {
@@ -133,15 +133,15 @@ export const sidebarData: SidebarData = {
           items: [
             {
               title: 'Sign In',
-              url: '/clerk/sign-in',
+              url: ROUTES.clerk.signIn,
             },
             {
               title: 'Sign Up',
-              url: '/clerk/sign-up',
+              url: ROUTES.clerk.signUp,
             },
             {
               title: 'User Management',
-              url: '/clerk/user-management',
+              url: ROUTES.clerk.userManagement,
             },
           ],
         },
@@ -156,23 +156,23 @@ export const sidebarData: SidebarData = {
           items: [
             {
               title: 'Sign In',
-              url: '/sign-in',
+              url: ROUTES.auth.signIn,
             },
             {
               title: 'Sign In (2 Col)',
-              url: '/sign-in-2',
+              url: ROUTES.auth.signIn2,
             },
             {
               title: 'Sign Up',
-              url: '/sign-up',
+              url: ROUTES.auth.signUp,
             },
             {
               title: 'Forgot Password',
-              url: '/forgot-password',
+              url: ROUTES.auth.forgotPassword,
             },
             {
               title: 'OTP',
-              url: '/otp',
+              url: ROUTES.auth.otp,
             },
           ],
         },
@@ -182,27 +182,27 @@ export const sidebarData: SidebarData = {
           items: [
             {
               title: 'Unauthorized',
-              url: '/errors/unauthorized',
+              url: ROUTES.errors.custom('unauthorized'),
               icon: Lock,
             },
             {
               title: 'Forbidden',
-              url: '/errors/forbidden',
+              url: ROUTES.errors.custom('forbidden'),
               icon: UserX,
             },
             {
               title: 'Not Found',
-              url: '/errors/not-found',
+              url: ROUTES.errors.custom('not-found'),
               icon: FileX,
             },
             {
               title: 'Internal Server Error',
-              url: '/errors/internal-server-error',
+              url: ROUTES.errors.custom('internal-server-error'),
               icon: ServerOff,
             },
             {
               title: 'Maintenance Error',
-              url: '/errors/maintenance-error',
+              url: ROUTES.errors.custom('maintenance-error'),
               icon: Construction,
             },
           ],
@@ -245,7 +245,7 @@ export const sidebarData: SidebarData = {
         },
         {
           title: 'Help Center',
-          url: '/help-center',
+          url: ROUTES.helpCenter.index,
           icon: HelpCircle,
         },
       ],
