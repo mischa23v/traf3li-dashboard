@@ -217,6 +217,12 @@ export function useSidebarData(): SidebarData {
           icon: TrendingUp,
           module: 'leads',
           items: [
+            // CRM Dashboard
+            {
+              title: 'sidebar.nav.crmDashboard',
+              url: ROUTES.dashboard.crm.index,
+              module: 'leads',
+            },
             {
               title: 'sidebar.nav.leads',
               url: ROUTES.dashboard.crm.leads.list,
@@ -225,6 +231,30 @@ export function useSidebarData(): SidebarData {
             {
               title: 'sidebar.nav.pipeline',
               url: ROUTES.dashboard.crm.pipeline,
+              module: 'leads',
+            },
+            // CRM Contacts
+            {
+              title: 'sidebar.nav.crmContacts',
+              url: ROUTES.dashboard.crm.contacts.list,
+              module: 'leads',
+            },
+            // CRM Products
+            {
+              title: 'sidebar.nav.products',
+              url: ROUTES.dashboard.crm.products.list,
+              module: 'leads',
+            },
+            // CRM Quotes
+            {
+              title: 'sidebar.nav.quotes',
+              url: ROUTES.dashboard.crm.quotes.list,
+              module: 'leads',
+            },
+            // CRM Campaigns
+            {
+              title: 'sidebar.nav.campaigns',
+              url: ROUTES.dashboard.crm.campaigns.list,
               module: 'leads',
             },
             {
