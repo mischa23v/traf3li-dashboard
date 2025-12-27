@@ -134,7 +134,10 @@ export const QueryKeys = {
     detail: (id: string) => [...QueryKeys.expenseClaims.details(), id] as const,
     stats: () => [...QueryKeys.expenseClaims.all(), 'stats'] as const,
     pendingApprovals: () => [...QueryKeys.expenseClaims.all(), 'pending-approvals'] as const,
+    pendingPayments: () => [...QueryKeys.expenseClaims.all(), 'pending-payments'] as const,
     employeeClaims: (employeeId: string) => [...QueryKeys.expenseClaims.all(), 'employee', employeeId] as const,
+    mileageRates: () => [...QueryKeys.expenseClaims.all(), 'mileage-rates'] as const,
+    corporateCard: (employeeId: string) => [...QueryKeys.expenseClaims.all(), 'corporate-card', employeeId] as const,
   },
 
   // ==================== EXPENSE POLICIES ====================
@@ -218,6 +221,19 @@ export const QueryKeys = {
     retainers: () => [...QueryKeys.accounting.all(), 'retainers'] as const,
     retainersList: (filters?: Record<string, any>) => [...QueryKeys.accounting.retainers(), 'list', filters] as const,
     retainer: (id: string) => [...QueryKeys.accounting.retainers(), id] as const,
+    retainerTransactions: (id: string) => [...QueryKeys.accounting.retainers(), id, 'transactions'] as const,
+    // Leads
+    leads: () => [...QueryKeys.accounting.all(), 'leads'] as const,
+    leadsList: (filters?: Record<string, any>) => [...QueryKeys.accounting.leads(), 'list', filters] as const,
+    lead: (id: string) => [...QueryKeys.accounting.leads(), id] as const,
+    leadStats: () => [...QueryKeys.accounting.leads(), 'stats'] as const,
+    // Reports
+    reports: () => [...QueryKeys.accounting.all(), 'reports'] as const,
+    profitLoss: (startDate: string, endDate: string) => [...QueryKeys.accounting.reports(), 'profit-loss', startDate, endDate] as const,
+    balanceSheet: (asOfDate?: string) => [...QueryKeys.accounting.reports(), 'balance-sheet', asOfDate] as const,
+    trialBalance: (asOfDate?: string) => [...QueryKeys.accounting.reports(), 'trial-balance', asOfDate] as const,
+    arAging: () => [...QueryKeys.accounting.reports(), 'ar-aging'] as const,
+    caseProfitability: (startDate: string, endDate: string) => [...QueryKeys.accounting.reports(), 'case-profitability', startDate, endDate] as const,
   },
 
   // ==================== FINANCE ADVANCED ====================
@@ -358,6 +374,23 @@ export const QueryKeys = {
     list: (filters?: Record<string, any>) => [...QueryKeys.leaveAllocation.lists(), filters] as const,
     details: () => [...QueryKeys.leaveAllocation.all(), 'detail'] as const,
     detail: (id: string) => [...QueryKeys.leaveAllocation.details(), id] as const,
+    employeeBalance: (employeeId: string, leaveType?: string) =>
+      [...QueryKeys.leaveAllocation.all(), 'employee-balance', employeeId, leaveType] as const,
+    employeeAll: (employeeId: string) =>
+      [...QueryKeys.leaveAllocation.all(), 'employee-all', employeeId] as const,
+    summary: (periodId: string, filters?: Record<string, any>) =>
+      [...QueryKeys.leaveAllocation.all(), 'summary', periodId, filters] as const,
+    carryForwardSummary: (fromPeriodId: string, toPeriodId: string, filters?: Record<string, any>) =>
+      [...QueryKeys.leaveAllocation.all(), 'carry-forward-summary', fromPeriodId, toPeriodId, filters] as const,
+    lowBalance: (leaveType: string, threshold: number) =>
+      [...QueryKeys.leaveAllocation.all(), 'low-balance', leaveType, threshold] as const,
+    expiringCarryForward: (daysBeforeExpiry: number) =>
+      [...QueryKeys.leaveAllocation.all(), 'expiring-carry-forward', daysBeforeExpiry] as const,
+    history: (employeeId: string, leaveType?: string) =>
+      [...QueryKeys.leaveAllocation.all(), 'history', employeeId, leaveType] as const,
+    statistics: (filters?: Record<string, any>) =>
+      [...QueryKeys.leaveAllocation.all(), 'statistics', filters] as const,
+    // Legacy support for employee key
     employee: (employeeId: string, leavePeriodId?: string) =>
       [...QueryKeys.leaveAllocation.all(), 'employee', employeeId, leavePeriodId] as const,
     stats: () => [...QueryKeys.leaveAllocation.all(), 'stats'] as const,
@@ -562,6 +595,10 @@ export const QueryKeys = {
     detail: (id: string) => [...QueryKeys.jobPositions.details(), id] as const,
     active: () => [...QueryKeys.jobPositions.all(), 'active'] as const,
     stats: () => [...QueryKeys.jobPositions.all(), 'stats'] as const,
+    vacant: () => [...QueryKeys.jobPositions.all(), 'vacant'] as const,
+    department: (departmentId: string) => [...QueryKeys.jobPositions.all(), 'department', departmentId] as const,
+    hierarchy: (positionId: string) => [...QueryKeys.jobPositions.all(), 'hierarchy', positionId] as const,
+    orgChart: () => [...QueryKeys.jobPositions.all(), 'org-chart'] as const,
     postings: () => ['job-postings'] as const,
   },
 
@@ -636,14 +673,19 @@ export const QueryKeys = {
 
   // ==================== TRAINING ====================
   training: {
-    all: () => ['training'] as const,
+    all: () => ['trainings'] as const, // Note: Using 'trainings' to match existing usage
     lists: () => [...QueryKeys.training.all(), 'list'] as const,
     list: (filters?: Record<string, any>) => [...QueryKeys.training.lists(), filters] as const,
     details: () => [...QueryKeys.training.all(), 'detail'] as const,
     detail: (id: string) => [...QueryKeys.training.details(), id] as const,
-    employee: (employeeId: string) => [...QueryKeys.training.all(), 'employee', employeeId] as const,
-    upcoming: () => [...QueryKeys.training.all(), 'upcoming'] as const,
     stats: () => [...QueryKeys.training.all(), 'stats'] as const,
+    byEmployee: (employeeId: string) => [...QueryKeys.training.all(), 'employee', employeeId] as const,
+    pendingApprovals: () => [...QueryKeys.training.all(), 'pending-approvals'] as const,
+    upcoming: () => [...QueryKeys.training.all(), 'upcoming'] as const,
+    overdueCompliance: () => [...QueryKeys.training.all(), 'overdue-compliance'] as const,
+    cleSummary: (employeeId: string) => [...QueryKeys.training.all(), 'cle-summary', employeeId] as const,
+    calendar: (month: number, year: number) => [...QueryKeys.training.all(), 'calendar', month, year] as const,
+    providers: () => [...QueryKeys.training.all(), 'providers'] as const,
   },
 
   // ==================== SKILLS ====================
@@ -719,8 +761,14 @@ export const QueryKeys = {
     list: (filters?: Record<string, any>) => [...QueryKeys.shiftAssignments.lists(), filters] as const,
     details: () => [...QueryKeys.shiftAssignments.all(), 'detail'] as const,
     detail: (id: string) => [...QueryKeys.shiftAssignments.details(), id] as const,
-    employee: (employeeId: string, startDate?: string, endDate?: string) =>
-      [...QueryKeys.shiftAssignments.all(), 'employee', employeeId, startDate, endDate] as const,
+    employeeShift: (employeeId: string, date?: string) =>
+      [...QueryKeys.shiftAssignments.all(), 'employee-shift', employeeId, date] as const,
+    activeAssignment: (employeeId: string) =>
+      [...QueryKeys.shiftAssignments.all(), 'active-assignment', employeeId] as const,
+    stats: (filters?: { departmentId?: string; startDate?: string; endDate?: string }) =>
+      [...QueryKeys.shiftAssignments.all(), 'stats', filters] as const,
+    coverageReport: (filters?: { departmentId?: string; startDate?: string; endDate?: string }) =>
+      [...QueryKeys.shiftAssignments.all(), 'coverage-report', filters] as const,
     calendar: (startDate: string, endDate: string, filters?: Record<string, any>) =>
       [...QueryKeys.shiftAssignments.all(), 'calendar', startDate, endDate, filters] as const,
   },
@@ -732,6 +780,9 @@ export const QueryKeys = {
     list: (filters?: Record<string, any>) => [...QueryKeys.shiftRequests.lists(), filters] as const,
     details: () => [...QueryKeys.shiftRequests.all(), 'detail'] as const,
     detail: (id: string) => [...QueryKeys.shiftRequests.details(), id] as const,
+    pendingApprovals: () => [...QueryKeys.shiftRequests.all(), 'pending-approvals'] as const,
+    stats: (filters?: { departmentId?: string; year?: number }) =>
+      [...QueryKeys.shiftRequests.all(), 'stats', filters] as const,
     employee: (employeeId: string) => [...QueryKeys.shiftRequests.all(), 'employee', employeeId] as const,
     pending: () => [...QueryKeys.shiftRequests.all(), 'pending'] as const,
   },
@@ -894,19 +945,36 @@ export const QueryKeys = {
   // ==================== CRM ADVANCED ====================
   crmAdvanced: {
     all: () => ['crm-advanced'] as const,
-    // Segments
-    segments: () => ['segments'] as const,
+    // Email Templates
+    emailTemplates: () => ['email-templates'] as const,
+    emailTemplatesList: (category?: string) => ['email-templates', category] as const,
+    emailTemplate: (id: string) => ['email-template', id] as const,
     // Email Campaigns
     emailCampaigns: () => ['email-campaigns'] as const,
-    emailTemplates: () => ['email-templates'] as const,
+    emailCampaignsList: (filters?: Record<string, any>) => ['email-campaigns', filters] as const,
+    emailCampaign: (id: string) => ['email-campaign', id] as const,
+    campaignAnalytics: (id: string) => ['campaign-analytics', id] as const,
     // Drip Campaigns
     dripCampaigns: () => ['drip-campaigns'] as const,
+    dripCampaign: (id: string) => ['drip-campaign', id] as const,
     // Subscribers
     subscribers: () => ['subscribers'] as const,
+    subscribersList: (params?: Record<string, any>) => ['subscribers', params] as const,
+    // Segments
+    segments: () => ['segments'] as const,
     // Lead Scoring
     leadScores: () => ['lead-scores'] as const,
+    leadScoresList: (params?: Record<string, any>) => ['lead-scores', params] as const,
+    leadInsights: (leadId: string) => ['lead-insights', leadId] as const,
+    leadLeaderboard: (limit: number) => ['lead-leaderboard', limit] as const,
     leadScoringConfig: () => ['lead-scoring-config'] as const,
     leadScoreDistribution: () => ['lead-score-distribution'] as const,
+    // WhatsApp
+    whatsAppConversations: () => ['whatsapp-conversations'] as const,
+    whatsAppConversationsList: (filters?: Record<string, any>) => ['whatsapp-conversations', filters] as const,
+    whatsAppConversation: (id: string) => ['whatsapp-conversation', id] as const,
+    whatsAppTemplates: () => ['whatsapp-templates'] as const,
+    whatsAppBroadcasts: () => ['whatsapp-broadcasts'] as const,
   },
 
   // ==================== CALENDAR ====================
@@ -1095,8 +1163,27 @@ export const QueryKeys = {
   // ==================== CORPORATE CARDS ====================
   corporateCards: {
     all: () => ['corporate-cards'] as const,
+    lists: () => [...QueryKeys.corporateCards.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.corporateCards.lists(), filters] as const,
+    details: () => [...QueryKeys.corporateCards.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.corporateCards.details(), id] as const,
+    // Transactions
     transactions: () => ['card-transactions'] as const,
+    transactionsList: () => [...QueryKeys.corporateCards.transactions(), 'list'] as const,
+    transactionList: (filters?: Record<string, any>) => [...QueryKeys.corporateCards.transactionsList(), filters] as const,
+    transactionDetails: () => [...QueryKeys.corporateCards.transactions(), 'detail'] as const,
+    transactionDetail: (id: string) => [...QueryKeys.corporateCards.transactionDetails(), id] as const,
+    unreconciledTransactions: (cardId?: string) => [...QueryKeys.corporateCards.transactions(), 'unreconciled', cardId] as const,
+    disputedTransactions: (cardId?: string) => [...QueryKeys.corporateCards.transactions(), 'disputed', cardId] as const,
+    potentialMatches: (transactionId: string) => [...QueryKeys.corporateCards.transactions(), transactionId, 'potential-matches'] as const,
+    // Statistics
     statistics: () => ['card-statistics'] as const,
+    statisticsWithDates: (startDate?: string, endDate?: string) => [...QueryKeys.corporateCards.statistics(), startDate, endDate] as const,
+    // Reports
+    reconciliationReport: (cardId?: string, startDate?: string, endDate?: string) => ['card-reconciliation-report', cardId, startDate, endDate] as const,
+    spendingByCategory: (cardId?: string, startDate?: string, endDate?: string) => ['card-spending-by-category', cardId, startDate, endDate] as const,
+    spendingByCard: (startDate?: string, endDate?: string) => ['card-spending-by-card', startDate, endDate] as const,
+    monthlySpendingTrend: (cardId?: string, months?: number) => ['card-monthly-spending-trend', cardId, months] as const,
   },
 
   // ==================== REPORTS ====================

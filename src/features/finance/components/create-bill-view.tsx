@@ -20,6 +20,7 @@ import { Main } from '@/components/layout/main'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { FinanceSidebar } from './finance-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { ROUTES } from '@/constants/routes'
 
 // Placeholder hooks - will be implemented in useFinance.ts
 const useCreateBill = () => {
@@ -149,26 +150,26 @@ export function CreateBillView({ mode = 'create' }: CreateBillViewProps) {
         if (mode === 'edit' && billId) {
             updateBillMutation.mutate({ id: billId, data: billData }, {
                 onSuccess: () => {
-                    navigate({ to: '/dashboard/finance/bills' })
+                    navigate({ to: ROUTES.dashboard.finance.bills.list })
                 },
             })
         } else {
             createBillMutation.mutate(billData, {
                 onSuccess: () => {
-                    navigate({ to: '/dashboard/finance/bills' })
+                    navigate({ to: ROUTES.dashboard.finance.bills.list })
                 },
             })
         }
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/bills', isActive: true },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
-        { title: 'كشف الحساب', href: '/dashboard/finance/statements', isActive: false },
-        { title: 'المعاملات', href: '/dashboard/finance/transactions', isActive: false },
-        { title: 'تتبع الوقت', href: '/dashboard/finance/time-tracking', isActive: false },
-        { title: 'نشاط الحساب', href: '/dashboard/finance/activity', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.bills.list, isActive: true },
+        { title: 'المصروفات', href: ROUTES.dashboard.finance.expenses.list, isActive: false },
+        { title: 'كشف الحساب', href: ROUTES.dashboard.finance.statements.list, isActive: false },
+        { title: 'المعاملات', href: ROUTES.dashboard.finance.transactions.list, isActive: false },
+        { title: 'تتبع الوقت', href: ROUTES.dashboard.finance.timeTracking.list, isActive: false },
+        { title: 'نشاط الحساب', href: ROUTES.dashboard.finance.activity.list, isActive: false },
     ]
 
     return (

@@ -3,9 +3,11 @@
  * React Query hooks for Gantt data, milestones, baselines, and resources
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
+import { QueryKeys } from '@/lib/query-keys'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   ganttService,
   milestoneService,
@@ -33,7 +35,7 @@ const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
 
 export const useGanttData = (caseId: string) => {
   return useQuery({
-    queryKey: ['gantt-data', caseId],
+    queryKey: QueryKeys.gantt.data(caseId),
     queryFn: () => ganttService.getGanttData(caseId),
     enabled: !!caseId,
     staleTime: STATS_STALE_TIME,
@@ -43,7 +45,7 @@ export const useGanttData = (caseId: string) => {
 
 export const useDHtmlxGanttData = (caseId: string) => {
   return useQuery({
-    queryKey: ['gantt-dhtmlx', caseId],
+    queryKey: QueryKeys.gantt.dhtmlx(caseId),
     queryFn: () => ganttService.getDHtmlxData(caseId),
     enabled: !!caseId,
     staleTime: STATS_STALE_TIME,
@@ -57,7 +59,7 @@ export const useDHtmlxGanttData = (caseId: string) => {
  */
 export const useProductivityGanttData = (filters?: ProductivityFilters) => {
   return useQuery({
-    queryKey: ['gantt', 'productivity', filters],
+    queryKey: QueryKeys.gantt.productivity(filters),
     queryFn: () => ganttService.getProductivityData(filters),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -65,13 +67,12 @@ export const useProductivityGanttData = (filters?: ProductivityFilters) => {
 }
 
 export const useUpdateTaskSchedule = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ taskId, data }: { taskId: string; data: UpdateScheduleData }) =>
       ganttService.updateTaskSchedule(taskId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['gantt-data'] })
-      queryClient.invalidateQueries({ queryKey: ['gantt-dhtmlx'] })
+      invalidateCache.gantt.data()
+      invalidateCache.gantt.dhtmlx()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في تحديث الجدول')
@@ -80,13 +81,12 @@ export const useUpdateTaskSchedule = () => {
 }
 
 export const useUpdateTaskProgress = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ taskId, progress }: { taskId: string; progress: number }) =>
       ganttService.updateTaskProgress(taskId, progress),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['gantt-data'] })
-      queryClient.invalidateQueries({ queryKey: ['gantt-dhtmlx'] })
+      invalidateCache.gantt.data()
+      invalidateCache.gantt.dhtmlx()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في تحديث التقدم')
@@ -95,13 +95,12 @@ export const useUpdateTaskProgress = () => {
 }
 
 export const useAddDependency = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ taskId, data }: { taskId: string; data: AddDependencyData }) =>
       ganttService.addDependency(taskId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['gantt-data'] })
-      queryClient.invalidateQueries({ queryKey: ['gantt-dhtmlx'] })
+      invalidateCache.gantt.data()
+      invalidateCache.gantt.dhtmlx()
       toast.success('تم إضافة الاعتمادية')
     },
     onError: (error: Error) => {
@@ -111,13 +110,12 @@ export const useAddDependency = () => {
 }
 
 export const useRemoveDependency = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ taskId, dependencyId }: { taskId: string; dependencyId: string }) =>
       ganttService.removeDependency(taskId, dependencyId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['gantt-data'] })
-      queryClient.invalidateQueries({ queryKey: ['gantt-dhtmlx'] })
+      invalidateCache.gantt.data()
+      invalidateCache.gantt.dhtmlx()
       toast.success('تم إزالة الاعتمادية')
     },
     onError: (error: Error) => {
@@ -128,7 +126,7 @@ export const useRemoveDependency = () => {
 
 export const useCriticalPath = (caseId: string) => {
   return useQuery({
-    queryKey: ['gantt-critical-path', caseId],
+    queryKey: QueryKeys.gantt.criticalPath(caseId),
     queryFn: () => ganttService.getCriticalPath(caseId),
     enabled: !!caseId,
     staleTime: STATS_STALE_TIME,
@@ -137,13 +135,12 @@ export const useCriticalPath = (caseId: string) => {
 }
 
 export const useAutoSchedule = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ caseId, options }: { caseId: string; options: AutoScheduleOptions }) =>
       ganttService.autoSchedule(caseId, options),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['gantt-data'] })
-      queryClient.invalidateQueries({ queryKey: ['gantt-dhtmlx'] })
+      invalidateCache.gantt.data()
+      invalidateCache.gantt.dhtmlx()
       toast.success(`تم تحديث جدول ${data.tasksUpdated} مهمة`)
     },
     onError: (error: Error) => {
@@ -174,7 +171,7 @@ export const useValidateDependencies = () => {
 
 export const useMilestones = (caseId: string) => {
   return useQuery({
-    queryKey: ['gantt-milestones', caseId],
+    queryKey: QueryKeys.gantt.milestones(caseId),
     queryFn: () => milestoneService.getMilestones(caseId),
     enabled: !!caseId,
     staleTime: STATS_STALE_TIME,
@@ -183,12 +180,11 @@ export const useMilestones = (caseId: string) => {
 }
 
 export const useCreateMilestone = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateMilestoneData) => milestoneService.createMilestone(data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['gantt-milestones', variables.caseId] })
-      queryClient.invalidateQueries({ queryKey: ['gantt-data', variables.caseId] })
+    onSuccess: () => {
+      invalidateCache.gantt.milestones()
+      invalidateCache.gantt.data()
       toast.success('تم إنشاء المعلم')
     },
     onError: (error: Error) => {
@@ -198,13 +194,12 @@ export const useCreateMilestone = () => {
 }
 
 export const useUpdateMilestone = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateMilestoneData> }) =>
       milestoneService.updateMilestone(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['gantt-milestones'] })
-      queryClient.invalidateQueries({ queryKey: ['gantt-data'] })
+      invalidateCache.gantt.milestones()
+      invalidateCache.gantt.data()
       toast.success('تم تحديث المعلم')
     },
     onError: (error: Error) => {
@@ -214,12 +209,11 @@ export const useUpdateMilestone = () => {
 }
 
 export const useDeleteMilestone = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => milestoneService.deleteMilestone(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['gantt-milestones'] })
-      queryClient.invalidateQueries({ queryKey: ['gantt-data'] })
+      invalidateCache.gantt.milestones()
+      invalidateCache.gantt.data()
       toast.success('تم حذف المعلم')
     },
     onError: (error: Error) => {
@@ -229,11 +223,10 @@ export const useDeleteMilestone = () => {
 }
 
 export const useCompleteMilestone = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => milestoneService.completeMilestone(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['gantt-milestones'] })
+      invalidateCache.gantt.milestones()
       toast.success('تم إكمال المعلم')
     },
     onError: (error: Error) => {
@@ -248,7 +241,7 @@ export const useCompleteMilestone = () => {
 
 export const useBaselines = (caseId: string) => {
   return useQuery({
-    queryKey: ['gantt-baselines', caseId],
+    queryKey: QueryKeys.gantt.baselines(caseId),
     queryFn: () => baselineService.getBaselines(caseId),
     enabled: !!caseId,
     staleTime: LIST_STALE_TIME,
@@ -257,11 +250,10 @@ export const useBaselines = (caseId: string) => {
 }
 
 export const useSaveBaseline = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateBaselineData) => baselineService.saveBaseline(data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['gantt-baselines', variables.caseId] })
+    onSuccess: () => {
+      invalidateCache.gantt.baselines()
       toast.success('تم حفظ خط الأساس')
     },
     onError: (error: Error) => {
@@ -271,11 +263,10 @@ export const useSaveBaseline = () => {
 }
 
 export const useDeleteBaseline = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => baselineService.deleteBaseline(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['gantt-baselines'] })
+      invalidateCache.gantt.baselines()
       toast.success('تم حذف خط الأساس')
     },
     onError: (error: Error) => {
@@ -286,7 +277,7 @@ export const useDeleteBaseline = () => {
 
 export const useCompareWithBaseline = (caseId: string, baselineId: string) => {
   return useQuery({
-    queryKey: ['gantt-baseline-compare', caseId, baselineId],
+    queryKey: QueryKeys.gantt.baselineCompare(caseId, baselineId),
     queryFn: () => baselineService.compareWithBaseline(caseId, baselineId),
     enabled: !!caseId && !!baselineId,
     staleTime: STATS_STALE_TIME,
@@ -300,7 +291,7 @@ export const useCompareWithBaseline = (caseId: string, baselineId: string) => {
 
 export const useResourceLoading = (caseId: string) => {
   return useQuery({
-    queryKey: ['gantt-resource-loading', caseId],
+    queryKey: QueryKeys.gantt.resourceLoading(caseId),
     queryFn: () => ganttResourceService.getResourceLoading(caseId),
     enabled: !!caseId,
     staleTime: STATS_STALE_TIME,
@@ -313,7 +304,7 @@ export const useResourceWorkload = (
   params?: { startDate?: string; endDate?: string }
 ) => {
   return useQuery({
-    queryKey: ['gantt-resource-workload', resourceId, params],
+    queryKey: QueryKeys.gantt.resourceWorkload(resourceId, params),
     queryFn: () => ganttResourceService.getResourceWorkload(resourceId, params),
     enabled: !!resourceId,
     staleTime: STATS_STALE_TIME,
@@ -322,13 +313,12 @@ export const useResourceWorkload = (
 }
 
 export const useLevelResources = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (caseId: string) => ganttResourceService.levelResources(caseId),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['gantt-data'] })
-      queryClient.invalidateQueries({ queryKey: ['gantt-dhtmlx'] })
-      queryClient.invalidateQueries({ queryKey: ['gantt-resource-loading'] })
+      invalidateCache.gantt.data()
+      invalidateCache.gantt.dhtmlx()
+      invalidateCache.gantt.resourceLoading()
       toast.success(`تم تسوية الموارد - ${data.adjustedTasks} مهمة معدلة`)
     },
     onError: (error: Error) => {
@@ -338,7 +328,6 @@ export const useLevelResources = () => {
 }
 
 export const useAssignResource = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({
       taskId,
@@ -350,9 +339,9 @@ export const useAssignResource = () => {
       hoursPerDay?: number
     }) => ganttResourceService.assignResource(taskId, resourceId, hoursPerDay),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['gantt-data'] })
-      queryClient.invalidateQueries({ queryKey: ['gantt-dhtmlx'] })
-      queryClient.invalidateQueries({ queryKey: ['gantt-resource-loading'] })
+      invalidateCache.gantt.data()
+      invalidateCache.gantt.dhtmlx()
+      invalidateCache.gantt.resourceLoading()
       toast.success('تم تعيين المورد')
     },
     onError: (error: Error) => {
@@ -362,13 +351,12 @@ export const useAssignResource = () => {
 }
 
 export const useUnassignResource = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (taskId: string) => ganttResourceService.unassignResource(taskId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['gantt-data'] })
-      queryClient.invalidateQueries({ queryKey: ['gantt-dhtmlx'] })
-      queryClient.invalidateQueries({ queryKey: ['gantt-resource-loading'] })
+      invalidateCache.gantt.data()
+      invalidateCache.gantt.dhtmlx()
+      invalidateCache.gantt.resourceLoading()
       toast.success('تم إلغاء تعيين المورد')
     },
     onError: (error: Error) => {
@@ -447,13 +435,12 @@ export const useExportMSProject = () => {
 }
 
 export const useImportMSProject = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ caseId, file }: { caseId: string; file: File }) =>
       ganttExportService.importFromMSProject(caseId, file),
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['gantt-data', variables.caseId] })
-      queryClient.invalidateQueries({ queryKey: ['gantt-dhtmlx', variables.caseId] })
+    onSuccess: (data) => {
+      invalidateCache.gantt.data()
+      invalidateCache.gantt.dhtmlx()
       toast.success(`تم استيراد ${data.imported} مهمة`)
       if (data.errors.length > 0) {
         toast.warning(`${data.errors.length} أخطاء أثناء الاستيراد`)

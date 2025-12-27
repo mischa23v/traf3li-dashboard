@@ -6,6 +6,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import permissionService from '@/services/permissionService'
+import { CACHE_TIMES } from '@/config/cache'
 import type {
   PermissionPolicy,
   CreatePolicyData,
@@ -52,7 +53,7 @@ export const usePolicies = (params?: {
   return useQuery({
     queryKey: permissionKeys.policyList(params),
     queryFn: () => permissionService.getPolicies(params),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -64,7 +65,7 @@ export const usePolicy = (policyId: string) => {
     queryKey: permissionKeys.policy(policyId),
     queryFn: () => permissionService.getPolicy(policyId),
     enabled: !!policyId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -202,7 +203,7 @@ export const useRelationTuples = (params?: {
         throw new Error(errorMessage)
       }
     },
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
     onError: (error: any) => {
       const errorMsg = error?.message ||
         'Failed to load permission relations | فشل في تحميل علاقات الصلاحيات'
@@ -326,7 +327,7 @@ export const useDecisionStats = (params?: {
   return useQuery({
     queryKey: permissionKeys.decisionStats(params),
     queryFn: () => permissionService.getDecisionStats(params),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -340,7 +341,7 @@ export const useResourceAccess = (resourceType: string, resourceId: string) => {
     queryKey: permissionKeys.resourceAccess(resourceType, resourceId),
     queryFn: () => permissionService.getResourceAccess(resourceType, resourceId),
     enabled: !!resourceType && !!resourceId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -409,7 +410,7 @@ export const useUserPermissionSummary = (userId?: string) => {
   return useQuery({
     queryKey: permissionKeys.userSummary(userId),
     queryFn: () => permissionService.getUserPermissionSummary(userId),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -421,7 +422,7 @@ export const useUserAccessibleResources = (userId: string, resourceType?: string
     queryKey: permissionKeys.userResources(userId, resourceType),
     queryFn: () => permissionService.getUserAccessibleResources(userId, resourceType),
     enabled: !!userId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -434,7 +435,7 @@ export const usePermissionConfig = () => {
   return useQuery({
     queryKey: [...permissionKeys.all, 'config'],
     queryFn: () => permissionService.getPermissionConfig(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -465,7 +466,7 @@ export const useRelationStats = () => {
   return useQuery({
     queryKey: [...permissionKeys.relations(), 'stats'],
     queryFn: () => permissionService.getRelationStats(),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -513,7 +514,7 @@ export const useResourceRelations = (namespace: string, object: string) => {
     queryKey: [...permissionKeys.relations(), namespace, object],
     queryFn: () => permissionService.getResourceRelations(namespace, object),
     enabled: !!namespace && !!object,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -536,7 +537,7 @@ export const useMyPermissions = () => {
   return useQuery({
     queryKey: [...permissionKeys.all, 'my-permissions'],
     queryFn: () => permissionService.getMyPermissions(),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -548,7 +549,7 @@ export const useExpandPermissions = (namespace: string, resourceId: string, rela
     queryKey: [...permissionKeys.all, 'expand', namespace, resourceId, relation],
     queryFn: () => permissionService.expandPermissions(namespace, resourceId, relation),
     enabled: !!namespace && !!resourceId && !!relation,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -560,7 +561,7 @@ export const useUserResources = (userId: string) => {
     queryKey: [...permissionKeys.all, 'user-resources', userId],
     queryFn: () => permissionService.getUserResources(userId),
     enabled: !!userId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -592,7 +593,7 @@ export const useComplianceReport = (params?: {
   return useQuery({
     queryKey: [...permissionKeys.decisions(), 'compliance', params],
     queryFn: () => permissionService.getComplianceReport(params),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -636,7 +637,7 @@ export const useVisibleSidebar = () => {
   return useQuery({
     queryKey: [...permissionKeys.all, 'ui', 'sidebar'],
     queryFn: () => permissionService.getVisibleSidebar(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -647,7 +648,7 @@ export const useAllSidebarItems = () => {
   return useQuery({
     queryKey: [...permissionKeys.all, 'ui', 'sidebar', 'all'],
     queryFn: () => permissionService.getAllSidebarItems(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -686,7 +687,7 @@ export const useAllPageAccess = () => {
   return useQuery({
     queryKey: [...permissionKeys.all, 'ui', 'pages', 'all'],
     queryFn: () => permissionService.getAllPageAccess(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -716,7 +717,7 @@ export const useUIAccessConfig = () => {
   return useQuery({
     queryKey: [...permissionKeys.all, 'ui', 'config'],
     queryFn: () => permissionService.getUIAccessConfig(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -745,7 +746,7 @@ export const useAccessMatrix = () => {
   return useQuery({
     queryKey: [...permissionKeys.all, 'ui', 'matrix'],
     queryFn: () => permissionService.getAccessMatrix(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 

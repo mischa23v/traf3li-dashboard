@@ -38,6 +38,7 @@ import { useClients, useCases } from '@/hooks/useCasesAndClients'
 import { Skeleton } from '@/components/ui/skeleton'
 import financeService from '@/services/financeService'
 import { toast } from 'sonner'
+import { ROUTES } from '@/constants/routes'
 
 interface LineItem {
     id: string
@@ -159,7 +160,7 @@ export function EditInvoiceView() {
 
         updateInvoice({ id: invoiceId, data: invoiceData }, {
             onSuccess: () => {
-                navigate({ to: '/dashboard/finance/invoices/$invoiceId', params: { invoiceId } })
+                navigate({ to: ROUTES.dashboard.finance.invoices.detail(invoiceId) })
             }
         })
     }
@@ -170,7 +171,7 @@ export function EditInvoiceView() {
         try {
             // Call delete API - would need to add this to the service
             toast.success('تم حذف الفاتورة بنجاح')
-            navigate({ to: '/dashboard/finance/invoices' })
+            navigate({ to: ROUTES.dashboard.finance.invoices.list })
         } catch (error) {
             toast.error('فشل حذف الفاتورة')
         } finally {
@@ -196,13 +197,13 @@ export function EditInvoiceView() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: true },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
-        { title: 'كشف الحساب', href: '/dashboard/finance/statements', isActive: false },
-        { title: 'المعاملات', href: '/dashboard/finance/transactions', isActive: false },
-        { title: 'تتبع الوقت', href: '/dashboard/finance/time-tracking', isActive: false },
-        { title: 'التقارير', href: '/dashboard/finance/reports', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: true },
+        { title: 'المصروفات', href: ROUTES.dashboard.finance.expenses.list, isActive: false },
+        { title: 'كشف الحساب', href: ROUTES.dashboard.finance.statements.list, isActive: false },
+        { title: 'المعاملات', href: ROUTES.dashboard.finance.transactions.list, isActive: false },
+        { title: 'تتبع الوقت', href: ROUTES.dashboard.finance.timeTracking.list, isActive: false },
+        { title: 'التقارير', href: ROUTES.dashboard.finance.reports.list, isActive: false },
     ]
 
     if (loadingInvoice) {

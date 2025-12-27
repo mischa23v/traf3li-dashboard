@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import uiAccessService from '@/services/uiAccessService'
 import apiClient from '@/lib/api'
 import { useAuthStore } from '@/stores/auth-store'
+import { CACHE_TIMES } from '@/config/cache'
 import type {
   SidebarItem,
   PageAccessRule,
@@ -47,8 +48,8 @@ export const useVisibleSidebar = () => {
   return useQuery({
     queryKey: uiAccessKeys.visibleSidebar(),
     queryFn: uiAccessService.getVisibleSidebar,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: CACHE_TIMES.MEDIUM,
+    gcTime: CACHE_TIMES.GC_MEDIUM,
   })
 }
 
@@ -59,7 +60,7 @@ export const useAllSidebarItems = () => {
   return useQuery({
     queryKey: uiAccessKeys.allSidebarItems(),
     queryFn: uiAccessService.getAllSidebarItems,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -97,7 +98,7 @@ export const usePageAccess = (routePath: string, options?: { enabled?: boolean }
     queryKey: uiAccessKeys.pageAccess(routePath),
     queryFn: () => uiAccessService.checkPageAccess(routePath),
     enabled: options?.enabled !== false && !!routePath,
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -108,7 +109,7 @@ export const useAllPageAccess = () => {
   return useQuery({
     queryKey: uiAccessKeys.allPageAccess(),
     queryFn: uiAccessService.getAllPageAccess,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -145,7 +146,7 @@ export const useUIAccessConfig = () => {
   return useQuery({
     queryKey: uiAccessKeys.config(),
     queryFn: uiAccessService.getUIAccessConfig,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -177,7 +178,7 @@ export const useAccessMatrix = () => {
   return useQuery({
     queryKey: uiAccessKeys.matrix(),
     queryFn: uiAccessService.getAccessMatrix,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -287,8 +288,8 @@ export const useAdminDashboardData = () => {
       const response = await apiClient.get('/admin/dashboard')
       return response.data
     },
-    staleTime: 2 * 60 * 1000,
-    gcTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
+    gcTime: CACHE_TIMES.GC_SHORT,
     enabled: isAuthenticated,
     retry: false,
   })

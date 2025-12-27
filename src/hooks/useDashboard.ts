@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query'
 import dashboardService from '@/services/dashboardService'
 import type { DashboardSummary } from '@/services/dashboardService'
 import { useAuthStore } from '@/stores/auth-store'
+import { CACHE_TIMES } from '@/config/cache'
 
 // ==================== DASHBOARD SUMMARY (GOLD STANDARD) ====================
 // Single API call for all dashboard data - replaces 7 separate calls
@@ -29,8 +30,8 @@ export const useDashboardSummary = () => {
   return useQuery<DashboardSummary>({
     queryKey: ['dashboard', 'summary'],
     queryFn: () => dashboardService.getDashboardSummary(),
-    staleTime: 5 * 60 * 1000, // 5 minutes - dashboard stats don't change frequently
-    gcTime: 10 * 60 * 1000,   // 10 minutes garbage collection
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes - dashboard stats don't change frequently
+    gcTime: CACHE_TIMES.GC_MEDIUM,   // 10 minutes garbage collection
     enabled: isAuthenticated,
     retry: false, // NO retry on 429 - prevents rate limit cascade
     refetchOnWindowFocus: false, // Don't refetch on tab focus
@@ -47,7 +48,7 @@ export const useDashboardStats = () => {
   return useQuery({
     queryKey: ['dashboard', 'stats'],
     queryFn: () => dashboardService.getDashboardStats(),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT, // 2 minutes
     enabled: isAuthenticated, // Only fetch when authenticated
     retry: false, // NO retry on 429 - prevents rate limit cascade
   })
@@ -71,7 +72,7 @@ export const useTodayEvents = (isEnabled = true) => {
   return useQuery({
     queryKey: ['dashboard', 'today-events'],
     queryFn: () => dashboardService.getTodayEvents(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     enabled: isAuthenticated && isEnabled, // Only fetch when authenticated and enabled
     retry: false, // NO retry on 429 - prevents rate limit cascade
     // Provide empty array when API fails to prevent UI crashes
@@ -85,7 +86,7 @@ export const useFinancialSummary = (isEnabled = true) => {
   return useQuery({
     queryKey: ['dashboard', 'financial-summary'],
     queryFn: () => dashboardService.getFinancialSummary(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     enabled: isAuthenticated && isEnabled, // Only fetch when authenticated and enabled
     retry: false, // NO retry on 429 - prevents rate limit cascade
     // Provide zero values when API fails to prevent UI crashes
@@ -99,7 +100,7 @@ export const useRecentMessages = (limit = 5, isEnabled = true) => {
   return useQuery({
     queryKey: ['dashboard', 'recent-messages', limit],
     queryFn: () => dashboardService.getRecentMessages(limit),
-    staleTime: 2 * 60 * 1000, // 2 minutes (increased from 30s)
+    staleTime: CACHE_TIMES.SHORT, // 2 minutes (increased from 30s)
     enabled: isAuthenticated && isEnabled, // Only fetch when authenticated and enabled
     retry: false, // NO retry on 429 - prevents rate limit cascade
   })
@@ -111,7 +112,7 @@ export const useMessageStats = () => {
   return useQuery({
     queryKey: ['messages', 'stats'],
     queryFn: () => dashboardService.getMessageStats(),
-    staleTime: 2 * 60 * 1000, // 2 minutes (increased from 1min)
+    staleTime: CACHE_TIMES.SHORT, // 2 minutes (increased from 1min)
     enabled: isAuthenticated, // Only fetch when authenticated
     retry: false, // NO retry on 429 - prevents rate limit cascade
   })
@@ -126,7 +127,7 @@ export const useCRMStats = (isTabActive = true) => {
   return useQuery({
     queryKey: ['dashboard', 'crm-stats'],
     queryFn: () => dashboardService.getCRMStats(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     enabled: isAuthenticated && isTabActive,
     retry: false,
   })
@@ -138,7 +139,7 @@ export const useHRStats = (isTabActive = true) => {
   return useQuery({
     queryKey: ['dashboard', 'hr-stats'],
     queryFn: () => dashboardService.getHRStats(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     enabled: isAuthenticated && isTabActive,
     retry: false,
   })
@@ -150,7 +151,7 @@ export const useFinanceStats = (isTabActive = true) => {
   return useQuery({
     queryKey: ['dashboard', 'finance-stats'],
     queryFn: () => dashboardService.getFinanceStats(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     enabled: isAuthenticated && isTabActive,
     retry: false,
   })
@@ -209,7 +210,7 @@ export const useUpcomingHearings = (days = 7) => {
   return useQuery({
     queryKey: ['dashboard', 'hearings', 'upcoming', days],
     queryFn: () => dashboardService.getUpcomingHearings(days),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     enabled: isAuthenticated,
     retry: false,
   })
@@ -221,7 +222,7 @@ export const useUpcomingDeadlines = (days = 14) => {
   return useQuery({
     queryKey: ['dashboard', 'deadlines', 'upcoming', days],
     queryFn: () => dashboardService.getUpcomingDeadlines(days),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     enabled: isAuthenticated,
     retry: false,
   })
@@ -233,7 +234,7 @@ export const useTimeEntrySummary = () => {
   return useQuery({
     queryKey: ['dashboard', 'time-entries', 'summary'],
     queryFn: () => dashboardService.getTimeEntrySummary(),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT, // 2 minutes
     enabled: isAuthenticated,
     retry: false,
   })
@@ -245,7 +246,7 @@ export const usePendingDocuments = (isTabActive = true) => {
   return useQuery({
     queryKey: ['dashboard', 'documents', 'pending'],
     queryFn: () => dashboardService.getPendingDocuments(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     enabled: isAuthenticated && isTabActive,
     retry: false,
   })

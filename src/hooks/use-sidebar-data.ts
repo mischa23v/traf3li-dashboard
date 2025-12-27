@@ -124,11 +124,11 @@ export function useSidebarData(): SidebarData {
           items: [
             {
               title: 'sidebar.nav.overview',
-              url: '/',
+              url: ROUTES.dashboard.home,
             },
             {
               title: 'sidebar.nav.calendar',
-              url: '/dashboard/calendar',
+              url: ROUTES.dashboard.calendar,
               module: 'events',
             },
           ],
@@ -145,23 +145,23 @@ export function useSidebarData(): SidebarData {
           items: [
             {
               title: 'sidebar.nav.tasks',
-              url: '/dashboard/tasks/list',
+              url: ROUTES.dashboard.tasks.list,
               module: 'tasks',
             },
             {
               title: 'sidebar.nav.reminders',
-              url: '/dashboard/tasks/reminders',
+              url: ROUTES.dashboard.tasks.reminders.list,
               module: 'tasks',
             },
             {
               title: 'sidebar.nav.events',
-              url: '/dashboard/tasks/events',
+              url: ROUTES.dashboard.tasks.events.list,
               module: 'events',
             },
             // Gantt View
             {
               title: 'sidebar.nav.gantt',
-              url: '/dashboard/tasks/gantt',
+              url: ROUTES.dashboard.tasks.gantt,
               module: 'tasks',
             },
           ],
@@ -173,7 +173,7 @@ export function useSidebarData(): SidebarData {
       items: [
         {
           title: 'sidebar.nav.messages',
-          url: '/dashboard/messages/chat',
+          url: ROUTES.dashboard.messages.chat,
           icon: MessageSquare,
         },
       ],
@@ -187,22 +187,22 @@ export function useSidebarData(): SidebarData {
           items: [
             {
               title: 'sidebar.nav.clients',
-              url: '/dashboard/clients',
+              url: ROUTES.dashboard.clients.list,
               module: 'clients',
             },
             {
               title: 'sidebar.nav.contacts',
-              url: '/dashboard/contacts',
+              url: ROUTES.dashboard.contacts.list,
               module: 'clients',
             },
             {
               title: 'sidebar.nav.organizations',
-              url: '/dashboard/organizations',
+              url: ROUTES.dashboard.organizations.list,
               module: 'clients',
             },
             {
               title: 'sidebar.nav.staff',
-              url: '/dashboard/staff',
+              url: ROUTES.dashboard.staff.list,
               module: 'team',
             },
           ],
@@ -219,70 +219,70 @@ export function useSidebarData(): SidebarData {
           items: [
             {
               title: 'sidebar.nav.leads',
-              url: '/dashboard/crm/leads',
+              url: ROUTES.dashboard.crm.leads.list,
               module: 'leads',
             },
             {
               title: 'sidebar.nav.pipeline',
-              url: '/dashboard/crm/pipeline',
+              url: ROUTES.dashboard.crm.pipeline,
               module: 'leads',
             },
             {
               title: 'sidebar.nav.referrals',
-              url: '/dashboard/crm/referrals',
+              url: ROUTES.dashboard.crm.referrals.list,
               module: 'leads',
             },
             {
               title: 'sidebar.nav.activities',
-              url: '/dashboard/crm/activities',
+              url: ROUTES.dashboard.crm.activities.list,
               module: 'leads',
             },
             // Email Marketing
             {
               title: 'sidebar.nav.emailMarketing',
-              url: '/dashboard/crm/email-marketing',
+              url: ROUTES.dashboard.crm.emailMarketing.list,
               module: 'leads',
             },
             // Lead Scoring
             {
               title: 'sidebar.nav.leadScoring',
-              url: '/dashboard/crm/lead-scoring',
+              url: ROUTES.dashboard.crm.leadScoring.list,
               module: 'leads',
             },
             // WhatsApp Integration
             {
               title: 'sidebar.nav.whatsapp',
-              url: '/dashboard/crm/whatsapp',
+              url: ROUTES.dashboard.crm.whatsapp.list,
               module: 'leads',
             },
             // Appointments
             {
               title: 'sidebar.nav.appointments',
-              url: '/dashboard/crm/appointments',
+              url: ROUTES.dashboard.crm.appointments,
               module: 'leads',
             },
             // Territories
             {
               title: 'sidebar.nav.territories',
-              url: '/dashboard/crm/territories',
+              url: ROUTES.dashboard.crm.territories,
               module: 'leads',
             },
             // Sales Persons
             {
               title: 'sidebar.nav.salesPersons',
-              url: '/dashboard/crm/sales-persons',
+              url: ROUTES.dashboard.crm.salesPersons,
               module: 'leads',
             },
             // CRM Reports
             {
               title: 'sidebar.nav.crmReports',
-              url: '/dashboard/crm/crm-reports',
+              url: ROUTES.dashboard.crm.crmReports,
               module: 'leads',
             },
             // CRM Setup Wizard
             {
               title: 'sidebar.nav.crmSetup',
-              url: '/dashboard/crm/setup-wizard',
+              url: ROUTES.dashboard.crm.setupWizard,
               module: 'leads',
             },
           ],
@@ -298,31 +298,31 @@ export function useSidebarData(): SidebarData {
           items: [
             {
               title: 'sidebar.nav.cases',
-              url: '/dashboard/cases',
+              url: ROUTES.dashboard.cases.list,
               module: 'cases',
             },
             {
               title: 'sidebar.nav.caseNotion',
-              url: '/dashboard/notion',
+              url: ROUTES.dashboard.notion,
               module: 'cases',
             },
             {
               title: 'sidebar.nav.casePipeline',
-              url: '/dashboard/cases/pipeline',
+              url: ROUTES.dashboard.cases.pipeline,
               module: 'cases',
             },
             {
               title: 'sidebar.nav.documents',
-              url: '/dashboard/documents',
+              url: ROUTES.dashboard.documents.list,
               module: 'documents',
             },
             {
               title: 'sidebar.nav.myServices',
-              url: '/dashboard/jobs/my-services',
+              url: ROUTES.dashboard.jobs.myServices,
             },
             {
               title: 'sidebar.nav.browseJobs',
-              url: '/dashboard/jobs/browse',
+              url: ROUTES.dashboard.jobs.browse,
             },
           ],
         },
@@ -338,67 +338,67 @@ export function useSidebarData(): SidebarData {
           items: [
             {
               title: 'sidebar.nav.financeOverview',
-              url: '/dashboard/finance/overview',
+              url: ROUTES.dashboard.finance.overview,
               module: 'invoices',
             },
             {
               title: 'sidebar.nav.invoices',
-              url: '/dashboard/finance/invoices',
+              url: ROUTES.dashboard.finance.invoices.list,
               module: 'invoices',
             },
             {
               title: 'sidebar.nav.pdfTemplates',
-              url: '/dashboard/pdf-templates',
+              url: ROUTES.dashboard.pdfTemplates.list,
               module: 'documents',
             },
             {
               title: 'sidebar.nav.payments',
-              url: '/dashboard/finance/payments',
+              url: ROUTES.dashboard.finance.payments.list,
               module: 'payments',
             },
             {
               title: 'sidebar.nav.expenses',
-              url: '/dashboard/finance/expenses',
+              url: ROUTES.dashboard.finance.expenses.list,
               module: 'expenses',
             },
             {
               title: 'sidebar.nav.transactions',
-              url: '/dashboard/finance/transactions',
+              url: ROUTES.dashboard.finance.transactions.list,
               module: 'payments',
             },
             {
               title: 'sidebar.nav.timeTracking',
-              url: '/dashboard/finance/time-tracking',
+              url: ROUTES.dashboard.finance.timeTracking.list,
               module: 'timeTracking',
             },
             // Bank Reconciliation
             {
               title: 'sidebar.nav.bankReconciliation',
-              url: '/dashboard/finance/reconciliation',
+              url: ROUTES.dashboard.finance.reconciliation.list,
               module: 'payments',
             },
             // Multi-Currency
             {
               title: 'sidebar.nav.multiCurrency',
-              url: '/dashboard/finance/currency',
+              url: ROUTES.dashboard.finance.currency.list,
               module: 'payments',
             },
             // Saudi Banking
             {
               title: 'sidebar.nav.saudiBanking',
-              url: '/dashboard/finance/saudi-banking',
+              url: ROUTES.dashboard.finance.saudiBanking.index,
               module: 'payments',
             },
             // Fiscal Periods
             {
               title: 'sidebar.nav.fiscalPeriods',
-              url: '/dashboard/finance/fiscal-periods',
+              url: ROUTES.dashboard.finance.fiscalPeriods.list,
               module: 'payments',
             },
             // Full Reports
             {
               title: 'sidebar.nav.fullReports',
-              url: '/dashboard/finance/full-reports',
+              url: ROUTES.dashboard.finance.fullReports.list,
               module: 'reports',
             },
           ],
@@ -414,19 +414,19 @@ export function useSidebarData(): SidebarData {
           items: [
             {
               title: 'sidebar.nav.items',
-              url: '/dashboard/inventory',
+              url: ROUTES.dashboard.inventory.list,
             },
             {
               title: 'sidebar.nav.warehouses',
-              url: '/dashboard/inventory/warehouses',
+              url: ROUTES.dashboard.inventory.warehouses.list,
             },
             {
               title: 'sidebar.nav.stockEntries',
-              url: '/dashboard/inventory/stock-entries',
+              url: ROUTES.dashboard.inventory.stockEntries.list,
             },
             {
               title: 'sidebar.nav.stockLedger',
-              url: '/dashboard/inventory/stock-ledger',
+              url: ROUTES.dashboard.inventory.stockLedger,
             },
           ],
         },
@@ -441,15 +441,15 @@ export function useSidebarData(): SidebarData {
           items: [
             {
               title: 'sidebar.nav.suppliers',
-              url: '/dashboard/buying',
+              url: ROUTES.dashboard.buying.list,
             },
             {
               title: 'sidebar.nav.purchaseOrders',
-              url: '/dashboard/buying/purchase-orders',
+              url: ROUTES.dashboard.buying.purchaseOrders.list,
             },
             {
               title: 'sidebar.nav.materialRequests',
-              url: '/dashboard/buying/material-requests',
+              url: ROUTES.dashboard.buying.materialRequests.list,
             },
             {
               title: 'sidebar.nav.purchaseReceipts',
@@ -457,7 +457,7 @@ export function useSidebarData(): SidebarData {
             },
             {
               title: 'sidebar.nav.rfqs',
-              url: '/dashboard/buying/rfqs',
+              url: ROUTES.dashboard.buying.rfq.list,
             },
           ],
         },
@@ -472,19 +472,19 @@ export function useSidebarData(): SidebarData {
           items: [
             {
               title: 'sidebar.nav.workOrders',
-              url: '/dashboard/manufacturing',
+              url: ROUTES.dashboard.manufacturing.list,
             },
             {
               title: 'sidebar.nav.boms',
-              url: '/dashboard/manufacturing/boms',
+              url: ROUTES.dashboard.manufacturing.bom.list,
             },
             {
               title: 'sidebar.nav.workstations',
-              url: '/dashboard/manufacturing/workstations',
+              url: ROUTES.dashboard.manufacturing.workstations.list,
             },
             {
               title: 'sidebar.nav.jobCards',
-              url: '/dashboard/manufacturing/job-cards',
+              url: ROUTES.dashboard.manufacturing.jobCards.list,
             },
             {
               title: 'sidebar.nav.productionPlans',
@@ -503,15 +503,15 @@ export function useSidebarData(): SidebarData {
           items: [
             {
               title: 'sidebar.nav.qualityInspections',
-              url: '/dashboard/quality',
+              url: ROUTES.dashboard.quality.list,
             },
             {
               title: 'sidebar.nav.qualityTemplates',
-              url: '/dashboard/quality/templates',
+              url: ROUTES.dashboard.quality.templates.list,
             },
             {
               title: 'sidebar.nav.qualityActions',
-              url: '/dashboard/quality/actions',
+              url: ROUTES.dashboard.quality.actions.list,
             },
             {
               title: 'sidebar.nav.ncrs',
@@ -530,11 +530,11 @@ export function useSidebarData(): SidebarData {
           items: [
             {
               title: 'sidebar.nav.assetsList',
-              url: '/dashboard/assets',
+              url: ROUTES.dashboard.assets.list,
             },
             {
               title: 'sidebar.nav.assetCategories',
-              url: '/dashboard/assets/categories',
+              url: ROUTES.dashboard.assets.categories.list,
             },
             {
               title: 'sidebar.nav.depreciation',
@@ -542,7 +542,7 @@ export function useSidebarData(): SidebarData {
             },
             {
               title: 'sidebar.nav.assetMaintenance',
-              url: '/dashboard/assets/maintenance',
+              url: ROUTES.dashboard.assets.maintenance.list,
             },
             {
               title: 'sidebar.nav.assetMovements',
@@ -561,11 +561,11 @@ export function useSidebarData(): SidebarData {
           items: [
             {
               title: 'sidebar.nav.subcontractingOrders',
-              url: '/dashboard/subcontracting',
+              url: ROUTES.dashboard.subcontracting.list,
             },
             {
               title: 'sidebar.nav.subcontractingReceipts',
-              url: '/dashboard/subcontracting/receipts',
+              url: ROUTES.dashboard.subcontracting.receipts.list,
             },
             {
               title: 'sidebar.nav.subcontractingBoms',
@@ -584,11 +584,11 @@ export function useSidebarData(): SidebarData {
           items: [
             {
               title: 'sidebar.nav.tickets',
-              url: '/dashboard/support',
+              url: ROUTES.dashboard.support.list,
             },
             {
               title: 'sidebar.nav.slas',
-              url: '/dashboard/support/slas',
+              url: ROUTES.dashboard.support.sla.list,
             },
           ],
         },
@@ -605,229 +605,229 @@ export function useSidebarData(): SidebarData {
             // Core HR
             {
               title: 'sidebar.nav.employees',
-              url: '/dashboard/hr/employees',
+              url: ROUTES.dashboard.hr.employees.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.orgStructure',
-              url: '/dashboard/hr/organizational-structure',
+              url: ROUTES.dashboard.hr.organizationalStructure.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.jobPositions',
-              url: '/dashboard/hr/job-positions',
+              url: ROUTES.dashboard.hr.jobPositions.list,
               module: 'hr',
             },
             // Time & Attendance
             {
               title: 'sidebar.nav.attendance',
-              url: '/dashboard/hr/attendance',
+              url: ROUTES.dashboard.hr.attendance.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.shiftTypes',
-              url: '/dashboard/hr/settings/shift-types',
+              url: ROUTES.dashboard.hr.settings.shiftTypes.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.shiftAssignments',
-              url: '/dashboard/hr/shift-assignments',
+              url: ROUTES.dashboard.hr.shiftAssignments.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.leave',
-              url: '/dashboard/hr/leave',
+              url: ROUTES.dashboard.hr.leave.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.leavePeriods',
-              url: '/dashboard/hr/leave/periods',
+              url: ROUTES.dashboard.hr.leave.periods,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.leavePolicies',
-              url: '/dashboard/hr/leave/policies',
+              url: ROUTES.dashboard.hr.leave.policies,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.leaveAllocations',
-              url: '/dashboard/hr/leave/allocations',
+              url: ROUTES.dashboard.hr.leave.allocations,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.leaveEncashments',
-              url: '/dashboard/hr/leave/encashments',
+              url: ROUTES.dashboard.hr.leave.encashments.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.compensatoryLeave',
-              url: '/dashboard/hr/leave/compensatory',
+              url: ROUTES.dashboard.hr.leave.compensatory.list,
               module: 'hr',
             },
             // Payroll & Compensation
             {
               title: 'sidebar.nav.payroll',
-              url: '/dashboard/hr/payroll',
+              url: ROUTES.dashboard.hr.payroll.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.payrollRuns',
-              url: '/dashboard/hr/payroll-runs',
+              url: ROUTES.dashboard.hr.payrollRuns.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.salaryComponents',
-              url: '/dashboard/hr/payroll/salary-components',
+              url: ROUTES.dashboard.hr.payroll.salaryComponents,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.compensation',
-              url: '/dashboard/hr/compensation',
+              url: ROUTES.dashboard.hr.compensation.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.retentionBonuses',
-              url: '/dashboard/hr/compensation/retention-bonuses',
+              url: ROUTES.dashboard.hr.compensation.retentionBonuses,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.employeeIncentives',
-              url: '/dashboard/hr/compensation/incentives',
+              url: ROUTES.dashboard.hr.compensation.incentives,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.benefits',
-              url: '/dashboard/hr/benefits',
+              url: ROUTES.dashboard.hr.benefits.list,
               module: 'hr',
             },
             // Financial
             {
               title: 'sidebar.nav.advances',
-              url: '/dashboard/hr/advances',
+              url: ROUTES.dashboard.hr.advances.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.loans',
-              url: '/dashboard/hr/loans',
+              url: ROUTES.dashboard.hr.loans.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.expenseClaims',
-              url: '/dashboard/hr/expense-claims',
+              url: ROUTES.dashboard.hr.expenseClaims.list,
               module: 'hr',
             },
             // Performance & Development
             {
               title: 'sidebar.nav.performance',
-              url: '/dashboard/hr/performance',
+              url: ROUTES.dashboard.hr.performance.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.training',
-              url: '/dashboard/hr/training',
+              url: ROUTES.dashboard.hr.training.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.successionPlanning',
-              url: '/dashboard/hr/succession-planning',
+              url: ROUTES.dashboard.hr.successionPlanning.list,
               module: 'hr',
             },
             // Recruitment & Lifecycle
             {
               title: 'sidebar.nav.recruitment',
-              url: '/dashboard/hr/recruitment/jobs',
+              url: ROUTES.dashboard.hr.recruitment.jobs.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.applicants',
-              url: '/dashboard/hr/recruitment/applicants',
+              url: ROUTES.dashboard.hr.recruitment.applicants.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.staffingPlans',
-              url: '/dashboard/hr/recruitment/staffing-plans',
+              url: ROUTES.dashboard.hr.recruitment.staffingPlans.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.onboarding',
-              url: '/dashboard/hr/onboarding',
+              url: ROUTES.dashboard.hr.onboarding.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.offboarding',
-              url: '/dashboard/hr/offboarding',
+              url: ROUTES.dashboard.hr.offboarding.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.promotions',
-              url: '/dashboard/hr/promotions',
+              url: ROUTES.dashboard.hr.promotions.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.transfers',
-              url: '/dashboard/hr/employee-transfers',
+              url: ROUTES.dashboard.hr.employeeTransfers.list,
               module: 'hr',
             },
             // Assets & Vehicles
             {
               title: 'sidebar.nav.assetAssignment',
-              url: '/dashboard/hr/asset-assignment',
+              url: ROUTES.dashboard.hr.assetAssignment.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.vehicles',
-              url: '/dashboard/hr/vehicles',
+              url: ROUTES.dashboard.hr.vehicles.list,
               module: 'hr',
             },
             // Skills
             {
               title: 'sidebar.nav.skills',
-              url: '/dashboard/hr/skills',
+              url: ROUTES.dashboard.hr.skills.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.skillMatrix',
-              url: '/dashboard/hr/skills/matrix',
+              url: ROUTES.dashboard.hr.skills.matrix,
               module: 'hr',
             },
             // Grievances
             {
               title: 'sidebar.nav.grievances',
-              url: '/dashboard/hr/grievances',
+              url: ROUTES.dashboard.hr.grievances.list,
               module: 'hr',
             },
             // Reports
             {
               title: 'sidebar.nav.hrReports',
-              url: '/dashboard/hr/reports',
+              url: ROUTES.dashboard.hr.reports.list,
               module: 'hr',
             },
             // Biometric & Geofencing
             {
               title: 'sidebar.nav.biometric',
-              url: '/dashboard/hr/biometric',
+              url: ROUTES.dashboard.hr.biometric.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.geofencing',
-              url: '/dashboard/hr/geofencing',
+              url: ROUTES.dashboard.hr.geofencing.list,
               module: 'hr',
             },
             // Analytics & Predictions
             {
               title: 'sidebar.nav.hrAnalytics',
-              url: '/dashboard/hr/analytics',
+              url: ROUTES.dashboard.hr.analytics.list,
               module: 'hr',
             },
             {
               title: 'sidebar.nav.aiPredictions',
-              url: '/dashboard/hr/predictions',
+              url: ROUTES.dashboard.hr.predictions.list,
               module: 'hr',
             },
             // HR Setup
             {
               title: 'sidebar.nav.hrSetupWizard',
-              url: '/dashboard/hr/setup-wizard',
+              url: ROUTES.dashboard.hr.setupWizard,
               module: 'hr',
             },
           ],
@@ -843,15 +843,15 @@ export function useSidebarData(): SidebarData {
           items: [
             {
               title: 'sidebar.nav.laws',
-              url: '/dashboard/knowledge/laws',
+              url: ROUTES.dashboard.knowledge.laws,
             },
             {
               title: 'sidebar.nav.judgments',
-              url: '/dashboard/knowledge/judgments',
+              url: ROUTES.dashboard.knowledge.judgments,
             },
             {
               title: 'sidebar.nav.forms',
-              url: '/dashboard/knowledge/forms',
+              url: ROUTES.dashboard.knowledge.forms,
             },
           ],
         },
@@ -866,11 +866,11 @@ export function useSidebarData(): SidebarData {
           items: [
             {
               title: 'sidebar.nav.excellenceOverview',
-              url: '/dashboard/reputation/overview',
+              url: ROUTES.dashboard.reputation.overview,
             },
             {
               title: 'sidebar.nav.badges',
-              url: '/dashboard/reputation/badges',
+              url: ROUTES.dashboard.reputation.badges,
             },
           ],
         },
@@ -898,16 +898,16 @@ export function useSidebarData(): SidebarData {
             },
             {
               title: 'sidebar.nav.apps',
-              url: '/dashboard/apps',
+              url: ROUTES.dashboard.apps.list,
             },
             {
               title: 'sidebar.nav.importExport',
-              url: '/dashboard/data-export',
+              url: ROUTES.dashboard.dataExport.list,
               module: 'reports',
             },
             {
               title: 'sidebar.nav.helpCenter',
-              url: '/dashboard/help',
+              url: ROUTES.dashboard.help,
             },
             // CRM Settings
             {

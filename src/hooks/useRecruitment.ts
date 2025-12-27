@@ -1,5 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
+import { QueryKeys } from '@/lib/query-keys'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import recruitmentService, {
   type JobPosting,
   type JobPostingFilters,
@@ -20,32 +22,11 @@ const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
 const STATS_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour
 const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
 
-// Query Keys
-export const recruitmentKeys = {
-  // Job Postings
-  jobs: ['job-postings'] as const,
-  jobLists: () => [...recruitmentKeys.jobs, 'list'] as const,
-  jobList: (filters?: JobPostingFilters) => [...recruitmentKeys.jobLists(), filters] as const,
-  jobDetails: () => [...recruitmentKeys.jobs, 'detail'] as const,
-  jobDetail: (id: string) => [...recruitmentKeys.jobDetails(), id] as const,
-  jobStats: () => [...recruitmentKeys.jobs, 'stats'] as const,
-
-  // Applicants
-  applicants: ['applicants'] as const,
-  applicantLists: () => [...recruitmentKeys.applicants, 'list'] as const,
-  applicantList: (filters?: ApplicantFilters) => [...recruitmentKeys.applicantLists(), filters] as const,
-  applicantDetails: () => [...recruitmentKeys.applicants, 'detail'] as const,
-  applicantDetail: (id: string) => [...recruitmentKeys.applicantDetails(), id] as const,
-  applicantStats: (jobId?: string) => [...recruitmentKeys.applicants, 'stats', jobId] as const,
-  jobApplicants: (jobId: string, filters?: ApplicantFilters) =>
-    [...recruitmentKeys.applicants, 'job', jobId, filters] as const,
-}
-
 // ==================== JOB POSTING HOOKS ====================
 
 export function useJobPostings(filters?: JobPostingFilters) {
   return useQuery({
-    queryKey: recruitmentKeys.jobList(filters),
+    queryKey: QueryKeys.recruitment.jobList(filters),
     queryFn: () => recruitmentService.getJobPostings(filters),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -54,7 +35,7 @@ export function useJobPostings(filters?: JobPostingFilters) {
 
 export function useJobPosting(jobId: string) {
   return useQuery({
-    queryKey: recruitmentKeys.jobDetail(jobId),
+    queryKey: QueryKeys.recruitment.jobDetail(jobId),
     queryFn: () => recruitmentService.getJobPosting(jobId),
     enabled: !!jobId,
   })
@@ -62,7 +43,7 @@ export function useJobPosting(jobId: string) {
 
 export function useRecruitmentStats() {
   return useQuery({
-    queryKey: recruitmentKeys.jobStats(),
+    queryKey: QueryKeys.recruitment.jobStats(),
     queryFn: () => recruitmentService.getRecruitmentStats(),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -71,7 +52,7 @@ export function useRecruitmentStats() {
 
 export function useJobPostingStats() {
   return useQuery({
-    queryKey: recruitmentKeys.jobStats(),
+    queryKey: QueryKeys.recruitment.jobStats(),
     queryFn: () => recruitmentService.getJobPostingStats(),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -80,7 +61,7 @@ export function useJobPostingStats() {
 
 export function useTalentPool() {
   return useQuery({
-    queryKey: ['talent-pool'],
+    queryKey: QueryKeys.recruitment.talentPool(),
     queryFn: () => recruitmentService.getTalentPool(),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -89,7 +70,7 @@ export function useTalentPool() {
 
 export function useJobsNearingDeadline() {
   return useQuery({
-    queryKey: ['jobs-nearing-deadline'],
+    queryKey: QueryKeys.recruitment.jobsNearingDeadline(),
     queryFn: () => recruitmentService.getJobsNearingDeadline(),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -98,124 +79,106 @@ export function useJobsNearingDeadline() {
 
 export function useJobPipeline(jobId: string) {
   return useQuery({
-    queryKey: ['job-pipeline', jobId],
+    queryKey: QueryKeys.recruitment.jobPipeline(jobId),
     queryFn: () => recruitmentService.getJobPipeline(jobId),
     enabled: !!jobId,
   })
 }
 
 export function useCreateJobPosting() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: Partial<JobPosting>) => recruitmentService.createJobPosting(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobLists() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobStats() })
+      invalidateCache.recruitment.jobLists()
+      invalidateCache.recruitment.jobStats()
     },
   })
 }
 
 export function useUpdateJobPosting() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ jobId, data }: { jobId: string; data: Partial<JobPosting> }) =>
       recruitmentService.updateJobPosting(jobId, data),
     onSuccess: (_, { jobId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobDetail(jobId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobLists() })
+      invalidateCache.recruitment.jobDetail(jobId)
+      invalidateCache.recruitment.jobLists()
     },
   })
 }
 
 export function useDeleteJobPosting() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (jobId: string) => recruitmentService.deleteJobPosting(jobId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobLists() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobStats() })
+      invalidateCache.recruitment.jobLists()
+      invalidateCache.recruitment.jobStats()
     },
   })
 }
 
 export function usePublishJobPosting() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (jobId: string) => recruitmentService.publishJobPosting(jobId),
     onSuccess: (_, jobId) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobDetail(jobId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobLists() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobStats() })
+      invalidateCache.recruitment.jobDetail(jobId)
+      invalidateCache.recruitment.jobLists()
+      invalidateCache.recruitment.jobStats()
     },
   })
 }
 
 export function useCloseJobPosting() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ jobId, reason }: { jobId: string; reason?: string }) =>
       recruitmentService.closeJobPosting(jobId, reason),
     onSuccess: (_, { jobId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobDetail(jobId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobLists() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobStats() })
+      invalidateCache.recruitment.jobDetail(jobId)
+      invalidateCache.recruitment.jobLists()
+      invalidateCache.recruitment.jobStats()
     },
   })
 }
 
 export function useHoldJobPosting() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ jobId, reason }: { jobId: string; reason?: string }) =>
       recruitmentService.holdJobPosting(jobId, reason),
     onSuccess: (_, { jobId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobDetail(jobId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobLists() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobStats() })
+      invalidateCache.recruitment.jobDetail(jobId)
+      invalidateCache.recruitment.jobLists()
+      invalidateCache.recruitment.jobStats()
     },
   })
 }
 
 export function useDuplicateJobPosting() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (jobId: string) => recruitmentService.duplicateJobPosting(jobId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobLists() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobStats() })
+      invalidateCache.recruitment.jobLists()
+      invalidateCache.recruitment.jobStats()
     },
   })
 }
 
 export function useCloneJobPosting() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (jobId: string) => recruitmentService.cloneJobPosting(jobId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobLists() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobStats() })
+      invalidateCache.recruitment.jobLists()
+      invalidateCache.recruitment.jobStats()
     },
   })
 }
 
 export function useChangeJobStatus() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ jobId, status, reason }: { jobId: string; status: any; reason?: string }) =>
       recruitmentService.changeJobStatus(jobId, status, reason),
     onSuccess: (_, { jobId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobDetail(jobId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobLists() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobStats() })
+      invalidateCache.recruitment.jobDetail(jobId)
+      invalidateCache.recruitment.jobLists()
+      invalidateCache.recruitment.jobStats()
     },
   })
 }
@@ -224,7 +187,7 @@ export function useChangeJobStatus() {
 
 export function useApplicants(filters?: ApplicantFilters) {
   return useQuery({
-    queryKey: recruitmentKeys.applicantList(filters),
+    queryKey: QueryKeys.recruitment.applicantList(filters),
     queryFn: () => recruitmentService.getApplicants(filters),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -233,7 +196,7 @@ export function useApplicants(filters?: ApplicantFilters) {
 
 export function useJobApplicants(jobId: string, filters?: ApplicantFilters) {
   return useQuery({
-    queryKey: recruitmentKeys.jobApplicants(jobId, filters),
+    queryKey: QueryKeys.recruitment.applicantList(filters),
     queryFn: () => recruitmentService.getJobApplicants(jobId, filters),
     enabled: !!jobId,
   })
@@ -241,7 +204,7 @@ export function useJobApplicants(jobId: string, filters?: ApplicantFilters) {
 
 export function useApplicant(applicantId: string) {
   return useQuery({
-    queryKey: recruitmentKeys.applicantDetail(applicantId),
+    queryKey: QueryKeys.recruitment.applicantDetail(applicantId),
     queryFn: () => recruitmentService.getApplicant(applicantId),
     enabled: !!applicantId,
   })
@@ -249,7 +212,7 @@ export function useApplicant(applicantId: string) {
 
 export function useApplicantStats(jobId?: string) {
   return useQuery({
-    queryKey: recruitmentKeys.applicantStats(jobId),
+    queryKey: QueryKeys.recruitment.applicantStats(),
     queryFn: () => recruitmentService.getApplicantStats(jobId),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -257,34 +220,28 @@ export function useApplicantStats(jobId?: string) {
 }
 
 export function useCreateApplicant() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: Partial<Applicant>) => recruitmentService.createApplicant(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantStats() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobLists() })
+      invalidateCache.recruitment.applicantLists()
+      invalidateCache.recruitment.applicantStats()
+      invalidateCache.recruitment.jobLists()
     },
   })
 }
 
 export function useUpdateApplicant() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ applicantId, data }: { applicantId: string; data: Partial<Applicant> }) =>
       recruitmentService.updateApplicant(applicantId, data),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
+      invalidateCache.recruitment.applicantDetail(applicantId)
+      invalidateCache.recruitment.applicantLists()
     },
   })
 }
 
 export function useUpdateApplicantStatus() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -296,16 +253,14 @@ export function useUpdateApplicantStatus() {
       notes?: string
     }) => recruitmentService.updateApplicantStatus(applicantId, status, notes),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantStats() })
+      invalidateCache.recruitment.applicantDetail(applicantId)
+      invalidateCache.recruitment.applicantLists()
+      invalidateCache.recruitment.applicantStats()
     },
   })
 }
 
 export function useUpdateApplicantStage() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -317,16 +272,14 @@ export function useUpdateApplicantStage() {
       notes?: string
     }) => recruitmentService.updateApplicantStage(applicantId, stage, notes),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantStats() })
+      invalidateCache.recruitment.applicantDetail(applicantId)
+      invalidateCache.recruitment.applicantLists()
+      invalidateCache.recruitment.applicantStats()
     },
   })
 }
 
 export function useUpdateTalentPoolStatus() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -338,15 +291,13 @@ export function useUpdateTalentPoolStatus() {
       talentPoolNotes?: string
     }) => recruitmentService.updateTalentPoolStatus(applicantId, inTalentPool, talentPoolNotes),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
+      invalidateCache.recruitment.applicantDetail(applicantId)
+      invalidateCache.recruitment.applicantLists()
     },
   })
 }
 
 export function useScreenApplicant() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -361,9 +312,9 @@ export function useScreenApplicant() {
       }
     }) => recruitmentService.screenApplicant(applicantId, data),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantStats() })
+      invalidateCache.recruitment.applicantDetail(applicantId)
+      invalidateCache.recruitment.applicantLists()
+      invalidateCache.recruitment.applicantStats()
     },
   })
 }
@@ -371,8 +322,6 @@ export function useScreenApplicant() {
 // ==================== INTERVIEW HOOKS ====================
 
 export function useScheduleInterview() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -382,15 +331,13 @@ export function useScheduleInterview() {
       data: Omit<Interview, 'interviewId' | 'interviewNumber' | 'status' | 'overallRecommendation'>
     }) => recruitmentService.scheduleInterview(applicantId, data),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
+      invalidateCache.recruitment.applicantDetail(applicantId)
+      invalidateCache.recruitment.applicantLists()
     },
   })
 }
 
 export function useUpdateInterview() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -402,14 +349,12 @@ export function useUpdateInterview() {
       data: Partial<Interview>
     }) => recruitmentService.updateInterview(applicantId, interviewId, data),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
+      invalidateCache.recruitment.applicantDetail(applicantId)
     },
   })
 }
 
 export function useSubmitInterviewFeedback() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -427,15 +372,13 @@ export function useSubmitInterviewFeedback() {
       }
     }) => recruitmentService.submitInterviewFeedback(applicantId, interviewId, data),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
+      invalidateCache.recruitment.applicantDetail(applicantId)
+      invalidateCache.recruitment.applicantLists()
     },
   })
 }
 
 export function useCompleteInterview() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -457,8 +400,8 @@ export function useCompleteInterview() {
       }
     }) => recruitmentService.completeInterview(applicantId, interviewId, data),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
+      invalidateCache.recruitment.applicantDetail(applicantId)
+      invalidateCache.recruitment.applicantLists()
     },
   })
 }
@@ -466,8 +409,6 @@ export function useCompleteInterview() {
 // ==================== ASSESSMENT HOOKS ====================
 
 export function useAssignAssessment() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -477,15 +418,13 @@ export function useAssignAssessment() {
       data: Omit<Assessment, 'assessmentId' | 'status' | 'passed'>
     }) => recruitmentService.assignAssessment(applicantId, data),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
+      invalidateCache.recruitment.applicantDetail(applicantId)
+      invalidateCache.recruitment.applicantLists()
     },
   })
 }
 
 export function useCompleteAssessment() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -507,8 +446,8 @@ export function useCompleteAssessment() {
       }
     }) => recruitmentService.completeAssessment(applicantId, assessmentId, data),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
+      invalidateCache.recruitment.applicantDetail(applicantId)
+      invalidateCache.recruitment.applicantLists()
     },
   })
 }
@@ -516,8 +455,6 @@ export function useCompleteAssessment() {
 // ==================== BACKGROUND CHECK HOOKS ====================
 
 export function useInitiateBackgroundCheck() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -532,15 +469,13 @@ export function useInitiateBackgroundCheck() {
       }
     }) => recruitmentService.initiateBackgroundCheck(applicantId, data),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
+      invalidateCache.recruitment.applicantDetail(applicantId)
+      invalidateCache.recruitment.applicantLists()
     },
   })
 }
 
 export function useUpdateBackgroundCheck() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -550,7 +485,7 @@ export function useUpdateBackgroundCheck() {
       data: Partial<BackgroundCheck>
     }) => recruitmentService.updateBackgroundCheck(applicantId, data),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
+      invalidateCache.recruitment.applicantDetail(applicantId)
     },
   })
 }
@@ -558,8 +493,6 @@ export function useUpdateBackgroundCheck() {
 // ==================== OFFER HOOKS ====================
 
 export function useExtendOffer() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -569,16 +502,14 @@ export function useExtendOffer() {
       data: Omit<Offer, 'offerStatus' | 'offerExtended'>
     }) => recruitmentService.extendOffer(applicantId, data),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantStats() })
+      invalidateCache.recruitment.applicantDetail(applicantId)
+      invalidateCache.recruitment.applicantLists()
+      invalidateCache.recruitment.applicantStats()
     },
   })
 }
 
 export function useUpdateOffer() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -588,14 +519,12 @@ export function useUpdateOffer() {
       data: Partial<Offer>
     }) => recruitmentService.updateOffer(applicantId, data),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
+      invalidateCache.recruitment.applicantDetail(applicantId)
     },
   })
 }
 
 export function useAcceptOffer() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -605,16 +534,14 @@ export function useAcceptOffer() {
       data: { acceptedDate: string; signedOfferUrl?: string }
     }) => recruitmentService.acceptOffer(applicantId, data),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantStats() })
+      invalidateCache.recruitment.applicantDetail(applicantId)
+      invalidateCache.recruitment.applicantLists()
+      invalidateCache.recruitment.applicantStats()
     },
   })
 }
 
 export function useRejectOffer() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -624,9 +551,9 @@ export function useRejectOffer() {
       data: { rejectionDate: string; rejectionReason: string }
     }) => recruitmentService.rejectOffer(applicantId, data),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantStats() })
+      invalidateCache.recruitment.applicantDetail(applicantId)
+      invalidateCache.recruitment.applicantLists()
+      invalidateCache.recruitment.applicantStats()
     },
   })
 }
@@ -634,8 +561,6 @@ export function useRejectOffer() {
 // ==================== HIRING HOOKS ====================
 
 export function useHireApplicant() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -649,18 +574,16 @@ export function useHireApplicant() {
       }
     }) => recruitmentService.hireApplicant(applicantId, data),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantStats() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobLists() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobStats() })
+      invalidateCache.recruitment.applicantDetail(applicantId)
+      invalidateCache.recruitment.applicantLists()
+      invalidateCache.recruitment.applicantStats()
+      invalidateCache.recruitment.jobLists()
+      invalidateCache.recruitment.jobStats()
     },
   })
 }
 
 export function useRejectApplicant() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -677,9 +600,9 @@ export function useRejectApplicant() {
       }
     }) => recruitmentService.rejectApplicant(applicantId, data),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantStats() })
+      invalidateCache.recruitment.applicantDetail(applicantId)
+      invalidateCache.recruitment.applicantLists()
+      invalidateCache.recruitment.applicantStats()
     },
   })
 }
@@ -687,8 +610,6 @@ export function useRejectApplicant() {
 // ==================== COMMUNICATION HOOKS ====================
 
 export function useAddCommunication() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -698,14 +619,12 @@ export function useAddCommunication() {
       data: Omit<Communication, 'communicationId'>
     }) => recruitmentService.addCommunication(applicantId, data),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
+      invalidateCache.recruitment.applicantDetail(applicantId)
     },
   })
 }
 
 export function useAddNote() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -717,32 +636,28 @@ export function useAddNote() {
       note: string
     }) => recruitmentService.addNote(applicantId, noteType, note),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
+      invalidateCache.recruitment.applicantDetail(applicantId)
     },
   })
 }
 
 export function useFlagApplicant() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ applicantId, flagReason }: { applicantId: string; flagReason: string }) =>
       recruitmentService.flagApplicant(applicantId, flagReason),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
+      invalidateCache.recruitment.applicantDetail(applicantId)
+      invalidateCache.recruitment.applicantLists()
     },
   })
 }
 
 export function useUnflagApplicant() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (applicantId: string) => recruitmentService.unflagApplicant(applicantId),
     onSuccess: (_, applicantId) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
+      invalidateCache.recruitment.applicantDetail(applicantId)
+      invalidateCache.recruitment.applicantLists()
     },
   })
 }
@@ -750,8 +665,6 @@ export function useUnflagApplicant() {
 // ==================== REFERENCE HOOKS ====================
 
 export function useAddReference() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -761,14 +674,12 @@ export function useAddReference() {
       data: any
     }) => recruitmentService.addReference(applicantId, data),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
+      invalidateCache.recruitment.applicantDetail(applicantId)
     },
   })
 }
 
 export function useUpdateReferenceCheck() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantId,
@@ -780,7 +691,7 @@ export function useUpdateReferenceCheck() {
       data: any
     }) => recruitmentService.updateReferenceCheck(applicantId, referenceId, data),
     onSuccess: (_, { applicantId }) => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
+      invalidateCache.recruitment.applicantDetail(applicantId)
     },
   })
 }
@@ -788,8 +699,6 @@ export function useUpdateReferenceCheck() {
 // ==================== BULK OPERATIONS ====================
 
 export function useBulkUpdateStage() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantIds,
@@ -801,15 +710,13 @@ export function useBulkUpdateStage() {
       notes?: string
     }) => recruitmentService.bulkUpdateStage(applicantIds, stage, notes),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantStats() })
+      invalidateCache.recruitment.applicantLists()
+      invalidateCache.recruitment.applicantStats()
     },
   })
 }
 
 export function useBulkReject() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantIds,
@@ -821,15 +728,13 @@ export function useBulkReject() {
       rejectionCategory: string
     }) => recruitmentService.bulkReject(applicantIds, rejectionReason, rejectionCategory),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantStats() })
+      invalidateCache.recruitment.applicantLists()
+      invalidateCache.recruitment.applicantStats()
     },
   })
 }
 
 export function useBulkUpdateApplicants() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       applicantIds,
@@ -839,8 +744,8 @@ export function useBulkUpdateApplicants() {
       data: { status?: ApplicantStatus; notes?: string }
     }) => recruitmentService.bulkUpdateApplicants(applicantIds, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
-      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantStats() })
+      invalidateCache.recruitment.applicantLists()
+      invalidateCache.recruitment.applicantStats()
     },
   })
 }

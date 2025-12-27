@@ -26,6 +26,7 @@ import {
 } from '@/services/hrAnalyticsService'
 import { useAuthStore } from '@/stores/auth-store'
 import apiClient from '@/lib/api'
+import { CACHE_TIMES } from '@/config/cache'
 
 // ═══════════════════════════════════════════════════════════════
 // WORKFORCE ANALYTICS HOOKS
@@ -43,7 +44,7 @@ export const useHRDashboard = (params?: {
   return useQuery<HRDashboardData>({
     queryKey: ['hr-dashboard', params],
     queryFn: () => hrAnalyticsService.getDashboard(params),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -54,7 +55,7 @@ export const useWorkforceOverview = () => {
   return useQuery<HRDashboardData>({
     queryKey: ['hr-workforce-overview'],
     queryFn: () => hrAnalyticsService.getDashboard(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -69,7 +70,7 @@ export const useHeadcountTrends = (params?: {
   return useQuery({
     queryKey: ['hr-headcount-trends', params],
     queryFn: () => hrAnalyticsService.getTrends({ limit: 12 }),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -80,7 +81,7 @@ export const useDepartmentBreakdown = () => {
   return useQuery<DemographicsData>({
     queryKey: ['hr-department-breakdown'],
     queryFn: () => hrAnalyticsService.getDemographics(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -91,7 +92,7 @@ export const useTenureDistribution = () => {
   return useQuery<DemographicsData>({
     queryKey: ['hr-tenure-distribution'],
     queryFn: () => hrAnalyticsService.getDemographics(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -105,7 +106,7 @@ export const usePayrollAnalytics = (params?: {
   return useQuery<CompensationData>({
     queryKey: ['hr-payroll-analytics', params],
     queryFn: () => hrAnalyticsService.getCompensation(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -116,7 +117,7 @@ export const useDiversityAnalytics = () => {
   return useQuery<DemographicsData>({
     queryKey: ['hr-diversity-analytics'],
     queryFn: () => hrAnalyticsService.getDemographics(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -130,7 +131,7 @@ export const useDemographics = (params?: {
   return useQuery<DemographicsData>({
     queryKey: ['hr-demographics', params],
     queryFn: () => hrAnalyticsService.getDemographics(params),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -145,7 +146,7 @@ export const useTurnover = (params?: {
   return useQuery<TurnoverData>({
     queryKey: ['hr-turnover', params],
     queryFn: () => hrAnalyticsService.getTurnover(params),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -160,7 +161,7 @@ export const useAbsenteeism = (params?: {
   return useQuery({
     queryKey: ['hr-absenteeism', params],
     queryFn: () => hrAnalyticsService.getAbsenteeism(params),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -175,7 +176,7 @@ export const useAttendanceAnalytics = (params?: {
   return useQuery({
     queryKey: ['hr-attendance-analytics', params],
     queryFn: () => hrAnalyticsService.getAttendance(params),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -190,7 +191,7 @@ export const usePerformanceAnalytics = (params?: {
   return useQuery({
     queryKey: ['hr-performance-analytics', params],
     queryFn: () => hrAnalyticsService.getPerformance(params),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -205,7 +206,7 @@ export const useRecruitmentAnalytics = (params?: {
   return useQuery({
     queryKey: ['hr-recruitment-analytics', params],
     queryFn: () => hrAnalyticsService.getRecruitment(params),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -218,7 +219,7 @@ export const useCompensationAnalytics = (params?: {
   return useQuery<CompensationData>({
     queryKey: ['hr-compensation-analytics', params],
     queryFn: () => hrAnalyticsService.getCompensation(params),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -233,7 +234,7 @@ export const useTrainingAnalytics = (params?: {
   return useQuery<TrainingData>({
     queryKey: ['hr-training-analytics', params],
     queryFn: () => hrAnalyticsService.getTraining(params),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -248,7 +249,7 @@ export const useLeaveAnalytics = (params?: {
   return useQuery({
     queryKey: ['hr-leave-analytics', params],
     queryFn: () => hrAnalyticsService.getLeave(params),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -259,7 +260,7 @@ export const useSaudization = () => {
   return useQuery<SaudizationData>({
     queryKey: ['hr-saudization'],
     queryFn: () => hrAnalyticsService.getSaudization(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -291,7 +292,7 @@ export const useTrends = (params?: {
   return useQuery<TrendSnapshot[]>({
     queryKey: ['hr-trends', params],
     queryFn: () => hrAnalyticsService.getTrends(params),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -337,7 +338,7 @@ export const useAttritionRisk = (params?: { department?: string }) => {
   return useQuery<AttritionRiskData>({
     queryKey: ['hr-attrition-risk', params],
     queryFn: () => hrPredictionsService.getAttritionRisk(params),
-    staleTime: 10 * 60 * 1000,
+    staleTime: CACHE_TIMES.GC_MEDIUM,
   })
 }
 
@@ -349,7 +350,7 @@ export const useEmployeeAttritionRisk = (employeeId: string) => {
     queryKey: ['hr-employee-attrition-risk', employeeId],
     queryFn: () => hrPredictionsService.getEmployeeAttritionRisk(employeeId),
     enabled: !!employeeId,
-    staleTime: 10 * 60 * 1000,
+    staleTime: CACHE_TIMES.GC_MEDIUM,
   })
 }
 
@@ -360,7 +361,7 @@ export const useWorkforceForecast = (months: number = 12) => {
   return useQuery<WorkforceForecastData>({
     queryKey: ['hr-workforce-forecast', months],
     queryFn: () => hrPredictionsService.getWorkforceForecast({ months }),
-    staleTime: 10 * 60 * 1000,
+    staleTime: CACHE_TIMES.GC_MEDIUM,
   })
 }
 
@@ -371,7 +372,7 @@ export const useHighPotential = (limit: number = 20) => {
   return useQuery<HighPotentialData>({
     queryKey: ['hr-high-potential', limit],
     queryFn: () => hrPredictionsService.getHighPotential({ limit }),
-    staleTime: 10 * 60 * 1000,
+    staleTime: CACHE_TIMES.GC_MEDIUM,
   })
 }
 
@@ -382,7 +383,7 @@ export const useFlightRisk = () => {
   return useQuery<FlightRiskData>({
     queryKey: ['hr-flight-risk'],
     queryFn: () => hrPredictionsService.getFlightRisk(),
-    staleTime: 10 * 60 * 1000,
+    staleTime: CACHE_TIMES.GC_MEDIUM,
   })
 }
 
@@ -393,7 +394,7 @@ export const useAbsencePredictions = () => {
   return useQuery<AbsencePredictionData>({
     queryKey: ['hr-absence-predictions'],
     queryFn: () => hrPredictionsService.getAbsencePredictions(),
-    staleTime: 10 * 60 * 1000,
+    staleTime: CACHE_TIMES.GC_MEDIUM,
   })
 }
 
@@ -404,7 +405,7 @@ export const useEngagementPredictions = () => {
   return useQuery<EngagementPredictionData>({
     queryKey: ['hr-engagement-predictions'],
     queryFn: () => hrPredictionsService.getEngagementPredictions(),
-    staleTime: 10 * 60 * 1000,
+    staleTime: CACHE_TIMES.GC_MEDIUM,
   })
 }
 
@@ -415,7 +416,7 @@ export const useHiringNeedsForecast = (months: number = 12) => {
   return useQuery<HiringNeedsForecastData>({
     queryKey: ['hr-hiring-needs-forecast', months],
     queryFn: () => hrPredictionsService.getHiringNeedsForecast(months),
-    staleTime: 10 * 60 * 1000,
+    staleTime: CACHE_TIMES.GC_MEDIUM,
   })
 }
 
@@ -426,7 +427,7 @@ export const usePromotionReadiness = (threshold: number = 75) => {
   return useQuery<PromotionReadinessData>({
     queryKey: ['hr-promotion-readiness', threshold],
     queryFn: () => hrPredictionsService.getPromotionReadiness(threshold),
-    staleTime: 10 * 60 * 1000,
+    staleTime: CACHE_TIMES.GC_MEDIUM,
   })
 }
 
@@ -477,8 +478,8 @@ export const useHRAnalyticsDashboard = () => {
       const response = await apiClient.get('/hr/analytics/dashboard')
       return response.data
     },
-    staleTime: 10 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
+    staleTime: CACHE_TIMES.GC_MEDIUM,
+    gcTime: CACHE_TIMES.LONG,
     enabled: isAuthenticated,
     retry: false,
     refetchOnWindowFocus: false,

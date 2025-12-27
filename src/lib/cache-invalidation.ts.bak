@@ -120,27 +120,6 @@ export const invalidateCache = {
     },
   },
 
-  // Expense Claims
-  expenseClaims: {
-    all: () => queryClient.invalidateQueries({ queryKey: ['expense-claims'] }),
-    lists: () => queryClient.invalidateQueries({ queryKey: ['expense-claims', 'list'] }),
-    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['expense-claims', 'detail', id] }),
-    stats: () => queryClient.invalidateQueries({ queryKey: ['expense-claims', 'stats'] }),
-    pendingApprovals: () => queryClient.invalidateQueries({ queryKey: ['expense-claims', 'pending-approvals'] }),
-    pendingPayments: () => queryClient.invalidateQueries({ queryKey: ['expense-claims', 'pending-payments'] }),
-    employeeClaims: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['expense-claims', 'employee', employeeId] }),
-    mileageRates: () => queryClient.invalidateQueries({ queryKey: ['expense-claims', 'mileage-rates'] }),
-    corporateCard: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['expense-claims', 'corporate-card', employeeId] }),
-    policies: () => queryClient.invalidateQueries({ queryKey: ['expense-policies'] }),
-    related: async () => {
-      await Promise.all([
-        invalidateCache.expenseClaims.all(),
-        invalidateCache.expenses.all(),
-        invalidateCache.finance.dashboard(),
-      ])
-    },
-  },
-
   // Journal Entries (not found in hooks, but mentioned in requirements)
   journalEntries: {
     all: () => queryClient.invalidateQueries({ queryKey: ['journal-entries'] }),
@@ -312,31 +291,8 @@ export const invalidateCache = {
   // Corporate Cards
   corporateCards: {
     all: () => queryClient.invalidateQueries({ queryKey: ['corporate-cards'] }),
-    lists: () => queryClient.invalidateQueries({ queryKey: ['corporate-cards', 'list'] }),
-    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['corporate-cards', 'detail', id] }),
-    // Transactions
-    transactions: () => queryClient.invalidateQueries({ queryKey: ['card-transactions'] }),
-    transactionsList: () => queryClient.invalidateQueries({ queryKey: ['card-transactions', 'list'] }),
-    transactionDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['card-transactions', 'detail', id] }),
-    unreconciledTransactions: (cardId?: string) => queryClient.invalidateQueries({ queryKey: ['card-transactions', 'unreconciled', cardId] }),
-    disputedTransactions: (cardId?: string) => queryClient.invalidateQueries({ queryKey: ['card-transactions', 'disputed', cardId] }),
-    potentialMatches: (transactionId: string) => queryClient.invalidateQueries({ queryKey: ['card-transactions', transactionId, 'potential-matches'] }),
-    // Statistics
     statistics: () => queryClient.invalidateQueries({ queryKey: ['card-statistics'] }),
-    statisticsWithDates: (startDate?: string, endDate?: string) => queryClient.invalidateQueries({ queryKey: ['card-statistics', startDate, endDate] }),
-    // Reports
-    reconciliationReport: (cardId?: string, startDate?: string, endDate?: string) => queryClient.invalidateQueries({ queryKey: ['card-reconciliation-report', cardId, startDate, endDate] }),
-    spendingByCategory: (cardId?: string, startDate?: string, endDate?: string) => queryClient.invalidateQueries({ queryKey: ['card-spending-by-category', cardId, startDate, endDate] }),
-    spendingByCard: (startDate?: string, endDate?: string) => queryClient.invalidateQueries({ queryKey: ['card-spending-by-card', startDate, endDate] }),
-    monthlySpendingTrend: (cardId?: string, months?: number) => queryClient.invalidateQueries({ queryKey: ['card-monthly-spending-trend', cardId, months] }),
-    // Related invalidations for corporate card mutations
-    related: async () => {
-      await Promise.all([
-        invalidateCache.corporateCards.all(),
-        invalidateCache.corporateCards.transactions(),
-        invalidateCache.corporateCards.statistics(),
-      ])
-    },
+    transactions: () => queryClient.invalidateQueries({ queryKey: ['card-transactions'] }),
   },
 
   // Staff/Employees
@@ -870,23 +826,11 @@ export const invalidateCache = {
 
   // Gantt
   gantt: {
-    all: () => queryClient.invalidateQueries({ queryKey: ['gantt'] }),
     data: () => queryClient.invalidateQueries({ queryKey: ['gantt-data'] }),
     dhtmlx: () => queryClient.invalidateQueries({ queryKey: ['gantt-dhtmlx'] }),
-    productivity: () => queryClient.invalidateQueries({ queryKey: ['gantt', 'productivity'] }),
-    criticalPath: () => queryClient.invalidateQueries({ queryKey: ['gantt-critical-path'] }),
-    milestones: () => queryClient.invalidateQueries({ queryKey: ['gantt-milestones'] }),
     baselines: () => queryClient.invalidateQueries({ queryKey: ['gantt-baselines'] }),
-    baselineCompare: () => queryClient.invalidateQueries({ queryKey: ['gantt-baseline-compare'] }),
+    milestones: () => queryClient.invalidateQueries({ queryKey: ['gantt-milestones'] }),
     resourceLoading: () => queryClient.invalidateQueries({ queryKey: ['gantt-resource-loading'] }),
-    resourceWorkload: () => queryClient.invalidateQueries({ queryKey: ['gantt-resource-workload'] }),
-    related: async () => {
-      await Promise.all([
-        invalidateCache.gantt.data(),
-        invalidateCache.gantt.dhtmlx(),
-        invalidateCache.gantt.productivity(),
-      ])
-    },
   },
 
   // Smart Buttons
@@ -913,36 +857,7 @@ export const invalidateCache = {
     data: (date?: string) => queryClient.invalidateQueries({ queryKey: ['sidebar', 'data', date] }),
   },
 
-  // CRM Advanced
-  crmAdvanced: {
-    // Email Templates
-    emailTemplates: () => queryClient.invalidateQueries({ queryKey: ['email-templates'] }),
-    emailTemplate: (id: string) => queryClient.invalidateQueries({ queryKey: ['email-template', id] }),
-    // Email Campaigns
-    emailCampaigns: () => queryClient.invalidateQueries({ queryKey: ['email-campaigns'] }),
-    emailCampaign: (id: string) => queryClient.invalidateQueries({ queryKey: ['email-campaign', id] }),
-    campaignAnalytics: (id: string) => queryClient.invalidateQueries({ queryKey: ['campaign-analytics', id] }),
-    // Drip Campaigns
-    dripCampaigns: () => queryClient.invalidateQueries({ queryKey: ['drip-campaigns'] }),
-    dripCampaign: (id: string) => queryClient.invalidateQueries({ queryKey: ['drip-campaign', id] }),
-    // Subscribers
-    subscribers: () => queryClient.invalidateQueries({ queryKey: ['subscribers'] }),
-    // Segments
-    segments: () => queryClient.invalidateQueries({ queryKey: ['segments'] }),
-    // Lead Scoring
-    leadScores: () => queryClient.invalidateQueries({ queryKey: ['lead-scores'] }),
-    leadInsights: (leadId: string) => queryClient.invalidateQueries({ queryKey: ['lead-insights', leadId] }),
-    leadLeaderboard: (limit?: number) => queryClient.invalidateQueries({ queryKey: ['lead-leaderboard', limit] }),
-    leadScoringConfig: () => queryClient.invalidateQueries({ queryKey: ['lead-scoring-config'] }),
-    leadScoreDistribution: () => queryClient.invalidateQueries({ queryKey: ['lead-score-distribution'] }),
-    // WhatsApp
-    whatsAppConversations: () => queryClient.invalidateQueries({ queryKey: ['whatsapp-conversations'] }),
-    whatsAppConversation: (id: string) => queryClient.invalidateQueries({ queryKey: ['whatsapp-conversation', id] }),
-    whatsAppTemplates: () => queryClient.invalidateQueries({ queryKey: ['whatsapp-templates'] }),
-    whatsAppBroadcasts: () => queryClient.invalidateQueries({ queryKey: ['whatsapp-broadcasts'] }),
-  },
-
-  // Email campaigns (legacy alias for backward compatibility)
+  // Email campaigns
   emailCampaigns: {
     all: () => queryClient.invalidateQueries({ queryKey: ['email-campaigns'] }),
     dripCampaigns: () => queryClient.invalidateQueries({ queryKey: ['drip-campaigns'] }),

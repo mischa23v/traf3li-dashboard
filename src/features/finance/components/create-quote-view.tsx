@@ -23,6 +23,7 @@ import { FinanceSidebar } from './finance-sidebar'
 import { useCreateQuote, useSendQuote } from '@/hooks/useQuotes'
 import { useClients, useCases } from '@/hooks/useCasesAndClients'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { ROUTES } from '@/constants/routes'
 
 export default function CreateQuoteView() {
     const navigate = useNavigate()
@@ -131,26 +132,26 @@ export default function CreateQuoteView() {
                 if (sendAfterCreate && data?._id) {
                     sendQuoteMutation.mutate(data._id, {
                         onSuccess: () => {
-                            navigate({ to: '/dashboard/finance/quotes' })
+                            navigate({ to: ROUTES.dashboard.finance.quotes.list })
                         },
                         onError: () => {
                             // Even if send fails, quote was created
-                            navigate({ to: '/dashboard/finance/quotes' })
+                            navigate({ to: ROUTES.dashboard.finance.quotes.list })
                         }
                     })
                 } else {
-                    navigate({ to: '/dashboard/finance/quotes' })
+                    navigate({ to: ROUTES.dashboard.finance.quotes.list })
                 }
             },
         })
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'عروض الأسعار', href: '/dashboard/finance/quotes', isActive: true },
-        { title: 'المدفوعات', href: '/dashboard/finance/payments', isActive: false },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: false },
+        { title: 'عروض الأسعار', href: ROUTES.dashboard.finance.quotes.list, isActive: true },
+        { title: 'المدفوعات', href: ROUTES.dashboard.finance.payments.list, isActive: false },
+        { title: 'المصروفات', href: ROUTES.dashboard.finance.expenses.list, isActive: false },
     ]
 
     return (

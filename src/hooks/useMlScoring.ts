@@ -6,6 +6,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
+import { CACHE_TIMES } from '@/config/cache'
 import {
   getMLScores,
   getMLScore,
@@ -76,7 +77,7 @@ export const useMLScores = (params?: GetMLScoresParams) => {
   return useQuery<{ data: MLScore[]; pagination: PaginationMeta }>({
     queryKey: mlScoringKeys.scoresList(params),
     queryFn: () => getMLScores(params),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -88,7 +89,7 @@ export const useMLScore = (leadId: string, enabled = true) => {
     queryKey: mlScoringKeys.score(leadId),
     queryFn: () => getMLScore(leadId),
     enabled: enabled && !!leadId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -100,7 +101,7 @@ export const useScoreExplanation = (leadId: string, enabled = true) => {
     queryKey: mlScoringKeys.explanation(leadId),
     queryFn: () => getScoreExplanation(leadId),
     enabled: enabled && !!leadId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -112,7 +113,7 @@ export const useHybridScore = (leadId: string, weights?: HybridScoreWeights, ena
     queryKey: mlScoringKeys.hybrid(leadId),
     queryFn: () => getHybridScore(leadId, weights),
     enabled: enabled && !!leadId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -179,7 +180,7 @@ export const usePriorityQueue = (params?: GetPriorityQueueParams) => {
     queryKey: mlScoringKeys.priorityQueueList(params),
     queryFn: () => getPriorityQueue(params),
     staleTime: 1 * 60 * 1000, // 1 minute - more frequent updates for queue
-    refetchInterval: 5 * 60 * 1000, // Auto-refresh every 5 minutes
+    refetchInterval: CACHE_TIMES.MEDIUM, // Auto-refresh every 5 minutes
   })
 }
 
@@ -190,7 +191,7 @@ export const useTeamWorkload = () => {
   return useQuery<{ data: { workload: TeamWorkloadItem[] } }>({
     queryKey: mlScoringKeys.teamWorkload(),
     queryFn: () => getTeamWorkload(),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -245,7 +246,7 @@ export const useSLAMetrics = (period?: string) => {
   return useQuery<{ data: SLAMetrics }>({
     queryKey: mlScoringKeys.slaMetrics(period),
     queryFn: () => getSLAMetrics(period),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -257,7 +258,7 @@ export const useSLABreaches = () => {
     queryKey: mlScoringKeys.slaBreaches(),
     queryFn: () => getSLABreaches(),
     staleTime: 1 * 60 * 1000, // 1 minute - important to keep updated
-    refetchInterval: 2 * 60 * 1000, // Auto-refresh every 2 minutes
+    refetchInterval: CACHE_TIMES.SHORT, // Auto-refresh every 2 minutes
   })
 }
 
@@ -270,7 +271,7 @@ export const useMLDashboard = (params?: GetMLDashboardParams) => {
   return useQuery<{ data: MLDashboardData }>({
     queryKey: mlScoringKeys.dashboard(params),
     queryFn: () => getMLDashboard(params),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -281,7 +282,7 @@ export const useFeatureImportance = () => {
   return useQuery<{ data: { features: FeatureImportance[] } }>({
     queryKey: mlScoringKeys.featureImportance(),
     queryFn: () => getFeatureImportance(),
-    staleTime: 30 * 60 * 1000, // 30 minutes - doesn't change often
+    staleTime: CACHE_TIMES.LONG, // 30 minutes - doesn't change often
   })
 }
 
@@ -292,7 +293,7 @@ export const useScoreDistribution = () => {
   return useQuery<{ data: ScoreDistribution }>({
     queryKey: mlScoringKeys.scoreDistribution(),
     queryFn: () => getScoreDistribution(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -305,7 +306,7 @@ export const useModelMetrics = () => {
   return useQuery<{ data: ModelMetrics }>({
     queryKey: mlScoringKeys.modelMetrics(),
     queryFn: () => getModelMetrics(),
-    staleTime: 10 * 60 * 1000,
+    staleTime: 10 * 60 * 1000, // 10 minutes
   })
 }
 
@@ -367,7 +368,7 @@ export const usePrefetchMLScore = () => {
     queryClient.prefetchQuery({
       queryKey: mlScoringKeys.score(leadId),
       queryFn: () => getMLScore(leadId),
-      staleTime: 2 * 60 * 1000,
+      staleTime: CACHE_TIMES.SHORT,
     })
   }
 }

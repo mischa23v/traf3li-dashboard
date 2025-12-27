@@ -518,14 +518,14 @@ export function CreateInvoiceView() {
                 clearError()
                 if (sendAfterCreate && data?._id) {
                     sendInvoiceMutation.mutate(data._id, {
-                        onSuccess: () => navigate({ to: '/dashboard/finance/invoices' }),
+                        onSuccess: () => navigate({ to: ROUTES.dashboard.finance.invoices.list }),
                         onError: (error) => {
                             handleApiError(error)
-                            navigate({ to: '/dashboard/finance/invoices' })
+                            navigate({ to: ROUTES.dashboard.finance.invoices.list })
                         }
                     })
                 } else {
-                    navigate({ to: '/dashboard/finance/invoices' })
+                    navigate({ to: ROUTES.dashboard.finance.invoices.list })
                 }
             },
             onError: (error) => {
@@ -537,13 +537,13 @@ export function CreateInvoiceView() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: true },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
-        { title: 'كشف الحساب', href: '/dashboard/finance/statements', isActive: false },
-        { title: 'المعاملات', href: '/dashboard/finance/transactions', isActive: false },
-        { title: 'تتبع الوقت', href: '/dashboard/finance/time-tracking', isActive: false },
-        { title: 'نشاط الحساب', href: '/dashboard/finance/activity', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: true },
+        { title: 'المصروفات', href: ROUTES.dashboard.finance.expenses.list, isActive: false },
+        { title: 'كشف الحساب', href: ROUTES.dashboard.finance.statements.list, isActive: false },
+        { title: 'المعاملات', href: ROUTES.dashboard.finance.transactions.list, isActive: false },
+        { title: 'تتبع الوقت', href: ROUTES.dashboard.finance.timeTracking.list, isActive: false },
+        { title: 'نشاط الحساب', href: ROUTES.dashboard.finance.activity.list, isActive: false },
     ]
 
     // Format currency

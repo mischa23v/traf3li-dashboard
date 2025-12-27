@@ -1,5 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
+import { QueryKeys } from '@/lib/query-keys'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   getTrainings,
   getTraining,
@@ -41,27 +43,10 @@ const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
 const STATS_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour
 const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
 
-// Query keys
-export const trainingKeys = {
-  all: ['trainings'] as const,
-  lists: () => [...trainingKeys.all, 'list'] as const,
-  list: (filters?: TrainingFilters) => [...trainingKeys.lists(), filters] as const,
-  details: () => [...trainingKeys.all, 'detail'] as const,
-  detail: (id: string) => [...trainingKeys.details(), id] as const,
-  stats: () => [...trainingKeys.all, 'stats'] as const,
-  byEmployee: (employeeId: string) => [...trainingKeys.all, 'employee', employeeId] as const,
-  pendingApprovals: () => [...trainingKeys.all, 'pending-approvals'] as const,
-  upcoming: () => [...trainingKeys.all, 'upcoming'] as const,
-  overdueCompliance: () => [...trainingKeys.all, 'overdue-compliance'] as const,
-  cleSummary: (employeeId: string) => [...trainingKeys.all, 'cle-summary', employeeId] as const,
-  calendar: (month: number, year: number) => [...trainingKeys.all, 'calendar', month, year] as const,
-  providers: () => [...trainingKeys.all, 'providers'] as const,
-}
-
 // Get all trainings
 export const useTrainings = (filters?: TrainingFilters) => {
   return useQuery({
-    queryKey: trainingKeys.list(filters),
+    queryKey: QueryKeys.training.list(filters),
     queryFn: () => getTrainings(filters),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -71,7 +56,7 @@ export const useTrainings = (filters?: TrainingFilters) => {
 // Get single training
 export const useTraining = (trainingId: string) => {
   return useQuery({
-    queryKey: trainingKeys.detail(trainingId),
+    queryKey: QueryKeys.training.detail(trainingId),
     queryFn: () => getTraining(trainingId),
     enabled: !!trainingId,
     staleTime: LIST_STALE_TIME,
@@ -82,7 +67,7 @@ export const useTraining = (trainingId: string) => {
 // Get training stats
 export const useTrainingStats = () => {
   return useQuery({
-    queryKey: trainingKeys.stats(),
+    queryKey: QueryKeys.training.stats(),
     queryFn: getTrainingStats,
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -92,7 +77,7 @@ export const useTrainingStats = () => {
 // Get employee trainings
 export const useEmployeeTrainings = (employeeId: string) => {
   return useQuery({
-    queryKey: trainingKeys.byEmployee(employeeId),
+    queryKey: QueryKeys.training.byEmployee(employeeId),
     queryFn: () => getEmployeeTrainings(employeeId),
     enabled: !!employeeId,
     staleTime: LIST_STALE_TIME,
@@ -103,7 +88,7 @@ export const useEmployeeTrainings = (employeeId: string) => {
 // Get pending approvals
 export const usePendingTrainingApprovals = () => {
   return useQuery({
-    queryKey: trainingKeys.pendingApprovals(),
+    queryKey: QueryKeys.training.pendingApprovals(),
     queryFn: getPendingTrainingApprovals,
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -113,7 +98,7 @@ export const usePendingTrainingApprovals = () => {
 // Get upcoming trainings
 export const useUpcomingTrainings = () => {
   return useQuery({
-    queryKey: trainingKeys.upcoming(),
+    queryKey: QueryKeys.training.upcoming(),
     queryFn: getUpcomingTrainings,
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -123,7 +108,7 @@ export const useUpcomingTrainings = () => {
 // Get overdue compliance trainings
 export const useOverdueComplianceTrainings = () => {
   return useQuery({
-    queryKey: trainingKeys.overdueCompliance(),
+    queryKey: QueryKeys.training.overdueCompliance(),
     queryFn: getOverdueComplianceTrainings,
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -133,7 +118,7 @@ export const useOverdueComplianceTrainings = () => {
 // Get CLE summary
 export const useCLESummary = (employeeId: string) => {
   return useQuery({
-    queryKey: trainingKeys.cleSummary(employeeId),
+    queryKey: QueryKeys.training.cleSummary(employeeId),
     queryFn: () => getCLESummary(employeeId),
     enabled: !!employeeId,
     staleTime: STATS_STALE_TIME,
@@ -144,7 +129,7 @@ export const useCLESummary = (employeeId: string) => {
 // Get training calendar
 export const useTrainingCalendar = (month: number, year: number) => {
   return useQuery({
-    queryKey: trainingKeys.calendar(month, year),
+    queryKey: QueryKeys.training.calendar(month, year),
     queryFn: () => getTrainingCalendar(month, year),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -154,7 +139,7 @@ export const useTrainingCalendar = (month: number, year: number) => {
 // Get training providers
 export const useTrainingProviders = () => {
   return useQuery({
-    queryKey: trainingKeys.providers(),
+    queryKey: QueryKeys.training.providers(),
     queryFn: getTrainingProviders,
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -163,118 +148,109 @@ export const useTrainingProviders = () => {
 
 // Create training
 export const useCreateTraining = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateTrainingData) => createTraining(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: trainingKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: trainingKeys.stats() })
+      invalidateCache.training.lists()
+      invalidateCache.training.stats()
     },
   })
 }
 
 // Update training
 export const useUpdateTraining = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ trainingId, data }: { trainingId: string; data: UpdateTrainingData }) =>
       updateTraining(trainingId, data),
     onSuccess: (_, { trainingId }) => {
-      queryClient.invalidateQueries({ queryKey: trainingKeys.detail(trainingId) })
-      queryClient.invalidateQueries({ queryKey: trainingKeys.lists() })
+      invalidateCache.training.detail(trainingId)
+      invalidateCache.training.lists()
     },
   })
 }
 
 // Delete training
 export const useDeleteTraining = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (trainingId: string) => deleteTraining(trainingId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: trainingKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: trainingKeys.stats() })
+      invalidateCache.training.lists()
+      invalidateCache.training.stats()
     },
   })
 }
 
 // Submit training request
 export const useSubmitTrainingRequest = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (trainingId: string) => submitTrainingRequest(trainingId),
     onSuccess: (_, trainingId) => {
-      queryClient.invalidateQueries({ queryKey: trainingKeys.detail(trainingId) })
-      queryClient.invalidateQueries({ queryKey: trainingKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: trainingKeys.pendingApprovals() })
+      invalidateCache.training.detail(trainingId)
+      invalidateCache.training.lists()
+      invalidateCache.training.pendingApprovals()
     },
   })
 }
 
 // Approve training
 export const useApproveTraining = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ trainingId, data }: {
       trainingId: string
       data: { comments?: string; budgetApproved?: boolean; costCenter?: string }
     }) => approveTraining(trainingId, data),
     onSuccess: (_, { trainingId }) => {
-      queryClient.invalidateQueries({ queryKey: trainingKeys.detail(trainingId) })
-      queryClient.invalidateQueries({ queryKey: trainingKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: trainingKeys.pendingApprovals() })
-      queryClient.invalidateQueries({ queryKey: trainingKeys.stats() })
+      invalidateCache.training.detail(trainingId)
+      invalidateCache.training.lists()
+      invalidateCache.training.pendingApprovals()
+      invalidateCache.training.stats()
     },
   })
 }
 
 // Reject training
 export const useRejectTraining = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ trainingId, data }: {
       trainingId: string
       data: { reason: string; comments?: string }
     }) => rejectTraining(trainingId, data),
     onSuccess: (_, { trainingId }) => {
-      queryClient.invalidateQueries({ queryKey: trainingKeys.detail(trainingId) })
-      queryClient.invalidateQueries({ queryKey: trainingKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: trainingKeys.pendingApprovals() })
+      invalidateCache.training.detail(trainingId)
+      invalidateCache.training.lists()
+      invalidateCache.training.pendingApprovals()
     },
   })
 }
 
 // Enroll in training
 export const useEnrollInTraining = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ trainingId, data }: {
       trainingId: string
       data?: { registrationNumber?: string }
     }) => enrollInTraining(trainingId, data),
     onSuccess: (_, { trainingId }) => {
-      queryClient.invalidateQueries({ queryKey: trainingKeys.detail(trainingId) })
-      queryClient.invalidateQueries({ queryKey: trainingKeys.lists() })
+      invalidateCache.training.detail(trainingId)
+      invalidateCache.training.lists()
     },
   })
 }
 
 // Start training
 export const useStartTraining = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (trainingId: string) => startTraining(trainingId),
     onSuccess: (_, trainingId) => {
-      queryClient.invalidateQueries({ queryKey: trainingKeys.detail(trainingId) })
-      queryClient.invalidateQueries({ queryKey: trainingKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: trainingKeys.stats() })
+      invalidateCache.training.detail(trainingId)
+      invalidateCache.training.lists()
+      invalidateCache.training.stats()
     },
   })
 }
 
 // Record attendance
 export const useRecordAttendance = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ trainingId, data }: {
       trainingId: string
@@ -287,28 +263,26 @@ export const useRecordAttendance = () => {
       }
     }) => recordAttendance(trainingId, data),
     onSuccess: (_, { trainingId }) => {
-      queryClient.invalidateQueries({ queryKey: trainingKeys.detail(trainingId) })
+      invalidateCache.training.detail(trainingId)
     },
   })
 }
 
 // Update progress
 export const useUpdateProgress = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ trainingId, data }: {
       trainingId: string
       data: { completedModules: number; timeSpent?: number }
     }) => updateProgress(trainingId, data),
     onSuccess: (_, { trainingId }) => {
-      queryClient.invalidateQueries({ queryKey: trainingKeys.detail(trainingId) })
+      invalidateCache.training.detail(trainingId)
     },
   })
 }
 
 // Submit assessment
 export const useSubmitAssessment = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ trainingId, data }: {
       trainingId: string
@@ -321,30 +295,28 @@ export const useSubmitAssessment = () => {
       }
     }) => submitAssessment(trainingId, data),
     onSuccess: (_, { trainingId }) => {
-      queryClient.invalidateQueries({ queryKey: trainingKeys.detail(trainingId) })
+      invalidateCache.training.detail(trainingId)
     },
   })
 }
 
 // Complete training
 export const useCompleteTraining = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ trainingId, data }: {
       trainingId: string
       data?: { passed?: boolean; finalScore?: number; finalGrade?: string }
     }) => completeTraining(trainingId, data),
     onSuccess: (_, { trainingId }) => {
-      queryClient.invalidateQueries({ queryKey: trainingKeys.detail(trainingId) })
-      queryClient.invalidateQueries({ queryKey: trainingKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: trainingKeys.stats() })
+      invalidateCache.training.detail(trainingId)
+      invalidateCache.training.lists()
+      invalidateCache.training.stats()
     },
   })
 }
 
 // Issue certificate
 export const useIssueCertificate = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ trainingId, data }: {
       trainingId: string
@@ -356,14 +328,13 @@ export const useIssueCertificate = () => {
       }
     }) => issueCertificate(trainingId, data),
     onSuccess: (_, { trainingId }) => {
-      queryClient.invalidateQueries({ queryKey: trainingKeys.detail(trainingId) })
+      invalidateCache.training.detail(trainingId)
     },
   })
 }
 
 // Submit evaluation
 export const useSubmitEvaluation = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ trainingId, data }: {
       trainingId: string
@@ -385,15 +356,14 @@ export const useSubmitEvaluation = () => {
       }
     }) => submitEvaluation(trainingId, data),
     onSuccess: (_, { trainingId }) => {
-      queryClient.invalidateQueries({ queryKey: trainingKeys.detail(trainingId) })
-      queryClient.invalidateQueries({ queryKey: trainingKeys.stats() })
+      invalidateCache.training.detail(trainingId)
+      invalidateCache.training.stats()
     },
   })
 }
 
 // Record payment
 export const useRecordTrainingPayment = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ trainingId, data }: {
       trainingId: string
@@ -405,35 +375,33 @@ export const useRecordTrainingPayment = () => {
       }
     }) => recordTrainingPayment(trainingId, data),
     onSuccess: (_, { trainingId }) => {
-      queryClient.invalidateQueries({ queryKey: trainingKeys.detail(trainingId) })
+      invalidateCache.training.detail(trainingId)
     },
   })
 }
 
 // Cancel training
 export const useCancelTraining = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ trainingId, data }: {
       trainingId: string
       data: { reason: string }
     }) => cancelTraining(trainingId, data),
     onSuccess: (_, { trainingId }) => {
-      queryClient.invalidateQueries({ queryKey: trainingKeys.detail(trainingId) })
-      queryClient.invalidateQueries({ queryKey: trainingKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: trainingKeys.stats() })
+      invalidateCache.training.detail(trainingId)
+      invalidateCache.training.lists()
+      invalidateCache.training.stats()
     },
   })
 }
 
 // Bulk delete
 export const useBulkDeleteTrainings = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteTrainings(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: trainingKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: trainingKeys.stats() })
+      invalidateCache.training.lists()
+      invalidateCache.training.stats()
     },
   })
 }
