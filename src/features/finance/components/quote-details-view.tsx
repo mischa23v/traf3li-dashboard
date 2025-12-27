@@ -21,6 +21,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { useQuote, useSendQuote, useConvertQuoteToInvoice, useDeleteQuote } from '@/hooks/useQuotes'
 import type { Quote, QuoteStatus } from '@/services/quoteService'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { ROUTES } from '@/constants/routes'
 
 const statusConfig: Record<QuoteStatus, { label: string; color: string; icon: React.ElementType }> = {
     draft: { label: 'مسودة', color: 'bg-slate-100 text-slate-700', icon: FileText },
@@ -45,11 +46,11 @@ export default function QuoteDetailsView() {
     const quote = quoteData?.quote
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'عروض الأسعار', href: '/dashboard/finance/quotes', isActive: true },
-        { title: 'المدفوعات', href: '/dashboard/finance/payments', isActive: false },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: false },
+        { title: 'عروض الأسعار', href: ROUTES.dashboard.finance.quotes.list, isActive: true },
+        { title: 'المدفوعات', href: ROUTES.dashboard.finance.payments.list, isActive: false },
+        { title: 'المصروفات', href: ROUTES.dashboard.finance.expenses.list, isActive: false },
     ]
 
     const formatCurrency = (amount: number, currency: string = 'SAR') => {
@@ -77,7 +78,7 @@ export default function QuoteDetailsView() {
         if (!quote) return
         const result = await convertMutation.mutateAsync(quote._id)
         if (result.invoice) {
-            navigate({ to: '/dashboard/finance/invoices/$invoiceId', params: { invoiceId: result.invoice._id } })
+            navigate({ to: ROUTES.dashboard.finance.invoices.detail(result.invoice._id) })
         }
     }
 
@@ -85,7 +86,7 @@ export default function QuoteDetailsView() {
         if (!quote) return
         if (confirm('هل أنت متأكد من حذف عرض السعر هذا؟')) {
             await deleteMutation.mutateAsync(quote._id)
-            navigate({ to: '/dashboard/finance/quotes' })
+            navigate({ to: ROUTES.dashboard.finance.quotes.list })
         }
     }
 

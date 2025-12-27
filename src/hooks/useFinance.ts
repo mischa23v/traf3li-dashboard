@@ -5,7 +5,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { CACHE_TIMES } from '@/config'
+import { CACHE_TIMES } from '@/config/cache'
 import { Analytics } from '@/lib/analytics'
 import apiClient from '@/lib/api'
 import { useAuthStore } from '@/stores/auth-store'
@@ -169,8 +169,8 @@ export const useInvoicesWithStats = (filters: InvoiceFilters = {}) => {
       })
       return response.data
     },
-    staleTime: 2 * 60 * 1000,
-    gcTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
+    gcTime: CACHE_TIMES.GC_SHORT,
     enabled: isAuthenticated,
     retry: false,
   })
@@ -723,7 +723,7 @@ export const useCheckTimeEntryLock = (id: string) => {
     queryKey: ['timeEntries', id, 'lockStatus'],
     queryFn: () => financeService.isTimeEntryLocked(id),
     enabled: !!id,
-    staleTime: 1 * 60 * 1000, // 1 minute
+    staleTime: CACHE_TIMES.CALENDAR.GRID, // 1 minute
   })
 }
 
@@ -896,8 +896,8 @@ export const usePaymentsWithSummary = (filters: PaymentFilters = {}) => {
       })
       return response.data
     },
-    staleTime: 2 * 60 * 1000,
-    gcTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
+    gcTime: CACHE_TIMES.GC_SHORT,
     enabled: isAuthenticated,
     retry: false,
   })
@@ -1908,7 +1908,7 @@ export const usePreviewNextInvoice = (id: string) => {
     queryKey: ['recurringInvoices', id, 'preview'],
     queryFn: () => recurringInvoiceService.previewNext(id),
     enabled: !!id,
-    staleTime: 1 * 60 * 1000,
+    staleTime: CACHE_TIMES.CALENDAR.GRID,
   })
 }
 
@@ -1958,8 +1958,8 @@ export const useFinancialOverview = () => {
       const response = await apiClient.get('/finance/overview')
       return response.data
     },
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
+    gcTime: CACHE_TIMES.GC_MEDIUM,
     enabled: isAuthenticated,
     retry: false,
     refetchOnWindowFocus: false,

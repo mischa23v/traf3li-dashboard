@@ -77,7 +77,7 @@ export const usePendingApprovals = (approverId?: string) => {
   return useQuery({
     queryKey: employeeTransferKeys.pendingApprovals(approverId),
     queryFn: () => employeeTransferService.getPendingApprovals(approverId),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
     gcTime: STATS_GC_TIME,
     retry: false,
   })
@@ -87,7 +87,7 @@ export const usePendingHandovers = () => {
   return useQuery({
     queryKey: employeeTransferKeys.pendingHandovers(),
     queryFn: () => employeeTransferService.getPendingHandovers(),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
     gcTime: STATS_GC_TIME,
     retry: false,
   })

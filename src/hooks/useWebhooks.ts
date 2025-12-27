@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { CACHE_TIMES } from '@/config/cache'
 import webhookService, {
   Webhook,
   WebhookFormData,
@@ -16,7 +17,7 @@ export const useWebhookStats = () => {
   return useQuery({
     queryKey: ['webhooks', 'stats'],
     queryFn: () => webhookService.getStats(),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT, // 2 minutes
   })
 }
 
@@ -27,7 +28,7 @@ export const useWebhookEvents = () => {
   return useQuery({
     queryKey: ['webhooks', 'events'],
     queryFn: () => webhookService.getAvailableEvents(),
-    staleTime: 10 * 60 * 1000, // 10 minutes (events don't change often)
+    staleTime: CACHE_TIMES.LONG, // 30 minutes (was 10 minutes, events don't change often)
   })
 }
 
@@ -38,7 +39,7 @@ export const useWebhooks = (params?: { page?: number; limit?: number }) => {
   return useQuery({
     queryKey: ['webhooks', 'list', params],
     queryFn: () => webhookService.getWebhooks(params),
-    staleTime: 1 * 60 * 1000, // 1 minute
+    staleTime: CACHE_TIMES.CALENDAR.GRID, // 1 minute
   })
 }
 
@@ -50,7 +51,7 @@ export const useWebhook = (id: string) => {
     queryKey: ['webhooks', 'detail', id],
     queryFn: () => webhookService.getWebhook(id),
     enabled: !!id,
-    staleTime: 1 * 60 * 1000,
+    staleTime: CACHE_TIMES.CALENDAR.GRID,
   })
 }
 

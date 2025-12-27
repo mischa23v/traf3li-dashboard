@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   useJobPosition,
   useDeleteJobPosition,
@@ -107,8 +108,8 @@ export function JobPositionsDetailsView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'المناصب الوظيفية', href: '/dashboard/hr/job-positions', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'المناصب الوظيفية', href: ROUTES.dashboard.hr.jobPositions.list, isActive: true },
   ]
 
   const getStatusColor = (status: PositionStatus) => {
@@ -152,14 +153,14 @@ export function JobPositionsDetailsView() {
   const handleClone = async () => {
     if (!positionId) return
     await cloneMutation.mutateAsync({ positionId })
-    navigate({ to: '/dashboard/hr/job-positions' })
+    navigate({ to: ROUTES.dashboard.hr.jobPositions.list })
   }
 
   const handleDelete = async () => {
     if (!positionId) return
     if (confirm('هل أنت متأكد من حذف هذا المنصب الوظيفي؟')) {
       await deleteMutation.mutateAsync(positionId)
-      navigate({ to: '/dashboard/hr/job-positions' })
+      navigate({ to: ROUTES.dashboard.hr.jobPositions.list })
     }
   }
 
@@ -212,7 +213,7 @@ export function JobPositionsDetailsView() {
                   <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" aria-hidden="true" />
                   <p className="text-red-600">حدث خطأ في تحميل بيانات المنصب</p>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/hr/job-positions' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.hr.jobPositions.list })}
                     className="mt-4"
                   >
                     العودة للقائمة
@@ -228,7 +229,7 @@ export function JobPositionsDetailsView() {
                       variant="ghost"
                       size="icon"
                       className="rounded-xl hover:bg-white"
-                      onClick={() => navigate({ to: '/dashboard/hr/job-positions' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.hr.jobPositions.list })}
                     >
                       <ArrowRight className="h-5 w-5" />
                     </Button>

@@ -6,6 +6,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
+import { CACHE_TIMES } from '@/config/cache'
 import oauthService, {
   type OAuthProvider,
   type OAuthProviderConfig,
@@ -89,8 +90,8 @@ export const useAvailableProviders = () => {
   return useQuery<OAuthProviderConfig[]>({
     queryKey: ['oauth', 'providers'],
     queryFn: () => oauthService.getAvailableProviders(),
-    staleTime: 60 * 60 * 1000, // 1 hour
-    gcTime: 60 * 60 * 1000,
+    staleTime: CACHE_TIMES.HOUR, // 1 hour
+    gcTime: CACHE_TIMES.GC_LONG,
   })
 }
 
@@ -101,7 +102,7 @@ export const useLinkedProviders = () => {
   return useQuery<OAuthProvider[]>({
     queryKey: ['oauth', 'linked'],
     queryFn: () => oauthService.getLinkedProviders(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 

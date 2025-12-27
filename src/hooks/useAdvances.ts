@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { CACHE_TIMES } from '@/config'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   getAdvances,
   getAdvance,
@@ -123,37 +124,34 @@ export const useEmergencyAdvances = () => {
 
 // Create advance
 export const useCreateAdvance = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateAdvanceData) => createAdvance(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: advanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: advanceKeys.stats() })
+      invalidateCache.advances.lists()
+      invalidateCache.advances.stats()
     },
   })
 }
 
 // Update advance
 export const useUpdateAdvance = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ advanceId, data }: { advanceId: string; data: UpdateAdvanceData }) =>
       updateAdvance(advanceId, data),
     onSuccess: (_, { advanceId }) => {
-      queryClient.invalidateQueries({ queryKey: advanceKeys.detail(advanceId) })
-      queryClient.invalidateQueries({ queryKey: advanceKeys.lists() })
+      invalidateCache.advances.detail(advanceId)
+      invalidateCache.advances.lists()
     },
   })
 }
 
 // Delete advance
 export const useDeleteAdvance = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (advanceId: string) => deleteAdvance(advanceId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: advanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: advanceKeys.stats() })
+      invalidateCache.advances.lists()
+      invalidateCache.advances.stats()
     },
   })
 }
@@ -175,8 +173,6 @@ export const useCheckAdvanceEligibility = () => {
  * The backend needs to implement this endpoint before this hook can be used in production.
  */
 export const useSubmitAdvanceRequest = () => {
-  const queryClient = useQueryClient()
-
   // Deprecation warning
   console.warn(
     '⚠️ DEPRECATED: useSubmitAdvanceRequest is using a non-implemented backend endpoint. ' +
@@ -214,9 +210,9 @@ export const useSubmitAdvanceRequest = () => {
       }
     },
     onSuccess: (_, advanceId) => {
-      queryClient.invalidateQueries({ queryKey: advanceKeys.detail(advanceId) })
-      queryClient.invalidateQueries({ queryKey: advanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: advanceKeys.pendingApprovals() })
+      invalidateCache.advances.detail(advanceId)
+      invalidateCache.advances.lists()
+      invalidateCache.advances.pendingApprovals()
 
       // Success toast
       toast.success(
@@ -234,7 +230,6 @@ export const useSubmitAdvanceRequest = () => {
 
 // Approve advance
 export const useApproveAdvance = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ advanceId, data }: {
       advanceId: string
@@ -245,33 +240,31 @@ export const useApproveAdvance = () => {
       }
     }) => approveAdvance(advanceId, data),
     onSuccess: (_, { advanceId }) => {
-      queryClient.invalidateQueries({ queryKey: advanceKeys.detail(advanceId) })
-      queryClient.invalidateQueries({ queryKey: advanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: advanceKeys.pendingApprovals() })
-      queryClient.invalidateQueries({ queryKey: advanceKeys.stats() })
+      invalidateCache.advances.detail(advanceId)
+      invalidateCache.advances.lists()
+      invalidateCache.advances.pendingApprovals()
+      invalidateCache.advances.stats()
     },
   })
 }
 
 // Reject advance
 export const useRejectAdvance = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ advanceId, data }: {
       advanceId: string
       data: { reason: string; comments?: string }
     }) => rejectAdvance(advanceId, data),
     onSuccess: (_, { advanceId }) => {
-      queryClient.invalidateQueries({ queryKey: advanceKeys.detail(advanceId) })
-      queryClient.invalidateQueries({ queryKey: advanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: advanceKeys.pendingApprovals() })
+      invalidateCache.advances.detail(advanceId)
+      invalidateCache.advances.lists()
+      invalidateCache.advances.pendingApprovals()
     },
   })
 }
 
 // Disburse advance
 export const useDisburseAdvance = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ advanceId, data }: {
       advanceId: string
@@ -287,16 +280,15 @@ export const useDisburseAdvance = () => {
       }
     }) => disburseAdvance(advanceId, data),
     onSuccess: (_, { advanceId }) => {
-      queryClient.invalidateQueries({ queryKey: advanceKeys.detail(advanceId) })
-      queryClient.invalidateQueries({ queryKey: advanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: advanceKeys.stats() })
+      invalidateCache.advances.detail(advanceId)
+      invalidateCache.advances.lists()
+      invalidateCache.advances.stats()
     },
   })
 }
 
 // Record recovery
 export const useRecordAdvanceRecovery = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ advanceId, data }: {
       advanceId: string
@@ -310,17 +302,16 @@ export const useRecordAdvanceRecovery = () => {
       }
     }) => recordAdvanceRecovery(advanceId, data),
     onSuccess: (_, { advanceId }) => {
-      queryClient.invalidateQueries({ queryKey: advanceKeys.detail(advanceId) })
-      queryClient.invalidateQueries({ queryKey: advanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: advanceKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: advanceKeys.overdueRecoveries() })
+      invalidateCache.advances.detail(advanceId)
+      invalidateCache.advances.lists()
+      invalidateCache.advances.stats()
+      invalidateCache.advances.overdueRecoveries()
     },
   })
 }
 
 // Process payroll deduction
 export const useProcessPayrollDeduction = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ advanceId, data }: {
       advanceId: string
@@ -332,15 +323,14 @@ export const useProcessPayrollDeduction = () => {
       }
     }) => processPayrollDeduction(advanceId, data),
     onSuccess: (_, { advanceId }) => {
-      queryClient.invalidateQueries({ queryKey: advanceKeys.detail(advanceId) })
-      queryClient.invalidateQueries({ queryKey: advanceKeys.lists() })
+      invalidateCache.advances.detail(advanceId)
+      invalidateCache.advances.lists()
     },
   })
 }
 
 // Process early recovery
 export const useProcessEarlyRecovery = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ advanceId, data }: {
       advanceId: string
@@ -351,9 +341,9 @@ export const useProcessEarlyRecovery = () => {
       }
     }) => processEarlyRecovery(advanceId, data),
     onSuccess: (_, { advanceId }) => {
-      queryClient.invalidateQueries({ queryKey: advanceKeys.detail(advanceId) })
-      queryClient.invalidateQueries({ queryKey: advanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: advanceKeys.stats() })
+      invalidateCache.advances.detail(advanceId)
+      invalidateCache.advances.lists()
+      invalidateCache.advances.stats()
     },
   })
 }
@@ -367,8 +357,6 @@ export const useProcessEarlyRecovery = () => {
  * The backend needs to implement this endpoint before this hook can be used in production.
  */
 export const useWaiveAdvance = () => {
-  const queryClient = useQueryClient()
-
   // Deprecation warning
   console.warn(
     '⚠️ DEPRECATED: useWaiveAdvance is using a non-implemented backend endpoint. ' +
@@ -413,9 +401,9 @@ export const useWaiveAdvance = () => {
       }
     },
     onSuccess: (_, { advanceId }) => {
-      queryClient.invalidateQueries({ queryKey: advanceKeys.detail(advanceId) })
-      queryClient.invalidateQueries({ queryKey: advanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: advanceKeys.stats() })
+      invalidateCache.advances.detail(advanceId)
+      invalidateCache.advances.lists()
+      invalidateCache.advances.stats()
 
       // Success toast
       toast.success(
@@ -433,23 +421,21 @@ export const useWaiveAdvance = () => {
 
 // Issue clearance letter
 export const useIssueClearanceLetter = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (advanceId: string) => issueClearanceLetter(advanceId),
     onSuccess: (_, advanceId) => {
-      queryClient.invalidateQueries({ queryKey: advanceKeys.detail(advanceId) })
+      invalidateCache.advances.detail(advanceId)
     },
   })
 }
 
 // Bulk delete
 export const useBulkDeleteAdvances = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteAdvances(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: advanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: advanceKeys.stats() })
+      invalidateCache.advances.lists()
+      invalidateCache.advances.stats()
     },
   })
 }

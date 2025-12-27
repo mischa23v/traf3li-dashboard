@@ -315,7 +315,7 @@ export function WarehouseDetailsView() {
                   <div className="flex flex-col gap-2">
                     <Button
                       onClick={() =>
-                        navigate({ to: `/dashboard/inventory/warehouses/${warehouseId}/edit` })
+                        navigate({ to: `${ROUTES.dashboard.inventory.warehouses.detail(warehouseId)}/edit` })
                       }
                       className="rounded-xl"
                     >

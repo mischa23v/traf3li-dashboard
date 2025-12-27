@@ -16,6 +16,7 @@ import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ROUTES } from '@/constants/routes'
 import {
   Search, Bell, ArrowRight, Users, AlertCircle, Eye,
   Briefcase, MapPin, Clock, CheckCircle, FileText, Building2,
@@ -107,9 +108,9 @@ export function JobPostingDetailsView() {
   }
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'التوظيف', href: '/dashboard/hr/recruitment/jobs', isActive: true },
+    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false }, // TODO: Add overview route to ROUTES constant
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'التوظيف', href: ROUTES.dashboard.hr.recruitment.jobs.list, isActive: true },
   ]
 
   if (isLoading) {
@@ -161,7 +162,7 @@ export function JobPostingDetailsView() {
             <h3 className="text-lg font-bold text-slate-700 mb-2">حدث خطأ</h3>
             <p className="text-slate-500">فشل في تحميل تفاصيل الوظيفة</p>
             <Button
-              onClick={() => navigate({ to: '/dashboard/hr/recruitment/jobs' })}
+              onClick={() => navigate({ to: ROUTES.dashboard.hr.recruitment.jobs.list })}
               className="mt-4"
             >
               العودة للوظائف
@@ -209,7 +210,7 @@ export function JobPostingDetailsView() {
               variant="ghost"
               size="icon"
               className="rounded-xl hover:bg-white"
-              onClick={() => navigate({ to: '/dashboard/hr/recruitment/jobs' })}
+              onClick={() => navigate({ to: ROUTES.dashboard.hr.recruitment.jobs.list })}
             >
               <ArrowRight className="h-5 w-5" />
             </Button>
@@ -736,7 +737,7 @@ export function JobPostingDetailsView() {
                     المتقدمين للوظيفة
                   </CardTitle>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants/new', search: { jobId } })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.hr.recruitment.applicants.new, search: { jobId } })}
                     className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
                     <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
@@ -753,7 +754,7 @@ export function JobPostingDetailsView() {
                         <div
                           key={applicant._id}
                           className="flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
-                          onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants/$applicantId', params: { applicantId: applicant._id } })}
+                          onClick={() => navigate({ to: ROUTES.dashboard.hr.recruitment.applicants.detail(applicant._id) })}
                         >
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
@@ -801,7 +802,7 @@ export function JobPostingDetailsView() {
                     <h3 className="text-lg font-bold text-slate-700 mb-2">لا يوجد متقدمين</h3>
                     <p className="text-slate-500 mb-4">لم يتقدم أحد لهذه الوظيفة بعد</p>
                     <Button
-                      onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants/new', search: { jobId } })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.hr.recruitment.applicants.new, search: { jobId } })}
                       className="bg-emerald-500 hover:bg-emerald-600"
                     >
                       <UserPlus className="w-4 h-4 ms-2" />

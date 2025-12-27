@@ -342,8 +342,8 @@ export const useInterCompanyCompanies = () => {
   return useQuery({
     queryKey: ['inter-company-firms'],
     queryFn: () => interCompanyService.getCompanies(),
-    staleTime: 30 * 60 * 1000, // 30 minutes - companies don't change often
-    gcTime: 60 * 60 * 1000, // 1 hour
+    staleTime: CACHE_TIMES.LONG, // 30 minutes - companies don't change often
+    gcTime: CACHE_TIMES.GC_LONG, // 1 hour
   })
 }
 
@@ -354,8 +354,8 @@ export const useExchangeRate = (fromCurrency: string, toCurrency: string, date?:
     queryKey: ['exchange-rate', fromCurrency, toCurrency, date],
     queryFn: () => interCompanyService.getExchangeRate(fromCurrency, toCurrency, date),
     enabled: !!fromCurrency && !!toCurrency && fromCurrency !== toCurrency,
-    staleTime: 60 * 60 * 1000, // 1 hour
-    gcTime: 2 * 60 * 60 * 1000, // 2 hours
+    staleTime: CACHE_TIMES.HOUR, // 1 hour
+    gcTime: CACHE_TIMES.GC_EXTENDED, // 2 hours
   })
 }
 

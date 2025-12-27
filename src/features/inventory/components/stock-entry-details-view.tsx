@@ -282,7 +282,7 @@ export function StockEntryDetailsView() {
                           {t('inventory.submit', 'ترحيل')}
                         </Button>
                         <Button
-                          onClick={() => navigate({ to: `/dashboard/inventory/stock-entries/${stockEntryId}/edit` })}
+                          onClick={() => navigate({ to: `${ROUTES.dashboard.inventory.stockEntries.detail(stockEntryId)}/edit` })}
                           variant="outline"
                           className="rounded-xl"
                         >

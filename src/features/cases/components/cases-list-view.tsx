@@ -196,7 +196,7 @@ export function CasesListView() {
   }, [casesData, searchQuery])
 
   const topNav = [
-    { title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },
+    { title: t('nav.overview', 'نظرة عامة'), href: ROUTES.dashboard.home, isActive: false },
     { title: t('nav.cases', 'القضايا'), href: ROUTES.dashboard.cases.list, isActive: true },
   ]
 

@@ -5,6 +5,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useCreatePayrollRun } from '@/hooks/usePayrollRun'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -281,7 +282,7 @@ export function PayrollRunCreateView() {
 
         try {
             const result = await createRunMutation.mutateAsync(data)
-            navigate({ to: '/dashboard/hr/payroll-runs/$runId', params: { runId: result._id } })
+            navigate({ to: ROUTES.dashboard.hr.payrollRuns.detail(runId), params: { runId: result._id } })
         } catch {
             // Error is handled by mutation's onError callback
         }
@@ -289,9 +290,9 @@ export function PayrollRunCreateView() {
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-        { title: 'قسائم الرواتب', href: '/dashboard/hr/payroll', isActive: false },
-        { title: 'دورات الرواتب', href: '/dashboard/hr/payroll-runs', isActive: true },
+        { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+        { title: 'قسائم الرواتب', href: ROUTES.dashboard.hr.payroll.list, isActive: false },
+        { title: 'دورات الرواتب', href: ROUTES.dashboard.hr.payrollRuns.list, isActive: true },
     ]
 
     // Determine which advanced sections to show based on office type
@@ -335,7 +336,7 @@ export function PayrollRunCreateView() {
                                 variant="ghost"
                                 size="icon"
                                 className="rounded-xl hover:bg-white"
-                                onClick={() => navigate({ to: '/dashboard/hr/payroll-runs' })}
+                                onClick={() => navigate({ to: ROUTES.dashboard.hr.payrollRuns.list })}
                             >
                                 <ArrowRight className="h-5 w-5" />
                             </Button>
@@ -979,7 +980,7 @@ export function PayrollRunCreateView() {
                             type="button"
                             variant="outline"
                             className="rounded-xl px-6"
-                            onClick={() => navigate({ to: '/dashboard/hr/payroll-runs' })}
+                            onClick={() => navigate({ to: ROUTES.dashboard.hr.payrollRuns.list })}
                         >
                             إلغاء
                         </Button>

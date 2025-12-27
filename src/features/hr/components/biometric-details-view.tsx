@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useParams, useNavigate, Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -100,13 +101,13 @@ export function BiometricDetailsView() {
     const handleDelete = () => {
         // TODO: Replace with actual API call
         setTimeout(() => {
-            navigate({ to: '/dashboard/hr/biometric' })
+            navigate({ to: ROUTES.dashboard.hr.biometric.list })
         }, 1000)
     }
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'البصمة', href: '/dashboard/hr/biometric', isActive: true },
+        { title: 'البصمة', href: ROUTES.dashboard.hr.biometric.list, isActive: true },
     ]
 
     return (

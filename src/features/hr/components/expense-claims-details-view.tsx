@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useParams, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   useExpenseClaim,
   useDeleteExpenseClaim,
@@ -132,7 +133,7 @@ export function ExpenseClaimsDetailsView() {
   const handleDelete = () => {
     if (confirm('هل أنت متأكد من حذف هذه المطالبة؟')) {
       deleteMutation.mutate(claimId, {
-        onSuccess: () => navigate({ to: '/dashboard/hr/expense-claims' }),
+        onSuccess: () => navigate({ to: ROUTES.dashboard.hr.expenseClaims.list }),
       })
     }
   }
@@ -228,8 +229,8 @@ export function ExpenseClaimsDetailsView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'مطالبات النفقات', href: '/dashboard/hr/expense-claims', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'مطالبات النفقات', href: ROUTES.dashboard.hr.expenseClaims.list, isActive: true },
   ]
 
   return (
@@ -274,7 +275,7 @@ export function ExpenseClaimsDetailsView() {
                   variant="ghost"
                   size="icon"
                   className="rounded-xl hover:bg-white"
-                  onClick={() => navigate({ to: '/dashboard/hr/expense-claims' })}
+                  onClick={() => navigate({ to: ROUTES.dashboard.hr.expenseClaims.list })}
                 >
                   <ArrowRight className="h-5 w-5" />
                 </Button>

@@ -13,6 +13,7 @@ import usersService, {
   ConvertToFirmData,
 } from '@/services/usersService'
 import { toast } from 'sonner'
+import { CACHE_TIMES } from '@/config/cache'
 
 // ==================== QUERY KEYS ====================
 
@@ -37,7 +38,7 @@ export const useUsers = (params?: GetUsersParams) => {
   return useQuery({
     queryKey: userKeys.list(params),
     queryFn: () => usersService.getUsers(params),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -50,7 +51,7 @@ export const useLawyers = (params?: GetLawyersParams) => {
   return useQuery({
     queryKey: userKeys.lawyers(params),
     queryFn: () => usersService.getLawyers(params),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -62,7 +63,7 @@ export const useTeamMembers = (isEnabled = true) => {
   return useQuery({
     queryKey: userKeys.team(),
     queryFn: () => usersService.getTeamMembers(),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
     enabled: isEnabled, // Allow deferred loading for performance
   })
 }
@@ -75,7 +76,7 @@ export const useUserProfile = (userId: string) => {
     queryKey: userKeys.profile(userId),
     queryFn: () => usersService.getUserProfile(userId),
     enabled: !!userId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -87,7 +88,7 @@ export const useLawyerProfile = (username: string) => {
     queryKey: userKeys.lawyerProfile(username),
     queryFn: () => usersService.getLawyerProfile(username),
     enabled: !!username,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -154,7 +155,7 @@ export const usePushSubscriptionStatus = () => {
   return useQuery({
     queryKey: userKeys.pushSubscription(),
     queryFn: () => usersService.getPushSubscriptionStatus(),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -202,7 +203,7 @@ export const useNotificationPreferences = () => {
   return useQuery({
     queryKey: userKeys.notificationPreferences(),
     queryFn: () => usersService.getNotificationPreferences(),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 

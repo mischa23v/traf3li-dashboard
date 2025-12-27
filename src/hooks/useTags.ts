@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config/cache'
 import tagsService, {
   type TagFilters,
   type CreateTagData,
@@ -24,7 +25,7 @@ export const useTags = (filters?: TagFilters) => {
   return useQuery({
     queryKey: tagsKeys.list(filters || {}),
     queryFn: () => tagsService.getTags(filters),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 
@@ -52,7 +53,7 @@ export const usePopularTags = (entityType?: string, limit?: number) => {
   return useQuery({
     queryKey: tagsKeys.popular(entityType),
     queryFn: () => tagsService.getPopularTags(entityType, limit),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 

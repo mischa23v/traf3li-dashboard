@@ -5,6 +5,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { CACHE_TIMES } from '@/config/cache'
 import expensePoliciesService, {
   CreateExpensePolicyData,
   UpdateExpensePolicyData,
@@ -16,7 +17,7 @@ export const useExpensePolicies = () => {
   return useQuery({
     queryKey: ['expense-policies'],
     queryFn: () => expensePoliciesService.getExpensePolicies(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 
@@ -25,7 +26,7 @@ export const useExpensePolicy = (id: string) => {
     queryKey: ['expense-policy', id],
     queryFn: () => expensePoliciesService.getExpensePolicy(id),
     enabled: !!id,
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -33,7 +34,7 @@ export const useDefaultExpensePolicy = () => {
   return useQuery({
     queryKey: ['expense-policy', 'default'],
     queryFn: () => expensePoliciesService.getDefaultPolicy(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 

@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config/cache'
 import appsService, { GetAppsParams, ConnectAppData } from '@/services/appsService'
 import { toast } from 'sonner'
 
@@ -6,7 +7,7 @@ export const useApps = (params?: GetAppsParams) => {
   return useQuery({
     queryKey: ['apps', params],
     queryFn: () => appsService.getApps(params),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 
@@ -15,7 +16,7 @@ export const useApp = (appId: string) => {
     queryKey: ['apps', appId],
     queryFn: () => appsService.getApp(appId),
     enabled: !!appId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 

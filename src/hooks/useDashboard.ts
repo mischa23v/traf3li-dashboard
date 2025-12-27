@@ -60,7 +60,7 @@ export const useDashboardHeroStats = () => {
   return useQuery({
     queryKey: ['dashboard', 'hero-stats'],
     queryFn: () => dashboardService.getDashboardHeroStats(),
-    staleTime: 1 * 60 * 1000, // 1 minute
+    staleTime: CACHE_TIMES.CALENDAR.GRID, // 1 minute
     enabled: isAuthenticated, // Only fetch when authenticated
     retry: false, // NO retry on 429 - prevents rate limit cascade
   })
@@ -166,7 +166,7 @@ export const useCasesChart = (months = 12, isTabActive = true) => {
   return useQuery({
     queryKey: ['reports', 'cases-chart', months],
     queryFn: () => dashboardService.getCasesChart(months),
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: CACHE_TIMES.LONG, // 30 minutes (was 10 minutes)
     enabled: isAuthenticated && isTabActive,
     retry: false,
   })
@@ -178,7 +178,7 @@ export const useRevenueChart = (months = 12, isTabActive = true) => {
   return useQuery({
     queryKey: ['reports', 'revenue-chart', months],
     queryFn: () => dashboardService.getRevenueChart(months),
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: CACHE_TIMES.LONG, // 30 minutes (was 10 minutes)
     enabled: isAuthenticated && isTabActive,
     retry: false,
   })
@@ -190,7 +190,7 @@ export const useTasksChart = (months = 12, isTabActive = true) => {
   return useQuery({
     queryKey: ['reports', 'tasks-chart', months],
     queryFn: () => dashboardService.getTasksChart(months),
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: CACHE_TIMES.LONG, // 30 minutes (was 10 minutes)
     enabled: isAuthenticated && isTabActive,
     retry: false,
   })

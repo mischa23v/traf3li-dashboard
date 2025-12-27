@@ -140,7 +140,7 @@ export function LeadDetailsView() {
   const handleConvert = useCallback(() => {
     convertLeadMutation.mutate(leadId, {
       onSuccess: () => {
-        navigate({ to: '/dashboard/clients' })
+        navigate({ to: ROUTES.dashboard.clients.list })
       },
     })
   }, [leadId, convertLeadMutation, navigate])

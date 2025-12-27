@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useReports, useReportStats, useBulkDeleteReports, useAddToFavorites, useRemoveFromFavorites } from '@/hooks/useReports'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -164,8 +165,8 @@ export function ReportsListView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'التقارير والتحليلات', href: '/dashboard/hr/reports', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'التقارير والتحليلات', href: ROUTES.dashboard.hr.reports.list, isActive: true },
   ]
 
   return (
@@ -357,7 +358,7 @@ export function ReportsListView() {
                     </Button>
                     <Button
                       size="sm"
-                      onClick={() => navigate({ to: '/dashboard/hr/reports/new' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.hr.reports.new })}
                       className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
                     >
                       <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
@@ -402,7 +403,7 @@ export function ReportsListView() {
                   <FileText className="w-12 h-12 mx-auto text-slate-300" aria-hidden="true" />
                   <p className="mt-4 text-slate-500">لا توجد تقارير</p>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/hr/reports/new' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.hr.reports.new })}
                     className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
                     <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
@@ -473,7 +474,7 @@ export function ReportsListView() {
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/reports/${report.reportId}` })}>
+                                    <DropdownMenuItem onClick={() => navigate({ to: ROUTES.dashboard.hr.reports.detail(report.reportId) })}>
                                       <Eye className="w-4 h-4 ms-2" aria-hidden="true" />
                                       عرض التفاصيل
                                     </DropdownMenuItem>
@@ -588,7 +589,7 @@ export function ReportsListView() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => navigate({ to: `/dashboard/hr/reports/${report.reportId}` })}
+                                onClick={() => navigate({ to: ROUTES.dashboard.hr.reports.detail(report.reportId) })}
                                 className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl"
                               >
                                 عرض التفاصيل

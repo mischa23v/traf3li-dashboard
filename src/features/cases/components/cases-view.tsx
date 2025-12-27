@@ -166,7 +166,7 @@ export function CasesView() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.home, isActive: false },
         { title: 'القضايا', href: ROUTES.dashboard.cases.list, isActive: true },
     ]
 

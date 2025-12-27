@@ -87,11 +87,11 @@ export function PracticeSidebar({
         },
         followups: {
             create: '/dashboard/followups/new',
-            viewAll: '/dashboard/followups'
+            viewAll: ROUTES.dashboard.followups.list
         },
         contacts: {
-            create: '/dashboard/contacts/new',
-            viewAll: '/dashboard/contacts'
+            create: ROUTES.dashboard.contacts.new,
+            viewAll: ROUTES.dashboard.contacts.list
         }
     }
 

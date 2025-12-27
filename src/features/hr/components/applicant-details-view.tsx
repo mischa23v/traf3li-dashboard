@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useParams, Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useApplicant, useUpdateApplicantStatus, useRejectApplicant, useHireApplicant } from '@/hooks/useRecruitment'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -91,8 +92,8 @@ export function ApplicantDetailsView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'التوظيف', href: '/dashboard/hr/recruitment/applicants', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'التوظيف', href: ROUTES.dashboard.hr.recruitment.applicants.list, isActive: true },
   ]
 
   const statusConfig = applicant ? APPLICANT_STATUS_LABELS[applicant.status] : null
@@ -199,7 +200,7 @@ export function ApplicantDetailsView() {
                       variant="ghost"
                       size="icon"
                       className="rounded-xl hover:bg-white"
-                      onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.hr.recruitment.applicants.list })}
                     >
                       <ArrowRight className="h-5 w-5" />
                     </Button>

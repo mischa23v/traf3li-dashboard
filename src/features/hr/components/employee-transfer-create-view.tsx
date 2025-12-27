@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useSearch } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   useCreateEmployeeTransfer,
   useUpdateEmployeeTransfer,
@@ -191,20 +192,20 @@ export function EmployeeTransferCreateView() {
       updateMutation.mutate(
         { id: editId, data },
         {
-          onSuccess: () => navigate({ to: '/dashboard/hr/employee-transfers' }),
+          onSuccess: () => navigate({ to: ROUTES.dashboard.hr.employeeTransfers.list }),
         }
       )
     } else {
       createMutation.mutate(data, {
-        onSuccess: () => navigate({ to: '/dashboard/hr/employee-transfers' }),
+        onSuccess: () => navigate({ to: ROUTES.dashboard.hr.employeeTransfers.list }),
       })
     }
   }
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'نقل الموظفين', href: '/dashboard/hr/employee-transfers', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'نقل الموظفين', href: ROUTES.dashboard.hr.employeeTransfers.list, isActive: true },
   ]
 
   if (isEditMode && isLoadingTransfer) {
@@ -579,7 +580,7 @@ export function EmployeeTransferCreateView() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => navigate({ to: '/dashboard/hr/employee-transfers' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.hr.employeeTransfers.list })}
                     className="rounded-xl"
                   >
                     إلغاء

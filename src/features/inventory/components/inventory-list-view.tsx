@@ -319,7 +319,7 @@ export function InventoryListView() {
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation()
-                                  navigate({ to: `/dashboard/inventory/${item._id}/edit` })
+                                  navigate({ to: `${ROUTES.dashboard.inventory.detail(item._id)}/edit` })
                                 }}>
                                   <Edit className="w-4 h-4 ml-2" />
                                   {t('common.edit', 'تعديل')}

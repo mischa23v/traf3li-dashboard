@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useSearch } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useCreateLoan, useUpdateLoan, useLoan, useCheckEligibility } from '@/hooks/useLoans'
 import { useEmployees } from '@/hooks/useHR'
 import { Button } from '@/components/ui/button'
@@ -229,7 +230,7 @@ export function LoansCreateView() {
         await createMutation.mutateAsync(data)
       }
 
-      navigate({ to: '/dashboard/hr/loans' })
+      navigate({ to: ROUTES.dashboard.hr.loans.list })
     } catch (error) {
       handleApiError(error)
     }
@@ -237,8 +238,8 @@ export function LoansCreateView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'القروض', href: '/dashboard/hr/loans', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'القروض', href: ROUTES.dashboard.hr.loans.list, isActive: true },
   ]
 
   const isPending = createMutation.isPending || updateMutation.isPending
@@ -284,7 +285,7 @@ export function LoansCreateView() {
                 variant="ghost"
                 size="icon"
                 className="rounded-xl hover:bg-white"
-                onClick={() => navigate({ to: '/dashboard/hr/loans' })}
+                onClick={() => navigate({ to: ROUTES.dashboard.hr.loans.list })}
               >
                 <ArrowRight className="h-5 w-5" />
               </Button>
@@ -703,7 +704,7 @@ export function LoansCreateView() {
             <div className="flex items-center justify-end gap-4">
               <Button
                 variant="outline"
-                onClick={() => navigate({ to: '/dashboard/hr/loans' })}
+                onClick={() => navigate({ to: ROUTES.dashboard.hr.loans.list })}
                 className="rounded-xl"
               >
                 إلغاء

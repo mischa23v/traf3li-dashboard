@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   useOrganizationalUnit,
   useDeleteOrganizationalUnit,
@@ -102,8 +103,8 @@ export function OrganizationalStructureDetailsView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'الهيكل التنظيمي', href: '/dashboard/hr/organizational-structure', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'الهيكل التنظيمي', href: ROUTES.dashboard.hr.organizationalStructure.list, isActive: true },
   ]
 
   const getStatusColor = (status: UnitStatus) => {
@@ -148,7 +149,7 @@ export function OrganizationalStructureDetailsView() {
     if (!unitId) return
     if (confirm('هل أنت متأكد من حذف هذه الوحدة التنظيمية؟')) {
       await deleteMutation.mutateAsync(unitId)
-      navigate({ to: '/dashboard/hr/organizational-structure' })
+      navigate({ to: ROUTES.dashboard.hr.organizationalStructure.list })
     }
   }
 
@@ -201,7 +202,7 @@ export function OrganizationalStructureDetailsView() {
                   <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" aria-hidden="true" />
                   <p className="text-red-600">حدث خطأ في تحميل بيانات الوحدة</p>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/hr/organizational-structure' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.hr.organizationalStructure.list })}
                     className="mt-4"
                   >
                     العودة للقائمة
@@ -217,7 +218,7 @@ export function OrganizationalStructureDetailsView() {
                       variant="ghost"
                       size="icon"
                       className="rounded-xl hover:bg-white"
-                      onClick={() => navigate({ to: '/dashboard/hr/organizational-structure' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.hr.organizationalStructure.list })}
                     >
                       <ArrowRight className="h-5 w-5" />
                     </Button>
@@ -551,7 +552,7 @@ export function OrganizationalStructureDetailsView() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => navigate({ to: `/dashboard/hr/organizational-structure/${unit.parentUnitId}` })}
+                                onClick={() => navigate({ to: ROUTES.dashboard.hr.organizationalStructure.detail(unit.parentUnitId) })}
                                 className="rounded-xl border-blue-200 text-blue-600 hover:bg-blue-50"
                               >
                                 عرض
@@ -587,7 +588,7 @@ export function OrganizationalStructureDetailsView() {
                                     <Button
                                       variant="outline"
                                       size="sm"
-                                      onClick={() => navigate({ to: `/dashboard/hr/organizational-structure/${child.unitId}` })}
+                                      onClick={() => navigate({ to: ROUTES.dashboard.hr.organizationalStructure.detail(child.unitId) })}
                                       className="rounded-xl"
                                     >
                                       عرض

@@ -136,8 +136,8 @@ export function LeavePeriodsListView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'فترات الإجازات', href: '/dashboard/hr/leave/periods', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'فترات الإجازات', href: ROUTES.dashboard.hr.leave.periods, isActive: true },
   ]
 
   return (

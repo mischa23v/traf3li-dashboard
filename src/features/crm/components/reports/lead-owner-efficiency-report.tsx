@@ -236,7 +236,7 @@ export function LeadOwnerEfficiencyReport() {
     ]
 
     const topNav = [
-        { title: isRTL ? 'نظرة عامة' : 'Overview', href: '/dashboard/overview', isActive: false },
+        { title: isRTL ? 'نظرة عامة' : 'Overview', href: ROUTES.dashboard.home, isActive: false },
         { title: isRTL ? 'العملاء المحتملين' : 'Leads', href: ROUTES.dashboard.crm.leads.list, isActive: false },
         { title: isRTL ? 'تقارير CRM' : 'CRM Reports', href: ROUTES.dashboard.crm.reports.list, isActive: true },
     ]

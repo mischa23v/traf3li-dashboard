@@ -579,7 +579,7 @@ export const useDeniedAttempts = (params?: {
   return useQuery({
     queryKey: [...permissionKeys.decisions(), 'denied', params],
     queryFn: () => permissionService.getDeniedAttempts(params),
-    staleTime: 1 * 60 * 1000,
+    staleTime: CACHE_TIMES.CALENDAR.GRID,
   })
 }
 

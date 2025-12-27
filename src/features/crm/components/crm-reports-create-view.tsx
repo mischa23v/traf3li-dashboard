@@ -193,7 +193,7 @@ export function CrmReportsCreateView() {
   }
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+    { title: 'نظرة عامة', href: ROUTES.dashboard.home, isActive: false },
     { title: 'العملاء المحتملين', href: ROUTES.dashboard.crm.leads.list, isActive: false },
     { title: 'التقارير', href: ROUTES.dashboard.crm.reports.list, isActive: true },
   ]

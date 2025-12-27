@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config/cache'
 import lawyersService, { type LawyerFilters } from '@/services/lawyersService'
 import apiClient, { handleApiError } from '@/lib/api'
 import { toast } from 'sonner'
@@ -100,7 +101,7 @@ export const useStaff = (filters?: LawyerFilters & { showDeparted?: boolean }) =
       return members
     },
     enabled: !!firmId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -109,7 +110,7 @@ export const useStaffMember = (staffId: string) => {
     queryKey: ['staff', staffId],
     queryFn: () => lawyersService.getById(staffId),
     enabled: !!staffId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -117,7 +118,7 @@ export const useTeamMembers = (isEnabled = true) => {
   return useQuery({
     queryKey: ['staff', 'team'],
     queryFn: () => lawyersService.getTeamMembers(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
     enabled: isEnabled, // Allow deferred loading for performance
   })
 }

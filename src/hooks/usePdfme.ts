@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config/cache'
 import pdfmeService, {
   type PdfmeTemplateFilters,
   type CreatePdfmeTemplateData,
@@ -22,7 +23,7 @@ export const usePdfmeTemplates = (filters?: PdfmeTemplateFilters) => {
   return useQuery({
     queryKey: pdfmeKeys.list(filters || {}),
     queryFn: () => pdfmeService.getTemplates(filters),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT, // 2 minutes
   })
 }
 
@@ -41,7 +42,7 @@ export const useDefaultPdfmeTemplate = (category: PdfmeTemplateCategory) => {
     queryKey: pdfmeKeys.defaultTemplate(category),
     queryFn: () => pdfmeService.getDefaultTemplate(category),
     enabled: !!category,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 

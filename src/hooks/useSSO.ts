@@ -6,6 +6,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
+import { CACHE_TIMES } from '@/config/cache'
 import ssoService, {
   SSOSettings,
   SaveProviderRequest,
@@ -31,7 +32,7 @@ export const useSSOSettings = () => {
   return useQuery({
     queryKey: ssoKeys.settings(),
     queryFn: () => ssoService.getSSOSettings(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 
@@ -64,7 +65,7 @@ export const useAvailableProviders = () => {
   return useQuery({
     queryKey: ssoKeys.availableProviders(),
     queryFn: () => ssoService.getAvailableProviders(),
-    staleTime: 30 * 60 * 1000, // 30 minutes
+    staleTime: CACHE_TIMES.LONG, // 30 minutes
   })
 }
 
@@ -76,7 +77,7 @@ export const useSSOProvider = (providerId: string, enabled = true) => {
     queryKey: ssoKeys.provider(providerId),
     queryFn: () => ssoService.getSSOProvider(providerId),
     enabled: enabled && !!providerId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 
@@ -87,7 +88,7 @@ export const useEnabledSSOProviders = () => {
   return useQuery({
     queryKey: ssoKeys.enabledProviders(),
     queryFn: () => ssoService.getEnabledSSOProviders(),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT, // 2 minutes
     retry: 1,
   })
 }

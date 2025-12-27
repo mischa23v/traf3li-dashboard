@@ -13,6 +13,7 @@ import companyService, {
   type CompanyTreeNode,
 } from '@/services/companyService'
 import { toast } from 'sonner'
+import { CACHE_TIMES } from '@/config/cache'
 
 // ==================== QUERY HOOKS ====================
 
@@ -23,7 +24,7 @@ export const useCompanies = (filters?: CompanyFilters) => {
   return useQuery({
     queryKey: ['firms', filters],
     queryFn: () => companyService.getAll(filters),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -35,7 +36,7 @@ export const useCompany = (id: string | undefined) => {
     queryKey: ['firm', id],
     queryFn: () => companyService.getById(id!),
     enabled: !!id,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -46,7 +47,7 @@ export const useCompanyTree = (rootFirmId?: string) => {
   return useQuery({
     queryKey: ['firms', 'tree', rootFirmId],
     queryFn: () => companyService.getTree(rootFirmId),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -58,7 +59,7 @@ export const useChildCompanies = (parentId: string | undefined) => {
     queryKey: ['firms', parentId, 'children'],
     queryFn: () => companyService.getChildren(parentId!),
     enabled: !!parentId,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -69,7 +70,7 @@ export const useAccessibleCompanies = () => {
   return useQuery({
     queryKey: ['firms', 'accessible'],
     queryFn: () => companyService.getUserAccessibleCompanies(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -81,7 +82,7 @@ export const useActiveCompany = () => {
     queryKey: ['firm', 'active'],
     queryFn: () => companyService.getActiveCompany(),
     retry: 1,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -93,7 +94,7 @@ export const useCompanyAccessList = (firmId: string | undefined) => {
     queryKey: ['firm', firmId, 'access'],
     queryFn: () => companyService.getAccessList(firmId!),
     enabled: !!firmId,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 

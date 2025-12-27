@@ -6,6 +6,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useOnboardings, useOnboardingStats, useBulkDeleteOnboardings, useDeleteOnboarding } from '@/hooks/useOnboarding'
@@ -114,11 +115,11 @@ export function OnboardingListView() {
 
   // Single onboarding actions
   const handleViewOnboarding = (onboardingId: string) => {
-    navigate({ to: '/dashboard/hr/onboarding/$onboardingId', params: { onboardingId } })
+    navigate({ to: ROUTES.dashboard.hr.onboarding.detail(onboardingId), params: { onboardingId } })
   }
 
   const handleEditOnboarding = (onboardingId: string) => {
-    navigate({ to: '/dashboard/hr/onboarding/new', search: { editId: onboardingId } })
+    navigate({ to: ROUTES.dashboard.hr.onboarding.new, search: { editId: onboardingId } })
   }
 
   const handleDeleteOnboarding = (onboardingId: string) => {
@@ -172,8 +173,8 @@ export function OnboardingListView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'التأهيل', href: '/dashboard/hr/onboarding', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'التأهيل', href: ROUTES.dashboard.hr.onboarding.list, isActive: true },
   ]
 
   return (
@@ -287,7 +288,7 @@ export function OnboardingListView() {
                     {onboardings.length} برنامج
                   </Badge>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/hr/onboarding/new' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.hr.onboarding.new })}
                     className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
                     <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
@@ -433,7 +434,7 @@ export function OnboardingListView() {
                           {getProbationBadge(onboarding.probation.probationStatus)}
                         </div>
                       </div>
-                      <Link to={`/dashboard/hr/onboarding/${onboarding._id}`}>
+                      <Link to={ROUTES.dashboard.hr.onboarding.detail(onboarding._id)}>
                         <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
                           عرض التفاصيل
                         </Button>

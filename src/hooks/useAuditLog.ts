@@ -6,6 +6,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { CACHE_TIMES } from '@/config/cache'
 import { useAuthStore } from '@/stores/auth-store'
 import auditService, {
   AuditLogEntry,
@@ -139,7 +140,7 @@ export const useAuditStats = (
     queryKey: auditKeys.stats(),
     queryFn: () => auditService.getAuditStats(filters),
     enabled,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT, // 2 minutes
   })
 }
 

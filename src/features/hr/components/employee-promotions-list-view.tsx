@@ -6,6 +6,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ProductivityHero } from '@/components/productivity-hero'
 import {
@@ -220,11 +221,11 @@ export function EmployeePromotionsListView() {
 
   // Single promotion actions
   const handleViewPromotion = (promotionId: string) => {
-    navigate({ to: '/dashboard/hr/promotions/$promotionId', params: { promotionId } })
+    navigate({ to: ROUTES.dashboard.hr.promotions.detail(promotionId), params: { promotionId } })
   }
 
   const handleEditPromotion = (promotionId: string) => {
-    navigate({ to: '/dashboard/hr/promotions/$promotionId/edit', params: { promotionId } })
+    navigate({ to: ROUTES.dashboard.hr.promotions.edit(promotionId), params: { promotionId } })
   }
 
   const handleDeletePromotion = (promotionId: string) => {
@@ -313,9 +314,9 @@ export function EmployeePromotionsListView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'الترقيات', href: '/dashboard/hr/promotions', isActive: true },
-    { title: 'الإجازات', href: '/dashboard/hr/leaves', isActive: false },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'الترقيات', href: ROUTES.dashboard.hr.promotions.list, isActive: true },
+    { title: 'الإجازات', href: ROUTES.dashboard.hr.leave.list, isActive: false },
   ]
 
   return (
@@ -653,7 +654,7 @@ export function EmployeePromotionsListView() {
                             زيادة: {formatCurrency(promotion.salaryIncrease)}
                           </span>
                         </div>
-                        <Link to={`/dashboard/hr/promotions/${promotion.id}`}>
+                        <Link to={ROUTES.dashboard.hr.promotions.detail(promotion.id)}>
                           <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
                             عرض التفاصيل
                           </Button>

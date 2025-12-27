@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useParams, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   useLoan,
   useDeleteLoan,
@@ -136,7 +137,7 @@ export function LoansDetailsView() {
   const handleDelete = () => {
     if (confirm('هل أنت متأكد من حذف هذا القرض؟')) {
       deleteMutation.mutate(loanId, {
-        onSuccess: () => navigate({ to: '/dashboard/hr/loans' }),
+        onSuccess: () => navigate({ to: ROUTES.dashboard.hr.loans.list }),
       })
     }
   }
@@ -237,8 +238,8 @@ export function LoansDetailsView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'القروض', href: '/dashboard/hr/loans', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'القروض', href: ROUTES.dashboard.hr.loans.list, isActive: true },
   ]
 
   return (
@@ -283,7 +284,7 @@ export function LoansDetailsView() {
                   variant="ghost"
                   size="icon"
                   className="rounded-xl hover:bg-white"
-                  onClick={() => navigate({ to: '/dashboard/hr/loans' })}
+                  onClick={() => navigate({ to: ROUTES.dashboard.hr.loans.list })}
                 >
                   <ArrowRight className="h-5 w-5" />
                 </Button>

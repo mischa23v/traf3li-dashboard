@@ -10,6 +10,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import * as React from 'react'
+import { CACHE_TIMES } from '@/config/cache'
 
 import {
   setupMFA,
@@ -55,7 +56,7 @@ export function useMFAStatus(enabled = true) {
     queryKey: mfaKeys.status(),
     queryFn: getMFAStatus,
     enabled,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     retry: 1,
   })
 }
@@ -68,7 +69,7 @@ export function useMFARequirement(enabled = true) {
     queryKey: mfaKeys.requirement(),
     queryFn: checkMFARequirement,
     enabled,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     retry: 1,
   })
 }
@@ -81,7 +82,7 @@ export function useBackupCodesCount(enabled = true) {
     queryKey: mfaKeys.backupCodesCount(),
     queryFn: getBackupCodesCount,
     enabled,
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
     retry: 1,
   })
 }

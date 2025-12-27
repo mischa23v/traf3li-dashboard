@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   useEmployeeTransfers,
   useEmployeeTransferStats,
@@ -126,8 +127,8 @@ export function EmployeeTransfersListView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'نقل الموظفين', href: '/dashboard/hr/employee-transfers', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'نقل الموظفين', href: ROUTES.dashboard.hr.employeeTransfers.list, isActive: true },
   ]
 
   const formatDate = (dateString: string) => {
@@ -323,7 +324,7 @@ export function EmployeeTransfersListView() {
                     </Button>
                     <Button
                       size="sm"
-                      onClick={() => navigate({ to: '/dashboard/hr/employee-transfers/new' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.hr.employeeTransfers.new })}
                       className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
                     >
                       <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
@@ -366,7 +367,7 @@ export function EmployeeTransfersListView() {
                   <Users className="w-12 h-12 mx-auto text-slate-300" />
                   <p className="mt-4 text-slate-500">لا توجد طلبات نقل</p>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/hr/employee-transfers/new' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.hr.employeeTransfers.new })}
                     className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
                     <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
@@ -423,7 +424,7 @@ export function EmployeeTransfersListView() {
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem
                                     onClick={() =>
-                                      navigate({ to: `/dashboard/hr/employee-transfers/${transfer._id}` })
+                                      navigate({ to: ROUTES.dashboard.hr.employeeTransfers.detail(transfer._id) })
                                     }
                                   >
                                     <Eye className="w-4 h-4 ms-2" aria-hidden="true" />

@@ -50,6 +50,7 @@ import { FinanceSidebar } from './finance-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { formatSAR } from '@/lib/currency'
 import type { DebitNoteStatus } from '@/services/accountingService'
+import { ROUTES } from '@/constants/routes'
 
 export default function DebitNotesDashboard() {
     const navigate = useNavigate()
@@ -162,12 +163,12 @@ export default function DebitNotesDashboard() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'فواتير الموردين', href: '/dashboard/finance/bills', isActive: false },
-        { title: 'إشعارات الخصم', href: '/dashboard/finance/debit-notes', isActive: true },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
-        { title: 'المعاملات', href: '/dashboard/finance/transactions', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: false },
+        { title: 'فواتير الموردين', href: ROUTES.dashboard.finance.bills.list, isActive: false },
+        { title: 'إشعارات الخصم', href: ROUTES.dashboard.finance.debitNotes.list, isActive: true },
+        { title: 'المصروفات', href: ROUTES.dashboard.finance.expenses.list, isActive: false },
+        { title: 'المعاملات', href: ROUTES.dashboard.finance.transactions.list, isActive: false },
     ]
 
     // LOADING STATE
@@ -291,7 +292,7 @@ export default function DebitNotesDashboard() {
                                 </div>
                                 <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد إشعارات خصم بعد</h3>
                                 <p className="text-slate-500 mb-6">ابدأ بإنشاء أول إشعار خصم من فاتورة مورد</p>
-                                <Button onClick={() => navigate({ to: '/dashboard/finance/debit-notes/new' })} className="bg-indigo-600 hover:bg-indigo-700 text-white px-8">
+                                <Button onClick={() => navigate({ to: ROUTES.dashboard.finance.debitNotes.new })} className="bg-indigo-600 hover:bg-indigo-700 text-white px-8">
                                     <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                                     إنشاء إشعار خصم
                                 </Button>
@@ -314,7 +315,7 @@ export default function DebitNotesDashboard() {
                                                 <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                                                 <Input placeholder="بحث..." className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]" defaultValue={searchQuery} onChange={(e) => debouncedSetSearch(e.target.value)} />
                                             </div>
-                                            <Button onClick={() => navigate({ to: '/dashboard/finance/debit-notes/new' })} className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white">
+                                            <Button onClick={() => navigate({ to: ROUTES.dashboard.finance.debitNotes.new })} className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white">
                                                 <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 إنشاء
                                             </Button>
@@ -417,7 +418,7 @@ export default function DebitNotesDashboard() {
                                             </Button>
                                         </div>
                                     ) : filteredDebitNotes.map((dn) => (
-                                        <Link key={dn.id} to={`/dashboard/finance/debit-notes/${dn._id}`}>
+                                        <Link key={dn.id} to={ROUTES.dashboard.finance.debitNotes.detail(dn._id)}>
                                             <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer">
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">

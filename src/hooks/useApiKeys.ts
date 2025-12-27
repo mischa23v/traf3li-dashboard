@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config/cache'
 import apiKeysService, {
   CreateApiKeyRequest,
 } from '@/services/apiKeysService'
@@ -12,7 +13,7 @@ export const useApiKeys = () => {
   return useQuery({
     queryKey: ['api-keys'],
     queryFn: () => apiKeysService.getUserApiKeys(),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT, // 2 minutes
   })
 }
 
@@ -23,7 +24,7 @@ export const useApiKeyStats = () => {
   return useQuery({
     queryKey: ['api-keys', 'stats'],
     queryFn: () => apiKeysService.getApiKeyStats(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 

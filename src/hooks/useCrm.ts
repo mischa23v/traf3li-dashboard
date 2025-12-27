@@ -353,7 +353,7 @@ export const useScheduleFollowUp = () => {
     },
     onSettled: async (_, __, { leadId }) => {
       await invalidateCache.leads.detail(leadId)
-      return await queryClient.invalidateQueries({ queryKey: ['leads', 'follow-up'] })
+      return await invalidateCache.leads.followUp()
     },
   })
 }
@@ -939,7 +939,7 @@ export const useMarkReferralConverted = () => {
     },
     onSettled: async (_, __, { referralId }) => {
       await invalidateCache.referrals.detail(referralId)
-      return await queryClient.invalidateQueries({ queryKey: ['referrals', 'stats'] })
+      return await invalidateCache.referrals.stats()
     },
   })
 }
@@ -966,7 +966,7 @@ export const useRecordReferralPayment = () => {
     },
     onSettled: async (_, __, { referralId }) => {
       await invalidateCache.referrals.detail(referralId)
-      return await queryClient.invalidateQueries({ queryKey: ['referrals', 'stats'] })
+      return await invalidateCache.referrals.stats()
     },
   })
 }

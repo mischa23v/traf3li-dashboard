@@ -6,6 +6,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ProductivityHero } from '@/components/productivity-hero'
 import {
@@ -238,9 +239,9 @@ export function LeavePoliciesListView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'الإجازات', href: '/dashboard/hr/leave', isActive: false },
-    { title: 'سياسات الإجازات', href: '/dashboard/hr/leave-policies', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'الإجازات', href: ROUTES.dashboard.hr.leave.list, isActive: false },
+    { title: 'سياسات الإجازات', href: ROUTES.dashboard.hr.leave.policies, isActive: true },
   ]
 
   return (

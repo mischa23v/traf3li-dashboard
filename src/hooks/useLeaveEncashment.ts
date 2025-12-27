@@ -1,4 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config/cache'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   getLeaveEncashments,
   getLeaveEncashment,
@@ -118,7 +120,7 @@ export const useEncashmentPolicy = () => {
   return useQuery({
     queryKey: leaveEncashmentKeys.policy(),
     queryFn: getEncashmentPolicy,
-    staleTime: 1000 * 60 * 60, // 1 hour - policy doesn't change often
+    staleTime: CACHE_TIMES.HOUR, // 1 hour - policy doesn't change often
   })
 }
 
@@ -128,14 +130,14 @@ export const useEncashmentPolicy = () => {
  * Create leave encashment request
  */
 export const useCreateLeaveEncashment = () => {
-  const queryClient = useQueryClient()
+  
 
   return useMutation({
     mutationFn: (data: CreateLeaveEncashmentData) => createLeaveEncashment(data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.employeeHistory(variables.employeeId) })
+      invalidateCache.leaveEncashment.lists()
+      invalidateCache.leaveEncashment.stats()
+      invalidateCache.leaveEncashment.employeeHistory(variables.employeeId)
     },
   })
 }
@@ -144,14 +146,14 @@ export const useCreateLeaveEncashment = () => {
  * Update leave encashment
  */
 export const useUpdateLeaveEncashment = () => {
-  const queryClient = useQueryClient()
+  
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateLeaveEncashmentData }) =>
       updateLeaveEncashment(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.lists() })
+      invalidateCache.leaveEncashment.detail(id)
+      invalidateCache.leaveEncashment.lists()
     },
   })
 }
@@ -160,13 +162,13 @@ export const useUpdateLeaveEncashment = () => {
  * Delete leave encashment
  */
 export const useDeleteLeaveEncashment = () => {
-  const queryClient = useQueryClient()
+  
 
   return useMutation({
     mutationFn: (id: string) => deleteLeaveEncashment(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.stats() })
+      invalidateCache.leaveEncashment.lists()
+      invalidateCache.leaveEncashment.stats()
     },
   })
 }
@@ -175,14 +177,14 @@ export const useDeleteLeaveEncashment = () => {
  * Submit leave encashment for approval
  */
 export const useSubmitLeaveEncashment = () => {
-  const queryClient = useQueryClient()
+  
 
   return useMutation({
     mutationFn: (id: string) => submitLeaveEncashment(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.pendingApprovals() })
+      invalidateCache.leaveEncashment.detail(id)
+      invalidateCache.leaveEncashment.lists()
+      invalidateCache.leaveEncashment.pendingApprovals()
     },
   })
 }
@@ -201,18 +203,18 @@ export const useCalculateEncashmentAmount = () => {
  * Approve leave encashment
  */
 export const useApproveLeaveEncashment = () => {
-  const queryClient = useQueryClient()
+  
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data?: ApprovalActionData }) =>
       approveLeaveEncashment(id, data),
     onSuccess: (result, { id }) => {
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.pendingApprovals() })
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.stats() })
+      invalidateCache.leaveEncashment.detail(id)
+      invalidateCache.leaveEncashment.lists()
+      invalidateCache.leaveEncashment.pendingApprovals()
+      invalidateCache.leaveEncashment.stats()
       if (result.employeeId) {
-        queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.employeeHistory(result.employeeId) })
+        invalidateCache.leaveEncashment.employeeHistory(result.employeeId)
       }
     },
   })
@@ -222,16 +224,16 @@ export const useApproveLeaveEncashment = () => {
  * Reject leave encashment
  */
 export const useRejectLeaveEncashment = () => {
-  const queryClient = useQueryClient()
+  
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: RejectionActionData }) =>
       rejectLeaveEncashment(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.pendingApprovals() })
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.stats() })
+      invalidateCache.leaveEncashment.detail(id)
+      invalidateCache.leaveEncashment.lists()
+      invalidateCache.leaveEncashment.pendingApprovals()
+      invalidateCache.leaveEncashment.stats()
     },
   })
 }
@@ -240,15 +242,15 @@ export const useRejectLeaveEncashment = () => {
  * Mark as paid
  */
 export const useMarkAsPaid = () => {
-  const queryClient = useQueryClient()
+  
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: MarkAsPaidData }) =>
       markAsPaid(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.stats() })
+      invalidateCache.leaveEncashment.detail(id)
+      invalidateCache.leaveEncashment.lists()
+      invalidateCache.leaveEncashment.stats()
     },
   })
 }
@@ -257,17 +259,17 @@ export const useMarkAsPaid = () => {
  * Process encashment (update leave allocation)
  */
 export const useProcessEncashment = () => {
-  const queryClient = useQueryClient()
+  
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data?: ProcessEncashmentData }) =>
       processEncashment(id, data),
     onSuccess: (result, { id }) => {
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.lists() })
+      invalidateCache.leaveEncashment.detail(id)
+      invalidateCache.leaveEncashment.lists()
       if (result.employeeId) {
-        queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.employeeHistory(result.employeeId) })
-        queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.eligibility(result.employeeId, result.leaveType) })
+        invalidateCache.leaveEncashment.employeeHistory(result.employeeId)
+        invalidateCache.leaveEncashment.eligibility(result.employeeId, result.leaveType)
       }
     },
   })
@@ -277,17 +279,17 @@ export const useProcessEncashment = () => {
  * Cancel leave encashment
  */
 export const useCancelLeaveEncashment = () => {
-  const queryClient = useQueryClient()
+  
 
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       cancelLeaveEncashment(id, reason),
     onSuccess: (result, { id }) => {
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.stats() })
+      invalidateCache.leaveEncashment.detail(id)
+      invalidateCache.leaveEncashment.lists()
+      invalidateCache.leaveEncashment.stats()
       if (result.employeeId) {
-        queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.employeeHistory(result.employeeId) })
+        invalidateCache.leaveEncashment.employeeHistory(result.employeeId)
       }
     },
   })
@@ -297,12 +299,12 @@ export const useCancelLeaveEncashment = () => {
  * Bulk approve encashments
  */
 export const useBulkApproveEncashments = () => {
-  const queryClient = useQueryClient()
+  
 
   return useMutation({
     mutationFn: (ids: string[]) => bulkApproveEncashments(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.all })
+      invalidateCache.leaveEncashment.all()
     },
   })
 }
@@ -311,13 +313,13 @@ export const useBulkApproveEncashments = () => {
  * Bulk reject encashments
  */
 export const useBulkRejectEncashments = () => {
-  const queryClient = useQueryClient()
+  
 
   return useMutation({
     mutationFn: ({ ids, reason }: { ids: string[]; reason: string }) =>
       bulkRejectEncashments(ids, reason),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: leaveEncashmentKeys.all })
+      invalidateCache.leaveEncashment.all()
     },
   })
 }

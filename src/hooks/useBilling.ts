@@ -5,6 +5,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { CACHE_TIMES } from '@/config/cache'
 import billingService, {
   type ChangePlanData,
   type CreatePaymentMethodData,
@@ -17,7 +18,7 @@ export const useSubscription = () => {
   return useQuery({
     queryKey: ['subscription'],
     queryFn: () => billingService.getSubscription(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     retry: 2,
   })
 }
@@ -26,7 +27,7 @@ export const useUsageMetrics = () => {
   return useQuery({
     queryKey: ['usage-metrics'],
     queryFn: () => billingService.getUsageMetrics(),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT, // 2 minutes
     refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
   })
 }
@@ -89,7 +90,7 @@ export const useUpcomingInvoice = (planId?: string) => {
     queryKey: ['upcoming-invoice', planId],
     queryFn: () => billingService.getUpcomingInvoice(planId as any),
     enabled: !!planId,
-    staleTime: 1 * 60 * 1000, // 1 minute
+    staleTime: CACHE_TIMES.CALENDAR.GRID, // 1 minute
   })
 }
 
@@ -99,7 +100,7 @@ export const usePaymentMethods = () => {
   return useQuery({
     queryKey: ['payment-methods'],
     queryFn: () => billingService.getPaymentMethods(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 
@@ -169,7 +170,7 @@ export const useBillingHistory = (filters?: BillingHistoryFilters) => {
   return useQuery({
     queryKey: ['billing-history', filters],
     queryFn: () => billingService.getBillingHistory(filters),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 
@@ -178,7 +179,7 @@ export const useInvoice = (id: string) => {
     queryKey: ['invoice', id],
     queryFn: () => billingService.getInvoice(id),
     enabled: !!id,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 

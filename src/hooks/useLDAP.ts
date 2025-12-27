@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config/cache'
 import ldapService, { LDAPConfigFormData } from '@/services/ldapService'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
@@ -10,7 +11,7 @@ export const useLDAPConfig = () => {
   return useQuery({
     queryKey: ['ldap-config'],
     queryFn: () => ldapService.getConfig(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 

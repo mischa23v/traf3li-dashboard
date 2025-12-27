@@ -7,6 +7,7 @@ import { labels, priorities, statuses } from '../data/data'
 import { type Task } from '../data/schema'
 import { DataTableRowActions } from './data-table-row-actions'
 import { Calendar } from 'lucide-react'
+import { ROUTES } from '@/constants/routes'
 
 // Memoized cell components
 const TitleCell = memo(({ title, label, linkedEventId }: { title: string; label?: { label: string; value: string }; linkedEventId?: string }) => (
@@ -20,7 +21,7 @@ const TitleCell = memo(({ title, label, linkedEventId }: { title: string; label?
         className='bg-purple-100 text-purple-700 hover:bg-purple-200 border-0 rounded-md px-2 flex items-center gap-1 cursor-pointer transition-all'
         onClick={(e) => {
           e.stopPropagation()
-          window.location.href = `/dashboard/tasks/events/${linkedEventId}`
+          window.location.href = ROUTES.dashboard.tasks.events.detail(linkedEventId)
         }}
       >
         <Calendar className='h-3 w-3' />

@@ -65,7 +65,7 @@ export const usePendingPromotions = () => {
   return useQuery({
     queryKey: ['employee-promotions', 'pending'],
     queryFn: () => employeePromotionService.getPendingPromotions(),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
     gcTime: STATS_GC_TIME,
     retry: false,
   })
@@ -78,7 +78,7 @@ export const usePromotionsAwaitingApplication = () => {
   return useQuery({
     queryKey: ['employee-promotions', 'awaiting-application'],
     queryFn: () => employeePromotionService.getPromotionsAwaitingApplication(),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
     gcTime: STATS_GC_TIME,
     retry: false,
   })

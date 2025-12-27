@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useJobPostings, useJobPostingStats } from '@/hooks/useRecruitment'
 import { Button } from '@/components/ui/button'
@@ -124,11 +125,11 @@ export function JobPostingsListView() {
 
   // Single job actions
   const handleViewJob = (jobId: string) => {
-    navigate({ to: '/dashboard/hr/recruitment/jobs/$jobId', params: { jobId } })
+    navigate({ to: ROUTES.dashboard.hr.recruitment.jobs.detail(jobId), params: { jobId } })
   }
 
   const handleEditJob = (jobId: string) => {
-    navigate({ to: '/dashboard/hr/recruitment/jobs/new', search: { editId: jobId } })
+    navigate({ to: ROUTES.dashboard.hr.recruitment.jobs.new, search: { editId: jobId } })
   }
 
   const handleDeleteJob = (jobId: string) => {
@@ -210,9 +211,9 @@ export function JobPostingsListView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'التوظيف', href: '/dashboard/hr/recruitment/jobs', isActive: true },
-    { title: 'المتقدمين', href: '/dashboard/hr/recruitment/applicants', isActive: false },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'التوظيف', href: ROUTES.dashboard.hr.recruitment.jobs.list, isActive: true },
+    { title: 'المتقدمين', href: ROUTES.dashboard.hr.recruitment.applicants.list, isActive: false },
   ]
 
   return (
@@ -507,7 +508,7 @@ export function JobPostingsListView() {
                           </p>
                         </div>
                       </div>
-                      <Link to={`/dashboard/hr/recruitment/jobs/${job._id}` as any}>
+                      <Link to={ROUTES.dashboard.hr.recruitment.jobs.detail(job._id) as any}>
                         <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
                           عرض الوظيفة
                         </Button>

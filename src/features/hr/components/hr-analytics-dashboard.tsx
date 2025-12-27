@@ -77,10 +77,10 @@ export function HrAnalyticsDashboard() {
   const { data: diversityData } = useDiversityAnalytics()
 
   const topNav = [
-    { title: t('biometric.devices'), href: '/dashboard/hr/biometric', isActive: false },
-    { title: t('biometric.geofencing'), href: '/dashboard/hr/geofencing', isActive: false },
-    { title: t('hrAnalytics.title'), href: '/dashboard/hr/analytics', isActive: true },
-    { title: t('hrPredictions.title'), href: '/dashboard/hr/predictions', isActive: false },
+    { title: t('biometric.devices'), href: ROUTES.dashboard.hr.biometric.list, isActive: false },
+    { title: t('biometric.geofencing'), href: ROUTES.dashboard.hr.geofencing.list, isActive: false },
+    { title: t('hrAnalytics.title'), href: ROUTES.dashboard.hr.analytics.list, isActive: true },
+    { title: t('hrPredictions.title'), href: ROUTES.dashboard.hr.predictions.list, isActive: false },
   ]
 
   const periods = [

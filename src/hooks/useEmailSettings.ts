@@ -5,6 +5,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { CACHE_TIMES } from '@/config/cache'
 import emailSettingsService, {
   UpdateSmtpConfigData,
   TestSmtpConnectionData,
@@ -20,7 +21,7 @@ export const useSmtpConfig = () => {
   return useQuery({
     queryKey: ['smtp-config'],
     queryFn: () => emailSettingsService.getSmtpConfig(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -74,7 +75,7 @@ export const useEmailSignatures = () => {
   return useQuery({
     queryKey: ['email-signatures'],
     queryFn: () => emailSettingsService.getEmailSignatures(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -182,7 +183,7 @@ export const useEmailTemplates = () => {
   return useQuery({
     queryKey: ['email-templates'],
     queryFn: () => emailSettingsService.getEmailTemplates(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -191,7 +192,7 @@ export const useEmailTemplate = (id: string) => {
     queryKey: ['email-templates', id],
     queryFn: () => emailSettingsService.getEmailTemplate(id),
     enabled: !!id,
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 

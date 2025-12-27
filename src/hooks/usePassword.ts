@@ -7,6 +7,7 @@ import { useState, useMemo, useCallback } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
+import { CACHE_TIMES } from '@/config/cache'
 import passwordService, {
   type PasswordStatus,
   type PasswordStrength,
@@ -26,7 +27,7 @@ export function usePasswordStatus(enabled = true) {
     queryKey: passwordKeys.status(),
     queryFn: () => passwordService.getStatus(),
     enabled,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     retry: 1,
   })
 }

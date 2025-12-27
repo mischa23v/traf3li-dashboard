@@ -276,7 +276,7 @@ export function CreateReminderView() {
                     {/* Main Form Content */}
                     <div className="lg:col-span-2 space-y-4">
                         {/* Back Arrow Link - Styled like sidebar cards */}
-                        <Link to="/dashboard/tasks/reminders" className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-slate-100 hover:border-emerald-200 hover:shadow-md transition-all group">
+                        <Link to={ROUTES.dashboard.tasks.reminders.list} className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-slate-100 hover:border-emerald-200 hover:shadow-md transition-all group">
                             <div className="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-emerald-100 flex items-center justify-center transition-colors">
                                 <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-emerald-600 transition-colors" />
                             </div>
@@ -817,7 +817,7 @@ export function CreateReminderView() {
                                 {/* Footer / Actions */}
                                 <div className="px-8 py-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-4">
                                     <div className="flex items-center gap-3 ms-auto">
-                                        <Link to="/dashboard/tasks/reminders">
+                                        <Link to={ROUTES.dashboard.tasks.reminders.list}>
                                             <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-700 h-11 px-6">
                                                 إلغاء
                                             </Button>

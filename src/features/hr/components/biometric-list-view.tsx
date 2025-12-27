@@ -6,6 +6,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useDevices, useDeleteDevice } from '@/hooks/useBiometric'
@@ -178,11 +179,11 @@ export function BiometricListView() {
 
     // Single device actions
     const handleViewDevice = (deviceId: string) => {
-        navigate({ to: '/dashboard/hr/biometric/$deviceId', params: { deviceId } })
+        navigate({ to: ROUTES.dashboard.hr.biometric.detail(deviceId), params: { deviceId } })
     }
 
     const handleEditDevice = (deviceId: string) => {
-        navigate({ to: '/dashboard/hr/biometric/new', search: { editId: deviceId } })
+        navigate({ to: ROUTES.dashboard.hr.biometric.new, search: { editId: deviceId } })
     }
 
     const handleDeleteDevice = (deviceId: string) => {
@@ -246,9 +247,9 @@ export function BiometricListView() {
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-        { title: 'الأجهزة البيومترية', href: '/dashboard/hr/biometric', isActive: true },
-        { title: 'الإجازات', href: '/dashboard/hr/leaves', isActive: false },
+        { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+        { title: 'الأجهزة البيومترية', href: ROUTES.dashboard.hr.biometric.list, isActive: true },
+        { title: 'الإجازات', href: ROUTES.dashboard.hr.leave.list, isActive: false },
     ]
 
     return (
@@ -523,7 +524,7 @@ export function BiometricListView() {
                                                     )}
                                                 </div>
                                             </div>
-                                            <Link to={`/dashboard/hr/biometric/${device.id}` as any}>
+                                            <Link to={ROUTES.dashboard.hr.biometric.detail(device.id) as any}>
                                                 <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
                                                     عرض التفاصيل
                                                 </Button>

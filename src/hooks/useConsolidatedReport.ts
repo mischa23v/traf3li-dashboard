@@ -5,6 +5,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { CACHE_TIMES } from '@/config/cache'
 import consolidatedReportService, {
   type ConsolidationFilters,
   type EliminationRule,
@@ -37,7 +38,7 @@ export const useConsolidatedProfitLoss = (filters: ConsolidationFilters) => {
     queryKey: consolidatedReportKeys.profitLoss(filters),
     queryFn: () => consolidatedReportService.getConsolidatedProfitLoss(filters),
     enabled: filters.firmIds.length > 0 && !!filters.startDate && !!filters.endDate,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT, // 2 minutes
     retry: 2,
   })
 }
@@ -49,7 +50,7 @@ export const useConsolidatedBalanceSheet = (filters: ConsolidationFilters) => {
     queryKey: consolidatedReportKeys.balanceSheet(filters),
     queryFn: () => consolidatedReportService.getConsolidatedBalanceSheet(filters),
     enabled: filters.firmIds.length > 0 && !!filters.startDate && !!filters.endDate,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT, // 2 minutes
     retry: 2,
   })
 }
@@ -66,7 +67,7 @@ export const useInterCompanyTransactions = (
     queryFn: () =>
       consolidatedReportService.getInterCompanyTransactions(firmIds, startDate, endDate),
     enabled: firmIds.length > 1 && !!startDate && !!endDate,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT, // 2 minutes
   })
 }
 
@@ -83,7 +84,7 @@ export const useCompanyComparisons = (
     queryFn: () =>
       consolidatedReportService.getCompanyComparisons(firmIds, startDate, endDate, metrics),
     enabled: firmIds.length > 0 && !!startDate && !!endDate && metrics.length > 0,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT, // 2 minutes
   })
 }
 
@@ -94,7 +95,7 @@ export const useConsolidationSummary = (filters: ConsolidationFilters) => {
     queryKey: consolidatedReportKeys.summary(filters),
     queryFn: () => consolidatedReportService.getConsolidationSummary(filters),
     enabled: filters.firmIds.length > 0 && !!filters.startDate && !!filters.endDate,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT, // 2 minutes
   })
 }
 
@@ -104,7 +105,7 @@ export const useEliminationRules = () => {
   return useQuery({
     queryKey: consolidatedReportKeys.eliminationRules(),
     queryFn: () => consolidatedReportService.getEliminationRules(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 
@@ -179,7 +180,7 @@ export const useExchangeRates = (currencies: string[], date?: string) => {
     queryKey: consolidatedReportKeys.exchangeRates(currencies, date),
     queryFn: () => consolidatedReportService.getExchangeRates(currencies, date),
     enabled: currencies.length > 0,
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: CACHE_TIMES.LONG, // 30 minutes (was 10 minutes)
   })
 }
 

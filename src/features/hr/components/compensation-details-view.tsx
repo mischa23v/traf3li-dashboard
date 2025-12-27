@@ -6,6 +6,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   useCompensationRecord,
   useDeleteCompensation,
@@ -64,8 +65,8 @@ export function CompensationDetailsView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'التعويضات', href: '/dashboard/hr/compensation', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'التعويضات', href: ROUTES.dashboard.hr.compensation.list, isActive: true },
   ]
 
   const getStatusColor = (status: CompensationStatus) => {
@@ -133,7 +134,7 @@ export function CompensationDetailsView() {
     if (!compensationId) return
     if (confirm('هل أنت متأكد من حذف سجل التعويضات هذا؟')) {
       await deleteMutation.mutateAsync(compensationId)
-      navigate({ to: '/dashboard/hr/compensation' })
+      navigate({ to: ROUTES.dashboard.hr.compensation.list })
     }
   }
 
@@ -186,7 +187,7 @@ export function CompensationDetailsView() {
                   <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" aria-hidden="true" />
                   <p className="text-red-600">حدث خطأ في تحميل بيانات التعويضات</p>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/hr/compensation' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.hr.compensation.list })}
                     className="mt-4"
                   >
                     العودة للقائمة
@@ -202,7 +203,7 @@ export function CompensationDetailsView() {
                       variant="ghost"
                       size="icon"
                       className="rounded-xl hover:bg-white"
-                      onClick={() => navigate({ to: '/dashboard/hr/compensation' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.hr.compensation.list })}
                     >
                       <ArrowRight className="h-5 w-5" />
                     </Button>

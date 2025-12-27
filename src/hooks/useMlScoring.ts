@@ -179,7 +179,7 @@ export const usePriorityQueue = (params?: GetPriorityQueueParams) => {
   return useQuery<{ data: PriorityQueueItem[] }>({
     queryKey: mlScoringKeys.priorityQueueList(params),
     queryFn: () => getPriorityQueue(params),
-    staleTime: 1 * 60 * 1000, // 1 minute - more frequent updates for queue
+    staleTime: CACHE_TIMES.CALENDAR.GRID, // 1 minute - more frequent updates for queue
     refetchInterval: CACHE_TIMES.MEDIUM, // Auto-refresh every 5 minutes
   })
 }
@@ -257,7 +257,7 @@ export const useSLABreaches = () => {
   return useQuery<{ data: { breaches: SLABreachItem[] } }>({
     queryKey: mlScoringKeys.slaBreaches(),
     queryFn: () => getSLABreaches(),
-    staleTime: 1 * 60 * 1000, // 1 minute - important to keep updated
+    staleTime: CACHE_TIMES.CALENDAR.GRID, // 1 minute - important to keep updated
     refetchInterval: CACHE_TIMES.SHORT, // Auto-refresh every 2 minutes
   })
 }
@@ -306,7 +306,7 @@ export const useModelMetrics = () => {
   return useQuery<{ data: ModelMetrics }>({
     queryKey: mlScoringKeys.modelMetrics(),
     queryFn: () => getModelMetrics(),
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: CACHE_TIMES.LONG, // 30 minutes (was 10 minutes)
   })
 }
 

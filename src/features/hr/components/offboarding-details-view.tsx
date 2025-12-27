@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useParams, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   useOffboarding,
   useDeleteOffboarding,
@@ -65,7 +66,7 @@ export function OffboardingDetailsView() {
   const handleDelete = () => {
     if (confirm('هل أنت متأكد من حذف هذا السجل؟')) {
       deleteMutation.mutate(offboardingId, {
-        onSuccess: () => navigate({ to: '/dashboard/hr/offboarding' }),
+        onSuccess: () => navigate({ to: ROUTES.dashboard.hr.offboarding.list }),
       })
     }
   }
@@ -115,8 +116,8 @@ export function OffboardingDetailsView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'إنهاء الخدمة', href: '/dashboard/hr/offboarding', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'إنهاء الخدمة', href: ROUTES.dashboard.hr.offboarding.list, isActive: true },
   ]
 
   return (
@@ -161,7 +162,7 @@ export function OffboardingDetailsView() {
                   variant="ghost"
                   size="icon"
                   className="rounded-xl hover:bg-white"
-                  onClick={() => navigate({ to: '/dashboard/hr/offboarding' })}
+                  onClick={() => navigate({ to: ROUTES.dashboard.hr.offboarding.list })}
                 >
                   <ArrowRight className="h-5 w-5" />
                 </Button>

@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useSearch } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useCreateAssetAssignment, useUpdateAssetAssignment, useAssetAssignment } from '@/hooks/useAssetAssignment'
 import { useEmployees } from '@/hooks/useHR'
 import { Button } from '@/components/ui/button'
@@ -361,13 +362,13 @@ export function AssetAssignmentCreateView() {
       await createMutation.mutateAsync(data)
     }
 
-    navigate({ to: '/dashboard/hr/asset-assignment' })
+    navigate({ to: ROUTES.dashboard.hr.assetAssignment.list })
   }
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'الأصول والمعدات', href: '/dashboard/hr/asset-assignment', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'الأصول والمعدات', href: ROUTES.dashboard.hr.assetAssignment.list, isActive: true },
   ]
 
   const isPending = createMutation.isPending || updateMutation.isPending
@@ -428,7 +429,7 @@ export function AssetAssignmentCreateView() {
                 variant="ghost"
                 size="icon"
                 className="rounded-xl hover:bg-white"
-                onClick={() => navigate({ to: '/dashboard/hr/asset-assignment' })}
+                onClick={() => navigate({ to: ROUTES.dashboard.hr.assetAssignment.list })}
               >
                 <ArrowRight className="h-5 w-5" />
               </Button>
@@ -1103,7 +1104,7 @@ export function AssetAssignmentCreateView() {
             <div className="flex items-center justify-end gap-4">
               <Button
                 variant="outline"
-                onClick={() => navigate({ to: '/dashboard/hr/asset-assignment' })}
+                onClick={() => navigate({ to: ROUTES.dashboard.hr.assetAssignment.list })}
                 className="rounded-xl"
               >
                 إلغاء

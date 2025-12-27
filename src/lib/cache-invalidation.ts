@@ -22,6 +22,8 @@ export const invalidateCache = {
     templates: () => queryClient.invalidateQueries({ queryKey: ['tasks', 'templates'] }),
     timeTracking: (taskId: string) => queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'time-tracking'] }),
     recurrenceHistory: (taskId: string) => queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'recurrence-history'] }),
+    documents: (taskId: string) => queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] }),
+    document: (taskId: string, documentId: string) => queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents', documentId] }),
     // Invalidate everything related to tasks
     related: async () => {
       await Promise.all([
@@ -439,6 +441,102 @@ export const invalidateCache = {
     },
   },
 
+  // Advances
+  advances: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['advances'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['advances', 'list'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['advances', 'detail', id] }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['advances', 'stats'] }),
+    byEmployee: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['advances', 'employee', employeeId] }),
+    pendingApprovals: () => queryClient.invalidateQueries({ queryKey: ['advances', 'pending-approvals'] }),
+    overdueRecoveries: () => queryClient.invalidateQueries({ queryKey: ['advances', 'overdue-recoveries'] }),
+    emergency: () => queryClient.invalidateQueries({ queryKey: ['advances', 'emergency'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.advances.all(),
+        invalidateCache.staff.all(),
+        invalidateCache.payroll.all(),
+      ])
+    },
+  },
+
+  // Compensatory Leave
+  compensatoryLeave: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['compensatory-leave-requests'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['compensatory-leave-requests', 'list'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['compensatory-leave-requests', 'detail', id] }),
+    stats: (filters?: any) => queryClient.invalidateQueries({ queryKey: ['compensatory-leave-requests', 'stats', filters] }),
+    balance: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['compensatory-leave-requests', 'balance', employeeId] }),
+    pendingApprovals: () => queryClient.invalidateQueries({ queryKey: ['compensatory-leave-requests', 'pending-approvals'] }),
+    expiring: (daysBeforeExpiry?: number) => queryClient.invalidateQueries({ queryKey: ['compensatory-leave-requests', 'expiring', daysBeforeExpiry] }),
+    holidayWorkRecords: (employeeId: string, filters?: any) => queryClient.invalidateQueries({ queryKey: ['compensatory-leave-requests', 'holiday-work', employeeId, filters] }),
+    policy: () => queryClient.invalidateQueries({ queryKey: ['compensatory-leave-requests', 'policy'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.compensatoryLeave.all(),
+        invalidateCache.leaves.all(),
+        invalidateCache.leaveAllocation.all(),
+        invalidateCache.attendance.all(),
+      ])
+    },
+  },
+
+  // Leave Encashment
+  leaveEncashment: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['leave-encashments'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['leave-encashments', 'list'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['leave-encashments', 'detail', id] }),
+    stats: (filters?: any) => queryClient.invalidateQueries({ queryKey: ['leave-encashments', 'stats', filters] }),
+    pendingApprovals: () => queryClient.invalidateQueries({ queryKey: ['leave-encashments', 'pending-approvals'] }),
+    employeeHistory: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['leave-encashments', 'employee', employeeId] }),
+    eligibility: (employeeId: string, leaveType: string) => queryClient.invalidateQueries({ queryKey: ['leave-encashments', 'eligibility', employeeId, leaveType] }),
+    policy: () => queryClient.invalidateQueries({ queryKey: ['leave-encashments', 'policy'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.leaveEncashment.all(),
+        invalidateCache.leaves.all(),
+        invalidateCache.leaveAllocation.all(),
+        invalidateCache.payroll.all(),
+      ])
+    },
+  },
+
+  // Organizational Structure
+  organizationalStructure: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['organizational-structure'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['organizational-structure', 'list'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['organizational-structure', 'detail', id] }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['organizational-structure', 'stats'] }),
+    tree: (rootUnitId?: string) => queryClient.invalidateQueries({ queryKey: ['organizational-structure', 'tree', rootUnitId] }),
+    children: (parentId: string) => queryClient.invalidateQueries({ queryKey: ['organizational-structure', 'children', parentId] }),
+    path: (unitId: string) => queryClient.invalidateQueries({ queryKey: ['organizational-structure', 'path', unitId] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.organizationalStructure.all(),
+        invalidateCache.staff.all(),
+        invalidateCache.jobPositions.all(),
+      ])
+    },
+  },
+
+  // Odoo Activities
+  odooActivities: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['odoo-activities'] }),
+    types: () => queryClient.invalidateQueries({ queryKey: ['odoo-activities', 'types'] }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['odoo-activities', 'stats'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['odoo-activities', 'list'] }),
+    my: () => queryClient.invalidateQueries({ queryKey: ['odoo-activities', 'my'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['odoo-activities', 'detail', id] }),
+    record: (resModel: string, resId: string) => queryClient.invalidateQueries({ queryKey: ['odoo-activities', 'record', resModel, resId] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.odooActivities.all(),
+        invalidateCache.activities.all(),
+        invalidateCache.calendar.all(),
+      ])
+    },
+  },
+
   // Shift Assignments
   shiftAssignments: {
     all: () => queryClient.invalidateQueries({ queryKey: ['shift-assignments'] }),
@@ -664,6 +762,7 @@ export const invalidateCache = {
     detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['leads', id] }),
     stats: () => queryClient.invalidateQueries({ queryKey: ['leads', 'stats'] }),
     pipeline: (pipelineId?: string) => queryClient.invalidateQueries({ queryKey: ['leads', 'pipeline', pipelineId] }),
+    followUp: () => queryClient.invalidateQueries({ queryKey: ['leads', 'follow-up'] }),
     scoring: () => queryClient.invalidateQueries({ queryKey: ['lead-scores'] }),
     scoreDistribution: () => queryClient.invalidateQueries({ queryKey: ['lead-score-distribution'] }),
     scoringConfig: () => queryClient.invalidateQueries({ queryKey: ['lead-scoring-config'] }),
@@ -679,6 +778,7 @@ export const invalidateCache = {
   referrals: {
     all: () => queryClient.invalidateQueries({ queryKey: ['referrals'] }),
     detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['referrals', id] }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['referrals', 'stats'] }),
   },
 
   // Contacts

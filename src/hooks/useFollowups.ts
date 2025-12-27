@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config/cache'
 import followupsService, {
   type FollowupFilters,
   type CreateFollowupData,
@@ -28,7 +29,7 @@ export const useFollowups = (filters?: FollowupFilters) => {
   return useQuery({
     queryKey: followupsKeys.list(filters || {}),
     queryFn: () => followupsService.getFollowups(filters),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT, // 2 minutes
   })
 }
 
@@ -58,7 +59,7 @@ export const useFollowupStats = () => {
   return useQuery({
     queryKey: followupsKeys.stats(),
     queryFn: () => followupsService.getFollowupStats(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 
@@ -67,7 +68,7 @@ export const useOverdueFollowups = () => {
   return useQuery({
     queryKey: followupsKeys.overdue(),
     queryFn: () => followupsService.getOverdueFollowups(),
-    staleTime: 1 * 60 * 1000, // 1 minute
+    staleTime: CACHE_TIMES.CALENDAR.GRID, // 1 minute
   })
 }
 
@@ -76,7 +77,7 @@ export const useUpcomingFollowups = (days: number = 7) => {
   return useQuery({
     queryKey: followupsKeys.upcoming(days),
     queryFn: () => followupsService.getUpcomingFollowups(days),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT, // 2 minutes
   })
 }
 
@@ -85,7 +86,7 @@ export const useTodayFollowups = () => {
   return useQuery({
     queryKey: followupsKeys.today(),
     queryFn: () => followupsService.getTodayFollowups(),
-    staleTime: 1 * 60 * 1000, // 1 minute
+    staleTime: CACHE_TIMES.CALENDAR.GRID, // 1 minute
   })
 }
 

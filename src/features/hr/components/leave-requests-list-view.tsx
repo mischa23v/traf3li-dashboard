@@ -6,6 +6,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useLeaveRequests, useLeaveStats, useDeleteLeaveRequest } from '@/hooks/useLeave'
@@ -132,11 +133,11 @@ export function LeaveRequestsListView() {
 
     // Single request actions
     const handleViewRequest = useCallback((requestId: string) => {
-        navigate({ to: '/dashboard/hr/leave/$requestId', params: { requestId } })
+        navigate({ to: ROUTES.dashboard.hr.leave.detail(requestId), params: { requestId } })
     }, [navigate])
 
     const handleEditRequest = useCallback((requestId: string) => {
-        navigate({ to: '/dashboard/hr/leave/new', search: { editId: requestId } })
+        navigate({ to: ROUTES.dashboard.hr.leave.new, search: { editId: requestId } })
     }, [navigate])
 
     const handleDeleteRequest = useCallback((requestId: string) => {
@@ -249,8 +250,8 @@ export function LeaveRequestsListView() {
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-        { title: 'الإجازات', href: '/dashboard/hr/leave', isActive: true },
+        { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+        { title: 'الإجازات', href: ROUTES.dashboard.hr.leave.list, isActive: true },
     ]
 
     return (
@@ -538,7 +539,7 @@ export function LeaveRequestsListView() {
                                         )}
 
                                         <div className="flex justify-end mt-4">
-                                            <Link to={`/dashboard/hr/leave/${request._id}` as any}>
+                                            <Link to={ROUTES.dashboard.hr.leave.detail(request._id) as any}>
                                                 <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
                                                     عرض الطلب
                                                 </Button>

@@ -6,6 +6,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useAttendanceRecords, useTodayAttendance } from '@/hooks/useAttendance'
@@ -123,11 +124,11 @@ export function AttendanceRecordsListView() {
 
   // Single record actions
   const handleViewRecord = useCallback((recordId: string) => {
-    navigate({ to: '/dashboard/hr/attendance/$recordId', params: { recordId } })
+    navigate({ to: ROUTES.dashboard.hr.attendance.detail(recordId), params: { recordId } })
   }, [navigate])
 
   const handleEditRecord = useCallback((recordId: string) => {
-    navigate({ to: '/dashboard/hr/attendance/new', search: { editId: recordId } })
+    navigate({ to: ROUTES.dashboard.hr.attendance.new, search: { editId: recordId } })
   }, [navigate])
 
   const handleDeleteRecord = useCallback((recordId: string) => {
@@ -213,9 +214,9 @@ export function AttendanceRecordsListView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'الحضور', href: '/dashboard/hr/attendance', isActive: true },
-    { title: 'الإجازات', href: '/dashboard/hr/leaves', isActive: false },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'الحضور', href: ROUTES.dashboard.hr.attendance.list, isActive: true },
+    { title: 'الإجازات', href: ROUTES.dashboard.hr.leave.list, isActive: false },
   ]
 
   return (
@@ -544,7 +545,7 @@ export function AttendanceRecordsListView() {
                           </div>
                         )}
                       </div>
-                      <Link to={`/dashboard/hr/attendance/${record._id}`}>
+                      <Link to={ROUTES.dashboard.hr.attendance.detail(record._id)}>
                         <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
                           عرض السجل
                         </Button>

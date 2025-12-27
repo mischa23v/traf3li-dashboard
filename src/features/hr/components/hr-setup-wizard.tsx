@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   Building2, Users, Calendar, Clock, DollarSign, Mail, CheckCircle2,
   ChevronRight, ChevronLeft, Loader2, Check, Edit, ArrowRight, Sparkles,
@@ -445,7 +446,7 @@ export default function HRSetupWizard() {
 
       // Navigate to HR overview
       setTimeout(() => {
-        navigate({ to: '/dashboard/hr/employees' })
+        navigate({ to: ROUTES.dashboard.hr.employees.list })
       }, 1500)
 
     } catch (error: any) {
@@ -459,8 +460,8 @@ export default function HRSetupWizard() {
   }
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'معالج إعداد HR', href: '/dashboard/hr/setup-wizard', isActive: true },
+    { title: 'نظرة عامة', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'معالج إعداد HR', href: ROUTES.dashboard.hr.setupWizard, isActive: true },
   ]
 
   const renderStepContent = () => {

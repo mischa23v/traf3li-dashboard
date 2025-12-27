@@ -341,8 +341,8 @@ export const useSidebarData = (isEnabled = true) => {
         throw error
       }
     },
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
+    gcTime: CACHE_TIMES.GC_LONG,
     enabled: isAuthenticated && isEnabled,
     retry: false,
     refetchOnWindowFocus: false,

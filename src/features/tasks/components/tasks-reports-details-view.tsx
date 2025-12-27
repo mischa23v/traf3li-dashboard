@@ -306,7 +306,7 @@ export function TasksReportsDetailsView() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/tasks/reports/new?editId=${reportId}` })}>
+                        <DropdownMenuItem onClick={() => navigate({ to: `${ROUTES.dashboard.tasks.reports.new}?editId=${reportId}` })}>
                           <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                           تعديل
                         </DropdownMenuItem>
@@ -752,7 +752,7 @@ export function TasksReportsDetailsView() {
                           <Button
                             variant="outline"
                             className="mt-4 rounded-xl"
-                            onClick={() => navigate({ to: `/dashboard/tasks/reports/new?editId=${reportId}` })}
+                            onClick={() => navigate({ to: `${ROUTES.dashboard.tasks.reports.new}?editId=${reportId}` })}
                           >
                             تفعيل الجدولة
                           </Button>

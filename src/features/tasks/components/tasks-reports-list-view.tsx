@@ -434,7 +434,7 @@ export function TasksReportsListView() {
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/tasks/reports/${report.reportId}` })}>
+                                    <DropdownMenuItem onClick={() => navigate({ to: ROUTES.dashboard.tasks.reports.detail(report.reportId) })}>
                                       <Eye className="w-4 h-4 ms-2" />
                                       عرض التفاصيل
                                     </DropdownMenuItem>
@@ -447,7 +447,7 @@ export function TasksReportsListView() {
                                       تصدير
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/tasks/reports/new?editId=${report.reportId}` })}>
+                                    <DropdownMenuItem onClick={() => navigate({ to: `${ROUTES.dashboard.tasks.reports.new}?editId=${report.reportId}` })}>
                                       <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                                       تعديل
                                     </DropdownMenuItem>
@@ -500,7 +500,7 @@ export function TasksReportsListView() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => navigate({ to: `/dashboard/tasks/reports/${report.reportId}` })}
+                                onClick={() => navigate({ to: ROUTES.dashboard.tasks.reports.detail(report.reportId) })}
                                 className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl"
                               >
                                 عرض التفاصيل

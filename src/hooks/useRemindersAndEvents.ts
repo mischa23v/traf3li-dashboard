@@ -803,8 +803,8 @@ export const useEventsWithStats = (filters: EventFilters = {}) => {
       })
       return response.data
     },
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
+    gcTime: CACHE_TIMES.GC_LONG,
     enabled: isAuthenticated,
     retry: false,
   })
@@ -835,8 +835,8 @@ export const useRemindersWithStats = (filters: ReminderFilters = {}) => {
       })
       return response.data
     },
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
+    gcTime: CACHE_TIMES.GC_LONG,
     enabled: isAuthenticated,
     retry: false,
   })

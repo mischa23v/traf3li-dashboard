@@ -5,6 +5,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
     usePayrollRun,
     useCalculatePayrollRun,
@@ -198,9 +199,9 @@ export function PayrollRunDetailsView() {
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-        { title: 'قسائم الرواتب', href: '/dashboard/hr/payroll', isActive: false },
-        { title: 'دورات الرواتب', href: '/dashboard/hr/payroll-runs', isActive: true },
+        { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+        { title: 'قسائم الرواتب', href: ROUTES.dashboard.hr.payroll.list, isActive: false },
+        { title: 'دورات الرواتب', href: ROUTES.dashboard.hr.payrollRuns.list, isActive: true },
     ]
 
     // Loading state
@@ -255,7 +256,7 @@ export function PayrollRunDetailsView() {
                         <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" aria-hidden="true" />
                         <h2 className="text-xl font-bold text-slate-900 mb-2">لم يتم العثور على الدورة</h2>
                         <p className="text-slate-500 mb-4">{error?.message || 'حدث خطأ أثناء تحميل بيانات الدورة'}</p>
-                        <Button onClick={() => navigate({ to: '/dashboard/hr/payroll-runs' })} className="bg-emerald-500 hover:bg-emerald-600">
+                        <Button onClick={() => navigate({ to: ROUTES.dashboard.hr.payrollRuns.list })} className="bg-emerald-500 hover:bg-emerald-600">
                             العودة للقائمة
                         </Button>
                     </div>
@@ -303,7 +304,7 @@ export function PayrollRunDetailsView() {
                             variant="ghost"
                             size="icon"
                             className="rounded-xl hover:bg-white"
-                            onClick={() => navigate({ to: '/dashboard/hr/payroll-runs' })}
+                            onClick={() => navigate({ to: ROUTES.dashboard.hr.payrollRuns.list })}
                         >
                             <ArrowRight className="h-5 w-5" />
                         </Button>

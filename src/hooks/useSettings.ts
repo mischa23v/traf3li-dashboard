@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config/cache'
 import settingsService, {
   UpdateAccountSettings,
   UpdateAppearanceSettings,
@@ -11,7 +12,7 @@ export const useSettings = () => {
   return useQuery({
     queryKey: ['settings'],
     queryFn: () => settingsService.getSettings(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 

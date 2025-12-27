@@ -8,6 +8,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useSuccessionPlans, useSuccessionPlanningStats, useBulkDeleteSuccessionPlans } from '@/hooks/useSuccessionPlanning'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -135,8 +136,8 @@ export function SuccessionPlanningListView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'تخطيط التعاقب', href: '/dashboard/hr/succession-planning', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'تخطيط التعاقب', href: ROUTES.dashboard.hr.successionPlanning.list, isActive: true },
   ]
 
   return (
@@ -326,7 +327,7 @@ export function SuccessionPlanningListView() {
                     </Button>
                     <Button
                       size="sm"
-                      onClick={() => navigate({ to: '/dashboard/hr/succession-planning/new' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.hr.successionPlanning.new })}
                       className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
                     >
                       <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
@@ -371,7 +372,7 @@ export function SuccessionPlanningListView() {
                   <TrendingUp className="w-12 h-12 mx-auto text-slate-300" aria-hidden="true" />
                   <p className="mt-4 text-slate-500">لا توجد خطط تعاقب</p>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/hr/succession-planning/new' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.hr.successionPlanning.new })}
                     className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
                     <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
@@ -426,7 +427,7 @@ export function SuccessionPlanningListView() {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/succession-planning/${plan.successionPlanId}` })}>
+                                  <DropdownMenuItem onClick={() => navigate({ to: ROUTES.dashboard.hr.successionPlanning.detail(plan.successionPlanId) })}>
                                     <Eye className="w-4 h-4 ms-2" aria-hidden="true" />
                                     عرض التفاصيل
                                   </DropdownMenuItem>
@@ -524,7 +525,7 @@ export function SuccessionPlanningListView() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => navigate({ to: `/dashboard/hr/succession-planning/${plan.successionPlanId}` })}
+                              onClick={() => navigate({ to: ROUTES.dashboard.hr.successionPlanning.detail(plan.successionPlanId) })}
                               className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl"
                             >
                               عرض التفاصيل

@@ -5,6 +5,7 @@
 
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { CACHE_TIMES } from '@/config/cache'
 import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   deviceService,
@@ -31,7 +32,7 @@ export const useDevices = (filters?: DeviceFilters) => {
   return useQuery({
     queryKey: ['biometric-devices', filters],
     queryFn: () => deviceService.getDevices(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -131,7 +132,7 @@ export const useEnrollments = (filters?: EnrollmentFilters) => {
   return useQuery({
     queryKey: ['biometric-enrollments', filters],
     queryFn: () => enrollmentService.getEnrollments(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -264,7 +265,7 @@ export const useVerificationStats = (startDate?: string, endDate?: string) => {
   return useQuery({
     queryKey: ['verification-stats', startDate, endDate],
     queryFn: () => verificationService.getStats(startDate, endDate),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -313,7 +314,7 @@ export const useGeofences = (filters?: GeofenceFilters) => {
   return useQuery({
     queryKey: ['geofences', filters],
     queryFn: () => geofenceService.getZones(filters),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 

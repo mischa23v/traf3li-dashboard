@@ -5,6 +5,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { CACHE_TIMES } from '@/config/cache'
 import authService, {
   LoginCredentials,
   RegisterData,
@@ -95,7 +96,7 @@ export const useCurrentUser = (enabled: boolean = true) => {
       return user
     },
     enabled,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     retry: false,
   })
 }

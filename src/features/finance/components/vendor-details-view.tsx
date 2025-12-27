@@ -21,6 +21,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { useVendor, useDeleteVendor, useBills } from '@/hooks/useAccounting'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { FinanceSidebar } from './finance-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 export default function VendorDetailsView() {
     const { vendorId } = useParams({ from: '/_authenticated/dashboard/finance/vendors/$vendorId' })
@@ -34,10 +35,10 @@ export default function VendorDetailsView() {
     const recentBills = billsData?.data || []
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'الفواتير المستلمة', href: '/dashboard/finance/bills', isActive: false },
-        { title: 'الموردين', href: '/dashboard/finance/vendors', isActive: true },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: false },
+        { title: 'الفواتير المستلمة', href: ROUTES.dashboard.finance.bills.list, isActive: false },
+        { title: 'الموردين', href: ROUTES.dashboard.finance.vendors.list, isActive: true },
     ]
 
     const formatCurrency = (amount: number) => {
@@ -60,7 +61,7 @@ export default function VendorDetailsView() {
         if (window.confirm('هل أنت متأكد من حذف هذا المورد؟')) {
             deleteVendorMutation.mutate(vendorId, {
                 onSuccess: () => {
-                    navigate({ to: '/dashboard/finance/vendors' })
+                    navigate({ to: ROUTES.dashboard.finance.vendors.list })
                 }
             })
         }

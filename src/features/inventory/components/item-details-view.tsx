@@ -222,7 +222,7 @@ export function ItemDetailsView() {
                   {/* Actions */}
                   <div className="flex flex-col gap-2">
                     <Button
-                      onClick={() => navigate({ to: `/dashboard/inventory/${itemId}/edit` })}
+                      onClick={() => navigate({ to: `${ROUTES.dashboard.inventory.detail(itemId)}/edit` })}
                       className="rounded-xl"
                     >
                       <Edit className="w-4 h-4 ml-2" />

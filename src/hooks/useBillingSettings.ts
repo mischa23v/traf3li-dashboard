@@ -5,6 +5,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { CACHE_TIMES } from '@/config/cache'
 import billingSettingsService, {
   UpdateCompanySettingsData,
   CreateTaxData,
@@ -22,7 +23,7 @@ export const useCompanySettings = () => {
   return useQuery({
     queryKey: ['company-settings'],
     queryFn: () => billingSettingsService.getCompanySettings(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -67,7 +68,7 @@ export const useTaxes = () => {
   return useQuery({
     queryKey: ['taxes'],
     queryFn: () => billingSettingsService.getTaxes(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -180,7 +181,7 @@ export const usePaymentModes = () => {
   return useQuery({
     queryKey: ['payment-modes'],
     queryFn: () => billingSettingsService.getPaymentModes(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -294,7 +295,7 @@ export const useFinanceSettings = () => {
   return useQuery({
     queryKey: ['finance-settings'],
     queryFn: () => billingSettingsService.getFinanceSettings(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -322,7 +323,7 @@ export const usePaymentTerms = () => {
   return useQuery({
     queryKey: ['payment-terms'],
     queryFn: () => paymentTermsService.getPaymentTerms(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -331,7 +332,7 @@ export const usePaymentTerm = (id: string) => {
     queryKey: ['payment-terms', id],
     queryFn: () => paymentTermsService.getPaymentTerm(id),
     enabled: !!id,
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 

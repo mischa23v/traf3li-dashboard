@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -332,7 +333,7 @@ export function PayrollCreateView() {
                 { id: editId, data: slipData },
                 {
                     onSuccess: () => {
-                        navigate({ to: '/dashboard/hr/payroll/$slipId', params: { slipId: editId } })
+                        navigate({ to: ROUTES.dashboard.hr.payroll.detail(slipId), params: { slipId: editId } })
                     },
                     onError: (error) => {
                         handleApiError(error)
@@ -342,7 +343,7 @@ export function PayrollCreateView() {
         } else {
             createMutation.mutate(slipData, {
                 onSuccess: (data) => {
-                    navigate({ to: '/dashboard/hr/payroll/$slipId', params: { slipId: data._id } })
+                    navigate({ to: ROUTES.dashboard.hr.payroll.detail(slipId), params: { slipId: data._id } })
                 },
                 onError: (error) => {
                     handleApiError(error)
@@ -355,7 +356,7 @@ export function PayrollCreateView() {
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'قسائم الرواتب', href: '/dashboard/hr/payroll', isActive: true },
+        { title: 'قسائم الرواتب', href: ROUTES.dashboard.hr.payroll.list, isActive: true },
     ]
 
     return (
@@ -938,7 +939,7 @@ export function PayrollCreateView() {
                                 <Button
                                     type="button"
                                     variant="outline"
-                                    onClick={() => navigate({ to: '/dashboard/hr/payroll' })}
+                                    onClick={() => navigate({ to: ROUTES.dashboard.hr.payroll.list })}
                                     className="h-12 px-8 rounded-xl"
                                 >
                                     إلغاء

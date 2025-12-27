@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate, Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -146,7 +147,7 @@ export function PromotionDetailsView() {
     if (confirm('هل أنت متأكد من حذف هذه الترقية؟')) {
       deletePromotionMutation.mutate(promotionId, {
         onSuccess: () => {
-          navigate({ to: '/dashboard/hr/promotions' })
+          navigate({ to: ROUTES.dashboard.hr.promotions.list })
         },
       })
     }
@@ -176,8 +177,8 @@ export function PromotionDetailsView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'الترقيات', href: '/dashboard/hr/promotions', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'الترقيات', href: ROUTES.dashboard.hr.promotions.list, isActive: true },
   ]
 
   if (isLoading) {
@@ -198,7 +199,7 @@ export function PromotionDetailsView() {
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto" />
           <h2 className="text-xl font-bold">خطأ في تحميل البيانات</h2>
           <p className="text-slate-600">{error?.message || 'تعذر تحميل بيانات الترقية'}</p>
-          <Button onClick={() => navigate({ to: '/dashboard/hr/promotions' })}>
+          <Button onClick={() => navigate({ to: ROUTES.dashboard.hr.promotions.list })}>
             العودة للقائمة
           </Button>
         </div>
@@ -255,7 +256,7 @@ export function PromotionDetailsView() {
         {/* Back Button */}
         <Button
           variant="ghost"
-          onClick={() => navigate({ to: '/dashboard/hr/promotions' })}
+          onClick={() => navigate({ to: ROUTES.dashboard.hr.promotions.list })}
           className="mb-4"
         >
           <ArrowLeft className="h-4 w-4 me-2" />
@@ -293,7 +294,7 @@ export function PromotionDetailsView() {
                   size="sm"
                   onClick={() =>
                     navigate({
-                      to: '/dashboard/hr/promotions/$promotionId/edit',
+                      to: ROUTES.dashboard.hr.promotions.edit(promotionId),
                       params: { promotionId },
                     })
                   }
@@ -541,7 +542,7 @@ export function PromotionDetailsView() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Link to={`/dashboard/hr/employees/${promotion.employeeId}`}>
+                <Link to={ROUTES.dashboard.hr.employees.detail(promotion.employeeId)}>
                   <Button variant="outline" className="w-full">
                     عرض ملف الموظف
                   </Button>

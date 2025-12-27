@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Checkbox } from '@/components/ui/checkbox'
 import { usePerformanceReviews, usePerformanceStats } from '@/hooks/usePerformanceReviews'
 import { Button } from '@/components/ui/button'
@@ -139,11 +140,11 @@ export function PerformanceReviewsListView() {
 
   // Single review actions
   const handleViewReview = useCallback((reviewId: string) => {
-    navigate({ to: '/dashboard/hr/performance/$reviewId', params: { reviewId } })
+    navigate({ to: ROUTES.dashboard.hr.performance.detail(reviewId), params: { reviewId } })
   }, [navigate])
 
   const handleEditReview = useCallback((reviewId: string) => {
-    navigate({ to: '/dashboard/hr/performance/new', search: { editId: reviewId } })
+    navigate({ to: ROUTES.dashboard.hr.performance.new, search: { editId: reviewId } })
   }, [navigate])
 
   const handleDeleteReview = useCallback((reviewId: string) => {
@@ -229,9 +230,9 @@ export function PerformanceReviewsListView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'تقييم الأداء', href: '/dashboard/hr/performance', isActive: true },
-    { title: 'الحضور', href: '/dashboard/hr/attendance', isActive: false },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'تقييم الأداء', href: ROUTES.dashboard.hr.performance.list, isActive: true },
+    { title: 'الحضور', href: ROUTES.dashboard.hr.attendance.list, isActive: false },
   ]
 
   return (
@@ -515,7 +516,7 @@ export function PerformanceReviewsListView() {
                           )}
                         </div>
                       </div>
-                      <Link to={`/dashboard/hr/performance/${review._id}` as any}>
+                      <Link to={ROUTES.dashboard.hr.performance.detail(review._id) as any}>
                         <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
                           عرض التقييم
                         </Button>

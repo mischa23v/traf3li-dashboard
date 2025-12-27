@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
+import { CACHE_TIMES } from '@/config/cache'
 import setupOrchestrationService, {
   type SetupOrchestrationStatus,
   type ModuleSetupStatus,
@@ -24,7 +25,7 @@ export function useSetupOrchestrationStatus() {
   return useQuery({
     queryKey: setupOrchestrationKeys.status(),
     queryFn: () => setupOrchestrationService.getSetupStatus(),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     retry: 2,
   })
 }
@@ -36,7 +37,7 @@ export function useModuleProgress(module: ModuleSetupStatus['module']) {
   return useQuery({
     queryKey: setupOrchestrationKeys.progress(module),
     queryFn: () => setupOrchestrationService.getModuleProgress(module),
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT, // 2 minutes
   })
 }
 
@@ -47,7 +48,7 @@ export function useNextIncompleteModule() {
   return useQuery({
     queryKey: setupOrchestrationKeys.nextIncomplete(),
     queryFn: () => setupOrchestrationService.getNextIncompleteModule(),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 
@@ -182,7 +183,7 @@ export function useShouldShowSetupReminder() {
   return useQuery({
     queryKey: [...setupOrchestrationKeys.all, 'should-show-reminder'],
     queryFn: () => setupOrchestrationService.shouldShowSetupReminder(),
-    staleTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: CACHE_TIMES.LONG, // 30 minutes (was 10 minutes)
   })
 }
 

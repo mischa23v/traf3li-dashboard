@@ -173,7 +173,7 @@ export function LeadScoringDashboard() {
   }
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+    { title: 'نظرة عامة', href: ROUTES.dashboard.home, isActive: false },
     { title: 'العملاء المحتملون', href: ROUTES.dashboard.crm.leads.list, isActive: false },
     { title: 'تقييم العملاء', href: ROUTES.dashboard.crm.leadScoring.list, isActive: true },
     { title: 'الأنشطة', href: ROUTES.dashboard.crm.activities.list, isActive: false },

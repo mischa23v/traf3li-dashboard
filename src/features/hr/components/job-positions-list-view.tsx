@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useJobPositions, useJobPositionStats, useBulkDeleteJobPositions } from '@/hooks/useJobPositions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -199,8 +200,8 @@ const getBgClasses = (color: string) => {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'المناصب الوظيفية', href: '/dashboard/hr/job-positions', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'المناصب الوظيفية', href: ROUTES.dashboard.hr.jobPositions.list, isActive: true },
   ]
 
   return (
@@ -392,7 +393,7 @@ const getBgClasses = (color: string) => {
                     </Button>
                     <Button
                       size="sm"
-                      onClick={() => navigate({ to: '/dashboard/hr/job-positions/new' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.hr.jobPositions.new })}
                       className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
                     >
                       <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
@@ -437,7 +438,7 @@ const getBgClasses = (color: string) => {
                   <Briefcase className="w-12 h-12 mx-auto text-slate-300" aria-hidden="true" />
                   <p className="mt-4 text-slate-500">لا توجد مناصب وظيفية</p>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/hr/job-positions/new' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.hr.jobPositions.new })}
                     className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
                     <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
@@ -497,7 +498,7 @@ const getBgClasses = (color: string) => {
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/job-positions/${position._id}` })}>
+                                    <DropdownMenuItem onClick={() => navigate({ to: ROUTES.dashboard.hr.jobPositions.detail(position._id) })}>
                                       <Eye className="w-4 h-4 ms-2" aria-hidden="true" />
                                       عرض التفاصيل
                                     </DropdownMenuItem>
@@ -573,7 +574,7 @@ const getBgClasses = (color: string) => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => navigate({ to: `/dashboard/hr/job-positions/${position._id}` })}
+                                onClick={() => navigate({ to: ROUTES.dashboard.hr.jobPositions.detail(position._id) })}
                                 className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl"
                               >
                                 عرض التفاصيل

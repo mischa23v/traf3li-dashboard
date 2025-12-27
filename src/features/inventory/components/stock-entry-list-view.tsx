@@ -532,7 +532,7 @@ export function StockEntryListView() {
                                       <DropdownMenuItem
                                         onClick={(e) => {
                                           e.stopPropagation()
-                                          navigate({ to: `/dashboard/inventory/stock-entries/${entry._id}/edit` })
+                                          navigate({ to: `${ROUTES.dashboard.inventory.stockEntries.detail(entry._id)}/edit` })
                                         }}
                                       >
                                         <Edit className="w-4 h-4 ml-2" />

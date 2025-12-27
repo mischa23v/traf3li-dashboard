@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   usePerformanceReview,
   useSubmitSelfAssessment,
@@ -215,9 +216,9 @@ export function PerformanceReviewDetailsView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'تقييم الأداء', href: '/dashboard/hr/performance', isActive: true },
-    { title: 'الحضور', href: '/dashboard/hr/attendance', isActive: false },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'تقييم الأداء', href: ROUTES.dashboard.hr.performance.list, isActive: true },
+    { title: 'الحضور', href: ROUTES.dashboard.hr.attendance.list, isActive: false },
   ]
 
   // Calculate completion percentage
@@ -286,7 +287,7 @@ export function PerformanceReviewDetailsView() {
                 <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" aria-hidden="true" />
                 <h2 className="text-xl font-bold text-slate-900 mb-2">لم يتم العثور على التقييم</h2>
                 <p className="text-slate-500 mb-4">{error?.message || 'حدث خطأ أثناء تحميل بيانات التقييم'}</p>
-                <Button onClick={() => navigate({ to: '/dashboard/hr/performance' })} className="bg-emerald-500 hover:bg-emerald-600">
+                <Button onClick={() => navigate({ to: ROUTES.dashboard.hr.performance.list })} className="bg-emerald-500 hover:bg-emerald-600">
                   العودة للقائمة
                 </Button>
               </div>
@@ -302,7 +303,7 @@ export function PerformanceReviewDetailsView() {
                       variant="ghost"
                       size="icon"
                       className="rounded-xl hover:bg-white"
-                      onClick={() => navigate({ to: '/dashboard/hr/performance' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.hr.performance.list })}
                     >
                       <ArrowRight className="h-5 w-5" />
                     </Button>
