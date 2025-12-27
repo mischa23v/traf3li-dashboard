@@ -689,6 +689,7 @@ export const ROUTES = {
      * CRM (Customer Relationship Management) module routes
      */
     crm: {
+      index: '/dashboard/crm',
       setupWizard: '/dashboard/crm/setup-wizard',
       pipeline: '/dashboard/crm/pipeline',
       appointments: '/dashboard/crm/appointments',
@@ -701,6 +702,31 @@ export const ROUTES = {
         list: '/dashboard/crm/leads',
         new: '/dashboard/crm/leads/new',
         detail: (leadId: string) => `/dashboard/crm/leads/${leadId}`,
+      },
+
+      // Contacts
+      contacts: {
+        list: '/dashboard/crm/contacts',
+        new: '/dashboard/crm/contacts/new',
+        detail: (contactId: string) => `/dashboard/crm/contacts/${contactId}`,
+        edit: (contactId: string) => `/dashboard/crm/contacts/${contactId}/edit`,
+      },
+
+      // Clients
+      clients: {
+        list: '/dashboard/crm/clients',
+        detail: (clientId: string) => `/dashboard/crm/clients/${clientId}`,
+      },
+
+      // Campaigns
+      campaigns: {
+        list: '/dashboard/crm/campaigns',
+        detail: (campaignId: string) => `/dashboard/crm/campaigns/${campaignId}`,
+      },
+
+      // Tasks
+      tasks: {
+        list: '/dashboard/crm/tasks',
       },
 
       // Lead scoring
@@ -758,6 +784,16 @@ export const ROUTES = {
         list: '/dashboard/crm/quotes',
         new: '/dashboard/crm/quotes/new',
         detail: (quoteId: string) => `/dashboard/crm/quotes/${quoteId}`,
+      },
+
+      // Settings
+      settings: {
+        index: '/dashboard/crm/settings',
+        teams: '/dashboard/crm/settings/teams',
+        territories: '/dashboard/crm/settings/territories',
+        lostReasons: '/dashboard/crm/settings/lost-reasons',
+        tags: '/dashboard/crm/settings/tags',
+        emailTemplates: '/dashboard/crm/settings/email-templates',
       },
     },
 
