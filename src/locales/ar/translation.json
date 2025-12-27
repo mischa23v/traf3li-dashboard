@@ -6834,6 +6834,176 @@
       "advertising": "إعلانات",
       "coldCall": "اتصال بارد",
       "event": "حدث"
+    },
+    "dashboard": {
+      "title": "لوحة تحكم المبيعات",
+      "totalLeads": "إجمالي العملاء المحتملين",
+      "openPipeline": "قيمة خط الأنابيب",
+      "weightedValue": "القيمة المرجحة",
+      "wonThisMonth": "المكاسب هذا الشهر",
+      "lostThisMonth": "الخسائر هذا الشهر",
+      "conversionRate": "معدل التحويل",
+      "avgDealSize": "متوسط حجم الصفقة",
+      "avgSalesCycle": "متوسط دورة المبيعات",
+      "activitiesDueToday": "الأنشطة المستحقة اليوم",
+      "recentLeads": "العملاء المحتملين الأخيرين",
+      "pipelineByStage": "خط الأنابيب حسب المرحلة",
+      "leadsBySource": "العملاء المحتملين حسب المصدر"
+    },
+    "leads": {
+      "title": "العملاء المحتملين",
+      "create": "إنشاء عميل محتمل",
+      "edit": "تعديل العميل المحتمل",
+      "name": "الاسم",
+      "company": "الشركة",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "status": "الحالة",
+      "source": "المصدر",
+      "assignedTo": "مسند إلى",
+      "expectedRevenue": "الإيرادات المتوقعة",
+      "probability": "الاحتمالية",
+      "expectedCloseDate": "تاريخ الإغلاق المتوقع"
+    },
+    "leadStatus": {
+      "new": "جديد",
+      "contacted": "تم التواصل",
+      "qualified": "مؤهل",
+      "proposal": "اقتراح",
+      "negotiation": "تفاوض",
+      "won": "مكسوب",
+      "lost": "مفقود",
+      "dormant": "خامل"
+    },
+    "contacts": {
+      "title": "جهات الاتصال",
+      "create": "إنشاء جهة اتصال",
+      "edit": "تعديل جهة الاتصال",
+      "fullName": "الاسم الكامل",
+      "conflictStatus": "حالة التعارض",
+      "vip": "عميل مميز",
+      "linkToCase": "ربط بقضية"
+    },
+    "conflictStatus": {
+      "not_checked": "لم يتم الفحص",
+      "clear": "لا يوجد تعارض",
+      "potential_conflict": "تعارض محتمل",
+      "confirmed_conflict": "تعارض مؤكد"
+    },
+    "clients": {
+      "title": "العملاء",
+      "create": "إنشاء عميل",
+      "edit": "تعديل العميل",
+      "clientNumber": "رقم العميل",
+      "lifetimeValue": "القيمة الإجمالية",
+      "creditStatus": "حالة الائتمان",
+      "outstanding": "المستحق"
+    },
+    "creditStatus": {
+      "good": "جيد",
+      "warning": "تحذير",
+      "hold": "موقوف",
+      "blacklisted": "مدرج في القائمة السوداء"
+    },
+    "quotes": {
+      "title": "عروض الأسعار",
+      "create": "إنشاء عرض سعر",
+      "edit": "تعديل عرض السعر",
+      "quoteId": "رقم العرض",
+      "validUntil": "صالح حتى",
+      "lineItems": "بنود العرض",
+      "subtotal": "المجموع الفرعي",
+      "discount": "الخصم",
+      "tax": "الضريبة",
+      "grandTotal": "المجموع الإجمالي",
+      "sendToCustomer": "إرسال للعميل",
+      "downloadPdf": "تحميل PDF",
+      "convertToInvoice": "تحويل لفاتورة"
+    },
+    "quoteStatus": {
+      "draft": "مسودة",
+      "sent": "مرسل",
+      "viewed": "تمت المشاهدة",
+      "accepted": "مقبول",
+      "rejected": "مرفوض",
+      "expired": "منتهي الصلاحية",
+      "revised": "معدل"
+    },
+    "products": {
+      "title": "المنتجات والخدمات",
+      "create": "إنشاء منتج",
+      "edit": "تعديل المنتج",
+      "code": "الرمز",
+      "type": "النوع",
+      "category": "الفئة",
+      "unitPrice": "سعر الوحدة",
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "productType": {
+      "service": "خدمة",
+      "product": "منتج",
+      "subscription": "اشتراك",
+      "retainer": "عقد مستمر",
+      "hourly": "بالساعة"
+    },
+    "campaigns": {
+      "title": "الحملات",
+      "create": "إنشاء حملة",
+      "edit": "تعديل الحملة",
+      "budget": "الميزانية",
+      "leadsGenerated": "العملاء المتولدين",
+      "conversions": "التحويلات",
+      "roi": "العائد على الاستثمار"
+    },
+    "campaignStatus": {
+      "draft": "مسودة",
+      "scheduled": "مجدولة",
+      "active": "نشطة",
+      "paused": "متوقفة",
+      "completed": "مكتملة",
+      "cancelled": "ملغاة"
+    },
+    "activities": {
+      "title": "الأنشطة",
+      "create": "إنشاء نشاط",
+      "call": "مكالمة",
+      "email": "بريد إلكتروني",
+      "meeting": "اجتماع",
+      "task": "مهمة",
+      "note": "ملاحظة",
+      "whatsapp": "واتساب",
+      "calendar": "التقويم",
+      "dueDate": "تاريخ الاستحقاق",
+      "reminder": "تذكير"
+    },
+    "settings": {
+      "title": "إعدادات المبيعات",
+      "teams": "فرق المبيعات",
+      "territories": "المناطق",
+      "lostReasons": "أسباب الخسارة",
+      "tags": "العلامات",
+      "emailTemplates": "قوالب البريد",
+      "general": "الإعدادات العامة"
+    },
+    "pipeline": {
+      "title": "خط الأنابيب",
+      "kanban": "عرض كانبان",
+      "moveToStage": "نقل للمرحلة",
+      "daysInStage": "أيام في المرحلة"
+    },
+    "common": {
+      "search": "بحث",
+      "filter": "تصفية",
+      "actions": "الإجراءات",
+      "view": "عرض",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "duplicate": "تكرار",
+      "export": "تصدير",
+      "viewAll": "عرض الكل",
+      "noData": "لا توجد بيانات",
+      "loading": "جاري التحميل..."
     }
   },
   "knowledge": {
@@ -7282,5 +7452,18 @@
       "manageUsers": "إدارة المستخدمين",
       "noManagementPermission": "ليس لديك صلاحيات الإدارة لهذه الشركة"
     }
+  },
+  "dealHealth": {
+    "label": "صحة الصفقة",
+    "grade": "الدرجة",
+    "overallScore": "النتيجة الإجمالية",
+    "factors": "العوامل"
+  },
+  "userPicker": {
+    "selectUser": "اختر مستخدم",
+    "selectUsers": "اختر مستخدمين",
+    "search": "ابحث عن مستخدمين...",
+    "loading": "جاري التحميل...",
+    "noResults": "لم يتم العثور على مستخدمين"
   }
 }

@@ -58,7 +58,11 @@ export const QueryKeys = {
     search: (query: string) => [...QueryKeys.clients.all(), 'search', query] as const,
     stats: () => [...QueryKeys.clients.all(), 'stats'] as const,
     topRevenue: (limit: number) => [...QueryKeys.clients.all(), 'top-revenue', limit] as const,
-    payments: (clientId: string) => [...QueryKeys.clients.all(), clientId, 'payments'] as const,
+    cases: (clientId: string, params?: Record<string, any>) => [...QueryKeys.clients.all(), clientId, 'cases', params] as const,
+    invoices: (clientId: string, params?: Record<string, any>) => [...QueryKeys.clients.all(), clientId, 'invoices', params] as const,
+    quotes: (clientId: string, params?: Record<string, any>) => [...QueryKeys.clients.all(), clientId, 'quotes', params] as const,
+    activities: (clientId: string, params?: Record<string, any>) => [...QueryKeys.clients.all(), clientId, 'activities', params] as const,
+    payments: (clientId: string, params?: Record<string, any>) => [...QueryKeys.clients.all(), clientId, 'payments', params] as const,
     billingInfo: (clientId: string) => [...QueryKeys.clients.all(), clientId, 'billing-info'] as const,
     wathq: (clientId: string, dataType: string) => [...QueryKeys.clients.all(), clientId, 'wathq', dataType] as const,
   },
@@ -157,6 +161,7 @@ export const QueryKeys = {
     list: (filters?: Record<string, any>) => [...QueryKeys.quotes.lists(), filters] as const,
     details: () => [...QueryKeys.quotes.all(), 'detail'] as const,
     detail: (id: string) => [...QueryKeys.quotes.details(), id] as const,
+    history: (id: string) => [...QueryKeys.quotes.detail(id), 'history'] as const,
     stats: () => [...QueryKeys.quotes.all(), 'stats'] as const,
     summary: (filters?: Record<string, any>) => [...QueryKeys.quotes.all(), 'summary', filters] as const,
   },
@@ -950,6 +955,29 @@ export const QueryKeys = {
     details: () => [...QueryKeys.referrals.all(), 'detail'] as const,
     detail: (id: string) => [...QueryKeys.referrals.details(), id] as const,
     stats: () => [...QueryKeys.referrals.all(), 'stats'] as const,
+  },
+
+  // ==================== CRM - CAMPAIGNS ====================
+  campaigns: {
+    all: () => ['campaigns'] as const,
+    lists: () => [...QueryKeys.campaigns.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.campaigns.lists(), filters] as const,
+    details: () => [...QueryKeys.campaigns.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.campaigns.details(), id] as const,
+    leads: (id: string, params?: Record<string, any>) => [...QueryKeys.campaigns.detail(id), 'leads', params] as const,
+    stats: (id: string) => [...QueryKeys.campaigns.detail(id), 'stats'] as const,
+    analytics: (id: string) => [...QueryKeys.campaigns.detail(id), 'analytics'] as const,
+  },
+
+  // ==================== CRM - PRODUCTS ====================
+  products: {
+    all: () => ['products'] as const,
+    lists: () => [...QueryKeys.products.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.products.lists(), filters] as const,
+    details: () => [...QueryKeys.products.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.products.details(), id] as const,
+    categories: () => [...QueryKeys.products.all(), 'categories'] as const,
+    stats: (id: string) => [...QueryKeys.products.detail(id), 'stats'] as const,
   },
 
   // ==================== CRM ADVANCED ====================

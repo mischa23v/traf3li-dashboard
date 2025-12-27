@@ -1,455 +1,310 @@
+/**
+ * Contact Hooks
+ * React Query hooks for Contact management
+ * Follows the same pattern as useCrm.ts
+ */
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
-import contactsService, {
-  type ContactFilters,
-  type CreateContactData,
-  type UpdateContactData,
-} from '@/services/contactsService'
-import { toast } from '@/hooks/use-toast'
-import { useTranslation } from 'react-i18next'
-import { createOptimisticMutation } from '@/lib/mutation-utils'
+import { toast } from 'sonner'
 import { invalidateCache } from '@/lib/cache-invalidation'
 import { QueryKeys } from '@/lib/query-keys'
+import { contactService } from '@/services/contactService'
+import type {
+  Contact,
+  CreateContactData,
+  Case,
+} from '@/services/contactService'
+import type { ContactFilters } from '@/services/contactsService'
+import type { CrmActivity } from '@/types/crm'
+import type { ContactConflictCheck } from '@/types/crm-extended'
 
 // ==================== Cache Configuration ====================
+// Cache data for 30 minutes to reduce API calls
+// Data is refreshed automatically when mutations occur
 const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
-const STATS_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour
+const STATS_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour (keep in cache)
 const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
 
-// Query keys
-export const contactsKeys = {
-  all: ['contacts'] as const,
-  lists: () => [...contactsKeys.all, 'list'] as const,
-  list: (filters: ContactFilters) => [...contactsKeys.lists(), filters] as const,
-  details: () => [...contactsKeys.all, 'detail'] as const,
-  detail: (id: string) => [...contactsKeys.details(), id] as const,
-  byCase: (caseId: string) => [...contactsKeys.all, 'case', caseId] as const,
-  byClient: (clientId: string) => [...contactsKeys.all, 'client', clientId] as const,
-  search: (query: string) => [...contactsKeys.all, 'search', query] as const,
+// ═══════════════════════════════════════════════════════════════
+// QUERY HOOKS
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Get all contacts with optional filters
+ */
+export const useContacts = (filters?: ContactFilters, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: QueryKeys.contacts.list(filters),
+    queryFn: () => contactService.getContacts(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
+  })
 }
 
-// Get all contacts - match useClients pattern exactly (simple queryKey)
-export const useContacts = (filters?: ContactFilters) => {
+/**
+ * Get single contact
+ */
+export const useContact = (contactId: string, enabled: boolean = true) => {
   return useQuery({
-    queryKey: QueryKeys.contacts.list(filters),  // Simple key like useClients uses
-    queryFn: () => contactsService.getContacts(filters),
+    queryKey: QueryKeys.contacts.detail(contactId),
+    queryFn: () => contactService.getContact(contactId),
+    enabled: !!contactId && enabled,
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
   })
 }
 
-// Get single contact
-export const useContact = (id: string) => {
+/**
+ * Get contact cases
+ */
+export const useContactCases = (contactId: string, enabled: boolean = true) => {
   return useQuery({
-    queryKey: contactsKeys.detail(id),
-    queryFn: () => contactsService.getContact(id),
-    enabled: !!id,
+    queryKey: [...QueryKeys.contacts.detail(contactId), 'cases'] as const,
+    queryFn: () => contactService.getContactCases(contactId),
+    enabled: !!contactId && enabled,
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
   })
 }
 
-// Get contacts by case
-export const useContactsByCase = (caseId: string) => {
+/**
+ * Get contact activities
+ */
+export const useContactActivities = (
+  contactId: string,
+  params?: { page?: number; limit?: number },
+  enabled: boolean = true
+) => {
   return useQuery({
-    queryKey: contactsKeys.byCase(caseId),
-    queryFn: () => contactsService.getContactsByCase(caseId),
-    enabled: !!caseId,
+    queryKey: [...QueryKeys.contacts.detail(contactId), 'activities', params] as const,
+    queryFn: () => contactService.getContactActivities(contactId, params),
+    enabled: !!contactId && enabled,
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
   })
 }
 
-// Get contacts by client
-export const useContactsByClient = (clientId: string) => {
-  return useQuery({
-    queryKey: contactsKeys.byClient(clientId),
-    queryFn: () => contactsService.getContactsByClient(clientId),
-    enabled: !!clientId,
-    staleTime: LIST_STALE_TIME,
-    gcTime: STATS_GC_TIME,
-  })
-}
+// ═══════════════════════════════════════════════════════════════
+// MUTATION HOOKS
+// ═══════════════════════════════════════════════════════════════
 
-// Search contacts
-export const useSearchContacts = (query: string) => {
-  return useQuery({
-    queryKey: contactsKeys.search(query),
-    queryFn: () => contactsService.searchContacts(query),
-    enabled: query.length >= 2,
-    staleTime: CACHE_TIMES.REALTIME.LIVE_FEED, // 30 seconds
-    gcTime: STATS_GC_TIME,
-  })
-}
-
-// Create contact
+/**
+ * Create new contact
+ */
 export const useCreateContact = () => {
   const queryClient = useQueryClient()
-  const { t } = useTranslation()
 
   return useMutation({
-    mutationFn: (data: CreateContactData) => contactsService.createContact(data),
-    onMutate: async (newContact) => {
-      // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: contactsKeys.lists() })
-
-      // Snapshot previous value
-      const previousData = queryClient.getQueriesData({ queryKey: contactsKeys.lists() })
-
-      // Optimistically update all list queries
-      queryClient.setQueriesData({ queryKey: contactsKeys.lists() }, (old: any) => {
-        if (!old) return old
-        // Handle { contacts: [...] } structure
-        if (old.contacts && Array.isArray(old.contacts)) {
-          return {
-            ...old,
-            contacts: [{ ...newContact, _id: 'temp-' + Date.now() }, ...old.contacts]
-          }
-        }
-        if (Array.isArray(old)) return [{ ...newContact, _id: 'temp-' + Date.now() }, ...old]
-        return old
-      })
-
-      return { previousData }
-    },
+    mutationFn: (data: CreateContactData) => contactService.createContact(data),
+    // Update cache on success (Stable & Correct)
     onSuccess: (data) => {
-      toast({
-        title: t('status.success'),
-        description: t('status.createdSuccessfully'),
-      })
+      toast.success('تم إنشاء جهة الاتصال بنجاح')
 
-      // Update cache with real data
-      queryClient.setQueriesData({ queryKey: contactsKeys.lists() }, (old: any) => {
+      // Manually update the cache with the REAL contact from server
+      queryClient.setQueriesData({ queryKey: ['contacts'] }, (old: any) => {
         if (!old) return old
-        // Handle { contacts: [...] } structure
-        if (old.contacts && Array.isArray(old.contacts)) {
+
+        // Handle { data: [...], total: N } structure
+        if (old.data && Array.isArray(old.data)) {
           return {
             ...old,
-            contacts: old.contacts.map((c: any) =>
-              c._id?.startsWith('temp-') ? data : c
-            )
+            data: [data, ...old.data],
+            total: (old.total || old.data.length) + 1,
           }
         }
-        if (Array.isArray(old)) return old.map((c: any) => c._id?.startsWith('temp-') ? data : c)
+
+        // Handle Array structure
+        if (Array.isArray(old)) {
+          return [data, ...old]
+        }
+
         return old
       })
     },
-    onError: (error: any, _variables, context) => {
-      // Rollback on error
-      if (context?.previousData) {
-        context.previousData.forEach(([queryKey, data]) => {
-          queryClient.setQueryData(queryKey, data)
-        })
-      }
-
-      toast({
-        variant: 'destructive',
-        title: t('status.error'),
-        description: error.response?.data?.message || t('common.unknownError'),
-      })
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إنشاء جهة الاتصال')
     },
     onSettled: async () => {
-      // Invalidate without delay
-      await invalidateCache.contacts.all()
+      // Delay to allow DB propagation
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      return await invalidateCache.contacts.all()
     },
   })
 }
 
-// Update contact
+/**
+ * Update contact
+ */
 export const useUpdateContact = () => {
-  const queryClient = useQueryClient()
-  const { t } = useTranslation()
-
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateContactData }) =>
-      contactsService.updateContact(id, data),
-    onMutate: async ({ id, data }) => {
-      // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: contactsKeys.detail(id) })
-      await queryClient.cancelQueries({ queryKey: contactsKeys.lists() })
-
-      // Snapshot previous values
-      const previousDetail = queryClient.getQueryData(contactsKeys.detail(id))
-      const previousLists = queryClient.getQueriesData({ queryKey: contactsKeys.lists() })
-
-      // Optimistically update detail
-      queryClient.setQueryData(contactsKeys.detail(id), (old: any) => {
-        if (!old) return old
-        return { ...old, ...data }
-      })
-
-      // Optimistically update lists
-      queryClient.setQueriesData({ queryKey: contactsKeys.lists() }, (old: any) => {
-        if (!old) return old
-        // Handle { contacts: [...] } structure
-        if (old.contacts && Array.isArray(old.contacts)) {
-          return {
-            ...old,
-            contacts: old.contacts.map((c: any) =>
-              c._id === id ? { ...c, ...data } : c
-            )
-          }
-        }
-        if (Array.isArray(old)) return old.map((c: any) => c._id === id ? { ...c, ...data } : c)
-        return old
-      })
-
-      return { previousDetail, previousLists }
-    },
+    mutationFn: ({ contactId, data }: { contactId: string; data: Partial<Contact> }) =>
+      contactService.updateContact(contactId, data),
     onSuccess: () => {
-      toast({
-        title: t('status.success'),
-        description: t('status.updatedSuccessfully'),
-      })
+      toast.success('تم تحديث جهة الاتصال بنجاح')
     },
-    onError: (error: any, { id }, context) => {
-      // Rollback on error
-      if (context?.previousDetail !== undefined) {
-        queryClient.setQueryData(contactsKeys.detail(id), context.previousDetail)
-      }
-      if (context?.previousLists) {
-        context.previousLists.forEach(([queryKey, data]) => {
-          queryClient.setQueryData(queryKey, data)
-        })
-      }
-
-      toast({
-        variant: 'destructive',
-        title: t('status.error'),
-        description: error.response?.data?.message || t('common.unknownError'),
-      })
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث جهة الاتصال')
     },
-    onSettled: async (_, __, { id }) => {
-      // Invalidate without delay
+    onSettled: async (_, __, { contactId }) => {
       await invalidateCache.contacts.all()
-      await invalidateCache.contacts.detail(id)
+      return await invalidateCache.contacts.detail(contactId)
     },
   })
 }
 
-// Delete contact
+/**
+ * Delete contact
+ */
 export const useDeleteContact = () => {
   const queryClient = useQueryClient()
-  const { t } = useTranslation()
 
   return useMutation({
-    mutationFn: (id: string) => contactsService.deleteContact(id),
-    onMutate: async (id) => {
-      // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: contactsKeys.lists() })
+    mutationFn: (contactId: string) => contactService.deleteContact(contactId),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, contactId) => {
+      toast.success('تم حذف جهة الاتصال بنجاح')
 
-      // Snapshot previous value
-      const previousData = queryClient.getQueriesData({ queryKey: contactsKeys.lists() })
-
-      // Optimistically update all list queries
-      queryClient.setQueriesData({ queryKey: contactsKeys.lists() }, (old: any) => {
+      // Optimistically remove contact from all lists
+      queryClient.setQueriesData({ queryKey: ['contacts'] }, (old: any) => {
         if (!old) return old
-        // Handle { contacts: [...] } structure
-        if (old.contacts && Array.isArray(old.contacts)) {
+
+        // Handle { data: [...], total: N } structure
+        if (old.data && Array.isArray(old.data)) {
           return {
             ...old,
-            contacts: old.contacts.filter((c: any) => c._id !== id)
+            data: old.data.filter((item: any) => item._id !== contactId),
+            total: Math.max(0, (old.total || old.data.length) - 1),
           }
         }
-        if (Array.isArray(old)) return old.filter((c: any) => c._id !== id)
+
+        // Handle Array structure
+        if (Array.isArray(old)) {
+          return old.filter((item: any) => item._id !== contactId)
+        }
+
         return old
       })
-
-      return { previousData }
     },
-    onSuccess: (_, id) => {
-      toast({
-        title: t('status.success'),
-        description: t('status.deletedSuccessfully'),
-      })
-    },
-    onError: (error: any, _id, context) => {
-      // Rollback on error
-      if (context?.previousData) {
-        context.previousData.forEach(([queryKey, data]) => {
-          queryClient.setQueryData(queryKey, data)
-        })
-      }
-
-      toast({
-        variant: 'destructive',
-        title: t('status.error'),
-        description: error.response?.data?.message || t('common.unknownError'),
-      })
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل حذف جهة الاتصال')
     },
     onSettled: async () => {
-      // Invalidate without delay
-      await invalidateCache.contacts.all()
+      // Delay to allow DB propagation
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      return await invalidateCache.contacts.all()
     },
   })
 }
 
-// Bulk delete contacts
-export const useBulkDeleteContacts = () => {
-  const queryClient = useQueryClient()
-  const { t } = useTranslation()
-
+/**
+ * Run conflict check
+ */
+export const useRunConflictCheck = () => {
   return useMutation({
-    mutationFn: (ids: string[]) => contactsService.bulkDeleteContacts(ids),
-    onMutate: async (ids) => {
-      // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: contactsKeys.lists() })
-
-      // Snapshot previous value
-      const previousData = queryClient.getQueriesData({ queryKey: contactsKeys.lists() })
-
-      // Optimistically update all list queries
-      queryClient.setQueriesData({ queryKey: contactsKeys.lists() }, (old: any) => {
-        if (!old) return old
-        // Handle { contacts: [...] } structure
-        if (old.contacts && Array.isArray(old.contacts)) {
-          return {
-            ...old,
-            contacts: old.contacts.filter((c: any) => !ids.includes(c._id))
-          }
-        }
-        if (Array.isArray(old)) return old.filter((c: any) => !ids.includes(c._id))
-        return old
-      })
-
-      return { previousData }
+    mutationFn: (contactId: string) => contactService.runConflictCheck(contactId),
+    onSuccess: () => {
+      toast.success('تم إجراء فحص تعارض المصالح بنجاح')
     },
-    onSuccess: (_, ids) => {
-      toast({
-        title: t('status.success'),
-        description: t('status.deletedSuccessfully'),
-      })
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل فحص تعارض المصالح')
     },
-    onError: (error: any, _ids, context) => {
-      // Rollback on error
-      if (context?.previousData) {
-        context.previousData.forEach(([queryKey, data]) => {
-          queryClient.setQueryData(queryKey, data)
-        })
-      }
-
-      toast({
-        variant: 'destructive',
-        title: t('status.error'),
-        description: error.response?.data?.message || t('common.unknownError'),
-      })
-    },
-    onSettled: async () => {
-      // Invalidate without delay
-      await invalidateCache.contacts.all()
+    onSettled: async (_, __, contactId) => {
+      return await invalidateCache.contacts.detail(contactId)
     },
   })
 }
 
-// Link contact to case
+/**
+ * Update conflict status
+ */
+export const useUpdateConflictStatus = () => {
+  return useMutation({
+    mutationFn: ({
+      contactId,
+      status,
+      notes,
+    }: {
+      contactId: string
+      status: string
+      notes?: string
+    }) => contactService.updateConflictStatus(contactId, { status, notes }),
+    onSuccess: () => {
+      toast.success('تم تحديث حالة تعارض المصالح بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث حالة تعارض المصالح')
+    },
+    onSettled: async (_, __, { contactId }) => {
+      return await invalidateCache.contacts.detail(contactId)
+    },
+  })
+}
+
+/**
+ * Link contact to case
+ */
 export const useLinkContactToCase = () => {
-  const queryClient = useQueryClient()
-  const { t } = useTranslation()
-
   return useMutation({
-    mutationFn: ({ contactId, caseId }: { contactId: string; caseId: string }) =>
-      contactsService.linkToCase(contactId, caseId),
-    onMutate: async ({ contactId, caseId }) => {
-      // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: contactsKeys.detail(contactId) })
-      await queryClient.cancelQueries({ queryKey: contactsKeys.byCase(caseId) })
-
-      // Snapshot previous values
-      const previousDetail = queryClient.getQueryData(contactsKeys.detail(contactId))
-      const previousByCase = queryClient.getQueryData(contactsKeys.byCase(caseId))
-
-      // Optimistically update detail to add case
-      queryClient.setQueryData(contactsKeys.detail(contactId), (old: any) => {
-        if (!old) return old
-        const cases = old.cases || []
-        if (!cases.includes(caseId)) {
-          return { ...old, cases: [...cases, caseId] }
-        }
-        return old
-      })
-
-      return { previousDetail, previousByCase }
-    },
+    mutationFn: ({
+      contactId,
+      caseId,
+      role,
+    }: {
+      contactId: string
+      caseId: string
+      role: string
+    }) => contactService.linkToCase(contactId, caseId, role),
     onSuccess: () => {
-      toast({
-        title: t('status.success'),
-        description: t('status.updatedSuccessfully'),
-      })
+      toast.success('تم ربط جهة الاتصال بالقضية بنجاح')
     },
-    onError: (error: any, { contactId }, context) => {
-      // Rollback on error
-      if (context?.previousDetail !== undefined) {
-        queryClient.setQueryData(contactsKeys.detail(contactId), context.previousDetail)
-      }
-      if (context?.previousByCase !== undefined) {
-        queryClient.setQueryData(contactsKeys.byCase(contactId), context.previousByCase)
-      }
-
-      toast({
-        variant: 'destructive',
-        title: t('status.error'),
-        description: error.response?.data?.message || t('common.unknownError'),
-      })
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل ربط جهة الاتصال بالقضية')
     },
     onSettled: async (_, __, { contactId, caseId }) => {
-      // Invalidate without delay
       await invalidateCache.contacts.detail(contactId)
-      await invalidateCache.contacts.byCase(caseId)
+      return await invalidateCache.contacts.byCase(caseId)
     },
   })
 }
 
-// Unlink contact from case
+/**
+ * Unlink contact from case
+ */
 export const useUnlinkContactFromCase = () => {
-  const queryClient = useQueryClient()
-  const { t } = useTranslation()
-
   return useMutation({
     mutationFn: ({ contactId, caseId }: { contactId: string; caseId: string }) =>
-      contactsService.unlinkFromCase(contactId, caseId),
-    onMutate: async ({ contactId, caseId }) => {
-      // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: contactsKeys.detail(contactId) })
-      await queryClient.cancelQueries({ queryKey: contactsKeys.byCase(caseId) })
-
-      // Snapshot previous values
-      const previousDetail = queryClient.getQueryData(contactsKeys.detail(contactId))
-      const previousByCase = queryClient.getQueryData(contactsKeys.byCase(caseId))
-
-      // Optimistically update detail to remove case
-      queryClient.setQueryData(contactsKeys.detail(contactId), (old: any) => {
-        if (!old) return old
-        const cases = old.cases || []
-        return { ...old, cases: cases.filter((id: string) => id !== caseId) }
-      })
-
-      return { previousDetail, previousByCase }
-    },
+      contactService.unlinkFromCase(contactId, caseId),
     onSuccess: () => {
-      toast({
-        title: t('status.success'),
-        description: t('status.updatedSuccessfully'),
-      })
+      toast.success('تم فك ارتباط جهة الاتصال من القضية بنجاح')
     },
-    onError: (error: any, { contactId }, context) => {
-      // Rollback on error
-      if (context?.previousDetail !== undefined) {
-        queryClient.setQueryData(contactsKeys.detail(contactId), context.previousDetail)
-      }
-      if (context?.previousByCase !== undefined) {
-        queryClient.setQueryData(contactsKeys.byCase(contactId), context.previousByCase)
-      }
-
-      toast({
-        variant: 'destructive',
-        title: t('status.error'),
-        description: error.response?.data?.message || t('common.unknownError'),
-      })
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل فك ارتباط جهة الاتصال من القضية')
     },
     onSettled: async (_, __, { contactId, caseId }) => {
-      // Invalidate without delay
       await invalidateCache.contacts.detail(contactId)
-      await invalidateCache.contacts.byCase(caseId)
+      return await invalidateCache.contacts.byCase(caseId)
+    },
+  })
+}
+
+/**
+ * Merge contacts
+ */
+export const useMergeContacts = () => {
+  return useMutation({
+    mutationFn: ({ primaryId, secondaryIds }: { primaryId: string; secondaryIds: string[] }) =>
+      contactService.mergeContacts(primaryId, secondaryIds),
+    onSuccess: () => {
+      toast.success('تم دمج جهات الاتصال بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل دمج جهات الاتصال')
+    },
+    onSettled: async (_, __, { primaryId }) => {
+      await invalidateCache.contacts.all()
+      return await invalidateCache.contacts.detail(primaryId)
     },
   })
 }

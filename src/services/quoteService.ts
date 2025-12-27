@@ -1,190 +1,349 @@
 /**
  * Quote Service
  * Handles all quote-related API calls
+ *
+ * ERROR HANDLING:
+ * - All errors return bilingual messages (English | Arabic)
+ * - Sensitive backend details are not exposed to users
+ * - Endpoint mismatches are handled gracefully with user-friendly messages
  */
 
-import apiClient, { handleApiError } from '@/lib/api'
+import apiClient from '@/lib/api'
+import { throwBilingualError } from '@/lib/bilingualErrorHandler'
 
-export type QuoteStatus = 'draft' | 'pending' | 'sent' | 'accepted' | 'declined' | 'cancelled' | 'on_hold' | 'expired'
+// ═══════════════════════════════════════════════════════════════
+// QUOTE TYPES
+// ═══════════════════════════════════════════════════════════════
 
-export interface Quote {
-  _id: string
-  quoteNumber: string
-  clientId: string | { firstName: string; lastName: string; name?: string; _id: string }
-  caseId?: string
-  items: QuoteItem[]
-  subtotal: number
-  vatRate: number
-  vatAmount: number
-  totalAmount: number
-  status: QuoteStatus
-  issueDate: string
-  expiredDate: string
-  validUntil?: string
-  notes?: string
-  terms?: string
-  currency: string
-  convertedToInvoice?: boolean
-  invoiceId?: string
-  history?: QuoteHistory[]
-  createdAt: string
-  updatedAt: string
-}
+export type QuoteStatus =
+  | 'draft'
+  | 'pending'
+  | 'sent'
+  | 'accepted'
+  | 'declined'
+  | 'cancelled'
+  | 'on_hold'
+  | 'expired'
+
+export type QuoteValidStatus = 'valid' | 'expiring_soon' | 'expired'
+export type QuoteCustomerType = 'lead' | 'client'
 
 export interface QuoteItem {
+  _id?: string
   description: string
   quantity: number
   unitPrice: number
   total: number
+  taxRate?: number
+  discount?: number
 }
 
-export interface QuoteHistory {
+export interface QuoteHistoryItem {
+  _id?: string
   action: string
-  performedBy: string
-  timestamp: string
+  performedBy: string | { _id: string; firstName: string; lastName: string }
+  timestamp: string | Date
   details?: any
+  notes?: string
+}
+
+export interface Quote {
+  _id: string
+  quoteNumber: string
+  clientId: string | { _id: string; firstName: string; lastName: string; name?: string }
+  leadId?: string | { _id: string; firstName: string; lastName: string; email?: string }
+  customerType: QuoteCustomerType
+  caseId?: string | { _id: string; caseNumber: string; title?: string }
+  items: QuoteItem[]
+  subtotal: number
+  vatRate: number
+  vatAmount: number
+  discount?: number
+  discountAmount?: number
+  totalAmount: number
+  status: QuoteStatus
+  issueDate: string | Date
+  expiryDate: string | Date
+  validUntil?: string | Date
+  notes?: string
+  terms?: string
+  termsAr?: string
+  currency: string
+  convertedToInvoice?: boolean
+  invoiceId?: string | { _id: string; invoiceNumber: string }
+  viewedAt?: string | Date
+  viewCount?: number
+  sentAt?: string | Date
+  acceptedAt?: string | Date
+  rejectedAt?: string | Date
+  rejectionReason?: string
+  signature?: string
+  history?: QuoteHistoryItem[]
+  createdBy?: string | { _id: string; firstName: string; lastName: string }
+  updatedBy?: string | { _id: string; firstName: string; lastName: string }
+  createdAt: string | Date
+  updatedAt: string | Date
 }
 
 export interface CreateQuoteData {
-  clientId: string
+  clientId?: string
+  leadId?: string
+  customerType: QuoteCustomerType
   caseId?: string
   items: QuoteItem[]
   subtotal: number
   vatRate: number
   vatAmount: number
+  discount?: number
+  discountAmount?: number
   totalAmount: number
-  expiredDate: string
+  expiryDate: string | Date
   notes?: string
   terms?: string
+  termsAr?: string
   currency?: string
+  status?: QuoteStatus
 }
 
 export interface QuoteFilters {
-  status?: QuoteStatus
+  search?: string
+  status?: string | string[]
+  customerType?: QuoteCustomerType
   clientId?: string
+  leadId?: string
   caseId?: string
+  createdBy?: string
+  validStatus?: QuoteValidStatus
+  createdAfter?: string
+  createdBefore?: string
   startDate?: string
   endDate?: string
   page?: number
   limit?: number
+  sortBy?: string
+  sortOrder?: 'asc' | 'desc'
 }
 
-const quoteService = {
-  // Get all quotes with optional filters
-  getQuotes: async (filters?: QuoteFilters) => {
+// ═══════════════════════════════════════════════════════════════
+// QUOTE SERVICE
+// ═══════════════════════════════════════════════════════════════
+
+export const quoteService = {
+  /**
+   * Get all quotes with optional filters
+   */
+  getQuotes: async (
+    params?: QuoteFilters
+  ): Promise<{ data: Quote[]; total: number; page: number; limit: number }> => {
     try {
-      const params = new URLSearchParams()
-      if (filters) {
-        Object.entries(filters).forEach(([key, value]) => {
-          if (value !== undefined && value !== '') {
-            params.append(key, String(value))
-          }
-        })
+      // Handle status as array
+      const queryParams = { ...params }
+      if (params?.status && Array.isArray(params.status)) {
+        queryParams.status = params.status.join(',')
       }
-      const query = params.toString()
-      const response = await apiClient.get(`/quotes${query ? `?${query}` : ''}`)
+
+      const response = await apiClient.get('/quotes', { params: queryParams })
       return response.data
-    } catch (error) {
-      throw handleApiError(error)
+    } catch (error: any) {
+      throwBilingualError(error)
     }
   },
 
-  // Get single quote by ID
-  getQuote: async (id: string) => {
+  /**
+   * Get single quote by ID
+   */
+  getQuote: async (quoteId: string): Promise<Quote> => {
     try {
-      const response = await apiClient.get(`/quotes/${id}`)
-      return response.data
-    } catch (error) {
-      throw handleApiError(error)
+      const response = await apiClient.get(`/quotes/${quoteId}`)
+      return response.data.data || response.data.quote || response.data
+    } catch (error: any) {
+      throwBilingualError(error, 'QUOTE_NOT_FOUND')
     }
   },
 
-  // Create new quote
-  createQuote: async (data: CreateQuoteData) => {
+  /**
+   * Create new quote
+   */
+  createQuote: async (data: CreateQuoteData): Promise<Quote> => {
     try {
       const response = await apiClient.post('/quotes', data)
-      return response.data
-    } catch (error) {
-      throw handleApiError(error)
+      // Backend returns: { success, message, data: quote }
+      return response.data.data || response.data.quote || response.data
+    } catch (error: any) {
+      throwBilingualError(error, 'QUOTE_CREATE_FAILED')
     }
   },
 
-  // Update quote
-  updateQuote: async (id: string, data: Partial<CreateQuoteData>) => {
+  /**
+   * Update quote
+   */
+  updateQuote: async (quoteId: string, data: Partial<Quote>): Promise<Quote> => {
     try {
-      const response = await apiClient.put(`/quotes/${id}`, data)
-      return response.data
-    } catch (error) {
-      throw handleApiError(error)
+      const response = await apiClient.put(`/quotes/${quoteId}`, data)
+      // Backend returns: { success, message, data: quote }
+      return response.data.data || response.data.quote || response.data
+    } catch (error: any) {
+      throwBilingualError(error, 'QUOTE_UPDATE_FAILED')
     }
   },
 
-  // Delete quote
-  deleteQuote: async (id: string) => {
+  /**
+   * Delete quote
+   */
+  deleteQuote: async (quoteId: string): Promise<void> => {
     try {
-      const response = await apiClient.delete(`/quotes/${id}`)
-      return response.data
-    } catch (error) {
-      throw handleApiError(error)
+      await apiClient.delete(`/quotes/${quoteId}`)
+    } catch (error: any) {
+      throwBilingualError(error, 'QUOTE_DELETE_FAILED')
     }
   },
 
-  // Send quote to client
-  sendQuote: async (id: string) => {
+  /**
+   * Duplicate quote
+   */
+  duplicateQuote: async (quoteId: string): Promise<Quote> => {
     try {
-      const response = await apiClient.post(`/quotes/${id}/send`)
-      return response.data
-    } catch (error) {
-      throw handleApiError(error)
+      const response = await apiClient.post(`/quotes/${quoteId}/duplicate`)
+      // Backend returns: { success, message, data: quote }
+      return response.data.data || response.data.quote || response.data
+    } catch (error: any) {
+      throwBilingualError(error, 'QUOTE_CREATE_FAILED')
     }
   },
 
-  // Update quote status
-  updateQuoteStatus: async (id: string, status: QuoteStatus) => {
+  /**
+   * Send quote to customer
+   */
+  sendQuote: async (
+    quoteId: string,
+    data?: { email?: string; message?: string }
+  ): Promise<void> => {
     try {
-      const response = await apiClient.patch(`/quotes/${id}/status`, { status })
-      return response.data
-    } catch (error) {
-      throw handleApiError(error)
+      await apiClient.post(`/quotes/${quoteId}/send`, data || {})
+    } catch (error: any) {
+      throwBilingualError(error, 'QUOTE_SEND_FAILED')
     }
   },
 
-  // Convert quote to invoice
-  convertToInvoice: async (id: string) => {
+  /**
+   * Mark quote as viewed (for tracking)
+   */
+  markViewed: async (quoteId: string): Promise<void> => {
     try {
-      const response = await apiClient.post(`/quotes/${id}/convert-to-invoice`)
-      return response.data
-    } catch (error) {
-      throw handleApiError(error)
+      await apiClient.post(`/quotes/${quoteId}/view`)
+    } catch (error: any) {
+      throwBilingualError(error, 'QUOTE_UPDATE_FAILED')
     }
   },
 
-  // Get quotes summary/statistics
-  getQuotesSummary: async (filters?: QuoteFilters) => {
+  /**
+   * Accept quote
+   */
+  acceptQuote: async (quoteId: string, signature?: string): Promise<Quote> => {
     try {
-      const params = new URLSearchParams()
-      if (filters) {
-        Object.entries(filters).forEach(([key, value]) => {
-          if (value !== undefined && value !== '') {
-            params.append(key, String(value))
-          }
-        })
-      }
-      const query = params.toString()
-      const response = await apiClient.get(`/quotes/summary${query ? `?${query}` : ''}`)
-      return response.data
-    } catch (error) {
-      throw handleApiError(error)
+      const response = await apiClient.post(`/quotes/${quoteId}/accept`, {
+        signature,
+      })
+      // Backend returns: { success, message, data: quote }
+      return response.data.data || response.data.quote || response.data
+    } catch (error: any) {
+      throwBilingualError(error, 'QUOTE_UPDATE_FAILED')
     }
   },
 
-  // Duplicate quote
-  duplicateQuote: async (id: string) => {
+  /**
+   * Reject quote
+   */
+  rejectQuote: async (quoteId: string, reason?: string): Promise<Quote> => {
     try {
-      const response = await apiClient.post(`/quotes/${id}/duplicate`)
+      const response = await apiClient.post(`/quotes/${quoteId}/reject`, {
+        reason,
+      })
+      // Backend returns: { success, message, data: quote }
+      return response.data.data || response.data.quote || response.data
+    } catch (error: any) {
+      throwBilingualError(error, 'QUOTE_UPDATE_FAILED')
+    }
+  },
+
+  /**
+   * Convert quote to invoice
+   */
+  convertToInvoice: async (
+    quoteId: string
+  ): Promise<{ invoiceId: string; invoice?: any }> => {
+    try {
+      const response = await apiClient.post(`/quotes/${quoteId}/convert-to-invoice`)
+      return response.data.data || response.data
+    } catch (error: any) {
+      throwBilingualError(error, 'QUOTE_CONVERT_FAILED')
+    }
+  },
+
+  /**
+   * Get quote PDF
+   */
+  getQuotePdf: async (
+    quoteId: string,
+    language?: 'ar' | 'en'
+  ): Promise<Blob> => {
+    try {
+      const response = await apiClient.get(`/quotes/${quoteId}/pdf`, {
+        params: { language },
+        responseType: 'blob',
+      })
       return response.data
-    } catch (error) {
-      throw handleApiError(error)
+    } catch (error: any) {
+      throwBilingualError(error, 'QUOTE_PDF_FAILED')
+    }
+  },
+
+  /**
+   * Get quote history/timeline
+   */
+  getQuoteHistory: async (quoteId: string): Promise<QuoteHistoryItem[]> => {
+    try {
+      const response = await apiClient.get(`/quotes/${quoteId}/history`)
+      return response.data.data || response.data.history || response.data
+    } catch (error: any) {
+      throwBilingualError(error, 'QUOTE_NOT_FOUND')
+    }
+  },
+
+  /**
+   * Update quote status
+   * @deprecated Use specific methods like acceptQuote, rejectQuote instead
+   */
+  updateQuoteStatus: async (
+    quoteId: string,
+    status: QuoteStatus
+  ): Promise<Quote> => {
+    try {
+      const response = await apiClient.patch(`/quotes/${quoteId}/status`, {
+        status,
+      })
+      // Backend returns: { success, message, data: quote }
+      return response.data.data || response.data.quote || response.data
+    } catch (error: any) {
+      throwBilingualError(error, 'QUOTE_UPDATE_FAILED')
+    }
+  },
+
+  /**
+   * Get quotes summary/statistics
+   */
+  getQuotesSummary: async (params?: QuoteFilters): Promise<{
+    total: number
+    byStatus: Record<QuoteStatus, number>
+    totalValue: number
+    averageValue: number
+    conversionRate: number
+  }> => {
+    try {
+      const response = await apiClient.get('/quotes/summary', { params })
+      return response.data.data || response.data
+    } catch (error: any) {
+      throwBilingualError(error)
     }
   },
 }

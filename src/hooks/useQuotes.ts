@@ -1,13 +1,19 @@
 /**
  * Quote Hooks
- * TanStack Query hooks for all quote operations
+ * React Query hooks for Quote management
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
-import quoteService, { QuoteFilters, CreateQuoteData, QuoteStatus } from '@/services/quoteService'
 import { invalidateCache } from '@/lib/cache-invalidation'
+import { QueryKeys } from '@/lib/query-keys'
+import { quoteService } from '@/services/quoteService'
+import type {
+  Quote,
+  CreateQuoteData,
+  QuoteFilters,
+} from '@/services/quoteService'
 
 // ==================== Cache Configuration ====================
 // Cache data for 30 minutes to reduce API calls
@@ -16,41 +22,83 @@ const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
 const STATS_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour (keep in cache)
 const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
 
-// Get all quotes
-export const useQuotes = (filters?: QuoteFilters, enabled: boolean = true) => {
+// ═══════════════════════════════════════════════════════════════
+// QUERY HOOKS
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Get all quotes with optional filters
+ */
+export const useQuotes = (params?: QuoteFilters, enabled: boolean = true) => {
   return useQuery({
-    queryKey: ['quotes', filters],
-    queryFn: () => quoteService.getQuotes(filters),
+    queryKey: QueryKeys.quotes.list(params),
+    queryFn: () => quoteService.getQuotes(params),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
     enabled,
   })
 }
 
-// Get single quote
-export const useQuote = (id: string, enabled: boolean = true) => {
+/**
+ * Get single quote by ID
+ */
+export const useQuote = (quoteId: string, enabled: boolean = true) => {
   return useQuery({
-    queryKey: ['quotes', id],
-    queryFn: () => quoteService.getQuote(id),
-    enabled: !!id && enabled,
+    queryKey: QueryKeys.quotes.detail(quoteId),
+    queryFn: () => quoteService.getQuote(quoteId),
+    enabled: !!quoteId && enabled,
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
   })
 }
 
-// Create quote
+/**
+ * Get quote history/timeline
+ */
+export const useQuoteHistory = (quoteId: string, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: QueryKeys.quotes.history(quoteId),
+    queryFn: () => quoteService.getQuoteHistory(quoteId),
+    enabled: !!quoteId && enabled,
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+  })
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MUTATION HOOKS
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Create new quote
+ */
 export const useCreateQuote = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (data: CreateQuoteData) => quoteService.createQuote(data),
+    // Update cache on success (Stable & Correct)
     onSuccess: (data) => {
       toast.success('تم إنشاء عرض السعر بنجاح')
-      // Optimistically update the cache
+
+      // Manually update the cache with the REAL quote from server
       queryClient.setQueriesData({ queryKey: ['quotes'] }, (old: any) => {
         if (!old) return old
-        if (Array.isArray(old)) return [data, ...old]
-        // Handle paginated response if applicable, otherwise just return old
+
+        // Handle { data: [...], total: number } structure
+        if (old.data && Array.isArray(old.data)) {
+          return {
+            ...old,
+            data: [data, ...old.data],
+            total: (old.total || old.data.length) + 1
+          }
+        }
+
+        // Handle Array structure
+        if (Array.isArray(old)) {
+          return [data, ...old]
+        }
+
         return old
       })
     },
@@ -58,57 +106,63 @@ export const useCreateQuote = () => {
       toast.error(error.message || 'فشل إنشاء عرض السعر')
     },
     onSettled: async () => {
+      // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await invalidateCache.quotes.all()
+      return await invalidateCache.quotes.all()
     },
   })
 }
 
-// Update quote
+/**
+ * Update quote
+ */
 export const useUpdateQuote = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<CreateQuoteData> }) =>
-      quoteService.updateQuote(id, data),
-    onSuccess: (data) => {
+    mutationFn: ({ quoteId, data }: { quoteId: string; data: Partial<Quote> }) =>
+      quoteService.updateQuote(quoteId, data),
+    onSuccess: () => {
       toast.success('تم تحديث عرض السعر بنجاح')
-      // Update specific quote in cache
-      queryClient.setQueryData(['quotes', data.id], data)
-      // Update list cache
-      queryClient.setQueriesData({ queryKey: ['quotes'] }, (old: any) => {
-        if (!old) return old
-        if (Array.isArray(old)) {
-          return old.map((item: any) => (item.id === data.id ? data : item))
-        }
-        return old
-      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث عرض السعر')
     },
-    onSettled: async (_, __, { id }) => {
-      await new Promise(resolve => setTimeout(resolve, 1000))
+    onSettled: async (_, __, { quoteId }) => {
       await invalidateCache.quotes.all()
-      await invalidateCache.quotes.detail(id)
+      return await invalidateCache.quotes.detail(quoteId)
     },
   })
 }
 
-// Delete quote
+/**
+ * Delete quote
+ */
 export const useDeleteQuote = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: string) => quoteService.deleteQuote(id),
-    onSuccess: (_, id) => {
+    mutationFn: (quoteId: string) => quoteService.deleteQuote(quoteId),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, quoteId) => {
       toast.success('تم حذف عرض السعر بنجاح')
-      // Remove from cache
+
+      // Optimistically remove quote from all lists
       queryClient.setQueriesData({ queryKey: ['quotes'] }, (old: any) => {
         if (!old) return old
-        if (Array.isArray(old)) {
-          return old.filter((item: any) => item.id !== id)
+
+        // Handle { data: [...], total: number } structure
+        if (old.data && Array.isArray(old.data)) {
+          return {
+            ...old,
+            data: old.data.filter((item: any) => item._id !== quoteId),
+            total: Math.max(0, (old.total || old.data.length) - 1)
+          }
         }
+
+        // Handle Array structure
+        if (Array.isArray(old)) {
+          return old.filter((item: any) => item._id !== quoteId)
+        }
+
         return old
       })
     },
@@ -116,99 +170,106 @@ export const useDeleteQuote = () => {
       toast.error(error.message || 'فشل حذف عرض السعر')
     },
     onSettled: async () => {
+      // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await invalidateCache.quotes.all()
+      return await invalidateCache.quotes.all()
     },
   })
 }
 
-// Send quote
+/**
+ * Duplicate quote
+ */
+export const useDuplicateQuote = () => {
+  return useMutation({
+    mutationFn: (quoteId: string) => quoteService.duplicateQuote(quoteId),
+    onSuccess: () => {
+      toast.success('تم نسخ عرض السعر بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل نسخ عرض السعر')
+    },
+    onSettled: async () => {
+      return await invalidateCache.quotes.all()
+    },
+  })
+}
+
+/**
+ * Send quote to customer
+ */
 export const useSendQuote = () => {
   return useMutation({
-    mutationFn: (id: string) => quoteService.sendQuote(id),
+    mutationFn: ({ quoteId, data }: { quoteId: string; data?: { email?: string; message?: string } }) =>
+      quoteService.sendQuote(quoteId, data),
     onSuccess: () => {
       toast.success('تم إرسال عرض السعر بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إرسال عرض السعر')
     },
-    onSettled: async (_, __, id) => {
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      await invalidateCache.quotes.all()
-      await invalidateCache.quotes.detail(id)
+    onSettled: async (_, __, { quoteId }) => {
+      await invalidateCache.quotes.detail(quoteId)
+      return await invalidateCache.quotes.all()
     },
   })
 }
 
-// Update quote status
-export const useUpdateQuoteStatus = () => {
+/**
+ * Accept quote
+ */
+export const useAcceptQuote = () => {
   return useMutation({
-    mutationFn: ({ id, status }: { id: string; status: QuoteStatus }) =>
-      quoteService.updateQuoteStatus(id, status),
+    mutationFn: ({ quoteId, signature }: { quoteId: string; signature?: string }) =>
+      quoteService.acceptQuote(quoteId, signature),
     onSuccess: () => {
-      toast.success('تم تحديث حالة عرض السعر بنجاح')
+      toast.success('تم قبول عرض السعر بنجاح')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث حالة عرض السعر')
+      toast.error(error.message || 'فشل قبول عرض السعر')
     },
-    onSettled: async (_, __, { id }) => {
-      await new Promise(resolve => setTimeout(resolve, 1000))
+    onSettled: async (_, __, { quoteId }) => {
       await invalidateCache.quotes.all()
-      await invalidateCache.quotes.detail(id)
+      return await invalidateCache.quotes.detail(quoteId)
     },
   })
 }
 
-// Convert quote to invoice
+/**
+ * Reject quote
+ */
+export const useRejectQuote = () => {
+  return useMutation({
+    mutationFn: ({ quoteId, reason }: { quoteId: string; reason?: string }) =>
+      quoteService.rejectQuote(quoteId, reason),
+    onSuccess: () => {
+      toast.success('تم رفض عرض السعر')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل رفض عرض السعر')
+    },
+    onSettled: async (_, __, { quoteId }) => {
+      await invalidateCache.quotes.all()
+      return await invalidateCache.quotes.detail(quoteId)
+    },
+  })
+}
+
+/**
+ * Convert quote to invoice
+ */
 export const useConvertQuoteToInvoice = () => {
   return useMutation({
-    mutationFn: (id: string) => quoteService.convertToInvoice(id),
+    mutationFn: (quoteId: string) => quoteService.convertToInvoice(quoteId),
     onSuccess: () => {
       toast.success('تم تحويل عرض السعر إلى فاتورة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحويل عرض السعر إلى فاتورة')
     },
-    onSettled: async (_, __, id) => {
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      await invalidateCache.quotes.detail(id)
-      await invalidateCache.quotes.related()
-    },
-  })
-}
-
-// Get quotes summary
-export const useQuotesSummary = (filters?: QuoteFilters, enabled: boolean = true) => {
-  return useQuery({
-    queryKey: ['quotes', 'summary', filters],
-    queryFn: () => quoteService.getQuotesSummary(filters),
-    staleTime: STATS_STALE_TIME,
-    gcTime: STATS_GC_TIME,
-    enabled,
-  })
-}
-
-// Duplicate quote
-export const useDuplicateQuote = () => {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: (id: string) => quoteService.duplicateQuote(id),
-    onSuccess: (data) => {
-      toast.success('تم نسخ عرض السعر بنجاح')
-      // Add to cache
-      queryClient.setQueriesData({ queryKey: ['quotes'] }, (old: any) => {
-        if (!old) return old
-        if (Array.isArray(old)) return [data, ...old]
-        return old
-      })
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || 'فشل نسخ عرض السعر')
-    },
     onSettled: async () => {
-      await new Promise(resolve => setTimeout(resolve, 1000))
       await invalidateCache.quotes.all()
+      return await invalidateCache.invoices.all()
     },
   })
 }
