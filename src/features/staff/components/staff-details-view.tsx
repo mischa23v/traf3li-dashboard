@@ -63,6 +63,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ClientsSidebar } from '@/features/clients/components/clients-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const ROLE_LABELS: Record<string, { label: string; color: string }> = {
   owner: { label: 'مالك', color: 'bg-purple-100 text-purple-700' },
@@ -123,7 +124,7 @@ export function StaffDetailsView() {
   const handleDelete = () => {
     deleteStaffMutation.mutate(staffId, {
       onSuccess: () => {
-        navigate({ to: '/dashboard/staff' })
+        navigate({ to: ROUTES.dashboard.staff.list })
       },
     })
   }
@@ -139,9 +140,9 @@ export function StaffDetailsView() {
     : ''
 
   const topNav = [
-    { title: 'فريق العمل', href: '/dashboard/staff', isActive: true },
-    { title: 'العملاء', href: '/dashboard/clients', isActive: false },
-    { title: 'جهات الاتصال', href: '/dashboard/contacts', isActive: false },
+    { title: 'فريق العمل', href: ROUTES.dashboard.staff.list, isActive: true },
+    { title: 'العملاء', href: ROUTES.dashboard.clients.list, isActive: false },
+    { title: 'جهات الاتصال', href: ROUTES.dashboard.contacts.list, isActive: false },
   ]
 
   return (
@@ -188,7 +189,7 @@ export function StaffDetailsView() {
         {/* Breadcrumb / Back Link */}
         <div className="mb-6">
           <Link
-            to="/dashboard/staff"
+            to={ROUTES.dashboard.staff.list}
             className="inline-flex items-center text-slate-500 hover:text-navy transition-colors"
           >
             <ArrowLeft className="h-4 w-4 ms-2" />
@@ -249,7 +250,7 @@ export function StaffDetailsView() {
               لم يتم العثور على عضو الفريق المطلوب
             </p>
             <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-              <Link to="/dashboard/staff">العودة إلى القائمة</Link>
+              <Link to={ROUTES.dashboard.staff.list}>العودة إلى القائمة</Link>
             </Button>
           </div>
         )}
@@ -266,7 +267,7 @@ export function StaffDetailsView() {
               hideButtons={true}
             >
               <div className="flex flex-wrap gap-3">
-                <Link to={`/dashboard/staff/${staffId}/edit`}>
+                <Link to={ROUTES.dashboard.staff.edit(staffId)}>
                   <Button
                     variant="outline"
                     className="border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm"

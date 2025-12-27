@@ -104,7 +104,7 @@ export function OnboardingDetailsView() {
   }
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+    { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
     { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
     { title: 'التأهيل', href: ROUTES.dashboard.hr.onboarding.list, isActive: true },
   ]
@@ -180,7 +180,7 @@ export function OnboardingDetailsView() {
             <h3 className="text-lg font-bold text-slate-900 mb-2">برنامج التأهيل غير موجود</h3>
             <p className="text-slate-500 mb-4">لم يتم العثور على البرنامج المطلوب</p>
             <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-              <Link to="/dashboard/hr/onboarding">
+              <Link to={ROUTES.dashboard.hr.onboarding.list}>
                 العودة إلى القائمة
               </Link>
             </Button>

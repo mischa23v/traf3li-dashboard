@@ -51,6 +51,7 @@ import { ProductivityHero } from '@/components/productivity-hero'
 import { useCreateStaff } from '@/hooks/useStaff'
 import { cn } from '@/lib/utils'
 import { usePermissions } from '@/hooks/use-permissions'
+import { ROUTES } from '@/constants/routes'
 
 // ==================== CONSTANTS ====================
 
@@ -356,16 +357,16 @@ export function CreateStaffView() {
 
         createStaff(staffData, {
             onSuccess: () => {
-                navigate({ to: '/dashboard/staff' })
+                navigate({ to: ROUTES.dashboard.staff.list })
             },
         })
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'العملاء', href: '/dashboard/clients', isActive: false },
-        { title: 'جهات الاتصال', href: '/dashboard/contacts', isActive: false },
-        { title: 'فريق العمل', href: '/dashboard/staff', isActive: true },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
+        { title: 'العملاء', href: ROUTES.dashboard.clients.list, isActive: false },
+        { title: 'جهات الاتصال', href: ROUTES.dashboard.contacts.list, isActive: false },
+        { title: 'فريق العمل', href: ROUTES.dashboard.staff.list, isActive: true },
     ]
 
     return (
@@ -1100,7 +1101,7 @@ export function CreateStaffView() {
 
                             {/* ACTION BUTTONS */}
                             <div className="flex items-center justify-between pt-6 border-t border-slate-200">
-                                <Link to="/dashboard/staff">
+                                <Link to={ROUTES.dashboard.staff.list}>
                                     <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
                                         <X className="ms-2 h-4 w-4" aria-hidden="true" />
                                         إلغاء

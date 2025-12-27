@@ -68,6 +68,7 @@ import { invalidateCache } from '@/lib/cache-invalidation'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { ROUTES } from '@/constants/routes'
 
 export function MaterialRequestDetailsView() {
   const { t, i18n } = useTranslation()
@@ -84,22 +85,22 @@ export function MaterialRequestDetailsView() {
   const topNav = [
     {
       title: t('buying.common.overview'),
-      href: '/dashboard/buying/overview',
+      href: ROUTES.dashboard.buying.overview,
       isActive: false,
     },
     {
       title: t('buying.suppliers'),
-      href: '/dashboard/buying/suppliers',
+      href: ROUTES.dashboard.buying.suppliers.list,
       isActive: false,
     },
     {
       title: t('buying.purchaseOrder.purchaseOrders'),
-      href: '/dashboard/buying/purchase-orders',
+      href: ROUTES.dashboard.buying.purchaseOrders.list,
       isActive: false,
     },
     {
       title: t('buying.materialRequest.materialRequests'),
-      href: '/dashboard/buying/material-requests',
+      href: ROUTES.dashboard.buying.materialRequests.list,
       isActive: true,
     },
   ]
@@ -204,7 +205,7 @@ export function MaterialRequestDetailsView() {
   const handleDelete = () => {
     // This will call the delete mutation when implemented
     toast.success(t('buying.toast.materialRequestDeleted'))
-    navigate({ to: '/dashboard/buying/material-requests' })
+    navigate({ to: ROUTES.dashboard.buying.materialRequests.list })
   }
 
   const handleSubmit = () => {
@@ -223,7 +224,7 @@ export function MaterialRequestDetailsView() {
   const handleCreatePO = () => {
     // Navigate to create purchase order with material request context
     navigate({
-      to: '/dashboard/buying/purchase-orders/create',
+      to: ROUTES.dashboard.buying.purchaseOrders.create,
       search: { materialRequestId },
     })
   }
@@ -276,7 +277,7 @@ export function MaterialRequestDetailsView() {
         <Main fluid={true} className="bg-[#f8f9fa] p-6 lg:p-8">
           <div className="max-w-7xl mx-auto">
             <Button asChild variant="ghost" className="mb-6">
-              <Link to="/dashboard/buying/material-requests">
+              <Link to={ROUTES.dashboard.buying.materialRequests.list}>
                 <ArrowLeft className="h-4 w-4 me-2" />
                 {t('buying.navigation.backToMaterialRequests')}
               </Link>
@@ -324,7 +325,7 @@ export function MaterialRequestDetailsView() {
           {/* Back Button & Actions */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <Button asChild variant="ghost" className="text-slate-600 hover:text-navy">
-              <Link to="/dashboard/buying/material-requests">
+              <Link to={ROUTES.dashboard.buying.materialRequests.list}>
                 <ArrowLeft className="h-4 w-4 me-2" />
                 {t('buying.navigation.backToMaterialRequests')}
               </Link>

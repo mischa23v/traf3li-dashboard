@@ -120,7 +120,7 @@ export function PayrollDetailsView() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
         { title: 'قسائم الرواتب', href: ROUTES.dashboard.hr.payroll.list, isActive: true },
     ]
 
@@ -195,7 +195,7 @@ export function PayrollDetailsView() {
                         <h3 className="text-lg font-bold text-slate-900 mb-2">القسيمة غير موجودة</h3>
                         <p className="text-slate-500 mb-4">لم يتم العثور على قسيمة الراتب المطلوبة</p>
                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                            <Link to="/dashboard/hr/payroll">
+                            <Link to={ROUTES.dashboard.hr.payroll.list}>
                                 العودة إلى القائمة
                             </Link>
                         </Button>

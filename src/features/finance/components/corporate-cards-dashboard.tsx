@@ -6,6 +6,7 @@ import {
     PieChart, BarChart3, Calendar, DollarSign, Users, ShoppingBag, Bell
 } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -226,7 +227,7 @@ export function CorporateCardsDashboard() {
                                             <p className="text-3xl font-bold text-slate-800 mt-2">
                                                 {statistics?.unReconciledTransactions || 0}
                                             </p>
-                                            <Link to="/dashboard/finance/corporate-cards/reconcile" className="text-xs text-amber-600 hover:underline mt-1 inline-block">
+                                            <Link to={ROUTES.dashboard.finance.corporateCards.reconcileAll} className="text-xs text-amber-600 hover:underline mt-1 inline-block">
                                                 عرض وتطابق
                                             </Link>
                                         </div>
@@ -313,7 +314,7 @@ export function CorporateCardsDashboard() {
                         {/* Action Buttons & Filters */}
                         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white p-4 rounded-2xl shadow-sm">
                             <div className="flex items-center gap-3">
-                                <Link to="/dashboard/finance/corporate-cards/new">
+                                <Link to={ROUTES.dashboard.finance.corporateCards.new}>
                                     <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
                                         <Plus className="h-4 w-4 ms-2" />
                                         إضافة بطاقة جديدة
@@ -406,12 +407,12 @@ export function CorporateCardsDashboard() {
                                                         <p className="font-semibold text-slate-800">{formatCurrency(card.currentBalance)}</p>
                                                     </div>
                                                     <div className="flex items-center gap-2">
-                                                        <Link to={`/dashboard/finance/corporate-cards/${card._id}`}>
+                                                        <Link to={ROUTES.dashboard.finance.corporateCards.detail(card._id)}>
                                                             <Button variant="ghost" size="sm" className="rounded-lg">
                                                                 <Eye className="h-4 w-4" />
                                                             </Button>
                                                         </Link>
-                                                        <Link to={`/dashboard/finance/corporate-cards/${card._id}/reconcile`}>
+                                                        <Link to={ROUTES.dashboard.finance.corporateCards.reconcile(card._id)}>
                                                             <Button variant="ghost" size="sm" className="rounded-lg">
                                                                 <CheckCircle className="h-4 w-4" />
                                                             </Button>
@@ -445,7 +446,7 @@ export function CorporateCardsDashboard() {
                                         <div className="text-center py-12">
                                             <CreditCard className="h-12 w-12 text-slate-300 mx-auto mb-4" />
                                             <p className="text-slate-500">لا توجد بطاقات</p>
-                                            <Link to="/dashboard/finance/corporate-cards/new">
+                                            <Link to={ROUTES.dashboard.finance.corporateCards.new}>
                                                 <Button className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
                                                     <Plus className="h-4 w-4 ms-2" />
                                                     إضافة بطاقة جديدة

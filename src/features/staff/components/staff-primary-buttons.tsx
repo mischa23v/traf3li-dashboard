@@ -4,6 +4,7 @@ import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { EditGate } from '@/components/permission-gate'
 import { useStaffContext } from './staff-provider'
+import { ROUTES } from '@/constants/routes'
 
 export function StaffPrimaryButtons() {
   const { t } = useTranslation()
@@ -21,7 +22,7 @@ export function StaffPrimaryButtons() {
         </Button>
       </EditGate>
       <Button asChild variant="outline" className="h-10 px-5 rounded-xl font-bold border-white/10 text-white hover:bg-white/10 hover:text-white bg-transparent text-sm">
-        <Link to="/dashboard/tasks/events">
+        <Link to={ROUTES.dashboard.tasks.events.list}>
           <Calendar className="ms-2 h-4 w-4" />
           {t('hero.calendar')}
         </Link>

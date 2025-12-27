@@ -154,7 +154,14 @@ export const ROUTES = {
     staff: {
       list: '/dashboard/staff',
       new: '/dashboard/staff/new',
+      detail: (staffId: string) => `/dashboard/staff/${staffId}`,
+      edit: (staffId: string) => `/dashboard/staff/${staffId}/edit`,
     },
+
+    /**
+     * Activities
+     */
+    activities: '/dashboard/activities',
 
     /**
      * Calendar and scheduling
@@ -385,7 +392,10 @@ export const ROUTES = {
       // Corporate cards
       corporateCards: {
         list: '/dashboard/finance/corporate-cards',
+        new: '/dashboard/finance/corporate-cards/new',
+        detail: (cardId: string) => `/dashboard/finance/corporate-cards/${cardId}`,
         reconcile: (cardId: string) => `/dashboard/finance/corporate-cards/${cardId}/reconcile`,
+        reconcileAll: '/dashboard/finance/corporate-cards/reconcile',
       },
 
       // Saudi banking

@@ -26,6 +26,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useActivityStats, useMyActivities } from '@/hooks/useOdooActivities'
 import type { OdooActivity } from '@/types/activity'
+import { ROUTES } from '@/constants/routes'
 
 interface ActivityBellProps {
   className?: string
@@ -183,7 +184,7 @@ export function ActivityBell({ className }: ActivityBellProps) {
 
         {/* Footer */}
         <div className="border-t px-4 py-2">
-          <Link to="/dashboard/activities">
+          <Link to={ROUTES.dashboard.activities}>
             <Button
               variant="ghost"
               className="w-full justify-between text-sm"

@@ -7,6 +7,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useOrganizations, useDeleteOrganization, useBulkDeleteOrganizations } from '@/hooks/useOrganizations'
@@ -144,11 +145,12 @@ function OrganizationsListView() {
 
   // Single organization actions
   const handleViewOrg = (orgId: string) => {
-    navigate({ to: '/dashboard/organizations/$organizationId', params: { organizationId: orgId } })
+    navigate({ to: ROUTES.dashboard.organizations.detail(orgId) })
   }
 
   const handleEditOrg = (orgId: string) => {
-    navigate({ to: '/dashboard/organizations/$organizationId/edit', params: { organizationId: orgId } })
+    // Note: Edit route not defined in ROUTES constants, using detail route
+    navigate({ to: ROUTES.dashboard.organizations.detail(orgId) })
   }
 
   const handleDeleteOrg = (orgId: string) => {
@@ -168,9 +170,9 @@ function OrganizationsListView() {
   }
 
   const topNav = [
-    { title: t('contacts.nav.contacts'), href: '/dashboard/contacts', isActive: false },
-    { title: t('contacts.nav.clients'), href: '/dashboard/clients', isActive: false },
-    { title: t('contacts.nav.organizations'), href: '/dashboard/organizations', isActive: true },
+    { title: t('contacts.nav.contacts'), href: ROUTES.dashboard.contacts.list, isActive: false },
+    { title: t('contacts.nav.clients'), href: ROUTES.dashboard.clients.list, isActive: false },
+    { title: t('contacts.nav.organizations'), href: ROUTES.dashboard.organizations.list, isActive: true },
   ]
 
   return (
@@ -321,7 +323,7 @@ function OrganizationsListView() {
                     <h3 className="text-lg font-bold text-slate-900 mb-2">{t('organizations.noOrganizations', 'لا توجد منظمات')}</h3>
                     <p className="text-slate-500 mb-4">{t('organizations.noOrganizationsDescription', 'ابدأ بإضافة منظمة جديدة')}</p>
                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                      <Link to="/dashboard/organizations/new">
+                      <Link to={ROUTES.dashboard.organizations.new}>
                         <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                         {t('organizations.addNewOrganization', 'إضافة منظمة جديدة')}
                       </Link>

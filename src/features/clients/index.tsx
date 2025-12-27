@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
+import { ROUTES } from '@/constants/routes'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -118,9 +119,9 @@ function ClientsContent() {
   const pagination = data?.pagination
 
   const topNav = [
-    { title: t('sidebar.nav.clients'), href: '/dashboard/clients', isActive: true },
-    { title: t('sidebar.nav.organizations'), href: '/dashboard/organizations', isActive: false },
-    { title: t('sidebar.nav.cases'), href: '/dashboard/cases', isActive: false },
+    { title: t('sidebar.nav.clients'), href: ROUTES.dashboard.clients.list, isActive: true },
+    { title: t('sidebar.nav.organizations'), href: ROUTES.dashboard.organizations.list, isActive: false },
+    { title: t('sidebar.nav.cases'), href: ROUTES.dashboard.cases.list, isActive: false },
   ]
 
   const isEmpty = !isLoading && clients.length === 0 && !searchQuery && !selectedStatus
@@ -182,7 +183,7 @@ function ClientsContent() {
   // Handle card click - navigate to details
   const handleCardClick = (clientId: string) => {
     if (!isSelectionMode) {
-      routerNavigate({ to: `/dashboard/clients/${clientId}` })
+      routerNavigate({ to: ROUTES.dashboard.clients.detail(clientId) })
     }
   }
 
@@ -316,7 +317,7 @@ function ClientsContent() {
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">{t('clients.noClients')}</h3>
                 <p className="text-slate-500 mb-6 max-w-md mx-auto">{t('clients.startAddingClient')}</p>
-                <Link to="/dashboard/clients/new">
+                <Link to={ROUTES.dashboard.clients.new}>
                   <Button className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 h-12 rounded-xl shadow-lg shadow-emerald-500/20 transition-all hover:shadow-xl hover:shadow-emerald-500/30 hover:-translate-y-0.5">
                     <Plus className="me-2 h-5 w-5" aria-hidden="true" />
                     {t('clients.addNewClient')}
@@ -514,7 +515,7 @@ function ClientsContent() {
                                     className="hidden sm:flex h-9 px-4 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all duration-200"
                                     onClick={(e) => {
                                       e.stopPropagation()
-                                      routerNavigate({ to: `/dashboard/clients/${client._id}` })
+                                      routerNavigate({ to: ROUTES.dashboard.clients.detail(client._id) })
                                     }}
                                   >
                                     {t('common.viewDetails')}

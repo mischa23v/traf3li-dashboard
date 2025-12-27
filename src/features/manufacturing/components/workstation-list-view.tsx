@@ -64,11 +64,12 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useWorkstations, useDeleteWorkstation, useManufacturingStats } from '@/hooks/use-manufacturing'
 import type { Workstation } from '@/types/manufacturing'
 import { ManufacturingSidebar } from './manufacturing-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
-  { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.manufacturing', href: '/dashboard/manufacturing' },
-  { title: 'manufacturing.workstations', href: '/dashboard/manufacturing/workstations' },
+  { title: 'sidebar.nav.overview', href: ROUTES.dashboard.home },
+  { title: 'sidebar.nav.manufacturing', href: ROUTES.dashboard.manufacturing.list },
+  { title: 'manufacturing.workstations', href: ROUTES.dashboard.manufacturing.workstations.list },
 ]
 
 type TabValue = 'all' | 'active' | 'inactive'
@@ -272,7 +273,7 @@ export function WorkstationListView() {
                     />
                   </div>
                   <Button asChild className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
-                    <Link to="/dashboard/manufacturing/workstations/create">
+                    <Link to={ROUTES.dashboard.manufacturing.workstations.create}>
                       <Plus className="w-4 h-4 ml-2" />
                       {t('manufacturing.workstations.createWorkstation', 'إنشاء محطة عمل')}
                     </Link>
@@ -309,7 +310,7 @@ export function WorkstationListView() {
                     </p>
                     {!search && (
                       <Button asChild className="rounded-xl">
-                        <Link to="/dashboard/manufacturing/workstations/create">
+                        <Link to={ROUTES.dashboard.manufacturing.workstations.create}>
                           <Plus className="w-4 h-4 ml-2" />
                           {t('manufacturing.workstations.createWorkstation', 'إنشاء محطة عمل')}
                         </Link>
