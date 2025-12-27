@@ -10,7 +10,7 @@
  * - Token refresh
  */
 
-import { apiClientNoVersion, handleApiError, storeTokens, clearTokens, resetApiState } from '@/lib/api'
+import { apiClientNoVersion, handleApiError, storeTokens, clearTokens, resetApiState, refreshCsrfToken } from '@/lib/api'
 
 // Auth routes are NOT versioned - they're at /api/auth/*, not /api/v1/auth/*
 // So we use apiClientNoVersion (baseURL: https://api.traf3li.com/api)
@@ -423,6 +423,12 @@ const authService = {
         username: user.username,
         userId: user._id,
         firmId: user.firmId,
+      })
+
+      // Initialize CSRF token after successful login
+      // This ensures we have a valid token for subsequent API calls
+      refreshCsrfToken().catch((err) => {
+        console.warn('[AUTH] CSRF token initialization after login failed:', err)
       })
 
       return user
@@ -887,6 +893,11 @@ const authService = {
         userId: user._id,
       })
 
+      // Initialize CSRF token after successful OTP verification
+      refreshCsrfToken().catch((err) => {
+        console.warn('[AUTH] CSRF token initialization after OTP failed:', err)
+      })
+
       return user
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -998,6 +1009,11 @@ const authService = {
       logAuthEvent('VERIFY_MAGIC_LINK_SUCCESS', {
         username: user.username,
         userId: user._id,
+      })
+
+      // Initialize CSRF token after successful magic link verification
+      refreshCsrfToken().catch((err) => {
+        console.warn('[AUTH] CSRF token initialization after magic link failed:', err)
       })
 
       return user
