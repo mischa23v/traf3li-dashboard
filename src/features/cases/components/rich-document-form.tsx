@@ -134,12 +134,12 @@ export function RichDocumentForm({
 
     // Validation
     if (!formData.titleAr && !formData.title) {
-      setError(isArabic ? 'يرجى إدخال عنوان المستند' : 'Please enter a document title')
+      setError(t('cases.richDocuments.validationTitleRequired'))
       return
     }
 
     if (!formData.content) {
-      setError(isArabic ? 'يرجى إدخال محتوى المستند' : 'Please enter document content')
+      setError(t('cases.richDocuments.validationContentRequired'))
       return
     }
 
@@ -159,7 +159,7 @@ export function RichDocumentForm({
         onSuccess?.(result)
       }
     } catch (err: any) {
-      setError(err.message || (isArabic ? 'حدث خطأ أثناء الحفظ' : 'An error occurred while saving'))
+      setError(err.message || t('cases.richDocuments.errorSaving'))
     }
   }
 
@@ -201,8 +201,8 @@ export function RichDocumentForm({
         <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
           <FileText className="h-5 w-5 text-emerald-500" aria-hidden="true" />
           {isEditMode
-            ? (isArabic ? 'تعديل المستند' : 'Edit Document')
-            : (isArabic ? 'إنشاء مستند جديد' : 'Create New Document')}
+            ? t('cases.richDocuments.editDocument')
+            : t('cases.richDocuments.createNewDocument')}
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6">
@@ -218,24 +218,24 @@ export function RichDocumentForm({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">
-                {isArabic ? 'العنوان بالعربية *' : 'Arabic Title *'}
+                {t('cases.richDocuments.form.arabicTitle')}
               </label>
               <Input
                 value={formData.titleAr}
                 onChange={(e) => handleChange('titleAr', e.target.value)}
-                placeholder={isArabic ? 'عنوان المستند بالعربية' : 'Document title in Arabic'}
+                placeholder={t('cases.richDocuments.form.arabicTitlePlaceholder')}
                 className="rounded-xl"
                 dir="rtl"
               />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">
-                {isArabic ? 'العنوان بالإنجليزية' : 'English Title'}
+                {t('cases.richDocuments.form.englishTitle')}
               </label>
               <Input
                 value={formData.title}
                 onChange={(e) => handleChange('title', e.target.value)}
-                placeholder={isArabic ? 'عنوان المستند بالإنجليزية' : 'Document title in English'}
+                placeholder={t('cases.richDocuments.form.englishTitlePlaceholder')}
                 className="rounded-xl"
                 dir="ltr"
               />
@@ -246,7 +246,7 @@ export function RichDocumentForm({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">
-                {isArabic ? 'نوع المستند *' : 'Document Type *'}
+                {t('cases.richDocuments.documentTypeLabel')}
               </label>
               <Select
                 value={formData.documentType}
@@ -266,7 +266,7 @@ export function RichDocumentForm({
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">
-                {isArabic ? 'الحالة' : 'Status'}
+                {t('cases.richDocuments.statusLabel')}
               </label>
               <Select
                 value={formData.status}
@@ -290,7 +290,7 @@ export function RichDocumentForm({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">
-                {isArabic ? 'اللغة' : 'Language'}
+                {t('cases.richDocuments.languageLabel')}
               </label>
               <Select
                 value={formData.language}
@@ -310,7 +310,7 @@ export function RichDocumentForm({
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">
-                {isArabic ? 'اتجاه النص' : 'Text Direction'}
+                {t('cases.richDocuments.textDirectionLabel')}
               </label>
               <Select
                 value={formData.textDirection}
@@ -334,13 +334,13 @@ export function RichDocumentForm({
           <div className="space-y-2">
             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
               <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-              {isArabic ? 'المحتوى *' : 'Content *'}
+              {t('cases.richDocuments.contentLabel')}
             </label>
             <Suspense fallback={<Skeleton className="min-h-[300px] w-full rounded-xl" />}>
               <TipTapEditor
                 content={formData.content}
                 onChange={(html) => handleChange('content', html)}
-                placeholder={isArabic ? 'اكتب محتوى المستند هنا...' : 'Write document content here...'}
+                placeholder={t('cases.richDocuments.form.contentPlaceholder')}
                 minHeight="300px"
                 dir={formData.textDirection === 'ltr' ? 'ltr' : 'rtl'}
                 editable={!isLoading}
@@ -355,7 +355,7 @@ export function RichDocumentForm({
                 <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
                   <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-emerald-500" aria-hidden="true" />
-                    {isArabic ? 'إعدادات التقويم' : 'Calendar Settings'}
+                    {t('cases.richDocuments.form.calendarSettings')}
                   </h3>
                   {showCalendarSettings ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
                 </Button>
@@ -370,10 +370,10 @@ export function RichDocumentForm({
                     />
                     <div>
                       <label htmlFor="showOnCalendar" className="text-sm font-medium text-slate-700 cursor-pointer">
-                        {isArabic ? 'إظهار في التقويم' : 'Show on Calendar'}
+                        {t('cases.richDocuments.form.showOnCalendar')}
                       </label>
                       <p className="text-xs text-slate-500">
-                        {isArabic ? 'عرض هذا المستند كحدث في التقويم' : 'Display this document as an event in the calendar'}
+                        {t('cases.richDocuments.form.showOnCalendarDescription')}
                       </p>
                     </div>
                   </div>
@@ -383,7 +383,7 @@ export function RichDocumentForm({
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <label className="text-sm font-medium text-slate-700">
-                            {isArabic ? 'تاريخ التقويم' : 'Calendar Date'}
+                            {t('cases.richDocuments.form.calendarDate')}
                           </label>
                           <Input
                             type="datetime-local"
@@ -394,8 +394,8 @@ export function RichDocumentForm({
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium text-slate-700">
-                            {isArabic ? 'تاريخ الانتهاء' : 'End Date'}{' '}
-                            <span className="text-slate-500">({isArabic ? 'اختياري' : 'optional'})</span>
+                            {t('cases.richDocuments.form.endDate')}{' '}
+                            <span className="text-slate-500">({t('cases.richDocuments.form.optional')})</span>
                           </label>
                           <Input
                             type="datetime-local"
@@ -408,7 +408,7 @@ export function RichDocumentForm({
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                           <Palette className="w-4 h-4 text-emerald-500" />
-                          {isArabic ? 'لون التقويم' : 'Calendar Color'}
+                          {t('cases.richDocuments.form.calendarColor')}
                         </label>
                         <div className="flex items-center gap-3">
                           <input
@@ -452,7 +452,7 @@ export function RichDocumentForm({
                 disabled={isLoading}
               >
                 <X className="w-4 h-4 me-2" aria-hidden="true" />
-                {isArabic ? 'إلغاء' : 'Cancel'}
+                {t('cases.richDocuments.form.cancel')}
               </Button>
             )}
             <Button
@@ -466,10 +466,10 @@ export function RichDocumentForm({
                 <Save className="w-4 h-4 me-2" aria-hidden="true" />
               )}
               {isLoading
-                ? (isArabic ? 'جاري الحفظ...' : 'Saving...')
+                ? t('cases.richDocuments.form.saving')
                 : isEditMode
-                ? (isArabic ? 'تحديث المستند' : 'Update Document')
-                : (isArabic ? 'إنشاء المستند' : 'Create Document')}
+                ? t('cases.richDocuments.form.update')
+                : t('cases.richDocuments.form.create')}
             </Button>
           </div>
         </form>

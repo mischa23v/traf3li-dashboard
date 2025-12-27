@@ -4,6 +4,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
 import remindersService, {
   ReminderFilters,
@@ -21,9 +22,9 @@ import apiClient from '@/lib/api'
 // ==================== Cache Configuration ====================
 // Cache data for 30 minutes to reduce API calls
 // Data is refreshed automatically when reminders/events are created/updated/deleted
-const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
-const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour (keep in cache)
-const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists (more dynamic)
+const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
+const STATS_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour (keep in cache)
+const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists (more dynamic)
 
 // ==================== REMINDERS ====================
 

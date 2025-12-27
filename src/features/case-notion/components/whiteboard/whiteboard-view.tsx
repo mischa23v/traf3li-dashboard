@@ -12,6 +12,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { CANVAS } from '@/config'
 import {
   useCaseNotionPage,
   useCaseNotionBlocks,
@@ -253,8 +254,8 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
             // Canvas positions at TOP LEVEL (matching Block schema)
             canvasX: x,
             canvasY: y,
-            canvasWidth: 200,
-            canvasHeight: 150,
+            canvasWidth: CANVAS.BLOCK.DEFAULT_WIDTH,
+            canvasHeight: CANVAS.BLOCK.DEFAULT_HEIGHT,
             // Shape properties if provided
             ...(shapeType && { shapeType }),
           },
@@ -266,8 +267,8 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
             ...newBlock,
             canvasX: x,
             canvasY: y,
-            canvasWidth: 200,
-            canvasHeight: 150,
+            canvasWidth: CANVAS.BLOCK.DEFAULT_WIDTH,
+            canvasHeight: CANVAS.BLOCK.DEFAULT_HEIGHT,
             ...(shapeType && { shapeType }),
           },
         ])
@@ -565,8 +566,8 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
     ) => {
       // Find a good position for the new block
       const existingBlocks = localBlocks.length
-      const x = 100 + (existingBlocks % 5) * 220
-      const y = 100 + Math.floor(existingBlocks / 5) * 180
+      const x = CANVAS.GRID.X_OFFSET + (existingBlocks % CANVAS.GRID.COLUMNS) * CANVAS.GRID.X_SPACING
+      const y = CANVAS.GRID.Y_OFFSET + Math.floor(existingBlocks / CANVAS.GRID.COLUMNS) * CANVAS.GRID.Y_SPACING
 
       const content: RichTextItem[] = [
         {
@@ -597,8 +598,8 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
             // Canvas positions at TOP LEVEL (matching Block schema)
             canvasX: x,
             canvasY: y,
-            canvasWidth: 200,
-            canvasHeight: 150,
+            canvasWidth: CANVAS.BLOCK.DEFAULT_WIDTH,
+            canvasHeight: CANVAS.BLOCK.DEFAULT_HEIGHT,
             [linkField]: data._id,
           },
         })
@@ -609,8 +610,8 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
             ...newBlock,
             canvasX: x,
             canvasY: y,
-            canvasWidth: 200,
-            canvasHeight: 150,
+            canvasWidth: CANVAS.BLOCK.DEFAULT_WIDTH,
+            canvasHeight: CANVAS.BLOCK.DEFAULT_HEIGHT,
             [linkField]: data._id,
           },
         ])
@@ -656,7 +657,7 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
         const selectedBlocksData = localBlocks.filter((b) => selectedBlockIds.includes(b._id))
         if (selectedBlocksData.length === 0) return
 
-        const padding = 30
+        const padding = CANVAS.GRID.PADDING
         let minX = Infinity,
           minY = Infinity,
           maxX = -Infinity,
@@ -665,8 +666,8 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
         selectedBlocksData.forEach((block) => {
           const x = block.canvasX || 0
           const y = block.canvasY || 0
-          const width = block.canvasWidth || 200
-          const height = block.canvasHeight || 150
+          const width = block.canvasWidth || CANVAS.BLOCK.DEFAULT_WIDTH
+          const height = block.canvasHeight || CANVAS.BLOCK.DEFAULT_HEIGHT
 
           minX = Math.min(minX, x)
           minY = Math.min(minY, y)

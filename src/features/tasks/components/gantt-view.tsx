@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PERF_DEBUG, perfLog } from '@/lib/perf-debug'
+import { ROUTES } from '@/constants/routes'
 import {
   ZoomIn,
   ZoomOut,
@@ -112,7 +113,7 @@ export function GanttView() {
 
   const topNav = [
     { title: t('tasks.nav.overview'), href: '/dashboard/overview', isActive: false },
-    { title: t('tasks.nav.tasks'), href: '/dashboard/tasks/list', isActive: false },
+    { title: t('tasks.nav.tasks'), href: ROUTES.dashboard.tasks.list, isActive: false },
     { title: t('tasks.nav.cases'), href: '/dashboard/cases', isActive: false },
     { title: t('tasks.nav.clients'), href: '/dashboard/clients', isActive: false },
   ]

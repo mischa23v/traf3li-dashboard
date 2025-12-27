@@ -19,6 +19,7 @@ import {
   defaultCaptchaConfig,
   getCaptchaSiteKey,
 } from '@/components/auth/captcha-config';
+import { ROUTES } from '@/constants/routes';
 
 // ============================================
 // SVG ICONS
@@ -247,7 +248,7 @@ export function SignIn() {
           });
         }
         // Redirect to MFA challenge page with original redirect preserved
-        navigate({ to: '/mfa-challenge', search: { redirect: redirectTo } });
+        navigate({ to: ROUTES.auth.mfaChallenge, search: { redirect: redirectTo } });
       } else {
         navigate({ to: redirectTo });
       }
@@ -390,7 +391,7 @@ export function SignIn() {
                     {t('auth.signIn.password')} <span className="text-red-500">*</span>
                   </label>
                   <a
-                    href="/forgot-password"
+                    href={ROUTES.auth.forgotPassword}
                     className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
                   >
                     {t('auth.signIn.forgotPassword')}
@@ -487,7 +488,7 @@ export function SignIn() {
           {/* Sign Up Link */}
           <p className="text-center text-slate-500 mt-6">
             {t('auth.signIn.noAccount')}{' '}
-            <Link to="/sign-up" className="text-emerald-600 hover:text-emerald-700 font-bold">
+            <Link to={ROUTES.auth.signUp} className="text-emerald-600 hover:text-emerald-700 font-bold">
               {t('auth.signIn.registerNow')}
             </Link>
           </p>

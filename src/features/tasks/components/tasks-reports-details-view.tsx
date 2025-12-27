@@ -6,6 +6,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   useReport,
   useDeleteReport,
@@ -81,8 +82,8 @@ export function TasksReportsDetailsView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'المهام', href: '/dashboard/tasks/list', isActive: false },
-    { title: 'تقارير الإنتاجية', href: '/dashboard/tasks/reports', isActive: true },
+    { title: 'المهام', href: ROUTES.dashboard.tasks.list, isActive: false },
+    { title: 'تقارير الإنتاجية', href: ROUTES.dashboard.tasks.reports.list, isActive: true },
   ]
 
   const getStatusColor = (status: ReportStatus) => {
@@ -171,7 +172,7 @@ export function TasksReportsDetailsView() {
     if (!reportId) return
     if (confirm('هل أنت متأكد من حذف هذا التقرير؟')) {
       await deleteMutation.mutateAsync(reportId)
-      navigate({ to: '/dashboard/tasks/reports' })
+      navigate({ to: ROUTES.dashboard.tasks.reports.list })
     }
   }
 
@@ -224,7 +225,7 @@ export function TasksReportsDetailsView() {
                   <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" aria-hidden="true" />
                   <p className="text-red-600">حدث خطأ في تحميل بيانات التقرير</p>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/tasks/reports' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.tasks.reports.list })}
                     className="mt-4"
                   >
                     العودة للقائمة
@@ -240,7 +241,7 @@ export function TasksReportsDetailsView() {
                       variant="ghost"
                       size="icon"
                       className="rounded-xl hover:bg-white"
-                      onClick={() => navigate({ to: '/dashboard/tasks/reports' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.tasks.reports.list })}
                     >
                       <ArrowRight className="h-5 w-5" />
                     </Button>

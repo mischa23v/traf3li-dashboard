@@ -93,14 +93,14 @@ export function StatementDetailsView() {
                             <h3 className="text-xl font-bold mb-2 text-slate-900">الكشف غير موجود</h3>
                             <p className="text-slate-500 mb-4">لم يتم العثور على الكشف المطلوب</p>
                             <Button asChild>
-                                <Link to="/dashboard/finance/statements">العودة إلى كشوف الحساب</Link>
+                                <Link to={ROUTES.dashboard.finance.statements.list}>العودة إلى كشوف الحساب</Link>
                             </Button>
                         </div>
                     </div>
                 ) : (
                     <>
                 <div className="max-w-[1600px] mx-auto mb-6">
-                    <Link to="/dashboard/finance/statements" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
+                    <Link to={ROUTES.dashboard.finance.statements.list} className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
                         <ArrowLeft className="h-4 w-4 ms-2" aria-hidden="true" />
                         العودة إلى كشوف الحساب
                     </Link>

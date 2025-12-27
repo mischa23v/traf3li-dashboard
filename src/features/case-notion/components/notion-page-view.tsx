@@ -335,9 +335,7 @@ export function NotionPageView({ caseId, pageId, onBack }: NotionPageViewProps) 
   }
 
   const PageIcon = pageTypeIcons[page.pageType] || FileText
-  const pageTypeLabel = isArabic
-    ? pageTypeLabels[page.pageType]?.ar || page.pageType
-    : pageTypeLabels[page.pageType]?.en || page.pageType
+  const pageTypeLabel = t(`caseNotion.pageTypes.${page.pageType}`, page.pageType)
 
   return (
     <div className="flex-1 flex flex-col h-full bg-white dark:bg-slate-900">

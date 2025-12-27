@@ -40,7 +40,7 @@ interface ConsolidatedFinancialReportProps {
 }
 
 export function ConsolidatedFinancialReport({ filters }: ConsolidatedFinancialReportProps) {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
 
   const [activeTab, setActiveTab] = useState<'profit_loss' | 'balance_sheet'>('profit_loss')
@@ -85,7 +85,7 @@ export function ConsolidatedFinancialReport({ filters }: ConsolidatedFinancialRe
           <div className="p-2 bg-emerald-50 rounded-xl">
             <PieChart className="w-6 h-6 text-emerald-600" />
           </div>
-          {isArabic ? 'التقارير المالية الموحدة' : 'Consolidated Financial Reports'}
+          {t('reports.consolidatedFinancialReport.title')}
         </CardTitle>
       </CardHeader>
 
@@ -94,11 +94,11 @@ export function ConsolidatedFinancialReport({ filters }: ConsolidatedFinancialRe
           <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
             <TabsTrigger value="profit_loss" className="gap-2">
               <TrendingUp className="w-4 h-4" />
-              {isArabic ? 'الأرباح والخسائر' : 'Profit & Loss'}
+              {t('reports.consolidatedFinancialReport.profitLoss')}
             </TabsTrigger>
             <TabsTrigger value="balance_sheet" className="gap-2">
               <Wallet className="w-4 h-4" />
-              {isArabic ? 'الميزانية العمومية' : 'Balance Sheet'}
+              {t('reports.consolidatedFinancialReport.balanceSheet')}
             </TabsTrigger>
           </TabsList>
 
@@ -111,7 +111,7 @@ export function ConsolidatedFinancialReport({ filters }: ConsolidatedFinancialRe
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-bold text-navy flex items-center gap-2">
                       <div className="w-2 h-8 bg-emerald-500 rounded-full" />
-                      {isArabic ? 'الإيرادات' : 'Income'}
+                      {t('reports.consolidatedFinancialReport.income')}
                     </h3>
                     <Badge variant="outline" className="bg-emerald-50 border-emerald-200 text-emerald-700">
                       {formatCurrency(profitLossData.income.subtotal)}
@@ -136,7 +136,7 @@ export function ConsolidatedFinancialReport({ filters }: ConsolidatedFinancialRe
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-bold text-navy flex items-center gap-2">
                       <div className="w-2 h-8 bg-rose-500 rounded-full" />
-                      {isArabic ? 'المصروفات' : 'Expenses'}
+                      {t('reports.consolidatedFinancialReport.expenses')}
                     </h3>
                     <Badge variant="outline" className="bg-rose-50 border-rose-200 text-rose-700">
                       {formatCurrency(profitLossData.expenses.subtotal)}
@@ -172,7 +172,7 @@ export function ConsolidatedFinancialReport({ filters }: ConsolidatedFinancialRe
                         )}
                         <div>
                           <div className="text-sm font-bold text-slate-600">
-                            {isArabic ? 'صافي الربح / الخسارة' : 'Net Income / Loss'}
+                            {t('reports.consolidatedFinancialReport.netIncomeLoss')}
                           </div>
                           <div
                             className={cn(
@@ -187,7 +187,7 @@ export function ConsolidatedFinancialReport({ filters }: ConsolidatedFinancialRe
                       {profitLossData.totalEliminations !== 0 && (
                         <div className="text-end">
                           <div className="text-xs text-slate-500">
-                            {isArabic ? 'قبل الإلغاء' : 'Before Elimination'}
+                            {t('reports.consolidatedFinancialReport.beforeElimination')}
                           </div>
                           <div className="text-lg font-semibold text-slate-600">
                             {formatCurrency(profitLossData.netIncomeBeforeElimination)}
@@ -201,18 +201,18 @@ export function ConsolidatedFinancialReport({ filters }: ConsolidatedFinancialRe
                 {/* Period Info */}
                 <div className="flex items-center justify-between text-sm text-slate-500 pt-4 border-t border-slate-100">
                   <span>
-                    {isArabic ? 'الفترة:' : 'Period:'} {profitLossData.period.start} {isArabic ? 'إلى' : 'to'}{' '}
+                    {t('reports.consolidatedFinancialReport.period')} {profitLossData.period.start} {t('reports.consolidatedFinancialReport.to')}{' '}
                     {profitLossData.period.end}
                   </span>
                   <span>
-                    {isArabic ? 'العملة:' : 'Currency:'} {profitLossData.baseCurrency}
+                    {t('reports.consolidatedFinancialReport.currency')} {profitLossData.baseCurrency}
                   </span>
                 </div>
               </>
             ) : (
               <div className="text-center py-12 text-slate-500">
                 <Activity className="w-12 h-12 mx-auto mb-3 opacity-20" />
-                <p>{isArabic ? 'لا توجد بيانات متاحة' : 'No data available'}</p>
+                <p>{t('reports.consolidatedFinancialReport.noDataAvailable')}</p>
               </div>
             )}
           </TabsContent>
@@ -226,7 +226,7 @@ export function ConsolidatedFinancialReport({ filters }: ConsolidatedFinancialRe
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-bold text-navy flex items-center gap-2">
                       <div className="w-2 h-8 bg-blue-500 rounded-full" />
-                      {isArabic ? 'الأصول' : 'Assets'}
+                      {t('reports.consolidatedFinancialReport.assets')}
                     </h3>
                     <Badge variant="outline" className="bg-blue-50 border-blue-200 text-blue-700">
                       {formatCurrency(balanceSheetData.assets.totalAssets)}
@@ -236,7 +236,7 @@ export function ConsolidatedFinancialReport({ filters }: ConsolidatedFinancialRe
                   {/* Current Assets */}
                   <div className="space-y-2">
                     <h4 className="text-sm font-bold text-slate-600 px-3">
-                      {isArabic ? 'الأصول المتداولة' : 'Current Assets'}
+                      {t('reports.consolidatedFinancialReport.currentAssets')}
                     </h4>
                     {balanceSheetData.assets.currentAssets.map((item, index) => (
                       <LineItemRow
@@ -253,7 +253,7 @@ export function ConsolidatedFinancialReport({ filters }: ConsolidatedFinancialRe
                   {balanceSheetData.assets.nonCurrentAssets.length > 0 && (
                     <div className="space-y-2">
                       <h4 className="text-sm font-bold text-slate-600 px-3">
-                        {isArabic ? 'الأصول غير المتداولة' : 'Non-Current Assets'}
+                        {t('reports.consolidatedFinancialReport.nonCurrentAssets')}
                       </h4>
                       {balanceSheetData.assets.nonCurrentAssets.map((item, index) => (
                         <LineItemRow
@@ -273,7 +273,7 @@ export function ConsolidatedFinancialReport({ filters }: ConsolidatedFinancialRe
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-bold text-navy flex items-center gap-2">
                       <div className="w-2 h-8 bg-orange-500 rounded-full" />
-                      {isArabic ? 'الالتزامات' : 'Liabilities'}
+                      {t('reports.consolidatedFinancialReport.liabilities')}
                     </h3>
                     <Badge variant="outline" className="bg-orange-50 border-orange-200 text-orange-700">
                       {formatCurrency(balanceSheetData.liabilities.totalLiabilities)}
@@ -283,7 +283,7 @@ export function ConsolidatedFinancialReport({ filters }: ConsolidatedFinancialRe
                   {/* Current Liabilities */}
                   <div className="space-y-2">
                     <h4 className="text-sm font-bold text-slate-600 px-3">
-                      {isArabic ? 'الالتزامات المتداولة' : 'Current Liabilities'}
+                      {t('reports.consolidatedFinancialReport.currentLiabilities')}
                     </h4>
                     {balanceSheetData.liabilities.currentLiabilities.map((item, index) => (
                       <LineItemRow
@@ -300,7 +300,7 @@ export function ConsolidatedFinancialReport({ filters }: ConsolidatedFinancialRe
                   {balanceSheetData.liabilities.nonCurrentLiabilities.length > 0 && (
                     <div className="space-y-2">
                       <h4 className="text-sm font-bold text-slate-600 px-3">
-                        {isArabic ? 'الالتزامات غير المتداولة' : 'Non-Current Liabilities'}
+                        {t('reports.consolidatedFinancialReport.nonCurrentLiabilities')}
                       </h4>
                       {balanceSheetData.liabilities.nonCurrentLiabilities.map((item, index) => (
                         <LineItemRow
@@ -320,7 +320,7 @@ export function ConsolidatedFinancialReport({ filters }: ConsolidatedFinancialRe
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-bold text-navy flex items-center gap-2">
                       <div className="w-2 h-8 bg-purple-500 rounded-full" />
-                      {isArabic ? 'حقوق الملكية' : 'Equity'}
+                      {t('reports.consolidatedFinancialReport.equity')}
                     </h3>
                     <Badge variant="outline" className="bg-purple-50 border-purple-200 text-purple-700">
                       {formatCurrency(balanceSheetData.equity.totalEquity)}
@@ -350,7 +350,7 @@ export function ConsolidatedFinancialReport({ filters }: ConsolidatedFinancialRe
                         </div>
                         <div>
                           <div className="text-sm font-bold text-slate-600">
-                            {isArabic ? 'إجمالي الالتزامات وحقوق الملكية' : 'Total Liabilities & Equity'}
+                            {t('reports.consolidatedFinancialReport.totalLiabilitiesEquity')}
                           </div>
                           <div className="text-3xl font-bold text-slate-900">
                             {formatCurrency(balanceSheetData.totalLiabilitiesAndEquity)}
@@ -364,17 +364,17 @@ export function ConsolidatedFinancialReport({ filters }: ConsolidatedFinancialRe
                 {/* Date Info */}
                 <div className="flex items-center justify-between text-sm text-slate-500 pt-4 border-t border-slate-100">
                   <span>
-                    {isArabic ? 'كما في:' : 'As of:'} {balanceSheetData.asOfDate}
+                    {t('reports.consolidatedFinancialReport.asOf')} {balanceSheetData.asOfDate}
                   </span>
                   <span>
-                    {isArabic ? 'العملة:' : 'Currency:'} {balanceSheetData.baseCurrency}
+                    {t('reports.consolidatedFinancialReport.currency')} {balanceSheetData.baseCurrency}
                   </span>
                 </div>
               </>
             ) : (
               <div className="text-center py-12 text-slate-500">
                 <Wallet className="w-12 h-12 mx-auto mb-3 opacity-20" />
-                <p>{isArabic ? 'لا توجد بيانات متاحة' : 'No data available'}</p>
+                <p>{t('reports.consolidatedFinancialReport.noDataAvailable')}</p>
               </div>
             )}
           </TabsContent>
@@ -440,7 +440,7 @@ function LineItemRow({ item, isArabic, formatCurrency, type }: LineItemRowProps)
             <div className="flex items-center gap-3">
               {item.eliminationAmount !== 0 && (
                 <Badge variant="outline" className="bg-amber-50 border-amber-200 text-amber-700 text-xs">
-                  {isArabic ? 'إلغاء' : 'Elim'}: {formatCurrency(item.eliminationAmount)}
+                  {t('reports.consolidatedFinancialReport.elim')}: {formatCurrency(item.eliminationAmount)}
                 </Badge>
               )}
               <div className={cn('font-bold px-3 py-1 rounded-lg border text-sm', getTypeColor())}>
@@ -481,7 +481,7 @@ function LineItemRow({ item, isArabic, formatCurrency, type }: LineItemRowProps)
             {item.eliminationAmount !== 0 && (
               <div className="mt-3 pt-3 border-t border-slate-200">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-600">{isArabic ? 'قبل الإلغاء' : 'Before Elimination'}:</span>
+                  <span className="text-slate-600">{t('reports.consolidatedFinancialReport.beforeElimination')}:</span>
                   <span className="font-semibold text-slate-700">
                     {formatCurrency(item.totalBeforeElimination)}
                   </span>

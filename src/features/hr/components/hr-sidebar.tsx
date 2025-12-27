@@ -13,6 +13,7 @@ import { useCalendar } from '@/hooks/useCalendar'
 import { useUpcomingReminders } from '@/hooks/useRemindersAndEvents'
 import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
+import { ROUTES } from '@/constants/routes'
 
 interface HRSidebarProps {
     context?: 'employees' | 'salaries' | 'payroll' | 'leaves' | 'attendance' | 'evaluations' | 'grievances' | 'organizational-structure' | 'job-positions' | 'succession-planning' | 'compensation' | 'reports' | 'biometric' | 'geofencing' | 'analytics' | 'predictions'
@@ -76,68 +77,68 @@ export function HRSidebar({
 
     const links: Record<string, { create: string; viewAll: string }> = {
         employees: {
-            create: '/dashboard/hr/employees/new',
-            viewAll: '/dashboard/hr/employees'
+            create: ROUTES.dashboard.hr.employees.new,
+            viewAll: ROUTES.dashboard.hr.employees.list
         },
         salaries: {
-            create: '/dashboard/hr/salaries/new',
-            viewAll: '/dashboard/hr/salaries'
+            create: ROUTES.dashboard.hr.payroll.new,
+            viewAll: ROUTES.dashboard.hr.payroll.list
         },
         payroll: {
-            create: '/dashboard/hr/payroll/new',
-            viewAll: '/dashboard/hr/payroll'
+            create: ROUTES.dashboard.hr.payroll.new,
+            viewAll: ROUTES.dashboard.hr.payroll.list
         },
         leaves: {
-            create: '/dashboard/hr/leaves/new',
-            viewAll: '/dashboard/hr/leaves'
+            create: ROUTES.dashboard.hr.leave.new,
+            viewAll: ROUTES.dashboard.hr.leave.list
         },
         attendance: {
-            create: '/dashboard/hr/attendance/new',
-            viewAll: '/dashboard/hr/attendance'
+            create: ROUTES.dashboard.hr.attendance.new,
+            viewAll: ROUTES.dashboard.hr.attendance.list
         },
         evaluations: {
-            create: '/dashboard/hr/evaluations/new',
-            viewAll: '/dashboard/hr/evaluations'
+            create: ROUTES.dashboard.hr.performance.new,
+            viewAll: ROUTES.dashboard.hr.performance.list
         },
         grievances: {
-            create: '/dashboard/hr/grievances/new',
-            viewAll: '/dashboard/hr/grievances'
+            create: ROUTES.dashboard.hr.grievances.new,
+            viewAll: ROUTES.dashboard.hr.grievances.list
         },
         'organizational-structure': {
-            create: '/dashboard/hr/organizational-structure/new',
-            viewAll: '/dashboard/hr/organizational-structure'
+            create: ROUTES.dashboard.hr.organizationalStructure.new,
+            viewAll: ROUTES.dashboard.hr.organizationalStructure.list
         },
         'job-positions': {
-            create: '/dashboard/hr/job-positions/new',
-            viewAll: '/dashboard/hr/job-positions'
+            create: ROUTES.dashboard.hr.jobPositions.new,
+            viewAll: ROUTES.dashboard.hr.jobPositions.list
         },
         'succession-planning': {
-            create: '/dashboard/hr/succession-planning/new',
-            viewAll: '/dashboard/hr/succession-planning'
+            create: ROUTES.dashboard.hr.successionPlanning.new,
+            viewAll: ROUTES.dashboard.hr.successionPlanning.list
         },
         'compensation': {
-            create: '/dashboard/hr/compensation/new',
-            viewAll: '/dashboard/hr/compensation'
+            create: ROUTES.dashboard.hr.compensation.new,
+            viewAll: ROUTES.dashboard.hr.compensation.list
         },
         'reports': {
-            create: '/dashboard/hr/reports/new',
-            viewAll: '/dashboard/hr/reports'
+            create: ROUTES.dashboard.hr.reports.new,
+            viewAll: ROUTES.dashboard.hr.reports.list
         },
         'biometric': {
-            create: '/dashboard/hr/biometric/new',
-            viewAll: '/dashboard/hr/biometric'
+            create: ROUTES.dashboard.hr.biometric.new,
+            viewAll: ROUTES.dashboard.hr.biometric.list
         },
         'geofencing': {
-            create: '/dashboard/hr/geofencing/new',
-            viewAll: '/dashboard/hr/geofencing'
+            create: ROUTES.dashboard.hr.geofencing.new,
+            viewAll: ROUTES.dashboard.hr.geofencing.list
         },
         'analytics': {
             create: '',
-            viewAll: '/dashboard/hr/analytics'
+            viewAll: ROUTES.dashboard.hr.analytics.list
         },
         'predictions': {
             create: '',
-            viewAll: '/dashboard/hr/predictions'
+            viewAll: ROUTES.dashboard.hr.predictions.list
         }
     }
 
@@ -241,7 +242,7 @@ export function HRSidebar({
                         <>
                             {/* Edit Button */}
                             <Button asChild className="bg-white hover:bg-blue-50 text-blue-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
-                                <Link to="/dashboard/hr/employees/new" search={{ editId: employeeId }}>
+                                <Link to={ROUTES.dashboard.hr.employees.new} search={{ editId: employeeId }}>
                                     <Edit3 className="h-7 w-7" aria-hidden="true" />
                                     <span className="text-sm font-bold">{t('common.edit')}</span>
                                 </Link>
@@ -451,7 +452,7 @@ export function HRSidebar({
                             </div>
 
                             <Button asChild variant="ghost" className="w-full mt-6 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 group cursor-pointer">
-                                <Link to="/dashboard/calendar">
+                                <Link to={ROUTES.dashboard.calendar}>
                                     <span>{t('sidebar.calendar.viewFullSchedule')}</span>
                                     <ChevronRight className="w-4 h-4 me-2 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1 rtl:rotate-180" aria-hidden="true" />
                                 </Link>
@@ -478,7 +479,7 @@ export function HRSidebar({
                                         return (
                                             <Link
                                                 key={reminder._id}
-                                                to={`/dashboard/tasks/reminders/${reminder._id}`}
+                                                to={ROUTES.dashboard.tasks.reminders.detail(reminder._id)}
                                                 className="flex gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:shadow-md transition-all cursor-pointer group"
                                             >
                                                 <div className={cn(
@@ -517,7 +518,7 @@ export function HRSidebar({
                                 </>
                             )}
                             <Button asChild variant="ghost" className="w-full text-xs text-slate-600 hover:text-emerald-600 hover:bg-emerald-50">
-                                <Link to="/dashboard/tasks/reminders">
+                                <Link to={ROUTES.dashboard.tasks.reminders.list}>
                                     {t('sidebar.notifications.viewAll')}
                                 </Link>
                             </Button>

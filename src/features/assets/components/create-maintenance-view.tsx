@@ -45,12 +45,13 @@ import { useCreateMaintenanceSchedule, useAssets } from '@/hooks/use-assets'
 import { useStaff } from '@/hooks/useStaff'
 import type { MaintenanceStatus } from '@/types/assets'
 import { AssetsSidebar } from './assets-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'assets.assets', href: '/dashboard/assets' },
-  { title: 'assets.maintenance', href: '/dashboard/assets/maintenance' },
-  { title: 'assets.scheduleMaintenance', href: '/dashboard/assets/maintenance/create' },
+  { title: 'assets.assets', href: ROUTES.dashboard.assets.list },
+  { title: 'assets.maintenance', href: ROUTES.dashboard.assets.maintenance.list },
+  { title: 'assets.scheduleMaintenance', href: ROUTES.dashboard.assets.maintenance.create },
 ]
 
 const MAINTENANCE_TYPES = [
@@ -163,7 +164,7 @@ export function CreateMaintenanceView() {
         data: maintenanceData,
       })
 
-      navigate({ to: '/dashboard/assets/maintenance' })
+      navigate({ to: ROUTES.dashboard.assets.maintenance.list })
     } catch (error) {
       // Error handled by mutation
     }
@@ -495,7 +496,7 @@ export function CreateMaintenanceView() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate({ to: '/dashboard/assets/maintenance' })}
+                  onClick={() => navigate({ to: ROUTES.dashboard.assets.maintenance.list })}
                   className="rounded-xl"
                 >
                   <X className="w-4 h-4 ml-2" />

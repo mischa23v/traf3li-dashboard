@@ -1,5 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
+import { useLanguage } from '@/hooks/useLanguage'
 import {
   Building2, ArrowRightLeft, TrendingUp, TrendingDown,
   FileText, Plus, Search, Download, RefreshCw, CheckCircle2
@@ -42,7 +44,9 @@ import { formatCurrency, formatDate } from '@/lib/utils'
 
 export default function InterCompanyDashboard() {
   const navigate = useNavigate()
-  const [isArabic, setIsArabic] = useState(true)
+  const { t } = useTranslation()
+  const { language } = useLanguage()
+  const isArabic = language === 'ar'
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCurrency, setSelectedCurrency] = useState('SAR')
   const [selectedStatus, setSelectedStatus] = useState('all')
@@ -59,9 +63,9 @@ export default function InterCompanyDashboard() {
   const exportMutation = useExportInterCompanyReport()
 
   const topNav = [
-    { title: isArabic ? 'المالية' : 'Finance', href: '/finance' },
+    { title: t('finance.interCompany.nav.finance'), href: '/finance' },
     {
-      title: isArabic ? 'المعاملات بين الشركات' : 'Inter-Company',
+      title: t('finance.interCompany.nav.interCompany'),
       isCurrentPage: true
     },
   ]
@@ -116,12 +120,10 @@ export default function InterCompanyDashboard() {
             <div>
               <h1 className="text-3xl font-bold flex items-center gap-3">
                 <Building2 className="h-8 w-8 text-primary" />
-                {isArabic ? 'المعاملات بين الشركات' : 'Inter-Company Transactions'}
+                {t('finance.interCompany.dashboard.title')}
               </h1>
               <p className="text-muted-foreground mt-2">
-                {isArabic
-                  ? 'إدارة المعاملات والأرصدة والتسويات بين شركات المجموعة'
-                  : 'Manage transactions, balances, and reconciliations between group companies'
+                {t('finance.interCompany.dashboard.subtitle')
                 }
               </p>
             </div>
@@ -132,11 +134,11 @@ export default function InterCompanyDashboard() {
                 disabled={exportMutation.isPending}
               >
                 <Download className="h-4 w-4 mr-2" />
-                {isArabic ? 'تصدير' : 'Export'}
+                {t('finance.interCompany.dashboard.export')}
               </Button>
               <Button onClick={() => navigate({ to: '/finance/inter-company/new' })}>
                 <Plus className="h-4 w-4 mr-2" />
-                {isArabic ? 'معاملة جديدة' : 'New Transaction'}
+                {t('finance.interCompany.dashboard.newTransaction')}
               </Button>
             </div>
           </div>
@@ -154,13 +156,13 @@ export default function InterCompanyDashboard() {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     <FileText className="h-4 w-4 text-blue-600" />
-                    {isArabic ? 'إجمالي المعاملات' : 'Total Transactions'}
+                    {t('finance.interCompany.dashboard.totalTransactions')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold">{stats.transactionCount}</div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {isArabic ? 'معاملة نشطة' : 'Active transactions'}
+                    {t('finance.interCompany.dashboard.activeTransactions')}
                   </p>
                 </CardContent>
               </Card>
@@ -169,7 +171,7 @@ export default function InterCompanyDashboard() {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-green-600" />
-                    {isArabic ? 'إجمالي المستحقات' : 'Total Receivables'}
+                    {t('finance.interCompany.dashboard.totalReceivables')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -177,7 +179,7 @@ export default function InterCompanyDashboard() {
                     {formatCurrency(stats.totalReceivable, selectedCurrency)}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {isArabic ? 'مستحق للشركات' : 'Due to companies'}
+                    {t('finance.interCompany.dashboard.dueToCompanies')}
                   </p>
                 </CardContent>
               </Card>
@@ -186,7 +188,7 @@ export default function InterCompanyDashboard() {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     <TrendingDown className="h-4 w-4 text-red-600" />
-                    {isArabic ? 'إجمالي المستحق الدفع' : 'Total Payables'}
+                    {t('finance.interCompany.dashboard.totalPayables')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -194,7 +196,7 @@ export default function InterCompanyDashboard() {
                     {formatCurrency(stats.totalPayable, selectedCurrency)}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {isArabic ? 'مستحق على الشركات' : 'Due from companies'}
+                    {t('finance.interCompany.dashboard.dueFromCompanies')}
                   </p>
                 </CardContent>
               </Card>
@@ -203,7 +205,7 @@ export default function InterCompanyDashboard() {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     <ArrowRightLeft className="h-4 w-4 text-blue-600" />
-                    {isArabic ? 'صافي الرصيد' : 'Net Balance'}
+                    {t('finance.interCompany.dashboard.netBalance')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -214,8 +216,8 @@ export default function InterCompanyDashboard() {
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
                     {stats.netBalance >= 0
-                      ? (isArabic ? 'صافي مستحق' : 'Net receivable')
-                      : (isArabic ? 'صافي مستحق الدفع' : 'Net payable')
+                      ? (t('finance.interCompany.dashboard.netReceivable'))
+                      : (t('finance.interCompany.dashboard.netPayable'))
                     }
                   </p>
                 </CardContent>
@@ -232,12 +234,10 @@ export default function InterCompanyDashboard() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Building2 className="h-5 w-5 text-primary" />
-                  {isArabic ? 'مصفوفة الأرصدة' : 'Balance Matrix'}
+                  {t('finance.interCompany.dashboard.balanceMatrix')}
                 </CardTitle>
                 <CardDescription>
-                  {isArabic
-                    ? 'عرض الأرصدة بين جميع الشركات في جدول تفاعلي'
-                    : 'View balances between all companies in an interactive grid'
+                  {t('finance.interCompany.dashboard.balanceMatrixDesc')
                   }
                 </CardDescription>
               </CardHeader>
@@ -250,12 +250,10 @@ export default function InterCompanyDashboard() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <CheckCircle2 className="h-5 w-5 text-primary" />
-                  {isArabic ? 'التسويات' : 'Reconciliations'}
+                  {t('finance.interCompany.dashboard.reconciliations')}
                 </CardTitle>
                 <CardDescription>
-                  {isArabic
-                    ? 'مطابقة وتسوية المعاملات بين الشركات'
-                    : 'Match and reconcile transactions between companies'
+                  {t('finance.interCompany.dashboard.reconciliationsDesc')
                   }
                 </CardDescription>
               </CardHeader>
@@ -268,12 +266,10 @@ export default function InterCompanyDashboard() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Plus className="h-5 w-5 text-primary" />
-                  {isArabic ? 'معاملة جديدة' : 'New Transaction'}
+                  {t('finance.interCompany.dashboard.newTransaction')}
                 </CardTitle>
                 <CardDescription>
-                  {isArabic
-                    ? 'إنشاء معاملة جديدة بين شركتين'
-                    : 'Create a new transaction between two companies'
+                  {t('finance.interCompany.dashboard.newTransactionDesc')
                   }
                 </CardDescription>
               </CardHeader>
@@ -284,10 +280,10 @@ export default function InterCompanyDashboard() {
           <Tabs defaultValue="transactions" className="space-y-4">
             <TabsList>
               <TabsTrigger value="transactions">
-                {isArabic ? 'المعاملات الأخيرة' : 'Recent Transactions'}
+                {t('finance.interCompany.dashboard.recentTransactions')}
               </TabsTrigger>
               <TabsTrigger value="reconciliations">
-                {isArabic ? 'التسويات' : 'Reconciliations'}
+                {t('finance.interCompany.dashboard.reconciliations')}
               </TabsTrigger>
             </TabsList>
 
@@ -296,17 +292,17 @@ export default function InterCompanyDashboard() {
               <Card>
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle>{isArabic ? 'المعاملات الأخيرة' : 'Recent Transactions'}</CardTitle>
+                    <CardTitle>{t('finance.interCompany.dashboard.recentTransactions')}</CardTitle>
                     <div className="flex gap-2">
                       <Select value={selectedStatus} onValueChange={setSelectedStatus}>
                         <SelectTrigger className="w-40">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">{isArabic ? 'الكل' : 'All'}</SelectItem>
-                          <SelectItem value="draft">{isArabic ? 'مسودة' : 'Draft'}</SelectItem>
-                          <SelectItem value="posted">{isArabic ? 'مرحلة' : 'Posted'}</SelectItem>
-                          <SelectItem value="reconciled">{isArabic ? 'مسوّاة' : 'Reconciled'}</SelectItem>
+                          <SelectItem value="all">{t('finance.interCompany.common.all')}</SelectItem>
+                          <SelectItem value="draft">{t('finance.interCompany.common.draft')}</SelectItem>
+                          <SelectItem value="posted">{t('finance.interCompany.common.posted')}</SelectItem>
+                          <SelectItem value="reconciled">{t('finance.interCompany.common.reconciled')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <Button
@@ -314,7 +310,7 @@ export default function InterCompanyDashboard() {
                         size="sm"
                         onClick={() => navigate({ to: '/finance/inter-company' })}
                       >
-                        {isArabic ? 'عرض الكل' : 'View All'}
+                        {t('finance.interCompany.dashboard.viewAll')}
                       </Button>
                     </div>
                   </div>
@@ -330,13 +326,13 @@ export default function InterCompanyDashboard() {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>{isArabic ? 'التاريخ' : 'Date'}</TableHead>
-                          <TableHead>{isArabic ? 'من' : 'From'}</TableHead>
-                          <TableHead>{isArabic ? 'إلى' : 'To'}</TableHead>
-                          <TableHead>{isArabic ? 'النوع' : 'Type'}</TableHead>
-                          <TableHead>{isArabic ? 'الوصف' : 'Description'}</TableHead>
-                          <TableHead className="text-right">{isArabic ? 'المبلغ' : 'Amount'}</TableHead>
-                          <TableHead>{isArabic ? 'الحالة' : 'Status'}</TableHead>
+                          <TableHead>{t('finance.interCompany.balances.date')}</TableHead>
+                          <TableHead>{t('finance.interCompany.common.from')}</TableHead>
+                          <TableHead>{t('finance.interCompany.common.to')}</TableHead>
+                          <TableHead>{t('finance.interCompany.balances.type')}</TableHead>
+                          <TableHead>{t('finance.interCompany.balances.description')}</TableHead>
+                          <TableHead className="text-right">{t('finance.interCompany.balances.amount')}</TableHead>
+                          <TableHead>{t('finance.interCompany.balances.status')}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -399,13 +395,13 @@ export default function InterCompanyDashboard() {
               <Card>
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle>{isArabic ? 'التسويات الأخيرة' : 'Recent Reconciliations'}</CardTitle>
+                    <CardTitle>{t('finance.interCompany.dashboard.recentReconciliations')}</CardTitle>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => navigate({ to: '/finance/inter-company/reconciliation' })}
                     >
-                      {isArabic ? 'عرض الكل' : 'View All'}
+                      {t('finance.interCompany.dashboard.viewAll')}
                     </Button>
                   </div>
                 </CardHeader>
@@ -420,12 +416,12 @@ export default function InterCompanyDashboard() {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>{isArabic ? 'الرقم' : 'Number'}</TableHead>
-                          <TableHead>{isArabic ? 'الشركات' : 'Companies'}</TableHead>
-                          <TableHead>{isArabic ? 'الفترة' : 'Period'}</TableHead>
-                          <TableHead>{isArabic ? 'المتطابقة' : 'Matched'}</TableHead>
-                          <TableHead>{isArabic ? 'غير المتطابقة' : 'Unmatched'}</TableHead>
-                          <TableHead>{isArabic ? 'الحالة' : 'Status'}</TableHead>
+                          <TableHead>{t('finance.interCompany.common.number')}</TableHead>
+                          <TableHead>{t('finance.interCompany.common.companies')}</TableHead>
+                          <TableHead>{t('finance.interCompany.common.period')}</TableHead>
+                          <TableHead>{t('finance.interCompany.reconciliation.matched')}</TableHead>
+                          <TableHead>{t('finance.interCompany.reconciliation.unmatched')}</TableHead>
+                          <TableHead>{t('finance.interCompany.balances.status')}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>

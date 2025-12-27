@@ -144,7 +144,7 @@ export function TimeEntryDetailsView() {
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 <div className="max-w-[1600px] mx-auto mb-6">
-                    <Link to="/dashboard/finance/time-tracking" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
+                    <Link to={ROUTES.dashboard.finance.timeTracking.list} className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
                         <ArrowLeft className="h-4 w-4 ms-2" aria-hidden="true" />
                         العودة إلى تتبع الوقت
                     </Link>
@@ -195,7 +195,7 @@ export function TimeEntryDetailsView() {
                             <h3 className="text-lg font-bold text-slate-900 mb-2">سجل الوقت غير موجود</h3>
                             <p className="text-slate-500 mb-4">لم يتم العثور على سجل الوقت المطلوب</p>
                             <Button asChild className="bg-brand-blue hover:bg-blue-600">
-                                <Link to="/dashboard/finance/time-tracking">
+                                <Link to={ROUTES.dashboard.finance.timeTracking.list}>
                                     العودة إلى القائمة
                                 </Link>
                             </Button>

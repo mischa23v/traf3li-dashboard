@@ -57,12 +57,13 @@ import type {
   StockEntryItem,
 } from '@/types/inventory'
 import { InventorySidebar } from './inventory-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.inventory', href: '/dashboard/inventory' },
-  { title: 'inventory.stockEntries', href: '/dashboard/inventory/stock-entries' },
-  { title: 'inventory.createStockEntry', href: '/dashboard/inventory/stock-entries/create' },
+  { title: 'sidebar.nav.inventory', href: ROUTES.dashboard.inventory.list },
+  { title: 'inventory.stockEntries', href: ROUTES.dashboard.inventory.stockEntries.list },
+  { title: 'inventory.createStockEntry', href: ROUTES.dashboard.inventory.stockEntries.create },
 ]
 
 interface StockEntryItemRow extends Omit<StockEntryItem, '_id'> {
@@ -192,7 +193,7 @@ export function CreateStockEntryView() {
       }
 
       await createStockEntryMutation.mutateAsync(submitData)
-      navigate({ to: '/dashboard/inventory/stock-entries' })
+      navigate({ to: ROUTES.dashboard.inventory.stockEntries.list })
     } catch (error) {
       // Error handled by mutation
     }
@@ -742,7 +743,7 @@ export function CreateStockEntryView() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate({ to: '/dashboard/inventory/stock-entries' })}
+                  onClick={() => navigate({ to: ROUTES.dashboard.inventory.stockEntries.list })}
                   className="rounded-xl"
                 >
                   <X className="w-4 h-4 ml-2" />

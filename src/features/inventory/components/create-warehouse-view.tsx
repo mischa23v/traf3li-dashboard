@@ -38,11 +38,12 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useCreateWarehouse, useWarehouses } from '@/hooks/use-inventory'
 import type { CreateWarehouseData } from '@/types/inventory'
 import { InventorySidebar } from './inventory-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.inventory', href: '/dashboard/inventory' },
-  { title: 'inventory.createWarehouse', href: '/dashboard/inventory/warehouses/create' },
+  { title: 'sidebar.nav.inventory', href: ROUTES.dashboard.inventory.list },
+  { title: 'inventory.createWarehouse', href: ROUTES.dashboard.inventory.warehouses.create },
 ]
 
 type ExtendedWarehouseData = CreateWarehouseData & {
@@ -115,7 +116,7 @@ export function CreateWarehouseView() {
       const { latitude, longitude, defaultExpenseAccount, defaultIncomeAccount, disabled, ...warehouseData } = formData
 
       await createWarehouseMutation.mutateAsync(warehouseData)
-      navigate({ to: '/dashboard/inventory/warehouses' })
+      navigate({ to: ROUTES.dashboard.inventory.warehouses.list })
     } catch (error) {
       // Error handled by mutation
     }
@@ -482,7 +483,7 @@ export function CreateWarehouseView() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate({ to: '/dashboard/inventory/warehouses' })}
+                  onClick={() => navigate({ to: ROUTES.dashboard.inventory.warehouses.list })}
                   className="rounded-xl"
                 >
                   <X className="w-4 h-4 ml-2" />

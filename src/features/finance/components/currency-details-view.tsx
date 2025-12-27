@@ -175,7 +175,7 @@ export function CurrencyDetailsView() {
                 </Header>
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
                     <div className="max-w-[1600px] mx-auto mb-6">
-                        <Link to="/dashboard/finance/currency" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
+                        <Link to={ROUTES.dashboard.finance.currency.list} className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
                             <ArrowLeft className="h-4 w-4 ms-2" aria-hidden="true" />
                             العودة إلى العملات
                         </Link>
@@ -223,7 +223,7 @@ export function CurrencyDetailsView() {
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 <div className="max-w-[1600px] mx-auto mb-6">
-                    <Link to="/dashboard/finance/currency" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
+                    <Link to={ROUTES.dashboard.finance.currency.list} className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
                         <ArrowLeft className="h-4 w-4 ms-2" aria-hidden="true" />
                         العودة إلى العملات
                     </Link>

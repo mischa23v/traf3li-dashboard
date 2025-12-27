@@ -1644,7 +1644,7 @@ export function CreateExpenseView() {
                                 {/* ========== ACTION BUTTONS ========== */}
                                 <div className="flex items-center justify-between pt-6 border-t border-slate-100">
                                     <div className="flex gap-2">
-                                        <Link to="/dashboard/finance/expenses">
+                                        <Link to={ROUTES.dashboard.finance.expenses.list}>
                                             <Button type="button" variant="outline" className="rounded-xl">
                                                 <X className="ms-2 h-4 w-4" aria-hidden="true" />
                                                 إلغاء

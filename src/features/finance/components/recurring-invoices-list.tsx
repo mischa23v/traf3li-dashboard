@@ -232,7 +232,7 @@ export default function RecurringInvoicesList() {
                     إدارة الفواتير التلقائية والاشتراكات
                   </p>
                 </div>
-                <Link to="/dashboard/finance/recurring-invoices/new">
+                <Link to={ROUTES.dashboard.finance.recurringInvoices.new}>
                   <Button>
                     <Plus className="h-4 w-4 ml-2" />
                     فاتورة متكررة جديدة
@@ -424,7 +424,7 @@ export default function RecurringInvoicesList() {
                     <p className="text-muted-foreground mb-4">
                       ابدأ بإنشاء فاتورة متكررة لأتمتة الفواتير الخاصة بك
                     </p>
-                    <Link to="/dashboard/finance/recurring-invoices/new">
+                    <Link to={ROUTES.dashboard.finance.recurringInvoices.new}>
                       <Button>
                         <Plus className="h-4 w-4 ml-2" />
                         فاتورة متكررة جديدة

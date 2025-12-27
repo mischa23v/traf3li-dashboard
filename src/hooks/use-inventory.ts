@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import inventoryService from '@/services/inventoryService'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import type {
   Item,
   CreateItemData,
@@ -72,13 +73,12 @@ export function useItemStock(id: string) {
 }
 
 export function useCreateItem() {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (data: CreateItemData) => inventoryService.createItem(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: inventoryKeys.items() })
+      invalidateCache.inventory.all()
       toast.success(t('inventory.itemCreated', 'تم إنشاء الصنف بنجاح'))
     },
     onError: (error: Error) => {
@@ -88,15 +88,13 @@ export function useCreateItem() {
 }
 
 export function useUpdateItem() {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateItemData> }) =>
       inventoryService.updateItem(id, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: inventoryKeys.items() })
-      queryClient.invalidateQueries({ queryKey: inventoryKeys.itemDetail(variables.id) })
+    onSuccess: () => {
+      invalidateCache.inventory.all()
       toast.success(t('inventory.itemUpdated', 'تم تحديث الصنف بنجاح'))
     },
     onError: (error: Error) => {
@@ -106,13 +104,12 @@ export function useUpdateItem() {
 }
 
 export function useDeleteItem() {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (id: string) => inventoryService.deleteItem(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: inventoryKeys.items() })
+      invalidateCache.inventory.all()
       toast.success(t('inventory.itemDeleted', 'تم حذف الصنف بنجاح'))
     },
     onError: (error: Error) => {
@@ -147,13 +144,12 @@ export function useWarehouseStock(id: string) {
 }
 
 export function useCreateWarehouse() {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (data: CreateWarehouseData) => inventoryService.createWarehouse(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: inventoryKeys.warehouses() })
+      invalidateCache.inventory.all()
       toast.success(t('inventory.warehouseCreated', 'تم إنشاء المستودع بنجاح'))
     },
     onError: (error: Error) => {
@@ -163,15 +159,13 @@ export function useCreateWarehouse() {
 }
 
 export function useUpdateWarehouse() {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateWarehouseData> }) =>
       inventoryService.updateWarehouse(id, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: inventoryKeys.warehouses() })
-      queryClient.invalidateQueries({ queryKey: inventoryKeys.warehouseDetail(variables.id) })
+    onSuccess: () => {
+      invalidateCache.inventory.all()
       toast.success(t('inventory.warehouseUpdated', 'تم تحديث المستودع بنجاح'))
     },
     onError: (error: Error) => {
@@ -181,13 +175,12 @@ export function useUpdateWarehouse() {
 }
 
 export function useDeleteWarehouse() {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (id: string) => inventoryService.deleteWarehouse(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: inventoryKeys.warehouses() })
+      invalidateCache.inventory.all()
       toast.success(t('inventory.warehouseDeleted', 'تم حذف المستودع بنجاح'))
     },
     onError: (error: Error) => {
@@ -220,7 +213,7 @@ export function useCreateStockEntry() {
   return useMutation({
     mutationFn: (data: CreateStockEntryData) => inventoryService.createStockEntry(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: inventoryKeys.stockEntries() })
+      invalidateCache.inventory.all()
       queryClient.invalidateQueries({ queryKey: inventoryKeys.stats() })
       toast.success(t('inventory.stockEntryCreated', 'تم إنشاء حركة المخزون بنجاح'))
     },
@@ -237,7 +230,7 @@ export function useSubmitStockEntry() {
   return useMutation({
     mutationFn: (id: string) => inventoryService.submitStockEntry(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: inventoryKeys.stockEntries() })
+      invalidateCache.inventory.all()
       queryClient.invalidateQueries({ queryKey: inventoryKeys.stockLedger() })
       queryClient.invalidateQueries({ queryKey: inventoryKeys.stats() })
       toast.success(t('inventory.stockEntrySubmitted', 'تم ترحيل حركة المخزون بنجاح'))
@@ -255,7 +248,7 @@ export function useCancelStockEntry() {
   return useMutation({
     mutationFn: (id: string) => inventoryService.cancelStockEntry(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: inventoryKeys.stockEntries() })
+      invalidateCache.inventory.all()
       queryClient.invalidateQueries({ queryKey: inventoryKeys.stockLedger() })
       queryClient.invalidateQueries({ queryKey: inventoryKeys.stats() })
       toast.success(t('inventory.stockEntryCancelled', 'تم إلغاء حركة المخزون'))
@@ -267,13 +260,12 @@ export function useCancelStockEntry() {
 }
 
 export function useDeleteStockEntry() {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (id: string) => inventoryService.deleteStockEntry(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: inventoryKeys.stockEntries() })
+      invalidateCache.inventory.all()
       toast.success(t('inventory.stockEntryDeleted', 'تم حذف حركة المخزون'))
     },
     onError: (error: Error) => {
@@ -331,6 +323,7 @@ export function useCreateReconciliation() {
     mutationFn: (data: Parameters<typeof inventoryService.createReconciliation>[0]) =>
       inventoryService.createReconciliation(data),
     onSuccess: () => {
+      invalidateCache.inventory.all()
       queryClient.invalidateQueries({ queryKey: inventoryKeys.reconciliations() })
       toast.success(t('inventory.reconciliationCreated', 'تم إنشاء تسوية المخزون بنجاح'))
     },
@@ -347,6 +340,7 @@ export function useSubmitReconciliation() {
   return useMutation({
     mutationFn: (id: string) => inventoryService.submitReconciliation(id),
     onSuccess: () => {
+      invalidateCache.inventory.all()
       queryClient.invalidateQueries({ queryKey: inventoryKeys.reconciliations() })
       queryClient.invalidateQueries({ queryKey: inventoryKeys.stockLedger() })
       queryClient.invalidateQueries({ queryKey: inventoryKeys.stats() })
@@ -433,6 +427,7 @@ export function useUpdateInventorySettings() {
     mutationFn: (data: Parameters<typeof inventoryService.updateSettings>[0]) =>
       inventoryService.updateSettings(data),
     onSuccess: () => {
+      invalidateCache.inventory.all()
       queryClient.invalidateQueries({ queryKey: inventoryKeys.settings() })
       toast.success(t('inventory.settingsUpdated', 'تم تحديث إعدادات المخزون بنجاح'))
     },

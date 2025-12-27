@@ -19,7 +19,8 @@ import { useUploadVersion } from '@/hooks/useDocumentVersions'
 import { type Document } from '../data/schema'
 import { type VersionType } from '@/services/documentVersionService'
 import documentVersionService from '@/services/documentVersionService'
-import { formatFileSize, MAX_FILE_SIZE, acceptedFileTypes } from '../data/data'
+import { formatFileSize, acceptedFileTypes } from '../data/data'
+import { FILE_LIMITS } from '@/config'
 import { useTranslation } from 'react-i18next'
 import {
   Upload,
@@ -92,7 +93,7 @@ export function VersionUploadDialog({
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
       const file = acceptedFiles[0]
-      if (file.size <= MAX_FILE_SIZE) {
+      if (file.size <= FILE_LIMITS.MAX_SIZE) {
         setSelectedFile(file)
       }
     }
@@ -102,7 +103,7 @@ export function VersionUploadDialog({
     onDrop,
     accept: acceptedFileTypes,
     maxFiles: 1,
-    maxSize: MAX_FILE_SIZE,
+    maxSize: FILE_LIMITS.MAX_SIZE,
   })
 
   const handleUpload = () => {
@@ -304,7 +305,7 @@ export function VersionUploadDialog({
                   {t('documents.dropNewVersion', 'Drop file here or click to browse')}
                 </p>
                 <p className='text-xs text-muted-foreground'>
-                  {t('documents.maxFileSize', `Max file size: ${formatFileSize(MAX_FILE_SIZE)}`)}
+                  {t('documents.maxFileSize', `Max file size: ${formatFileSize(FILE_LIMITS.MAX_SIZE)}`)}
                 </p>
               </div>
             ) : (

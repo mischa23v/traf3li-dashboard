@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
+import { useLanguage } from '@/hooks/useLanguage'
 import {
   Building2, ArrowRightLeft, Calendar, DollarSign,
   FileText, Plus, Save, X, AlertCircle, Info
@@ -44,7 +46,9 @@ export default function InterCompanyTransactionForm({
   mode = 'create'
 }: InterCompanyTransactionFormProps) {
   const navigate = useNavigate()
-  const [isArabic, setIsArabic] = useState(true)
+  const { t } = useTranslation()
+  const { language } = useLanguage()
+  const isArabic = language === 'ar'
 
   // Form state
   const [sourceFirmId, setSourceFirmId] = useState('')
@@ -112,12 +116,12 @@ export default function InterCompanyTransactionForm({
   }
 
   const topNav = [
-    { title: isArabic ? 'المالية' : 'Finance', href: '/finance' },
-    { title: isArabic ? 'المعاملات بين الشركات' : 'Inter-Company', href: '/finance/inter-company' },
+    { title: t('finance.interCompany.nav.finance'), href: '/finance' },
+    { title: t('finance.interCompany.nav.interCompany'), href: '/finance/inter-company' },
     {
       title: mode === 'create'
-        ? (isArabic ? 'معاملة جديدة' : 'New Transaction')
-        : (isArabic ? 'تعديل معاملة' : 'Edit Transaction'),
+        ? t('finance.interCompany.nav.newTransaction')
+        : t('finance.interCompany.nav.editTransaction'),
       isCurrentPage: true
     },
   ]
@@ -143,14 +147,12 @@ export default function InterCompanyTransactionForm({
             <div>
               <h1 className="text-3xl font-bold">
                 {mode === 'create'
-                  ? (isArabic ? 'معاملة جديدة بين الشركات' : 'New Inter-Company Transaction')
-                  : (isArabic ? 'تعديل معاملة بين الشركات' : 'Edit Inter-Company Transaction')
+                  ? t('finance.interCompany.transaction.newTitle')
+                  : t('finance.interCompany.transaction.editTitle')
                 }
               </h1>
               <p className="text-muted-foreground mt-2">
-                {isArabic
-                  ? 'إنشاء معاملة مالية بين شركات المجموعة مع دعم العملات المتعددة'
-                  : 'Create financial transactions between group companies with multi-currency support'
+                {t('finance.interCompany.transaction.subtitle')
                 }
               </p>
             </div>
@@ -163,12 +165,10 @@ export default function InterCompanyTransactionForm({
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Building2 className="h-5 w-5" />
-                    {isArabic ? 'الشركات' : 'Companies'}
+                    {t('finance.interCompany.transaction.companies')}
                   </CardTitle>
                   <CardDescription>
-                    {isArabic
-                      ? 'اختر الشركة المصدرة والشركة المستقبلة للمعاملة'
-                      : 'Select the source and target companies for the transaction'
+                    {t('finance.interCompany.transaction.companiesDesc')
                     }
                   </CardDescription>
                 </CardHeader>
@@ -177,12 +177,12 @@ export default function InterCompanyTransactionForm({
                     {/* Source Company */}
                     <div className="space-y-2">
                       <Label htmlFor="sourceCompany">
-                        {isArabic ? 'الشركة المصدرة' : 'Source Company'}
+                        {t('finance.interCompany.transaction.sourceCompany')}
                         <span className="text-red-500">*</span>
                       </Label>
                       <Select value={sourceFirmId} onValueChange={setSourceFirmId} required>
                         <SelectTrigger id="sourceCompany">
-                          <SelectValue placeholder={isArabic ? 'اختر الشركة' : 'Select company'} />
+                          <SelectValue placeholder={t('finance.interCompany.transaction.selectCompany')} />
                         </SelectTrigger>
                         <SelectContent>
                           {companies?.map((company) => (
@@ -199,7 +199,7 @@ export default function InterCompanyTransactionForm({
                       </Select>
                       {sourceCompany && (
                         <p className="text-sm text-muted-foreground">
-                          {isArabic ? 'العملة:' : 'Currency:'} {sourceCompany.currency}
+                          {t('finance.interCompany.transaction.currency') + ':'} {sourceCompany.currency}
                         </p>
                       )}
                     </div>
@@ -207,12 +207,12 @@ export default function InterCompanyTransactionForm({
                     {/* Target Company */}
                     <div className="space-y-2">
                       <Label htmlFor="targetCompany">
-                        {isArabic ? 'الشركة المستقبلة' : 'Target Company'}
+                        {t('finance.interCompany.transaction.targetCompany')}
                         <span className="text-red-500">*</span>
                       </Label>
                       <Select value={targetFirmId} onValueChange={setTargetFirmId} required>
                         <SelectTrigger id="targetCompany">
-                          <SelectValue placeholder={isArabic ? 'اختر الشركة' : 'Select company'} />
+                          <SelectValue placeholder={t('finance.interCompany.transaction.selectCompany')} />
                         </SelectTrigger>
                         <SelectContent>
                           {companies
@@ -231,7 +231,7 @@ export default function InterCompanyTransactionForm({
                       </Select>
                       {targetCompany && (
                         <p className="text-sm text-muted-foreground">
-                          {isArabic ? 'العملة:' : 'Currency:'} {targetCompany.currency}
+                          {t('finance.interCompany.transaction.currency') + ':'} {targetCompany.currency}
                         </p>
                       )}
                     </div>
@@ -244,15 +244,15 @@ export default function InterCompanyTransactionForm({
                       <AlertDescription>
                         <div className="space-y-1">
                           <p className="font-medium">
-                            {isArabic ? 'معاملة بعملات مختلفة' : 'Multi-currency transaction'}
+                            {t('finance.interCompany.transaction.multiCurrency')}
                           </p>
                           <p className="text-sm">
-                            {isArabic ? 'سعر الصرف:' : 'Exchange rate:'} {exchangeRate || '...'} {' '}
+                            {t('finance.interCompany.transaction.exchangeRate') + ':'} {exchangeRate || '...'} {' '}
                             ({sourceCompany.currency} → {targetCompany.currency})
                           </p>
                           {equivalentAmount && (
                             <p className="text-sm">
-                              {isArabic ? 'المبلغ المكافئ:' : 'Equivalent amount:'}{' '}
+                              {t('finance.interCompany.transaction.equivalentAmount') + ':'}{' '}
                               {formatCurrency(parseFloat(equivalentAmount), targetCompany.currency)}
                             </p>
                           )}
@@ -268,14 +268,14 @@ export default function InterCompanyTransactionForm({
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <FileText className="h-5 w-5" />
-                    {isArabic ? 'تفاصيل المعاملة' : 'Transaction Details'}
+                    {t('finance.interCompany.transaction.transactionDetails')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Transaction Type */}
                   <div className="space-y-2">
                     <Label htmlFor="transactionType">
-                      {isArabic ? 'نوع المعاملة' : 'Transaction Type'}
+                      {t('finance.interCompany.transaction.transactionType')}
                       <span className="text-red-500">*</span>
                     </Label>
                     <Select value={transactionType} onValueChange={(v: any) => setTransactionType(v)} required>
@@ -284,16 +284,16 @@ export default function InterCompanyTransactionForm({
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="invoice">
-                          {isArabic ? 'فاتورة' : 'Invoice'}
+                          {t('finance.interCompany.transaction.invoice')}
                         </SelectItem>
                         <SelectItem value="payment">
-                          {isArabic ? 'دفعة' : 'Payment'}
+                          {t('finance.interCompany.transaction.payment')}
                         </SelectItem>
                         <SelectItem value="expense">
-                          {isArabic ? 'مصروف' : 'Expense'}
+                          {t('finance.interCompany.transaction.expense')}
                         </SelectItem>
                         <SelectItem value="transfer">
-                          {isArabic ? 'تحويل' : 'Transfer'}
+                          {t('finance.interCompany.transaction.transfer')}
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -303,7 +303,7 @@ export default function InterCompanyTransactionForm({
                     {/* Amount */}
                     <div className="space-y-2">
                       <Label htmlFor="amount">
-                        {isArabic ? 'المبلغ' : 'Amount'}
+                        {t('finance.interCompany.transaction.amount')}
                         <span className="text-red-500">*</span>
                       </Label>
                       <Input
@@ -321,7 +321,7 @@ export default function InterCompanyTransactionForm({
                     {/* Currency */}
                     <div className="space-y-2">
                       <Label htmlFor="currency">
-                        {isArabic ? 'العملة' : 'Currency'}
+                        {t('finance.interCompany.transaction.currency')}
                         <span className="text-red-500">*</span>
                       </Label>
                       <Select value={currency} onValueChange={setCurrency} required>
@@ -342,14 +342,14 @@ export default function InterCompanyTransactionForm({
                   {/* Description */}
                   <div className="space-y-2">
                     <Label htmlFor="description">
-                      {isArabic ? 'الوصف' : 'Description'}
+                      {t('finance.interCompany.transaction.description')}
                       <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="description"
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      placeholder={isArabic ? 'وصف المعاملة' : 'Transaction description'}
+                      placeholder={t('finance.interCompany.transaction.transactionDesc')}
                       required
                     />
                   </div>
@@ -357,13 +357,13 @@ export default function InterCompanyTransactionForm({
                   {/* Reference Number */}
                   <div className="space-y-2">
                     <Label htmlFor="referenceNumber">
-                      {isArabic ? 'رقم المرجع' : 'Reference Number'}
+                      {t('finance.interCompany.transaction.referenceNumber')}
                     </Label>
                     <Input
                       id="referenceNumber"
                       value={referenceNumber}
                       onChange={(e) => setReferenceNumber(e.target.value)}
-                      placeholder={isArabic ? 'رقم مرجعي اختياري' : 'Optional reference number'}
+                      placeholder={t('finance.interCompany.transaction.optionalReference')}
                     />
                   </div>
 
@@ -371,7 +371,7 @@ export default function InterCompanyTransactionForm({
                     {/* Transaction Date */}
                     <div className="space-y-2">
                       <Label htmlFor="transactionDate">
-                        {isArabic ? 'تاريخ المعاملة' : 'Transaction Date'}
+                        {t('finance.interCompany.transaction.transactionDate')}
                         <span className="text-red-500">*</span>
                       </Label>
                       <Input
@@ -387,7 +387,7 @@ export default function InterCompanyTransactionForm({
                     {(transactionType === 'invoice' || transactionType === 'payment') && (
                       <div className="space-y-2">
                         <Label htmlFor="dueDate">
-                          {isArabic ? 'تاريخ الاستحقاق' : 'Due Date'}
+                          {t('finance.interCompany.transaction.dueDate')}
                         </Label>
                         <Input
                           id="dueDate"
@@ -403,13 +403,13 @@ export default function InterCompanyTransactionForm({
                   {/* Notes */}
                   <div className="space-y-2">
                     <Label htmlFor="notes">
-                      {isArabic ? 'ملاحظات' : 'Notes'}
+                      {t('finance.interCompany.transaction.notes')}
                     </Label>
                     <Textarea
                       id="notes"
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
-                      placeholder={isArabic ? 'ملاحظات إضافية...' : 'Additional notes...'}
+                      placeholder={t('finance.interCompany.transaction.additionalNotes')}
                       rows={3}
                     />
                   </div>
@@ -421,19 +421,17 @@ export default function InterCompanyTransactionForm({
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <ArrowRightLeft className="h-5 w-5" />
-                    {isArabic ? 'إنشاء تلقائي' : 'Auto-create'}
+                    {t('finance.interCompany.transaction.autoCreate')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
                       <Label htmlFor="autoCreate">
-                        {isArabic ? 'إنشاء المعاملة المقابلة تلقائياً' : 'Auto-create counterpart transaction'}
+                        {t('finance.interCompany.transaction.autoCreateCounterpart')}
                       </Label>
                       <p className="text-sm text-muted-foreground">
-                        {isArabic
-                          ? 'سيتم إنشاء معاملة معكوسة في الشركة المستقبلة تلقائياً'
-                          : 'Automatically create the opposite transaction in the target company'
+                        {t('finance.interCompany.transaction.autoCreateDesc')
                         }
                       </p>
                     </div>
@@ -454,7 +452,7 @@ export default function InterCompanyTransactionForm({
                   onClick={() => navigate({ to: '/finance/inter-company' })}
                 >
                   <X className="h-4 w-4 mr-2" />
-                  {isArabic ? 'إلغاء' : 'Cancel'}
+                  {t('finance.interCompany.transaction.cancel')}
                 </Button>
                 <Button
                   type="submit"
@@ -462,8 +460,8 @@ export default function InterCompanyTransactionForm({
                 >
                   <Save className="h-4 w-4 mr-2" />
                   {mode === 'create'
-                    ? (isArabic ? 'إنشاء معاملة' : 'Create Transaction')
-                    : (isArabic ? 'حفظ التغييرات' : 'Save Changes')
+                    ? t('finance.interCompany.transaction.createTransaction')
+                    : t('finance.interCompany.transaction.saveChanges')
                   }
                 </Button>
               </div>

@@ -237,7 +237,7 @@ export default function AccountActivityDashboard() {
                                             تصفية متقدمة
                                         </Button>
                                         <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white border-0 shadow-lg shadow-blue-500/20 rounded-xl">
-                                            <Link to="/dashboard/finance/activity/new">
+                                            <Link to={ROUTES.dashboard.finance.activity.new}>
                                                 <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 تسجيل نشاط
                                             </Link>
@@ -348,7 +348,7 @@ export default function AccountActivityDashboard() {
                                         <h3 className="text-xl font-bold text-slate-900 mb-2">لا يوجد نشاط مالي</h3>
                                         <p className="text-slate-500 mb-6">لم يتم تسجيل أي نشاط مالي بعد</p>
                                         <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white px-8">
-                                            <Link to="/dashboard/finance/activity/new">
+                                            <Link to={ROUTES.dashboard.finance.activity.new}>
                                                 <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                                                 تسجيل نشاط جديد
                                             </Link>
@@ -429,7 +429,7 @@ export default function AccountActivityDashboard() {
                                                                         <div className="flex-1 min-w-0">
                                                                             <div className="flex justify-between items-start mb-1">
                                                                                 <div>
-                                                                                    <Link to="/dashboard/finance/activity/$activityId" params={{ activityId: activity._id }}>
+                                                                                    <Link to={ROUTES.dashboard.finance.activity.detail(activity._id )}>
                                                                                         <h4 className="font-bold text-[#022c22] text-lg mb-1 hover:text-emerald-600 transition-colors">{activity.title}</h4>
                                                                                     </Link>
                                                                                     <p className="text-slate-600 text-sm">{activity.description}</p>

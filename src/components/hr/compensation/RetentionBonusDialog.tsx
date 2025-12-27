@@ -1,8 +1,4 @@
-import { useState, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { useTranslation } from 'react-i18next'
 import {
   useCreateRetentionBonus,
   useUpdateRetentionBonus,
@@ -14,57 +10,13 @@ import {
   bonusTypeLabels,
   paymentMethodLabels,
 } from '@/services/retentionBonusService'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Switch } from '@/components/ui/switch'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import { Label } from '@/components/ui/label'
-import {
-  Loader2,
-  DollarSign,
-  Calendar,
-  Info,
-  AlertCircle,
-  Users,
-  FileText,
-  Clock,
-  Shield,
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { GenericFormDialog, FormSectionConfig } from '@/components/generic-form-dialog'
 
 // Form validation schema
+// Note: Employee-related fields (employeeName, employeeNameAr, departmentId, designation)
+// are computed from the selected employee in the onSubmit handler
 const bonusFormSchema = z.object({
   employeeId: z.string().min(1, 'الرجاء اختيار الموظف'),
-  employeeName: z.string().min(1, 'اسم الموظف مطلوب'),
-  employeeNameAr: z.string().min(1, 'اسم الموظف بالعربي مطلوب'),
-  departmentId: z.string().min(1, 'الرجاء اختيار القسم'),
-  designation: z.string().min(1, 'المسمى الوظيفي مطلوب'),
   bonusType: z.nativeEnum(BonusType),
   bonusAmount: z.number().min(1, 'المبلغ يجب أن يكون أكبر من صفر'),
   currency: z.string().default('SAR'),
@@ -119,58 +71,20 @@ const MOCK_EMPLOYEES = [
   },
 ]
 
-const MOCK_DEPARTMENTS = [
-  { id: 'dept1', nameAr: 'قسم التقنية', nameEn: 'IT Department' },
-  { id: 'dept2', nameAr: 'قسم الموارد البشرية', nameEn: 'HR Department' },
-  { id: 'dept3', nameAr: 'قسم المالية', nameEn: 'Finance Department' },
-]
-
 export function RetentionBonusDialog({
   open,
   onOpenChange,
   bonus,
   onSuccess,
 }: RetentionBonusDialogProps) {
-  const { i18n } = useTranslation()
-  const isArabic = i18n.language === 'ar'
-  const [selectedEmployee, setSelectedEmployee] = useState<typeof MOCK_EMPLOYEES[0] | null>(null)
-  const [hasVesting, setHasVesting] = useState(false)
-
-  // Form
-  const form = useForm<BonusFormValues>({
-    resolver: zodResolver(bonusFormSchema),
-    defaultValues: {
-      employeeId: '',
-      employeeName: '',
-      employeeNameAr: '',
-      departmentId: '',
-      designation: '',
-      bonusType: BonusType.RETENTION,
-      bonusAmount: 0,
-      currency: 'SAR',
-      paymentDate: '',
-      paymentMethod: PaymentMethod.PAYROLL,
-      conditionsForPayment: '',
-      conditionsForPaymentAr: '',
-      reasonForGiving: '',
-      reasonForGivingAr: '',
-      clawbackApplicable: false,
-    },
-  })
-
   // Mutations
   const createMutation = useCreateRetentionBonus()
   const updateMutation = useUpdateRetentionBonus()
 
-  // Set form values when editing
-  useEffect(() => {
-    if (bonus) {
-      form.reset({
+  // Prepare default values
+  const defaultValues: Partial<BonusFormValues> = bonus
+    ? {
         employeeId: bonus.employeeId,
-        employeeName: bonus.employeeName,
-        employeeNameAr: bonus.employeeNameAr,
-        departmentId: bonus.departmentId,
-        designation: bonus.designation,
         bonusType: bonus.bonusType,
         bonusAmount: bonus.bonusAmount,
         currency: bonus.currency,
@@ -186,518 +100,260 @@ export function RetentionBonusDialog({
         clawbackApplicable: bonus.clawbackApplicable,
         clawbackConditions: bonus.clawbackConditions,
         clawbackPeriod: bonus.clawbackPeriod,
-      })
-      setHasVesting(!!bonus.vestingPeriod)
-    }
-  }, [bonus, form])
-
-  // Watch employee selection
-  useEffect(() => {
-    const subscription = form.watch((value, { name }) => {
-      if (name === 'employeeId' && value.employeeId) {
-        const emp = MOCK_EMPLOYEES.find(e => e.id === value.employeeId)
-        if (emp) {
-          setSelectedEmployee(emp)
-          form.setValue('employeeName', emp.nameEn)
-          form.setValue('employeeNameAr', emp.nameAr)
-          form.setValue('departmentId', emp.departmentId)
-          form.setValue('designation', emp.designation)
-        }
       }
-    })
-    return () => subscription.unsubscribe()
-  }, [form])
+    : {
+        bonusType: BonusType.RETENTION,
+        currency: 'SAR',
+        paymentMethod: PaymentMethod.PAYROLL,
+        clawbackApplicable: false,
+      }
 
   // Submit form
-  const onSubmit = async (values: BonusFormValues) => {
-    try {
-      const data: CreateRetentionBonusInput = {
-        ...values,
-        vestingPeriod: hasVesting ? values.vestingPeriod : undefined,
-        vestingStartDate: hasVesting ? values.vestingStartDate : undefined,
-        vestingEndDate: hasVesting ? values.vestingEndDate : undefined,
-      }
-
-      if (bonus) {
-        await updateMutation.mutateAsync({ id: bonus._id, data })
-      } else {
-        await createMutation.mutateAsync(data)
-      }
-
-      form.reset()
-      onOpenChange(false)
-      onSuccess?.()
-    } catch (error) {
-      // Error is handled by mutation hooks
+  const handleSubmit = async (values: BonusFormValues) => {
+    // Get employee details from selected employee
+    const selectedEmployee = MOCK_EMPLOYEES.find(e => e.id === values.employeeId)
+    if (!selectedEmployee) {
+      throw new Error('Employee not found')
     }
+
+    const data: CreateRetentionBonusInput = {
+      ...values,
+      employeeName: selectedEmployee.nameEn,
+      employeeNameAr: selectedEmployee.nameAr,
+      departmentId: selectedEmployee.departmentId,
+      designation: selectedEmployee.designation,
+      vestingPeriod: values.vestingPeriod || undefined,
+      vestingStartDate: values.vestingStartDate || undefined,
+      vestingEndDate: values.vestingEndDate || undefined,
+      clawbackConditions: values.clawbackApplicable ? values.clawbackConditions : undefined,
+      clawbackPeriod: values.clawbackApplicable ? values.clawbackPeriod : undefined,
+    }
+
+    if (bonus) {
+      await updateMutation.mutateAsync({ id: bonus._id, data })
+    } else {
+      await createMutation.mutateAsync(data)
+    }
+
+    onSuccess?.()
   }
-
-  // Reset when dialog closes
-  useEffect(() => {
-    if (!open) {
-      form.reset()
-      setSelectedEmployee(null)
-      setHasVesting(false)
-    }
-  }, [open, form])
 
   const isPending = createMutation.isPending || updateMutation.isPending
 
+  // Generate form sections based on current form values
+  const getFormSections = (currentValues?: Partial<BonusFormValues>): FormSectionConfig[] => {
+    const sections: FormSectionConfig[] = [
+      {
+        title: 'Employee Information',
+        titleAr: 'معلومات الموظف',
+        columns: 2,
+        fields: [
+          {
+            name: 'employeeId',
+            type: 'select' as const,
+            label: 'Employee',
+            labelAr: 'الموظف',
+            placeholder: 'Select employee',
+            placeholderAr: 'اختر الموظف',
+            required: true,
+            colSpan: 2,
+            options: MOCK_EMPLOYEES.map((emp) => ({
+              value: emp.id,
+              label: `${emp.nameEn} (${emp.number})`,
+              labelAr: `${emp.nameAr} (${emp.number})`,
+            })),
+          },
+        ],
+      },
+      {
+        title: 'Bonus Details',
+        titleAr: 'تفاصيل المكافأة',
+        columns: 2,
+        fields: [
+          {
+            name: 'bonusType',
+            type: 'select' as const,
+            label: 'Bonus Type',
+            labelAr: 'نوع المكافأة',
+            required: true,
+            options: Object.values(BonusType).map((type) => ({
+              value: type,
+              label: bonusTypeLabels[type].en,
+              labelAr: bonusTypeLabels[type].ar,
+            })),
+          },
+          {
+            name: 'bonusAmount',
+            type: 'currency' as const,
+            label: 'Amount',
+            labelAr: 'المبلغ',
+            placeholder: 'Enter amount',
+            placeholderAr: 'أدخل المبلغ',
+            required: true,
+            min: 0,
+            step: 0.01,
+          },
+          {
+            name: 'paymentDate',
+            type: 'date' as const,
+            label: 'Payment Date',
+            labelAr: 'تاريخ الدفع',
+            required: true,
+          },
+          {
+            name: 'paymentMethod',
+            type: 'select' as const,
+            label: 'Payment Method',
+            labelAr: 'طريقة الدفع',
+            required: true,
+            options: Object.values(PaymentMethod).map((method) => ({
+              value: method,
+              label: paymentMethodLabels[method].en,
+              labelAr: paymentMethodLabels[method].ar,
+            })),
+          },
+        ],
+      },
+      {
+        title: 'Vesting Period (Optional)',
+        titleAr: 'فترة الاستحقاق (اختياري)',
+        columns: 2,
+        fields: [
+          {
+            name: 'vestingPeriod',
+            type: 'number' as const,
+            label: 'Vesting Period (months)',
+            labelAr: 'فترة الاستحقاق (أشهر)',
+            placeholder: 'e.g. 12',
+            placeholderAr: 'مثال: 12',
+            min: 1,
+            description: 'Number of months over which bonus vests',
+            descriptionAr: 'عدد الأشهر التي تستحق فيها المكافأة',
+          },
+          {
+            name: 'vestingStartDate',
+            type: 'date' as const,
+            label: 'Vesting Start Date',
+            labelAr: 'تاريخ بداية الاستحقاق',
+          },
+          {
+            name: 'vestingEndDate',
+            type: 'date' as const,
+            label: 'Vesting End Date',
+            labelAr: 'تاريخ نهاية الاستحقاق',
+          },
+        ],
+      },
+      {
+        title: 'Conditions & Reasons',
+        titleAr: 'الشروط والأسباب',
+        columns: 1,
+        fields: [
+          {
+            name: 'reasonForGiving',
+            type: 'textarea' as const,
+            label: 'Reason for Bonus (English)',
+            labelAr: 'سبب المكافأة (إنجليزي)',
+            placeholder: 'Enter the reason for granting this bonus in English...',
+            placeholderAr: 'اكتب سبب منح المكافأة بالإنجليزي...',
+            required: true,
+            rows: 3,
+          },
+          {
+            name: 'reasonForGivingAr',
+            type: 'textarea' as const,
+            label: 'Reason for Bonus (Arabic)',
+            labelAr: 'سبب المكافأة (عربي)',
+            placeholder: 'Enter the reason for granting this bonus in Arabic...',
+            placeholderAr: 'اكتب سبب منح المكافأة بالعربي...',
+            required: true,
+            rows: 3,
+          },
+          {
+            name: 'conditionsForPayment',
+            type: 'textarea' as const,
+            label: 'Payment Conditions (English)',
+            labelAr: 'شروط الدفع (إنجليزي)',
+            placeholder: 'Enter the payment conditions in English...',
+            placeholderAr: 'اكتب شروط الدفع بالإنجليزي...',
+            required: true,
+            rows: 3,
+          },
+          {
+            name: 'conditionsForPaymentAr',
+            type: 'textarea' as const,
+            label: 'Payment Conditions (Arabic)',
+            labelAr: 'شروط الدفع (عربي)',
+            placeholder: 'Enter the payment conditions in Arabic...',
+            placeholderAr: 'اكتب شروط الدفع بالعربي...',
+            required: true,
+            rows: 3,
+          },
+        ],
+      },
+      {
+        title: 'Clawback Policy',
+        titleAr: 'سياسة الاسترداد',
+        columns: 1,
+        fields: [
+          {
+            name: 'clawbackApplicable',
+            type: 'switch' as const,
+            label: 'Enable Clawback',
+            labelAr: 'تفعيل سياسة الاسترداد',
+            description: 'The bonus can be recovered if conditions are not met',
+            descriptionAr: 'يمكن استرداد المكافأة في حالة عدم الالتزام بالشروط',
+          },
+        ],
+      },
+    ]
+
+    // Add clawback fields if enabled
+    if (currentValues?.clawbackApplicable) {
+      sections[4].fields.push(
+        {
+          name: 'clawbackPeriod',
+          type: 'number' as const,
+          label: 'Clawback Period (months)',
+          labelAr: 'فترة الاسترداد (أشهر)',
+          placeholder: 'e.g. 12',
+          placeholderAr: 'مثال: 12',
+          min: 1,
+          description: 'Period during which the bonus can be recovered after payment',
+          descriptionAr: 'الفترة التي يمكن خلالها استرداد المكافأة بعد الدفع',
+        },
+        {
+          name: 'clawbackConditions',
+          type: 'textarea' as const,
+          label: 'Clawback Conditions',
+          labelAr: 'شروط الاسترداد',
+          placeholder: 'Enter the conditions that may trigger a clawback...',
+          placeholderAr: 'اكتب الشروط التي قد تؤدي إلى استرداد المكافأة...',
+          rows: 3,
+        }
+      )
+    }
+
+    return sections
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {bonus
-              ? isArabic ? 'تعديل المكافأة' : 'Edit Bonus'
-              : isArabic ? 'مكافأة جديدة' : 'New Bonus'}
-          </DialogTitle>
-          <DialogDescription>
-            {isArabic
-              ? 'قم بتعبئة البيانات أدناه لإنشاء مكافأة جديدة للموظف'
-              : 'Fill in the details below to create a new employee bonus'}
-          </DialogDescription>
-        </DialogHeader>
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Employee Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  {isArabic ? 'معلومات الموظف' : 'Employee Information'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="grid gap-4 md:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="employeeId"
-                  render={({ field }) => (
-                    <FormItem className="md:col-span-2">
-                      <FormLabel>{isArabic ? 'الموظف' : 'Employee'} *</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={isArabic ? 'اختر الموظف' : 'Select employee'} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {MOCK_EMPLOYEES.map((emp) => (
-                            <SelectItem key={emp.id} value={emp.id}>
-                              {isArabic ? emp.nameAr : emp.nameEn} ({emp.number})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {selectedEmployee && (
-                  <>
-                    <div className="space-y-2">
-                      <Label className="text-sm text-muted-foreground">
-                        {isArabic ? 'القسم' : 'Department'}
-                      </Label>
-                      <div className="text-sm font-medium">
-                        {isArabic
-                          ? MOCK_DEPARTMENTS.find(d => d.id === selectedEmployee.departmentId)?.nameAr
-                          : MOCK_DEPARTMENTS.find(d => d.id === selectedEmployee.departmentId)?.nameEn}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label className="text-sm text-muted-foreground">
-                        {isArabic ? 'المسمى الوظيفي' : 'Designation'}
-                      </Label>
-                      <div className="text-sm font-medium">{selectedEmployee.designation}</div>
-                    </div>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Bonus Details */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <DollarSign className="h-4 w-4" />
-                  {isArabic ? 'تفاصيل المكافأة' : 'Bonus Details'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="grid gap-4 md:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="bonusType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isArabic ? 'نوع المكافأة' : 'Bonus Type'} *</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {Object.values(BonusType).map((type) => (
-                            <SelectItem key={type} value={type}>
-                              {isArabic ? bonusTypeLabels[type].ar : bonusTypeLabels[type].en}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="bonusAmount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isArabic ? 'المبلغ' : 'Amount'} *</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min={0}
-                          step={0.01}
-                          {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                          placeholder={isArabic ? 'أدخل المبلغ' : 'Enter amount'}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        {isArabic ? 'بالريال السعودي' : 'In Saudi Riyals'}
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="paymentDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isArabic ? 'تاريخ الدفع' : 'Payment Date'} *</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="paymentMethod"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isArabic ? 'طريقة الدفع' : 'Payment Method'} *</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {Object.values(PaymentMethod).map((method) => (
-                            <SelectItem key={method} value={method}>
-                              {isArabic ? paymentMethodLabels[method].ar : paymentMethodLabels[method].en}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-
-            {/* Vesting */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Clock className="h-4 w-4" />
-                  {isArabic ? 'فترة الاستحقاق (اختياري)' : 'Vesting Period (Optional)'}
-                </CardTitle>
-                <CardDescription>
-                  {isArabic
-                    ? 'إذا كانت المكافأة تستحق على فترات، حدد تفاصيل الاستحقاق'
-                    : 'If the bonus vests over time, specify the vesting details'}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    checked={hasVesting}
-                    onCheckedChange={setHasVesting}
-                  />
-                  <Label>
-                    {isArabic ? 'تفعيل فترة الاستحقاق' : 'Enable vesting period'}
-                  </Label>
-                </div>
-
-                {hasVesting && (
-                  <div className="grid gap-4 md:grid-cols-3">
-                    <FormField
-                      control={form.control}
-                      name="vestingPeriod"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{isArabic ? 'فترة الاستحقاق (أشهر)' : 'Vesting Period (months)'}</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              min={1}
-                              {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
-                              placeholder={isArabic ? 'مثال: 12' : 'e.g. 12'}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="vestingStartDate"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{isArabic ? 'تاريخ البداية' : 'Start Date'}</FormLabel>
-                          <FormControl>
-                            <Input type="date" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="vestingEndDate"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{isArabic ? 'تاريخ النهاية' : 'End Date'}</FormLabel>
-                          <FormControl>
-                            <Input type="date" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Conditions & Reason */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <FileText className="h-4 w-4" />
-                  {isArabic ? 'الشروط والأسباب' : 'Conditions & Reasons'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="reasonForGiving"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isArabic ? 'سبب المكافأة (إنجليزي)' : 'Reason for Bonus (English)'} *</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          {...field}
-                          rows={3}
-                          placeholder={isArabic
-                            ? 'اكتب سبب منح المكافأة بالإنجليزي...'
-                            : 'Enter the reason for granting this bonus in English...'}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="reasonForGivingAr"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isArabic ? 'سبب المكافأة (عربي)' : 'Reason for Bonus (Arabic)'} *</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          {...field}
-                          rows={3}
-                          placeholder={isArabic
-                            ? 'اكتب سبب منح المكافأة بالعربي...'
-                            : 'Enter the reason for granting this bonus in Arabic...'}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <Separator />
-
-                <FormField
-                  control={form.control}
-                  name="conditionsForPayment"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isArabic ? 'شروط الدفع (إنجليزي)' : 'Payment Conditions (English)'} *</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          {...field}
-                          rows={3}
-                          placeholder={isArabic
-                            ? 'اكتب شروط الدفع بالإنجليزي...'
-                            : 'Enter the payment conditions in English...'}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="conditionsForPaymentAr"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{isArabic ? 'شروط الدفع (عربي)' : 'Payment Conditions (Arabic)'} *</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          {...field}
-                          rows={3}
-                          placeholder={isArabic
-                            ? 'اكتب شروط الدفع بالعربي...'
-                            : 'Enter the payment conditions in Arabic...'}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-
-            {/* Clawback */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Shield className="h-4 w-4" />
-                  {isArabic ? 'سياسة الاسترداد' : 'Clawback Policy'}
-                </CardTitle>
-                <CardDescription>
-                  {isArabic
-                    ? 'حدد ما إذا كان يمكن استرداد المكافأة في حالات معينة'
-                    : 'Specify if the bonus can be recovered under certain conditions'}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="clawbackApplicable"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">
-                          {isArabic ? 'تفعيل سياسة الاسترداد' : 'Enable Clawback'}
-                        </FormLabel>
-                        <FormDescription>
-                          {isArabic
-                            ? 'يمكن استرداد المكافأة في حالة عدم الالتزام بالشروط'
-                            : 'The bonus can be recovered if conditions are not met'}
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                {form.watch('clawbackApplicable') && (
-                  <div className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="clawbackPeriod"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{isArabic ? 'فترة الاسترداد (أشهر)' : 'Clawback Period (months)'}</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              min={1}
-                              {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
-                              placeholder={isArabic ? 'مثال: 12' : 'e.g. 12'}
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            {isArabic
-                              ? 'الفترة التي يمكن خلالها استرداد المكافأة بعد الدفع'
-                              : 'Period during which the bonus can be recovered after payment'}
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="clawbackConditions"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{isArabic ? 'شروط الاسترداد' : 'Clawback Conditions'}</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              {...field}
-                              rows={3}
-                              placeholder={isArabic
-                                ? 'اكتب الشروط التي قد تؤدي إلى استرداد المكافأة...'
-                                : 'Enter the conditions that may trigger a clawback...'}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={isPending}
-              >
-                {isArabic ? 'إلغاء' : 'Cancel'}
-              </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
-                {bonus
-                  ? isArabic ? 'حفظ التعديلات' : 'Save Changes'
-                  : isArabic ? 'إنشاء المكافأة' : 'Create Bonus'}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+    <GenericFormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={bonus ? 'Edit Bonus' : 'New Bonus'}
+      titleAr={bonus ? 'تعديل المكافأة' : 'مكافأة جديدة'}
+      description="Fill in the details below to create a new employee bonus"
+      descriptionAr="قم بتعبئة البيانات أدناه لإنشاء مكافأة جديدة للموظف"
+      schema={bonusFormSchema}
+      sections={getFormSections(defaultValues)}
+      defaultValues={defaultValues}
+      onSubmit={handleSubmit}
+      isLoading={isPending}
+      mode={bonus ? 'edit' : 'create'}
+      submitLabel={bonus ? 'Save Changes' : 'Create Bonus'}
+      submitLabelAr={bonus ? 'حفظ التعديلات' : 'إنشاء المكافأة'}
+      maxWidth="3xl"
+    />
   )
 }

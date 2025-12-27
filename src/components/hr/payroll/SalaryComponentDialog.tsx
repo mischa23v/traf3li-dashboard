@@ -197,21 +197,13 @@ export function SalaryComponentDialog({
           <DialogTitle className="flex items-center gap-2">
             <DollarSign className="h-5 w-5" />
             {isEdit
-              ? isArabic
-                ? 'تعديل مكون الراتب'
-                : 'Edit Salary Component'
-              : isArabic
-              ? 'مكون راتب جديد'
-              : 'New Salary Component'}
+              ? t('hr.payroll.components.dialog.titleEdit')
+              : t('hr.payroll.components.dialog.titleNew')}
           </DialogTitle>
           <DialogDescription>
             {isEdit
-              ? isArabic
-                ? 'تعديل تفاصيل مكون الراتب'
-                : 'Edit salary component details'
-              : isArabic
-              ? 'إضافة مكون جديد للراتب (بدل أو استقطاع)'
-              : 'Add a new salary component (allowance or deduction)'}
+              ? t('hr.payroll.components.dialog.descriptionEdit')
+              : t('hr.payroll.components.dialog.descriptionNew')}
           </DialogDescription>
         </DialogHeader>
 
@@ -220,13 +212,13 @@ export function SalaryComponentDialog({
             <Tabs defaultValue="basic" dir={isArabic ? 'rtl' : 'ltr'}>
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="basic">
-                  {isArabic ? 'المعلومات الأساسية' : 'Basic Info'}
+                  {t('hr.payroll.components.dialog.tabs.basic')}
                 </TabsTrigger>
                 <TabsTrigger value="calculation">
-                  {isArabic ? 'الحساب' : 'Calculation'}
+                  {t('hr.payroll.components.dialog.tabs.calculation')}
                 </TabsTrigger>
                 <TabsTrigger value="advanced">
-                  {isArabic ? 'متقدم' : 'Advanced'}
+                  {t('hr.payroll.components.dialog.tabs.advanced')}
                 </TabsTrigger>
               </TabsList>
 
@@ -238,7 +230,7 @@ export function SalaryComponentDialog({
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{isArabic ? 'الاسم (EN)' : 'Name (EN)'}</FormLabel>
+                        <FormLabel>{t('hr.payroll.components.dialog.fields.nameEn')}</FormLabel>
                         <FormControl>
                           <Input placeholder="Housing Allowance" {...field} />
                         </FormControl>
@@ -252,7 +244,7 @@ export function SalaryComponentDialog({
                     name="nameAr"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{isArabic ? 'الاسم (AR)' : 'Name (AR)'}</FormLabel>
+                        <FormLabel>{t('hr.payroll.components.dialog.fields.nameAr')}</FormLabel>
                         <FormControl>
                           <Input placeholder="بدل السكن" {...field} dir="rtl" />
                         </FormControl>
@@ -268,14 +260,12 @@ export function SalaryComponentDialog({
                     name="abbr"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{isArabic ? 'الرمز' : 'Abbreviation'}</FormLabel>
+                        <FormLabel>{t('hr.payroll.components.dialog.fields.abbreviation')}</FormLabel>
                         <FormControl>
                           <Input placeholder="HRA" {...field} className="uppercase" />
                         </FormControl>
                         <FormDescription>
-                          {isArabic
-                            ? 'رمز مختصر (مثل: HRA, GOSI)'
-                            : 'Short code (e.g., HRA, GOSI)'}
+                          {t('hr.payroll.components.dialog.fields.abbreviationDesc')}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -287,7 +277,7 @@ export function SalaryComponentDialog({
                     name="type"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{isArabic ? 'النوع' : 'Type'}</FormLabel>
+                        <FormLabel>{t('hr.payroll.components.dialog.fields.type')}</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
@@ -296,10 +286,10 @@ export function SalaryComponentDialog({
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="earning">
-                              {isArabic ? 'استحقاق' : 'Earning'}
+                              {t('hr.payroll.components.type.earning')}
                             </SelectItem>
                             <SelectItem value="deduction">
-                              {isArabic ? 'استقطاع' : 'Deduction'}
+                              {t('hr.payroll.components.type.deduction')}
                             </SelectItem>
                           </SelectContent>
                         </Select>
@@ -314,7 +304,7 @@ export function SalaryComponentDialog({
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{isArabic ? 'الوصف (EN)' : 'Description (EN)'}</FormLabel>
+                      <FormLabel>{t('hr.payroll.components.dialog.fields.descriptionEn')}</FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="Housing allowance provided to all employees"
@@ -331,7 +321,7 @@ export function SalaryComponentDialog({
                   name="descriptionAr"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{isArabic ? 'الوصف (AR)' : 'Description (AR)'}</FormLabel>
+                      <FormLabel>{t('hr.payroll.components.dialog.fields.descriptionAr')}</FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="بدل السكن المقدم لجميع الموظفين"
@@ -351,12 +341,10 @@ export function SalaryComponentDialog({
                     <FormItem className="flex items-center justify-between rounded-lg border p-4">
                       <div className="space-y-0.5">
                         <FormLabel className="text-base">
-                          {isArabic ? 'نشط' : 'Active'}
+                          {t('hr.payroll.components.dialog.fields.active')}
                         </FormLabel>
                         <FormDescription>
-                          {isArabic
-                            ? 'تفعيل أو تعطيل هذا المكون'
-                            : 'Enable or disable this component'}
+                          {t('hr.payroll.components.dialog.fields.activeDesc')}
                         </FormDescription>
                       </div>
                       <FormControl>
@@ -376,12 +364,10 @@ export function SalaryComponentDialog({
                     <FormItem className="flex items-center justify-between rounded-lg border p-4">
                       <div className="space-y-0.5">
                         <FormLabel className="text-base">
-                          {isArabic ? 'مبني على معادلة' : 'Formula-based'}
+                          {t('hr.payroll.components.dialog.fields.formulaBased')}
                         </FormLabel>
                         <FormDescription>
-                          {isArabic
-                            ? 'حساب المبلغ باستخدام معادلة'
-                            : 'Calculate amount using a formula'}
+                          {t('hr.payroll.components.dialog.fields.formulaBasedDesc')}
                         </FormDescription>
                       </div>
                       <FormControl>
@@ -397,7 +383,7 @@ export function SalaryComponentDialog({
                     name="formula"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{isArabic ? 'المعادلة' : 'Formula'}</FormLabel>
+                        <FormLabel>{t('hr.payroll.components.dialog.fields.formula')}</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="base_salary * 0.25"
@@ -406,9 +392,7 @@ export function SalaryComponentDialog({
                           />
                         </FormControl>
                         <FormDescription>
-                          {isArabic
-                            ? 'مثال: base_salary * 0.25'
-                            : 'Example: base_salary * 0.25'}
+                          {t('hr.payroll.components.dialog.fields.formulaExample')}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -420,12 +404,12 @@ export function SalaryComponentDialog({
                     name="amount"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{isArabic ? 'المبلغ الثابت' : 'Fixed Amount'}</FormLabel>
+                        <FormLabel>{t('hr.payroll.components.dialog.fields.fixedAmount')}</FormLabel>
                         <FormControl>
                           <Input type="number" placeholder="500" {...field} />
                         </FormControl>
                         <FormDescription>
-                          {isArabic ? 'المبلغ بالريال السعودي' : 'Amount in SAR'}
+                          {t('hr.payroll.components.dialog.fields.amountInSar')}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -438,7 +422,7 @@ export function SalaryComponentDialog({
                   name="condition"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{isArabic ? 'الشرط' : 'Condition'}</FormLabel>
+                      <FormLabel>{t('hr.payroll.components.dialog.fields.condition')}</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="employee.is_saudi == true"
@@ -447,9 +431,7 @@ export function SalaryComponentDialog({
                         />
                       </FormControl>
                       <FormDescription>
-                        {isArabic
-                          ? 'شرط اختياري لتطبيق هذا المكون'
-                          : 'Optional condition to apply this component'}
+                        {t('hr.payroll.components.dialog.fields.conditionDesc')}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -461,7 +443,7 @@ export function SalaryComponentDialog({
                   name="roundToNearest"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{isArabic ? 'التقريب' : 'Round to nearest'}</FormLabel>
+                      <FormLabel>{t('hr.payroll.components.dialog.fields.roundTo')}</FormLabel>
                       <Select
                         onValueChange={(v) => field.onChange(Number(v))}
                         defaultValue={String(field.value)}
@@ -480,7 +462,7 @@ export function SalaryComponentDialog({
                         </SelectContent>
                       </Select>
                       <FormDescription>
-                        {isArabic ? 'تقريب المبلغ لأقرب رقم' : 'Round amount to nearest number'}
+                        {t('hr.payroll.components.dialog.fields.roundDesc')}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -495,7 +477,7 @@ export function SalaryComponentDialog({
                   name="applicableFor"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{isArabic ? 'ينطبق على' : 'Applicable for'}</FormLabel>
+                      <FormLabel>{t('hr.payroll.components.dialog.fields.applicableFor')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -503,15 +485,15 @@ export function SalaryComponentDialog({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="all">{isArabic ? 'الكل' : 'All'}</SelectItem>
+                          <SelectItem value="all">{t('hr.payroll.components.dialog.fields.all')}</SelectItem>
                           <SelectItem value="saudi">
-                            {isArabic ? 'سعوديين فقط' : 'Saudi only'}
+                            {t('hr.payroll.components.dialog.fields.saudiOnly')}
                           </SelectItem>
                           <SelectItem value="non_saudi">
-                            {isArabic ? 'غير سعوديين فقط' : 'Non-Saudi only'}
+                            {t('hr.payroll.components.dialog.fields.nonSaudiOnly')}
                           </SelectItem>
                           <SelectItem value="custom">
-                            {isArabic ? 'مخصص' : 'Custom'}
+                            {t('hr.payroll.components.dialog.fields.custom')}
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -527,7 +509,7 @@ export function SalaryComponentDialog({
                     render={({ field }) => (
                       <FormItem className="flex items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5">
-                          <FormLabel>{isArabic ? 'خاضع للضريبة' : 'Tax applicable'}</FormLabel>
+                          <FormLabel>{t('hr.payroll.components.dialog.fields.taxApplicable')}</FormLabel>
                         </div>
                         <FormControl>
                           <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -543,7 +525,7 @@ export function SalaryComponentDialog({
                       <FormItem className="flex items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5">
                           <FormLabel>
-                            {isArabic ? 'معفى من ضريبة الدخل' : 'Exempt from income tax'}
+                            {t('hr.payroll.components.dialog.fields.exemptFromIncomeTax')}
                           </FormLabel>
                         </div>
                         <FormControl>
@@ -560,7 +542,7 @@ export function SalaryComponentDialog({
                       <FormItem className="flex items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5">
                           <FormLabel>
-                            {isArabic ? 'ينطبق عليه GOSI' : 'GOSI applicable'}
+                            {t('hr.payroll.components.dialog.fields.gosiApplicable')}
                           </FormLabel>
                         </div>
                         <FormControl>
@@ -577,7 +559,7 @@ export function SalaryComponentDialog({
                         name="gosiType"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{isArabic ? 'نوع GOSI' : 'GOSI Type'}</FormLabel>
+                            <FormLabel>{t('hr.payroll.components.dialog.fields.gosiType')}</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger>
@@ -586,10 +568,10 @@ export function SalaryComponentDialog({
                               </FormControl>
                               <SelectContent>
                                 <SelectItem value="employee_contribution">
-                                  {isArabic ? 'حصة الموظف' : 'Employee contribution'}
+                                  {t('hr.payroll.components.dialog.fields.employeeContribution')}
                                 </SelectItem>
                                 <SelectItem value="employer_contribution">
-                                  {isArabic ? 'حصة صاحب العمل' : 'Employer contribution'}
+                                  {t('hr.payroll.components.dialog.fields.employerContribution')}
                                 </SelectItem>
                               </SelectContent>
                             </Select>
@@ -603,7 +585,7 @@ export function SalaryComponentDialog({
                         name="gosiPercentage"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{isArabic ? 'نسبة GOSI %' : 'GOSI Percentage %'}</FormLabel>
+                            <FormLabel>{t('hr.payroll.components.dialog.fields.gosiPercentage')}</FormLabel>
                             <FormControl>
                               <Input type="number" placeholder="10" {...field} />
                             </FormControl>
@@ -621,7 +603,7 @@ export function SalaryComponentDialog({
                       <FormItem className="flex items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5">
                           <FormLabel>
-                            {isArabic ? 'يعتمد على أيام الدفع' : 'Depends on payment days'}
+                            {t('hr.payroll.components.dialog.fields.dependsOnPaymentDays')}
                           </FormLabel>
                         </div>
                         <FormControl>
@@ -638,7 +620,7 @@ export function SalaryComponentDialog({
                       <FormItem className="flex items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5">
                           <FormLabel>
-                            {isArabic ? 'ميزة مرنة' : 'Flexible benefit'}
+                            {t('hr.payroll.components.dialog.fields.flexibleBenefit')}
                           </FormLabel>
                         </div>
                         <FormControl>
@@ -655,7 +637,7 @@ export function SalaryComponentDialog({
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>
-                            {isArabic ? 'الحد الأقصى للمزايا' : 'Max benefit amount'}
+                            {t('hr.payroll.components.dialog.fields.maxBenefitAmount')}
                           </FormLabel>
                           <FormControl>
                             <Input type="number" placeholder="5000" {...field} />
@@ -673,12 +655,10 @@ export function SalaryComponentDialog({
                       <FormItem className="flex items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5">
                           <FormLabel>
-                            {isArabic ? 'مكون إحصائي' : 'Statistical component'}
+                            {t('hr.payroll.components.dialog.fields.statisticalComponent')}
                           </FormLabel>
                           <FormDescription>
-                            {isArabic
-                              ? 'للتقارير فقط، لا يظهر في قسيمة الراتب'
-                              : 'For reports only, not shown in payslip'}
+                            {t('hr.payroll.components.dialog.fields.statisticalDesc')}
                           </FormDescription>
                         </div>
                         <FormControl>
@@ -695,7 +675,7 @@ export function SalaryComponentDialog({
                       <FormItem className="flex items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5">
                           <FormLabel>
-                            {isArabic ? 'مكون متغير' : 'Variable component'}
+                            {t('hr.payroll.components.dialog.fields.variableComponent')}
                           </FormLabel>
                         </div>
                         <FormControl>
@@ -710,23 +690,17 @@ export function SalaryComponentDialog({
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={handleClose}>
-                {isArabic ? 'إلغاء' : 'Cancel'}
+                {t('hr.payroll.components.dialog.buttons.cancel')}
               </Button>
               <Button
                 type="submit"
                 disabled={createMutation.isPending || updateMutation.isPending}
               >
                 {createMutation.isPending || updateMutation.isPending
-                  ? isArabic
-                    ? 'جارٍ الحفظ...'
-                    : 'Saving...'
+                  ? t('hr.payroll.components.dialog.buttons.saving')
                   : isEdit
-                  ? isArabic
-                    ? 'تحديث'
-                    : 'Update'
-                  : isArabic
-                  ? 'حفظ'
-                  : 'Save'}
+                  ? t('hr.payroll.components.dialog.buttons.update')
+                  : t('hr.payroll.components.dialog.buttons.save')}
               </Button>
             </DialogFooter>
           </form>

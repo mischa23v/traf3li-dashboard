@@ -26,7 +26,7 @@ import { SelectDropdown } from '@/components/select-dropdown'
 import { type Vendor } from '@/services/accountingService'
 import { useCreateVendor, useUpdateVendor } from '@/hooks/useAccounting'
 import { Lock } from 'lucide-react'
-import { isValidIban, isValidVatNumber, errorMessages } from '@/utils/validation-patterns'
+import { fieldSchemas } from '@/lib/shared-schemas'
 
 const vendorCategories = [
   { value: 'consultants', label: 'استشاريون', labelEn: 'Consultants' },
@@ -37,25 +37,19 @@ const vendorCategories = [
 ]
 
 const formSchema = z.object({
-  name: z.string().min(2, 'الاسم بالإنجليزية مطلوب ويجب أن يكون حرفين على الأقل'),
-  nameAr: z.string().optional(),
-  email: z.string().email('البريد الإلكتروني غير صالح').optional().or(z.literal('')),
-  phone: z.string().optional(),
+  name: fieldSchemas.name,
+  nameAr: fieldSchemas.nameAr,
+  email: fieldSchemas.email,
+  phone: fieldSchemas.phone,
   address: z.string().optional(),
-  city: z.string().optional(),
-  country: z.string().default('SA'),
-  taxNumber: z.string().optional().refine(
-    (val) => !val || val === '' || isValidVatNumber(val),
-    { message: errorMessages.vatNumber.ar }
-  ),
+  city: fieldSchemas.city,
+  country: fieldSchemas.country,
+  taxNumber: fieldSchemas.vatNumber,
   bankName: z.string().optional(),
   bankAccountNumber: z.string().optional(),
-  iban: z.string().optional().refine(
-    (val) => !val || val === '' || isValidIban(val),
-    { message: errorMessages.iban.ar }
-  ),
+  iban: fieldSchemas.iban,
   category: z.string().optional(),
-  notes: z.string().optional(),
+  notes: fieldSchemas.notes,
 })
 
 type VendorForm = z.infer<typeof formSchema>

@@ -64,11 +64,12 @@ import { useAssetSettings, useUpdateAssetSettings, useAssetCategories } from '@/
 import { useStaff } from '@/hooks/useStaff'
 import type { AssetSettings, DepreciationMethod } from '@/types/assets'
 import { AssetsSidebar } from './assets-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'assets.assets', href: '/dashboard/assets' },
-  { title: 'assets.settings', href: '/dashboard/assets/settings' },
+  { title: 'assets.assets', href: ROUTES.dashboard.assets.list },
+  { title: 'assets.settings', href: ROUTES.dashboard.assets.settings },
 ]
 
 const DEPRECIATION_METHODS: { value: DepreciationMethod; label: string; labelEn: string }[] = [

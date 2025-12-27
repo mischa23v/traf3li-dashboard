@@ -67,10 +67,11 @@ import {
 import { useAssets, useDeleteAsset, useAssetStats } from '@/hooks/use-assets'
 import type { Asset, AssetFilters, AssetStatus } from '@/types/assets'
 import { AssetsSidebar } from './assets-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.assets', href: '/dashboard/assets' },
+  { title: 'sidebar.nav.assets', href: ROUTES.dashboard.assets.list },
 ]
 
 export function AssetsListView() {
@@ -203,7 +204,7 @@ export function AssetsListView() {
                     </SelectContent>
                   </Select>
                   <Button asChild className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
-                    <Link to="/dashboard/assets/create">
+                    <Link to={ROUTES.dashboard.assets.create}>
                       <Plus className="w-4 h-4 ml-2" />
                       {t('assets.addAsset', 'إضافة أصل')}
                     </Link>
@@ -231,7 +232,7 @@ export function AssetsListView() {
                     <h3 className="text-lg font-medium mb-2">{t('assets.noAssets', 'لا توجد أصول')}</h3>
                     <p className="text-muted-foreground mb-4">{t('assets.noAssetsDesc', 'ابدأ بإضافة أصل جديد')}</p>
                     <Button asChild className="rounded-xl">
-                      <Link to="/dashboard/assets/create">
+                      <Link to={ROUTES.dashboard.assets.create}>
                         <Plus className="w-4 h-4 ml-2" />
                         {t('assets.addAsset', 'إضافة أصل')}
                       </Link>
@@ -253,7 +254,7 @@ export function AssetsListView() {
                         <TableRow
                           key={asset._id}
                           className="cursor-pointer hover:bg-muted/50"
-                          onClick={() => navigate({ to: `/dashboard/assets/${asset._id}` })}
+                          onClick={() => navigate({ to: ROUTES.dashboard.assets.detail(asset._id) })}
                         >
                           <TableCell className="font-mono text-sm">{asset.assetNumber}</TableCell>
                           <TableCell>
@@ -272,14 +273,14 @@ export function AssetsListView() {
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation()
-                                  navigate({ to: `/dashboard/assets/${asset._id}` })
+                                  navigate({ to: ROUTES.dashboard.assets.detail(asset._id) })
                                 }}>
                                   <Eye className="w-4 h-4 ml-2" />
                                   {t('common.view', 'عرض')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation()
-                                  navigate({ to: `/dashboard/assets/${asset._id}/edit` })
+                                  navigate({ to: ROUTES.dashboard.assets.edit(asset._id) })
                                 }}>
                                   <Edit className="w-4 h-4 ml-2" />
                                   {t('common.edit', 'تعديل')}

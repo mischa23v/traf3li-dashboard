@@ -71,10 +71,11 @@ import {
 } from '@/hooks/use-assets'
 import type { AssetStatus, DepreciationMethod, MaintenanceStatus } from '@/types/assets'
 import { AssetsSidebar } from './assets-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.assets', href: '/dashboard/assets' },
+  { title: 'sidebar.nav.assets', href: ROUTES.dashboard.assets.list },
 ]
 
 export function AssetDetailsView() {
@@ -93,7 +94,7 @@ export function AssetDetailsView() {
 
   const handleDelete = async () => {
     await deleteAssetMutation.mutateAsync(assetId)
-    navigate({ to: '/dashboard/assets' })
+    navigate({ to: ROUTES.dashboard.assets.list })
   }
 
   const handleScrap = async () => {
@@ -263,7 +264,7 @@ export function AssetDetailsView() {
                 {t('assets.assetNotFound', 'الأصل غير موجود')}
               </h3>
               <Button
-                onClick={() => navigate({ to: '/dashboard/assets' })}
+                onClick={() => navigate({ to: ROUTES.dashboard.assets.list })}
                 className="rounded-xl"
               >
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -356,7 +357,7 @@ export function AssetDetailsView() {
                   {/* Actions */}
                   <div className="flex flex-col gap-2">
                     <Button
-                      onClick={() => navigate({ to: `/dashboard/assets/${assetId}/edit` })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.assets.edit(assetId) })}
                       className="rounded-xl"
                     >
                       <Edit className="w-4 h-4 ml-2" />

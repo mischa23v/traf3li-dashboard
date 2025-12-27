@@ -55,12 +55,13 @@ import {
 } from '@/hooks/use-subcontracting'
 import { useWarehouses } from '@/hooks/use-inventory'
 import { SubcontractingSidebar } from './subcontracting-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
-  { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'subcontracting.subcontracting', href: '/dashboard/subcontracting' },
-  { title: 'subcontracting.receipts', href: '/dashboard/subcontracting/receipts' },
-  { title: 'subcontracting.createReceipt', href: '/dashboard/subcontracting/receipts/create' },
+  { title: 'sidebar.nav.overview', href: ROUTES.dashboard.home },
+  { title: 'subcontracting.subcontracting', href: ROUTES.dashboard.subcontracting.list },
+  { title: 'subcontracting.receipts', href: ROUTES.dashboard.subcontracting.receipts.list },
+  { title: 'subcontracting.createReceipt', href: ROUTES.dashboard.subcontracting.receipts.create },
 ]
 
 interface ReceiptItemRow {
@@ -254,7 +255,7 @@ export function CreateReceiptView() {
       }
 
       await createReceiptMutation.mutateAsync(submitData)
-      navigate({ to: '/dashboard/subcontracting/receipts' })
+      navigate({ to: ROUTES.dashboard.subcontracting.receipts.list })
     } catch (error) {
       // Error handled by mutation
     }
@@ -682,7 +683,7 @@ export function CreateReceiptView() {
                         type="button"
                         variant="ghost"
                         className="text-slate-500 hover:text-navy rounded-xl"
-                        onClick={() => navigate({ to: '/dashboard/subcontracting/receipts' })}
+                        onClick={() => navigate({ to: ROUTES.dashboard.subcontracting.receipts.list })}
                       >
                         <X className="w-4 h-4 ml-2" />
                         {t('common.cancel', 'إلغاء')}

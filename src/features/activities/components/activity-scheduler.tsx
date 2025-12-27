@@ -66,7 +66,7 @@ export function ActivityScheduler({
   trigger,
   defaultOpen = false,
 }: ActivitySchedulerProps) {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const isArabic = i18n.language === 'ar'
   const [open, setOpen] = React.useState(defaultOpen)
   const [selectedTypeId, setSelectedTypeId] = React.useState<string>('')
@@ -147,26 +147,24 @@ export function ActivityScheduler({
         {trigger || (
           <Button variant="outline" size="sm">
             <Calendar className="h-4 w-4 me-2" />
-            {isArabic ? 'جدولة نشاط' : 'Schedule Activity'}
+            {t('odooActivities.schedule')}
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>
-            {isArabic ? 'جدولة نشاط جديد' : 'Schedule New Activity'}
+            {t('odooActivities.scheduleNew')}
           </DialogTitle>
           <DialogDescription>
-            {isArabic
-              ? 'اختر نوع النشاط وحدد الموعد النهائي'
-              : 'Choose the activity type and set a deadline'}
+            {t('odooActivities.scheduleDescription')}
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
           {/* Activity Type Selection */}
           <div className="space-y-2">
-            <Label>{isArabic ? 'نوع النشاط' : 'Activity Type'}</Label>
+            <Label>{t('odooActivities.activityType')}</Label>
             {typesLoading ? (
               <div className="flex items-center justify-center p-4">
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -197,19 +195,19 @@ export function ActivityScheduler({
           {/* Summary */}
           <div className="space-y-2">
             <Label htmlFor="summary">
-              {isArabic ? 'ملخص النشاط' : 'Activity Summary'}
+              {t('odooActivities.summary')}
             </Label>
             <Input
               id="summary"
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
-              placeholder={isArabic ? 'أدخل ملخص النشاط...' : 'Enter activity summary...'}
+              placeholder={t('odooActivities.summaryPlaceholder')}
             />
           </div>
 
           {/* Deadline */}
           <div className="space-y-2">
-            <Label>{isArabic ? 'الموعد النهائي' : 'Deadline'}</Label>
+            <Label>{t('odooActivities.deadline')}</Label>
             <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
               <PopoverTrigger asChild>
                 <Button
@@ -222,9 +220,7 @@ export function ActivityScheduler({
                   <Calendar className="me-2 h-4 w-4" />
                   {deadline
                     ? format(deadline, 'PPP', { locale: isArabic ? ar : enUS })
-                    : isArabic
-                    ? 'اختر التاريخ'
-                    : 'Pick a date'}
+                    : t('odooActivities.pickDate')}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -244,13 +240,13 @@ export function ActivityScheduler({
           {/* Note (Optional) */}
           <div className="space-y-2">
             <Label htmlFor="note">
-              {isArabic ? 'ملاحظات (اختياري)' : 'Notes (Optional)'}
+              {t('odooActivities.notesOptional')}
             </Label>
             <Textarea
               id="note"
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder={isArabic ? 'أضف ملاحظات...' : 'Add notes...'}
+              placeholder={t('odooActivities.notesPlaceholder')}
               rows={3}
             />
           </div>
@@ -258,7 +254,7 @@ export function ActivityScheduler({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>
-            {isArabic ? 'إلغاء' : 'Cancel'}
+            {t('odooActivities.cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -269,7 +265,7 @@ export function ActivityScheduler({
             {scheduleActivity.isPending && (
               <Loader2 className="me-2 h-4 w-4 animate-spin" />
             )}
-            {isArabic ? 'جدولة' : 'Schedule'}
+            {t('odooActivities.schedule')}
           </Button>
         </DialogFooter>
       </DialogContent>

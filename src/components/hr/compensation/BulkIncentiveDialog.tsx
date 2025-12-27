@@ -213,7 +213,7 @@ export function BulkIncentiveDialog({
         referenceId: commonSettings.referenceId || undefined,
       }))
     )
-    toast.success(isArabic ? 'تم تطبيق الإعدادات على جميع الصفوف' : 'Settings applied to all rows')
+    toast.success(t('hr.dialogs.bulkIncentive.settingsApplied'))
   }
 
   // Submit
@@ -229,15 +229,13 @@ export function BulkIncentiveDialog({
     const invalidCount = validatedIncentives.filter((i) => !i.isValid).length
     if (invalidCount > 0) {
       toast.error(
-        isArabic
-          ? `${invalidCount} صف غير صالح. الرجاء التحقق من البيانات.`
-          : `${invalidCount} invalid row(s). Please check the data.`
+        `${invalidCount} ${t('hr.dialogs.bulkIncentive.invalidRowsError')}`
       )
       return
     }
 
     if (validatedIncentives.length === 0) {
-      toast.error(isArabic ? 'الرجاء إضافة حوافز' : 'Please add incentives')
+      toast.error(t('hr.dialogs.bulkIncentive.pleaseAddIncentives'))
       return
     }
 
@@ -295,7 +293,7 @@ export function BulkIncentiveDialog({
     window.URL.revokeObjectURL(url)
     document.body.removeChild(a)
 
-    toast.success(isArabic ? 'تم تنزيل القالب' : 'Template downloaded')
+    toast.success(t('hr.dialogs.bulkIncentive.templateDownloaded'))
   }
 
   const validCount = incentives.filter((i) => i.isValid).length
@@ -306,12 +304,10 @@ export function BulkIncentiveDialog({
       <DialogContent className="max-h-[90vh] max-w-[95vw] overflow-y-auto lg:max-w-[1200px]">
         <DialogHeader>
           <DialogTitle>
-            {isArabic ? 'إنشاء حوافز جماعي' : 'Bulk Create Incentives'}
+            {t('hr.dialogs.bulkIncentive.title')}
           </DialogTitle>
           <DialogDescription>
-            {isArabic
-              ? 'أضف حوافز متعددة للموظفين دفعة واحدة'
-              : 'Add multiple employee incentives at once'}
+            {t('hr.dialogs.bulkIncentive.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -320,18 +316,16 @@ export function BulkIncentiveDialog({
           <Card>
             <CardHeader>
               <CardTitle className="text-base">
-                {isArabic ? 'الإعدادات المشتركة' : 'Common Settings'}
+                {t('hr.dialogs.bulkIncentive.commonSettings')}
               </CardTitle>
               <CardDescription>
-                {isArabic
-                  ? 'سيتم تطبيق هذه الإعدادات على جميع الحوافز'
-                  : 'These settings will be applied to all incentives'}
+                {t('hr.dialogs.bulkIncentive.commonSettingsDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
-                  <Label>{isArabic ? 'نوع الحافز' : 'Incentive Type'}</Label>
+                  <Label>{t('hr.dialogs.bulkIncentive.incentiveType')}</Label>
                   <Select
                     value={commonSettings.incentiveType}
                     onValueChange={(value) =>
@@ -355,7 +349,7 @@ export function BulkIncentiveDialog({
                 </div>
 
                 <div className="space-y-2">
-                  <Label>{isArabic ? 'العملة' : 'Currency'}</Label>
+                  <Label>{t('hr.dialogs.bulkIncentive.currency')}</Label>
                   <Select
                     value={commonSettings.currency}
                     onValueChange={(value) =>
@@ -367,18 +361,18 @@ export function BulkIncentiveDialog({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="SAR">
-                        {isArabic ? 'ريال سعودي' : 'Saudi Riyal'}
+                        {t('hr.dialogs.bulkIncentive.currencySAR')}
                       </SelectItem>
                       <SelectItem value="USD">
-                        {isArabic ? 'دولار أمريكي' : 'US Dollar'}
+                        {t('hr.dialogs.bulkIncentive.currencyUSD')}
                       </SelectItem>
-                      <SelectItem value="EUR">{isArabic ? 'يورو' : 'Euro'}</SelectItem>
+                      <SelectItem value="EUR">{t('hr.dialogs.bulkIncentive.currencyEUR')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>{isArabic ? 'تاريخ الرواتب' : 'Payroll Date'}</Label>
+                  <Label>{t('hr.dialogs.bulkIncentive.payrollDate')}</Label>
                   <Input
                     type="date"
                     value={commonSettings.payrollDate}
@@ -391,7 +385,7 @@ export function BulkIncentiveDialog({
 
               <div className="mt-4">
                 <Button onClick={applyCommonSettings} variant="outline" size="sm">
-                  {isArabic ? 'تطبيق على الكل' : 'Apply to All'}
+                  {t('hr.dialogs.bulkIncentive.applyToAll')}
                 </Button>
               </div>
             </CardContent>
@@ -402,20 +396,20 @@ export function BulkIncentiveDialog({
             <div className="flex gap-2">
               <Button onClick={addIncentiveRow} variant="outline" size="sm">
                 <Plus className="mr-2 h-4 w-4" />
-                {isArabic ? 'إضافة صف' : 'Add Row'}
+                {t('hr.dialogs.bulkIncentive.addRow')}
               </Button>
               <Button onClick={downloadTemplate} variant="outline" size="sm">
                 <Download className="mr-2 h-4 w-4" />
-                {isArabic ? 'تنزيل القالب' : 'Download Template'}
+                {t('hr.dialogs.bulkIncentive.downloadTemplate')}
               </Button>
             </div>
 
             {incentives.length > 0 && (
               <div className="text-sm text-muted-foreground">
-                {isArabic ? 'إجمالي:' : 'Total:'} {incentives.length} |{' '}
-                {isArabic ? 'صالح:' : 'Valid:'}{' '}
+                {t('hr.dialogs.bulkIncentive.total')} {incentives.length} |{' '}
+                {t('hr.dialogs.bulkIncentive.valid')}{' '}
                 <span className="text-green-600">{validCount}</span> |{' '}
-                {isArabic ? 'غير صالح:' : 'Invalid:'}{' '}
+                {t('hr.dialogs.bulkIncentive.invalid')}{' '}
                 <span className="text-red-600">{invalidCount}</span>
               </div>
             )}
@@ -428,14 +422,14 @@ export function BulkIncentiveDialog({
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[50px]">#</TableHead>
-                    <TableHead>{isArabic ? 'الموظف' : 'Employee'}</TableHead>
-                    <TableHead>{isArabic ? 'النوع' : 'Type'}</TableHead>
-                    <TableHead>{isArabic ? 'المبلغ' : 'Amount'}</TableHead>
-                    <TableHead>{isArabic ? 'السبب (EN)' : 'Reason (EN)'}</TableHead>
-                    <TableHead>{isArabic ? 'السبب (AR)' : 'Reason (AR)'}</TableHead>
-                    <TableHead>{isArabic ? 'الحالة' : 'Status'}</TableHead>
+                    <TableHead>{t('hr.dialogs.bulkIncentive.employee')}</TableHead>
+                    <TableHead>{t('hr.dialogs.bulkIncentive.type')}</TableHead>
+                    <TableHead>{t('hr.dialogs.bulkIncentive.amount')}</TableHead>
+                    <TableHead>{t('hr.dialogs.bulkIncentive.reasonEN')}</TableHead>
+                    <TableHead>{t('hr.dialogs.bulkIncentive.reasonAR')}</TableHead>
+                    <TableHead>{t('hr.dialogs.bulkIncentive.status')}</TableHead>
                     <TableHead className="w-[80px]">
-                      {isArabic ? 'إجراءات' : 'Actions'}
+                      {t('hr.dialogs.bulkIncentive.actions')}
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -452,7 +446,7 @@ export function BulkIncentiveDialog({
                         >
                           <SelectTrigger className="w-[200px]">
                             <SelectValue
-                              placeholder={isArabic ? 'اختر الموظف' : 'Select Employee'}
+                              placeholder={t('hr.dialogs.bulkIncentive.selectEmployee')}
                             />
                           </SelectTrigger>
                           <SelectContent>
@@ -525,11 +519,11 @@ export function BulkIncentiveDialog({
                       <TableCell>
                         {incentive.isValid ? (
                           <Badge variant="default" className="bg-green-600">
-                            {isArabic ? 'صالح' : 'Valid'}
+                            {t('hr.dialogs.bulkIncentive.validStatus')}
                           </Badge>
                         ) : (
                           <Badge variant="destructive">
-                            {isArabic ? 'غير صالح' : 'Invalid'}
+                            {t('hr.dialogs.bulkIncentive.invalidStatus')}
                           </Badge>
                         )}
                       </TableCell>
@@ -550,11 +544,9 @@ export function BulkIncentiveDialog({
           ) : (
             <Alert>
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>{isArabic ? 'لا توجد حوافز' : 'No Incentives'}</AlertTitle>
+              <AlertTitle>{t('hr.dialogs.bulkIncentive.noIncentives')}</AlertTitle>
               <AlertDescription>
-                {isArabic
-                  ? 'الرجاء إضافة حوافز باستخدام زر "إضافة صف"'
-                  : 'Please add incentives using the "Add Row" button'}
+                {t('hr.dialogs.bulkIncentive.noIncentivesDescription')}
               </AlertDescription>
             </Alert>
           )}
@@ -567,7 +559,7 @@ export function BulkIncentiveDialog({
             onClick={() => onOpenChange(false)}
             disabled={bulkCreateMutation.isPending}
           >
-            {isArabic ? 'إلغاء' : 'Cancel'}
+            {t('hr.dialogs.bulkIncentive.cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -576,7 +568,7 @@ export function BulkIncentiveDialog({
             {bulkCreateMutation.isPending && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             )}
-            {isArabic ? 'إنشاء' : 'Create'} ({incentives.length})
+            {t('hr.dialogs.bulkIncentive.create')} ({incentives.length})
           </Button>
         </DialogFooter>
       </DialogContent>

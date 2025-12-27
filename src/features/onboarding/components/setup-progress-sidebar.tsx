@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useSetupOrchestrationStatus, useNavigateToModuleSetup } from '@/hooks/useSetupOrchestration'
 import { MODULE_CONFIGS, type ModuleSetupStatus } from '@/services/setupOrchestrationService'
+import { useTranslation } from 'react-i18next'
 
 const MODULE_ICONS = {
   Users,
@@ -56,6 +57,7 @@ interface SetupProgressSidebarProps {
 export function SetupProgressSidebar({ currentModule, onModuleClick }: SetupProgressSidebarProps) {
   const { data: status } = useSetupOrchestrationStatus()
   const { goToModule } = useNavigateToModuleSetup()
+  const { t } = useTranslation()
 
   if (!status) {
     return (
@@ -87,15 +89,15 @@ export function SetupProgressSidebar({ currentModule, onModuleClick }: SetupProg
     <div className="w-80 bg-white border-l border-slate-200 flex flex-col">
       {/* Header */}
       <div className="p-6 border-b border-slate-200">
-        <h2 className="text-lg font-bold text-navy mb-2">تقدم الإعداد</h2>
+        <h2 className="text-lg font-bold text-navy mb-2">{t('onboarding.progressSidebar.title')}</h2>
         <p className="text-sm text-slate-600 mb-4">
-          {status.completedModules} من {status.totalModules} وحدات مكتملة
+          {t('onboarding.progressSidebar.modulesCompleted', { completed: status.completedModules, total: status.totalModules })}
         </p>
 
         {/* Overall Progress */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-slate-600">التقدم الإجمالي</span>
+            <span className="text-slate-600">{t('onboarding.progressSidebar.overallProgress')}</span>
             <span className="font-medium text-emerald-600">
               {Math.round(status.overallProgress)}%
             </span>
@@ -158,12 +160,12 @@ export function SetupProgressSidebar({ currentModule, onModuleClick }: SetupProg
                       <h3 className="font-medium text-navy text-sm">{config.name}</h3>
                       {config.isCritical && !module.isComplete && (
                         <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
-                          مطلوب
+                          {t('onboarding.progressSidebar.required')}
                         </span>
                       )}
                       {isCurrent && (
                         <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">
-                          الحالي
+                          {t('onboarding.progressSidebar.current')}
                         </span>
                       )}
                     </div>
@@ -174,7 +176,7 @@ export function SetupProgressSidebar({ currentModule, onModuleClick }: SetupProg
                       <div className="space-y-1">
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-slate-500">
-                            الخطوة {module.currentStep} من {module.totalSteps}
+                            {t('onboarding.progressSidebar.stepOf', { current: module.currentStep, total: module.totalSteps })}
                           </span>
                           <span className="text-slate-600 font-medium">
                             {Math.round((module.currentStep / module.totalSteps) * 100)}%
@@ -192,13 +194,13 @@ export function SetupProgressSidebar({ currentModule, onModuleClick }: SetupProg
                     {module.isComplete && (
                       <div className="flex items-center gap-2 text-xs text-green-600">
                         <Check className="w-3 h-3" />
-                        <span>مكتمل</span>
+                        <span>{t('onboarding.progressSidebar.completed')}</span>
                       </div>
                     )}
                     {module.isSkipped && (
                       <div className="flex items-center gap-2 text-xs text-slate-500">
                         <XCircle className="w-3 h-3" />
-                        <span>تم التخطي</span>
+                        <span>{t('onboarding.progressSidebar.skipped')}</span>
                       </div>
                     )}
                   </div>
@@ -218,15 +220,15 @@ export function SetupProgressSidebar({ currentModule, onModuleClick }: SetupProg
         <div className="space-y-2 text-xs text-slate-600">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-green-500"></div>
-            <span>مكتمل</span>
+            <span>{t('onboarding.progressSidebar.completed')}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-            <span>قيد التنفيذ</span>
+            <span>{t('onboarding.progressSidebar.inProgress')}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-slate-300"></div>
-            <span>تم التخطي</span>
+            <span>{t('onboarding.progressSidebar.skipped')}</span>
           </div>
         </div>
       </div>

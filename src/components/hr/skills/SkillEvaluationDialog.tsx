@@ -85,13 +85,11 @@ export function SkillEvaluationDialog({
         notes: notes.trim() || undefined,
       })
 
-      toast.success(
-        isArabic ? 'تم تقييم المهارة بنجاح' : 'Skill evaluated successfully'
-      )
+      toast.success(t('hr.dialogs.skillEvaluation.evaluationSuccess'))
 
       onOpenChange(false)
     } catch (error) {
-      toast.error(isArabic ? 'حدث خطأ' : 'An error occurred')
+      toast.error(t('hr.dialogs.skillEvaluation.error'))
     }
   }
 
@@ -116,7 +114,7 @@ export function SkillEvaluationDialog({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {isArabic ? 'تقييم المهارة' : 'Evaluate Skill'}
+            {t('hr.dialogs.skillEvaluation.title')}
           </DialogTitle>
           <DialogDescription>
             {skill && (
@@ -127,7 +125,7 @@ export function SkillEvaluationDialog({
                 {skill.lastEvaluationDate && (
                   <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
                     <Calendar className="h-3 w-3" />
-                    {isArabic ? 'آخر تقييم:' : 'Last evaluated:'}
+                    {t('hr.dialogs.skillEvaluation.lastEvaluated')}
                     {format(new Date(skill.lastEvaluationDate), 'PP', {
                       locale: isArabic ? ar : undefined,
                     })}
@@ -144,7 +142,7 @@ export function SkillEvaluationDialog({
             <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
               <div>
                 <div className="text-sm text-muted-foreground mb-1">
-                  {isArabic ? 'الكفاءة الحالية' : 'Current Proficiency'}
+                  {t('hr.dialogs.skillEvaluation.currentProficiency')}
                 </div>
                 <div className="flex items-center gap-2">
                   <span
@@ -157,7 +155,7 @@ export function SkillEvaluationDialog({
               </div>
               <div>
                 <div className="text-sm text-muted-foreground mb-1">
-                  {isArabic ? 'المُقيّم' : 'Evaluated By'}
+                  {t('hr.dialogs.skillEvaluation.evaluatedBy')}
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   {skill.evaluatedByName ? (
@@ -180,7 +178,7 @@ export function SkillEvaluationDialog({
                 <div className="flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
                   <span className="font-medium">
-                    {isArabic ? 'الاتجاه' : 'Trend'}
+                    {t('hr.dialogs.skillEvaluation.trend')}
                   </span>
                 </div>
                 <span
@@ -193,21 +191,15 @@ export function SkillEvaluationDialog({
                   }`}
                 >
                   {trends.trend === 'improving'
-                    ? isArabic
-                      ? 'تحسن'
-                      : 'Improving'
+                    ? t('hr.dialogs.skillEvaluation.improving')
                     : trends.trend === 'declining'
-                    ? isArabic
-                      ? 'تراجع'
-                      : 'Declining'
-                    : isArabic
-                    ? 'مستقر'
-                    : 'Stable'}
+                    ? t('hr.dialogs.skillEvaluation.declining')
+                    : t('hr.dialogs.skillEvaluation.stable')}
                 </span>
               </div>
               <div className="space-y-2">
                 <div className="text-sm text-muted-foreground">
-                  {isArabic ? 'آخر 3 تقييمات' : 'Last 3 Evaluations'}
+                  {t('hr.dialogs.skillEvaluation.lastEvaluations')}
                 </div>
                 {trends.history.slice(-3).reverse().map((evaluation, idx) => (
                   <div key={idx} className="flex items-center justify-between text-sm">
@@ -233,7 +225,7 @@ export function SkillEvaluationDialog({
           {/* Proficiency Level Selection */}
           <div className="space-y-3">
             <Label>
-              {isArabic ? 'مستوى الكفاءة الجديد' : 'New Proficiency Level'}
+              {t('hr.dialogs.skillEvaluation.newProficiencyLevel')}
               <span className="text-destructive ml-1">*</span>
             </Label>
             <RadioGroup
@@ -285,13 +277,13 @@ export function SkillEvaluationDialog({
               <div className="flex items-center gap-2 text-amber-700">
                 <Award className="h-4 w-4" />
                 <span className="font-medium">
-                  {isArabic ? 'تفاصيل الشهادة' : 'Certification Details'}
+                  {t('hr.dialogs.skillEvaluation.certificationDetails')}
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="certificationId">
-                    {isArabic ? 'رقم الشهادة' : 'Certification ID'}
+                    {t('hr.dialogs.skillEvaluation.certificationId')}
                   </Label>
                   <Input
                     id="certificationId"
@@ -302,7 +294,7 @@ export function SkillEvaluationDialog({
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="certificationExpiry">
-                    {isArabic ? 'تاريخ انتهاء الصلاحية' : 'Expiry Date'}
+                    {t('hr.dialogs.skillEvaluation.expiryDate')}
                   </Label>
                   <Input
                     id="certificationExpiry"
@@ -318,17 +310,13 @@ export function SkillEvaluationDialog({
           {/* Notes */}
           <div className="space-y-2">
             <Label htmlFor="notes">
-              {isArabic ? 'ملاحظات التقييم' : 'Evaluation Notes'}
+              {t('hr.dialogs.skillEvaluation.evaluationNotes')}
             </Label>
             <Textarea
               id="notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder={
-                isArabic
-                  ? 'أضف أي ملاحظات أو تعليقات حول هذا التقييم...'
-                  : 'Add any notes or comments about this evaluation...'
-              }
+              placeholder={t('hr.dialogs.skillEvaluation.evaluationNotesPlaceholder')}
               rows={4}
               dir={isArabic ? 'rtl' : 'ltr'}
             />
@@ -338,18 +326,16 @@ export function SkillEvaluationDialog({
           <div className="flex items-center gap-2 text-sm text-muted-foreground p-3 bg-blue-50 rounded-lg">
             <Clock className="h-4 w-4" />
             <span>
-              {isArabic
-                ? 'سيتم تسجيل هذا التقييم في سجل مهارات الموظف'
-                : 'This evaluation will be recorded in the employee skill history'}
+              {t('hr.dialogs.skillEvaluation.evaluationInfo')}
             </span>
           </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              {isArabic ? 'إلغاء' : 'Cancel'}
+              {t('hr.dialogs.skillEvaluation.cancel')}
             </Button>
             <Button type="submit" disabled={evaluateMutation.isPending}>
-              {isArabic ? 'حفظ التقييم' : 'Save Evaluation'}
+              {t('hr.dialogs.skillEvaluation.saveEvaluation')}
             </Button>
           </DialogFooter>
         </form>

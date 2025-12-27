@@ -79,6 +79,7 @@ import { ar } from 'date-fns/locale'
 import { SalesSidebar } from './sales-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { cn } from '@/lib/utils'
+import { ROUTES } from '@/constants/routes'
 
 const activityIcons: Record<ActivityType, React.ReactNode> = {
   call: <Phone className="h-5 w-5" aria-hidden="true" />,
@@ -370,7 +371,7 @@ const ActivityCard = memo(function ActivityCard({ activity, isLast }: { activity
             </div>
             {activity.entityName && (
               <Link
-                to={`/dashboard/crm/leads/${activity.entityId}`}
+                to={ROUTES.dashboard.crm.leads.detail(activity.entityId)}
                 className="text-sm text-emerald-600 hover:underline flex items-center gap-1 mt-1"
               >
                 {activity.entityType === 'lead' && <User className="w-3 h-3" aria-hidden="true" />}
@@ -554,10 +555,10 @@ export function ActivitiesView() {
   }, [stats])
 
   const topNav = [
-    { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: false },
-    { title: 'مسار المبيعات', href: '/dashboard/crm/pipeline', isActive: false },
-    { title: 'الإحالات', href: '/dashboard/crm/referrals', isActive: false },
-    { title: 'سجل الأنشطة', href: '/dashboard/crm/activities', isActive: true },
+    { title: 'العملاء المحتملين', href: ROUTES.dashboard.crm.leads.list, isActive: false },
+    { title: 'مسار المبيعات', href: ROUTES.dashboard.crm.pipeline, isActive: false },
+    { title: 'الإحالات', href: ROUTES.dashboard.crm.referrals.list, isActive: false },
+    { title: 'سجل الأنشطة', href: ROUTES.dashboard.crm.activities.list, isActive: true },
   ]
 
   const typeFilters = [
@@ -780,7 +781,7 @@ export function ActivitiesView() {
                     {searchQuery ? 'لا توجد نتائج مطابقة للبحث' : 'سيتم عرض الأنشطة هنا عند إضافتها'}
                   </p>
                   <Button asChild className="bg-emerald-500 hover:bg-emerald-600 rounded-xl">
-                    <Link to="/dashboard/crm/activities/new">
+                    <Link to={ROUTES.dashboard.crm.activities.new}>
                       <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                       تسجيل أول نشاط
                     </Link>

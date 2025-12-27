@@ -42,6 +42,7 @@ import { usePayments, usePaymentsSummary, useExportReport } from '@/hooks/useFin
 import { useClients } from '@/hooks/useCasesAndClients'
 import { FinanceSidebar } from './finance-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { ROUTES } from '@/constants/routes'
 
 const statusConfig: Record<string, { label: string; color: string; bgColor: string; icon: React.ElementType }> = {
     pending: { label: 'معلق', color: 'text-amber-700', bgColor: 'bg-amber-100', icon: Clock },
@@ -171,11 +172,11 @@ export default function PaymentsDashboard() {
     }, [paymentsData, summaryData])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'عروض الأسعار', href: '/dashboard/finance/quotes', isActive: false },
-        { title: 'المدفوعات', href: '/dashboard/finance/payments', isActive: true },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: false },
+        { title: 'عروض الأسعار', href: ROUTES.dashboard.finance.quotes.list, isActive: false },
+        { title: 'المدفوعات', href: ROUTES.dashboard.finance.payments.list, isActive: true },
+        { title: 'المصروفات', href: ROUTES.dashboard.finance.expenses.list, isActive: false },
     ]
 
     // LOADING STATE
@@ -314,7 +315,7 @@ export default function PaymentsDashboard() {
                                     <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد مدفوعات بعد</h3>
                                     <p className="text-slate-500 mb-6">ستظهر المدفوعات هنا عند تسجيل دفعات للفواتير</p>
                                     <Button asChild className="bg-emerald-600 hover:bg-emerald-700 text-white px-8">
-                                        <Link to="/dashboard/finance/invoices">
+                                        <Link to={ROUTES.dashboard.finance.invoices.list}>
                                             <CreditCard className="ms-2 h-4 w-4" aria-hidden="true" />
                                             عرض الفواتير
                                         </Link>
@@ -547,7 +548,7 @@ export default function PaymentsDashboard() {
                                                             </DropdownMenuTrigger>
                                                             <DropdownMenuContent align="end">
                                                                 <DropdownMenuItem asChild>
-                                                                    <Link to="/dashboard/finance/payments/$paymentId" params={{ paymentId: payment.id }}>
+                                                                    <Link to={ROUTES.dashboard.finance.payments.detail(payment.id)}>
                                                                         عرض التفاصيل
                                                                     </Link>
                                                                 </DropdownMenuItem>

@@ -18,6 +18,7 @@ import { useLeadStats, useLeadsNeedingFollowUp, useUpcomingTasks } from '@/hooks
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatDistanceToNow } from 'date-fns'
 import { ar } from 'date-fns/locale'
+import { ROUTES } from '@/constants/routes'
 
 interface CrmSidebarProps {
   context: 'leads' | 'pipeline' | 'referrals' | 'activities' | 'reports'
@@ -29,22 +30,22 @@ interface CrmSidebarProps {
 
 const links = {
   leads: {
-    create: '/dashboard/crm/leads/new',
-    viewAll: '/dashboard/crm/leads',
+    create: ROUTES.dashboard.crm.leads.new,
+    viewAll: ROUTES.dashboard.crm.leads.list,
   },
   pipeline: {
-    viewAll: '/dashboard/crm/pipeline',
+    viewAll: ROUTES.dashboard.crm.pipeline,
   },
   activities: {
-    viewAll: '/dashboard/crm/activities',
+    viewAll: ROUTES.dashboard.crm.activities.list,
   },
   referrals: {
-    create: '/dashboard/crm/referrals/new',
-    viewAll: '/dashboard/crm/referrals',
+    create: ROUTES.dashboard.crm.referrals.new,
+    viewAll: ROUTES.dashboard.crm.referrals.list,
   },
   reports: {
-    create: '/dashboard/crm/reports/new',
-    viewAll: '/dashboard/crm/reports',
+    create: ROUTES.dashboard.crm.reports.new,
+    viewAll: ROUTES.dashboard.crm.reports.list,
   },
 }
 
@@ -71,7 +72,7 @@ export function CrmSidebar({
             asChild
             className="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-12 justify-start"
           >
-            <Link to="/dashboard/crm/leads/new">
+            <Link to={links.leads.create}>
               <UserPlus className="ms-3 h-5 w-5" aria-hidden="true" />
               إضافة عميل محتمل
             </Link>
@@ -81,7 +82,7 @@ export function CrmSidebar({
             variant="outline"
             className="w-full rounded-xl h-12 justify-start border-slate-200 hover:bg-slate-50"
           >
-            <Link to="/dashboard/crm/pipeline">
+            <Link to={links.pipeline.viewAll}>
               <TrendingUp className="ms-3 h-5 w-5 text-emerald-600" aria-hidden="true" />
               عرض مسار المبيعات
             </Link>
@@ -91,7 +92,7 @@ export function CrmSidebar({
             variant="outline"
             className="w-full rounded-xl h-12 justify-start border-slate-200 hover:bg-slate-50"
           >
-            <Link to="/dashboard/crm/activities">
+            <Link to={links.activities.viewAll}>
               <Clock className="ms-3 h-5 w-5 text-blue-600" aria-hidden="true" />
               سجل الأنشطة
             </Link>
@@ -192,7 +193,7 @@ export function CrmSidebar({
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-bold text-navy text-lg">يحتاج متابعة</h3>
           <Button variant="ghost" size="sm" className="text-emerald-600" asChild>
-            <Link to="/dashboard/crm/leads?filter=followup">عرض الكل</Link>
+            <Link to={`${ROUTES.dashboard.crm.leads.list}?filter=followup`}>عرض الكل</Link>
           </Button>
         </div>
         {followUpLoading ? (
@@ -206,7 +207,7 @@ export function CrmSidebar({
             {followUpData.slice(0, 5).map((lead: any) => (
               <Link
                 key={lead._id}
-                to={`/dashboard/crm/leads/${lead._id}`}
+                to={ROUTES.dashboard.crm.leads.detail(lead._id)}
                 className="block p-3 bg-orange-50 rounded-xl hover:bg-orange-100 transition-colors"
               >
                 <div className="flex justify-between items-start">
@@ -239,7 +240,7 @@ export function CrmSidebar({
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-bold text-navy text-lg">المهام القادمة</h3>
           <Button variant="ghost" size="sm" className="text-emerald-600" asChild>
-            <Link to="/dashboard/crm/activities">عرض الكل</Link>
+            <Link to={links.activities.viewAll}>عرض الكل</Link>
           </Button>
         </div>
         {tasksLoading ? (

@@ -64,10 +64,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAssetCategories, useDeleteAssetCategory, useAssets } from '@/hooks/use-assets'
 import type { AssetCategory, DepreciationMethod } from '@/types/assets'
 import { AssetsSidebar } from './assets-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.assets', href: '/dashboard/assets' },
+  { title: 'sidebar.nav.assets', href: ROUTES.dashboard.assets.list },
 ]
 
 interface CategoryWithAssets extends AssetCategory {
@@ -295,7 +296,7 @@ export function CategoryListView() {
       <TableRow
         key={category._id}
         className="cursor-pointer hover:bg-muted/50"
-        onClick={() => navigate({ to: `/dashboard/assets/categories/${category._id}` })}
+        onClick={() => navigate({ to: ROUTES.dashboard.assets.categories.detail(category._id) })}
       >
         <TableCell>
           <div className="flex items-center gap-2" style={{ paddingRight: `${indent}rem` }}>
@@ -360,7 +361,7 @@ export function CategoryListView() {
               <DropdownMenuItem
                 onClick={(e) => {
                   e.stopPropagation()
-                  navigate({ to: `/dashboard/assets/categories/${category._id}` })
+                  navigate({ to: ROUTES.dashboard.assets.categories.detail(category._id) })
                 }}
               >
                 <Eye className="w-4 h-4 ml-2" />
@@ -369,7 +370,7 @@ export function CategoryListView() {
               <DropdownMenuItem
                 onClick={(e) => {
                   e.stopPropagation()
-                  navigate({ to: `/dashboard/assets/categories/${category._id}/edit` })
+                  navigate({ to: ROUTES.dashboard.assets.categories.edit(category._id) })
                 }}
               >
                 <Edit className="w-4 h-4 ml-2" />
@@ -468,7 +469,7 @@ export function CategoryListView() {
                       />
                     </div>
                     <Button asChild className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
-                      <Link to="/dashboard/assets/categories/create">
+                      <Link to={ROUTES.dashboard.assets.categories.create}>
                         <Plus className="w-4 h-4 ml-2" />
                         {t('assets.category.addCategory', 'إضافة فئة')}
                       </Link>
@@ -548,7 +549,7 @@ export function CategoryListView() {
                           )}
                         </p>
                         <Button asChild className="rounded-xl">
-                          <Link to="/dashboard/assets/categories/create">
+                          <Link to={ROUTES.dashboard.assets.categories.create}>
                             <Plus className="w-4 h-4 ml-2" />
                             {t('assets.category.addCategory', 'إضافة فئة')}
                           </Link>

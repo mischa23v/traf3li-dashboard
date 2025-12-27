@@ -21,6 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ROUTES } from '@/constants/routes'
 
 import { useQualityStats, useActions, useInspections } from '@/hooks/use-quality'
 
@@ -43,20 +44,20 @@ export function QualitySidebar() {
         </CardHeader>
         <CardContent className="space-y-2">
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/quality/create">
+            <Link to={ROUTES.dashboard.quality.create}>
               <Plus className="w-4 h-4 ml-2" />
               {t('quality.newInspection', 'فحص جديد')}
               <kbd className="mr-auto bg-muted px-2 py-0.5 rounded text-xs">⌘N</kbd>
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/quality/templates/create">
+            <Link to={ROUTES.dashboard.quality.templates.create}>
               <FileText className="w-4 h-4 ml-2" />
               {t('quality.newTemplate', 'قالب جديد')}
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/quality/actions/create">
+            <Link to={ROUTES.dashboard.quality.actions.create}>
               <AlertTriangle className="w-4 h-4 ml-2" />
               {t('quality.newAction', 'إجراء جديد')}
             </Link>
@@ -74,25 +75,25 @@ export function QualitySidebar() {
         </CardHeader>
         <CardContent className="space-y-2">
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/quality">
+            <Link to={ROUTES.dashboard.quality.list}>
               <ClipboardCheck className="w-4 h-4 ml-2" />
               {t('quality.inspections', 'الفحوصات')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/quality/templates">
+            <Link to={ROUTES.dashboard.quality.templates.list}>
               <FileText className="w-4 h-4 ml-2" />
               {t('quality.templates', 'القوالب')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/quality/actions">
+            <Link to={ROUTES.dashboard.quality.actions.list}>
               <AlertTriangle className="w-4 h-4 ml-2" />
               {t('quality.actions', 'الإجراءات')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/quality/settings">
+            <Link to={ROUTES.dashboard.quality.settings}>
               <Settings className="w-4 h-4 ml-2" />
               {t('quality.settings', 'الإعدادات')}
             </Link>
@@ -123,7 +124,7 @@ export function QualitySidebar() {
               {pendingInspections.slice(0, 5).map((inspection) => (
                 <Link
                   key={inspection._id}
-                  to={`/dashboard/quality/${inspection._id}`}
+                  to={ROUTES.dashboard.quality.detail(inspection._id)}
                   className="flex items-center justify-between p-2 rounded-lg hover:bg-blue-100 transition-colors"
                 >
                   <div className="flex items-center gap-2">
@@ -139,7 +140,7 @@ export function QualitySidebar() {
               ))}
               {pendingInspections.length > 5 && (
                 <Button asChild variant="ghost" size="sm" className="w-full text-blue-700">
-                  <Link to="/dashboard/quality?status=pending">
+                  <Link to={`${ROUTES.dashboard.quality.list}?status=pending`}>
                     {t('quality.viewAll', 'عرض الكل')} ({pendingInspections.length})
                   </Link>
                 </Button>
@@ -173,7 +174,7 @@ export function QualitySidebar() {
               {failedInspections.slice(0, 5).map((inspection) => (
                 <Link
                   key={inspection._id}
-                  to={`/dashboard/quality/${inspection._id}`}
+                  to={ROUTES.dashboard.quality.detail(inspection._id)}
                   className="flex items-center justify-between p-2 rounded-lg hover:bg-red-100 transition-colors"
                 >
                   <div className="flex items-center gap-2">
@@ -189,7 +190,7 @@ export function QualitySidebar() {
               ))}
               {failedInspections.length > 5 && (
                 <Button asChild variant="ghost" size="sm" className="w-full text-red-700">
-                  <Link to="/dashboard/quality?status=failed">
+                  <Link to={`${ROUTES.dashboard.quality.list}?status=failed`}>
                     {t('quality.viewAll', 'عرض الكل')} ({failedInspections.length})
                   </Link>
                 </Button>
@@ -222,7 +223,7 @@ export function QualitySidebar() {
               {openActions.slice(0, 5).map((action) => (
                 <Link
                   key={action._id}
-                  to={`/dashboard/quality/actions/${action._id}`}
+                  to={`${ROUTES.dashboard.quality.actions.list}/${action._id}`}
                   className="flex items-center justify-between p-2 rounded-lg hover:bg-amber-100 transition-colors"
                 >
                   <div className="flex items-center gap-2">
@@ -238,7 +239,7 @@ export function QualitySidebar() {
               ))}
               {openActions.length > 5 && (
                 <Button asChild variant="ghost" size="sm" className="w-full text-amber-700">
-                  <Link to="/dashboard/quality/actions?status=open">
+                  <Link to={`${ROUTES.dashboard.quality.actions.list}?status=open`}>
                     {t('quality.viewAll', 'عرض الكل')} ({openActions.length})
                   </Link>
                 </Button>

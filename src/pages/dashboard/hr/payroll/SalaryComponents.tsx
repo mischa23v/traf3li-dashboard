@@ -59,7 +59,6 @@ import { toast } from 'sonner'
 
 export default function SalaryComponentsPage() {
   const { t, i18n } = useTranslation()
-  const isArabic = i18n.language === 'ar'
 
   // State
   const [searchQuery, setSearchQuery] = useState('')
@@ -94,7 +93,7 @@ export default function SalaryComponentsPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm(isArabic ? 'هل أنت متأكد من حذف هذا المكون؟' : 'Are you sure you want to delete this component?')) {
+    if (confirm(t('hr.payroll.components.deleteConfirm'))) {
       await deleteMutation.mutateAsync(id)
     }
   }
@@ -108,7 +107,7 @@ export default function SalaryComponentsPage() {
   }
 
   const handleSeedDefaults = async () => {
-    if (confirm(isArabic ? 'هل تريد إضافة المكونات القياسية السعودية؟' : 'Do you want to add Saudi standard components?')) {
+    if (confirm(t('hr.payroll.components.seedDefaultsConfirm'))) {
       await seedDefaultsMutation.mutateAsync()
     }
   }
@@ -119,22 +118,20 @@ export default function SalaryComponentsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            {isArabic ? 'مكونات الراتب' : 'Salary Components'}
+            {t('hr.payroll.components.title')}
           </h1>
           <p className="text-muted-foreground">
-            {isArabic
-              ? 'إدارة البدلات والاستقطاعات والمكونات الأخرى للراتب'
-              : 'Manage allowances, deductions, and other salary components'}
+            {t('hr.payroll.components.description')}
           </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleSeedDefaults}>
             <Upload className="mr-2 h-4 w-4" />
-            {isArabic ? 'إضافة المكونات القياسية' : 'Add Defaults'}
+            {t('hr.payroll.components.addDefaults')}
           </Button>
           <Button onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" />
-            {isArabic ? 'مكون جديد' : 'New Component'}
+            {t('hr.payroll.components.newComponent')}
           </Button>
         </div>
       </div>
@@ -144,14 +141,14 @@ export default function SalaryComponentsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'إجمالي المكونات' : 'Total Components'}
+              {t('hr.payroll.components.stats.totalComponents')}
             </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.totalComponents || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {stats?.activeComponents || 0} {isArabic ? 'نشط' : 'active'}
+              {stats?.activeComponents || 0} {t('hr.payroll.components.stats.active')}
             </p>
           </CardContent>
         </Card>
@@ -159,14 +156,14 @@ export default function SalaryComponentsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'الاستحقاقات' : 'Earnings'}
+              {t('hr.payroll.components.stats.earnings')}
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.earningComponents || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {isArabic ? 'مكونات الدخل' : 'Income components'}
+              {t('hr.payroll.components.stats.incomeComponents')}
             </p>
           </CardContent>
         </Card>
@@ -174,14 +171,14 @@ export default function SalaryComponentsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'الاستقطاعات' : 'Deductions'}
+              {t('hr.payroll.components.stats.deductions')}
             </CardTitle>
             <TrendingDown className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.deductionComponents || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {isArabic ? 'مكونات الخصم' : 'Deduction components'}
+              {t('hr.payroll.components.stats.deductionComponents')}
             </p>
           </CardContent>
         </Card>
@@ -189,14 +186,14 @@ export default function SalaryComponentsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'المعادلات' : 'Formula-based'}
+              {t('hr.payroll.components.stats.formulaBased')}
             </CardTitle>
             <Settings className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.formulaBasedComponents || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {isArabic ? 'مبني على معادلات' : 'Based on formulas'}
+              {t('hr.payroll.components.stats.basedOnFormulas')}
             </p>
           </CardContent>
         </Card>
@@ -210,7 +207,7 @@ export default function SalaryComponentsPage() {
               <div className="relative max-w-sm">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder={isArabic ? 'بحث...' : 'Search...'}
+                  placeholder={t('common.search')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9"
@@ -223,13 +220,13 @@ export default function SalaryComponentsPage() {
           <Tabs value={selectedType} onValueChange={(v) => setSelectedType(v as ComponentType | 'all')}>
             <TabsList>
               <TabsTrigger value="all">
-                {isArabic ? 'الكل' : 'All'} ({stats?.totalComponents || 0})
+                {t('common.all')} ({stats?.totalComponents || 0})
               </TabsTrigger>
               <TabsTrigger value="earning">
-                {isArabic ? 'الاستحقاقات' : 'Earnings'} ({stats?.earningComponents || 0})
+                {t('hr.payroll.components.tabs.earnings')} ({stats?.earningComponents || 0})
               </TabsTrigger>
               <TabsTrigger value="deduction">
-                {isArabic ? 'الاستقطاعات' : 'Deductions'} ({stats?.deductionComponents || 0})
+                {t('hr.payroll.components.tabs.deductions')} ({stats?.deductionComponents || 0})
               </TabsTrigger>
             </TabsList>
 
@@ -244,19 +241,19 @@ export default function SalaryComponentsPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>{isArabic ? 'الرمز' : 'Code'}</TableHead>
-                      <TableHead>{isArabic ? 'الاسم' : 'Name'}</TableHead>
-                      <TableHead>{isArabic ? 'النوع' : 'Type'}</TableHead>
-                      <TableHead>{isArabic ? 'القيمة' : 'Value'}</TableHead>
-                      <TableHead>{isArabic ? 'الحالة' : 'Status'}</TableHead>
-                      <TableHead className="text-right">{isArabic ? 'الإجراءات' : 'Actions'}</TableHead>
+                      <TableHead>{t('hr.payroll.components.table.code')}</TableHead>
+                      <TableHead>{t('hr.payroll.components.table.name')}</TableHead>
+                      <TableHead>{t('hr.payroll.components.table.type')}</TableHead>
+                      <TableHead>{t('hr.payroll.components.table.value')}</TableHead>
+                      <TableHead>{t('hr.payroll.components.table.status')}</TableHead>
+                      <TableHead className="text-right">{t('hr.payroll.components.table.actions')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {components.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={6} className="text-center text-muted-foreground">
-                          {isArabic ? 'لا توجد مكونات' : 'No components found'}
+                          {t('hr.payroll.components.noComponents')}
                         </TableCell>
                       </TableRow>
                     ) : (
@@ -268,22 +265,18 @@ export default function SalaryComponentsPage() {
                           <TableCell>
                             <div>
                               <div className="font-medium">
-                                {isArabic ? component.nameAr : component.name}
+                                {i18n.language === 'ar' ? component.nameAr : component.name}
                               </div>
                               <div className="text-sm text-muted-foreground">
-                                {isArabic ? component.descriptionAr : component.description}
+                                {i18n.language === 'ar' ? component.descriptionAr : component.description}
                               </div>
                             </div>
                           </TableCell>
                           <TableCell>
                             <Badge variant={component.type === 'earning' ? 'default' : 'destructive'}>
                               {component.type === 'earning'
-                                ? isArabic
-                                  ? 'استحقاق'
-                                  : 'Earning'
-                                : isArabic
-                                ? 'استقطاع'
-                                : 'Deduction'}
+                                ? t('hr.payroll.components.type.earning')
+                                : t('hr.payroll.components.type.deduction')}
                             </Badge>
                           </TableCell>
                           <TableCell>
@@ -295,19 +288,15 @@ export default function SalaryComponentsPage() {
                               </div>
                             ) : (
                               <div className="font-medium">
-                                {component.amount?.toLocaleString()} {isArabic ? 'ريال' : 'SAR'}
+                                {component.amount?.toLocaleString()} {t('common.currency.sar')}
                               </div>
                             )}
                           </TableCell>
                           <TableCell>
                             <Badge variant={component.isActive ? 'default' : 'secondary'}>
                               {component.isActive
-                                ? isArabic
-                                  ? 'نشط'
-                                  : 'Active'
-                                : isArabic
-                                ? 'غير نشط'
-                                : 'Inactive'}
+                                ? t('common.status.active')
+                                : t('common.status.inactive')}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-right">
@@ -319,26 +308,22 @@ export default function SalaryComponentsPage() {
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>
-                                  {isArabic ? 'الإجراءات' : 'Actions'}
+                                  {t('hr.payroll.components.table.actions')}
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem onClick={() => handleEdit(component)}>
                                   <Edit className="mr-2 h-4 w-4" />
-                                  {isArabic ? 'تعديل' : 'Edit'}
+                                  {t('common.actions.edit')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => handleDuplicate(component._id)}>
                                   <Copy className="mr-2 h-4 w-4" />
-                                  {isArabic ? 'نسخ' : 'Duplicate'}
+                                  {t('hr.payroll.components.actions.duplicate')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => handleToggleStatus(component._id)}>
                                   <Power className="mr-2 h-4 w-4" />
                                   {component.isActive
-                                    ? isArabic
-                                      ? 'تعطيل'
-                                      : 'Deactivate'
-                                    : isArabic
-                                    ? 'تفعيل'
-                                    : 'Activate'}
+                                    ? t('hr.payroll.components.actions.deactivate')
+                                    : t('hr.payroll.components.actions.activate')}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
@@ -346,7 +331,7 @@ export default function SalaryComponentsPage() {
                                   className="text-red-600"
                                 >
                                   <Trash2 className="mr-2 h-4 w-4" />
-                                  {isArabic ? 'حذف' : 'Delete'}
+                                  {t('common.actions.delete')}
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>

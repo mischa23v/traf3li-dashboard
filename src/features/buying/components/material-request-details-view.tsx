@@ -84,22 +84,22 @@ export function MaterialRequestDetailsView() {
 
   const topNav = [
     {
-      title: isArabic ? 'نظرة عامة' : 'Overview',
+      title: t('buying.common.overview'),
       href: '/dashboard/buying/overview',
       isActive: false,
     },
     {
-      title: isArabic ? 'الموردين' : 'Suppliers',
+      title: t('buying.suppliers'),
       href: '/dashboard/buying/suppliers',
       isActive: false,
     },
     {
-      title: isArabic ? 'أوامر الشراء' : 'Purchase Orders',
+      title: t('buying.purchaseOrder.purchaseOrders'),
       href: '/dashboard/buying/purchase-orders',
       isActive: false,
     },
     {
-      title: isArabic ? 'طلبات المواد' : 'Material Requests',
+      title: t('buying.materialRequest.materialRequests'),
       href: '/dashboard/buying/material-requests',
       isActive: true,
     },
@@ -116,32 +116,32 @@ export function MaterialRequestDetailsView() {
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       draft: {
-        label: isArabic ? 'مسودة' : 'Draft',
+        label: t('buying.mrStatus.draft'),
         className: 'bg-gray-100 text-gray-700',
         icon: FileText,
       },
       submitted: {
-        label: isArabic ? 'مقدم' : 'Submitted',
+        label: t('buying.mrStatus.submitted'),
         className: 'bg-blue-100 text-blue-700',
         icon: Send,
       },
       ordered: {
-        label: isArabic ? 'تم الطلب' : 'Ordered',
+        label: t('buying.mrStatus.ordered'),
         className: 'bg-purple-100 text-purple-700',
         icon: ShoppingCart,
       },
       transferred: {
-        label: isArabic ? 'تم النقل' : 'Transferred',
+        label: t('buying.mrStatus.transferred'),
         className: 'bg-teal-100 text-teal-700',
         icon: TruckIcon,
       },
       issued: {
-        label: isArabic ? 'تم الإصدار' : 'Issued',
+        label: t('buying.mrStatus.issued'),
         className: 'bg-emerald-100 text-emerald-700',
         icon: CheckCircle,
       },
       cancelled: {
-        label: isArabic ? 'ملغى' : 'Cancelled',
+        label: t('buying.mrStatus.cancelled'),
         className: 'bg-red-100 text-red-700',
         icon: XCircle,
       },
@@ -158,10 +158,10 @@ export function MaterialRequestDetailsView() {
 
   const getRequestTypeLabel = (type: string) => {
     const types = {
-      purchase: isArabic ? 'شراء' : 'Purchase',
-      transfer: isArabic ? 'نقل' : 'Transfer',
-      material_issue: isArabic ? 'إصدار مواد' : 'Material Issue',
-      manufacture: isArabic ? 'تصنيع' : 'Manufacture',
+      purchase: t('buying.requestTypes.purchase'),
+      transfer: t('buying.requestTypes.transfer'),
+      material_issue: t('buying.requestTypes.materialIssue'),
+      manufacture: t('buying.requestTypes.manufacture'),
     }
     return types[type as keyof typeof types] || type
   }
@@ -175,28 +175,28 @@ export function MaterialRequestDetailsView() {
       return (
         <Badge className="bg-emerald-100 text-emerald-700">
           <CheckCircle className="h-3 w-3 me-1" />
-          {isArabic ? 'مستلم' : 'Received'}
+          {t('buying.purchaseOrder.received')}
         </Badge>
       )
     } else if (orderedQty >= qty) {
       return (
         <Badge className="bg-purple-100 text-purple-700">
           <ShoppingCart className="h-3 w-3 me-1" />
-          {isArabic ? 'تم الطلب' : 'Ordered'}
+          {t('buying.mrStatus.ordered')}
         </Badge>
       )
     } else if (orderedQty > 0) {
       return (
         <Badge className="bg-blue-100 text-blue-700">
           <Clock className="h-3 w-3 me-1" />
-          {isArabic ? 'جزئي' : 'Partial'}
+          {t('buying.itemStatus.partial')}
         </Badge>
       )
     } else {
       return (
         <Badge className="bg-gray-100 text-gray-700">
           <Clock className="h-3 w-3 me-1" />
-          {isArabic ? 'معلق' : 'Pending'}
+          {t('buying.itemStatus.pending')}
         </Badge>
       )
     }
@@ -204,19 +204,19 @@ export function MaterialRequestDetailsView() {
 
   const handleDelete = () => {
     // This will call the delete mutation when implemented
-    toast.success(isArabic ? 'تم حذف طلب المواد بنجاح' : 'Material Request deleted successfully')
+    toast.success(t('buying.toast.materialRequestDeleted'))
     navigate({ to: '/dashboard/buying/material-requests' })
   }
 
   const handleSubmit = () => {
     // This will call the submit mutation when implemented
-    toast.success(isArabic ? 'تم ترحيل طلب المواد بنجاح' : 'Material Request submitted successfully')
+    toast.success(t('buying.toast.materialRequestSubmitted'))
     queryClient.invalidateQueries({ queryKey: ['buying', 'material-requests'] })
   }
 
   const handleCancel = () => {
     // This will call the cancel mutation when implemented
-    toast.success(isArabic ? 'تم إلغاء طلب المواد بنجاح' : 'Material Request cancelled successfully')
+    toast.success(t('buying.toast.materialRequestCancelled'))
     queryClient.invalidateQueries({ queryKey: ['buying', 'material-requests'] })
     setShowCancelDialog(false)
   }
@@ -231,7 +231,7 @@ export function MaterialRequestDetailsView() {
 
   const handleCreateTransfer = () => {
     // Navigate to create stock entry for transfer
-    toast.info(isArabic ? 'سيتم توجيهك لإنشاء حركة مخزون' : 'You will be redirected to create stock entry')
+    toast.info(t('buying.toast.stockEntryRedirect'))
   }
 
   // Loading State
@@ -279,16 +279,16 @@ export function MaterialRequestDetailsView() {
             <Button asChild variant="ghost" className="mb-6">
               <Link to="/dashboard/buying/material-requests">
                 <ArrowLeft className="h-4 w-4 me-2" />
-                {isArabic ? 'العودة لطلبات المواد' : 'Back to Material Requests'}
+                {t('buying.navigation.backToMaterialRequests')}
               </Link>
             </Button>
             <Card className="border-0 shadow-sm rounded-3xl p-12 text-center">
               <AlertCircle className="h-16 w-16 text-rose-400 mx-auto mb-4" aria-hidden="true" />
               <h3 className="text-xl font-bold text-navy mb-2">
-                {isArabic ? 'فشل تحميل طلب المواد' : 'Failed to Load Material Request'}
+                {t('buying.materialRequest.failedToLoad')}
               </h3>
               <p className="text-slate-500">
-                {error?.message || (isArabic ? 'طلب المواد غير موجود' : 'Material Request not found')}
+                {error?.message || t('buying.materialRequest.notFound')}
               </p>
             </Card>
           </div>
@@ -327,7 +327,7 @@ export function MaterialRequestDetailsView() {
             <Button asChild variant="ghost" className="text-slate-600 hover:text-navy">
               <Link to="/dashboard/buying/material-requests">
                 <ArrowLeft className="h-4 w-4 me-2" />
-                {isArabic ? 'العودة لطلبات المواد' : 'Back to Material Requests'}
+                {t('buying.navigation.backToMaterialRequests')}
               </Link>
             </Button>
             <div className="flex gap-2 flex-wrap">
@@ -335,12 +335,12 @@ export function MaterialRequestDetailsView() {
                 <>
                   <Button onClick={handleSubmit} className="bg-brand-blue hover:bg-brand-blue/90">
                     <Send className="h-4 w-4 me-2" aria-hidden="true" />
-                    {isArabic ? 'ترحيل' : 'Submit'}
+                    {t('buying.common.submit')}
                   </Button>
                   <Button asChild variant="outline">
                     <Link to={`/dashboard/buying/material-requests/${materialRequestId}/edit`}>
                       <Edit className="h-4 w-4 me-2" aria-hidden="true" />
-                      {isArabic ? 'تعديل' : 'Edit'}
+                      {t('buying.common.edit')}
                     </Link>
                   </Button>
                   <Button
@@ -349,7 +349,7 @@ export function MaterialRequestDetailsView() {
                     onClick={() => setShowDeleteDialog(true)}
                   >
                     <Trash2 className="h-4 w-4 me-2" aria-hidden="true" />
-                    {isArabic ? 'حذف' : 'Delete'}
+                    {t('buying.common.delete')}
                   </Button>
                 </>
               )}
@@ -358,13 +358,13 @@ export function MaterialRequestDetailsView() {
                   {isPurchaseType && (
                     <Button onClick={handleCreatePO} className="bg-brand-blue hover:bg-brand-blue/90">
                       <ShoppingCart className="h-4 w-4 me-2" aria-hidden="true" />
-                      {isArabic ? 'إنشاء أمر شراء' : 'Create Purchase Order'}
+                      {t('buying.materialRequest.createPurchaseOrder')}
                     </Button>
                   )}
                   {isTransferType && (
                     <Button onClick={handleCreateTransfer} className="bg-teal-600 hover:bg-teal-700">
                       <TruckIcon className="h-4 w-4 me-2" aria-hidden="true" />
-                      {isArabic ? 'إنشاء حركة نقل' : 'Create Transfer'}
+                      {t('buying.materialRequest.createTransfer')}
                     </Button>
                   )}
                   <Button
@@ -373,7 +373,7 @@ export function MaterialRequestDetailsView() {
                     onClick={() => setShowCancelDialog(true)}
                   >
                     <X className="h-4 w-4 me-2" aria-hidden="true" />
-                    {isArabic ? 'إلغاء' : 'Cancel'}
+                    {t('buying.common.cancel')}
                   </Button>
                 </>
               )}
@@ -382,7 +382,7 @@ export function MaterialRequestDetailsView() {
 
           {/* Material Request Header */}
           <ProductivityHero
-            badge={isArabic ? 'طلب المواد' : 'Material Request'}
+            badge={t('buying.materialRequest.materialRequest')}
             title={materialRequest.mrNumber}
             type="buying"
             listMode={true}
@@ -430,14 +430,14 @@ export function MaterialRequestDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <Package className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'معلومات الطلب' : 'Request Information'}
+                            {t('buying.materialRequest.requestInformation')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'رقم الطلب' : 'Request Number'}
+                                {t('buying.materialRequest.requestNumber')}
                               </p>
                               <p className="font-medium text-navy font-mono">
                                 {materialRequest.mrNumber}
@@ -445,13 +445,13 @@ export function MaterialRequestDetailsView() {
                             </div>
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'الحالة' : 'Status'}
+                                {t('buying.common.status')}
                               </p>
                               {getStatusBadge(materialRequest.status)}
                             </div>
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'نوع الطلب' : 'Request Type'}
+                                {t('buying.materialRequest.requestType')}
                               </p>
                               <Badge variant="outline" className="font-medium">
                                 {getRequestTypeLabel(materialRequest.requestType)}
@@ -459,7 +459,7 @@ export function MaterialRequestDetailsView() {
                             </div>
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'تاريخ المعاملة' : 'Transaction Date'}
+                                {t('buying.materialRequest.transactionDate')}
                               </p>
                               <p className="font-medium text-navy flex items-center gap-1">
                                 <Calendar className="h-4 w-4 text-slate-400" />
@@ -469,7 +469,7 @@ export function MaterialRequestDetailsView() {
                             {materialRequest.requiredDate && (
                               <div>
                                 <p className="text-sm text-slate-500 mb-1">
-                                  {isArabic ? 'التاريخ المطلوب' : 'Required Date'}
+                                  {t('buying.purchaseOrder.requiredDate')}
                                 </p>
                                 <p className="font-medium text-navy flex items-center gap-1">
                                   <Calendar className="h-4 w-4 text-slate-400" />
@@ -480,14 +480,14 @@ export function MaterialRequestDetailsView() {
                             {materialRequest.requestedBy && (
                               <div>
                                 <p className="text-sm text-slate-500 mb-1">
-                                  {isArabic ? 'تم الطلب بواسطة' : 'Requested By'}
+                                  {t('buying.materialRequest.requestedBy')}
                                 </p>
                                 <p className="font-medium text-navy">{materialRequest.requestedBy}</p>
                               </div>
                             )}
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'إجمالي الكمية' : 'Total Quantity'}
+                                {t('buying.purchaseOrder.totalQuantity')}
                               </p>
                               <p className="font-medium text-navy text-lg">
                                 {materialRequest.totalQty || 0}
@@ -496,7 +496,7 @@ export function MaterialRequestDetailsView() {
                             {materialRequest.purpose && (
                               <div className="md:col-span-2">
                                 <p className="text-sm text-slate-500 mb-1">
-                                  {isArabic ? 'الغرض' : 'Purpose'}
+                                  {t('buying.materialRequest.purpose')}
                                 </p>
                                 <p className="font-medium text-navy">{materialRequest.purpose}</p>
                               </div>
@@ -510,7 +510,7 @@ export function MaterialRequestDetailsView() {
                         <Card className="border-none shadow-sm bg-white rounded-2xl">
                           <CardHeader className="border-b border-slate-100">
                             <CardTitle className="text-lg font-bold text-navy">
-                              {isArabic ? 'ملاحظات' : 'Remarks'}
+                              {t('buying.purchaseOrder.remarks')}
                             </CardTitle>
                           </CardHeader>
                           <CardContent className="p-6">
@@ -525,7 +525,7 @@ export function MaterialRequestDetailsView() {
                       <Card className="border-none shadow-sm bg-white rounded-2xl">
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy">
-                            {isArabic ? 'معلومات إضافية' : 'Additional Information'}
+                            {t('buying.materialRequest.additionalInformation')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
@@ -533,14 +533,14 @@ export function MaterialRequestDetailsView() {
                             {materialRequest.company && (
                               <div>
                                 <p className="text-sm text-slate-500 mb-1">
-                                  {isArabic ? 'الشركة' : 'Company'}
+                                  {t('buying.company')}
                                 </p>
                                 <p className="font-medium text-navy">{materialRequest.company}</p>
                               </div>
                             )}
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'تاريخ الإنشاء' : 'Created At'}
+                                {t('buying.materialRequest.createdAt')}
                               </p>
                               <p className="font-medium text-navy">
                                 {formatDate(materialRequest.createdAt)}
@@ -548,7 +548,7 @@ export function MaterialRequestDetailsView() {
                             </div>
                             <div>
                               <p className="text-sm text-slate-500 mb-1">
-                                {isArabic ? 'آخر تحديث' : 'Last Updated'}
+                                {t('buying.materialRequest.lastUpdated')}
                               </p>
                               <p className="font-medium text-navy">
                                 {formatDate(materialRequest.updatedAt)}
@@ -557,7 +557,7 @@ export function MaterialRequestDetailsView() {
                             {materialRequest.createdBy && (
                               <div>
                                 <p className="text-sm text-slate-500 mb-1">
-                                  {isArabic ? 'أنشئ بواسطة' : 'Created By'}
+                                  {t('buying.materialRequest.createdBy')}
                                 </p>
                                 <p className="font-medium text-navy">{materialRequest.createdBy}</p>
                               </div>
@@ -573,7 +573,7 @@ export function MaterialRequestDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <Package className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'الأصناف المطلوبة' : 'Requested Items'}
+                            {t('buying.materialRequest.requestedItems')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
@@ -583,27 +583,27 @@ export function MaterialRequestDetailsView() {
                                 className="h-12 w-12 mx-auto mb-4 opacity-20"
                                 aria-hidden="true"
                               />
-                              <p>{isArabic ? 'لا توجد أصناف' : 'No items'}</p>
+                              <p>{t('buying.materialRequest.noItems')}</p>
                             </div>
                           ) : (
                             <div className="overflow-x-auto">
                               <Table>
                                 <TableHeader>
                                   <TableRow>
-                                    <TableHead>{isArabic ? 'الصنف' : 'Item'}</TableHead>
+                                    <TableHead>{t('buying.materialRequest.item')}</TableHead>
                                     <TableHead className="text-center">
-                                      {isArabic ? 'الكمية المطلوبة' : 'Required Qty'}
+                                      {t('buying.materialRequest.requiredQty')}
                                     </TableHead>
                                     <TableHead className="text-center">
-                                      {isArabic ? 'الكمية المطلوبة' : 'Ordered Qty'}
+                                      {t('buying.materialRequest.orderedQty')}
                                     </TableHead>
                                     <TableHead className="text-center">
-                                      {isArabic ? 'الكمية المستلمة' : 'Received Qty'}
+                                      {t('buying.materialRequest.receivedQty')}
                                     </TableHead>
-                                    <TableHead>{isArabic ? 'الوحدة' : 'UOM'}</TableHead>
-                                    <TableHead>{isArabic ? 'المستودع' : 'Warehouse'}</TableHead>
-                                    <TableHead>{isArabic ? 'التاريخ المطلوب' : 'Required Date'}</TableHead>
-                                    <TableHead>{isArabic ? 'الحالة' : 'Status'}</TableHead>
+                                    <TableHead>{t('buying.purchaseOrder.uom')}</TableHead>
+                                    <TableHead>{t('buying.materialRequest.warehouse')}</TableHead>
+                                    <TableHead>{t('buying.purchaseOrder.requiredDate')}</TableHead>
+                                    <TableHead>{t('buying.common.status')}</TableHead>
                                   </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -660,7 +660,7 @@ export function MaterialRequestDetailsView() {
                         <CardHeader className="border-b border-slate-100">
                           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                             <FileText className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {isArabic ? 'المستندات المرتبطة' : 'Linked Documents'}
+                            {t('buying.materialRequest.linkedDocuments')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
@@ -669,7 +669,7 @@ export function MaterialRequestDetailsView() {
                             <div>
                               <h4 className="font-semibold text-navy mb-3 flex items-center gap-2">
                                 <ShoppingCart className="h-4 w-4 text-brand-blue" />
-                                {isArabic ? 'أوامر الشراء' : 'Purchase Orders'}
+                                {t('buying.purchaseOrder.purchaseOrders')}
                               </h4>
                               <div className="text-center py-8 text-slate-500 bg-slate-50 rounded-xl">
                                 <ShoppingCart
@@ -677,9 +677,7 @@ export function MaterialRequestDetailsView() {
                                   aria-hidden="true"
                                 />
                                 <p className="text-sm">
-                                  {isArabic
-                                    ? 'لا توجد أوامر شراء مرتبطة'
-                                    : 'No linked purchase orders'}
+                                  {t('buying.materialRequest.noPurchaseOrders')}
                                 </p>
                               </div>
                             </div>
@@ -688,7 +686,7 @@ export function MaterialRequestDetailsView() {
                             <div>
                               <h4 className="font-semibold text-navy mb-3 flex items-center gap-2">
                                 <TruckIcon className="h-4 w-4 text-teal-600" />
-                                {isArabic ? 'حركات المخزون' : 'Stock Entries'}
+                                {t('buying.materialRequest.stockEntries')}
                               </h4>
                               <div className="text-center py-8 text-slate-500 bg-slate-50 rounded-xl">
                                 <TruckIcon
@@ -696,9 +694,7 @@ export function MaterialRequestDetailsView() {
                                   aria-hidden="true"
                                 />
                                 <p className="text-sm">
-                                  {isArabic
-                                    ? 'لا توجد حركات مخزون مرتبطة'
-                                    : 'No linked stock entries'}
+                                  {t('buying.materialRequest.noStockEntries')}
                                 </p>
                               </div>
                             </div>
@@ -722,7 +718,7 @@ export function MaterialRequestDetailsView() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {isArabic ? 'تأكيد الحذف' : 'Confirm Deletion'}
+              {t('buying.dialogs.confirmDeletion')}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {isArabic
@@ -731,9 +727,9 @@ export function MaterialRequestDetailsView() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{isArabic ? 'إلغاء' : 'Cancel'}</AlertDialogCancel>
+            <AlertDialogCancel>{t('buying.common.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
-              {isArabic ? 'حذف' : 'Delete'}
+              {t('buying.common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -744,7 +740,7 @@ export function MaterialRequestDetailsView() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {isArabic ? 'تأكيد الإلغاء' : 'Confirm Cancellation'}
+              {t('buying.dialogs.confirmCancellation')}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {isArabic
@@ -753,9 +749,9 @@ export function MaterialRequestDetailsView() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{isArabic ? 'رجوع' : 'Go Back'}</AlertDialogCancel>
+            <AlertDialogCancel>{t('buying.dialogs.goBack')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleCancel} className="bg-red-600 hover:bg-red-700">
-              {isArabic ? 'إلغاء الطلب' : 'Cancel Request'}
+              {t('buying.dialogs.cancelRequest')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

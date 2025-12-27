@@ -421,7 +421,7 @@ export function CardReconciliationView() {
                                     )}
 
                                     <Button variant="outline" className="w-full rounded-xl" asChild>
-                                        <Link to="/dashboard/finance/expenses/new">
+                                        <Link to={ROUTES.dashboard.finance.expenses.new}>
                                             <Plus className="h-4 w-4 ms-2" />
                                             إنشاء مصروف جديد من هذه المعاملة
                                         </Link>

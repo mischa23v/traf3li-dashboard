@@ -94,7 +94,7 @@ export function DocumentsViewDialog({
               variant='outline'
               style={{ borderColor: categoryInfo.color, color: categoryInfo.color }}
             >
-              {isArabic ? categoryInfo.labelAr : categoryInfo.label}
+              {t(`documents.categories.${currentRow.category}`)}
             </Badge>
             {currentRow.version > 1 && (
               <Badge variant='secondary'>

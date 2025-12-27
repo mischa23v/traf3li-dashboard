@@ -5,6 +5,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link, useParams } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -122,9 +123,9 @@ export function WhatsAppConversationView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: false },
-    { title: 'واتساب', href: '/dashboard/crm/whatsapp', isActive: true },
-    { title: 'التسويق بالبريد', href: '/dashboard/crm/email-marketing', isActive: false },
+    { title: 'العملاء المحتملين', href: ROUTES.dashboard.crm.leads.list, isActive: false },
+    { title: 'واتساب', href: ROUTES.dashboard.crm.whatsapp.list, isActive: true },
+    { title: 'التسويق بالبريد', href: ROUTES.dashboard.crm.emailMarketing.list, isActive: false },
   ]
 
   return (
@@ -172,7 +173,7 @@ export function WhatsAppConversationView() {
             variant="ghost"
             className="h-10 px-4 text-slate-600 hover:text-navy hover:bg-white rounded-xl"
           >
-            <Link to="/dashboard/crm/whatsapp">
+            <Link to={ROUTES.dashboard.crm.whatsapp.list}>
               <ArrowRight className="h-4 w-4 ms-2 rtl:rotate-180" aria-hidden="true" />
               العودة للمحادثات
             </Link>
@@ -222,7 +223,7 @@ export function WhatsAppConversationView() {
             <h3 className="text-lg font-bold text-slate-900 mb-2">خطأ في تحميل المحادثة</h3>
             <p className="text-slate-500 mb-4">{error?.message || 'حدث خطأ في الاتصال'}</p>
             <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-              <Link to="/dashboard/crm/whatsapp">العودة للمحادثات</Link>
+              <Link to={ROUTES.dashboard.crm.whatsapp.list}>العودة للمحادثات</Link>
             </Button>
           </div>
         )}

@@ -39,6 +39,7 @@ import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { SalesSidebar } from './sales-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useCreateReferral } from '@/hooks/useCrm'
@@ -329,16 +330,16 @@ export function CreateReferralView() {
 
     createReferralMutation.mutate(referralData, {
       onSuccess: () => {
-        navigate({ to: '/dashboard/crm/referrals' })
+        navigate({ to: ROUTES.dashboard.crm.referrals.list })
       }
     })
   }
 
   const topNav = [
-    { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: false },
-    { title: 'مسار المبيعات', href: '/dashboard/crm/pipeline', isActive: false },
-    { title: 'الإحالات', href: '/dashboard/crm/referrals', isActive: true },
-    { title: 'سجل الأنشطة', href: '/dashboard/crm/activities', isActive: false },
+    { title: 'العملاء المحتملين', href: ROUTES.dashboard.crm.leads.list, isActive: false },
+    { title: 'مسار المبيعات', href: ROUTES.dashboard.crm.pipeline, isActive: false },
+    { title: 'الإحالات', href: ROUTES.dashboard.crm.referrals.list, isActive: true },
+    { title: 'سجل الأنشطة', href: ROUTES.dashboard.crm.activities.list, isActive: false },
   ]
 
   return (
@@ -354,7 +355,7 @@ export function CreateReferralView() {
       <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
         {/* HERO CARD */}
         <ProductivityHero badge="إدارة مصادر الإحالة" title="إضافة مصدر إحالة جديد" type="referrals" listMode={true} hideButtons={true}>
-          <Link to="/dashboard/crm/referrals">
+          <Link to={ROUTES.dashboard.crm.referrals.list}>
             <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
               <ArrowRight className="w-5 h-5" />
             </Button>
@@ -1103,7 +1104,7 @@ export function CreateReferralView() {
 
               {/* Submit */}
               <div className="flex items-center justify-end gap-4 pt-6">
-                <Link to="/dashboard/crm/referrals">
+                <Link to={ROUTES.dashboard.crm.referrals.list}>
                   <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
                     إلغاء
                   </Button>

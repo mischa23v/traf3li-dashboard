@@ -12,6 +12,7 @@ import { useCalendar } from '@/hooks/useCalendar'
 import { useUpcomingReminders } from '@/hooks/useRemindersAndEvents'
 import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
+import { ROUTES } from '@/constants/routes'
 
 interface FinanceSidebarProps {
     context?: 'invoices' | 'quotes' | 'payments' | 'expenses' | 'statements' | 'transactions' | 'activity' | 'time-tracking' | 'bills' | 'vendors' | 'retainers' | 'recurring' | 'reports' | 'fiscal-periods' | 'reconciliation' | 'currency' | 'chart-of-accounts' | 'credit-notes' | 'journal-entries' | 'general-ledger' | 'inter-company' | 'inter-company-balances' | 'inter-company-reconciliation'
@@ -65,96 +66,98 @@ export function FinanceSidebar({
 
     const links = {
         invoices: {
-            create: '/dashboard/finance/invoices/new',
-            viewAll: '/dashboard/finance/invoices'
+            create: ROUTES.dashboard.finance.invoices.new,
+            viewAll: ROUTES.dashboard.finance.invoices.list
         },
         'credit-notes': {
-            create: '/dashboard/finance/credit-notes/new',
-            viewAll: '/dashboard/finance/credit-notes'
+            create: ROUTES.dashboard.finance.creditNotes.new,
+            viewAll: ROUTES.dashboard.finance.creditNotes.list
         },
         quotes: {
-            create: '/dashboard/finance/quotes/new',
-            viewAll: '/dashboard/finance/quotes'
+            create: ROUTES.dashboard.finance.quotes.new,
+            viewAll: ROUTES.dashboard.finance.quotes.list
         },
         payments: {
-            create: '/dashboard/finance/payments/new',
-            viewAll: '/dashboard/finance/payments'
+            create: ROUTES.dashboard.finance.payments.new,
+            viewAll: ROUTES.dashboard.finance.payments.list
         },
         expenses: {
-            create: '/dashboard/finance/expenses/new',
-            viewAll: '/dashboard/finance/expenses'
+            create: ROUTES.dashboard.finance.expenses.new,
+            viewAll: ROUTES.dashboard.finance.expenses.list
         },
         statements: {
-            create: '/dashboard/finance/statements/new',
-            viewAll: '/dashboard/finance/statements'
+            create: ROUTES.dashboard.finance.statements.new,
+            viewAll: ROUTES.dashboard.finance.statements.list
         },
         transactions: {
-            create: '/dashboard/finance/transactions/new',
-            viewAll: '/dashboard/finance/transactions'
+            // Note: Transactions is read-only, no create route
+            create: '',
+            viewAll: ROUTES.dashboard.finance.transactions.list
         },
         activity: {
-            create: '/dashboard/finance/activity/new',
-            viewAll: '/dashboard/finance/activity'
+            create: ROUTES.dashboard.finance.activity.new,
+            viewAll: ROUTES.dashboard.finance.activity.list
         },
         'time-tracking': {
-            create: '/dashboard/finance/time-tracking/new',
-            viewAll: '/dashboard/finance/time-tracking'
+            create: ROUTES.dashboard.finance.timeTracking.new,
+            viewAll: ROUTES.dashboard.finance.timeTracking.list
         },
         bills: {
-            create: '/dashboard/finance/bills/new',
-            viewAll: '/dashboard/finance/bills'
+            create: ROUTES.dashboard.finance.bills.new,
+            viewAll: ROUTES.dashboard.finance.bills.list
         },
         vendors: {
-            create: '/dashboard/finance/vendors/new',
-            viewAll: '/dashboard/finance/vendors'
+            create: ROUTES.dashboard.finance.vendors.new,
+            viewAll: ROUTES.dashboard.finance.vendors.list
         },
         retainers: {
-            create: '/dashboard/finance/retainers/new',
-            viewAll: '/dashboard/finance/retainers'
+            create: ROUTES.dashboard.finance.retainers.new,
+            viewAll: ROUTES.dashboard.finance.retainers.list
         },
         recurring: {
-            create: '/dashboard/finance/recurring-invoices/new',
-            viewAll: '/dashboard/finance/recurring-invoices'
+            create: ROUTES.dashboard.finance.recurringInvoices.new,
+            viewAll: ROUTES.dashboard.finance.recurringInvoices.list
         },
         reports: {
-            create: '/dashboard/finance/reports/new',
-            viewAll: '/dashboard/finance/reports'
+            create: ROUTES.dashboard.finance.reports.new,
+            viewAll: ROUTES.dashboard.finance.reports.list
         },
         'fiscal-periods': {
             create: '',
-            viewAll: '/dashboard/finance/fiscal-periods'
+            viewAll: ROUTES.dashboard.finance.fiscalPeriods.list
         },
         'reconciliation': {
-            create: '/dashboard/finance/reconciliation/new',
-            viewAll: '/dashboard/finance/reconciliation'
+            create: ROUTES.dashboard.finance.reconciliation.new,
+            viewAll: ROUTES.dashboard.finance.reconciliation.list
         },
         'currency': {
-            create: '/dashboard/finance/currency/new',
-            viewAll: '/dashboard/finance/currency'
+            create: ROUTES.dashboard.finance.currency.new,
+            viewAll: ROUTES.dashboard.finance.currency.list
         },
         'chart-of-accounts': {
             create: '',
-            viewAll: '/dashboard/finance/chart-of-accounts'
+            viewAll: ROUTES.dashboard.finance.chartOfAccounts
         },
         'journal-entries': {
-            create: '/dashboard/finance/journal-entries/new',
-            viewAll: '/dashboard/finance/journal-entries'
+            create: ROUTES.dashboard.finance.journalEntries.new,
+            viewAll: ROUTES.dashboard.finance.journalEntries.list
         },
         'general-ledger': {
             create: '',
-            viewAll: '/dashboard/finance/general-ledger'
+            viewAll: ROUTES.dashboard.finance.generalLedger
         },
+        // Note: Inter-company routes are not yet defined in ROUTES constants - using placeholders
         'inter-company': {
-            create: '/dashboard/finance/inter-company/new',
-            viewAll: '/dashboard/finance/inter-company'
+            create: '',
+            viewAll: ''
         },
         'inter-company-balances': {
             create: '',
-            viewAll: '/dashboard/finance/inter-company/balances'
+            viewAll: ''
         },
         'inter-company-reconciliation': {
-            create: '/dashboard/finance/inter-company/reconciliation/new',
-            viewAll: '/dashboard/finance/inter-company/reconciliation'
+            create: '',
+            viewAll: ''
         }
     }
 
@@ -443,7 +446,7 @@ export function FinanceSidebar({
                             </div>
 
                             <Button asChild variant="ghost" className="w-full mt-6 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 group cursor-pointer">
-                                <Link to="/dashboard/calendar">
+                                <Link to={ROUTES.dashboard.calendar}>
                                     <span>{t('sidebar.calendar.viewFullSchedule')}</span>
                                     <ChevronRight className="w-4 h-4 me-2 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1 rtl:rotate-180" aria-hidden="true" />
                                 </Link>
@@ -470,7 +473,7 @@ export function FinanceSidebar({
                                         return (
                                             <Link
                                                 key={reminder._id}
-                                                to={`/dashboard/tasks/reminders/${reminder._id}`}
+                                                to={ROUTES.dashboard.tasks.reminders.detail(reminder._id)}
                                                 className="flex gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:shadow-md transition-all cursor-pointer group"
                                             >
                                                 <div className={cn(
@@ -509,7 +512,7 @@ export function FinanceSidebar({
                                 </>
                             )}
                             <Button asChild variant="ghost" className="w-full text-xs text-slate-600 hover:text-emerald-600 hover:bg-emerald-50">
-                                <Link to="/dashboard/tasks/reminders">
+                                <Link to={ROUTES.dashboard.tasks.reminders.list}>
                                     {t('sidebar.notifications.viewAll')}
                                 </Link>
                             </Button>

@@ -74,10 +74,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useWarehouses, useDeleteWarehouse } from '@/hooks/use-inventory'
 import type { Warehouse } from '@/types/inventory'
 import { InventorySidebar } from './inventory-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.inventory', href: '/dashboard/inventory' },
+  { title: 'sidebar.nav.inventory', href: ROUTES.dashboard.inventory.list },
 ]
 
 export function WarehouseListView() {
@@ -237,7 +238,7 @@ export function WarehouseListView() {
                     </SelectContent>
                   </Select>
                   <Button asChild className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
-                    <Link to="/dashboard/inventory/warehouses/create">
+                    <Link to={ROUTES.dashboard.inventory.warehouses.create}>
                       <Plus className="w-4 h-4 ml-2" />
                       {t('warehouse.addWarehouse', 'إضافة مستودع')}
                     </Link>
@@ -281,7 +282,7 @@ export function WarehouseListView() {
                         <h3 className="text-lg font-medium mb-2">{t('warehouse.noWarehouses', 'لا توجد مستودعات')}</h3>
                         <p className="text-muted-foreground mb-4">{t('warehouse.noWarehousesDesc', 'ابدأ بإضافة مستودع جديد')}</p>
                         <Button asChild className="rounded-xl">
-                          <Link to="/dashboard/inventory/warehouses/create">
+                          <Link to={ROUTES.dashboard.inventory.warehouses.create}>
                             <Plus className="w-4 h-4 ml-2" />
                             {t('warehouse.addWarehouse', 'إضافة مستودع')}
                           </Link>
@@ -305,7 +306,7 @@ export function WarehouseListView() {
                             <TableRow
                               key={warehouse._id}
                               className="cursor-pointer hover:bg-muted/50"
-                              onClick={() => navigate({ to: `/dashboard/inventory/warehouses/${warehouse._id}` })}
+                              onClick={() => navigate({ to: ROUTES.dashboard.inventory.warehouses.detail(warehouse._id) })}
                             >
                               <TableCell>
                                 <div className="flex items-center gap-3">
@@ -356,7 +357,7 @@ export function WarehouseListView() {
                                   <DropdownMenuContent align="end">
                                     <DropdownMenuItem onClick={(e) => {
                                       e.stopPropagation()
-                                      navigate({ to: `/dashboard/inventory/warehouses/${warehouse._id}` })
+                                      navigate({ to: ROUTES.dashboard.inventory.warehouses.detail(warehouse._id) })
                                     }}>
                                       <Eye className="w-4 h-4 ml-2" />
                                       {t('common.view', 'عرض')}

@@ -42,6 +42,7 @@ import {
   calculateRiskScore,
 } from '@/services/captchaService'
 import type { CaptchaConfig } from '@/components/auth/captcha-config'
+import { ROUTES } from '@/constants/routes'
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -63,7 +64,6 @@ const createFormSchema = (t: any) =>
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
-  const isArabic = i18n.language === 'ar'
   const login = useAuthStore((state) => state.login)
   const authError = useAuthStore((state) => state.error)
   const clearError = useAuthStore((state) => state.clearError)
@@ -89,19 +89,15 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     identifier: currentIdentifier,
     onLockout: (status) => {
       toast({
-        title: isArabic ? 'تم قفل الحساب' : 'Account Locked',
-        description: isArabic
-          ? `تم قفل حسابك مؤقتاً بسبب محاولات تسجيل دخول فاشلة متعددة. يرجى الانتظار ${status.waitTime} دقيقة.`
-          : `Your account has been temporarily locked due to multiple failed login attempts. Please wait ${Math.ceil(status.waitTime / 60)} minutes.`,
+        title: t('auth.toast.accountLocked.title'),
+        description: t('auth.toast.accountLocked.description', { minutes: Math.ceil(status.waitTime / 60) }),
         variant: 'destructive',
       })
     },
     onUnlock: () => {
       toast({
-        title: isArabic ? 'تم فتح الحساب' : 'Account Unlocked',
-        description: isArabic
-          ? 'يمكنك الآن محاولة تسجيل الدخول مرة أخرى.'
-          : 'You can now try logging in again.',
+        title: t('auth.toast.accountUnlocked.title'),
+        description: t('auth.toast.accountUnlocked.description'),
       })
     },
   })
@@ -187,13 +183,11 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const handleCaptchaError = useCallback((error: Error) => {
     console.error('CAPTCHA error:', error)
     toast({
-      title: isArabic ? 'خطأ في التحقق' : 'Verification Error',
-      description: isArabic
-        ? 'فشل التحقق. يرجى المحاولة مرة أخرى.'
-        : 'Verification failed. Please try again.',
+      title: t('auth.toast.verificationError.title'),
+      description: t('auth.toast.verificationError.description'),
       variant: 'destructive',
     })
-  }, [isArabic])
+  }, [t])
 
   /**
    * Handle form submission with rate limiting and CAPTCHA
@@ -219,10 +213,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             setCaptchaToken(token)
           } else {
             toast({
-              title: isArabic ? 'التحقق مطلوب' : 'Verification Required',
-              description: isArabic
-                ? 'يرجى إكمال التحقق للمتابعة.'
-                : 'Please complete the verification to continue.',
+              title: t('auth.toast.verificationRequired.title'),
+              description: t('auth.toast.verificationRequired.description'),
               variant: 'destructive',
             })
             return
@@ -275,10 +267,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       if (errorCode === 'CAPTCHA_REQUIRED') {
         setShowCaptcha(true)
         toast({
-          title: isArabic ? 'التحقق مطلوب' : 'Verification Required',
-          description: isArabic
-            ? 'يرجى إكمال التحقق للمتابعة.'
-            : 'Please complete the verification to continue.',
+          title: t('auth.toast.verificationRequired.title'),
+          description: t('auth.toast.verificationRequired.description'),
           variant: 'default',
         })
         return
@@ -289,10 +279,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       const rateLimitInfo = rateLimit.handle429(error)
       if (rateLimitInfo.isRateLimited) {
         toast({
-          title: isArabic ? 'تم تجاوز الحد المسموح' : 'Rate Limit Exceeded',
-          description: isArabic
-            ? `يرجى الانتظار ${rateLimitInfo.retryAfter} ثانية قبل المحاولة مرة أخرى.`
-            : `Please wait ${rateLimitInfo.retryAfter} seconds before trying again.`,
+          title: t('auth.toast.rateLimitExceeded.title'),
+          description: t('auth.toast.rateLimitExceeded.description', { seconds: rateLimitInfo.retryAfter }),
           variant: 'destructive',
         })
         return
@@ -364,10 +352,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 
       // Show success message
       toast({
-        title: isArabic ? 'نجح تسجيل الدخول عبر LDAP' : 'LDAP Login Successful',
-        description: isArabic
-          ? 'تم تسجيل دخولك بنجاح عبر Active Directory'
-          : 'You have been successfully authenticated via Active Directory',
+        title: t('auth.toast.ldapLoginSuccess.title'),
+        description: t('auth.toast.ldapLoginSuccess.description'),
       })
 
       // Redirect based on role
@@ -385,10 +371,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       const rateLimitInfo = rateLimit.handle429(error)
       if (rateLimitInfo.isRateLimited) {
         toast({
-          title: isArabic ? 'تم تجاوز الحد المسموح' : 'Rate Limit Exceeded',
-          description: isArabic
-            ? `يرجى الانتظار ${rateLimitInfo.retryAfter} ثانية قبل المحاولة مرة أخرى.`
-            : `Please wait ${rateLimitInfo.retryAfter} seconds before trying again.`,
+          title: t('auth.toast.rateLimitExceeded.title'),
+          description: t('auth.toast.rateLimitExceeded.description', { seconds: rateLimitInfo.retryAfter }),
           variant: 'destructive',
         })
         return
@@ -403,10 +387,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 
       // Show error message
       toast({
-        title: isArabic ? 'فشل تسجيل الدخول عبر LDAP' : 'LDAP Login Failed',
-        description: error.message || (isArabic
-          ? 'فشل التحقق من بيانات اعتماد LDAP'
-          : 'Failed to authenticate LDAP credentials'),
+        title: t('auth.toast.ldapLoginFailed.title'),
+        description: error.message || t('auth.toast.ldapLoginFailed.description'),
         variant: 'destructive',
       })
     } finally {
@@ -449,7 +431,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
                     <Button
                       variant='link'
                       className='h-auto p-0 text-sm font-normal'
-                      onClick={() => navigate({ to: '/forgot-password' })}
+                      onClick={() => navigate({ to: ROUTES.auth.forgotPassword })}
                       type='button'
                     >
                       {t('auth.signIn.forgotPassword')}
@@ -537,7 +519,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         <Button
           variant='link'
           className='h-auto p-0 font-semibold underline-offset-4 hover:underline'
-          onClick={() => navigate({ to: '/sign-up' })}
+          onClick={() => navigate({ to: ROUTES.auth.signUp })}
           type='button'
         >
           {t('auth.signIn.registerNow')}

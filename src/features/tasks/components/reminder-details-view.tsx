@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useParams, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
     Clock, AlertCircle, CheckCircle2, Trash2, Edit3, Loader2,
     ArrowLeft, Briefcase, XCircle,
@@ -92,7 +93,7 @@ export function ReminderDetailsView() {
     const handleDelete = () => {
         deleteReminderMutation.mutate(reminderId, {
             onSuccess: () => {
-                navigate({ to: '/dashboard/tasks/reminders' })
+                navigate({ to: ROUTES.dashboard.tasks.reminders.list })
             }
         })
     }
@@ -179,9 +180,9 @@ export function ReminderDetailsView() {
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'المهام', href: '/dashboard/tasks/list', isActive: false },
-        { title: 'التذكيرات', href: '/dashboard/tasks/reminders', isActive: true },
-        { title: 'الأحداث', href: '/dashboard/tasks/events', isActive: false },
+        { title: 'المهام', href: ROUTES.dashboard.tasks.list, isActive: false },
+        { title: 'التذكيرات', href: '{ROUTES.dashboard.tasks.reminders.list}', isActive: true },
+        { title: 'الأحداث', href: ROUTES.dashboard.tasks.events.list, isActive: false },
     ]
 
     return (
@@ -264,7 +265,7 @@ export function ReminderDetailsView() {
                             <h4 className="text-lg font-bold text-navy mb-2">لم يتم العثور على التذكير</h4>
                             <p className="text-slate-500 mb-4">التذكير المطلوب غير موجود أو تم حذفه</p>
                             <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
-                                <Link to="/dashboard/tasks/reminders">
+                                <Link to="{ROUTES.dashboard.tasks.reminders.list}">
                                     <ArrowLeft className="ms-2 h-4 w-4" />
                                     العودة إلى التذكيرات
                                 </Link>

@@ -12,6 +12,7 @@ import { useCalendar } from '@/hooks/useCalendar'
 import { useUpcomingReminders } from '@/hooks/useRemindersAndEvents'
 import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
+import { ROUTES } from '@/constants/routes'
 
 interface PracticeSidebarProps {
     context?: 'clients' | 'organizations' | 'cases' | 'workflows' | 'documents' | 'followups' | 'contacts'
@@ -65,24 +66,24 @@ export function PracticeSidebar({
 
     const links = {
         clients: {
-            create: '/dashboard/clients/new',
-            viewAll: '/dashboard/clients'
+            create: ROUTES.dashboard.clients.new,
+            viewAll: ROUTES.dashboard.clients.list
         },
         organizations: {
-            create: '/dashboard/organizations/new',
-            viewAll: '/dashboard/organizations'
+            create: ROUTES.dashboard.organizations.new,
+            viewAll: ROUTES.dashboard.organizations.list
         },
         cases: {
-            create: '/dashboard/cases/new',
-            viewAll: '/dashboard/cases'
+            create: ROUTES.dashboard.cases.new,
+            viewAll: ROUTES.dashboard.cases.list
         },
         workflows: {
-            create: '/dashboard/case-workflows/new',
-            viewAll: '/dashboard/case-workflows'
+            create: ROUTES.dashboard.workflows.new,
+            viewAll: ROUTES.dashboard.workflows.list
         },
         documents: {
-            create: '/dashboard/documents/new',
-            viewAll: '/dashboard/documents'
+            create: ROUTES.dashboard.documents.new,
+            viewAll: ROUTES.dashboard.documents.list
         },
         followups: {
             create: '/dashboard/followups/new',
@@ -357,7 +358,7 @@ export function PracticeSidebar({
                             </div>
 
                             <Button asChild variant="ghost" className="w-full mt-6 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 group cursor-pointer">
-                                <Link to="/dashboard/calendar">
+                                <Link to={ROUTES.dashboard.calendar}>
                                     <span>{t('sidebar.calendar.viewFullSchedule')}</span>
                                     <ChevronRight className="w-4 h-4 me-2 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1 rtl:rotate-180" aria-hidden="true" />
                                 </Link>
@@ -384,7 +385,7 @@ export function PracticeSidebar({
                                         return (
                                             <Link
                                                 key={reminder._id}
-                                                to={`/dashboard/tasks/reminders/${reminder._id}`}
+                                                to={ROUTES.dashboard.tasks.reminderDetail(reminder._id)}
                                                 className="flex gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:shadow-md transition-all cursor-pointer group"
                                             >
                                                 <div className={cn(
@@ -423,7 +424,7 @@ export function PracticeSidebar({
                                 </>
                             )}
                             <Button asChild variant="ghost" className="w-full text-xs text-slate-500 hover:text-emerald-600 hover:bg-emerald-50">
-                                <Link to="/dashboard/tasks/reminders">
+                                <Link to={ROUTES.dashboard.tasks.reminders}>
                                     {t('sidebar.notifications.viewAll')}
                                 </Link>
                             </Button>

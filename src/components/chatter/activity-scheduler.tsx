@@ -148,7 +148,7 @@ export function ActivityScheduler({
         <div className="flex items-center gap-2">
           <Calendar className="h-5 w-5 text-muted-foreground" />
           <h3 className="font-semibold">
-            {isArabic ? 'الأنشطة المجدولة' : 'Scheduled Activities'}
+            {t('common.scheduledActivities')}
           </h3>
           <Badge variant="secondary">{activities.length}</Badge>
         </div>
@@ -158,7 +158,7 @@ export function ActivityScheduler({
             <DialogTrigger asChild>
               <Button size="sm">
                 <Plus className="h-4 w-4 me-2" />
-                {isArabic ? 'جدولة نشاط' : 'Schedule Activity'}
+                {t('common.scheduleActivity')}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-md">
@@ -186,12 +186,10 @@ export function ActivityScheduler({
           <div className="flex flex-col items-center justify-center p-8 text-center">
             <Calendar className="h-12 w-12 text-muted-foreground mb-3" />
             <p className="text-sm text-muted-foreground">
-              {isArabic ? 'لا توجد أنشطة مجدولة' : 'No scheduled activities'}
+              {t('common.noScheduledActivities')}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              {isArabic
-                ? 'قم بجدولة نشاط لتتبع المهام والمتابعات'
-                : 'Schedule an activity to track tasks and follow-ups'}
+              {t('common.scheduleActivityToTrack')}
             </p>
           </div>
         ) : (
@@ -199,7 +197,7 @@ export function ActivityScheduler({
             {/* Overdue */}
             {groupedActivities.overdue.length > 0 && (
               <ActivityGroup
-                title={isArabic ? 'متأخرة' : 'Overdue'}
+                title={t('common.overdueActivities')}
                 activities={groupedActivities.overdue}
                 icon={<AlertCircle className="h-4 w-4" />}
                 color="text-red-600"
@@ -213,7 +211,7 @@ export function ActivityScheduler({
             {/* Today */}
             {groupedActivities.today.length > 0 && (
               <ActivityGroup
-                title={isArabic ? 'اليوم' : 'Today'}
+                title={t('common.today')}
                 activities={groupedActivities.today}
                 icon={<Clock className="h-4 w-4" />}
                 color="text-orange-600"
@@ -227,7 +225,7 @@ export function ActivityScheduler({
             {/* Planned */}
             {groupedActivities.planned.length > 0 && (
               <ActivityGroup
-                title={isArabic ? 'مجدولة' : 'Planned'}
+                title={t('common.planned')}
                 activities={groupedActivities.planned}
                 icon={<Calendar className="h-4 w-4" />}
                 color="text-blue-600"
@@ -241,7 +239,7 @@ export function ActivityScheduler({
             {/* Done */}
             {groupedActivities.done.length > 0 && (
               <ActivityGroup
-                title={isArabic ? 'منجزة' : 'Done'}
+                title={t('common.done')}
                 activities={groupedActivities.done}
                 icon={<CheckCircle2 className="h-4 w-4" />}
                 color="text-green-600"
@@ -317,6 +315,7 @@ interface ActivityItemProps {
 }
 
 function ActivityItem({ activity, isArabic, onMarkDone, onCancel, onUpdate }: ActivityItemProps) {
+  const { t: activityT } = useTranslation()
   const [showFeedback, setShowFeedback] = React.useState(false)
   const [feedback, setFeedback] = React.useState('')
 
@@ -367,7 +366,7 @@ function ActivityItem({ activity, isArabic, onMarkDone, onCancel, onUpdate }: Ac
                   {onMarkDone && (
                     <DropdownMenuItem onClick={() => setShowFeedback(true)}>
                       <CheckCircle2 className="h-4 w-4 me-2 text-green-600" />
-                      {isArabic ? 'وضع علامة منجز' : 'Mark as Done'}
+                      {activityT('common.markAsDone')}
                     </DropdownMenuItem>
                   )}
                   {onCancel && (
@@ -376,7 +375,7 @@ function ActivityItem({ activity, isArabic, onMarkDone, onCancel, onUpdate }: Ac
                       onClick={() => onCancel(activity._id)}
                     >
                       <XCircle className="h-4 w-4 me-2" />
-                      {isArabic ? 'إلغاء' : 'Cancel'}
+                      {activityT('common.cancel')}
                     </DropdownMenuItem>
                   )}
                 </DropdownMenuContent>
@@ -415,36 +414,30 @@ function ActivityItem({ activity, isArabic, onMarkDone, onCancel, onUpdate }: Ac
       <Dialog open={showFeedback} onOpenChange={setShowFeedback}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{isArabic ? 'إتمام النشاط' : 'Complete Activity'}</DialogTitle>
+            <DialogTitle>{activityT('common.completeActivity')}</DialogTitle>
             <DialogDescription>
-              {isArabic
-                ? 'أضف ملاحظات اختيارية حول إتمام هذا النشاط'
-                : 'Add optional feedback about completing this activity'}
+              {activityT('common.addOptionalFeedback')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="feedback">{isArabic ? 'الملاحظات' : 'Feedback'}</Label>
+              <Label htmlFor="feedback">{activityT('common.feedback')}</Label>
               <Textarea
                 id="feedback"
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
-                placeholder={
-                  isArabic
-                    ? 'اكتب أي ملاحظات أو نتائج...'
-                    : 'Write any notes or outcomes...'
-                }
+                placeholder={activityT('common.writeNotesOrOutcomes')}
                 rows={4}
               />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowFeedback(false)}>
-              {isArabic ? 'إلغاء' : 'Cancel'}
+              {activityT('common.cancel')}
             </Button>
             <Button onClick={handleMarkDone}>
               <CheckCircle2 className="h-4 w-4 me-2" />
-              {isArabic ? 'وضع علامة منجز' : 'Mark as Done'}
+              {activityT('common.markAsDone')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -505,11 +498,9 @@ function ScheduleActivityForm({
   return (
     <form onSubmit={handleSubmit}>
       <DialogHeader>
-        <DialogTitle>{isArabic ? 'جدولة نشاط' : 'Schedule Activity'}</DialogTitle>
+        <DialogTitle>{t('common.scheduleActivity')}</DialogTitle>
         <DialogDescription>
-          {isArabic
-            ? 'قم بإنشاء نشاط مجدول للمتابعة أو التذكير'
-            : 'Create a scheduled activity for follow-up or reminder'}
+          {t('common.createScheduledActivity')}
         </DialogDescription>
       </DialogHeader>
 
@@ -517,13 +508,13 @@ function ScheduleActivityForm({
         {/* Activity Type */}
         <div>
           <Label htmlFor="activity-type">
-            {isArabic ? 'نوع النشاط' : 'Activity Type'}
+            {t('common.activityType')}
             <span className="text-destructive">*</span>
           </Label>
           <Select value={activityTypeId} onValueChange={setActivityTypeId}>
             <SelectTrigger id="activity-type">
               <SelectValue
-                placeholder={isArabic ? 'اختر نوع النشاط' : 'Select activity type'}
+                placeholder={t('common.selectActivityType')}
               />
             </SelectTrigger>
             <SelectContent>
@@ -542,14 +533,14 @@ function ScheduleActivityForm({
         {/* Summary */}
         <div>
           <Label htmlFor="summary">
-            {isArabic ? 'الملخص' : 'Summary'}
+            {t('common.summary')}
             <span className="text-destructive">*</span>
           </Label>
           <Input
             id="summary"
             value={summary}
             onChange={(e) => setSummary(e.target.value)}
-            placeholder={isArabic ? 'ملخص النشاط' : 'Activity summary'}
+            placeholder={t('common.activitySummary')}
             required
           />
         </div>
@@ -557,24 +548,24 @@ function ScheduleActivityForm({
         {/* Summary (Arabic) */}
         {!isArabic && (
           <div>
-            <Label htmlFor="summary-ar">{isArabic ? 'الملخص (عربي)' : 'Summary (Arabic)'}</Label>
+            <Label htmlFor="summary-ar">{t('common.summaryArabic')}</Label>
             <Input
               id="summary-ar"
               value={summaryAr}
               onChange={(e) => setSummaryAr(e.target.value)}
-              placeholder={isArabic ? 'الملخص بالعربية' : 'Summary in Arabic'}
+              placeholder={t('common.summaryInArabic')}
             />
           </div>
         )}
 
         {/* Note */}
         <div>
-          <Label htmlFor="note">{isArabic ? 'ملاحظة' : 'Note'}</Label>
+          <Label htmlFor="note">{t('common.note')}</Label>
           <Textarea
             id="note"
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder={isArabic ? 'ملاحظات إضافية...' : 'Additional notes...'}
+            placeholder={t('common.additionalNotes')}
             rows={3}
           />
         </div>
@@ -582,7 +573,7 @@ function ScheduleActivityForm({
         {/* Due Date */}
         <div>
           <Label>
-            {isArabic ? 'تاريخ الاستحقاق' : 'Due Date'}
+            {t('common.dueDate')}
             <span className="text-destructive">*</span>
           </Label>
           <Popover>
@@ -598,7 +589,7 @@ function ScheduleActivityForm({
                 {dueDate ? (
                   format(dueDate, 'PPP', { locale: isArabic ? ar : enUS })
                 ) : (
-                  <span>{isArabic ? 'اختر التاريخ' : 'Pick a date'}</span>
+                  <span>{t('common.pickDate')}</span>
                 )}
               </Button>
             </PopoverTrigger>
@@ -611,12 +602,12 @@ function ScheduleActivityForm({
         {/* Assign To */}
         <div>
           <Label htmlFor="assign-to">
-            {isArabic ? 'تعيين إلى' : 'Assign To'}
+            {t('common.assignTo')}
             <span className="text-destructive">*</span>
           </Label>
           <Select value={userId} onValueChange={setUserId}>
             <SelectTrigger id="assign-to">
-              <SelectValue placeholder={isArabic ? 'اختر المستخدم' : 'Select user'} />
+              <SelectValue placeholder={t('common.selectUser')} />
             </SelectTrigger>
             <SelectContent>
               {users.map((user) => (
@@ -642,14 +633,14 @@ function ScheduleActivityForm({
 
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onCancel}>
-          {isArabic ? 'إلغاء' : 'Cancel'}
+          {t('common.cancel')}
         </Button>
         <Button
           type="submit"
           disabled={!activityTypeId || !summary || !dueDate || !userId}
         >
           <Plus className="h-4 w-4 me-2" />
-          {isArabic ? 'جدولة' : 'Schedule'}
+          {t('common.schedule')}
         </Button>
       </DialogFooter>
     </form>

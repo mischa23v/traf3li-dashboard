@@ -201,7 +201,7 @@ export default function PaymentDetailsView() {
                 <Main className="bg-[#f8f9fa] p-6 lg:p-8">
                     <div className="max-w-4xl mx-auto">
                         <Button asChild variant="ghost" className="mb-6">
-                            <Link to="/dashboard/finance/payments">
+                            <Link to={ROUTES.dashboard.finance.payments.list}>
                                 <ArrowRight className="h-4 w-4 ms-2" />
                                 العودة للمدفوعات
                             </Link>
@@ -239,7 +239,7 @@ export default function PaymentDetailsView() {
                     {/* Back Button & Actions */}
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                         <Button asChild variant="ghost" className="text-slate-600 hover:text-navy">
-                            <Link to="/dashboard/finance/payments">
+                            <Link to={ROUTES.dashboard.finance.payments.list}>
                                 <ArrowRight className="h-4 w-4 ms-2" />
                                 العودة للمدفوعات
                             </Link>
@@ -378,8 +378,7 @@ export default function PaymentDetailsView() {
                                     </CardHeader>
                                     <CardContent className="p-6">
                                         <Link
-                                            to="/dashboard/finance/invoices/$invoiceId"
-                                            params={{ invoiceId: typeof payment.invoiceId === 'string' ? payment.invoiceId : payment.invoiceId }}
+                                            to={ROUTES.dashboard.finance.invoices.detail(typeof payment.invoiceId === 'string' ? payment.invoiceId : payment.invoiceId )}
                                             className="flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors"
                                         >
                                             <div>

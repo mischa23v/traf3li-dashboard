@@ -66,6 +66,7 @@ import {
 import { toast } from 'sonner'
 import { format } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
+import { ROUTES } from '@/constants/routes'
 
 export function RemindersView() {
     const { t, i18n } = useTranslation()
@@ -217,7 +218,7 @@ export function RemindersView() {
 
     // Single reminder actions
     const handleViewReminder = useCallback((reminderId: string) => {
-        navigate({ to: '/dashboard/tasks/reminders/$reminderId', params: { reminderId } })
+        navigate({ to: ROUTES.dashboard.tasks.reminders.detail(reminderId) })
     }, [navigate])
 
     const handleDeleteReminder = useCallback(async (reminderId: string) => {
@@ -317,9 +318,9 @@ export function RemindersView() {
 
     const topNav = [
         { title: t('reminders.nav.overview'), href: '/dashboard/overview', isActive: false },
-        { title: t('reminders.nav.tasks'), href: '/dashboard/tasks/list', isActive: false },
-        { title: t('reminders.nav.reminders'), href: '/dashboard/tasks/reminders', isActive: true },
-        { title: t('reminders.nav.events'), href: '/dashboard/tasks/events', isActive: false },
+        { title: t('reminders.nav.tasks'), href: ROUTES.dashboard.tasks.list, isActive: false },
+        { title: t('reminders.nav.reminders'), href: ROUTES.dashboard.tasks.reminders.list, isActive: true },
+        { title: t('reminders.nav.events'), href: ROUTES.dashboard.tasks.events.list, isActive: false },
     ]
 
     return (
@@ -501,7 +502,7 @@ export function RemindersView() {
                                     <h3 className="text-lg font-bold text-slate-900 mb-2">{t('reminders.list.noReminders', 'لا توجد تذكيرات')}</h3>
                                     <p className="text-slate-500 mb-4">{t('reminders.list.noRemindersDesc', 'أنت جاهز تماماً! لا توجد تذكيرات في الوقت الحالي.')}</p>
                                     <GosiButton asChild className="bg-emerald-500 hover:bg-emerald-600">
-                                        <Link to="/dashboard/tasks/reminders/new">
+                                        <Link to="{ROUTES.dashboard.tasks.reminders.new}">
                                             <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                             {t('reminders.list.newReminder', 'إضافة تذكير')}
                                         </Link>

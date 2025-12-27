@@ -194,7 +194,7 @@ export function CreateCreditNoteView() {
           title="إنشاء إشعار دائن جديد"
           description="إصدار إشعار دائن (Credit Note) لتصحيح أو تعديل فاتورة سابقة"
         />
-        <Link to="/dashboard/finance/credit-notes">
+        <Link to={ROUTES.dashboard.finance.creditNotes.list}>
           <Button variant="outline">
             <ArrowLeft className="h-4 w-4 ms-2" />
             العودة إلى القائمة

@@ -31,6 +31,7 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { KnowledgeSidebar } from './knowledge-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { ROUTES } from '@/constants/routes'
 
 // Mock forms data
 const mockForms = [
@@ -160,9 +161,9 @@ export function FormsView() {
   }, [])
 
   const topNav = [
-    { title: isRTL ? 'القوانين' : 'Laws', href: '/dashboard/knowledge/laws', isActive: false },
-    { title: isRTL ? 'الأحكام' : 'Judgments', href: '/dashboard/knowledge/judgments', isActive: false },
-    { title: isRTL ? 'النماذج' : 'Forms', href: '/dashboard/knowledge/forms', isActive: true },
+    { title: t('knowledge.navigation.laws'), href: ROUTES.dashboard.knowledge.laws, isActive: false },
+    { title: t('knowledge.navigation.judgments'), href: ROUTES.dashboard.knowledge.judgments, isActive: false },
+    { title: t('knowledge.navigation.forms'), href: ROUTES.dashboard.knowledge.forms, isActive: true },
   ]
 
   const toggleBookmark = (id: string) => {
@@ -174,15 +175,16 @@ export function FormsView() {
   }
 
   const getCategoryBadge = (category: string) => {
-    const config: Record<string, { color: string; label: string; labelEn: string }> = {
-      contracts: { color: 'bg-blue-100 text-blue-700', label: 'عقود', labelEn: 'Contracts' },
-      poa: { color: 'bg-emerald-100 text-emerald-700', label: 'وكالات', labelEn: 'POA' },
-      lawsuits: { color: 'bg-purple-100 text-purple-700', label: 'صحائف دعوى', labelEn: 'Lawsuits' },
-      corporate: { color: 'bg-amber-100 text-amber-700', label: 'شركات', labelEn: 'Corporate' },
-      general: { color: 'bg-slate-100 text-slate-700', label: 'عام', labelEn: 'General' },
+    const config: Record<string, { color: string }> = {
+      contracts: { color: 'bg-blue-100 text-blue-700' },
+      poa: { color: 'bg-emerald-100 text-emerald-700' },
+      lawsuits: { color: 'bg-purple-100 text-purple-700' },
+      corporate: { color: 'bg-amber-100 text-amber-700' },
+      general: { color: 'bg-slate-100 text-slate-700' },
     }
-    const cat = config[category] || { color: 'bg-slate-100 text-slate-700', label: category, labelEn: category }
-    return <Badge className={`${cat.color} hover:${cat.color} border-0`}>{isRTL ? cat.label : cat.labelEn}</Badge>
+    const cat = config[category] || { color: 'bg-slate-100 text-slate-700' }
+    const label = t(`knowledge.forms.categoryBadges.${category}`, category)
+    return <Badge className={`${cat.color} hover:${cat.color} border-0`}>{label}</Badge>
   }
 
   const getFormatIcon = (format: string) => {
@@ -258,8 +260,8 @@ export function FormsView() {
       >
         {/* HERO CARD & STATS */}
         <ProductivityHero
-          badge={isRTL ? 'قاعدة المعرفة' : 'Knowledge Base'}
-          title={isRTL ? 'النماذج' : 'Forms'}
+          badge={t('knowledge.title')}
+          title={t('knowledge.forms.title')}
           type="forms"
         />
 
@@ -274,7 +276,7 @@ export function FormsView() {
                   <div className="relative">
                     <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                     <Input
-                      placeholder={isRTL ? 'بحث في النماذج...' : 'Search forms...'}
+                      placeholder={t('knowledge.forms.searchPlaceholder')}
                       defaultValue={searchQuery}
                       onChange={(e) => debouncedSetSearch(e.target.value)}
                       className="ps-10 rounded-xl border-slate-200"
@@ -288,7 +290,7 @@ export function FormsView() {
                       <SelectContent>
                         {categories.map((cat) => (
                           <SelectItem key={cat.value} value={cat.value}>
-                            {isRTL ? cat.label : cat.labelEn}
+                            {t(`knowledge.forms.categories.${cat.value}`)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -300,7 +302,7 @@ export function FormsView() {
                       <SelectContent>
                         {formats.map((format) => (
                           <SelectItem key={format.value} value={format.value}>
-                            {isRTL ? format.label : format.labelEn}
+                            {t(`knowledge.forms.formats.${format.value}`)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -398,11 +400,11 @@ export function FormsView() {
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm" className="flex-1 border-slate-200">
                         <ExternalLink className="h-4 w-4 me-1" aria-hidden="true" />
-                        {isRTL ? 'معاينة' : 'Preview'}
+                        {t('knowledge.forms.preview')}
                       </Button>
                       <Button size="sm" className="flex-1 bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/20">
                         <Download className="h-4 w-4 me-1" aria-hidden="true" />
-                        {isRTL ? 'تحميل' : 'Download'}
+                        {t('knowledge.forms.download')}
                       </Button>
                     </div>
                   </CardContent>
@@ -418,10 +420,10 @@ export function FormsView() {
                     <FileText className="h-8 w-8 text-slate-300" aria-hidden="true" />
                   </div>
                   <h3 className="text-lg font-bold text-navy">
-                    {isRTL ? 'لا توجد نماذج مطابقة' : 'No matching forms found'}
+                    {t('knowledge.forms.noMatchingForms')}
                   </h3>
                   <p className="text-slate-500 mt-1 max-w-xs mx-auto">
-                    {isRTL ? 'جرب تعديل معايير البحث' : 'Try adjusting your search criteria'}
+                    {t('knowledge.forms.adjustSearchCriteria')}
                   </p>
                   <Button
                     variant="outline"
@@ -432,7 +434,7 @@ export function FormsView() {
                       setFormatFilter('all')
                     }}
                   >
-                    {isRTL ? 'مسح الفلاتر' : 'Clear Filters'}
+                    {t('knowledge.forms.clearFilters')}
                   </Button>
                 </CardContent>
               </Card>

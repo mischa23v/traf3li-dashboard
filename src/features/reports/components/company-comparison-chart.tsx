@@ -63,7 +63,7 @@ export function CompanyComparisonChart({
   startDate,
   endDate,
 }: CompanyComparisonChartProps) {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
 
   // Selected metrics to display
@@ -122,21 +122,21 @@ export function CompanyComparisonChart({
       return (
         <div className="flex items-center gap-1 text-amber-600">
           <Trophy className="w-4 h-4" />
-          <span className="text-xs font-bold">{isArabic ? 'الأول' : '1st'}</span>
+          <span className="text-xs font-bold">{t('reports.companyComparison.ranks.first')}</span>
         </div>
       )
     } else if (rank === 2) {
       return (
         <div className="flex items-center gap-1 text-slate-500">
           <Medal className="w-4 h-4" />
-          <span className="text-xs font-bold">{isArabic ? 'الثاني' : '2nd'}</span>
+          <span className="text-xs font-bold">{t('reports.companyComparison.ranks.second')}</span>
         </div>
       )
     } else if (rank === 3) {
       return (
         <div className="flex items-center gap-1 text-orange-600">
           <Award className="w-4 h-4" />
-          <span className="text-xs font-bold">{isArabic ? 'الثالث' : '3rd'}</span>
+          <span className="text-xs font-bold">{t('reports.companyComparison.ranks.third')}</span>
         </div>
       )
     }
@@ -168,20 +168,20 @@ export function CompanyComparisonChart({
             <div className="p-2 bg-indigo-50 rounded-xl">
               <BarChart3 className="w-6 h-6 text-indigo-600" />
             </div>
-            {isArabic ? 'مقارنة الشركات' : 'Company Comparison'}
+            {t('reports.companyComparison.title')}
           </CardTitle>
 
           {/* Metric Selector */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="rounded-xl gap-2">
-                {isArabic ? 'المؤشرات' : 'Metrics'}
+                {t('reports.companyComparison.metrics')}
                 <Badge variant="secondary">{selectedMetrics.length}</Badge>
                 <ChevronDown className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align={isArabic ? 'end' : 'start'} className="w-56">
-              <DropdownMenuLabel>{isArabic ? 'اختر المؤشرات' : 'Select Metrics'}</DropdownMenuLabel>
+              <DropdownMenuLabel>{t('reports.companyComparison.selectMetrics')}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {AVAILABLE_METRICS.map((metric) => (
                 <DropdownMenuCheckboxItem
@@ -224,7 +224,7 @@ export function CompanyComparisonChart({
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {activeComparison.total !== undefined && (
                   <div className="bg-blue-50 rounded-2xl p-4 border border-blue-100">
-                    <div className="text-xs text-blue-600 mb-1">{isArabic ? 'الإجمالي' : 'Total'}</div>
+                    <div className="text-xs text-blue-600 mb-1">{t('reports.companyComparison.total')}</div>
                     <div className="text-xl font-bold text-blue-900">
                       {formatValue(activeComparison.total, activeComparison.unit)}
                     </div>
@@ -232,7 +232,7 @@ export function CompanyComparisonChart({
                 )}
                 {activeComparison.average !== undefined && (
                   <div className="bg-purple-50 rounded-2xl p-4 border border-purple-100">
-                    <div className="text-xs text-purple-600 mb-1">{isArabic ? 'المتوسط' : 'Average'}</div>
+                    <div className="text-xs text-purple-600 mb-1">{t('reports.companyComparison.average')}</div>
                     <div className="text-xl font-bold text-purple-900">
                       {formatValue(activeComparison.average, activeComparison.unit)}
                     </div>
@@ -240,7 +240,7 @@ export function CompanyComparisonChart({
                 )}
                 {activeComparison.median !== undefined && (
                   <div className="bg-emerald-50 rounded-2xl p-4 border border-emerald-100">
-                    <div className="text-xs text-emerald-600 mb-1">{isArabic ? 'الوسيط' : 'Median'}</div>
+                    <div className="text-xs text-emerald-600 mb-1">{t('reports.companyComparison.median')}</div>
                     <div className="text-xl font-bold text-emerald-900">
                       {formatValue(activeComparison.median, activeComparison.unit)}
                     </div>
@@ -252,7 +252,7 @@ export function CompanyComparisonChart({
             {/* Bar Chart */}
             <div className="space-y-3">
               <h3 className="text-sm font-bold text-slate-700">
-                {isArabic ? 'مخطط المقارنة' : 'Comparison Chart'}
+                {t('reports.companyComparison.comparisonChart')}
               </h3>
               <div className="space-y-2">
                 {activeComparison.byCompany
@@ -306,24 +306,24 @@ export function CompanyComparisonChart({
             {/* Ranking Table */}
             <div className="space-y-3">
               <h3 className="text-sm font-bold text-slate-700">
-                {isArabic ? 'جدول الترتيب' : 'Ranking Table'}
+                {t('reports.companyComparison.rankingTable')}
               </h3>
               <div className="rounded-2xl border border-slate-100 overflow-hidden">
                 <table className="w-full">
                   <thead className="bg-slate-50 border-b border-slate-100">
                     <tr>
                       <th className="text-start px-4 py-3 text-xs font-bold text-slate-600">
-                        {isArabic ? 'الترتيب' : 'Rank'}
+                        {t('reports.companyComparison.rank')}
                       </th>
                       <th className="text-start px-4 py-3 text-xs font-bold text-slate-600">
-                        {isArabic ? 'الشركة' : 'Company'}
+                        {t('reports.companyComparison.company')}
                       </th>
                       <th className="text-end px-4 py-3 text-xs font-bold text-slate-600">
                         {getMetricLabel(activeMetric)}
                       </th>
                       {activeComparison.byCompany.some((c) => c.percentageOfTotal !== undefined) && (
                         <th className="text-end px-4 py-3 text-xs font-bold text-slate-600">
-                          {isArabic ? 'النسبة' : '% of Total'}
+                          {t('reports.companyComparison.percentOfTotal')}
                         </th>
                       )}
                     </tr>

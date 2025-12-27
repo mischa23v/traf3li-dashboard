@@ -37,11 +37,12 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useCreateItem, useItemGroups, useUnitsOfMeasure } from '@/hooks/use-inventory'
 import type { CreateItemData, ItemType, ItemStatus, ValuationMethod } from '@/types/inventory'
 import { InventorySidebar } from './inventory-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.inventory', href: '/dashboard/inventory' },
-  { title: 'inventory.createItem', href: '/dashboard/inventory/create' },
+  { title: 'sidebar.nav.inventory', href: ROUTES.dashboard.inventory.list },
+  { title: 'inventory.createItem', href: ROUTES.dashboard.inventory.create },
 ]
 
 export function CreateItemView() {
@@ -104,7 +105,7 @@ export function CreateItemView() {
 
     try {
       await createItemMutation.mutateAsync(formData)
-      navigate({ to: '/dashboard/inventory' })
+      navigate({ to: ROUTES.dashboard.inventory.list })
     } catch (error) {
       // Error handled by mutation
     }
@@ -448,7 +449,7 @@ export function CreateItemView() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate({ to: '/dashboard/inventory' })}
+                  onClick={() => navigate({ to: ROUTES.dashboard.inventory.list })}
                   className="rounded-xl"
                 >
                   <X className="w-4 h-4 ml-2" />

@@ -40,6 +40,7 @@ import {
   DollarSign,
   AlertTriangle,
 } from 'lucide-react'
+import { ROUTES } from '@/constants/routes'
 
 // Case categories
 const CASE_CATEGORIES = [
@@ -85,12 +86,12 @@ export function CasesKanbanView() {
 
   // Handle card click
   const handleCardClick = (card: any) => {
-    navigate({ to: `/dashboard/cases/${card._id}` as any })
+    navigate({ to: ROUTES.dashboard.cases.detail(card._id) as any })
   }
 
   const topNav = [
     { title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },
-    { title: t('nav.cases', 'القضايا'), href: '/dashboard/cases', isActive: true },
+    { title: t('nav.cases', 'القضايا'), href: ROUTES.dashboard.cases.list, isActive: true },
   ]
 
   return (
@@ -143,7 +144,7 @@ export function CasesKanbanView() {
           type="cases"
           hideButtons={true}
         >
-          <Link to="/dashboard/cases/new">
+          <Link to={ROUTES.dashboard.cases.new}>
             <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-10 px-5 font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm">
               <Plus className="ms-2 h-4 w-4" />
               {t('cases.newCase', 'قضية جديدة')}
@@ -181,7 +182,7 @@ export function CasesKanbanView() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate({ to: '/dashboard/cases' as any })}
+                onClick={() => navigate({ to: ROUTES.dashboard.cases.list as any })}
                 className="rounded-lg px-3"
               >
                 <List className="h-4 w-4 ms-2" />

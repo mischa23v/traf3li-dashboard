@@ -30,6 +30,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   DropdownMenu,
@@ -108,10 +109,10 @@ export function LeadsListView() {
   }, [selectedLeadIds, deleteLead])
 
   const topNav = [
-    { title: t('sidebar.nav.leads'), href: '/dashboard/crm/leads', isActive: true },
-    { title: t('sidebar.nav.pipeline'), href: '/dashboard/crm/pipeline', isActive: false },
-    { title: t('sidebar.nav.referrals'), href: '/dashboard/crm/referrals', isActive: false },
-    { title: t('sidebar.nav.activities'), href: '/dashboard/crm/activities', isActive: false },
+    { title: t('sidebar.nav.leads'), href: ROUTES.dashboard.crm.leads.list, isActive: true },
+    { title: t('sidebar.nav.pipeline'), href: ROUTES.dashboard.crm.pipeline, isActive: false },
+    { title: t('sidebar.nav.referrals'), href: ROUTES.dashboard.crm.referrals.list, isActive: false },
+    { title: t('sidebar.nav.activities'), href: ROUTES.dashboard.crm.activities.list, isActive: false },
   ]
 
   const statusTabs = [
@@ -250,7 +251,7 @@ export function LeadsListView() {
                     </h3>
                     <p className="text-slate-500 mb-4">{t('leads.startAddingLead')}</p>
                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                      <Link to="/dashboard/crm/leads/new">
+                      <Link to={ROUTES.dashboard.crm.leads.new}>
                         <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                         {t('leads.newLead')}
                       </Link>
@@ -335,7 +336,7 @@ export function LeadsListView() {
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem asChild>
-                                  <Link to={`/dashboard/crm/leads/${lead._id}`}>
+                                  <Link to={ROUTES.dashboard.crm.leads.detail(lead._id)}>
                                     {t('common.viewDetails')}
                                   </Link>
                                 </DropdownMenuItem>
@@ -387,7 +388,7 @@ export function LeadsListView() {
                                 </div>
                               )}
                             </div>
-                            <Link to={`/dashboard/crm/leads/${lead._id}`}>
+                            <Link to={ROUTES.dashboard.crm.leads.detail(lead._id)}>
                               <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
                                 {t('common.viewDetails')}
                               </Button>

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { ROUTES } from '@/constants/routes'
 import {
     Download, Filter, Calendar, TrendingUp, Clock,
     Users, DollarSign, AlertCircle, Target, BarChart3,
@@ -88,11 +89,11 @@ export function LeadConversionTimeReport() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/crm/overview', isActive: false },
-        { title: 'العملاء المحتملون', href: '/dashboard/crm/leads', isActive: false },
-        { title: 'الأنشطة', href: '/dashboard/crm/activities', isActive: false },
-        { title: 'الإحالات', href: '/dashboard/crm/referrals', isActive: false },
-        { title: 'التقارير', href: '/dashboard/crm/reports', isActive: true },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.crm.pipeline, isActive: false },
+        { title: 'العملاء المحتملون', href: ROUTES.dashboard.crm.leads.list, isActive: false },
+        { title: 'الأنشطة', href: ROUTES.dashboard.crm.activities.list, isActive: false },
+        { title: 'الإحالات', href: ROUTES.dashboard.crm.referrals.list, isActive: false },
+        { title: 'التقارير', href: ROUTES.dashboard.crm.reports.list, isActive: true },
     ]
 
     // Mock data for development - will be replaced by API

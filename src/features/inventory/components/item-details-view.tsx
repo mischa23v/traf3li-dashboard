@@ -55,10 +55,11 @@ import {
 import { useItem, useItemStock, useDeleteItem, useStockLedger } from '@/hooks/use-inventory'
 import type { ItemStatus, ItemType } from '@/types/inventory'
 import { InventorySidebar } from './inventory-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.inventory', href: '/dashboard/inventory' },
+  { title: 'sidebar.nav.inventory', href: ROUTES.dashboard.inventory.list },
 ]
 
 export function ItemDetailsView() {
@@ -73,7 +74,7 @@ export function ItemDetailsView() {
 
   const handleDelete = async () => {
     await deleteItemMutation.mutateAsync(itemId)
-    navigate({ to: '/dashboard/inventory' })
+    navigate({ to: ROUTES.dashboard.inventory.list })
   }
 
   const getStatusBadge = (status: ItemStatus) => {
@@ -145,7 +146,7 @@ export function ItemDetailsView() {
             <CardContent className="p-12 text-center">
               <Package className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium mb-2">{t('inventory.itemNotFound', 'الصنف غير موجود')}</h3>
-              <Button onClick={() => navigate({ to: '/dashboard/inventory' })} className="rounded-xl">
+              <Button onClick={() => navigate({ to: ROUTES.dashboard.inventory.list })} className="rounded-xl">
                 <ArrowRight className="w-4 h-4 ml-2" />
                 {t('inventory.backToList', 'العودة للقائمة')}
               </Button>

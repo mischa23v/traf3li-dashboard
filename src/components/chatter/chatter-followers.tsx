@@ -107,7 +107,7 @@ export function ChatterFollowers({
         <div className="flex items-center gap-2">
           <Users className="h-5 w-5 text-muted-foreground" />
           <h3 className="font-semibold">
-            {isArabic ? 'المتابعون' : 'Followers'}
+            {t('common.followers')}
           </h3>
           <Badge variant="secondary">{followers.length}</Badge>
         </div>
@@ -121,12 +121,12 @@ export function ChatterFollowers({
           {isFollowing ? (
             <>
               <UserMinus className="h-4 w-4 me-2" />
-              {isArabic ? 'إلغاء المتابعة' : 'Unfollow'}
+              {t('common.unfollow')}
             </>
           ) : (
             <>
               <UserPlus className="h-4 w-4 me-2" />
-              {isArabic ? 'متابعة' : 'Follow'}
+              {t('common.follow')}
             </>
           )}
         </Button>
@@ -138,12 +138,10 @@ export function ChatterFollowers({
           <div className="flex flex-col items-center justify-center p-8 text-center">
             <Users className="h-12 w-12 text-muted-foreground mb-3" />
             <p className="text-sm text-muted-foreground">
-              {isArabic ? 'لا يوجد متابعون بعد' : 'No followers yet'}
+              {t('common.noFollowersYet')}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              {isArabic
-                ? 'أضف متابعين لإبقائهم على اطلاع'
-                : 'Add followers to keep them informed'}
+              {t('common.addFollowersToKeepInformed')}
             </p>
           </div>
         ) : (
@@ -169,38 +167,36 @@ export function ChatterFollowers({
             <DialogTrigger asChild>
               <Button variant="outline" size="sm" className="w-full">
                 <UserPlus className="h-4 w-4 me-2" />
-                {isArabic ? 'إضافة متابع' : 'Add Follower'}
+                {t('common.addFollower')}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
-                  {isArabic ? 'إضافة متابع' : 'Add Follower'}
+                  {t('common.addFollower')}
                 </DialogTitle>
                 <DialogDescription>
-                  {isArabic
-                    ? 'ابحث عن مستخدم لإضافته كمتابع'
-                    : 'Search for a user to add as a follower'}
+                  {t('common.searchForUserToAdd')}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="search-user">
-                    {isArabic ? 'بحث عن مستخدم' : 'Search User'}
+                    {t('common.searchUser')}
                   </Label>
                   <Input
                     id="search-user"
-                    placeholder={isArabic ? 'اسم أو بريد إلكتروني...' : 'Name or email...'}
+                    placeholder={t('common.nameOrEmail')}
                   />
                 </div>
                 {/* User search results would go here */}
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setShowAddDialog(false)}>
-                  {isArabic ? 'إلغاء' : 'Cancel'}
+                  {t('common.cancel')}
                 </Button>
                 <Button onClick={() => setShowAddDialog(false)}>
-                  {isArabic ? 'إضافة' : 'Add'}
+                  {t('common.add')}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -231,6 +227,7 @@ function FollowerItem({
   onRemove,
   onUpdatePreferences,
 }: FollowerItemProps) {
+  const { t: followerT } = useTranslation()
   const [showPreferences, setShowPreferences] = React.useState(false)
   const [emailNotif, setEmailNotif] = React.useState(
     follower.notificationPreferences?.email ?? true
@@ -273,7 +270,7 @@ function FollowerItem({
           </p>
           {isCurrentUser && (
             <Badge variant="outline" className="text-xs">
-              {isArabic ? 'أنت' : 'You'}
+              {followerT('common.you')}
             </Badge>
           )}
         </div>
@@ -307,7 +304,7 @@ function FollowerItem({
               <div className="space-y-4">
                 <div>
                   <h4 className="font-medium text-sm mb-3">
-                    {isArabic ? 'تفضيلات الإشعارات' : 'Notification Preferences'}
+                    {followerT('common.notificationPreferences')}
                   </h4>
                 </div>
 
@@ -316,7 +313,7 @@ function FollowerItem({
                     <div className="flex items-center gap-2">
                       <Mail className="h-4 w-4 text-muted-foreground" />
                       <Label htmlFor="email-notif" className="text-sm cursor-pointer">
-                        {isArabic ? 'بريد إلكتروني' : 'Email'}
+                        {followerT('common.email')}
                       </Label>
                     </div>
                     <Switch
@@ -330,7 +327,7 @@ function FollowerItem({
                     <div className="flex items-center gap-2">
                       <Bell className="h-4 w-4 text-muted-foreground" />
                       <Label htmlFor="push-notif" className="text-sm cursor-pointer">
-                        {isArabic ? 'إشعارات فورية' : 'Push Notifications'}
+                        {followerT('common.pushNotifications')}
                       </Label>
                     </div>
                     <Switch
@@ -344,7 +341,7 @@ function FollowerItem({
                     <div className="flex items-center gap-2">
                       <Smartphone className="h-4 w-4 text-muted-foreground" />
                       <Label htmlFor="sms-notif" className="text-sm cursor-pointer">
-                        {isArabic ? 'رسائل SMS' : 'SMS'}
+                        {followerT('common.sms')}
                       </Label>
                     </div>
                     <Switch
@@ -361,10 +358,10 @@ function FollowerItem({
                     size="sm"
                     onClick={() => setShowPreferences(false)}
                   >
-                    {isArabic ? 'إلغاء' : 'Cancel'}
+                    {followerT('common.cancel')}
                   </Button>
                   <Button size="sm" onClick={handleSavePreferences}>
-                    {isArabic ? 'حفظ' : 'Save'}
+                    {followerT('common.save')}
                   </Button>
                 </div>
               </div>

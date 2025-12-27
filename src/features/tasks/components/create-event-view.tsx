@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { ROUTES } from '@/constants/routes'
 import {
     ArrowRight, Save, Calendar, Clock,
     MapPin, Users, FileText, Briefcase, Loader2,
@@ -367,16 +368,16 @@ export function CreateEventView() {
 
         createEventMutation.mutate(eventData, {
             onSuccess: () => {
-                navigate({ to: '/dashboard/tasks/events' })
+                navigate({ to: ROUTES.dashboard.tasks.events.list })
             }
         })
     }
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'المهام', href: '/dashboard/tasks/list', isActive: false },
-        { title: 'التذكيرات', href: '/dashboard/tasks/reminders', isActive: false },
-        { title: 'الأحداث', href: '/dashboard/tasks/events', isActive: true },
+        { title: 'المهام', href: ROUTES.dashboard.tasks.list, isActive: false },
+        { title: 'التذكيرات', href: ROUTES.dashboard.tasks.reminders.list, isActive: false },
+        { title: 'الأحداث', href: ROUTES.dashboard.tasks.events.list, isActive: true },
     ]
 
     return (

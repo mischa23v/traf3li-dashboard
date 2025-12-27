@@ -3,6 +3,7 @@ import { useNavigate, Link, useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
 import authService from '@/services/authService'
+import { ROUTES } from '@/constants/routes'
 
 // ============================================
 // SVG ICONS
@@ -153,13 +154,13 @@ export function MagicLinkVerify() {
                   {/* Action Buttons */}
                   <div className="pt-4 space-y-3">
                     <Link
-                      to="/magic-link"
+                      to={ROUTES.auth.magicLink}
                       className="w-full h-12 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"
                     >
                       {t('magicLink.verify.requestNew', 'طلب رابط جديد | Request New Link')}
                     </Link>
                     <Link
-                      to="/sign-in"
+                      to={ROUTES.auth.signIn}
                       className="w-full h-12 rounded-xl border-2 border-slate-200 bg-white text-[#0f172a] font-medium hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-3"
                     >
                       {t('magicLink.verify.usePassword', 'تسجيل الدخول بكلمة المرور | Login with Password')}

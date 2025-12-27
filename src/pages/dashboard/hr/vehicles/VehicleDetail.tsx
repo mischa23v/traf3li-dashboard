@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   useVehicle,
   useVehicleLogs,
@@ -134,7 +135,7 @@ export function VehicleDetail() {
         <p className="text-sm text-muted-foreground">
           {isRTL ? 'فشل تحميل المركبة' : 'Failed to load vehicle'}
         </p>
-        <Button onClick={() => navigate({ to: '/dashboard/hr/vehicles' })} variant="outline">
+        <Button onClick={() => navigate({ to: ROUTES.dashboard.hr.vehicles.list })} variant="outline">
           <ArrowLeft className="mr-2 h-4 w-4" />
           {isRTL ? 'العودة' : 'Go Back'}
         </Button>
@@ -151,7 +152,7 @@ export function VehicleDetail() {
       {/* Header */}
       <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="flex h-16 items-center gap-4 px-6">
-          <Button variant="ghost" size="icon" onClick={() => navigate({ to: '/dashboard/hr/vehicles' })}>
+          <Button variant="ghost" size="icon" onClick={() => navigate({ to: ROUTES.dashboard.hr.vehicles.list })}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex items-center gap-3">

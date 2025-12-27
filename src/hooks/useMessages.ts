@@ -8,6 +8,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config'
 import messageService from '@/services/messageService'
 import type {
   ThreadMessage,
@@ -21,9 +22,9 @@ import type {
 } from '@/types/message'
 
 // ==================== Cache Configuration ====================
-const THREAD_STALE_TIME = 2 * 60 * 1000 // 2 minutes
-const THREAD_GC_TIME = 30 * 60 * 1000 // 30 minutes
-const MENTION_STALE_TIME = 5 * 60 * 1000 // 5 minutes
+const THREAD_STALE_TIME = CACHE_TIMES.SHORT // 2 minutes
+const THREAD_GC_TIME = CACHE_TIMES.GC_MEDIUM // 30 minutes
+const MENTION_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes
 
 // ==================== QUERY KEYS ====================
 

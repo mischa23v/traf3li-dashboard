@@ -21,7 +21,8 @@ import {
   useDocumentPreviewUrl,
 } from '@/hooks/useDocuments'
 import { type Document, type DocumentVersion } from '../data/schema'
-import { formatFileSize, MAX_FILE_SIZE, acceptedFileTypes } from '../data/data'
+import { formatFileSize, acceptedFileTypes } from '../data/data'
+import { FILE_LIMITS } from '@/config'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { ar, enUS } from 'date-fns/locale'
@@ -94,7 +95,7 @@ export function DocumentsVersionsDialog({
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
       const file = acceptedFiles[0]
-      if (file.size <= MAX_FILE_SIZE) {
+      if (file.size <= FILE_LIMITS.MAX_SIZE) {
         setSelectedFile(file)
       }
     }
@@ -104,7 +105,7 @@ export function DocumentsVersionsDialog({
     onDrop,
     accept: acceptedFileTypes,
     maxFiles: 1,
-    maxSize: MAX_FILE_SIZE,
+    maxSize: FILE_LIMITS.MAX_SIZE,
   })
 
   const formatDate = (dateString: string) => {

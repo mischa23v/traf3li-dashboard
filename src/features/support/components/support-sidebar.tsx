@@ -23,6 +23,7 @@ import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 
 import { useSupportStats, useTickets } from '@/hooks/use-support'
+import { ROUTES } from '@/constants/routes'
 
 export function SupportSidebar() {
   const { t } = useTranslation()
@@ -41,14 +42,14 @@ export function SupportSidebar() {
         </CardHeader>
         <CardContent className="space-y-2">
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/support/create">
+            <Link to={ROUTES.dashboard.support.create}>
               <Plus className="w-4 h-4 ml-2" />
               {t('support.newTicket', 'تذكرة جديدة')}
               <kbd className="mr-auto bg-muted px-2 py-0.5 rounded text-xs">⌘N</kbd>
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/support/sla/create">
+            <Link to={ROUTES.dashboard.support.sla.create}>
               <Clock className="w-4 h-4 ml-2" />
               {t('support.newSLA', 'SLA جديد')}
             </Link>
@@ -66,19 +67,19 @@ export function SupportSidebar() {
         </CardHeader>
         <CardContent className="space-y-2">
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/support">
+            <Link to={ROUTES.dashboard.support.list}>
               <MessageSquare className="w-4 h-4 ml-2" />
               {t('support.tickets', 'التذاكر')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/support/sla">
+            <Link to={ROUTES.dashboard.support.sla.list}>
               <Clock className="w-4 h-4 ml-2" />
               {t('support.sla', 'SLA')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/support/settings">
+            <Link to={ROUTES.dashboard.support.settings}>
               <Settings className="w-4 h-4 ml-2" />
               {t('support.settings', 'الإعدادات')}
             </Link>
@@ -160,7 +161,7 @@ export function SupportSidebar() {
               {urgentTickets.tickets.slice(0, 5).map((ticket) => (
                 <Link
                   key={ticket._id}
-                  to={`/dashboard/support/${ticket._id}`}
+                  to={ROUTES.dashboard.support.detail(ticket._id)}
                   className="flex items-center justify-between p-2 rounded-lg hover:bg-red-100 transition-colors"
                 >
                   <div className="flex items-center gap-2">

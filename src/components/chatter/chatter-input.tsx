@@ -180,13 +180,9 @@ export function ChatterInput({
           content={messageHtml}
           onChange={handleMessageChange}
           placeholder={
-            isArabic
-              ? isInternal
-                ? 'اكتب ملاحظة داخلية...'
-                : 'اكتب رسالة...'
-              : isInternal
-              ? 'Write an internal note...'
-              : 'Write a message...'
+            isInternal
+              ? t('common.writeInternalNote')
+              : t('common.writeMessage')
           }
           dir={isArabic ? 'rtl' : 'ltr'}
           minHeight="120px"
@@ -269,12 +265,12 @@ export function ChatterInput({
             {isInternal ? (
               <>
                 <StickyNote className="h-4 w-4" />
-                {isArabic ? 'ملاحظة داخلية' : 'Log Note'}
+                {t('common.logNote')}
               </>
             ) : (
               <>
                 <MessageSquare className="h-4 w-4" />
-                {isArabic ? 'رسالة' : 'Send Message'}
+                {t('common.sendMessage')}
               </>
             )}
           </Button>
@@ -313,12 +309,10 @@ export function ChatterInput({
               <PopoverContent className="w-80" align="start">
                 <div className="space-y-2">
                   <p className="text-sm font-medium">
-                    {isArabic ? 'الإشارة إلى المستخدمين' : 'Mention Users'}
+                    {t('common.mentionUsers')}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {isArabic
-                      ? 'اكتب @ متبوعًا باسم المستخدم للإشارة إليه في رسالتك'
-                      : 'Type @ followed by a name to mention someone in your message'}
+                    {t('common.mentionInstructions')}
                   </p>
                 </div>
               </PopoverContent>
@@ -334,13 +328,13 @@ export function ChatterInput({
         >
           {isLoading && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
           <Send className="h-4 w-4 me-2" />
-          {isArabic ? 'إرسال' : 'Send'}
+          {t('common.send')}
         </Button>
       </div>
 
       {/* Keyboard shortcut hint */}
       <div className="px-3 pb-2 text-xs text-muted-foreground">
-        {isArabic ? 'نصيحة: اضغط Ctrl+Enter للإرسال' : 'Tip: Press Ctrl+Enter to send'}
+        {t('common.tipPressCtrlEnterToSend')}
       </div>
     </div>
   )

@@ -40,6 +40,7 @@ import { useActiveSessions, useRevokeSession, useRevokeAllSessions } from '@/hoo
 import { formatLastActive, formatDevice, formatLocation } from '@/services/sessions.service'
 import { useAuthStore } from '@/stores/auth-store'
 import { toast } from 'sonner'
+import { ROUTES } from '@/constants/routes'
 
 export function SecurityPage() {
   const { t, i18n } = useTranslation()
@@ -85,9 +86,9 @@ export function SecurityPage() {
   const revokeAllSessionsMutation = useRevokeAllSessions()
 
   const topNav = [
-    { title: isRTL ? 'الملف الشخصي' : 'Profile', href: '/dashboard/settings/profile', isActive: false },
-    { title: isRTL ? 'الأمان' : 'Security', href: '/dashboard/settings/security', isActive: true },
-    { title: isRTL ? 'التفضيلات' : 'Preferences', href: '/dashboard/settings/preferences', isActive: false },
+    { title: isRTL ? 'الملف الشخصي' : 'Profile', href: ROUTES.dashboard.settings.profile, isActive: false },
+    { title: isRTL ? 'الأمان' : 'Security', href: ROUTES.dashboard.settings.security, isActive: true },
+    { title: isRTL ? 'التفضيلات' : 'Preferences', href: ROUTES.dashboard.settings.preferences, isActive: false },
   ]
 
   const handlePasswordChange = async () => {

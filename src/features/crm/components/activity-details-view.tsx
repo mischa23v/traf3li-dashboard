@@ -48,6 +48,7 @@ import type { ActivityType, ActivityStatus } from '@/types/crm'
 import { format } from 'date-fns'
 import { ar } from 'date-fns/locale'
 import { SalesSidebar } from './sales-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const typeLabels: Record<ActivityType, string> = {
   call: 'مكالمة',
@@ -133,7 +134,7 @@ export function ActivityDetailsView() {
   const handleDelete = () => {
     deleteActivityMutation.mutate(activityId, {
       onSuccess: () => {
-        navigate({ to: '/dashboard/crm/activities' })
+        navigate({ to: ROUTES.dashboard.crm.activities.list })
       },
     })
   }
@@ -146,10 +147,10 @@ export function ActivityDetailsView() {
   const activity = activityData?.activity
 
   const topNav = [
-    { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: false },
-    { title: 'مسار المبيعات', href: '/dashboard/crm/pipeline', isActive: false },
-    { title: 'الإحالات', href: '/dashboard/crm/referrals', isActive: false },
-    { title: 'سجل الأنشطة', href: '/dashboard/crm/activities', isActive: true },
+    { title: 'العملاء المحتملين', href: ROUTES.dashboard.crm.leads.list, isActive: false },
+    { title: 'مسار المبيعات', href: ROUTES.dashboard.crm.pipeline, isActive: false },
+    { title: 'الإحالات', href: ROUTES.dashboard.crm.referrals.list, isActive: false },
+    { title: 'سجل الأنشطة', href: ROUTES.dashboard.crm.activities.list, isActive: true },
   ]
 
   const TypeIcon = activity ? typeIcons[activity.type] || FileText : FileText
@@ -199,7 +200,7 @@ export function ActivityDetailsView() {
         {/* Breadcrumb / Back Link */}
         <div className="mb-6">
           <Link
-            to="/dashboard/crm/activities"
+            to={ROUTES.dashboard.crm.activities.list}
             className="inline-flex items-center text-slate-500 hover:text-navy transition-colors"
           >
             <ArrowLeft className="h-4 w-4 ms-2" />
@@ -263,7 +264,7 @@ export function ActivityDetailsView() {
                 لم يتم العثور على النشاط المطلوب
               </p>
               <Button asChild className="bg-blue-500 hover:bg-blue-600">
-                <Link to="/dashboard/crm/activities">العودة إلى القائمة</Link>
+                <Link to={ROUTES.dashboard.crm.activities.list}>العودة إلى القائمة</Link>
               </Button>
             </div>
           </div>

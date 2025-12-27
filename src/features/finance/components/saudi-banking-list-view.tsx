@@ -30,25 +30,25 @@ function SaudiBankingSidebar() {
                     <CardTitle className="text-lg font-bold text-navy">إجراءات سريعة</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                    <Link to="/dashboard/finance/saudi-banking/lean">
+                    <Link to={ROUTES.dashboard.finance.saudiBanking.lean}>
                         <Button variant="outline" className="w-full justify-start gap-3 h-12 rounded-xl hover:bg-emerald-50 hover:border-emerald-200">
                             <Landmark className="h-5 w-5 text-emerald-600" />
                             <span>ربط حساب بنكي</span>
                         </Button>
                     </Link>
-                    <Link to="/dashboard/finance/saudi-banking/wps/new">
+                    <Link to={ROUTES.dashboard.finance.saudiBanking.wps.new}>
                         <Button variant="outline" className="w-full justify-start gap-3 h-12 rounded-xl hover:bg-blue-50 hover:border-blue-200">
                             <FileText className="h-5 w-5 text-blue-600" />
                             <span>إنشاء ملف WPS</span>
                         </Button>
                     </Link>
-                    <Link to="/dashboard/finance/saudi-banking/sadad/pay">
+                    <Link to={ROUTES.dashboard.finance.saudiBanking.sadad.pay}>
                         <Button variant="outline" className="w-full justify-start gap-3 h-12 rounded-xl hover:bg-purple-50 hover:border-purple-200">
                             <Receipt className="h-5 w-5 text-purple-600" />
                             <span>دفع فاتورة سداد</span>
                         </Button>
                     </Link>
-                    <Link to="/dashboard/finance/saudi-banking/mudad">
+                    <Link to={ROUTES.dashboard.finance.saudiBanking.mudad}>
                         <Button variant="outline" className="w-full justify-start gap-3 h-12 rounded-xl hover:bg-orange-50 hover:border-orange-200">
                             <Calculator className="h-5 w-5 text-orange-600" />
                             <span>حاسبة التأمينات</span>

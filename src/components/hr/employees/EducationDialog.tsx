@@ -1,11 +1,7 @@
-import { useState, useEffect } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
-import { Loader2, CheckCircle, GraduationCap } from 'lucide-react'
+import { z } from 'zod'
+import { GraduationCap } from 'lucide-react'
+import { GenericFormDialog } from '@/components/generic-form-dialog'
+import type { FormSectionConfig } from '@/components/generic-form-dialog'
 import type { Education, EducationLevel } from '@/services/hrService'
 
 interface EducationDialogProps {
@@ -19,339 +15,274 @@ interface EducationDialogProps {
 const EDUCATION_LEVELS: { value: EducationLevel; labelAr: string; labelEn: string }[] = [
   { value: 'high_school', labelAr: 'ثانوية عامة', labelEn: 'High School' },
   { value: 'diploma', labelAr: 'دبلوم', labelEn: 'Diploma' },
-  { value: 'bachelors', labelAr: 'بكالوريوس', labelEn: 'Bachelor\'s' },
-  { value: 'masters', labelAr: 'ماجستير', labelEn: 'Master\'s' },
+  { value: 'bachelors', labelAr: 'بكالوريوس', labelEn: "Bachelor's" },
+  { value: 'masters', labelAr: 'ماجستير', labelEn: "Master's" },
   { value: 'doctorate', labelAr: 'دكتوراه', labelEn: 'Doctorate' },
   { value: 'professional', labelAr: 'مهنية', labelEn: 'Professional' },
 ]
 
 const COUNTRIES = [
-  'Saudi Arabia',
-  'United States',
-  'United Kingdom',
-  'Egypt',
-  'Jordan',
-  'Lebanon',
-  'UAE',
-  'Canada',
-  'Australia',
-  'Other',
+  { value: 'Saudi Arabia', labelAr: 'المملكة العربية السعودية', labelEn: 'Saudi Arabia' },
+  { value: 'United States', labelAr: 'الولايات المتحدة', labelEn: 'United States' },
+  { value: 'United Kingdom', labelAr: 'المملكة المتحدة', labelEn: 'United Kingdom' },
+  { value: 'Egypt', labelAr: 'مصر', labelEn: 'Egypt' },
+  { value: 'Jordan', labelAr: 'الأردن', labelEn: 'Jordan' },
+  { value: 'Lebanon', labelAr: 'لبنان', labelEn: 'Lebanon' },
+  { value: 'UAE', labelAr: 'الإمارات', labelEn: 'UAE' },
+  { value: 'Canada', labelAr: 'كندا', labelEn: 'Canada' },
+  { value: 'Australia', labelAr: 'أستراليا', labelEn: 'Australia' },
+  { value: 'Other', labelAr: 'أخرى', labelEn: 'Other' },
 ]
 
+// Zod schema for education form validation
+const educationSchema = z.object({
+  schoolUniversity: z.string().min(1, { message: 'School/University name (English) is required' }),
+  schoolUniversityAr: z.string().min(1, { message: 'اسم الجامعة/المدرسة (عربي) مطلوب' }),
+  qualification: z.string().min(1, { message: 'Qualification (English) is required' }),
+  qualificationAr: z.string().min(1, { message: 'المؤهل (عربي) مطلوب' }),
+  level: z.enum(['high_school', 'diploma', 'bachelors', 'masters', 'doctorate', 'professional']),
+  fieldOfStudy: z.string().min(1, { message: 'Field of study (English) is required' }),
+  fieldOfStudyAr: z.string().min(1, { message: 'التخصص (عربي) مطلوب' }),
+  yearOfPassing: z.number().min(1950).max(new Date().getFullYear() + 5),
+  classPercentage: z.number().min(0).max(100).optional(),
+  gpa: z.number().min(0).optional(),
+  gpaScale: z.number().optional(),
+  country: z.string().min(1, { message: 'Country is required' }),
+  verified: z.boolean(),
+})
+
+type EducationFormData = z.infer<typeof educationSchema>
+
 export function EducationDialog({ open, onOpenChange, education, onSave, isLoading }: EducationDialogProps) {
-  const [schoolUniversity, setSchoolUniversity] = useState('')
-  const [schoolUniversityAr, setSchoolUniversityAr] = useState('')
-  const [qualification, setQualification] = useState('')
-  const [qualificationAr, setQualificationAr] = useState('')
-  const [level, setLevel] = useState<EducationLevel>('bachelors')
-  const [fieldOfStudy, setFieldOfStudy] = useState('')
-  const [fieldOfStudyAr, setFieldOfStudyAr] = useState('')
-  const [yearOfPassing, setYearOfPassing] = useState<number>(new Date().getFullYear())
-  const [classPercentage, setClassPercentage] = useState<number | undefined>(undefined)
-  const [gpa, setGpa] = useState<number | undefined>(undefined)
-  const [gpaScale, setGpaScale] = useState<number | undefined>(4.0)
-  const [country, setCountry] = useState('Saudi Arabia')
-  const [verified, setVerified] = useState(false)
+  // Form sections configuration
+  const sections: FormSectionConfig[] = [
+    {
+      fields: [
+        {
+          name: 'schoolUniversityAr',
+          type: 'text',
+          label: 'School/University (Arabic)',
+          labelAr: 'الجامعة/المدرسة (عربي)',
+          placeholder: 'King Saud University',
+          placeholderAr: 'جامعة الملك سعود',
+          required: true,
+        },
+        {
+          name: 'schoolUniversity',
+          type: 'text',
+          label: 'School/University (English)',
+          labelAr: 'الجامعة/المدرسة (إنجليزي)',
+          placeholder: 'King Saud University',
+          placeholderAr: 'جامعة الملك سعود',
+          required: true,
+        },
+      ],
+      columns: 2,
+    },
+    {
+      fields: [
+        {
+          name: 'qualificationAr',
+          type: 'text',
+          label: 'Qualification (Arabic)',
+          labelAr: 'المؤهل (عربي)',
+          placeholder: 'Bachelor of Law',
+          placeholderAr: 'بكالوريوس القانون',
+          required: true,
+        },
+        {
+          name: 'qualification',
+          type: 'text',
+          label: 'Qualification (English)',
+          labelAr: 'المؤهل (إنجليزي)',
+          placeholder: 'Bachelor of Law',
+          placeholderAr: 'بكالوريوس القانون',
+          required: true,
+        },
+      ],
+      columns: 2,
+    },
+    {
+      fields: [
+        {
+          name: 'level',
+          type: 'select',
+          label: 'Education Level',
+          labelAr: 'المستوى التعليمي',
+          required: true,
+          options: EDUCATION_LEVELS.map((lvl) => ({
+            value: lvl.value,
+            label: lvl.labelEn,
+            labelAr: lvl.labelAr,
+          })),
+        },
+        {
+          name: 'yearOfPassing',
+          type: 'number',
+          label: 'Year of Graduation',
+          labelAr: 'سنة التخرج',
+          required: true,
+          min: 1950,
+          max: new Date().getFullYear() + 5,
+        },
+      ],
+      columns: 2,
+    },
+    {
+      fields: [
+        {
+          name: 'fieldOfStudyAr',
+          type: 'text',
+          label: 'Field of Study (Arabic)',
+          labelAr: 'التخصص (عربي)',
+          placeholder: 'Law',
+          placeholderAr: 'القانون',
+          required: true,
+        },
+        {
+          name: 'fieldOfStudy',
+          type: 'text',
+          label: 'Field of Study (English)',
+          labelAr: 'التخصص (إنجليزي)',
+          placeholder: 'Law',
+          placeholderAr: 'القانون',
+          required: true,
+        },
+      ],
+      columns: 2,
+    },
+    {
+      fields: [
+        {
+          name: 'country',
+          type: 'select',
+          label: 'Country',
+          labelAr: 'الدولة',
+          required: true,
+          options: COUNTRIES.map((c) => ({
+            value: c.value,
+            label: c.labelEn,
+            labelAr: c.labelAr,
+          })),
+          colSpan: 2,
+        },
+      ],
+      columns: 2,
+    },
+    {
+      title: 'Academic Performance',
+      titleAr: 'الأداء الأكاديمي',
+      fields: [
+        {
+          name: 'classPercentage',
+          type: 'number',
+          label: 'Percentage',
+          labelAr: 'النسبة المئوية',
+          placeholder: '85.5',
+          min: 0,
+          max: 100,
+          step: 0.01,
+        },
+        {
+          name: 'gpa',
+          type: 'number',
+          label: 'GPA',
+          labelAr: 'GPA',
+          placeholder: '3.75',
+          min: 0,
+          step: 0.01,
+        },
+        {
+          name: 'gpaScale',
+          type: 'select',
+          label: 'GPA Scale',
+          labelAr: 'سلم GPA',
+          options: [
+            { value: '4.0', label: '4.0', labelAr: '4.0' },
+            { value: '5.0', label: '5.0', labelAr: '5.0' },
+            { value: '10.0', label: '10.0', labelAr: '10.0' },
+          ],
+        },
+      ],
+      columns: 2,
+    },
+    {
+      title: 'Verification',
+      titleAr: 'التحقق',
+      fields: [
+        {
+          name: 'verified',
+          type: 'switch',
+          label: 'Qualification Verified',
+          labelAr: 'تم التحقق من المؤهل',
+          description: 'Has this qualification been verified?',
+          descriptionAr: 'هل تم التحقق من صحة هذا المؤهل؟',
+          colSpan: 2,
+        },
+      ],
+      columns: 2,
+    },
+  ]
 
-  useEffect(() => {
-    if (education) {
-      setSchoolUniversity(education.schoolUniversity)
-      setSchoolUniversityAr(education.schoolUniversityAr)
-      setQualification(education.qualification)
-      setQualificationAr(education.qualificationAr)
-      setLevel(education.level)
-      setFieldOfStudy(education.fieldOfStudy)
-      setFieldOfStudyAr(education.fieldOfStudyAr)
-      setYearOfPassing(education.yearOfPassing)
-      setClassPercentage(education.classPercentage)
-      setGpa(education.gpa)
-      setGpaScale(education.gpaScale)
-      setCountry(education.country)
-      setVerified(education.verified)
-    } else {
-      // Reset form
-      setSchoolUniversity('')
-      setSchoolUniversityAr('')
-      setQualification('')
-      setQualificationAr('')
-      setLevel('bachelors')
-      setFieldOfStudy('')
-      setFieldOfStudyAr('')
-      setYearOfPassing(new Date().getFullYear())
-      setClassPercentage(undefined)
-      setGpa(undefined)
-      setGpaScale(4.0)
-      setCountry('Saudi Arabia')
-      setVerified(false)
-    }
-  }, [education, open])
+  // Default values from education prop or initial values
+  const defaultValues: Partial<EducationFormData> = education
+    ? {
+        schoolUniversity: education.schoolUniversity,
+        schoolUniversityAr: education.schoolUniversityAr,
+        qualification: education.qualification,
+        qualificationAr: education.qualificationAr,
+        level: education.level,
+        fieldOfStudy: education.fieldOfStudy,
+        fieldOfStudyAr: education.fieldOfStudyAr,
+        yearOfPassing: education.yearOfPassing,
+        classPercentage: education.classPercentage,
+        gpa: education.gpa,
+        gpaScale: education.gpaScale,
+        country: education.country,
+        verified: education.verified,
+      }
+    : {
+        schoolUniversity: '',
+        schoolUniversityAr: '',
+        qualification: '',
+        qualificationAr: '',
+        level: 'bachelors' as EducationLevel,
+        fieldOfStudy: '',
+        fieldOfStudyAr: '',
+        yearOfPassing: new Date().getFullYear(),
+        classPercentage: undefined,
+        gpa: undefined,
+        gpaScale: 4.0,
+        country: 'Saudi Arabia',
+        verified: false,
+      }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-
+  // Handle form submission
+  const handleSubmit = (data: EducationFormData) => {
     const educationData: Omit<Education, 'educationId'> = {
-      schoolUniversity,
-      schoolUniversityAr,
-      qualification,
-      qualificationAr,
-      level,
-      fieldOfStudy,
-      fieldOfStudyAr,
-      yearOfPassing,
-      classPercentage,
-      gpa,
-      gpaScale,
-      country,
-      verified,
-      verificationDate: verified ? new Date().toISOString() : undefined,
+      ...data,
+      verificationDate: data.verified ? new Date().toISOString() : undefined,
     }
-
     onSave(educationData)
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-navy flex items-center gap-2">
-            <GraduationCap className="w-6 h-6 text-emerald-500" />
-            {education ? 'تعديل المؤهل التعليمي' : 'إضافة مؤهل تعليمي'}
-          </DialogTitle>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* School/University Name */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-navy font-medium">
-                الجامعة/المدرسة (عربي) <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                value={schoolUniversityAr}
-                onChange={(e) => setSchoolUniversityAr(e.target.value)}
-                placeholder="جامعة الملك سعود"
-                required
-                className="h-11 rounded-xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-navy font-medium">
-                الجامعة/المدرسة (إنجليزي) <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                value={schoolUniversity}
-                onChange={(e) => setSchoolUniversity(e.target.value)}
-                placeholder="King Saud University"
-                required
-                className="h-11 rounded-xl"
-                dir="ltr"
-              />
-            </div>
-          </div>
-
-          {/* Qualification */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-navy font-medium">
-                المؤهل (عربي) <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                value={qualificationAr}
-                onChange={(e) => setQualificationAr(e.target.value)}
-                placeholder="بكالوريوس القانون"
-                required
-                className="h-11 rounded-xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-navy font-medium">
-                المؤهل (إنجليزي) <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                value={qualification}
-                onChange={(e) => setQualification(e.target.value)}
-                placeholder="Bachelor of Law"
-                required
-                className="h-11 rounded-xl"
-                dir="ltr"
-              />
-            </div>
-          </div>
-
-          {/* Level */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-navy font-medium">
-                المستوى التعليمي <span className="text-red-500">*</span>
-              </Label>
-              <Select value={level} onValueChange={(v) => setLevel(v as EducationLevel)}>
-                <SelectTrigger className="h-11 rounded-xl">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {EDUCATION_LEVELS.map((lvl) => (
-                    <SelectItem key={lvl.value} value={lvl.value}>
-                      {lvl.labelAr}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label className="text-navy font-medium">
-                سنة التخرج <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                type="number"
-                value={yearOfPassing}
-                onChange={(e) => setYearOfPassing(parseInt(e.target.value) || new Date().getFullYear())}
-                min={1950}
-                max={new Date().getFullYear() + 5}
-                required
-                className="h-11 rounded-xl"
-              />
-            </div>
-          </div>
-
-          {/* Field of Study */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-navy font-medium">
-                التخصص (عربي) <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                value={fieldOfStudyAr}
-                onChange={(e) => setFieldOfStudyAr(e.target.value)}
-                placeholder="القانون"
-                required
-                className="h-11 rounded-xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-navy font-medium">
-                التخصص (إنجليزي) <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                value={fieldOfStudy}
-                onChange={(e) => setFieldOfStudy(e.target.value)}
-                placeholder="Law"
-                required
-                className="h-11 rounded-xl"
-                dir="ltr"
-              />
-            </div>
-          </div>
-
-          {/* Country */}
-          <div className="space-y-2">
-            <Label className="text-navy font-medium">
-              الدولة <span className="text-red-500">*</span>
-            </Label>
-            <Select value={country} onValueChange={setCountry}>
-              <SelectTrigger className="h-11 rounded-xl">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {COUNTRIES.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {c === 'Saudi Arabia' ? 'المملكة العربية السعودية' :
-                     c === 'United States' ? 'الولايات المتحدة' :
-                     c === 'United Kingdom' ? 'المملكة المتحدة' :
-                     c === 'Egypt' ? 'مصر' :
-                     c === 'Jordan' ? 'الأردن' :
-                     c === 'Lebanon' ? 'لبنان' :
-                     c === 'UAE' ? 'الإمارات' :
-                     c === 'Canada' ? 'كندا' :
-                     c === 'Australia' ? 'أستراليا' : 'أخرى'}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* GPA or Percentage */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label className="text-navy font-medium">النسبة المئوية</Label>
-              <Input
-                type="number"
-                value={classPercentage || ''}
-                onChange={(e) => setClassPercentage(e.target.value ? parseFloat(e.target.value) : undefined)}
-                min={0}
-                max={100}
-                step={0.01}
-                placeholder="85.5"
-                className="h-11 rounded-xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-navy font-medium">GPA</Label>
-              <Input
-                type="number"
-                value={gpa || ''}
-                onChange={(e) => setGpa(e.target.value ? parseFloat(e.target.value) : undefined)}
-                min={0}
-                step={0.01}
-                placeholder="3.75"
-                className="h-11 rounded-xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-navy font-medium">سلم GPA</Label>
-              <Select
-                value={gpaScale?.toString() || '4.0'}
-                onValueChange={(v) => setGpaScale(parseFloat(v))}
-              >
-                <SelectTrigger className="h-11 rounded-xl">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="4.0">4.0</SelectItem>
-                  <SelectItem value="5.0">5.0</SelectItem>
-                  <SelectItem value="10.0">10.0</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Verification */}
-          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-            <div>
-              <Label className="text-navy font-medium">تم التحقق من المؤهل</Label>
-              <p className="text-sm text-slate-500">هل تم التحقق من صحة هذا المؤهل؟</p>
-            </div>
-            <Switch checked={verified} onCheckedChange={setVerified} />
-          </div>
-
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="rounded-xl"
-            >
-              إلغاء
-            </Button>
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="h-4 w-4 ms-2 animate-spin" />
-                  جاري الحفظ...
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="h-4 w-4 ms-2" />
-                  حفظ
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <GenericFormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={education ? 'Edit Education' : 'Add Education'}
+      titleAr={education ? 'تعديل المؤهل التعليمي' : 'إضافة مؤهل تعليمي'}
+      schema={educationSchema}
+      sections={sections}
+      defaultValues={defaultValues}
+      onSubmit={handleSubmit}
+      isLoading={isLoading}
+      mode={education ? 'edit' : 'create'}
+      submitLabel={education ? 'Save' : 'Add'}
+      submitLabelAr={education ? 'حفظ' : 'إضافة'}
+      cancelLabel="Cancel"
+      cancelLabelAr="إلغاء"
+      maxWidth="3xl"
+    />
   )
 }

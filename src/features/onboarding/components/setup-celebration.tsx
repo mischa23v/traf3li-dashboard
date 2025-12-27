@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import Confetti from 'react-confetti'
 import { useWindowSize } from '@/hooks/useWindowSize'
+import { useTranslation } from 'react-i18next'
 
 interface SetupCelebrationProps {
   completedModules?: string[]
@@ -13,6 +14,7 @@ interface SetupCelebrationProps {
 export function SetupCelebration({ completedModules = [], onContinue }: SetupCelebrationProps) {
   const navigate = useNavigate()
   const { width, height } = useWindowSize()
+  const { t } = useTranslation()
 
   const handleContinue = () => {
     if (onContinue) {
@@ -25,29 +27,29 @@ export function SetupCelebration({ completedModules = [], onContinue }: SetupCel
   const nextSteps = [
     {
       icon: Users,
-      title: 'قم بدعوة فريقك',
-      description: 'أضف أعضاء فريقك ووزّع الصلاحيات',
-      action: 'دعوة',
+      title: t('onboarding.celebration.inviteTeam'),
+      description: t('onboarding.celebration.inviteTeamDesc'),
+      action: t('onboarding.celebration.invite'),
       route: '/dashboard/settings/team',
     },
     {
       icon: FileText,
-      title: 'ابدأ بإضافة البيانات',
-      description: 'أضف الموظفين، العملاء، والمشاريع',
-      action: 'إضافة',
+      title: t('onboarding.celebration.addData'),
+      description: t('onboarding.celebration.addDataDesc'),
+      action: t('onboarding.celebration.add'),
     },
     {
       icon: TrendingUp,
-      title: 'استكشف التقارير',
-      description: 'تابع أداء عملك من خلال التقارير والتحليلات',
-      action: 'عرض التقارير',
+      title: t('onboarding.celebration.exploreReports'),
+      description: t('onboarding.celebration.exploreReportsDesc'),
+      action: t('onboarding.celebration.viewReports'),
       route: '/dashboard/reports',
     },
     {
       icon: Settings,
-      title: 'خصص الإعدادات',
-      description: 'عدّل الإعدادات لتناسب احتياجاتك',
-      action: 'الإعدادات',
+      title: t('onboarding.celebration.customizeSettings'),
+      description: t('onboarding.celebration.customizeSettingsDesc'),
+      action: t('onboarding.celebration.settings'),
       route: '/dashboard/settings',
     },
   ]
@@ -72,22 +74,18 @@ export function SetupCelebration({ completedModules = [], onContinue }: SetupCel
 
         {/* Title */}
         <h1 className="text-5xl font-bold text-navy mb-4">
-          🎉 تهانينا!
-          <br />
-          <span className="text-3xl">Congratulations!</span>
+          🎉 {t('onboarding.celebration.congratulations')}
         </h1>
 
         {/* Subtitle */}
         <p className="text-xl text-slate-600 mb-8">
-          لقد أكملت إعداد جميع الوحدات بنجاح!
-          <br />
-          <span className="text-base">You've successfully completed all module setups!</span>
+          {t('onboarding.celebration.completed')}
         </p>
 
         {/* Completed Modules */}
         {completedModules.length > 0 && (
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 mb-8 text-right">
-            <h3 className="font-bold text-navy mb-4 text-center">الوحدات المكتملة</h3>
+            <h3 className="font-bold text-navy mb-4 text-center">{t('onboarding.celebration.completedModules')}</h3>
             <div className="flex flex-wrap gap-3 justify-center">
               {completedModules.map((module, index) => (
                 <div
@@ -104,7 +102,7 @@ export function SetupCelebration({ completedModules = [], onContinue }: SetupCel
 
         {/* Next Steps */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-navy mb-6">الخطوات التالية</h2>
+          <h2 className="text-2xl font-bold text-navy mb-6">{t('onboarding.celebration.nextSteps')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {nextSteps.map((step, index) => {
               const Icon = step.icon
@@ -148,10 +146,10 @@ export function SetupCelebration({ completedModules = [], onContinue }: SetupCel
             className="rounded-xl bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white shadow-2xl shadow-emerald-500/20 px-8 py-6 text-lg"
           >
             <Sparkles className="w-6 h-6 me-2" />
-            الانتقال إلى لوحة التحكم
+            {t('onboarding.celebration.goToDashboard')}
           </Button>
           <p className="text-sm text-slate-500">
-            يمكنك العودة لإعدادات أي وحدة في أي وقت من قائمة الإعدادات
+            {t('onboarding.celebration.returnToSettings')}
           </p>
         </div>
       </div>

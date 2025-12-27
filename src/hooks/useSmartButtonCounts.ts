@@ -10,14 +10,15 @@
  */
 
 import { useQuery, useQueries } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config'
 import apiClient from '@/lib/api'
 import type { EntityType, SmartButtonConfig } from '@/components/smart-button/smart-button-config'
 
 // ════════════════════════════════════════════════════════════
 // CACHE CONFIGURATION
 // ════════════════════════════════════════════════════════════
-const COUNTS_STALE_TIME = 5 * 60 * 1000 // 5 minutes
-const COUNTS_GC_TIME = 15 * 60 * 1000 // 15 minutes
+const COUNTS_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes
+const COUNTS_GC_TIME = 3 * CACHE_TIMES.MEDIUM // 15 minutes
 
 // ════════════════════════════════════════════════════════════
 // TYPES

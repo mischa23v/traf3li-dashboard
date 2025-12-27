@@ -22,7 +22,6 @@ export function ProgressiveDelay({
   onDelayComplete,
 }: ProgressiveDelayProps) {
   const { t, i18n } = useTranslation()
-  const isArabic = i18n.language === 'ar'
   const [remainingSeconds, setRemainingSeconds] = useState(initialDelay)
   const [progress, setProgress] = useState(0)
 
@@ -91,7 +90,7 @@ export function ProgressiveDelay({
               {t('auth.rateLimit.progressiveDelay.pleaseWait')}
             </div>
             <div className="text-xl font-bold tabular-nums text-blue-900 dark:text-blue-100" dir="ltr">
-              {formatLockoutTime(remainingSeconds, isArabic ? 'ar' : 'en')}
+              {formatLockoutTime(remainingSeconds, i18n.language)}
             </div>
           </div>
         </div>

@@ -7,6 +7,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
+import { CACHE_TIMES } from '@/config'
 import notificationService, {
   type Notification,
   type NotificationFilters,
@@ -16,10 +17,10 @@ import notificationService, {
 
 // ==================== Cache Configuration ====================
 // Optimized cache times for better performance
-const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
-const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
-const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
-const UNREAD_COUNT_REFETCH_INTERVAL = 2 * 60 * 1000 // 2 minutes (batched updates)
+const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
+const STATS_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour
+const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
+const UNREAD_COUNT_REFETCH_INTERVAL = CACHE_TIMES.REALTIME.UNREAD_COUNT // 2 minutes (batched updates)
 
 // Query keys
 export const notificationKeys = {

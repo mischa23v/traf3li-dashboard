@@ -52,6 +52,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   Card,
   CardContent,
@@ -233,7 +234,7 @@ const LeadCard = memo(function LeadCard({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem asChild>
-                <Link to={`/dashboard/crm/leads/${lead._id}`}>
+                <Link to={ROUTES.dashboard.crm.leads.detail(lead._id)}>
                   عرض التفاصيل
                 </Link>
               </DropdownMenuItem>
@@ -494,10 +495,10 @@ export function PipelineView() {
   }, [pipeline, selectedStageForAutomation, updateStage, refetch])
 
   const topNav = [
-    { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: false },
-    { title: 'مسار المبيعات', href: '/dashboard/crm/pipeline', isActive: true },
-    { title: 'الإحالات', href: '/dashboard/crm/referrals', isActive: false },
-    { title: 'سجل الأنشطة', href: '/dashboard/crm/activities', isActive: false },
+    { title: 'العملاء المحتملين', href: ROUTES.dashboard.crm.leads.list, isActive: false },
+    { title: 'مسار المبيعات', href: ROUTES.dashboard.crm.pipeline, isActive: true },
+    { title: 'الإحالات', href: ROUTES.dashboard.crm.referrals.list, isActive: false },
+    { title: 'سجل الأنشطة', href: ROUTES.dashboard.crm.activities.list, isActive: false },
   ]
 
   // Calculate stage totals

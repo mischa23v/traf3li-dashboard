@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { validationPatterns, getErrorMessage } from '@/utils/validation-patterns'
+import { fieldSchemas } from '@/lib/shared-schemas'
 
 // Contact type enum
 export const contactTypeSchema = z.enum([
@@ -36,11 +36,11 @@ export type ContactStatus = z.infer<typeof contactStatusSchema>
 
 // Arabic name schema
 const arabicNameSchema = z.object({
-  firstName: z.string().optional(),
-  fatherName: z.string().optional(),
-  grandfatherName: z.string().optional(),
-  familyName: z.string().optional(),
-  fullName: z.string().optional(),
+  firstName: fieldSchemas.nameOptional,
+  fatherName: fieldSchemas.nameOptional,
+  grandfatherName: fieldSchemas.nameOptional,
+  familyName: fieldSchemas.nameOptional,
+  fullName: fieldSchemas.nameOptional,
 }).optional()
 
 // Contact schema - matches backend API (all fields optional)
@@ -49,17 +49,17 @@ export const contactSchema = z.object({
   lawyerId: z.string().optional(),
   // Name fields
   salutation: z.string().optional(),
-  firstName: z.string().optional(),
-  middleName: z.string().optional(),
-  lastName: z.string().optional(),
-  preferredName: z.string().optional(),
+  firstName: fieldSchemas.firstNameOptional,
+  middleName: fieldSchemas.middleName,
+  lastName: fieldSchemas.lastNameOptional,
+  preferredName: fieldSchemas.preferredName,
   suffix: z.string().optional(),
   fullNameArabic: z.string().optional(),
   arabicName: arabicNameSchema,
   // Contact info
-  email: z.string().optional(),
-  phone: z.string().optional(),
-  alternatePhone: z.string().optional(),
+  email: fieldSchemas.email,
+  phone: fieldSchemas.phone,
+  alternatePhone: fieldSchemas.alternatePhone,
   // Classification
   type: contactTypeSchema.optional(),
   category: contactCategorySchema.optional(),
@@ -71,37 +71,37 @@ export const contactSchema = z.object({
   department: z.string().optional(),
   // Address
   address: z.string().optional(),
-  city: z.string().optional(),
-  district: z.string().optional(),
-  postalCode: z.string().optional(),
-  country: z.string().optional(),
+  city: fieldSchemas.city,
+  district: fieldSchemas.district,
+  postalCode: fieldSchemas.postalCode,
+  country: fieldSchemas.countryOptional,
   // Identification
-  nationalId: z.string().optional(),
-  iqamaNumber: z.string().optional(),
-  passportNumber: z.string().optional(),
-  passportCountry: z.string().optional(),
-  dateOfBirth: z.string().optional(),
+  nationalId: fieldSchemas.nationalId,
+  iqamaNumber: fieldSchemas.iqamaNumber,
+  passportNumber: fieldSchemas.passportNumber,
+  passportCountry: fieldSchemas.countryOptional,
+  dateOfBirth: fieldSchemas.dateOptional,
   nationality: z.string().optional(),
   // Communication preferences
-  preferredLanguage: z.string().optional(),
-  preferredContactMethod: z.string().optional(),
+  preferredLanguage: fieldSchemas.preferredLanguage,
+  preferredContactMethod: fieldSchemas.preferredContactMethod,
   // Status & flags
   status: contactStatusSchema.optional(),
-  priority: z.string().optional(),
-  vipStatus: z.boolean().optional(),
-  riskLevel: z.string().optional(),
-  isBlacklisted: z.boolean().optional(),
+  priority: fieldSchemas.priority,
+  vipStatus: fieldSchemas.isVip,
+  riskLevel: fieldSchemas.riskLevel,
+  isBlacklisted: fieldSchemas.isBlacklisted,
   blacklistReason: z.string().optional(),
   // Conflict check
-  conflictCheckStatus: z.string().optional(),
-  conflictNotes: z.string().optional(),
-  conflictCheckDate: z.string().optional(),
+  conflictCheckStatus: fieldSchemas.conflictCheckStatus,
+  conflictNotes: fieldSchemas.notes,
+  conflictCheckDate: fieldSchemas.dateOptional,
   // Other
-  notes: z.string().optional(),
-  tags: z.array(z.string()).optional(),
-  practiceAreas: z.array(z.string()).optional(),
-  linkedCases: z.array(z.string()).optional(),
-  linkedClients: z.array(z.string()).optional(),
+  notes: fieldSchemas.notes,
+  tags: fieldSchemas.tags,
+  practiceAreas: fieldSchemas.practiceAreas,
+  linkedCases: fieldSchemas.objectIdArray,
+  linkedClients: fieldSchemas.objectIdArray,
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
 })
@@ -110,38 +110,22 @@ export type Contact = z.infer<typeof contactSchema>
 
 // Create contact form schema (all optional for backend flexibility)
 export const createContactSchema = z.object({
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  email: z.string()
-    .optional()
-    .or(z.literal(''))
-    .refine(
-      (val) => !val || val === '' || validationPatterns.email.test(val),
-      { message: getErrorMessage('email', 'en') }
-    ),
-  phone: z.string()
-    .optional()
-    .refine(
-      (val) => !val || validationPatterns.phone.test(val),
-      { message: getErrorMessage('phone', 'en') }
-    ),
-  alternatePhone: z.string()
-    .optional()
-    .refine(
-      (val) => !val || validationPatterns.phone.test(val),
-      { message: getErrorMessage('phone', 'en') }
-    ),
+  firstName: fieldSchemas.firstNameOptional,
+  lastName: fieldSchemas.lastNameOptional,
+  email: fieldSchemas.email,
+  phone: fieldSchemas.phone,
+  alternatePhone: fieldSchemas.alternatePhone,
   title: z.string().optional(),
   company: z.string().optional(),
   type: contactTypeSchema.optional(),
   category: contactCategorySchema.optional(),
   primaryRole: contactCategorySchema.optional(),
   address: z.string().optional(),
-  city: z.string().optional(),
-  postalCode: z.string().optional(),
-  country: z.string().optional(),
-  notes: z.string().optional(),
-  tags: z.array(z.string()).optional(),
+  city: fieldSchemas.city,
+  postalCode: fieldSchemas.postalCode,
+  country: fieldSchemas.countryOptional,
+  notes: fieldSchemas.notes,
+  tags: fieldSchemas.tags,
   status: contactStatusSchema.optional(),
 })
 

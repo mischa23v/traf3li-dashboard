@@ -408,7 +408,7 @@ export function CreateClientView() {
             // National ID validation
             if (nationalId && !isValidNationalId(nationalId)) {
                 errors.push({
-                    field: isArabic ? 'رقم الهوية الوطنية' : 'National ID',
+                    field: t('clients.validationFields.nationalId'),
                     message: getErrorMessage('nationalId', isArabic ? 'ar' : 'en')
                 })
             }
@@ -416,7 +416,7 @@ export function CreateClientView() {
             // Commercial Registration validation
             if (crNumber && !isValidCrNumber(crNumber)) {
                 errors.push({
-                    field: isArabic ? 'رقم السجل التجاري' : 'Commercial Registration',
+                    field: t('clients.validationFields.crNumber'),
                     message: getErrorMessage('crNumber', isArabic ? 'ar' : 'en')
                 })
             }
@@ -424,7 +424,7 @@ export function CreateClientView() {
             // Legal representative phone validation
             if (legalRepPhone && !isValidPhone(legalRepPhone)) {
                 errors.push({
-                    field: isArabic ? 'هاتف الممثل القانوني' : 'Legal Rep. Phone',
+                    field: t('clients.validationFields.legalRepPhone'),
                     message: getErrorMessage('phone', isArabic ? 'ar' : 'en')
                 })
             }
@@ -433,7 +433,7 @@ export function CreateClientView() {
         // Phone validation (common for both types)
         if (phone && !isValidPhone(phone)) {
             errors.push({
-                field: isArabic ? 'رقم الهاتف' : 'Phone',
+                field: t('clients.validationFields.phone'),
                 message: getErrorMessage('phone', isArabic ? 'ar' : 'en')
             })
         }
@@ -441,7 +441,7 @@ export function CreateClientView() {
         // Alternate phone validation
         if (alternatePhone && !isValidPhone(alternatePhone)) {
             errors.push({
-                field: isArabic ? 'رقم الهاتف البديل' : 'Alternate Phone',
+                field: t('clients.validationFields.alternatePhone'),
                 message: getErrorMessage('phone', isArabic ? 'ar' : 'en')
             })
         }
@@ -449,7 +449,7 @@ export function CreateClientView() {
         // WhatsApp validation (if different from phone)
         if (!sameAsPhone && whatsapp && !isValidPhone(whatsapp)) {
             errors.push({
-                field: isArabic ? 'رقم الواتساب' : 'WhatsApp',
+                field: t('clients.validationFields.whatsapp'),
                 message: getErrorMessage('phone', isArabic ? 'ar' : 'en')
             })
         }
@@ -457,7 +457,7 @@ export function CreateClientView() {
         // Email validation
         if (email && !isValidEmail(email)) {
             errors.push({
-                field: isArabic ? 'البريد الإلكتروني' : 'Email',
+                field: t('clients.validationFields.email'),
                 message: getErrorMessage('email', isArabic ? 'ar' : 'en')
             })
         }
@@ -465,7 +465,7 @@ export function CreateClientView() {
         // Secondary email validation
         if (secondaryEmail && !isValidEmail(secondaryEmail)) {
             errors.push({
-                field: isArabic ? 'البريد الإلكتروني الثانوي' : 'Secondary Email',
+                field: t('clients.validationFields.secondaryEmail'),
                 message: getErrorMessage('email', isArabic ? 'ar' : 'en')
             })
         }
@@ -473,7 +473,7 @@ export function CreateClientView() {
         // VAT number validation (if registered)
         if (isVatRegistered && vatNumber && !isValidVatNumber(vatNumber)) {
             errors.push({
-                field: isArabic ? 'رقم الضريبة' : 'VAT Number',
+                field: t('clients.validationFields.vatNumber'),
                 message: getErrorMessage('vatNumber', isArabic ? 'ar' : 'en')
             })
         }
@@ -481,7 +481,7 @@ export function CreateClientView() {
         // Attorney phone validation
         if (hasPowerOfAttorney && attorneyPhone && !isValidPhone(attorneyPhone)) {
             errors.push({
-                field: isArabic ? 'هاتف الوكيل' : 'Attorney Phone',
+                field: t('clients.validationFields.attorneyPhone'),
                 message: getErrorMessage('phone', isArabic ? 'ar' : 'en')
             })
         }
@@ -489,7 +489,7 @@ export function CreateClientView() {
         // Attorney email validation
         if (hasPowerOfAttorney && attorneyEmail && !isValidEmail(attorneyEmail)) {
             errors.push({
-                field: isArabic ? 'بريد الوكيل' : 'Attorney Email',
+                field: t('clients.validationFields.attorneyEmail'),
                 message: getErrorMessage('email', isArabic ? 'ar' : 'en')
             })
         }
@@ -497,7 +497,7 @@ export function CreateClientView() {
         // Emergency contact phone validation
         if (emergencyPhone && !isValidPhone(emergencyPhone)) {
             errors.push({
-                field: isArabic ? 'هاتف جهة الاتصال الطارئة' : 'Emergency Contact Phone',
+                field: t('clients.validationFields.emergencyContactPhone'),
                 message: getErrorMessage('phone', isArabic ? 'ar' : 'en')
             })
         }
@@ -505,7 +505,7 @@ export function CreateClientView() {
         // Emergency contact email validation
         if (emergencyEmail && !isValidEmail(emergencyEmail)) {
             errors.push({
-                field: isArabic ? 'بريد جهة الاتصال الطارئة' : 'Emergency Contact Email',
+                field: t('clients.validationFields.emergencyContactEmail'),
                 message: getErrorMessage('email', isArabic ? 'ar' : 'en')
             })
         }

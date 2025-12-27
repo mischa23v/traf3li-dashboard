@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { ROUTES } from '@/constants/routes'
 import {
   useCompensatoryLeaveRequests,
   useCompensatoryLeaveStats,
@@ -85,60 +86,54 @@ import { formatDistanceToNow, format, differenceInDays } from 'date-fns'
 import { ar } from 'date-fns/locale'
 
 // Status configuration
-const STATUS_CONFIG: Record<
-  CompensatoryLeaveStatus,
-  { label: string; labelAr: string; variant: any; icon: any }
-> = {
+const getStatusConfig = (
+  t: any
+): Record<CompensatoryLeaveStatus, { label: string; variant: any; icon: any }> => ({
   draft: {
-    label: 'Draft',
-    labelAr: 'مسودة',
+    label: t('hr.leave.compensatory.status.draft', 'Draft'),
     variant: 'secondary',
     icon: Edit3,
   },
   pending_approval: {
-    label: 'Pending Approval',
-    labelAr: 'قيد الموافقة',
+    label: t('hr.leave.compensatory.status.pendingApproval', 'Pending Approval'),
     variant: 'warning',
     icon: Clock,
   },
   approved: {
-    label: 'Approved',
-    labelAr: 'موافق عليه',
+    label: t('hr.leave.compensatory.status.approved', 'Approved'),
     variant: 'success',
     icon: CheckCircle,
   },
   rejected: {
-    label: 'Rejected',
-    labelAr: 'مرفوض',
+    label: t('hr.leave.compensatory.status.rejected', 'Rejected'),
     variant: 'destructive',
     icon: XCircle,
   },
   expired: {
-    label: 'Expired',
-    labelAr: 'منتهي الصلاحية',
+    label: t('hr.leave.compensatory.status.expired', 'Expired'),
     variant: 'outline',
     icon: AlertTriangle,
   },
   used: {
-    label: 'Used',
-    labelAr: 'مستخدم',
+    label: t('hr.leave.compensatory.status.used', 'Used'),
     variant: 'default',
     icon: CheckCircle,
   },
   cancelled: {
-    label: 'Cancelled',
-    labelAr: 'ملغي',
+    label: t('hr.leave.compensatory.status.cancelled', 'Cancelled'),
     variant: 'outline',
     icon: X,
   },
-}
+})
 
 export default function CompensatoryLeave() {
   const { t, i18n } = useTranslation()
-  const isArabic = i18n.language === 'ar'
   const isRTL = i18n.language === 'ar'
   const navigate = useNavigate()
   const { toast } = useToast()
+
+  // Status configuration with translations
+  const STATUS_CONFIG = getStatusConfig(t)
 
   // State
   const [isSelectionMode, setIsSelectionMode] = useState(false)
@@ -251,21 +246,23 @@ export default function CompensatoryLeave() {
     try {
       await deleteRequestMutation.mutateAsync(requestToDelete)
       toast({
-        title: isArabic ? 'نجح الحذف' : 'Delete Successful',
-        description: isArabic
-          ? 'تم حذف طلب الإجازة التعويضية بنجاح'
-          : 'Compensatory leave request deleted successfully',
+        title: t('hr.leave.compensatory.deleteSuccess', 'Delete Successful'),
+        description: t(
+          'hr.leave.compensatory.deleteSuccessDesc',
+          'Compensatory leave request deleted successfully'
+        ),
       })
       setDeleteDialogOpen(false)
       setRequestToDelete(null)
     } catch (error: any) {
       toast({
-        title: isArabic ? 'فشل الحذف' : 'Delete Failed',
+        title: t('hr.leave.compensatory.deleteFailed', 'Delete Failed'),
         description:
           error.message ||
-          (isArabic
-            ? 'فشل حذف طلب الإجازة التعويضية'
-            : 'Failed to delete compensatory leave request'),
+          t(
+            'hr.leave.compensatory.deleteFailedDesc',
+            'Failed to delete compensatory leave request'
+          ),
         variant: 'destructive',
       })
     }
@@ -276,19 +273,20 @@ export default function CompensatoryLeave() {
     try {
       await bulkApproveMutation.mutateAsync({ ids: selectedIds })
       toast({
-        title: isArabic ? 'نجحت الموافقة' : 'Approval Successful',
-        description: isArabic
-          ? `تمت الموافقة على ${selectedIds.length} طلب`
-          : `${selectedIds.length} request(s) approved`,
+        title: t('hr.leave.compensatory.approvalSuccess', 'Approval Successful'),
+        description: t(
+          'hr.leave.compensatory.approvalSuccessDesc',
+          `${selectedIds.length} request(s) approved`
+        ),
       })
       setSelectedIds([])
       setIsSelectionMode(false)
     } catch (error: any) {
       toast({
-        title: isArabic ? 'فشلت الموافقة' : 'Approval Failed',
+        title: t('hr.leave.compensatory.approvalFailed', 'Approval Failed'),
         description:
           error.message ||
-          (isArabic ? 'فشلت الموافقة على الطلبات' : 'Failed to approve requests'),
+          t('hr.leave.compensatory.approvalFailedDesc', 'Failed to approve requests'),
         variant: 'destructive',
       })
     }
@@ -296,26 +294,27 @@ export default function CompensatoryLeave() {
 
   const handleBulkReject = async () => {
     const reason = prompt(
-      isArabic ? 'أدخل سبب الرفض:' : 'Enter rejection reason:'
+      t('hr.leave.compensatory.enterRejectionReason', 'Enter rejection reason:')
     )
     if (!reason) return
 
     try {
       await bulkRejectMutation.mutateAsync({ ids: selectedIds, reason })
       toast({
-        title: isArabic ? 'نجح الرفض' : 'Rejection Successful',
-        description: isArabic
-          ? `تم رفض ${selectedIds.length} طلب`
-          : `${selectedIds.length} request(s) rejected`,
+        title: t('hr.leave.compensatory.rejectionSuccess', 'Rejection Successful'),
+        description: t(
+          'hr.leave.compensatory.rejectionSuccessDesc',
+          `${selectedIds.length} request(s) rejected`
+        ),
       })
       setSelectedIds([])
       setIsSelectionMode(false)
     } catch (error: any) {
       toast({
-        title: isArabic ? 'فشل الرفض' : 'Rejection Failed',
+        title: t('hr.leave.compensatory.rejectionFailed', 'Rejection Failed'),
         description:
           error.message ||
-          (isArabic ? 'فشل رفض الطلبات' : 'Failed to reject requests'),
+          t('hr.leave.compensatory.rejectionFailedDesc', 'Failed to reject requests'),
         variant: 'destructive',
       })
     }
@@ -334,16 +333,14 @@ export default function CompensatoryLeave() {
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
       toast({
-        title: isArabic ? 'نجح التصدير' : 'Export Successful',
-        description: isArabic
-          ? 'تم تصدير البيانات بنجاح'
-          : 'Data exported successfully',
+        title: t('hr.leave.compensatory.exportSuccess', 'Export Successful'),
+        description: t('hr.leave.compensatory.exportSuccessDesc', 'Data exported successfully'),
       })
     } catch (error: any) {
       toast({
-        title: isArabic ? 'فشل التصدير' : 'Export Failed',
+        title: t('hr.leave.compensatory.exportFailed', 'Export Failed'),
         description:
-          error.message || (isArabic ? 'فشل تصدير البيانات' : 'Failed to export data'),
+          error.message || t('hr.leave.compensatory.exportFailedDesc', 'Failed to export data'),
         variant: 'destructive',
       })
     }
@@ -368,22 +365,23 @@ export default function CompensatoryLeave() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            {isArabic ? 'الإجازات التعويضية' : 'Compensatory Leave'}
+            {t('hr.leave.compensatory.title', 'Compensatory Leave')}
           </h1>
           <p className="text-muted-foreground mt-1">
-            {isArabic
-              ? 'إدارة طلبات الإجازات التعويضية للعمل الإضافي والعطل'
-              : 'Manage compensatory leave requests for overtime and holiday work'}
+            {t(
+              'hr.leave.compensatory.description',
+              'Manage compensatory leave requests for overtime and holiday work'
+            )}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={handleExport} disabled={exportMutation.isPending}>
             <FileDown className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-            {isArabic ? 'تصدير' : 'Export'}
+            {t('common.export', 'Export')}
           </Button>
-          <Button onClick={() => navigate({ to: '/dashboard/hr/leave/compensatory/new' })}>
+          <Button onClick={() => navigate({ to: ROUTES.dashboard.hr.leave.compensatory.new })}>
             <Plus className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-            {isArabic ? 'طلب إجازة تعويضية' : 'New Request'}
+            {t('hr.leave.compensatory.newRequest', 'New Request')}
           </Button>
         </div>
       </div>
@@ -394,7 +392,7 @@ export default function CompensatoryLeave() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                {isArabic ? 'إجمالي الطلبات' : 'Total Requests'}
+                {t('hr.leave.compensatory.stats.totalRequests', 'Total Requests')}
               </CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -402,28 +400,28 @@ export default function CompensatoryLeave() {
               <div className="text-2xl font-bold">{stats.totalRequests}</div>
               <p className="text-xs text-muted-foreground mt-1">
                 {stats.pendingApproval}{' '}
-                {isArabic ? 'قيد الموافقة' : 'pending approval'}
+                {t('hr.leave.compensatory.stats.pendingApproval', 'pending approval')}
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                {isArabic ? 'الأيام المكتسبة' : 'Days Earned'}
+                {t('hr.leave.compensatory.stats.daysEarned', 'Days Earned')}
               </CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalDaysEarned}</div>
               <p className="text-xs text-muted-foreground mt-1">
-                {stats.totalDaysUsed} {isArabic ? 'مستخدم' : 'used'}
+                {stats.totalDaysUsed} {t('hr.leave.compensatory.stats.used', 'used')}
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                {isArabic ? 'الرصيد المتبقي' : 'Remaining Balance'}
+                {t('hr.leave.compensatory.stats.remainingBalance', 'Remaining Balance')}
               </CardTitle>
               <CalendarClock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -431,21 +429,21 @@ export default function CompensatoryLeave() {
               <div className="text-2xl font-bold">{stats.totalDaysRemaining}</div>
               <p className="text-xs text-muted-foreground mt-1">
                 {((stats.utilizationRate || 0) * 100).toFixed(0)}%{' '}
-                {isArabic ? 'نسبة الاستخدام' : 'utilization rate'}
+                {t('hr.leave.compensatory.stats.utilizationRate', 'utilization rate')}
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                {isArabic ? 'ينتهي قريباً' : 'Expiring Soon'}
+                {t('hr.leave.compensatory.stats.expiringSoon', 'Expiring Soon')}
               </CardTitle>
               <AlertTriangle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.expiringInNext30Days}</div>
               <p className="text-xs text-muted-foreground mt-1">
-                {isArabic ? 'خلال 30 يوم' : 'within 30 days'}
+                {t('hr.leave.compensatory.stats.within30Days', 'within 30 days')}
               </p>
             </CardContent>
           </Card>
@@ -456,11 +454,11 @@ export default function CompensatoryLeave() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>{isArabic ? 'البحث والتصفية' : 'Search & Filter'}</CardTitle>
+            <CardTitle>{t('common.searchAndFilter', 'Search & Filter')}</CardTitle>
             {hasActiveFilters && (
               <Button variant="ghost" size="sm" onClick={clearFilters}>
                 <X className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                {isArabic ? 'مسح الفلاتر' : 'Clear Filters'}
+                {t('common.clearFilters', 'Clear Filters')}
               </Button>
             )}
           </div>
@@ -472,9 +470,10 @@ export default function CompensatoryLeave() {
                 className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-3 h-4 w-4 text-muted-foreground`}
               />
               <Input
-                placeholder={
-                  isArabic ? 'البحث بالموظف أو الرقم...' : 'Search by employee or number...'
-                }
+                placeholder={t(
+                  'hr.leave.compensatory.searchPlaceholder',
+                  'Search by employee or number...'
+                )}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={isRTL ? 'pr-9' : 'pl-9'}
@@ -482,42 +481,36 @@ export default function CompensatoryLeave() {
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger>
-                <SelectValue placeholder={isArabic ? 'الحالة' : 'Status'} />
+                <SelectValue placeholder={t('common.status', 'Status')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">
-                  {isArabic ? 'جميع الحالات' : 'All Statuses'}
-                </SelectItem>
-                {Object.entries(COMPENSATORY_STATUS_LABELS).map(([status, label]) => (
+                <SelectItem value="all">{t('common.allStatuses', 'All Statuses')}</SelectItem>
+                {Object.keys(COMPENSATORY_STATUS_LABELS).map((status) => (
                   <SelectItem key={status} value={status}>
-                    {isArabic ? label.ar : label.en}
+                    {t(`hr.leave.compensatory.statusFilter.${status}`)}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <Select value={reasonFilter} onValueChange={setReasonFilter}>
               <SelectTrigger>
-                <SelectValue placeholder={isArabic ? 'السبب' : 'Reason'} />
+                <SelectValue placeholder={t('hr.leave.compensatory.reason', 'Reason')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">
-                  {isArabic ? 'جميع الأسباب' : 'All Reasons'}
-                </SelectItem>
-                {Object.entries(WORK_REASON_LABELS).map(([reason, label]) => (
+                <SelectItem value="all">{t('hr.leave.compensatory.allReasons', 'All Reasons')}</SelectItem>
+                {Object.keys(WORK_REASON_LABELS).map((reason) => (
                   <SelectItem key={reason} value={reason}>
-                    {isArabic ? label.ar : label.en}
+                    {t(`hr.leave.compensatory.workReason.${reason}`)}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <Select value={yearFilter} onValueChange={setYearFilter}>
               <SelectTrigger>
-                <SelectValue placeholder={isArabic ? 'السنة' : 'Year'} />
+                <SelectValue placeholder={t('common.year', 'Year')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">
-                  {isArabic ? 'جميع السنوات' : 'All Years'}
-                </SelectItem>
+                <SelectItem value="all">{t('common.allYears', 'All Years')}</SelectItem>
                 {yearOptions.map((year) => (
                   <SelectItem key={year} value={year.toString()}>
                     {year}
@@ -527,23 +520,23 @@ export default function CompensatoryLeave() {
             </Select>
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger>
-                <SelectValue placeholder={isArabic ? 'الترتيب حسب' : 'Sort By'} />
+                <SelectValue placeholder={t('common.sortBy', 'Sort By')} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="workFromDate">
-                  {isArabic ? 'تاريخ العمل' : 'Work Date'}
+                  {t('hr.leave.compensatory.workDate', 'Work Date')}
                 </SelectItem>
                 <SelectItem value="leaveDaysEarned">
-                  {isArabic ? 'الأيام المكتسبة' : 'Days Earned'}
+                  {t('hr.leave.compensatory.daysEarned', 'Days Earned')}
                 </SelectItem>
                 <SelectItem value="validUntil">
-                  {isArabic ? 'تاريخ الانتهاء' : 'Expiry Date'}
+                  {t('hr.leave.compensatory.expiryDate', 'Expiry Date')}
                 </SelectItem>
                 <SelectItem value="createdAt">
-                  {isArabic ? 'تاريخ الطلب' : 'Request Date'}
+                  {t('hr.leave.compensatory.requestDate', 'Request Date')}
                 </SelectItem>
                 <SelectItem value="employeeName">
-                  {isArabic ? 'اسم الموظف' : 'Employee Name'}
+                  {t('common.employeeName', 'Employee Name')}
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -557,20 +550,20 @@ export default function CompensatoryLeave() {
           <CardContent className="flex items-center justify-between py-4">
             <div className="flex items-center gap-2">
               <span className="font-medium">
-                {selectedIds.length} {isArabic ? 'محدد' : 'selected'}
+                {selectedIds.length} {t('common.selected', 'selected')}
               </span>
               <Button variant="ghost" size="sm" onClick={() => setIsSelectionMode(false)}>
-                {isArabic ? 'إلغاء التحديد' : 'Cancel Selection'}
+                {t('common.cancelSelection', 'Cancel Selection')}
               </Button>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="default" size="sm" onClick={handleBulkApprove}>
                 <CheckCircle className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                {isArabic ? 'موافقة' : 'Approve'}
+                {t('common.approve', 'Approve')}
               </Button>
               <Button variant="destructive" size="sm" onClick={handleBulkReject}>
                 <XCircle className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                {isArabic ? 'رفض' : 'Reject'}
+                {t('common.reject', 'Reject')}
               </Button>
             </div>
           </CardContent>
@@ -588,22 +581,18 @@ export default function CompensatoryLeave() {
             </div>
           ) : isError ? (
             <div className="p-8 text-center text-destructive">
-              <p>{isArabic ? 'حدث خطأ في تحميل البيانات' : 'Error loading data'}</p>
+              <p>{t('common.errorLoadingData', 'Error loading data')}</p>
               <Button variant="outline" className="mt-4" onClick={() => refetch()}>
-                {isArabic ? 'إعادة المحاولة' : 'Retry'}
+                {t('common.retry', 'Retry')}
               </Button>
             </div>
           ) : requests.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
               <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>
-                {isArabic
-                  ? 'لا توجد طلبات إجازة تعويضية'
-                  : 'No compensatory leave requests'}
-              </p>
+              <p>{t('hr.leave.compensatory.noRequests', 'No compensatory leave requests')}</p>
               {hasActiveFilters && (
                 <Button variant="outline" className="mt-4" onClick={clearFilters}>
-                  {isArabic ? 'مسح الفلاتر' : 'Clear Filters'}
+                  {t('common.clearFilters', 'Clear Filters')}
                 </Button>
               )}
             </div>
@@ -616,20 +605,20 @@ export default function CompensatoryLeave() {
                       <Checkbox
                         checked={isAllSelected}
                         onCheckedChange={handleSelectAll}
-                        aria-label={isArabic ? 'تحديد الكل' : 'Select All'}
+                        aria-label={t('common.selectAll', 'Select All')}
                       />
                     </TableHead>
                   )}
-                  <TableHead>{isArabic ? 'رقم الطلب' : 'Request ID'}</TableHead>
-                  <TableHead>{isArabic ? 'الموظف' : 'Employee'}</TableHead>
-                  <TableHead>{isArabic ? 'القسم' : 'Department'}</TableHead>
-                  <TableHead>{isArabic ? 'السبب' : 'Reason'}</TableHead>
-                  <TableHead>{isArabic ? 'تاريخ العمل' : 'Work Date'}</TableHead>
-                  <TableHead>{isArabic ? 'الساعات' : 'Hours'}</TableHead>
-                  <TableHead>{isArabic ? 'الأيام المكتسبة' : 'Days Earned'}</TableHead>
-                  <TableHead>{isArabic ? 'الرصيد' : 'Balance'}</TableHead>
-                  <TableHead>{isArabic ? 'صلاحية حتى' : 'Valid Until'}</TableHead>
-                  <TableHead>{isArabic ? 'الحالة' : 'Status'}</TableHead>
+                  <TableHead>{t('hr.leave.compensatory.requestId', 'Request ID')}</TableHead>
+                  <TableHead>{t('common.employee', 'Employee')}</TableHead>
+                  <TableHead>{t('common.department', 'Department')}</TableHead>
+                  <TableHead>{t('hr.leave.compensatory.reason', 'Reason')}</TableHead>
+                  <TableHead>{t('hr.leave.compensatory.workDate', 'Work Date')}</TableHead>
+                  <TableHead>{t('hr.leave.compensatory.hours', 'Hours')}</TableHead>
+                  <TableHead>{t('hr.leave.compensatory.daysEarned', 'Days Earned')}</TableHead>
+                  <TableHead>{t('hr.leave.compensatory.balance', 'Balance')}</TableHead>
+                  <TableHead>{t('hr.leave.compensatory.validUntil', 'Valid Until')}</TableHead>
+                  <TableHead>{t('common.status', 'Status')}</TableHead>
                   <TableHead className="w-12"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -658,7 +647,7 @@ export default function CompensatoryLeave() {
                       <TableCell>
                         <div>
                           <div className="font-medium">
-                            {isArabic ? request.employeeNameAr : request.employeeName}
+                            {isRTL ? request.employeeNameAr : request.employeeName}
                           </div>
                           <div className="text-sm text-muted-foreground">
                             {request.employeeNumber}
@@ -666,12 +655,12 @@ export default function CompensatoryLeave() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        {isArabic
+                        {isRTL
                           ? request.departmentNameAr || request.departmentName
                           : request.departmentName || request.departmentNameAr}
                       </TableCell>
                       <TableCell>
-                        {isArabic
+                        {isRTL
                           ? WORK_REASON_LABELS[request.reason]?.ar || request.reason
                           : WORK_REASON_LABELS[request.reason]?.en || request.reason}
                       </TableCell>
@@ -679,27 +668,25 @@ export default function CompensatoryLeave() {
                         {format(new Date(request.workFromDate), 'dd/MM/yyyy')}
                       </TableCell>
                       <TableCell>
-                        {request.hoursWorked} {isArabic ? 'ساعة' : 'hours'}
+                        {request.hoursWorked} {t('hr.leave.compensatory.hoursUnit', 'hours')}
                       </TableCell>
                       <TableCell className="font-medium">
-                        {request.leaveDaysEarned} {isArabic ? 'يوم' : 'days'}
+                        {request.leaveDaysEarned} {t('hr.leave.compensatory.daysUnit', 'days')}
                       </TableCell>
                       <TableCell>
-                        {request.daysRemaining} {isArabic ? 'يوم' : 'days'}
+                        {request.daysRemaining} {t('hr.leave.compensatory.daysUnit', 'days')}
                       </TableCell>
                       <TableCell>
                         <Badge variant={getExpiryBadgeVariant(request.validUntil)}>
                           {daysUntilExpiry < 0
-                            ? isArabic
-                              ? 'منتهي'
-                              : 'Expired'
-                            : `${daysUntilExpiry} ${isArabic ? 'يوم' : 'days'}`}
+                            ? t('hr.leave.compensatory.expired', 'Expired')
+                            : `${daysUntilExpiry} ${t('hr.leave.compensatory.daysUnit', 'days')}`}
                         </Badge>
                       </TableCell>
                       <TableCell>
                         <Badge variant={statusConfig.variant as any}>
                           <StatusIcon className={`h-3 w-3 ${isRTL ? 'ml-1' : 'mr-1'}`} />
-                          {isArabic ? statusConfig.labelAr : statusConfig.label}
+                          {statusConfig.label}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -713,24 +700,24 @@ export default function CompensatoryLeave() {
                             <DropdownMenuItem
                               onClick={() =>
                                 navigate({
-                                  to: `/dashboard/hr/leave/compensatory/${request._id}`,
+                                  to: ROUTES.dashboard.hr.leave.compensatory.detail(request._id),
                                 })
                               }
                             >
                               <Eye className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                              {isArabic ? 'عرض التفاصيل' : 'View Details'}
+                              {t('common.viewDetails', 'View Details')}
                             </DropdownMenuItem>
                             {request.status === 'draft' && (
                               <>
                                 <DropdownMenuItem
                                   onClick={() =>
                                     navigate({
-                                      to: `/dashboard/hr/leave/compensatory/${request._id}/edit`,
+                                      to: ROUTES.dashboard.hr.leave.compensatory.edit(request._id),
                                     })
                                   }
                                 >
                                   <Edit3 className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                                  {isArabic ? 'تعديل' : 'Edit'}
+                                  {t('common.edit', 'Edit')}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
@@ -741,7 +728,7 @@ export default function CompensatoryLeave() {
                                   }}
                                 >
                                   <Trash2 className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                                  {isArabic ? 'حذف' : 'Delete'}
+                                  {t('common.delete', 'Delete')}
                                 </DropdownMenuItem>
                               </>
                             )}
@@ -761,9 +748,10 @@ export default function CompensatoryLeave() {
       {requestsData?.pagination && requestsData.pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            {isArabic
-              ? `عرض ${requests.length} من ${requestsData.pagination.total} نتيجة`
-              : `Showing ${requests.length} of ${requestsData.pagination.total} results`}
+            {t(
+              'common.showingResults',
+              `Showing ${requests.length} of ${requestsData.pagination.total} results`
+            )}
           </div>
           <div className="flex items-center gap-2">
             {/* Pagination buttons would go here */}
@@ -775,22 +763,21 @@ export default function CompensatoryLeave() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              {isArabic ? 'تأكيد الحذف' : 'Confirm Deletion'}
-            </AlertDialogTitle>
+            <AlertDialogTitle>{t('common.confirmDeletion', 'Confirm Deletion')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {isArabic
-                ? 'هل أنت متأكد من حذف طلب الإجازة التعويضية هذا؟ لا يمكن التراجع عن هذا الإجراء.'
-                : 'Are you sure you want to delete this compensatory leave request? This action cannot be undone.'}
+              {t(
+                'hr.leave.compensatory.deleteConfirmMessage',
+                'Are you sure you want to delete this compensatory leave request? This action cannot be undone.'
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{isArabic ? 'إلغاء' : 'Cancel'}</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground"
             >
-              {isArabic ? 'حذف' : 'Delete'}
+              {t('common.delete', 'Delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

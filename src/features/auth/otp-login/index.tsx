@@ -9,6 +9,7 @@ import {
   InputOTPSlot,
   InputOTPSeparator,
 } from '@/components/ui/input-otp'
+import { ROUTES } from '@/constants/routes'
 
 // ============================================
 // SVG ICONS
@@ -300,7 +301,7 @@ export function OtpLogin({ purpose = 'login' }: OtpLoginProps) {
 
                 {/* Password Login Link */}
                 <Link
-                  to="/sign-in"
+                  to={ROUTES.auth.signIn}
                   className="w-full h-12 rounded-xl border-2 border-slate-200 bg-white text-[#0f172a] font-medium hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-3"
                 >
                   {t('otpLogin.usePassword', 'تسجيل الدخول بكلمة المرور')}
@@ -422,7 +423,7 @@ export function OtpLogin({ purpose = 'login' }: OtpLoginProps) {
           {/* Sign Up Link */}
           <p className="text-center text-slate-500 mt-6">
             {t('otpLogin.noAccount', 'ليس لديك حساب؟')}{' '}
-            <Link to="/sign-up" className="text-emerald-600 hover:text-emerald-700 font-bold">
+            <Link to={ROUTES.auth.signUp} className="text-emerald-600 hover:text-emerald-700 font-bold">
               {t('otpLogin.signUp', 'إنشاء حساب جديد')}
             </Link>
           </p>

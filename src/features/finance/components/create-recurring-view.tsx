@@ -641,7 +641,7 @@ export function CreateRecurringView({ mode = 'create' }: CreateRecurringViewProp
                                 </div>
 
                                 <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
-                                    <Link to="/dashboard/finance/recurring">
+                                    <Link to={ROUTES.dashboard.finance.recurringInvoices.list}>
                                         <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
                                             إلغاء
                                         </Button>

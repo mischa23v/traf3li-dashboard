@@ -106,12 +106,10 @@ export function AttachmentVersionsDialog({
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <Clock className='h-5 w-5' />
-            {isArabic ? 'سجل النسخ' : 'Version History'}
+            {t('tasks.versionHistory')}
           </DialogTitle>
           <DialogDescription>
-            {isArabic
-              ? `سجل نسخ الملف: ${attachment.fileName}`
-              : `Version history for: ${attachment.fileName}`}
+            {t('tasks.versionHistoryFor', { fileName: attachment.fileName })}
           </DialogDescription>
         </DialogHeader>
 
@@ -121,10 +119,10 @@ export function AttachmentVersionsDialog({
             <div className='flex items-center justify-between mb-4'>
               <h3 className='font-medium flex items-center gap-2'>
                 <History className='h-4 w-4 text-primary' />
-                {isArabic ? 'النسخ المتوفرة' : 'Available Versions'}
+                {t('tasks.availableVersions')}
               </h3>
               <Badge variant='secondary' className='text-xs'>
-                {versions.length} {isArabic ? 'نسخة' : 'versions'}
+                {versions.length} {t('tasks.versions')}
               </Badge>
             </div>
             <ScrollArea className='h-[350px]'>
@@ -132,23 +130,21 @@ export function AttachmentVersionsDialog({
                 <div className='flex items-center justify-center py-8'>
                   <Loader2 className='h-6 w-6 animate-spin text-muted-foreground' />
                   <span className='me-2 text-muted-foreground'>
-                    {isArabic ? 'جاري التحميل...' : 'Loading...'}
+                    {t('tasks.loading')}
                   </span>
                 </div>
               ) : error ? (
                 <div className='text-center py-8 text-destructive'>
-                  {isArabic ? 'فشل في تحميل سجل النسخ' : 'Failed to load version history'}
+                  {t('tasks.failedToLoadVersionHistory')}
                 </div>
               ) : versions.length === 0 ? (
                 <div className='text-center py-8 text-slate-600'>
                   <GitBranch className='mx-auto h-12 w-12 mb-4 opacity-50' />
                   <p className='text-sm'>
-                    {isArabic ? 'لا توجد نسخ سابقة' : 'No previous versions'}
+                    {t('tasks.noPreviousVersions')}
                   </p>
                   <p className='text-xs mt-1'>
-                    {isArabic
-                      ? 'هذه هي النسخة الأولى من الملف'
-                      : 'This is the first version of the file'}
+                    {t('tasks.firstVersionOfFile')}
                   </p>
                 </div>
               ) : (
@@ -194,16 +190,12 @@ export function AttachmentVersionsDialog({
                                   <FileText className='h-4 w-4 text-primary' />
                                   <span className='font-semibold'>
                                     {version.isLatest
-                                      ? isArabic
-                                        ? 'النسخة الحالية'
-                                        : 'Current Version'
-                                      : isArabic
-                                      ? `نسخة ${versions.length - index}`
-                                      : `Version ${versions.length - index}`}
+                                      ? t('tasks.currentVersion')
+                                      : t('tasks.versionNumber', { number: versions.length - index })}
                                   </span>
                                   {version.isLatest && (
                                     <Badge className='bg-primary text-primary-foreground'>
-                                      {isArabic ? 'الأحدث' : 'Latest'}
+                                      {t('tasks.latest')}
                                     </Badge>
                                   )}
                                 </div>
@@ -241,7 +233,7 @@ export function AttachmentVersionsDialog({
                                     </Button>
                                   </TooltipTrigger>
                                   <TooltipContent>
-                                    {isArabic ? 'معاينة' : 'Preview'}
+                                    {t('tasks.preview')}
                                   </TooltipContent>
                                 </Tooltip>
                                 <Tooltip>
@@ -261,7 +253,7 @@ export function AttachmentVersionsDialog({
                                     </Button>
                                   </TooltipTrigger>
                                   <TooltipContent>
-                                    {isArabic ? 'تحميل' : 'Download'}
+                                    {t('tasks.download')}
                                   </TooltipContent>
                                 </Tooltip>
                               </div>
@@ -278,9 +270,7 @@ export function AttachmentVersionsDialog({
 
           {/* Help text */}
           <div className='text-xs text-slate-600 bg-muted/50 p-3 rounded-lg'>
-            {isArabic
-              ? 'لإضافة نسخة جديدة، قم برفع ملف بنفس الاسم. سيتم حفظ النسخة السابقة تلقائياً.'
-              : 'To add a new version, upload a file with the same name. The previous version will be saved automatically.'}
+            {t('tasks.versionHelpText')}
           </div>
         </div>
       </DialogContent>

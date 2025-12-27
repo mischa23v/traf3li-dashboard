@@ -10,6 +10,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { SidebarNav } from './components/sidebar-nav'
+import { ROUTES } from '@/constants/routes'
 
 export function Settings() {
   const { t } = useTranslation()
@@ -18,52 +19,52 @@ export function Settings() {
   const sidebarNavItems = useMemo(() => [
     {
       title: t('settings.tabs.profile'),
-      href: '/settings',
+      href: ROUTES.settings.index,
       icon: <UserCog size={18} />,
     },
     {
       title: t('settings.tabs.account'),
-      href: '/settings/account',
+      href: ROUTES.settings.account,
       icon: <Wrench size={18} />,
     },
     {
       title: t('settings.tabs.appearance'),
-      href: '/settings/appearance',
+      href: ROUTES.settings.appearance,
       icon: <Palette size={18} />,
     },
     {
       title: t('settings.tabs.notifications'),
-      href: '/settings/notifications',
+      href: ROUTES.settings.notifications,
       icon: <Bell size={18} />,
     },
     {
       title: t('settings.tabs.display'),
-      href: '/settings/display',
+      href: ROUTES.settings.display,
       icon: <Monitor size={18} />,
     },
     {
       title: t('settings.tabs.billing', 'Billing'),
-      href: '/settings/billing',
+      href: ROUTES.settings.billing,
       icon: <CreditCard size={18} />,
     },
     {
       title: t('settings.tabs.email', 'Email'),
-      href: '/settings/email',
+      href: ROUTES.settings.email,
       icon: <Mail size={18} />,
     },
     {
       title: t('settings.tabs.apiKeys'),
-      href: '/settings/api-keys',
+      href: ROUTES.settings.apiKeys,
       icon: <Key size={18} />,
     },
     {
       title: t('settings.tabs.webhooks', 'Webhooks'),
-      href: '/settings/webhooks',
+      href: ROUTES.settings.webhooks,
       icon: <Webhook size={18} />,
     },
     {
       title: t('settings.tabs.integrations'),
-      href: '/settings/integrations',
+      href: ROUTES.settings.integrations,
       icon: <Plug size={18} />,
     },
   ], [t])

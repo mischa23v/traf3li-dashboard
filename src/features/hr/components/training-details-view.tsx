@@ -18,9 +18,6 @@ import {
   useDeleteTraining,
 } from '@/hooks/useTraining'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Header } from '@/components/layout/header'
@@ -29,12 +26,11 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
+  ApproveTrainingDialog,
+  RejectTrainingDialog,
+  CompleteTrainingDialog,
+  TrainingEvaluationDialog,
+} from '@/components/hr/training/TrainingDialogs'
 import {
   Search, Bell, ArrowRight, User, Calendar, Clock,
   CheckCircle, XCircle, AlertCircle, Loader2, GraduationCap,
@@ -78,26 +74,6 @@ export function TrainingDetailsView() {
   const [showCompleteDialog, setShowCompleteDialog] = useState(false)
   const [showEvaluationDialog, setShowEvaluationDialog] = useState(false)
 
-  // Form states
-  const [approvalComments, setApprovalComments] = useState('')
-  const [rejectReason, setRejectReason] = useState('')
-  const [finalScore, setFinalScore] = useState<number>(0)
-  const [finalGrade, setFinalGrade] = useState('')
-  const [evaluationRatings, setEvaluationRatings] = useState({
-    overallSatisfaction: 0,
-    contentRelevance: 0,
-    contentQuality: 0,
-    instructorKnowledge: 0,
-    instructorEffectiveness: 0,
-    materialsQuality: 0,
-    recommendToOthers: 0,
-  })
-  const [evaluationFeedback, setEvaluationFeedback] = useState({
-    whatWasGood: '',
-    whatCouldImprove: '',
-    additionalComments: '',
-  })
-
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
     { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
@@ -118,24 +94,20 @@ export function TrainingDetailsView() {
     return colors[status]
   }
 
-  const handleApprove = async () => {
+  const handleApprove = async (data: { comments?: string }) => {
     if (!trainingId) return
     await approveMutation.mutateAsync({
       trainingId,
-      data: { comments: approvalComments },
+      data: { comments: data.comments },
     })
-    setShowApproveDialog(false)
-    setApprovalComments('')
   }
 
-  const handleReject = async () => {
-    if (!trainingId || !rejectReason) return
+  const handleReject = async (data: { reason: string }) => {
+    if (!trainingId) return
     await rejectMutation.mutateAsync({
       trainingId,
-      data: { reason: rejectReason },
+      data: { reason: data.reason },
     })
-    setShowRejectDialog(false)
-    setRejectReason('')
   }
 
   const handleStart = async () => {
@@ -143,17 +115,16 @@ export function TrainingDetailsView() {
     await startMutation.mutateAsync(trainingId)
   }
 
-  const handleComplete = async () => {
+  const handleComplete = async (data: { finalScore?: number; finalGrade?: string }) => {
     if (!trainingId) return
     await completeMutation.mutateAsync({
       trainingId,
       data: {
         passed: true,
-        finalScore,
-        finalGrade,
+        finalScore: data.finalScore,
+        finalGrade: data.finalGrade,
       },
     })
-    setShowCompleteDialog(false)
   }
 
   const handleIssueCertificate = async () => {
@@ -167,16 +138,38 @@ export function TrainingDetailsView() {
     })
   }
 
-  const handleSubmitEvaluation = async () => {
+  const handleSubmitEvaluation = async (data: {
+    overallSatisfaction: number
+    contentRelevance: number
+    contentQuality: number
+    instructorKnowledge: number
+    instructorEffectiveness: number
+    materialsQuality: number
+    recommendToOthers: number
+    whatWasGood?: string
+    whatCouldImprove?: string
+    additionalComments?: string
+  }) => {
     if (!trainingId) return
     await evaluationMutation.mutateAsync({
       trainingId,
       data: {
-        ratings: evaluationRatings,
-        openEndedFeedback: evaluationFeedback,
+        ratings: {
+          overallSatisfaction: data.overallSatisfaction,
+          contentRelevance: data.contentRelevance,
+          contentQuality: data.contentQuality,
+          instructorKnowledge: data.instructorKnowledge,
+          instructorEffectiveness: data.instructorEffectiveness,
+          materialsQuality: data.materialsQuality,
+          recommendToOthers: data.recommendToOthers,
+        },
+        openEndedFeedback: {
+          whatWasGood: data.whatWasGood,
+          whatCouldImprove: data.whatCouldImprove,
+          additionalComments: data.additionalComments,
+        },
       },
     })
-    setShowEvaluationDialog(false)
   }
 
   const handleDelete = async () => {
@@ -298,80 +291,22 @@ export function TrainingDetailsView() {
                 <div className="flex flex-wrap items-center gap-3">
                   {training.status === 'requested' && (
                     <>
-                      <Dialog open={showApproveDialog} onOpenChange={setShowApproveDialog}>
-                        <DialogTrigger asChild>
-                          <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
-                            <CheckCircle className="w-4 h-4 ms-2" />
-                            اعتماد
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>اعتماد طلب التدريب</DialogTitle>
-                          </DialogHeader>
-                          <div className="space-y-4">
-                            <div className="space-y-2">
-                              <Label>ملاحظات (اختياري)</Label>
-                              <Textarea
-                                value={approvalComments}
-                                onChange={(e) => setApprovalComments(e.target.value)}
-                                placeholder="أي ملاحظات على الاعتماد..."
-                                className="rounded-xl"
-                              />
-                            </div>
-                            <div className="flex justify-end gap-2">
-                              <Button variant="outline" onClick={() => setShowApproveDialog(false)} className="rounded-xl">
-                                إلغاء
-                              </Button>
-                              <Button
-                                onClick={handleApprove}
-                                disabled={approveMutation.isPending}
-                                className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
-                              >
-                                {approveMutation.isPending ? 'جاري الاعتماد...' : 'اعتماد'}
-                              </Button>
-                            </div>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
+                      <Button
+                        onClick={() => setShowApproveDialog(true)}
+                        className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
+                      >
+                        <CheckCircle className="w-4 h-4 ms-2" />
+                        اعتماد
+                      </Button>
 
-                      <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
-                        <DialogTrigger asChild>
-                          <Button variant="destructive" className="rounded-xl">
-                            <XCircle className="w-4 h-4 ms-2" />
-                            رفض
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>رفض طلب التدريب</DialogTitle>
-                          </DialogHeader>
-                          <div className="space-y-4">
-                            <div className="space-y-2">
-                              <Label>سبب الرفض <span className="text-red-500">*</span></Label>
-                              <Textarea
-                                value={rejectReason}
-                                onChange={(e) => setRejectReason(e.target.value)}
-                                placeholder="يرجى توضيح سبب الرفض..."
-                                className="rounded-xl"
-                              />
-                            </div>
-                            <div className="flex justify-end gap-2">
-                              <Button variant="outline" onClick={() => setShowRejectDialog(false)} className="rounded-xl">
-                                إلغاء
-                              </Button>
-                              <Button
-                                onClick={handleReject}
-                                disabled={!rejectReason || rejectMutation.isPending}
-                                variant="destructive"
-                                className="rounded-xl"
-                              >
-                                {rejectMutation.isPending ? 'جاري الرفض...' : 'رفض'}
-                              </Button>
-                            </div>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
+                      <Button
+                        onClick={() => setShowRejectDialog(true)}
+                        variant="destructive"
+                        className="rounded-xl"
+                      >
+                        <XCircle className="w-4 h-4 ms-2" />
+                        رفض
+                      </Button>
                     </>
                   )}
 
@@ -387,56 +322,13 @@ export function TrainingDetailsView() {
                   )}
 
                   {training.status === 'in_progress' && (
-                    <Dialog open={showCompleteDialog} onOpenChange={setShowCompleteDialog}>
-                      <DialogTrigger asChild>
-                        <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
-                          <CheckCircle className="w-4 h-4 ms-2" />
-                          إكمال التدريب
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>إكمال التدريب</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <Label>الدرجة النهائية</Label>
-                              <Input
-                                type="number"
-                                value={finalScore || ''}
-                                onChange={(e) => setFinalScore(Number(e.target.value))}
-                                placeholder="0"
-                                className="rounded-xl"
-                                min={0}
-                                max={100}
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label>التقدير</Label>
-                              <Input
-                                value={finalGrade}
-                                onChange={(e) => setFinalGrade(e.target.value)}
-                                placeholder="مثال: ممتاز"
-                                className="rounded-xl"
-                              />
-                            </div>
-                          </div>
-                          <div className="flex justify-end gap-2">
-                            <Button variant="outline" onClick={() => setShowCompleteDialog(false)} className="rounded-xl">
-                              إلغاء
-                            </Button>
-                            <Button
-                              onClick={handleComplete}
-                              disabled={completeMutation.isPending}
-                              className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
-                            >
-                              {completeMutation.isPending ? 'جاري الإكمال...' : 'إكمال'}
-                            </Button>
-                          </div>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                    <Button
+                      onClick={() => setShowCompleteDialog(true)}
+                      className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
+                    >
+                      <CheckCircle className="w-4 h-4 ms-2" />
+                      إكمال التدريب
+                    </Button>
                   )}
 
                   {training.status === 'completed' && !training.certificate?.issued && (
@@ -451,104 +343,14 @@ export function TrainingDetailsView() {
                   )}
 
                   {training.status === 'completed' && !training.evaluation?.evaluationCompleted && (
-                    <Dialog open={showEvaluationDialog} onOpenChange={setShowEvaluationDialog}>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" className="rounded-xl">
-                          <Star className="w-4 h-4 ms-2" />
-                          تقييم التدريب
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                        <DialogHeader>
-                          <DialogTitle>تقييم التدريب</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-6">
-                          <div className="grid grid-cols-2 gap-4">
-                            {[
-                              { key: 'overallSatisfaction', label: 'الرضا العام' },
-                              { key: 'contentRelevance', label: 'صلة المحتوى' },
-                              { key: 'contentQuality', label: 'جودة المحتوى' },
-                              { key: 'instructorKnowledge', label: 'معرفة المدرب' },
-                              { key: 'instructorEffectiveness', label: 'فعالية المدرب' },
-                              { key: 'materialsQuality', label: 'جودة المواد' },
-                              { key: 'recommendToOthers', label: 'التوصية للآخرين' },
-                            ].map((item) => (
-                              <div key={item.key} className="space-y-2">
-                                <Label>{item.label}</Label>
-                                <div className="flex gap-1">
-                                  {[1, 2, 3, 4, 5].map((star) => (
-                                    <button
-                                      key={star}
-                                      type="button"
-                                      onClick={() => setEvaluationRatings({
-                                        ...evaluationRatings,
-                                        [item.key]: star,
-                                      })}
-                                      className="p-1"
-                                    >
-                                      <Star
-                                        className={`w-6 h-6 ${
-                                          star <= evaluationRatings[item.key as keyof typeof evaluationRatings]
-                                            ? 'fill-amber-400 text-amber-400'
-                                            : 'text-slate-300'
-                                        }`}
-                                      />
-                                    </button>
-                                  ))}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                          <div className="space-y-4">
-                            <div className="space-y-2">
-                              <Label>ما الذي أعجبك؟</Label>
-                              <Textarea
-                                value={evaluationFeedback.whatWasGood}
-                                onChange={(e) => setEvaluationFeedback({
-                                  ...evaluationFeedback,
-                                  whatWasGood: e.target.value,
-                                })}
-                                className="rounded-xl"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label>ما الذي يمكن تحسينه؟</Label>
-                              <Textarea
-                                value={evaluationFeedback.whatCouldImprove}
-                                onChange={(e) => setEvaluationFeedback({
-                                  ...evaluationFeedback,
-                                  whatCouldImprove: e.target.value,
-                                })}
-                                className="rounded-xl"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label>ملاحظات إضافية</Label>
-                              <Textarea
-                                value={evaluationFeedback.additionalComments}
-                                onChange={(e) => setEvaluationFeedback({
-                                  ...evaluationFeedback,
-                                  additionalComments: e.target.value,
-                                })}
-                                className="rounded-xl"
-                              />
-                            </div>
-                          </div>
-                          <div className="flex justify-end gap-2">
-                            <Button variant="outline" onClick={() => setShowEvaluationDialog(false)} className="rounded-xl">
-                              إلغاء
-                            </Button>
-                            <Button
-                              onClick={handleSubmitEvaluation}
-                              disabled={evaluationMutation.isPending}
-                              className="bg-amber-500 hover:bg-amber-600 text-white rounded-xl"
-                            >
-                              {evaluationMutation.isPending ? 'جاري الإرسال...' : 'إرسال التقييم'}
-                            </Button>
-                          </div>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                    <Button
+                      onClick={() => setShowEvaluationDialog(true)}
+                      variant="outline"
+                      className="rounded-xl"
+                    >
+                      <Star className="w-4 h-4 ms-2" />
+                      تقييم التدريب
+                    </Button>
                   )}
                 </div>
               </CardContent>
@@ -1120,6 +922,35 @@ export function TrainingDetailsView() {
           <HRSidebar context="employees" />
         </div>
       </Main>
+
+      {/* Training Dialogs */}
+      <ApproveTrainingDialog
+        open={showApproveDialog}
+        onOpenChange={setShowApproveDialog}
+        onSubmit={handleApprove}
+        isLoading={approveMutation.isPending}
+      />
+
+      <RejectTrainingDialog
+        open={showRejectDialog}
+        onOpenChange={setShowRejectDialog}
+        onSubmit={handleReject}
+        isLoading={rejectMutation.isPending}
+      />
+
+      <CompleteTrainingDialog
+        open={showCompleteDialog}
+        onOpenChange={setShowCompleteDialog}
+        onSubmit={handleComplete}
+        isLoading={completeMutation.isPending}
+      />
+
+      <TrainingEvaluationDialog
+        open={showEvaluationDialog}
+        onOpenChange={setShowEvaluationDialog}
+        onSubmit={handleSubmitEvaluation}
+        isLoading={evaluationMutation.isPending}
+      />
     </>
   )
 }

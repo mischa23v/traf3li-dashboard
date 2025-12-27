@@ -6,6 +6,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -134,7 +135,7 @@ export function LeadScoringDashboard() {
 
   // Handlers
   const handleViewLead = (leadId: string) => {
-    navigate({ to: '/dashboard/crm/leads/$leadId', params: { leadId } })
+    navigate({ to: ROUTES.dashboard.crm.leads.detail(leadId) })
   }
 
   const handleRecalculateAll = () => {
@@ -173,9 +174,9 @@ export function LeadScoringDashboard() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'العملاء المحتملون', href: '/dashboard/crm/leads', isActive: false },
-    { title: 'تقييم العملاء', href: '/dashboard/crm/lead-scoring', isActive: true },
-    { title: 'الأنشطة', href: '/dashboard/crm/activities', isActive: false },
+    { title: 'العملاء المحتملون', href: ROUTES.dashboard.crm.leads.list, isActive: false },
+    { title: 'تقييم العملاء', href: ROUTES.dashboard.crm.leadScoring.list, isActive: true },
+    { title: 'الأنشطة', href: ROUTES.dashboard.crm.activities.list, isActive: false },
   ]
 
   return (
@@ -389,7 +390,7 @@ export function LeadScoringDashboard() {
                     <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد تقييمات</h3>
                     <p className="text-slate-500 mb-4">ابدأ بإضافة عملاء محتملين لرؤية تقييماتهم</p>
                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                      <Link to="/dashboard/crm/leads">
+                      <Link to={ROUTES.dashboard.crm.leads.list}>
                         <Users className="w-4 h-4 ms-2" aria-hidden="true" />
                         عرض العملاء
                       </Link>

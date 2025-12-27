@@ -54,7 +54,7 @@ type PeriodType = 'this-month' | 'last-month' | 'this-quarter' | 'this-year' | '
 type ReportTypeOption = 'profit_loss' | 'balance_sheet' | 'cash_flow' | 'all'
 
 export function ConsolidatedReport() {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
 
   const { accessibleCompanies } = useCompanyContext()
@@ -172,14 +172,14 @@ export function ConsolidatedReport() {
             <div className="p-2 bg-blue-50 rounded-xl">
               <Building2 className="w-6 h-6 text-blue-600" />
             </div>
-            {isArabic ? 'التقرير المالي الموحد' : 'Consolidated Financial Report'}
+            {t('reports.consolidatedReport.title')}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-8 space-y-6">
           {/* Company Selector */}
           <div className="space-y-3">
             <Label className="text-sm font-bold text-navy">
-              {isArabic ? 'اختيار الشركات' : 'Select Companies'}
+              {t('reports.consolidatedReport.selectCompanies')}
               {selectedFirmIds.length > 0 && (
                 <Badge variant="secondary" className="ms-2">
                   {selectedFirmIds.length}
@@ -200,12 +200,10 @@ export function ConsolidatedReport() {
                       <Building2 className="w-4 h-4 shrink-0" />
                       <span className="truncate">
                         {selectedFirmIds.length === 0
-                          ? isArabic
-                            ? 'اختر الشركات'
-                            : 'Select companies'
+                          ? t('reports.consolidatedReport.selectCompaniesPlaceholder')
                           : selectedFirmIds.length === 1
                           ? getCompanyName(selectedCompanies[0])
-                          : `${selectedFirmIds.length} ${isArabic ? 'شركات' : 'companies'}`}
+                          : `${selectedFirmIds.length} ${t('reports.consolidatedReport.companies')}`}
                       </span>
                     </div>
                     <CheckSquare className="w-4 h-4 shrink-0 opacity-50" />
@@ -217,7 +215,7 @@ export function ConsolidatedReport() {
                   dir={isArabic ? 'rtl' : 'ltr'}
                 >
                   <DropdownMenuLabel className="flex items-center justify-between">
-                    <span>{isArabic ? 'الشركات المتاحة' : 'Available Companies'}</span>
+                    <span>{t('reports.consolidatedReport.availableCompanies')}</span>
                     <div className="flex gap-1">
                       <Button
                         variant="ghost"
@@ -225,7 +223,7 @@ export function ConsolidatedReport() {
                         className="h-6 px-2 text-xs"
                         onClick={selectAllCompanies}
                       >
-                        {isArabic ? 'الكل' : 'All'}
+                        {t('reports.consolidatedReport.all')}
                       </Button>
                       <Button
                         variant="ghost"
@@ -233,7 +231,7 @@ export function ConsolidatedReport() {
                         className="h-6 px-2 text-xs"
                         onClick={clearAllCompanies}
                       >
-                        {isArabic ? 'إلغاء' : 'Clear'}
+                        {t('reports.consolidatedReport.clear')}
                       </Button>
                     </div>
                   </DropdownMenuLabel>
@@ -275,7 +273,7 @@ export function ConsolidatedReport() {
                   ))}
                   {selectedCompanies.length > 3 && (
                     <Badge variant="secondary">
-                      +{selectedCompanies.length - 3} {isArabic ? 'أخرى' : 'more'}
+                      +{selectedCompanies.length - 3} {t('reports.consolidatedReport.more')}
                     </Badge>
                   )}
                 </div>
@@ -289,7 +287,7 @@ export function ConsolidatedReport() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-3">
               <Label className="text-sm font-bold text-navy">
-                {isArabic ? 'الفترة الزمنية' : 'Time Period'}
+                {t('reports.consolidatedReport.timePeriod')}
               </Label>
               <Select value={period} onValueChange={(v) => setPeriod(v as PeriodType)}>
                 <SelectTrigger className="rounded-xl">
@@ -297,19 +295,19 @@ export function ConsolidatedReport() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="this-month">
-                    {isArabic ? 'هذا الشهر' : 'This Month'}
+                    {t('reports.consolidatedReport.thisMonth')}
                   </SelectItem>
                   <SelectItem value="last-month">
-                    {isArabic ? 'الشهر الماضي' : 'Last Month'}
+                    {t('reports.consolidatedReport.lastMonth')}
                   </SelectItem>
                   <SelectItem value="this-quarter">
-                    {isArabic ? 'هذا الربع' : 'This Quarter'}
+                    {t('reports.consolidatedReport.thisQuarter')}
                   </SelectItem>
                   <SelectItem value="this-year">
-                    {isArabic ? 'هذه السنة' : 'This Year'}
+                    {t('reports.consolidatedReport.thisYear')}
                   </SelectItem>
                   <SelectItem value="custom">
-                    {isArabic ? 'فترة مخصصة' : 'Custom Period'}
+                    {t('reports.consolidatedReport.customPeriod')}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -318,7 +316,7 @@ export function ConsolidatedReport() {
             {period === 'custom' && (
               <div className="space-y-3">
                 <Label className="text-sm font-bold text-navy">
-                  {isArabic ? 'التاريخ المخصص' : 'Custom Date Range'}
+                  {t('reports.consolidatedReport.customDateRange')}
                 </Label>
                 <div className="flex gap-2">
                   <input
@@ -328,7 +326,7 @@ export function ConsolidatedReport() {
                     className="flex-1 h-10 px-3 rounded-xl border border-slate-200 text-sm"
                   />
                   <span className="text-slate-500 flex items-center">
-                    {isArabic ? 'إلى' : 'to'}
+                    {t('reports.consolidatedReport.to')}
                   </span>
                   <input
                     type="date"
@@ -345,7 +343,7 @@ export function ConsolidatedReport() {
             {/* Report Type */}
             <div className="space-y-3">
               <Label className="text-sm font-bold text-navy">
-                {isArabic ? 'نوع التقرير' : 'Report Type'}
+                {t('reports.consolidatedReport.reportType')}
               </Label>
               <Select value={reportType} onValueChange={(v) => setReportType(v as ReportTypeOption)}>
                 <SelectTrigger className="rounded-xl">
@@ -353,16 +351,16 @@ export function ConsolidatedReport() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">
-                    {isArabic ? 'جميع التقارير' : 'All Reports'}
+                    {t('reports.consolidatedReport.allReports')}
                   </SelectItem>
                   <SelectItem value="profit_loss">
-                    {isArabic ? 'الأرباح والخسائر' : 'Profit & Loss'}
+                    {t('reports.consolidatedReport.profitLoss')}
                   </SelectItem>
                   <SelectItem value="balance_sheet">
-                    {isArabic ? 'الميزانية العمومية' : 'Balance Sheet'}
+                    {t('reports.consolidatedReport.balanceSheet')}
                   </SelectItem>
                   <SelectItem value="cash_flow">
-                    {isArabic ? 'التدفق النقدي' : 'Cash Flow'}
+                    {t('reports.consolidatedReport.cashFlow')}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -371,7 +369,7 @@ export function ConsolidatedReport() {
             {/* Base Currency */}
             <div className="space-y-3">
               <Label className="text-sm font-bold text-navy">
-                {isArabic ? 'العملة الأساسية' : 'Base Currency'}
+                {t('reports.consolidatedReport.baseCurrency')}
               </Label>
               <Select value={baseCurrency} onValueChange={setBaseCurrency}>
                 <SelectTrigger className="rounded-xl">
@@ -390,7 +388,7 @@ export function ConsolidatedReport() {
             {/* Consolidation Method */}
             <div className="space-y-3">
               <Label className="text-sm font-bold text-navy">
-                {isArabic ? 'طريقة الدمج' : 'Consolidation Method'}
+                {t('reports.consolidatedReport.consolidationMethod')}
               </Label>
               <Select
                 value={consolidationMethod}
@@ -401,10 +399,10 @@ export function ConsolidatedReport() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="full">
-                    {isArabic ? 'دمج كامل' : 'Full Consolidation'}
+                    {t('reports.consolidatedReport.fullConsolidation')}
                   </SelectItem>
                   <SelectItem value="proportional">
-                    {isArabic ? 'دمج نسبي' : 'Proportional Consolidation'}
+                    {t('reports.consolidatedReport.proportionalConsolidation')}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -422,7 +420,7 @@ export function ConsolidatedReport() {
                 onCheckedChange={setIncludeEliminationEntries}
               />
               <Label htmlFor="elimination-entries" className="text-sm cursor-pointer">
-                {isArabic ? 'عرض قيود الإلغاء' : 'Show Elimination Entries'}
+                {t('reports.consolidatedReport.showEliminationEntries')}
               </Label>
             </div>
 
@@ -435,18 +433,18 @@ export function ConsolidatedReport() {
                     disabled={selectedFirmIds.length === 0 || exportMutation.isPending}
                   >
                     <Download className="w-4 h-4 me-2" />
-                    {isArabic ? 'تصدير' : 'Export'}
+                    {t('reports.consolidatedReport.export')}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align={isArabic ? 'end' : 'start'}>
                   <DropdownMenuItem onClick={() => handleExport('pdf')}>
-                    {isArabic ? 'تصدير PDF' : 'Export as PDF'}
+                    {t('reports.consolidatedReport.exportPDF')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleExport('excel')}>
-                    {isArabic ? 'تصدير Excel' : 'Export as Excel'}
+                    {t('reports.consolidatedReport.exportExcel')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleExport('csv')}>
-                    {isArabic ? 'تصدير CSV' : 'Export as CSV'}
+                    {t('reports.consolidatedReport.exportCSV')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -461,7 +459,7 @@ export function ConsolidatedReport() {
                 <div className="text-center">
                   <div className="text-2xl font-bold text-navy">{summary.totalCompanies}</div>
                   <div className="text-xs text-slate-500">
-                    {isArabic ? 'الشركات' : 'Companies'}
+                    {t('reports.consolidatedReport.companiesLabel')}
                   </div>
                 </div>
                 <div className="text-center">
@@ -469,7 +467,7 @@ export function ConsolidatedReport() {
                     {summary.profitMargin.toFixed(1)}%
                   </div>
                   <div className="text-xs text-slate-500">
-                    {isArabic ? 'هامش الربح' : 'Profit Margin'}
+                    {t('reports.consolidatedReport.profitMargin')}
                   </div>
                 </div>
                 <div className="text-center">
@@ -477,7 +475,7 @@ export function ConsolidatedReport() {
                     {summary.interCompanyEliminationsCount}
                   </div>
                   <div className="text-xs text-slate-500">
-                    {isArabic ? 'قيود الإلغاء' : 'Eliminations'}
+                    {t('reports.consolidatedReport.eliminations')}
                   </div>
                 </div>
                 <div className="text-center">
@@ -485,7 +483,7 @@ export function ConsolidatedReport() {
                     {summary.currenciesInvolved.length}
                   </div>
                   <div className="text-xs text-slate-500">
-                    {isArabic ? 'العملات' : 'Currencies'}
+                    {t('reports.consolidatedReport.currencies')}
                   </div>
                 </div>
               </div>
@@ -527,12 +525,10 @@ export function ConsolidatedReport() {
             <div className="text-center text-slate-500">
               <Building2 className="w-16 h-16 mx-auto mb-4 opacity-20" />
               <p className="text-lg font-semibold mb-2">
-                {isArabic ? 'لم يتم اختيار أي شركة' : 'No Companies Selected'}
+                {t('reports.consolidatedReport.noCompaniesSelected')}
               </p>
               <p className="text-sm">
-                {isArabic
-                  ? 'يرجى اختيار شركتين أو أكثر لعرض التقرير الموحد'
-                  : 'Please select two or more companies to view the consolidated report'}
+                {t('reports.consolidatedReport.selectTwoOrMore')}
               </p>
             </div>
           </CardContent>

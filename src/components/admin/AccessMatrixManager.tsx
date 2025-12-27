@@ -115,6 +115,8 @@ function AccessToggle({
   isSystem: boolean
   onToggle: () => void
 }) {
+  const { t } = useTranslation()
+
   return (
     <TooltipProvider>
       <Tooltip>
@@ -136,7 +138,7 @@ function AccessToggle({
           </button>
         </TooltipTrigger>
         <TooltipContent>
-          {isSystem ? 'نظام - لا يمكن التعديل' : isAllowed ? 'مسموح' : 'ممنوع'}
+          {isSystem ? t('common.systemCannotModify') : isAllowed ? t('common.allowed') : t('common.denied')}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

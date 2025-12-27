@@ -92,7 +92,7 @@ export function RichDocumentView({
   }
 
   const handleRestoreVersion = async (versionNumber: number) => {
-    if (!confirm(isArabic ? `هل تريد استعادة الإصدار ${versionNumber}؟` : `Restore version ${versionNumber}?`)) {
+    if (!confirm(t('cases.richDocuments.restoreVersionConfirm', { version: versionNumber }))) {
       return
     }
     try {
@@ -115,7 +115,7 @@ export function RichDocumentView({
   const getEditorName = (editor: RichDocumentVersion['editedBy']) => {
     if (typeof editor === 'string') return editor
     if (editor?.firstName && editor?.lastName) return `${editor.firstName} ${editor.lastName}`
-    return editor?.username || (isArabic ? 'مستخدم' : 'User')
+    return editor?.username || t('cases.richDocuments.user')
   }
 
   // Loading State
@@ -142,13 +142,13 @@ export function RichDocumentView({
         {onBack && (
           <Button variant="outline" onClick={onBack} className="rounded-xl">
             <ArrowLeft className="h-4 w-4 me-2" aria-hidden="true" />
-            {isArabic ? 'رجوع' : 'Back'}
+            {t('cases.richDocuments.back')}
           </Button>
         )}
         <Alert className="border-red-200 bg-red-50">
           <AlertCircle className="h-4 w-4 text-red-600" aria-hidden="true" />
           <AlertDescription className="text-red-800">
-            {isArabic ? 'حدث خطأ أثناء تحميل المستند' : 'Error loading document'}: {error?.message}
+            {t('cases.richDocuments.errorLoading')}: {error?.message}
           </AlertDescription>
         </Alert>
       </div>
@@ -161,13 +161,13 @@ export function RichDocumentView({
         {onBack && (
           <Button variant="outline" onClick={onBack} className="rounded-xl">
             <ArrowLeft className="h-4 w-4 me-2" aria-hidden="true" />
-            {isArabic ? 'رجوع' : 'Back'}
+            {t('cases.richDocuments.back')}
           </Button>
         )}
         <Alert className="border-amber-200 bg-amber-50">
           <AlertCircle className="h-4 w-4 text-amber-600" aria-hidden="true" />
           <AlertDescription className="text-amber-800">
-            {isArabic ? 'المستند غير موجود' : 'Document not found'}
+            {t('cases.richDocuments.documentNotFound')}
           </AlertDescription>
         </Alert>
       </div>
@@ -182,7 +182,7 @@ export function RichDocumentView({
           {onBack && (
             <Button variant="outline" onClick={onBack} className="rounded-xl">
               <ArrowLeft className="h-4 w-4 me-2" aria-hidden="true" />
-              {isArabic ? 'رجوع' : 'Back'}
+              {t('cases.richDocuments.back')}
             </Button>
           )}
           <div>
@@ -191,8 +191,7 @@ export function RichDocumentView({
             </h1>
             <div className="flex items-center gap-2 mt-1 text-sm text-slate-500">
               <Clock className="h-4 w-4" aria-hidden="true" />
-              {isArabic ? 'آخر تعديل: ' : 'Last updated: '}
-              {new Date(document.updatedAt).toLocaleString(isArabic ? 'ar-SA' : 'en-US')}
+              {t('cases.richDocuments.updated')} {new Date(document.updatedAt).toLocaleString(isArabic ? 'ar-SA' : 'en-US')}
             </div>
           </div>
         </div>
@@ -203,14 +202,14 @@ export function RichDocumentView({
               className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
             >
               <Edit className="h-4 w-4 me-2" aria-hidden="true" />
-              {isArabic ? 'تعديل' : 'Edit'}
+              {t('cases.richDocuments.edit')}
             </Button>
           )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="rounded-xl">
                 <Download className="h-4 w-4 me-2" aria-hidden="true" />
-                {isArabic ? 'تصدير' : 'Export'}
+                {t('cases.richDocuments.export')}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -241,7 +240,7 @@ export function RichDocumentView({
                 disabled={exportMutation.isPending}
               >
                 <Eye className="h-4 w-4 me-2" aria-hidden="true" />
-                {isArabic ? 'معاينة' : 'Preview'}
+                {t('cases.richDocuments.preview')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -251,7 +250,7 @@ export function RichDocumentView({
             className="rounded-xl"
           >
             <History className="h-4 w-4 me-2" aria-hidden="true" />
-            {isArabic ? 'سجل الإصدارات' : 'Version History'}
+            {t('cases.richDocuments.versionHistory')}
           </Button>
         </div>
       </div>
@@ -289,17 +288,17 @@ export function RichDocumentView({
             </div>
             <div className="flex items-center gap-2 text-sm text-slate-600">
               <FileText className="h-4 w-4" aria-hidden="true" />
-              {isArabic ? 'الإصدار' : 'Version'} {document.version}
+              {t('cases.richDocuments.version')} {document.version}
             </div>
             {document.wordCount && (
               <div className="flex items-center gap-2 text-sm text-slate-600">
-                {document.wordCount} {isArabic ? 'كلمة' : 'words'}
+                {document.wordCount} {t('cases.richDocuments.words')}
               </div>
             )}
             {document.showOnCalendar && (
               <div className="flex items-center gap-2 text-sm text-emerald-600">
                 <Calendar className="h-4 w-4" aria-hidden="true" />
-                {isArabic ? 'مُضاف للتقويم' : 'On Calendar'}
+                {t('cases.richDocuments.onCalendar')}
               </div>
             )}
           </div>
@@ -311,7 +310,7 @@ export function RichDocumentView({
         <CardHeader className="border-b border-slate-50">
           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
             <FileText className="h-5 w-5 text-emerald-500" aria-hidden="true" />
-            {isArabic ? 'محتوى المستند' : 'Document Content'}
+            {t('cases.richDocuments.documentContent')}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6">
@@ -334,7 +333,7 @@ export function RichDocumentView({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <History className="h-5 w-5 text-emerald-500" aria-hidden="true" />
-              {isArabic ? 'سجل الإصدارات' : 'Version History'}
+              {t('cases.richDocuments.versionHistory')}
             </DialogTitle>
           </DialogHeader>
           <ScrollArea className="max-h-[60vh] pe-4">
@@ -362,11 +361,11 @@ export function RichDocumentView({
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-navy">
-                            {isArabic ? 'الإصدار' : 'Version'} {version.version}
+                            {t('cases.richDocuments.version')} {version.version}
                           </span>
                           {version.isCurrent && (
                             <Badge className="bg-emerald-500 text-white text-xs">
-                              {isArabic ? 'الحالي' : 'Current'}
+                              {t('cases.richDocuments.current')}
                             </Badge>
                           )}
                         </div>
@@ -395,7 +394,7 @@ export function RichDocumentView({
                           className="rounded-lg"
                         >
                           <RotateCcw className="h-4 w-4 me-1" aria-hidden="true" />
-                          {isArabic ? 'استعادة' : 'Restore'}
+                          {t('cases.richDocuments.restore')}
                         </Button>
                       )}
                     </div>
@@ -404,7 +403,7 @@ export function RichDocumentView({
               </div>
             ) : (
               <div className="text-center py-8 text-slate-500">
-                {isArabic ? 'لا توجد إصدارات سابقة' : 'No previous versions'}
+                {t('cases.richDocuments.noVersions')}
               </div>
             )}
           </ScrollArea>

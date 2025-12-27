@@ -64,11 +64,12 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useSLAs, useDeleteSLA } from '@/hooks/use-support'
 import type { ServiceLevelAgreement, TicketPriority } from '@/types/support'
 import { SupportSidebar } from './support-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
-  { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.support', href: '/dashboard/support' },
-  { title: 'support.sla.title', href: '/dashboard/support/sla' },
+  { title: 'sidebar.nav.overview', href: ROUTES.dashboard.home },
+  { title: 'sidebar.nav.support', href: ROUTES.dashboard.support.list },
+  { title: 'support.sla.title', href: ROUTES.dashboard.support.sla.list },
 ]
 
 export function SLAListView() {
@@ -317,7 +318,7 @@ export function SLAListView() {
                     </Tabs>
 
                     <Button asChild className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
-                      <Link to="/dashboard/support/sla/create">
+                      <Link to={ROUTES.dashboard.support.sla.create}>
                         <Plus className="w-4 h-4 ml-2" />
                         {t('support.sla.createSLA', 'إنشاء SLA')}
                       </Link>
@@ -364,7 +365,7 @@ export function SLAListView() {
                     </p>
                     {!search && (
                       <Button asChild className="rounded-xl">
-                        <Link to="/dashboard/support/sla/create">
+                        <Link to={ROUTES.dashboard.support.sla.create}>
                           <Plus className="w-4 h-4 ml-2" />
                           {t('support.sla.createSLA', 'إنشاء SLA')}
                         </Link>

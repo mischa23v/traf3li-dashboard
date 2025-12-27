@@ -5,6 +5,7 @@
 
 import { MouseEvent as ReactMouseEvent } from 'react'
 import { cn } from '@/lib/utils'
+import { CANVAS } from '@/config'
 import type { Block } from '../../data/schema'
 
 interface ShapeRendererProps {
@@ -18,10 +19,10 @@ interface ShapeRendererProps {
   readOnly?: boolean
 }
 
-const MIN_WIDTH = 50
-const MIN_HEIGHT = 50
-const DEFAULT_WIDTH = 200
-const DEFAULT_HEIGHT = 150
+const MIN_WIDTH = CANVAS.SHAPE.MIN_WIDTH
+const MIN_HEIGHT = CANVAS.SHAPE.MIN_HEIGHT
+const DEFAULT_WIDTH = CANVAS.SHAPE.DEFAULT_WIDTH
+const DEFAULT_HEIGHT = CANVAS.SHAPE.DEFAULT_HEIGHT
 
 // Helper to get color hex from block color
 function getBlockColorHex(color?: string): string {

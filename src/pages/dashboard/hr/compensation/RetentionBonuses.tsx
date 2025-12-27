@@ -134,13 +134,13 @@ export default function RetentionBonusesPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm(isArabic ? 'هل أنت متأكد من حذف هذه المكافأة؟' : 'Are you sure you want to delete this bonus?')) {
+    if (confirm(t('hr.compensation.retentionBonuses.confirmDelete'))) {
       await deleteMutation.mutateAsync(id)
     }
   }
 
   const handleSubmitForApproval = async (id: string) => {
-    if (confirm(isArabic ? 'هل تريد إرسال هذه المكافأة للموافقة؟' : 'Do you want to submit this bonus for approval?')) {
+    if (confirm(t('hr.compensation.retentionBonuses.confirmSubmit'))) {
       await submitMutation.mutateAsync(id)
     }
   }
@@ -238,22 +238,20 @@ export default function RetentionBonusesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            {isArabic ? 'مكافآت الاستبقاء' : 'Retention Bonuses'}
+            {t('hr.compensation.retentionBonuses.title')}
           </h1>
           <p className="text-muted-foreground">
-            {isArabic
-              ? 'إدارة مكافآت الاستبقاء والمكافآت الأخرى للموظفين'
-              : 'Manage employee retention and other bonuses'}
+            {t('hr.compensation.retentionBonuses.description')}
           </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleExport}>
             <Download className="mr-2 h-4 w-4" />
-            {isArabic ? 'تصدير' : 'Export'}
+            {t('hr.compensation.retentionBonuses.export')}
           </Button>
           <Button onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" />
-            {isArabic ? 'مكافأة جديدة' : 'New Bonus'}
+            {t('hr.compensation.retentionBonuses.newBonus')}
           </Button>
         </div>
       </div>
@@ -263,7 +261,7 @@ export default function RetentionBonusesPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'إجمالي المكافآت' : 'Total Bonuses'}
+              {t('hr.compensation.retentionBonuses.stats.totalBonuses')}
             </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -278,14 +276,14 @@ export default function RetentionBonusesPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'بانتظار الموافقة' : 'Pending Approval'}
+              {t('hr.compensation.retentionBonuses.stats.pendingApproval')}
             </CardTitle>
             <Clock className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.pendingApprovals || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {isArabic ? 'طلبات معلقة' : 'Pending requests'}
+              {t('hr.compensation.retentionBonuses.stats.pendingRequests')}
             </p>
           </CardContent>
         </Card>
@@ -293,14 +291,14 @@ export default function RetentionBonusesPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'مستحقة الدفع' : 'Due for Payment'}
+              {t('hr.compensation.retentionBonuses.stats.dueForPayment')}
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.dueForPayment || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {isArabic ? 'مكافآت معتمدة' : 'Approved bonuses'}
+              {t('hr.compensation.retentionBonuses.stats.approvedBonuses')}
             </p>
           </CardContent>
         </Card>
@@ -308,7 +306,7 @@ export default function RetentionBonusesPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isArabic ? 'متوسط المكافأة' : 'Average Bonus'}
+              {t('hr.compensation.retentionBonuses.stats.averageBonus')}
             </CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -317,7 +315,7 @@ export default function RetentionBonusesPage() {
               {formatCurrency(stats?.averageBonusAmount || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
-              {isArabic ? 'للمكافأة الواحدة' : 'Per bonus'}
+              {t('hr.compensation.retentionBonuses.stats.perBonus')}
             </p>
           </CardContent>
         </Card>
@@ -331,7 +329,7 @@ export default function RetentionBonusesPage() {
               <div className="relative max-w-sm">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder={isArabic ? 'بحث...' : 'Search...'}
+                  placeholder={t('hr.compensation.retentionBonuses.search')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9"
@@ -341,10 +339,10 @@ export default function RetentionBonusesPage() {
             <div className="flex gap-2">
               <Select value={selectedType} onValueChange={(v) => setSelectedType(v as BonusType | 'all')}>
                 <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder={isArabic ? 'نوع المكافأة' : 'Bonus Type'} />
+                  <SelectValue placeholder={t('hr.compensation.retentionBonuses.filters.bonusType')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{isArabic ? 'الكل' : 'All'}</SelectItem>
+                  <SelectItem value="all">{t('hr.compensation.retentionBonuses.filters.all')}</SelectItem>
                   {Object.values(BonusType).map((type) => (
                     <SelectItem key={type} value={type}>
                       {isArabic ? bonusTypeLabels[type].ar : bonusTypeLabels[type].en}
@@ -355,10 +353,10 @@ export default function RetentionBonusesPage() {
 
               <Select value={selectedStatus} onValueChange={(v) => setSelectedStatus(v as BonusStatus | 'all')}>
                 <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder={isArabic ? 'الحالة' : 'Status'} />
+                  <SelectValue placeholder={t('hr.compensation.retentionBonuses.filters.status')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{isArabic ? 'الكل' : 'All'}</SelectItem>
+                  <SelectItem value="all">{t('hr.compensation.retentionBonuses.filters.all')}</SelectItem>
                   {Object.values(BonusStatus).map((status) => (
                     <SelectItem key={status} value={status}>
                       {isArabic ? bonusStatusLabels[status].ar : bonusStatusLabels[status].en}
@@ -380,20 +378,20 @@ export default function RetentionBonusesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{isArabic ? 'رقم المكافأة' : 'Bonus ID'}</TableHead>
-                  <TableHead>{isArabic ? 'الموظف' : 'Employee'}</TableHead>
-                  <TableHead>{isArabic ? 'النوع' : 'Type'}</TableHead>
-                  <TableHead>{isArabic ? 'المبلغ' : 'Amount'}</TableHead>
-                  <TableHead>{isArabic ? 'تاريخ الدفع' : 'Payment Date'}</TableHead>
-                  <TableHead>{isArabic ? 'الحالة' : 'Status'}</TableHead>
-                  <TableHead className="text-right">{isArabic ? 'الإجراءات' : 'Actions'}</TableHead>
+                  <TableHead>{t('hr.compensation.retentionBonuses.table.bonusId')}</TableHead>
+                  <TableHead>{t('hr.compensation.retentionBonuses.table.employee')}</TableHead>
+                  <TableHead>{t('hr.compensation.retentionBonuses.table.type')}</TableHead>
+                  <TableHead>{t('hr.compensation.retentionBonuses.table.amount')}</TableHead>
+                  <TableHead>{t('hr.compensation.retentionBonuses.table.paymentDate')}</TableHead>
+                  <TableHead>{t('hr.compensation.retentionBonuses.table.status')}</TableHead>
+                  <TableHead className="text-right">{t('hr.compensation.retentionBonuses.table.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {bonuses.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={7} className="text-center text-muted-foreground">
-                      {isArabic ? 'لا توجد مكافآت' : 'No bonuses found'}
+                      {t('hr.compensation.retentionBonuses.table.noBonuses')}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -423,7 +421,7 @@ export default function RetentionBonusesPage() {
                         </div>
                         {bonus.vestingPeriod && (
                           <div className="text-xs text-muted-foreground">
-                            {isArabic ? 'فترة الاستحقاق' : 'Vesting'}: {bonus.vestingPeriod} {isArabic ? 'شهر' : 'months'}
+                            {t('hr.compensation.retentionBonuses.table.vesting')}: {bonus.vestingPeriod} {t('hr.compensation.retentionBonuses.table.months')}
                           </div>
                         )}
                       </TableCell>
@@ -444,7 +442,7 @@ export default function RetentionBonusesPage() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>
-                              {isArabic ? 'الإجراءات' : 'Actions'}
+                              {t('hr.compensation.retentionBonuses.actions.label')}
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
 
@@ -452,11 +450,11 @@ export default function RetentionBonusesPage() {
                               <>
                                 <DropdownMenuItem onClick={() => handleEdit(bonus)}>
                                   <Edit className="mr-2 h-4 w-4" />
-                                  {isArabic ? 'تعديل' : 'Edit'}
+                                  {t('hr.compensation.retentionBonuses.actions.edit')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => handleSubmitForApproval(bonus._id)}>
                                   <Send className="mr-2 h-4 w-4" />
-                                  {isArabic ? 'إرسال للموافقة' : 'Submit for Approval'}
+                                  {t('hr.compensation.retentionBonuses.actions.submitForApproval')}
                                 </DropdownMenuItem>
                               </>
                             )}
@@ -465,11 +463,11 @@ export default function RetentionBonusesPage() {
                               <>
                                 <DropdownMenuItem onClick={() => openActionDialog(bonus, 'approve')}>
                                   <CheckCircle className="mr-2 h-4 w-4" />
-                                  {isArabic ? 'موافقة' : 'Approve'}
+                                  {t('hr.compensation.retentionBonuses.actions.approve')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => openActionDialog(bonus, 'reject')}>
                                   <XCircle className="mr-2 h-4 w-4" />
-                                  {isArabic ? 'رفض' : 'Reject'}
+                                  {t('hr.compensation.retentionBonuses.actions.reject')}
                                 </DropdownMenuItem>
                               </>
                             )}
@@ -477,7 +475,7 @@ export default function RetentionBonusesPage() {
                             {bonus.status === BonusStatus.APPROVED && (
                               <DropdownMenuItem onClick={() => openActionDialog(bonus, 'pay')}>
                                 <DollarSign className="mr-2 h-4 w-4" />
-                                {isArabic ? 'تسجيل الدفع' : 'Mark as Paid'}
+                                {t('hr.compensation.retentionBonuses.actions.markAsPaid')}
                               </DropdownMenuItem>
                             )}
 
@@ -487,7 +485,7 @@ export default function RetentionBonusesPage() {
                                 className="text-red-600"
                               >
                                 <Ban className="mr-2 h-4 w-4" />
-                                {isArabic ? 'إلغاء' : 'Cancel'}
+                                {t('hr.compensation.retentionBonuses.actions.cancel')}
                               </DropdownMenuItem>
                             )}
 
@@ -499,7 +497,7 @@ export default function RetentionBonusesPage() {
                                 className="text-red-600"
                               >
                                 <Trash2 className="mr-2 h-4 w-4" />
-                                {isArabic ? 'حذف' : 'Delete'}
+                                {t('hr.compensation.retentionBonuses.actions.delete')}
                               </DropdownMenuItem>
                             )}
                           </DropdownMenuContent>
@@ -526,15 +524,15 @@ export default function RetentionBonusesPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {actionType === 'approve' && (isArabic ? 'الموافقة على المكافأة' : 'Approve Bonus')}
-              {actionType === 'reject' && (isArabic ? 'رفض المكافأة' : 'Reject Bonus')}
-              {actionType === 'cancel' && (isArabic ? 'إلغاء المكافأة' : 'Cancel Bonus')}
-              {actionType === 'pay' && (isArabic ? 'تسجيل الدفع' : 'Mark as Paid')}
+              {actionType === 'approve' && t('hr.compensation.retentionBonuses.dialog.approveTitle')}
+              {actionType === 'reject' && t('hr.compensation.retentionBonuses.dialog.rejectTitle')}
+              {actionType === 'cancel' && t('hr.compensation.retentionBonuses.dialog.cancelTitle')}
+              {actionType === 'pay' && t('hr.compensation.retentionBonuses.dialog.payTitle')}
             </DialogTitle>
             <DialogDescription>
               {selectedBonus && (
                 <span>
-                  {isArabic ? 'الموظف: ' : 'Employee: '}
+                  {t('hr.compensation.retentionBonuses.dialog.employee')}
                   {isArabic ? selectedBonus.employeeNameAr : selectedBonus.employeeName}
                 </span>
               )}
@@ -545,25 +543,25 @@ export default function RetentionBonusesPage() {
             {actionType === 'pay' ? (
               <div className="space-y-2">
                 <Label htmlFor="paymentReference">
-                  {isArabic ? 'مرجع الدفع' : 'Payment Reference'}
+                  {t('hr.compensation.retentionBonuses.dialog.paymentReference')}
                 </Label>
                 <Input
                   id="paymentReference"
                   value={paymentReference}
                   onChange={(e) => setPaymentReference(e.target.value)}
-                  placeholder={isArabic ? 'أدخل مرجع الدفع' : 'Enter payment reference'}
+                  placeholder={t('hr.compensation.retentionBonuses.dialog.paymentReferencePlaceholder')}
                 />
               </div>
             ) : (
               <div className="space-y-2">
                 <Label htmlFor="comments">
-                  {isArabic ? 'الملاحظات' : 'Comments'}
+                  {t('hr.compensation.retentionBonuses.dialog.comments')}
                 </Label>
                 <Textarea
                   id="comments"
                   value={actionComments}
                   onChange={(e) => setActionComments(e.target.value)}
-                  placeholder={isArabic ? 'أدخل الملاحظات...' : 'Enter comments...'}
+                  placeholder={t('hr.compensation.retentionBonuses.dialog.commentsPlaceholder')}
                   rows={4}
                 />
               </div>
@@ -572,10 +570,10 @@ export default function RetentionBonusesPage() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setActionDialogOpen(false)}>
-              {isArabic ? 'إلغاء' : 'Cancel'}
+              {t('hr.compensation.retentionBonuses.dialog.cancelButton')}
             </Button>
             <Button onClick={handleAction}>
-              {isArabic ? 'تأكيد' : 'Confirm'}
+              {t('hr.compensation.retentionBonuses.dialog.confirmButton')}
             </Button>
           </DialogFooter>
         </DialogContent>

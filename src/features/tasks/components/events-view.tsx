@@ -63,6 +63,7 @@ import {
 import { toast } from 'sonner'
 import { format } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
+import { ROUTES } from '@/constants/routes'
 
 export function EventsView() {
     const { t, i18n } = useTranslation()
@@ -206,7 +207,7 @@ export function EventsView() {
 
     // Single event actions
     const handleViewEvent = useCallback((eventId: string) => {
-        navigate({ to: '/dashboard/tasks/events/$eventId', params: { eventId } })
+        navigate({ to: ROUTES.dashboard.tasks.events.detail(eventId) })
     }, [navigate])
 
     const handleDeleteEvent = useCallback(async (eventId: string) => {
@@ -282,10 +283,10 @@ export function EventsView() {
     }, [rsvpEvent, t])
 
     const topNav = [
-        { title: t('events.nav.overview'), href: '/dashboard/overview', isActive: false },
-        { title: t('events.nav.tasks'), href: '/dashboard/tasks/list', isActive: false },
-        { title: t('events.nav.reminders'), href: '/dashboard/tasks/reminders', isActive: false },
-        { title: t('events.nav.events'), href: '/dashboard/tasks/events', isActive: true },
+        { title: t('events.nav.overview'), href: ROUTES.dashboard.home, isActive: false },
+        { title: t('events.nav.tasks'), href: ROUTES.dashboard.tasks.list, isActive: false },
+        { title: t('events.nav.reminders'), href: ROUTES.dashboard.tasks.reminders.list, isActive: false },
+        { title: t('events.nav.events'), href: ROUTES.dashboard.tasks.events.list, isActive: true },
     ]
 
     return (
@@ -448,7 +449,7 @@ export function EventsView() {
                                     <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد فعاليات</h3>
                                     <p className="text-slate-500 mb-4">جدولك خالٍ حالياً. ابدأ بإضافة أحداث جديدة.</p>
                                     <GosiButton asChild className="bg-blue-500 hover:bg-blue-600">
-                                        <Link to="/dashboard/tasks/events/new">
+                                        <Link to={ROUTES.dashboard.tasks.events.new}>
                                             <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                             إضافة حدث جديد
                                         </Link>
@@ -512,7 +513,7 @@ export function EventsView() {
                                                             onClick={(e) => {
                                                                 e.stopPropagation()
                                                                 const taskId = typeof event.taskId === 'string' ? event.taskId : event.taskId._id
-                                                                navigate({ to: '/dashboard/tasks/$taskId', params: { taskId } })
+                                                                navigate({ to: ROUTES.dashboard.tasks.detail(taskId) })
                                                             }}
                                                         >
                                                             <CheckSquare className="h-3 w-3" />

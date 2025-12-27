@@ -10,6 +10,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config'
 import lockDateService from '@/services/lockDateService'
 import type {
   LockDateConfig,
@@ -24,9 +25,9 @@ import type {
 import { toast } from 'sonner'
 
 // ==================== Cache Configuration ====================
-const CONFIG_STALE_TIME = 30 * 60 * 1000 // 30 minutes
-const CONFIG_GC_TIME = 60 * 60 * 1000 // 1 hour
-const HISTORY_STALE_TIME = 10 * 60 * 1000 // 10 minutes
+const CONFIG_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
+const CONFIG_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour
+const HISTORY_STALE_TIME = 2 * CACHE_TIMES.MEDIUM // 10 minutes
 
 // ==================== QUERY KEYS ====================
 

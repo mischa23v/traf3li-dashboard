@@ -109,7 +109,7 @@ export default function VendorDetailsView() {
                 <Main fluid={true} className="bg-[#f8f9fa] p-6 lg:p-8">
                     <div className="max-w-7xl mx-auto">
                         <Button asChild variant="ghost" className="mb-6">
-                            <Link to="/dashboard/finance/vendors">
+                            <Link to={ROUTES.dashboard.finance.vendors.list}>
                                 <ArrowRight className="h-4 w-4 ms-2" />
                                 العودة للموردين
                             </Link>
@@ -144,14 +144,14 @@ export default function VendorDetailsView() {
                     {/* Back Button & Actions */}
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                         <Button asChild variant="ghost" className="text-slate-600 hover:text-navy">
-                            <Link to="/dashboard/finance/vendors">
+                            <Link to={ROUTES.dashboard.finance.vendors.list}>
                                 <ArrowRight className="h-4 w-4 ms-2" />
                                 العودة للموردين
                             </Link>
                         </Button>
                         <div className="flex gap-2">
                             <Button asChild variant="outline">
-                                <Link to="/dashboard/finance/vendors/$vendorId/edit" params={{ vendorId }}>
+                                <Link to={ROUTES.dashboard.finance.vendors.edit(vendorId)}>
                                     <Edit className="h-4 w-4 ms-2" aria-hidden="true" />
                                     تعديل
                                 </Link>
@@ -374,8 +374,7 @@ export default function VendorDetailsView() {
                                             {recentBills.map((bill: any) => (
                                                 <Link
                                                     key={bill._id}
-                                                    to="/dashboard/finance/bills/$billId"
-                                                    params={{ billId: bill._id }}
+                                                    to={ROUTES.dashboard.finance.bills.detail(bill._id )}
                                                     className="flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors"
                                                 >
                                                     <div>

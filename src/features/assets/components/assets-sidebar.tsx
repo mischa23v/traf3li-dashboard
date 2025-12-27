@@ -22,6 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ROUTES } from '@/constants/routes'
 
 import { useAssetStats, useMaintenanceSchedules } from '@/hooks/use-assets'
 
@@ -42,20 +43,20 @@ export function AssetsSidebar() {
         </CardHeader>
         <CardContent className="space-y-2">
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/assets/create">
+            <Link to={ROUTES.dashboard.assets.create}>
               <Plus className="w-4 h-4 ml-2" />
               {t('assets.newAsset', 'أصل جديد')}
               <kbd className="mr-auto bg-muted px-2 py-0.5 rounded text-xs">⌘N</kbd>
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/assets/categories/create">
+            <Link to={ROUTES.dashboard.assets.categories.create}>
               <FolderOpen className="w-4 h-4 ml-2" />
               {t('assets.newCategory', 'فئة جديدة')}
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/assets/maintenance/create">
+            <Link to={ROUTES.dashboard.assets.maintenance.create}>
               <Calendar className="w-4 h-4 ml-2" />
               {t('assets.scheduleMaintenance', 'جدولة صيانة')}
             </Link>
@@ -73,25 +74,25 @@ export function AssetsSidebar() {
         </CardHeader>
         <CardContent className="space-y-2">
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/assets">
+            <Link to={ROUTES.dashboard.assets.list}>
               <Building2 className="w-4 h-4 ml-2" />
               {t('assets.assets', 'الأصول')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/assets/categories">
+            <Link to={ROUTES.dashboard.assets.categories.list}>
               <FolderOpen className="w-4 h-4 ml-2" />
               {t('assets.categories', 'الفئات')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/assets/maintenance">
+            <Link to={ROUTES.dashboard.assets.maintenance.list}>
               <Wrench className="w-4 h-4 ml-2" />
               {t('assets.maintenance', 'الصيانة')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/assets/settings">
+            <Link to={ROUTES.dashboard.assets.settings}>
               <Settings className="w-4 h-4 ml-2" />
               {t('assets.settings', 'الإعدادات')}
             </Link>
@@ -154,7 +155,7 @@ export function AssetsSidebar() {
                 <span className="text-2xl font-bold text-amber-800">{stats.overdueMaintenance}</span>
               </div>
               <Button asChild variant="outline" size="sm" className="w-full text-amber-700 border-amber-300 hover:bg-amber-100">
-                <Link to="/dashboard/assets/maintenance?filter=overdue">
+                <Link to={`${ROUTES.dashboard.assets.maintenance.list}?filter=overdue`}>
                   {t('assets.viewOverdue', 'عرض المتأخرات')}
                 </Link>
               </Button>
@@ -194,7 +195,7 @@ export function AssetsSidebar() {
                 </span>
               </div>
               <Button asChild variant="outline" size="sm" className="w-full text-blue-700 border-blue-300 hover:bg-blue-100">
-                <Link to="/dashboard/assets/depreciation">
+                <Link to={`${ROUTES.dashboard.assets.list}/depreciation`}>
                   {t('assets.viewDepreciation', 'عرض تفاصيل الإهلاك')}
                 </Link>
               </Button>

@@ -48,7 +48,7 @@ function WPSSidebar() {
                     <CardTitle className="text-lg font-bold text-navy">إجراءات سريعة</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                    <Link to="/dashboard/finance/saudi-banking/wps/new">
+                    <Link to={ROUTES.dashboard.finance.saudiBanking.wps.new}>
                         <Button className="w-full bg-blue-500 hover:bg-blue-600 rounded-xl shadow-lg shadow-blue-500/20">
                             <Plus className="h-4 w-4 ms-2" />
                             إنشاء ملف WPS جديد
@@ -279,7 +279,7 @@ export function SaudiBankingWPSView() {
 
                 {/* Breadcrumb */}
                 <div className="flex items-center gap-2 text-sm">
-                    <Link to="/dashboard/finance/saudi-banking" className="text-slate-500 hover:text-emerald-600">
+                    <Link to={ROUTES.dashboard.finance.saudiBanking.index} className="text-slate-500 hover:text-emerald-600">
                         الخدمات المصرفية
                     </Link>
                     <ChevronLeft className="h-4 w-4 text-slate-400" />
@@ -320,7 +320,7 @@ export function SaudiBankingWPSView() {
                                             <SelectItem value="FAILED">فشل</SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    <Link to="/dashboard/finance/saudi-banking/wps/new">
+                                    <Link to={ROUTES.dashboard.finance.saudiBanking.wps.new}>
                                         <Button className="bg-blue-500 hover:bg-blue-600 rounded-xl">
                                             <Plus className="h-4 w-4 ms-2" />
                                             ملف جديد
@@ -364,7 +364,7 @@ export function SaudiBankingWPSView() {
                                         <FileText className="h-12 w-12 text-slate-300 mx-auto mb-4" />
                                         <h3 className="text-lg font-bold text-navy mb-2">لا توجد ملفات</h3>
                                         <p className="text-slate-500 mb-4">ابدأ بإنشاء ملف WPS جديد</p>
-                                        <Link to="/dashboard/finance/saudi-banking/wps/new">
+                                        <Link to={ROUTES.dashboard.finance.saudiBanking.wps.new}>
                                             <Button className="bg-blue-500 hover:bg-blue-600">
                                                 <Plus className="h-4 w-4 ms-2" />
                                                 إنشاء ملف جديد

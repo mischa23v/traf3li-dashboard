@@ -8,6 +8,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useReports, useReportStats, useBulkDeleteReports, useAddToFavorites, useRemoveFromFavorites } from '@/hooks/useReports'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -161,8 +162,8 @@ export function TasksReportsListView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'المهام', href: '/dashboard/tasks/list', isActive: false },
-    { title: 'تقارير الإنتاجية', href: '/dashboard/tasks/reports', isActive: true },
+    { title: 'المهام', href: ROUTES.dashboard.tasks.list, isActive: false },
+    { title: 'تقارير الإنتاجية', href: ROUTES.dashboard.tasks.reports.list, isActive: true },
   ]
 
   return (
@@ -318,7 +319,7 @@ export function TasksReportsListView() {
                     </Button>
                     <Button
                       size="sm"
-                      onClick={() => navigate({ to: '/dashboard/tasks/reports/new' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.tasks.reports.new })}
                       className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
                     >
                       <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
@@ -363,7 +364,7 @@ export function TasksReportsListView() {
                   <FileText className="w-12 h-12 mx-auto text-slate-300" aria-hidden="true" />
                   <p className="mt-4 text-slate-500">لا توجد تقارير للإنتاجية</p>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/tasks/reports/new' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.tasks.reports.new })}
                     className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
                     <Plus className="w-4 h-4 ms-1" aria-hidden="true" />

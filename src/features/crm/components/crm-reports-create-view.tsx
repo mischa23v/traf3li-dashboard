@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useSearch } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useCreateReport, useUpdateReport, useReport } from '@/hooks/useReports'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -188,13 +189,13 @@ export function CrmReportsCreateView() {
       await createMutation.mutateAsync(data)
     }
 
-    navigate({ to: '/dashboard/crm/reports' })
+    navigate({ to: ROUTES.dashboard.crm.reports.list })
   }
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: false },
-    { title: 'التقارير', href: '/dashboard/crm/reports', isActive: true },
+    { title: 'العملاء المحتملين', href: ROUTES.dashboard.crm.leads.list, isActive: false },
+    { title: 'التقارير', href: ROUTES.dashboard.crm.reports.list, isActive: true },
   ]
 
   const isPending = createMutation.isPending || updateMutation.isPending
@@ -228,7 +229,7 @@ export function CrmReportsCreateView() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" className="rounded-xl hover:bg-white" onClick={() => navigate({ to: '/dashboard/crm/reports' })}>
+              <Button variant="ghost" size="icon" className="rounded-xl hover:bg-white" onClick={() => navigate({ to: ROUTES.dashboard.crm.reports.list })}>
                 <ArrowRight className="h-5 w-5" />
               </Button>
               <div>
@@ -438,7 +439,7 @@ export function CrmReportsCreateView() {
             </Card>
 
             <div className="flex items-center justify-end gap-4">
-              <Button variant="outline" onClick={() => navigate({ to: '/dashboard/crm/reports' })} className="rounded-xl">إلغاء</Button>
+              <Button variant="outline" onClick={() => navigate({ to: ROUTES.dashboard.crm.reports.list })} className="rounded-xl">إلغاء</Button>
               <Button onClick={handleSubmit} disabled={!reportCode || !reportName || isPending} className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8">
                 {isPending ? <>جاري الحفظ...</> : (
                   <><CheckCircle className="w-4 h-4 ms-2" />{isEditMode ? 'حفظ التعديلات' : 'إنشاء التقرير'}</>

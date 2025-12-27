@@ -7,6 +7,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useWhatsAppConversations, useWhatsAppTemplates, useWhatsAppBroadcasts } from '@/hooks/useCrmAdvanced'
@@ -23,6 +24,7 @@ import {
     Send, Calendar, Users
 } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { format } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
 import { Input } from '@/components/ui/input'
@@ -215,7 +217,7 @@ export function WhatsAppListView() {
     }
 
     const handleViewConversation = (conversationId: string) => {
-        navigate({ to: '/dashboard/crm/whatsapp/$conversationId', params: { conversationId } })
+        navigate({ to: ROUTES.dashboard.crm.whatsapp.detail(conversationId), params: { conversationId } })
     }
 
     // Get status badge
@@ -264,9 +266,9 @@ export function WhatsAppListView() {
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: false },
-        { title: 'واتساب', href: '/dashboard/crm/whatsapp', isActive: true },
-        { title: 'التسويق بالبريد', href: '/dashboard/crm/email-marketing', isActive: false },
+        { title: 'العملاء المحتملين', href: ROUTES.dashboard.crm.leads.list, isActive: false },
+        { title: 'واتساب', href: ROUTES.dashboard.crm.whatsapp.list, isActive: true },
+        { title: 'التسويق بالبريد', href: ROUTES.dashboard.crm.emailMarketing.list, isActive: false },
     ]
 
     return (
@@ -443,7 +445,7 @@ export function WhatsAppListView() {
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد محادثات</h3>
                                         <p className="text-slate-500 mb-4">ابدأ محادثة جديدة مع عميل عبر واتساب</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/20">
-                                            <Link to="/dashboard/crm/whatsapp/start">
+                                            <Link to={ROUTES.dashboard.crm.whatsapp.start}>
                                                 <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 محادثة جديدة
                                             </Link>
@@ -618,7 +620,7 @@ export function WhatsAppListView() {
                                         {broadcasts.length} حملة
                                     </Badge>
                                     <Button asChild size="sm" className="bg-emerald-500 hover:bg-emerald-600 rounded-lg h-8 px-3 text-xs">
-                                        <Link to="/dashboard/crm/whatsapp/new">
+                                        <Link to={ROUTES.dashboard.crm.whatsapp.new}>
                                             <Plus className="h-3.5 w-3.5 ms-1" aria-hidden="true" />
                                             حملة جديدة
                                         </Link>
@@ -633,7 +635,7 @@ export function WhatsAppListView() {
                                         <p className="text-slate-500 text-sm mb-2">لا توجد حملات بث</p>
                                         <p className="text-slate-400 text-xs mb-4">أنشئ حملة بث جديدة للتواصل مع عملائك</p>
                                         <Button asChild size="sm" className="bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/20">
-                                            <Link to="/dashboard/crm/whatsapp/new">
+                                            <Link to={ROUTES.dashboard.crm.whatsapp.new}>
                                                 <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
                                                 إنشاء حملة
                                             </Link>

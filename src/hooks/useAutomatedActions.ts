@@ -11,6 +11,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config'
 import automatedActionService from '@/services/automatedActionService'
 import type {
   AutomatedAction,
@@ -42,9 +43,9 @@ const logBackendNotImplemented = (operation: string): void => {
 }
 
 // ==================== Cache Configuration ====================
-const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes
-const LIST_GC_TIME = 30 * 60 * 1000 // 30 minutes
-const METADATA_STALE_TIME = 60 * 60 * 1000 // 1 hour
+const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes
+const LIST_GC_TIME = CACHE_TIMES.LONG // 30 minutes
+const METADATA_STALE_TIME = CACHE_TIMES.GC_LONG // 1 hour
 
 // ==================== QUERY KEYS ====================
 

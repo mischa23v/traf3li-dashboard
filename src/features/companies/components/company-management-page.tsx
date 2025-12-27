@@ -37,7 +37,7 @@ import { useCompanyContext } from '@/contexts/CompanyContext'
 import type { CreateCompanyData, UpdateCompanyData } from '@/services/companyService'
 
 export function CompanyManagementPage() {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const isArabic = i18n.language === 'ar'
 
   const { accessibleCompanies, canManageCompany } = useCompanyContext()
@@ -151,19 +151,17 @@ export function CompanyManagementPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            {isArabic ? 'إدارة الشركات' : 'Company Management'}
+            {t('companies.management.title')}
           </h1>
           <p className="text-muted-foreground">
-            {isArabic
-              ? 'إدارة الهيكل التنظيمي للشركات والصلاحيات'
-              : 'Manage company structure and permissions'}
+            {t('companies.management.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-4">
           <CompanySwitcher />
           <Button onClick={handleAddCompany}>
             <Plus className={cn('h-4 w-4', isArabic ? 'ml-2' : 'mr-2')} />
-            {isArabic ? 'إضافة شركة' : 'Add Company'}
+            {t('companies.management.addCompany')}
           </Button>
         </div>
       </div>
@@ -184,19 +182,17 @@ export function CompanyManagementPage() {
           <form onSubmit={handleSubmitAdd}>
             <DialogHeader>
               <DialogTitle>
-                {isArabic ? 'إضافة شركة جديدة' : 'Add New Company'}
+                {t('companies.management.addNewCompany')}
               </DialogTitle>
               <DialogDescription>
-                {isArabic
-                  ? 'أدخل بيانات الشركة الجديدة'
-                  : 'Enter the details of the new company'}
+                {t('companies.management.enterDetails')}
               </DialogDescription>
             </DialogHeader>
 
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <Label htmlFor="name">
-                  {isArabic ? 'الاسم (إنجليزي)' : 'Name (English)'}
+                  {t('companies.management.nameEnglish')}
                 </Label>
                 <Input
                   id="name"
@@ -208,7 +204,7 @@ export function CompanyManagementPage() {
 
               <div className="grid gap-2">
                 <Label htmlFor="nameAr">
-                  {isArabic ? 'الاسم (عربي)' : 'Name (Arabic)'}
+                  {t('companies.management.nameArabic')}
                 </Label>
                 <Input
                   id="nameAr"
@@ -218,7 +214,7 @@ export function CompanyManagementPage() {
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="code">{isArabic ? 'الرمز' : 'Code'}</Label>
+                <Label htmlFor="code">{t('companies.management.code')}</Label>
                 <Input
                   id="code"
                   value={formData.code}
@@ -227,7 +223,7 @@ export function CompanyManagementPage() {
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="status">{isArabic ? 'الحالة' : 'Status'}</Label>
+                <Label htmlFor="status">{t('companies.management.status')}</Label>
                 <Select
                   value={formData.status}
                   onValueChange={(value: any) => setFormData({ ...formData, status: value })}
@@ -237,13 +233,13 @@ export function CompanyManagementPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="active">
-                      {isArabic ? 'نشط' : 'Active'}
+                      {t('companies.management.active')}
                     </SelectItem>
                     <SelectItem value="inactive">
-                      {isArabic ? 'غير نشط' : 'Inactive'}
+                      {t('companies.management.inactive')}
                     </SelectItem>
                     <SelectItem value="suspended">
-                      {isArabic ? 'معلق' : 'Suspended'}
+                      {t('companies.management.suspended')}
                     </SelectItem>
                   </SelectContent>
                 </Select>
@@ -256,16 +252,12 @@ export function CompanyManagementPage() {
                 variant="outline"
                 onClick={() => setShowAddDialog(false)}
               >
-                {isArabic ? 'إلغاء' : 'Cancel'}
+                {t('companies.management.cancel')}
               </Button>
               <Button type="submit" disabled={createMutation.isPending}>
                 {createMutation.isPending
-                  ? isArabic
-                    ? 'جاري الإضافة...'
-                    : 'Adding...'
-                  : isArabic
-                  ? 'إضافة'
-                  : 'Add'}
+                  ? t('companies.management.adding')
+                  : t('companies.management.add')}
               </Button>
             </DialogFooter>
           </form>
@@ -277,16 +269,16 @@ export function CompanyManagementPage() {
         <DialogContent dir={isArabic ? 'rtl' : 'ltr'}>
           <form onSubmit={handleSubmitEdit}>
             <DialogHeader>
-              <DialogTitle>{isArabic ? 'تعديل الشركة' : 'Edit Company'}</DialogTitle>
+              <DialogTitle>{t('companies.management.editCompany')}</DialogTitle>
               <DialogDescription>
-                {isArabic ? 'تعديل بيانات الشركة' : 'Update company details'}
+                {t('companies.management.updateDetails')}
               </DialogDescription>
             </DialogHeader>
 
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <Label htmlFor="edit-name">
-                  {isArabic ? 'الاسم (إنجليزي)' : 'Name (English)'}
+                  {t('companies.management.nameEnglish')}
                 </Label>
                 <Input
                   id="edit-name"
@@ -298,7 +290,7 @@ export function CompanyManagementPage() {
 
               <div className="grid gap-2">
                 <Label htmlFor="edit-nameAr">
-                  {isArabic ? 'الاسم (عربي)' : 'Name (Arabic)'}
+                  {t('companies.management.nameArabic')}
                 </Label>
                 <Input
                   id="edit-nameAr"
@@ -308,7 +300,7 @@ export function CompanyManagementPage() {
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="edit-code">{isArabic ? 'الرمز' : 'Code'}</Label>
+                <Label htmlFor="edit-code">{t('companies.management.code')}</Label>
                 <Input
                   id="edit-code"
                   value={formData.code}
@@ -317,7 +309,7 @@ export function CompanyManagementPage() {
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="edit-status">{isArabic ? 'الحالة' : 'Status'}</Label>
+                <Label htmlFor="edit-status">{t('companies.management.status')}</Label>
                 <Select
                   value={formData.status}
                   onValueChange={(value: any) => setFormData({ ...formData, status: value })}
@@ -327,13 +319,13 @@ export function CompanyManagementPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="active">
-                      {isArabic ? 'نشط' : 'Active'}
+                      {t('companies.management.active')}
                     </SelectItem>
                     <SelectItem value="inactive">
-                      {isArabic ? 'غير نشط' : 'Inactive'}
+                      {t('companies.management.inactive')}
                     </SelectItem>
                     <SelectItem value="suspended">
-                      {isArabic ? 'معلق' : 'Suspended'}
+                      {t('companies.management.suspended')}
                     </SelectItem>
                   </SelectContent>
                 </Select>
@@ -346,16 +338,12 @@ export function CompanyManagementPage() {
                 variant="outline"
                 onClick={() => setShowEditDialog(false)}
               >
-                {isArabic ? 'إلغاء' : 'Cancel'}
+                {t('companies.management.cancel')}
               </Button>
               <Button type="submit" disabled={updateMutation.isPending}>
                 {updateMutation.isPending
-                  ? isArabic
-                    ? 'جاري التحديث...'
-                    : 'Updating...'
-                  : isArabic
-                  ? 'تحديث'
-                  : 'Update'}
+                  ? t('companies.management.updating')
+                  : t('companies.management.update')}
               </Button>
             </DialogFooter>
           </form>
@@ -366,11 +354,9 @@ export function CompanyManagementPage() {
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent dir={isArabic ? 'rtl' : 'ltr'}>
           <DialogHeader>
-            <DialogTitle>{isArabic ? 'حذف الشركة' : 'Delete Company'}</DialogTitle>
+            <DialogTitle>{t('companies.management.deleteCompany')}</DialogTitle>
             <DialogDescription>
-              {isArabic
-                ? 'هل أنت متأكد من حذف هذه الشركة؟ لا يمكن التراجع عن هذا الإجراء.'
-                : 'Are you sure you want to delete this company? This action cannot be undone.'}
+              {t('companies.management.deleteConfirmation')}
             </DialogDescription>
           </DialogHeader>
 
@@ -380,7 +366,7 @@ export function CompanyManagementPage() {
               variant="outline"
               onClick={() => setShowDeleteDialog(false)}
             >
-              {isArabic ? 'إلغاء' : 'Cancel'}
+              {t('companies.management.cancel')}
             </Button>
             <Button
               variant="destructive"
@@ -388,12 +374,8 @@ export function CompanyManagementPage() {
               disabled={deleteMutation.isPending}
             >
               {deleteMutation.isPending
-                ? isArabic
-                  ? 'جاري الحذف...'
-                  : 'Deleting...'
-                : isArabic
-                ? 'حذف'
-                : 'Delete'}
+                ? t('companies.management.deleting')
+                : t('companies.management.delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

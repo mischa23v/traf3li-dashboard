@@ -190,17 +190,13 @@ export function NoResultsState({
     <EmptyState
       icon="search"
       variant="search"
-      title={isArabic ? 'لا توجد نتائج' : 'No results found'}
+      title={t('common.noResultsFound')}
       description={
         searchQuery
-          ? isArabic
-            ? `لم يتم العثور على نتائج لـ "${searchQuery}"`
-            : `No results found for "${searchQuery}"`
-          : isArabic
-            ? 'حاول تعديل معايير البحث'
-            : 'Try adjusting your search criteria'
+          ? t('common.noResultsFoundFor', { query: searchQuery })
+          : t('common.tryAdjustingSearchCriteria')
       }
-      actionLabel={onClear ? (isArabic ? 'مسح البحث' : 'Clear search') : undefined}
+      actionLabel={onClear ? t('common.clearSearch') : undefined}
       onAction={onClear}
     />
   )
@@ -238,16 +234,15 @@ export function ErrorState({
   message?: string
   onRetry?: () => void
 }) {
-  const { i18n } = useTranslation()
-  const isArabic = i18n.language === 'ar'
+  const { t } = useTranslation()
 
   return (
     <EmptyState
       icon="error"
       variant="error"
-      title={isArabic ? 'حدث خطأ' : 'Something went wrong'}
-      description={message || (isArabic ? 'يرجى المحاولة مرة أخرى' : 'Please try again')}
-      actionLabel={onRetry ? (isArabic ? 'إعادة المحاولة' : 'Try again') : undefined}
+      title={t('common.somethingWentWrong')}
+      description={message || t('common.pleaseRetry')}
+      actionLabel={onRetry ? t('common.tryAgain') : undefined}
       onAction={onRetry}
     />
   )

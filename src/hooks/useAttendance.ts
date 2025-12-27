@@ -1,4 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   getAttendanceRecords,
   getAttendanceRecord,
@@ -56,9 +58,9 @@ import {
 } from '@/services/attendanceService'
 
 // ==================== Cache Configuration ====================
-const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
-const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
-const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
+const STATS_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour
+const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
 
 // Query Keys
 export const attendanceKeys = {
@@ -102,47 +104,37 @@ export const useAttendanceRecord = (recordId: string) => {
 
 // Create attendance record
 export const useCreateAttendanceRecord = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateAttendanceData) => createAttendanceRecord(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.today() })
+      invalidateCache.attendance.all()
     },
   })
 }
 
 // Update attendance record
 export const useUpdateAttendanceRecord = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ recordId, data }: { recordId: string; data: UpdateAttendanceData }) =>
       updateAttendanceRecord(recordId, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.lists() })
+    onSuccess: () => {
+      invalidateCache.attendance.all()
     },
   })
 }
 
 // Delete attendance record
 export const useDeleteAttendanceRecord = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (recordId: string) => deleteAttendanceRecord(recordId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.lists() })
+      invalidateCache.attendance.all()
     },
   })
 }
 
 // Check-in
 export const useCheckIn = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: {
       employeeId: string
@@ -150,17 +142,17 @@ export const useCheckIn = () => {
       location?: Partial<CheckLocation>
       notes?: string
     }) => checkIn(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.today() })
+    onSuccess: (_, variables) => {
+      Promise.all([
+        invalidateCache.attendance.all(),
+        invalidateCache.attendance.checkInStatus(variables.employeeId)
+      ])
     },
   })
 }
 
 // Check-out
 export const useCheckOut = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: {
       employeeId: string
@@ -168,30 +160,28 @@ export const useCheckOut = () => {
       location?: Partial<CheckLocation>
       notes?: string
     }) => checkOut(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.today() })
+    onSuccess: (_, variables) => {
+      Promise.all([
+        invalidateCache.attendance.all(),
+        invalidateCache.attendance.checkInStatus(variables.employeeId)
+      ])
     },
   })
 }
 
 // Add break
 export const useAddBreak = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ recordId, breakData }: { recordId: string; breakData: BreakRecord }) =>
       addBreak(recordId, breakData),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
+      invalidateCache.attendance.breaks(variables.recordId)
     },
   })
 }
 
 // Request correction
 export const useRequestCorrection = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       recordId,
@@ -206,17 +196,14 @@ export const useRequestCorrection = () => {
         evidenceUrl?: string
       }
     }) => requestCorrection(recordId, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.pendingApprovals() })
+    onSuccess: () => {
+      invalidateCache.attendance.all()
     },
   })
 }
 
 // Approve correction
 export const useApproveCorrection = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       recordId,
@@ -227,17 +214,14 @@ export const useApproveCorrection = () => {
       correctionId: string
       comments?: string
     }) => approveCorrection(recordId, correctionId, comments),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.pendingApprovals() })
+    onSuccess: () => {
+      invalidateCache.attendance.all()
     },
   })
 }
 
 // Reject correction
 export const useRejectCorrection = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       recordId,
@@ -248,73 +232,58 @@ export const useRejectCorrection = () => {
       correctionId: string
       reason: string
     }) => rejectCorrection(recordId, correctionId, reason),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.pendingApprovals() })
+    onSuccess: () => {
+      invalidateCache.attendance.all()
     },
   })
 }
 
 // Excuse late arrival
 export const useExcuseLateArrival = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ recordId, reason }: { recordId: string; reason: string }) =>
       excuseLateArrival(recordId, reason),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.lists() })
+    onSuccess: () => {
+      invalidateCache.attendance.all()
     },
   })
 }
 
 // Approve early departure
 export const useApproveEarlyDeparture = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ recordId, comments }: { recordId: string; comments?: string }) =>
       approveEarlyDeparture(recordId, comments),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.lists() })
+    onSuccess: () => {
+      invalidateCache.attendance.all()
     },
   })
 }
 
 // Approve timesheet
 export const useApproveTimesheet = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ recordId, comments }: { recordId: string; comments?: string }) =>
       approveTimesheet(recordId, comments),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.pendingApprovals() })
+    onSuccess: () => {
+      invalidateCache.attendance.all()
     },
   })
 }
 
 // Reject timesheet
 export const useRejectTimesheet = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ recordId, reason }: { recordId: string; reason: string }) =>
       rejectTimesheet(recordId, reason),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.pendingApprovals() })
+    onSuccess: () => {
+      invalidateCache.attendance.all()
     },
   })
 }
 
 // Approve overtime
 export const useApproveOvertime = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       recordId,
@@ -325,9 +294,8 @@ export const useApproveOvertime = () => {
       approvedHours: number
       comments?: string
     }) => approveOvertime(recordId, approvedHours, comments),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.pendingApprovals() })
+    onSuccess: () => {
+      invalidateCache.attendance.all()
     },
   })
 }
@@ -392,26 +360,21 @@ export const usePendingApprovals = () => {
 
 // Bulk check-in
 export const useBulkCheckIn = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (records: CreateAttendanceData[]) => bulkCheckIn(records),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.today() })
+      invalidateCache.attendance.all()
     },
   })
 }
 
 // Lock for payroll
 export const useLockForPayroll = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ recordIds, payrollRunId }: { recordIds: string[]; payrollRunId: string }) =>
       lockForPayroll(recordIds, payrollRunId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.lists() })
+      invalidateCache.attendance.all()
     },
   })
 }
@@ -429,22 +392,17 @@ export const useViolations = (recordId: string) => {
 
 // Confirm violation
 export const useConfirmViolation = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ recordId, violationId }: { recordId: string; violationId: string }) =>
       confirmViolation(recordId, violationId),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.violations(variables.recordId) })
+    onSuccess: () => {
+      invalidateCache.attendance.violations()
     },
   })
 }
 
 // Dismiss violation
 export const useDismissViolation = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       recordId,
@@ -455,9 +413,8 @@ export const useDismissViolation = () => {
       violationId: string
       reason: string
     }) => dismissViolation(recordId, violationId, reason),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.violations(variables.recordId) })
+    onSuccess: () => {
+      invalidateCache.attendance.violations()
     },
   })
 }
@@ -542,52 +499,42 @@ export const useAttendanceByEmployeeAndDate = (employeeId: string, date: string)
 
 // Mark absences for a date
 export const useMarkAbsences = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ date, departmentId }: { date: string; departmentId?: string }) =>
       markAbsences(date, departmentId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.today() })
+      invalidateCache.attendance.all()
     },
   })
 }
 
 // Import attendance records (bulk)
 export const useImportAttendance = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (records: CreateAttendanceData[]) => importAttendance(records),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.today() })
+      invalidateCache.attendance.all()
     },
   })
 }
 
 // Start break
 export const useStartBreak = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ recordId, breakData }: { recordId: string; breakData: Partial<BreakRecord> }) =>
       startBreak(recordId, breakData),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
+      invalidateCache.attendance.breaks(variables.recordId)
     },
   })
 }
 
 // End break
 export const useEndBreak = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (recordId: string) => endBreak(recordId),
     onSuccess: (_, recordId) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(recordId) })
+      invalidateCache.attendance.breaks(recordId)
     },
   })
 }
@@ -605,8 +552,6 @@ export const useBreaks = (recordId: string) => {
 
 // Submit correction (duplicate but with different function name from requestCorrection)
 export const useSubmitCorrection = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       recordId,
@@ -622,17 +567,14 @@ export const useSubmitCorrection = () => {
         evidenceUrl?: string
       }
     }) => submitCorrection(recordId, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.pendingApprovals() })
+    onSuccess: () => {
+      invalidateCache.attendance.all()
     },
   })
 }
 
 // Review correction (backend-aligned version)
 export const useReviewCorrection = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       recordId,
@@ -646,59 +588,47 @@ export const useReviewCorrection = () => {
         reviewComments?: string
       }
     }) => reviewCorrection(recordId, correctionId, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.pendingApprovals() })
+    onSuccess: () => {
+      invalidateCache.attendance.all()
     },
   })
 }
 
 // Approve attendance (alternative to approveTimesheet)
 export const useApproveAttendance = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ recordId, comments }: { recordId: string; comments?: string }) =>
       approveAttendance(recordId, comments),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.pendingApprovals() })
+    onSuccess: () => {
+      invalidateCache.attendance.all()
     },
   })
 }
 
 // Reject attendance (alternative to rejectTimesheet)
 export const useRejectAttendance = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ recordId, reason }: { recordId: string; reason: string }) =>
       rejectAttendance(recordId, reason),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.pendingApprovals() })
+    onSuccess: () => {
+      invalidateCache.attendance.all()
     },
   })
 }
 
 // Add violation
 export const useAddViolation = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ recordId, violationData }: { recordId: string; violationData: any }) =>
       addViolation(recordId, violationData),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.violations(variables.recordId) })
+    onSuccess: () => {
+      invalidateCache.attendance.violations()
     },
   })
 }
 
 // Resolve violation
 export const useResolveViolation = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       recordId,
@@ -709,17 +639,14 @@ export const useResolveViolation = () => {
       violationIndex: number
       resolutionData: any
     }) => resolveViolation(recordId, violationIndex, resolutionData),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.violations(variables.recordId) })
+    onSuccess: () => {
+      invalidateCache.attendance.violations()
     },
   })
 }
 
 // Appeal violation
 export const useAppealViolation = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       recordId,
@@ -730,17 +657,14 @@ export const useAppealViolation = () => {
       violationIndex: number
       appealData: any
     }) => appealViolation(recordId, violationIndex, appealData),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.violations(variables.recordId) })
+    onSuccess: () => {
+      invalidateCache.attendance.violations()
     },
   })
 }
 
 // Approve overtime for record (alternative to approveOvertime)
 export const useApproveOvertimeForRecord = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       recordId,
@@ -752,9 +676,8 @@ export const useApproveOvertimeForRecord = () => {
         comments?: string
       }
     }) => approveOvertimeForRecord(recordId, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
-      queryClient.invalidateQueries({ queryKey: attendanceKeys.pendingApprovals() })
+    onSuccess: () => {
+      invalidateCache.attendance.all()
     },
   })
 }

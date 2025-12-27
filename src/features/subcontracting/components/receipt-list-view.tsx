@@ -56,11 +56,12 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useSubcontractingReceipts, useSubmitSubcontractingReceipt } from '@/hooks/use-subcontracting'
 import type { SubcontractingReceipt, SubcontractingReceiptStatus } from '@/types/subcontracting'
 import { SubcontractingSidebar } from './subcontracting-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
-  { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.subcontracting', href: '/dashboard/subcontracting' },
-  { title: 'subcontracting.receipts', href: '/dashboard/subcontracting/receipts' },
+  { title: 'sidebar.nav.overview', href: ROUTES.dashboard.home },
+  { title: 'sidebar.nav.subcontracting', href: ROUTES.dashboard.subcontracting.list },
+  { title: 'subcontracting.receipts', href: ROUTES.dashboard.subcontracting.receipts.list },
 ]
 
 // Quality status based on rejection rate
@@ -339,7 +340,7 @@ export function ReceiptListView() {
                     />
                   </div>
                   <Button asChild className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
-                    <Link to="/dashboard/subcontracting/receipts/create">
+                    <Link to={ROUTES.dashboard.subcontracting.receipts.create}>
                       <Plus className="w-4 h-4 ml-2" />
                       {t('subcontracting.receipt.create', 'إنشاء إيصال')}
                     </Link>
@@ -371,7 +372,7 @@ export function ReceiptListView() {
                       {t('subcontracting.receipt.noReceiptsDesc', 'ابدأ بإنشاء إيصال استلام جديد')}
                     </p>
                     <Button asChild className="rounded-xl">
-                      <Link to="/dashboard/subcontracting/receipts/create">
+                      <Link to={ROUTES.dashboard.subcontracting.receipts.create}>
                         <Plus className="w-4 h-4 ml-2" />
                         {t('subcontracting.receipt.create', 'إنشاء إيصال')}
                       </Link>
@@ -416,7 +417,7 @@ export function ReceiptListView() {
                             <TableRow
                               key={receipt._id}
                               className="cursor-pointer hover:bg-muted/50"
-                              onClick={() => navigate({ to: `/dashboard/subcontracting/receipts/${receipt._id}` })}
+                              onClick={() => navigate({ to: ROUTES.dashboard.subcontracting.receipts.list + `/${receipt._id}` })}
                             >
                               <TableCell>
                                 <div className="flex items-center gap-3">
@@ -469,7 +470,7 @@ export function ReceiptListView() {
                                     <DropdownMenuItem
                                       onClick={(e) => {
                                         e.stopPropagation()
-                                        navigate({ to: `/dashboard/subcontracting/receipts/${receipt._id}` })
+                                        navigate({ to: ROUTES.dashboard.subcontracting.receipts.list + `/${receipt._id}` })
                                       }}
                                     >
                                       <Eye className="w-4 h-4 ml-2" />
@@ -480,7 +481,7 @@ export function ReceiptListView() {
                                         <DropdownMenuItem
                                           onClick={(e) => {
                                             e.stopPropagation()
-                                            navigate({ to: `/dashboard/subcontracting/receipts/${receipt._id}/edit` })
+                                            navigate({ to: ROUTES.dashboard.subcontracting.receipts.list + `/${receipt._id}/edit` })
                                           }}
                                         >
                                           <Edit className="w-4 h-4 ml-2" />

@@ -6,6 +6,7 @@ import {
     X, Copy, Bell, DollarSign, Link as LinkIcon
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { TAX_CONFIG } from '@/config'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
@@ -67,6 +68,7 @@ import { cn } from '@/lib/utils'
 import { useApiError } from '@/hooks/useApiError'
 import { ValidationErrors } from '@/components/validation-errors'
 import { isValidVatNumber, errorMessages } from '@/utils/validation-patterns'
+import { ROUTES } from '@/constants/routes'
 
 // Types
 type FirmSize = 'solo' | 'small' | 'medium' | 'large'
@@ -354,7 +356,7 @@ export function CreateInvoiceView() {
 
         const totalDiscount = itemDiscounts + invoiceDiscount
         const taxableAmount = subtotal - totalDiscount
-        const vatAmount = taxableAmount * 0.15 // 15% Saudi VAT
+        const vatAmount = taxableAmount * TAX_CONFIG.SAUDI_VAT_RATE // 15% Saudi VAT
         const total = taxableAmount + vatAmount
 
         // Apply retainer
@@ -481,7 +483,7 @@ export function CreateInvoiceView() {
             discountType,
             discountValue,
             discountAmount: calculations.totalDiscount,
-            vatRate: 0.15,
+            vatRate: TAX_CONFIG.SAUDI_VAT_RATE,
             vatAmount: calculations.vatAmount,
             totalAmount: calculations.total,
             // Notes
@@ -2108,7 +2110,7 @@ export function CreateInvoiceView() {
                             {/* ACTION BUTTONS */}
                             <div className="flex justify-between items-center pt-6 border-t border-slate-100">
                                 <div className="flex gap-2">
-                                    <Link to="/dashboard/finance/invoices">
+                                    <Link to={ROUTES.dashboard.finance.invoices.list}>
                                         <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-700 rounded-xl">
                                             <X className="ms-2 h-4 w-4" aria-hidden="true" />
                                             إلغاء

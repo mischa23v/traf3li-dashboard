@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useSearch } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useCreateReport, useUpdateReport, useReport } from '@/hooks/useReports'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -189,13 +190,13 @@ export function TasksReportsCreateView() {
       await createMutation.mutateAsync(data)
     }
 
-    navigate({ to: '/dashboard/tasks/reports' })
+    navigate({ to: ROUTES.dashboard.tasks.reports.list })
   }
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'المهام', href: '/dashboard/tasks/list', isActive: false },
-    { title: 'التقارير', href: '/dashboard/tasks/reports', isActive: true },
+    { title: 'المهام', href: ROUTES.dashboard.tasks.list, isActive: false },
+    { title: 'التقارير', href: ROUTES.dashboard.tasks.reports.list, isActive: true },
   ]
 
   const isPending = createMutation.isPending || updateMutation.isPending
@@ -229,7 +230,7 @@ export function TasksReportsCreateView() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" className="rounded-xl hover:bg-white" onClick={() => navigate({ to: '/dashboard/tasks/reports' })}>
+              <Button variant="ghost" size="icon" className="rounded-xl hover:bg-white" onClick={() => navigate({ to: ROUTES.dashboard.tasks.reports.list })}>
                 <ArrowRight className="h-5 w-5" />
               </Button>
               <div>
@@ -439,7 +440,7 @@ export function TasksReportsCreateView() {
             </Card>
 
             <div className="flex items-center justify-end gap-4">
-              <Button variant="outline" onClick={() => navigate({ to: '/dashboard/tasks/reports' })} className="rounded-xl">إلغاء</Button>
+              <Button variant="outline" onClick={() => navigate({ to: ROUTES.dashboard.tasks.reports.list })} className="rounded-xl">إلغاء</Button>
               <Button onClick={handleSubmit} disabled={!reportCode || !reportName || isPending} className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8">
                 {isPending ? <>جاري الحفظ...</> : (
                   <><CheckCircle className="w-4 h-4 ms-2" />{isEditMode ? 'حفظ التعديلات' : 'إنشاء التقرير'}</>

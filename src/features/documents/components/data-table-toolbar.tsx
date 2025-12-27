@@ -14,19 +14,18 @@ interface DataTableToolbarProps<TData> {
 export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const isFiltered = table.getState().columnFilters.length > 0
-  const isArabic = i18n.language === 'ar'
 
   const categoryFilterOptions = categoryOptions.map((option) => ({
     value: option.value,
-    label: isArabic ? option.labelAr : option.label,
+    label: t(`documents.categories.${option.value}`),
     icon: option.icon,
   }))
 
   const confidentialOptions = [
-    { value: 'true', label: isArabic ? 'سري' : 'Confidential' },
-    { value: 'false', label: isArabic ? 'عام' : 'Public' },
+    { value: 'true', label: t('documents.confidentialOptions.confidential') },
+    { value: 'false', label: t('documents.confidentialOptions.public') },
   ]
 
   return (

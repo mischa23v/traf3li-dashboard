@@ -52,38 +52,35 @@ const topNav = [
   { title: 'quality.createAction', href: '/dashboard/quality/actions/create' },
 ]
 
-const ACTION_TYPES: { value: ActionType; label: string; labelEn: string; icon: any }[] = [
+const ACTION_TYPES: { value: ActionType; translationKey: string; icon: any }[] = [
   {
     value: 'corrective',
-    label: 'تصحيحي',
-    labelEn: 'Corrective',
+    translationKey: 'quality.actionType.corrective',
     icon: AlertTriangle,
   },
   {
     value: 'preventive',
-    label: 'وقائي',
-    labelEn: 'Preventive',
+    translationKey: 'quality.actionType.preventive',
     icon: CheckCircle2,
   },
 ]
 
 const PRIORITY_LEVELS: {
   value: 'low' | 'medium' | 'high' | 'urgent'
-  label: string
-  labelEn: string
+  translationKey: string
   color: string
 }[] = [
-  { value: 'low', label: 'منخفض', labelEn: 'Low', color: 'bg-gray-500' },
-  { value: 'medium', label: 'متوسط', labelEn: 'Medium', color: 'bg-blue-500' },
-  { value: 'high', label: 'عالي', labelEn: 'High', color: 'bg-orange-500' },
-  { value: 'urgent', label: 'عاجل', labelEn: 'Urgent', color: 'bg-red-500' },
+  { value: 'low', translationKey: 'quality.priority.low', color: 'bg-gray-500' },
+  { value: 'medium', translationKey: 'quality.priority.medium', color: 'bg-blue-500' },
+  { value: 'high', translationKey: 'quality.priority.high', color: 'bg-orange-500' },
+  { value: 'urgent', translationKey: 'quality.priority.urgent', color: 'bg-red-500' },
 ]
 
-const STATUS_OPTIONS: { value: ActionStatus; label: string; labelEn: string }[] = [
-  { value: 'open', label: 'مفتوح', labelEn: 'Open' },
-  { value: 'in_progress', label: 'قيد التنفيذ', labelEn: 'In Progress' },
-  { value: 'resolved', label: 'تم الحل', labelEn: 'Resolved' },
-  { value: 'closed', label: 'مغلق', labelEn: 'Closed' },
+const STATUS_OPTIONS: { value: ActionStatus; translationKey: string }[] = [
+  { value: 'open', translationKey: 'quality.status.open' },
+  { value: 'in_progress', translationKey: 'quality.status.inProgress' },
+  { value: 'resolved', translationKey: 'quality.status.resolved' },
+  { value: 'closed', translationKey: 'quality.status.closed' },
 ]
 
 type FormData = Omit<
@@ -282,7 +279,7 @@ export function CreateActionView() {
                                 <div className="flex items-center gap-2">
                                   <Icon className="w-4 h-4" />
                                   <span>
-                                    {type.label} ({type.labelEn})
+                                    {t(type.translationKey)}
                                   </span>
                                 </div>
                               </SelectItem>
@@ -310,7 +307,7 @@ export function CreateActionView() {
                               <div className="flex items-center gap-2">
                                 <Flag className={`w-4 h-4 text-white ${level.color}`} />
                                 <span>
-                                  {level.label} ({level.labelEn})
+                                  {t(level.translationKey)}
                                 </span>
                               </div>
                             </SelectItem>
@@ -492,7 +489,7 @@ export function CreateActionView() {
                         <SelectContent>
                           {STATUS_OPTIONS.map((status) => (
                             <SelectItem key={status.value} value={status.value}>
-                              {status.label} ({status.labelEn})
+                              {t(status.translationKey)}
                             </SelectItem>
                           ))}
                         </SelectContent>

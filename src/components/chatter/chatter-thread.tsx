@@ -78,12 +78,10 @@ export function ChatterThread({
       <div className={cn('flex flex-col items-center justify-center p-12', className)}>
         <MessageSquare className="h-12 w-12 text-muted-foreground mb-3" />
         <p className="text-sm text-muted-foreground">
-          {isArabic ? 'لا توجد رسائل بعد' : 'No messages yet'}
+          {t('common.noMessagesYet')}
         </p>
         <p className="text-xs text-muted-foreground mt-1">
-          {isArabic
-            ? 'ابدأ المحادثة بإرسال رسالة أو ملاحظة'
-            : 'Start the conversation by sending a message or note'}
+          {t('common.startConversation')}
         </p>
       </div>
     )
@@ -135,16 +133,18 @@ function MessageItem({ message, isArabic, onToggleStar, onDelete, onEdit }: Mess
     }
   }
 
+  const { t: messageT } = useTranslation()
+
   const getMessageTypeLabel = () => {
     switch (message.message_type) {
       case 'notification':
-        return isArabic ? 'إشعار' : 'Notification'
+        return messageT('common.notification')
       case 'activity_done':
-        return isArabic ? 'نشاط مكتمل' : 'Activity Done'
+        return messageT('common.activityDone')
       case 'stage_change':
-        return isArabic ? 'تغيير مرحلة' : 'Stage Change'
+        return messageT('common.stageChange')
       case 'auto_log':
-        return isArabic ? 'تسجيل تلقائي' : 'Auto Log'
+        return messageT('common.autoLog')
       default:
         return null
     }
@@ -187,15 +187,13 @@ function MessageItem({ message, isArabic, onToggleStar, onDelete, onEdit }: Mess
               <span className="font-medium text-sm">
                 {author
                   ? `${author.firstName} ${author.lastName}`
-                  : isArabic
-                  ? 'النظام'
-                  : 'System'}
+                  : messageT('common.system')}
               </span>
 
               {message.is_internal && (
                 <Badge variant="outline" className="text-xs bg-yellow-100 border-yellow-300">
                   <StickyNote className="h-3 w-3 me-1" />
-                  {isArabic ? 'داخلي' : 'Internal'}
+                  {messageT('common.internal')}
                 </Badge>
               )}
 
@@ -236,18 +234,14 @@ function MessageItem({ message, isArabic, onToggleStar, onDelete, onEdit }: Mess
                         )}
                       />
                       {message.is_starred
-                        ? isArabic
-                          ? 'إزالة من المميزة'
-                          : 'Unstar'
-                        : isArabic
-                        ? 'تمييز'
-                        : 'Star'}
+                        ? messageT('common.unstar')
+                        : messageT('common.star')}
                     </DropdownMenuItem>
                   )}
                   {onEdit && !message.is_internal && message.message_type === 'comment' && (
                     <DropdownMenuItem onClick={() => onEdit(message._id, message.body)}>
                       <Edit2 className="h-4 w-4 me-2" />
-                      {isArabic ? 'تعديل' : 'Edit'}
+                      {messageT('common.edit')}
                     </DropdownMenuItem>
                   )}
                   {onDelete && (
@@ -256,7 +250,7 @@ function MessageItem({ message, isArabic, onToggleStar, onDelete, onEdit }: Mess
                       onClick={() => onDelete(message._id)}
                     >
                       <Trash2 className="h-4 w-4 me-2" />
-                      {isArabic ? 'حذف' : 'Delete'}
+                      {messageT('common.delete')}
                     </DropdownMenuItem>
                   )}
                 </DropdownMenuContent>
@@ -281,7 +275,7 @@ function MessageItem({ message, isArabic, onToggleStar, onDelete, onEdit }: Mess
           {message.tracking_value_ids && message.tracking_value_ids.length > 0 && (
             <div className="mt-3 space-y-1.5 bg-muted/50 rounded-md p-3">
               <div className="text-xs font-medium text-muted-foreground mb-2">
-                {isArabic ? 'التغييرات:' : 'Changes:'}
+                {messageT('common.changes')}:
               </div>
               {message.tracking_value_ids.map((tracking, idx) => (
                 <TrackingItem key={idx} tracking={tracking} isArabic={isArabic} />
@@ -315,6 +309,8 @@ interface TrackingItemProps {
 }
 
 function TrackingItem({ tracking, isArabic }: TrackingItemProps) {
+  const { t: trackingT } = useTranslation()
+
   const getDisplayValue = (
     type: string,
     char?: string,
@@ -329,7 +325,7 @@ function TrackingItem({ tracking, isArabic }: TrackingItemProps) {
     if (datetime !== undefined) {
       return format(new Date(datetime), 'PPp', { locale: isArabic ? ar : enUS })
     }
-    if (bool !== undefined) return bool ? (isArabic ? 'نعم' : 'Yes') : isArabic ? 'لا' : 'No'
+    if (bool !== undefined) return bool ? trackingT('common.yes') : trackingT('common.no')
     return '-'
   }
 
@@ -371,11 +367,13 @@ interface AttachmentItemProps {
 }
 
 function AttachmentItem({ attachment, isArabic }: AttachmentItemProps) {
+  const { t: attachT } = useTranslation()
+
   if (typeof attachment === 'string') {
     return (
       <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-md text-xs">
         <Paperclip className="h-3 w-3" />
-        <span>{isArabic ? 'مرفق' : 'Attachment'}</span>
+        <span>{attachT('common.attachment')}</span>
       </div>
     )
   }

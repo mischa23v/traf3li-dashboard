@@ -37,6 +37,7 @@ import { PracticeSidebar } from './practice-sidebar'
 import { useCreateCase } from '@/hooks/useCasesAndClients'
 import { cn } from '@/lib/utils'
 import type { CaseCategory, CasePriority, CreateCaseData, LaborCaseDetails } from '@/services/casesService'
+import { ROUTES } from '@/constants/routes'
 
 // Field Tooltips
 const FIELD_TOOLTIPS = {
@@ -610,7 +611,7 @@ export function CreateCaseView() {
 
         try {
             await createCaseMutation.mutateAsync(payload)
-            navigate({ to: '/dashboard/cases' })
+            navigate({ to: ROUTES.dashboard.cases.list })
         } catch (error) {
             // Error is handled by the mutation
         }
@@ -618,7 +619,7 @@ export function CreateCaseView() {
 
     const topNav = [
         { title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },
-        { title: t('nav.cases', 'القضايا'), href: '/dashboard/cases', isActive: true },
+        { title: t('nav.cases', 'القضايا'), href: ROUTES.dashboard.cases.list, isActive: true },
     ]
 
     // Render step content
@@ -1573,7 +1574,7 @@ export function CreateCaseView() {
 
                                 {/* Navigation Footer */}
                                 <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
-                                    <Link to="/dashboard/cases">
+                                    <Link to={ROUTES.dashboard.cases.list}>
                                         <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
                                             إلغاء
                                         </Button>

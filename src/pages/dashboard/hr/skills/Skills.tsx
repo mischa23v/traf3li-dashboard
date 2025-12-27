@@ -112,14 +112,14 @@ export default function SkillsPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm(isArabic ? 'هل أنت متأكد من حذف هذه المهارة؟' : 'Are you sure you want to delete this skill?')) {
+    if (confirm(t('skills.confirmDelete'))) {
       await deleteMutation.mutateAsync(id)
     }
   }
 
   const handleBulkDelete = async () => {
     if (selectedSkills.length === 0) return
-    if (confirm(isArabic ? `هل تريد حذف ${selectedSkills.length} مهارة؟` : `Delete ${selectedSkills.length} skills?`)) {
+    if (confirm(t('skills.confirmBulkDelete', { count: selectedSkills.length }))) {
       await bulkDeleteMutation.mutateAsync(selectedSkills)
       setSelectedSkills([])
     }
@@ -159,22 +159,20 @@ export default function SkillsPage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">
-            {isArabic ? 'إدارة المهارات' : 'Skills Management'}
+            {t('skills.management')}
           </h1>
           <p className="text-muted-foreground mt-1">
-            {isArabic
-              ? 'إدارة قاعدة بيانات المهارات والكفاءات'
-              : 'Manage skill master data and competencies'}
+            {t('skills.description')}
           </p>
         </div>
         <div className="flex gap-2">
           <Button onClick={handleExport} variant="outline">
             <Download className="h-4 w-4 mr-2" />
-            {isArabic ? 'تصدير' : 'Export'}
+            {t('skills.export')}
           </Button>
           <Button onClick={handleCreate}>
             <Plus className="h-4 w-4 mr-2" />
-            {isArabic ? 'إضافة مهارة' : 'Add Skill'}
+            {t('skills.addSkill')}
           </Button>
         </div>
       </div>
@@ -185,14 +183,14 @@ export default function SkillsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                {isArabic ? 'إجمالي المهارات' : 'Total Skills'}
+                {t('skills.stats.totalSkills')}
               </CardTitle>
               <Award className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalSkills}</div>
               <p className="text-xs text-muted-foreground">
-                {stats.activeSkills} {isArabic ? 'نشط' : 'active'}
+                {stats.activeSkills} {t('skills.stats.active')}
               </p>
             </CardContent>
           </Card>
@@ -200,7 +198,7 @@ export default function SkillsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                {isArabic ? 'المهارات التقنية' : 'Technical Skills'}
+                {t('skills.stats.technicalSkills')}
               </CardTitle>
               <Code className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -214,7 +212,7 @@ export default function SkillsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                {isArabic ? 'يتطلب شهادة' : 'Requires Certification'}
+                {t('skills.stats.requiresCertification')}
               </CardTitle>
               <Award className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -226,14 +224,14 @@ export default function SkillsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                {isArabic ? 'الأكثر طلباً' : 'Most Demanded'}
+                {t('skills.stats.mostDemanded')}
               </CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.mostDemandedSkills.length}</div>
               <p className="text-xs text-muted-foreground">
-                {isArabic ? 'مهارات متقدمة' : 'trending skills'}
+                {t('skills.stats.trendingSkills')}
               </p>
             </CardContent>
           </Card>
@@ -248,7 +246,7 @@ export default function SkillsPage() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder={isArabic ? 'البحث في المهارات...' : 'Search skills...'}
+                  placeholder={t('skills.searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9"
@@ -264,7 +262,7 @@ export default function SkillsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">
-                  {isArabic ? 'كل الفئات' : 'All Categories'}
+                  {t('skills.allCategories')}
                 </SelectItem>
                 {Object.entries(SKILL_CATEGORY_LABELS).map(([key, label]) => (
                   <SelectItem key={key} value={key}>
@@ -276,7 +274,7 @@ export default function SkillsPage() {
             {selectedSkills.length > 0 && (
               <Button variant="destructive" onClick={handleBulkDelete}>
                 <Trash2 className="h-4 w-4 mr-2" />
-                {isArabic ? `حذف (${selectedSkills.length})` : `Delete (${selectedSkills.length})`}
+                {t('skills.deleteCount', { count: selectedSkills.length })}
               </Button>
             )}
           </div>
@@ -300,19 +298,19 @@ export default function SkillsPage() {
                       className="rounded border-gray-300"
                     />
                   </TableHead>
-                  <TableHead>{isArabic ? 'اسم المهارة' : 'Skill Name'}</TableHead>
-                  <TableHead>{isArabic ? 'الفئة' : 'Category'}</TableHead>
-                  <TableHead>{isArabic ? 'الوصف' : 'Description'}</TableHead>
-                  <TableHead className="text-center">{isArabic ? 'مستويات' : 'Levels'}</TableHead>
-                  <TableHead className="text-center">{isArabic ? 'شهادة' : 'Certification'}</TableHead>
-                  <TableHead className="text-right">{isArabic ? 'الإجراءات' : 'Actions'}</TableHead>
+                  <TableHead>{t('skills.table.skillName')}</TableHead>
+                  <TableHead>{t('skills.table.category')}</TableHead>
+                  <TableHead>{t('skills.table.description')}</TableHead>
+                  <TableHead className="text-center">{t('skills.table.levels')}</TableHead>
+                  <TableHead className="text-center">{t('skills.table.certification')}</TableHead>
+                  <TableHead className="text-right">{t('skills.table.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {skills.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                      {isArabic ? 'لا توجد مهارات' : 'No skills found'}
+                      {t('skills.noSkillsFound')}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -338,7 +336,7 @@ export default function SkillsPage() {
                               </div>
                               {!skill.isActive && (
                                 <Badge variant="secondary" className="text-xs">
-                                  {isArabic ? 'غير نشط' : 'Inactive'}
+                                  {t('skills.inactive')}
                                 </Badge>
                               )}
                             </div>
@@ -374,19 +372,19 @@ export default function SkillsPage() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuLabel>
-                                {isArabic ? 'الإجراءات' : 'Actions'}
+                                {t('skills.table.actions')}
                               </DropdownMenuLabel>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem onClick={() => handleEdit(skill)}>
                                 <Edit className="h-4 w-4 mr-2" />
-                                {isArabic ? 'تعديل' : 'Edit'}
+                                {t('skills.edit')}
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => handleDelete(skill._id)}
                                 className="text-destructive"
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
-                                {isArabic ? 'حذف' : 'Delete'}
+                                {t('skills.delete')}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>

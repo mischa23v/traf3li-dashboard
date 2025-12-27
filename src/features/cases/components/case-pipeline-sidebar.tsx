@@ -15,6 +15,7 @@ import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 import { useTranslation } from 'react-i18next'
 import { caseTypes } from '../data/case-pipeline-schema'
+import { ROUTES } from '@/constants/routes'
 
 interface CasePipelineSidebarProps {
     context?: 'pipeline' | 'list'
@@ -181,7 +182,7 @@ export function CasePipelineSidebar({
                 <div className="relative z-10 grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
                     {/* Create Case Button */}
                     <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
-                        <Link to="/dashboard/cases/create">
+                        <Link to={ROUTES.dashboard.cases.new}>
                             <Plus className="h-7 w-7" aria-hidden="true" />
                             <span className="text-sm font-bold">{t('casePipeline.sidebar.newCase', 'قضية جديدة')}</span>
                         </Link>
@@ -189,7 +190,7 @@ export function CasePipelineSidebar({
 
                     {/* View All Cases Button */}
                     <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
-                        <Link to="/dashboard/cases">
+                        <Link to={ROUTES.dashboard.cases.list}>
                             <Scale className="h-6 w-6" aria-hidden="true" />
                             <span className="text-sm font-bold">{t('casePipeline.sidebar.viewCases', 'عرض القضايا')}</span>
                         </Link>

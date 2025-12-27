@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useParams, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
     Calendar as CalendarIcon, MapPin, CheckCircle2, Trash2, Edit3, Loader2,
     ArrowLeft, Briefcase, XCircle, Check, X, HelpCircle,
@@ -73,7 +74,7 @@ export function EventDetailsView() {
     const handleDelete = () => {
         deleteEventMutation.mutate(eventId, {
             onSuccess: () => {
-                navigate({ to: '/dashboard/tasks/events' })
+                navigate({ to: ROUTES.dashboard.tasks.events.list })
             }
         })
     }
@@ -146,9 +147,9 @@ export function EventDetailsView() {
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'المهام', href: '/dashboard/tasks/list', isActive: false },
-        { title: 'التذكيرات', href: '/dashboard/tasks/reminders', isActive: false },
-        { title: 'الأحداث', href: '/dashboard/tasks/events', isActive: true },
+        { title: 'المهام', href: ROUTES.dashboard.tasks.list, isActive: false },
+        { title: 'التذكيرات', href: ROUTES.dashboard.tasks.reminders.list, isActive: false },
+        { title: 'الأحداث', href: '{ROUTES.dashboard.tasks.events.list}', isActive: true },
     ]
 
     return (
@@ -231,7 +232,7 @@ export function EventDetailsView() {
                             <h4 className="text-lg font-bold text-navy mb-2">لم يتم العثور على الفعالية</h4>
                             <p className="text-slate-500 mb-4">الفعالية المطلوبة غير موجودة أو تم حذفها</p>
                             <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl">
-                                <Link to="/dashboard/tasks/events">
+                                <Link to="{ROUTES.dashboard.tasks.events.list}">
                                     <ArrowLeft className="ms-2 h-4 w-4" />
                                     العودة إلى الفعاليات
                                 </Link>
@@ -251,7 +252,7 @@ export function EventDetailsView() {
                                 <Button
                                     onClick={() => {
                                         const taskId = typeof event.taskId === 'string' ? event.taskId : event.taskId._id
-                                        navigate({ to: '/dashboard/tasks/$taskId', params: { taskId } })
+                                        navigate({ to: ROUTES.dashboard.tasks.detail(taskId) })
                                     }}
                                     variant="outline"
                                     className="bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-300 rounded-xl px-4 py-2 flex items-center gap-2"

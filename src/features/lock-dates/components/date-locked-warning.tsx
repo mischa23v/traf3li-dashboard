@@ -26,7 +26,7 @@ export function DateLockedWarning({
   className,
   compact = false,
 }: DateLockedWarningProps) {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const isArabic = i18n.language === 'ar'
 
   // Backend not implemented - disable the check
@@ -50,9 +50,7 @@ export function DateLockedWarning({
           {check.messageAr && isArabic
             ? check.messageAr
             : check.message ||
-              (isArabic
-                ? `التاريخ مغلق (${format(new Date(check.lock_date!), 'PP', { locale: ar })})`
-                : `Date locked (${format(new Date(check.lock_date!), 'PP', { locale: enUS })})`)}
+              `${t('lockDates.dateLockedCompact')} (${format(new Date(check.lock_date!), 'PP', { locale: isArabic ? ar : enUS })})`}
         </span>
       </div>
     )
@@ -63,7 +61,7 @@ export function DateLockedWarning({
       <AlertTriangle className="h-4 w-4" />
       <AlertTitle className="flex items-center gap-2">
         <Lock className="h-4 w-4" />
-        {isArabic ? 'التاريخ مغلق' : 'Date Locked'}
+        {t('lockDates.dateLocked')}
         {lockConfig && (
           <span className="text-xs font-normal opacity-75">
             ({isArabic ? lockConfig.labelAr : lockConfig.label})
@@ -74,13 +72,9 @@ export function DateLockedWarning({
         {check.messageAr && isArabic
           ? check.messageAr
           : check.message ||
-            (isArabic
-              ? `لا يمكن إنشاء أو تعديل سجلات قبل ${format(new Date(check.lock_date!), 'PP', {
-                  locale: ar,
-                })}`
-              : `Cannot create or modify records before ${format(new Date(check.lock_date!), 'PP', {
-                  locale: enUS,
-                })}`)}
+            `${t('lockDates.cannotModify')} ${format(new Date(check.lock_date!), 'PP', {
+              locale: isArabic ? ar : enUS,
+            })}`}
       </AlertDescription>
     </Alert>
   )

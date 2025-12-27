@@ -27,12 +27,14 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useEmailCampaign, useCampaignAnalytics, useSendCampaign, usePauseCampaign, useResumeCampaign } from '@/hooks/useCrmAdvanced'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useParams, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Progress } from '@/components/ui/progress'
 import { Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
@@ -97,7 +99,7 @@ export function EmailCampaignDetailsView() {
   const handleDelete = () => {
     if (confirm('هل أنت متأكد من حذف هذه الحملة؟')) {
       // TODO: Implement delete mutation
-      navigate({ to: '/dashboard/crm/email-marketing' })
+      navigate({ to: ROUTES.dashboard.crm.emailMarketing.list })
     }
   }
 
@@ -106,10 +108,10 @@ export function EmailCampaignDetailsView() {
   const analytics = analyticsData?.data || campaign?.analytics
 
   const topNav = [
-    { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: false },
-    { title: 'خط المبيعات', href: '/dashboard/crm/pipeline', isActive: false },
-    { title: 'التسويق عبر البريد', href: '/dashboard/crm/email-marketing', isActive: true },
-    { title: 'الأنشطة', href: '/dashboard/crm/activities', isActive: false },
+    { title: 'العملاء المحتملين', href: ROUTES.dashboard.crm.leads.list, isActive: false },
+    { title: 'خط المبيعات', href: ROUTES.dashboard.crm.pipeline, isActive: false },
+    { title: 'التسويق عبر البريد', href: ROUTES.dashboard.crm.emailMarketing.list, isActive: true },
+    { title: 'الأنشطة', href: ROUTES.dashboard.crm.activities.list, isActive: false },
   ]
 
   // Calculate metrics
@@ -167,7 +169,7 @@ export function EmailCampaignDetailsView() {
         {/* Breadcrumb / Back Link */}
         <div className="mb-6">
           <Link
-            to="/dashboard/crm/email-marketing"
+            to={ROUTES.dashboard.crm.emailMarketing.list}
             className="inline-flex items-center text-slate-500 hover:text-navy transition-colors"
           >
             <ArrowLeft className="h-4 w-4 ms-2" />
@@ -231,7 +233,7 @@ export function EmailCampaignDetailsView() {
                 لم يتم العثور على الحملة المطلوبة
               </p>
               <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                <Link to="/dashboard/crm/email-marketing">العودة إلى القائمة</Link>
+                <Link to={ROUTES.dashboard.crm.emailMarketing.list}>العودة إلى القائمة</Link>
               </Button>
             </div>
           </div>
@@ -249,7 +251,7 @@ export function EmailCampaignDetailsView() {
 
                 {campaign.status === 'draft' && (
                   <>
-                    <Link to={`/dashboard/crm/email-marketing/new`} search={{ editId: campaignId }}>
+                    <Link to={ROUTES.dashboard.crm.emailMarketing.new} search={{ editId: campaignId }}>
                       <Button
                         variant="outline"
                         className="border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm"

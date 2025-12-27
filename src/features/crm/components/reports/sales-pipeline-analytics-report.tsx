@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { ROUTES } from '@/constants/routes'
 import {
     Download, Filter, Calendar, TrendingUp,
     Users, DollarSign, AlertCircle, BarChart3,
@@ -112,11 +113,11 @@ export function SalesPipelineAnalyticsReport() {
     }
 
     const topNav = [
-        { title: 'لوحة التحكم', href: '/dashboard/crm', isActive: false },
-        { title: 'العملاء المحتملون', href: '/dashboard/crm/leads', isActive: false },
-        { title: 'خط المبيعات', href: '/dashboard/crm/pipeline', isActive: false },
-        { title: 'الأنشطة', href: '/dashboard/crm/activities', isActive: false },
-        { title: 'التقارير', href: '/dashboard/crm/reports', isActive: true },
+        { title: 'لوحة التحكم', href: ROUTES.dashboard.crm.pipeline, isActive: false },
+        { title: 'العملاء المحتملون', href: ROUTES.dashboard.crm.leads.list, isActive: false },
+        { title: 'خط المبيعات', href: ROUTES.dashboard.crm.pipeline, isActive: false },
+        { title: 'الأنشطة', href: ROUTES.dashboard.crm.activities.list, isActive: false },
+        { title: 'التقارير', href: ROUTES.dashboard.crm.reports.list, isActive: true },
     ]
 
     if (isLoading) {

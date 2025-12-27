@@ -32,7 +32,8 @@ import {
 import { Progress } from '@/components/ui/progress'
 import { useUploadDocument } from '@/hooks/useDocuments'
 import { createDocumentSchema, type CreateDocumentData } from '../data/schema'
-import { categoryOptions, formatFileSize, MAX_FILE_SIZE, acceptedFileTypes } from '../data/data'
+import { categoryOptions, formatFileSize, acceptedFileTypes } from '../data/data'
+import { FILE_LIMITS } from '@/config'
 import { useTranslation } from 'react-i18next'
 import { Upload, X, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -71,8 +72,7 @@ export function DocumentsUploadDialog({
   defaultCaseId,
   defaultClientId,
 }: DocumentsUploadDialogProps) {
-  const { t, i18n } = useTranslation()
-  const isArabic = i18n.language === 'ar'
+  const { t } = useTranslation()
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [uploadProgress, setUploadProgress] = useState(0)
 
@@ -93,7 +93,7 @@ export function DocumentsUploadDialog({
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
       const file = acceptedFiles[0]
-      if (file.size > MAX_FILE_SIZE) {
+      if (file.size > FILE_LIMITS.MAX_SIZE) {
         return
       }
       setSelectedFile(file)
@@ -104,7 +104,7 @@ export function DocumentsUploadDialog({
     onDrop,
     accept: acceptedFileTypes,
     maxFiles: 1,
-    maxSize: MAX_FILE_SIZE,
+    maxSize: FILE_LIMITS.MAX_SIZE,
   })
 
   const onSubmit = (data: CreateDocumentData) => {
@@ -213,7 +213,7 @@ export function DocumentsUploadDialog({
                       <SelectContent>
                         {categoryOptions.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
-                            {isArabic ? option.labelAr : option.label}
+                            {t(`documents.categories.${option.value}`)}
                           </SelectItem>
                         ))}
                       </SelectContent>

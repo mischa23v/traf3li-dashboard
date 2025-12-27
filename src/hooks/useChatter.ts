@@ -8,6 +8,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config'
 import chatterService, {
   type Follower,
   type ScheduledActivity,
@@ -23,10 +24,10 @@ import type { ThreadResModel } from '@/types/message'
 import { toast } from 'sonner'
 
 // ==================== Cache Configuration ====================
-const FOLLOWERS_STALE_TIME = 5 * 60 * 1000 // 5 minutes
-const ACTIVITIES_STALE_TIME = 2 * 60 * 1000 // 2 minutes
-const TYPES_STALE_TIME = 30 * 60 * 1000 // 30 minutes (rarely changes)
-const GC_TIME = 30 * 60 * 1000 // 30 minutes
+const FOLLOWERS_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes
+const ACTIVITIES_STALE_TIME = CACHE_TIMES.SHORT // 2 minutes
+const TYPES_STALE_TIME = CACHE_TIMES.LONG // 30 minutes (rarely changes)
+const GC_TIME = CACHE_TIMES.LONG // 30 minutes
 
 // ==================== QUERY KEYS ====================
 

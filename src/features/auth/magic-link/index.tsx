@@ -3,6 +3,7 @@ import { useNavigate, Link, useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
 import authService from '@/services/authService'
+import { ROUTES } from '@/constants/routes'
 
 // ============================================
 // SVG ICONS
@@ -224,7 +225,7 @@ export function MagicLinkLogin() {
 
                 {/* Password Login Link */}
                 <Link
-                  to="/sign-in"
+                  to={ROUTES.auth.signIn}
                   className="w-full h-12 rounded-xl border-2 border-slate-200 bg-white text-[#0f172a] font-medium hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-3"
                 >
                   {t('magicLink.usePassword', 'تسجيل الدخول بكلمة المرور | Login with Password')}
@@ -314,7 +315,7 @@ export function MagicLinkLogin() {
           {/* Sign Up Link */}
           <p className="text-center text-slate-500 mt-6">
             {t('magicLink.noAccount', 'ليس لديك حساب؟ | Don\'t have an account?')}{' '}
-            <Link to="/sign-up" className="text-emerald-600 hover:text-emerald-700 font-bold">
+            <Link to={ROUTES.auth.signUp} className="text-emerald-600 hover:text-emerald-700 font-bold">
               {t('magicLink.signUp', 'إنشاء حساب جديد | Create Account')}
             </Link>
           </p>

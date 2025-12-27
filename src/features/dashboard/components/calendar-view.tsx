@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
     ChevronLeft,
     ChevronRight,
@@ -18,6 +19,7 @@ import {
     Loader2,
     AlertCircle,
 } from 'lucide-react'
+import { ROUTES } from '@/constants/routes'
 import { useCalendar } from '@/hooks/useCalendar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
@@ -37,6 +39,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { DynamicIsland } from '@/components/dynamic-island'
 
 export function CalendarView() {
+    const { t } = useTranslation()
     const [currentDate, setCurrentDate] = useState(new Date())
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date())
     const [view, setView] = useState<'month' | 'week' | 'day'>('month')
@@ -47,19 +50,19 @@ export function CalendarView() {
 
     const topNav = [
         {
-            title: 'الرئيسية',
+            title: t('dashboard.calendar.nav.home'),
             href: '/',
             isActive: false,
             disabled: false,
         },
         {
-            title: 'التقويم',
-            href: '/dashboard/calendar',
+            title: t('dashboard.calendar.nav.calendar'),
+            href: ROUTES.dashboard.calendar,
             isActive: true,
             disabled: false,
         },
         {
-            title: 'المهام',
+            title: t('dashboard.calendar.nav.tasks'),
             href: '/dashboard/tasks',
             isActive: false,
             disabled: false,
@@ -148,10 +151,16 @@ export function CalendarView() {
     }, [calendarData])
 
     const monthNames = [
-        'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-        'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+        t('dashboard.calendar.months.january'), t('dashboard.calendar.months.february'), t('dashboard.calendar.months.march'),
+        t('dashboard.calendar.months.april'), t('dashboard.calendar.months.may'), t('dashboard.calendar.months.june'),
+        t('dashboard.calendar.months.july'), t('dashboard.calendar.months.august'), t('dashboard.calendar.months.september'),
+        t('dashboard.calendar.months.october'), t('dashboard.calendar.months.november'), t('dashboard.calendar.months.december')
     ]
-    const dayNames = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت']
+    const dayNames = [
+        t('dashboard.calendar.days.sunday'), t('dashboard.calendar.days.monday'), t('dashboard.calendar.days.tuesday'),
+        t('dashboard.calendar.days.wednesday'), t('dashboard.calendar.days.thursday'), t('dashboard.calendar.days.friday'),
+        t('dashboard.calendar.days.saturday')
+    ]
 
     // --- Helpers ---
     const getDaysInMonth = (date: Date) => {
@@ -258,7 +267,7 @@ export function CalendarView() {
 
     // --- Error State ---
     if (isError) {
-        const errorMsg = error?.message || 'حدث خطأ أثناء تحميل البيانات | An error occurred while loading data'
+        const errorMsg = error?.message || t('dashboard.calendar.errors.loadingError')
         const isBackendPending = errorMsg.includes('[BACKEND-PENDING]')
 
         return (
@@ -285,7 +294,7 @@ export function CalendarView() {
                             <AlertCircle className={`h-8 w-8 ${isBackendPending ? 'text-orange-500' : 'text-red-500'}`} aria-hidden="true" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-900 mb-2">
-                            {isBackendPending ? '[بانتظار التطبيق] فشل تحميل التقويم' : 'فشل تحميل التقويم'}
+                            {t('dashboard.calendar.errors.backendPending')}
                         </h3>
                         <p className="text-slate-500 mb-4">{errorMsg}</p>
                         {isBackendPending && (
@@ -325,7 +334,7 @@ export function CalendarView() {
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder={t('dashboard.calendar.toolbar.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -350,35 +359,35 @@ export function CalendarView() {
                             <div className="flex items-center gap-2 mb-2">
                                 <Badge className="bg-blue-500/20 text-blue-100 hover:bg-blue-500/30 border-0 px-3 py-1">
                                     <Briefcase className="w-3 h-3 ms-2" />
-                                    مكتب المحاماة
+                                    {t('dashboard.calendar.hero.lawFirmBadge')}
                                 </Badge>
                                 <span className="text-slate-500 text-sm">نوفمبر 2025</span>
                             </div>
-                            <h1 className="text-4xl font-bold leading-tight mb-2">جدول القضايا والجلسات</h1>
+                            <h1 className="text-4xl font-bold leading-tight mb-2">{t('dashboard.calendar.hero.scheduleTitle')}</h1>
                             <p className="text-slate-300 text-lg max-w-xl">
-                                لديك{' '}
+                                {t('dashboard.calendar.hero.youHave')}{' '}
                                 <span className="text-white font-bold border-b-2 border-brand-blue">
-                                    {calendarData?.data.summary.eventCount || 0} {calendarData?.data.summary.eventCount === 1 ? 'حدث' : 'أحداث'}
+                                    {calendarData?.data.summary.eventCount || 0} {calendarData?.data.summary.eventCount === 1 ? t('dashboard.calendar.hero.event') : t('dashboard.calendar.hero.events')}
                                 </span>
-                                {' '}و{' '}
+                                {' '}{t('dashboard.calendar.hero.and')}{' '}
                                 <span className="text-white font-bold border-b-2 border-orange-500">
-                                    {calendarData?.data.summary.taskCount || 0} {calendarData?.data.summary.taskCount === 1 ? 'مهمة' : 'مهام'}
+                                    {calendarData?.data.summary.taskCount || 0} {calendarData?.data.summary.taskCount === 1 ? t('dashboard.calendar.hero.task') : t('dashboard.calendar.hero.tasks')}
                                 </span>
-                                {' '}و{' '}
+                                {' '}{t('dashboard.calendar.hero.and')}{' '}
                                 <span className="text-white font-bold border-b-2 border-purple-500">
-                                    {calendarData?.data.summary.reminderCount || 0} {calendarData?.data.summary.reminderCount === 1 ? 'تذكير' : 'تذكيرات'}
+                                    {calendarData?.data.summary.reminderCount || 0} {calendarData?.data.summary.reminderCount === 1 ? t('dashboard.calendar.hero.reminder') : t('dashboard.calendar.hero.reminders')}
                                 </span>
-                                {' '}هذا الشهر.
+                                {' '}{t('dashboard.calendar.hero.thisMonth')}.
                             </p>
                         </div>
                         <div className="flex gap-3">
                             <Button className="bg-brand-blue hover:bg-blue-600 text-white rounded-xl h-12 px-8 font-bold shadow-lg shadow-blue-600/30 hover:scale-105 transition-all duration-300 border-0 text-base">
                                 <Plus className="ms-2 h-5 w-5" aria-hidden="true" />
-                                جلسة جديدة
+                                {t('dashboard.calendar.hero.newSessionButton')}
                             </Button>
                             <Button className="bg-white/10 hover:bg-white/20 text-white rounded-xl h-12 px-6 font-bold backdrop-blur-md border border-white/10 transition-all duration-300">
                                 <Filter className="ms-2 h-5 w-5" aria-hidden="true" />
-                                تصفية
+                                {t('dashboard.calendar.hero.filterButton')}
                             </Button>
                         </div>
                     </div>
@@ -391,9 +400,9 @@ export function CalendarView() {
                         <Card className="rounded-3xl border-0 shadow-lg bg-white h-full flex flex-col overflow-hidden">
                             <div className="bg-navy p-6 text-white relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-brand-blue blur-[40px] opacity-30"></div>
-                                <h3 className="text-lg font-bold relative z-10 mb-1">جدول اليوم</h3>
+                                <h3 className="text-lg font-bold relative z-10 mb-1">{t('dashboard.calendar.sidebar.todayScheduleTitle')}</h3>
                                 <p className="text-blue-200 text-sm relative z-10">
-                                    {selectedDate ? selectedDate.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'اختر يوماً'}
+                                    {selectedDate ? selectedDate.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : t('dashboard.calendar.sidebar.selectDay')}
                                 </p>
                             </div>
 
@@ -411,9 +420,9 @@ export function CalendarView() {
                                                                     item.type === 'meeting' ? 'bg-blue-50 text-blue-600' :
                                                                         'bg-purple-50 text-purple-600'}
                                                                 `}>
-                                                            {item.type === 'court' ? 'جلسة محكمة' :
-                                                                item.type === 'deadline' ? 'موعد نهائي' :
-                                                                    item.type === 'meeting' ? 'اجتماع' : 'إيداع'}
+                                                            {item.type === 'court' ? t('dashboard.calendar.eventTypes.courtSession') :
+                                                                item.type === 'deadline' ? t('dashboard.calendar.eventTypes.deadline') :
+                                                                    item.type === 'meeting' ? t('dashboard.calendar.eventTypes.meeting') : t('dashboard.calendar.eventTypes.filing')}
                                                         </Badge>
                                                         <span className="text-xs font-bold text-slate-500">{item.time}</span>
                                                     </div>
@@ -453,11 +462,11 @@ export function CalendarView() {
                                             <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
                                                 <Clock className="h-8 w-8 text-slate-300" aria-hidden="true" />
                                             </div>
-                                            <p className="font-bold text-navy">لا توجد مواعيد</p>
-                                            <p className="text-xs mt-1">لا توجد جلسات أو مهام مسجلة لهذا اليوم.</p>
+                                            <p className="font-bold text-navy">{t('dashboard.calendar.sidebar.noAppointments')}</p>
+                                            <p className="text-xs mt-1">{t('dashboard.calendar.sidebar.noEventsMessage')}</p>
                                             <Button variant="link" className="text-brand-blue mt-2">
                                                 <Plus className="h-4 w-4 ms-1" aria-hidden="true" />
-                                                إضافة موعد
+                                                {t('dashboard.calendar.sidebar.addAppointment')}
                                             </Button>
                                         </div>
                                     )}
@@ -484,7 +493,7 @@ export function CalendarView() {
                                         <ChevronRight className="h-5 w-5" aria-hidden="true" />
                                     </Button>
                                     <Button variant="ghost" className="h-9 px-4 rounded-lg hover:bg-white hover:shadow-sm text-slate-600 font-bold text-sm" onClick={() => setCurrentDate(new Date())}>
-                                        اليوم
+                                        {t('dashboard.calendar.views.today')}
                                     </Button>
                                     <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-white hover:shadow-sm text-slate-600" onClick={() => {
                                         const newDate = new Date(currentDate)
@@ -506,7 +515,7 @@ export function CalendarView() {
                                       ${view === v ? 'bg-white text-brand-blue shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:text-navy hover:bg-slate-100'}
                                    `}
                                     >
-                                        {v === 'month' ? 'شهر' : v === 'week' ? 'أسبوع' : 'يوم'}
+                                        {v === 'month' ? t('dashboard.calendar.views.month') : v === 'week' ? t('dashboard.calendar.views.week') : t('dashboard.calendar.views.day')}
                                     </button>
                                 ))}
                             </div>
@@ -576,7 +585,7 @@ export function CalendarView() {
                                                                 ))}
                                                                 {items.length > 4 && (
                                                                     <div className="text-[10px] text-center text-slate-500 font-bold mt-auto pt-1 hover:text-brand-blue">
-                                                                        +{items.length - 4} المزيد
+                                                                        +{items.length - 4} {t('dashboard.calendar.toolbar.viewMore')}
                                                                     </div>
                                                                 )}
                                                             </div>

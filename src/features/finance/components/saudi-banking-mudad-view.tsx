@@ -237,7 +237,7 @@ export function SaudiBankingMudadView() {
 
                 {/* Breadcrumb */}
                 <div className="flex items-center gap-2 text-sm">
-                    <Link to="/dashboard/finance/saudi-banking" className="text-slate-500 hover:text-emerald-600">
+                    <Link to={ROUTES.dashboard.finance.saudiBanking.index} className="text-slate-500 hover:text-emerald-600">
                         الخدمات المصرفية
                     </Link>
                     <ChevronLeft className="h-4 w-4 text-slate-400" />

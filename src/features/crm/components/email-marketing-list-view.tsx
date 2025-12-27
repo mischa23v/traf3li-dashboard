@@ -6,6 +6,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useEmailCampaigns, useCampaignAnalytics, useSendCampaign, usePauseCampaign, useResumeCampaign } from '@/hooks/useCrmAdvanced'
@@ -17,6 +18,7 @@ import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { Search, Bell, AlertCircle, Mail, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, Edit3, SortAsc, X, Send, Calendar, BarChart3, Users, TrendingUp, Clock, Pause, Play } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { format } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 import { Input } from '@/components/ui/input'
@@ -147,11 +149,11 @@ export function EmailMarketingListView() {
 
     // Single campaign actions
     const handleViewCampaign = (campaignId: string) => {
-        navigate({ to: '/dashboard/crm/email-marketing/$campaignId', params: { campaignId } })
+        navigate({ to: ROUTES.dashboard.crm.emailMarketing.detail(campaignId), params: { campaignId } })
     }
 
     const handleEditCampaign = (campaignId: string) => {
-        navigate({ to: '/dashboard/crm/email-marketing/new', search: { editId: campaignId } })
+        navigate({ to: ROUTES.dashboard.crm.emailMarketing.new, search: { editId: campaignId } })
     }
 
     const handleDeleteCampaign = (campaignId: string) => {
@@ -226,10 +228,10 @@ export function EmailMarketingListView() {
     }, [campaignsData])
 
     const topNav = [
-        { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: false },
-        { title: 'خط المبيعات', href: '/dashboard/crm/pipeline', isActive: false },
-        { title: 'التسويق عبر البريد', href: '/dashboard/crm/email-marketing', isActive: true },
-        { title: 'الأنشطة', href: '/dashboard/crm/activities', isActive: false },
+        { title: 'العملاء المحتملين', href: ROUTES.dashboard.crm.leads.list, isActive: false },
+        { title: 'خط المبيعات', href: ROUTES.dashboard.crm.pipeline, isActive: false },
+        { title: 'التسويق عبر البريد', href: ROUTES.dashboard.crm.emailMarketing.list, isActive: true },
+        { title: 'الأنشطة', href: ROUTES.dashboard.crm.activities.list, isActive: false },
     ]
 
     return (
@@ -393,7 +395,7 @@ export function EmailMarketingListView() {
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد حملات</h3>
                                         <p className="text-slate-500 mb-4">ابدأ بإنشاء حملة تسويقية جديدة</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                                            <Link to="/dashboard/crm/email-marketing/new">
+                                            <Link to={ROUTES.dashboard.crm.emailMarketing.new}>
                                                 <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 إنشاء حملة
                                             </Link>
@@ -515,7 +517,7 @@ export function EmailMarketingListView() {
                                                     </div>
                                                 )}
                                             </div>
-                                            <Link to={`/dashboard/crm/email-marketing/${campaign.id}`}>
+                                            <Link to={ROUTES.dashboard.crm.emailMarketing.detail(campaign.id)}>
                                                 <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
                                                     عرض التفاصيل
                                                 </Button>

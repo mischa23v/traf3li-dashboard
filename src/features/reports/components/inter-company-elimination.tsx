@@ -51,7 +51,7 @@ export function InterCompanyElimination({
   startDate,
   endDate,
 }: InterCompanyEliminationProps) {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
 
   const [showEliminationDetails, setShowEliminationDetails] = useState(true)
@@ -83,11 +83,11 @@ export function InterCompanyElimination({
   // Get transaction type badge
   const getTransactionTypeBadge = (type: InterCompanyTransaction['transactionType']) => {
     const configs = {
-      sale: { label: isArabic ? 'مبيعات' : 'Sale', color: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
-      purchase: { label: isArabic ? 'مشتريات' : 'Purchase', color: 'bg-blue-100 text-blue-700 border-blue-200' },
-      loan: { label: isArabic ? 'قرض' : 'Loan', color: 'bg-purple-100 text-purple-700 border-purple-200' },
-      service: { label: isArabic ? 'خدمة' : 'Service', color: 'bg-amber-100 text-amber-700 border-amber-200' },
-      other: { label: isArabic ? 'أخرى' : 'Other', color: 'bg-slate-100 text-slate-700 border-slate-200' },
+      sale: { label: t('reports.interCompanyElimination.transactionTypes.sale'), color: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
+      purchase: { label: t('reports.interCompanyElimination.transactionTypes.purchase'), color: 'bg-blue-100 text-blue-700 border-blue-200' },
+      loan: { label: t('reports.interCompanyElimination.transactionTypes.loan'), color: 'bg-purple-100 text-purple-700 border-purple-200' },
+      service: { label: t('reports.interCompanyElimination.transactionTypes.service'), color: 'bg-amber-100 text-amber-700 border-amber-200' },
+      other: { label: t('reports.interCompanyElimination.transactionTypes.other'), color: 'bg-slate-100 text-slate-700 border-slate-200' },
     }
     const config = configs[type] || configs.other
     return (
@@ -118,19 +118,17 @@ export function InterCompanyElimination({
             <div className="p-2 bg-amber-50 rounded-xl">
               <ArrowRightLeft className="w-6 h-6 text-amber-600" />
             </div>
-            {isArabic ? 'قيود الإلغاء بين الشركات' : 'Inter-Company Eliminations'}
+            {t('reports.interCompanyElimination.title')}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-12">
           <div className="text-center text-slate-500">
             <CheckCircle className="w-12 h-12 mx-auto mb-3 text-emerald-500 opacity-50" />
             <p className="text-lg font-semibold mb-2">
-              {isArabic ? 'لا توجد معاملات بين الشركات' : 'No Inter-Company Transactions'}
+              {t('reports.interCompanyElimination.noTransactions')}
             </p>
             <p className="text-sm">
-              {isArabic
-                ? 'لم يتم العثور على معاملات تتطلب قيود إلغاء في الفترة المحددة'
-                : 'No transactions requiring elimination entries were found in the selected period'}
+              {t('reports.interCompanyElimination.noTransactionsFound')}
             </p>
           </div>
         </CardContent>
@@ -146,7 +144,7 @@ export function InterCompanyElimination({
             <div className="p-2 bg-amber-50 rounded-xl">
               <ArrowRightLeft className="w-6 h-6 text-amber-600" />
             </div>
-            {isArabic ? 'قيود الإلغاء بين الشركات' : 'Inter-Company Eliminations'}
+            {t('reports.interCompanyElimination.title')}
           </CardTitle>
           <TooltipProvider>
             <Tooltip>
@@ -157,9 +155,7 @@ export function InterCompanyElimination({
               </TooltipTrigger>
               <TooltipContent className="max-w-xs">
                 <p className="text-sm">
-                  {isArabic
-                    ? 'قيود الإلغاء تستبعد المعاملات بين الشركات التابعة لتجنب تضخيم الإيرادات والمصروفات في التقارير الموحدة'
-                    : 'Elimination entries exclude inter-company transactions to avoid inflating revenues and expenses in consolidated reports'}
+                  {t('reports.interCompanyElimination.tooltipText')}
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -173,7 +169,7 @@ export function InterCompanyElimination({
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-bold text-blue-700">
-                {isArabic ? 'إجمالي المعاملات' : 'Total Transactions'}
+                {t('reports.interCompanyElimination.totalTransactions')}
               </span>
               <FileText className="w-5 h-5 text-blue-600" />
             </div>
@@ -183,7 +179,7 @@ export function InterCompanyElimination({
           <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-bold text-purple-700">
-                {isArabic ? 'مبلغ المعاملات' : 'Transaction Amount'}
+                {t('reports.interCompanyElimination.transactionAmount')}
               </span>
               <DollarSign className="w-5 h-5 text-purple-600" />
             </div>
@@ -193,7 +189,7 @@ export function InterCompanyElimination({
           <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-6 border border-amber-100">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-bold text-amber-700">
-                {isArabic ? 'مبلغ الإلغاء' : 'Elimination Amount'}
+                {t('reports.interCompanyElimination.eliminationAmount')}
               </span>
               <AlertCircle className="w-5 h-5 text-amber-600" />
             </div>
@@ -210,13 +206,13 @@ export function InterCompanyElimination({
               onCheckedChange={setShowEliminationDetails}
             />
             <Label htmlFor="show-elimination" className="text-sm cursor-pointer">
-              {isArabic ? 'عرض تفاصيل الإلغاء' : 'Show Elimination Details'}
+              {t('reports.interCompanyElimination.showEliminationDetails')}
             </Label>
           </div>
 
           {/* Filter by type */}
           <div className="flex items-center gap-2 ms-auto">
-            <span className="text-sm text-slate-600">{isArabic ? 'النوع:' : 'Type:'}</span>
+            <span className="text-sm text-slate-600">{t('reports.interCompanyElimination.type')}</span>
             {(['all', 'sale', 'purchase', 'loan', 'service', 'other'] as const).map((type) => (
               <Button
                 key={type}
@@ -225,12 +221,12 @@ export function InterCompanyElimination({
                 className="rounded-xl h-8"
                 onClick={() => setFilterType(type)}
               >
-                {type === 'all' && (isArabic ? 'الكل' : 'All')}
-                {type === 'sale' && (isArabic ? 'مبيعات' : 'Sales')}
-                {type === 'purchase' && (isArabic ? 'مشتريات' : 'Purchases')}
-                {type === 'loan' && (isArabic ? 'قروض' : 'Loans')}
-                {type === 'service' && (isArabic ? 'خدمات' : 'Services')}
-                {type === 'other' && (isArabic ? 'أخرى' : 'Other')}
+                {type === 'all' && t('reports.interCompanyElimination.all')}
+                {type === 'sale' && t('reports.interCompanyElimination.sales')}
+                {type === 'purchase' && t('reports.interCompanyElimination.purchases')}
+                {type === 'loan' && t('reports.interCompanyElimination.loans')}
+                {type === 'service' && t('reports.interCompanyElimination.services')}
+                {type === 'other' && t('reports.interCompanyElimination.other')}
               </Button>
             ))}
           </div>
@@ -253,7 +249,7 @@ export function InterCompanyElimination({
         {filteredTransactions.length === 0 && (
           <div className="text-center py-8 text-slate-500">
             <AlertCircle className="w-12 h-12 mx-auto mb-3 opacity-20" />
-            <p>{isArabic ? 'لا توجد معاملات من هذا النوع' : 'No transactions of this type'}</p>
+            <p>{t('reports.interCompanyElimination.noTransactionsOfType')}</p>
           </div>
         )}
       </CardContent>
@@ -336,7 +332,7 @@ function TransactionRow({
             <div className="flex items-center gap-3">
               {transaction.eliminationEntry && (
                 <Badge variant="outline" className="bg-amber-50 border-amber-200 text-amber-700">
-                  {isArabic ? 'قيد إلغاء' : 'Elimination'}
+                  {t('reports.interCompanyElimination.elimination')}
                 </Badge>
               )}
               <div className="font-bold text-navy text-lg">
@@ -356,25 +352,22 @@ function TransactionRow({
                 </div>
                 <div className="flex-1">
                   <h4 className="text-sm font-bold text-amber-900 mb-1">
-                    {isArabic ? 'قيد الإلغاء' : 'Elimination Entry'}
+                    {t('reports.interCompanyElimination.eliminationEntry')}
                   </h4>
                   <p className="text-xs text-amber-700">
-                    {transaction.eliminationEntry.description ||
-                      (isArabic
-                        ? 'قيد لإلغاء المعاملة بين الشركات من التقرير الموحد'
-                        : 'Entry to eliminate inter-company transaction from consolidated report')}
+                    {transaction.eliminationEntry.description || t('reports.interCompanyElimination.eliminationDescription')}
                   </p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-white rounded-lg p-3 border border-amber-100">
-                  <div className="text-xs text-slate-500 mb-1">{isArabic ? 'مدين' : 'Debit'}</div>
+                  <div className="text-xs text-slate-500 mb-1">{t('reports.interCompanyElimination.debit')}</div>
                   <div className="text-sm font-semibold text-slate-700">
                     {transaction.eliminationEntry.debitAccount}
                   </div>
                 </div>
                 <div className="bg-white rounded-lg p-3 border border-amber-100">
-                  <div className="text-xs text-slate-500 mb-1">{isArabic ? 'دائن' : 'Credit'}</div>
+                  <div className="text-xs text-slate-500 mb-1">{t('reports.interCompanyElimination.credit')}</div>
                   <div className="text-sm font-semibold text-slate-700">
                     {transaction.eliminationEntry.creditAccount}
                   </div>
@@ -382,7 +375,7 @@ function TransactionRow({
               </div>
               <div className="mt-3 flex items-center justify-between text-sm">
                 <span className="text-amber-700 font-medium">
-                  {isArabic ? 'مبلغ القيد:' : 'Entry Amount:'}
+                  {t('reports.interCompanyElimination.entryAmount')}
                 </span>
                 <span className="font-bold text-amber-900">
                   {formatCurrency(transaction.eliminationEntry.amount)}

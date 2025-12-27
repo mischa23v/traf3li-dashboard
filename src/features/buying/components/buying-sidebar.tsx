@@ -28,6 +28,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Separator } from '@/components/ui/separator'
+import { ROUTES } from '@/constants/routes'
 
 import { useBuyingStats, usePendingPurchaseOrders } from '@/hooks/use-buying'
 
@@ -48,27 +49,27 @@ export function BuyingSidebar() {
         </CardHeader>
         <CardContent className="space-y-2">
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/buying/create">
+            <Link to={ROUTES.dashboard.buying.create}>
               <Plus className="w-4 h-4 ml-2" />
               {t('buying.newSupplier', 'مورد جديد')}
               <kbd className="mr-auto bg-muted px-2 py-0.5 rounded text-xs">⌘N</kbd>
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/buying/purchase-orders/create">
+            <Link to={ROUTES.dashboard.buying.purchaseOrders.create}>
               <FileText className="w-4 h-4 ml-2" />
               {t('buying.newPurchaseOrder', 'أمر شراء جديد')}
               <kbd className="mr-auto bg-muted px-2 py-0.5 rounded text-xs">⌘O</kbd>
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/buying/material-requests/create">
+            <Link to={ROUTES.dashboard.buying.materialRequests.create}>
               <Package className="w-4 h-4 ml-2" />
               {t('buying.newMaterialRequest', 'طلب مواد جديد')}
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/buying/rfq/create">
+            <Link to={ROUTES.dashboard.buying.rfq.create}>
               <MessageSquare className="w-4 h-4 ml-2" />
               {t('buying.newRFQ', 'طلب عرض سعر جديد')}
             </Link>
@@ -86,32 +87,32 @@ export function BuyingSidebar() {
         </CardHeader>
         <CardContent className="space-y-1">
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/buying">
+            <Link to={ROUTES.dashboard.buying.list}>
               <Users className="w-4 h-4 ml-2" />
               {t('buying.suppliers', 'الموردين')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/buying/purchase-orders">
+            <Link to={ROUTES.dashboard.buying.purchaseOrders.list}>
               <ClipboardList className="w-4 h-4 ml-2" />
               {t('buying.purchaseOrders', 'أوامر الشراء')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/buying/material-requests">
+            <Link to={ROUTES.dashboard.buying.materialRequests.list}>
               <Package className="w-4 h-4 ml-2" />
               {t('buying.materialRequests', 'طلبات المواد')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/buying/rfq">
+            <Link to={ROUTES.dashboard.buying.rfq.list}>
               <MessageSquare className="w-4 h-4 ml-2" />
               {t('buying.rfq', 'طلبات عروض الأسعار')}
             </Link>
           </Button>
           <Separator className="my-2" />
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to="/dashboard/buying/settings">
+            <Link to={ROUTES.dashboard.buying.settings}>
               <Settings className="w-4 h-4 ml-2" />
               {t('buying.settings', 'الإعدادات')}
             </Link>
@@ -166,7 +167,7 @@ export function BuyingSidebar() {
               {pendingOrders.slice(0, 5).map((order) => (
                 <Link
                   key={order._id}
-                  to={`/dashboard/buying/purchase-orders/${order._id}`}
+                  to={ROUTES.dashboard.buying.purchaseOrders.detail(order._id)}
                   className="flex items-center justify-between p-2 rounded-lg hover:bg-amber-100 transition-colors"
                 >
                   <div className="flex items-center gap-2">
@@ -182,7 +183,7 @@ export function BuyingSidebar() {
               ))}
               {pendingOrders.length > 5 && (
                 <Button asChild variant="ghost" size="sm" className="w-full text-amber-700">
-                  <Link to="/dashboard/buying/purchase-orders?status=pending">
+                  <Link to={`${ROUTES.dashboard.buying.purchaseOrders.list}?status=pending`}>
                     {t('buying.viewAll', 'عرض الكل')} ({pendingOrders.length})
                   </Link>
                 </Button>

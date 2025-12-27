@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   useLeaveEncashments,
   useEncashmentStats,
@@ -321,7 +322,7 @@ export default function LeaveEncashments() {
             <FileDown className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
             {t('common.export', 'Export')}
           </Button>
-          <Button onClick={() => navigate({ to: '/dashboard/hr/leave/encashments/new' })}>
+          <Button onClick={() => navigate({ to: ROUTES.dashboard.hr.leave.encashments.new })}>
             <Plus className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
             {t('hr.leave.encashment.newRequest', 'New Encashment Request')}
           </Button>
@@ -556,7 +557,7 @@ export default function LeaveEncashments() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem
-                              onClick={() => navigate({ to: `/dashboard/hr/leave/encashments/${encashment._id}` })}
+                              onClick={() => navigate({ to: ROUTES.dashboard.hr.leave.encashments.detail(encashment._id) })}
                             >
                               <Eye className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
                               {t('common.viewDetails', 'View Details')}
@@ -564,7 +565,7 @@ export default function LeaveEncashments() {
                             {encashment.status === 'draft' && (
                               <>
                                 <DropdownMenuItem
-                                  onClick={() => navigate({ to: `/dashboard/hr/leave/encashments/${encashment._id}/edit` })}
+                                  onClick={() => navigate({ to: ROUTES.dashboard.hr.leave.encashments.edit(encashment._id) })}
                                 >
                                   <Edit3 className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
                                   {t('common.edit', 'Edit')}

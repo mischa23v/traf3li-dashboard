@@ -24,7 +24,6 @@ export function AccountLockoutWarning({
   onUnlock,
 }: AccountLockoutWarningProps) {
   const { t, i18n } = useTranslation()
-  const isArabic = i18n.language === 'ar'
   const [remainingSeconds, setRemainingSeconds] = useState(initialSeconds)
 
   // Countdown timer
@@ -71,7 +70,7 @@ export function AccountLockoutWarning({
                 {t('auth.rateLimit.unlockIn')}
               </div>
               <div className="text-lg font-bold tabular-nums" dir="ltr">
-                {formatLockoutTime(remainingSeconds, isArabic ? 'ar' : 'en')}
+                {formatLockoutTime(remainingSeconds, i18n.language)}
               </div>
             </div>
           </div>

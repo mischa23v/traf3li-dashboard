@@ -5,9 +5,11 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { CACHE_TIMES } from '@/config'
 import { Analytics } from '@/lib/analytics'
 import apiClient from '@/lib/api'
 import { useAuthStore } from '@/stores/auth-store'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import financeService, {
   Invoice,
   InvoiceFilters,
@@ -24,9 +26,9 @@ import financeService, {
 } from '@/services/financeService'
 
 // ==================== Cache Configuration ====================
-const STATS_STALE_TIME = 30 * 60 * 1000 // 30 minutes
-const STATS_GC_TIME = 60 * 60 * 1000 // 1 hour
-const LIST_STALE_TIME = 5 * 60 * 1000 // 5 minutes for lists
+const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
+const STATS_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour
+const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
 
 // ==================== INVOICES ====================
 
@@ -83,7 +85,7 @@ export const useCreateInvoice = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['invoices'], refetchType: 'all' })
+      return await invalidateCache.invoices.all()
     },
   })
 }
@@ -101,8 +103,8 @@ export const useUpdateInvoice = () => {
       toast.error(error.message || 'Failed to update invoice | فشل تحديث الفاتورة')
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      return await queryClient.invalidateQueries({ queryKey: ['invoices', id] })
+      await invalidateCache.invoices.all()
+      return await invalidateCache.invoices.detail(id)
     },
   })
 }
@@ -122,8 +124,8 @@ export const useSendInvoice = () => {
       toast.error(error.message || 'Failed to send invoice | فشل إرسال الفاتورة')
     },
     onSettled: async (_, __, id) => {
-      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      return await queryClient.invalidateQueries({ queryKey: ['invoices', id] })
+      await invalidateCache.invoices.all()
+      return await invalidateCache.invoices.detail(id)
     },
   })
 }
@@ -224,8 +226,8 @@ export const useCreateCreditNote = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['creditNotes'], refetchType: 'all' })
-      return await queryClient.invalidateQueries({ queryKey: ['invoices'], refetchType: 'all' })
+      await invalidateCache.creditNotes.all()
+      return await invalidateCache.invoices.all()
     },
   })
 }
@@ -243,8 +245,8 @@ export const useUpdateCreditNote = () => {
       toast.error(error.message || 'Failed to update credit note | فشل تحديث إشعار الدائن')
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['creditNotes'] })
-      return await queryClient.invalidateQueries({ queryKey: ['creditNotes', id] })
+      await invalidateCache.creditNotes.all()
+      return await invalidateCache.creditNotes.detail(id)
     },
   })
 }
@@ -277,7 +279,7 @@ export const useDeleteCreditNote = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['creditNotes'], refetchType: 'all' })
+      return await invalidateCache.creditNotes.all()
     },
   })
 }
@@ -294,8 +296,8 @@ export const useIssueCreditNote = () => {
       toast.error(error.message || 'Failed to issue credit note | فشل إصدار إشعار الدائن')
     },
     onSettled: async (_, __, id) => {
-      await queryClient.invalidateQueries({ queryKey: ['creditNotes'] })
-      return await queryClient.invalidateQueries({ queryKey: ['creditNotes', id] })
+      await invalidateCache.creditNotes.all()
+      return await invalidateCache.creditNotes.detail(id)
     },
   })
 }
@@ -312,9 +314,9 @@ export const useApplyCreditNote = () => {
       toast.error(error.message || 'Failed to apply credit note | فشل تطبيق إشعار الدائن')
     },
     onSettled: async (_, __, id) => {
-      await queryClient.invalidateQueries({ queryKey: ['creditNotes'] })
-      await queryClient.invalidateQueries({ queryKey: ['creditNotes', id] })
-      return await queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      await invalidateCache.creditNotes.all()
+      await invalidateCache.creditNotes.detail(id)
+      return await invalidateCache.invoices.all()
     },
   })
 }
@@ -332,8 +334,8 @@ export const useVoidCreditNote = () => {
       toast.error(error.message || 'Failed to void credit note | فشل إلغاء إشعار الدائن')
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['creditNotes'] })
-      return await queryClient.invalidateQueries({ queryKey: ['creditNotes', id] })
+      await invalidateCache.creditNotes.all()
+      return await invalidateCache.creditNotes.detail(id)
     },
   })
 }
@@ -360,8 +362,8 @@ export const useSubmitCreditNoteToZATCA = () => {
       toast.error(error.message || 'Failed to submit credit note to ZATCA | فشل إرسال إشعار الدائن إلى هيئة الزكاة والضريبة والجمارك')
     },
     onSettled: async (_, __, id) => {
-      await queryClient.invalidateQueries({ queryKey: ['creditNotes'] })
-      return await queryClient.invalidateQueries({ queryKey: ['creditNotes', id] })
+      await invalidateCache.creditNotes.all()
+      return await invalidateCache.creditNotes.detail(id)
     },
   })
 }
@@ -438,7 +440,7 @@ export const useCreateExpense = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['expenses'], refetchType: 'all' })
+      return await invalidateCache.expenses.all()
     },
   })
 }
@@ -456,8 +458,8 @@ export const useUpdateExpense = () => {
       toast.error(error.message || 'Failed to update expense | فشل تحديث المصروف')
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['expenses'] })
-      return await queryClient.invalidateQueries({ queryKey: ['expenses', id] })
+      await invalidateCache.expenses.all()
+      return await invalidateCache.expenses.detail(id)
     },
   })
 }
@@ -475,7 +477,7 @@ export const useUploadReceipt = () => {
       toast.error(error.message || 'Failed to upload receipt | فشل رفع الإيصال')
     },
     onSettled: async (_, __, { id }) => {
-      return await queryClient.invalidateQueries({ queryKey: ['expenses', id] })
+      return await invalidateCache.expenses.detail(id)
     },
   })
 }
@@ -522,7 +524,7 @@ export const useStartTimer = () => {
       toast.error(error.message || 'Failed to start timer | فشل بدء المؤقت')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['timer'] })
+      return await invalidateCache.timeEntries.timer()
     },
   })
 }
@@ -539,7 +541,7 @@ export const usePauseTimer = () => {
       toast.error(error.message || 'Failed to pause timer | فشل إيقاف المؤقت')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['timer'] })
+      return await invalidateCache.timeEntries.timer()
     },
   })
 }
@@ -556,7 +558,7 @@ export const useResumeTimer = () => {
       toast.error(error.message || 'Failed to resume timer | فشل استئناف المؤقت')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['timer'] })
+      return await invalidateCache.timeEntries.timer()
     },
   })
 }
@@ -574,8 +576,8 @@ export const useStopTimer = () => {
       toast.error(error.message || 'Failed to stop timer | فشل إيقاف المؤقت')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['timer'] })
-      return await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
+      await invalidateCache.timeEntries.timer()
+      return await invalidateCache.timeEntries.all()
     },
   })
 }
@@ -625,7 +627,7 @@ export const useCreateTimeEntry = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['timeEntries'], refetchType: 'all' })
+      return await invalidateCache.timeEntries.all()
     },
   })
 }
@@ -666,8 +668,8 @@ export const useLockTimeEntry = () => {
       toast.error(error.message || 'Failed to lock time entry | فشل قفل سجل الوقت')
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
-      return await queryClient.invalidateQueries({ queryKey: ['timeEntries', id] })
+      await invalidateCache.timeEntries.all()
+      return await invalidateCache.timeEntries.detail(id)
     },
   })
 }
@@ -685,8 +687,8 @@ export const useUnlockTimeEntry = () => {
       toast.error(error.message || 'Failed to unlock time entry | فشل إلغاء قفل سجل الوقت')
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
-      return await queryClient.invalidateQueries({ queryKey: ['timeEntries', id] })
+      await invalidateCache.timeEntries.all()
+      return await invalidateCache.timeEntries.detail(id)
     },
   })
 }
@@ -711,7 +713,7 @@ export const useBulkLockTimeEntries = () => {
       toast.error(error.message || 'Bulk lock operation failed | فشل عملية القفل الجماعية')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
+      return await invalidateCache.timeEntries.all()
     },
   })
 }
@@ -746,7 +748,7 @@ export const useLockTimeEntriesByDateRange = () => {
       toast.error(error.message || 'Failed to lock entries by date range | فشل قفل السجلات حسب الفترة')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
+      return await invalidateCache.timeEntries.all()
     },
   })
 }
@@ -778,8 +780,8 @@ export const useCreatePayment = () => {
       toast.error(error.message || 'Failed to create payment | فشل إنشاء الدفعة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['payments'] })
-      return await queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      await invalidateCache.payments.all()
+      return await invalidateCache.invoices.all()
     },
   })
 }
@@ -804,8 +806,8 @@ export const useCompletePayment = () => {
       toast.error(error.message || 'Failed to complete payment | فشل إكمال الدفعة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['payments'] })
-      return await queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      await invalidateCache.payments.all()
+      return await invalidateCache.invoices.all()
     },
   })
 }
@@ -823,8 +825,8 @@ export const useRecordPaymentForInvoice = () => {
       toast.error(error.message || 'Failed to record payment | فشل تسجيل الدفعة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['payments'] })
-      return await queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      await invalidateCache.payments.all()
+      return await invalidateCache.invoices.all()
     },
   })
 }
@@ -953,7 +955,7 @@ export const useCreateTransaction = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['transactions'], refetchType: 'all' })
+      return await invalidateCache.finance.transactions()
     },
   })
 }
@@ -1007,7 +1009,7 @@ export const useCreateStatement = () => {
       toast.error(error.message || 'فشل إنشاء الكشف الحسابي')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['statements'] })
+      return await invalidateCache.finance.statements()
     },
   })
 }
@@ -1025,8 +1027,8 @@ export const useUpdateStatement = () => {
       toast.error(error.message || 'فشل تحديث الكشف الحسابي')
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['statements'] })
-      return await queryClient.invalidateQueries({ queryKey: ['statements', id] })
+      await invalidateCache.finance.statements()
+      return await invalidateCache.finance.statements()
     },
   })
 }
@@ -1043,7 +1045,7 @@ export const useDeleteStatement = () => {
       toast.error(error.message || 'فشل حذف الكشف الحسابي')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['statements'] })
+      return await invalidateCache.finance.statements()
     },
   })
 }
@@ -1060,8 +1062,8 @@ export const useSendStatement = () => {
       toast.error(error.message || 'فشل إرسال الكشف الحسابي')
     },
     onSettled: async (_, __, id) => {
-      await queryClient.invalidateQueries({ queryKey: ['statements'] })
-      return await queryClient.invalidateQueries({ queryKey: ['statements', id] })
+      await invalidateCache.finance.statements()
+      return await invalidateCache.finance.statements()
     },
   })
 }
@@ -1097,7 +1099,7 @@ export const useCreateActivity = () => {
       toast.error(error.message || 'فشل إنشاء النشاط المالي')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['activities'] })
+      return await invalidateCache.activities.all()
     },
   })
 }
@@ -1206,7 +1208,7 @@ export const useDeleteInvoice = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['invoices'], refetchType: 'all' })
+      return await invalidateCache.invoices.all()
     },
   })
 }
@@ -1251,8 +1253,8 @@ export const useMarkInvoicePaid = () => {
       toast.error(error.message || 'Failed to record payment | فشل تسجيل الدفعة')
     },
     onSettled: async (_, __, { invoiceId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      return await queryClient.invalidateQueries({ queryKey: ['invoices', invoiceId] })
+      await invalidateCache.invoices.all()
+      return await invalidateCache.invoices.detail(invoiceId)
     },
   })
 }
@@ -1331,7 +1333,7 @@ export const useDeleteExpense = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['expenses'], refetchType: 'all' })
+      return await invalidateCache.expenses.all()
     },
   })
 }
@@ -1349,8 +1351,8 @@ export const useUpdateTimeEntry = () => {
       toast.error(error.message || 'فشل تحديث إدخال الوقت')
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
-      return await queryClient.invalidateQueries({ queryKey: ['timeEntries', id] })
+      await invalidateCache.timeEntries.all()
+      return await invalidateCache.timeEntries.detail(id)
     },
   })
 }
@@ -1387,7 +1389,7 @@ export const useDeleteTimeEntry = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['timeEntries'], refetchType: 'all' })
+      return await invalidateCache.timeEntries.all()
     },
   })
 }
@@ -1405,8 +1407,8 @@ export const useUpdateTransaction = () => {
       toast.error(error.message || 'فشل تحديث المعاملة')
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['transactions'] })
-      return await queryClient.invalidateQueries({ queryKey: ['transactions', id] })
+      await invalidateCache.finance.transactions()
+      return await invalidateCache.finance.transactions()
     },
   })
 }
@@ -1443,7 +1445,7 @@ export const useDeleteTransaction = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['transactions'], refetchType: 'all' })
+      return await invalidateCache.finance.transactions()
     },
   })
 }
@@ -1492,8 +1494,8 @@ export const useUpdateAccountActivity = () => {
       toast.error(error.message || 'فشل تحديث النشاط')
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['activities'] })
-      return await queryClient.invalidateQueries({ queryKey: ['activities', id] })
+      await invalidateCache.activities.all()
+      return await invalidateCache.activities.detail(id)
     },
   })
 }
@@ -1510,7 +1512,7 @@ export const useDeleteAccountActivity = () => {
       toast.error(error.message || 'فشل حذف النشاط')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['activities'] })
+      return await invalidateCache.activities.all()
     },
   })
 }
@@ -1548,9 +1550,9 @@ export const useSubmitInvoiceForApproval = () => {
       toast.error(error.message || 'فشل إرسال الفاتورة للموافقة')
     },
     onSettled: async (_, __, { invoiceId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      await queryClient.invalidateQueries({ queryKey: ['invoices', 'pending-approval'] })
-      return await queryClient.invalidateQueries({ queryKey: ['invoices', invoiceId] })
+      await invalidateCache.invoices.all()
+      await invalidateCache.invoices.all()
+      return await invalidateCache.invoices.detail(invoiceId)
     },
   })
 }
@@ -1568,10 +1570,10 @@ export const useApproveInvoice = () => {
       toast.error(error.message || 'فشل اعتماد الفاتورة')
     },
     onSettled: async (_, __, { invoiceId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      await queryClient.invalidateQueries({ queryKey: ['invoices', 'pending-approval'] })
-      await queryClient.invalidateQueries({ queryKey: ['invoices', 'pending-approvals-count'] })
-      return await queryClient.invalidateQueries({ queryKey: ['invoices', invoiceId] })
+      await invalidateCache.invoices.all()
+      await invalidateCache.invoices.all()
+      await invalidateCache.invoices.all()
+      return await invalidateCache.invoices.detail(invoiceId)
     },
   })
 }
@@ -1589,10 +1591,10 @@ export const useRejectInvoice = () => {
       toast.error(error.message || 'فشل رفض الفاتورة')
     },
     onSettled: async (_, __, { invoiceId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      await queryClient.invalidateQueries({ queryKey: ['invoices', 'pending-approval'] })
-      await queryClient.invalidateQueries({ queryKey: ['invoices', 'pending-approvals-count'] })
-      return await queryClient.invalidateQueries({ queryKey: ['invoices', invoiceId] })
+      await invalidateCache.invoices.all()
+      await invalidateCache.invoices.all()
+      await invalidateCache.invoices.all()
+      return await invalidateCache.invoices.detail(invoiceId)
     },
   })
 }
@@ -1610,9 +1612,9 @@ export const useRequestInvoiceChanges = () => {
       toast.error(error.message || 'فشل إرسال طلب التعديلات')
     },
     onSettled: async (_, __, { invoiceId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      await queryClient.invalidateQueries({ queryKey: ['invoices', 'pending-approval'] })
-      return await queryClient.invalidateQueries({ queryKey: ['invoices', invoiceId] })
+      await invalidateCache.invoices.all()
+      await invalidateCache.invoices.all()
+      return await invalidateCache.invoices.detail(invoiceId)
     },
   })
 }
@@ -1630,9 +1632,9 @@ export const useEscalateInvoiceApproval = () => {
       toast.error(error.message || 'فشل رفع الفاتورة')
     },
     onSettled: async (_, __, { invoiceId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      await queryClient.invalidateQueries({ queryKey: ['invoices', 'pending-approval'] })
-      return await queryClient.invalidateQueries({ queryKey: ['invoices', invoiceId] })
+      await invalidateCache.invoices.all()
+      await invalidateCache.invoices.all()
+      return await invalidateCache.invoices.detail(invoiceId)
     },
   })
 }
@@ -1653,9 +1655,9 @@ export const useBulkApproveInvoices = () => {
       toast.error(error.message || 'فشل اعتماد الفواتير')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      await queryClient.invalidateQueries({ queryKey: ['invoices', 'pending-approval'] })
-      return await queryClient.invalidateQueries({ queryKey: ['invoices', 'pending-approvals-count'] })
+      await invalidateCache.invoices.all()
+      await invalidateCache.invoices.all()
+      return await invalidateCache.invoices.all()
     },
   })
 }
@@ -1681,7 +1683,7 @@ export const useUpdateApprovalWorkflowConfig = () => {
       toast.error(error.message || 'فشل تحديث إعدادات الموافقات')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['invoices', 'approval-config'] })
+      return await invalidateCache.invoices.all()
     },
   })
 }
@@ -1751,7 +1753,7 @@ export const useCreateRecurringInvoice = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['recurringInvoices'], refetchType: 'all' })
+      return await invalidateCache.invoices.recurring()
     },
   })
 }
@@ -1769,8 +1771,8 @@ export const useUpdateRecurringInvoice = () => {
       toast.error(error.message || 'فشل تحديث الفاتورة المتكررة')
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['recurringInvoices'] })
-      return await queryClient.invalidateQueries({ queryKey: ['recurringInvoices', id] })
+      await invalidateCache.invoices.recurring()
+      return await invalidateCache.invoices.recurring()
     },
   })
 }
@@ -1804,7 +1806,7 @@ export const useDeleteRecurringInvoice = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['recurringInvoices'], refetchType: 'all' })
+      return await invalidateCache.invoices.recurring()
     },
   })
 }
@@ -1821,8 +1823,8 @@ export const usePauseRecurringInvoice = () => {
       toast.error(error.message || 'فشل إيقاف الفاتورة المتكررة')
     },
     onSettled: async (_, __, id) => {
-      await queryClient.invalidateQueries({ queryKey: ['recurringInvoices'] })
-      return await queryClient.invalidateQueries({ queryKey: ['recurringInvoices', id] })
+      await invalidateCache.invoices.recurring()
+      return await invalidateCache.invoices.recurring()
     },
   })
 }
@@ -1839,8 +1841,8 @@ export const useResumeRecurringInvoice = () => {
       toast.error(error.message || 'فشل استئناف الفاتورة المتكررة')
     },
     onSettled: async (_, __, id) => {
-      await queryClient.invalidateQueries({ queryKey: ['recurringInvoices'] })
-      return await queryClient.invalidateQueries({ queryKey: ['recurringInvoices', id] })
+      await invalidateCache.invoices.recurring()
+      return await invalidateCache.invoices.recurring()
     },
   })
 }
@@ -1857,8 +1859,8 @@ export const useCancelRecurringInvoice = () => {
       toast.error(error.message || 'فشل إلغاء الفاتورة المتكررة')
     },
     onSettled: async (_, __, id) => {
-      await queryClient.invalidateQueries({ queryKey: ['recurringInvoices'] })
-      return await queryClient.invalidateQueries({ queryKey: ['recurringInvoices', id] })
+      await invalidateCache.invoices.recurring()
+      return await invalidateCache.invoices.recurring()
     },
   })
 }
@@ -1875,9 +1877,9 @@ export const useGenerateFromRecurring = () => {
       toast.error(error.message || 'فشل إنشاء الفاتورة')
     },
     onSettled: async (_, __, id) => {
-      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      await queryClient.invalidateQueries({ queryKey: ['recurringInvoices'] })
-      return await queryClient.invalidateQueries({ queryKey: ['recurringInvoices', id] })
+      await invalidateCache.invoices.all()
+      await invalidateCache.invoices.recurring()
+      return await invalidateCache.invoices.recurring()
     },
   })
 }
@@ -1924,7 +1926,7 @@ export const useDuplicateRecurringInvoice = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['recurringInvoices'], refetchType: 'all' })
+      return await invalidateCache.invoices.recurring()
     },
   })
 }

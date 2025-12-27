@@ -7,6 +7,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useEmployees, useEmployeeStats, useBulkDeleteEmployees, useDeleteEmployee } from '@/hooks/useHR'
@@ -185,11 +186,11 @@ export function EmployeesListView() {
 
     // Single employee actions
     const handleViewEmployee = useCallback((employeeId: string) => {
-        navigate({ to: '/dashboard/hr/employees/$employeeId', params: { employeeId } })
+        navigate({ to: ROUTES.dashboard.hr.employees.detail(employeeId) })
     }, [navigate])
 
     const handleEditEmployee = useCallback((employeeId: string) => {
-        navigate({ to: '/dashboard/hr/employees/new', search: { editId: employeeId } })
+        navigate({ to: ROUTES.dashboard.hr.employees.new, search: { editId: employeeId } })
     }, [navigate])
 
     const handleDeleteEmployee = useCallback((employeeId: string) => {
@@ -428,7 +429,7 @@ export function EmployeesListView() {
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">لا يوجد موظفين</h3>
                                         <p className="text-slate-500 mb-4">ابدأ بإضافة موظف جديد</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                                            <Link to="/dashboard/hr/employees/new">
+                                            <Link to={ROUTES.dashboard.hr.employees.new}>
                                                 <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 إضافة موظف
                                             </Link>
@@ -522,7 +523,7 @@ export function EmployeesListView() {
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <Link to={`/dashboard/hr/employees/${employee.id}`}>
+                                                        <Link to={ROUTES.dashboard.hr.employees.detail(employee.id)}>
                                                             <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
                                                                 عرض الملف
                                                             </Button>

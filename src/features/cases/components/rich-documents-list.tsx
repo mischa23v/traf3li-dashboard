@@ -131,12 +131,10 @@ export function RichDocumentsList({
         <div>
           <h2 className="text-xl font-bold text-navy flex items-center gap-2">
             <FileText className="h-5 w-5 text-emerald-500" aria-hidden="true" />
-            {isArabic ? 'المستندات النصية' : 'Rich Documents'}
+            {t('cases.richDocuments.title')}
           </h2>
           <p className="text-sm text-slate-500 mt-1">
-            {isArabic
-              ? 'إنشاء وإدارة المستندات القانونية للقضية'
-              : 'Create and manage legal documents for this case'}
+            {t('cases.richDocuments.subtitle')}
           </p>
         </div>
         {onCreate && (
@@ -145,7 +143,7 @@ export function RichDocumentsList({
             className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
           >
             <Plus className="h-4 w-4 me-2" aria-hidden="true" />
-            {isArabic ? 'إنشاء مستند جديد' : 'Create Document'}
+            {t('cases.richDocuments.createDocument')}
           </Button>
         )}
       </div>
@@ -157,11 +155,11 @@ export function RichDocumentsList({
             <div className="relative flex-1">
               <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
               <Input
-                placeholder={isArabic ? 'بحث في المستندات...' : 'Search documents...'}
+                placeholder={t('cases.richDocuments.searchPlaceholder')}
                 value={filters.search}
                 onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
                 className="pe-10 rounded-xl"
-                aria-label={isArabic ? 'بحث' : 'Search'}
+                aria-label={t('cases.richDocuments.search')}
               />
             </div>
             <Select
@@ -175,10 +173,10 @@ export function RichDocumentsList({
             >
               <SelectTrigger className="w-[180px] rounded-xl">
                 <Filter className="h-4 w-4 me-2 text-slate-500" aria-hidden="true" />
-                <SelectValue placeholder={isArabic ? 'نوع المستند' : 'Document Type'} />
+                <SelectValue placeholder={t('cases.richDocuments.documentType')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{isArabic ? 'كل الأنواع' : 'All Types'}</SelectItem>
+                <SelectItem value="all">{t('cases.richDocuments.allTypes')}</SelectItem>
                 {documentTypes.map((type) => (
                   <SelectItem key={type} value={type}>
                     {getTypeLabel(type)}
@@ -196,10 +194,10 @@ export function RichDocumentsList({
               }
             >
               <SelectTrigger className="w-[150px] rounded-xl">
-                <SelectValue placeholder={isArabic ? 'الحالة' : 'Status'} />
+                <SelectValue placeholder={t('cases.richDocuments.status')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{isArabic ? 'كل الحالات' : 'All Status'}</SelectItem>
+                <SelectItem value="all">{t('cases.richDocuments.allStatus')}</SelectItem>
                 {statusOptions.map((status) => (
                   <SelectItem key={status} value={status}>
                     {getStatusLabel(status)}
@@ -240,9 +238,9 @@ export function RichDocumentsList({
           <AlertCircle className="h-4 w-4 text-red-600" aria-hidden="true" />
           <AlertDescription className="text-red-800">
             <div className="flex items-center justify-between">
-              <span>{isArabic ? 'حدث خطأ أثناء تحميل المستندات' : 'Error loading documents'}: {error?.message}</span>
+              <span>{t('cases.richDocuments.errorLoadingDocuments')}: {error?.message}</span>
               <Button onClick={() => refetch()} variant="outline" size="sm" className="border-red-300 text-red-700 hover:bg-red-100">
-                {isArabic ? 'إعادة المحاولة' : 'Retry'}
+                {t('cases.richDocuments.retry')}
               </Button>
             </div>
           </AlertDescription>
@@ -258,13 +256,13 @@ export function RichDocumentsList({
             </div>
             <h4 className="text-lg font-bold text-navy mb-2">
               {filters.search || filters.documentType || filters.status
-                ? (isArabic ? 'لا توجد نتائج' : 'No Results')
-                : (isArabic ? 'لا توجد مستندات' : 'No Documents')}
+                ? t('cases.richDocuments.noResults')
+                : t('cases.richDocuments.noDocuments')}
             </h4>
             <p className="text-slate-500 mb-4">
               {filters.search || filters.documentType || filters.status
-                ? (isArabic ? 'جرب البحث بكلمات مختلفة' : 'Try different search terms')
-                : (isArabic ? 'ابدأ بإنشاء مستند جديد لهذه القضية' : 'Start by creating a new document for this case')}
+                ? t('cases.richDocuments.noResultsDescription')
+                : t('cases.richDocuments.noDocumentsDescription')}
             </p>
             {onCreate && !filters.search && !filters.documentType && !filters.status && (
               <Button
@@ -272,7 +270,7 @@ export function RichDocumentsList({
                 className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
               >
                 <Plus className="h-4 w-4 me-2" aria-hidden="true" />
-                {isArabic ? 'إنشاء مستند جديد' : 'Create Document'}
+                {t('cases.richDocuments.createDocument')}
               </Button>
             )}
           </CardContent>
@@ -302,13 +300,13 @@ export function RichDocumentsList({
                       {onView && (
                         <DropdownMenuItem onClick={() => onView(doc)}>
                           <Eye className="h-4 w-4 me-2" aria-hidden="true" />
-                          {isArabic ? 'عرض' : 'View'}
+                          {t('cases.richDocuments.view')}
                         </DropdownMenuItem>
                       )}
                       {onEdit && (
                         <DropdownMenuItem onClick={() => onEdit(doc)}>
                           <Edit className="h-4 w-4 me-2" aria-hidden="true" />
-                          {isArabic ? 'تعديل' : 'Edit'}
+                          {t('cases.richDocuments.edit')}
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuSeparator />
@@ -317,28 +315,28 @@ export function RichDocumentsList({
                         disabled={exportMutation.isPending}
                       >
                         <Download className="h-4 w-4 me-2" aria-hidden="true" />
-                        {isArabic ? 'تصدير PDF' : 'Export PDF'}
+                        {t('cases.richDocuments.exportPdf')}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => handleExport(doc._id, 'latex')}
                         disabled={exportMutation.isPending}
                       >
                         <FileCode className="h-4 w-4 me-2" aria-hidden="true" />
-                        {isArabic ? 'تصدير LaTeX' : 'Export LaTeX'}
+                        {t('cases.richDocuments.exportLatex')}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => handleExport(doc._id, 'markdown')}
                         disabled={exportMutation.isPending}
                       >
                         <FileType className="h-4 w-4 me-2" aria-hidden="true" />
-                        {isArabic ? 'تصدير Markdown' : 'Export Markdown'}
+                        {t('cases.richDocuments.exportMarkdown')}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => handleExport(doc._id, 'preview')}
                         disabled={exportMutation.isPending}
                       >
                         <Eye className="h-4 w-4 me-2" aria-hidden="true" />
-                        {isArabic ? 'معاينة' : 'Preview'}
+                        {t('cases.richDocuments.preview')}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
@@ -346,7 +344,7 @@ export function RichDocumentsList({
                         onClick={() => setDeleteDocId(doc._id)}
                       >
                         <Trash2 className="h-4 w-4 me-2" aria-hidden="true" />
-                        {isArabic ? 'حذف' : 'Delete'}
+                        {t('cases.richDocuments.delete')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -387,7 +385,7 @@ export function RichDocumentsList({
                     v{doc.version}
                   </span>
                   {doc.wordCount && (
-                    <span>{doc.wordCount} {isArabic ? 'كلمة' : 'words'}</span>
+                    <span>{doc.wordCount} {t('cases.richDocuments.words')}</span>
                   )}
                   {doc.showOnCalendar && (
                     <span className="flex items-center gap-1">
@@ -398,8 +396,7 @@ export function RichDocumentsList({
 
                 {/* Date */}
                 <div className="text-xs text-slate-500">
-                  {isArabic ? 'آخر تعديل: ' : 'Updated: '}
-                  {new Date(doc.updatedAt).toLocaleDateString(isArabic ? 'ar-SA' : 'en-US')}
+                  {t('cases.richDocuments.updated')} {new Date(doc.updatedAt).toLocaleDateString(isArabic ? 'ar-SA' : 'en-US')}
                 </div>
 
                 {/* Actions */}
@@ -412,7 +409,7 @@ export function RichDocumentsList({
                       className="flex-1 rounded-lg text-xs"
                     >
                       <Eye className="h-3 w-3 me-1" aria-hidden="true" />
-                      {isArabic ? 'عرض' : 'View'}
+                      {t('cases.richDocuments.view')}
                     </Button>
                   )}
                   {onEdit && (
@@ -422,7 +419,7 @@ export function RichDocumentsList({
                       className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs"
                     >
                       <Edit className="h-3 w-3 me-1" aria-hidden="true" />
-                      {isArabic ? 'تعديل' : 'Edit'}
+                      {t('cases.richDocuments.edit')}
                     </Button>
                   )}
                 </div>
@@ -437,23 +434,21 @@ export function RichDocumentsList({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {isArabic ? 'حذف المستند' : 'Delete Document'}
+              {t('cases.richDocuments.deleteConfirmTitle')}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {isArabic
-                ? 'هل أنت متأكد من حذف هذا المستند؟ لا يمكن التراجع عن هذا الإجراء.'
-                : 'Are you sure you want to delete this document? This action cannot be undone.'}
+              {t('cases.richDocuments.deleteConfirmDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{isArabic ? 'إلغاء' : 'Cancel'}</AlertDialogCancel>
+            <AlertDialogCancel>{t('cases.richDocuments.form.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-red-500 hover:bg-red-600"
             >
               {deleteMutation.isPending
-                ? (isArabic ? 'جاري الحذف...' : 'Deleting...')
-                : (isArabic ? 'حذف' : 'Delete')}
+                ? t('cases.richDocuments.deleting')
+                : t('cases.richDocuments.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
