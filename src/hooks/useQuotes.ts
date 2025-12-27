@@ -65,6 +65,19 @@ export const useQuoteHistory = (quoteId: string, enabled: boolean = true) => {
   })
 }
 
+/**
+ * Get quotes summary/statistics
+ */
+export const useQuotesSummary = (params?: QuoteFilters, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: [...QueryKeys.quotes.all, 'summary', params],
+    queryFn: () => quoteService.getQuotesSummary(params),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
+  })
+}
+
 // ═══════════════════════════════════════════════════════════════
 // MUTATION HOOKS
 // ═══════════════════════════════════════════════════════════════

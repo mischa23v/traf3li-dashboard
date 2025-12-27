@@ -199,6 +199,54 @@ export const useDeleteContact = () => {
 }
 
 /**
+ * Bulk delete contacts
+ */
+export const useBulkDeleteContacts = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (contactIds: string[]) => {
+      // Delete contacts sequentially to avoid overwhelming the server
+      for (const contactId of contactIds) {
+        await contactService.deleteContact(contactId)
+      }
+    },
+    onSuccess: (_, contactIds) => {
+      toast.success(`تم حذف ${contactIds.length} جهات اتصال بنجاح`)
+
+      // Optimistically remove contacts from all lists
+      queryClient.setQueriesData({ queryKey: ['contacts'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { data: [...], total: N } structure
+        if (old.data && Array.isArray(old.data)) {
+          return {
+            ...old,
+            data: old.data.filter((item: any) => !contactIds.includes(item._id)),
+            total: Math.max(0, (old.total || old.data.length) - contactIds.length),
+          }
+        }
+
+        // Handle Array structure
+        if (Array.isArray(old)) {
+          return old.filter((item: any) => !contactIds.includes(item._id))
+        }
+
+        return old
+      })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل حذف جهات الاتصال')
+    },
+    onSettled: async () => {
+      // Delay to allow DB propagation
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      return await invalidateCache.contacts.all()
+    },
+  })
+}
+
+/**
  * Run conflict check
  */
 export const useRunConflictCheck = () => {

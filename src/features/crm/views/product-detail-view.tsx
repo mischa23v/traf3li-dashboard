@@ -828,8 +828,5 @@ export function ProductDetailView() {
   )
 }
 
-// Named export
-export { ProductDetailView }
-
 // Default export
 export default ProductDetailView
