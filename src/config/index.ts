@@ -92,6 +92,29 @@ export {
   BUSINESS_RULES,
 }
 
+// Feature flags
+import {
+  FEATURES,
+  FeatureStatus,
+  isFeatureEnabled,
+  getFeatureDetails,
+  getEnabledFeatures,
+  getDisabledFeatures,
+  getFeaturesByStatus,
+  default as FEATURE_FLAGS,
+} from './feature-flags'
+export {
+  FEATURES,
+  FeatureStatus,
+  isFeatureEnabled,
+  getFeatureDetails,
+  getEnabledFeatures,
+  getDisabledFeatures,
+  getFeaturesByStatus,
+  FEATURE_FLAGS,
+}
+export type { FeatureFlag, FeatureName, FeatureStatusType } from './feature-flags'
+
 // Re-export everything as a single object for convenience
 export const CONFIG = {
   TAX: TAX_CONFIG,
@@ -121,6 +144,7 @@ export const CONFIG = {
     INVENTORY,
     VALIDATION,
   },
+  FEATURES,
 } as const
 
 export default CONFIG
