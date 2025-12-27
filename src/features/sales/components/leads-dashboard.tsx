@@ -299,7 +299,7 @@ function ConvertLeadDialog({
                   <label className="text-sm text-slate-600">نوع القضية</label>
                   <Select value={caseType} onValueChange={setCaseType}>
                     <SelectTrigger>
-                      <SelectValue placeholder=t('sales.leads.selectCaseType') />
+                      <SelectValue placeholder={t('sales.leads.selectCaseType')} />
                     </SelectTrigger>
                     <SelectContent>
                       {getCaseTypes(t).map((type) => (
@@ -488,7 +488,7 @@ function LeadFormDialog({
                 }
               >
                 <SelectTrigger className="rounded-xl">
-                  <SelectValue placeholder=t('sales.leads.form.selectStaff') />
+                  <SelectValue placeholder={t('sales.leads.form.selectStaff')} />
                 </SelectTrigger>
                 <SelectContent>
                   {staff.map((member: any) => (
@@ -538,7 +538,7 @@ function LeadFormDialog({
               }
             >
               <SelectTrigger className="rounded-xl">
-                <SelectValue placeholder=t('sales.leads.selectCaseType') />
+                <SelectValue placeholder={t('sales.leads.selectCaseType')} />
               </SelectTrigger>
               <SelectContent>
                 {getCaseTypes(t).map((type) => (
@@ -952,7 +952,7 @@ export function LeadsDashboard() {
             <div className="relative flex-1">
               <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
               <Input
-                placeholder=t('sales.leads.searchLeads')
+                placeholder={t('sales.leads.searchLeads')}
                 defaultValue={searchQuery}
                 onChange={(e) => debouncedSetSearch(e.target.value)}
                 className="pe-10 rounded-xl"

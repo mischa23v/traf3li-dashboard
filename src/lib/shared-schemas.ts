@@ -1054,18 +1054,10 @@ export const bulkOperationSchema = z.object({
 })
 
 // ============================================================================
-// EXPORTS
-// Export all schemas for use throughout the application
+// TYPES
+// Export types for common schemas
 // ============================================================================
 
-export {
-  fieldSchemas,
-  compositeSchemas,
-  entitySchemas,
-  formSchemas,
-}
-
-// Export types for common schemas
 export type FieldSchemas = typeof fieldSchemas
 export type CompositeSchemas = typeof compositeSchemas
 export type EntitySchemas = typeof entitySchemas

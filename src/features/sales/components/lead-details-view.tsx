@@ -1,5 +1,5 @@
-import {
 import { useTranslation } from 'react-i18next'
+import {
     ArrowRight, Edit, Phone, Mail, Building, User,
     Calendar, DollarSign, Target, TrendingUp,
     Activity, MessageSquare, Plus, CheckCircle,
@@ -491,7 +491,7 @@ export default function LeadDetailsView() {
                                 value={activityForm.description}
                                 onChange={(e) => setActivityForm(prev => ({ ...prev, description: e.target.value }))}
                                 rows={3}
-                                placeholder=t('sales.leads.activities.description')
+                                placeholder={t('sales.leads.activities.description')}
                             />
                         </div>
                         <div>
@@ -499,7 +499,7 @@ export default function LeadDetailsView() {
                             <Input
                                 value={activityForm.outcome}
                                 onChange={(e) => setActivityForm(prev => ({ ...prev, outcome: e.target.value }))}
-                                placeholder=t('sales.leads.activities.outcomeQuestion')
+                                placeholder={t('sales.leads.activities.outcomeQuestion')}
                             />
                         </div>
                     </div>

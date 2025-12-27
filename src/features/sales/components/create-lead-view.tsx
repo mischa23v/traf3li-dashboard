@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import {
 import { useTranslation } from 'react-i18next'
+import {
     ArrowRight, Save, User, Phone, Mail, Building,
     DollarSign, Calendar, FileText, Target, Loader2
 } from 'lucide-react'
@@ -241,7 +241,7 @@ export function CreateLeadView({
                                             الشركة
                                         </label>
                                         <Input
-                                            placeholder=t('sales.leads.form.companyName')
+                                            placeholder={t('sales.leads.form.companyName')}
                                             className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
                                             value={formData.company}
                                             onChange={(e) => handleChange('company', e.target.value)}
@@ -267,7 +267,7 @@ export function CreateLeadView({
                                                 required
                                             >
                                                 <SelectTrigger className="rounded-xl border-slate-200">
-                                                    <SelectValue placeholder=t('sales.leads.form.selectSource') />
+                                                    <SelectValue placeholder={t('sales.leads.form.selectSource')} />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {getSourceOptions(t).map(option => (
@@ -288,7 +288,7 @@ export function CreateLeadView({
                                                 onValueChange={(value) => handleChange('assignedTo', value)}
                                             >
                                                 <SelectTrigger className="rounded-xl border-slate-200">
-                                                    <SelectValue placeholder=t('sales.leads.form.selectStaff') />
+                                                    <SelectValue placeholder={t('sales.leads.form.selectStaff')} />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {staffData?.map((staff: any) => (
@@ -357,7 +357,7 @@ export function CreateLeadView({
                                             onValueChange={(value) => handleChange('caseType', value)}
                                         >
                                             <SelectTrigger className="rounded-xl border-slate-200">
-                                                <SelectValue placeholder=t('sales.leads.selectCaseType') />
+                                                <SelectValue placeholder={t('sales.leads.selectCaseType')} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {getCaseTypes(t).map(type => (
@@ -374,7 +374,7 @@ export function CreateLeadView({
                                             الوصف
                                         </label>
                                         <Textarea
-                                            placeholder=t('sales.leads.form.descriptionPlaceholder')
+                                            placeholder={t('sales.leads.form.descriptionPlaceholder')}
                                             className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 min-h-[100px]"
                                             value={formData.description}
                                             onChange={(e) => handleChange('description', e.target.value)}
@@ -386,7 +386,7 @@ export function CreateLeadView({
                                             ملاحظات
                                         </label>
                                         <Textarea
-                                            placeholder=t('sales.leads.form.notesPlaceholder')
+                                            placeholder={t('sales.leads.form.notesPlaceholder')}
                                             className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 min-h-[100px]"
                                             value={formData.notes}
                                             onChange={(e) => handleChange('notes', e.target.value)}
