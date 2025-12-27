@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import { Link } from '@tanstack/react-router'
-import {
 import { useTranslation } from 'react-i18next'
+import {
   FileBarChart,
   Plus,
   Search,
@@ -223,7 +223,7 @@ export function SalesReportsListView() {
             <div className="relative">
               <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
               <Input
-                placeholder=t('sales.reports.searchReports')
+                placeholder={t('sales.reports.searchReports')}
                 defaultValue={searchQuery}
                 onChange={(e) => debouncedSetSearch(e.target.value)}
                 className="pe-10 rounded-xl"
@@ -233,7 +233,7 @@ export function SalesReportsListView() {
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
             <SelectTrigger className="w-[180px] rounded-xl">
               <Filter className="h-4 w-4 ms-2" aria-hidden="true" />
-              <SelectValue placeholder=t('sales.reports.category') />
+              <SelectValue placeholder={t('sales.reports.category')} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">جميع الفئات</SelectItem>
@@ -246,7 +246,7 @@ export function SalesReportsListView() {
           </Select>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-[180px] rounded-xl">
-              <SelectValue placeholder=t('sales.reports.status') />
+              <SelectValue placeholder={t('sales.reports.status')} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">جميع الحالات</SelectItem>

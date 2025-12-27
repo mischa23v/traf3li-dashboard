@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from '@tanstack/react-router'
-import {
 import { useTranslation } from 'react-i18next'
+import {
   FileBarChart,
   ArrowRight,
   Save,
@@ -165,7 +165,7 @@ export function SalesReportsCreateView() {
                   id="name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder=t('sales.reports.reportNamePlaceholder')
+                  placeholder={t('sales.reports.reportNamePlaceholder')}
                   className="rounded-xl"
                   required
                 />
@@ -176,7 +176,7 @@ export function SalesReportsCreateView() {
                   id="description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder=t('sales.reports.descriptionPlaceholder')
+                  placeholder={t('sales.reports.descriptionPlaceholder')}
                   className="rounded-xl min-h-[100px]"
                 />
               </div>
@@ -187,7 +187,7 @@ export function SalesReportsCreateView() {
                   onValueChange={(value) => setFormData({ ...formData, category: value as ReportCategory })}
                 >
                   <SelectTrigger className="rounded-xl">
-                    <SelectValue placeholder=t('sales.reports.selectCategory') />
+                    <SelectValue placeholder={t('sales.reports.selectCategory')} />
                   </SelectTrigger>
                   <SelectContent>
                     {salesCategories.map((cat) => {

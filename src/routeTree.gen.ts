@@ -69,10 +69,18 @@ import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_a
 import { Route as AuthenticatedSettingsApiKeysRouteImport } from './routes/_authenticated/settings/api-keys'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
+import { Route as AuthenticatedDashboardTasksRouteImport } from './routes/_authenticated/dashboard.tasks'
 import { Route as AuthenticatedDashboardSetupOrchestratorRouteImport } from './routes/_authenticated/dashboard.setup-orchestrator'
+import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
 import { Route as AuthenticatedDashboardNotionRouteImport } from './routes/_authenticated/dashboard.notion'
+import { Route as AuthenticatedDashboardInventoryRouteImport } from './routes/_authenticated/dashboard.inventory'
+import { Route as AuthenticatedDashboardHrRouteImport } from './routes/_authenticated/dashboard.hr'
 import { Route as AuthenticatedDashboardHelpRouteImport } from './routes/_authenticated/dashboard.help'
+import { Route as AuthenticatedDashboardFinanceRouteImport } from './routes/_authenticated/dashboard.finance'
+import { Route as AuthenticatedDashboardCrmRouteImport } from './routes/_authenticated/dashboard.crm'
+import { Route as AuthenticatedDashboardCasesRouteImport } from './routes/_authenticated/dashboard.cases'
 import { Route as AuthenticatedDashboardCalendarRouteImport } from './routes/_authenticated/dashboard.calendar'
+import { Route as AuthenticatedDashboardAssetsRouteImport } from './routes/_authenticated/dashboard.assets'
 import { Route as authSignUpCompleteProfileRouteImport } from './routes/(auth)/sign-up.complete-profile'
 import { Route as AuthenticatedDashboardTagsIndexRouteImport } from './routes/_authenticated/dashboard.tags.index'
 import { Route as AuthenticatedDashboardSupportIndexRouteImport } from './routes/_authenticated/dashboard.support.index'
@@ -737,10 +745,22 @@ const AuthenticatedErrorsErrorRoute =
     path: '/errors/$error',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardTasksRoute =
+  AuthenticatedDashboardTasksRouteImport.update({
+    id: '/dashboard/tasks',
+    path: '/dashboard/tasks',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardSetupOrchestratorRoute =
   AuthenticatedDashboardSetupOrchestratorRouteImport.update({
     id: '/dashboard/setup-orchestrator',
     path: '/dashboard/setup-orchestrator',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardSettingsRoute =
+  AuthenticatedDashboardSettingsRouteImport.update({
+    id: '/dashboard/settings',
+    path: '/dashboard/settings',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardNotionRoute =
@@ -749,16 +769,52 @@ const AuthenticatedDashboardNotionRoute =
     path: '/dashboard/notion',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardInventoryRoute =
+  AuthenticatedDashboardInventoryRouteImport.update({
+    id: '/dashboard/inventory',
+    path: '/dashboard/inventory',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrRoute =
+  AuthenticatedDashboardHrRouteImport.update({
+    id: '/dashboard/hr',
+    path: '/dashboard/hr',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardHelpRoute =
   AuthenticatedDashboardHelpRouteImport.update({
     id: '/dashboard/help',
     path: '/dashboard/help',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardFinanceRoute =
+  AuthenticatedDashboardFinanceRouteImport.update({
+    id: '/dashboard/finance',
+    path: '/dashboard/finance',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardCrmRoute =
+  AuthenticatedDashboardCrmRouteImport.update({
+    id: '/dashboard/crm',
+    path: '/dashboard/crm',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardCasesRoute =
+  AuthenticatedDashboardCasesRouteImport.update({
+    id: '/dashboard/cases',
+    path: '/dashboard/cases',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardCalendarRoute =
   AuthenticatedDashboardCalendarRouteImport.update({
     id: '/dashboard/calendar',
     path: '/dashboard/calendar',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardAssetsRoute =
+  AuthenticatedDashboardAssetsRouteImport.update({
+    id: '/dashboard/assets',
+    path: '/dashboard/assets',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const authSignUpCompleteProfileRoute =
@@ -835,9 +891,9 @@ const AuthenticatedDashboardInvoiceTemplatesIndexRoute =
   } as any)
 const AuthenticatedDashboardInventoryIndexRoute =
   AuthenticatedDashboardInventoryIndexRouteImport.update({
-    id: '/dashboard/inventory/',
-    path: '/dashboard/inventory/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDashboardInventoryRoute,
   } as any)
 const AuthenticatedDashboardFollowupsIndexRoute =
   AuthenticatedDashboardFollowupsIndexRouteImport.update({
@@ -871,9 +927,9 @@ const AuthenticatedDashboardClientsIndexRoute =
   } as any)
 const AuthenticatedDashboardCasesIndexRoute =
   AuthenticatedDashboardCasesIndexRouteImport.update({
-    id: '/dashboard/cases/',
-    path: '/dashboard/cases/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDashboardCasesRoute,
   } as any)
 const AuthenticatedDashboardCaseWorkflowsIndexRoute =
   AuthenticatedDashboardCaseWorkflowsIndexRouteImport.update({
@@ -895,9 +951,9 @@ const AuthenticatedDashboardBillingRatesIndexRoute =
   } as any)
 const AuthenticatedDashboardAssetsIndexRoute =
   AuthenticatedDashboardAssetsIndexRouteImport.update({
-    id: '/dashboard/assets/',
-    path: '/dashboard/assets/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDashboardAssetsRoute,
   } as any)
 const AuthenticatedDashboardAppsIndexRoute =
   AuthenticatedDashboardAppsIndexRouteImport.update({
@@ -907,27 +963,27 @@ const AuthenticatedDashboardAppsIndexRoute =
   } as any)
 const AuthenticatedDashboardTasksNewRoute =
   AuthenticatedDashboardTasksNewRouteImport.update({
-    id: '/dashboard/tasks/new',
-    path: '/dashboard/tasks/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthenticatedDashboardTasksRoute,
   } as any)
 const AuthenticatedDashboardTasksListRoute =
   AuthenticatedDashboardTasksListRouteImport.update({
-    id: '/dashboard/tasks/list',
-    path: '/dashboard/tasks/list',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/list',
+    path: '/list',
+    getParentRoute: () => AuthenticatedDashboardTasksRoute,
   } as any)
 const AuthenticatedDashboardTasksGanttRoute =
   AuthenticatedDashboardTasksGanttRouteImport.update({
-    id: '/dashboard/tasks/gantt',
-    path: '/dashboard/tasks/gantt',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/gantt',
+    path: '/gantt',
+    getParentRoute: () => AuthenticatedDashboardTasksRoute,
   } as any)
 const AuthenticatedDashboardTasksTaskIdRoute =
   AuthenticatedDashboardTasksTaskIdRouteImport.update({
-    id: '/dashboard/tasks/$taskId',
-    path: '/dashboard/tasks/$taskId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/$taskId',
+    path: '/$taskId',
+    getParentRoute: () => AuthenticatedDashboardTasksRoute,
   } as any)
 const AuthenticatedDashboardSupportSlaRoute =
   AuthenticatedDashboardSupportSlaRouteImport.update({
@@ -985,63 +1041,63 @@ const AuthenticatedDashboardStaffNewRoute =
   } as any)
 const AuthenticatedDashboardSettingsTaxesRoute =
   AuthenticatedDashboardSettingsTaxesRouteImport.update({
-    id: '/dashboard/settings/taxes',
-    path: '/dashboard/settings/taxes',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/taxes',
+    path: '/taxes',
+    getParentRoute: () => AuthenticatedDashboardSettingsRoute,
   } as any)
 const AuthenticatedDashboardSettingsSecurityRoute =
   AuthenticatedDashboardSettingsSecurityRouteImport.update({
-    id: '/dashboard/settings/security',
-    path: '/dashboard/settings/security',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/security',
+    path: '/security',
+    getParentRoute: () => AuthenticatedDashboardSettingsRoute,
   } as any)
 const AuthenticatedDashboardSettingsProfileRoute =
   AuthenticatedDashboardSettingsProfileRouteImport.update({
-    id: '/dashboard/settings/profile',
-    path: '/dashboard/settings/profile',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/profile',
+    path: '/profile',
+    getParentRoute: () => AuthenticatedDashboardSettingsRoute,
   } as any)
 const AuthenticatedDashboardSettingsPreferencesRoute =
   AuthenticatedDashboardSettingsPreferencesRouteImport.update({
-    id: '/dashboard/settings/preferences',
-    path: '/dashboard/settings/preferences',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/preferences',
+    path: '/preferences',
+    getParentRoute: () => AuthenticatedDashboardSettingsRoute,
   } as any)
 const AuthenticatedDashboardSettingsPaymentTermsRoute =
   AuthenticatedDashboardSettingsPaymentTermsRouteImport.update({
-    id: '/dashboard/settings/payment-terms',
-    path: '/dashboard/settings/payment-terms',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/payment-terms',
+    path: '/payment-terms',
+    getParentRoute: () => AuthenticatedDashboardSettingsRoute,
   } as any)
 const AuthenticatedDashboardSettingsPaymentModesRoute =
   AuthenticatedDashboardSettingsPaymentModesRouteImport.update({
-    id: '/dashboard/settings/payment-modes',
-    path: '/dashboard/settings/payment-modes',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/payment-modes',
+    path: '/payment-modes',
+    getParentRoute: () => AuthenticatedDashboardSettingsRoute,
   } as any)
 const AuthenticatedDashboardSettingsFinanceRoute =
   AuthenticatedDashboardSettingsFinanceRouteImport.update({
-    id: '/dashboard/settings/finance',
-    path: '/dashboard/settings/finance',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/finance',
+    path: '/finance',
+    getParentRoute: () => AuthenticatedDashboardSettingsRoute,
   } as any)
 const AuthenticatedDashboardSettingsExpensePoliciesRoute =
   AuthenticatedDashboardSettingsExpensePoliciesRouteImport.update({
-    id: '/dashboard/settings/expense-policies',
-    path: '/dashboard/settings/expense-policies',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/expense-policies',
+    path: '/expense-policies',
+    getParentRoute: () => AuthenticatedDashboardSettingsRoute,
   } as any)
 const AuthenticatedDashboardSettingsCrmRoute =
   AuthenticatedDashboardSettingsCrmRouteImport.update({
-    id: '/dashboard/settings/crm',
-    path: '/dashboard/settings/crm',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/crm',
+    path: '/crm',
+    getParentRoute: () => AuthenticatedDashboardSettingsRoute,
   } as any)
 const AuthenticatedDashboardSettingsCompanyRoute =
   AuthenticatedDashboardSettingsCompanyRouteImport.update({
-    id: '/dashboard/settings/company',
-    path: '/dashboard/settings/company',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/company',
+    path: '/company',
+    getParentRoute: () => AuthenticatedDashboardSettingsRoute,
   } as any)
 const AuthenticatedDashboardReputationOverviewRoute =
   AuthenticatedDashboardReputationOverviewRouteImport.update({
@@ -1195,111 +1251,111 @@ const AuthenticatedDashboardJobsBrowseRoute =
   } as any)
 const AuthenticatedDashboardInventoryStockLedgerRoute =
   AuthenticatedDashboardInventoryStockLedgerRouteImport.update({
-    id: '/dashboard/inventory/stock-ledger',
-    path: '/dashboard/inventory/stock-ledger',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/stock-ledger',
+    path: '/stock-ledger',
+    getParentRoute: () => AuthenticatedDashboardInventoryRoute,
   } as any)
 const AuthenticatedDashboardInventorySettingsRoute =
   AuthenticatedDashboardInventorySettingsRouteImport.update({
-    id: '/dashboard/inventory/settings',
-    path: '/dashboard/inventory/settings',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedDashboardInventoryRoute,
   } as any)
 const AuthenticatedDashboardInventoryCreateRoute =
   AuthenticatedDashboardInventoryCreateRouteImport.update({
-    id: '/dashboard/inventory/create',
-    path: '/dashboard/inventory/create',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/create',
+    path: '/create',
+    getParentRoute: () => AuthenticatedDashboardInventoryRoute,
   } as any)
 const AuthenticatedDashboardInventoryItemIdRoute =
   AuthenticatedDashboardInventoryItemIdRouteImport.update({
-    id: '/dashboard/inventory/$itemId',
-    path: '/dashboard/inventory/$itemId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/$itemId',
+    path: '/$itemId',
+    getParentRoute: () => AuthenticatedDashboardInventoryRoute,
   } as any)
 const AuthenticatedDashboardHrSetupWizardRoute =
   AuthenticatedDashboardHrSetupWizardRouteImport.update({
-    id: '/dashboard/hr/setup-wizard',
-    path: '/dashboard/hr/setup-wizard',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/setup-wizard',
+    path: '/setup-wizard',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardFinanceSetupWizardRoute =
   AuthenticatedDashboardFinanceSetupWizardRouteImport.update({
-    id: '/dashboard/finance/setup-wizard',
-    path: '/dashboard/finance/setup-wizard',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/setup-wizard',
+    path: '/setup-wizard',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceOverviewRoute =
   AuthenticatedDashboardFinanceOverviewRouteImport.update({
-    id: '/dashboard/finance/overview',
-    path: '/dashboard/finance/overview',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/overview',
+    path: '/overview',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceOpeningBalancesRoute =
   AuthenticatedDashboardFinanceOpeningBalancesRouteImport.update({
-    id: '/dashboard/finance/opening-balances',
-    path: '/dashboard/finance/opening-balances',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/opening-balances',
+    path: '/opening-balances',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceGeneralLedgerRoute =
   AuthenticatedDashboardFinanceGeneralLedgerRouteImport.update({
-    id: '/dashboard/finance/general-ledger',
-    path: '/dashboard/finance/general-ledger',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/general-ledger',
+    path: '/general-ledger',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceCorporateCardsRoute =
   AuthenticatedDashboardFinanceCorporateCardsRouteImport.update({
-    id: '/dashboard/finance/corporate-cards',
-    path: '/dashboard/finance/corporate-cards',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/corporate-cards',
+    path: '/corporate-cards',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceConsolidatedReportsRoute =
   AuthenticatedDashboardFinanceConsolidatedReportsRouteImport.update({
-    id: '/dashboard/finance/consolidated-reports',
-    path: '/dashboard/finance/consolidated-reports',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/consolidated-reports',
+    path: '/consolidated-reports',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceChartOfAccountsRoute =
   AuthenticatedDashboardFinanceChartOfAccountsRouteImport.update({
-    id: '/dashboard/finance/chart-of-accounts',
-    path: '/dashboard/finance/chart-of-accounts',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/chart-of-accounts',
+    path: '/chart-of-accounts',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardCrmTerritoriesRoute =
   AuthenticatedDashboardCrmTerritoriesRouteImport.update({
-    id: '/dashboard/crm/territories',
-    path: '/dashboard/crm/territories',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/territories',
+    path: '/territories',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmSetupWizardRoute =
   AuthenticatedDashboardCrmSetupWizardRouteImport.update({
-    id: '/dashboard/crm/setup-wizard',
-    path: '/dashboard/crm/setup-wizard',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/setup-wizard',
+    path: '/setup-wizard',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmSalesPersonsRoute =
   AuthenticatedDashboardCrmSalesPersonsRouteImport.update({
-    id: '/dashboard/crm/sales-persons',
-    path: '/dashboard/crm/sales-persons',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/sales-persons',
+    path: '/sales-persons',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmPipelineRoute =
   AuthenticatedDashboardCrmPipelineRouteImport.update({
-    id: '/dashboard/crm/pipeline',
-    path: '/dashboard/crm/pipeline',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/pipeline',
+    path: '/pipeline',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmCrmReportsRoute =
   AuthenticatedDashboardCrmCrmReportsRouteImport.update({
-    id: '/dashboard/crm/crm-reports',
-    path: '/dashboard/crm/crm-reports',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/crm-reports',
+    path: '/crm-reports',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmAppointmentsRoute =
   AuthenticatedDashboardCrmAppointmentsRouteImport.update({
-    id: '/dashboard/crm/appointments',
-    path: '/dashboard/crm/appointments',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/appointments',
+    path: '/appointments',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardContactsNewRoute =
   AuthenticatedDashboardContactsNewRouteImport.update({
@@ -1327,27 +1383,27 @@ const AuthenticatedDashboardClientsClientIdRoute =
   } as any)
 const AuthenticatedDashboardCasesPipelineRoute =
   AuthenticatedDashboardCasesPipelineRouteImport.update({
-    id: '/dashboard/cases/pipeline',
-    path: '/dashboard/cases/pipeline',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/pipeline',
+    path: '/pipeline',
+    getParentRoute: () => AuthenticatedDashboardCasesRoute,
   } as any)
 const AuthenticatedDashboardCasesNewRoute =
   AuthenticatedDashboardCasesNewRouteImport.update({
-    id: '/dashboard/cases/new',
-    path: '/dashboard/cases/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthenticatedDashboardCasesRoute,
   } as any)
 const AuthenticatedDashboardCasesKanbanRoute =
   AuthenticatedDashboardCasesKanbanRouteImport.update({
-    id: '/dashboard/cases/kanban',
-    path: '/dashboard/cases/kanban',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/kanban',
+    path: '/kanban',
+    getParentRoute: () => AuthenticatedDashboardCasesRoute,
   } as any)
 const AuthenticatedDashboardCasesCaseIdRoute =
   AuthenticatedDashboardCasesCaseIdRouteImport.update({
-    id: '/dashboard/cases/$caseId',
-    path: '/dashboard/cases/$caseId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/$caseId',
+    path: '/$caseId',
+    getParentRoute: () => AuthenticatedDashboardCasesRoute,
   } as any)
 const AuthenticatedDashboardBuyingSettingsRoute =
   AuthenticatedDashboardBuyingSettingsRouteImport.update({
@@ -1375,33 +1431,33 @@ const AuthenticatedDashboardBuyingSupplierIdRoute =
   } as any)
 const AuthenticatedDashboardAssetsSettingsRoute =
   AuthenticatedDashboardAssetsSettingsRouteImport.update({
-    id: '/dashboard/assets/settings',
-    path: '/dashboard/assets/settings',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedDashboardAssetsRoute,
   } as any)
 const AuthenticatedDashboardAssetsMaintenanceRoute =
   AuthenticatedDashboardAssetsMaintenanceRouteImport.update({
-    id: '/dashboard/assets/maintenance',
-    path: '/dashboard/assets/maintenance',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/maintenance',
+    path: '/maintenance',
+    getParentRoute: () => AuthenticatedDashboardAssetsRoute,
   } as any)
 const AuthenticatedDashboardAssetsCreateRoute =
   AuthenticatedDashboardAssetsCreateRouteImport.update({
-    id: '/dashboard/assets/create',
-    path: '/dashboard/assets/create',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/create',
+    path: '/create',
+    getParentRoute: () => AuthenticatedDashboardAssetsRoute,
   } as any)
 const AuthenticatedDashboardAssetsCategoriesRoute =
   AuthenticatedDashboardAssetsCategoriesRouteImport.update({
-    id: '/dashboard/assets/categories',
-    path: '/dashboard/assets/categories',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/categories',
+    path: '/categories',
+    getParentRoute: () => AuthenticatedDashboardAssetsRoute,
   } as any)
 const AuthenticatedDashboardAssetsAssetIdRoute =
   AuthenticatedDashboardAssetsAssetIdRouteImport.update({
-    id: '/dashboard/assets/$assetId',
-    path: '/dashboard/assets/$assetId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/$assetId',
+    path: '/$assetId',
+    getParentRoute: () => AuthenticatedDashboardAssetsRoute,
   } as any)
 const authAuthCallbackProviderRoute =
   authAuthCallbackProviderRouteImport.update({
@@ -1411,21 +1467,21 @@ const authAuthCallbackProviderRoute =
   } as any)
 const AuthenticatedDashboardTasksReportsIndexRoute =
   AuthenticatedDashboardTasksReportsIndexRouteImport.update({
-    id: '/dashboard/tasks/reports/',
-    path: '/dashboard/tasks/reports/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reports/',
+    path: '/reports/',
+    getParentRoute: () => AuthenticatedDashboardTasksRoute,
   } as any)
 const AuthenticatedDashboardTasksRemindersIndexRoute =
   AuthenticatedDashboardTasksRemindersIndexRouteImport.update({
-    id: '/dashboard/tasks/reminders/',
-    path: '/dashboard/tasks/reminders/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reminders/',
+    path: '/reminders/',
+    getParentRoute: () => AuthenticatedDashboardTasksRoute,
   } as any)
 const AuthenticatedDashboardTasksEventsIndexRoute =
   AuthenticatedDashboardTasksEventsIndexRouteImport.update({
-    id: '/dashboard/tasks/events/',
-    path: '/dashboard/tasks/events/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/events/',
+    path: '/events/',
+    getParentRoute: () => AuthenticatedDashboardTasksRoute,
   } as any)
 const AuthenticatedDashboardSupportSlaIndexRoute =
   AuthenticatedDashboardSupportSlaIndexRouteImport.update({
@@ -1483,363 +1539,363 @@ const AuthenticatedDashboardManufacturingBomIndexRoute =
   } as any)
 const AuthenticatedDashboardInventoryWarehousesIndexRoute =
   AuthenticatedDashboardInventoryWarehousesIndexRouteImport.update({
-    id: '/dashboard/inventory/warehouses/',
-    path: '/dashboard/inventory/warehouses/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/warehouses/',
+    path: '/warehouses/',
+    getParentRoute: () => AuthenticatedDashboardInventoryRoute,
   } as any)
 const AuthenticatedDashboardInventoryStockEntriesIndexRoute =
   AuthenticatedDashboardInventoryStockEntriesIndexRouteImport.update({
-    id: '/dashboard/inventory/stock-entries/',
-    path: '/dashboard/inventory/stock-entries/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/stock-entries/',
+    path: '/stock-entries/',
+    getParentRoute: () => AuthenticatedDashboardInventoryRoute,
   } as any)
 const AuthenticatedDashboardHrVehiclesIndexRoute =
   AuthenticatedDashboardHrVehiclesIndexRouteImport.update({
-    id: '/dashboard/hr/vehicles/',
-    path: '/dashboard/hr/vehicles/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/vehicles/',
+    path: '/vehicles/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrTrainingIndexRoute =
   AuthenticatedDashboardHrTrainingIndexRouteImport.update({
-    id: '/dashboard/hr/training/',
-    path: '/dashboard/hr/training/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/training/',
+    path: '/training/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrSuccessionPlanningIndexRoute =
   AuthenticatedDashboardHrSuccessionPlanningIndexRouteImport.update({
-    id: '/dashboard/hr/succession-planning/',
-    path: '/dashboard/hr/succession-planning/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/succession-planning/',
+    path: '/succession-planning/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrSkillsIndexRoute =
   AuthenticatedDashboardHrSkillsIndexRouteImport.update({
-    id: '/dashboard/hr/skills/',
-    path: '/dashboard/hr/skills/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/skills/',
+    path: '/skills/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrShiftAssignmentsIndexRoute =
   AuthenticatedDashboardHrShiftAssignmentsIndexRouteImport.update({
-    id: '/dashboard/hr/shift-assignments/',
-    path: '/dashboard/hr/shift-assignments/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/shift-assignments/',
+    path: '/shift-assignments/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrReportsIndexRoute =
   AuthenticatedDashboardHrReportsIndexRouteImport.update({
-    id: '/dashboard/hr/reports/',
-    path: '/dashboard/hr/reports/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reports/',
+    path: '/reports/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrPromotionsIndexRoute =
   AuthenticatedDashboardHrPromotionsIndexRouteImport.update({
-    id: '/dashboard/hr/promotions/',
-    path: '/dashboard/hr/promotions/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/promotions/',
+    path: '/promotions/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrPredictionsIndexRoute =
   AuthenticatedDashboardHrPredictionsIndexRouteImport.update({
-    id: '/dashboard/hr/predictions/',
-    path: '/dashboard/hr/predictions/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/predictions/',
+    path: '/predictions/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrPerformanceIndexRoute =
   AuthenticatedDashboardHrPerformanceIndexRouteImport.update({
-    id: '/dashboard/hr/performance/',
-    path: '/dashboard/hr/performance/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/performance/',
+    path: '/performance/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrPayrollIndexRoute =
   AuthenticatedDashboardHrPayrollIndexRouteImport.update({
-    id: '/dashboard/hr/payroll/',
-    path: '/dashboard/hr/payroll/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/payroll/',
+    path: '/payroll/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrPayrollRunsIndexRoute =
   AuthenticatedDashboardHrPayrollRunsIndexRouteImport.update({
-    id: '/dashboard/hr/payroll-runs/',
-    path: '/dashboard/hr/payroll-runs/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/payroll-runs/',
+    path: '/payroll-runs/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrOrganizationalStructureIndexRoute =
   AuthenticatedDashboardHrOrganizationalStructureIndexRouteImport.update({
-    id: '/dashboard/hr/organizational-structure/',
-    path: '/dashboard/hr/organizational-structure/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/organizational-structure/',
+    path: '/organizational-structure/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrOnboardingIndexRoute =
   AuthenticatedDashboardHrOnboardingIndexRouteImport.update({
-    id: '/dashboard/hr/onboarding/',
-    path: '/dashboard/hr/onboarding/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/onboarding/',
+    path: '/onboarding/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrOffboardingIndexRoute =
   AuthenticatedDashboardHrOffboardingIndexRouteImport.update({
-    id: '/dashboard/hr/offboarding/',
-    path: '/dashboard/hr/offboarding/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/offboarding/',
+    path: '/offboarding/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrLoansIndexRoute =
   AuthenticatedDashboardHrLoansIndexRouteImport.update({
-    id: '/dashboard/hr/loans/',
-    path: '/dashboard/hr/loans/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/loans/',
+    path: '/loans/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrLeaveIndexRoute =
   AuthenticatedDashboardHrLeaveIndexRouteImport.update({
-    id: '/dashboard/hr/leave/',
-    path: '/dashboard/hr/leave/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/leave/',
+    path: '/leave/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrJobPositionsIndexRoute =
   AuthenticatedDashboardHrJobPositionsIndexRouteImport.update({
-    id: '/dashboard/hr/job-positions/',
-    path: '/dashboard/hr/job-positions/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/job-positions/',
+    path: '/job-positions/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrGrievancesIndexRoute =
   AuthenticatedDashboardHrGrievancesIndexRouteImport.update({
-    id: '/dashboard/hr/grievances/',
-    path: '/dashboard/hr/grievances/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/grievances/',
+    path: '/grievances/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrGeofencingIndexRoute =
   AuthenticatedDashboardHrGeofencingIndexRouteImport.update({
-    id: '/dashboard/hr/geofencing/',
-    path: '/dashboard/hr/geofencing/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/geofencing/',
+    path: '/geofencing/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrExpenseClaimsIndexRoute =
   AuthenticatedDashboardHrExpenseClaimsIndexRouteImport.update({
-    id: '/dashboard/hr/expense-claims/',
-    path: '/dashboard/hr/expense-claims/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/expense-claims/',
+    path: '/expense-claims/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrEmployeesIndexRoute =
   AuthenticatedDashboardHrEmployeesIndexRouteImport.update({
-    id: '/dashboard/hr/employees/',
-    path: '/dashboard/hr/employees/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/employees/',
+    path: '/employees/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrEmployeeTransfersIndexRoute =
   AuthenticatedDashboardHrEmployeeTransfersIndexRouteImport.update({
-    id: '/dashboard/hr/employee-transfers/',
-    path: '/dashboard/hr/employee-transfers/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/employee-transfers/',
+    path: '/employee-transfers/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrCompensationIndexRoute =
   AuthenticatedDashboardHrCompensationIndexRouteImport.update({
-    id: '/dashboard/hr/compensation/',
-    path: '/dashboard/hr/compensation/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/compensation/',
+    path: '/compensation/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrBiometricIndexRoute =
   AuthenticatedDashboardHrBiometricIndexRouteImport.update({
-    id: '/dashboard/hr/biometric/',
-    path: '/dashboard/hr/biometric/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/biometric/',
+    path: '/biometric/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrBenefitsIndexRoute =
   AuthenticatedDashboardHrBenefitsIndexRouteImport.update({
-    id: '/dashboard/hr/benefits/',
-    path: '/dashboard/hr/benefits/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/benefits/',
+    path: '/benefits/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrAttendanceIndexRoute =
   AuthenticatedDashboardHrAttendanceIndexRouteImport.update({
-    id: '/dashboard/hr/attendance/',
-    path: '/dashboard/hr/attendance/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/attendance/',
+    path: '/attendance/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrAssetAssignmentIndexRoute =
   AuthenticatedDashboardHrAssetAssignmentIndexRouteImport.update({
-    id: '/dashboard/hr/asset-assignment/',
-    path: '/dashboard/hr/asset-assignment/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/asset-assignment/',
+    path: '/asset-assignment/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrAnalyticsIndexRoute =
   AuthenticatedDashboardHrAnalyticsIndexRouteImport.update({
-    id: '/dashboard/hr/analytics/',
-    path: '/dashboard/hr/analytics/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/analytics/',
+    path: '/analytics/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrAdvancesIndexRoute =
   AuthenticatedDashboardHrAdvancesIndexRouteImport.update({
-    id: '/dashboard/hr/advances/',
-    path: '/dashboard/hr/advances/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/advances/',
+    path: '/advances/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardFinanceVendorsIndexRoute =
   AuthenticatedDashboardFinanceVendorsIndexRouteImport.update({
-    id: '/dashboard/finance/vendors/',
-    path: '/dashboard/finance/vendors/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/vendors/',
+    path: '/vendors/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceTransactionsIndexRoute =
   AuthenticatedDashboardFinanceTransactionsIndexRouteImport.update({
-    id: '/dashboard/finance/transactions/',
-    path: '/dashboard/finance/transactions/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/transactions/',
+    path: '/transactions/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute =
   AuthenticatedDashboardFinanceTransactionsHistoryIndexRouteImport.update({
-    id: '/dashboard/finance/transactions-history/',
-    path: '/dashboard/finance/transactions-history/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/transactions-history/',
+    path: '/transactions-history/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceTimeTrackingIndexRoute =
   AuthenticatedDashboardFinanceTimeTrackingIndexRouteImport.update({
-    id: '/dashboard/finance/time-tracking/',
-    path: '/dashboard/finance/time-tracking/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/time-tracking/',
+    path: '/time-tracking/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceStatementsIndexRoute =
   AuthenticatedDashboardFinanceStatementsIndexRouteImport.update({
-    id: '/dashboard/finance/statements/',
-    path: '/dashboard/finance/statements/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/statements/',
+    path: '/statements/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceSaudiBankingIndexRoute =
   AuthenticatedDashboardFinanceSaudiBankingIndexRouteImport.update({
-    id: '/dashboard/finance/saudi-banking/',
-    path: '/dashboard/finance/saudi-banking/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/saudi-banking/',
+    path: '/saudi-banking/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceRetainersIndexRoute =
   AuthenticatedDashboardFinanceRetainersIndexRouteImport.update({
-    id: '/dashboard/finance/retainers/',
-    path: '/dashboard/finance/retainers/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/retainers/',
+    path: '/retainers/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceReportsIndexRoute =
   AuthenticatedDashboardFinanceReportsIndexRouteImport.update({
-    id: '/dashboard/finance/reports/',
-    path: '/dashboard/finance/reports/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reports/',
+    path: '/reports/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceRecurringIndexRoute =
   AuthenticatedDashboardFinanceRecurringIndexRouteImport.update({
-    id: '/dashboard/finance/recurring/',
-    path: '/dashboard/finance/recurring/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/recurring/',
+    path: '/recurring/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceRecurringInvoicesIndexRoute =
   AuthenticatedDashboardFinanceRecurringInvoicesIndexRouteImport.update({
-    id: '/dashboard/finance/recurring-invoices/',
-    path: '/dashboard/finance/recurring-invoices/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/recurring-invoices/',
+    path: '/recurring-invoices/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceReconciliationIndexRoute =
   AuthenticatedDashboardFinanceReconciliationIndexRouteImport.update({
-    id: '/dashboard/finance/reconciliation/',
-    path: '/dashboard/finance/reconciliation/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reconciliation/',
+    path: '/reconciliation/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceQuotesIndexRoute =
   AuthenticatedDashboardFinanceQuotesIndexRouteImport.update({
-    id: '/dashboard/finance/quotes/',
-    path: '/dashboard/finance/quotes/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/quotes/',
+    path: '/quotes/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinancePaymentsIndexRoute =
   AuthenticatedDashboardFinancePaymentsIndexRouteImport.update({
-    id: '/dashboard/finance/payments/',
-    path: '/dashboard/finance/payments/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/payments/',
+    path: '/payments/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceJournalEntriesIndexRoute =
   AuthenticatedDashboardFinanceJournalEntriesIndexRouteImport.update({
-    id: '/dashboard/finance/journal-entries/',
-    path: '/dashboard/finance/journal-entries/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/journal-entries/',
+    path: '/journal-entries/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceInvoicesIndexRoute =
   AuthenticatedDashboardFinanceInvoicesIndexRouteImport.update({
-    id: '/dashboard/finance/invoices/',
-    path: '/dashboard/finance/invoices/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/invoices/',
+    path: '/invoices/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceFullReportsIndexRoute =
   AuthenticatedDashboardFinanceFullReportsIndexRouteImport.update({
-    id: '/dashboard/finance/full-reports/',
-    path: '/dashboard/finance/full-reports/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/full-reports/',
+    path: '/full-reports/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute =
   AuthenticatedDashboardFinanceFiscalPeriodsIndexRouteImport.update({
-    id: '/dashboard/finance/fiscal-periods/',
-    path: '/dashboard/finance/fiscal-periods/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/fiscal-periods/',
+    path: '/fiscal-periods/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceExpensesIndexRoute =
   AuthenticatedDashboardFinanceExpensesIndexRouteImport.update({
-    id: '/dashboard/finance/expenses/',
-    path: '/dashboard/finance/expenses/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/expenses/',
+    path: '/expenses/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceCurrencyIndexRoute =
   AuthenticatedDashboardFinanceCurrencyIndexRouteImport.update({
-    id: '/dashboard/finance/currency/',
-    path: '/dashboard/finance/currency/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/currency/',
+    path: '/currency/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceCreditNotesIndexRoute =
   AuthenticatedDashboardFinanceCreditNotesIndexRouteImport.update({
-    id: '/dashboard/finance/credit-notes/',
-    path: '/dashboard/finance/credit-notes/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/credit-notes/',
+    path: '/credit-notes/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceBillsIndexRoute =
   AuthenticatedDashboardFinanceBillsIndexRouteImport.update({
-    id: '/dashboard/finance/bills/',
-    path: '/dashboard/finance/bills/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/bills/',
+    path: '/bills/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceActivityIndexRoute =
   AuthenticatedDashboardFinanceActivityIndexRouteImport.update({
-    id: '/dashboard/finance/activity/',
-    path: '/dashboard/finance/activity/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/activity/',
+    path: '/activity/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardCrmWhatsappIndexRoute =
   AuthenticatedDashboardCrmWhatsappIndexRouteImport.update({
-    id: '/dashboard/crm/whatsapp/',
-    path: '/dashboard/crm/whatsapp/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/whatsapp/',
+    path: '/whatsapp/',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmReportsIndexRoute =
   AuthenticatedDashboardCrmReportsIndexRouteImport.update({
-    id: '/dashboard/crm/reports/',
-    path: '/dashboard/crm/reports/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reports/',
+    path: '/reports/',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmReferralsIndexRoute =
   AuthenticatedDashboardCrmReferralsIndexRouteImport.update({
-    id: '/dashboard/crm/referrals/',
-    path: '/dashboard/crm/referrals/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/referrals/',
+    path: '/referrals/',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmLeadsIndexRoute =
   AuthenticatedDashboardCrmLeadsIndexRouteImport.update({
-    id: '/dashboard/crm/leads/',
-    path: '/dashboard/crm/leads/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/leads/',
+    path: '/leads/',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmLeadScoringIndexRoute =
   AuthenticatedDashboardCrmLeadScoringIndexRouteImport.update({
-    id: '/dashboard/crm/lead-scoring/',
-    path: '/dashboard/crm/lead-scoring/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/lead-scoring/',
+    path: '/lead-scoring/',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmEmailMarketingIndexRoute =
   AuthenticatedDashboardCrmEmailMarketingIndexRouteImport.update({
-    id: '/dashboard/crm/email-marketing/',
-    path: '/dashboard/crm/email-marketing/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/email-marketing/',
+    path: '/email-marketing/',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmActivitiesIndexRoute =
   AuthenticatedDashboardCrmActivitiesIndexRouteImport.update({
-    id: '/dashboard/crm/activities/',
-    path: '/dashboard/crm/activities/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/activities/',
+    path: '/activities/',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardBuyingRfqIndexRoute =
   AuthenticatedDashboardBuyingRfqIndexRouteImport.update({
@@ -1867,39 +1923,39 @@ const AuthenticatedDashboardAssetsCategoriesIndexRoute =
   } as any)
 const AuthenticatedDashboardTasksReportsNewRoute =
   AuthenticatedDashboardTasksReportsNewRouteImport.update({
-    id: '/dashboard/tasks/reports/new',
-    path: '/dashboard/tasks/reports/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reports/new',
+    path: '/reports/new',
+    getParentRoute: () => AuthenticatedDashboardTasksRoute,
   } as any)
 const AuthenticatedDashboardTasksReportsReportIdRoute =
   AuthenticatedDashboardTasksReportsReportIdRouteImport.update({
-    id: '/dashboard/tasks/reports/$reportId',
-    path: '/dashboard/tasks/reports/$reportId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reports/$reportId',
+    path: '/reports/$reportId',
+    getParentRoute: () => AuthenticatedDashboardTasksRoute,
   } as any)
 const AuthenticatedDashboardTasksRemindersNewRoute =
   AuthenticatedDashboardTasksRemindersNewRouteImport.update({
-    id: '/dashboard/tasks/reminders/new',
-    path: '/dashboard/tasks/reminders/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reminders/new',
+    path: '/reminders/new',
+    getParentRoute: () => AuthenticatedDashboardTasksRoute,
   } as any)
 const AuthenticatedDashboardTasksRemindersReminderIdRoute =
   AuthenticatedDashboardTasksRemindersReminderIdRouteImport.update({
-    id: '/dashboard/tasks/reminders/$reminderId',
-    path: '/dashboard/tasks/reminders/$reminderId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reminders/$reminderId',
+    path: '/reminders/$reminderId',
+    getParentRoute: () => AuthenticatedDashboardTasksRoute,
   } as any)
 const AuthenticatedDashboardTasksEventsNewRoute =
   AuthenticatedDashboardTasksEventsNewRouteImport.update({
-    id: '/dashboard/tasks/events/new',
-    path: '/dashboard/tasks/events/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/events/new',
+    path: '/events/new',
+    getParentRoute: () => AuthenticatedDashboardTasksRoute,
   } as any)
 const AuthenticatedDashboardTasksEventsEventIdRoute =
   AuthenticatedDashboardTasksEventsEventIdRouteImport.update({
-    id: '/dashboard/tasks/events/$eventId',
-    path: '/dashboard/tasks/events/$eventId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/events/$eventId',
+    path: '/events/$eventId',
+    getParentRoute: () => AuthenticatedDashboardTasksRoute,
   } as any)
 const AuthenticatedDashboardSupportSlaCreateRoute =
   AuthenticatedDashboardSupportSlaCreateRouteImport.update({
@@ -1969,717 +2025,717 @@ const AuthenticatedDashboardManufacturingBomBomIdRoute =
   } as any)
 const AuthenticatedDashboardInventoryWarehousesCreateRoute =
   AuthenticatedDashboardInventoryWarehousesCreateRouteImport.update({
-    id: '/dashboard/inventory/warehouses/create',
-    path: '/dashboard/inventory/warehouses/create',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/warehouses/create',
+    path: '/warehouses/create',
+    getParentRoute: () => AuthenticatedDashboardInventoryRoute,
   } as any)
 const AuthenticatedDashboardInventoryWarehousesWarehouseIdRoute =
   AuthenticatedDashboardInventoryWarehousesWarehouseIdRouteImport.update({
-    id: '/dashboard/inventory/warehouses/$warehouseId',
-    path: '/dashboard/inventory/warehouses/$warehouseId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/warehouses/$warehouseId',
+    path: '/warehouses/$warehouseId',
+    getParentRoute: () => AuthenticatedDashboardInventoryRoute,
   } as any)
 const AuthenticatedDashboardInventoryStockEntriesCreateRoute =
   AuthenticatedDashboardInventoryStockEntriesCreateRouteImport.update({
-    id: '/dashboard/inventory/stock-entries/create',
-    path: '/dashboard/inventory/stock-entries/create',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/stock-entries/create',
+    path: '/stock-entries/create',
+    getParentRoute: () => AuthenticatedDashboardInventoryRoute,
   } as any)
 const AuthenticatedDashboardInventoryStockEntriesStockEntryIdRoute =
   AuthenticatedDashboardInventoryStockEntriesStockEntryIdRouteImport.update({
-    id: '/dashboard/inventory/stock-entries/$stockEntryId',
-    path: '/dashboard/inventory/stock-entries/$stockEntryId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/stock-entries/$stockEntryId',
+    path: '/stock-entries/$stockEntryId',
+    getParentRoute: () => AuthenticatedDashboardInventoryRoute,
   } as any)
 const AuthenticatedDashboardHrTrainingNewRoute =
   AuthenticatedDashboardHrTrainingNewRouteImport.update({
-    id: '/dashboard/hr/training/new',
-    path: '/dashboard/hr/training/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/training/new',
+    path: '/training/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrTrainingTrainingIdRoute =
   AuthenticatedDashboardHrTrainingTrainingIdRouteImport.update({
-    id: '/dashboard/hr/training/$trainingId',
-    path: '/dashboard/hr/training/$trainingId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/training/$trainingId',
+    path: '/training/$trainingId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrSuccessionPlanningNewRoute =
   AuthenticatedDashboardHrSuccessionPlanningNewRouteImport.update({
-    id: '/dashboard/hr/succession-planning/new',
-    path: '/dashboard/hr/succession-planning/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/succession-planning/new',
+    path: '/succession-planning/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrSuccessionPlanningPlanIdRoute =
   AuthenticatedDashboardHrSuccessionPlanningPlanIdRouteImport.update({
-    id: '/dashboard/hr/succession-planning/$planId',
-    path: '/dashboard/hr/succession-planning/$planId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/succession-planning/$planId',
+    path: '/succession-planning/$planId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrSkillsMatrixRoute =
   AuthenticatedDashboardHrSkillsMatrixRouteImport.update({
-    id: '/dashboard/hr/skills/matrix',
-    path: '/dashboard/hr/skills/matrix',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/skills/matrix',
+    path: '/skills/matrix',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrShiftAssignmentsAssignmentIdRoute =
   AuthenticatedDashboardHrShiftAssignmentsAssignmentIdRouteImport.update({
-    id: '/dashboard/hr/shift-assignments/$assignmentId',
-    path: '/dashboard/hr/shift-assignments/$assignmentId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/shift-assignments/$assignmentId',
+    path: '/shift-assignments/$assignmentId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrReportsNewRoute =
   AuthenticatedDashboardHrReportsNewRouteImport.update({
-    id: '/dashboard/hr/reports/new',
-    path: '/dashboard/hr/reports/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reports/new',
+    path: '/reports/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrReportsReportIdRoute =
   AuthenticatedDashboardHrReportsReportIdRouteImport.update({
-    id: '/dashboard/hr/reports/$reportId',
-    path: '/dashboard/hr/reports/$reportId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reports/$reportId',
+    path: '/reports/$reportId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrRecruitmentStaffingPlansRoute =
   AuthenticatedDashboardHrRecruitmentStaffingPlansRouteImport.update({
-    id: '/dashboard/hr/recruitment/staffing-plans',
-    path: '/dashboard/hr/recruitment/staffing-plans',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/recruitment/staffing-plans',
+    path: '/recruitment/staffing-plans',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrPromotionsNewRoute =
   AuthenticatedDashboardHrPromotionsNewRouteImport.update({
-    id: '/dashboard/hr/promotions/new',
-    path: '/dashboard/hr/promotions/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/promotions/new',
+    path: '/promotions/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrPromotionsPromotionIdRoute =
   AuthenticatedDashboardHrPromotionsPromotionIdRouteImport.update({
-    id: '/dashboard/hr/promotions/$promotionId',
-    path: '/dashboard/hr/promotions/$promotionId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/promotions/$promotionId',
+    path: '/promotions/$promotionId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrPerformanceNewRoute =
   AuthenticatedDashboardHrPerformanceNewRouteImport.update({
-    id: '/dashboard/hr/performance/new',
-    path: '/dashboard/hr/performance/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/performance/new',
+    path: '/performance/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrPerformanceReviewIdRoute =
   AuthenticatedDashboardHrPerformanceReviewIdRouteImport.update({
-    id: '/dashboard/hr/performance/$reviewId',
-    path: '/dashboard/hr/performance/$reviewId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/performance/$reviewId',
+    path: '/performance/$reviewId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrPayrollSalaryComponentsRoute =
   AuthenticatedDashboardHrPayrollSalaryComponentsRouteImport.update({
-    id: '/dashboard/hr/payroll/salary-components',
-    path: '/dashboard/hr/payroll/salary-components',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/payroll/salary-components',
+    path: '/payroll/salary-components',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrPayrollNewRoute =
   AuthenticatedDashboardHrPayrollNewRouteImport.update({
-    id: '/dashboard/hr/payroll/new',
-    path: '/dashboard/hr/payroll/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/payroll/new',
+    path: '/payroll/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrPayrollSlipIdRoute =
   AuthenticatedDashboardHrPayrollSlipIdRouteImport.update({
-    id: '/dashboard/hr/payroll/$slipId',
-    path: '/dashboard/hr/payroll/$slipId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/payroll/$slipId',
+    path: '/payroll/$slipId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrPayrollRunsNewRoute =
   AuthenticatedDashboardHrPayrollRunsNewRouteImport.update({
-    id: '/dashboard/hr/payroll-runs/new',
-    path: '/dashboard/hr/payroll-runs/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/payroll-runs/new',
+    path: '/payroll-runs/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrPayrollRunsRunIdRoute =
   AuthenticatedDashboardHrPayrollRunsRunIdRouteImport.update({
-    id: '/dashboard/hr/payroll-runs/$runId',
-    path: '/dashboard/hr/payroll-runs/$runId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/payroll-runs/$runId',
+    path: '/payroll-runs/$runId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrOrganizationalStructureNewRoute =
   AuthenticatedDashboardHrOrganizationalStructureNewRouteImport.update({
-    id: '/dashboard/hr/organizational-structure/new',
-    path: '/dashboard/hr/organizational-structure/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/organizational-structure/new',
+    path: '/organizational-structure/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrOrganizationalStructureUnitIdRoute =
   AuthenticatedDashboardHrOrganizationalStructureUnitIdRouteImport.update({
-    id: '/dashboard/hr/organizational-structure/$unitId',
-    path: '/dashboard/hr/organizational-structure/$unitId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/organizational-structure/$unitId',
+    path: '/organizational-structure/$unitId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrOnboardingNewRoute =
   AuthenticatedDashboardHrOnboardingNewRouteImport.update({
-    id: '/dashboard/hr/onboarding/new',
-    path: '/dashboard/hr/onboarding/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/onboarding/new',
+    path: '/onboarding/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrOnboardingOnboardingIdRoute =
   AuthenticatedDashboardHrOnboardingOnboardingIdRouteImport.update({
-    id: '/dashboard/hr/onboarding/$onboardingId',
-    path: '/dashboard/hr/onboarding/$onboardingId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/onboarding/$onboardingId',
+    path: '/onboarding/$onboardingId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrOffboardingNewRoute =
   AuthenticatedDashboardHrOffboardingNewRouteImport.update({
-    id: '/dashboard/hr/offboarding/new',
-    path: '/dashboard/hr/offboarding/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/offboarding/new',
+    path: '/offboarding/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrOffboardingOffboardingIdRoute =
   AuthenticatedDashboardHrOffboardingOffboardingIdRouteImport.update({
-    id: '/dashboard/hr/offboarding/$offboardingId',
-    path: '/dashboard/hr/offboarding/$offboardingId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/offboarding/$offboardingId',
+    path: '/offboarding/$offboardingId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrLoansNewRoute =
   AuthenticatedDashboardHrLoansNewRouteImport.update({
-    id: '/dashboard/hr/loans/new',
-    path: '/dashboard/hr/loans/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/loans/new',
+    path: '/loans/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrLoansLoanIdRoute =
   AuthenticatedDashboardHrLoansLoanIdRouteImport.update({
-    id: '/dashboard/hr/loans/$loanId',
-    path: '/dashboard/hr/loans/$loanId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/loans/$loanId',
+    path: '/loans/$loanId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrLeavePoliciesRoute =
   AuthenticatedDashboardHrLeavePoliciesRouteImport.update({
-    id: '/dashboard/hr/leave/policies',
-    path: '/dashboard/hr/leave/policies',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/leave/policies',
+    path: '/leave/policies',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrLeavePeriodsRoute =
   AuthenticatedDashboardHrLeavePeriodsRouteImport.update({
-    id: '/dashboard/hr/leave/periods',
-    path: '/dashboard/hr/leave/periods',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/leave/periods',
+    path: '/leave/periods',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrLeaveNewRoute =
   AuthenticatedDashboardHrLeaveNewRouteImport.update({
-    id: '/dashboard/hr/leave/new',
-    path: '/dashboard/hr/leave/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/leave/new',
+    path: '/leave/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrLeaveEncashmentsRoute =
   AuthenticatedDashboardHrLeaveEncashmentsRouteImport.update({
-    id: '/dashboard/hr/leave/encashments',
-    path: '/dashboard/hr/leave/encashments',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/leave/encashments',
+    path: '/leave/encashments',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrLeaveCompensatoryRoute =
   AuthenticatedDashboardHrLeaveCompensatoryRouteImport.update({
-    id: '/dashboard/hr/leave/compensatory',
-    path: '/dashboard/hr/leave/compensatory',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/leave/compensatory',
+    path: '/leave/compensatory',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrLeaveAllocationsRoute =
   AuthenticatedDashboardHrLeaveAllocationsRouteImport.update({
-    id: '/dashboard/hr/leave/allocations',
-    path: '/dashboard/hr/leave/allocations',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/leave/allocations',
+    path: '/leave/allocations',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrLeaveRequestIdRoute =
   AuthenticatedDashboardHrLeaveRequestIdRouteImport.update({
-    id: '/dashboard/hr/leave/$requestId',
-    path: '/dashboard/hr/leave/$requestId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/leave/$requestId',
+    path: '/leave/$requestId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrJobPositionsNewRoute =
   AuthenticatedDashboardHrJobPositionsNewRouteImport.update({
-    id: '/dashboard/hr/job-positions/new',
-    path: '/dashboard/hr/job-positions/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/job-positions/new',
+    path: '/job-positions/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrJobPositionsPositionIdRoute =
   AuthenticatedDashboardHrJobPositionsPositionIdRouteImport.update({
-    id: '/dashboard/hr/job-positions/$positionId',
-    path: '/dashboard/hr/job-positions/$positionId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/job-positions/$positionId',
+    path: '/job-positions/$positionId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrGrievancesNewRoute =
   AuthenticatedDashboardHrGrievancesNewRouteImport.update({
-    id: '/dashboard/hr/grievances/new',
-    path: '/dashboard/hr/grievances/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/grievances/new',
+    path: '/grievances/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrGrievancesGrievanceIdRoute =
   AuthenticatedDashboardHrGrievancesGrievanceIdRouteImport.update({
-    id: '/dashboard/hr/grievances/$grievanceId',
-    path: '/dashboard/hr/grievances/$grievanceId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/grievances/$grievanceId',
+    path: '/grievances/$grievanceId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrGeofencingNewRoute =
   AuthenticatedDashboardHrGeofencingNewRouteImport.update({
-    id: '/dashboard/hr/geofencing/new',
-    path: '/dashboard/hr/geofencing/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/geofencing/new',
+    path: '/geofencing/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrGeofencingZoneIdRoute =
   AuthenticatedDashboardHrGeofencingZoneIdRouteImport.update({
-    id: '/dashboard/hr/geofencing/$zoneId',
-    path: '/dashboard/hr/geofencing/$zoneId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/geofencing/$zoneId',
+    path: '/geofencing/$zoneId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrExpenseClaimsNewRoute =
   AuthenticatedDashboardHrExpenseClaimsNewRouteImport.update({
-    id: '/dashboard/hr/expense-claims/new',
-    path: '/dashboard/hr/expense-claims/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/expense-claims/new',
+    path: '/expense-claims/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrExpenseClaimsClaimIdRoute =
   AuthenticatedDashboardHrExpenseClaimsClaimIdRouteImport.update({
-    id: '/dashboard/hr/expense-claims/$claimId',
-    path: '/dashboard/hr/expense-claims/$claimId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/expense-claims/$claimId',
+    path: '/expense-claims/$claimId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrEmployeesNewRoute =
   AuthenticatedDashboardHrEmployeesNewRouteImport.update({
-    id: '/dashboard/hr/employees/new',
-    path: '/dashboard/hr/employees/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/employees/new',
+    path: '/employees/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrEmployeesEmployeeIdRoute =
   AuthenticatedDashboardHrEmployeesEmployeeIdRouteImport.update({
-    id: '/dashboard/hr/employees/$employeeId',
-    path: '/dashboard/hr/employees/$employeeId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/employees/$employeeId',
+    path: '/employees/$employeeId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrEmployeeTransfersNewRoute =
   AuthenticatedDashboardHrEmployeeTransfersNewRouteImport.update({
-    id: '/dashboard/hr/employee-transfers/new',
-    path: '/dashboard/hr/employee-transfers/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/employee-transfers/new',
+    path: '/employee-transfers/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrEmployeeTransfersTransferIdRoute =
   AuthenticatedDashboardHrEmployeeTransfersTransferIdRouteImport.update({
-    id: '/dashboard/hr/employee-transfers/$transferId',
-    path: '/dashboard/hr/employee-transfers/$transferId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/employee-transfers/$transferId',
+    path: '/employee-transfers/$transferId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrCompensationRetentionBonusesRoute =
   AuthenticatedDashboardHrCompensationRetentionBonusesRouteImport.update({
-    id: '/dashboard/hr/compensation/retention-bonuses',
-    path: '/dashboard/hr/compensation/retention-bonuses',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/compensation/retention-bonuses',
+    path: '/compensation/retention-bonuses',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrCompensationNewRoute =
   AuthenticatedDashboardHrCompensationNewRouteImport.update({
-    id: '/dashboard/hr/compensation/new',
-    path: '/dashboard/hr/compensation/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/compensation/new',
+    path: '/compensation/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrCompensationIncentivesRoute =
   AuthenticatedDashboardHrCompensationIncentivesRouteImport.update({
-    id: '/dashboard/hr/compensation/incentives',
-    path: '/dashboard/hr/compensation/incentives',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/compensation/incentives',
+    path: '/compensation/incentives',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrCompensationCompensationIdRoute =
   AuthenticatedDashboardHrCompensationCompensationIdRouteImport.update({
-    id: '/dashboard/hr/compensation/$compensationId',
-    path: '/dashboard/hr/compensation/$compensationId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/compensation/$compensationId',
+    path: '/compensation/$compensationId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrBiometricNewRoute =
   AuthenticatedDashboardHrBiometricNewRouteImport.update({
-    id: '/dashboard/hr/biometric/new',
-    path: '/dashboard/hr/biometric/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/biometric/new',
+    path: '/biometric/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrBiometricDeviceIdRoute =
   AuthenticatedDashboardHrBiometricDeviceIdRouteImport.update({
-    id: '/dashboard/hr/biometric/$deviceId',
-    path: '/dashboard/hr/biometric/$deviceId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/biometric/$deviceId',
+    path: '/biometric/$deviceId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrBenefitsNewRoute =
   AuthenticatedDashboardHrBenefitsNewRouteImport.update({
-    id: '/dashboard/hr/benefits/new',
-    path: '/dashboard/hr/benefits/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/benefits/new',
+    path: '/benefits/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrBenefitsBenefitIdRoute =
   AuthenticatedDashboardHrBenefitsBenefitIdRouteImport.update({
-    id: '/dashboard/hr/benefits/$benefitId',
-    path: '/dashboard/hr/benefits/$benefitId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/benefits/$benefitId',
+    path: '/benefits/$benefitId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrAttendanceNewRoute =
   AuthenticatedDashboardHrAttendanceNewRouteImport.update({
-    id: '/dashboard/hr/attendance/new',
-    path: '/dashboard/hr/attendance/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/attendance/new',
+    path: '/attendance/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrAttendanceRecordIdRoute =
   AuthenticatedDashboardHrAttendanceRecordIdRouteImport.update({
-    id: '/dashboard/hr/attendance/$recordId',
-    path: '/dashboard/hr/attendance/$recordId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/attendance/$recordId',
+    path: '/attendance/$recordId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrAssetAssignmentNewRoute =
   AuthenticatedDashboardHrAssetAssignmentNewRouteImport.update({
-    id: '/dashboard/hr/asset-assignment/new',
-    path: '/dashboard/hr/asset-assignment/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/asset-assignment/new',
+    path: '/asset-assignment/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrAssetAssignmentAssignmentIdRoute =
   AuthenticatedDashboardHrAssetAssignmentAssignmentIdRouteImport.update({
-    id: '/dashboard/hr/asset-assignment/$assignmentId',
-    path: '/dashboard/hr/asset-assignment/$assignmentId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/asset-assignment/$assignmentId',
+    path: '/asset-assignment/$assignmentId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrAdvancesNewRoute =
   AuthenticatedDashboardHrAdvancesNewRouteImport.update({
-    id: '/dashboard/hr/advances/new',
-    path: '/dashboard/hr/advances/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/advances/new',
+    path: '/advances/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrAdvancesAdvanceIdRoute =
   AuthenticatedDashboardHrAdvancesAdvanceIdRouteImport.update({
-    id: '/dashboard/hr/advances/$advanceId',
-    path: '/dashboard/hr/advances/$advanceId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/advances/$advanceId',
+    path: '/advances/$advanceId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardFinanceVendorsNewRoute =
   AuthenticatedDashboardFinanceVendorsNewRouteImport.update({
-    id: '/dashboard/finance/vendors/new',
-    path: '/dashboard/finance/vendors/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/vendors/new',
+    path: '/vendors/new',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceVendorsVendorIdRoute =
   AuthenticatedDashboardFinanceVendorsVendorIdRouteImport.update({
-    id: '/dashboard/finance/vendors/$vendorId',
-    path: '/dashboard/finance/vendors/$vendorId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/vendors/$vendorId',
+    path: '/vendors/$vendorId',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceTimeTrackingWeeklyRoute =
   AuthenticatedDashboardFinanceTimeTrackingWeeklyRouteImport.update({
-    id: '/dashboard/finance/time-tracking/weekly',
-    path: '/dashboard/finance/time-tracking/weekly',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/time-tracking/weekly',
+    path: '/time-tracking/weekly',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceTimeTrackingNewRoute =
   AuthenticatedDashboardFinanceTimeTrackingNewRouteImport.update({
-    id: '/dashboard/finance/time-tracking/new',
-    path: '/dashboard/finance/time-tracking/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/time-tracking/new',
+    path: '/time-tracking/new',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceTimeTrackingMonthlyRoute =
   AuthenticatedDashboardFinanceTimeTrackingMonthlyRouteImport.update({
-    id: '/dashboard/finance/time-tracking/monthly',
-    path: '/dashboard/finance/time-tracking/monthly',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/time-tracking/monthly',
+    path: '/time-tracking/monthly',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceTimeTrackingApprovalsRoute =
   AuthenticatedDashboardFinanceTimeTrackingApprovalsRouteImport.update({
-    id: '/dashboard/finance/time-tracking/approvals',
-    path: '/dashboard/finance/time-tracking/approvals',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/time-tracking/approvals',
+    path: '/time-tracking/approvals',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute =
   AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteImport.update({
-    id: '/dashboard/finance/time-tracking/$entryId',
-    path: '/dashboard/finance/time-tracking/$entryId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/time-tracking/$entryId',
+    path: '/time-tracking/$entryId',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceStatementsNewRoute =
   AuthenticatedDashboardFinanceStatementsNewRouteImport.update({
-    id: '/dashboard/finance/statements/new',
-    path: '/dashboard/finance/statements/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/statements/new',
+    path: '/statements/new',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceStatementsStatementIdRoute =
   AuthenticatedDashboardFinanceStatementsStatementIdRouteImport.update({
-    id: '/dashboard/finance/statements/$statementId',
-    path: '/dashboard/finance/statements/$statementId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/statements/$statementId',
+    path: '/statements/$statementId',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceSaudiBankingMudadRoute =
   AuthenticatedDashboardFinanceSaudiBankingMudadRouteImport.update({
-    id: '/dashboard/finance/saudi-banking/mudad',
-    path: '/dashboard/finance/saudi-banking/mudad',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/saudi-banking/mudad',
+    path: '/saudi-banking/mudad',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceSaudiBankingLeanRoute =
   AuthenticatedDashboardFinanceSaudiBankingLeanRouteImport.update({
-    id: '/dashboard/finance/saudi-banking/lean',
-    path: '/dashboard/finance/saudi-banking/lean',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/saudi-banking/lean',
+    path: '/saudi-banking/lean',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceRetainersNewRoute =
   AuthenticatedDashboardFinanceRetainersNewRouteImport.update({
-    id: '/dashboard/finance/retainers/new',
-    path: '/dashboard/finance/retainers/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/retainers/new',
+    path: '/retainers/new',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceRetainersRetainerIdRoute =
   AuthenticatedDashboardFinanceRetainersRetainerIdRouteImport.update({
-    id: '/dashboard/finance/retainers/$retainerId',
-    path: '/dashboard/finance/retainers/$retainerId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/retainers/$retainerId',
+    path: '/retainers/$retainerId',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceReportsTimeEntriesRoute =
   AuthenticatedDashboardFinanceReportsTimeEntriesRouteImport.update({
-    id: '/dashboard/finance/reports/time-entries',
-    path: '/dashboard/finance/reports/time-entries',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reports/time-entries',
+    path: '/reports/time-entries',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceReportsRevenueByClientRoute =
   AuthenticatedDashboardFinanceReportsRevenueByClientRouteImport.update({
-    id: '/dashboard/finance/reports/revenue-by-client',
-    path: '/dashboard/finance/reports/revenue-by-client',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reports/revenue-by-client',
+    path: '/reports/revenue-by-client',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceReportsOutstandingInvoicesRoute =
   AuthenticatedDashboardFinanceReportsOutstandingInvoicesRouteImport.update({
-    id: '/dashboard/finance/reports/outstanding-invoices',
-    path: '/dashboard/finance/reports/outstanding-invoices',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reports/outstanding-invoices',
+    path: '/reports/outstanding-invoices',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceReportsNewRoute =
   AuthenticatedDashboardFinanceReportsNewRouteImport.update({
-    id: '/dashboard/finance/reports/new',
-    path: '/dashboard/finance/reports/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reports/new',
+    path: '/reports/new',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceReportsFinancialRoute =
   AuthenticatedDashboardFinanceReportsFinancialRouteImport.update({
-    id: '/dashboard/finance/reports/financial',
-    path: '/dashboard/finance/reports/financial',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reports/financial',
+    path: '/reports/financial',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceReportsAccountsAgingRoute =
   AuthenticatedDashboardFinanceReportsAccountsAgingRouteImport.update({
-    id: '/dashboard/finance/reports/accounts-aging',
-    path: '/dashboard/finance/reports/accounts-aging',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reports/accounts-aging',
+    path: '/reports/accounts-aging',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceReportsReportIdRoute =
   AuthenticatedDashboardFinanceReportsReportIdRouteImport.update({
-    id: '/dashboard/finance/reports/$reportId',
-    path: '/dashboard/finance/reports/$reportId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reports/$reportId',
+    path: '/reports/$reportId',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceRecurringInvoicesNewRoute =
   AuthenticatedDashboardFinanceRecurringInvoicesNewRouteImport.update({
-    id: '/dashboard/finance/recurring-invoices/new',
-    path: '/dashboard/finance/recurring-invoices/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/recurring-invoices/new',
+    path: '/recurring-invoices/new',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceRecurringInvoicesIdRoute =
   AuthenticatedDashboardFinanceRecurringInvoicesIdRouteImport.update({
-    id: '/dashboard/finance/recurring-invoices/$id',
-    path: '/dashboard/finance/recurring-invoices/$id',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/recurring-invoices/$id',
+    path: '/recurring-invoices/$id',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceReconciliationNewRoute =
   AuthenticatedDashboardFinanceReconciliationNewRouteImport.update({
-    id: '/dashboard/finance/reconciliation/new',
-    path: '/dashboard/finance/reconciliation/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reconciliation/new',
+    path: '/reconciliation/new',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceReconciliationFeedIdRoute =
   AuthenticatedDashboardFinanceReconciliationFeedIdRouteImport.update({
-    id: '/dashboard/finance/reconciliation/$feedId',
-    path: '/dashboard/finance/reconciliation/$feedId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reconciliation/$feedId',
+    path: '/reconciliation/$feedId',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceQuotesNewRoute =
   AuthenticatedDashboardFinanceQuotesNewRouteImport.update({
-    id: '/dashboard/finance/quotes/new',
-    path: '/dashboard/finance/quotes/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/quotes/new',
+    path: '/quotes/new',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceQuotesQuoteIdRoute =
   AuthenticatedDashboardFinanceQuotesQuoteIdRouteImport.update({
-    id: '/dashboard/finance/quotes/$quoteId',
-    path: '/dashboard/finance/quotes/$quoteId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/quotes/$quoteId',
+    path: '/quotes/$quoteId',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinancePaymentsNewRoute =
   AuthenticatedDashboardFinancePaymentsNewRouteImport.update({
-    id: '/dashboard/finance/payments/new',
-    path: '/dashboard/finance/payments/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/payments/new',
+    path: '/payments/new',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinancePaymentsPaymentIdRoute =
   AuthenticatedDashboardFinancePaymentsPaymentIdRouteImport.update({
-    id: '/dashboard/finance/payments/$paymentId',
-    path: '/dashboard/finance/payments/$paymentId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/payments/$paymentId',
+    path: '/payments/$paymentId',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceJournalEntriesNewRoute =
   AuthenticatedDashboardFinanceJournalEntriesNewRouteImport.update({
-    id: '/dashboard/finance/journal-entries/new',
-    path: '/dashboard/finance/journal-entries/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/journal-entries/new',
+    path: '/journal-entries/new',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceJournalEntriesIdRoute =
   AuthenticatedDashboardFinanceJournalEntriesIdRouteImport.update({
-    id: '/dashboard/finance/journal-entries/$id',
-    path: '/dashboard/finance/journal-entries/$id',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/journal-entries/$id',
+    path: '/journal-entries/$id',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceInvoicesNewRoute =
   AuthenticatedDashboardFinanceInvoicesNewRouteImport.update({
-    id: '/dashboard/finance/invoices/new',
-    path: '/dashboard/finance/invoices/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/invoices/new',
+    path: '/invoices/new',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceInvoicesApprovalsRoute =
   AuthenticatedDashboardFinanceInvoicesApprovalsRouteImport.update({
-    id: '/dashboard/finance/invoices/approvals',
-    path: '/dashboard/finance/invoices/approvals',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/invoices/approvals',
+    path: '/invoices/approvals',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute =
   AuthenticatedDashboardFinanceInvoicesInvoiceIdRouteImport.update({
-    id: '/dashboard/finance/invoices/$invoiceId',
-    path: '/dashboard/finance/invoices/$invoiceId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/invoices/$invoiceId',
+    path: '/invoices/$invoiceId',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceExpensesNewRoute =
   AuthenticatedDashboardFinanceExpensesNewRouteImport.update({
-    id: '/dashboard/finance/expenses/new',
-    path: '/dashboard/finance/expenses/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/expenses/new',
+    path: '/expenses/new',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceExpensesExpenseIdRoute =
   AuthenticatedDashboardFinanceExpensesExpenseIdRouteImport.update({
-    id: '/dashboard/finance/expenses/$expenseId',
-    path: '/dashboard/finance/expenses/$expenseId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/expenses/$expenseId',
+    path: '/expenses/$expenseId',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceCurrencyNewRoute =
   AuthenticatedDashboardFinanceCurrencyNewRouteImport.update({
-    id: '/dashboard/finance/currency/new',
-    path: '/dashboard/finance/currency/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/currency/new',
+    path: '/currency/new',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceCurrencyRateIdRoute =
   AuthenticatedDashboardFinanceCurrencyRateIdRouteImport.update({
-    id: '/dashboard/finance/currency/$rateId',
-    path: '/dashboard/finance/currency/$rateId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/currency/$rateId',
+    path: '/currency/$rateId',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceCreditNotesNewRoute =
   AuthenticatedDashboardFinanceCreditNotesNewRouteImport.update({
-    id: '/dashboard/finance/credit-notes/new',
-    path: '/dashboard/finance/credit-notes/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/credit-notes/new',
+    path: '/credit-notes/new',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceCreditNotesCreditNoteIdRoute =
   AuthenticatedDashboardFinanceCreditNotesCreditNoteIdRouteImport.update({
-    id: '/dashboard/finance/credit-notes/$creditNoteId',
-    path: '/dashboard/finance/credit-notes/$creditNoteId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/credit-notes/$creditNoteId',
+    path: '/credit-notes/$creditNoteId',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceBillsNewRoute =
   AuthenticatedDashboardFinanceBillsNewRouteImport.update({
-    id: '/dashboard/finance/bills/new',
-    path: '/dashboard/finance/bills/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/bills/new',
+    path: '/bills/new',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceBillsBillIdRoute =
   AuthenticatedDashboardFinanceBillsBillIdRouteImport.update({
-    id: '/dashboard/finance/bills/$billId',
-    path: '/dashboard/finance/bills/$billId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/bills/$billId',
+    path: '/bills/$billId',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceActivityNewRoute =
   AuthenticatedDashboardFinanceActivityNewRouteImport.update({
-    id: '/dashboard/finance/activity/new',
-    path: '/dashboard/finance/activity/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/activity/new',
+    path: '/activity/new',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceActivityActivityIdRoute =
   AuthenticatedDashboardFinanceActivityActivityIdRouteImport.update({
-    id: '/dashboard/finance/activity/$activityId',
-    path: '/dashboard/finance/activity/$activityId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/activity/$activityId',
+    path: '/activity/$activityId',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardCrmWhatsappStartRoute =
   AuthenticatedDashboardCrmWhatsappStartRouteImport.update({
-    id: '/dashboard/crm/whatsapp/start',
-    path: '/dashboard/crm/whatsapp/start',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/whatsapp/start',
+    path: '/whatsapp/start',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmWhatsappNewRoute =
   AuthenticatedDashboardCrmWhatsappNewRouteImport.update({
-    id: '/dashboard/crm/whatsapp/new',
-    path: '/dashboard/crm/whatsapp/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/whatsapp/new',
+    path: '/whatsapp/new',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmWhatsappConversationIdRoute =
   AuthenticatedDashboardCrmWhatsappConversationIdRouteImport.update({
-    id: '/dashboard/crm/whatsapp/$conversationId',
-    path: '/dashboard/crm/whatsapp/$conversationId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/whatsapp/$conversationId',
+    path: '/whatsapp/$conversationId',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmReportsNewRoute =
   AuthenticatedDashboardCrmReportsNewRouteImport.update({
-    id: '/dashboard/crm/reports/new',
-    path: '/dashboard/crm/reports/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reports/new',
+    path: '/reports/new',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmReportsReportIdRoute =
   AuthenticatedDashboardCrmReportsReportIdRouteImport.update({
-    id: '/dashboard/crm/reports/$reportId',
-    path: '/dashboard/crm/reports/$reportId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/reports/$reportId',
+    path: '/reports/$reportId',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmReferralsNewRoute =
   AuthenticatedDashboardCrmReferralsNewRouteImport.update({
-    id: '/dashboard/crm/referrals/new',
-    path: '/dashboard/crm/referrals/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/referrals/new',
+    path: '/referrals/new',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmReferralsReferralIdRoute =
   AuthenticatedDashboardCrmReferralsReferralIdRouteImport.update({
-    id: '/dashboard/crm/referrals/$referralId',
-    path: '/dashboard/crm/referrals/$referralId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/referrals/$referralId',
+    path: '/referrals/$referralId',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmLeadsNewRoute =
   AuthenticatedDashboardCrmLeadsNewRouteImport.update({
-    id: '/dashboard/crm/leads/new',
-    path: '/dashboard/crm/leads/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/leads/new',
+    path: '/leads/new',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmLeadsLeadIdRoute =
   AuthenticatedDashboardCrmLeadsLeadIdRouteImport.update({
-    id: '/dashboard/crm/leads/$leadId',
-    path: '/dashboard/crm/leads/$leadId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/leads/$leadId',
+    path: '/leads/$leadId',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmEmailMarketingNewRoute =
   AuthenticatedDashboardCrmEmailMarketingNewRouteImport.update({
-    id: '/dashboard/crm/email-marketing/new',
-    path: '/dashboard/crm/email-marketing/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/email-marketing/new',
+    path: '/email-marketing/new',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute =
   AuthenticatedDashboardCrmEmailMarketingCampaignIdRouteImport.update({
-    id: '/dashboard/crm/email-marketing/$campaignId',
-    path: '/dashboard/crm/email-marketing/$campaignId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/email-marketing/$campaignId',
+    path: '/email-marketing/$campaignId',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmActivitiesNewRoute =
   AuthenticatedDashboardCrmActivitiesNewRouteImport.update({
-    id: '/dashboard/crm/activities/new',
-    path: '/dashboard/crm/activities/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/activities/new',
+    path: '/activities/new',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmActivitiesActivityIdRoute =
   AuthenticatedDashboardCrmActivitiesActivityIdRouteImport.update({
-    id: '/dashboard/crm/activities/$activityId',
-    path: '/dashboard/crm/activities/$activityId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/activities/$activityId',
+    path: '/activities/$activityId',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCasesPipelineBoardRoute =
   AuthenticatedDashboardCasesPipelineBoardRouteImport.update({
@@ -2745,57 +2801,57 @@ const AuthenticatedDashboardAssetsCategoriesCreateRoute =
   } as any)
 const AuthenticatedDashboardHrSettingsShiftTypesIndexRoute =
   AuthenticatedDashboardHrSettingsShiftTypesIndexRouteImport.update({
-    id: '/dashboard/hr/settings/shift-types/',
-    path: '/dashboard/hr/settings/shift-types/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/settings/shift-types/',
+    path: '/settings/shift-types/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrRecruitmentJobsIndexRoute =
   AuthenticatedDashboardHrRecruitmentJobsIndexRouteImport.update({
-    id: '/dashboard/hr/recruitment/jobs/',
-    path: '/dashboard/hr/recruitment/jobs/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/recruitment/jobs/',
+    path: '/recruitment/jobs/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute =
   AuthenticatedDashboardHrRecruitmentApplicantsIndexRouteImport.update({
-    id: '/dashboard/hr/recruitment/applicants/',
-    path: '/dashboard/hr/recruitment/applicants/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/recruitment/applicants/',
+    path: '/recruitment/applicants/',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute =
   AuthenticatedDashboardFinanceSaudiBankingWpsIndexRouteImport.update({
-    id: '/dashboard/finance/saudi-banking/wps/',
-    path: '/dashboard/finance/saudi-banking/wps/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/saudi-banking/wps/',
+    path: '/saudi-banking/wps/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute =
   AuthenticatedDashboardFinanceSaudiBankingSadadIndexRouteImport.update({
-    id: '/dashboard/finance/saudi-banking/sadad/',
-    path: '/dashboard/finance/saudi-banking/sadad/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/saudi-banking/sadad/',
+    path: '/saudi-banking/sadad/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardHrRecruitmentJobsNewRoute =
   AuthenticatedDashboardHrRecruitmentJobsNewRouteImport.update({
-    id: '/dashboard/hr/recruitment/jobs/new',
-    path: '/dashboard/hr/recruitment/jobs/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/recruitment/jobs/new',
+    path: '/recruitment/jobs/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrRecruitmentJobsJobIdRoute =
   AuthenticatedDashboardHrRecruitmentJobsJobIdRouteImport.update({
-    id: '/dashboard/hr/recruitment/jobs/$jobId',
-    path: '/dashboard/hr/recruitment/jobs/$jobId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/recruitment/jobs/$jobId',
+    path: '/recruitment/jobs/$jobId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrRecruitmentApplicantsNewRoute =
   AuthenticatedDashboardHrRecruitmentApplicantsNewRouteImport.update({
-    id: '/dashboard/hr/recruitment/applicants/new',
-    path: '/dashboard/hr/recruitment/applicants/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/recruitment/applicants/new',
+    path: '/recruitment/applicants/new',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrRecruitmentApplicantsApplicantIdRoute =
   AuthenticatedDashboardHrRecruitmentApplicantsApplicantIdRouteImport.update({
-    id: '/dashboard/hr/recruitment/applicants/$applicantId',
-    path: '/dashboard/hr/recruitment/applicants/$applicantId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/recruitment/applicants/$applicantId',
+    path: '/recruitment/applicants/$applicantId',
+    getParentRoute: () => AuthenticatedDashboardHrRoute,
   } as any)
 const AuthenticatedDashboardHrPromotionsPromotionIdEditRoute =
   AuthenticatedDashboardHrPromotionsPromotionIdEditRouteImport.update({
@@ -2824,15 +2880,15 @@ const AuthenticatedDashboardFinanceStatementsStatementIdEditRoute =
   } as any)
 const AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute =
   AuthenticatedDashboardFinanceSaudiBankingWpsNewRouteImport.update({
-    id: '/dashboard/finance/saudi-banking/wps/new',
-    path: '/dashboard/finance/saudi-banking/wps/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/saudi-banking/wps/new',
+    path: '/saudi-banking/wps/new',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute =
   AuthenticatedDashboardFinanceSaudiBankingSadadPayRouteImport.update({
-    id: '/dashboard/finance/saudi-banking/sadad/pay',
-    path: '/dashboard/finance/saudi-banking/sadad/pay',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/saudi-banking/sadad/pay',
+    path: '/saudi-banking/sadad/pay',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
 const AuthenticatedDashboardFinanceRecurringInvoicesIdEditRoute =
   AuthenticatedDashboardFinanceRecurringInvoicesIdEditRouteImport.update({
@@ -2918,10 +2974,18 @@ export interface FileRoutesByFullPath {
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
   '/sign-up/complete-profile': typeof authSignUpCompleteProfileRoute
+  '/dashboard/assets': typeof AuthenticatedDashboardAssetsRouteWithChildren
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
+  '/dashboard/cases': typeof AuthenticatedDashboardCasesRouteWithChildren
+  '/dashboard/crm': typeof AuthenticatedDashboardCrmRouteWithChildren
+  '/dashboard/finance': typeof AuthenticatedDashboardFinanceRouteWithChildren
   '/dashboard/help': typeof AuthenticatedDashboardHelpRoute
+  '/dashboard/hr': typeof AuthenticatedDashboardHrRouteWithChildren
+  '/dashboard/inventory': typeof AuthenticatedDashboardInventoryRouteWithChildren
   '/dashboard/notion': typeof AuthenticatedDashboardNotionRoute
+  '/dashboard/settings': typeof AuthenticatedDashboardSettingsRouteWithChildren
   '/dashboard/setup-orchestrator': typeof AuthenticatedDashboardSetupOrchestratorRoute
+  '/dashboard/tasks': typeof AuthenticatedDashboardTasksRouteWithChildren
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/api-keys': typeof AuthenticatedSettingsApiKeysRoute
@@ -3025,17 +3089,17 @@ export interface FileRoutesByFullPath {
   '/dashboard/tasks/list': typeof AuthenticatedDashboardTasksListRoute
   '/dashboard/tasks/new': typeof AuthenticatedDashboardTasksNewRoute
   '/dashboard/apps': typeof AuthenticatedDashboardAppsIndexRoute
-  '/dashboard/assets': typeof AuthenticatedDashboardAssetsIndexRoute
+  '/dashboard/assets/': typeof AuthenticatedDashboardAssetsIndexRoute
   '/dashboard/billing-rates': typeof AuthenticatedDashboardBillingRatesIndexRoute
   '/dashboard/buying': typeof AuthenticatedDashboardBuyingIndexRoute
   '/dashboard/case-workflows': typeof AuthenticatedDashboardCaseWorkflowsIndexRoute
-  '/dashboard/cases': typeof AuthenticatedDashboardCasesIndexRoute
+  '/dashboard/cases/': typeof AuthenticatedDashboardCasesIndexRoute
   '/dashboard/clients': typeof AuthenticatedDashboardClientsIndexRoute
   '/dashboard/contacts': typeof AuthenticatedDashboardContactsIndexRoute
   '/dashboard/data-export': typeof AuthenticatedDashboardDataExportIndexRoute
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsIndexRoute
   '/dashboard/followups': typeof AuthenticatedDashboardFollowupsIndexRoute
-  '/dashboard/inventory': typeof AuthenticatedDashboardInventoryIndexRoute
+  '/dashboard/inventory/': typeof AuthenticatedDashboardInventoryIndexRoute
   '/dashboard/invoice-templates': typeof AuthenticatedDashboardInvoiceTemplatesIndexRoute
   '/dashboard/manufacturing': typeof AuthenticatedDashboardManufacturingIndexRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsIndexRoute
@@ -3333,9 +3397,14 @@ export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
   '/sign-up/complete-profile': typeof authSignUpCompleteProfileRoute
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
+  '/dashboard/crm': typeof AuthenticatedDashboardCrmRouteWithChildren
+  '/dashboard/finance': typeof AuthenticatedDashboardFinanceRouteWithChildren
   '/dashboard/help': typeof AuthenticatedDashboardHelpRoute
+  '/dashboard/hr': typeof AuthenticatedDashboardHrRouteWithChildren
   '/dashboard/notion': typeof AuthenticatedDashboardNotionRoute
+  '/dashboard/settings': typeof AuthenticatedDashboardSettingsRouteWithChildren
   '/dashboard/setup-orchestrator': typeof AuthenticatedDashboardSetupOrchestratorRoute
+  '/dashboard/tasks': typeof AuthenticatedDashboardTasksRouteWithChildren
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/api-keys': typeof AuthenticatedSettingsApiKeysRoute
@@ -3743,10 +3812,18 @@ export interface FileRoutesById {
   '/(errors)/503': typeof errors503Route
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/(auth)/sign-up/complete-profile': typeof authSignUpCompleteProfileRoute
+  '/_authenticated/dashboard/assets': typeof AuthenticatedDashboardAssetsRouteWithChildren
   '/_authenticated/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
+  '/_authenticated/dashboard/cases': typeof AuthenticatedDashboardCasesRouteWithChildren
+  '/_authenticated/dashboard/crm': typeof AuthenticatedDashboardCrmRouteWithChildren
+  '/_authenticated/dashboard/finance': typeof AuthenticatedDashboardFinanceRouteWithChildren
   '/_authenticated/dashboard/help': typeof AuthenticatedDashboardHelpRoute
+  '/_authenticated/dashboard/hr': typeof AuthenticatedDashboardHrRouteWithChildren
+  '/_authenticated/dashboard/inventory': typeof AuthenticatedDashboardInventoryRouteWithChildren
   '/_authenticated/dashboard/notion': typeof AuthenticatedDashboardNotionRoute
+  '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRouteWithChildren
   '/_authenticated/dashboard/setup-orchestrator': typeof AuthenticatedDashboardSetupOrchestratorRoute
+  '/_authenticated/dashboard/tasks': typeof AuthenticatedDashboardTasksRouteWithChildren
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/api-keys': typeof AuthenticatedSettingsApiKeysRoute
@@ -4160,10 +4237,18 @@ export interface FileRouteTypes {
     | '/503'
     | '/'
     | '/sign-up/complete-profile'
+    | '/dashboard/assets'
     | '/dashboard/calendar'
+    | '/dashboard/cases'
+    | '/dashboard/crm'
+    | '/dashboard/finance'
     | '/dashboard/help'
+    | '/dashboard/hr'
+    | '/dashboard/inventory'
     | '/dashboard/notion'
+    | '/dashboard/settings'
     | '/dashboard/setup-orchestrator'
+    | '/dashboard/tasks'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/api-keys'
@@ -4267,17 +4352,17 @@ export interface FileRouteTypes {
     | '/dashboard/tasks/list'
     | '/dashboard/tasks/new'
     | '/dashboard/apps'
-    | '/dashboard/assets'
+    | '/dashboard/assets/'
     | '/dashboard/billing-rates'
     | '/dashboard/buying'
     | '/dashboard/case-workflows'
-    | '/dashboard/cases'
+    | '/dashboard/cases/'
     | '/dashboard/clients'
     | '/dashboard/contacts'
     | '/dashboard/data-export'
     | '/dashboard/documents'
     | '/dashboard/followups'
-    | '/dashboard/inventory'
+    | '/dashboard/inventory/'
     | '/dashboard/invoice-templates'
     | '/dashboard/manufacturing'
     | '/dashboard/notifications'
@@ -4575,9 +4660,14 @@ export interface FileRouteTypes {
     | '/'
     | '/sign-up/complete-profile'
     | '/dashboard/calendar'
+    | '/dashboard/crm'
+    | '/dashboard/finance'
     | '/dashboard/help'
+    | '/dashboard/hr'
     | '/dashboard/notion'
+    | '/dashboard/settings'
     | '/dashboard/setup-orchestrator'
+    | '/dashboard/tasks'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/api-keys'
@@ -4984,10 +5074,18 @@ export interface FileRouteTypes {
     | '/(errors)/503'
     | '/_authenticated/'
     | '/(auth)/sign-up/complete-profile'
+    | '/_authenticated/dashboard/assets'
     | '/_authenticated/dashboard/calendar'
+    | '/_authenticated/dashboard/cases'
+    | '/_authenticated/dashboard/crm'
+    | '/_authenticated/dashboard/finance'
     | '/_authenticated/dashboard/help'
+    | '/_authenticated/dashboard/hr'
+    | '/_authenticated/dashboard/inventory'
     | '/_authenticated/dashboard/notion'
+    | '/_authenticated/dashboard/settings'
     | '/_authenticated/dashboard/setup-orchestrator'
+    | '/_authenticated/dashboard/tasks'
     | '/_authenticated/errors/$error'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/api-keys'
@@ -5823,11 +5921,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/tasks': {
+      id: '/_authenticated/dashboard/tasks'
+      path: '/dashboard/tasks'
+      fullPath: '/dashboard/tasks'
+      preLoaderRoute: typeof AuthenticatedDashboardTasksRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/setup-orchestrator': {
       id: '/_authenticated/dashboard/setup-orchestrator'
       path: '/dashboard/setup-orchestrator'
       fullPath: '/dashboard/setup-orchestrator'
       preLoaderRoute: typeof AuthenticatedDashboardSetupOrchestratorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/settings': {
+      id: '/_authenticated/dashboard/settings'
+      path: '/dashboard/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof AuthenticatedDashboardSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/notion': {
@@ -5837,6 +5949,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardNotionRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/inventory': {
+      id: '/_authenticated/dashboard/inventory'
+      path: '/dashboard/inventory'
+      fullPath: '/dashboard/inventory'
+      preLoaderRoute: typeof AuthenticatedDashboardInventoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr': {
+      id: '/_authenticated/dashboard/hr'
+      path: '/dashboard/hr'
+      fullPath: '/dashboard/hr'
+      preLoaderRoute: typeof AuthenticatedDashboardHrRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/help': {
       id: '/_authenticated/dashboard/help'
       path: '/dashboard/help'
@@ -5844,11 +5970,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardHelpRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/finance': {
+      id: '/_authenticated/dashboard/finance'
+      path: '/dashboard/finance'
+      fullPath: '/dashboard/finance'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/crm': {
+      id: '/_authenticated/dashboard/crm'
+      path: '/dashboard/crm'
+      fullPath: '/dashboard/crm'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/cases': {
+      id: '/_authenticated/dashboard/cases'
+      path: '/dashboard/cases'
+      fullPath: '/dashboard/cases'
+      preLoaderRoute: typeof AuthenticatedDashboardCasesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/calendar': {
       id: '/_authenticated/dashboard/calendar'
       path: '/dashboard/calendar'
       fullPath: '/dashboard/calendar'
       preLoaderRoute: typeof AuthenticatedDashboardCalendarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/assets': {
+      id: '/_authenticated/dashboard/assets'
+      path: '/dashboard/assets'
+      fullPath: '/dashboard/assets'
+      preLoaderRoute: typeof AuthenticatedDashboardAssetsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/(auth)/sign-up/complete-profile': {
@@ -5937,10 +6091,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/inventory/': {
       id: '/_authenticated/dashboard/inventory/'
-      path: '/dashboard/inventory'
-      fullPath: '/dashboard/inventory'
+      path: '/'
+      fullPath: '/dashboard/inventory/'
       preLoaderRoute: typeof AuthenticatedDashboardInventoryIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardInventoryRoute
     }
     '/_authenticated/dashboard/followups/': {
       id: '/_authenticated/dashboard/followups/'
@@ -5979,10 +6133,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/cases/': {
       id: '/_authenticated/dashboard/cases/'
-      path: '/dashboard/cases'
-      fullPath: '/dashboard/cases'
+      path: '/'
+      fullPath: '/dashboard/cases/'
       preLoaderRoute: typeof AuthenticatedDashboardCasesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCasesRoute
     }
     '/_authenticated/dashboard/case-workflows/': {
       id: '/_authenticated/dashboard/case-workflows/'
@@ -6007,10 +6161,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/assets/': {
       id: '/_authenticated/dashboard/assets/'
-      path: '/dashboard/assets'
-      fullPath: '/dashboard/assets'
+      path: '/'
+      fullPath: '/dashboard/assets/'
       preLoaderRoute: typeof AuthenticatedDashboardAssetsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardAssetsRoute
     }
     '/_authenticated/dashboard/apps/': {
       id: '/_authenticated/dashboard/apps/'
@@ -6021,31 +6175,31 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/tasks/new': {
       id: '/_authenticated/dashboard/tasks/new'
-      path: '/dashboard/tasks/new'
+      path: '/new'
       fullPath: '/dashboard/tasks/new'
       preLoaderRoute: typeof AuthenticatedDashboardTasksNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardTasksRoute
     }
     '/_authenticated/dashboard/tasks/list': {
       id: '/_authenticated/dashboard/tasks/list'
-      path: '/dashboard/tasks/list'
+      path: '/list'
       fullPath: '/dashboard/tasks/list'
       preLoaderRoute: typeof AuthenticatedDashboardTasksListRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardTasksRoute
     }
     '/_authenticated/dashboard/tasks/gantt': {
       id: '/_authenticated/dashboard/tasks/gantt'
-      path: '/dashboard/tasks/gantt'
+      path: '/gantt'
       fullPath: '/dashboard/tasks/gantt'
       preLoaderRoute: typeof AuthenticatedDashboardTasksGanttRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardTasksRoute
     }
     '/_authenticated/dashboard/tasks/$taskId': {
       id: '/_authenticated/dashboard/tasks/$taskId'
-      path: '/dashboard/tasks/$taskId'
+      path: '/$taskId'
       fullPath: '/dashboard/tasks/$taskId'
       preLoaderRoute: typeof AuthenticatedDashboardTasksTaskIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardTasksRoute
     }
     '/_authenticated/dashboard/support/sla': {
       id: '/_authenticated/dashboard/support/sla'
@@ -6112,73 +6266,73 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/settings/taxes': {
       id: '/_authenticated/dashboard/settings/taxes'
-      path: '/dashboard/settings/taxes'
+      path: '/taxes'
       fullPath: '/dashboard/settings/taxes'
       preLoaderRoute: typeof AuthenticatedDashboardSettingsTaxesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardSettingsRoute
     }
     '/_authenticated/dashboard/settings/security': {
       id: '/_authenticated/dashboard/settings/security'
-      path: '/dashboard/settings/security'
+      path: '/security'
       fullPath: '/dashboard/settings/security'
       preLoaderRoute: typeof AuthenticatedDashboardSettingsSecurityRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardSettingsRoute
     }
     '/_authenticated/dashboard/settings/profile': {
       id: '/_authenticated/dashboard/settings/profile'
-      path: '/dashboard/settings/profile'
+      path: '/profile'
       fullPath: '/dashboard/settings/profile'
       preLoaderRoute: typeof AuthenticatedDashboardSettingsProfileRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardSettingsRoute
     }
     '/_authenticated/dashboard/settings/preferences': {
       id: '/_authenticated/dashboard/settings/preferences'
-      path: '/dashboard/settings/preferences'
+      path: '/preferences'
       fullPath: '/dashboard/settings/preferences'
       preLoaderRoute: typeof AuthenticatedDashboardSettingsPreferencesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardSettingsRoute
     }
     '/_authenticated/dashboard/settings/payment-terms': {
       id: '/_authenticated/dashboard/settings/payment-terms'
-      path: '/dashboard/settings/payment-terms'
+      path: '/payment-terms'
       fullPath: '/dashboard/settings/payment-terms'
       preLoaderRoute: typeof AuthenticatedDashboardSettingsPaymentTermsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardSettingsRoute
     }
     '/_authenticated/dashboard/settings/payment-modes': {
       id: '/_authenticated/dashboard/settings/payment-modes'
-      path: '/dashboard/settings/payment-modes'
+      path: '/payment-modes'
       fullPath: '/dashboard/settings/payment-modes'
       preLoaderRoute: typeof AuthenticatedDashboardSettingsPaymentModesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardSettingsRoute
     }
     '/_authenticated/dashboard/settings/finance': {
       id: '/_authenticated/dashboard/settings/finance'
-      path: '/dashboard/settings/finance'
+      path: '/finance'
       fullPath: '/dashboard/settings/finance'
       preLoaderRoute: typeof AuthenticatedDashboardSettingsFinanceRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardSettingsRoute
     }
     '/_authenticated/dashboard/settings/expense-policies': {
       id: '/_authenticated/dashboard/settings/expense-policies'
-      path: '/dashboard/settings/expense-policies'
+      path: '/expense-policies'
       fullPath: '/dashboard/settings/expense-policies'
       preLoaderRoute: typeof AuthenticatedDashboardSettingsExpensePoliciesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardSettingsRoute
     }
     '/_authenticated/dashboard/settings/crm': {
       id: '/_authenticated/dashboard/settings/crm'
-      path: '/dashboard/settings/crm'
+      path: '/crm'
       fullPath: '/dashboard/settings/crm'
       preLoaderRoute: typeof AuthenticatedDashboardSettingsCrmRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardSettingsRoute
     }
     '/_authenticated/dashboard/settings/company': {
       id: '/_authenticated/dashboard/settings/company'
-      path: '/dashboard/settings/company'
+      path: '/company'
       fullPath: '/dashboard/settings/company'
       preLoaderRoute: typeof AuthenticatedDashboardSettingsCompanyRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardSettingsRoute
     }
     '/_authenticated/dashboard/reputation/overview': {
       id: '/_authenticated/dashboard/reputation/overview'
@@ -6357,129 +6511,129 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/inventory/stock-ledger': {
       id: '/_authenticated/dashboard/inventory/stock-ledger'
-      path: '/dashboard/inventory/stock-ledger'
+      path: '/stock-ledger'
       fullPath: '/dashboard/inventory/stock-ledger'
       preLoaderRoute: typeof AuthenticatedDashboardInventoryStockLedgerRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardInventoryRoute
     }
     '/_authenticated/dashboard/inventory/settings': {
       id: '/_authenticated/dashboard/inventory/settings'
-      path: '/dashboard/inventory/settings'
+      path: '/settings'
       fullPath: '/dashboard/inventory/settings'
       preLoaderRoute: typeof AuthenticatedDashboardInventorySettingsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardInventoryRoute
     }
     '/_authenticated/dashboard/inventory/create': {
       id: '/_authenticated/dashboard/inventory/create'
-      path: '/dashboard/inventory/create'
+      path: '/create'
       fullPath: '/dashboard/inventory/create'
       preLoaderRoute: typeof AuthenticatedDashboardInventoryCreateRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardInventoryRoute
     }
     '/_authenticated/dashboard/inventory/$itemId': {
       id: '/_authenticated/dashboard/inventory/$itemId'
-      path: '/dashboard/inventory/$itemId'
+      path: '/$itemId'
       fullPath: '/dashboard/inventory/$itemId'
       preLoaderRoute: typeof AuthenticatedDashboardInventoryItemIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardInventoryRoute
     }
     '/_authenticated/dashboard/hr/setup-wizard': {
       id: '/_authenticated/dashboard/hr/setup-wizard'
-      path: '/dashboard/hr/setup-wizard'
+      path: '/setup-wizard'
       fullPath: '/dashboard/hr/setup-wizard'
       preLoaderRoute: typeof AuthenticatedDashboardHrSetupWizardRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/finance/setup-wizard': {
       id: '/_authenticated/dashboard/finance/setup-wizard'
-      path: '/dashboard/finance/setup-wizard'
+      path: '/setup-wizard'
       fullPath: '/dashboard/finance/setup-wizard'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceSetupWizardRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/overview': {
       id: '/_authenticated/dashboard/finance/overview'
-      path: '/dashboard/finance/overview'
+      path: '/overview'
       fullPath: '/dashboard/finance/overview'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceOverviewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/opening-balances': {
       id: '/_authenticated/dashboard/finance/opening-balances'
-      path: '/dashboard/finance/opening-balances'
+      path: '/opening-balances'
       fullPath: '/dashboard/finance/opening-balances'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceOpeningBalancesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/general-ledger': {
       id: '/_authenticated/dashboard/finance/general-ledger'
-      path: '/dashboard/finance/general-ledger'
+      path: '/general-ledger'
       fullPath: '/dashboard/finance/general-ledger'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceGeneralLedgerRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/corporate-cards': {
       id: '/_authenticated/dashboard/finance/corporate-cards'
-      path: '/dashboard/finance/corporate-cards'
+      path: '/corporate-cards'
       fullPath: '/dashboard/finance/corporate-cards'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceCorporateCardsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/consolidated-reports': {
       id: '/_authenticated/dashboard/finance/consolidated-reports'
-      path: '/dashboard/finance/consolidated-reports'
+      path: '/consolidated-reports'
       fullPath: '/dashboard/finance/consolidated-reports'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceConsolidatedReportsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/chart-of-accounts': {
       id: '/_authenticated/dashboard/finance/chart-of-accounts'
-      path: '/dashboard/finance/chart-of-accounts'
+      path: '/chart-of-accounts'
       fullPath: '/dashboard/finance/chart-of-accounts'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceChartOfAccountsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/crm/territories': {
       id: '/_authenticated/dashboard/crm/territories'
-      path: '/dashboard/crm/territories'
+      path: '/territories'
       fullPath: '/dashboard/crm/territories'
       preLoaderRoute: typeof AuthenticatedDashboardCrmTerritoriesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/setup-wizard': {
       id: '/_authenticated/dashboard/crm/setup-wizard'
-      path: '/dashboard/crm/setup-wizard'
+      path: '/setup-wizard'
       fullPath: '/dashboard/crm/setup-wizard'
       preLoaderRoute: typeof AuthenticatedDashboardCrmSetupWizardRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/sales-persons': {
       id: '/_authenticated/dashboard/crm/sales-persons'
-      path: '/dashboard/crm/sales-persons'
+      path: '/sales-persons'
       fullPath: '/dashboard/crm/sales-persons'
       preLoaderRoute: typeof AuthenticatedDashboardCrmSalesPersonsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/pipeline': {
       id: '/_authenticated/dashboard/crm/pipeline'
-      path: '/dashboard/crm/pipeline'
+      path: '/pipeline'
       fullPath: '/dashboard/crm/pipeline'
       preLoaderRoute: typeof AuthenticatedDashboardCrmPipelineRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/crm-reports': {
       id: '/_authenticated/dashboard/crm/crm-reports'
-      path: '/dashboard/crm/crm-reports'
+      path: '/crm-reports'
       fullPath: '/dashboard/crm/crm-reports'
       preLoaderRoute: typeof AuthenticatedDashboardCrmCrmReportsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/appointments': {
       id: '/_authenticated/dashboard/crm/appointments'
-      path: '/dashboard/crm/appointments'
+      path: '/appointments'
       fullPath: '/dashboard/crm/appointments'
       preLoaderRoute: typeof AuthenticatedDashboardCrmAppointmentsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/contacts/new': {
       id: '/_authenticated/dashboard/contacts/new'
@@ -6511,31 +6665,31 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/cases/pipeline': {
       id: '/_authenticated/dashboard/cases/pipeline'
-      path: '/dashboard/cases/pipeline'
+      path: '/pipeline'
       fullPath: '/dashboard/cases/pipeline'
       preLoaderRoute: typeof AuthenticatedDashboardCasesPipelineRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCasesRoute
     }
     '/_authenticated/dashboard/cases/new': {
       id: '/_authenticated/dashboard/cases/new'
-      path: '/dashboard/cases/new'
+      path: '/new'
       fullPath: '/dashboard/cases/new'
       preLoaderRoute: typeof AuthenticatedDashboardCasesNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCasesRoute
     }
     '/_authenticated/dashboard/cases/kanban': {
       id: '/_authenticated/dashboard/cases/kanban'
-      path: '/dashboard/cases/kanban'
+      path: '/kanban'
       fullPath: '/dashboard/cases/kanban'
       preLoaderRoute: typeof AuthenticatedDashboardCasesKanbanRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCasesRoute
     }
     '/_authenticated/dashboard/cases/$caseId': {
       id: '/_authenticated/dashboard/cases/$caseId'
-      path: '/dashboard/cases/$caseId'
+      path: '/$caseId'
       fullPath: '/dashboard/cases/$caseId'
       preLoaderRoute: typeof AuthenticatedDashboardCasesCaseIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCasesRoute
     }
     '/_authenticated/dashboard/buying/settings': {
       id: '/_authenticated/dashboard/buying/settings'
@@ -6567,38 +6721,38 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/assets/settings': {
       id: '/_authenticated/dashboard/assets/settings'
-      path: '/dashboard/assets/settings'
+      path: '/settings'
       fullPath: '/dashboard/assets/settings'
       preLoaderRoute: typeof AuthenticatedDashboardAssetsSettingsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardAssetsRoute
     }
     '/_authenticated/dashboard/assets/maintenance': {
       id: '/_authenticated/dashboard/assets/maintenance'
-      path: '/dashboard/assets/maintenance'
+      path: '/maintenance'
       fullPath: '/dashboard/assets/maintenance'
       preLoaderRoute: typeof AuthenticatedDashboardAssetsMaintenanceRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardAssetsRoute
     }
     '/_authenticated/dashboard/assets/create': {
       id: '/_authenticated/dashboard/assets/create'
-      path: '/dashboard/assets/create'
+      path: '/create'
       fullPath: '/dashboard/assets/create'
       preLoaderRoute: typeof AuthenticatedDashboardAssetsCreateRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardAssetsRoute
     }
     '/_authenticated/dashboard/assets/categories': {
       id: '/_authenticated/dashboard/assets/categories'
-      path: '/dashboard/assets/categories'
+      path: '/categories'
       fullPath: '/dashboard/assets/categories'
       preLoaderRoute: typeof AuthenticatedDashboardAssetsCategoriesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardAssetsRoute
     }
     '/_authenticated/dashboard/assets/$assetId': {
       id: '/_authenticated/dashboard/assets/$assetId'
-      path: '/dashboard/assets/$assetId'
+      path: '/$assetId'
       fullPath: '/dashboard/assets/$assetId'
       preLoaderRoute: typeof AuthenticatedDashboardAssetsAssetIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardAssetsRoute
     }
     '/(auth)/auth/callback/$provider': {
       id: '/(auth)/auth/callback/$provider'
@@ -6609,24 +6763,24 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/tasks/reports/': {
       id: '/_authenticated/dashboard/tasks/reports/'
-      path: '/dashboard/tasks/reports'
+      path: '/reports'
       fullPath: '/dashboard/tasks/reports'
       preLoaderRoute: typeof AuthenticatedDashboardTasksReportsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardTasksRoute
     }
     '/_authenticated/dashboard/tasks/reminders/': {
       id: '/_authenticated/dashboard/tasks/reminders/'
-      path: '/dashboard/tasks/reminders'
+      path: '/reminders'
       fullPath: '/dashboard/tasks/reminders'
       preLoaderRoute: typeof AuthenticatedDashboardTasksRemindersIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardTasksRoute
     }
     '/_authenticated/dashboard/tasks/events/': {
       id: '/_authenticated/dashboard/tasks/events/'
-      path: '/dashboard/tasks/events'
+      path: '/events'
       fullPath: '/dashboard/tasks/events'
       preLoaderRoute: typeof AuthenticatedDashboardTasksEventsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardTasksRoute
     }
     '/_authenticated/dashboard/support/sla/': {
       id: '/_authenticated/dashboard/support/sla/'
@@ -6693,423 +6847,423 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/inventory/warehouses/': {
       id: '/_authenticated/dashboard/inventory/warehouses/'
-      path: '/dashboard/inventory/warehouses'
+      path: '/warehouses'
       fullPath: '/dashboard/inventory/warehouses'
       preLoaderRoute: typeof AuthenticatedDashboardInventoryWarehousesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardInventoryRoute
     }
     '/_authenticated/dashboard/inventory/stock-entries/': {
       id: '/_authenticated/dashboard/inventory/stock-entries/'
-      path: '/dashboard/inventory/stock-entries'
+      path: '/stock-entries'
       fullPath: '/dashboard/inventory/stock-entries'
       preLoaderRoute: typeof AuthenticatedDashboardInventoryStockEntriesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardInventoryRoute
     }
     '/_authenticated/dashboard/hr/vehicles/': {
       id: '/_authenticated/dashboard/hr/vehicles/'
-      path: '/dashboard/hr/vehicles'
+      path: '/vehicles'
       fullPath: '/dashboard/hr/vehicles'
       preLoaderRoute: typeof AuthenticatedDashboardHrVehiclesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/training/': {
       id: '/_authenticated/dashboard/hr/training/'
-      path: '/dashboard/hr/training'
+      path: '/training'
       fullPath: '/dashboard/hr/training'
       preLoaderRoute: typeof AuthenticatedDashboardHrTrainingIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/succession-planning/': {
       id: '/_authenticated/dashboard/hr/succession-planning/'
-      path: '/dashboard/hr/succession-planning'
+      path: '/succession-planning'
       fullPath: '/dashboard/hr/succession-planning'
       preLoaderRoute: typeof AuthenticatedDashboardHrSuccessionPlanningIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/skills/': {
       id: '/_authenticated/dashboard/hr/skills/'
-      path: '/dashboard/hr/skills'
+      path: '/skills'
       fullPath: '/dashboard/hr/skills'
       preLoaderRoute: typeof AuthenticatedDashboardHrSkillsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/shift-assignments/': {
       id: '/_authenticated/dashboard/hr/shift-assignments/'
-      path: '/dashboard/hr/shift-assignments'
+      path: '/shift-assignments'
       fullPath: '/dashboard/hr/shift-assignments'
       preLoaderRoute: typeof AuthenticatedDashboardHrShiftAssignmentsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/reports/': {
       id: '/_authenticated/dashboard/hr/reports/'
-      path: '/dashboard/hr/reports'
+      path: '/reports'
       fullPath: '/dashboard/hr/reports'
       preLoaderRoute: typeof AuthenticatedDashboardHrReportsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/promotions/': {
       id: '/_authenticated/dashboard/hr/promotions/'
-      path: '/dashboard/hr/promotions'
+      path: '/promotions'
       fullPath: '/dashboard/hr/promotions'
       preLoaderRoute: typeof AuthenticatedDashboardHrPromotionsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/predictions/': {
       id: '/_authenticated/dashboard/hr/predictions/'
-      path: '/dashboard/hr/predictions'
+      path: '/predictions'
       fullPath: '/dashboard/hr/predictions'
       preLoaderRoute: typeof AuthenticatedDashboardHrPredictionsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/performance/': {
       id: '/_authenticated/dashboard/hr/performance/'
-      path: '/dashboard/hr/performance'
+      path: '/performance'
       fullPath: '/dashboard/hr/performance'
       preLoaderRoute: typeof AuthenticatedDashboardHrPerformanceIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/payroll/': {
       id: '/_authenticated/dashboard/hr/payroll/'
-      path: '/dashboard/hr/payroll'
+      path: '/payroll'
       fullPath: '/dashboard/hr/payroll'
       preLoaderRoute: typeof AuthenticatedDashboardHrPayrollIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/payroll-runs/': {
       id: '/_authenticated/dashboard/hr/payroll-runs/'
-      path: '/dashboard/hr/payroll-runs'
+      path: '/payroll-runs'
       fullPath: '/dashboard/hr/payroll-runs'
       preLoaderRoute: typeof AuthenticatedDashboardHrPayrollRunsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/organizational-structure/': {
       id: '/_authenticated/dashboard/hr/organizational-structure/'
-      path: '/dashboard/hr/organizational-structure'
+      path: '/organizational-structure'
       fullPath: '/dashboard/hr/organizational-structure'
       preLoaderRoute: typeof AuthenticatedDashboardHrOrganizationalStructureIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/onboarding/': {
       id: '/_authenticated/dashboard/hr/onboarding/'
-      path: '/dashboard/hr/onboarding'
+      path: '/onboarding'
       fullPath: '/dashboard/hr/onboarding'
       preLoaderRoute: typeof AuthenticatedDashboardHrOnboardingIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/offboarding/': {
       id: '/_authenticated/dashboard/hr/offboarding/'
-      path: '/dashboard/hr/offboarding'
+      path: '/offboarding'
       fullPath: '/dashboard/hr/offboarding'
       preLoaderRoute: typeof AuthenticatedDashboardHrOffboardingIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/loans/': {
       id: '/_authenticated/dashboard/hr/loans/'
-      path: '/dashboard/hr/loans'
+      path: '/loans'
       fullPath: '/dashboard/hr/loans'
       preLoaderRoute: typeof AuthenticatedDashboardHrLoansIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/leave/': {
       id: '/_authenticated/dashboard/hr/leave/'
-      path: '/dashboard/hr/leave'
+      path: '/leave'
       fullPath: '/dashboard/hr/leave'
       preLoaderRoute: typeof AuthenticatedDashboardHrLeaveIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/job-positions/': {
       id: '/_authenticated/dashboard/hr/job-positions/'
-      path: '/dashboard/hr/job-positions'
+      path: '/job-positions'
       fullPath: '/dashboard/hr/job-positions'
       preLoaderRoute: typeof AuthenticatedDashboardHrJobPositionsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/grievances/': {
       id: '/_authenticated/dashboard/hr/grievances/'
-      path: '/dashboard/hr/grievances'
+      path: '/grievances'
       fullPath: '/dashboard/hr/grievances'
       preLoaderRoute: typeof AuthenticatedDashboardHrGrievancesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/geofencing/': {
       id: '/_authenticated/dashboard/hr/geofencing/'
-      path: '/dashboard/hr/geofencing'
+      path: '/geofencing'
       fullPath: '/dashboard/hr/geofencing'
       preLoaderRoute: typeof AuthenticatedDashboardHrGeofencingIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/expense-claims/': {
       id: '/_authenticated/dashboard/hr/expense-claims/'
-      path: '/dashboard/hr/expense-claims'
+      path: '/expense-claims'
       fullPath: '/dashboard/hr/expense-claims'
       preLoaderRoute: typeof AuthenticatedDashboardHrExpenseClaimsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/employees/': {
       id: '/_authenticated/dashboard/hr/employees/'
-      path: '/dashboard/hr/employees'
+      path: '/employees'
       fullPath: '/dashboard/hr/employees'
       preLoaderRoute: typeof AuthenticatedDashboardHrEmployeesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/employee-transfers/': {
       id: '/_authenticated/dashboard/hr/employee-transfers/'
-      path: '/dashboard/hr/employee-transfers'
+      path: '/employee-transfers'
       fullPath: '/dashboard/hr/employee-transfers'
       preLoaderRoute: typeof AuthenticatedDashboardHrEmployeeTransfersIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/compensation/': {
       id: '/_authenticated/dashboard/hr/compensation/'
-      path: '/dashboard/hr/compensation'
+      path: '/compensation'
       fullPath: '/dashboard/hr/compensation'
       preLoaderRoute: typeof AuthenticatedDashboardHrCompensationIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/biometric/': {
       id: '/_authenticated/dashboard/hr/biometric/'
-      path: '/dashboard/hr/biometric'
+      path: '/biometric'
       fullPath: '/dashboard/hr/biometric'
       preLoaderRoute: typeof AuthenticatedDashboardHrBiometricIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/benefits/': {
       id: '/_authenticated/dashboard/hr/benefits/'
-      path: '/dashboard/hr/benefits'
+      path: '/benefits'
       fullPath: '/dashboard/hr/benefits'
       preLoaderRoute: typeof AuthenticatedDashboardHrBenefitsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/attendance/': {
       id: '/_authenticated/dashboard/hr/attendance/'
-      path: '/dashboard/hr/attendance'
+      path: '/attendance'
       fullPath: '/dashboard/hr/attendance'
       preLoaderRoute: typeof AuthenticatedDashboardHrAttendanceIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/asset-assignment/': {
       id: '/_authenticated/dashboard/hr/asset-assignment/'
-      path: '/dashboard/hr/asset-assignment'
+      path: '/asset-assignment'
       fullPath: '/dashboard/hr/asset-assignment'
       preLoaderRoute: typeof AuthenticatedDashboardHrAssetAssignmentIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/analytics/': {
       id: '/_authenticated/dashboard/hr/analytics/'
-      path: '/dashboard/hr/analytics'
+      path: '/analytics'
       fullPath: '/dashboard/hr/analytics'
       preLoaderRoute: typeof AuthenticatedDashboardHrAnalyticsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/advances/': {
       id: '/_authenticated/dashboard/hr/advances/'
-      path: '/dashboard/hr/advances'
+      path: '/advances'
       fullPath: '/dashboard/hr/advances'
       preLoaderRoute: typeof AuthenticatedDashboardHrAdvancesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/finance/vendors/': {
       id: '/_authenticated/dashboard/finance/vendors/'
-      path: '/dashboard/finance/vendors'
+      path: '/vendors'
       fullPath: '/dashboard/finance/vendors'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceVendorsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/transactions/': {
       id: '/_authenticated/dashboard/finance/transactions/'
-      path: '/dashboard/finance/transactions'
+      path: '/transactions'
       fullPath: '/dashboard/finance/transactions'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceTransactionsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/transactions-history/': {
       id: '/_authenticated/dashboard/finance/transactions-history/'
-      path: '/dashboard/finance/transactions-history'
+      path: '/transactions-history'
       fullPath: '/dashboard/finance/transactions-history'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceTransactionsHistoryIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/time-tracking/': {
       id: '/_authenticated/dashboard/finance/time-tracking/'
-      path: '/dashboard/finance/time-tracking'
+      path: '/time-tracking'
       fullPath: '/dashboard/finance/time-tracking'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceTimeTrackingIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/statements/': {
       id: '/_authenticated/dashboard/finance/statements/'
-      path: '/dashboard/finance/statements'
+      path: '/statements'
       fullPath: '/dashboard/finance/statements'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceStatementsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/saudi-banking/': {
       id: '/_authenticated/dashboard/finance/saudi-banking/'
-      path: '/dashboard/finance/saudi-banking'
+      path: '/saudi-banking'
       fullPath: '/dashboard/finance/saudi-banking'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/retainers/': {
       id: '/_authenticated/dashboard/finance/retainers/'
-      path: '/dashboard/finance/retainers'
+      path: '/retainers'
       fullPath: '/dashboard/finance/retainers'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceRetainersIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/reports/': {
       id: '/_authenticated/dashboard/finance/reports/'
-      path: '/dashboard/finance/reports'
+      path: '/reports'
       fullPath: '/dashboard/finance/reports'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceReportsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/recurring/': {
       id: '/_authenticated/dashboard/finance/recurring/'
-      path: '/dashboard/finance/recurring'
+      path: '/recurring'
       fullPath: '/dashboard/finance/recurring'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceRecurringIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/recurring-invoices/': {
       id: '/_authenticated/dashboard/finance/recurring-invoices/'
-      path: '/dashboard/finance/recurring-invoices'
+      path: '/recurring-invoices'
       fullPath: '/dashboard/finance/recurring-invoices'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceRecurringInvoicesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/reconciliation/': {
       id: '/_authenticated/dashboard/finance/reconciliation/'
-      path: '/dashboard/finance/reconciliation'
+      path: '/reconciliation'
       fullPath: '/dashboard/finance/reconciliation'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceReconciliationIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/quotes/': {
       id: '/_authenticated/dashboard/finance/quotes/'
-      path: '/dashboard/finance/quotes'
+      path: '/quotes'
       fullPath: '/dashboard/finance/quotes'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceQuotesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/payments/': {
       id: '/_authenticated/dashboard/finance/payments/'
-      path: '/dashboard/finance/payments'
+      path: '/payments'
       fullPath: '/dashboard/finance/payments'
       preLoaderRoute: typeof AuthenticatedDashboardFinancePaymentsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/journal-entries/': {
       id: '/_authenticated/dashboard/finance/journal-entries/'
-      path: '/dashboard/finance/journal-entries'
+      path: '/journal-entries'
       fullPath: '/dashboard/finance/journal-entries'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceJournalEntriesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/invoices/': {
       id: '/_authenticated/dashboard/finance/invoices/'
-      path: '/dashboard/finance/invoices'
+      path: '/invoices'
       fullPath: '/dashboard/finance/invoices'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceInvoicesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/full-reports/': {
       id: '/_authenticated/dashboard/finance/full-reports/'
-      path: '/dashboard/finance/full-reports'
+      path: '/full-reports'
       fullPath: '/dashboard/finance/full-reports'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceFullReportsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/fiscal-periods/': {
       id: '/_authenticated/dashboard/finance/fiscal-periods/'
-      path: '/dashboard/finance/fiscal-periods'
+      path: '/fiscal-periods'
       fullPath: '/dashboard/finance/fiscal-periods'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceFiscalPeriodsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/expenses/': {
       id: '/_authenticated/dashboard/finance/expenses/'
-      path: '/dashboard/finance/expenses'
+      path: '/expenses'
       fullPath: '/dashboard/finance/expenses'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceExpensesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/currency/': {
       id: '/_authenticated/dashboard/finance/currency/'
-      path: '/dashboard/finance/currency'
+      path: '/currency'
       fullPath: '/dashboard/finance/currency'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceCurrencyIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/credit-notes/': {
       id: '/_authenticated/dashboard/finance/credit-notes/'
-      path: '/dashboard/finance/credit-notes'
+      path: '/credit-notes'
       fullPath: '/dashboard/finance/credit-notes'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceCreditNotesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/bills/': {
       id: '/_authenticated/dashboard/finance/bills/'
-      path: '/dashboard/finance/bills'
+      path: '/bills'
       fullPath: '/dashboard/finance/bills'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceBillsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/activity/': {
       id: '/_authenticated/dashboard/finance/activity/'
-      path: '/dashboard/finance/activity'
+      path: '/activity'
       fullPath: '/dashboard/finance/activity'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceActivityIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/crm/whatsapp/': {
       id: '/_authenticated/dashboard/crm/whatsapp/'
-      path: '/dashboard/crm/whatsapp'
+      path: '/whatsapp'
       fullPath: '/dashboard/crm/whatsapp'
       preLoaderRoute: typeof AuthenticatedDashboardCrmWhatsappIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/reports/': {
       id: '/_authenticated/dashboard/crm/reports/'
-      path: '/dashboard/crm/reports'
+      path: '/reports'
       fullPath: '/dashboard/crm/reports'
       preLoaderRoute: typeof AuthenticatedDashboardCrmReportsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/referrals/': {
       id: '/_authenticated/dashboard/crm/referrals/'
-      path: '/dashboard/crm/referrals'
+      path: '/referrals'
       fullPath: '/dashboard/crm/referrals'
       preLoaderRoute: typeof AuthenticatedDashboardCrmReferralsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/leads/': {
       id: '/_authenticated/dashboard/crm/leads/'
-      path: '/dashboard/crm/leads'
+      path: '/leads'
       fullPath: '/dashboard/crm/leads'
       preLoaderRoute: typeof AuthenticatedDashboardCrmLeadsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/lead-scoring/': {
       id: '/_authenticated/dashboard/crm/lead-scoring/'
-      path: '/dashboard/crm/lead-scoring'
+      path: '/lead-scoring'
       fullPath: '/dashboard/crm/lead-scoring'
       preLoaderRoute: typeof AuthenticatedDashboardCrmLeadScoringIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/email-marketing/': {
       id: '/_authenticated/dashboard/crm/email-marketing/'
-      path: '/dashboard/crm/email-marketing'
+      path: '/email-marketing'
       fullPath: '/dashboard/crm/email-marketing'
       preLoaderRoute: typeof AuthenticatedDashboardCrmEmailMarketingIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/activities/': {
       id: '/_authenticated/dashboard/crm/activities/'
-      path: '/dashboard/crm/activities'
+      path: '/activities'
       fullPath: '/dashboard/crm/activities'
       preLoaderRoute: typeof AuthenticatedDashboardCrmActivitiesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/buying/rfq/': {
       id: '/_authenticated/dashboard/buying/rfq/'
@@ -7141,45 +7295,45 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/tasks/reports/new': {
       id: '/_authenticated/dashboard/tasks/reports/new'
-      path: '/dashboard/tasks/reports/new'
+      path: '/reports/new'
       fullPath: '/dashboard/tasks/reports/new'
       preLoaderRoute: typeof AuthenticatedDashboardTasksReportsNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardTasksRoute
     }
     '/_authenticated/dashboard/tasks/reports/$reportId': {
       id: '/_authenticated/dashboard/tasks/reports/$reportId'
-      path: '/dashboard/tasks/reports/$reportId'
+      path: '/reports/$reportId'
       fullPath: '/dashboard/tasks/reports/$reportId'
       preLoaderRoute: typeof AuthenticatedDashboardTasksReportsReportIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardTasksRoute
     }
     '/_authenticated/dashboard/tasks/reminders/new': {
       id: '/_authenticated/dashboard/tasks/reminders/new'
-      path: '/dashboard/tasks/reminders/new'
+      path: '/reminders/new'
       fullPath: '/dashboard/tasks/reminders/new'
       preLoaderRoute: typeof AuthenticatedDashboardTasksRemindersNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardTasksRoute
     }
     '/_authenticated/dashboard/tasks/reminders/$reminderId': {
       id: '/_authenticated/dashboard/tasks/reminders/$reminderId'
-      path: '/dashboard/tasks/reminders/$reminderId'
+      path: '/reminders/$reminderId'
       fullPath: '/dashboard/tasks/reminders/$reminderId'
       preLoaderRoute: typeof AuthenticatedDashboardTasksRemindersReminderIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardTasksRoute
     }
     '/_authenticated/dashboard/tasks/events/new': {
       id: '/_authenticated/dashboard/tasks/events/new'
-      path: '/dashboard/tasks/events/new'
+      path: '/events/new'
       fullPath: '/dashboard/tasks/events/new'
       preLoaderRoute: typeof AuthenticatedDashboardTasksEventsNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardTasksRoute
     }
     '/_authenticated/dashboard/tasks/events/$eventId': {
       id: '/_authenticated/dashboard/tasks/events/$eventId'
-      path: '/dashboard/tasks/events/$eventId'
+      path: '/events/$eventId'
       fullPath: '/dashboard/tasks/events/$eventId'
       preLoaderRoute: typeof AuthenticatedDashboardTasksEventsEventIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardTasksRoute
     }
     '/_authenticated/dashboard/support/sla/create': {
       id: '/_authenticated/dashboard/support/sla/create'
@@ -7260,836 +7414,836 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/inventory/warehouses/create': {
       id: '/_authenticated/dashboard/inventory/warehouses/create'
-      path: '/dashboard/inventory/warehouses/create'
+      path: '/warehouses/create'
       fullPath: '/dashboard/inventory/warehouses/create'
       preLoaderRoute: typeof AuthenticatedDashboardInventoryWarehousesCreateRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardInventoryRoute
     }
     '/_authenticated/dashboard/inventory/warehouses/$warehouseId': {
       id: '/_authenticated/dashboard/inventory/warehouses/$warehouseId'
-      path: '/dashboard/inventory/warehouses/$warehouseId'
+      path: '/warehouses/$warehouseId'
       fullPath: '/dashboard/inventory/warehouses/$warehouseId'
       preLoaderRoute: typeof AuthenticatedDashboardInventoryWarehousesWarehouseIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardInventoryRoute
     }
     '/_authenticated/dashboard/inventory/stock-entries/create': {
       id: '/_authenticated/dashboard/inventory/stock-entries/create'
-      path: '/dashboard/inventory/stock-entries/create'
+      path: '/stock-entries/create'
       fullPath: '/dashboard/inventory/stock-entries/create'
       preLoaderRoute: typeof AuthenticatedDashboardInventoryStockEntriesCreateRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardInventoryRoute
     }
     '/_authenticated/dashboard/inventory/stock-entries/$stockEntryId': {
       id: '/_authenticated/dashboard/inventory/stock-entries/$stockEntryId'
-      path: '/dashboard/inventory/stock-entries/$stockEntryId'
+      path: '/stock-entries/$stockEntryId'
       fullPath: '/dashboard/inventory/stock-entries/$stockEntryId'
       preLoaderRoute: typeof AuthenticatedDashboardInventoryStockEntriesStockEntryIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardInventoryRoute
     }
     '/_authenticated/dashboard/hr/training/new': {
       id: '/_authenticated/dashboard/hr/training/new'
-      path: '/dashboard/hr/training/new'
+      path: '/training/new'
       fullPath: '/dashboard/hr/training/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrTrainingNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/training/$trainingId': {
       id: '/_authenticated/dashboard/hr/training/$trainingId'
-      path: '/dashboard/hr/training/$trainingId'
+      path: '/training/$trainingId'
       fullPath: '/dashboard/hr/training/$trainingId'
       preLoaderRoute: typeof AuthenticatedDashboardHrTrainingTrainingIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/succession-planning/new': {
       id: '/_authenticated/dashboard/hr/succession-planning/new'
-      path: '/dashboard/hr/succession-planning/new'
+      path: '/succession-planning/new'
       fullPath: '/dashboard/hr/succession-planning/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrSuccessionPlanningNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/succession-planning/$planId': {
       id: '/_authenticated/dashboard/hr/succession-planning/$planId'
-      path: '/dashboard/hr/succession-planning/$planId'
+      path: '/succession-planning/$planId'
       fullPath: '/dashboard/hr/succession-planning/$planId'
       preLoaderRoute: typeof AuthenticatedDashboardHrSuccessionPlanningPlanIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/skills/matrix': {
       id: '/_authenticated/dashboard/hr/skills/matrix'
-      path: '/dashboard/hr/skills/matrix'
+      path: '/skills/matrix'
       fullPath: '/dashboard/hr/skills/matrix'
       preLoaderRoute: typeof AuthenticatedDashboardHrSkillsMatrixRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/shift-assignments/$assignmentId': {
       id: '/_authenticated/dashboard/hr/shift-assignments/$assignmentId'
-      path: '/dashboard/hr/shift-assignments/$assignmentId'
+      path: '/shift-assignments/$assignmentId'
       fullPath: '/dashboard/hr/shift-assignments/$assignmentId'
       preLoaderRoute: typeof AuthenticatedDashboardHrShiftAssignmentsAssignmentIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/reports/new': {
       id: '/_authenticated/dashboard/hr/reports/new'
-      path: '/dashboard/hr/reports/new'
+      path: '/reports/new'
       fullPath: '/dashboard/hr/reports/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrReportsNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/reports/$reportId': {
       id: '/_authenticated/dashboard/hr/reports/$reportId'
-      path: '/dashboard/hr/reports/$reportId'
+      path: '/reports/$reportId'
       fullPath: '/dashboard/hr/reports/$reportId'
       preLoaderRoute: typeof AuthenticatedDashboardHrReportsReportIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/recruitment/staffing-plans': {
       id: '/_authenticated/dashboard/hr/recruitment/staffing-plans'
-      path: '/dashboard/hr/recruitment/staffing-plans'
+      path: '/recruitment/staffing-plans'
       fullPath: '/dashboard/hr/recruitment/staffing-plans'
       preLoaderRoute: typeof AuthenticatedDashboardHrRecruitmentStaffingPlansRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/promotions/new': {
       id: '/_authenticated/dashboard/hr/promotions/new'
-      path: '/dashboard/hr/promotions/new'
+      path: '/promotions/new'
       fullPath: '/dashboard/hr/promotions/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrPromotionsNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/promotions/$promotionId': {
       id: '/_authenticated/dashboard/hr/promotions/$promotionId'
-      path: '/dashboard/hr/promotions/$promotionId'
+      path: '/promotions/$promotionId'
       fullPath: '/dashboard/hr/promotions/$promotionId'
       preLoaderRoute: typeof AuthenticatedDashboardHrPromotionsPromotionIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/performance/new': {
       id: '/_authenticated/dashboard/hr/performance/new'
-      path: '/dashboard/hr/performance/new'
+      path: '/performance/new'
       fullPath: '/dashboard/hr/performance/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrPerformanceNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/performance/$reviewId': {
       id: '/_authenticated/dashboard/hr/performance/$reviewId'
-      path: '/dashboard/hr/performance/$reviewId'
+      path: '/performance/$reviewId'
       fullPath: '/dashboard/hr/performance/$reviewId'
       preLoaderRoute: typeof AuthenticatedDashboardHrPerformanceReviewIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/payroll/salary-components': {
       id: '/_authenticated/dashboard/hr/payroll/salary-components'
-      path: '/dashboard/hr/payroll/salary-components'
+      path: '/payroll/salary-components'
       fullPath: '/dashboard/hr/payroll/salary-components'
       preLoaderRoute: typeof AuthenticatedDashboardHrPayrollSalaryComponentsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/payroll/new': {
       id: '/_authenticated/dashboard/hr/payroll/new'
-      path: '/dashboard/hr/payroll/new'
+      path: '/payroll/new'
       fullPath: '/dashboard/hr/payroll/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrPayrollNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/payroll/$slipId': {
       id: '/_authenticated/dashboard/hr/payroll/$slipId'
-      path: '/dashboard/hr/payroll/$slipId'
+      path: '/payroll/$slipId'
       fullPath: '/dashboard/hr/payroll/$slipId'
       preLoaderRoute: typeof AuthenticatedDashboardHrPayrollSlipIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/payroll-runs/new': {
       id: '/_authenticated/dashboard/hr/payroll-runs/new'
-      path: '/dashboard/hr/payroll-runs/new'
+      path: '/payroll-runs/new'
       fullPath: '/dashboard/hr/payroll-runs/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrPayrollRunsNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/payroll-runs/$runId': {
       id: '/_authenticated/dashboard/hr/payroll-runs/$runId'
-      path: '/dashboard/hr/payroll-runs/$runId'
+      path: '/payroll-runs/$runId'
       fullPath: '/dashboard/hr/payroll-runs/$runId'
       preLoaderRoute: typeof AuthenticatedDashboardHrPayrollRunsRunIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/organizational-structure/new': {
       id: '/_authenticated/dashboard/hr/organizational-structure/new'
-      path: '/dashboard/hr/organizational-structure/new'
+      path: '/organizational-structure/new'
       fullPath: '/dashboard/hr/organizational-structure/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrOrganizationalStructureNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/organizational-structure/$unitId': {
       id: '/_authenticated/dashboard/hr/organizational-structure/$unitId'
-      path: '/dashboard/hr/organizational-structure/$unitId'
+      path: '/organizational-structure/$unitId'
       fullPath: '/dashboard/hr/organizational-structure/$unitId'
       preLoaderRoute: typeof AuthenticatedDashboardHrOrganizationalStructureUnitIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/onboarding/new': {
       id: '/_authenticated/dashboard/hr/onboarding/new'
-      path: '/dashboard/hr/onboarding/new'
+      path: '/onboarding/new'
       fullPath: '/dashboard/hr/onboarding/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrOnboardingNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/onboarding/$onboardingId': {
       id: '/_authenticated/dashboard/hr/onboarding/$onboardingId'
-      path: '/dashboard/hr/onboarding/$onboardingId'
+      path: '/onboarding/$onboardingId'
       fullPath: '/dashboard/hr/onboarding/$onboardingId'
       preLoaderRoute: typeof AuthenticatedDashboardHrOnboardingOnboardingIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/offboarding/new': {
       id: '/_authenticated/dashboard/hr/offboarding/new'
-      path: '/dashboard/hr/offboarding/new'
+      path: '/offboarding/new'
       fullPath: '/dashboard/hr/offboarding/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrOffboardingNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/offboarding/$offboardingId': {
       id: '/_authenticated/dashboard/hr/offboarding/$offboardingId'
-      path: '/dashboard/hr/offboarding/$offboardingId'
+      path: '/offboarding/$offboardingId'
       fullPath: '/dashboard/hr/offboarding/$offboardingId'
       preLoaderRoute: typeof AuthenticatedDashboardHrOffboardingOffboardingIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/loans/new': {
       id: '/_authenticated/dashboard/hr/loans/new'
-      path: '/dashboard/hr/loans/new'
+      path: '/loans/new'
       fullPath: '/dashboard/hr/loans/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrLoansNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/loans/$loanId': {
       id: '/_authenticated/dashboard/hr/loans/$loanId'
-      path: '/dashboard/hr/loans/$loanId'
+      path: '/loans/$loanId'
       fullPath: '/dashboard/hr/loans/$loanId'
       preLoaderRoute: typeof AuthenticatedDashboardHrLoansLoanIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/leave/policies': {
       id: '/_authenticated/dashboard/hr/leave/policies'
-      path: '/dashboard/hr/leave/policies'
+      path: '/leave/policies'
       fullPath: '/dashboard/hr/leave/policies'
       preLoaderRoute: typeof AuthenticatedDashboardHrLeavePoliciesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/leave/periods': {
       id: '/_authenticated/dashboard/hr/leave/periods'
-      path: '/dashboard/hr/leave/periods'
+      path: '/leave/periods'
       fullPath: '/dashboard/hr/leave/periods'
       preLoaderRoute: typeof AuthenticatedDashboardHrLeavePeriodsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/leave/new': {
       id: '/_authenticated/dashboard/hr/leave/new'
-      path: '/dashboard/hr/leave/new'
+      path: '/leave/new'
       fullPath: '/dashboard/hr/leave/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrLeaveNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/leave/encashments': {
       id: '/_authenticated/dashboard/hr/leave/encashments'
-      path: '/dashboard/hr/leave/encashments'
+      path: '/leave/encashments'
       fullPath: '/dashboard/hr/leave/encashments'
       preLoaderRoute: typeof AuthenticatedDashboardHrLeaveEncashmentsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/leave/compensatory': {
       id: '/_authenticated/dashboard/hr/leave/compensatory'
-      path: '/dashboard/hr/leave/compensatory'
+      path: '/leave/compensatory'
       fullPath: '/dashboard/hr/leave/compensatory'
       preLoaderRoute: typeof AuthenticatedDashboardHrLeaveCompensatoryRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/leave/allocations': {
       id: '/_authenticated/dashboard/hr/leave/allocations'
-      path: '/dashboard/hr/leave/allocations'
+      path: '/leave/allocations'
       fullPath: '/dashboard/hr/leave/allocations'
       preLoaderRoute: typeof AuthenticatedDashboardHrLeaveAllocationsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/leave/$requestId': {
       id: '/_authenticated/dashboard/hr/leave/$requestId'
-      path: '/dashboard/hr/leave/$requestId'
+      path: '/leave/$requestId'
       fullPath: '/dashboard/hr/leave/$requestId'
       preLoaderRoute: typeof AuthenticatedDashboardHrLeaveRequestIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/job-positions/new': {
       id: '/_authenticated/dashboard/hr/job-positions/new'
-      path: '/dashboard/hr/job-positions/new'
+      path: '/job-positions/new'
       fullPath: '/dashboard/hr/job-positions/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrJobPositionsNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/job-positions/$positionId': {
       id: '/_authenticated/dashboard/hr/job-positions/$positionId'
-      path: '/dashboard/hr/job-positions/$positionId'
+      path: '/job-positions/$positionId'
       fullPath: '/dashboard/hr/job-positions/$positionId'
       preLoaderRoute: typeof AuthenticatedDashboardHrJobPositionsPositionIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/grievances/new': {
       id: '/_authenticated/dashboard/hr/grievances/new'
-      path: '/dashboard/hr/grievances/new'
+      path: '/grievances/new'
       fullPath: '/dashboard/hr/grievances/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrGrievancesNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/grievances/$grievanceId': {
       id: '/_authenticated/dashboard/hr/grievances/$grievanceId'
-      path: '/dashboard/hr/grievances/$grievanceId'
+      path: '/grievances/$grievanceId'
       fullPath: '/dashboard/hr/grievances/$grievanceId'
       preLoaderRoute: typeof AuthenticatedDashboardHrGrievancesGrievanceIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/geofencing/new': {
       id: '/_authenticated/dashboard/hr/geofencing/new'
-      path: '/dashboard/hr/geofencing/new'
+      path: '/geofencing/new'
       fullPath: '/dashboard/hr/geofencing/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrGeofencingNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/geofencing/$zoneId': {
       id: '/_authenticated/dashboard/hr/geofencing/$zoneId'
-      path: '/dashboard/hr/geofencing/$zoneId'
+      path: '/geofencing/$zoneId'
       fullPath: '/dashboard/hr/geofencing/$zoneId'
       preLoaderRoute: typeof AuthenticatedDashboardHrGeofencingZoneIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/expense-claims/new': {
       id: '/_authenticated/dashboard/hr/expense-claims/new'
-      path: '/dashboard/hr/expense-claims/new'
+      path: '/expense-claims/new'
       fullPath: '/dashboard/hr/expense-claims/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrExpenseClaimsNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/expense-claims/$claimId': {
       id: '/_authenticated/dashboard/hr/expense-claims/$claimId'
-      path: '/dashboard/hr/expense-claims/$claimId'
+      path: '/expense-claims/$claimId'
       fullPath: '/dashboard/hr/expense-claims/$claimId'
       preLoaderRoute: typeof AuthenticatedDashboardHrExpenseClaimsClaimIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/employees/new': {
       id: '/_authenticated/dashboard/hr/employees/new'
-      path: '/dashboard/hr/employees/new'
+      path: '/employees/new'
       fullPath: '/dashboard/hr/employees/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrEmployeesNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/employees/$employeeId': {
       id: '/_authenticated/dashboard/hr/employees/$employeeId'
-      path: '/dashboard/hr/employees/$employeeId'
+      path: '/employees/$employeeId'
       fullPath: '/dashboard/hr/employees/$employeeId'
       preLoaderRoute: typeof AuthenticatedDashboardHrEmployeesEmployeeIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/employee-transfers/new': {
       id: '/_authenticated/dashboard/hr/employee-transfers/new'
-      path: '/dashboard/hr/employee-transfers/new'
+      path: '/employee-transfers/new'
       fullPath: '/dashboard/hr/employee-transfers/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrEmployeeTransfersNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/employee-transfers/$transferId': {
       id: '/_authenticated/dashboard/hr/employee-transfers/$transferId'
-      path: '/dashboard/hr/employee-transfers/$transferId'
+      path: '/employee-transfers/$transferId'
       fullPath: '/dashboard/hr/employee-transfers/$transferId'
       preLoaderRoute: typeof AuthenticatedDashboardHrEmployeeTransfersTransferIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/compensation/retention-bonuses': {
       id: '/_authenticated/dashboard/hr/compensation/retention-bonuses'
-      path: '/dashboard/hr/compensation/retention-bonuses'
+      path: '/compensation/retention-bonuses'
       fullPath: '/dashboard/hr/compensation/retention-bonuses'
       preLoaderRoute: typeof AuthenticatedDashboardHrCompensationRetentionBonusesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/compensation/new': {
       id: '/_authenticated/dashboard/hr/compensation/new'
-      path: '/dashboard/hr/compensation/new'
+      path: '/compensation/new'
       fullPath: '/dashboard/hr/compensation/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrCompensationNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/compensation/incentives': {
       id: '/_authenticated/dashboard/hr/compensation/incentives'
-      path: '/dashboard/hr/compensation/incentives'
+      path: '/compensation/incentives'
       fullPath: '/dashboard/hr/compensation/incentives'
       preLoaderRoute: typeof AuthenticatedDashboardHrCompensationIncentivesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/compensation/$compensationId': {
       id: '/_authenticated/dashboard/hr/compensation/$compensationId'
-      path: '/dashboard/hr/compensation/$compensationId'
+      path: '/compensation/$compensationId'
       fullPath: '/dashboard/hr/compensation/$compensationId'
       preLoaderRoute: typeof AuthenticatedDashboardHrCompensationCompensationIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/biometric/new': {
       id: '/_authenticated/dashboard/hr/biometric/new'
-      path: '/dashboard/hr/biometric/new'
+      path: '/biometric/new'
       fullPath: '/dashboard/hr/biometric/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrBiometricNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/biometric/$deviceId': {
       id: '/_authenticated/dashboard/hr/biometric/$deviceId'
-      path: '/dashboard/hr/biometric/$deviceId'
+      path: '/biometric/$deviceId'
       fullPath: '/dashboard/hr/biometric/$deviceId'
       preLoaderRoute: typeof AuthenticatedDashboardHrBiometricDeviceIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/benefits/new': {
       id: '/_authenticated/dashboard/hr/benefits/new'
-      path: '/dashboard/hr/benefits/new'
+      path: '/benefits/new'
       fullPath: '/dashboard/hr/benefits/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrBenefitsNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/benefits/$benefitId': {
       id: '/_authenticated/dashboard/hr/benefits/$benefitId'
-      path: '/dashboard/hr/benefits/$benefitId'
+      path: '/benefits/$benefitId'
       fullPath: '/dashboard/hr/benefits/$benefitId'
       preLoaderRoute: typeof AuthenticatedDashboardHrBenefitsBenefitIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/attendance/new': {
       id: '/_authenticated/dashboard/hr/attendance/new'
-      path: '/dashboard/hr/attendance/new'
+      path: '/attendance/new'
       fullPath: '/dashboard/hr/attendance/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrAttendanceNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/attendance/$recordId': {
       id: '/_authenticated/dashboard/hr/attendance/$recordId'
-      path: '/dashboard/hr/attendance/$recordId'
+      path: '/attendance/$recordId'
       fullPath: '/dashboard/hr/attendance/$recordId'
       preLoaderRoute: typeof AuthenticatedDashboardHrAttendanceRecordIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/asset-assignment/new': {
       id: '/_authenticated/dashboard/hr/asset-assignment/new'
-      path: '/dashboard/hr/asset-assignment/new'
+      path: '/asset-assignment/new'
       fullPath: '/dashboard/hr/asset-assignment/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrAssetAssignmentNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/asset-assignment/$assignmentId': {
       id: '/_authenticated/dashboard/hr/asset-assignment/$assignmentId'
-      path: '/dashboard/hr/asset-assignment/$assignmentId'
+      path: '/asset-assignment/$assignmentId'
       fullPath: '/dashboard/hr/asset-assignment/$assignmentId'
       preLoaderRoute: typeof AuthenticatedDashboardHrAssetAssignmentAssignmentIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/advances/new': {
       id: '/_authenticated/dashboard/hr/advances/new'
-      path: '/dashboard/hr/advances/new'
+      path: '/advances/new'
       fullPath: '/dashboard/hr/advances/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrAdvancesNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/advances/$advanceId': {
       id: '/_authenticated/dashboard/hr/advances/$advanceId'
-      path: '/dashboard/hr/advances/$advanceId'
+      path: '/advances/$advanceId'
       fullPath: '/dashboard/hr/advances/$advanceId'
       preLoaderRoute: typeof AuthenticatedDashboardHrAdvancesAdvanceIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/finance/vendors/new': {
       id: '/_authenticated/dashboard/finance/vendors/new'
-      path: '/dashboard/finance/vendors/new'
+      path: '/vendors/new'
       fullPath: '/dashboard/finance/vendors/new'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceVendorsNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/vendors/$vendorId': {
       id: '/_authenticated/dashboard/finance/vendors/$vendorId'
-      path: '/dashboard/finance/vendors/$vendorId'
+      path: '/vendors/$vendorId'
       fullPath: '/dashboard/finance/vendors/$vendorId'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceVendorsVendorIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/time-tracking/weekly': {
       id: '/_authenticated/dashboard/finance/time-tracking/weekly'
-      path: '/dashboard/finance/time-tracking/weekly'
+      path: '/time-tracking/weekly'
       fullPath: '/dashboard/finance/time-tracking/weekly'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceTimeTrackingWeeklyRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/time-tracking/new': {
       id: '/_authenticated/dashboard/finance/time-tracking/new'
-      path: '/dashboard/finance/time-tracking/new'
+      path: '/time-tracking/new'
       fullPath: '/dashboard/finance/time-tracking/new'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceTimeTrackingNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/time-tracking/monthly': {
       id: '/_authenticated/dashboard/finance/time-tracking/monthly'
-      path: '/dashboard/finance/time-tracking/monthly'
+      path: '/time-tracking/monthly'
       fullPath: '/dashboard/finance/time-tracking/monthly'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceTimeTrackingMonthlyRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/time-tracking/approvals': {
       id: '/_authenticated/dashboard/finance/time-tracking/approvals'
-      path: '/dashboard/finance/time-tracking/approvals'
+      path: '/time-tracking/approvals'
       fullPath: '/dashboard/finance/time-tracking/approvals'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceTimeTrackingApprovalsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/time-tracking/$entryId': {
       id: '/_authenticated/dashboard/finance/time-tracking/$entryId'
-      path: '/dashboard/finance/time-tracking/$entryId'
+      path: '/time-tracking/$entryId'
       fullPath: '/dashboard/finance/time-tracking/$entryId'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/statements/new': {
       id: '/_authenticated/dashboard/finance/statements/new'
-      path: '/dashboard/finance/statements/new'
+      path: '/statements/new'
       fullPath: '/dashboard/finance/statements/new'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceStatementsNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/statements/$statementId': {
       id: '/_authenticated/dashboard/finance/statements/$statementId'
-      path: '/dashboard/finance/statements/$statementId'
+      path: '/statements/$statementId'
       fullPath: '/dashboard/finance/statements/$statementId'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceStatementsStatementIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/saudi-banking/mudad': {
       id: '/_authenticated/dashboard/finance/saudi-banking/mudad'
-      path: '/dashboard/finance/saudi-banking/mudad'
+      path: '/saudi-banking/mudad'
       fullPath: '/dashboard/finance/saudi-banking/mudad'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingMudadRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/saudi-banking/lean': {
       id: '/_authenticated/dashboard/finance/saudi-banking/lean'
-      path: '/dashboard/finance/saudi-banking/lean'
+      path: '/saudi-banking/lean'
       fullPath: '/dashboard/finance/saudi-banking/lean'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingLeanRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/retainers/new': {
       id: '/_authenticated/dashboard/finance/retainers/new'
-      path: '/dashboard/finance/retainers/new'
+      path: '/retainers/new'
       fullPath: '/dashboard/finance/retainers/new'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceRetainersNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/retainers/$retainerId': {
       id: '/_authenticated/dashboard/finance/retainers/$retainerId'
-      path: '/dashboard/finance/retainers/$retainerId'
+      path: '/retainers/$retainerId'
       fullPath: '/dashboard/finance/retainers/$retainerId'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceRetainersRetainerIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/reports/time-entries': {
       id: '/_authenticated/dashboard/finance/reports/time-entries'
-      path: '/dashboard/finance/reports/time-entries'
+      path: '/reports/time-entries'
       fullPath: '/dashboard/finance/reports/time-entries'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceReportsTimeEntriesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/reports/revenue-by-client': {
       id: '/_authenticated/dashboard/finance/reports/revenue-by-client'
-      path: '/dashboard/finance/reports/revenue-by-client'
+      path: '/reports/revenue-by-client'
       fullPath: '/dashboard/finance/reports/revenue-by-client'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceReportsRevenueByClientRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/reports/outstanding-invoices': {
       id: '/_authenticated/dashboard/finance/reports/outstanding-invoices'
-      path: '/dashboard/finance/reports/outstanding-invoices'
+      path: '/reports/outstanding-invoices'
       fullPath: '/dashboard/finance/reports/outstanding-invoices'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceReportsOutstandingInvoicesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/reports/new': {
       id: '/_authenticated/dashboard/finance/reports/new'
-      path: '/dashboard/finance/reports/new'
+      path: '/reports/new'
       fullPath: '/dashboard/finance/reports/new'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceReportsNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/reports/financial': {
       id: '/_authenticated/dashboard/finance/reports/financial'
-      path: '/dashboard/finance/reports/financial'
+      path: '/reports/financial'
       fullPath: '/dashboard/finance/reports/financial'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceReportsFinancialRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/reports/accounts-aging': {
       id: '/_authenticated/dashboard/finance/reports/accounts-aging'
-      path: '/dashboard/finance/reports/accounts-aging'
+      path: '/reports/accounts-aging'
       fullPath: '/dashboard/finance/reports/accounts-aging'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceReportsAccountsAgingRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/reports/$reportId': {
       id: '/_authenticated/dashboard/finance/reports/$reportId'
-      path: '/dashboard/finance/reports/$reportId'
+      path: '/reports/$reportId'
       fullPath: '/dashboard/finance/reports/$reportId'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceReportsReportIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/recurring-invoices/new': {
       id: '/_authenticated/dashboard/finance/recurring-invoices/new'
-      path: '/dashboard/finance/recurring-invoices/new'
+      path: '/recurring-invoices/new'
       fullPath: '/dashboard/finance/recurring-invoices/new'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceRecurringInvoicesNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/recurring-invoices/$id': {
       id: '/_authenticated/dashboard/finance/recurring-invoices/$id'
-      path: '/dashboard/finance/recurring-invoices/$id'
+      path: '/recurring-invoices/$id'
       fullPath: '/dashboard/finance/recurring-invoices/$id'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceRecurringInvoicesIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/reconciliation/new': {
       id: '/_authenticated/dashboard/finance/reconciliation/new'
-      path: '/dashboard/finance/reconciliation/new'
+      path: '/reconciliation/new'
       fullPath: '/dashboard/finance/reconciliation/new'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceReconciliationNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/reconciliation/$feedId': {
       id: '/_authenticated/dashboard/finance/reconciliation/$feedId'
-      path: '/dashboard/finance/reconciliation/$feedId'
+      path: '/reconciliation/$feedId'
       fullPath: '/dashboard/finance/reconciliation/$feedId'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceReconciliationFeedIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/quotes/new': {
       id: '/_authenticated/dashboard/finance/quotes/new'
-      path: '/dashboard/finance/quotes/new'
+      path: '/quotes/new'
       fullPath: '/dashboard/finance/quotes/new'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceQuotesNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/quotes/$quoteId': {
       id: '/_authenticated/dashboard/finance/quotes/$quoteId'
-      path: '/dashboard/finance/quotes/$quoteId'
+      path: '/quotes/$quoteId'
       fullPath: '/dashboard/finance/quotes/$quoteId'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceQuotesQuoteIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/payments/new': {
       id: '/_authenticated/dashboard/finance/payments/new'
-      path: '/dashboard/finance/payments/new'
+      path: '/payments/new'
       fullPath: '/dashboard/finance/payments/new'
       preLoaderRoute: typeof AuthenticatedDashboardFinancePaymentsNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/payments/$paymentId': {
       id: '/_authenticated/dashboard/finance/payments/$paymentId'
-      path: '/dashboard/finance/payments/$paymentId'
+      path: '/payments/$paymentId'
       fullPath: '/dashboard/finance/payments/$paymentId'
       preLoaderRoute: typeof AuthenticatedDashboardFinancePaymentsPaymentIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/journal-entries/new': {
       id: '/_authenticated/dashboard/finance/journal-entries/new'
-      path: '/dashboard/finance/journal-entries/new'
+      path: '/journal-entries/new'
       fullPath: '/dashboard/finance/journal-entries/new'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceJournalEntriesNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/journal-entries/$id': {
       id: '/_authenticated/dashboard/finance/journal-entries/$id'
-      path: '/dashboard/finance/journal-entries/$id'
+      path: '/journal-entries/$id'
       fullPath: '/dashboard/finance/journal-entries/$id'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceJournalEntriesIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/invoices/new': {
       id: '/_authenticated/dashboard/finance/invoices/new'
-      path: '/dashboard/finance/invoices/new'
+      path: '/invoices/new'
       fullPath: '/dashboard/finance/invoices/new'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceInvoicesNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/invoices/approvals': {
       id: '/_authenticated/dashboard/finance/invoices/approvals'
-      path: '/dashboard/finance/invoices/approvals'
+      path: '/invoices/approvals'
       fullPath: '/dashboard/finance/invoices/approvals'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceInvoicesApprovalsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/invoices/$invoiceId': {
       id: '/_authenticated/dashboard/finance/invoices/$invoiceId'
-      path: '/dashboard/finance/invoices/$invoiceId'
+      path: '/invoices/$invoiceId'
       fullPath: '/dashboard/finance/invoices/$invoiceId'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/expenses/new': {
       id: '/_authenticated/dashboard/finance/expenses/new'
-      path: '/dashboard/finance/expenses/new'
+      path: '/expenses/new'
       fullPath: '/dashboard/finance/expenses/new'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceExpensesNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/expenses/$expenseId': {
       id: '/_authenticated/dashboard/finance/expenses/$expenseId'
-      path: '/dashboard/finance/expenses/$expenseId'
+      path: '/expenses/$expenseId'
       fullPath: '/dashboard/finance/expenses/$expenseId'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceExpensesExpenseIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/currency/new': {
       id: '/_authenticated/dashboard/finance/currency/new'
-      path: '/dashboard/finance/currency/new'
+      path: '/currency/new'
       fullPath: '/dashboard/finance/currency/new'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceCurrencyNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/currency/$rateId': {
       id: '/_authenticated/dashboard/finance/currency/$rateId'
-      path: '/dashboard/finance/currency/$rateId'
+      path: '/currency/$rateId'
       fullPath: '/dashboard/finance/currency/$rateId'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceCurrencyRateIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/credit-notes/new': {
       id: '/_authenticated/dashboard/finance/credit-notes/new'
-      path: '/dashboard/finance/credit-notes/new'
+      path: '/credit-notes/new'
       fullPath: '/dashboard/finance/credit-notes/new'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceCreditNotesNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/credit-notes/$creditNoteId': {
       id: '/_authenticated/dashboard/finance/credit-notes/$creditNoteId'
-      path: '/dashboard/finance/credit-notes/$creditNoteId'
+      path: '/credit-notes/$creditNoteId'
       fullPath: '/dashboard/finance/credit-notes/$creditNoteId'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceCreditNotesCreditNoteIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/bills/new': {
       id: '/_authenticated/dashboard/finance/bills/new'
-      path: '/dashboard/finance/bills/new'
+      path: '/bills/new'
       fullPath: '/dashboard/finance/bills/new'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceBillsNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/bills/$billId': {
       id: '/_authenticated/dashboard/finance/bills/$billId'
-      path: '/dashboard/finance/bills/$billId'
+      path: '/bills/$billId'
       fullPath: '/dashboard/finance/bills/$billId'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceBillsBillIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/activity/new': {
       id: '/_authenticated/dashboard/finance/activity/new'
-      path: '/dashboard/finance/activity/new'
+      path: '/activity/new'
       fullPath: '/dashboard/finance/activity/new'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceActivityNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/activity/$activityId': {
       id: '/_authenticated/dashboard/finance/activity/$activityId'
-      path: '/dashboard/finance/activity/$activityId'
+      path: '/activity/$activityId'
       fullPath: '/dashboard/finance/activity/$activityId'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceActivityActivityIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/crm/whatsapp/start': {
       id: '/_authenticated/dashboard/crm/whatsapp/start'
-      path: '/dashboard/crm/whatsapp/start'
+      path: '/whatsapp/start'
       fullPath: '/dashboard/crm/whatsapp/start'
       preLoaderRoute: typeof AuthenticatedDashboardCrmWhatsappStartRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/whatsapp/new': {
       id: '/_authenticated/dashboard/crm/whatsapp/new'
-      path: '/dashboard/crm/whatsapp/new'
+      path: '/whatsapp/new'
       fullPath: '/dashboard/crm/whatsapp/new'
       preLoaderRoute: typeof AuthenticatedDashboardCrmWhatsappNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/whatsapp/$conversationId': {
       id: '/_authenticated/dashboard/crm/whatsapp/$conversationId'
-      path: '/dashboard/crm/whatsapp/$conversationId'
+      path: '/whatsapp/$conversationId'
       fullPath: '/dashboard/crm/whatsapp/$conversationId'
       preLoaderRoute: typeof AuthenticatedDashboardCrmWhatsappConversationIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/reports/new': {
       id: '/_authenticated/dashboard/crm/reports/new'
-      path: '/dashboard/crm/reports/new'
+      path: '/reports/new'
       fullPath: '/dashboard/crm/reports/new'
       preLoaderRoute: typeof AuthenticatedDashboardCrmReportsNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/reports/$reportId': {
       id: '/_authenticated/dashboard/crm/reports/$reportId'
-      path: '/dashboard/crm/reports/$reportId'
+      path: '/reports/$reportId'
       fullPath: '/dashboard/crm/reports/$reportId'
       preLoaderRoute: typeof AuthenticatedDashboardCrmReportsReportIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/referrals/new': {
       id: '/_authenticated/dashboard/crm/referrals/new'
-      path: '/dashboard/crm/referrals/new'
+      path: '/referrals/new'
       fullPath: '/dashboard/crm/referrals/new'
       preLoaderRoute: typeof AuthenticatedDashboardCrmReferralsNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/referrals/$referralId': {
       id: '/_authenticated/dashboard/crm/referrals/$referralId'
-      path: '/dashboard/crm/referrals/$referralId'
+      path: '/referrals/$referralId'
       fullPath: '/dashboard/crm/referrals/$referralId'
       preLoaderRoute: typeof AuthenticatedDashboardCrmReferralsReferralIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/leads/new': {
       id: '/_authenticated/dashboard/crm/leads/new'
-      path: '/dashboard/crm/leads/new'
+      path: '/leads/new'
       fullPath: '/dashboard/crm/leads/new'
       preLoaderRoute: typeof AuthenticatedDashboardCrmLeadsNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/leads/$leadId': {
       id: '/_authenticated/dashboard/crm/leads/$leadId'
-      path: '/dashboard/crm/leads/$leadId'
+      path: '/leads/$leadId'
       fullPath: '/dashboard/crm/leads/$leadId'
       preLoaderRoute: typeof AuthenticatedDashboardCrmLeadsLeadIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/email-marketing/new': {
       id: '/_authenticated/dashboard/crm/email-marketing/new'
-      path: '/dashboard/crm/email-marketing/new'
+      path: '/email-marketing/new'
       fullPath: '/dashboard/crm/email-marketing/new'
       preLoaderRoute: typeof AuthenticatedDashboardCrmEmailMarketingNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/email-marketing/$campaignId': {
       id: '/_authenticated/dashboard/crm/email-marketing/$campaignId'
-      path: '/dashboard/crm/email-marketing/$campaignId'
+      path: '/email-marketing/$campaignId'
       fullPath: '/dashboard/crm/email-marketing/$campaignId'
       preLoaderRoute: typeof AuthenticatedDashboardCrmEmailMarketingCampaignIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/activities/new': {
       id: '/_authenticated/dashboard/crm/activities/new'
-      path: '/dashboard/crm/activities/new'
+      path: '/activities/new'
       fullPath: '/dashboard/crm/activities/new'
       preLoaderRoute: typeof AuthenticatedDashboardCrmActivitiesNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/activities/$activityId': {
       id: '/_authenticated/dashboard/crm/activities/$activityId'
-      path: '/dashboard/crm/activities/$activityId'
+      path: '/activities/$activityId'
       fullPath: '/dashboard/crm/activities/$activityId'
       preLoaderRoute: typeof AuthenticatedDashboardCrmActivitiesActivityIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/cases/pipeline/board': {
       id: '/_authenticated/dashboard/cases/pipeline/board'
@@ -8163,66 +8317,66 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/hr/settings/shift-types/': {
       id: '/_authenticated/dashboard/hr/settings/shift-types/'
-      path: '/dashboard/hr/settings/shift-types'
+      path: '/settings/shift-types'
       fullPath: '/dashboard/hr/settings/shift-types'
       preLoaderRoute: typeof AuthenticatedDashboardHrSettingsShiftTypesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/recruitment/jobs/': {
       id: '/_authenticated/dashboard/hr/recruitment/jobs/'
-      path: '/dashboard/hr/recruitment/jobs'
+      path: '/recruitment/jobs'
       fullPath: '/dashboard/hr/recruitment/jobs'
       preLoaderRoute: typeof AuthenticatedDashboardHrRecruitmentJobsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/recruitment/applicants/': {
       id: '/_authenticated/dashboard/hr/recruitment/applicants/'
-      path: '/dashboard/hr/recruitment/applicants'
+      path: '/recruitment/applicants'
       fullPath: '/dashboard/hr/recruitment/applicants'
       preLoaderRoute: typeof AuthenticatedDashboardHrRecruitmentApplicantsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/finance/saudi-banking/wps/': {
       id: '/_authenticated/dashboard/finance/saudi-banking/wps/'
-      path: '/dashboard/finance/saudi-banking/wps'
+      path: '/saudi-banking/wps'
       fullPath: '/dashboard/finance/saudi-banking/wps'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingWpsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/saudi-banking/sadad/': {
       id: '/_authenticated/dashboard/finance/saudi-banking/sadad/'
-      path: '/dashboard/finance/saudi-banking/sadad'
+      path: '/saudi-banking/sadad'
       fullPath: '/dashboard/finance/saudi-banking/sadad'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingSadadIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/hr/recruitment/jobs/new': {
       id: '/_authenticated/dashboard/hr/recruitment/jobs/new'
-      path: '/dashboard/hr/recruitment/jobs/new'
+      path: '/recruitment/jobs/new'
       fullPath: '/dashboard/hr/recruitment/jobs/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrRecruitmentJobsNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/recruitment/jobs/$jobId': {
       id: '/_authenticated/dashboard/hr/recruitment/jobs/$jobId'
-      path: '/dashboard/hr/recruitment/jobs/$jobId'
+      path: '/recruitment/jobs/$jobId'
       fullPath: '/dashboard/hr/recruitment/jobs/$jobId'
       preLoaderRoute: typeof AuthenticatedDashboardHrRecruitmentJobsJobIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/recruitment/applicants/new': {
       id: '/_authenticated/dashboard/hr/recruitment/applicants/new'
-      path: '/dashboard/hr/recruitment/applicants/new'
+      path: '/recruitment/applicants/new'
       fullPath: '/dashboard/hr/recruitment/applicants/new'
       preLoaderRoute: typeof AuthenticatedDashboardHrRecruitmentApplicantsNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/recruitment/applicants/$applicantId': {
       id: '/_authenticated/dashboard/hr/recruitment/applicants/$applicantId'
-      path: '/dashboard/hr/recruitment/applicants/$applicantId'
+      path: '/recruitment/applicants/$applicantId'
       fullPath: '/dashboard/hr/recruitment/applicants/$applicantId'
       preLoaderRoute: typeof AuthenticatedDashboardHrRecruitmentApplicantsApplicantIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardHrRoute
     }
     '/_authenticated/dashboard/hr/promotions/$promotionId/edit': {
       id: '/_authenticated/dashboard/hr/promotions/$promotionId/edit'
@@ -8254,17 +8408,17 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/finance/saudi-banking/wps/new': {
       id: '/_authenticated/dashboard/finance/saudi-banking/wps/new'
-      path: '/dashboard/finance/saudi-banking/wps/new'
+      path: '/saudi-banking/wps/new'
       fullPath: '/dashboard/finance/saudi-banking/wps/new'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingWpsNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/saudi-banking/sadad/pay': {
       id: '/_authenticated/dashboard/finance/saudi-banking/sadad/pay'
-      path: '/dashboard/finance/saudi-banking/sadad/pay'
+      path: '/saudi-banking/sadad/pay'
       fullPath: '/dashboard/finance/saudi-banking/sadad/pay'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingSadadPayRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/recurring-invoices/$id/edit': {
       id: '/_authenticated/dashboard/finance/recurring-invoices/$id/edit'
@@ -8388,22 +8542,34 @@ const AuthenticatedDashboardAssetsMaintenanceRouteWithChildren =
     AuthenticatedDashboardAssetsMaintenanceRouteChildren,
   )
 
-interface AuthenticatedDashboardBuyingPurchaseOrdersRouteChildren {
-  AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute
-  AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute
+interface AuthenticatedDashboardAssetsRouteChildren {
+  AuthenticatedDashboardAssetsAssetIdRoute: typeof AuthenticatedDashboardAssetsAssetIdRoute
+  AuthenticatedDashboardAssetsCategoriesRoute: typeof AuthenticatedDashboardAssetsCategoriesRouteWithChildren
+  AuthenticatedDashboardAssetsCreateRoute: typeof AuthenticatedDashboardAssetsCreateRoute
+  AuthenticatedDashboardAssetsMaintenanceRoute: typeof AuthenticatedDashboardAssetsMaintenanceRouteWithChildren
+  AuthenticatedDashboardAssetsSettingsRoute: typeof AuthenticatedDashboardAssetsSettingsRoute
+  AuthenticatedDashboardAssetsIndexRoute: typeof AuthenticatedDashboardAssetsIndexRoute
 }
 
-const AuthenticatedDashboardBuyingPurchaseOrdersRouteChildren: AuthenticatedDashboardBuyingPurchaseOrdersRouteChildren =
+const AuthenticatedDashboardAssetsRouteChildren: AuthenticatedDashboardAssetsRouteChildren =
   {
-    AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute:
-      AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute,
-    AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute:
-      AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute,
+    AuthenticatedDashboardAssetsAssetIdRoute:
+      AuthenticatedDashboardAssetsAssetIdRoute,
+    AuthenticatedDashboardAssetsCategoriesRoute:
+      AuthenticatedDashboardAssetsCategoriesRouteWithChildren,
+    AuthenticatedDashboardAssetsCreateRoute:
+      AuthenticatedDashboardAssetsCreateRoute,
+    AuthenticatedDashboardAssetsMaintenanceRoute:
+      AuthenticatedDashboardAssetsMaintenanceRouteWithChildren,
+    AuthenticatedDashboardAssetsSettingsRoute:
+      AuthenticatedDashboardAssetsSettingsRoute,
+    AuthenticatedDashboardAssetsIndexRoute:
+      AuthenticatedDashboardAssetsIndexRoute,
   }
 
-const AuthenticatedDashboardBuyingPurchaseOrdersRouteWithChildren =
-  AuthenticatedDashboardBuyingPurchaseOrdersRoute._addFileChildren(
-    AuthenticatedDashboardBuyingPurchaseOrdersRouteChildren,
+const AuthenticatedDashboardAssetsRouteWithChildren =
+  AuthenticatedDashboardAssetsRoute._addFileChildren(
+    AuthenticatedDashboardAssetsRouteChildren,
   )
 
 interface AuthenticatedDashboardCasesCaseIdNotionRouteChildren {
@@ -8454,6 +8620,122 @@ const AuthenticatedDashboardCasesPipelineRouteWithChildren =
     AuthenticatedDashboardCasesPipelineRouteChildren,
   )
 
+interface AuthenticatedDashboardCasesRouteChildren {
+  AuthenticatedDashboardCasesCaseIdRoute: typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
+  AuthenticatedDashboardCasesKanbanRoute: typeof AuthenticatedDashboardCasesKanbanRoute
+  AuthenticatedDashboardCasesNewRoute: typeof AuthenticatedDashboardCasesNewRoute
+  AuthenticatedDashboardCasesPipelineRoute: typeof AuthenticatedDashboardCasesPipelineRouteWithChildren
+  AuthenticatedDashboardCasesIndexRoute: typeof AuthenticatedDashboardCasesIndexRoute
+}
+
+const AuthenticatedDashboardCasesRouteChildren: AuthenticatedDashboardCasesRouteChildren =
+  {
+    AuthenticatedDashboardCasesCaseIdRoute:
+      AuthenticatedDashboardCasesCaseIdRouteWithChildren,
+    AuthenticatedDashboardCasesKanbanRoute:
+      AuthenticatedDashboardCasesKanbanRoute,
+    AuthenticatedDashboardCasesNewRoute: AuthenticatedDashboardCasesNewRoute,
+    AuthenticatedDashboardCasesPipelineRoute:
+      AuthenticatedDashboardCasesPipelineRouteWithChildren,
+    AuthenticatedDashboardCasesIndexRoute:
+      AuthenticatedDashboardCasesIndexRoute,
+  }
+
+const AuthenticatedDashboardCasesRouteWithChildren =
+  AuthenticatedDashboardCasesRoute._addFileChildren(
+    AuthenticatedDashboardCasesRouteChildren,
+  )
+
+interface AuthenticatedDashboardCrmRouteChildren {
+  AuthenticatedDashboardCrmAppointmentsRoute: typeof AuthenticatedDashboardCrmAppointmentsRoute
+  AuthenticatedDashboardCrmCrmReportsRoute: typeof AuthenticatedDashboardCrmCrmReportsRoute
+  AuthenticatedDashboardCrmPipelineRoute: typeof AuthenticatedDashboardCrmPipelineRoute
+  AuthenticatedDashboardCrmSalesPersonsRoute: typeof AuthenticatedDashboardCrmSalesPersonsRoute
+  AuthenticatedDashboardCrmSetupWizardRoute: typeof AuthenticatedDashboardCrmSetupWizardRoute
+  AuthenticatedDashboardCrmTerritoriesRoute: typeof AuthenticatedDashboardCrmTerritoriesRoute
+  AuthenticatedDashboardCrmActivitiesActivityIdRoute: typeof AuthenticatedDashboardCrmActivitiesActivityIdRoute
+  AuthenticatedDashboardCrmActivitiesNewRoute: typeof AuthenticatedDashboardCrmActivitiesNewRoute
+  AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute: typeof AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute
+  AuthenticatedDashboardCrmEmailMarketingNewRoute: typeof AuthenticatedDashboardCrmEmailMarketingNewRoute
+  AuthenticatedDashboardCrmLeadsLeadIdRoute: typeof AuthenticatedDashboardCrmLeadsLeadIdRoute
+  AuthenticatedDashboardCrmLeadsNewRoute: typeof AuthenticatedDashboardCrmLeadsNewRoute
+  AuthenticatedDashboardCrmReferralsReferralIdRoute: typeof AuthenticatedDashboardCrmReferralsReferralIdRoute
+  AuthenticatedDashboardCrmReferralsNewRoute: typeof AuthenticatedDashboardCrmReferralsNewRoute
+  AuthenticatedDashboardCrmReportsReportIdRoute: typeof AuthenticatedDashboardCrmReportsReportIdRoute
+  AuthenticatedDashboardCrmReportsNewRoute: typeof AuthenticatedDashboardCrmReportsNewRoute
+  AuthenticatedDashboardCrmWhatsappConversationIdRoute: typeof AuthenticatedDashboardCrmWhatsappConversationIdRoute
+  AuthenticatedDashboardCrmWhatsappNewRoute: typeof AuthenticatedDashboardCrmWhatsappNewRoute
+  AuthenticatedDashboardCrmWhatsappStartRoute: typeof AuthenticatedDashboardCrmWhatsappStartRoute
+  AuthenticatedDashboardCrmActivitiesIndexRoute: typeof AuthenticatedDashboardCrmActivitiesIndexRoute
+  AuthenticatedDashboardCrmEmailMarketingIndexRoute: typeof AuthenticatedDashboardCrmEmailMarketingIndexRoute
+  AuthenticatedDashboardCrmLeadScoringIndexRoute: typeof AuthenticatedDashboardCrmLeadScoringIndexRoute
+  AuthenticatedDashboardCrmLeadsIndexRoute: typeof AuthenticatedDashboardCrmLeadsIndexRoute
+  AuthenticatedDashboardCrmReferralsIndexRoute: typeof AuthenticatedDashboardCrmReferralsIndexRoute
+  AuthenticatedDashboardCrmReportsIndexRoute: typeof AuthenticatedDashboardCrmReportsIndexRoute
+  AuthenticatedDashboardCrmWhatsappIndexRoute: typeof AuthenticatedDashboardCrmWhatsappIndexRoute
+}
+
+const AuthenticatedDashboardCrmRouteChildren: AuthenticatedDashboardCrmRouteChildren =
+  {
+    AuthenticatedDashboardCrmAppointmentsRoute:
+      AuthenticatedDashboardCrmAppointmentsRoute,
+    AuthenticatedDashboardCrmCrmReportsRoute:
+      AuthenticatedDashboardCrmCrmReportsRoute,
+    AuthenticatedDashboardCrmPipelineRoute:
+      AuthenticatedDashboardCrmPipelineRoute,
+    AuthenticatedDashboardCrmSalesPersonsRoute:
+      AuthenticatedDashboardCrmSalesPersonsRoute,
+    AuthenticatedDashboardCrmSetupWizardRoute:
+      AuthenticatedDashboardCrmSetupWizardRoute,
+    AuthenticatedDashboardCrmTerritoriesRoute:
+      AuthenticatedDashboardCrmTerritoriesRoute,
+    AuthenticatedDashboardCrmActivitiesActivityIdRoute:
+      AuthenticatedDashboardCrmActivitiesActivityIdRoute,
+    AuthenticatedDashboardCrmActivitiesNewRoute:
+      AuthenticatedDashboardCrmActivitiesNewRoute,
+    AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute:
+      AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute,
+    AuthenticatedDashboardCrmEmailMarketingNewRoute:
+      AuthenticatedDashboardCrmEmailMarketingNewRoute,
+    AuthenticatedDashboardCrmLeadsLeadIdRoute:
+      AuthenticatedDashboardCrmLeadsLeadIdRoute,
+    AuthenticatedDashboardCrmLeadsNewRoute:
+      AuthenticatedDashboardCrmLeadsNewRoute,
+    AuthenticatedDashboardCrmReferralsReferralIdRoute:
+      AuthenticatedDashboardCrmReferralsReferralIdRoute,
+    AuthenticatedDashboardCrmReferralsNewRoute:
+      AuthenticatedDashboardCrmReferralsNewRoute,
+    AuthenticatedDashboardCrmReportsReportIdRoute:
+      AuthenticatedDashboardCrmReportsReportIdRoute,
+    AuthenticatedDashboardCrmReportsNewRoute:
+      AuthenticatedDashboardCrmReportsNewRoute,
+    AuthenticatedDashboardCrmWhatsappConversationIdRoute:
+      AuthenticatedDashboardCrmWhatsappConversationIdRoute,
+    AuthenticatedDashboardCrmWhatsappNewRoute:
+      AuthenticatedDashboardCrmWhatsappNewRoute,
+    AuthenticatedDashboardCrmWhatsappStartRoute:
+      AuthenticatedDashboardCrmWhatsappStartRoute,
+    AuthenticatedDashboardCrmActivitiesIndexRoute:
+      AuthenticatedDashboardCrmActivitiesIndexRoute,
+    AuthenticatedDashboardCrmEmailMarketingIndexRoute:
+      AuthenticatedDashboardCrmEmailMarketingIndexRoute,
+    AuthenticatedDashboardCrmLeadScoringIndexRoute:
+      AuthenticatedDashboardCrmLeadScoringIndexRoute,
+    AuthenticatedDashboardCrmLeadsIndexRoute:
+      AuthenticatedDashboardCrmLeadsIndexRoute,
+    AuthenticatedDashboardCrmReferralsIndexRoute:
+      AuthenticatedDashboardCrmReferralsIndexRoute,
+    AuthenticatedDashboardCrmReportsIndexRoute:
+      AuthenticatedDashboardCrmReportsIndexRoute,
+    AuthenticatedDashboardCrmWhatsappIndexRoute:
+      AuthenticatedDashboardCrmWhatsappIndexRoute,
+  }
+
+const AuthenticatedDashboardCrmRouteWithChildren =
+  AuthenticatedDashboardCrmRoute._addFileChildren(
+    AuthenticatedDashboardCrmRouteChildren,
+  )
+
 interface AuthenticatedDashboardFinanceCorporateCardsRouteChildren {
   AuthenticatedDashboardFinanceCorporateCardsCardIdReconcileRoute: typeof AuthenticatedDashboardFinanceCorporateCardsCardIdReconcileRoute
 }
@@ -8467,117 +8749,6 @@ const AuthenticatedDashboardFinanceCorporateCardsRouteChildren: AuthenticatedDas
 const AuthenticatedDashboardFinanceCorporateCardsRouteWithChildren =
   AuthenticatedDashboardFinanceCorporateCardsRoute._addFileChildren(
     AuthenticatedDashboardFinanceCorporateCardsRouteChildren,
-  )
-
-interface AuthenticatedDashboardManufacturingBomRouteChildren {
-  AuthenticatedDashboardManufacturingBomBomIdRoute: typeof AuthenticatedDashboardManufacturingBomBomIdRoute
-  AuthenticatedDashboardManufacturingBomCreateRoute: typeof AuthenticatedDashboardManufacturingBomCreateRoute
-  AuthenticatedDashboardManufacturingBomIndexRoute: typeof AuthenticatedDashboardManufacturingBomIndexRoute
-}
-
-const AuthenticatedDashboardManufacturingBomRouteChildren: AuthenticatedDashboardManufacturingBomRouteChildren =
-  {
-    AuthenticatedDashboardManufacturingBomBomIdRoute:
-      AuthenticatedDashboardManufacturingBomBomIdRoute,
-    AuthenticatedDashboardManufacturingBomCreateRoute:
-      AuthenticatedDashboardManufacturingBomCreateRoute,
-    AuthenticatedDashboardManufacturingBomIndexRoute:
-      AuthenticatedDashboardManufacturingBomIndexRoute,
-  }
-
-const AuthenticatedDashboardManufacturingBomRouteWithChildren =
-  AuthenticatedDashboardManufacturingBomRoute._addFileChildren(
-    AuthenticatedDashboardManufacturingBomRouteChildren,
-  )
-
-interface AuthenticatedDashboardManufacturingWorkstationsRouteChildren {
-  AuthenticatedDashboardManufacturingWorkstationsCreateRoute: typeof AuthenticatedDashboardManufacturingWorkstationsCreateRoute
-  AuthenticatedDashboardManufacturingWorkstationsIndexRoute: typeof AuthenticatedDashboardManufacturingWorkstationsIndexRoute
-}
-
-const AuthenticatedDashboardManufacturingWorkstationsRouteChildren: AuthenticatedDashboardManufacturingWorkstationsRouteChildren =
-  {
-    AuthenticatedDashboardManufacturingWorkstationsCreateRoute:
-      AuthenticatedDashboardManufacturingWorkstationsCreateRoute,
-    AuthenticatedDashboardManufacturingWorkstationsIndexRoute:
-      AuthenticatedDashboardManufacturingWorkstationsIndexRoute,
-  }
-
-const AuthenticatedDashboardManufacturingWorkstationsRouteWithChildren =
-  AuthenticatedDashboardManufacturingWorkstationsRoute._addFileChildren(
-    AuthenticatedDashboardManufacturingWorkstationsRouteChildren,
-  )
-
-interface AuthenticatedDashboardQualityActionsRouteChildren {
-  AuthenticatedDashboardQualityActionsCreateRoute: typeof AuthenticatedDashboardQualityActionsCreateRoute
-  AuthenticatedDashboardQualityActionsIndexRoute: typeof AuthenticatedDashboardQualityActionsIndexRoute
-}
-
-const AuthenticatedDashboardQualityActionsRouteChildren: AuthenticatedDashboardQualityActionsRouteChildren =
-  {
-    AuthenticatedDashboardQualityActionsCreateRoute:
-      AuthenticatedDashboardQualityActionsCreateRoute,
-    AuthenticatedDashboardQualityActionsIndexRoute:
-      AuthenticatedDashboardQualityActionsIndexRoute,
-  }
-
-const AuthenticatedDashboardQualityActionsRouteWithChildren =
-  AuthenticatedDashboardQualityActionsRoute._addFileChildren(
-    AuthenticatedDashboardQualityActionsRouteChildren,
-  )
-
-interface AuthenticatedDashboardQualityTemplatesRouteChildren {
-  AuthenticatedDashboardQualityTemplatesCreateRoute: typeof AuthenticatedDashboardQualityTemplatesCreateRoute
-  AuthenticatedDashboardQualityTemplatesIndexRoute: typeof AuthenticatedDashboardQualityTemplatesIndexRoute
-}
-
-const AuthenticatedDashboardQualityTemplatesRouteChildren: AuthenticatedDashboardQualityTemplatesRouteChildren =
-  {
-    AuthenticatedDashboardQualityTemplatesCreateRoute:
-      AuthenticatedDashboardQualityTemplatesCreateRoute,
-    AuthenticatedDashboardQualityTemplatesIndexRoute:
-      AuthenticatedDashboardQualityTemplatesIndexRoute,
-  }
-
-const AuthenticatedDashboardQualityTemplatesRouteWithChildren =
-  AuthenticatedDashboardQualityTemplatesRoute._addFileChildren(
-    AuthenticatedDashboardQualityTemplatesRouteChildren,
-  )
-
-interface AuthenticatedDashboardSubcontractingReceiptsRouteChildren {
-  AuthenticatedDashboardSubcontractingReceiptsCreateRoute: typeof AuthenticatedDashboardSubcontractingReceiptsCreateRoute
-  AuthenticatedDashboardSubcontractingReceiptsIndexRoute: typeof AuthenticatedDashboardSubcontractingReceiptsIndexRoute
-}
-
-const AuthenticatedDashboardSubcontractingReceiptsRouteChildren: AuthenticatedDashboardSubcontractingReceiptsRouteChildren =
-  {
-    AuthenticatedDashboardSubcontractingReceiptsCreateRoute:
-      AuthenticatedDashboardSubcontractingReceiptsCreateRoute,
-    AuthenticatedDashboardSubcontractingReceiptsIndexRoute:
-      AuthenticatedDashboardSubcontractingReceiptsIndexRoute,
-  }
-
-const AuthenticatedDashboardSubcontractingReceiptsRouteWithChildren =
-  AuthenticatedDashboardSubcontractingReceiptsRoute._addFileChildren(
-    AuthenticatedDashboardSubcontractingReceiptsRouteChildren,
-  )
-
-interface AuthenticatedDashboardSupportSlaRouteChildren {
-  AuthenticatedDashboardSupportSlaCreateRoute: typeof AuthenticatedDashboardSupportSlaCreateRoute
-  AuthenticatedDashboardSupportSlaIndexRoute: typeof AuthenticatedDashboardSupportSlaIndexRoute
-}
-
-const AuthenticatedDashboardSupportSlaRouteChildren: AuthenticatedDashboardSupportSlaRouteChildren =
-  {
-    AuthenticatedDashboardSupportSlaCreateRoute:
-      AuthenticatedDashboardSupportSlaCreateRoute,
-    AuthenticatedDashboardSupportSlaIndexRoute:
-      AuthenticatedDashboardSupportSlaIndexRoute,
-  }
-
-const AuthenticatedDashboardSupportSlaRouteWithChildren =
-  AuthenticatedDashboardSupportSlaRoute._addFileChildren(
-    AuthenticatedDashboardSupportSlaRouteChildren,
   )
 
 interface AuthenticatedDashboardFinanceActivityActivityIdRouteChildren {
@@ -8700,56 +8871,7 @@ const AuthenticatedDashboardFinanceVendorsVendorIdRouteWithChildren =
     AuthenticatedDashboardFinanceVendorsVendorIdRouteChildren,
   )
 
-interface AuthenticatedDashboardHrPromotionsPromotionIdRouteChildren {
-  AuthenticatedDashboardHrPromotionsPromotionIdEditRoute: typeof AuthenticatedDashboardHrPromotionsPromotionIdEditRoute
-}
-
-const AuthenticatedDashboardHrPromotionsPromotionIdRouteChildren: AuthenticatedDashboardHrPromotionsPromotionIdRouteChildren =
-  {
-    AuthenticatedDashboardHrPromotionsPromotionIdEditRoute:
-      AuthenticatedDashboardHrPromotionsPromotionIdEditRoute,
-  }
-
-const AuthenticatedDashboardHrPromotionsPromotionIdRouteWithChildren =
-  AuthenticatedDashboardHrPromotionsPromotionIdRoute._addFileChildren(
-    AuthenticatedDashboardHrPromotionsPromotionIdRouteChildren,
-  )
-
-interface AuthenticatedRouteRouteChildren {
-  AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
-  AuthenticatedDashboardCalendarRoute: typeof AuthenticatedDashboardCalendarRoute
-  AuthenticatedDashboardHelpRoute: typeof AuthenticatedDashboardHelpRoute
-  AuthenticatedDashboardNotionRoute: typeof AuthenticatedDashboardNotionRoute
-  AuthenticatedDashboardSetupOrchestratorRoute: typeof AuthenticatedDashboardSetupOrchestratorRoute
-  AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
-  AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
-  AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
-  AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
-  AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
-  AuthenticatedDashboardAssetsAssetIdRoute: typeof AuthenticatedDashboardAssetsAssetIdRoute
-  AuthenticatedDashboardAssetsCategoriesRoute: typeof AuthenticatedDashboardAssetsCategoriesRouteWithChildren
-  AuthenticatedDashboardAssetsCreateRoute: typeof AuthenticatedDashboardAssetsCreateRoute
-  AuthenticatedDashboardAssetsMaintenanceRoute: typeof AuthenticatedDashboardAssetsMaintenanceRouteWithChildren
-  AuthenticatedDashboardAssetsSettingsRoute: typeof AuthenticatedDashboardAssetsSettingsRoute
-  AuthenticatedDashboardBuyingSupplierIdRoute: typeof AuthenticatedDashboardBuyingSupplierIdRoute
-  AuthenticatedDashboardBuyingCreateRoute: typeof AuthenticatedDashboardBuyingCreateRoute
-  AuthenticatedDashboardBuyingPurchaseOrdersRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersRouteWithChildren
-  AuthenticatedDashboardBuyingSettingsRoute: typeof AuthenticatedDashboardBuyingSettingsRoute
-  AuthenticatedDashboardCasesCaseIdRoute: typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
-  AuthenticatedDashboardCasesKanbanRoute: typeof AuthenticatedDashboardCasesKanbanRoute
-  AuthenticatedDashboardCasesNewRoute: typeof AuthenticatedDashboardCasesNewRoute
-  AuthenticatedDashboardCasesPipelineRoute: typeof AuthenticatedDashboardCasesPipelineRouteWithChildren
-  AuthenticatedDashboardClientsClientIdRoute: typeof AuthenticatedDashboardClientsClientIdRoute
-  AuthenticatedDashboardClientsNewRoute: typeof AuthenticatedDashboardClientsNewRoute
-  AuthenticatedDashboardContactsContactIdRoute: typeof AuthenticatedDashboardContactsContactIdRoute
-  AuthenticatedDashboardContactsNewRoute: typeof AuthenticatedDashboardContactsNewRoute
-  AuthenticatedDashboardCrmAppointmentsRoute: typeof AuthenticatedDashboardCrmAppointmentsRoute
-  AuthenticatedDashboardCrmCrmReportsRoute: typeof AuthenticatedDashboardCrmCrmReportsRoute
-  AuthenticatedDashboardCrmPipelineRoute: typeof AuthenticatedDashboardCrmPipelineRoute
-  AuthenticatedDashboardCrmSalesPersonsRoute: typeof AuthenticatedDashboardCrmSalesPersonsRoute
-  AuthenticatedDashboardCrmSetupWizardRoute: typeof AuthenticatedDashboardCrmSetupWizardRoute
-  AuthenticatedDashboardCrmTerritoriesRoute: typeof AuthenticatedDashboardCrmTerritoriesRoute
+interface AuthenticatedDashboardFinanceRouteChildren {
   AuthenticatedDashboardFinanceChartOfAccountsRoute: typeof AuthenticatedDashboardFinanceChartOfAccountsRoute
   AuthenticatedDashboardFinanceConsolidatedReportsRoute: typeof AuthenticatedDashboardFinanceConsolidatedReportsRoute
   AuthenticatedDashboardFinanceCorporateCardsRoute: typeof AuthenticatedDashboardFinanceCorporateCardsRouteWithChildren
@@ -8757,98 +8879,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardFinanceOpeningBalancesRoute: typeof AuthenticatedDashboardFinanceOpeningBalancesRoute
   AuthenticatedDashboardFinanceOverviewRoute: typeof AuthenticatedDashboardFinanceOverviewRoute
   AuthenticatedDashboardFinanceSetupWizardRoute: typeof AuthenticatedDashboardFinanceSetupWizardRoute
-  AuthenticatedDashboardHrSetupWizardRoute: typeof AuthenticatedDashboardHrSetupWizardRoute
-  AuthenticatedDashboardInventoryItemIdRoute: typeof AuthenticatedDashboardInventoryItemIdRoute
-  AuthenticatedDashboardInventoryCreateRoute: typeof AuthenticatedDashboardInventoryCreateRoute
-  AuthenticatedDashboardInventorySettingsRoute: typeof AuthenticatedDashboardInventorySettingsRoute
-  AuthenticatedDashboardInventoryStockLedgerRoute: typeof AuthenticatedDashboardInventoryStockLedgerRoute
-  AuthenticatedDashboardJobsBrowseRoute: typeof AuthenticatedDashboardJobsBrowseRoute
-  AuthenticatedDashboardJobsMyServicesRoute: typeof AuthenticatedDashboardJobsMyServicesRoute
-  AuthenticatedDashboardKnowledgeFormsRoute: typeof AuthenticatedDashboardKnowledgeFormsRoute
-  AuthenticatedDashboardKnowledgeJudgmentsRoute: typeof AuthenticatedDashboardKnowledgeJudgmentsRoute
-  AuthenticatedDashboardKnowledgeLawsRoute: typeof AuthenticatedDashboardKnowledgeLawsRoute
-  AuthenticatedDashboardManufacturingWorkOrderIdRoute: typeof AuthenticatedDashboardManufacturingWorkOrderIdRoute
-  AuthenticatedDashboardManufacturingBomRoute: typeof AuthenticatedDashboardManufacturingBomRouteWithChildren
-  AuthenticatedDashboardManufacturingCreateRoute: typeof AuthenticatedDashboardManufacturingCreateRoute
-  AuthenticatedDashboardManufacturingSettingsRoute: typeof AuthenticatedDashboardManufacturingSettingsRoute
-  AuthenticatedDashboardManufacturingWorkstationsRoute: typeof AuthenticatedDashboardManufacturingWorkstationsRouteWithChildren
-  AuthenticatedDashboardMessagesChatRoute: typeof AuthenticatedDashboardMessagesChatRoute
-  AuthenticatedDashboardMessagesEmailRoute: typeof AuthenticatedDashboardMessagesEmailRoute
-  AuthenticatedDashboardMlAnalyticsRoute: typeof AuthenticatedDashboardMlAnalyticsRoute
-  AuthenticatedDashboardMlQueueRoute: typeof AuthenticatedDashboardMlQueueRoute
-  AuthenticatedDashboardMlSlaRoute: typeof AuthenticatedDashboardMlSlaRoute
-  AuthenticatedDashboardNotificationsSettingsRoute: typeof AuthenticatedDashboardNotificationsSettingsRoute
-  AuthenticatedDashboardOrganizationsOrganizationIdRoute: typeof AuthenticatedDashboardOrganizationsOrganizationIdRoute
-  AuthenticatedDashboardOrganizationsNewRoute: typeof AuthenticatedDashboardOrganizationsNewRoute
-  AuthenticatedDashboardQualityInspectionIdRoute: typeof AuthenticatedDashboardQualityInspectionIdRoute
-  AuthenticatedDashboardQualityActionsRoute: typeof AuthenticatedDashboardQualityActionsRouteWithChildren
-  AuthenticatedDashboardQualityCreateRoute: typeof AuthenticatedDashboardQualityCreateRoute
-  AuthenticatedDashboardQualitySettingsRoute: typeof AuthenticatedDashboardQualitySettingsRoute
-  AuthenticatedDashboardQualityTemplatesRoute: typeof AuthenticatedDashboardQualityTemplatesRouteWithChildren
-  AuthenticatedDashboardReputationBadgesRoute: typeof AuthenticatedDashboardReputationBadgesRoute
-  AuthenticatedDashboardReputationOverviewRoute: typeof AuthenticatedDashboardReputationOverviewRoute
-  AuthenticatedDashboardSettingsCompanyRoute: typeof AuthenticatedDashboardSettingsCompanyRoute
-  AuthenticatedDashboardSettingsCrmRoute: typeof AuthenticatedDashboardSettingsCrmRoute
-  AuthenticatedDashboardSettingsExpensePoliciesRoute: typeof AuthenticatedDashboardSettingsExpensePoliciesRoute
-  AuthenticatedDashboardSettingsFinanceRoute: typeof AuthenticatedDashboardSettingsFinanceRoute
-  AuthenticatedDashboardSettingsPaymentModesRoute: typeof AuthenticatedDashboardSettingsPaymentModesRoute
-  AuthenticatedDashboardSettingsPaymentTermsRoute: typeof AuthenticatedDashboardSettingsPaymentTermsRoute
-  AuthenticatedDashboardSettingsPreferencesRoute: typeof AuthenticatedDashboardSettingsPreferencesRoute
-  AuthenticatedDashboardSettingsProfileRoute: typeof AuthenticatedDashboardSettingsProfileRoute
-  AuthenticatedDashboardSettingsSecurityRoute: typeof AuthenticatedDashboardSettingsSecurityRoute
-  AuthenticatedDashboardSettingsTaxesRoute: typeof AuthenticatedDashboardSettingsTaxesRoute
-  AuthenticatedDashboardStaffNewRoute: typeof AuthenticatedDashboardStaffNewRoute
-  AuthenticatedDashboardSubcontractingOrderIdRoute: typeof AuthenticatedDashboardSubcontractingOrderIdRoute
-  AuthenticatedDashboardSubcontractingCreateRoute: typeof AuthenticatedDashboardSubcontractingCreateRoute
-  AuthenticatedDashboardSubcontractingReceiptsRoute: typeof AuthenticatedDashboardSubcontractingReceiptsRouteWithChildren
-  AuthenticatedDashboardSubcontractingSettingsRoute: typeof AuthenticatedDashboardSubcontractingSettingsRoute
-  AuthenticatedDashboardSupportTicketIdRoute: typeof AuthenticatedDashboardSupportTicketIdRoute
-  AuthenticatedDashboardSupportCreateRoute: typeof AuthenticatedDashboardSupportCreateRoute
-  AuthenticatedDashboardSupportSettingsRoute: typeof AuthenticatedDashboardSupportSettingsRoute
-  AuthenticatedDashboardSupportSlaRoute: typeof AuthenticatedDashboardSupportSlaRouteWithChildren
-  AuthenticatedDashboardTasksTaskIdRoute: typeof AuthenticatedDashboardTasksTaskIdRoute
-  AuthenticatedDashboardTasksGanttRoute: typeof AuthenticatedDashboardTasksGanttRoute
-  AuthenticatedDashboardTasksListRoute: typeof AuthenticatedDashboardTasksListRoute
-  AuthenticatedDashboardTasksNewRoute: typeof AuthenticatedDashboardTasksNewRoute
-  AuthenticatedDashboardAppsIndexRoute: typeof AuthenticatedDashboardAppsIndexRoute
-  AuthenticatedDashboardAssetsIndexRoute: typeof AuthenticatedDashboardAssetsIndexRoute
-  AuthenticatedDashboardBillingRatesIndexRoute: typeof AuthenticatedDashboardBillingRatesIndexRoute
-  AuthenticatedDashboardBuyingIndexRoute: typeof AuthenticatedDashboardBuyingIndexRoute
-  AuthenticatedDashboardCaseWorkflowsIndexRoute: typeof AuthenticatedDashboardCaseWorkflowsIndexRoute
-  AuthenticatedDashboardCasesIndexRoute: typeof AuthenticatedDashboardCasesIndexRoute
-  AuthenticatedDashboardClientsIndexRoute: typeof AuthenticatedDashboardClientsIndexRoute
-  AuthenticatedDashboardContactsIndexRoute: typeof AuthenticatedDashboardContactsIndexRoute
-  AuthenticatedDashboardDataExportIndexRoute: typeof AuthenticatedDashboardDataExportIndexRoute
-  AuthenticatedDashboardDocumentsIndexRoute: typeof AuthenticatedDashboardDocumentsIndexRoute
-  AuthenticatedDashboardFollowupsIndexRoute: typeof AuthenticatedDashboardFollowupsIndexRoute
-  AuthenticatedDashboardInventoryIndexRoute: typeof AuthenticatedDashboardInventoryIndexRoute
-  AuthenticatedDashboardInvoiceTemplatesIndexRoute: typeof AuthenticatedDashboardInvoiceTemplatesIndexRoute
-  AuthenticatedDashboardManufacturingIndexRoute: typeof AuthenticatedDashboardManufacturingIndexRoute
-  AuthenticatedDashboardNotificationsIndexRoute: typeof AuthenticatedDashboardNotificationsIndexRoute
-  AuthenticatedDashboardOrganizationsIndexRoute: typeof AuthenticatedDashboardOrganizationsIndexRoute
-  AuthenticatedDashboardPdfTemplatesIndexRoute: typeof AuthenticatedDashboardPdfTemplatesIndexRoute
-  AuthenticatedDashboardQualityIndexRoute: typeof AuthenticatedDashboardQualityIndexRoute
-  AuthenticatedDashboardReportsIndexRoute: typeof AuthenticatedDashboardReportsIndexRoute
-  AuthenticatedDashboardStaffIndexRoute: typeof AuthenticatedDashboardStaffIndexRoute
-  AuthenticatedDashboardSubcontractingIndexRoute: typeof AuthenticatedDashboardSubcontractingIndexRoute
-  AuthenticatedDashboardSupportIndexRoute: typeof AuthenticatedDashboardSupportIndexRoute
-  AuthenticatedDashboardTagsIndexRoute: typeof AuthenticatedDashboardTagsIndexRoute
-  AuthenticatedDashboardBuyingMaterialRequestsMaterialRequestIdRoute: typeof AuthenticatedDashboardBuyingMaterialRequestsMaterialRequestIdRoute
-  AuthenticatedDashboardBuyingMaterialRequestsCreateRoute: typeof AuthenticatedDashboardBuyingMaterialRequestsCreateRoute
-  AuthenticatedDashboardBuyingRfqCreateRoute: typeof AuthenticatedDashboardBuyingRfqCreateRoute
-  AuthenticatedDashboardCrmActivitiesActivityIdRoute: typeof AuthenticatedDashboardCrmActivitiesActivityIdRoute
-  AuthenticatedDashboardCrmActivitiesNewRoute: typeof AuthenticatedDashboardCrmActivitiesNewRoute
-  AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute: typeof AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute
-  AuthenticatedDashboardCrmEmailMarketingNewRoute: typeof AuthenticatedDashboardCrmEmailMarketingNewRoute
-  AuthenticatedDashboardCrmLeadsLeadIdRoute: typeof AuthenticatedDashboardCrmLeadsLeadIdRoute
-  AuthenticatedDashboardCrmLeadsNewRoute: typeof AuthenticatedDashboardCrmLeadsNewRoute
-  AuthenticatedDashboardCrmReferralsReferralIdRoute: typeof AuthenticatedDashboardCrmReferralsReferralIdRoute
-  AuthenticatedDashboardCrmReferralsNewRoute: typeof AuthenticatedDashboardCrmReferralsNewRoute
-  AuthenticatedDashboardCrmReportsReportIdRoute: typeof AuthenticatedDashboardCrmReportsReportIdRoute
-  AuthenticatedDashboardCrmReportsNewRoute: typeof AuthenticatedDashboardCrmReportsNewRoute
-  AuthenticatedDashboardCrmWhatsappConversationIdRoute: typeof AuthenticatedDashboardCrmWhatsappConversationIdRoute
-  AuthenticatedDashboardCrmWhatsappNewRoute: typeof AuthenticatedDashboardCrmWhatsappNewRoute
-  AuthenticatedDashboardCrmWhatsappStartRoute: typeof AuthenticatedDashboardCrmWhatsappStartRoute
   AuthenticatedDashboardFinanceActivityActivityIdRoute: typeof AuthenticatedDashboardFinanceActivityActivityIdRouteWithChildren
   AuthenticatedDashboardFinanceActivityNewRoute: typeof AuthenticatedDashboardFinanceActivityNewRoute
   AuthenticatedDashboardFinanceBillsBillIdRoute: typeof AuthenticatedDashboardFinanceBillsBillIdRouteWithChildren
@@ -8892,6 +8922,212 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardFinanceTimeTrackingWeeklyRoute: typeof AuthenticatedDashboardFinanceTimeTrackingWeeklyRoute
   AuthenticatedDashboardFinanceVendorsVendorIdRoute: typeof AuthenticatedDashboardFinanceVendorsVendorIdRouteWithChildren
   AuthenticatedDashboardFinanceVendorsNewRoute: typeof AuthenticatedDashboardFinanceVendorsNewRoute
+  AuthenticatedDashboardFinanceActivityIndexRoute: typeof AuthenticatedDashboardFinanceActivityIndexRoute
+  AuthenticatedDashboardFinanceBillsIndexRoute: typeof AuthenticatedDashboardFinanceBillsIndexRoute
+  AuthenticatedDashboardFinanceCreditNotesIndexRoute: typeof AuthenticatedDashboardFinanceCreditNotesIndexRoute
+  AuthenticatedDashboardFinanceCurrencyIndexRoute: typeof AuthenticatedDashboardFinanceCurrencyIndexRoute
+  AuthenticatedDashboardFinanceExpensesIndexRoute: typeof AuthenticatedDashboardFinanceExpensesIndexRoute
+  AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute: typeof AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute
+  AuthenticatedDashboardFinanceFullReportsIndexRoute: typeof AuthenticatedDashboardFinanceFullReportsIndexRoute
+  AuthenticatedDashboardFinanceInvoicesIndexRoute: typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
+  AuthenticatedDashboardFinanceJournalEntriesIndexRoute: typeof AuthenticatedDashboardFinanceJournalEntriesIndexRoute
+  AuthenticatedDashboardFinancePaymentsIndexRoute: typeof AuthenticatedDashboardFinancePaymentsIndexRoute
+  AuthenticatedDashboardFinanceQuotesIndexRoute: typeof AuthenticatedDashboardFinanceQuotesIndexRoute
+  AuthenticatedDashboardFinanceReconciliationIndexRoute: typeof AuthenticatedDashboardFinanceReconciliationIndexRoute
+  AuthenticatedDashboardFinanceRecurringInvoicesIndexRoute: typeof AuthenticatedDashboardFinanceRecurringInvoicesIndexRoute
+  AuthenticatedDashboardFinanceRecurringIndexRoute: typeof AuthenticatedDashboardFinanceRecurringIndexRoute
+  AuthenticatedDashboardFinanceReportsIndexRoute: typeof AuthenticatedDashboardFinanceReportsIndexRoute
+  AuthenticatedDashboardFinanceRetainersIndexRoute: typeof AuthenticatedDashboardFinanceRetainersIndexRoute
+  AuthenticatedDashboardFinanceSaudiBankingIndexRoute: typeof AuthenticatedDashboardFinanceSaudiBankingIndexRoute
+  AuthenticatedDashboardFinanceStatementsIndexRoute: typeof AuthenticatedDashboardFinanceStatementsIndexRoute
+  AuthenticatedDashboardFinanceTimeTrackingIndexRoute: typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
+  AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute: typeof AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute
+  AuthenticatedDashboardFinanceTransactionsIndexRoute: typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
+  AuthenticatedDashboardFinanceVendorsIndexRoute: typeof AuthenticatedDashboardFinanceVendorsIndexRoute
+  AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute: typeof AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute
+  AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute: typeof AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute
+  AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute: typeof AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute
+  AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute: typeof AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute
+}
+
+const AuthenticatedDashboardFinanceRouteChildren: AuthenticatedDashboardFinanceRouteChildren =
+  {
+    AuthenticatedDashboardFinanceChartOfAccountsRoute:
+      AuthenticatedDashboardFinanceChartOfAccountsRoute,
+    AuthenticatedDashboardFinanceConsolidatedReportsRoute:
+      AuthenticatedDashboardFinanceConsolidatedReportsRoute,
+    AuthenticatedDashboardFinanceCorporateCardsRoute:
+      AuthenticatedDashboardFinanceCorporateCardsRouteWithChildren,
+    AuthenticatedDashboardFinanceGeneralLedgerRoute:
+      AuthenticatedDashboardFinanceGeneralLedgerRoute,
+    AuthenticatedDashboardFinanceOpeningBalancesRoute:
+      AuthenticatedDashboardFinanceOpeningBalancesRoute,
+    AuthenticatedDashboardFinanceOverviewRoute:
+      AuthenticatedDashboardFinanceOverviewRoute,
+    AuthenticatedDashboardFinanceSetupWizardRoute:
+      AuthenticatedDashboardFinanceSetupWizardRoute,
+    AuthenticatedDashboardFinanceActivityActivityIdRoute:
+      AuthenticatedDashboardFinanceActivityActivityIdRouteWithChildren,
+    AuthenticatedDashboardFinanceActivityNewRoute:
+      AuthenticatedDashboardFinanceActivityNewRoute,
+    AuthenticatedDashboardFinanceBillsBillIdRoute:
+      AuthenticatedDashboardFinanceBillsBillIdRouteWithChildren,
+    AuthenticatedDashboardFinanceBillsNewRoute:
+      AuthenticatedDashboardFinanceBillsNewRoute,
+    AuthenticatedDashboardFinanceCreditNotesCreditNoteIdRoute:
+      AuthenticatedDashboardFinanceCreditNotesCreditNoteIdRoute,
+    AuthenticatedDashboardFinanceCreditNotesNewRoute:
+      AuthenticatedDashboardFinanceCreditNotesNewRoute,
+    AuthenticatedDashboardFinanceCurrencyRateIdRoute:
+      AuthenticatedDashboardFinanceCurrencyRateIdRoute,
+    AuthenticatedDashboardFinanceCurrencyNewRoute:
+      AuthenticatedDashboardFinanceCurrencyNewRoute,
+    AuthenticatedDashboardFinanceExpensesExpenseIdRoute:
+      AuthenticatedDashboardFinanceExpensesExpenseIdRouteWithChildren,
+    AuthenticatedDashboardFinanceExpensesNewRoute:
+      AuthenticatedDashboardFinanceExpensesNewRoute,
+    AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute:
+      AuthenticatedDashboardFinanceInvoicesInvoiceIdRouteWithChildren,
+    AuthenticatedDashboardFinanceInvoicesApprovalsRoute:
+      AuthenticatedDashboardFinanceInvoicesApprovalsRoute,
+    AuthenticatedDashboardFinanceInvoicesNewRoute:
+      AuthenticatedDashboardFinanceInvoicesNewRoute,
+    AuthenticatedDashboardFinanceJournalEntriesIdRoute:
+      AuthenticatedDashboardFinanceJournalEntriesIdRoute,
+    AuthenticatedDashboardFinanceJournalEntriesNewRoute:
+      AuthenticatedDashboardFinanceJournalEntriesNewRoute,
+    AuthenticatedDashboardFinancePaymentsPaymentIdRoute:
+      AuthenticatedDashboardFinancePaymentsPaymentIdRoute,
+    AuthenticatedDashboardFinancePaymentsNewRoute:
+      AuthenticatedDashboardFinancePaymentsNewRoute,
+    AuthenticatedDashboardFinanceQuotesQuoteIdRoute:
+      AuthenticatedDashboardFinanceQuotesQuoteIdRoute,
+    AuthenticatedDashboardFinanceQuotesNewRoute:
+      AuthenticatedDashboardFinanceQuotesNewRoute,
+    AuthenticatedDashboardFinanceReconciliationFeedIdRoute:
+      AuthenticatedDashboardFinanceReconciliationFeedIdRoute,
+    AuthenticatedDashboardFinanceReconciliationNewRoute:
+      AuthenticatedDashboardFinanceReconciliationNewRoute,
+    AuthenticatedDashboardFinanceRecurringInvoicesIdRoute:
+      AuthenticatedDashboardFinanceRecurringInvoicesIdRouteWithChildren,
+    AuthenticatedDashboardFinanceRecurringInvoicesNewRoute:
+      AuthenticatedDashboardFinanceRecurringInvoicesNewRoute,
+    AuthenticatedDashboardFinanceReportsReportIdRoute:
+      AuthenticatedDashboardFinanceReportsReportIdRoute,
+    AuthenticatedDashboardFinanceReportsAccountsAgingRoute:
+      AuthenticatedDashboardFinanceReportsAccountsAgingRoute,
+    AuthenticatedDashboardFinanceReportsFinancialRoute:
+      AuthenticatedDashboardFinanceReportsFinancialRoute,
+    AuthenticatedDashboardFinanceReportsNewRoute:
+      AuthenticatedDashboardFinanceReportsNewRoute,
+    AuthenticatedDashboardFinanceReportsOutstandingInvoicesRoute:
+      AuthenticatedDashboardFinanceReportsOutstandingInvoicesRoute,
+    AuthenticatedDashboardFinanceReportsRevenueByClientRoute:
+      AuthenticatedDashboardFinanceReportsRevenueByClientRoute,
+    AuthenticatedDashboardFinanceReportsTimeEntriesRoute:
+      AuthenticatedDashboardFinanceReportsTimeEntriesRoute,
+    AuthenticatedDashboardFinanceRetainersRetainerIdRoute:
+      AuthenticatedDashboardFinanceRetainersRetainerIdRoute,
+    AuthenticatedDashboardFinanceRetainersNewRoute:
+      AuthenticatedDashboardFinanceRetainersNewRoute,
+    AuthenticatedDashboardFinanceSaudiBankingLeanRoute:
+      AuthenticatedDashboardFinanceSaudiBankingLeanRoute,
+    AuthenticatedDashboardFinanceSaudiBankingMudadRoute:
+      AuthenticatedDashboardFinanceSaudiBankingMudadRoute,
+    AuthenticatedDashboardFinanceStatementsStatementIdRoute:
+      AuthenticatedDashboardFinanceStatementsStatementIdRouteWithChildren,
+    AuthenticatedDashboardFinanceStatementsNewRoute:
+      AuthenticatedDashboardFinanceStatementsNewRoute,
+    AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute:
+      AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteWithChildren,
+    AuthenticatedDashboardFinanceTimeTrackingApprovalsRoute:
+      AuthenticatedDashboardFinanceTimeTrackingApprovalsRoute,
+    AuthenticatedDashboardFinanceTimeTrackingMonthlyRoute:
+      AuthenticatedDashboardFinanceTimeTrackingMonthlyRoute,
+    AuthenticatedDashboardFinanceTimeTrackingNewRoute:
+      AuthenticatedDashboardFinanceTimeTrackingNewRoute,
+    AuthenticatedDashboardFinanceTimeTrackingWeeklyRoute:
+      AuthenticatedDashboardFinanceTimeTrackingWeeklyRoute,
+    AuthenticatedDashboardFinanceVendorsVendorIdRoute:
+      AuthenticatedDashboardFinanceVendorsVendorIdRouteWithChildren,
+    AuthenticatedDashboardFinanceVendorsNewRoute:
+      AuthenticatedDashboardFinanceVendorsNewRoute,
+    AuthenticatedDashboardFinanceActivityIndexRoute:
+      AuthenticatedDashboardFinanceActivityIndexRoute,
+    AuthenticatedDashboardFinanceBillsIndexRoute:
+      AuthenticatedDashboardFinanceBillsIndexRoute,
+    AuthenticatedDashboardFinanceCreditNotesIndexRoute:
+      AuthenticatedDashboardFinanceCreditNotesIndexRoute,
+    AuthenticatedDashboardFinanceCurrencyIndexRoute:
+      AuthenticatedDashboardFinanceCurrencyIndexRoute,
+    AuthenticatedDashboardFinanceExpensesIndexRoute:
+      AuthenticatedDashboardFinanceExpensesIndexRoute,
+    AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute:
+      AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute,
+    AuthenticatedDashboardFinanceFullReportsIndexRoute:
+      AuthenticatedDashboardFinanceFullReportsIndexRoute,
+    AuthenticatedDashboardFinanceInvoicesIndexRoute:
+      AuthenticatedDashboardFinanceInvoicesIndexRoute,
+    AuthenticatedDashboardFinanceJournalEntriesIndexRoute:
+      AuthenticatedDashboardFinanceJournalEntriesIndexRoute,
+    AuthenticatedDashboardFinancePaymentsIndexRoute:
+      AuthenticatedDashboardFinancePaymentsIndexRoute,
+    AuthenticatedDashboardFinanceQuotesIndexRoute:
+      AuthenticatedDashboardFinanceQuotesIndexRoute,
+    AuthenticatedDashboardFinanceReconciliationIndexRoute:
+      AuthenticatedDashboardFinanceReconciliationIndexRoute,
+    AuthenticatedDashboardFinanceRecurringInvoicesIndexRoute:
+      AuthenticatedDashboardFinanceRecurringInvoicesIndexRoute,
+    AuthenticatedDashboardFinanceRecurringIndexRoute:
+      AuthenticatedDashboardFinanceRecurringIndexRoute,
+    AuthenticatedDashboardFinanceReportsIndexRoute:
+      AuthenticatedDashboardFinanceReportsIndexRoute,
+    AuthenticatedDashboardFinanceRetainersIndexRoute:
+      AuthenticatedDashboardFinanceRetainersIndexRoute,
+    AuthenticatedDashboardFinanceSaudiBankingIndexRoute:
+      AuthenticatedDashboardFinanceSaudiBankingIndexRoute,
+    AuthenticatedDashboardFinanceStatementsIndexRoute:
+      AuthenticatedDashboardFinanceStatementsIndexRoute,
+    AuthenticatedDashboardFinanceTimeTrackingIndexRoute:
+      AuthenticatedDashboardFinanceTimeTrackingIndexRoute,
+    AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute:
+      AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute,
+    AuthenticatedDashboardFinanceTransactionsIndexRoute:
+      AuthenticatedDashboardFinanceTransactionsIndexRoute,
+    AuthenticatedDashboardFinanceVendorsIndexRoute:
+      AuthenticatedDashboardFinanceVendorsIndexRoute,
+    AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute:
+      AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute,
+    AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute:
+      AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute,
+    AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute:
+      AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute,
+    AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute:
+      AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute,
+  }
+
+const AuthenticatedDashboardFinanceRouteWithChildren =
+  AuthenticatedDashboardFinanceRoute._addFileChildren(
+    AuthenticatedDashboardFinanceRouteChildren,
+  )
+
+interface AuthenticatedDashboardHrPromotionsPromotionIdRouteChildren {
+  AuthenticatedDashboardHrPromotionsPromotionIdEditRoute: typeof AuthenticatedDashboardHrPromotionsPromotionIdEditRoute
+}
+
+const AuthenticatedDashboardHrPromotionsPromotionIdRouteChildren: AuthenticatedDashboardHrPromotionsPromotionIdRouteChildren =
+  {
+    AuthenticatedDashboardHrPromotionsPromotionIdEditRoute:
+      AuthenticatedDashboardHrPromotionsPromotionIdEditRoute,
+  }
+
+const AuthenticatedDashboardHrPromotionsPromotionIdRouteWithChildren =
+  AuthenticatedDashboardHrPromotionsPromotionIdRoute._addFileChildren(
+    AuthenticatedDashboardHrPromotionsPromotionIdRouteChildren,
+  )
+
+interface AuthenticatedDashboardHrRouteChildren {
+  AuthenticatedDashboardHrSetupWizardRoute: typeof AuthenticatedDashboardHrSetupWizardRoute
   AuthenticatedDashboardHrAdvancesAdvanceIdRoute: typeof AuthenticatedDashboardHrAdvancesAdvanceIdRoute
   AuthenticatedDashboardHrAdvancesNewRoute: typeof AuthenticatedDashboardHrAdvancesNewRoute
   AuthenticatedDashboardHrAssetAssignmentAssignmentIdRoute: typeof AuthenticatedDashboardHrAssetAssignmentAssignmentIdRoute
@@ -8951,51 +9187,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardHrSuccessionPlanningNewRoute: typeof AuthenticatedDashboardHrSuccessionPlanningNewRoute
   AuthenticatedDashboardHrTrainingTrainingIdRoute: typeof AuthenticatedDashboardHrTrainingTrainingIdRoute
   AuthenticatedDashboardHrTrainingNewRoute: typeof AuthenticatedDashboardHrTrainingNewRoute
-  AuthenticatedDashboardInventoryStockEntriesStockEntryIdRoute: typeof AuthenticatedDashboardInventoryStockEntriesStockEntryIdRoute
-  AuthenticatedDashboardInventoryStockEntriesCreateRoute: typeof AuthenticatedDashboardInventoryStockEntriesCreateRoute
-  AuthenticatedDashboardInventoryWarehousesWarehouseIdRoute: typeof AuthenticatedDashboardInventoryWarehousesWarehouseIdRoute
-  AuthenticatedDashboardInventoryWarehousesCreateRoute: typeof AuthenticatedDashboardInventoryWarehousesCreateRoute
-  AuthenticatedDashboardManufacturingJobCardsJobCardIdRoute: typeof AuthenticatedDashboardManufacturingJobCardsJobCardIdRoute
-  AuthenticatedDashboardManufacturingWorkOrdersCreateRoute: typeof AuthenticatedDashboardManufacturingWorkOrdersCreateRoute
-  AuthenticatedDashboardSalesReportsReportIdRoute: typeof AuthenticatedDashboardSalesReportsReportIdRoute
-  AuthenticatedDashboardSalesReportsNewRoute: typeof AuthenticatedDashboardSalesReportsNewRoute
-  AuthenticatedDashboardTasksEventsEventIdRoute: typeof AuthenticatedDashboardTasksEventsEventIdRoute
-  AuthenticatedDashboardTasksEventsNewRoute: typeof AuthenticatedDashboardTasksEventsNewRoute
-  AuthenticatedDashboardTasksRemindersReminderIdRoute: typeof AuthenticatedDashboardTasksRemindersReminderIdRoute
-  AuthenticatedDashboardTasksRemindersNewRoute: typeof AuthenticatedDashboardTasksRemindersNewRoute
-  AuthenticatedDashboardTasksReportsReportIdRoute: typeof AuthenticatedDashboardTasksReportsReportIdRoute
-  AuthenticatedDashboardTasksReportsNewRoute: typeof AuthenticatedDashboardTasksReportsNewRoute
-  AuthenticatedDashboardBuyingMaterialRequestsIndexRoute: typeof AuthenticatedDashboardBuyingMaterialRequestsIndexRoute
-  AuthenticatedDashboardBuyingRfqIndexRoute: typeof AuthenticatedDashboardBuyingRfqIndexRoute
-  AuthenticatedDashboardCrmActivitiesIndexRoute: typeof AuthenticatedDashboardCrmActivitiesIndexRoute
-  AuthenticatedDashboardCrmEmailMarketingIndexRoute: typeof AuthenticatedDashboardCrmEmailMarketingIndexRoute
-  AuthenticatedDashboardCrmLeadScoringIndexRoute: typeof AuthenticatedDashboardCrmLeadScoringIndexRoute
-  AuthenticatedDashboardCrmLeadsIndexRoute: typeof AuthenticatedDashboardCrmLeadsIndexRoute
-  AuthenticatedDashboardCrmReferralsIndexRoute: typeof AuthenticatedDashboardCrmReferralsIndexRoute
-  AuthenticatedDashboardCrmReportsIndexRoute: typeof AuthenticatedDashboardCrmReportsIndexRoute
-  AuthenticatedDashboardCrmWhatsappIndexRoute: typeof AuthenticatedDashboardCrmWhatsappIndexRoute
-  AuthenticatedDashboardFinanceActivityIndexRoute: typeof AuthenticatedDashboardFinanceActivityIndexRoute
-  AuthenticatedDashboardFinanceBillsIndexRoute: typeof AuthenticatedDashboardFinanceBillsIndexRoute
-  AuthenticatedDashboardFinanceCreditNotesIndexRoute: typeof AuthenticatedDashboardFinanceCreditNotesIndexRoute
-  AuthenticatedDashboardFinanceCurrencyIndexRoute: typeof AuthenticatedDashboardFinanceCurrencyIndexRoute
-  AuthenticatedDashboardFinanceExpensesIndexRoute: typeof AuthenticatedDashboardFinanceExpensesIndexRoute
-  AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute: typeof AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute
-  AuthenticatedDashboardFinanceFullReportsIndexRoute: typeof AuthenticatedDashboardFinanceFullReportsIndexRoute
-  AuthenticatedDashboardFinanceInvoicesIndexRoute: typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
-  AuthenticatedDashboardFinanceJournalEntriesIndexRoute: typeof AuthenticatedDashboardFinanceJournalEntriesIndexRoute
-  AuthenticatedDashboardFinancePaymentsIndexRoute: typeof AuthenticatedDashboardFinancePaymentsIndexRoute
-  AuthenticatedDashboardFinanceQuotesIndexRoute: typeof AuthenticatedDashboardFinanceQuotesIndexRoute
-  AuthenticatedDashboardFinanceReconciliationIndexRoute: typeof AuthenticatedDashboardFinanceReconciliationIndexRoute
-  AuthenticatedDashboardFinanceRecurringInvoicesIndexRoute: typeof AuthenticatedDashboardFinanceRecurringInvoicesIndexRoute
-  AuthenticatedDashboardFinanceRecurringIndexRoute: typeof AuthenticatedDashboardFinanceRecurringIndexRoute
-  AuthenticatedDashboardFinanceReportsIndexRoute: typeof AuthenticatedDashboardFinanceReportsIndexRoute
-  AuthenticatedDashboardFinanceRetainersIndexRoute: typeof AuthenticatedDashboardFinanceRetainersIndexRoute
-  AuthenticatedDashboardFinanceSaudiBankingIndexRoute: typeof AuthenticatedDashboardFinanceSaudiBankingIndexRoute
-  AuthenticatedDashboardFinanceStatementsIndexRoute: typeof AuthenticatedDashboardFinanceStatementsIndexRoute
-  AuthenticatedDashboardFinanceTimeTrackingIndexRoute: typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
-  AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute: typeof AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute
-  AuthenticatedDashboardFinanceTransactionsIndexRoute: typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
-  AuthenticatedDashboardFinanceVendorsIndexRoute: typeof AuthenticatedDashboardFinanceVendorsIndexRoute
   AuthenticatedDashboardHrAdvancesIndexRoute: typeof AuthenticatedDashboardHrAdvancesIndexRoute
   AuthenticatedDashboardHrAnalyticsIndexRoute: typeof AuthenticatedDashboardHrAnalyticsIndexRoute
   AuthenticatedDashboardHrAssetAssignmentIndexRoute: typeof AuthenticatedDashboardHrAssetAssignmentIndexRoute
@@ -9025,50 +9216,604 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardHrSuccessionPlanningIndexRoute: typeof AuthenticatedDashboardHrSuccessionPlanningIndexRoute
   AuthenticatedDashboardHrTrainingIndexRoute: typeof AuthenticatedDashboardHrTrainingIndexRoute
   AuthenticatedDashboardHrVehiclesIndexRoute: typeof AuthenticatedDashboardHrVehiclesIndexRoute
-  AuthenticatedDashboardInventoryStockEntriesIndexRoute: typeof AuthenticatedDashboardInventoryStockEntriesIndexRoute
-  AuthenticatedDashboardInventoryWarehousesIndexRoute: typeof AuthenticatedDashboardInventoryWarehousesIndexRoute
-  AuthenticatedDashboardManufacturingJobCardsIndexRoute: typeof AuthenticatedDashboardManufacturingJobCardsIndexRoute
-  AuthenticatedDashboardSalesLeadsIndexRoute: typeof AuthenticatedDashboardSalesLeadsIndexRoute
-  AuthenticatedDashboardSalesReportsIndexRoute: typeof AuthenticatedDashboardSalesReportsIndexRoute
-  AuthenticatedDashboardTasksEventsIndexRoute: typeof AuthenticatedDashboardTasksEventsIndexRoute
-  AuthenticatedDashboardTasksRemindersIndexRoute: typeof AuthenticatedDashboardTasksRemindersIndexRoute
-  AuthenticatedDashboardTasksReportsIndexRoute: typeof AuthenticatedDashboardTasksReportsIndexRoute
-  AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute: typeof AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute
-  AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute: typeof AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute
   AuthenticatedDashboardHrRecruitmentApplicantsApplicantIdRoute: typeof AuthenticatedDashboardHrRecruitmentApplicantsApplicantIdRoute
   AuthenticatedDashboardHrRecruitmentApplicantsNewRoute: typeof AuthenticatedDashboardHrRecruitmentApplicantsNewRoute
   AuthenticatedDashboardHrRecruitmentJobsJobIdRoute: typeof AuthenticatedDashboardHrRecruitmentJobsJobIdRoute
   AuthenticatedDashboardHrRecruitmentJobsNewRoute: typeof AuthenticatedDashboardHrRecruitmentJobsNewRoute
-  AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute: typeof AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute
-  AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute: typeof AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute
   AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute: typeof AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute
   AuthenticatedDashboardHrRecruitmentJobsIndexRoute: typeof AuthenticatedDashboardHrRecruitmentJobsIndexRoute
   AuthenticatedDashboardHrSettingsShiftTypesIndexRoute: typeof AuthenticatedDashboardHrSettingsShiftTypesIndexRoute
 }
 
+const AuthenticatedDashboardHrRouteChildren: AuthenticatedDashboardHrRouteChildren =
+  {
+    AuthenticatedDashboardHrSetupWizardRoute:
+      AuthenticatedDashboardHrSetupWizardRoute,
+    AuthenticatedDashboardHrAdvancesAdvanceIdRoute:
+      AuthenticatedDashboardHrAdvancesAdvanceIdRoute,
+    AuthenticatedDashboardHrAdvancesNewRoute:
+      AuthenticatedDashboardHrAdvancesNewRoute,
+    AuthenticatedDashboardHrAssetAssignmentAssignmentIdRoute:
+      AuthenticatedDashboardHrAssetAssignmentAssignmentIdRoute,
+    AuthenticatedDashboardHrAssetAssignmentNewRoute:
+      AuthenticatedDashboardHrAssetAssignmentNewRoute,
+    AuthenticatedDashboardHrAttendanceRecordIdRoute:
+      AuthenticatedDashboardHrAttendanceRecordIdRoute,
+    AuthenticatedDashboardHrAttendanceNewRoute:
+      AuthenticatedDashboardHrAttendanceNewRoute,
+    AuthenticatedDashboardHrBenefitsBenefitIdRoute:
+      AuthenticatedDashboardHrBenefitsBenefitIdRoute,
+    AuthenticatedDashboardHrBenefitsNewRoute:
+      AuthenticatedDashboardHrBenefitsNewRoute,
+    AuthenticatedDashboardHrBiometricDeviceIdRoute:
+      AuthenticatedDashboardHrBiometricDeviceIdRoute,
+    AuthenticatedDashboardHrBiometricNewRoute:
+      AuthenticatedDashboardHrBiometricNewRoute,
+    AuthenticatedDashboardHrCompensationCompensationIdRoute:
+      AuthenticatedDashboardHrCompensationCompensationIdRoute,
+    AuthenticatedDashboardHrCompensationIncentivesRoute:
+      AuthenticatedDashboardHrCompensationIncentivesRoute,
+    AuthenticatedDashboardHrCompensationNewRoute:
+      AuthenticatedDashboardHrCompensationNewRoute,
+    AuthenticatedDashboardHrCompensationRetentionBonusesRoute:
+      AuthenticatedDashboardHrCompensationRetentionBonusesRoute,
+    AuthenticatedDashboardHrEmployeeTransfersTransferIdRoute:
+      AuthenticatedDashboardHrEmployeeTransfersTransferIdRoute,
+    AuthenticatedDashboardHrEmployeeTransfersNewRoute:
+      AuthenticatedDashboardHrEmployeeTransfersNewRoute,
+    AuthenticatedDashboardHrEmployeesEmployeeIdRoute:
+      AuthenticatedDashboardHrEmployeesEmployeeIdRoute,
+    AuthenticatedDashboardHrEmployeesNewRoute:
+      AuthenticatedDashboardHrEmployeesNewRoute,
+    AuthenticatedDashboardHrExpenseClaimsClaimIdRoute:
+      AuthenticatedDashboardHrExpenseClaimsClaimIdRoute,
+    AuthenticatedDashboardHrExpenseClaimsNewRoute:
+      AuthenticatedDashboardHrExpenseClaimsNewRoute,
+    AuthenticatedDashboardHrGeofencingZoneIdRoute:
+      AuthenticatedDashboardHrGeofencingZoneIdRoute,
+    AuthenticatedDashboardHrGeofencingNewRoute:
+      AuthenticatedDashboardHrGeofencingNewRoute,
+    AuthenticatedDashboardHrGrievancesGrievanceIdRoute:
+      AuthenticatedDashboardHrGrievancesGrievanceIdRoute,
+    AuthenticatedDashboardHrGrievancesNewRoute:
+      AuthenticatedDashboardHrGrievancesNewRoute,
+    AuthenticatedDashboardHrJobPositionsPositionIdRoute:
+      AuthenticatedDashboardHrJobPositionsPositionIdRoute,
+    AuthenticatedDashboardHrJobPositionsNewRoute:
+      AuthenticatedDashboardHrJobPositionsNewRoute,
+    AuthenticatedDashboardHrLeaveRequestIdRoute:
+      AuthenticatedDashboardHrLeaveRequestIdRoute,
+    AuthenticatedDashboardHrLeaveAllocationsRoute:
+      AuthenticatedDashboardHrLeaveAllocationsRoute,
+    AuthenticatedDashboardHrLeaveCompensatoryRoute:
+      AuthenticatedDashboardHrLeaveCompensatoryRoute,
+    AuthenticatedDashboardHrLeaveEncashmentsRoute:
+      AuthenticatedDashboardHrLeaveEncashmentsRoute,
+    AuthenticatedDashboardHrLeaveNewRoute:
+      AuthenticatedDashboardHrLeaveNewRoute,
+    AuthenticatedDashboardHrLeavePeriodsRoute:
+      AuthenticatedDashboardHrLeavePeriodsRoute,
+    AuthenticatedDashboardHrLeavePoliciesRoute:
+      AuthenticatedDashboardHrLeavePoliciesRoute,
+    AuthenticatedDashboardHrLoansLoanIdRoute:
+      AuthenticatedDashboardHrLoansLoanIdRoute,
+    AuthenticatedDashboardHrLoansNewRoute:
+      AuthenticatedDashboardHrLoansNewRoute,
+    AuthenticatedDashboardHrOffboardingOffboardingIdRoute:
+      AuthenticatedDashboardHrOffboardingOffboardingIdRoute,
+    AuthenticatedDashboardHrOffboardingNewRoute:
+      AuthenticatedDashboardHrOffboardingNewRoute,
+    AuthenticatedDashboardHrOnboardingOnboardingIdRoute:
+      AuthenticatedDashboardHrOnboardingOnboardingIdRoute,
+    AuthenticatedDashboardHrOnboardingNewRoute:
+      AuthenticatedDashboardHrOnboardingNewRoute,
+    AuthenticatedDashboardHrOrganizationalStructureUnitIdRoute:
+      AuthenticatedDashboardHrOrganizationalStructureUnitIdRoute,
+    AuthenticatedDashboardHrOrganizationalStructureNewRoute:
+      AuthenticatedDashboardHrOrganizationalStructureNewRoute,
+    AuthenticatedDashboardHrPayrollRunsRunIdRoute:
+      AuthenticatedDashboardHrPayrollRunsRunIdRoute,
+    AuthenticatedDashboardHrPayrollRunsNewRoute:
+      AuthenticatedDashboardHrPayrollRunsNewRoute,
+    AuthenticatedDashboardHrPayrollSlipIdRoute:
+      AuthenticatedDashboardHrPayrollSlipIdRoute,
+    AuthenticatedDashboardHrPayrollNewRoute:
+      AuthenticatedDashboardHrPayrollNewRoute,
+    AuthenticatedDashboardHrPayrollSalaryComponentsRoute:
+      AuthenticatedDashboardHrPayrollSalaryComponentsRoute,
+    AuthenticatedDashboardHrPerformanceReviewIdRoute:
+      AuthenticatedDashboardHrPerformanceReviewIdRoute,
+    AuthenticatedDashboardHrPerformanceNewRoute:
+      AuthenticatedDashboardHrPerformanceNewRoute,
+    AuthenticatedDashboardHrPromotionsPromotionIdRoute:
+      AuthenticatedDashboardHrPromotionsPromotionIdRouteWithChildren,
+    AuthenticatedDashboardHrPromotionsNewRoute:
+      AuthenticatedDashboardHrPromotionsNewRoute,
+    AuthenticatedDashboardHrRecruitmentStaffingPlansRoute:
+      AuthenticatedDashboardHrRecruitmentStaffingPlansRoute,
+    AuthenticatedDashboardHrReportsReportIdRoute:
+      AuthenticatedDashboardHrReportsReportIdRoute,
+    AuthenticatedDashboardHrReportsNewRoute:
+      AuthenticatedDashboardHrReportsNewRoute,
+    AuthenticatedDashboardHrShiftAssignmentsAssignmentIdRoute:
+      AuthenticatedDashboardHrShiftAssignmentsAssignmentIdRoute,
+    AuthenticatedDashboardHrSkillsMatrixRoute:
+      AuthenticatedDashboardHrSkillsMatrixRoute,
+    AuthenticatedDashboardHrSuccessionPlanningPlanIdRoute:
+      AuthenticatedDashboardHrSuccessionPlanningPlanIdRoute,
+    AuthenticatedDashboardHrSuccessionPlanningNewRoute:
+      AuthenticatedDashboardHrSuccessionPlanningNewRoute,
+    AuthenticatedDashboardHrTrainingTrainingIdRoute:
+      AuthenticatedDashboardHrTrainingTrainingIdRoute,
+    AuthenticatedDashboardHrTrainingNewRoute:
+      AuthenticatedDashboardHrTrainingNewRoute,
+    AuthenticatedDashboardHrAdvancesIndexRoute:
+      AuthenticatedDashboardHrAdvancesIndexRoute,
+    AuthenticatedDashboardHrAnalyticsIndexRoute:
+      AuthenticatedDashboardHrAnalyticsIndexRoute,
+    AuthenticatedDashboardHrAssetAssignmentIndexRoute:
+      AuthenticatedDashboardHrAssetAssignmentIndexRoute,
+    AuthenticatedDashboardHrAttendanceIndexRoute:
+      AuthenticatedDashboardHrAttendanceIndexRoute,
+    AuthenticatedDashboardHrBenefitsIndexRoute:
+      AuthenticatedDashboardHrBenefitsIndexRoute,
+    AuthenticatedDashboardHrBiometricIndexRoute:
+      AuthenticatedDashboardHrBiometricIndexRoute,
+    AuthenticatedDashboardHrCompensationIndexRoute:
+      AuthenticatedDashboardHrCompensationIndexRoute,
+    AuthenticatedDashboardHrEmployeeTransfersIndexRoute:
+      AuthenticatedDashboardHrEmployeeTransfersIndexRoute,
+    AuthenticatedDashboardHrEmployeesIndexRoute:
+      AuthenticatedDashboardHrEmployeesIndexRoute,
+    AuthenticatedDashboardHrExpenseClaimsIndexRoute:
+      AuthenticatedDashboardHrExpenseClaimsIndexRoute,
+    AuthenticatedDashboardHrGeofencingIndexRoute:
+      AuthenticatedDashboardHrGeofencingIndexRoute,
+    AuthenticatedDashboardHrGrievancesIndexRoute:
+      AuthenticatedDashboardHrGrievancesIndexRoute,
+    AuthenticatedDashboardHrJobPositionsIndexRoute:
+      AuthenticatedDashboardHrJobPositionsIndexRoute,
+    AuthenticatedDashboardHrLeaveIndexRoute:
+      AuthenticatedDashboardHrLeaveIndexRoute,
+    AuthenticatedDashboardHrLoansIndexRoute:
+      AuthenticatedDashboardHrLoansIndexRoute,
+    AuthenticatedDashboardHrOffboardingIndexRoute:
+      AuthenticatedDashboardHrOffboardingIndexRoute,
+    AuthenticatedDashboardHrOnboardingIndexRoute:
+      AuthenticatedDashboardHrOnboardingIndexRoute,
+    AuthenticatedDashboardHrOrganizationalStructureIndexRoute:
+      AuthenticatedDashboardHrOrganizationalStructureIndexRoute,
+    AuthenticatedDashboardHrPayrollRunsIndexRoute:
+      AuthenticatedDashboardHrPayrollRunsIndexRoute,
+    AuthenticatedDashboardHrPayrollIndexRoute:
+      AuthenticatedDashboardHrPayrollIndexRoute,
+    AuthenticatedDashboardHrPerformanceIndexRoute:
+      AuthenticatedDashboardHrPerformanceIndexRoute,
+    AuthenticatedDashboardHrPredictionsIndexRoute:
+      AuthenticatedDashboardHrPredictionsIndexRoute,
+    AuthenticatedDashboardHrPromotionsIndexRoute:
+      AuthenticatedDashboardHrPromotionsIndexRoute,
+    AuthenticatedDashboardHrReportsIndexRoute:
+      AuthenticatedDashboardHrReportsIndexRoute,
+    AuthenticatedDashboardHrShiftAssignmentsIndexRoute:
+      AuthenticatedDashboardHrShiftAssignmentsIndexRoute,
+    AuthenticatedDashboardHrSkillsIndexRoute:
+      AuthenticatedDashboardHrSkillsIndexRoute,
+    AuthenticatedDashboardHrSuccessionPlanningIndexRoute:
+      AuthenticatedDashboardHrSuccessionPlanningIndexRoute,
+    AuthenticatedDashboardHrTrainingIndexRoute:
+      AuthenticatedDashboardHrTrainingIndexRoute,
+    AuthenticatedDashboardHrVehiclesIndexRoute:
+      AuthenticatedDashboardHrVehiclesIndexRoute,
+    AuthenticatedDashboardHrRecruitmentApplicantsApplicantIdRoute:
+      AuthenticatedDashboardHrRecruitmentApplicantsApplicantIdRoute,
+    AuthenticatedDashboardHrRecruitmentApplicantsNewRoute:
+      AuthenticatedDashboardHrRecruitmentApplicantsNewRoute,
+    AuthenticatedDashboardHrRecruitmentJobsJobIdRoute:
+      AuthenticatedDashboardHrRecruitmentJobsJobIdRoute,
+    AuthenticatedDashboardHrRecruitmentJobsNewRoute:
+      AuthenticatedDashboardHrRecruitmentJobsNewRoute,
+    AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute:
+      AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute,
+    AuthenticatedDashboardHrRecruitmentJobsIndexRoute:
+      AuthenticatedDashboardHrRecruitmentJobsIndexRoute,
+    AuthenticatedDashboardHrSettingsShiftTypesIndexRoute:
+      AuthenticatedDashboardHrSettingsShiftTypesIndexRoute,
+  }
+
+const AuthenticatedDashboardHrRouteWithChildren =
+  AuthenticatedDashboardHrRoute._addFileChildren(
+    AuthenticatedDashboardHrRouteChildren,
+  )
+
+interface AuthenticatedDashboardInventoryRouteChildren {
+  AuthenticatedDashboardInventoryItemIdRoute: typeof AuthenticatedDashboardInventoryItemIdRoute
+  AuthenticatedDashboardInventoryCreateRoute: typeof AuthenticatedDashboardInventoryCreateRoute
+  AuthenticatedDashboardInventorySettingsRoute: typeof AuthenticatedDashboardInventorySettingsRoute
+  AuthenticatedDashboardInventoryStockLedgerRoute: typeof AuthenticatedDashboardInventoryStockLedgerRoute
+  AuthenticatedDashboardInventoryIndexRoute: typeof AuthenticatedDashboardInventoryIndexRoute
+  AuthenticatedDashboardInventoryStockEntriesStockEntryIdRoute: typeof AuthenticatedDashboardInventoryStockEntriesStockEntryIdRoute
+  AuthenticatedDashboardInventoryStockEntriesCreateRoute: typeof AuthenticatedDashboardInventoryStockEntriesCreateRoute
+  AuthenticatedDashboardInventoryWarehousesWarehouseIdRoute: typeof AuthenticatedDashboardInventoryWarehousesWarehouseIdRoute
+  AuthenticatedDashboardInventoryWarehousesCreateRoute: typeof AuthenticatedDashboardInventoryWarehousesCreateRoute
+  AuthenticatedDashboardInventoryStockEntriesIndexRoute: typeof AuthenticatedDashboardInventoryStockEntriesIndexRoute
+  AuthenticatedDashboardInventoryWarehousesIndexRoute: typeof AuthenticatedDashboardInventoryWarehousesIndexRoute
+}
+
+const AuthenticatedDashboardInventoryRouteChildren: AuthenticatedDashboardInventoryRouteChildren =
+  {
+    AuthenticatedDashboardInventoryItemIdRoute:
+      AuthenticatedDashboardInventoryItemIdRoute,
+    AuthenticatedDashboardInventoryCreateRoute:
+      AuthenticatedDashboardInventoryCreateRoute,
+    AuthenticatedDashboardInventorySettingsRoute:
+      AuthenticatedDashboardInventorySettingsRoute,
+    AuthenticatedDashboardInventoryStockLedgerRoute:
+      AuthenticatedDashboardInventoryStockLedgerRoute,
+    AuthenticatedDashboardInventoryIndexRoute:
+      AuthenticatedDashboardInventoryIndexRoute,
+    AuthenticatedDashboardInventoryStockEntriesStockEntryIdRoute:
+      AuthenticatedDashboardInventoryStockEntriesStockEntryIdRoute,
+    AuthenticatedDashboardInventoryStockEntriesCreateRoute:
+      AuthenticatedDashboardInventoryStockEntriesCreateRoute,
+    AuthenticatedDashboardInventoryWarehousesWarehouseIdRoute:
+      AuthenticatedDashboardInventoryWarehousesWarehouseIdRoute,
+    AuthenticatedDashboardInventoryWarehousesCreateRoute:
+      AuthenticatedDashboardInventoryWarehousesCreateRoute,
+    AuthenticatedDashboardInventoryStockEntriesIndexRoute:
+      AuthenticatedDashboardInventoryStockEntriesIndexRoute,
+    AuthenticatedDashboardInventoryWarehousesIndexRoute:
+      AuthenticatedDashboardInventoryWarehousesIndexRoute,
+  }
+
+const AuthenticatedDashboardInventoryRouteWithChildren =
+  AuthenticatedDashboardInventoryRoute._addFileChildren(
+    AuthenticatedDashboardInventoryRouteChildren,
+  )
+
+interface AuthenticatedDashboardSettingsRouteChildren {
+  AuthenticatedDashboardSettingsCompanyRoute: typeof AuthenticatedDashboardSettingsCompanyRoute
+  AuthenticatedDashboardSettingsCrmRoute: typeof AuthenticatedDashboardSettingsCrmRoute
+  AuthenticatedDashboardSettingsExpensePoliciesRoute: typeof AuthenticatedDashboardSettingsExpensePoliciesRoute
+  AuthenticatedDashboardSettingsFinanceRoute: typeof AuthenticatedDashboardSettingsFinanceRoute
+  AuthenticatedDashboardSettingsPaymentModesRoute: typeof AuthenticatedDashboardSettingsPaymentModesRoute
+  AuthenticatedDashboardSettingsPaymentTermsRoute: typeof AuthenticatedDashboardSettingsPaymentTermsRoute
+  AuthenticatedDashboardSettingsPreferencesRoute: typeof AuthenticatedDashboardSettingsPreferencesRoute
+  AuthenticatedDashboardSettingsProfileRoute: typeof AuthenticatedDashboardSettingsProfileRoute
+  AuthenticatedDashboardSettingsSecurityRoute: typeof AuthenticatedDashboardSettingsSecurityRoute
+  AuthenticatedDashboardSettingsTaxesRoute: typeof AuthenticatedDashboardSettingsTaxesRoute
+}
+
+const AuthenticatedDashboardSettingsRouteChildren: AuthenticatedDashboardSettingsRouteChildren =
+  {
+    AuthenticatedDashboardSettingsCompanyRoute:
+      AuthenticatedDashboardSettingsCompanyRoute,
+    AuthenticatedDashboardSettingsCrmRoute:
+      AuthenticatedDashboardSettingsCrmRoute,
+    AuthenticatedDashboardSettingsExpensePoliciesRoute:
+      AuthenticatedDashboardSettingsExpensePoliciesRoute,
+    AuthenticatedDashboardSettingsFinanceRoute:
+      AuthenticatedDashboardSettingsFinanceRoute,
+    AuthenticatedDashboardSettingsPaymentModesRoute:
+      AuthenticatedDashboardSettingsPaymentModesRoute,
+    AuthenticatedDashboardSettingsPaymentTermsRoute:
+      AuthenticatedDashboardSettingsPaymentTermsRoute,
+    AuthenticatedDashboardSettingsPreferencesRoute:
+      AuthenticatedDashboardSettingsPreferencesRoute,
+    AuthenticatedDashboardSettingsProfileRoute:
+      AuthenticatedDashboardSettingsProfileRoute,
+    AuthenticatedDashboardSettingsSecurityRoute:
+      AuthenticatedDashboardSettingsSecurityRoute,
+    AuthenticatedDashboardSettingsTaxesRoute:
+      AuthenticatedDashboardSettingsTaxesRoute,
+  }
+
+const AuthenticatedDashboardSettingsRouteWithChildren =
+  AuthenticatedDashboardSettingsRoute._addFileChildren(
+    AuthenticatedDashboardSettingsRouteChildren,
+  )
+
+interface AuthenticatedDashboardTasksRouteChildren {
+  AuthenticatedDashboardTasksTaskIdRoute: typeof AuthenticatedDashboardTasksTaskIdRoute
+  AuthenticatedDashboardTasksGanttRoute: typeof AuthenticatedDashboardTasksGanttRoute
+  AuthenticatedDashboardTasksListRoute: typeof AuthenticatedDashboardTasksListRoute
+  AuthenticatedDashboardTasksNewRoute: typeof AuthenticatedDashboardTasksNewRoute
+  AuthenticatedDashboardTasksEventsEventIdRoute: typeof AuthenticatedDashboardTasksEventsEventIdRoute
+  AuthenticatedDashboardTasksEventsNewRoute: typeof AuthenticatedDashboardTasksEventsNewRoute
+  AuthenticatedDashboardTasksRemindersReminderIdRoute: typeof AuthenticatedDashboardTasksRemindersReminderIdRoute
+  AuthenticatedDashboardTasksRemindersNewRoute: typeof AuthenticatedDashboardTasksRemindersNewRoute
+  AuthenticatedDashboardTasksReportsReportIdRoute: typeof AuthenticatedDashboardTasksReportsReportIdRoute
+  AuthenticatedDashboardTasksReportsNewRoute: typeof AuthenticatedDashboardTasksReportsNewRoute
+  AuthenticatedDashboardTasksEventsIndexRoute: typeof AuthenticatedDashboardTasksEventsIndexRoute
+  AuthenticatedDashboardTasksRemindersIndexRoute: typeof AuthenticatedDashboardTasksRemindersIndexRoute
+  AuthenticatedDashboardTasksReportsIndexRoute: typeof AuthenticatedDashboardTasksReportsIndexRoute
+}
+
+const AuthenticatedDashboardTasksRouteChildren: AuthenticatedDashboardTasksRouteChildren =
+  {
+    AuthenticatedDashboardTasksTaskIdRoute:
+      AuthenticatedDashboardTasksTaskIdRoute,
+    AuthenticatedDashboardTasksGanttRoute:
+      AuthenticatedDashboardTasksGanttRoute,
+    AuthenticatedDashboardTasksListRoute: AuthenticatedDashboardTasksListRoute,
+    AuthenticatedDashboardTasksNewRoute: AuthenticatedDashboardTasksNewRoute,
+    AuthenticatedDashboardTasksEventsEventIdRoute:
+      AuthenticatedDashboardTasksEventsEventIdRoute,
+    AuthenticatedDashboardTasksEventsNewRoute:
+      AuthenticatedDashboardTasksEventsNewRoute,
+    AuthenticatedDashboardTasksRemindersReminderIdRoute:
+      AuthenticatedDashboardTasksRemindersReminderIdRoute,
+    AuthenticatedDashboardTasksRemindersNewRoute:
+      AuthenticatedDashboardTasksRemindersNewRoute,
+    AuthenticatedDashboardTasksReportsReportIdRoute:
+      AuthenticatedDashboardTasksReportsReportIdRoute,
+    AuthenticatedDashboardTasksReportsNewRoute:
+      AuthenticatedDashboardTasksReportsNewRoute,
+    AuthenticatedDashboardTasksEventsIndexRoute:
+      AuthenticatedDashboardTasksEventsIndexRoute,
+    AuthenticatedDashboardTasksRemindersIndexRoute:
+      AuthenticatedDashboardTasksRemindersIndexRoute,
+    AuthenticatedDashboardTasksReportsIndexRoute:
+      AuthenticatedDashboardTasksReportsIndexRoute,
+  }
+
+const AuthenticatedDashboardTasksRouteWithChildren =
+  AuthenticatedDashboardTasksRoute._addFileChildren(
+    AuthenticatedDashboardTasksRouteChildren,
+  )
+
+interface AuthenticatedDashboardBuyingPurchaseOrdersRouteChildren {
+  AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute
+  AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute
+}
+
+const AuthenticatedDashboardBuyingPurchaseOrdersRouteChildren: AuthenticatedDashboardBuyingPurchaseOrdersRouteChildren =
+  {
+    AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute:
+      AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute,
+    AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute:
+      AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute,
+  }
+
+const AuthenticatedDashboardBuyingPurchaseOrdersRouteWithChildren =
+  AuthenticatedDashboardBuyingPurchaseOrdersRoute._addFileChildren(
+    AuthenticatedDashboardBuyingPurchaseOrdersRouteChildren,
+  )
+
+interface AuthenticatedDashboardManufacturingBomRouteChildren {
+  AuthenticatedDashboardManufacturingBomBomIdRoute: typeof AuthenticatedDashboardManufacturingBomBomIdRoute
+  AuthenticatedDashboardManufacturingBomCreateRoute: typeof AuthenticatedDashboardManufacturingBomCreateRoute
+  AuthenticatedDashboardManufacturingBomIndexRoute: typeof AuthenticatedDashboardManufacturingBomIndexRoute
+}
+
+const AuthenticatedDashboardManufacturingBomRouteChildren: AuthenticatedDashboardManufacturingBomRouteChildren =
+  {
+    AuthenticatedDashboardManufacturingBomBomIdRoute:
+      AuthenticatedDashboardManufacturingBomBomIdRoute,
+    AuthenticatedDashboardManufacturingBomCreateRoute:
+      AuthenticatedDashboardManufacturingBomCreateRoute,
+    AuthenticatedDashboardManufacturingBomIndexRoute:
+      AuthenticatedDashboardManufacturingBomIndexRoute,
+  }
+
+const AuthenticatedDashboardManufacturingBomRouteWithChildren =
+  AuthenticatedDashboardManufacturingBomRoute._addFileChildren(
+    AuthenticatedDashboardManufacturingBomRouteChildren,
+  )
+
+interface AuthenticatedDashboardManufacturingWorkstationsRouteChildren {
+  AuthenticatedDashboardManufacturingWorkstationsCreateRoute: typeof AuthenticatedDashboardManufacturingWorkstationsCreateRoute
+  AuthenticatedDashboardManufacturingWorkstationsIndexRoute: typeof AuthenticatedDashboardManufacturingWorkstationsIndexRoute
+}
+
+const AuthenticatedDashboardManufacturingWorkstationsRouteChildren: AuthenticatedDashboardManufacturingWorkstationsRouteChildren =
+  {
+    AuthenticatedDashboardManufacturingWorkstationsCreateRoute:
+      AuthenticatedDashboardManufacturingWorkstationsCreateRoute,
+    AuthenticatedDashboardManufacturingWorkstationsIndexRoute:
+      AuthenticatedDashboardManufacturingWorkstationsIndexRoute,
+  }
+
+const AuthenticatedDashboardManufacturingWorkstationsRouteWithChildren =
+  AuthenticatedDashboardManufacturingWorkstationsRoute._addFileChildren(
+    AuthenticatedDashboardManufacturingWorkstationsRouteChildren,
+  )
+
+interface AuthenticatedDashboardQualityActionsRouteChildren {
+  AuthenticatedDashboardQualityActionsCreateRoute: typeof AuthenticatedDashboardQualityActionsCreateRoute
+  AuthenticatedDashboardQualityActionsIndexRoute: typeof AuthenticatedDashboardQualityActionsIndexRoute
+}
+
+const AuthenticatedDashboardQualityActionsRouteChildren: AuthenticatedDashboardQualityActionsRouteChildren =
+  {
+    AuthenticatedDashboardQualityActionsCreateRoute:
+      AuthenticatedDashboardQualityActionsCreateRoute,
+    AuthenticatedDashboardQualityActionsIndexRoute:
+      AuthenticatedDashboardQualityActionsIndexRoute,
+  }
+
+const AuthenticatedDashboardQualityActionsRouteWithChildren =
+  AuthenticatedDashboardQualityActionsRoute._addFileChildren(
+    AuthenticatedDashboardQualityActionsRouteChildren,
+  )
+
+interface AuthenticatedDashboardQualityTemplatesRouteChildren {
+  AuthenticatedDashboardQualityTemplatesCreateRoute: typeof AuthenticatedDashboardQualityTemplatesCreateRoute
+  AuthenticatedDashboardQualityTemplatesIndexRoute: typeof AuthenticatedDashboardQualityTemplatesIndexRoute
+}
+
+const AuthenticatedDashboardQualityTemplatesRouteChildren: AuthenticatedDashboardQualityTemplatesRouteChildren =
+  {
+    AuthenticatedDashboardQualityTemplatesCreateRoute:
+      AuthenticatedDashboardQualityTemplatesCreateRoute,
+    AuthenticatedDashboardQualityTemplatesIndexRoute:
+      AuthenticatedDashboardQualityTemplatesIndexRoute,
+  }
+
+const AuthenticatedDashboardQualityTemplatesRouteWithChildren =
+  AuthenticatedDashboardQualityTemplatesRoute._addFileChildren(
+    AuthenticatedDashboardQualityTemplatesRouteChildren,
+  )
+
+interface AuthenticatedDashboardSubcontractingReceiptsRouteChildren {
+  AuthenticatedDashboardSubcontractingReceiptsCreateRoute: typeof AuthenticatedDashboardSubcontractingReceiptsCreateRoute
+  AuthenticatedDashboardSubcontractingReceiptsIndexRoute: typeof AuthenticatedDashboardSubcontractingReceiptsIndexRoute
+}
+
+const AuthenticatedDashboardSubcontractingReceiptsRouteChildren: AuthenticatedDashboardSubcontractingReceiptsRouteChildren =
+  {
+    AuthenticatedDashboardSubcontractingReceiptsCreateRoute:
+      AuthenticatedDashboardSubcontractingReceiptsCreateRoute,
+    AuthenticatedDashboardSubcontractingReceiptsIndexRoute:
+      AuthenticatedDashboardSubcontractingReceiptsIndexRoute,
+  }
+
+const AuthenticatedDashboardSubcontractingReceiptsRouteWithChildren =
+  AuthenticatedDashboardSubcontractingReceiptsRoute._addFileChildren(
+    AuthenticatedDashboardSubcontractingReceiptsRouteChildren,
+  )
+
+interface AuthenticatedDashboardSupportSlaRouteChildren {
+  AuthenticatedDashboardSupportSlaCreateRoute: typeof AuthenticatedDashboardSupportSlaCreateRoute
+  AuthenticatedDashboardSupportSlaIndexRoute: typeof AuthenticatedDashboardSupportSlaIndexRoute
+}
+
+const AuthenticatedDashboardSupportSlaRouteChildren: AuthenticatedDashboardSupportSlaRouteChildren =
+  {
+    AuthenticatedDashboardSupportSlaCreateRoute:
+      AuthenticatedDashboardSupportSlaCreateRoute,
+    AuthenticatedDashboardSupportSlaIndexRoute:
+      AuthenticatedDashboardSupportSlaIndexRoute,
+  }
+
+const AuthenticatedDashboardSupportSlaRouteWithChildren =
+  AuthenticatedDashboardSupportSlaRoute._addFileChildren(
+    AuthenticatedDashboardSupportSlaRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedDashboardAssetsRoute: typeof AuthenticatedDashboardAssetsRouteWithChildren
+  AuthenticatedDashboardCalendarRoute: typeof AuthenticatedDashboardCalendarRoute
+  AuthenticatedDashboardCasesRoute: typeof AuthenticatedDashboardCasesRouteWithChildren
+  AuthenticatedDashboardCrmRoute: typeof AuthenticatedDashboardCrmRouteWithChildren
+  AuthenticatedDashboardFinanceRoute: typeof AuthenticatedDashboardFinanceRouteWithChildren
+  AuthenticatedDashboardHelpRoute: typeof AuthenticatedDashboardHelpRoute
+  AuthenticatedDashboardHrRoute: typeof AuthenticatedDashboardHrRouteWithChildren
+  AuthenticatedDashboardInventoryRoute: typeof AuthenticatedDashboardInventoryRouteWithChildren
+  AuthenticatedDashboardNotionRoute: typeof AuthenticatedDashboardNotionRoute
+  AuthenticatedDashboardSettingsRoute: typeof AuthenticatedDashboardSettingsRouteWithChildren
+  AuthenticatedDashboardSetupOrchestratorRoute: typeof AuthenticatedDashboardSetupOrchestratorRoute
+  AuthenticatedDashboardTasksRoute: typeof AuthenticatedDashboardTasksRouteWithChildren
+  AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
+  AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
+  AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
+  AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
+  AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
+  AuthenticatedDashboardBuyingSupplierIdRoute: typeof AuthenticatedDashboardBuyingSupplierIdRoute
+  AuthenticatedDashboardBuyingCreateRoute: typeof AuthenticatedDashboardBuyingCreateRoute
+  AuthenticatedDashboardBuyingPurchaseOrdersRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersRouteWithChildren
+  AuthenticatedDashboardBuyingSettingsRoute: typeof AuthenticatedDashboardBuyingSettingsRoute
+  AuthenticatedDashboardClientsClientIdRoute: typeof AuthenticatedDashboardClientsClientIdRoute
+  AuthenticatedDashboardClientsNewRoute: typeof AuthenticatedDashboardClientsNewRoute
+  AuthenticatedDashboardContactsContactIdRoute: typeof AuthenticatedDashboardContactsContactIdRoute
+  AuthenticatedDashboardContactsNewRoute: typeof AuthenticatedDashboardContactsNewRoute
+  AuthenticatedDashboardJobsBrowseRoute: typeof AuthenticatedDashboardJobsBrowseRoute
+  AuthenticatedDashboardJobsMyServicesRoute: typeof AuthenticatedDashboardJobsMyServicesRoute
+  AuthenticatedDashboardKnowledgeFormsRoute: typeof AuthenticatedDashboardKnowledgeFormsRoute
+  AuthenticatedDashboardKnowledgeJudgmentsRoute: typeof AuthenticatedDashboardKnowledgeJudgmentsRoute
+  AuthenticatedDashboardKnowledgeLawsRoute: typeof AuthenticatedDashboardKnowledgeLawsRoute
+  AuthenticatedDashboardManufacturingWorkOrderIdRoute: typeof AuthenticatedDashboardManufacturingWorkOrderIdRoute
+  AuthenticatedDashboardManufacturingBomRoute: typeof AuthenticatedDashboardManufacturingBomRouteWithChildren
+  AuthenticatedDashboardManufacturingCreateRoute: typeof AuthenticatedDashboardManufacturingCreateRoute
+  AuthenticatedDashboardManufacturingSettingsRoute: typeof AuthenticatedDashboardManufacturingSettingsRoute
+  AuthenticatedDashboardManufacturingWorkstationsRoute: typeof AuthenticatedDashboardManufacturingWorkstationsRouteWithChildren
+  AuthenticatedDashboardMessagesChatRoute: typeof AuthenticatedDashboardMessagesChatRoute
+  AuthenticatedDashboardMessagesEmailRoute: typeof AuthenticatedDashboardMessagesEmailRoute
+  AuthenticatedDashboardMlAnalyticsRoute: typeof AuthenticatedDashboardMlAnalyticsRoute
+  AuthenticatedDashboardMlQueueRoute: typeof AuthenticatedDashboardMlQueueRoute
+  AuthenticatedDashboardMlSlaRoute: typeof AuthenticatedDashboardMlSlaRoute
+  AuthenticatedDashboardNotificationsSettingsRoute: typeof AuthenticatedDashboardNotificationsSettingsRoute
+  AuthenticatedDashboardOrganizationsOrganizationIdRoute: typeof AuthenticatedDashboardOrganizationsOrganizationIdRoute
+  AuthenticatedDashboardOrganizationsNewRoute: typeof AuthenticatedDashboardOrganizationsNewRoute
+  AuthenticatedDashboardQualityInspectionIdRoute: typeof AuthenticatedDashboardQualityInspectionIdRoute
+  AuthenticatedDashboardQualityActionsRoute: typeof AuthenticatedDashboardQualityActionsRouteWithChildren
+  AuthenticatedDashboardQualityCreateRoute: typeof AuthenticatedDashboardQualityCreateRoute
+  AuthenticatedDashboardQualitySettingsRoute: typeof AuthenticatedDashboardQualitySettingsRoute
+  AuthenticatedDashboardQualityTemplatesRoute: typeof AuthenticatedDashboardQualityTemplatesRouteWithChildren
+  AuthenticatedDashboardReputationBadgesRoute: typeof AuthenticatedDashboardReputationBadgesRoute
+  AuthenticatedDashboardReputationOverviewRoute: typeof AuthenticatedDashboardReputationOverviewRoute
+  AuthenticatedDashboardStaffNewRoute: typeof AuthenticatedDashboardStaffNewRoute
+  AuthenticatedDashboardSubcontractingOrderIdRoute: typeof AuthenticatedDashboardSubcontractingOrderIdRoute
+  AuthenticatedDashboardSubcontractingCreateRoute: typeof AuthenticatedDashboardSubcontractingCreateRoute
+  AuthenticatedDashboardSubcontractingReceiptsRoute: typeof AuthenticatedDashboardSubcontractingReceiptsRouteWithChildren
+  AuthenticatedDashboardSubcontractingSettingsRoute: typeof AuthenticatedDashboardSubcontractingSettingsRoute
+  AuthenticatedDashboardSupportTicketIdRoute: typeof AuthenticatedDashboardSupportTicketIdRoute
+  AuthenticatedDashboardSupportCreateRoute: typeof AuthenticatedDashboardSupportCreateRoute
+  AuthenticatedDashboardSupportSettingsRoute: typeof AuthenticatedDashboardSupportSettingsRoute
+  AuthenticatedDashboardSupportSlaRoute: typeof AuthenticatedDashboardSupportSlaRouteWithChildren
+  AuthenticatedDashboardAppsIndexRoute: typeof AuthenticatedDashboardAppsIndexRoute
+  AuthenticatedDashboardBillingRatesIndexRoute: typeof AuthenticatedDashboardBillingRatesIndexRoute
+  AuthenticatedDashboardBuyingIndexRoute: typeof AuthenticatedDashboardBuyingIndexRoute
+  AuthenticatedDashboardCaseWorkflowsIndexRoute: typeof AuthenticatedDashboardCaseWorkflowsIndexRoute
+  AuthenticatedDashboardClientsIndexRoute: typeof AuthenticatedDashboardClientsIndexRoute
+  AuthenticatedDashboardContactsIndexRoute: typeof AuthenticatedDashboardContactsIndexRoute
+  AuthenticatedDashboardDataExportIndexRoute: typeof AuthenticatedDashboardDataExportIndexRoute
+  AuthenticatedDashboardDocumentsIndexRoute: typeof AuthenticatedDashboardDocumentsIndexRoute
+  AuthenticatedDashboardFollowupsIndexRoute: typeof AuthenticatedDashboardFollowupsIndexRoute
+  AuthenticatedDashboardInvoiceTemplatesIndexRoute: typeof AuthenticatedDashboardInvoiceTemplatesIndexRoute
+  AuthenticatedDashboardManufacturingIndexRoute: typeof AuthenticatedDashboardManufacturingIndexRoute
+  AuthenticatedDashboardNotificationsIndexRoute: typeof AuthenticatedDashboardNotificationsIndexRoute
+  AuthenticatedDashboardOrganizationsIndexRoute: typeof AuthenticatedDashboardOrganizationsIndexRoute
+  AuthenticatedDashboardPdfTemplatesIndexRoute: typeof AuthenticatedDashboardPdfTemplatesIndexRoute
+  AuthenticatedDashboardQualityIndexRoute: typeof AuthenticatedDashboardQualityIndexRoute
+  AuthenticatedDashboardReportsIndexRoute: typeof AuthenticatedDashboardReportsIndexRoute
+  AuthenticatedDashboardStaffIndexRoute: typeof AuthenticatedDashboardStaffIndexRoute
+  AuthenticatedDashboardSubcontractingIndexRoute: typeof AuthenticatedDashboardSubcontractingIndexRoute
+  AuthenticatedDashboardSupportIndexRoute: typeof AuthenticatedDashboardSupportIndexRoute
+  AuthenticatedDashboardTagsIndexRoute: typeof AuthenticatedDashboardTagsIndexRoute
+  AuthenticatedDashboardBuyingMaterialRequestsMaterialRequestIdRoute: typeof AuthenticatedDashboardBuyingMaterialRequestsMaterialRequestIdRoute
+  AuthenticatedDashboardBuyingMaterialRequestsCreateRoute: typeof AuthenticatedDashboardBuyingMaterialRequestsCreateRoute
+  AuthenticatedDashboardBuyingRfqCreateRoute: typeof AuthenticatedDashboardBuyingRfqCreateRoute
+  AuthenticatedDashboardManufacturingJobCardsJobCardIdRoute: typeof AuthenticatedDashboardManufacturingJobCardsJobCardIdRoute
+  AuthenticatedDashboardManufacturingWorkOrdersCreateRoute: typeof AuthenticatedDashboardManufacturingWorkOrdersCreateRoute
+  AuthenticatedDashboardSalesReportsReportIdRoute: typeof AuthenticatedDashboardSalesReportsReportIdRoute
+  AuthenticatedDashboardSalesReportsNewRoute: typeof AuthenticatedDashboardSalesReportsNewRoute
+  AuthenticatedDashboardBuyingMaterialRequestsIndexRoute: typeof AuthenticatedDashboardBuyingMaterialRequestsIndexRoute
+  AuthenticatedDashboardBuyingRfqIndexRoute: typeof AuthenticatedDashboardBuyingRfqIndexRoute
+  AuthenticatedDashboardManufacturingJobCardsIndexRoute: typeof AuthenticatedDashboardManufacturingJobCardsIndexRoute
+  AuthenticatedDashboardSalesLeadsIndexRoute: typeof AuthenticatedDashboardSalesLeadsIndexRoute
+  AuthenticatedDashboardSalesReportsIndexRoute: typeof AuthenticatedDashboardSalesReportsIndexRoute
+}
+
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedDashboardAssetsRoute:
+    AuthenticatedDashboardAssetsRouteWithChildren,
   AuthenticatedDashboardCalendarRoute: AuthenticatedDashboardCalendarRoute,
+  AuthenticatedDashboardCasesRoute:
+    AuthenticatedDashboardCasesRouteWithChildren,
+  AuthenticatedDashboardCrmRoute: AuthenticatedDashboardCrmRouteWithChildren,
+  AuthenticatedDashboardFinanceRoute:
+    AuthenticatedDashboardFinanceRouteWithChildren,
   AuthenticatedDashboardHelpRoute: AuthenticatedDashboardHelpRoute,
+  AuthenticatedDashboardHrRoute: AuthenticatedDashboardHrRouteWithChildren,
+  AuthenticatedDashboardInventoryRoute:
+    AuthenticatedDashboardInventoryRouteWithChildren,
   AuthenticatedDashboardNotionRoute: AuthenticatedDashboardNotionRoute,
+  AuthenticatedDashboardSettingsRoute:
+    AuthenticatedDashboardSettingsRouteWithChildren,
   AuthenticatedDashboardSetupOrchestratorRoute:
     AuthenticatedDashboardSetupOrchestratorRoute,
+  AuthenticatedDashboardTasksRoute:
+    AuthenticatedDashboardTasksRouteWithChildren,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
-  AuthenticatedDashboardAssetsAssetIdRoute:
-    AuthenticatedDashboardAssetsAssetIdRoute,
-  AuthenticatedDashboardAssetsCategoriesRoute:
-    AuthenticatedDashboardAssetsCategoriesRouteWithChildren,
-  AuthenticatedDashboardAssetsCreateRoute:
-    AuthenticatedDashboardAssetsCreateRoute,
-  AuthenticatedDashboardAssetsMaintenanceRoute:
-    AuthenticatedDashboardAssetsMaintenanceRouteWithChildren,
-  AuthenticatedDashboardAssetsSettingsRoute:
-    AuthenticatedDashboardAssetsSettingsRoute,
   AuthenticatedDashboardBuyingSupplierIdRoute:
     AuthenticatedDashboardBuyingSupplierIdRoute,
   AuthenticatedDashboardBuyingCreateRoute:
@@ -9077,13 +9822,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardBuyingPurchaseOrdersRouteWithChildren,
   AuthenticatedDashboardBuyingSettingsRoute:
     AuthenticatedDashboardBuyingSettingsRoute,
-  AuthenticatedDashboardCasesCaseIdRoute:
-    AuthenticatedDashboardCasesCaseIdRouteWithChildren,
-  AuthenticatedDashboardCasesKanbanRoute:
-    AuthenticatedDashboardCasesKanbanRoute,
-  AuthenticatedDashboardCasesNewRoute: AuthenticatedDashboardCasesNewRoute,
-  AuthenticatedDashboardCasesPipelineRoute:
-    AuthenticatedDashboardCasesPipelineRouteWithChildren,
   AuthenticatedDashboardClientsClientIdRoute:
     AuthenticatedDashboardClientsClientIdRoute,
   AuthenticatedDashboardClientsNewRoute: AuthenticatedDashboardClientsNewRoute,
@@ -9091,42 +9829,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardContactsContactIdRoute,
   AuthenticatedDashboardContactsNewRoute:
     AuthenticatedDashboardContactsNewRoute,
-  AuthenticatedDashboardCrmAppointmentsRoute:
-    AuthenticatedDashboardCrmAppointmentsRoute,
-  AuthenticatedDashboardCrmCrmReportsRoute:
-    AuthenticatedDashboardCrmCrmReportsRoute,
-  AuthenticatedDashboardCrmPipelineRoute:
-    AuthenticatedDashboardCrmPipelineRoute,
-  AuthenticatedDashboardCrmSalesPersonsRoute:
-    AuthenticatedDashboardCrmSalesPersonsRoute,
-  AuthenticatedDashboardCrmSetupWizardRoute:
-    AuthenticatedDashboardCrmSetupWizardRoute,
-  AuthenticatedDashboardCrmTerritoriesRoute:
-    AuthenticatedDashboardCrmTerritoriesRoute,
-  AuthenticatedDashboardFinanceChartOfAccountsRoute:
-    AuthenticatedDashboardFinanceChartOfAccountsRoute,
-  AuthenticatedDashboardFinanceConsolidatedReportsRoute:
-    AuthenticatedDashboardFinanceConsolidatedReportsRoute,
-  AuthenticatedDashboardFinanceCorporateCardsRoute:
-    AuthenticatedDashboardFinanceCorporateCardsRouteWithChildren,
-  AuthenticatedDashboardFinanceGeneralLedgerRoute:
-    AuthenticatedDashboardFinanceGeneralLedgerRoute,
-  AuthenticatedDashboardFinanceOpeningBalancesRoute:
-    AuthenticatedDashboardFinanceOpeningBalancesRoute,
-  AuthenticatedDashboardFinanceOverviewRoute:
-    AuthenticatedDashboardFinanceOverviewRoute,
-  AuthenticatedDashboardFinanceSetupWizardRoute:
-    AuthenticatedDashboardFinanceSetupWizardRoute,
-  AuthenticatedDashboardHrSetupWizardRoute:
-    AuthenticatedDashboardHrSetupWizardRoute,
-  AuthenticatedDashboardInventoryItemIdRoute:
-    AuthenticatedDashboardInventoryItemIdRoute,
-  AuthenticatedDashboardInventoryCreateRoute:
-    AuthenticatedDashboardInventoryCreateRoute,
-  AuthenticatedDashboardInventorySettingsRoute:
-    AuthenticatedDashboardInventorySettingsRoute,
-  AuthenticatedDashboardInventoryStockLedgerRoute:
-    AuthenticatedDashboardInventoryStockLedgerRoute,
   AuthenticatedDashboardJobsBrowseRoute: AuthenticatedDashboardJobsBrowseRoute,
   AuthenticatedDashboardJobsMyServicesRoute:
     AuthenticatedDashboardJobsMyServicesRoute,
@@ -9174,26 +9876,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardReputationBadgesRoute,
   AuthenticatedDashboardReputationOverviewRoute:
     AuthenticatedDashboardReputationOverviewRoute,
-  AuthenticatedDashboardSettingsCompanyRoute:
-    AuthenticatedDashboardSettingsCompanyRoute,
-  AuthenticatedDashboardSettingsCrmRoute:
-    AuthenticatedDashboardSettingsCrmRoute,
-  AuthenticatedDashboardSettingsExpensePoliciesRoute:
-    AuthenticatedDashboardSettingsExpensePoliciesRoute,
-  AuthenticatedDashboardSettingsFinanceRoute:
-    AuthenticatedDashboardSettingsFinanceRoute,
-  AuthenticatedDashboardSettingsPaymentModesRoute:
-    AuthenticatedDashboardSettingsPaymentModesRoute,
-  AuthenticatedDashboardSettingsPaymentTermsRoute:
-    AuthenticatedDashboardSettingsPaymentTermsRoute,
-  AuthenticatedDashboardSettingsPreferencesRoute:
-    AuthenticatedDashboardSettingsPreferencesRoute,
-  AuthenticatedDashboardSettingsProfileRoute:
-    AuthenticatedDashboardSettingsProfileRoute,
-  AuthenticatedDashboardSettingsSecurityRoute:
-    AuthenticatedDashboardSettingsSecurityRoute,
-  AuthenticatedDashboardSettingsTaxesRoute:
-    AuthenticatedDashboardSettingsTaxesRoute,
   AuthenticatedDashboardStaffNewRoute: AuthenticatedDashboardStaffNewRoute,
   AuthenticatedDashboardSubcontractingOrderIdRoute:
     AuthenticatedDashboardSubcontractingOrderIdRoute,
@@ -9211,21 +9893,13 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardSupportSettingsRoute,
   AuthenticatedDashboardSupportSlaRoute:
     AuthenticatedDashboardSupportSlaRouteWithChildren,
-  AuthenticatedDashboardTasksTaskIdRoute:
-    AuthenticatedDashboardTasksTaskIdRoute,
-  AuthenticatedDashboardTasksGanttRoute: AuthenticatedDashboardTasksGanttRoute,
-  AuthenticatedDashboardTasksListRoute: AuthenticatedDashboardTasksListRoute,
-  AuthenticatedDashboardTasksNewRoute: AuthenticatedDashboardTasksNewRoute,
   AuthenticatedDashboardAppsIndexRoute: AuthenticatedDashboardAppsIndexRoute,
-  AuthenticatedDashboardAssetsIndexRoute:
-    AuthenticatedDashboardAssetsIndexRoute,
   AuthenticatedDashboardBillingRatesIndexRoute:
     AuthenticatedDashboardBillingRatesIndexRoute,
   AuthenticatedDashboardBuyingIndexRoute:
     AuthenticatedDashboardBuyingIndexRoute,
   AuthenticatedDashboardCaseWorkflowsIndexRoute:
     AuthenticatedDashboardCaseWorkflowsIndexRoute,
-  AuthenticatedDashboardCasesIndexRoute: AuthenticatedDashboardCasesIndexRoute,
   AuthenticatedDashboardClientsIndexRoute:
     AuthenticatedDashboardClientsIndexRoute,
   AuthenticatedDashboardContactsIndexRoute:
@@ -9236,8 +9910,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardDocumentsIndexRoute,
   AuthenticatedDashboardFollowupsIndexRoute:
     AuthenticatedDashboardFollowupsIndexRoute,
-  AuthenticatedDashboardInventoryIndexRoute:
-    AuthenticatedDashboardInventoryIndexRoute,
   AuthenticatedDashboardInvoiceTemplatesIndexRoute:
     AuthenticatedDashboardInvoiceTemplatesIndexRoute,
   AuthenticatedDashboardManufacturingIndexRoute:
@@ -9264,242 +9936,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardBuyingMaterialRequestsCreateRoute,
   AuthenticatedDashboardBuyingRfqCreateRoute:
     AuthenticatedDashboardBuyingRfqCreateRoute,
-  AuthenticatedDashboardCrmActivitiesActivityIdRoute:
-    AuthenticatedDashboardCrmActivitiesActivityIdRoute,
-  AuthenticatedDashboardCrmActivitiesNewRoute:
-    AuthenticatedDashboardCrmActivitiesNewRoute,
-  AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute:
-    AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute,
-  AuthenticatedDashboardCrmEmailMarketingNewRoute:
-    AuthenticatedDashboardCrmEmailMarketingNewRoute,
-  AuthenticatedDashboardCrmLeadsLeadIdRoute:
-    AuthenticatedDashboardCrmLeadsLeadIdRoute,
-  AuthenticatedDashboardCrmLeadsNewRoute:
-    AuthenticatedDashboardCrmLeadsNewRoute,
-  AuthenticatedDashboardCrmReferralsReferralIdRoute:
-    AuthenticatedDashboardCrmReferralsReferralIdRoute,
-  AuthenticatedDashboardCrmReferralsNewRoute:
-    AuthenticatedDashboardCrmReferralsNewRoute,
-  AuthenticatedDashboardCrmReportsReportIdRoute:
-    AuthenticatedDashboardCrmReportsReportIdRoute,
-  AuthenticatedDashboardCrmReportsNewRoute:
-    AuthenticatedDashboardCrmReportsNewRoute,
-  AuthenticatedDashboardCrmWhatsappConversationIdRoute:
-    AuthenticatedDashboardCrmWhatsappConversationIdRoute,
-  AuthenticatedDashboardCrmWhatsappNewRoute:
-    AuthenticatedDashboardCrmWhatsappNewRoute,
-  AuthenticatedDashboardCrmWhatsappStartRoute:
-    AuthenticatedDashboardCrmWhatsappStartRoute,
-  AuthenticatedDashboardFinanceActivityActivityIdRoute:
-    AuthenticatedDashboardFinanceActivityActivityIdRouteWithChildren,
-  AuthenticatedDashboardFinanceActivityNewRoute:
-    AuthenticatedDashboardFinanceActivityNewRoute,
-  AuthenticatedDashboardFinanceBillsBillIdRoute:
-    AuthenticatedDashboardFinanceBillsBillIdRouteWithChildren,
-  AuthenticatedDashboardFinanceBillsNewRoute:
-    AuthenticatedDashboardFinanceBillsNewRoute,
-  AuthenticatedDashboardFinanceCreditNotesCreditNoteIdRoute:
-    AuthenticatedDashboardFinanceCreditNotesCreditNoteIdRoute,
-  AuthenticatedDashboardFinanceCreditNotesNewRoute:
-    AuthenticatedDashboardFinanceCreditNotesNewRoute,
-  AuthenticatedDashboardFinanceCurrencyRateIdRoute:
-    AuthenticatedDashboardFinanceCurrencyRateIdRoute,
-  AuthenticatedDashboardFinanceCurrencyNewRoute:
-    AuthenticatedDashboardFinanceCurrencyNewRoute,
-  AuthenticatedDashboardFinanceExpensesExpenseIdRoute:
-    AuthenticatedDashboardFinanceExpensesExpenseIdRouteWithChildren,
-  AuthenticatedDashboardFinanceExpensesNewRoute:
-    AuthenticatedDashboardFinanceExpensesNewRoute,
-  AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute:
-    AuthenticatedDashboardFinanceInvoicesInvoiceIdRouteWithChildren,
-  AuthenticatedDashboardFinanceInvoicesApprovalsRoute:
-    AuthenticatedDashboardFinanceInvoicesApprovalsRoute,
-  AuthenticatedDashboardFinanceInvoicesNewRoute:
-    AuthenticatedDashboardFinanceInvoicesNewRoute,
-  AuthenticatedDashboardFinanceJournalEntriesIdRoute:
-    AuthenticatedDashboardFinanceJournalEntriesIdRoute,
-  AuthenticatedDashboardFinanceJournalEntriesNewRoute:
-    AuthenticatedDashboardFinanceJournalEntriesNewRoute,
-  AuthenticatedDashboardFinancePaymentsPaymentIdRoute:
-    AuthenticatedDashboardFinancePaymentsPaymentIdRoute,
-  AuthenticatedDashboardFinancePaymentsNewRoute:
-    AuthenticatedDashboardFinancePaymentsNewRoute,
-  AuthenticatedDashboardFinanceQuotesQuoteIdRoute:
-    AuthenticatedDashboardFinanceQuotesQuoteIdRoute,
-  AuthenticatedDashboardFinanceQuotesNewRoute:
-    AuthenticatedDashboardFinanceQuotesNewRoute,
-  AuthenticatedDashboardFinanceReconciliationFeedIdRoute:
-    AuthenticatedDashboardFinanceReconciliationFeedIdRoute,
-  AuthenticatedDashboardFinanceReconciliationNewRoute:
-    AuthenticatedDashboardFinanceReconciliationNewRoute,
-  AuthenticatedDashboardFinanceRecurringInvoicesIdRoute:
-    AuthenticatedDashboardFinanceRecurringInvoicesIdRouteWithChildren,
-  AuthenticatedDashboardFinanceRecurringInvoicesNewRoute:
-    AuthenticatedDashboardFinanceRecurringInvoicesNewRoute,
-  AuthenticatedDashboardFinanceReportsReportIdRoute:
-    AuthenticatedDashboardFinanceReportsReportIdRoute,
-  AuthenticatedDashboardFinanceReportsAccountsAgingRoute:
-    AuthenticatedDashboardFinanceReportsAccountsAgingRoute,
-  AuthenticatedDashboardFinanceReportsFinancialRoute:
-    AuthenticatedDashboardFinanceReportsFinancialRoute,
-  AuthenticatedDashboardFinanceReportsNewRoute:
-    AuthenticatedDashboardFinanceReportsNewRoute,
-  AuthenticatedDashboardFinanceReportsOutstandingInvoicesRoute:
-    AuthenticatedDashboardFinanceReportsOutstandingInvoicesRoute,
-  AuthenticatedDashboardFinanceReportsRevenueByClientRoute:
-    AuthenticatedDashboardFinanceReportsRevenueByClientRoute,
-  AuthenticatedDashboardFinanceReportsTimeEntriesRoute:
-    AuthenticatedDashboardFinanceReportsTimeEntriesRoute,
-  AuthenticatedDashboardFinanceRetainersRetainerIdRoute:
-    AuthenticatedDashboardFinanceRetainersRetainerIdRoute,
-  AuthenticatedDashboardFinanceRetainersNewRoute:
-    AuthenticatedDashboardFinanceRetainersNewRoute,
-  AuthenticatedDashboardFinanceSaudiBankingLeanRoute:
-    AuthenticatedDashboardFinanceSaudiBankingLeanRoute,
-  AuthenticatedDashboardFinanceSaudiBankingMudadRoute:
-    AuthenticatedDashboardFinanceSaudiBankingMudadRoute,
-  AuthenticatedDashboardFinanceStatementsStatementIdRoute:
-    AuthenticatedDashboardFinanceStatementsStatementIdRouteWithChildren,
-  AuthenticatedDashboardFinanceStatementsNewRoute:
-    AuthenticatedDashboardFinanceStatementsNewRoute,
-  AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute:
-    AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteWithChildren,
-  AuthenticatedDashboardFinanceTimeTrackingApprovalsRoute:
-    AuthenticatedDashboardFinanceTimeTrackingApprovalsRoute,
-  AuthenticatedDashboardFinanceTimeTrackingMonthlyRoute:
-    AuthenticatedDashboardFinanceTimeTrackingMonthlyRoute,
-  AuthenticatedDashboardFinanceTimeTrackingNewRoute:
-    AuthenticatedDashboardFinanceTimeTrackingNewRoute,
-  AuthenticatedDashboardFinanceTimeTrackingWeeklyRoute:
-    AuthenticatedDashboardFinanceTimeTrackingWeeklyRoute,
-  AuthenticatedDashboardFinanceVendorsVendorIdRoute:
-    AuthenticatedDashboardFinanceVendorsVendorIdRouteWithChildren,
-  AuthenticatedDashboardFinanceVendorsNewRoute:
-    AuthenticatedDashboardFinanceVendorsNewRoute,
-  AuthenticatedDashboardHrAdvancesAdvanceIdRoute:
-    AuthenticatedDashboardHrAdvancesAdvanceIdRoute,
-  AuthenticatedDashboardHrAdvancesNewRoute:
-    AuthenticatedDashboardHrAdvancesNewRoute,
-  AuthenticatedDashboardHrAssetAssignmentAssignmentIdRoute:
-    AuthenticatedDashboardHrAssetAssignmentAssignmentIdRoute,
-  AuthenticatedDashboardHrAssetAssignmentNewRoute:
-    AuthenticatedDashboardHrAssetAssignmentNewRoute,
-  AuthenticatedDashboardHrAttendanceRecordIdRoute:
-    AuthenticatedDashboardHrAttendanceRecordIdRoute,
-  AuthenticatedDashboardHrAttendanceNewRoute:
-    AuthenticatedDashboardHrAttendanceNewRoute,
-  AuthenticatedDashboardHrBenefitsBenefitIdRoute:
-    AuthenticatedDashboardHrBenefitsBenefitIdRoute,
-  AuthenticatedDashboardHrBenefitsNewRoute:
-    AuthenticatedDashboardHrBenefitsNewRoute,
-  AuthenticatedDashboardHrBiometricDeviceIdRoute:
-    AuthenticatedDashboardHrBiometricDeviceIdRoute,
-  AuthenticatedDashboardHrBiometricNewRoute:
-    AuthenticatedDashboardHrBiometricNewRoute,
-  AuthenticatedDashboardHrCompensationCompensationIdRoute:
-    AuthenticatedDashboardHrCompensationCompensationIdRoute,
-  AuthenticatedDashboardHrCompensationIncentivesRoute:
-    AuthenticatedDashboardHrCompensationIncentivesRoute,
-  AuthenticatedDashboardHrCompensationNewRoute:
-    AuthenticatedDashboardHrCompensationNewRoute,
-  AuthenticatedDashboardHrCompensationRetentionBonusesRoute:
-    AuthenticatedDashboardHrCompensationRetentionBonusesRoute,
-  AuthenticatedDashboardHrEmployeeTransfersTransferIdRoute:
-    AuthenticatedDashboardHrEmployeeTransfersTransferIdRoute,
-  AuthenticatedDashboardHrEmployeeTransfersNewRoute:
-    AuthenticatedDashboardHrEmployeeTransfersNewRoute,
-  AuthenticatedDashboardHrEmployeesEmployeeIdRoute:
-    AuthenticatedDashboardHrEmployeesEmployeeIdRoute,
-  AuthenticatedDashboardHrEmployeesNewRoute:
-    AuthenticatedDashboardHrEmployeesNewRoute,
-  AuthenticatedDashboardHrExpenseClaimsClaimIdRoute:
-    AuthenticatedDashboardHrExpenseClaimsClaimIdRoute,
-  AuthenticatedDashboardHrExpenseClaimsNewRoute:
-    AuthenticatedDashboardHrExpenseClaimsNewRoute,
-  AuthenticatedDashboardHrGeofencingZoneIdRoute:
-    AuthenticatedDashboardHrGeofencingZoneIdRoute,
-  AuthenticatedDashboardHrGeofencingNewRoute:
-    AuthenticatedDashboardHrGeofencingNewRoute,
-  AuthenticatedDashboardHrGrievancesGrievanceIdRoute:
-    AuthenticatedDashboardHrGrievancesGrievanceIdRoute,
-  AuthenticatedDashboardHrGrievancesNewRoute:
-    AuthenticatedDashboardHrGrievancesNewRoute,
-  AuthenticatedDashboardHrJobPositionsPositionIdRoute:
-    AuthenticatedDashboardHrJobPositionsPositionIdRoute,
-  AuthenticatedDashboardHrJobPositionsNewRoute:
-    AuthenticatedDashboardHrJobPositionsNewRoute,
-  AuthenticatedDashboardHrLeaveRequestIdRoute:
-    AuthenticatedDashboardHrLeaveRequestIdRoute,
-  AuthenticatedDashboardHrLeaveAllocationsRoute:
-    AuthenticatedDashboardHrLeaveAllocationsRoute,
-  AuthenticatedDashboardHrLeaveCompensatoryRoute:
-    AuthenticatedDashboardHrLeaveCompensatoryRoute,
-  AuthenticatedDashboardHrLeaveEncashmentsRoute:
-    AuthenticatedDashboardHrLeaveEncashmentsRoute,
-  AuthenticatedDashboardHrLeaveNewRoute: AuthenticatedDashboardHrLeaveNewRoute,
-  AuthenticatedDashboardHrLeavePeriodsRoute:
-    AuthenticatedDashboardHrLeavePeriodsRoute,
-  AuthenticatedDashboardHrLeavePoliciesRoute:
-    AuthenticatedDashboardHrLeavePoliciesRoute,
-  AuthenticatedDashboardHrLoansLoanIdRoute:
-    AuthenticatedDashboardHrLoansLoanIdRoute,
-  AuthenticatedDashboardHrLoansNewRoute: AuthenticatedDashboardHrLoansNewRoute,
-  AuthenticatedDashboardHrOffboardingOffboardingIdRoute:
-    AuthenticatedDashboardHrOffboardingOffboardingIdRoute,
-  AuthenticatedDashboardHrOffboardingNewRoute:
-    AuthenticatedDashboardHrOffboardingNewRoute,
-  AuthenticatedDashboardHrOnboardingOnboardingIdRoute:
-    AuthenticatedDashboardHrOnboardingOnboardingIdRoute,
-  AuthenticatedDashboardHrOnboardingNewRoute:
-    AuthenticatedDashboardHrOnboardingNewRoute,
-  AuthenticatedDashboardHrOrganizationalStructureUnitIdRoute:
-    AuthenticatedDashboardHrOrganizationalStructureUnitIdRoute,
-  AuthenticatedDashboardHrOrganizationalStructureNewRoute:
-    AuthenticatedDashboardHrOrganizationalStructureNewRoute,
-  AuthenticatedDashboardHrPayrollRunsRunIdRoute:
-    AuthenticatedDashboardHrPayrollRunsRunIdRoute,
-  AuthenticatedDashboardHrPayrollRunsNewRoute:
-    AuthenticatedDashboardHrPayrollRunsNewRoute,
-  AuthenticatedDashboardHrPayrollSlipIdRoute:
-    AuthenticatedDashboardHrPayrollSlipIdRoute,
-  AuthenticatedDashboardHrPayrollNewRoute:
-    AuthenticatedDashboardHrPayrollNewRoute,
-  AuthenticatedDashboardHrPayrollSalaryComponentsRoute:
-    AuthenticatedDashboardHrPayrollSalaryComponentsRoute,
-  AuthenticatedDashboardHrPerformanceReviewIdRoute:
-    AuthenticatedDashboardHrPerformanceReviewIdRoute,
-  AuthenticatedDashboardHrPerformanceNewRoute:
-    AuthenticatedDashboardHrPerformanceNewRoute,
-  AuthenticatedDashboardHrPromotionsPromotionIdRoute:
-    AuthenticatedDashboardHrPromotionsPromotionIdRouteWithChildren,
-  AuthenticatedDashboardHrPromotionsNewRoute:
-    AuthenticatedDashboardHrPromotionsNewRoute,
-  AuthenticatedDashboardHrRecruitmentStaffingPlansRoute:
-    AuthenticatedDashboardHrRecruitmentStaffingPlansRoute,
-  AuthenticatedDashboardHrReportsReportIdRoute:
-    AuthenticatedDashboardHrReportsReportIdRoute,
-  AuthenticatedDashboardHrReportsNewRoute:
-    AuthenticatedDashboardHrReportsNewRoute,
-  AuthenticatedDashboardHrShiftAssignmentsAssignmentIdRoute:
-    AuthenticatedDashboardHrShiftAssignmentsAssignmentIdRoute,
-  AuthenticatedDashboardHrSkillsMatrixRoute:
-    AuthenticatedDashboardHrSkillsMatrixRoute,
-  AuthenticatedDashboardHrSuccessionPlanningPlanIdRoute:
-    AuthenticatedDashboardHrSuccessionPlanningPlanIdRoute,
-  AuthenticatedDashboardHrSuccessionPlanningNewRoute:
-    AuthenticatedDashboardHrSuccessionPlanningNewRoute,
-  AuthenticatedDashboardHrTrainingTrainingIdRoute:
-    AuthenticatedDashboardHrTrainingTrainingIdRoute,
-  AuthenticatedDashboardHrTrainingNewRoute:
-    AuthenticatedDashboardHrTrainingNewRoute,
-  AuthenticatedDashboardInventoryStockEntriesStockEntryIdRoute:
-    AuthenticatedDashboardInventoryStockEntriesStockEntryIdRoute,
-  AuthenticatedDashboardInventoryStockEntriesCreateRoute:
-    AuthenticatedDashboardInventoryStockEntriesCreateRoute,
-  AuthenticatedDashboardInventoryWarehousesWarehouseIdRoute:
-    AuthenticatedDashboardInventoryWarehousesWarehouseIdRoute,
-  AuthenticatedDashboardInventoryWarehousesCreateRoute:
-    AuthenticatedDashboardInventoryWarehousesCreateRoute,
   AuthenticatedDashboardManufacturingJobCardsJobCardIdRoute:
     AuthenticatedDashboardManufacturingJobCardsJobCardIdRoute,
   AuthenticatedDashboardManufacturingWorkOrdersCreateRoute:
@@ -9508,176 +9944,16 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardSalesReportsReportIdRoute,
   AuthenticatedDashboardSalesReportsNewRoute:
     AuthenticatedDashboardSalesReportsNewRoute,
-  AuthenticatedDashboardTasksEventsEventIdRoute:
-    AuthenticatedDashboardTasksEventsEventIdRoute,
-  AuthenticatedDashboardTasksEventsNewRoute:
-    AuthenticatedDashboardTasksEventsNewRoute,
-  AuthenticatedDashboardTasksRemindersReminderIdRoute:
-    AuthenticatedDashboardTasksRemindersReminderIdRoute,
-  AuthenticatedDashboardTasksRemindersNewRoute:
-    AuthenticatedDashboardTasksRemindersNewRoute,
-  AuthenticatedDashboardTasksReportsReportIdRoute:
-    AuthenticatedDashboardTasksReportsReportIdRoute,
-  AuthenticatedDashboardTasksReportsNewRoute:
-    AuthenticatedDashboardTasksReportsNewRoute,
   AuthenticatedDashboardBuyingMaterialRequestsIndexRoute:
     AuthenticatedDashboardBuyingMaterialRequestsIndexRoute,
   AuthenticatedDashboardBuyingRfqIndexRoute:
     AuthenticatedDashboardBuyingRfqIndexRoute,
-  AuthenticatedDashboardCrmActivitiesIndexRoute:
-    AuthenticatedDashboardCrmActivitiesIndexRoute,
-  AuthenticatedDashboardCrmEmailMarketingIndexRoute:
-    AuthenticatedDashboardCrmEmailMarketingIndexRoute,
-  AuthenticatedDashboardCrmLeadScoringIndexRoute:
-    AuthenticatedDashboardCrmLeadScoringIndexRoute,
-  AuthenticatedDashboardCrmLeadsIndexRoute:
-    AuthenticatedDashboardCrmLeadsIndexRoute,
-  AuthenticatedDashboardCrmReferralsIndexRoute:
-    AuthenticatedDashboardCrmReferralsIndexRoute,
-  AuthenticatedDashboardCrmReportsIndexRoute:
-    AuthenticatedDashboardCrmReportsIndexRoute,
-  AuthenticatedDashboardCrmWhatsappIndexRoute:
-    AuthenticatedDashboardCrmWhatsappIndexRoute,
-  AuthenticatedDashboardFinanceActivityIndexRoute:
-    AuthenticatedDashboardFinanceActivityIndexRoute,
-  AuthenticatedDashboardFinanceBillsIndexRoute:
-    AuthenticatedDashboardFinanceBillsIndexRoute,
-  AuthenticatedDashboardFinanceCreditNotesIndexRoute:
-    AuthenticatedDashboardFinanceCreditNotesIndexRoute,
-  AuthenticatedDashboardFinanceCurrencyIndexRoute:
-    AuthenticatedDashboardFinanceCurrencyIndexRoute,
-  AuthenticatedDashboardFinanceExpensesIndexRoute:
-    AuthenticatedDashboardFinanceExpensesIndexRoute,
-  AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute:
-    AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute,
-  AuthenticatedDashboardFinanceFullReportsIndexRoute:
-    AuthenticatedDashboardFinanceFullReportsIndexRoute,
-  AuthenticatedDashboardFinanceInvoicesIndexRoute:
-    AuthenticatedDashboardFinanceInvoicesIndexRoute,
-  AuthenticatedDashboardFinanceJournalEntriesIndexRoute:
-    AuthenticatedDashboardFinanceJournalEntriesIndexRoute,
-  AuthenticatedDashboardFinancePaymentsIndexRoute:
-    AuthenticatedDashboardFinancePaymentsIndexRoute,
-  AuthenticatedDashboardFinanceQuotesIndexRoute:
-    AuthenticatedDashboardFinanceQuotesIndexRoute,
-  AuthenticatedDashboardFinanceReconciliationIndexRoute:
-    AuthenticatedDashboardFinanceReconciliationIndexRoute,
-  AuthenticatedDashboardFinanceRecurringInvoicesIndexRoute:
-    AuthenticatedDashboardFinanceRecurringInvoicesIndexRoute,
-  AuthenticatedDashboardFinanceRecurringIndexRoute:
-    AuthenticatedDashboardFinanceRecurringIndexRoute,
-  AuthenticatedDashboardFinanceReportsIndexRoute:
-    AuthenticatedDashboardFinanceReportsIndexRoute,
-  AuthenticatedDashboardFinanceRetainersIndexRoute:
-    AuthenticatedDashboardFinanceRetainersIndexRoute,
-  AuthenticatedDashboardFinanceSaudiBankingIndexRoute:
-    AuthenticatedDashboardFinanceSaudiBankingIndexRoute,
-  AuthenticatedDashboardFinanceStatementsIndexRoute:
-    AuthenticatedDashboardFinanceStatementsIndexRoute,
-  AuthenticatedDashboardFinanceTimeTrackingIndexRoute:
-    AuthenticatedDashboardFinanceTimeTrackingIndexRoute,
-  AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute:
-    AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute,
-  AuthenticatedDashboardFinanceTransactionsIndexRoute:
-    AuthenticatedDashboardFinanceTransactionsIndexRoute,
-  AuthenticatedDashboardFinanceVendorsIndexRoute:
-    AuthenticatedDashboardFinanceVendorsIndexRoute,
-  AuthenticatedDashboardHrAdvancesIndexRoute:
-    AuthenticatedDashboardHrAdvancesIndexRoute,
-  AuthenticatedDashboardHrAnalyticsIndexRoute:
-    AuthenticatedDashboardHrAnalyticsIndexRoute,
-  AuthenticatedDashboardHrAssetAssignmentIndexRoute:
-    AuthenticatedDashboardHrAssetAssignmentIndexRoute,
-  AuthenticatedDashboardHrAttendanceIndexRoute:
-    AuthenticatedDashboardHrAttendanceIndexRoute,
-  AuthenticatedDashboardHrBenefitsIndexRoute:
-    AuthenticatedDashboardHrBenefitsIndexRoute,
-  AuthenticatedDashboardHrBiometricIndexRoute:
-    AuthenticatedDashboardHrBiometricIndexRoute,
-  AuthenticatedDashboardHrCompensationIndexRoute:
-    AuthenticatedDashboardHrCompensationIndexRoute,
-  AuthenticatedDashboardHrEmployeeTransfersIndexRoute:
-    AuthenticatedDashboardHrEmployeeTransfersIndexRoute,
-  AuthenticatedDashboardHrEmployeesIndexRoute:
-    AuthenticatedDashboardHrEmployeesIndexRoute,
-  AuthenticatedDashboardHrExpenseClaimsIndexRoute:
-    AuthenticatedDashboardHrExpenseClaimsIndexRoute,
-  AuthenticatedDashboardHrGeofencingIndexRoute:
-    AuthenticatedDashboardHrGeofencingIndexRoute,
-  AuthenticatedDashboardHrGrievancesIndexRoute:
-    AuthenticatedDashboardHrGrievancesIndexRoute,
-  AuthenticatedDashboardHrJobPositionsIndexRoute:
-    AuthenticatedDashboardHrJobPositionsIndexRoute,
-  AuthenticatedDashboardHrLeaveIndexRoute:
-    AuthenticatedDashboardHrLeaveIndexRoute,
-  AuthenticatedDashboardHrLoansIndexRoute:
-    AuthenticatedDashboardHrLoansIndexRoute,
-  AuthenticatedDashboardHrOffboardingIndexRoute:
-    AuthenticatedDashboardHrOffboardingIndexRoute,
-  AuthenticatedDashboardHrOnboardingIndexRoute:
-    AuthenticatedDashboardHrOnboardingIndexRoute,
-  AuthenticatedDashboardHrOrganizationalStructureIndexRoute:
-    AuthenticatedDashboardHrOrganizationalStructureIndexRoute,
-  AuthenticatedDashboardHrPayrollRunsIndexRoute:
-    AuthenticatedDashboardHrPayrollRunsIndexRoute,
-  AuthenticatedDashboardHrPayrollIndexRoute:
-    AuthenticatedDashboardHrPayrollIndexRoute,
-  AuthenticatedDashboardHrPerformanceIndexRoute:
-    AuthenticatedDashboardHrPerformanceIndexRoute,
-  AuthenticatedDashboardHrPredictionsIndexRoute:
-    AuthenticatedDashboardHrPredictionsIndexRoute,
-  AuthenticatedDashboardHrPromotionsIndexRoute:
-    AuthenticatedDashboardHrPromotionsIndexRoute,
-  AuthenticatedDashboardHrReportsIndexRoute:
-    AuthenticatedDashboardHrReportsIndexRoute,
-  AuthenticatedDashboardHrShiftAssignmentsIndexRoute:
-    AuthenticatedDashboardHrShiftAssignmentsIndexRoute,
-  AuthenticatedDashboardHrSkillsIndexRoute:
-    AuthenticatedDashboardHrSkillsIndexRoute,
-  AuthenticatedDashboardHrSuccessionPlanningIndexRoute:
-    AuthenticatedDashboardHrSuccessionPlanningIndexRoute,
-  AuthenticatedDashboardHrTrainingIndexRoute:
-    AuthenticatedDashboardHrTrainingIndexRoute,
-  AuthenticatedDashboardHrVehiclesIndexRoute:
-    AuthenticatedDashboardHrVehiclesIndexRoute,
-  AuthenticatedDashboardInventoryStockEntriesIndexRoute:
-    AuthenticatedDashboardInventoryStockEntriesIndexRoute,
-  AuthenticatedDashboardInventoryWarehousesIndexRoute:
-    AuthenticatedDashboardInventoryWarehousesIndexRoute,
   AuthenticatedDashboardManufacturingJobCardsIndexRoute:
     AuthenticatedDashboardManufacturingJobCardsIndexRoute,
   AuthenticatedDashboardSalesLeadsIndexRoute:
     AuthenticatedDashboardSalesLeadsIndexRoute,
   AuthenticatedDashboardSalesReportsIndexRoute:
     AuthenticatedDashboardSalesReportsIndexRoute,
-  AuthenticatedDashboardTasksEventsIndexRoute:
-    AuthenticatedDashboardTasksEventsIndexRoute,
-  AuthenticatedDashboardTasksRemindersIndexRoute:
-    AuthenticatedDashboardTasksRemindersIndexRoute,
-  AuthenticatedDashboardTasksReportsIndexRoute:
-    AuthenticatedDashboardTasksReportsIndexRoute,
-  AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute:
-    AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute,
-  AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute:
-    AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute,
-  AuthenticatedDashboardHrRecruitmentApplicantsApplicantIdRoute:
-    AuthenticatedDashboardHrRecruitmentApplicantsApplicantIdRoute,
-  AuthenticatedDashboardHrRecruitmentApplicantsNewRoute:
-    AuthenticatedDashboardHrRecruitmentApplicantsNewRoute,
-  AuthenticatedDashboardHrRecruitmentJobsJobIdRoute:
-    AuthenticatedDashboardHrRecruitmentJobsJobIdRoute,
-  AuthenticatedDashboardHrRecruitmentJobsNewRoute:
-    AuthenticatedDashboardHrRecruitmentJobsNewRoute,
-  AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute:
-    AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute,
-  AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute:
-    AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute,
-  AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute:
-    AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute,
-  AuthenticatedDashboardHrRecruitmentJobsIndexRoute:
-    AuthenticatedDashboardHrRecruitmentJobsIndexRoute,
-  AuthenticatedDashboardHrSettingsShiftTypesIndexRoute:
-    AuthenticatedDashboardHrSettingsShiftTypesIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
