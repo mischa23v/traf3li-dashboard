@@ -1,6 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   getOnboardings,
   getOnboarding,
@@ -101,14 +102,12 @@ export const useUpcomingProbationReviews = (days?: number) => {
 
 // Create onboarding
 export const useCreateOnboarding = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateOnboardingData) => createOnboarding(data),
     onSuccess: () => {
       toast.success('تم إنشاء برنامج التأهيل بنجاح')
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.stats() })
+      invalidateCache.onboarding.lists()
+      invalidateCache.onboarding.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إنشاء برنامج التأهيل')
@@ -118,15 +117,13 @@ export const useCreateOnboarding = () => {
 
 // Update onboarding
 export const useUpdateOnboarding = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ onboardingId, data }: { onboardingId: string; data: UpdateOnboardingData }) =>
       updateOnboarding(onboardingId, data),
     onSuccess: (_, variables) => {
       toast.success('تم تحديث برنامج التأهيل بنجاح')
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.detail(variables.onboardingId) })
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.lists() })
+      invalidateCache.onboarding.detail(variables.onboardingId)
+      invalidateCache.onboarding.lists()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في تحديث برنامج التأهيل')
@@ -136,14 +133,12 @@ export const useUpdateOnboarding = () => {
 
 // Delete onboarding
 export const useDeleteOnboarding = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (onboardingId: string) => deleteOnboarding(onboardingId),
     onSuccess: () => {
       toast.success('تم حذف برنامج التأهيل بنجاح')
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.stats() })
+      invalidateCache.onboarding.lists()
+      invalidateCache.onboarding.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في حذف برنامج التأهيل')
@@ -153,14 +148,12 @@ export const useDeleteOnboarding = () => {
 
 // Bulk delete onboardings
 export const useBulkDeleteOnboardings = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteOnboardings(ids),
     onSuccess: (data) => {
       toast.success(`تم حذف ${data.deleted} برنامج تأهيل بنجاح`)
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.stats() })
+      invalidateCache.onboarding.lists()
+      invalidateCache.onboarding.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في حذف برامج التأهيل')
@@ -170,16 +163,14 @@ export const useBulkDeleteOnboardings = () => {
 
 // Update onboarding status
 export const useUpdateOnboardingStatus = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ onboardingId, status }: { onboardingId: string; status: OnboardingStatus }) =>
       updateOnboardingStatus(onboardingId, status),
     onSuccess: (_, variables) => {
       toast.success('تم تحديث الحالة بنجاح')
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.detail(variables.onboardingId) })
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.stats() })
+      invalidateCache.onboarding.detail(variables.onboardingId)
+      invalidateCache.onboarding.lists()
+      invalidateCache.onboarding.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في تحديث الحالة')
@@ -189,15 +180,13 @@ export const useUpdateOnboardingStatus = () => {
 
 // Complete task
 export const useCompleteTask = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ onboardingId, taskId }: { onboardingId: string; taskId: string }) =>
       completeTask(onboardingId, taskId),
     onSuccess: (_, variables) => {
       toast.success('تم إكمال المهمة بنجاح')
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.detail(variables.onboardingId) })
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.lists() })
+      invalidateCache.onboarding.detail(variables.onboardingId)
+      invalidateCache.onboarding.lists()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إكمال المهمة')
@@ -207,15 +196,13 @@ export const useCompleteTask = () => {
 
 // Add probation review
 export const useAddProbationReview = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ onboardingId, review }: { onboardingId: string; review: Partial<ProbationReview> }) =>
       addProbationReview(onboardingId, review),
     onSuccess: (_, variables) => {
       toast.success('تم إضافة تقييم فترة التجربة بنجاح')
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.detail(variables.onboardingId) })
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.upcomingReviews() })
+      invalidateCache.onboarding.detail(variables.onboardingId)
+      invalidateCache.onboarding.upcomingReviews()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إضافة التقييم')
@@ -225,8 +212,6 @@ export const useAddProbationReview = () => {
 
 // Complete probation (no extension - max 180 days per Saudi Labor Law Article 53)
 export const useCompleteProbation = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ onboardingId, data }: {
       onboardingId: string
@@ -242,9 +227,9 @@ export const useCompleteProbation = () => {
         terminate: 'تم إنهاء فترة التجربة',
       }
       toast.success(messages[variables.data.decision])
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.detail(variables.onboardingId) })
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.stats() })
+      invalidateCache.onboarding.detail(variables.onboardingId)
+      invalidateCache.onboarding.lists()
+      invalidateCache.onboarding.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إكمال فترة التجربة')
@@ -254,8 +239,6 @@ export const useCompleteProbation = () => {
 
 // Upload document
 export const useUploadOnboardingDocument = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ onboardingId, file, documentType }: {
       onboardingId: string
@@ -273,8 +256,6 @@ export const useUploadOnboardingDocument = () => {
 
 // Verify document
 export const useVerifyOnboardingDocument = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ onboardingId, documentType }: {
       onboardingId: string
@@ -291,14 +272,12 @@ export const useVerifyOnboardingDocument = () => {
 
 // Complete first day
 export const useCompleteFirstDay = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (onboardingId: string) => completeFirstDay(onboardingId),
     onSuccess: (_, onboardingId) => {
       toast.success('تم إكمال اليوم الأول بنجاح')
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.detail(onboardingId) })
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.lists() })
+      invalidateCache.onboarding.detail(onboardingId)
+      invalidateCache.onboarding.lists()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إكمال اليوم الأول')
@@ -308,14 +287,12 @@ export const useCompleteFirstDay = () => {
 
 // Complete first week
 export const useCompleteFirstWeek = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (onboardingId: string) => completeFirstWeek(onboardingId),
     onSuccess: (_, onboardingId) => {
       toast.success('تم إكمال الأسبوع الأول بنجاح')
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.detail(onboardingId) })
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.lists() })
+      invalidateCache.onboarding.detail(onboardingId)
+      invalidateCache.onboarding.lists()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إكمال الأسبوع الأول')
@@ -325,14 +302,12 @@ export const useCompleteFirstWeek = () => {
 
 // Complete first month
 export const useCompleteFirstMonth = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (onboardingId: string) => completeFirstMonth(onboardingId),
     onSuccess: (_, onboardingId) => {
       toast.success('تم إكمال الشهر الأول بنجاح')
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.detail(onboardingId) })
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.lists() })
+      invalidateCache.onboarding.detail(onboardingId)
+      invalidateCache.onboarding.lists()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إكمال الشهر الأول')
@@ -342,15 +317,13 @@ export const useCompleteFirstMonth = () => {
 
 // Complete onboarding
 export const useCompleteOnboarding = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (onboardingId: string) => completeOnboarding(onboardingId),
     onSuccess: (_, onboardingId) => {
       toast.success('تم إكمال برنامج التأهيل بنجاح')
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.detail(onboardingId) })
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.stats() })
+      invalidateCache.onboarding.detail(onboardingId)
+      invalidateCache.onboarding.lists()
+      invalidateCache.onboarding.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إكمال برنامج التأهيل')
@@ -360,8 +333,6 @@ export const useCompleteOnboarding = () => {
 
 // Add checklist category
 export const useAddChecklistCategory = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ onboardingId, category }: {
       onboardingId: string
@@ -372,7 +343,7 @@ export const useAddChecklistCategory = () => {
     }) => addChecklistCategory(onboardingId, category),
     onSuccess: (_, variables) => {
       toast.success('تم إضافة فئة القائمة بنجاح')
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.detail(variables.onboardingId) })
+      invalidateCache.onboarding.detail(variables.onboardingId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إضافة فئة القائمة')
@@ -382,8 +353,6 @@ export const useAddChecklistCategory = () => {
 
 // Add checklist task
 export const useAddChecklistTask = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ onboardingId, categoryId, task }: {
       onboardingId: string
@@ -392,7 +361,7 @@ export const useAddChecklistTask = () => {
     }) => addChecklistTask(onboardingId, categoryId, task),
     onSuccess: (_, variables) => {
       toast.success('تم إضافة مهمة القائمة بنجاح')
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.detail(variables.onboardingId) })
+      invalidateCache.onboarding.detail(variables.onboardingId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إضافة مهمة القائمة')
@@ -402,8 +371,6 @@ export const useAddChecklistTask = () => {
 
 // Add employee feedback
 export const useAddEmployeeFeedback = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ onboardingId, feedback }: {
       onboardingId: string
@@ -416,7 +383,7 @@ export const useAddEmployeeFeedback = () => {
     }) => addEmployeeFeedback(onboardingId, feedback),
     onSuccess: (_, variables) => {
       toast.success('تم إضافة ملاحظات الموظف بنجاح')
-      queryClient.invalidateQueries({ queryKey: onboardingKeys.detail(variables.onboardingId) })
+      invalidateCache.onboarding.detail(variables.onboardingId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إضافة ملاحظات الموظف')

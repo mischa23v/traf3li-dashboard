@@ -5,6 +5,8 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { CACHE_TIMES } from '@/config/cache'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import expensePoliciesService, {
   CreateExpensePolicyData,
   UpdateExpensePolicyData,
@@ -16,7 +18,7 @@ export const useExpensePolicies = () => {
   return useQuery({
     queryKey: ['expense-policies'],
     queryFn: () => expensePoliciesService.getExpensePolicies(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 
@@ -25,7 +27,7 @@ export const useExpensePolicy = (id: string) => {
     queryKey: ['expense-policy', id],
     queryFn: () => expensePoliciesService.getExpensePolicy(id),
     enabled: !!id,
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -33,7 +35,7 @@ export const useDefaultExpensePolicy = () => {
   return useQuery({
     queryKey: ['expense-policy', 'default'],
     queryFn: () => expensePoliciesService.getDefaultPolicy(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -65,7 +67,7 @@ export const useCreateExpensePolicy = () => {
       toast.error(error.message || 'Failed to create policy | فشل إنشاء السياسة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['expense-policies'] })
+      await invalidateCache.expenses.policies()
     },
   })
 }
@@ -100,8 +102,8 @@ export const useUpdateExpensePolicy = () => {
       toast.error(error.message || 'Failed to update policy | فشل تحديث السياسة')
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: ['expense-policies'] })
-      await queryClient.invalidateQueries({ queryKey: ['expense-policy', variables.id] })
+      await invalidateCache.expenses.policies()
+      await invalidateCache.expenses.policy(variables.id)
     },
   })
 }
@@ -131,7 +133,7 @@ export const useDeleteExpensePolicy = () => {
       toast.error(error.message || 'Failed to delete policy | فشل حذف السياسة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['expense-policies'] })
+      await invalidateCache.expenses.policies()
     },
   })
 }
@@ -163,8 +165,8 @@ export const useSetDefaultExpensePolicy = () => {
       toast.error(error.message || 'Failed to set default policy | فشل تعيين السياسة الافتراضية')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['expense-policies'] })
-      await queryClient.invalidateQueries({ queryKey: ['expense-policy', 'default'] })
+      await invalidateCache.expenses.policies()
+      await invalidateCache.expenses.defaultPolicy()
     },
   })
 }
@@ -199,7 +201,7 @@ export const useTogglePolicyStatus = () => {
       toast.error(error.message || 'Failed to toggle policy status | فشل تغيير حالة السياسة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['expense-policies'] })
+      await invalidateCache.expenses.policies()
     },
   })
 }
@@ -230,7 +232,7 @@ export const useDuplicateExpensePolicy = () => {
       toast.error(error.message || 'Failed to duplicate policy | فشل نسخ السياسة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['expense-policies'] })
+      await invalidateCache.expenses.policies()
     },
   })
 }

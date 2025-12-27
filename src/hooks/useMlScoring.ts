@@ -6,6 +6,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
+import { CACHE_TIMES } from '@/config/cache'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   getMLScores,
   getMLScore,
@@ -76,7 +78,7 @@ export const useMLScores = (params?: GetMLScoresParams) => {
   return useQuery<{ data: MLScore[]; pagination: PaginationMeta }>({
     queryKey: mlScoringKeys.scoresList(params),
     queryFn: () => getMLScores(params),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -88,7 +90,7 @@ export const useMLScore = (leadId: string, enabled = true) => {
     queryKey: mlScoringKeys.score(leadId),
     queryFn: () => getMLScore(leadId),
     enabled: enabled && !!leadId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -100,7 +102,7 @@ export const useScoreExplanation = (leadId: string, enabled = true) => {
     queryKey: mlScoringKeys.explanation(leadId),
     queryFn: () => getScoreExplanation(leadId),
     enabled: enabled && !!leadId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -112,7 +114,7 @@ export const useHybridScore = (leadId: string, weights?: HybridScoreWeights, ena
     queryKey: mlScoringKeys.hybrid(leadId),
     queryFn: () => getHybridScore(leadId, weights),
     enabled: enabled && !!leadId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -120,16 +122,15 @@ export const useHybridScore = (leadId: string, weights?: HybridScoreWeights, ena
  * Calculate/refresh ML score for a lead
  */
 export const useCalculateMLScore = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (leadId: string) => calculateMLScore(leadId),
     onSuccess: (data, leadId) => {
       // Invalidate related queries
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.score(leadId) })
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.scoresList() })
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.priorityQueueList() })
+      invalidateCache.mlScoring.score(leadId)
+      invalidateCache.mlScoring.scoresList()
+      invalidateCache.mlScoring.priorityQueueList()
       toast.success(t('mlScoring.scoreCalculated', 'Score calculated successfully'))
     },
     onError: (error: any) => {
@@ -142,14 +143,13 @@ export const useCalculateMLScore = () => {
  * Batch calculate scores for multiple leads
  */
 export const useBatchCalculateScores = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (leadIds: string[]) => batchCalculateScores(leadIds),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.scores() })
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.priorityQueueList() })
+      invalidateCache.mlScoring.scores()
+      invalidateCache.mlScoring.priorityQueueList()
       const successCount = data.data.results.length
       const failedCount = data.data.failed.length
       if (failedCount > 0) {
@@ -178,8 +178,8 @@ export const usePriorityQueue = (params?: GetPriorityQueueParams) => {
   return useQuery<{ data: PriorityQueueItem[] }>({
     queryKey: mlScoringKeys.priorityQueueList(params),
     queryFn: () => getPriorityQueue(params),
-    staleTime: 1 * 60 * 1000, // 1 minute - more frequent updates for queue
-    refetchInterval: 5 * 60 * 1000, // Auto-refresh every 5 minutes
+    staleTime: CACHE_TIMES.CALENDAR.GRID, // 1 minute - more frequent updates for queue
+    refetchInterval: CACHE_TIMES.MEDIUM, // Auto-refresh every 5 minutes
   })
 }
 
@@ -190,7 +190,7 @@ export const useTeamWorkload = () => {
   return useQuery<{ data: { workload: TeamWorkloadItem[] } }>({
     queryKey: mlScoringKeys.teamWorkload(),
     queryFn: () => getTeamWorkload(),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -198,15 +198,14 @@ export const useTeamWorkload = () => {
  * Record contact with a lead
  */
 export const useRecordContact = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
     mutationFn: ({ leadId, data }: { leadId: string; data: ContactData }) => recordContact(leadId, data),
     onSuccess: (_, { leadId }) => {
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.priorityQueueList() })
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.score(leadId) })
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.slaBreaches() })
+      invalidateCache.mlScoring.priorityQueueList()
+      invalidateCache.mlScoring.score(leadId)
+      invalidateCache.mlScoring.slaBreaches()
       toast.success(t('mlScoring.contactRecorded', 'Contact recorded successfully'))
     },
     onError: (error: any) => {
@@ -219,15 +218,14 @@ export const useRecordContact = () => {
  * Assign lead to a sales rep
  */
 export const useAssignLead = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
     mutationFn: ({ leadId, userId }: { leadId: string; userId: string }) => assignLead(leadId, userId),
     onSuccess: (_, { leadId }) => {
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.priorityQueueList() })
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.score(leadId) })
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.teamWorkload() })
+      invalidateCache.mlScoring.priorityQueueList()
+      invalidateCache.mlScoring.score(leadId)
+      invalidateCache.mlScoring.teamWorkload()
       toast.success(t('mlScoring.leadAssigned', 'Lead assigned successfully'))
     },
     onError: (error: any) => {
@@ -245,7 +243,7 @@ export const useSLAMetrics = (period?: string) => {
   return useQuery<{ data: SLAMetrics }>({
     queryKey: mlScoringKeys.slaMetrics(period),
     queryFn: () => getSLAMetrics(period),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -256,8 +254,8 @@ export const useSLABreaches = () => {
   return useQuery<{ data: { breaches: SLABreachItem[] } }>({
     queryKey: mlScoringKeys.slaBreaches(),
     queryFn: () => getSLABreaches(),
-    staleTime: 1 * 60 * 1000, // 1 minute - important to keep updated
-    refetchInterval: 2 * 60 * 1000, // Auto-refresh every 2 minutes
+    staleTime: CACHE_TIMES.CALENDAR.GRID, // 1 minute - important to keep updated
+    refetchInterval: CACHE_TIMES.SHORT, // Auto-refresh every 2 minutes
   })
 }
 
@@ -270,7 +268,7 @@ export const useMLDashboard = (params?: GetMLDashboardParams) => {
   return useQuery<{ data: MLDashboardData }>({
     queryKey: mlScoringKeys.dashboard(params),
     queryFn: () => getMLDashboard(params),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -281,7 +279,7 @@ export const useFeatureImportance = () => {
   return useQuery<{ data: { features: FeatureImportance[] } }>({
     queryKey: mlScoringKeys.featureImportance(),
     queryFn: () => getFeatureImportance(),
-    staleTime: 30 * 60 * 1000, // 30 minutes - doesn't change often
+    staleTime: CACHE_TIMES.LONG, // 30 minutes - doesn't change often
   })
 }
 
@@ -292,7 +290,7 @@ export const useScoreDistribution = () => {
   return useQuery<{ data: ScoreDistribution }>({
     queryKey: mlScoringKeys.scoreDistribution(),
     queryFn: () => getScoreDistribution(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -305,7 +303,7 @@ export const useModelMetrics = () => {
   return useQuery<{ data: ModelMetrics }>({
     queryKey: mlScoringKeys.modelMetrics(),
     queryFn: () => getModelMetrics(),
-    staleTime: 10 * 60 * 1000,
+    staleTime: CACHE_TIMES.LONG, // 30 minutes (was 10 minutes)
   })
 }
 
@@ -313,14 +311,13 @@ export const useModelMetrics = () => {
  * Train the ML model
  */
 export const useTrainModel = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (options?: TrainModelOptions) => trainModel(options),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.modelMetrics() })
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.featureImportance() })
+      invalidateCache.mlScoring.modelMetrics()
+      invalidateCache.mlScoring.featureImportance()
       toast.success(t('mlScoring.modelTrained', 'Model trained successfully'))
     },
     onError: (error: any) => {
@@ -367,7 +364,7 @@ export const usePrefetchMLScore = () => {
     queryClient.prefetchQuery({
       queryKey: mlScoringKeys.score(leadId),
       queryFn: () => getMLScore(leadId),
-      staleTime: 2 * 60 * 1000,
+      staleTime: CACHE_TIMES.SHORT,
     })
   }
 }
@@ -376,10 +373,8 @@ export const usePrefetchMLScore = () => {
  * Invalidate all ML scoring queries (useful after major changes)
  */
 export const useInvalidateMLScoring = () => {
-  const queryClient = useQueryClient()
-
   return () => {
-    queryClient.invalidateQueries({ queryKey: mlScoringKeys.all })
+    invalidateCache.mlScoring.all()
   }
 }
 

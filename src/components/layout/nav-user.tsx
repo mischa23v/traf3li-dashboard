@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import useDialogState from '@/hooks/use-dialog-state'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { ROUTES } from '@/constants/routes'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -93,19 +94,19 @@ export function NavUser({ user }: NavUserProps) {
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
-                  <Link to='/settings/account'>
+                  <Link to={ROUTES.settings.account}>
                     <BadgeCheck aria-hidden='true' />
                     {t('profile.dropdown.account')}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to='/settings'>
+                  <Link to={ROUTES.settings.index}>
                     <CreditCard aria-hidden='true' />
                     {t('profile.dropdown.billing')}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to='/settings/notifications'>
+                  <Link to={ROUTES.settings.notifications}>
                     <Bell aria-hidden='true' />
                     {t('profile.dropdown.notifications')}
                   </Link>

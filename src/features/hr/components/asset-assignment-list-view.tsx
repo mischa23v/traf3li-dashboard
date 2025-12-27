@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useAssetAssignments, useAssetAssignmentStats, useBulkDeleteAssetAssignments } from '@/hooks/useAssetAssignment'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -181,8 +182,8 @@ const getBgClasses = (color: string) => {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'الأصول والمعدات', href: '/dashboard/hr/asset-assignment', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'الأصول والمعدات', href: ROUTES.dashboard.hr.assetAssignment.list, isActive: true },
   ]
 
   return (
@@ -365,7 +366,7 @@ const getBgClasses = (color: string) => {
                     </Button>
                     <Button
                       size="sm"
-                      onClick={() => navigate({ to: '/dashboard/hr/asset-assignment/new' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.hr.assetAssignment.new })}
                       className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
                     >
                       <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
@@ -410,7 +411,7 @@ const getBgClasses = (color: string) => {
                   <Package className="w-12 h-12 mx-auto text-slate-300" />
                   <p className="mt-4 text-slate-500">لا توجد تخصيصات</p>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/hr/asset-assignment/new' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.hr.assetAssignment.new })}
                     className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
                     <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
@@ -463,7 +464,7 @@ const getBgClasses = (color: string) => {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/asset-assignment/${assignment._id}` })}>
+                                  <DropdownMenuItem onClick={() => navigate({ to: ROUTES.dashboard.hr.assetAssignment.detail(assignment._id) })}>
                                     <Eye className="w-4 h-4 ms-2" aria-hidden="true" />
                                     عرض التفاصيل
                                   </DropdownMenuItem>
@@ -528,7 +529,7 @@ const getBgClasses = (color: string) => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => navigate({ to: `/dashboard/hr/asset-assignment/${assignment._id}` })}
+                              onClick={() => navigate({ to: ROUTES.dashboard.hr.assetAssignment.detail(assignment._id) })}
                               className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl"
                             >
                               عرض التفاصيل

@@ -7,8 +7,9 @@
  * Error handling includes bilingual user-facing alerts.
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import messageService from '@/services/messageService'
 import type {
   ThreadMessage,
@@ -138,21 +139,17 @@ export function useMessageById(id: string, enabled = true) {
  * Post a new message/comment
  */
 export function useCreateMessage() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateMessageData) => messageService.createMessage(data),
     onSuccess: (newMessage) => {
       // Invalidate the thread for this record
       if (newMessage.res_model && newMessage.res_id) {
-        queryClient.invalidateQueries({
-          queryKey: messageKeys.thread(
-            newMessage.res_model as ThreadResModel,
-            newMessage.res_id
-          ),
-        })
+        invalidateCache.messages.thread(
+          newMessage.res_model as ThreadResModel,
+          newMessage.res_id
+        )
       }
-      queryClient.invalidateQueries({ queryKey: messageKeys.lists() })
+      invalidateCache.messages.lists()
     },
   })
 }
@@ -161,21 +158,17 @@ export function useCreateMessage() {
  * Post an internal note
  */
 export function useCreateNote() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateNoteData) => messageService.createNote(data),
     onSuccess: (newNote) => {
       // Invalidate the thread for this record
       if (newNote.res_model && newNote.res_id) {
-        queryClient.invalidateQueries({
-          queryKey: messageKeys.thread(
-            newNote.res_model as ThreadResModel,
-            newNote.res_id
-          ),
-        })
+        invalidateCache.messages.thread(
+          newNote.res_model as ThreadResModel,
+          newNote.res_id
+        )
       }
-      queryClient.invalidateQueries({ queryKey: messageKeys.lists() })
+      invalidateCache.messages.lists()
     },
   })
 }
@@ -184,20 +177,16 @@ export function useCreateNote() {
  * Update a message
  */
 export function useUpdateMessage() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, body }: { id: string; body: string }) =>
       messageService.updateMessage(id, body),
     onSuccess: (updatedMessage, { id }) => {
-      queryClient.invalidateQueries({ queryKey: messageKeys.detail(id) })
+      invalidateCache.messages.detail(id)
       if (updatedMessage.res_model && updatedMessage.res_id) {
-        queryClient.invalidateQueries({
-          queryKey: messageKeys.thread(
-            updatedMessage.res_model as ThreadResModel,
-            updatedMessage.res_id
-          ),
-        })
+        invalidateCache.messages.thread(
+          updatedMessage.res_model as ThreadResModel,
+          updatedMessage.res_id
+        )
       }
     },
   })
@@ -207,20 +196,16 @@ export function useUpdateMessage() {
  * Toggle star on a message
  */
 export function useToggleMessageStar() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => messageService.toggleMessageStar(id),
     onSuccess: (updatedMessage, id) => {
-      queryClient.invalidateQueries({ queryKey: messageKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: messageKeys.starred() })
+      invalidateCache.messages.detail(id)
+      invalidateCache.messages.starred()
       if (updatedMessage.res_model && updatedMessage.res_id) {
-        queryClient.invalidateQueries({
-          queryKey: messageKeys.thread(
-            updatedMessage.res_model as ThreadResModel,
-            updatedMessage.res_id
-          ),
-        })
+        invalidateCache.messages.thread(
+          updatedMessage.res_model as ThreadResModel,
+          updatedMessage.res_id
+        )
       }
     },
   })
@@ -230,13 +215,11 @@ export function useToggleMessageStar() {
  * Delete a message
  */
 export function useDeleteMessage() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => messageService.deleteMessage(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: messageKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: messageKeys.starred() })
+      invalidateCache.messages.lists()
+      invalidateCache.messages.starred()
     },
   })
 }
@@ -247,8 +230,6 @@ export function useDeleteMessage() {
  * Post a quick comment (convenience wrapper)
  */
 export function usePostComment() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       resModel,
@@ -262,9 +243,7 @@ export function usePostComment() {
       attachmentIds?: string[]
     }) => messageService.postComment(resModel, resId, body, attachmentIds),
     onSuccess: (_, { resModel, resId }) => {
-      queryClient.invalidateQueries({
-        queryKey: messageKeys.thread(resModel, resId),
-      })
+      invalidateCache.messages.thread(resModel, resId)
     },
   })
 }
@@ -273,8 +252,6 @@ export function usePostComment() {
  * Post a quick internal note (convenience wrapper)
  */
 export function usePostInternalNote() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       resModel,
@@ -288,9 +265,7 @@ export function usePostInternalNote() {
       partnerIds?: string[]
     }) => messageService.postInternalNote(resModel, resId, body, partnerIds),
     onSuccess: (_, { resModel, resId }) => {
-      queryClient.invalidateQueries({
-        queryKey: messageKeys.thread(resModel, resId),
-      })
+      invalidateCache.messages.thread(resModel, resId)
     },
   })
 }

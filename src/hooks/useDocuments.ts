@@ -6,9 +6,9 @@ import documentsService, {
   type UpdateDocumentData,
 } from '@/services/documentsService'
 import { toast } from '@/hooks/use-toast'
-import { CACHE_TIMES } from '@/config'
 import { useTranslation } from 'react-i18next'
 import { Analytics } from '@/lib/analytics'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ==================== Cache Configuration ====================
 const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
@@ -219,18 +219,12 @@ export const useUploadDocument = () => {
     onSettled: async (_, __, variables) => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: documentsKeys.all, refetchType: 'all' })
+      await invalidateCache.documents.all()
       if (variables.metadata.caseId) {
-        await queryClient.invalidateQueries({
-          queryKey: documentsKeys.byCase(variables.metadata.caseId),
-          refetchType: 'all'
-        })
+        await invalidateCache.documents.forCase(variables.metadata.caseId)
       }
       if (variables.metadata.clientId) {
-        return await queryClient.invalidateQueries({
-          queryKey: documentsKeys.byClient(variables.metadata.clientId),
-          refetchType: 'all'
-        })
+        await invalidateCache.documents.forClient(variables.metadata.clientId)
       }
     },
   })
@@ -300,8 +294,8 @@ export const useUpdateDocument = () => {
       })
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: documentsKeys.all })
-      return await queryClient.invalidateQueries({ queryKey: documentsKeys.detail(id) })
+      await invalidateCache.documents.all()
+      await invalidateCache.documents.detail(id)
     },
   })
 }
@@ -355,7 +349,7 @@ export const useDeleteDocument = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: documentsKeys.all, refetchType: 'all' })
+      await invalidateCache.documents.all()
     },
   })
 }
@@ -385,7 +379,7 @@ export const useBulkDeleteDocuments = () => {
       })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: documentsKeys.all })
+      await invalidateCache.documents.all()
     },
   })
 }
@@ -455,9 +449,9 @@ export const useUploadDocumentVersion = () => {
       )
     },
     onSettled: async (_, __, { documentId }) => {
-      await queryClient.invalidateQueries({ queryKey: documentsKeys.all })
-      await queryClient.invalidateQueries({ queryKey: documentsKeys.detail(documentId) })
-      return await queryClient.invalidateQueries({ queryKey: documentsKeys.versions(documentId) })
+      await invalidateCache.documents.all()
+      await invalidateCache.documents.detail(documentId)
+      await invalidateCache.documents.versions(documentId)
     },
   })
 }
@@ -493,9 +487,9 @@ export const useRestoreDocumentVersion = () => {
       })
     },
     onSettled: async (_, __, { documentId }) => {
-      await queryClient.invalidateQueries({ queryKey: documentsKeys.all })
-      await queryClient.invalidateQueries({ queryKey: documentsKeys.detail(documentId) })
-      return await queryClient.invalidateQueries({ queryKey: documentsKeys.versions(documentId) })
+      await invalidateCache.documents.all()
+      await invalidateCache.documents.detail(documentId)
+      await invalidateCache.documents.versions(documentId)
     },
   })
 }
@@ -632,7 +626,7 @@ export const useRevokeShareLink = () => {
       })
     },
     onSettled: async (_, __, id) => {
-      return await queryClient.invalidateQueries({ queryKey: documentsKeys.detail(id) })
+      await invalidateCache.documents.detail(id)
     },
   })
 }
@@ -669,8 +663,8 @@ export const useEncryptDocument = () => {
       )
     },
     onSettled: async (_, __, id) => {
-      await queryClient.invalidateQueries({ queryKey: documentsKeys.all })
-      return await queryClient.invalidateQueries({ queryKey: documentsKeys.detail(id) })
+      await invalidateCache.documents.all()
+      await invalidateCache.documents.detail(id)
     },
   })
 }
@@ -739,9 +733,9 @@ export const useMoveDocumentToCase = () => {
       })
     },
     onSettled: async (_, __, { documentId, caseId }) => {
-      await queryClient.invalidateQueries({ queryKey: documentsKeys.all })
-      await queryClient.invalidateQueries({ queryKey: documentsKeys.detail(documentId) })
-      return await queryClient.invalidateQueries({ queryKey: documentsKeys.byCase(caseId) })
+      await invalidateCache.documents.all()
+      await invalidateCache.documents.detail(documentId)
+      await invalidateCache.documents.forCase(caseId)
     },
   })
 }

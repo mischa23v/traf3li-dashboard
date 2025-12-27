@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useLoans, useLoanStats, useDeleteLoan, useBulkDeleteLoans } from '@/hooks/useLoans'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -144,8 +145,8 @@ export function LoansListView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'القروض', href: '/dashboard/hr/loans', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'القروض', href: ROUTES.dashboard.hr.loans.list, isActive: true },
   ]
 
   return (
@@ -275,7 +276,7 @@ export function LoansListView() {
                     </SelectContent>
                   </Select>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/hr/loans/new' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.hr.loans.new })}
                     className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
                   >
                     <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
@@ -340,7 +341,7 @@ export function LoansListView() {
                   <Wallet className="w-12 h-12 mx-auto text-slate-300" />
                   <p className="mt-4 text-slate-500">لا توجد قروض</p>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/hr/loans/new' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.hr.loans.new })}
                     className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
                     <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
@@ -367,7 +368,7 @@ export function LoansListView() {
 
                         <div
                           className="flex-1 cursor-pointer"
-                          onClick={() => navigate({ to: `/dashboard/hr/loans/${loan._id}` })}
+                          onClick={() => navigate({ to: ROUTES.dashboard.hr.loans.detail(loan._id) })}
                         >
                           <div className="flex items-start justify-between">
                             <div>
@@ -437,7 +438,7 @@ export function LoansListView() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-48">
                             <DropdownMenuItem
-                              onClick={() => navigate({ to: `/dashboard/hr/loans/${loan._id}` })}
+                              onClick={() => navigate({ to: ROUTES.dashboard.hr.loans.detail(loan._id) })}
                             >
                               <Eye className="w-4 h-4 ms-2" aria-hidden="true" />
                               عرض التفاصيل

@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useSearch } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useCreateApplicant, useJobPostings } from '@/hooks/useRecruitment'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -286,7 +287,7 @@ export function ApplicantCreateView() {
       }
 
       await createMutation.mutateAsync(applicantData)
-      navigate({ to: '/dashboard/hr/recruitment/applicants' })
+      navigate({ to: ROUTES.dashboard.hr.recruitment.applicants.list })
     } catch {
       // Error is handled by mutation's onError callback
     }
@@ -294,8 +295,8 @@ export function ApplicantCreateView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'التوظيف', href: '/dashboard/hr/recruitment/applicants', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'التوظيف', href: ROUTES.dashboard.hr.recruitment.applicants.list, isActive: true },
   ]
 
   // Loading state
@@ -411,7 +412,7 @@ export function ApplicantCreateView() {
                 variant="ghost"
                 size="icon"
                 className="rounded-xl hover:bg-white"
-                onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants' })}
+                onClick={() => navigate({ to: ROUTES.dashboard.hr.recruitment.applicants.list })}
               >
                 <ArrowRight className="h-5 w-5" />
               </Button>
@@ -1063,7 +1064,7 @@ export function ApplicantCreateView() {
             <div className="flex items-center justify-end gap-4">
               <Button
                 variant="outline"
-                onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants' })}
+                onClick={() => navigate({ to: ROUTES.dashboard.hr.recruitment.applicants.list })}
                 className="rounded-xl"
               >
                 إلغاء

@@ -60,6 +60,7 @@ import { FinanceSidebar } from './finance-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { formatSAR } from '@/lib/currency'
 import type { BillStatus, CreateBillData } from '@/services/accountingService'
+import { ROUTES } from '@/constants/routes'
 
 interface BillLine {
     description: string
@@ -239,12 +240,12 @@ export default function BillsDashboard() {
     }, [])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'فواتير الموردين', href: '/dashboard/finance/bills', isActive: true },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
-        { title: 'كشف الحساب', href: '/dashboard/finance/statements', isActive: false },
-        { title: 'المعاملات', href: '/dashboard/finance/transactions', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: false },
+        { title: 'فواتير الموردين', href: ROUTES.dashboard.finance.bills.list, isActive: true },
+        { title: 'المصروفات', href: ROUTES.dashboard.finance.expenses.list, isActive: false },
+        { title: 'كشف الحساب', href: ROUTES.dashboard.finance.statements.list, isActive: false },
+        { title: 'المعاملات', href: ROUTES.dashboard.finance.transactions.list, isActive: false },
     ]
 
     // LOADING STATE

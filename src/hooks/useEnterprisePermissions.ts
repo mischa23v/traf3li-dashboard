@@ -6,6 +6,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import permissionService from '@/services/permissionService'
+import { CACHE_TIMES } from '@/config/cache'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import type {
   PermissionPolicy,
   CreatePolicyData,
@@ -52,7 +54,7 @@ export const usePolicies = (params?: {
   return useQuery({
     queryKey: permissionKeys.policyList(params),
     queryFn: () => permissionService.getPolicies(params),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -64,7 +66,7 @@ export const usePolicy = (policyId: string) => {
     queryKey: permissionKeys.policy(policyId),
     queryFn: () => permissionService.getPolicy(policyId),
     enabled: !!policyId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -91,7 +93,7 @@ export const useCreatePolicy = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 500))
-      await queryClient.invalidateQueries({ queryKey: permissionKeys.policies() })
+      await invalidateCache.permissions.policies()
     },
   })
 }
@@ -113,8 +115,8 @@ export const useUpdatePolicy = () => {
       toast.error(error.message || 'فشل تحديث السياسة')
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: permissionKeys.policies() })
-      await queryClient.invalidateQueries({ queryKey: permissionKeys.policy(variables.policyId) })
+      await invalidateCache.permissions.policies()
+      await invalidateCache.permissions.policy(variables.policyId)
     },
   })
 }
@@ -141,7 +143,7 @@ export const useDeletePolicy = () => {
       toast.error(error.message || 'فشل حذف السياسة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: permissionKeys.policies() })
+      await invalidateCache.permissions.policies()
     },
   })
 }
@@ -164,7 +166,7 @@ export const useTogglePolicy = () => {
       toast.error(error.message || 'فشل تغيير حالة السياسة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: permissionKeys.policies() })
+      await invalidateCache.permissions.policies()
     },
   })
 }
@@ -202,7 +204,7 @@ export const useRelationTuples = (params?: {
         throw new Error(errorMessage)
       }
     },
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
     onError: (error: any) => {
       const errorMsg = error?.message ||
         'Failed to load permission relations | فشل في تحميل علاقات الصلاحيات'
@@ -215,8 +217,6 @@ export const useRelationTuples = (params?: {
  * Hook to create a relation tuple
  */
 export const useCreateRelation = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateRelationTupleData) => permissionService.createRelation(data),
     onSuccess: () => {
@@ -226,7 +226,7 @@ export const useCreateRelation = () => {
       toast.error(error.message || 'فشل إنشاء العلاقة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: permissionKeys.relations() })
+      await invalidateCache.permissions.relations()
     },
   })
 }
@@ -235,8 +235,6 @@ export const useCreateRelation = () => {
  * Hook to delete a relation tuple
  */
 export const useDeleteRelation = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (relationId: string) => permissionService.deleteRelation(relationId),
     onSuccess: () => {
@@ -246,7 +244,7 @@ export const useDeleteRelation = () => {
       toast.error(error.message || 'فشل حذف العلاقة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: permissionKeys.relations() })
+      await invalidateCache.permissions.relations()
     },
   })
 }
@@ -255,8 +253,6 @@ export const useDeleteRelation = () => {
  * Hook to bulk create relations
  */
 export const useBulkCreateRelations = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (tuples: CreateRelationTupleData[]) => permissionService.bulkCreateRelations(tuples),
     onSuccess: () => {
@@ -266,7 +262,7 @@ export const useBulkCreateRelations = () => {
       toast.error(error.message || 'فشل إنشاء العلاقات')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: permissionKeys.relations() })
+      await invalidateCache.permissions.relations()
     },
   })
 }
@@ -300,7 +296,7 @@ export const useDecisionLogs = (filters?: DecisionLogFilters) => {
   return useQuery({
     queryKey: permissionKeys.decisionList(filters || {}),
     queryFn: () => permissionService.getDecisionLogs(filters),
-    staleTime: 30 * 1000, // 30 seconds for logs
+    staleTime: CACHE_TIMES.AUDIT.LOGS, // 30 seconds for logs
   })
 }
 
@@ -326,7 +322,7 @@ export const useDecisionStats = (params?: {
   return useQuery({
     queryKey: permissionKeys.decisionStats(params),
     queryFn: () => permissionService.getDecisionStats(params),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -340,7 +336,7 @@ export const useResourceAccess = (resourceType: string, resourceId: string) => {
     queryKey: permissionKeys.resourceAccess(resourceType, resourceId),
     queryFn: () => permissionService.getResourceAccess(resourceType, resourceId),
     enabled: !!resourceType && !!resourceId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -348,8 +344,6 @@ export const useResourceAccess = (resourceType: string, resourceId: string) => {
  * Hook to grant resource access
  */
 export const useGrantResourceAccess = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       resourceType,
@@ -362,9 +356,7 @@ export const useGrantResourceAccess = () => {
     }) => permissionService.grantResourceAccess(resourceType, resourceId, data),
     onSuccess: (_, variables) => {
       toast.success('تم منح الصلاحية بنجاح')
-      queryClient.invalidateQueries({
-        queryKey: permissionKeys.resourceAccess(variables.resourceType, variables.resourceId),
-      })
+      invalidateCache.permissions.resourceAccess(variables.resourceType, variables.resourceId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل منح الصلاحية')
@@ -376,8 +368,6 @@ export const useGrantResourceAccess = () => {
  * Hook to revoke resource access
  */
 export const useRevokeResourceAccess = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       resourceType,
@@ -390,9 +380,7 @@ export const useRevokeResourceAccess = () => {
     }) => permissionService.revokeResourceAccess(resourceType, resourceId, userId),
     onSuccess: (_, variables) => {
       toast.success('تم إلغاء الصلاحية بنجاح')
-      queryClient.invalidateQueries({
-        queryKey: permissionKeys.resourceAccess(variables.resourceType, variables.resourceId),
-      })
+      invalidateCache.permissions.resourceAccess(variables.resourceType, variables.resourceId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إلغاء الصلاحية')
@@ -409,7 +397,7 @@ export const useUserPermissionSummary = (userId?: string) => {
   return useQuery({
     queryKey: permissionKeys.userSummary(userId),
     queryFn: () => permissionService.getUserPermissionSummary(userId),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -421,7 +409,7 @@ export const useUserAccessibleResources = (userId: string, resourceType?: string
     queryKey: permissionKeys.userResources(userId, resourceType),
     queryFn: () => permissionService.getUserAccessibleResources(userId, resourceType),
     enabled: !!userId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -434,7 +422,7 @@ export const usePermissionConfig = () => {
   return useQuery({
     queryKey: [...permissionKeys.all, 'config'],
     queryFn: () => permissionService.getPermissionConfig(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -442,13 +430,11 @@ export const usePermissionConfig = () => {
  * Hook to update permission configuration
  */
 export const useUpdatePermissionConfig = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (config: any) => permissionService.updatePermissionConfig(config),
     onSuccess: () => {
       toast.success('تم تحديث إعدادات الصلاحيات بنجاح')
-      queryClient.invalidateQueries({ queryKey: [...permissionKeys.all, 'config'] })
+      invalidateCache.permissions.config()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث إعدادات الصلاحيات')
@@ -465,7 +451,7 @@ export const useRelationStats = () => {
   return useQuery({
     queryKey: [...permissionKeys.relations(), 'stats'],
     queryFn: () => permissionService.getRelationStats(),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -473,13 +459,11 @@ export const useRelationStats = () => {
  * Hook to grant a relation
  */
 export const useGrantRelation = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: any) => permissionService.grantRelation(data),
     onSuccess: () => {
       toast.success('تم منح العلاقة بنجاح')
-      queryClient.invalidateQueries({ queryKey: permissionKeys.relations() })
+      invalidateCache.permissions.relations()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل منح العلاقة')
@@ -491,13 +475,11 @@ export const useGrantRelation = () => {
  * Hook to revoke a relation
  */
 export const useRevokeRelation = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: any) => permissionService.revokeRelation(data),
     onSuccess: () => {
       toast.success('تم إلغاء العلاقة بنجاح')
-      queryClient.invalidateQueries({ queryKey: permissionKeys.relations() })
+      invalidateCache.permissions.relations()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إلغاء العلاقة')
@@ -513,7 +495,7 @@ export const useResourceRelations = (namespace: string, object: string) => {
     queryKey: [...permissionKeys.relations(), namespace, object],
     queryFn: () => permissionService.getResourceRelations(namespace, object),
     enabled: !!namespace && !!object,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -536,7 +518,7 @@ export const useMyPermissions = () => {
   return useQuery({
     queryKey: [...permissionKeys.all, 'my-permissions'],
     queryFn: () => permissionService.getMyPermissions(),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -548,7 +530,7 @@ export const useExpandPermissions = (namespace: string, resourceId: string, rela
     queryKey: [...permissionKeys.all, 'expand', namespace, resourceId, relation],
     queryFn: () => permissionService.expandPermissions(namespace, resourceId, relation),
     enabled: !!namespace && !!resourceId && !!relation,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -560,7 +542,7 @@ export const useUserResources = (userId: string) => {
     queryKey: [...permissionKeys.all, 'user-resources', userId],
     queryFn: () => permissionService.getUserResources(userId),
     enabled: !!userId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -578,7 +560,7 @@ export const useDeniedAttempts = (params?: {
   return useQuery({
     queryKey: [...permissionKeys.decisions(), 'denied', params],
     queryFn: () => permissionService.getDeniedAttempts(params),
-    staleTime: 1 * 60 * 1000,
+    staleTime: CACHE_TIMES.CALENDAR.GRID,
   })
 }
 
@@ -592,7 +574,7 @@ export const useComplianceReport = (params?: {
   return useQuery({
     queryKey: [...permissionKeys.decisions(), 'compliance', params],
     queryFn: () => permissionService.getComplianceReport(params),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -605,7 +587,7 @@ export const useCacheStats = () => {
   return useQuery({
     queryKey: [...permissionKeys.all, 'cache', 'stats'],
     queryFn: () => permissionService.getCacheStats(),
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: CACHE_TIMES.AUDIT.LOGS, // 30 seconds
   })
 }
 
@@ -613,13 +595,11 @@ export const useCacheStats = () => {
  * Hook to clear cache
  */
 export const useClearCache = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: () => permissionService.clearCache(),
     onSuccess: () => {
       toast.success('تم مسح الذاكرة المؤقتة بنجاح')
-      queryClient.invalidateQueries({ queryKey: permissionKeys.all })
+      invalidateCache.permissions.all()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل مسح الذاكرة المؤقتة')
@@ -636,7 +616,7 @@ export const useVisibleSidebar = () => {
   return useQuery({
     queryKey: [...permissionKeys.all, 'ui', 'sidebar'],
     queryFn: () => permissionService.getVisibleSidebar(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -647,7 +627,7 @@ export const useAllSidebarItems = () => {
   return useQuery({
     queryKey: [...permissionKeys.all, 'ui', 'sidebar', 'all'],
     queryFn: () => permissionService.getAllSidebarItems(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -655,14 +635,12 @@ export const useAllSidebarItems = () => {
  * Hook to update sidebar visibility
  */
 export const useUpdateSidebarVisibility = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ itemId, data }: { itemId: string; data: any }) =>
       permissionService.updateSidebarVisibility(itemId, data),
     onSuccess: () => {
       toast.success('تم تحديث رؤية القائمة الجانبية بنجاح')
-      queryClient.invalidateQueries({ queryKey: [...permissionKeys.all, 'ui', 'sidebar'] })
+      invalidateCache.permissions.sidebar()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث رؤية القائمة الجانبية')
@@ -686,7 +664,7 @@ export const useAllPageAccess = () => {
   return useQuery({
     queryKey: [...permissionKeys.all, 'ui', 'pages', 'all'],
     queryFn: () => permissionService.getAllPageAccess(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -694,14 +672,12 @@ export const useAllPageAccess = () => {
  * Hook to update page access for role
  */
 export const useUpdatePageAccessForRole = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ pageId, data }: { pageId: string; data: any }) =>
       permissionService.updatePageAccessForRole(pageId, data),
     onSuccess: () => {
       toast.success('تم تحديث صلاحيات الصفحة بنجاح')
-      queryClient.invalidateQueries({ queryKey: [...permissionKeys.all, 'ui', 'pages'] })
+      invalidateCache.permissions.pages()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث صلاحيات الصفحة')
@@ -716,7 +692,7 @@ export const useUIAccessConfig = () => {
   return useQuery({
     queryKey: [...permissionKeys.all, 'ui', 'config'],
     queryFn: () => permissionService.getUIAccessConfig(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -724,13 +700,11 @@ export const useUIAccessConfig = () => {
  * Hook to update UI access configuration
  */
 export const useUpdateUIAccessConfig = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (config: any) => permissionService.updateUIAccessConfig(config),
     onSuccess: () => {
       toast.success('تم تحديث إعدادات الوصول للواجهة بنجاح')
-      queryClient.invalidateQueries({ queryKey: [...permissionKeys.all, 'ui', 'config'] })
+      invalidateCache.permissions.ui()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث إعدادات الوصول للواجهة')
@@ -745,7 +719,7 @@ export const useAccessMatrix = () => {
   return useQuery({
     queryKey: [...permissionKeys.all, 'ui', 'matrix'],
     queryFn: () => permissionService.getAccessMatrix(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -753,14 +727,12 @@ export const useAccessMatrix = () => {
  * Hook to bulk update role access
  */
 export const useBulkUpdateRoleAccess = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ role, data }: { role: string; data: any }) =>
       permissionService.bulkUpdateRoleAccess(role, data),
     onSuccess: () => {
       toast.success('تم تحديث صلاحيات الدور بنجاح')
-      queryClient.invalidateQueries({ queryKey: [...permissionKeys.all, 'ui'] })
+      invalidateCache.permissions.ui()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث صلاحيات الدور')
@@ -772,13 +744,11 @@ export const useBulkUpdateRoleAccess = () => {
  * Hook to add user override
  */
 export const useAddUserOverride = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: any) => permissionService.addUserOverride(data),
     onSuccess: () => {
       toast.success('تم إضافة استثناء المستخدم بنجاح')
-      queryClient.invalidateQueries({ queryKey: [...permissionKeys.all, 'ui'] })
+      invalidateCache.permissions.ui()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إضافة استثناء المستخدم')
@@ -790,13 +760,11 @@ export const useAddUserOverride = () => {
  * Hook to remove user override
  */
 export const useRemoveUserOverride = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (userId: string) => permissionService.removeUserOverride(userId),
     onSuccess: () => {
       toast.success('تم إزالة استثناء المستخدم بنجاح')
-      queryClient.invalidateQueries({ queryKey: [...permissionKeys.all, 'ui'] })
+      invalidateCache.permissions.ui()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إزالة استثناء المستخدم')

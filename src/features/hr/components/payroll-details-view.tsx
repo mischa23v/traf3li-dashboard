@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useParams, useNavigate, Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -58,7 +59,7 @@ export function PayrollDetailsView() {
     const handleDelete = () => {
         deleteSlipMutation.mutate(slipId, {
             onSuccess: () => {
-                navigate({ to: '/dashboard/hr/payroll' })
+                navigate({ to: ROUTES.dashboard.hr.payroll.list })
             }
         })
     }
@@ -120,7 +121,7 @@ export function PayrollDetailsView() {
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'قسائم الرواتب', href: '/dashboard/hr/payroll', isActive: true },
+        { title: 'قسائم الرواتب', href: ROUTES.dashboard.hr.payroll.list, isActive: true },
     ]
 
     return (

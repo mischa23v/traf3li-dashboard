@@ -240,9 +240,9 @@ export function EmployeesListView() {
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: true },
+        { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: true },
         { title: 'الرواتب', href: '/dashboard/hr/salaries', isActive: false },
-        { title: 'الإجازات', href: '/dashboard/hr/leaves', isActive: false },
+        { title: 'الإجازات', href: ROUTES.dashboard.hr.leave.list, isActive: false },
     ]
 
     return (

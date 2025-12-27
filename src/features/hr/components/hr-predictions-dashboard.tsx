@@ -76,6 +76,7 @@ import {
   Line,
 } from 'recharts'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 
 const RISK_COLORS = {
   high: '#ef4444',
@@ -109,10 +110,10 @@ export function HrPredictionsDashboard() {
   const hasError = attritionError
 
   const topNav = [
-    { title: t('biometric.devices'), href: '/dashboard/hr/biometric', isActive: false },
-    { title: t('biometric.geofencing'), href: '/dashboard/hr/geofencing', isActive: false },
-    { title: t('hrAnalytics.title'), href: '/dashboard/hr/analytics', isActive: false },
-    { title: t('hrPredictions.title'), href: '/dashboard/hr/predictions', isActive: true },
+    { title: t('biometric.devices'), href: ROUTES.dashboard.hr.biometric.list, isActive: false },
+    { title: t('biometric.geofencing'), href: ROUTES.dashboard.hr.geofencing.list, isActive: false },
+    { title: t('hrAnalytics.title'), href: ROUTES.dashboard.hr.analytics.list, isActive: false },
+    { title: t('hrPredictions.title'), href: ROUTES.dashboard.hr.predictions.list, isActive: true },
   ]
 
   const handleRecalculate = () => {
@@ -481,7 +482,7 @@ export function HrPredictionsDashboard() {
                                       </DropdownMenuTrigger>
                                       <DropdownMenuContent align="end">
                                         <DropdownMenuItem asChild>
-                                          <Link to={`/dashboard/hr/employees/${employee.employeeId}`}>
+                                          <Link to={ROUTES.dashboard.hr.employees.detail(employee.employeeId)}>
                                             <Eye className="w-4 h-4 ms-2" aria-hidden="true" />
                                             {t('hrPredictions.viewDetails')}
                                           </Link>
@@ -665,7 +666,7 @@ export function HrPredictionsDashboard() {
                                       </DropdownMenuTrigger>
                                       <DropdownMenuContent align="end">
                                         <DropdownMenuItem asChild>
-                                          <Link to={`/dashboard/hr/employees/${employee.employeeId}`}>
+                                          <Link to={ROUTES.dashboard.hr.employees.detail(employee.employeeId)}>
                                             <Eye className="w-4 h-4 ms-2" aria-hidden="true" />
                                             {t('hrPredictions.viewDetails')}
                                           </Link>
@@ -733,7 +734,7 @@ export function HrPredictionsDashboard() {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                       <DropdownMenuItem asChild>
-                                        <Link to={`/dashboard/hr/employees/${employee.employeeId}`}>
+                                        <Link to={ROUTES.dashboard.hr.employees.detail(employee.employeeId)}>
                                           <Eye className="w-4 h-4 ms-2" aria-hidden="true" />
                                           {t('hrPredictions.viewDetails')}
                                         </Link>

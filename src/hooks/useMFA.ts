@@ -6,10 +6,12 @@
  * Only TOTP supported (no SMS/email)
  */
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import * as React from 'react'
+import { CACHE_TIMES } from '@/config/cache'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 import {
   setupMFA,
@@ -55,7 +57,7 @@ export function useMFAStatus(enabled = true) {
     queryKey: mfaKeys.status(),
     queryFn: getMFAStatus,
     enabled,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     retry: 1,
   })
 }
@@ -68,7 +70,7 @@ export function useMFARequirement(enabled = true) {
     queryKey: mfaKeys.requirement(),
     queryFn: checkMFARequirement,
     enabled,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     retry: 1,
   })
 }
@@ -81,7 +83,7 @@ export function useBackupCodesCount(enabled = true) {
     queryKey: mfaKeys.backupCodesCount(),
     queryFn: getBackupCodesCount,
     enabled,
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
     retry: 1,
   })
 }
@@ -108,16 +110,13 @@ export function useSetupMFA() {
  */
 export function useVerifyMFASetup() {
   const { t } = useTranslation()
-  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (token: string) => verifyMFASetup(token),
     onSuccess: (data) => {
       if (!data.error && data.enabled) {
         toast.success(t('mfa.setup.setupComplete'))
-        queryClient.invalidateQueries({ queryKey: mfaKeys.status() })
-        queryClient.invalidateQueries({ queryKey: mfaKeys.requirement() })
-        queryClient.invalidateQueries({ queryKey: mfaKeys.backupCodesCount() })
+        invalidateCache.mfa.related()
       }
     },
     onError: (error: any) => {
@@ -162,16 +161,13 @@ export function useVerifyMFA() {
  */
 export function useDisableMFA() {
   const { t } = useTranslation()
-  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (password: string) => disableMFA(password),
     onSuccess: (data) => {
       if (!data.error && data.disabled) {
         toast.success(t('mfa.disable.disabled'))
-        queryClient.invalidateQueries({ queryKey: mfaKeys.status() })
-        queryClient.invalidateQueries({ queryKey: mfaKeys.requirement() })
-        queryClient.invalidateQueries({ queryKey: mfaKeys.backupCodesCount() })
+        invalidateCache.mfa.related()
       }
     },
     onError: (error: any) => {
@@ -192,13 +188,12 @@ export function useDisableMFA() {
  */
 export function useRegenerateBackupCodes() {
   const { t } = useTranslation()
-  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: () => regenerateBackupCodes(),
     onSuccess: () => {
       toast.success(t('mfa.backup.regenerate'))
-      queryClient.invalidateQueries({ queryKey: mfaKeys.backupCodesCount() })
+      invalidateCache.mfa.backupCodesCount()
     },
     onError: (error: any) => {
       const message = error.response?.data?.messageEn || error.response?.data?.message
@@ -213,7 +208,6 @@ export function useRegenerateBackupCodes() {
  */
 export function useVerifyBackupCode() {
   const { t } = useTranslation()
-  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: ({ userId, code }: { userId: string; code: string }) =>
@@ -222,7 +216,7 @@ export function useVerifyBackupCode() {
       if (data.remainingCodes <= 2 && data.warning) {
         toast.warning(t('mfa.backup.lowCodesWarning'))
       }
-      queryClient.invalidateQueries({ queryKey: mfaKeys.backupCodesCount() })
+      invalidateCache.mfa.backupCodesCount()
     },
     onError: (error: any) => {
       const code = error.response?.data?.code

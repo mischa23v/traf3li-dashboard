@@ -1,6 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import onboardingWizardService, {
   type WizardData,
   type WizardCompanyInfo,
@@ -40,12 +41,10 @@ export const useOnboardingWizardStatus = () => {
  * Save wizard progress to the database
  */
 export const useSaveWizardProgress = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: Partial<WizardData>) => onboardingWizardService.saveWizardProgress(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: onboardingWizardKeys.status() })
+      invalidateCache.onboardingWizard.status()
     },
     onError: (error: Error) => {
       console.error('Failed to save wizard progress:', error)
@@ -60,15 +59,13 @@ export const useSaveWizardProgress = () => {
  * Save company information
  */
 export const useSaveCompanyInfo = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (companyInfo: WizardCompanyInfo) => onboardingWizardService.saveCompanyInfo(companyInfo),
     onSuccess: () => {
       toast.success('تم حفظ معلومات الشركة بنجاح', {
         description: 'Company information saved successfully'
       })
-      queryClient.invalidateQueries({ queryKey: onboardingWizardKeys.status() })
+      invalidateCache.onboardingWizard.status()
     },
     onError: (error: Error) => {
       toast.error('فشل في حفظ معلومات الشركة', {
@@ -103,15 +100,13 @@ export const useUploadCompanyLogo = () => {
  * Save user profile information
  */
 export const useSaveUserProfile = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (userProfile: WizardUserProfile) => onboardingWizardService.saveUserProfile(userProfile),
     onSuccess: () => {
       toast.success('تم حفظ الملف الشخصي بنجاح', {
         description: 'User profile saved successfully'
       })
-      queryClient.invalidateQueries({ queryKey: onboardingWizardKeys.status() })
+      invalidateCache.onboardingWizard.status()
     },
     onError: (error: Error) => {
       toast.error('فشل في حفظ الملف الشخصي', {
@@ -146,15 +141,13 @@ export const useUploadUserAvatar = () => {
  * Save module selection
  */
 export const useSaveModuleSelection = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (modules: WizardModuleSelection) => onboardingWizardService.saveModuleSelection(modules),
     onSuccess: () => {
       toast.success('تم حفظ اختيار الوحدات بنجاح', {
         description: 'Module selection saved successfully'
       })
-      queryClient.invalidateQueries({ queryKey: onboardingWizardKeys.status() })
+      invalidateCache.onboardingWizard.status()
     },
     onError: (error: Error) => {
       toast.error('فشل في حفظ اختيار الوحدات', {
@@ -170,15 +163,13 @@ export const useSaveModuleSelection = () => {
  * Complete the onboarding wizard
  */
 export const useCompleteWizard = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (wizardData: WizardData) => onboardingWizardService.completeWizard(wizardData),
     onSuccess: () => {
       toast.success('مرحباً بك في النظام!', {
         description: 'Welcome! Your account is ready to use.'
       })
-      queryClient.invalidateQueries({ queryKey: onboardingWizardKeys.status() })
+      invalidateCache.onboardingWizard.status()
     },
     onError: (error: Error) => {
       toast.error('فشل في إكمال الإعداد', {
@@ -194,15 +185,13 @@ export const useCompleteWizard = () => {
  * Skip the onboarding wizard (mark as completed with minimal data)
  */
 export const useSkipWizard = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: () => onboardingWizardService.skipWizard(),
     onSuccess: () => {
       toast.info('تم تخطي معالج الإعداد', {
         description: 'You can complete your profile later from settings'
       })
-      queryClient.invalidateQueries({ queryKey: onboardingWizardKeys.status() })
+      invalidateCache.onboardingWizard.status()
     },
     onError: (error: Error) => {
       toast.error('فشل في تخطي معالج الإعداد', {

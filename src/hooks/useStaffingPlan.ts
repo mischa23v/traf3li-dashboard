@@ -1,40 +1,25 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import staffingPlanService, {
   type StaffingPlan,
   type StaffingPlanDetail,
   type StaffingPlanFilters,
 } from '@/services/staffingPlanService'
-
-// Query Keys
-export const staffingPlanKeys = {
-  all: ['staffing-plans'] as const,
-  lists: () => [...staffingPlanKeys.all, 'list'] as const,
-  list: (filters?: StaffingPlanFilters) => [...staffingPlanKeys.lists(), filters] as const,
-  details: () => [...staffingPlanKeys.all, 'detail'] as const,
-  detail: (id: string) => [...staffingPlanKeys.details(), id] as const,
-  stats: () => [...staffingPlanKeys.all, 'stats'] as const,
-  active: () => [...staffingPlanKeys.all, 'active'] as const,
-  department: (departmentId: string) => [...staffingPlanKeys.all, 'department', departmentId] as const,
-  progress: (planId: string) => [...staffingPlanKeys.all, 'progress', planId] as const,
-  vacanciesSummary: () => [...staffingPlanKeys.all, 'vacancies-summary'] as const,
-  urgentVacancies: () => [...staffingPlanKeys.all, 'urgent-vacancies'] as const,
-  headcount: (departmentId: string, designation: string) =>
-    [...staffingPlanKeys.all, 'headcount', departmentId, designation] as const,
-}
+import { QueryKeys } from '@/lib/query-keys'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ==================== STAFFING PLAN HOOKS ====================
 
 export function useStaffingPlans(filters?: StaffingPlanFilters) {
   return useQuery({
-    queryKey: staffingPlanKeys.list(filters),
+    queryKey: QueryKeys.staffingPlan.list(filters),
     queryFn: () => staffingPlanService.getStaffingPlans(filters),
   })
 }
 
 export function useStaffingPlan(planId: string) {
   return useQuery({
-    queryKey: staffingPlanKeys.detail(planId),
+    queryKey: QueryKeys.staffingPlan.detail(planId),
     queryFn: () => staffingPlanService.getStaffingPlan(planId),
     enabled: !!planId,
   })
@@ -42,21 +27,21 @@ export function useStaffingPlan(planId: string) {
 
 export function useStaffingPlanStats() {
   return useQuery({
-    queryKey: staffingPlanKeys.stats(),
+    queryKey: QueryKeys.staffingPlan.stats(),
     queryFn: () => staffingPlanService.getStaffingPlanStats(),
   })
 }
 
 export function useActivePlans() {
   return useQuery({
-    queryKey: staffingPlanKeys.active(),
+    queryKey: QueryKeys.staffingPlan.active(),
     queryFn: () => staffingPlanService.getActivePlans(),
   })
 }
 
 export function usePlansByDepartment(departmentId: string) {
   return useQuery({
-    queryKey: staffingPlanKeys.department(departmentId),
+    queryKey: QueryKeys.staffingPlan.department(departmentId),
     queryFn: () => staffingPlanService.getPlansByDepartment(departmentId),
     enabled: !!departmentId,
   })
@@ -64,7 +49,7 @@ export function usePlansByDepartment(departmentId: string) {
 
 export function usePlanProgress(planId: string) {
   return useQuery({
-    queryKey: staffingPlanKeys.progress(planId),
+    queryKey: QueryKeys.staffingPlan.progress(planId),
     queryFn: () => staffingPlanService.getPlanProgress(planId),
     enabled: !!planId,
   })
@@ -72,21 +57,21 @@ export function usePlanProgress(planId: string) {
 
 export function useVacanciesSummary() {
   return useQuery({
-    queryKey: staffingPlanKeys.vacanciesSummary(),
+    queryKey: QueryKeys.staffingPlan.vacanciesSummary(),
     queryFn: () => staffingPlanService.getVacanciesSummary(),
   })
 }
 
 export function useUrgentVacancies() {
   return useQuery({
-    queryKey: staffingPlanKeys.urgentVacancies(),
+    queryKey: QueryKeys.staffingPlan.urgentVacancies(),
     queryFn: () => staffingPlanService.getUrgentVacancies(),
   })
 }
 
 export function useCurrentHeadcount(departmentId: string, designation: string) {
   return useQuery({
-    queryKey: staffingPlanKeys.headcount(departmentId, designation),
+    queryKey: QueryKeys.staffingPlan.headcount(departmentId, designation),
     queryFn: () => staffingPlanService.getCurrentHeadcount(departmentId, designation),
     enabled: !!departmentId && !!designation,
   })
@@ -95,14 +80,12 @@ export function useCurrentHeadcount(departmentId: string, designation: string) {
 // ==================== MUTATION HOOKS ====================
 
 export function useCreateStaffingPlan() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: Partial<StaffingPlan>) => staffingPlanService.createStaffingPlan(data),
     onSuccess: () => {
       toast.success('تم إنشاء خطة التوظيف بنجاح')
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.stats() })
+      invalidateCache.staffingPlan.lists()
+      invalidateCache.staffingPlan.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء خطة التوظيف')
@@ -111,16 +94,14 @@ export function useCreateStaffingPlan() {
 }
 
 export function useUpdateStaffingPlan() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ planId, data }: { planId: string; data: Partial<StaffingPlan> }) =>
       staffingPlanService.updateStaffingPlan(planId, data),
     onSuccess: (_, { planId }) => {
       toast.success('تم تحديث خطة التوظيف بنجاح')
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.detail(planId) })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.stats() })
+      invalidateCache.staffingPlan.detail(planId)
+      invalidateCache.staffingPlan.lists()
+      invalidateCache.staffingPlan.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث خطة التوظيف')
@@ -129,14 +110,12 @@ export function useUpdateStaffingPlan() {
 }
 
 export function useDeleteStaffingPlan() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (planId: string) => staffingPlanService.deleteStaffingPlan(planId),
     onSuccess: () => {
       toast.success('تم حذف خطة التوظيف بنجاح')
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.stats() })
+      invalidateCache.staffingPlan.lists()
+      invalidateCache.staffingPlan.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف خطة التوظيف')
@@ -145,8 +124,6 @@ export function useDeleteStaffingPlan() {
 }
 
 export function useDuplicateStaffingPlan() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       planId,
@@ -157,8 +134,8 @@ export function useDuplicateStaffingPlan() {
     }) => staffingPlanService.duplicateStaffingPlan(planId, newPlanData),
     onSuccess: () => {
       toast.success('تم نسخ خطة التوظيف بنجاح')
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.stats() })
+      invalidateCache.staffingPlan.lists()
+      invalidateCache.staffingPlan.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل نسخ خطة التوظيف')
@@ -169,8 +146,6 @@ export function useDuplicateStaffingPlan() {
 // ==================== PLAN DETAIL HOOKS ====================
 
 export function useAddPlanDetail() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       planId,
@@ -181,10 +156,10 @@ export function useAddPlanDetail() {
     }) => staffingPlanService.addPlanDetail(planId, detail),
     onSuccess: (_, { planId }) => {
       toast.success('تم إضافة تفاصيل المنصب بنجاح')
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.detail(planId) })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.progress(planId) })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.vacanciesSummary() })
+      invalidateCache.staffingPlan.detail(planId)
+      invalidateCache.staffingPlan.lists()
+      invalidateCache.staffingPlan.progress(planId)
+      invalidateCache.staffingPlan.vacanciesSummary()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إضافة تفاصيل المنصب')
@@ -193,8 +168,6 @@ export function useAddPlanDetail() {
 }
 
 export function useUpdatePlanDetail() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       planId,
@@ -207,10 +180,10 @@ export function useUpdatePlanDetail() {
     }) => staffingPlanService.updatePlanDetail(planId, detailId, detail),
     onSuccess: (_, { planId }) => {
       toast.success('تم تحديث تفاصيل المنصب بنجاح')
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.detail(planId) })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.progress(planId) })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.vacanciesSummary() })
+      invalidateCache.staffingPlan.detail(planId)
+      invalidateCache.staffingPlan.lists()
+      invalidateCache.staffingPlan.progress(planId)
+      invalidateCache.staffingPlan.vacanciesSummary()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث تفاصيل المنصب')
@@ -219,17 +192,15 @@ export function useUpdatePlanDetail() {
 }
 
 export function useRemovePlanDetail() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ planId, detailId }: { planId: string; detailId: string }) =>
       staffingPlanService.removePlanDetail(planId, detailId),
     onSuccess: (_, { planId }) => {
       toast.success('تم حذف تفاصيل المنصب بنجاح')
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.detail(planId) })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.progress(planId) })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.vacanciesSummary() })
+      invalidateCache.staffingPlan.detail(planId)
+      invalidateCache.staffingPlan.lists()
+      invalidateCache.staffingPlan.progress(planId)
+      invalidateCache.staffingPlan.vacanciesSummary()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف تفاصيل المنصب')
@@ -238,8 +209,6 @@ export function useRemovePlanDetail() {
 }
 
 export function useBulkUpdateDetails() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       planId,
@@ -250,9 +219,9 @@ export function useBulkUpdateDetails() {
     }) => staffingPlanService.bulkUpdateDetails(planId, updates),
     onSuccess: (_, { planId }) => {
       toast.success('تم تحديث التفاصيل بنجاح')
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.detail(planId) })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.progress(planId) })
+      invalidateCache.staffingPlan.detail(planId)
+      invalidateCache.staffingPlan.lists()
+      invalidateCache.staffingPlan.progress(planId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث التفاصيل')
@@ -263,16 +232,14 @@ export function useBulkUpdateDetails() {
 // ==================== VACANCY CALCULATION HOOKS ====================
 
 export function useCalculateVacancies() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (planId: string) => staffingPlanService.calculateVacancies(planId),
     onSuccess: (_, planId) => {
       toast.success('تم حساب الشواغر بنجاح')
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.detail(planId) })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.progress(planId) })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.vacanciesSummary() })
+      invalidateCache.staffingPlan.detail(planId)
+      invalidateCache.staffingPlan.lists()
+      invalidateCache.staffingPlan.progress(planId)
+      invalidateCache.staffingPlan.vacanciesSummary()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حساب الشواغر')
@@ -283,17 +250,14 @@ export function useCalculateVacancies() {
 // ==================== JOB OPENING HOOKS ====================
 
 export function useCreateJobOpeningFromPlan() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ planId, detailId }: { planId: string; detailId: string }) =>
       staffingPlanService.createJobOpeningFromPlan(planId, detailId),
     onSuccess: (_, { planId }) => {
       toast.success('تم إنشاء إعلان الوظيفة بنجاح')
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.detail(planId) })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.progress(planId) })
-      // Also invalidate job postings if using recruitment hooks
-      queryClient.invalidateQueries({ queryKey: ['job-postings'] })
+      invalidateCache.staffingPlan.detail(planId)
+      invalidateCache.staffingPlan.progress(planId)
+      invalidateCache.jobs.postings()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء إعلان الوظيفة')
@@ -302,8 +266,6 @@ export function useCreateJobOpeningFromPlan() {
 }
 
 export function useLinkJobOpening() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       planId,
@@ -316,8 +278,8 @@ export function useLinkJobOpening() {
     }) => staffingPlanService.linkJobOpening(planId, detailId, jobOpeningId),
     onSuccess: (_, { planId }) => {
       toast.success('تم ربط إعلان الوظيفة بنجاح')
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.detail(planId) })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.progress(planId) })
+      invalidateCache.staffingPlan.detail(planId)
+      invalidateCache.staffingPlan.progress(planId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل ربط إعلان الوظيفة')
@@ -326,15 +288,13 @@ export function useLinkJobOpening() {
 }
 
 export function useUnlinkJobOpening() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ planId, detailId }: { planId: string; detailId: string }) =>
       staffingPlanService.unlinkJobOpening(planId, detailId),
     onSuccess: (_, { planId }) => {
       toast.success('تم إلغاء ربط إعلان الوظيفة بنجاح')
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.detail(planId) })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.progress(planId) })
+      invalidateCache.staffingPlan.detail(planId)
+      invalidateCache.staffingPlan.progress(planId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إلغاء ربط إعلان الوظيفة')
@@ -343,16 +303,14 @@ export function useUnlinkJobOpening() {
 }
 
 export function useBulkCreateJobOpenings() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ planId, detailIds }: { planId: string; detailIds: string[] }) =>
       staffingPlanService.bulkCreateJobOpenings(planId, detailIds),
     onSuccess: (data, { planId }) => {
       toast.success(`تم إنشاء ${data.created} إعلان وظيفي بنجاح`)
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.detail(planId) })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.progress(planId) })
-      queryClient.invalidateQueries({ queryKey: ['job-postings'] })
+      invalidateCache.staffingPlan.detail(planId)
+      invalidateCache.staffingPlan.progress(planId)
+      invalidateCache.jobs.postings()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء إعلانات الوظائف')
@@ -363,16 +321,14 @@ export function useBulkCreateJobOpenings() {
 // ==================== STATUS MANAGEMENT HOOKS ====================
 
 export function useActivatePlan() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (planId: string) => staffingPlanService.activatePlan(planId),
     onSuccess: (_, planId) => {
       toast.success('تم تفعيل خطة التوظيف بنجاح')
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.detail(planId) })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.active() })
+      invalidateCache.staffingPlan.detail(planId)
+      invalidateCache.staffingPlan.lists()
+      invalidateCache.staffingPlan.stats()
+      invalidateCache.staffingPlan.active()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تفعيل خطة التوظيف')
@@ -381,17 +337,15 @@ export function useActivatePlan() {
 }
 
 export function useClosePlan() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ planId, reason }: { planId: string; reason?: string }) =>
       staffingPlanService.closePlan(planId, reason),
     onSuccess: (_, { planId }) => {
       toast.success('تم إغلاق خطة التوظيف بنجاح')
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.detail(planId) })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.active() })
+      invalidateCache.staffingPlan.detail(planId)
+      invalidateCache.staffingPlan.lists()
+      invalidateCache.staffingPlan.stats()
+      invalidateCache.staffingPlan.active()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إغلاق خطة التوظيف')
@@ -400,15 +354,13 @@ export function useClosePlan() {
 }
 
 export function useApprovePlan() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ planId, notes }: { planId: string; notes?: string }) =>
       staffingPlanService.approvePlan(planId, notes),
     onSuccess: (_, { planId }) => {
       toast.success('تم اعتماد خطة التوظيف بنجاح')
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.detail(planId) })
-      queryClient.invalidateQueries({ queryKey: staffingPlanKeys.lists() })
+      invalidateCache.staffingPlan.detail(planId)
+      invalidateCache.staffingPlan.lists()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل اعتماد خطة التوظيف')

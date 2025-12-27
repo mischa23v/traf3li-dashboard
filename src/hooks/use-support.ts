@@ -3,10 +3,11 @@
  * React Query hooks for Support/Helpdesk operations
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import supportService from '@/services/supportService'
 import type { TicketFilters, CreateTicketData, ServiceLevelAgreement, SupportSettings } from '@/types/support'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // Query Keys
 export const supportKeys = {
@@ -38,11 +39,10 @@ export function useTicket(id: string) {
 }
 
 export function useCreateTicket() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateTicketData) => supportService.createTicket(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: supportKeys.tickets() })
+      invalidateCache.support.tickets()
       toast.success('تم إنشاء التذكرة بنجاح | Ticket created successfully')
     },
     onError: () => {
@@ -52,12 +52,11 @@ export function useCreateTicket() {
 }
 
 export function useUpdateTicket() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateTicketData> }) => supportService.updateTicket(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: supportKeys.tickets() })
-      queryClient.invalidateQueries({ queryKey: supportKeys.ticketDetail(id) })
+      invalidateCache.support.tickets()
+      invalidateCache.support.ticketDetail(id)
       toast.success('تم تحديث التذكرة بنجاح | Ticket updated successfully')
     },
     onError: () => {
@@ -67,11 +66,10 @@ export function useUpdateTicket() {
 }
 
 export function useDeleteTicket() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => supportService.deleteTicket(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: supportKeys.tickets() })
+      invalidateCache.support.tickets()
       toast.success('تم حذف التذكرة بنجاح | Ticket deleted successfully')
     },
     onError: () => {
@@ -81,12 +79,11 @@ export function useDeleteTicket() {
 }
 
 export function useUpdateTicketStatus() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: string }) => supportService.updateTicketStatus(id, status as any),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: supportKeys.tickets() })
-      queryClient.invalidateQueries({ queryKey: supportKeys.ticketDetail(id) })
+      invalidateCache.support.tickets()
+      invalidateCache.support.ticketDetail(id)
       toast.success('تم تحديث حالة التذكرة | Ticket status updated')
     },
     onError: () => {
@@ -96,12 +93,11 @@ export function useUpdateTicketStatus() {
 }
 
 export function useAssignTicket() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, assignedTo }: { id: string; assignedTo: string }) => supportService.assignTicket(id, assignedTo),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: supportKeys.tickets() })
-      queryClient.invalidateQueries({ queryKey: supportKeys.ticketDetail(id) })
+      invalidateCache.support.tickets()
+      invalidateCache.support.ticketDetail(id)
       toast.success('تم تعيين التذكرة بنجاح | Ticket assigned successfully')
     },
     onError: () => {
@@ -120,13 +116,12 @@ export function useTicketCommunications(ticketId: string) {
 }
 
 export function useAddCommunication() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ ticketId, data }: { ticketId: string; data: { content: string; isInternal?: boolean } }) =>
       supportService.addTicketCommunication(ticketId, data),
     onSuccess: (_, { ticketId }) => {
-      queryClient.invalidateQueries({ queryKey: supportKeys.ticketCommunications(ticketId) })
-      queryClient.invalidateQueries({ queryKey: supportKeys.ticketDetail(ticketId) })
+      invalidateCache.support.ticketCommunications(ticketId)
+      invalidateCache.support.ticketDetail(ticketId)
       toast.success('تم إضافة الرد بنجاح | Reply added successfully')
     },
     onError: () => {
@@ -152,11 +147,10 @@ export function useSLA(id: string) {
 }
 
 export function useCreateSLA() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: Omit<ServiceLevelAgreement, '_id' | 'slaId' | 'createdAt' | 'updatedAt'>) => supportService.createSLA(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: supportKeys.slas() })
+      invalidateCache.support.slas()
       toast.success('تم إنشاء SLA بنجاح | SLA created successfully')
     },
     onError: () => {
@@ -166,12 +160,11 @@ export function useCreateSLA() {
 }
 
 export function useUpdateSLA() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<ServiceLevelAgreement> }) => supportService.updateSLA(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: supportKeys.slas() })
-      queryClient.invalidateQueries({ queryKey: supportKeys.slaDetail(id) })
+      invalidateCache.support.slas()
+      invalidateCache.support.slaDetail(id)
       toast.success('تم تحديث SLA بنجاح | SLA updated successfully')
     },
     onError: () => {
@@ -181,11 +174,10 @@ export function useUpdateSLA() {
 }
 
 export function useDeleteSLA() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => supportService.deleteSLA(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: supportKeys.slas() })
+      invalidateCache.support.slas()
       toast.success('تم حذف SLA بنجاح | SLA deleted successfully')
     },
     onError: () => {
@@ -211,11 +203,10 @@ export function useSupportSettings() {
 }
 
 export function useUpdateSupportSettings() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: Partial<SupportSettings>) => supportService.updateSupportSettings(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: supportKeys.settings() })
+      invalidateCache.support.settings()
       toast.success('تم تحديث الإعدادات بنجاح | Settings updated successfully')
     },
     onError: () => {

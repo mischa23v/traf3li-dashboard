@@ -20,6 +20,7 @@ import billingRatesService, {
   type CreateTimeEntryData,
   type UpdateTimeEntryData,
 } from '@/services/billingRatesService'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ==================== QUERY KEYS ====================
 
@@ -98,8 +99,8 @@ export function useCreateRate() {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: billingKeys.rates(), refetchType: 'all' })
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics(), refetchType: 'all' })
+      await invalidateCache.billingRates.rates()
+      return await invalidateCache.billingRates.statistics()
     },
   })
 }
@@ -117,7 +118,7 @@ export function useUpdateRate() {
       queryClient.setQueryData(billingKeys.rateDetail(rate._id), rate)
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.rates() })
+      return await invalidateCache.billingRates.ratesLight()
     },
   })
 }
@@ -149,8 +150,8 @@ export function useDeleteRate() {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: billingKeys.rates(), refetchType: 'all' })
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics(), refetchType: 'all' })
+      await invalidateCache.billingRates.rates()
+      return await invalidateCache.billingRates.statistics()
     },
   })
 }
@@ -207,8 +208,8 @@ export function useCreateRateGroup() {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: billingKeys.groups(), refetchType: 'all' })
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics(), refetchType: 'all' })
+      await invalidateCache.billingRates.groups()
+      return await invalidateCache.billingRates.statistics()
     },
   })
 }
@@ -226,7 +227,7 @@ export function useUpdateRateGroup() {
       queryClient.setQueryData(billingKeys.groupDetail(group._id), group)
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.groups() })
+      return await invalidateCache.billingRates.groupsLight()
     },
   })
 }
@@ -258,8 +259,8 @@ export function useDeleteRateGroup() {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: billingKeys.groups(), refetchType: 'all' })
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics(), refetchType: 'all' })
+      await invalidateCache.billingRates.groups()
+      return await invalidateCache.billingRates.statistics()
     },
   })
 }
@@ -277,7 +278,7 @@ export function useAddRateToGroup() {
       queryClient.setQueryData(billingKeys.groupDetail(group._id), group)
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.groups() })
+      return await invalidateCache.billingRates.groupsLight()
     },
   })
 }
@@ -295,7 +296,7 @@ export function useRemoveRateFromGroup() {
       queryClient.setQueryData(billingKeys.groupDetail(group._id), group)
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.groups() })
+      return await invalidateCache.billingRates.groupsLight()
     },
   })
 }
@@ -352,8 +353,8 @@ export function useCreateRateCard() {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: billingKeys.rateCards(), refetchType: 'all' })
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics(), refetchType: 'all' })
+      await invalidateCache.billingRates.rateCards()
+      return await invalidateCache.billingRates.statistics()
     },
   })
 }
@@ -368,7 +369,7 @@ export function useUpdateRateCard() {
     mutationFn: ({ id, data }: { id: string; data: UpdateRateCardData }) =>
       billingRatesService.updateRateCard(id, data),
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.rateCards() })
+      return await invalidateCache.billingRates.rateCardsLight()
     },
   })
 }
@@ -400,8 +401,8 @@ export function useDeleteRateCard() {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: billingKeys.rateCards(), refetchType: 'all' })
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics(), refetchType: 'all' })
+      await invalidateCache.billingRates.rateCards()
+      return await invalidateCache.billingRates.statistics()
     },
   })
 }
@@ -447,8 +448,8 @@ export function useCreateTimeEntry() {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: billingKeys.timeEntries(), refetchType: 'all' })
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics(), refetchType: 'all' })
+      await invalidateCache.billingRates.timeEntries()
+      return await invalidateCache.billingRates.statistics()
     },
   })
 }
@@ -463,7 +464,7 @@ export function useUpdateTimeEntry() {
     mutationFn: ({ id, data }: { id: string; data: UpdateTimeEntryData }) =>
       billingRatesService.updateTimeEntry(id, data),
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.timeEntries() })
+      return await invalidateCache.billingRates.timeEntriesLight()
     },
   })
 }
@@ -495,8 +496,8 @@ export function useDeleteTimeEntry() {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: billingKeys.timeEntries(), refetchType: 'all' })
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics(), refetchType: 'all' })
+      await invalidateCache.billingRates.timeEntries()
+      return await invalidateCache.billingRates.statistics()
     },
   })
 }
@@ -510,7 +511,7 @@ export function useApproveTimeEntries() {
   return useMutation({
     mutationFn: (ids: string[]) => billingRatesService.approveTimeEntries(ids),
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.timeEntries() })
+      return await invalidateCache.billingRates.timeEntriesLight()
     },
   })
 }

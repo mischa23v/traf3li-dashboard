@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import documentVersionService, {
   type UploadVersionData,
@@ -6,6 +6,7 @@ import documentVersionService, {
 } from '@/services/documentVersionService'
 import { toast } from '@/hooks/use-toast'
 import { useTranslation } from 'react-i18next'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // Cache configuration
 const VERSION_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes
@@ -104,7 +105,6 @@ export const useVersionContent = (documentId: string, versionId: string) => {
 
 // Upload new version
 export const useUploadVersion = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
@@ -135,8 +135,8 @@ export const useUploadVersion = () => {
       })
     },
     onSettled: async (_, __, { documentId }) => {
-      await queryClient.invalidateQueries({ queryKey: versionKeys.all(documentId) })
-      await queryClient.invalidateQueries({ queryKey: ['documents'] })
+      await invalidateCache.documentVersions.all(documentId)
+      await invalidateCache.documents.all()
     },
   })
 }
@@ -213,7 +213,6 @@ export const useVersionPreviewUrl = () => {
 
 // Restore version
 export const useRestoreVersion = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
@@ -237,15 +236,14 @@ export const useRestoreVersion = () => {
       })
     },
     onSettled: async (_, __, { documentId }) => {
-      await queryClient.invalidateQueries({ queryKey: versionKeys.all(documentId) })
-      await queryClient.invalidateQueries({ queryKey: ['documents'] })
+      await invalidateCache.documentVersions.all(documentId)
+      await invalidateCache.documents.all()
     },
   })
 }
 
 // Delete version
 export const useDeleteVersion = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
@@ -269,14 +267,13 @@ export const useDeleteVersion = () => {
       })
     },
     onSettled: async (_, __, { documentId }) => {
-      await queryClient.invalidateQueries({ queryKey: versionKeys.all(documentId) })
+      await invalidateCache.documentVersions.all(documentId)
     },
   })
 }
 
 // Delete old versions
 export const useDeleteOldVersions = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
@@ -303,14 +300,13 @@ export const useDeleteOldVersions = () => {
       })
     },
     onSettled: async (_, __, { documentId }) => {
-      await queryClient.invalidateQueries({ queryKey: versionKeys.all(documentId) })
+      await invalidateCache.documentVersions.all(documentId)
     },
   })
 }
 
 // Update version metadata
 export const useUpdateVersionMetadata = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
@@ -341,10 +337,8 @@ export const useUpdateVersionMetadata = () => {
       })
     },
     onSettled: async (_, __, { documentId, versionId }) => {
-      await queryClient.invalidateQueries({ queryKey: versionKeys.all(documentId) })
-      await queryClient.invalidateQueries({
-        queryKey: versionKeys.detail(documentId, versionId),
-      })
+      await invalidateCache.documentVersions.all(documentId)
+      await invalidateCache.documentVersions.detail(documentId, versionId)
     },
   })
 }

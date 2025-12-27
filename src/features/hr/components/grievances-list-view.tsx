@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useGrievances, useGrievanceStats, useBulkDeleteGrievances } from '@/hooks/useGrievances'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -118,8 +119,8 @@ export function GrievancesListView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'الشكاوى', href: '/dashboard/hr/grievances', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'الشكاوى', href: ROUTES.dashboard.hr.grievances.list, isActive: true },
   ]
 
   return (
@@ -298,7 +299,7 @@ export function GrievancesListView() {
                     </Button>
                     <Button
                       size="sm"
-                      onClick={() => navigate({ to: '/dashboard/hr/grievances/new' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.hr.grievances.new })}
                       className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
                     >
                       <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
@@ -343,7 +344,7 @@ export function GrievancesListView() {
                   <FileWarning className="w-12 h-12 mx-auto text-slate-300" />
                   <p className="mt-4 text-slate-500">لا توجد شكاوى</p>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/hr/grievances/new' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.hr.grievances.new })}
                     className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
                     <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
@@ -387,7 +388,7 @@ export function GrievancesListView() {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/grievances/${grievance._id}` })}>
+                                  <DropdownMenuItem onClick={() => navigate({ to: ROUTES.dashboard.hr.grievances.detail(grievance._id) })}>
                                     <Eye className="w-4 h-4 ms-2" aria-hidden="true" />
                                     عرض التفاصيل
                                   </DropdownMenuItem>
@@ -444,7 +445,7 @@ export function GrievancesListView() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => navigate({ to: `/dashboard/hr/grievances/${grievance._id}` })}
+                              onClick={() => navigate({ to: ROUTES.dashboard.hr.grievances.detail(grievance._id) })}
                               className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl"
                             >
                               عرض التفاصيل

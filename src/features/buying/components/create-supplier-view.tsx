@@ -43,6 +43,7 @@ import { ProductivityHero } from '@/components/productivity-hero'
 import { useCreateSupplier } from '@/hooks/use-buying'
 import { BuyingSidebar } from './buying-sidebar'
 import type { CreateSupplierData, SupplierType, SupplierStatus } from '@/types/buying'
+import { ROUTES } from '@/constants/routes'
 
 // Extended form data to include additional fields
 interface SupplierFormData extends CreateSupplierData {
@@ -116,16 +117,16 @@ export function CreateSupplierView() {
 
     try {
       await createSupplierMutation.mutateAsync(apiData)
-      navigate({ to: '/dashboard/buying' })
+      navigate({ to: ROUTES.dashboard.buying.list })
     } catch (error) {
       // Error handled by mutation
     }
   }
 
   const topNav = [
-    { title: t('buying.overview', 'نظرة عامة'), href: '/dashboard/buying', isActive: false },
-    { title: t('buying.suppliers', 'الموردين'), href: '/dashboard/buying/suppliers', isActive: false },
-    { title: t('buying.createSupplier', 'إضافة مورد جديد'), href: '/dashboard/buying/suppliers/create', isActive: true },
+    { title: t('buying.overview', 'نظرة عامة'), href: ROUTES.dashboard.buying.list, isActive: false },
+    { title: t('buying.suppliers', 'الموردين'), href: ROUTES.dashboard.buying.list, isActive: false },
+    { title: t('buying.createSupplier', 'إضافة مورد جديد'), href: ROUTES.dashboard.buying.list, isActive: true },
   ]
 
   return (
@@ -512,7 +513,7 @@ export function CreateSupplierView() {
                     type="button"
                     variant="ghost"
                     className="text-slate-500 hover:text-navy rounded-xl"
-                    onClick={() => navigate({ to: '/dashboard/buying' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.buying.list })}
                   >
                     {t('common.cancel', 'إلغاء')}
                   </Button>

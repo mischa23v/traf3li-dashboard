@@ -13,6 +13,7 @@ import jobsService, {
   UpdateJobData,
   JobFilters,
 } from '@/services/jobsService'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ==================== Cache Configuration ====================
 const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
@@ -91,7 +92,7 @@ export const useCreateJob = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 500))
-      await queryClient.invalidateQueries({ queryKey: ['jobs'], refetchType: 'all' })
+      await invalidateCache.jobs.all()
     },
   })
 }
@@ -113,9 +114,9 @@ export const useUpdateJob = () => {
       toast.error(error.message || t('jobs.updateError', 'فشل تحديث الوظيفة'))
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['jobs'] })
-      await queryClient.invalidateQueries({ queryKey: ['jobs', 'my-jobs'] })
-      return await queryClient.invalidateQueries({ queryKey: ['jobs', id] })
+      await invalidateCache.jobs.all()
+      await invalidateCache.jobs.myJobs()
+      return await invalidateCache.jobs.detail(id)
     },
   })
 }
@@ -150,7 +151,7 @@ export const useDeleteJob = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 500))
-      await queryClient.invalidateQueries({ queryKey: ['jobs'], refetchType: 'all' })
+      await invalidateCache.jobs.all()
     },
   })
 }

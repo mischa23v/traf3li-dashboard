@@ -3,8 +3,9 @@
  * React Query hooks for Manufacturing operations
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import manufacturingService from '@/services/manufacturingService'
 import type { ManufacturingFilters, CreateBomData, CreateWorkOrderData, Workstation, ManufacturingSettings } from '@/types/manufacturing'
 
@@ -44,11 +45,11 @@ export function useBOM(id: string) {
 }
 
 export function useCreateBOM() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (data: CreateBomData) => manufacturingService.createBOM(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.boms() })
+      invalidateCache.manufacturing.boms()
       toast.success('تم إنشاء قائمة المواد بنجاح | BOM created successfully')
     },
     onError: () => {
@@ -58,12 +59,12 @@ export function useCreateBOM() {
 }
 
 export function useUpdateBOM() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateBomData> }) => manufacturingService.updateBOM(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.boms() })
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.bomDetail(id) })
+      invalidateCache.manufacturing.boms()
+      invalidateCache.manufacturing.bomDetail(id)
       toast.success('تم تحديث قائمة المواد بنجاح | BOM updated successfully')
     },
     onError: () => {
@@ -73,11 +74,11 @@ export function useUpdateBOM() {
 }
 
 export function useDeleteBOM() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (id: string) => manufacturingService.deleteBOM(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.boms() })
+      invalidateCache.manufacturing.boms()
       toast.success('تم حذف قائمة المواد بنجاح | BOM deleted successfully')
     },
     onError: () => {
@@ -103,11 +104,11 @@ export function useWorkstation(id: string) {
 }
 
 export function useCreateWorkstation() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (data: Omit<Workstation, '_id' | 'workstationId' | 'createdAt' | 'updatedAt'>) => manufacturingService.createWorkstation(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.workstations() })
+      invalidateCache.manufacturing.workstations()
       toast.success('تم إنشاء محطة العمل بنجاح | Workstation created successfully')
     },
     onError: () => {
@@ -117,12 +118,12 @@ export function useCreateWorkstation() {
 }
 
 export function useUpdateWorkstation() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Workstation> }) => manufacturingService.updateWorkstation(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.workstations() })
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.workstationDetail(id) })
+      invalidateCache.manufacturing.workstations()
+      invalidateCache.manufacturing.workstationDetail(id)
       toast.success('تم تحديث محطة العمل بنجاح | Workstation updated successfully')
     },
     onError: () => {
@@ -132,11 +133,11 @@ export function useUpdateWorkstation() {
 }
 
 export function useDeleteWorkstation() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (id: string) => manufacturingService.deleteWorkstation(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.workstations() })
+      invalidateCache.manufacturing.workstations()
       toast.success('تم حذف محطة العمل بنجاح | Workstation deleted successfully')
     },
     onError: () => {
@@ -162,11 +163,11 @@ export function useWorkOrder(id: string) {
 }
 
 export function useCreateWorkOrder() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (data: CreateWorkOrderData) => manufacturingService.createWorkOrder(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.workOrders() })
+      invalidateCache.manufacturing.workOrders()
       toast.success('تم إنشاء أمر العمل بنجاح | Work order created successfully')
     },
     onError: () => {
@@ -176,12 +177,12 @@ export function useCreateWorkOrder() {
 }
 
 export function useUpdateWorkOrder() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateWorkOrderData> }) => manufacturingService.updateWorkOrder(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.workOrders() })
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.workOrderDetail(id) })
+      invalidateCache.manufacturing.workOrders()
+      invalidateCache.manufacturing.workOrderDetail(id)
       toast.success('تم تحديث أمر العمل بنجاح | Work order updated successfully')
     },
     onError: () => {
@@ -191,11 +192,11 @@ export function useUpdateWorkOrder() {
 }
 
 export function useDeleteWorkOrder() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (id: string) => manufacturingService.deleteWorkOrder(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.workOrders() })
+      invalidateCache.manufacturing.workOrders()
       toast.success('تم حذف أمر العمل بنجاح | Work order deleted successfully')
     },
     onError: () => {
@@ -205,12 +206,12 @@ export function useDeleteWorkOrder() {
 }
 
 export function useStartWorkOrder() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (id: string) => manufacturingService.startWorkOrder(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.workOrders() })
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.workOrderDetail(id) })
+      invalidateCache.manufacturing.workOrders()
+      invalidateCache.manufacturing.workOrderDetail(id)
       toast.success('تم بدء أمر العمل | Work order started')
     },
     onError: () => {
@@ -220,12 +221,12 @@ export function useStartWorkOrder() {
 }
 
 export function useCompleteWorkOrder() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (id: string) => manufacturingService.completeWorkOrder(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.workOrders() })
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.workOrderDetail(id) })
+      invalidateCache.manufacturing.workOrders()
+      invalidateCache.manufacturing.workOrderDetail(id)
       toast.success('تم إكمال أمر العمل | Work order completed')
     },
     onError: () => {
@@ -235,12 +236,12 @@ export function useCompleteWorkOrder() {
 }
 
 export function useStopWorkOrder() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (id: string) => manufacturingService.stopWorkOrder(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.workOrders() })
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.workOrderDetail(id) })
+      invalidateCache.manufacturing.workOrders()
+      invalidateCache.manufacturing.workOrderDetail(id)
       toast.success('تم إيقاف أمر العمل | Work order stopped')
     },
     onError: () => {
@@ -266,11 +267,11 @@ export function useJobCard(id: string) {
 }
 
 export function useCreateJobCard() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (data: any) => manufacturingService.createJobCard(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.jobCards() })
+      invalidateCache.manufacturing.jobCards()
       toast.success('تم إنشاء بطاقة العمل بنجاح | Job card created successfully')
     },
     onError: () => {
@@ -280,12 +281,12 @@ export function useCreateJobCard() {
 }
 
 export function useStartJobCard() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (id: string) => manufacturingService.startJobCard(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.jobCards() })
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.jobCardDetail(id) })
+      invalidateCache.manufacturing.jobCards()
+      invalidateCache.manufacturing.jobCardDetail(id)
       toast.success('تم بدء بطاقة العمل | Job card started')
     },
     onError: () => {
@@ -295,12 +296,12 @@ export function useStartJobCard() {
 }
 
 export function useCompleteJobCard() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: ({ id, completedQty }: { id: string; completedQty: number }) => manufacturingService.completeJobCard(id, completedQty),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.jobCards() })
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.jobCardDetail(id) })
+      invalidateCache.manufacturing.jobCards()
+      invalidateCache.manufacturing.jobCardDetail(id)
       toast.success('تم إكمال بطاقة العمل | Job card completed')
     },
     onError: () => {
@@ -326,11 +327,11 @@ export function useProductionPlan(id: string) {
 }
 
 export function useCreateProductionPlan() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (data: any) => manufacturingService.createProductionPlan(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.productionPlans() })
+      invalidateCache.manufacturing.productionPlans()
       toast.success('تم إنشاء خطة الإنتاج بنجاح | Production plan created successfully')
     },
     onError: () => {
@@ -356,11 +357,11 @@ export function useManufacturingSettings() {
 }
 
 export function useUpdateManufacturingSettings() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (data: Partial<ManufacturingSettings>) => manufacturingService.updateManufacturingSettings(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: manufacturingKeys.settings() })
+      invalidateCache.manufacturing.settings()
       toast.success('تم تحديث الإعدادات بنجاح | Settings updated successfully')
     },
     onError: () => {

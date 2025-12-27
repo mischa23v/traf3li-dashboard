@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress'
 import { useSetupOrchestrationStatus } from '@/hooks/useSetupOrchestration'
 import { cn } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
+import { ROUTES } from '@/constants/routes'
 
 export function SetupReminderBanner() {
   const navigate = useNavigate()
@@ -29,7 +30,7 @@ export function SetupReminderBanner() {
   )
 
   const handleStartSetup = () => {
-    navigate({ to: '/dashboard/setup-orchestrator' as any })
+    navigate({ to: ROUTES.dashboard.setupOrchestrator as any })
   }
 
   const handleDismiss = () => {

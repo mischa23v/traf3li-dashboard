@@ -4,6 +4,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import caseWorkflowsService, {
   type WorkflowTemplate,
   type WorkflowFilters,
@@ -143,8 +144,8 @@ export function useCreateWorkflow() {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists(), refetchType: 'all' })
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.statistics(), refetchType: 'all' })
+      await invalidateCache.caseWorkflows.lists()
+      await invalidateCache.caseWorkflows.statistics()
     },
   })
 }
@@ -162,7 +163,7 @@ export function useUpdateWorkflow() {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
+      await invalidateCache.caseWorkflows.lists()
     },
   })
 }
@@ -194,8 +195,8 @@ export function useDeleteWorkflow() {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists(), refetchType: 'all' })
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.statistics(), refetchType: 'all' })
+      await invalidateCache.caseWorkflows.lists()
+      await invalidateCache.caseWorkflows.statistics()
     },
   })
 }
@@ -210,8 +211,8 @@ export function useDuplicateWorkflow() {
     mutationFn: ({ id, name, nameAr }: { id: string; name: string; nameAr: string }) =>
       caseWorkflowsService.duplicateWorkflow(id, name, nameAr),
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.statistics() })
+      await invalidateCache.caseWorkflows.lists()
+      await invalidateCache.caseWorkflows.statistics()
     },
   })
 }
@@ -233,7 +234,7 @@ export function useAddStage() {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists(), refetchType: 'all' })
+      await invalidateCache.caseWorkflows.lists()
     },
   })
 }
@@ -251,7 +252,7 @@ export function useUpdateStage() {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
+      await invalidateCache.caseWorkflows.lists()
     },
   })
 }
@@ -271,7 +272,7 @@ export function useDeleteStage() {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists(), refetchType: 'all' })
+      await invalidateCache.caseWorkflows.lists()
     },
   })
 }
@@ -289,7 +290,7 @@ export function useReorderStages() {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
+      await invalidateCache.caseWorkflows.lists()
     },
   })
 }
@@ -318,7 +319,7 @@ export function useAddRequirement() {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists(), refetchType: 'all' })
+      await invalidateCache.caseWorkflows.lists()
     },
   })
 }
@@ -345,7 +346,7 @@ export function useUpdateRequirement() {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
+      await invalidateCache.caseWorkflows.lists()
     },
   })
 }
@@ -365,7 +366,7 @@ export function useDeleteRequirement() {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists(), refetchType: 'all' })
+      await invalidateCache.caseWorkflows.lists()
     },
   })
 }
@@ -387,7 +388,7 @@ export function useAddTransition() {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists(), refetchType: 'all' })
+      await invalidateCache.caseWorkflows.lists()
     },
   })
 }
@@ -412,7 +413,7 @@ export function useUpdateTransition() {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
+      await invalidateCache.caseWorkflows.lists()
     },
   })
 }
@@ -432,7 +433,7 @@ export function useDeleteTransition() {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists(), refetchType: 'all' })
+      await invalidateCache.caseWorkflows.lists()
     },
   })
 }
@@ -493,8 +494,8 @@ export function useImportPresetTemplate() {
   return useMutation({
     mutationFn: (presetId: string) => caseWorkflowsService.importPresetTemplate(presetId),
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.statistics() })
+      await invalidateCache.caseWorkflows.lists()
+      await invalidateCache.caseWorkflows.statistics()
     },
   })
 }

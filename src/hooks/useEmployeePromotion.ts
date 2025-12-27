@@ -1,6 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import employeePromotionService, {
   PromotionFilters,
   CreatePromotionInput,
@@ -65,7 +66,7 @@ export const usePendingPromotions = () => {
   return useQuery({
     queryKey: ['employee-promotions', 'pending'],
     queryFn: () => employeePromotionService.getPendingPromotions(),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
     gcTime: STATS_GC_TIME,
     retry: false,
   })
@@ -78,7 +79,7 @@ export const usePromotionsAwaitingApplication = () => {
   return useQuery({
     queryKey: ['employee-promotions', 'awaiting-application'],
     queryFn: () => employeePromotionService.getPromotionsAwaitingApplication(),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
     gcTime: STATS_GC_TIME,
     retry: false,
   })
@@ -121,8 +122,6 @@ export const useEmployeePromotions = (
  * Create a new promotion
  */
 export const useCreatePromotion = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreatePromotionInput) => employeePromotionService.createPromotion(data),
     onSuccess: () => {
@@ -132,7 +131,7 @@ export const useCreatePromotion = () => {
       toast.error(error.message || 'فشل إنشاء الترقية / Failed to create promotion')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['employee-promotions'] })
+      await invalidateCache.employeePromotions.all()
     },
   })
 }
@@ -141,8 +140,6 @@ export const useCreatePromotion = () => {
  * Update an existing promotion
  */
 export const useUpdatePromotion = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdatePromotionInput }) =>
       employeePromotionService.updatePromotion(id, data),
@@ -153,8 +150,8 @@ export const useUpdatePromotion = () => {
       toast.error(error.message || 'فشل تحديث الترقية / Failed to update promotion')
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: ['employee-promotions'] })
-      await queryClient.invalidateQueries({ queryKey: ['employee-promotions', variables.id] })
+      await invalidateCache.employeePromotions.all()
+      await invalidateCache.employeePromotions.detail(variables.id)
     },
   })
 }
@@ -163,8 +160,6 @@ export const useUpdatePromotion = () => {
  * Delete a promotion
  */
 export const useDeletePromotion = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => employeePromotionService.deletePromotion(id),
     onSuccess: () => {
@@ -174,7 +169,7 @@ export const useDeletePromotion = () => {
       toast.error(error.message || 'فشل حذف الترقية / Failed to delete promotion')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['employee-promotions'] })
+      await invalidateCache.employeePromotions.all()
     },
   })
 }
@@ -183,8 +178,6 @@ export const useDeletePromotion = () => {
  * Bulk delete promotions
  */
 export const useBulkDeletePromotions = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (ids: string[]) => employeePromotionService.bulkDeletePromotions(ids),
     onSuccess: (_, variables) => {
@@ -194,7 +187,7 @@ export const useBulkDeletePromotions = () => {
       toast.error(error.message || 'فشل حذف الترقيات / Failed to delete promotions')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['employee-promotions'] })
+      await invalidateCache.employeePromotions.all()
     },
   })
 }
@@ -205,8 +198,6 @@ export const useBulkDeletePromotions = () => {
  * Submit promotion for approval
  */
 export const useSubmitPromotionForApproval = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => employeePromotionService.submitForApproval(id),
     onSuccess: () => {
@@ -216,8 +207,8 @@ export const useSubmitPromotionForApproval = () => {
       toast.error(error.message || 'فشل إرسال الترقية للموافقة / Failed to submit promotion')
     },
     onSettled: async (_, __, id) => {
-      await queryClient.invalidateQueries({ queryKey: ['employee-promotions'] })
-      await queryClient.invalidateQueries({ queryKey: ['employee-promotions', id] })
+      await invalidateCache.employeePromotions.all()
+      await invalidateCache.employeePromotions.detail(id)
     },
   })
 }
@@ -226,8 +217,6 @@ export const useSubmitPromotionForApproval = () => {
  * Approve a promotion
  */
 export const useApprovePromotion = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, stepNumber, comments }: { id: string; stepNumber: number; comments?: string }) =>
       employeePromotionService.approvePromotion(id, { stepNumber, comments }),
@@ -238,8 +227,8 @@ export const useApprovePromotion = () => {
       toast.error(error.message || 'فشل الموافقة على الترقية / Failed to approve promotion')
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: ['employee-promotions'] })
-      await queryClient.invalidateQueries({ queryKey: ['employee-promotions', variables.id] })
+      await invalidateCache.employeePromotions.all()
+      await invalidateCache.employeePromotions.detail(variables.id)
     },
   })
 }
@@ -248,8 +237,6 @@ export const useApprovePromotion = () => {
  * Reject a promotion
  */
 export const useRejectPromotion = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, stepNumber, comments }: { id: string; stepNumber: number; comments: string }) =>
       employeePromotionService.rejectPromotion(id, { stepNumber, comments }),
@@ -260,8 +247,8 @@ export const useRejectPromotion = () => {
       toast.error(error.message || 'فشل رفض الترقية / Failed to reject promotion')
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: ['employee-promotions'] })
-      await queryClient.invalidateQueries({ queryKey: ['employee-promotions', variables.id] })
+      await invalidateCache.employeePromotions.all()
+      await invalidateCache.employeePromotions.detail(variables.id)
     },
   })
 }
@@ -270,8 +257,6 @@ export const useRejectPromotion = () => {
  * Cancel a promotion
  */
 export const useCancelPromotion = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       employeePromotionService.cancelPromotion(id, reason),
@@ -282,8 +267,8 @@ export const useCancelPromotion = () => {
       toast.error(error.message || 'فشل إلغاء الترقية / Failed to cancel promotion')
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: ['employee-promotions'] })
-      await queryClient.invalidateQueries({ queryKey: ['employee-promotions', variables.id] })
+      await invalidateCache.employeePromotions.all()
+      await invalidateCache.employeePromotions.detail(variables.id)
     },
   })
 }
@@ -292,8 +277,6 @@ export const useCancelPromotion = () => {
  * Apply promotion - updates employee record
  */
 export const useApplyPromotion = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => employeePromotionService.applyPromotion(id),
     onSuccess: () => {
@@ -303,12 +286,12 @@ export const useApplyPromotion = () => {
       toast.error(error.message || 'فشل تطبيق الترقية / Failed to apply promotion')
     },
     onSettled: async (data, __, id) => {
-      await queryClient.invalidateQueries({ queryKey: ['employee-promotions'] })
-      await queryClient.invalidateQueries({ queryKey: ['employee-promotions', id] })
+      await invalidateCache.employeePromotions.all()
+      await invalidateCache.employeePromotions.detail(id)
       // Also invalidate employee queries since employee record was updated
       if (data?.employee) {
-        await queryClient.invalidateQueries({ queryKey: ['employees'] })
-        await queryClient.invalidateQueries({ queryKey: ['employees', data.employee._id] })
+        await invalidateCache.staff.employees()
+        await invalidateCache.staff.employee(data.employee._id)
       }
     },
   })
@@ -320,8 +303,6 @@ export const useApplyPromotion = () => {
  * Notify employee about their promotion
  */
 export const useNotifyEmployee = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => employeePromotionService.notifyEmployee(id),
     onSuccess: () => {
@@ -331,7 +312,7 @@ export const useNotifyEmployee = () => {
       toast.error(error.message || 'فشل إرسال الإشعار / Failed to notify employee')
     },
     onSettled: async (_, __, id) => {
-      await queryClient.invalidateQueries({ queryKey: ['employee-promotions', id] })
+      await invalidateCache.employeePromotions.detail(id)
     },
   })
 }
@@ -340,8 +321,6 @@ export const useNotifyEmployee = () => {
  * Employee acknowledgement of promotion
  */
 export const useAcknowledgePromotion = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, comments }: { id: string; comments?: string }) =>
       employeePromotionService.acknowledgePromotion(id, comments),
@@ -352,7 +331,7 @@ export const useAcknowledgePromotion = () => {
       toast.error(error.message || 'فشل الإقرار بالترقية / Failed to acknowledge promotion')
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: ['employee-promotions', variables.id] })
+      await invalidateCache.employeePromotions.detail(variables.id)
     },
   })
 }

@@ -10,6 +10,7 @@ import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 
 interface ReportCard {
     id: string
@@ -28,7 +29,7 @@ const reports: ReportCard[] = [
         title: 'تقرير أعمار الحسابات',
         description: 'تحليل المستحقات حسب فترات التأخير (0-30، 31-60، 61-90، +90 يوم)',
         icon: <Clock className="w-6 h-6" aria-hidden="true" />,
-        href: '/dashboard/finance/reports/accounts-aging',
+        href: ROUTES.dashboard.finance.reports.accountsAging,
         color: 'text-amber-600',
         bgColor: 'bg-amber-50',
         borderColor: 'border-amber-100'
@@ -38,7 +39,7 @@ const reports: ReportCard[] = [
         title: 'إيرادات العملاء',
         description: 'تحليل الإيرادات والمدفوعات والمستحقات حسب كل عميل',
         icon: <TrendingUp className="w-6 h-6" />,
-        href: '/dashboard/finance/reports/revenue-by-client',
+        href: ROUTES.dashboard.finance.reports.revenueByClient,
         color: 'text-emerald-600',
         bgColor: 'bg-emerald-50',
         borderColor: 'border-emerald-100'
@@ -48,7 +49,7 @@ const reports: ReportCard[] = [
         title: 'الفواتير المستحقة',
         description: 'قائمة شاملة بجميع الفواتير المستحقة مع تفاصيل التأخير',
         icon: <FileText className="w-6 h-6" aria-hidden="true" />,
-        href: '/dashboard/finance/reports/outstanding-invoices',
+        href: ROUTES.dashboard.finance.reports.outstandingInvoices,
         color: 'text-blue-600',
         bgColor: 'bg-blue-50',
         borderColor: 'border-blue-100'
@@ -58,7 +59,7 @@ const reports: ReportCard[] = [
         title: 'تقرير الوقت',
         description: 'تحليل ساعات العمل القابلة للفوترة وغير القابلة',
         icon: <Calendar className="w-6 h-6" aria-hidden="true" />,
-        href: '/dashboard/finance/reports/time-entries',
+        href: ROUTES.dashboard.finance.reports.timeEntries,
         color: 'text-purple-600',
         bgColor: 'bg-purple-50',
         borderColor: 'border-purple-100'
@@ -67,13 +68,13 @@ const reports: ReportCard[] = [
 
 export function ReportsDashboard() {
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
-        { title: 'كشف الحساب', href: '/dashboard/finance/statements', isActive: false },
-        { title: 'المعاملات', href: '/dashboard/finance/transactions', isActive: false },
-        { title: 'تتبع الوقت', href: '/dashboard/finance/time-tracking', isActive: false },
-        { title: 'التقارير', href: '/dashboard/finance/reports', isActive: true },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: false },
+        { title: 'المصروفات', href: ROUTES.dashboard.finance.expenses.list, isActive: false },
+        { title: 'كشف الحساب', href: ROUTES.dashboard.finance.statements.list, isActive: false },
+        { title: 'المعاملات', href: ROUTES.dashboard.finance.transactions.list, isActive: false },
+        { title: 'تتبع الوقت', href: ROUTES.dashboard.finance.timeTracking.list, isActive: false },
+        { title: 'التقارير', href: ROUTES.dashboard.finance.reports.list, isActive: true },
     ]
 
     return (

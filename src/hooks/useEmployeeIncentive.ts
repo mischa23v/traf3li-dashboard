@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { employeeIncentiveService } from '@/services/employeeIncentiveService'
 import type {
   EmployeeIncentiveFilters,
@@ -9,6 +9,7 @@ import type {
   RejectIncentiveData,
 } from '@/services/employeeIncentiveService'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ==================== QUERY KEYS ====================
 
@@ -113,13 +114,11 @@ export function useApprovedAwaitingProcessing() {
  * Create a new employee incentive
  */
 export function useCreateEmployeeIncentive() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateEmployeeIncentiveData) =>
       employeeIncentiveService.createEmployeeIncentive(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: employeeIncentiveKeys.all })
+      invalidateCache.employeeIncentives.all()
       toast.success('تم إنشاء الحافز بنجاح')
     },
     onError: (error: any) => {
@@ -132,16 +131,12 @@ export function useCreateEmployeeIncentive() {
  * Update an employee incentive
  */
 export function useUpdateEmployeeIncentive() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateEmployeeIncentiveData }) =>
       employeeIncentiveService.updateEmployeeIncentive(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: employeeIncentiveKeys.detail(variables.id),
-      })
-      queryClient.invalidateQueries({ queryKey: employeeIncentiveKeys.lists() })
+      invalidateCache.employeeIncentives.detail(variables.id)
+      invalidateCache.employeeIncentives.lists()
       toast.success('تم تحديث الحافز بنجاح')
     },
     onError: (error: any) => {
@@ -154,12 +149,10 @@ export function useUpdateEmployeeIncentive() {
  * Delete an employee incentive
  */
 export function useDeleteEmployeeIncentive() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => employeeIncentiveService.deleteEmployeeIncentive(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: employeeIncentiveKeys.all })
+      invalidateCache.employeeIncentives.all()
       toast.success('تم حذف الحافز بنجاح')
     },
     onError: (error: any) => {
@@ -172,13 +165,11 @@ export function useDeleteEmployeeIncentive() {
  * Bulk delete employee incentives
  */
 export function useBulkDeleteEmployeeIncentives() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (ids: string[]) =>
       employeeIncentiveService.bulkDeleteEmployeeIncentives(ids),
     onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: employeeIncentiveKeys.all })
+      invalidateCache.employeeIncentives.all()
       toast.success(`تم حذف ${result.deleted} حافز بنجاح`)
     },
     onError: (error: any) => {
@@ -191,15 +182,11 @@ export function useBulkDeleteEmployeeIncentives() {
  * Submit incentive for approval
  */
 export function useSubmitIncentiveForApproval() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => employeeIncentiveService.submitForApproval(id),
     onSuccess: (incentive) => {
-      queryClient.invalidateQueries({
-        queryKey: employeeIncentiveKeys.detail(incentive._id),
-      })
-      queryClient.invalidateQueries({ queryKey: employeeIncentiveKeys.lists() })
+      invalidateCache.employeeIncentives.detail(incentive._id)
+      invalidateCache.employeeIncentives.lists()
       toast.success('تم إرسال الحافز للموافقة بنجاح')
     },
     onError: (error: any) => {
@@ -212,17 +199,13 @@ export function useSubmitIncentiveForApproval() {
  * Approve an incentive
  */
 export function useApproveIncentive() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data?: ApproveIncentiveData }) =>
       employeeIncentiveService.approveIncentive(id, data),
     onSuccess: (incentive) => {
-      queryClient.invalidateQueries({
-        queryKey: employeeIncentiveKeys.detail(incentive._id),
-      })
-      queryClient.invalidateQueries({ queryKey: employeeIncentiveKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: employeeIncentiveKeys.pending() })
+      invalidateCache.employeeIncentives.detail(incentive._id)
+      invalidateCache.employeeIncentives.lists()
+      invalidateCache.employeeIncentives.pending()
       toast.success('تم الموافقة على الحافز بنجاح')
     },
     onError: (error: any) => {
@@ -235,17 +218,13 @@ export function useApproveIncentive() {
  * Reject/Cancel an incentive
  */
 export function useRejectIncentive() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: RejectIncentiveData }) =>
       employeeIncentiveService.rejectIncentive(id, data),
     onSuccess: (incentive) => {
-      queryClient.invalidateQueries({
-        queryKey: employeeIncentiveKeys.detail(incentive._id),
-      })
-      queryClient.invalidateQueries({ queryKey: employeeIncentiveKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: employeeIncentiveKeys.pending() })
+      invalidateCache.employeeIncentives.detail(incentive._id)
+      invalidateCache.employeeIncentives.lists()
+      invalidateCache.employeeIncentives.pending()
       toast.success('تم رفض الحافز بنجاح')
     },
     onError: (error: any) => {
@@ -258,19 +237,13 @@ export function useRejectIncentive() {
  * Mark incentive as processed
  */
 export function useMarkIncentiveAsProcessed() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, payrollEntryId }: { id: string; payrollEntryId: string }) =>
       employeeIncentiveService.markAsProcessed(id, payrollEntryId),
     onSuccess: (incentive) => {
-      queryClient.invalidateQueries({
-        queryKey: employeeIncentiveKeys.detail(incentive._id),
-      })
-      queryClient.invalidateQueries({ queryKey: employeeIncentiveKeys.lists() })
-      queryClient.invalidateQueries({
-        queryKey: employeeIncentiveKeys.awaitingProcessing(),
-      })
+      invalidateCache.employeeIncentives.detail(incentive._id)
+      invalidateCache.employeeIncentives.lists()
+      invalidateCache.employeeIncentives.awaitingProcessing()
       toast.success('تم تحديث حالة الحافز بنجاح')
     },
     onError: (error: any) => {
@@ -283,13 +256,11 @@ export function useMarkIncentiveAsProcessed() {
  * Bulk create incentives
  */
 export function useBulkCreateIncentives() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: BulkIncentiveData) =>
       employeeIncentiveService.bulkCreateIncentives(data),
     onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: employeeIncentiveKeys.all })
+      invalidateCache.employeeIncentives.all()
       if (result.failed > 0) {
         toast.warning(
           `تم إنشاء ${result.created} حافز بنجاح. فشل ${result.failed} حافز`
@@ -308,13 +279,11 @@ export function useBulkCreateIncentives() {
  * Bulk approve incentives
  */
 export function useBulkApproveIncentives() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ ids, data }: { ids: string[]; data?: ApproveIncentiveData }) =>
       employeeIncentiveService.bulkApproveIncentives(ids, data),
     onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: employeeIncentiveKeys.all })
+      invalidateCache.employeeIncentives.all()
       toast.success(`تم الموافقة على ${result.approved} حافز بنجاح`)
     },
     onError: (error: any) => {

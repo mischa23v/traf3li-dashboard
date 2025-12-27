@@ -34,6 +34,7 @@ import { FinanceSidebar } from './finance-sidebar'
 import { useSetExchangeRate } from '@/hooks/useFinanceAdvanced'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { cn } from '@/lib/utils'
+import { ROUTES } from '@/constants/routes'
 
 export function CurrencyCreateView() {
     const navigate = useNavigate()
@@ -75,16 +76,16 @@ export function CurrencyCreateView() {
             rate: parseFloat(rate),
         }, {
             onSuccess: () => {
-                navigate({ to: '/dashboard/finance/currency' })
+                navigate({ to: ROUTES.dashboard.finance.currency.list })
             },
         })
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
-        { title: 'العملات', href: '/dashboard/finance/currency', isActive: true },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: false },
+        { title: 'المصروفات', href: ROUTES.dashboard.finance.expenses.list, isActive: false },
+        { title: 'العملات', href: ROUTES.dashboard.finance.currency.list, isActive: true },
     ]
 
     return (

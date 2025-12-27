@@ -1,5 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   getJobPositions,
   getJobPosition,
@@ -108,14 +109,13 @@ export const useOrgChart = () => {
 
 // Create job position
 export const useCreateJobPosition = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateJobPositionData) => createJobPosition(data),
     onSuccess: () => {
       toast.success('تم إنشاء المنصب الوظيفي بنجاح')
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.all })
+      invalidateCache.jobPositions.lists()
+      invalidateCache.jobPositions.stats()
+      invalidateCache.jobPositions.all()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء المنصب الوظيفي')
@@ -125,14 +125,13 @@ export const useCreateJobPosition = () => {
 
 // Update job position
 export const useUpdateJobPosition = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ positionId, data }: { positionId: string; data: UpdateJobPositionData }) =>
       updateJobPosition(positionId, data),
     onSuccess: (_, { positionId }) => {
       toast.success('تم تحديث المنصب الوظيفي بنجاح')
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.detail(positionId) })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.lists() })
+      invalidateCache.jobPositions.detail(positionId)
+      invalidateCache.jobPositions.lists()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث المنصب الوظيفي')
@@ -142,14 +141,13 @@ export const useUpdateJobPosition = () => {
 
 // Delete job position
 export const useDeleteJobPosition = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (positionId: string) => deleteJobPosition(positionId),
     onSuccess: () => {
       toast.success('تم حذف المنصب الوظيفي بنجاح')
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.all })
+      invalidateCache.jobPositions.lists()
+      invalidateCache.jobPositions.stats()
+      invalidateCache.jobPositions.all()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف المنصب الوظيفي')
@@ -159,14 +157,13 @@ export const useDeleteJobPosition = () => {
 
 // Bulk delete job positions
 export const useBulkDeleteJobPositions = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteJobPositions(ids),
     onSuccess: (_, variables) => {
       toast.success(`تم حذف ${variables.length} منصب وظيفي بنجاح`)
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.all })
+      invalidateCache.jobPositions.lists()
+      invalidateCache.jobPositions.stats()
+      invalidateCache.jobPositions.all()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف المناصب الوظيفية')
@@ -176,15 +173,14 @@ export const useBulkDeleteJobPositions = () => {
 
 // Freeze job position
 export const useFreezeJobPosition = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ positionId, data }: { positionId: string; data: { reason: string; effectiveDate?: string } }) =>
       freezeJobPosition(positionId, data),
     onSuccess: (_, { positionId }) => {
       toast.success('تم تجميد المنصب الوظيفي بنجاح')
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.detail(positionId) })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.stats() })
+      invalidateCache.jobPositions.detail(positionId)
+      invalidateCache.jobPositions.lists()
+      invalidateCache.jobPositions.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تجميد المنصب الوظيفي')
@@ -194,14 +190,13 @@ export const useFreezeJobPosition = () => {
 
 // Unfreeze job position
 export const useUnfreezeJobPosition = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (positionId: string) => unfreezeJobPosition(positionId),
     onSuccess: (_, positionId) => {
       toast.success('تم إلغاء تجميد المنصب الوظيفي بنجاح')
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.detail(positionId) })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.stats() })
+      invalidateCache.jobPositions.detail(positionId)
+      invalidateCache.jobPositions.lists()
+      invalidateCache.jobPositions.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إلغاء تجميد المنصب الوظيفي')
@@ -211,15 +206,14 @@ export const useUnfreezeJobPosition = () => {
 
 // Eliminate job position
 export const useEliminateJobPosition = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ positionId, data }: { positionId: string; data: { reason: string; effectiveDate?: string } }) =>
       eliminateJobPosition(positionId, data),
     onSuccess: (_, { positionId }) => {
       toast.success('تم إلغاء المنصب الوظيفي بنجاح')
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.detail(positionId) })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.stats() })
+      invalidateCache.jobPositions.detail(positionId)
+      invalidateCache.jobPositions.lists()
+      invalidateCache.jobPositions.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إلغاء المنصب الوظيفي')
@@ -229,16 +223,15 @@ export const useEliminateJobPosition = () => {
 
 // Mark position as vacant
 export const useMarkPositionVacant = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ positionId, data }: { positionId: string; data: { reason: string; vacantSince?: string } }) =>
       markPositionVacant(positionId, data),
     onSuccess: (_, { positionId }) => {
       toast.success('تم تحديد المنصب كشاغر بنجاح')
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.detail(positionId) })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.vacant() })
+      invalidateCache.jobPositions.detail(positionId)
+      invalidateCache.jobPositions.lists()
+      invalidateCache.jobPositions.stats()
+      invalidateCache.jobPositions.vacant()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديد المنصب كشاغر')
@@ -248,7 +241,6 @@ export const useMarkPositionVacant = () => {
 
 // Fill job position
 export const useFillJobPosition = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ positionId, data }: {
       positionId: string
@@ -263,10 +255,10 @@ export const useFillJobPosition = () => {
     }) => fillJobPosition(positionId, data),
     onSuccess: (_, { positionId }) => {
       toast.success('تم شغل المنصب الوظيفي بنجاح')
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.detail(positionId) })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.vacant() })
+      invalidateCache.jobPositions.detail(positionId)
+      invalidateCache.jobPositions.lists()
+      invalidateCache.jobPositions.stats()
+      invalidateCache.jobPositions.vacant()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل شغل المنصب الوظيفي')
@@ -276,16 +268,15 @@ export const useFillJobPosition = () => {
 
 // Vacate job position
 export const useVacateJobPosition = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ positionId, data }: { positionId: string; data: { reason: string; effectiveDate?: string } }) =>
       vacateJobPosition(positionId, data),
     onSuccess: (_, { positionId }) => {
       toast.success('تم إخلاء المنصب الوظيفي بنجاح')
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.detail(positionId) })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.vacant() })
+      invalidateCache.jobPositions.detail(positionId)
+      invalidateCache.jobPositions.lists()
+      invalidateCache.jobPositions.stats()
+      invalidateCache.jobPositions.vacant()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إخلاء المنصب الوظيفي')
@@ -295,14 +286,13 @@ export const useVacateJobPosition = () => {
 
 // Clone job position
 export const useCloneJobPosition = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ positionId, data }: { positionId: string; data?: { newPositionNumber?: string } }) =>
       cloneJobPosition(positionId, data),
     onSuccess: () => {
       toast.success('تم نسخ المنصب الوظيفي بنجاح')
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.stats() })
+      invalidateCache.jobPositions.lists()
+      invalidateCache.jobPositions.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل نسخ المنصب الوظيفي')
@@ -312,13 +302,12 @@ export const useCloneJobPosition = () => {
 
 // Update responsibilities
 export const useUpdateResponsibilities = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ positionId, responsibilities }: { positionId: string; responsibilities: Omit<Responsibility, 'responsibilityId'>[] }) =>
       updateResponsibilities(positionId, responsibilities),
     onSuccess: (_, { positionId }) => {
       toast.success('تم تحديث المسؤوليات بنجاح')
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.detail(positionId) })
+      invalidateCache.jobPositions.detail(positionId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث المسؤوليات')
@@ -328,13 +317,12 @@ export const useUpdateResponsibilities = () => {
 
 // Update qualifications
 export const useUpdateQualifications = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ positionId, qualifications }: { positionId: string; qualifications: Qualification }) =>
       updateQualifications(positionId, qualifications),
     onSuccess: (_, { positionId }) => {
       toast.success('تم تحديث المؤهلات بنجاح')
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.detail(positionId) })
+      invalidateCache.jobPositions.detail(positionId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث المؤهلات')
@@ -344,13 +332,12 @@ export const useUpdateQualifications = () => {
 
 // Update salary range
 export const useUpdateSalaryRange = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ positionId, salaryRange }: { positionId: string; salaryRange: SalaryRange }) =>
       updateSalaryRange(positionId, salaryRange),
     onSuccess: (_, { positionId }) => {
       toast.success('تم تحديث نطاق الراتب بنجاح')
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.detail(positionId) })
+      invalidateCache.jobPositions.detail(positionId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث نطاق الراتب')
@@ -360,13 +347,12 @@ export const useUpdateSalaryRange = () => {
 
 // Update competencies
 export const useUpdateCompetencies = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ positionId, competencies }: { positionId: string; competencies: any }) =>
       updateCompetencies(positionId, competencies),
     onSuccess: (_, { positionId }) => {
       toast.success('تم تحديث الكفاءات بنجاح')
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.detail(positionId) })
+      invalidateCache.jobPositions.detail(positionId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث الكفاءات')
@@ -376,13 +362,12 @@ export const useUpdateCompetencies = () => {
 
 // Add document
 export const useAddDocument = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ positionId, document }: { positionId: string; document: any }) =>
       addDocument(positionId, document),
     onSuccess: (_, { positionId }) => {
       toast.success('تم إضافة المستند بنجاح')
-      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.detail(positionId) })
+      invalidateCache.jobPositions.detail(positionId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إضافة المستند')

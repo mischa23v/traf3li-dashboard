@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useOffboardings, useOffboardingStats, useDeleteOffboarding, useBulkDeleteOffboardings } from '@/hooks/useOffboarding'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -126,8 +127,8 @@ export function OffboardingListView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'إنهاء الخدمة', href: '/dashboard/hr/offboarding', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'إنهاء الخدمة', href: ROUTES.dashboard.hr.offboarding.list, isActive: true },
   ]
 
   return (
@@ -257,7 +258,7 @@ export function OffboardingListView() {
                     </SelectContent>
                   </Select>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/hr/offboarding/new' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.hr.offboarding.new })}
                     className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
                   >
                     <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
@@ -322,7 +323,7 @@ export function OffboardingListView() {
                   <UserMinus className="w-12 h-12 mx-auto text-slate-300" />
                   <p className="mt-4 text-slate-500">لا توجد سجلات إنهاء خدمة</p>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/hr/offboarding/new' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.hr.offboarding.new })}
                     className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
                     <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
@@ -349,7 +350,7 @@ export function OffboardingListView() {
 
                         <div
                           className="flex-1 cursor-pointer"
-                          onClick={() => navigate({ to: `/dashboard/hr/offboarding/${offboarding._id}` })}
+                          onClick={() => navigate({ to: ROUTES.dashboard.hr.offboarding.detail(offboarding._id) })}
                         >
                           <div className="flex items-start justify-between">
                             <div>
@@ -419,13 +420,13 @@ export function OffboardingListView() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-48">
                             <DropdownMenuItem
-                              onClick={() => navigate({ to: `/dashboard/hr/offboarding/${offboarding._id}` })}
+                              onClick={() => navigate({ to: ROUTES.dashboard.hr.offboarding.detail(offboarding._id) })}
                             >
                               <Eye className="w-4 h-4 ms-2" aria-hidden="true" />
                               عرض التفاصيل
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() => navigate({ to: `/dashboard/hr/offboarding/new?editId=${offboarding._id}` })}
+                              onClick={() => navigate({ to: `${ROUTES.dashboard.hr.offboarding.new}?editId=${offboarding._id}` })}
                             >
                               <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                               تعديل

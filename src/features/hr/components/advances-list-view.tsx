@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useAdvances, useAdvanceStats, useBulkDeleteAdvances } from '@/hooks/useAdvances'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -143,8 +144,8 @@ export function AdvancesListView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'السلف', href: '/dashboard/hr/advances', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'السلف', href: ROUTES.dashboard.hr.advances.list, isActive: true },
   ]
 
   return (
@@ -304,7 +305,7 @@ export function AdvancesListView() {
                     </Button>
                     <Button
                       size="sm"
-                      onClick={() => navigate({ to: '/dashboard/hr/advances/new' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.hr.advances.new })}
                       className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
                     >
                       <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
@@ -349,7 +350,7 @@ export function AdvancesListView() {
                   <Wallet className="w-12 h-12 mx-auto text-slate-300" />
                   <p className="mt-4 text-slate-500">لا توجد سلف</p>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/hr/advances/new' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.hr.advances.new })}
                     className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
                     <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
@@ -399,7 +400,7 @@ export function AdvancesListView() {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/advances/${advance._id}` })}>
+                                  <DropdownMenuItem onClick={() => navigate({ to: ROUTES.dashboard.hr.advances.detail(advance._id) })}>
                                     <Eye className="w-4 h-4 ms-2" aria-hidden="true" />
                                     عرض التفاصيل
                                   </DropdownMenuItem>
@@ -467,7 +468,7 @@ export function AdvancesListView() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => navigate({ to: `/dashboard/hr/advances/${advance._id}` })}
+                              onClick={() => navigate({ to: ROUTES.dashboard.hr.advances.detail(advance._id) })}
                               className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl"
                             >
                               عرض التفاصيل

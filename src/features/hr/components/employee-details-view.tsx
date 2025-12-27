@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useParams, useNavigate, Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -43,7 +44,7 @@ export function EmployeeDetailsView() {
     const handleDelete = () => {
         deleteEmployeeMutation.mutate(employeeId, {
             onSuccess: () => {
-                navigate({ to: '/dashboard/hr/employees' })
+                navigate({ to: ROUTES.dashboard.hr.employees.list })
             }
         })
     }
@@ -104,9 +105,9 @@ export function EmployeeDetailsView() {
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: true },
+        { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: true },
         { title: 'الرواتب', href: '/dashboard/hr/salaries', isActive: false },
-        { title: 'الإجازات', href: '/dashboard/hr/leaves', isActive: false },
+        { title: 'الإجازات', href: ROUTES.dashboard.hr.leave.list, isActive: false },
     ]
 
     return (

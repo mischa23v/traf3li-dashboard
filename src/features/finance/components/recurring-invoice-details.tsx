@@ -52,6 +52,7 @@ import { getFrequencyLabel, getStatusLabel, getStatusColor } from '@/services/re
 import type { RecurringInvoice } from '@/services/recurringInvoiceService'
 import { format } from 'date-fns'
 import { ar } from 'date-fns/locale'
+import { ROUTES } from '@/constants/routes'
 
 interface RecurringInvoiceDetailsProps {
   invoiceId: string
@@ -86,7 +87,7 @@ export default function RecurringInvoiceDetails({ invoiceId }: RecurringInvoiceD
   const handleDelete = () => {
     deleteInvoice(invoiceId, {
       onSuccess: () => {
-        navigate({ to: '/dashboard/finance/recurring-invoices' })
+        navigate({ to: ROUTES.dashboard.finance.recurringInvoices.list })
       },
     })
   }
@@ -158,7 +159,7 @@ export default function RecurringInvoiceDetails({ invoiceId }: RecurringInvoiceD
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate({ to: '/dashboard/finance/recurring-invoices' })}
+              onClick={() => navigate({ to: ROUTES.dashboard.finance.recurringInvoices.list })}
             >
               <ArrowRight className="h-4 w-4" />
             </Button>

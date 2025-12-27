@@ -13,8 +13,10 @@
  * @deprecated نقاط النهاية هذه غير مطبقة في الخادم
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
+import { QueryKeys } from '@/lib/query-keys'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   getExpenseClaims,
   getExpenseClaim,
@@ -59,21 +61,11 @@ const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
 const STATS_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour
 const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
 
-// Query keys
-export const expenseClaimKeys = {
-  all: ['expense-claims'] as const,
-  lists: () => [...expenseClaimKeys.all, 'list'] as const,
-  list: (filters?: ExpenseClaimFilters) => [...expenseClaimKeys.lists(), filters] as const,
-  details: () => [...expenseClaimKeys.all, 'detail'] as const,
-  detail: (id: string) => [...expenseClaimKeys.details(), id] as const,
-  stats: () => [...expenseClaimKeys.all, 'stats'] as const,
-  byEmployee: (employeeId: string) => [...expenseClaimKeys.all, 'employee', employeeId] as const,
-  pendingApprovals: () => [...expenseClaimKeys.all, 'pending-approvals'] as const,
-  pendingPayments: () => [...expenseClaimKeys.all, 'pending-payments'] as const,
-  mileageRates: () => [...expenseClaimKeys.all, 'mileage-rates'] as const,
-  policies: () => [...expenseClaimKeys.all, 'policies'] as const,
-  corporateCard: (employeeId: string) => [...expenseClaimKeys.all, 'corporate-card', employeeId] as const,
-}
+/**
+ * @deprecated Use QueryKeys.expenseClaims instead
+ * Local query keys deprecated in favor of centralized QueryKeys factory
+ */
+export const expenseClaimKeys = QueryKeys.expenseClaims
 
 // Get all expense claims
 export const useExpenseClaims = (filters?: ExpenseClaimFilters) => {
@@ -172,7 +164,6 @@ export const useCorporateCardTransactions = (employeeId: string, filters?: {
  * @deprecated نقطة النهاية غير مطبقة في الخادم
  */
 export const useCreateExpenseClaim = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateExpenseClaimData) => {
       console.warn(
@@ -184,8 +175,8 @@ export const useCreateExpenseClaim = () => {
       return createExpenseClaim(data)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.stats() })
+      invalidateCache.expenseClaims.lists()
+      invalidateCache.expenseClaims.stats()
     },
   })
 }
@@ -196,7 +187,6 @@ export const useCreateExpenseClaim = () => {
  * @deprecated نقطة النهاية غير مطبقة في الخادم
  */
 export const useUpdateExpenseClaim = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ claimId, data }: { claimId: string; data: UpdateExpenseClaimData }) => {
       console.warn(
@@ -208,8 +198,8 @@ export const useUpdateExpenseClaim = () => {
       return updateExpenseClaim(claimId, data)
     },
     onSuccess: (_, { claimId }) => {
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.detail(claimId) })
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.lists() })
+      invalidateCache.expenseClaims.detail(claimId)
+      invalidateCache.expenseClaims.lists()
     },
   })
 }
@@ -220,7 +210,6 @@ export const useUpdateExpenseClaim = () => {
  * @deprecated نقطة النهاية غير مطبقة في الخادم
  */
 export const useDeleteExpenseClaim = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (claimId: string) => {
       console.warn(
@@ -232,8 +221,8 @@ export const useDeleteExpenseClaim = () => {
       return deleteExpenseClaim(claimId)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.stats() })
+      invalidateCache.expenseClaims.lists()
+      invalidateCache.expenseClaims.stats()
     },
   })
 }
@@ -244,7 +233,6 @@ export const useDeleteExpenseClaim = () => {
  * @deprecated نقطة النهاية غير مطبقة في الخادم
  */
 export const useSubmitExpenseClaim = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (claimId: string) => {
       console.warn(
@@ -256,9 +244,9 @@ export const useSubmitExpenseClaim = () => {
       return submitExpenseClaim(claimId)
     },
     onSuccess: (_, claimId) => {
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.detail(claimId) })
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.pendingApprovals() })
+      invalidateCache.expenseClaims.detail(claimId)
+      invalidateCache.expenseClaims.lists()
+      invalidateCache.expenseClaims.pendingApprovals()
     },
   })
 }
@@ -269,7 +257,6 @@ export const useSubmitExpenseClaim = () => {
  * @deprecated نقطة النهاية غير مطبقة في الخادم
  */
 export const useApproveExpenseClaim = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ claimId, data }: {
       claimId: string
@@ -284,42 +271,40 @@ export const useApproveExpenseClaim = () => {
       return approveExpenseClaim(claimId, data)
     },
     onSuccess: (_, { claimId }) => {
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.detail(claimId) })
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.pendingApprovals() })
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.pendingPayments() })
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.stats() })
+      invalidateCache.expenseClaims.detail(claimId)
+      invalidateCache.expenseClaims.lists()
+      invalidateCache.expenseClaims.pendingApprovals()
+      invalidateCache.expenseClaims.pendingPayments()
+      invalidateCache.expenseClaims.stats()
     },
   })
 }
 
 // Reject expense claim
 export const useRejectExpenseClaim = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ claimId, data }: {
       claimId: string
       data: { reason: string; comments?: string }
     }) => rejectExpenseClaim(claimId, data),
     onSuccess: (_, { claimId }) => {
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.detail(claimId) })
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.pendingApprovals() })
+      invalidateCache.expenseClaims.detail(claimId)
+      invalidateCache.expenseClaims.lists()
+      invalidateCache.expenseClaims.pendingApprovals()
     },
   })
 }
 
 // Request changes
 export const useRequestClaimChanges = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ claimId, data }: {
       claimId: string
       data: { changesRequested: string; lineItemIds?: string[] }
     }) => requestClaimChanges(claimId, data),
     onSuccess: (_, { claimId }) => {
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.detail(claimId) })
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.lists() })
+      invalidateCache.expenseClaims.detail(claimId)
+      invalidateCache.expenseClaims.lists()
     },
   })
 }
@@ -330,7 +315,6 @@ export const useRequestClaimChanges = () => {
  * @deprecated نقطة النهاية غير مطبقة في الخادم
  */
 export const useProcessClaimPayment = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ claimId, data }: {
       claimId: string
@@ -353,17 +337,16 @@ export const useProcessClaimPayment = () => {
       return processClaimPayment(claimId, data)
     },
     onSuccess: (_, { claimId }) => {
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.detail(claimId) })
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.pendingPayments() })
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.stats() })
+      invalidateCache.expenseClaims.detail(claimId)
+      invalidateCache.expenseClaims.lists()
+      invalidateCache.expenseClaims.pendingPayments()
+      invalidateCache.expenseClaims.stats()
     },
   })
 }
 
 // Add line item
 export const useAddLineItem = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ claimId, data }: {
       claimId: string
@@ -382,14 +365,13 @@ export const useAddLineItem = () => {
       }
     }) => addLineItem(claimId, data),
     onSuccess: (_, { claimId }) => {
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.detail(claimId) })
+      invalidateCache.expenseClaims.detail(claimId)
     },
   })
 }
 
 // Update line item
 export const useUpdateLineItem = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ claimId, lineItemId, data }: {
       claimId: string
@@ -408,69 +390,64 @@ export const useUpdateLineItem = () => {
       }
     }) => updateLineItem(claimId, lineItemId, data),
     onSuccess: (_, { claimId }) => {
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.detail(claimId) })
+      invalidateCache.expenseClaims.detail(claimId)
     },
   })
 }
 
 // Delete line item
 export const useDeleteLineItem = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ claimId, lineItemId }: { claimId: string; lineItemId: string }) =>
       deleteLineItem(claimId, lineItemId),
     onSuccess: (_, { claimId }) => {
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.detail(claimId) })
+      invalidateCache.expenseClaims.detail(claimId)
     },
   })
 }
 
 // Upload receipt
 export const useUploadReceipt = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ claimId, data }: { claimId: string; data: FormData }) =>
       uploadReceipt(claimId, data),
     onSuccess: (_, { claimId }) => {
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.detail(claimId) })
+      invalidateCache.expenseClaims.detail(claimId)
     },
   })
 }
 
 // Delete receipt
 export const useDeleteReceipt = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ claimId, receiptId }: { claimId: string; receiptId: string }) =>
       deleteReceipt(claimId, receiptId),
     onSuccess: (_, { claimId }) => {
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.detail(claimId) })
+      invalidateCache.expenseClaims.detail(claimId)
     },
   })
 }
 
 // Verify receipt
 export const useVerifyReceipt = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ claimId, receiptId }: { claimId: string; receiptId: string }) =>
       verifyReceipt(claimId, receiptId),
     onSuccess: (_, { claimId }) => {
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.detail(claimId) })
+      invalidateCache.expenseClaims.detail(claimId)
     },
   })
 }
 
 // Reconcile card transaction
 export const useReconcileCardTransaction = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ claimId, data }: {
       claimId: string
       data: { transactionId: string; lineItemId: string }
     }) => reconcileCardTransaction(claimId, data),
     onSuccess: (_, { claimId }) => {
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.detail(claimId) })
+      invalidateCache.expenseClaims.detail(claimId)
     },
   })
 }
@@ -484,64 +461,59 @@ export const useCheckPolicyCompliance = () => {
 
 // Approve exception
 export const useApproveException = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ claimId, data }: {
       claimId: string
       data: { exceptionReason: string }
     }) => approveException(claimId, data),
     onSuccess: (_, { claimId }) => {
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.detail(claimId) })
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.lists() })
+      invalidateCache.expenseClaims.detail(claimId)
+      invalidateCache.expenseClaims.lists()
     },
   })
 }
 
 // Mark as billable
 export const useMarkAsBillable = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ claimId, data }: {
       claimId: string
       data: { lineItemIds: string[]; clientId: string; caseId?: string }
     }) => markAsBillable(claimId, data),
     onSuccess: (_, { claimId }) => {
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.detail(claimId) })
+      invalidateCache.expenseClaims.detail(claimId)
     },
   })
 }
 
 // Create billable invoice
 export const useCreateBillableInvoice = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (claimId: string) => createBillableInvoice(claimId),
     onSuccess: (_, claimId) => {
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.detail(claimId) })
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.stats() })
+      invalidateCache.expenseClaims.detail(claimId)
+      invalidateCache.expenseClaims.stats()
     },
   })
 }
 
 // Bulk delete
 export const useBulkDeleteExpenseClaims = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteExpenseClaims(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.stats() })
+      invalidateCache.expenseClaims.lists()
+      invalidateCache.expenseClaims.stats()
     },
   })
 }
 
 // Duplicate expense claim
 export const useDuplicateExpenseClaim = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (claimId: string) => duplicateExpenseClaim(claimId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: expenseClaimKeys.lists() })
+      invalidateCache.expenseClaims.lists()
     },
   })
 }

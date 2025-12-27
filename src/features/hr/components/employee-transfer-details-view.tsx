@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useParams, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   useEmployeeTransfer,
   useDeleteEmployeeTransfer,
@@ -106,7 +107,7 @@ export function EmployeeTransferDetailsView() {
   const handleDelete = () => {
     if (confirm('هل أنت متأكد من حذف طلب النقل هذا؟')) {
       deleteMutation.mutate(transferId, {
-        onSuccess: () => navigate({ to: '/dashboard/hr/employee-transfers' }),
+        onSuccess: () => navigate({ to: ROUTES.dashboard.hr.employeeTransfers.list }),
       })
     }
   }
@@ -180,8 +181,8 @@ export function EmployeeTransferDetailsView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'نقل الموظفين', href: '/dashboard/hr/employee-transfers', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'نقل الموظفين', href: ROUTES.dashboard.hr.employeeTransfers.list, isActive: true },
   ]
 
   if (isLoading) {

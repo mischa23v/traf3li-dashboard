@@ -1,5 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import performanceReviewService, {
   type PerformanceReview,
   type PerformanceReviewFilters,
@@ -65,8 +66,6 @@ export function usePerformanceReview(reviewId: string) {
 }
 
 export function useCreatePerformanceReview() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: {
       employeeId: string
@@ -79,27 +78,23 @@ export function useCreatePerformanceReview() {
       feedbackProviders?: Omit<FeedbackProvider, 'status' | 'requestedAt' | 'completedAt'>[]
     }) => performanceReviewService.createPerformanceReview(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.lists() })
+      invalidateCache.performanceReviews.lists()
     },
   })
 }
 
 export function useUpdatePerformanceReview() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ reviewId, data }: { reviewId: string; data: Partial<PerformanceReview> }) =>
       performanceReviewService.updatePerformanceReview(reviewId, data),
     onSuccess: (_, { reviewId }) => {
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.detail(reviewId) })
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.lists() })
+      invalidateCache.performanceReviews.detail(reviewId)
+      invalidateCache.performanceReviews.lists()
     },
   })
 }
 
 export function useSubmitSelfAssessment() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       reviewId,
@@ -112,15 +107,13 @@ export function useSubmitSelfAssessment() {
       }
     }) => performanceReviewService.submitSelfAssessment(reviewId, data),
     onSuccess: (_, { reviewId }) => {
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.detail(reviewId) })
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.lists() })
+      invalidateCache.performanceReviews.detail(reviewId)
+      invalidateCache.performanceReviews.lists()
     },
   })
 }
 
 export function useSubmitManagerAssessment() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       reviewId,
@@ -135,15 +128,13 @@ export function useSubmitManagerAssessment() {
       }
     }) => performanceReviewService.submitManagerAssessment(reviewId, data),
     onSuccess: (_, { reviewId }) => {
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.detail(reviewId) })
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.lists() })
+      invalidateCache.performanceReviews.detail(reviewId)
+      invalidateCache.performanceReviews.lists()
     },
   })
 }
 
 export function useRequest360Feedback() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       reviewId,
@@ -153,14 +144,12 @@ export function useRequest360Feedback() {
       providers: Omit<FeedbackProvider, 'status' | 'requestedAt' | 'completedAt'>[]
     }) => performanceReviewService.request360Feedback(reviewId, providers),
     onSuccess: (_, { reviewId }) => {
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.detail(reviewId) })
+      invalidateCache.performanceReviews.detail(reviewId)
     },
   })
 }
 
 export function useSubmit360Feedback() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       reviewId,
@@ -172,26 +161,22 @@ export function useSubmit360Feedback() {
       data: Omit<FeedbackResponse, 'providerId' | 'submittedAt'>
     }) => performanceReviewService.submit360Feedback(reviewId, providerId, data),
     onSuccess: (_, { reviewId }) => {
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.detail(reviewId) })
+      invalidateCache.performanceReviews.detail(reviewId)
     },
   })
 }
 
 export function useCreateDevelopmentPlan() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ reviewId, data }: { reviewId: string; data: DevelopmentPlan }) =>
       performanceReviewService.createDevelopmentPlan(reviewId, data),
     onSuccess: (_, { reviewId }) => {
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.detail(reviewId) })
+      invalidateCache.performanceReviews.detail(reviewId)
     },
   })
 }
 
 export function useUpdateDevelopmentPlanItem() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       reviewId,
@@ -203,28 +188,24 @@ export function useUpdateDevelopmentPlanItem() {
       data: Partial<DevelopmentPlanItem>
     }) => performanceReviewService.updateDevelopmentPlanItem(reviewId, itemId, data),
     onSuccess: (_, { reviewId }) => {
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.detail(reviewId) })
+      invalidateCache.performanceReviews.detail(reviewId)
     },
   })
 }
 
 export function useSubmitForCalibration() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ reviewId, calibrationSessionId }: { reviewId: string; calibrationSessionId: string }) =>
       performanceReviewService.submitForCalibration(reviewId, calibrationSessionId),
     onSuccess: (_, { reviewId }) => {
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.detail(reviewId) })
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.calibrationSessions() })
+      invalidateCache.performanceReviews.detail(reviewId)
+      invalidateCache.performanceReviews.lists()
+      invalidateCache.performanceReviews.calibrationSessions()
     },
   })
 }
 
 export function useApplyCalibration() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       reviewId,
@@ -238,27 +219,23 @@ export function useApplyCalibration() {
       }
     }) => performanceReviewService.applyCalibration(reviewId, data),
     onSuccess: (_, { reviewId }) => {
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.detail(reviewId) })
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.lists() })
+      invalidateCache.performanceReviews.detail(reviewId)
+      invalidateCache.performanceReviews.lists()
     },
   })
 }
 
 export function useCompleteReview() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (reviewId: string) => performanceReviewService.completeReview(reviewId),
     onSuccess: (_, reviewId) => {
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.detail(reviewId) })
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.lists() })
+      invalidateCache.performanceReviews.detail(reviewId)
+      invalidateCache.performanceReviews.lists()
     },
   })
 }
 
 export function useAcknowledgeReview() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       reviewId,
@@ -272,15 +249,13 @@ export function useAcknowledgeReview() {
       }
     }) => performanceReviewService.acknowledgeReview(reviewId, data),
     onSuccess: (_, { reviewId }) => {
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.detail(reviewId) })
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.lists() })
+      invalidateCache.performanceReviews.detail(reviewId)
+      invalidateCache.performanceReviews.lists()
     },
   })
 }
 
 export function useApproveReviewStep() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       reviewId,
@@ -292,15 +267,13 @@ export function useApproveReviewStep() {
       comments?: string
     }) => performanceReviewService.approveReviewStep(reviewId, stepNumber, { comments }),
     onSuccess: (_, { reviewId }) => {
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.detail(reviewId) })
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.lists() })
+      invalidateCache.performanceReviews.detail(reviewId)
+      invalidateCache.performanceReviews.lists()
     },
   })
 }
 
 export function useRejectReviewStep() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       reviewId,
@@ -312,8 +285,8 @@ export function useRejectReviewStep() {
       comments: string
     }) => performanceReviewService.rejectReviewStep(reviewId, stepNumber, { comments }),
     onSuccess: (_, { reviewId }) => {
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.detail(reviewId) })
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.lists() })
+      invalidateCache.performanceReviews.detail(reviewId)
+      invalidateCache.performanceReviews.lists()
     },
   })
 }
@@ -329,13 +302,11 @@ export function useReviewTemplates(reviewType?: ReviewType) {
 }
 
 export function useCreateReviewTemplate() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: Omit<ReviewTemplate, '_id' | 'templateId'>) =>
       performanceReviewService.createReviewTemplate(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.templates() })
+      invalidateCache.performanceReviews.templates()
     },
   })
 }
@@ -351,26 +322,22 @@ export function useCalibrationSessions(filters?: { periodYear?: number; status?:
 }
 
 export function useCreateCalibrationSession() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (
       data: Omit<CalibrationSession, '_id' | 'sessionId' | 'status' | 'ratingDistribution' | 'completedAt'>
     ) => performanceReviewService.createCalibrationSession(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.calibrationSessions() })
+      invalidateCache.performanceReviews.calibrationSessions()
     },
   })
 }
 
 export function useCompleteCalibrationSession() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (sessionId: string) => performanceReviewService.completeCalibrationSession(sessionId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.calibrationSessions() })
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.lists() })
+      invalidateCache.performanceReviews.calibrationSessions()
+      invalidateCache.performanceReviews.lists()
     },
   })
 }
@@ -407,8 +374,6 @@ export function useTeamPerformanceSummary(managerId: string, periodYear?: number
 
 // Bulk Operations
 export function useBulkCreateReviews() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: {
       departmentId?: string
@@ -418,7 +383,7 @@ export function useBulkCreateReviews() {
       templateId: string
     }) => performanceReviewService.bulkCreateReviews(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: performanceReviewKeys.lists() })
+      invalidateCache.performanceReviews.lists()
     },
   })
 }

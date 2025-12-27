@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -359,7 +360,7 @@ export function EmployeeCreateView() {
                 { id: editId, data: employeeData },
                 {
                     onSuccess: () => {
-                        navigate({ to: '/dashboard/hr/employees/$employeeId', params: { employeeId: editId } })
+                        navigate({ to: ROUTES.dashboard.hr.employees.detail(employeeId), params: { employeeId: editId } })
                     },
                     onError: (error) => {
                         handleApiError(error)
@@ -370,7 +371,7 @@ export function EmployeeCreateView() {
             createMutation.mutate(employeeData, {
                 onSuccess: () => {
                     // Navigate back to employees list after successful creation
-                    navigate({ to: '/dashboard/hr/employees' })
+                    navigate({ to: ROUTES.dashboard.hr.employees.list })
                 },
                 onError: (error) => {
                     handleApiError(error)
@@ -383,7 +384,7 @@ export function EmployeeCreateView() {
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: true },
+        { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: true },
     ]
 
     return (
@@ -1376,7 +1377,7 @@ export function EmployeeCreateView() {
                                 <Button
                                     type="button"
                                     variant="outline"
-                                    onClick={() => navigate({ to: '/dashboard/hr/employees' })}
+                                    onClick={() => navigate({ to: ROUTES.dashboard.hr.employees.list })}
                                     className="h-12 px-8 rounded-xl"
                                 >
                                     إلغاء

@@ -1,10 +1,11 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import clientsService, {
   type ClientFilters,
   type CreateClientData,
 } from '@/services/clientsService'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ==================== Cache Configuration ====================
 const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
@@ -31,8 +32,6 @@ export const useClient = (clientId: string) => {
 }
 
 export const useCreateClient = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateClientData) => clientsService.createClient(data),
     onSuccess: () => {
@@ -45,14 +44,12 @@ export const useCreateClient = () => {
       )
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['clients'] })
+      return await invalidateCache.clients.all()
     },
   })
 }
 
 export const useUpdateClient = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       clientId,
@@ -71,15 +68,13 @@ export const useUpdateClient = () => {
       )
     },
     onSettled: async (_, __, { clientId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['clients'] })
-      return await queryClient.invalidateQueries({ queryKey: ['clients', clientId] })
+      await invalidateCache.clients.all()
+      return await invalidateCache.clients.detail(clientId)
     },
   })
 }
 
 export const useDeleteClient = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (clientId: string) => clientsService.deleteClient(clientId),
     onSuccess: () => {
@@ -92,7 +87,7 @@ export const useDeleteClient = () => {
       )
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['clients'] })
+      return await invalidateCache.clients.all()
     },
   })
 }
@@ -102,7 +97,7 @@ export const useSearchClients = (query: string) => {
     queryKey: ['clients', 'search', query],
     queryFn: () => clientsService.searchClients(query),
     enabled: query.length >= 2,
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: CACHE_TIMES.REALTIME.LIVE_FEED, // 30 seconds
     gcTime: STATS_GC_TIME,
   })
 }
@@ -126,8 +121,6 @@ export const useTopRevenueClients = (limit: number = 10) => {
 }
 
 export const useBulkDeleteClients = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (clientIds: string[]) => clientsService.bulkDelete(clientIds),
     onSuccess: () => {
@@ -140,7 +133,7 @@ export const useBulkDeleteClients = () => {
       )
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['clients'] })
+      return await invalidateCache.clients.all()
     },
   })
 }
@@ -194,8 +187,6 @@ export const useClientBillingInfo = (clientId: string) => {
  * @deprecated Backend endpoint may not be implemented - POST /clients/:id/verify/wathq
  */
 export const useVerifyWathq = () => {
-  const queryClient = useQueryClient()
-
   if (import.meta.env.DEV) {
     console.warn(
       '⚠️ [DEPRECATED] useVerifyWathq: Backend endpoint may not be implemented. | ' +
@@ -216,7 +207,7 @@ export const useVerifyWathq = () => {
       )
     },
     onSettled: async (_, __, { clientId }) => {
-      return await queryClient.invalidateQueries({ queryKey: ['clients', clientId] })
+      return await invalidateCache.clients.detail(clientId)
     },
   })
 }
@@ -247,8 +238,6 @@ export const useWathqData = (clientId: string, dataType: string) => {
  * Consider using /clients/:id/documents instead
  */
 export const useUploadClientAttachments = () => {
-  const queryClient = useQueryClient()
-
   if (import.meta.env.DEV) {
     console.warn(
       '⚠️ [DEPRECATED] useUploadClientAttachments: Backend endpoint may not be implemented. ' +
@@ -271,7 +260,7 @@ export const useUploadClientAttachments = () => {
       )
     },
     onSettled: async (_, __, { clientId }) => {
-      return await queryClient.invalidateQueries({ queryKey: ['clients', clientId] })
+      return await invalidateCache.clients.detail(clientId)
     },
   })
 }
@@ -280,8 +269,6 @@ export const useUploadClientAttachments = () => {
  * @deprecated Backend endpoint may not be implemented - DELETE /clients/:id/attachments/:attachmentId
  */
 export const useDeleteClientAttachment = () => {
-  const queryClient = useQueryClient()
-
   if (import.meta.env.DEV) {
     console.warn(
       '⚠️ [DEPRECATED] useDeleteClientAttachment: Backend endpoint may not be implemented. | ' +
@@ -302,7 +289,7 @@ export const useDeleteClientAttachment = () => {
       )
     },
     onSettled: async (_, __, { clientId }) => {
-      return await queryClient.invalidateQueries({ queryKey: ['clients', clientId] })
+      return await invalidateCache.clients.detail(clientId)
     },
   })
 }
@@ -311,8 +298,6 @@ export const useDeleteClientAttachment = () => {
  * @deprecated Backend endpoint may not be implemented - POST /clients/:id/conflict-check
  */
 export const useRunConflictCheck = () => {
-  const queryClient = useQueryClient()
-
   if (import.meta.env.DEV) {
     console.warn(
       '⚠️ [DEPRECATED] useRunConflictCheck: Backend endpoint may not be implemented. | ' +
@@ -333,7 +318,7 @@ export const useRunConflictCheck = () => {
       )
     },
     onSettled: async (_, __, { clientId }) => {
-      return await queryClient.invalidateQueries({ queryKey: ['clients', clientId] })
+      return await invalidateCache.clients.detail(clientId)
     },
   })
 }
@@ -343,8 +328,6 @@ export const useRunConflictCheck = () => {
  * Consider using PUT /clients/:id with status field instead
  */
 export const useUpdateClientStatus = () => {
-  const queryClient = useQueryClient()
-
   if (import.meta.env.DEV) {
     console.warn(
       '⚠️ [DEPRECATED] useUpdateClientStatus: Backend endpoint may not be implemented. ' +
@@ -367,8 +350,8 @@ export const useUpdateClientStatus = () => {
       )
     },
     onSettled: async (_, __, { clientId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['clients'] })
-      return await queryClient.invalidateQueries({ queryKey: ['clients', clientId] })
+      await invalidateCache.clients.all()
+      return await invalidateCache.clients.detail(clientId)
     },
   })
 }
@@ -378,8 +361,6 @@ export const useUpdateClientStatus = () => {
  * Consider using PUT /clients/:id with flags field instead
  */
 export const useUpdateClientFlags = () => {
-  const queryClient = useQueryClient()
-
   if (import.meta.env.DEV) {
     console.warn(
       '⚠️ [DEPRECATED] useUpdateClientFlags: Backend endpoint may not be implemented. ' +
@@ -402,8 +383,8 @@ export const useUpdateClientFlags = () => {
       )
     },
     onSettled: async (_, __, { clientId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['clients'] })
-      return await queryClient.invalidateQueries({ queryKey: ['clients', clientId] })
+      await invalidateCache.clients.all()
+      return await invalidateCache.clients.detail(clientId)
     },
   })
 }

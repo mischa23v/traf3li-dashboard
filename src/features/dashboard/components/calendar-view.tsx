@@ -51,7 +51,7 @@ export function CalendarView() {
     const topNav = [
         {
             title: t('dashboard.calendar.nav.home'),
-            href: '/',
+            href: ROUTES.dashboard.home,
             isActive: false,
             disabled: false,
         },
@@ -63,7 +63,7 @@ export function CalendarView() {
         },
         {
             title: t('dashboard.calendar.nav.tasks'),
-            href: '/dashboard/tasks',
+            href: ROUTES.dashboard.tasks.list,
             isActive: false,
             disabled: false,
         },

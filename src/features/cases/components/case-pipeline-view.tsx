@@ -230,7 +230,7 @@ export function CasePipelineView() {
   }, [selectedCase])
 
   const topNav = [
-    { title: t('casePipeline.nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },
+    { title: t('casePipeline.nav.overview', 'نظرة عامة'), href: ROUTES.dashboard.home, isActive: false },
     { title: t('casePipeline.nav.cases', 'القضايا'), href: ROUTES.dashboard.cases.list, isActive: false },
     { title: t('casePipeline.nav.pipeline', 'مسار القضايا'), href: ROUTES.dashboard.cases.pipeline, isActive: true },
     { title: t('casePipeline.nav.brainstorm', 'العصف الذهني'), href: ROUTES.dashboard.notion, isActive: false },

@@ -3,8 +3,9 @@
  * React Query hooks for Quality Management operations
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import qualityService from '@/services/qualityService'
 import type { QualityFilters, CreateQualityInspectionData, QualityInspectionTemplate, QualityAction, NonConformanceReport, QualitySettings } from '@/types/quality'
 
@@ -42,11 +43,11 @@ export function useInspection(id: string) {
 }
 
 export function useCreateInspection() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (data: CreateQualityInspectionData) => qualityService.createInspection(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: qualityKeys.inspections() })
+      invalidateCache.quality.inspections()
       toast.success('تم إنشاء الفحص بنجاح | Inspection created successfully')
     },
     onError: () => {
@@ -56,12 +57,12 @@ export function useCreateInspection() {
 }
 
 export function useUpdateInspection() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateQualityInspectionData> }) => qualityService.updateInspection(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: qualityKeys.inspections() })
-      queryClient.invalidateQueries({ queryKey: qualityKeys.inspectionDetail(id) })
+      invalidateCache.quality.inspections()
+      invalidateCache.quality.inspectionDetail(id)
       toast.success('تم تحديث الفحص بنجاح | Inspection updated successfully')
     },
     onError: () => {
@@ -71,11 +72,11 @@ export function useUpdateInspection() {
 }
 
 export function useDeleteInspection() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (id: string) => qualityService.deleteInspection(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: qualityKeys.inspections() })
+      invalidateCache.quality.inspections()
       toast.success('تم حذف الفحص بنجاح | Inspection deleted successfully')
     },
     onError: () => {
@@ -85,12 +86,12 @@ export function useDeleteInspection() {
 }
 
 export function useSubmitInspection() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: string }) => qualityService.submitInspection(id, status as any),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: qualityKeys.inspections() })
-      queryClient.invalidateQueries({ queryKey: qualityKeys.inspectionDetail(id) })
+      invalidateCache.quality.inspections()
+      invalidateCache.quality.inspectionDetail(id)
       toast.success('تم تقديم نتيجة الفحص | Inspection submitted')
     },
     onError: () => {
@@ -116,11 +117,11 @@ export function useTemplate(id: string) {
 }
 
 export function useCreateTemplate() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (data: Omit<QualityInspectionTemplate, '_id' | 'templateId' | 'createdAt' | 'updatedAt'>) => qualityService.createTemplate(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: qualityKeys.templates() })
+      invalidateCache.quality.templates()
       toast.success('تم إنشاء القالب بنجاح | Template created successfully')
     },
     onError: () => {
@@ -130,12 +131,12 @@ export function useCreateTemplate() {
 }
 
 export function useUpdateTemplate() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<QualityInspectionTemplate> }) => qualityService.updateTemplate(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: qualityKeys.templates() })
-      queryClient.invalidateQueries({ queryKey: qualityKeys.templateDetail(id) })
+      invalidateCache.quality.templates()
+      invalidateCache.quality.templateDetail(id)
       toast.success('تم تحديث القالب بنجاح | Template updated successfully')
     },
     onError: () => {
@@ -145,11 +146,11 @@ export function useUpdateTemplate() {
 }
 
 export function useDeleteTemplate() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (id: string) => qualityService.deleteTemplate(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: qualityKeys.templates() })
+      invalidateCache.quality.templates()
       toast.success('تم حذف القالب بنجاح | Template deleted successfully')
     },
     onError: () => {
@@ -167,11 +168,11 @@ export function useParameters() {
 }
 
 export function useCreateParameter() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (data: any) => qualityService.createParameter(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: qualityKeys.parameters() })
+      invalidateCache.quality.parameters()
       toast.success('تم إنشاء المعيار بنجاح | Parameter created successfully')
     },
     onError: () => {
@@ -197,11 +198,11 @@ export function useAction(id: string) {
 }
 
 export function useCreateAction() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (data: Omit<QualityAction, '_id' | 'actionId' | 'actionNumber' | 'createdAt' | 'updatedAt'>) => qualityService.createAction(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: qualityKeys.actions() })
+      invalidateCache.quality.actions()
       toast.success('تم إنشاء الإجراء بنجاح | Action created successfully')
     },
     onError: () => {
@@ -211,12 +212,12 @@ export function useCreateAction() {
 }
 
 export function useUpdateAction() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<QualityAction> }) => qualityService.updateAction(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: qualityKeys.actions() })
-      queryClient.invalidateQueries({ queryKey: qualityKeys.actionDetail(id) })
+      invalidateCache.quality.actions()
+      invalidateCache.quality.actionDetail(id)
       toast.success('تم تحديث الإجراء بنجاح | Action updated successfully')
     },
     onError: () => {
@@ -242,11 +243,11 @@ export function useNCR(id: string) {
 }
 
 export function useCreateNCR() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (data: Omit<NonConformanceReport, '_id' | 'ncrId' | 'ncrNumber' | 'createdAt' | 'updatedAt'>) => qualityService.createNCR(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: qualityKeys.ncrs() })
+      invalidateCache.quality.ncrs()
       toast.success('تم إنشاء تقرير عدم المطابقة بنجاح | NCR created successfully')
     },
     onError: () => {
@@ -256,12 +257,12 @@ export function useCreateNCR() {
 }
 
 export function useUpdateNCR() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<NonConformanceReport> }) => qualityService.updateNCR(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: qualityKeys.ncrs() })
-      queryClient.invalidateQueries({ queryKey: qualityKeys.ncrDetail(id) })
+      invalidateCache.quality.ncrs()
+      invalidateCache.quality.ncrDetail(id)
       toast.success('تم تحديث التقرير بنجاح | NCR updated successfully')
     },
     onError: () => {
@@ -287,11 +288,11 @@ export function useQualitySettings() {
 }
 
 export function useUpdateQualitySettings() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (data: Partial<QualitySettings>) => qualityService.updateQualitySettings(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: qualityKeys.settings() })
+      invalidateCache.quality.settings()
       toast.success('تم تحديث الإعدادات بنجاح | Settings updated successfully')
     },
     onError: () => {

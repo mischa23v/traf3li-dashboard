@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useCreatePerformanceReview, useReviewTemplates } from '@/hooks/usePerformanceReviews'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -227,7 +228,7 @@ export function PerformanceReviewCreateView() {
           relationship: p.relationship as 'peer' | 'subordinate' | 'client' | 'cross_functional',
         })) : undefined,
       })
-      navigate({ to: '/dashboard/hr/performance' })
+      navigate({ to: ROUTES.dashboard.hr.performance.list })
     } catch {
       // Error is handled by mutation's onError callback
     }
@@ -235,8 +236,8 @@ export function PerformanceReviewCreateView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'تقييم الأداء', href: '/dashboard/hr/performance', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'تقييم الأداء', href: ROUTES.dashboard.hr.performance.list, isActive: true },
   ]
 
   return (
@@ -821,7 +822,7 @@ export function PerformanceReviewCreateView() {
               <div className="flex items-center justify-end gap-4 pt-4 border-t border-slate-100">
                 <Button
                   variant="outline"
-                  onClick={() => navigate({ to: '/dashboard/hr/performance' })}
+                  onClick={() => navigate({ to: ROUTES.dashboard.hr.performance.list })}
                   className="rounded-xl"
                 >
                   إلغاء

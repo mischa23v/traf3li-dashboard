@@ -21,6 +21,7 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { FinanceSidebar } from './finance-sidebar'
 import { useCreateStatement } from '@/hooks/useFinance'
 import { useClients } from '@/hooks/useCasesAndClients'
+import { ROUTES } from '@/constants/routes'
 
 export function CreateStatementView() {
     const navigate = useNavigate()
@@ -45,19 +46,19 @@ export function CreateStatementView() {
 
         createStatement(formData, {
             onSuccess: () => {
-                navigate({ to: '/dashboard/finance/statements' })
+                navigate({ to: ROUTES.dashboard.finance.statements.list })
             }
         })
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
-        { title: 'كشف الحساب', href: '/dashboard/finance/statements', isActive: true },
-        { title: 'المعاملات', href: '/dashboard/finance/transactions', isActive: false },
-        { title: 'تتبع الوقت', href: '/dashboard/finance/time-tracking', isActive: false },
-        { title: 'نشاط الحساب', href: '/dashboard/finance/activity', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: false },
+        { title: 'المصروفات', href: ROUTES.dashboard.finance.expenses.list, isActive: false },
+        { title: 'كشف الحساب', href: ROUTES.dashboard.finance.statements.list, isActive: true },
+        { title: 'المعاملات', href: ROUTES.dashboard.finance.transactions.list, isActive: false },
+        { title: 'تتبع الوقت', href: ROUTES.dashboard.finance.timeTracking.list, isActive: false },
+        { title: 'نشاط الحساب', href: ROUTES.dashboard.finance.activity.list, isActive: false },
     ]
 
     return (

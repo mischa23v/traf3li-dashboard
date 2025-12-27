@@ -1,9 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config/cache'
 import lawyersService, { type LawyerFilters } from '@/services/lawyersService'
 import apiClient, { handleApiError } from '@/lib/api'
 import { toast } from 'sonner'
 import { useAuthStore, selectFirmId } from '@/stores/auth-store'
 import firmService from '@/services/firmService'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // Extended Staff interfaces for CRUD operations
 export interface CreateStaffData {
@@ -100,7 +102,7 @@ export const useStaff = (filters?: LawyerFilters & { showDeparted?: boolean }) =
       return members
     },
     enabled: !!firmId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -109,7 +111,7 @@ export const useStaffMember = (staffId: string) => {
     queryKey: ['staff', staffId],
     queryFn: () => lawyersService.getById(staffId),
     enabled: !!staffId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -117,7 +119,7 @@ export const useTeamMembers = (isEnabled = true) => {
   return useQuery({
     queryKey: ['staff', 'team'],
     queryFn: () => lawyersService.getTeamMembers(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
     enabled: isEnabled, // Allow deferred loading for performance
   })
 }
@@ -141,7 +143,7 @@ export const useCreateStaff = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['staff'], refetchType: 'all' })
+      await invalidateCache.staff.all()
     },
   })
 }
@@ -175,8 +177,8 @@ export const useUpdateStaff = () => {
     },
     onSettled: async (_, __, variables) => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['staff'], refetchType: 'all' })
-      await queryClient.invalidateQueries({ queryKey: ['staff', variables.staffId], refetchType: 'all' })
+      await invalidateCache.staff.all()
+      await invalidateCache.staff.detail(variables.staffId)
     },
   })
 }
@@ -202,7 +204,7 @@ export const useDeleteStaff = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['staff'], refetchType: 'all' })
+      await invalidateCache.staff.all()
     },
   })
 }
@@ -228,7 +230,7 @@ export const useBulkDeleteStaff = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['staff'], refetchType: 'all' })
+      await invalidateCache.staff.all()
     },
   })
 }
@@ -238,7 +240,6 @@ export const useBulkDeleteStaff = () => {
  * Sends invitation email with code that they use during sign up
  */
 export const useInviteStaff = () => {
-  const queryClient = useQueryClient()
   const firmId = useAuthStore(selectFirmId)
 
   return useMutation({
@@ -256,7 +257,7 @@ export const useInviteStaff = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['staff'], refetchType: 'all' })
+      await invalidateCache.staff.all()
     },
   })
 }

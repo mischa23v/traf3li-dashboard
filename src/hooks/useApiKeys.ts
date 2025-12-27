@@ -1,9 +1,11 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config/cache'
 import apiKeysService, {
   CreateApiKeyRequest,
 } from '@/services/apiKeysService'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 /**
  * Hook to fetch all API keys for the current user
@@ -12,7 +14,7 @@ export const useApiKeys = () => {
   return useQuery({
     queryKey: ['api-keys'],
     queryFn: () => apiKeysService.getUserApiKeys(),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT, // 2 minutes
   })
 }
 
@@ -23,7 +25,7 @@ export const useApiKeyStats = () => {
   return useQuery({
     queryKey: ['api-keys', 'stats'],
     queryFn: () => apiKeysService.getApiKeyStats(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 
@@ -31,7 +33,6 @@ export const useApiKeyStats = () => {
  * Hook to create a new API key
  */
 export const useCreateApiKey = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
@@ -44,7 +45,7 @@ export const useCreateApiKey = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 500))
-      await queryClient.invalidateQueries({ queryKey: ['api-keys'], refetchType: 'all' })
+      await invalidateCache.apiKeys.all()
     },
   })
 }
@@ -53,7 +54,6 @@ export const useCreateApiKey = () => {
  * Hook to revoke an API key
  */
 export const useRevokeApiKey = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
@@ -66,7 +66,7 @@ export const useRevokeApiKey = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 500))
-      await queryClient.invalidateQueries({ queryKey: ['api-keys'], refetchType: 'all' })
+      await invalidateCache.apiKeys.all()
     },
   })
 }
@@ -84,7 +84,6 @@ export const useRevokeApiKey = () => {
  * Current Status: Not used in any components (safe to remove after migration period)
  */
 export const useUpdateApiKey = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
@@ -115,7 +114,7 @@ export const useUpdateApiKey = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 500))
-      await queryClient.invalidateQueries({ queryKey: ['api-keys'], refetchType: 'all' })
+      await invalidateCache.apiKeys.all()
     },
   })
 }

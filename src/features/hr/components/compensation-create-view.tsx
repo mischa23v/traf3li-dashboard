@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useSearch } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useCreateCompensation, useUpdateCompensation, useCompensationRecord } from '@/hooks/useCompensation'
 import { useEmployees } from '@/hooks/useHR'
 import { Button } from '@/components/ui/button'
@@ -508,7 +509,7 @@ export function CompensationCreateView() {
       await createMutation.mutateAsync(data)
     }
 
-    navigate({ to: '/dashboard/hr/compensation' })
+    navigate({ to: ROUTES.dashboard.hr.compensation.list })
   }
 
   const formatCurrency = (amount: number) => {
@@ -522,8 +523,8 @@ export function CompensationCreateView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'التعويضات', href: '/dashboard/hr/compensation', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'التعويضات', href: ROUTES.dashboard.hr.compensation.list, isActive: true },
   ]
 
   const isPending = createMutation.isPending || updateMutation.isPending
@@ -569,7 +570,7 @@ export function CompensationCreateView() {
                 variant="ghost"
                 size="icon"
                 className="rounded-xl hover:bg-white"
-                onClick={() => navigate({ to: '/dashboard/hr/compensation' })}
+                onClick={() => navigate({ to: ROUTES.dashboard.hr.compensation.list })}
               >
                 <ArrowRight className="h-5 w-5" />
               </Button>
@@ -1451,7 +1452,7 @@ export function CompensationCreateView() {
             <div className="flex items-center justify-end gap-4">
               <Button
                 variant="outline"
-                onClick={() => navigate({ to: '/dashboard/hr/compensation' })}
+                onClick={() => navigate({ to: ROUTES.dashboard.hr.compensation.list })}
                 className="rounded-xl"
               >
                 إلغاء

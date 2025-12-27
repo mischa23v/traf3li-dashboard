@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   useGrievance,
   useDeleteGrievance,
@@ -124,8 +125,8 @@ export function GrievancesDetailsView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'الشكاوى', href: '/dashboard/hr/grievances', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'الشكاوى', href: ROUTES.dashboard.hr.grievances.list, isActive: true },
   ]
 
   const getStatusColor = (status: GrievanceStatus) => {
@@ -192,7 +193,7 @@ export function GrievancesDetailsView() {
     if (!grievanceId) return
     if (confirm('هل أنت متأكد من حذف هذه الشكوى؟')) {
       await deleteMutation.mutateAsync(grievanceId)
-      navigate({ to: '/dashboard/hr/grievances' })
+      navigate({ to: ROUTES.dashboard.hr.grievances.list })
     }
   }
 
@@ -245,7 +246,7 @@ export function GrievancesDetailsView() {
                   <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" aria-hidden="true" />
                   <p className="text-red-600">حدث خطأ في تحميل بيانات الشكوى</p>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/hr/grievances' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.hr.grievances.list })}
                     className="mt-4"
                   >
                     العودة للقائمة
@@ -261,7 +262,7 @@ export function GrievancesDetailsView() {
                       variant="ghost"
                       size="icon"
                       className="rounded-xl hover:bg-white"
-                      onClick={() => navigate({ to: '/dashboard/hr/grievances' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.hr.grievances.list })}
                     >
                       <ArrowRight className="h-5 w-5" />
                     </Button>

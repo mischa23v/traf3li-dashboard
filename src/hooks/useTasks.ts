@@ -1446,8 +1446,8 @@ export const useUpdateDocument = () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
       await invalidateCache.tasks.detail(taskId)
-      await queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
-      return await queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents', documentId] })
+      await invalidateCache.tasks.documents(taskId)
+      return await invalidateCache.tasks.document(taskId, documentId)
     },
   })
 }
@@ -1592,8 +1592,8 @@ export const useTaskWithRelated = (taskId: string | null) => {
       const response = await apiClient.get(`/tasks/${taskId}/full`)
       return response.data
     },
-    staleTime: 2 * 60 * 1000,
-    gcTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
+    gcTime: CACHE_TIMES.GC_SHORT,
     enabled: isAuthenticated && !!taskId,
     retry: false,
   })

@@ -4,9 +4,11 @@
  * Provides hooks for logging actions and querying audit logs
  */
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { CACHE_TIMES } from '@/config/cache'
 import { useAuthStore } from '@/stores/auth-store'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import auditService, {
   AuditLogEntry,
   AuditLogFilters,
@@ -38,14 +40,12 @@ export const auditKeys = {
  * Usage: const { mutate: logEvent } = useLogAuditEvent()
  */
 export const useLogAuditEvent = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (entry: Omit<AuditLogEntry, 'id' | '_id' | 'timestamp'>) =>
       auditService.logAuditEvent(entry),
     onSuccess: () => {
       // Invalidate audit log queries to refetch latest data
-      queryClient.invalidateQueries({ queryKey: auditKeys.all })
+      invalidateCache.auditLog.all()
     },
     onError: (error: Error) => {
       // Silent fail for audit logs - don't disrupt user experience
@@ -59,13 +59,11 @@ export const useLogAuditEvent = () => {
  * Usage: const { mutate: logBatch } = useLogAuditEventsBatch()
  */
 export const useLogAuditEventsBatch = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (entries: Array<Omit<AuditLogEntry, 'id' | '_id' | 'timestamp'>>) =>
       auditService.logAuditEventsBatch(entries),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: auditKeys.all })
+      invalidateCache.auditLog.all()
     },
     onError: (error: Error) => {
       console.error('[Audit] Failed to log batch events:', error.message)
@@ -84,7 +82,7 @@ export const useAuditLogs = (filters: AuditLogFilters = {}, enabled: boolean = t
     queryKey: auditKeys.list(filters),
     queryFn: () => auditService.getAuditLogs(filters),
     enabled,
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: CACHE_TIMES.AUDIT.LOGS, // 30 seconds
   })
 }
 
@@ -102,7 +100,7 @@ export const useResourceAuditTrail = (
     queryKey: auditKeys.resource(resource, resourceId),
     queryFn: () => auditService.getResourceAuditTrail(resource, resourceId, filters),
     enabled: enabled && !!resourceId,
-    staleTime: 60 * 1000, // 1 minute
+    staleTime: CACHE_TIMES.AUDIT.STATS, // 1 minute
   })
 }
 
@@ -119,7 +117,7 @@ export const useUserActivity = (
     queryKey: auditKeys.user(userId),
     queryFn: () => auditService.getUserActivity(userId, filters),
     enabled: enabled && !!userId,
-    staleTime: 60 * 1000, // 1 minute
+    staleTime: CACHE_TIMES.AUDIT.STATS, // 1 minute
   })
 }
 
@@ -139,7 +137,7 @@ export const useAuditStats = (
     queryKey: auditKeys.stats(),
     queryFn: () => auditService.getAuditStats(filters),
     enabled,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TIMES.SHORT, // 2 minutes
   })
 }
 
@@ -161,7 +159,7 @@ export const useSecurityEvents = (
     queryKey: auditKeys.security(),
     queryFn: () => auditService.getSecurityEvents(filters),
     enabled,
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: CACHE_TIMES.AUDIT.LOGS, // 30 seconds
   })
 }
 
@@ -180,7 +178,7 @@ export const useFailedLogins = (
     queryKey: auditKeys.failedLogins(),
     queryFn: () => auditService.getFailedLogins(params),
     enabled,
-    staleTime: 60 * 1000, // 1 minute
+    staleTime: CACHE_TIMES.AUDIT.STATS, // 1 minute
     refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes
     retry: false,
   })
@@ -201,7 +199,7 @@ export const useSuspiciousActivity = (
     queryKey: auditKeys.suspicious(),
     queryFn: () => auditService.getSuspiciousActivity(params),
     enabled,
-    staleTime: 60 * 1000, // 1 minute
+    staleTime: CACHE_TIMES.AUDIT.STATS, // 1 minute
     refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes
     retry: false,
   })

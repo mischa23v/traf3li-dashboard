@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import {
   retentionBonusApi,
   RetentionBonus,
@@ -10,6 +10,7 @@ import {
   ApprovalActionData
 } from '@/services/retentionBonusService'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // Query Keys
 export const retentionBonusKeys = {
@@ -99,12 +100,10 @@ export function useDepartmentSummary(departmentId?: string) {
 
 // Create retention bonus
 export function useCreateRetentionBonus() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateRetentionBonusInput) => retentionBonusApi.create(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: retentionBonusKeys.all })
+      invalidateCache.retentionBonus.all()
       toast.success('تم إنشاء مكافأة الاستبقاء بنجاح', {
         description: 'تم حفظ البيانات بنجاح'
       })
@@ -119,14 +118,12 @@ export function useCreateRetentionBonus() {
 
 // Update retention bonus
 export function useUpdateRetentionBonus() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateRetentionBonusInput }) =>
       retentionBonusApi.update(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: retentionBonusKeys.all })
-      queryClient.invalidateQueries({ queryKey: retentionBonusKeys.detail(variables.id) })
+      invalidateCache.retentionBonus.all()
+      invalidateCache.retentionBonus.detail(variables.id)
       toast.success('تم تحديث مكافأة الاستبقاء بنجاح', {
         description: 'تم حفظ التعديلات بنجاح'
       })
@@ -141,12 +138,10 @@ export function useUpdateRetentionBonus() {
 
 // Delete retention bonus
 export function useDeleteRetentionBonus() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => retentionBonusApi.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: retentionBonusKeys.all })
+      invalidateCache.retentionBonus.all()
       toast.success('تم حذف مكافأة الاستبقاء بنجاح', {
         description: 'تم حذف السجل بنجاح'
       })
@@ -161,12 +156,10 @@ export function useDeleteRetentionBonus() {
 
 // Bulk delete retention bonuses
 export function useBulkDeleteRetentionBonuses() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (ids: string[]) => retentionBonusApi.bulkDelete(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: retentionBonusKeys.all })
+      invalidateCache.retentionBonus.all()
       toast.success('تم حذف المكافآت المحددة بنجاح', {
         description: 'تم حذف السجلات بنجاح'
       })
@@ -183,13 +176,11 @@ export function useBulkDeleteRetentionBonuses() {
 
 // Submit for approval
 export function useSubmitForApproval() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => retentionBonusApi.submitForApproval(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: retentionBonusKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: retentionBonusKeys.all })
+      invalidateCache.retentionBonus.detail(id)
+      invalidateCache.retentionBonus.all()
       toast.success('تم إرسال المكافأة للموافقة', {
         description: 'تم تقديم الطلب للموافقة بنجاح'
       })
@@ -204,15 +195,13 @@ export function useSubmitForApproval() {
 
 // Approve bonus
 export function useApproveBonus() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: ApprovalActionData }) =>
       retentionBonusApi.approveBonus(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: retentionBonusKeys.detail(variables.id) })
-      queryClient.invalidateQueries({ queryKey: retentionBonusKeys.all })
-      queryClient.invalidateQueries({ queryKey: retentionBonusKeys.pendingApprovals() })
+      invalidateCache.retentionBonus.detail(variables.id)
+      invalidateCache.retentionBonus.all()
+      invalidateCache.retentionBonus.pendingApprovals()
       toast.success('تم الموافقة على المكافأة بنجاح', {
         description: 'تمت الموافقة بنجاح'
       })
@@ -227,15 +216,13 @@ export function useApproveBonus() {
 
 // Reject bonus
 export function useRejectBonus() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: ApprovalActionData }) =>
       retentionBonusApi.rejectBonus(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: retentionBonusKeys.detail(variables.id) })
-      queryClient.invalidateQueries({ queryKey: retentionBonusKeys.all })
-      queryClient.invalidateQueries({ queryKey: retentionBonusKeys.pendingApprovals() })
+      invalidateCache.retentionBonus.detail(variables.id)
+      invalidateCache.retentionBonus.all()
+      invalidateCache.retentionBonus.pendingApprovals()
       toast.success('تم رفض المكافأة', {
         description: 'تم رفض الطلب بنجاح'
       })
@@ -252,15 +239,13 @@ export function useRejectBonus() {
 
 // Mark as paid
 export function useMarkBonusAsPaid() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: BonusPaymentData }) =>
       retentionBonusApi.markAsPaid(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: retentionBonusKeys.detail(variables.id) })
-      queryClient.invalidateQueries({ queryKey: retentionBonusKeys.all })
-      queryClient.invalidateQueries({ queryKey: retentionBonusKeys.dueForPayment() })
+      invalidateCache.retentionBonus.detail(variables.id)
+      invalidateCache.retentionBonus.all()
+      invalidateCache.retentionBonus.dueForPayment()
       toast.success('تم تسجيل الدفعة بنجاح', {
         description: 'تم تحديث حالة المكافأة إلى مدفوعة'
       })
@@ -275,14 +260,12 @@ export function useMarkBonusAsPaid() {
 
 // Process clawback
 export function useProcessClawback() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: BonusClawbackData }) =>
       retentionBonusApi.processClawback(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: retentionBonusKeys.detail(variables.id) })
-      queryClient.invalidateQueries({ queryKey: retentionBonusKeys.all })
+      invalidateCache.retentionBonus.detail(variables.id)
+      invalidateCache.retentionBonus.all()
       toast.success('تم معالجة الاسترداد بنجاح', {
         description: 'تم استرداد المكافأة بنجاح'
       })
@@ -297,14 +280,12 @@ export function useProcessClawback() {
 
 // Cancel bonus
 export function useCancelBonus() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       retentionBonusApi.cancelBonus(id, reason),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: retentionBonusKeys.detail(variables.id) })
-      queryClient.invalidateQueries({ queryKey: retentionBonusKeys.all })
+      invalidateCache.retentionBonus.detail(variables.id)
+      invalidateCache.retentionBonus.all()
       toast.success('تم إلغاء المكافأة بنجاح', {
         description: 'تم إلغاء المكافأة'
       })

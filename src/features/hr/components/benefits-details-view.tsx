@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   useBenefit,
   useDeleteBenefit,
@@ -102,8 +103,8 @@ export function BenefitsDetailsView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'المزايا', href: '/dashboard/hr/benefits', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'المزايا', href: ROUTES.dashboard.hr.benefits.list, isActive: true },
   ]
 
   const getStatusColor = (status: BenefitStatus) => {
@@ -147,7 +148,7 @@ export function BenefitsDetailsView() {
     if (!benefitId) return
     if (confirm('هل أنت متأكد من حذف هذه الميزة؟')) {
       await deleteMutation.mutateAsync(benefitId)
-      navigate({ to: '/dashboard/hr/benefits' })
+      navigate({ to: ROUTES.dashboard.hr.benefits.list })
     }
   }
 
@@ -165,7 +166,7 @@ export function BenefitsDetailsView() {
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" aria-hidden="true" />
         <p className="text-red-600">حدث خطأ في تحميل بيانات الميزة</p>
         <Button
-          onClick={() => navigate({ to: '/dashboard/hr/benefits' })}
+          onClick={() => navigate({ to: ROUTES.dashboard.hr.benefits.list })}
           className="mt-4"
         >
           العودة للقائمة
@@ -216,7 +217,7 @@ export function BenefitsDetailsView() {
                   variant="ghost"
                   size="icon"
                   className="rounded-xl hover:bg-white"
-                  onClick={() => navigate({ to: '/dashboard/hr/benefits' })}
+                  onClick={() => navigate({ to: ROUTES.dashboard.hr.benefits.list })}
                 >
                   <ArrowRight className="h-5 w-5" />
                 </Button>

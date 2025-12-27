@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   useAttendanceRecord,
   useApproveTimesheet,
@@ -204,9 +205,9 @@ export function AttendanceRecordDetailsView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'الحضور', href: '/dashboard/hr/attendance', isActive: true },
-    { title: 'الإجازات', href: '/dashboard/hr/leaves', isActive: false },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'الحضور', href: ROUTES.dashboard.hr.attendance.list, isActive: true },
+    { title: 'الإجازات', href: ROUTES.dashboard.hr.leave.list, isActive: false },
   ]
 
   const checkInDisplay = getCheckMethodDisplay(record?.checkIn?.method)
@@ -268,7 +269,7 @@ export function AttendanceRecordDetailsView() {
                 <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" aria-hidden="true" />
                 <h2 className="text-xl font-bold text-slate-900 mb-2">لم يتم العثور على السجل</h2>
                 <p className="text-slate-500 mb-4">{error?.message || 'حدث خطأ أثناء تحميل بيانات السجل'}</p>
-                <Button onClick={() => navigate({ to: '/dashboard/hr/attendance' })} className="bg-emerald-500 hover:bg-emerald-600">
+                <Button onClick={() => navigate({ to: ROUTES.dashboard.hr.attendance.list })} className="bg-emerald-500 hover:bg-emerald-600">
                   العودة للقائمة
                 </Button>
               </div>
@@ -284,7 +285,7 @@ export function AttendanceRecordDetailsView() {
               variant="ghost"
               size="icon"
               className="rounded-xl hover:bg-white"
-              onClick={() => navigate({ to: '/dashboard/hr/attendance' })}
+              onClick={() => navigate({ to: ROUTES.dashboard.hr.attendance.list })}
             >
               <ArrowRight className="h-5 w-5" />
             </Button>

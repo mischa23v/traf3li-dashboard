@@ -3,9 +3,11 @@
  * TanStack Query hooks for all corporate card operations
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
+import { QueryKeys } from '@/lib/query-keys'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import corporateCardService from '@/services/corporateCardService'
 import type {
   CorporateCardFilters,
@@ -25,7 +27,7 @@ const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
 
 export const useCorporateCards = (filters?: CorporateCardFilters) => {
   return useQuery({
-    queryKey: ['corporate-cards', filters],
+    queryKey: QueryKeys.corporateCards.list(filters),
     queryFn: () => corporateCardService.getCorporateCards(filters),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -34,21 +36,19 @@ export const useCorporateCards = (filters?: CorporateCardFilters) => {
 
 export const useCorporateCard = (id: string) => {
   return useQuery({
-    queryKey: ['corporate-cards', id],
+    queryKey: QueryKeys.corporateCards.detail(id),
     queryFn: () => corporateCardService.getCorporateCard(id),
     enabled: !!id,
   })
 }
 
 export const useCreateCorporateCard = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateCorporateCardData) =>
       corporateCardService.createCorporateCard(data),
     onSuccess: () => {
       toast.success('تم إنشاء البطاقة بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['corporate-cards'] })
+      invalidateCache.corporateCards.all()
     },
     onError: (error: Error) => {
       toast.error(`فشل إنشاء البطاقة: ${error.message}`)
@@ -57,15 +57,13 @@ export const useCreateCorporateCard = () => {
 }
 
 export const useUpdateCorporateCard = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateCorporateCardData }) =>
       corporateCardService.updateCorporateCard(id, data),
     onSuccess: (_, variables) => {
       toast.success('تم تحديث البطاقة بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['corporate-cards'] })
-      queryClient.invalidateQueries({ queryKey: ['corporate-cards', variables.id] })
+      invalidateCache.corporateCards.all()
+      invalidateCache.corporateCards.detail(variables.id)
     },
     onError: (error: Error) => {
       toast.error(`فشل تحديث البطاقة: ${error.message}`)
@@ -74,13 +72,11 @@ export const useUpdateCorporateCard = () => {
 }
 
 export const useDeleteCorporateCard = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => corporateCardService.deleteCorporateCard(id),
     onSuccess: () => {
       toast.success('تم حذف البطاقة بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['corporate-cards'] })
+      invalidateCache.corporateCards.all()
     },
     onError: (error: Error) => {
       toast.error(`فشل حذف البطاقة: ${error.message}`)
@@ -89,15 +85,13 @@ export const useDeleteCorporateCard = () => {
 }
 
 export const useBlockCorporateCard = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason?: string }) =>
       corporateCardService.blockCorporateCard(id, reason),
     onSuccess: (_, variables) => {
       toast.success('تم حظر البطاقة بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['corporate-cards'] })
-      queryClient.invalidateQueries({ queryKey: ['corporate-cards', variables.id] })
+      invalidateCache.corporateCards.all()
+      invalidateCache.corporateCards.detail(variables.id)
     },
     onError: (error: Error) => {
       toast.error(`فشل حظر البطاقة: ${error.message}`)
@@ -106,14 +100,12 @@ export const useBlockCorporateCard = () => {
 }
 
 export const useUnblockCorporateCard = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => corporateCardService.unblockCorporateCard(id),
     onSuccess: (_, id) => {
       toast.success('تم إلغاء حظر البطاقة بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['corporate-cards'] })
-      queryClient.invalidateQueries({ queryKey: ['corporate-cards', id] })
+      invalidateCache.corporateCards.all()
+      invalidateCache.corporateCards.detail(id)
     },
     onError: (error: Error) => {
       toast.error(`فشل إلغاء حظر البطاقة: ${error.message}`)
@@ -125,7 +117,7 @@ export const useUnblockCorporateCard = () => {
 
 export const useCardTransactions = (filters?: CardTransactionFilters) => {
   return useQuery({
-    queryKey: ['card-transactions', filters],
+    queryKey: QueryKeys.corporateCards.transactionList(filters),
     queryFn: () => corporateCardService.getCardTransactions(filters),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -134,22 +126,20 @@ export const useCardTransactions = (filters?: CardTransactionFilters) => {
 
 export const useCardTransaction = (id: string) => {
   return useQuery({
-    queryKey: ['card-transactions', id],
+    queryKey: QueryKeys.corporateCards.transactionDetail(id),
     queryFn: () => corporateCardService.getCardTransaction(id),
     enabled: !!id,
   })
 }
 
 export const useCreateCardTransaction = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateCardTransactionData) =>
       corporateCardService.createCardTransaction(data),
     onSuccess: () => {
       toast.success('تم إضافة المعاملة بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['card-transactions'] })
-      queryClient.invalidateQueries({ queryKey: ['card-statistics'] })
+      invalidateCache.corporateCards.transactions()
+      invalidateCache.corporateCards.statistics()
     },
     onError: (error: Error) => {
       toast.error(`فشل إضافة المعاملة: ${error.message}`)
@@ -158,15 +148,13 @@ export const useCreateCardTransaction = () => {
 }
 
 export const useUpdateCardTransaction = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateCardTransactionData> }) =>
       corporateCardService.updateCardTransaction(id, data),
     onSuccess: (_, variables) => {
       toast.success('تم تحديث المعاملة بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['card-transactions'] })
-      queryClient.invalidateQueries({ queryKey: ['card-transactions', variables.id] })
+      invalidateCache.corporateCards.transactions()
+      invalidateCache.corporateCards.transactionDetail(variables.id)
     },
     onError: (error: Error) => {
       toast.error(`فشل تحديث المعاملة: ${error.message}`)
@@ -175,14 +163,12 @@ export const useUpdateCardTransaction = () => {
 }
 
 export const useDeleteCardTransaction = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => corporateCardService.deleteCardTransaction(id),
     onSuccess: () => {
       toast.success('تم حذف المعاملة بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['card-transactions'] })
-      queryClient.invalidateQueries({ queryKey: ['card-statistics'] })
+      invalidateCache.corporateCards.transactions()
+      invalidateCache.corporateCards.statistics()
     },
     onError: (error: Error) => {
       toast.error(`فشل حذف المعاملة: ${error.message}`)
@@ -192,7 +178,7 @@ export const useDeleteCardTransaction = () => {
 
 export const useUnreconciledTransactions = (cardId?: string) => {
   return useQuery({
-    queryKey: ['card-transactions', 'unreconciled', cardId],
+    queryKey: QueryKeys.corporateCards.unreconciledTransactions(cardId),
     queryFn: () => corporateCardService.getUnreconciledTransactions(cardId),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -201,7 +187,7 @@ export const useUnreconciledTransactions = (cardId?: string) => {
 
 export const useDisputedTransactions = (cardId?: string) => {
   return useQuery({
-    queryKey: ['card-transactions', 'disputed', cardId],
+    queryKey: QueryKeys.corporateCards.disputedTransactions(cardId),
     queryFn: () => corporateCardService.getDisputedTransactions(cardId),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -211,15 +197,13 @@ export const useDisputedTransactions = (cardId?: string) => {
 // ==================== RECONCILIATION ====================
 
 export const useReconcileTransaction = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: ReconcileTransactionData) =>
       corporateCardService.reconcileTransaction(data),
     onSuccess: () => {
       toast.success('تم تطابق المعاملة بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['card-transactions'] })
-      queryClient.invalidateQueries({ queryKey: ['card-statistics'] })
+      invalidateCache.corporateCards.transactions()
+      invalidateCache.corporateCards.statistics()
     },
     onError: (error: Error) => {
       toast.error(`فشل تطابق المعاملة: ${error.message}`)
@@ -228,8 +212,6 @@ export const useReconcileTransaction = () => {
 }
 
 export const useBulkReconcileTransactions = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (reconciliations: ReconcileTransactionData[]) =>
       corporateCardService.bulkReconcileTransactions(reconciliations),
@@ -238,8 +220,8 @@ export const useBulkReconcileTransactions = () => {
       if (result.failed > 0) {
         toast.warning(`فشل تطابق ${result.failed} معاملة`)
       }
-      queryClient.invalidateQueries({ queryKey: ['card-transactions'] })
-      queryClient.invalidateQueries({ queryKey: ['card-statistics'] })
+      invalidateCache.corporateCards.transactions()
+      invalidateCache.corporateCards.statistics()
     },
     onError: (error: Error) => {
       toast.error(`فشل التطابق الجماعي: ${error.message}`)
@@ -248,14 +230,12 @@ export const useBulkReconcileTransactions = () => {
 }
 
 export const useMatchTransactionToExpense = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ transactionId, expenseClaimId }: { transactionId: string; expenseClaimId: string }) =>
       corporateCardService.matchTransactionToExpense(transactionId, expenseClaimId),
     onSuccess: () => {
       toast.success('تم ربط المعاملة بالمصروف بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['card-transactions'] })
+      invalidateCache.corporateCards.transactions()
     },
     onError: (error: Error) => {
       toast.error(`فشل ربط المعاملة: ${error.message}`)
@@ -265,22 +245,20 @@ export const useMatchTransactionToExpense = () => {
 
 export const usePotentialMatches = (transactionId: string) => {
   return useQuery({
-    queryKey: ['card-transactions', transactionId, 'potential-matches'],
+    queryKey: QueryKeys.corporateCards.potentialMatches(transactionId),
     queryFn: () => corporateCardService.findPotentialMatches(transactionId),
     enabled: !!transactionId,
   })
 }
 
 export const useDisputeTransaction = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ transactionId, reason }: { transactionId: string; reason: string }) =>
       corporateCardService.disputeTransaction(transactionId, reason),
     onSuccess: () => {
       toast.success('تم الاعتراض على المعاملة بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['card-transactions'] })
-      queryClient.invalidateQueries({ queryKey: ['card-statistics'] })
+      invalidateCache.corporateCards.transactions()
+      invalidateCache.corporateCards.statistics()
     },
     onError: (error: Error) => {
       toast.error(`فشل الاعتراض على المعاملة: ${error.message}`)
@@ -289,15 +267,13 @@ export const useDisputeTransaction = () => {
 }
 
 export const useResolveDispute = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ transactionId, resolution }: { transactionId: string; resolution: string }) =>
       corporateCardService.resolveDispute(transactionId, resolution),
     onSuccess: () => {
       toast.success('تم حل الاعتراض بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['card-transactions'] })
-      queryClient.invalidateQueries({ queryKey: ['card-statistics'] })
+      invalidateCache.corporateCards.transactions()
+      invalidateCache.corporateCards.statistics()
     },
     onError: (error: Error) => {
       toast.error(`فشل حل الاعتراض: ${error.message}`)
@@ -308,8 +284,6 @@ export const useResolveDispute = () => {
 // ==================== CSV IMPORT ====================
 
 export const useImportTransactionsCSV = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ cardId, file }: { cardId: string; file: File }) =>
       corporateCardService.importTransactionsCSV(cardId, file),
@@ -321,8 +295,8 @@ export const useImportTransactionsCSV = () => {
       if (result.errorRecords > 0) {
         toast.warning(`فشل استيراد ${result.errorRecords} معاملة`)
       }
-      queryClient.invalidateQueries({ queryKey: ['card-transactions'] })
-      queryClient.invalidateQueries({ queryKey: ['card-statistics'] })
+      invalidateCache.corporateCards.transactions()
+      invalidateCache.corporateCards.statistics()
     },
     onError: (error: Error) => {
       toast.error(`فشل استيراد الملف: ${error.message}`)
@@ -334,7 +308,7 @@ export const useImportTransactionsCSV = () => {
 
 export const useCardStatistics = (startDate?: string, endDate?: string) => {
   return useQuery({
-    queryKey: ['card-statistics', startDate, endDate],
+    queryKey: QueryKeys.corporateCards.statisticsWithDates(startDate, endDate),
     queryFn: () => corporateCardService.getCardStatistics(startDate, endDate),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -343,7 +317,7 @@ export const useCardStatistics = (startDate?: string, endDate?: string) => {
 
 export const useReconciliationReport = (cardId?: string, startDate?: string, endDate?: string) => {
   return useQuery({
-    queryKey: ['card-reconciliation-report', cardId, startDate, endDate],
+    queryKey: QueryKeys.corporateCards.reconciliationReport(cardId, startDate, endDate),
     queryFn: () => corporateCardService.getReconciliationReport(cardId, startDate, endDate),
     enabled: !!(startDate && endDate),
     staleTime: STATS_STALE_TIME,
@@ -353,7 +327,7 @@ export const useReconciliationReport = (cardId?: string, startDate?: string, end
 
 export const useSpendingByCategory = (cardId?: string, startDate?: string, endDate?: string) => {
   return useQuery({
-    queryKey: ['card-spending-by-category', cardId, startDate, endDate],
+    queryKey: QueryKeys.corporateCards.spendingByCategory(cardId, startDate, endDate),
     queryFn: () => corporateCardService.getSpendingByCategory(cardId, startDate, endDate),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -362,7 +336,7 @@ export const useSpendingByCategory = (cardId?: string, startDate?: string, endDa
 
 export const useSpendingByCard = (startDate?: string, endDate?: string) => {
   return useQuery({
-    queryKey: ['card-spending-by-card', startDate, endDate],
+    queryKey: QueryKeys.corporateCards.spendingByCard(startDate, endDate),
     queryFn: () => corporateCardService.getSpendingByCard(startDate, endDate),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -371,7 +345,7 @@ export const useSpendingByCard = (startDate?: string, endDate?: string) => {
 
 export const useMonthlySpendingTrend = (cardId?: string, months: number = 6) => {
   return useQuery({
-    queryKey: ['card-monthly-spending-trend', cardId, months],
+    queryKey: QueryKeys.corporateCards.monthlySpendingTrend(cardId, months),
     queryFn: () => corporateCardService.getMonthlySpendingTrend(cardId, months),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,

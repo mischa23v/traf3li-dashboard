@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   useSuccessionPlan,
   useDeleteSuccessionPlan,
@@ -68,8 +69,8 @@ export function SuccessionPlanningDetailsView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'تخطيط التعاقب', href: '/dashboard/hr/succession-planning', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'تخطيط التعاقب', href: ROUTES.dashboard.hr.successionPlanning.list, isActive: true },
   ]
 
   const getCriticalityColor = (criticality: PositionCriticality) => {
@@ -139,7 +140,7 @@ export function SuccessionPlanningDetailsView() {
     if (!planId) return
     if (confirm('هل أنت متأكد من حذف خطة التعاقب هذه؟')) {
       await deleteMutation.mutateAsync(planId)
-      navigate({ to: '/dashboard/hr/succession-planning' })
+      navigate({ to: ROUTES.dashboard.hr.successionPlanning.list })
     }
   }
 
@@ -192,7 +193,7 @@ export function SuccessionPlanningDetailsView() {
                   <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" aria-hidden="true" />
                   <p className="text-red-600">حدث خطأ في تحميل بيانات الخطة</p>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/hr/succession-planning' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.hr.successionPlanning.list })}
                     className="mt-4"
                   >
                     العودة للقائمة
@@ -208,7 +209,7 @@ export function SuccessionPlanningDetailsView() {
                       variant="ghost"
                       size="icon"
                       className="rounded-xl hover:bg-white"
-                      onClick={() => navigate({ to: '/dashboard/hr/succession-planning' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.hr.successionPlanning.list })}
                     >
                       <ArrowRight className="h-5 w-5" />
                     </Button>

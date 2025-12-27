@@ -1,5 +1,6 @@
 import { useState, useMemo, lazy, Suspense } from 'react'
 import { useParams, useNavigate, Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -44,7 +45,7 @@ export function GeofencingDetailsView() {
     const handleDelete = () => {
         deleteZoneMutation.mutate(zoneId, {
             onSuccess: () => {
-                navigate({ to: '/dashboard/hr/geofencing' })
+                navigate({ to: ROUTES.dashboard.hr.geofencing.list })
             }
         })
     }
@@ -109,9 +110,9 @@ export function GeofencingDetailsView() {
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-        { title: 'الحضور', href: '/dashboard/hr/attendance', isActive: false },
-        { title: 'النطاق الجغرافي', href: '/dashboard/hr/geofencing', isActive: true },
+        { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+        { title: 'الحضور', href: ROUTES.dashboard.hr.attendance.list, isActive: false },
+        { title: 'النطاق الجغرافي', href: ROUTES.dashboard.hr.geofencing.list, isActive: true },
     ]
 
     return (
@@ -461,7 +462,7 @@ export function GeofencingDetailsView() {
                                                         {zone.isActive ? 'تعطيل النطاق' : 'تفعيل النطاق'}
                                                     </Button>
                                                     <Button
-                                                        onClick={() => navigate({ to: '/dashboard/hr/geofencing/new', search: { editId: zoneId } })}
+                                                        onClick={() => navigate({ to: ROUTES.dashboard.hr.geofencing.new, search: { editId: zoneId } })}
                                                         className="flex-1 h-12 bg-blue-500 hover:bg-blue-600 text-white rounded-xl"
                                                     >
                                                         <Edit3 className="h-5 w-5 ms-2" />

@@ -1,6 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   getShiftTypes,
   getShiftType,
@@ -120,14 +121,13 @@ export const useRamadanShifts = () => {
 
 // Create shift type
 export const useCreateShiftType = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateShiftTypeData) => createShiftType(data),
     onSuccess: () => {
       toast.success('تم إنشاء نوع الوردية بنجاح')
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.all })
+      invalidateCache.shiftTypes.lists()
+      invalidateCache.shiftTypes.stats()
+      invalidateCache.shiftTypes.all()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء نوع الوردية')
@@ -137,15 +137,14 @@ export const useCreateShiftType = () => {
 
 // Update shift type
 export const useUpdateShiftType = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ shiftTypeId, data }: { shiftTypeId: string; data: UpdateShiftTypeData }) =>
       updateShiftType(shiftTypeId, data),
     onSuccess: (_, { shiftTypeId }) => {
       toast.success('تم تحديث نوع الوردية بنجاح')
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.detail(shiftTypeId) })
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.stats() })
+      invalidateCache.shiftTypes.detail(shiftTypeId)
+      invalidateCache.shiftTypes.lists()
+      invalidateCache.shiftTypes.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث نوع الوردية')
@@ -155,14 +154,13 @@ export const useUpdateShiftType = () => {
 
 // Delete shift type
 export const useDeleteShiftType = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (shiftTypeId: string) => deleteShiftType(shiftTypeId),
     onSuccess: () => {
       toast.success('تم حذف نوع الوردية بنجاح')
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.all })
+      invalidateCache.shiftTypes.lists()
+      invalidateCache.shiftTypes.stats()
+      invalidateCache.shiftTypes.all()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف نوع الوردية')
@@ -172,14 +170,13 @@ export const useDeleteShiftType = () => {
 
 // Bulk delete shift types
 export const useBulkDeleteShiftTypes = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteShiftTypes(ids),
     onSuccess: (_, variables) => {
       toast.success(`تم حذف ${variables.length} نوع وردية بنجاح`)
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.all })
+      invalidateCache.shiftTypes.lists()
+      invalidateCache.shiftTypes.stats()
+      invalidateCache.shiftTypes.all()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف أنواع الورديات')
@@ -189,14 +186,13 @@ export const useBulkDeleteShiftTypes = () => {
 
 // Set as default
 export const useSetAsDefaultShift = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (shiftTypeId: string) => setAsDefaultShift(shiftTypeId),
     onSuccess: (_, shiftTypeId) => {
       toast.success('تم تعيين الوردية الافتراضية بنجاح')
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.detail(shiftTypeId) })
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.default() })
+      invalidateCache.shiftTypes.detail(shiftTypeId)
+      invalidateCache.shiftTypes.lists()
+      invalidateCache.shiftTypes.default()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تعيين الوردية الافتراضية')
@@ -206,14 +202,13 @@ export const useSetAsDefaultShift = () => {
 
 // Activate shift type
 export const useActivateShiftType = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (shiftTypeId: string) => activateShiftType(shiftTypeId),
     onSuccess: (_, shiftTypeId) => {
       toast.success('تم تفعيل نوع الوردية بنجاح')
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.detail(shiftTypeId) })
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.active() })
+      invalidateCache.shiftTypes.detail(shiftTypeId)
+      invalidateCache.shiftTypes.lists()
+      invalidateCache.shiftTypes.active()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تفعيل نوع الوردية')
@@ -223,14 +218,13 @@ export const useActivateShiftType = () => {
 
 // Deactivate shift type
 export const useDeactivateShiftType = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (shiftTypeId: string) => deactivateShiftType(shiftTypeId),
     onSuccess: (_, shiftTypeId) => {
       toast.success('تم إلغاء تفعيل نوع الوردية بنجاح')
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.detail(shiftTypeId) })
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.active() })
+      invalidateCache.shiftTypes.detail(shiftTypeId)
+      invalidateCache.shiftTypes.lists()
+      invalidateCache.shiftTypes.active()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إلغاء تفعيل نوع الوردية')
@@ -240,14 +234,13 @@ export const useDeactivateShiftType = () => {
 
 // Clone shift type
 export const useCloneShiftType = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ shiftTypeId, data }: { shiftTypeId: string; data?: { name?: string; nameAr?: string } }) =>
       cloneShiftType(shiftTypeId, data),
     onSuccess: () => {
       toast.success('تم نسخ نوع الوردية بنجاح')
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.stats() })
+      invalidateCache.shiftTypes.lists()
+      invalidateCache.shiftTypes.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل نسخ نوع الوردية')
@@ -297,13 +290,12 @@ export const useExportShiftTypes = () => {
 
 // Import shift types
 export const useImportShiftTypes = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (file: File) => importShiftTypes(file),
     onSuccess: (result) => {
       toast.success(`تم استيراد ${result.success} نوع وردية بنجاح${result.failed > 0 ? ` (فشل ${result.failed})` : ''}`)
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: shiftTypeKeys.stats() })
+      invalidateCache.shiftTypes.lists()
+      invalidateCache.shiftTypes.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل استيراد أنواع الورديات')

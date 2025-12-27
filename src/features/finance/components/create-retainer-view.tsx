@@ -21,6 +21,7 @@ import { FinanceSidebar } from './finance-sidebar'
 import { useCreateRetainer } from '@/hooks/useAccounting'
 import { useClients, useCases } from '@/hooks/useCasesAndClients'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { ROUTES } from '@/constants/routes'
 
 export function CreateRetainerView() {
     const navigate = useNavigate()
@@ -51,19 +52,19 @@ export function CreateRetainerView() {
 
         createRetainerMutation.mutate(retainerData, {
             onSuccess: () => {
-                navigate({ to: '/dashboard/finance/retainers' })
+                navigate({ to: ROUTES.dashboard.finance.retainers.list })
             },
         })
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
-        { title: 'حسابات الأمانة', href: '/dashboard/finance/retainers', isActive: true },
-        { title: 'المعاملات', href: '/dashboard/finance/transactions', isActive: false },
-        { title: 'تتبع الوقت', href: '/dashboard/finance/time-tracking', isActive: false },
-        { title: 'نشاط الحساب', href: '/dashboard/finance/activity', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: false },
+        { title: 'المصروفات', href: ROUTES.dashboard.finance.expenses.list, isActive: false },
+        { title: 'حسابات الأمانة', href: ROUTES.dashboard.finance.retainers.list, isActive: true },
+        { title: 'المعاملات', href: ROUTES.dashboard.finance.transactions.list, isActive: false },
+        { title: 'تتبع الوقت', href: ROUTES.dashboard.finance.timeTracking.list, isActive: false },
+        { title: 'نشاط الحساب', href: ROUTES.dashboard.finance.activity.list, isActive: false },
     ]
 
     return (

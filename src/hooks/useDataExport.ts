@@ -7,6 +7,7 @@ import dataExportService, {
   type ExportFormat,
 } from '@/services/dataExportService'
 import { useTranslation } from 'react-i18next'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // Query key factory
 export const exportKeys = {
@@ -26,7 +27,6 @@ export const exportKeys = {
 
 // Start export
 export function useStartExport() {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
@@ -45,7 +45,7 @@ export function useStartExport() {
       })
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: exportKeys.exports() })
+      await invalidateCache.dataExport.exports()
     },
   })
 }
@@ -104,7 +104,6 @@ export function useDownloadExport() {
 
 // Cancel export
 export function useCancelExport() {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
@@ -123,7 +122,7 @@ export function useCancelExport() {
       })
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: exportKeys.exports() })
+      await invalidateCache.dataExport.exports()
     },
   })
 }
@@ -175,7 +174,7 @@ export function useStartImport() {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: exportKeys.imports(), refetchType: 'all' })
+      await invalidateCache.dataExport.imports({ refetchType: 'all' })
     },
   })
 }
@@ -237,7 +236,7 @@ export function useCancelImport() {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: exportKeys.imports(), refetchType: 'all' })
+      await invalidateCache.dataExport.imports({ refetchType: 'all' })
     },
   })
 }
@@ -307,7 +306,7 @@ export function useCreateExportTemplate() {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: exportKeys.templates(), refetchType: 'all' })
+      await invalidateCache.dataExport.templates({ refetchType: 'all' })
     },
   })
 }
@@ -342,7 +341,7 @@ export function useDeleteExportTemplate() {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: exportKeys.templates(), refetchType: 'all' })
+      await invalidateCache.dataExport.templates({ refetchType: 'all' })
     },
   })
 }

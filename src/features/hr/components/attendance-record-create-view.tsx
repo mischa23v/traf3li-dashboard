@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useCreateAttendanceRecord, useCheckIn, useCheckOut } from '@/hooks/useAttendance'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -176,7 +177,7 @@ export function AttendanceRecordCreateView() {
           },
         })
       }
-      navigate({ to: '/dashboard/hr/attendance' })
+      navigate({ to: ROUTES.dashboard.hr.attendance.list })
     } catch {
       // Error is handled by mutation's onError callback
     }
@@ -184,9 +185,9 @@ export function AttendanceRecordCreateView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'الحضور', href: '/dashboard/hr/attendance', isActive: true },
-    { title: 'الإجازات', href: '/dashboard/hr/leaves', isActive: false },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'الحضور', href: ROUTES.dashboard.hr.attendance.list, isActive: true },
+    { title: 'الإجازات', href: ROUTES.dashboard.hr.leave.list, isActive: false },
   ]
 
   const isPending = createMutation.isPending || checkInMutation.isPending || checkOutMutation.isPending
@@ -675,7 +676,7 @@ export function AttendanceRecordCreateView() {
               <div className="flex items-center justify-end gap-4 pt-4 border-t border-slate-100">
                 <Button
                   variant="outline"
-                  onClick={() => navigate({ to: '/dashboard/hr/attendance' })}
+                  onClick={() => navigate({ to: ROUTES.dashboard.hr.attendance.list })}
                   className="rounded-xl"
                 >
                   إلغاء

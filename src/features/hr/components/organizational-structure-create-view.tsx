@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useSearch } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useCreateOrganizationalUnit, useUpdateOrganizationalUnit, useOrganizationalUnit, useOrganizationalUnits } from '@/hooks/useOrganizationalStructure'
 import { useEmployees } from '@/hooks/useHR'
 import { Button } from '@/components/ui/button'
@@ -319,13 +320,13 @@ export function OrganizationalStructureCreateView() {
       await createMutation.mutateAsync(data)
     }
 
-    navigate({ to: '/dashboard/hr/organizational-structure' })
+    navigate({ to: ROUTES.dashboard.hr.organizationalStructure.list })
   }
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'الهيكل التنظيمي', href: '/dashboard/hr/organizational-structure', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'الهيكل التنظيمي', href: ROUTES.dashboard.hr.organizationalStructure.list, isActive: true },
   ]
 
   const isPending = createMutation.isPending || updateMutation.isPending
@@ -371,7 +372,7 @@ export function OrganizationalStructureCreateView() {
                 variant="ghost"
                 size="icon"
                 className="rounded-xl hover:bg-white"
-                onClick={() => navigate({ to: '/dashboard/hr/organizational-structure' })}
+                onClick={() => navigate({ to: ROUTES.dashboard.hr.organizationalStructure.list })}
               >
                 <ArrowRight className="h-5 w-5" />
               </Button>
@@ -1125,7 +1126,7 @@ export function OrganizationalStructureCreateView() {
             <div className="flex items-center justify-end gap-4">
               <Button
                 variant="outline"
-                onClick={() => navigate({ to: '/dashboard/hr/organizational-structure' })}
+                onClick={() => navigate({ to: ROUTES.dashboard.hr.organizationalStructure.list })}
                 className="rounded-xl"
               >
                 إلغاء

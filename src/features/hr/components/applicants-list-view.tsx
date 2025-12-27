@@ -17,6 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
+import { ROUTES } from '@/constants/routes'
 import {
   Select,
   SelectContent,
@@ -148,9 +149,9 @@ export function ApplicantsListView() {
   }, [statsData])
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'التوظيف', href: '/dashboard/hr/recruitment/jobs', isActive: true },
+    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false }, // TODO: Add overview route to ROUTES constant
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'التوظيف', href: ROUTES.dashboard.hr.recruitment.jobs.list, isActive: true },
   ]
 
   return (
@@ -200,14 +201,14 @@ export function ApplicantsListView() {
               <div className="flex items-center gap-3">
                 <Button
                   variant="outline"
-                  onClick={() => navigate({ to: '/dashboard/hr/recruitment/jobs' })}
+                  onClick={() => navigate({ to: ROUTES.dashboard.hr.recruitment.jobs.list })}
                   className="rounded-xl"
                 >
                   <Briefcase className="w-4 h-4 ms-2" aria-hidden="true" />
                   الوظائف
                 </Button>
                 <Button
-                  onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants/new' })}
+                  onClick={() => navigate({ to: ROUTES.dashboard.hr.recruitment.applicants.new })}
                   className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                 >
                   <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
@@ -329,7 +330,7 @@ export function ApplicantsListView() {
                     <h3 className="text-lg font-bold text-slate-900 mb-2">لا يوجد متقدمين</h3>
                     <p className="text-slate-500 mb-4">ابدأ بإضافة متقدم جديد</p>
                     <Button
-                      onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants/new' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.hr.recruitment.applicants.new })}
                       className="bg-emerald-500 hover:bg-emerald-600"
                     >
                       <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
@@ -385,7 +386,7 @@ export function ApplicantsListView() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants/$applicantId', params: { applicantId: applicant._id } })}>
+                          <DropdownMenuItem onClick={() => navigate({ to: ROUTES.dashboard.hr.recruitment.applicants.detail(applicant._id) })}>
                             <Eye className="h-4 w-4 ms-2" aria-hidden="true" />
                             عرض التفاصيل
                           </DropdownMenuItem>
@@ -432,7 +433,7 @@ export function ApplicantsListView() {
                         </div>
                       </div>
                       <Button
-                        onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants/$applicantId', params: { applicantId: applicant._id } })}
+                        onClick={() => navigate({ to: ROUTES.dashboard.hr.recruitment.applicants.detail(applicant._id) })}
                         className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20"
                       >
                         عرض الملف

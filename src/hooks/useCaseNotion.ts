@@ -6,6 +6,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { caseNotionService } from '@/services/caseNotionService'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import type {
   CaseNotionPage,
   Block,
@@ -84,13 +85,11 @@ export function useCaseNotionPage(caseId: string, pageId: string) {
  * Create a new page
  */
 export function useCreateCaseNotionPage() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ caseId, data }: { caseId: string; data: CreatePageInput }) =>
       caseNotionService.createPage(caseId, data),
     onSuccess: (_, { caseId }) => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.pages(caseId) })
+      invalidateCache.caseNotion.pages(caseId)
     },
   })
 }
@@ -99,8 +98,6 @@ export function useCreateCaseNotionPage() {
  * Update a page
  */
 export function useUpdateCaseNotionPage() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       caseId,
@@ -112,8 +109,8 @@ export function useUpdateCaseNotionPage() {
       data: UpdatePageInput
     }) => caseNotionService.updatePage(caseId, pageId, data),
     onSuccess: (_, { caseId, pageId }) => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.page(caseId, pageId) })
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.pages(caseId) })
+      invalidateCache.caseNotion.page(caseId, pageId)
+      invalidateCache.caseNotion.pages(caseId)
     },
   })
 }
@@ -122,13 +119,11 @@ export function useUpdateCaseNotionPage() {
  * Delete a page
  */
 export function useDeleteCaseNotionPage() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ caseId, pageId }: { caseId: string; pageId: string }) =>
       caseNotionService.deletePage(caseId, pageId),
     onSuccess: (_, { caseId }) => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.pages(caseId) })
+      invalidateCache.caseNotion.pages(caseId)
     },
   })
 }
@@ -137,14 +132,12 @@ export function useDeleteCaseNotionPage() {
  * Archive a page
  */
 export function useArchiveCaseNotionPage() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ caseId, pageId }: { caseId: string; pageId: string }) =>
       caseNotionService.archivePage(caseId, pageId),
     onSuccess: (_, { caseId, pageId }) => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.page(caseId, pageId) })
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.pages(caseId) })
+      invalidateCache.caseNotion.page(caseId, pageId)
+      invalidateCache.caseNotion.pages(caseId)
     },
   })
 }
@@ -153,14 +146,12 @@ export function useArchiveCaseNotionPage() {
  * Restore a page
  */
 export function useRestoreCaseNotionPage() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ caseId, pageId }: { caseId: string; pageId: string }) =>
       caseNotionService.restorePage(caseId, pageId),
     onSuccess: (_, { caseId, pageId }) => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.page(caseId, pageId) })
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.pages(caseId) })
+      invalidateCache.caseNotion.page(caseId, pageId)
+      invalidateCache.caseNotion.pages(caseId)
     },
   })
 }
@@ -169,13 +160,11 @@ export function useRestoreCaseNotionPage() {
  * Duplicate a page
  */
 export function useDuplicateCaseNotionPage() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ caseId, pageId }: { caseId: string; pageId: string }) =>
       caseNotionService.duplicatePage(caseId, pageId),
     onSuccess: (_, { caseId }) => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.pages(caseId) })
+      invalidateCache.caseNotion.pages(caseId)
     },
   })
 }
@@ -184,14 +173,12 @@ export function useDuplicateCaseNotionPage() {
  * Toggle favorite status
  */
 export function useToggleFavoritePage() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ caseId, pageId }: { caseId: string; pageId: string }) =>
       caseNotionService.toggleFavorite(caseId, pageId),
     onSuccess: (_, { caseId, pageId }) => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.page(caseId, pageId) })
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.pages(caseId) })
+      invalidateCache.caseNotion.page(caseId, pageId)
+      invalidateCache.caseNotion.pages(caseId)
     },
   })
 }
@@ -200,14 +187,12 @@ export function useToggleFavoritePage() {
  * Toggle pin status
  */
 export function useTogglePinPage() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ caseId, pageId }: { caseId: string; pageId: string }) =>
       caseNotionService.togglePin(caseId, pageId),
     onSuccess: (_, { caseId, pageId }) => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.page(caseId, pageId) })
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.pages(caseId) })
+      invalidateCache.caseNotion.page(caseId, pageId)
+      invalidateCache.caseNotion.pages(caseId)
     },
   })
 }
@@ -233,8 +218,6 @@ export function useCaseNotionBlocks(caseId: string, pageId: string) {
  * Create a block
  */
 export function useCreateBlock() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       caseId,
@@ -246,8 +229,8 @@ export function useCreateBlock() {
       data: CreateBlockInput
     }) => caseNotionService.createBlock(caseId, pageId, data),
     onSuccess: (_, { caseId, pageId }) => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.blocks(caseId, pageId) })
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.page(caseId, pageId) })
+      invalidateCache.caseNotion.blocks(caseId, pageId)
+      invalidateCache.caseNotion.page(caseId, pageId)
     },
   })
 }
@@ -256,8 +239,6 @@ export function useCreateBlock() {
  * Update a block
  */
 export function useUpdateBlock() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       caseId,
@@ -271,9 +252,9 @@ export function useUpdateBlock() {
       data: UpdateBlockInput
     }) => caseNotionService.updateBlock(caseId, blockId, data),
     onSuccess: (_, { caseId, pageId }) => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.blocks(caseId, pageId) })
+      invalidateCache.caseNotion.blocks(caseId, pageId)
       // FIX: Also invalidate page query since CaseNotionPage includes blocks array
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.page(caseId, pageId) })
+      invalidateCache.caseNotion.page(caseId, pageId)
     },
   })
 }
@@ -282,8 +263,6 @@ export function useUpdateBlock() {
  * Delete a block
  */
 export function useDeleteBlock() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       caseId,
@@ -295,8 +274,8 @@ export function useDeleteBlock() {
       blockId: string
     }) => caseNotionService.deleteBlock(caseId, blockId),
     onSuccess: (_, { caseId, pageId }) => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.blocks(caseId, pageId) })
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.page(caseId, pageId) })
+      invalidateCache.caseNotion.blocks(caseId, pageId)
+      invalidateCache.caseNotion.page(caseId, pageId)
     },
   })
 }
@@ -305,8 +284,6 @@ export function useDeleteBlock() {
  * Move a block
  */
 export function useMoveBlock() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       caseId,
@@ -318,7 +295,7 @@ export function useMoveBlock() {
       data: MoveBlockInput
     }) => caseNotionService.moveBlock(caseId, data),
     onSuccess: (_, { caseId, pageId }) => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.blocks(caseId, pageId) })
+      invalidateCache.caseNotion.blocks(caseId, pageId)
     },
   })
 }
@@ -327,8 +304,6 @@ export function useMoveBlock() {
  * Lock a block for editing
  */
 export function useLockBlock() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       caseId,
@@ -340,7 +315,7 @@ export function useLockBlock() {
       blockId: string
     }) => caseNotionService.lockBlock(caseId, blockId),
     onSuccess: (_, { caseId, pageId }) => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.blocks(caseId, pageId) })
+      invalidateCache.caseNotion.blocks(caseId, pageId)
     },
   })
 }
@@ -349,8 +324,6 @@ export function useLockBlock() {
  * Unlock a block
  */
 export function useUnlockBlock() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       caseId,
@@ -362,7 +335,7 @@ export function useUnlockBlock() {
       blockId: string
     }) => caseNotionService.unlockBlock(caseId, blockId),
     onSuccess: (_, { caseId, pageId }) => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.blocks(caseId, pageId) })
+      invalidateCache.caseNotion.blocks(caseId, pageId)
     },
   })
 }
@@ -388,8 +361,6 @@ export function useBlockComments(caseId: string, blockId: string) {
  * Add a comment
  */
 export function useAddComment() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       caseId,
@@ -403,7 +374,7 @@ export function useAddComment() {
       parentCommentId?: string
     }) => caseNotionService.addComment(caseId, blockId, content, parentCommentId),
     onSuccess: (_, { caseId, blockId }) => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.comments(caseId, blockId) })
+      invalidateCache.caseNotion.comments(caseId, blockId)
     },
   })
 }
@@ -412,8 +383,6 @@ export function useAddComment() {
  * Resolve a comment
  */
 export function useResolveComment() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       caseId,
@@ -425,7 +394,7 @@ export function useResolveComment() {
       commentId: string
     }) => caseNotionService.resolveComment(caseId, commentId),
     onSuccess: (_, { caseId, blockId }) => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.comments(caseId, blockId) })
+      invalidateCache.caseNotion.comments(caseId, blockId)
     },
   })
 }
@@ -434,8 +403,6 @@ export function useResolveComment() {
  * Delete a comment
  */
 export function useDeleteComment() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       caseId,
@@ -447,7 +414,7 @@ export function useDeleteComment() {
       commentId: string
     }) => caseNotionService.deleteComment(caseId, commentId),
     onSuccess: (_, { caseId, blockId }) => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.comments(caseId, blockId) })
+      invalidateCache.caseNotion.comments(caseId, blockId)
     },
   })
 }
@@ -489,8 +456,6 @@ export function useCaseNotionTemplates(category?: string) {
  * Apply a template to a page
  */
 export function useApplyTemplate() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       caseId,
@@ -502,8 +467,8 @@ export function useApplyTemplate() {
       templateId: string
     }) => caseNotionService.applyTemplate(caseId, pageId, templateId),
     onSuccess: (_, { caseId, pageId }) => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.page(caseId, pageId) })
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.blocks(caseId, pageId) })
+      invalidateCache.caseNotion.page(caseId, pageId)
+      invalidateCache.caseNotion.blocks(caseId, pageId)
     },
   })
 }
@@ -512,8 +477,6 @@ export function useApplyTemplate() {
  * Save page as template
  */
 export function useSaveAsTemplate() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       caseId,
@@ -525,7 +488,7 @@ export function useSaveAsTemplate() {
       templateData: { name: string; nameAr?: string; category: string; description?: string }
     }) => caseNotionService.saveAsTemplate(caseId, pageId, templateData),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.templates() })
+      invalidateCache.caseNotion.templates()
     },
   })
 }
@@ -579,8 +542,6 @@ export function useExportPageMarkdown() {
  * Merge multiple pages
  */
 export function useMergePages() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       caseId,
@@ -594,7 +555,7 @@ export function useMergePages() {
       deleteSourcePages?: boolean
     }) => caseNotionService.mergePages(caseId, sourcePageIds, targetTitle, deleteSourcePages),
     onSuccess: (_, { caseId }) => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.pages(caseId) })
+      invalidateCache.caseNotion.pages(caseId)
     },
   })
 }
@@ -603,8 +564,6 @@ export function useMergePages() {
  * Link a task to a block
  */
 export function useLinkTaskToBlock() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       caseId,
@@ -618,7 +577,7 @@ export function useLinkTaskToBlock() {
       taskId: string
     }) => caseNotionService.linkTask(caseId, blockId, taskId),
     onSuccess: (_, { caseId, pageId }) => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.blocks(caseId, pageId) })
+      invalidateCache.caseNotion.blocks(caseId, pageId)
     },
   })
 }
@@ -627,8 +586,6 @@ export function useLinkTaskToBlock() {
  * Create a task from a block
  */
 export function useCreateTaskFromBlock() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       caseId,
@@ -642,7 +599,7 @@ export function useCreateTaskFromBlock() {
       taskData: { title: string; dueDate?: string; assigneeId?: string; priority?: string }
     }) => caseNotionService.createTaskFromBlock(caseId, blockId, taskData),
     onSuccess: (_, { caseId, pageId }) => {
-      queryClient.invalidateQueries({ queryKey: caseNotionKeys.blocks(caseId, pageId) })
+      invalidateCache.caseNotion.blocks(caseId, pageId)
     },
   })
 }

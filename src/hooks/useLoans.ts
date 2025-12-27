@@ -1,6 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   getLoans,
   getLoan,
@@ -138,14 +139,12 @@ export const useEarlySettlementCalculation = (loanId: string) => {
 
 // Create loan
 export const useCreateLoan = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateLoanData) => createLoan(data),
     onSuccess: () => {
       toast.success('تم إنشاء طلب القرض بنجاح')
-      queryClient.invalidateQueries({ queryKey: loanKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: loanKeys.stats() })
+      invalidateCache.loans.lists()
+      invalidateCache.loans.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إنشاء طلب القرض')
@@ -155,15 +154,13 @@ export const useCreateLoan = () => {
 
 // Update loan
 export const useUpdateLoan = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ loanId, data }: { loanId: string; data: UpdateLoanData }) =>
       updateLoan(loanId, data),
     onSuccess: (_, variables) => {
       toast.success('تم تحديث القرض بنجاح')
-      queryClient.invalidateQueries({ queryKey: loanKeys.detail(variables.loanId) })
-      queryClient.invalidateQueries({ queryKey: loanKeys.lists() })
+      invalidateCache.loans.detail(variables.loanId)
+      invalidateCache.loans.lists()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في تحديث القرض')
@@ -173,14 +170,12 @@ export const useUpdateLoan = () => {
 
 // Delete loan
 export const useDeleteLoan = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (loanId: string) => deleteLoan(loanId),
     onSuccess: () => {
       toast.success('تم حذف القرض بنجاح')
-      queryClient.invalidateQueries({ queryKey: loanKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: loanKeys.stats() })
+      invalidateCache.loans.lists()
+      invalidateCache.loans.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في حذف القرض')
@@ -190,14 +185,12 @@ export const useDeleteLoan = () => {
 
 // Bulk delete
 export const useBulkDeleteLoans = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteLoans(ids),
     onSuccess: (data) => {
       toast.success(`تم حذف ${data.deleted} قرض بنجاح`)
-      queryClient.invalidateQueries({ queryKey: loanKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: loanKeys.stats() })
+      invalidateCache.loans.lists()
+      invalidateCache.loans.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في حذف القروض')
@@ -207,15 +200,13 @@ export const useBulkDeleteLoans = () => {
 
 // Submit application
 export const useSubmitLoanApplication = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (loanId: string) => submitLoanApplication(loanId),
     onSuccess: (_, loanId) => {
       toast.success('تم تقديم طلب القرض بنجاح')
-      queryClient.invalidateQueries({ queryKey: loanKeys.detail(loanId) })
-      queryClient.invalidateQueries({ queryKey: loanKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: loanKeys.pendingApprovals() })
+      invalidateCache.loans.detail(loanId)
+      invalidateCache.loans.lists()
+      invalidateCache.loans.pendingApprovals()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في تقديم الطلب')
@@ -225,8 +216,6 @@ export const useSubmitLoanApplication = () => {
 
 // Approve loan
 export const useApproveLoan = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ loanId, data }: {
       loanId: string
@@ -239,10 +228,10 @@ export const useApproveLoan = () => {
     }) => approveLoan(loanId, data),
     onSuccess: (_, variables) => {
       toast.success('تم اعتماد القرض بنجاح')
-      queryClient.invalidateQueries({ queryKey: loanKeys.detail(variables.loanId) })
-      queryClient.invalidateQueries({ queryKey: loanKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: loanKeys.pendingApprovals() })
-      queryClient.invalidateQueries({ queryKey: loanKeys.stats() })
+      invalidateCache.loans.detail(variables.loanId)
+      invalidateCache.loans.lists()
+      invalidateCache.loans.pendingApprovals()
+      invalidateCache.loans.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في اعتماد القرض')
@@ -252,8 +241,6 @@ export const useApproveLoan = () => {
 
 // Reject loan
 export const useRejectLoan = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ loanId, data }: {
       loanId: string
@@ -261,9 +248,9 @@ export const useRejectLoan = () => {
     }) => rejectLoan(loanId, data),
     onSuccess: (_, variables) => {
       toast.success('تم رفض القرض')
-      queryClient.invalidateQueries({ queryKey: loanKeys.detail(variables.loanId) })
-      queryClient.invalidateQueries({ queryKey: loanKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: loanKeys.pendingApprovals() })
+      invalidateCache.loans.detail(variables.loanId)
+      invalidateCache.loans.lists()
+      invalidateCache.loans.pendingApprovals()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في رفض القرض')
@@ -273,8 +260,6 @@ export const useRejectLoan = () => {
 
 // Disburse loan
 export const useDisburseLoan = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ loanId, data }: {
       loanId: string
@@ -290,9 +275,9 @@ export const useDisburseLoan = () => {
     }) => disburseLoan(loanId, data),
     onSuccess: (_, variables) => {
       toast.success('تم صرف القرض بنجاح')
-      queryClient.invalidateQueries({ queryKey: loanKeys.detail(variables.loanId) })
-      queryClient.invalidateQueries({ queryKey: loanKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: loanKeys.stats() })
+      invalidateCache.loans.detail(variables.loanId)
+      invalidateCache.loans.lists()
+      invalidateCache.loans.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في صرف القرض')
@@ -302,8 +287,6 @@ export const useDisburseLoan = () => {
 
 // Record payment
 export const useRecordPayment = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ loanId, data }: {
       loanId: string
@@ -318,10 +301,10 @@ export const useRecordPayment = () => {
     }) => recordLoanPayment(loanId, data),
     onSuccess: (_, variables) => {
       toast.success('تم تسجيل السداد بنجاح')
-      queryClient.invalidateQueries({ queryKey: loanKeys.detail(variables.loanId) })
-      queryClient.invalidateQueries({ queryKey: loanKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: loanKeys.overdueInstallments() })
-      queryClient.invalidateQueries({ queryKey: loanKeys.stats() })
+      invalidateCache.loans.detail(variables.loanId)
+      invalidateCache.loans.lists()
+      invalidateCache.loans.overdueInstallments()
+      invalidateCache.loans.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في تسجيل السداد')
@@ -331,8 +314,6 @@ export const useRecordPayment = () => {
 
 // Process payroll deduction
 export const useProcessPayrollDeduction = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ loanId, data }: {
       loanId: string
@@ -345,8 +326,8 @@ export const useProcessPayrollDeduction = () => {
     }) => processPayrollDeduction(loanId, data),
     onSuccess: (_, variables) => {
       toast.success('تم خصم القسط من الراتب بنجاح')
-      queryClient.invalidateQueries({ queryKey: loanKeys.detail(variables.loanId) })
-      queryClient.invalidateQueries({ queryKey: loanKeys.lists() })
+      invalidateCache.loans.detail(variables.loanId)
+      invalidateCache.loans.lists()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في خصم القسط')
@@ -356,8 +337,6 @@ export const useProcessPayrollDeduction = () => {
 
 // Process early settlement
 export const useProcessEarlySettlement = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ loanId, data }: {
       loanId: string
@@ -369,9 +348,9 @@ export const useProcessEarlySettlement = () => {
     }) => processEarlySettlement(loanId, data),
     onSuccess: (_, variables) => {
       toast.success('تم السداد المبكر بنجاح')
-      queryClient.invalidateQueries({ queryKey: loanKeys.detail(variables.loanId) })
-      queryClient.invalidateQueries({ queryKey: loanKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: loanKeys.stats() })
+      invalidateCache.loans.detail(variables.loanId)
+      invalidateCache.loans.lists()
+      invalidateCache.loans.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في السداد المبكر')
@@ -381,8 +360,6 @@ export const useProcessEarlySettlement = () => {
 
 // Mark as defaulted
 export const useMarkLoanDefaulted = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ loanId, data }: {
       loanId: string
@@ -390,9 +367,9 @@ export const useMarkLoanDefaulted = () => {
     }) => markLoanDefaulted(loanId, data),
     onSuccess: (_, variables) => {
       toast.warning('تم تصنيف القرض كمتعثر')
-      queryClient.invalidateQueries({ queryKey: loanKeys.detail(variables.loanId) })
-      queryClient.invalidateQueries({ queryKey: loanKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: loanKeys.stats() })
+      invalidateCache.loans.detail(variables.loanId)
+      invalidateCache.loans.lists()
+      invalidateCache.loans.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في تصنيف القرض')
@@ -402,8 +379,6 @@ export const useMarkLoanDefaulted = () => {
 
 // Restructure loan
 export const useRestructureLoan = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ loanId, data }: {
       loanId: string
@@ -415,8 +390,8 @@ export const useRestructureLoan = () => {
     }) => restructureLoan(loanId, data),
     onSuccess: (_, variables) => {
       toast.success('تم إعادة هيكلة القرض بنجاح')
-      queryClient.invalidateQueries({ queryKey: loanKeys.detail(variables.loanId) })
-      queryClient.invalidateQueries({ queryKey: loanKeys.lists() })
+      invalidateCache.loans.detail(variables.loanId)
+      invalidateCache.loans.lists()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إعادة هيكلة القرض')
@@ -426,13 +401,11 @@ export const useRestructureLoan = () => {
 
 // Issue clearance letter
 export const useIssueClearanceLetter = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (loanId: string) => issueClearanceLetter(loanId),
     onSuccess: (_, loanId) => {
       toast.success('تم إصدار خطاب إخلاء الطرف بنجاح')
-      queryClient.invalidateQueries({ queryKey: loanKeys.detail(loanId) })
+      invalidateCache.loans.detail(loanId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إصدار خطاب إخلاء الطرف')

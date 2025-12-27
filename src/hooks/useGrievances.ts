@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   getGrievances,
   getGrievance,
@@ -95,8 +96,8 @@ export const useCreateGrievance = () => {
     mutationFn: (data: CreateGrievanceData) => createGrievance(data),
     onSuccess: () => {
       toast.success('تم تقديم الشكوى بنجاح')
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.stats() })
+      invalidateCache.grievances.lists()
+      invalidateCache.grievances.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تقديم الشكوى')
@@ -112,8 +113,8 @@ export const useUpdateGrievance = () => {
       updateGrievance(grievanceId, data),
     onSuccess: (_, { grievanceId }) => {
       toast.success('تم تحديث الشكوى بنجاح')
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.detail(grievanceId) })
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.lists() })
+      invalidateCache.grievances.detail(grievanceId)
+      invalidateCache.grievances.lists()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث الشكوى')
@@ -128,8 +129,8 @@ export const useDeleteGrievance = () => {
     mutationFn: (grievanceId: string) => deleteGrievance(grievanceId),
     onSuccess: () => {
       toast.success('تم حذف الشكوى بنجاح')
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.stats() })
+      invalidateCache.grievances.lists()
+      invalidateCache.grievances.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف الشكوى')
@@ -144,8 +145,8 @@ export const useBulkDeleteGrievances = () => {
     mutationFn: (ids: string[]) => bulkDeleteGrievances(ids),
     onSuccess: (_, variables) => {
       toast.success(`تم حذف ${variables.length} شكوى بنجاح`)
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.stats() })
+      invalidateCache.grievances.lists()
+      invalidateCache.grievances.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف الشكاوى')
@@ -161,9 +162,9 @@ export const useStartInvestigation = () => {
       startInvestigation(grievanceId, data),
     onSuccess: (_, { grievanceId }) => {
       toast.success('تم بدء التحقيق بنجاح')
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.detail(grievanceId) })
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.stats() })
+      invalidateCache.grievances.detail(grievanceId)
+      invalidateCache.grievances.lists()
+      invalidateCache.grievances.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل بدء التحقيق')
@@ -179,8 +180,8 @@ export const useCompleteInvestigation = () => {
       completeInvestigation(grievanceId, data),
     onSuccess: (_, { grievanceId }) => {
       toast.success('تم إكمال التحقيق بنجاح')
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.detail(grievanceId) })
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.lists() })
+      invalidateCache.grievances.detail(grievanceId)
+      invalidateCache.grievances.lists()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إكمال التحقيق')
@@ -203,9 +204,9 @@ export const useResolveGrievance = () => {
     }) => resolveGrievance(grievanceId, data),
     onSuccess: (_, { grievanceId }) => {
       toast.success('تم حل الشكوى بنجاح')
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.detail(grievanceId) })
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.stats() })
+      invalidateCache.grievances.detail(grievanceId)
+      invalidateCache.grievances.lists()
+      invalidateCache.grievances.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حل الشكوى')
@@ -221,9 +222,9 @@ export const useEscalateGrievance = () => {
       escalateGrievance(grievanceId, data),
     onSuccess: (_, { grievanceId }) => {
       toast.success('تم تصعيد الشكوى بنجاح')
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.detail(grievanceId) })
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.stats() })
+      invalidateCache.grievances.detail(grievanceId)
+      invalidateCache.grievances.lists()
+      invalidateCache.grievances.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تصعيد الشكوى')
@@ -239,9 +240,9 @@ export const useWithdrawGrievance = () => {
       withdrawGrievance(grievanceId, data),
     onSuccess: (_, { grievanceId }) => {
       toast.success('تم سحب الشكوى بنجاح')
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.detail(grievanceId) })
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.stats() })
+      invalidateCache.grievances.detail(grievanceId)
+      invalidateCache.grievances.lists()
+      invalidateCache.grievances.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل سحب الشكوى')
@@ -257,9 +258,9 @@ export const useCloseGrievance = () => {
       closeGrievance(grievanceId, data),
     onSuccess: (_, { grievanceId }) => {
       toast.success('تم إغلاق الشكوى بنجاح')
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.detail(grievanceId) })
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.stats() })
+      invalidateCache.grievances.detail(grievanceId)
+      invalidateCache.grievances.lists()
+      invalidateCache.grievances.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إغلاق الشكوى')
@@ -275,7 +276,7 @@ export const useAddTimelineEvent = () => {
       addTimelineEvent(grievanceId, data),
     onSuccess: (_, { grievanceId }) => {
       toast.success('تم إضافة الحدث للجدول الزمني')
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.detail(grievanceId) })
+      invalidateCache.grievances.detail(grievanceId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إضافة الحدث')
@@ -291,7 +292,7 @@ export const useAddWitness = () => {
       addWitness(grievanceId, data),
     onSuccess: (_, { grievanceId }) => {
       toast.success('تم إضافة الشاهد بنجاح')
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.detail(grievanceId) })
+      invalidateCache.grievances.detail(grievanceId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إضافة الشاهد')
@@ -307,7 +308,7 @@ export const useAddEvidence = () => {
       addEvidence(grievanceId, data),
     onSuccess: (_, { grievanceId }) => {
       toast.success('تم إضافة الدليل بنجاح')
-      queryClient.invalidateQueries({ queryKey: grievanceKeys.detail(grievanceId) })
+      invalidateCache.grievances.detail(grievanceId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إضافة الدليل')

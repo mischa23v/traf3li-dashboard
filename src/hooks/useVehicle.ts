@@ -1,5 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   getVehicles,
   getVehicle,
@@ -134,47 +135,43 @@ export const useVehicleExpenses = (vehicleId: string, dateRange?: { from: string
 
 // Create vehicle
 export const useCreateVehicle = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateVehicleData) => createVehicle(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.fleetSummary() })
+      invalidateCache.vehicles.lists()
+      invalidateCache.vehicles.stats()
+      invalidateCache.vehicles.fleetSummary()
     },
   })
 }
 
 // Update vehicle
 export const useUpdateVehicle = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ vehicleId, data }: { vehicleId: string; data: UpdateVehicleData }) =>
       updateVehicle(vehicleId, data),
     onSuccess: (_, { vehicleId }) => {
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.detail(vehicleId) })
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.stats() })
+      invalidateCache.vehicles.detail(vehicleId)
+      invalidateCache.vehicles.lists()
+      invalidateCache.vehicles.stats()
     },
   })
 }
 
 // Delete vehicle
 export const useDeleteVehicle = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (vehicleId: string) => deleteVehicle(vehicleId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.fleetSummary() })
+      invalidateCache.vehicles.lists()
+      invalidateCache.vehicles.stats()
+      invalidateCache.vehicles.fleetSummary()
     },
   })
 }
 
 // Assign vehicle
 export const useAssignVehicle = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ vehicleId, data }: {
       vehicleId: string
@@ -186,35 +183,33 @@ export const useAssignVehicle = () => {
       }
     }) => assignVehicle(vehicleId, data),
     onSuccess: (_, { vehicleId }) => {
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.detail(vehicleId) })
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.stats() })
+      invalidateCache.vehicles.detail(vehicleId)
+      invalidateCache.vehicles.lists()
+      invalidateCache.vehicles.stats()
     },
   })
 }
 
 // Unassign vehicle
 export const useUnassignVehicle = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (vehicleId: string) => unassignVehicle(vehicleId),
     onSuccess: (_, vehicleId) => {
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.detail(vehicleId) })
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.stats() })
+      invalidateCache.vehicles.detail(vehicleId)
+      invalidateCache.vehicles.lists()
+      invalidateCache.vehicles.stats()
     },
   })
 }
 
 // Bulk delete vehicles
 export const useBulkDeleteVehicles = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteVehicles(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.fleetSummary() })
+      invalidateCache.vehicles.lists()
+      invalidateCache.vehicles.stats()
+      invalidateCache.vehicles.fleetSummary()
     },
   })
 }
@@ -242,23 +237,21 @@ export const useVehicleLogs = (filters?: VehicleLogFilters) => {
 
 // Create vehicle log
 export const useCreateVehicleLog = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateVehicleLogData) => createVehicleLog(data),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: vehicleLogKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.detail(data.vehicleId) })
-      queryClient.invalidateQueries({ queryKey: vehicleKeys.stats() })
+      invalidateCache.vehicleLogs.lists()
+      invalidateCache.vehicles.detail(data.vehicleId)
+      invalidateCache.vehicles.stats()
       // Invalidate utilization and expenses for the vehicle
-      queryClient.invalidateQueries({ queryKey: [...vehicleKeys.all, 'utilization', data.vehicleId] })
-      queryClient.invalidateQueries({ queryKey: [...vehicleKeys.all, 'expenses', data.vehicleId] })
+      invalidateCache.vehicles.utilization(data.vehicleId)
+      invalidateCache.vehicles.expenses(data.vehicleId)
     },
   })
 }
 
 // Update reimbursement status
 export const useUpdateReimbursementStatus = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ logId, data }: {
       logId: string
@@ -268,9 +261,9 @@ export const useUpdateReimbursementStatus = () => {
       }
     }) => updateReimbursementStatus(logId, data),
     onSuccess: (updatedLog) => {
-      queryClient.invalidateQueries({ queryKey: vehicleLogKeys.lists() })
+      invalidateCache.vehicleLogs.lists()
       // Invalidate expenses for the vehicle
-      queryClient.invalidateQueries({ queryKey: [...vehicleKeys.all, 'expenses', updatedLog.vehicleId] })
+      invalidateCache.vehicles.expenses(updatedLog.vehicleId)
     },
   })
 }

@@ -14,6 +14,7 @@ import { useNavigate } from '@tanstack/react-router'
 import i18n from '@/i18n'
 import { useAuthStore } from '@/stores/auth-store'
 import { Plan, PLAN_FEATURES } from './plan-gate'
+import { ROUTES } from '@/constants/routes'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -170,7 +171,7 @@ export function UpgradePrompt({
       onUpgrade()
     } else {
       // Navigate to pricing/billing page
-      navigate({ to: '/dashboard/settings/billing' })
+      navigate({ to: ROUTES.settings.billing })
     }
   }
 

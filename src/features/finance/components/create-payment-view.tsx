@@ -77,6 +77,7 @@ import { validateAmount, validateSaudiIBAN, validateReferenceNumber } from '@/li
 import { ValidationErrors, type ValidationError } from '@/components/validation-errors'
 import { useApiError } from '@/hooks/useApiError'
 import { RateLimitBadge } from '@/components/rate-limit-badge'
+import { ROUTES } from '@/constants/routes'
 
 // Types
 type PaymentType = 'customer_payment' | 'vendor_payment' | 'refund' | 'transfer' | 'advance' | 'retainer'
@@ -465,7 +466,7 @@ export function CreatePaymentView() {
                 if (response?.headers) {
                     setResponseHeaders(response.headers)
                 }
-                navigate({ to: '/dashboard/finance/payments' })
+                navigate({ to: ROUTES.dashboard.finance.payments.list })
             },
             onError: (error) => {
                 handleApiError(error)
@@ -474,11 +475,11 @@ export function CreatePaymentView() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'المدفوعات', href: '/dashboard/finance/payments', isActive: true },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
-        { title: 'كشف الحساب', href: '/dashboard/finance/statements', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: false },
+        { title: 'المدفوعات', href: ROUTES.dashboard.finance.payments.list, isActive: true },
+        { title: 'المصروفات', href: ROUTES.dashboard.finance.expenses.list, isActive: false },
+        { title: 'كشف الحساب', href: ROUTES.dashboard.finance.statements.list, isActive: false },
     ]
 
     // Format currency

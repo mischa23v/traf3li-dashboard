@@ -3,7 +3,7 @@
  * React Query hooks for Asset Management operations
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import assetsService from '@/services/assetsService'
 import { invalidateCache } from '@/lib/cache-invalidation'
@@ -137,11 +137,10 @@ export function useAssetCategory(id: string) {
 }
 
 export function useCreateAssetCategory() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: Omit<AssetCategory, '_id' | 'categoryId' | 'createdAt' | 'updatedAt'>) => assetsService.createAssetCategory(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: assetsKeys.categories() })
+      invalidateCache.assets.categories()
       toast.success('تم إنشاء الفئة بنجاح | Category created successfully')
     },
     onError: () => {
@@ -151,12 +150,11 @@ export function useCreateAssetCategory() {
 }
 
 export function useUpdateAssetCategory() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<AssetCategory> }) => assetsService.updateAssetCategory(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: assetsKeys.categories() })
-      queryClient.invalidateQueries({ queryKey: assetsKeys.categoryDetail(id) })
+      invalidateCache.assets.categories()
+      invalidateCache.assets.categoryDetail(id)
       toast.success('تم تحديث الفئة بنجاح | Category updated successfully')
     },
     onError: () => {
@@ -166,11 +164,10 @@ export function useUpdateAssetCategory() {
 }
 
 export function useDeleteAssetCategory() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => assetsService.deleteAssetCategory(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: assetsKeys.categories() })
+      invalidateCache.assets.categories()
       toast.success('تم حذف الفئة بنجاح | Category deleted successfully')
     },
     onError: () => {
@@ -189,11 +186,10 @@ export function useDepreciationSchedule(assetId: string) {
 }
 
 export function useProcessDepreciation() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ assetId, date }: { assetId: string; date: string }) => assetsService.processDepreciation(assetId, date),
     onSuccess: (_, { assetId }) => {
-      queryClient.invalidateQueries({ queryKey: assetsKeys.depreciation(assetId) })
+      invalidateCache.assets.depreciation(assetId)
       invalidateCache.assets.all()
       toast.success('تم معالجة الإهلاك بنجاح | Depreciation processed')
     },
@@ -289,12 +285,11 @@ export function useCreateAssetRepair() {
 }
 
 export function useUpdateAssetRepair() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => assetsService.updateAssetRepair(id, data),
     onSuccess: (_, { id }) => {
       invalidateCache.assets.repairs()
-      queryClient.invalidateQueries({ queryKey: assetsKeys.repairDetail(id) })
+      invalidateCache.assets.repairDetail(id)
       toast.success('تم تحديث طلب الإصلاح بنجاح | Repair request updated')
     },
     onError: () => {
@@ -304,12 +299,11 @@ export function useUpdateAssetRepair() {
 }
 
 export function useCompleteAssetRepair() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => assetsService.completeAssetRepair(id, data),
     onSuccess: (_, { id }) => {
       invalidateCache.assets.repairs()
-      queryClient.invalidateQueries({ queryKey: assetsKeys.repairDetail(id) })
+      invalidateCache.assets.repairDetail(id)
       toast.success('تم إكمال الإصلاح بنجاح | Repair completed')
     },
     onError: () => {
@@ -335,11 +329,10 @@ export function useAssetSettings() {
 }
 
 export function useUpdateAssetSettings() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: Partial<AssetSettings>) => assetsService.updateAssetSettings(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: assetsKeys.settings() })
+      invalidateCache.assets.settings()
       toast.success('تم تحديث الإعدادات بنجاح | Settings updated successfully')
     },
     onError: () => {

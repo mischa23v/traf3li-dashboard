@@ -6,6 +6,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useGeofences, useDeleteGeofence } from '@/hooks/useBiometric'
@@ -148,11 +149,11 @@ export function GeofencingListView() {
 
     // Single geofence actions
     const handleViewGeofence = (geofenceId: string) => {
-        navigate({ to: '/dashboard/hr/geofencing/$geofenceId', params: { geofenceId } })
+        navigate({ to: ROUTES.dashboard.hr.geofencing.detail(geofenceId), params: { geofenceId } })
     }
 
     const handleEditGeofence = (geofenceId: string) => {
-        navigate({ to: '/dashboard/hr/geofencing/new', search: { editId: geofenceId } })
+        navigate({ to: ROUTES.dashboard.hr.geofencing.new, search: { editId: geofenceId } })
     }
 
     const handleDeleteGeofence = (geofenceId: string) => {
@@ -202,9 +203,9 @@ export function GeofencingListView() {
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-        { title: 'الحضور', href: '/dashboard/hr/attendance', isActive: false },
-        { title: 'النطاق الجغرافي', href: '/dashboard/hr/geofencing', isActive: true },
+        { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+        { title: 'الحضور', href: ROUTES.dashboard.hr.attendance.list, isActive: false },
+        { title: 'النطاق الجغرافي', href: ROUTES.dashboard.hr.geofencing.list, isActive: true },
     ]
 
     // Calculate map center (average of all zone centers)
@@ -534,7 +535,7 @@ export function GeofencingListView() {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <Link to={`/dashboard/hr/geofencing/${geofence.id}` as any}>
+                                            <Link to={ROUTES.dashboard.hr.geofencing.detail(geofence.id) as any}>
                                                 <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
                                                     عرض التفاصيل
                                                 </Button>

@@ -64,11 +64,12 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { usePurchaseOrders, useBuyingStats } from '@/hooks/use-buying'
 import type { PurchaseOrder, PurchaseOrderFilters, PurchaseOrderStatus } from '@/types/buying'
 import { BuyingSidebar } from './buying-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
-  { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.buying', href: '/dashboard/buying' },
-  { title: 'buying.purchaseOrders', href: '/dashboard/buying/purchase-orders' },
+  { title: 'sidebar.nav.overview', href: ROUTES.dashboard.home },
+  { title: 'sidebar.nav.buying', href: ROUTES.dashboard.buying.list },
+  { title: 'buying.purchaseOrders', href: ROUTES.dashboard.buying.purchaseOrders.list },
 ]
 
 export function PurchaseOrderListView() {
@@ -276,7 +277,7 @@ export function PurchaseOrderListView() {
                       />
                     </div>
                     <Button asChild className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
-                      <Link to="/dashboard/buying/purchase-orders/create">
+                      <Link to={ROUTES.dashboard.buying.purchaseOrders.create}>
                         <Plus className="w-4 h-4 ml-2" />
                         {t('buying.po.createPO', 'إنشاء أمر شراء')}
                       </Link>
@@ -349,7 +350,7 @@ export function PurchaseOrderListView() {
                       {t('buying.po.noPOsDesc', 'ابدأ بإنشاء أمر شراء جديد')}
                     </p>
                     <Button asChild className="rounded-xl">
-                      <Link to="/dashboard/buying/purchase-orders/create">
+                      <Link to={ROUTES.dashboard.buying.purchaseOrders.create}>
                         <Plus className="w-4 h-4 ml-2" />
                         {t('buying.po.createPO', 'إنشاء أمر شراء')}
                       </Link>
@@ -374,7 +375,7 @@ export function PurchaseOrderListView() {
                           <TableRow
                             key={po._id}
                             className="cursor-pointer hover:bg-muted/50"
-                            onClick={() => navigate({ to: `/dashboard/buying/purchase-orders/${po._id}` })}
+                            onClick={() => navigate({ to: ROUTES.dashboard.buying.purchaseOrders.detail(po._id) })}
                           >
                             <TableCell>
                               <div className="flex items-center gap-3">
@@ -428,7 +429,7 @@ export function PurchaseOrderListView() {
                                   <DropdownMenuItem
                                     onClick={(e) => {
                                       e.stopPropagation()
-                                      navigate({ to: `/dashboard/buying/purchase-orders/${po._id}` })
+                                      navigate({ to: ROUTES.dashboard.buying.purchaseOrders.detail(po._id) })
                                     }}
                                   >
                                     <Eye className="w-4 h-4 ml-2" />
@@ -438,7 +439,7 @@ export function PurchaseOrderListView() {
                                     <DropdownMenuItem
                                       onClick={(e) => {
                                         e.stopPropagation()
-                                        navigate({ to: `/dashboard/buying/purchase-orders/${po._id}/edit` })
+                                        navigate({ to: ROUTES.dashboard.buying.purchaseOrders.detail(po._id) })
                                       }}
                                     >
                                       <Edit className="w-4 h-4 ml-2" />

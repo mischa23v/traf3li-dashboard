@@ -17,6 +17,7 @@ import { useCreateVendor, useUpdateVendor, useVendor } from '@/hooks/useAccounti
 import { ProductivityHero } from '@/components/productivity-hero'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { CreateVendorData } from '@/services/accountingService'
+import { ROUTES } from '@/constants/routes'
 
 interface CreateVendorViewProps {
     mode?: 'create' | 'edit'
@@ -85,24 +86,24 @@ export function CreateVendorView({ mode = 'create' }: CreateVendorViewProps) {
                 { id: vendorId, data: formData },
                 {
                     onSuccess: () => {
-                        navigate({ to: '/dashboard/finance/vendors/$vendorId', params: { vendorId } })
+                        navigate({ to: ROUTES.dashboard.finance.vendors.detail(vendorId) })
                     },
                 }
             )
         } else {
             createVendorMutation.mutate(formData, {
                 onSuccess: (data) => {
-                    navigate({ to: '/dashboard/finance/vendors' })
+                    navigate({ to: ROUTES.dashboard.finance.vendors.list })
                 },
             })
         }
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'الفواتير المستلمة', href: '/dashboard/finance/bills', isActive: false },
-        { title: 'الموردين', href: '/dashboard/finance/vendors', isActive: true },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: false },
+        { title: 'الفواتير المستلمة', href: ROUTES.dashboard.finance.bills.list, isActive: false },
+        { title: 'الموردين', href: ROUTES.dashboard.finance.vendors.list, isActive: true },
     ]
 
     const isLoading = mode === 'edit' && isLoadingVendor

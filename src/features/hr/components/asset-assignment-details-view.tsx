@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   useAssetAssignment,
   useInitiateReturn,
@@ -260,7 +261,7 @@ export function AssetAssignmentDetailsView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الأصول والمعدات', href: '/dashboard/hr/asset-assignment', isActive: false },
+    { title: 'الأصول والمعدات', href: ROUTES.dashboard.hr.assetAssignment.list, isActive: false },
     { title: 'تفاصيل التخصيص', href: '#', isActive: true },
   ]
 
@@ -317,7 +318,7 @@ export function AssetAssignmentDetailsView() {
             <CardContent className="p-8 text-center">
               <AlertCircle className="w-8 h-8 mx-auto text-red-500" aria-hidden="true" />
               <p className="mt-4 text-red-600">لم يتم العثور على التخصيص</p>
-              <Button onClick={() => navigate({ to: '/dashboard/hr/asset-assignment' })} className="mt-4 rounded-xl">
+              <Button onClick={() => navigate({ to: ROUTES.dashboard.hr.assetAssignment.list })} className="mt-4 rounded-xl">
                 العودة للقائمة
               </Button>
             </CardContent>
@@ -368,7 +369,7 @@ export function AssetAssignmentDetailsView() {
                   variant="ghost"
                   size="icon"
                   className="rounded-xl hover:bg-white"
-                  onClick={() => navigate({ to: '/dashboard/hr/asset-assignment' })}
+                  onClick={() => navigate({ to: ROUTES.dashboard.hr.assetAssignment.list })}
                 >
                   <ArrowRight className="h-5 w-5" />
                 </Button>

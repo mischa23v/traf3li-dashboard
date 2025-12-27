@@ -68,11 +68,12 @@ import type { RequestForQuotation, RfqStatus, RfqFilters } from '@/types/buying'
 import { BuyingSidebar } from './buying-sidebar'
 import { format, isPast, parseISO } from 'date-fns'
 import { ar } from 'date-fns/locale'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
-  { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.buying', href: '/dashboard/buying' },
-  { title: 'buying.rfqs', href: '/dashboard/buying/rfqs' },
+  { title: 'sidebar.nav.overview', href: ROUTES.dashboard.home },
+  { title: 'sidebar.nav.buying', href: ROUTES.dashboard.buying.list },
+  { title: 'buying.rfqs', href: ROUTES.dashboard.buying.rfq.list },
 ]
 
 type TabValue = 'all' | 'draft' | 'submitted' | 'quoted' | 'ordered' | 'expired'
@@ -301,7 +302,7 @@ export function RfqListView() {
                     />
                   </div>
                   <Button asChild className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
-                    <Link to="/dashboard/buying/rfqs/create">
+                    <Link to={ROUTES.dashboard.buying.rfq.create}>
                       <Plus className="w-4 h-4 ml-2" />
                       {t('buying.rfq.createRfq', 'إنشاء طلب عرض سعر')}
                     </Link>
@@ -333,7 +334,7 @@ export function RfqListView() {
                       {t('buying.rfq.noRfqsDesc', 'ابدأ بإنشاء طلب عرض سعر جديد للموردين')}
                     </p>
                     <Button asChild className="rounded-xl">
-                      <Link to="/dashboard/buying/rfqs/create">
+                      <Link to={ROUTES.dashboard.buying.rfq.create}>
                         <Plus className="w-4 h-4 ml-2" />
                         {t('buying.rfq.createRfq', 'إنشاء طلب عرض سعر')}
                       </Link>
@@ -370,7 +371,7 @@ export function RfqListView() {
                           <TableRow
                             key={rfq._id}
                             className="cursor-pointer hover:bg-muted/50"
-                            onClick={() => navigate({ to: `/dashboard/buying/rfqs/${rfq._id}` })}
+                            onClick={() => navigate({ to: `/dashboard/buying/rfq/${rfq._id}` })}
                           >
                             <TableCell>
                               <div className="flex items-center gap-3">
@@ -438,7 +439,7 @@ export function RfqListView() {
                                   <DropdownMenuItem
                                     onClick={(e) => {
                                       e.stopPropagation()
-                                      navigate({ to: `/dashboard/buying/rfqs/${rfq._id}` })
+                                      navigate({ to: `/dashboard/buying/rfq/${rfq._id}` })
                                     }}
                                   >
                                     <Eye className="w-4 h-4 ml-2" />
@@ -448,7 +449,7 @@ export function RfqListView() {
                                     <DropdownMenuItem
                                       onClick={(e) => {
                                         e.stopPropagation()
-                                        navigate({ to: `/dashboard/buying/rfqs/${rfq._id}/edit` })
+                                        navigate({ to: `/dashboard/buying/rfq/${rfq._id}/edit` })
                                       }}
                                     >
                                       <Edit className="w-4 h-4 ml-2" />

@@ -6,6 +6,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import remindersService, {
   ReminderFilters,
   CreateReminderData,
@@ -89,6 +90,12 @@ export const useCreateReminder = () => {
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء التذكير')
     },
+    onSettled: async () => {
+      await Promise.all([
+        invalidateCache.reminders.all(),
+        invalidateCache.calendar.all(),
+      ])
+    },
   })
 }
 
@@ -135,6 +142,12 @@ export const useCreateEvent = () => {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء الحدث')
+    },
+    onSettled: async () => {
+      await Promise.all([
+        invalidateCache.events.all(),
+        invalidateCache.calendar.all(),
+      ])
     },
   })
 }
@@ -189,9 +202,11 @@ export const useUpdateReminder = () => {
       toast.error(error.message || 'فشل تحديث التذكير')
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
-      await queryClient.invalidateQueries({ queryKey: ['reminders', id] })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      await Promise.all([
+        invalidateCache.reminders.all(),
+        invalidateCache.reminders.detail(id),
+        invalidateCache.calendar.all(),
+      ])
     },
   })
 }
@@ -237,6 +252,13 @@ export const useDeleteReminder = () => {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف التذكير')
+    },
+    onSettled: async (_, __, id) => {
+      await Promise.all([
+        invalidateCache.reminders.all(),
+        invalidateCache.reminders.detail(id),
+        invalidateCache.calendar.all(),
+      ])
     },
   })
 }
@@ -287,9 +309,11 @@ export const useCompleteReminder = () => {
       toast.error(error.message || 'Failed to complete reminder | فشل إكمال التذكير')
     },
     onSettled: async (_, __, id) => {
-      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
-      await queryClient.invalidateQueries({ queryKey: ['reminders', id] })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      await Promise.all([
+        invalidateCache.reminders.all(),
+        invalidateCache.reminders.detail(id),
+        invalidateCache.calendar.all(),
+      ])
     },
   })
 }
@@ -308,9 +332,11 @@ export const useDismissReminder = () => {
       toast.error(error.message || 'Failed to dismiss reminder | فشل تجاهل التذكير')
     },
     onSettled: async (_, __, id) => {
-      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
-      await queryClient.invalidateQueries({ queryKey: ['reminders', id] })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      await Promise.all([
+        invalidateCache.reminders.all(),
+        invalidateCache.reminders.detail(id),
+        invalidateCache.calendar.all(),
+      ])
     },
   })
 }
@@ -359,9 +385,11 @@ export const useSnoozeReminder = () => {
       toast.error(error.message || 'Failed to snooze reminder | فشل تأجيل التذكير')
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
-      await queryClient.invalidateQueries({ queryKey: ['reminders', id] })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      await Promise.all([
+        invalidateCache.reminders.all(),
+        invalidateCache.reminders.detail(id),
+        invalidateCache.calendar.all(),
+      ])
     },
   })
 }
@@ -380,9 +408,11 @@ export const useReopenReminder = () => {
       toast.error(error.message || 'Failed to reopen reminder | فشل إعادة فتح التذكير')
     },
     onSettled: async (_, __, id) => {
-      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
-      await queryClient.invalidateQueries({ queryKey: ['reminders', id] })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      await Promise.all([
+        invalidateCache.reminders.all(),
+        invalidateCache.reminders.detail(id),
+        invalidateCache.calendar.all(),
+      ])
     },
   })
 }
@@ -402,9 +432,11 @@ export const useDelegateReminder = () => {
       toast.error(error.message || 'Failed to delegate reminder | فشل تفويض التذكير')
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
-      await queryClient.invalidateQueries({ queryKey: ['reminders', id] })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      await Promise.all([
+        invalidateCache.reminders.all(),
+        invalidateCache.reminders.detail(id),
+        invalidateCache.calendar.all(),
+      ])
     },
   })
 }
@@ -480,9 +512,11 @@ export const useUpdateEvent = () => {
       toast.error(error.message || 'فشل تحديث الحدث')
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['events'] })
-      await queryClient.invalidateQueries({ queryKey: ['events', id] })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      await Promise.all([
+        invalidateCache.events.all(),
+        invalidateCache.events.detail(id),
+        invalidateCache.calendar.all(),
+      ])
     },
   })
 }
@@ -529,6 +563,13 @@ export const useDeleteEvent = () => {
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف الحدث')
     },
+    onSettled: async (_, __, id) => {
+      await Promise.all([
+        invalidateCache.events.all(),
+        invalidateCache.events.detail(id),
+        invalidateCache.calendar.all(),
+      ])
+    },
   })
 }
 
@@ -545,9 +586,11 @@ export const useCompleteEvent = () => {
       toast.error(error.message || 'فشل إكمال الحدث')
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['events'] })
-      await queryClient.invalidateQueries({ queryKey: ['events', id] })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      await Promise.all([
+        invalidateCache.events.all(),
+        invalidateCache.events.detail(id),
+        invalidateCache.calendar.all(),
+      ])
     },
   })
 }
@@ -565,9 +608,11 @@ export const useCancelEvent = () => {
       toast.error(error.message || 'فشل إلغاء الحدث')
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['events'] })
-      await queryClient.invalidateQueries({ queryKey: ['events', id] })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      await Promise.all([
+        invalidateCache.events.all(),
+        invalidateCache.events.detail(id),
+        invalidateCache.calendar.all(),
+      ])
     },
   })
 }
@@ -585,9 +630,11 @@ export const usePostponeEvent = () => {
       toast.error(error.message || 'فشل تأجيل الحدث')
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['events'] })
-      await queryClient.invalidateQueries({ queryKey: ['events', id] })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      await Promise.all([
+        invalidateCache.events.all(),
+        invalidateCache.events.detail(id),
+        invalidateCache.calendar.all(),
+      ])
     },
   })
 }
@@ -605,9 +652,11 @@ export const useRSVPEvent = () => {
       toast.error(error.message || 'فشل تسجيل الحضور')
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['events'] })
-      await queryClient.invalidateQueries({ queryKey: ['events', id] })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      await Promise.all([
+        invalidateCache.events.all(),
+        invalidateCache.events.detail(id),
+        invalidateCache.calendar.all(),
+      ])
     },
   })
 }
@@ -633,8 +682,6 @@ export const useEventStats = (filters?: { dateFrom?: string; dateTo?: string; ca
 }
 
 export const useCheckAvailability = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ attendeeIds, startDate, endDate }: { attendeeIds: string[]; startDate: string; endDate: string }) =>
       eventsService.checkAvailability(attendeeIds, startDate, endDate),
@@ -659,8 +706,7 @@ export const useBulkUpdateReminders = () => {
       toast.error(error.message || 'فشل تحديث التذكيرات')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
-      await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      await invalidateCache.reminders.related()
     },
   })
 }
@@ -677,8 +723,7 @@ export const useBulkDeleteReminders = () => {
       toast.error(error.message || 'فشل حذف التذكيرات')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
-      await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      await invalidateCache.reminders.related()
     },
   })
 }
@@ -695,8 +740,7 @@ export const useBulkCompleteReminders = () => {
       toast.error(error.message || 'فشل إكمال التذكيرات')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
-      await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      await invalidateCache.reminders.related()
     },
   })
 }
@@ -714,8 +758,7 @@ export const useBulkUpdateEvents = () => {
       toast.error(error.message || 'فشل تحديث الأحداث')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['events'] })
-      await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      await invalidateCache.events.related()
     },
   })
 }
@@ -732,8 +775,7 @@ export const useBulkDeleteEvents = () => {
       toast.error(error.message || 'فشل حذف الأحداث')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['events'] })
-      await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      await invalidateCache.events.related()
     },
   })
 }
@@ -751,8 +793,7 @@ export const useBulkCancelEvents = () => {
       toast.error(error.message || 'فشل إلغاء الأحداث')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['events'] })
-      await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      await invalidateCache.events.related()
     },
   })
 }
@@ -786,8 +827,8 @@ export const useEventsWithStats = (filters: EventFilters = {}) => {
       })
       return response.data
     },
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
+    gcTime: CACHE_TIMES.GC_LONG,
     enabled: isAuthenticated,
     retry: false,
   })
@@ -818,8 +859,8 @@ export const useRemindersWithStats = (filters: ReminderFilters = {}) => {
       })
       return response.data
     },
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
+    gcTime: CACHE_TIMES.GC_LONG,
     enabled: isAuthenticated,
     retry: false,
   })

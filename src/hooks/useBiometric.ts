@@ -3,8 +3,10 @@
  * React Query hooks for biometric devices, enrollments, logs, and geofences
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { CACHE_TIMES } from '@/config/cache'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   deviceService,
   enrollmentService,
@@ -30,7 +32,7 @@ export const useDevices = (filters?: DeviceFilters) => {
   return useQuery({
     queryKey: ['biometric-devices', filters],
     queryFn: () => deviceService.getDevices(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -43,11 +45,10 @@ export const useDevice = (id: string) => {
 }
 
 export const useCreateDevice = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateDeviceData) => deviceService.createDevice(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['biometric-devices'] })
+      invalidateCache.biometric.devices()
       toast.success('تم إضافة الجهاز بنجاح')
     },
     onError: (error: Error) => {
@@ -57,13 +58,12 @@ export const useCreateDevice = () => {
 }
 
 export const useUpdateDevice = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateDeviceData }) =>
       deviceService.updateDevice(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['biometric-devices'] })
-      queryClient.invalidateQueries({ queryKey: ['biometric-device', variables.id] })
+      invalidateCache.biometric.devices()
+      invalidateCache.biometric.device(variables.id)
       toast.success('تم تحديث الجهاز بنجاح')
     },
     onError: (error: Error) => {
@@ -73,11 +73,10 @@ export const useUpdateDevice = () => {
 }
 
 export const useDeleteDevice = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => deviceService.deleteDevice(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['biometric-devices'] })
+      invalidateCache.biometric.devices()
       toast.success('تم حذف الجهاز بنجاح')
     },
     onError: (error: Error) => {
@@ -87,11 +86,10 @@ export const useDeleteDevice = () => {
 }
 
 export const useSyncDevice = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => deviceService.syncDevice(id),
     onSuccess: (data, id) => {
-      queryClient.invalidateQueries({ queryKey: ['biometric-device', id] })
+      invalidateCache.biometric.device(id)
       toast.success(`تم مزامنة ${data.synced} سجل بنجاح`)
     },
     onError: (error: Error) => {
@@ -134,7 +132,7 @@ export const useEnrollments = (filters?: EnrollmentFilters) => {
   return useQuery({
     queryKey: ['biometric-enrollments', filters],
     queryFn: () => enrollmentService.getEnrollments(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -155,11 +153,10 @@ export const useEnrollmentByEmployee = (employeeId: string) => {
 }
 
 export const useCreateEnrollment = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateEnrollmentData) => enrollmentService.createEnrollment(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['biometric-enrollments'] })
+      invalidateCache.biometric.enrollments()
       toast.success('تم إنشاء التسجيل بنجاح')
     },
     onError: (error: Error) => {
@@ -169,14 +166,13 @@ export const useCreateEnrollment = () => {
 }
 
 export const useAddFingerprint = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ enrollmentId, data }: {
       enrollmentId: string
       data: { finger: string; template: string; quality: number }
     }) => enrollmentService.addFingerprint(enrollmentId, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['biometric-enrollment', variables.enrollmentId] })
+      invalidateCache.biometric.enrollment(variables.enrollmentId)
       toast.success('تم إضافة بصمة الإصبع بنجاح')
     },
     onError: (error: Error) => {
@@ -186,14 +182,13 @@ export const useAddFingerprint = () => {
 }
 
 export const useAddFacial = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ enrollmentId, data }: {
       enrollmentId: string
       data: { photo: string; template: string; quality: number }
     }) => enrollmentService.addFacial(enrollmentId, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['biometric-enrollment', variables.enrollmentId] })
+      invalidateCache.biometric.enrollment(variables.enrollmentId)
       toast.success('تم إضافة بصمة الوجه بنجاح')
     },
     onError: (error: Error) => {
@@ -203,14 +198,13 @@ export const useAddFacial = () => {
 }
 
 export const useAssignCard = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ enrollmentId, data }: {
       enrollmentId: string
       data: { cardNumber: string; cardType: string; expiresAt?: Date }
     }) => enrollmentService.assignCard(enrollmentId, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['biometric-enrollment', variables.enrollmentId] })
+      invalidateCache.biometric.enrollment(variables.enrollmentId)
       toast.success('تم تعيين البطاقة بنجاح')
     },
     onError: (error: Error) => {
@@ -220,12 +214,11 @@ export const useAssignCard = () => {
 }
 
 export const useSuspendEnrollment = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       enrollmentService.suspendEnrollment(id, reason),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['biometric-enrollments'] })
+      invalidateCache.biometric.enrollments()
       toast.success('تم تعليق التسجيل')
     },
     onError: (error: Error) => {
@@ -235,11 +228,10 @@ export const useSuspendEnrollment = () => {
 }
 
 export const useReactivateEnrollment = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => enrollmentService.reactivateEnrollment(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['biometric-enrollments'] })
+      invalidateCache.biometric.enrollments()
       toast.success('تم إعادة تفعيل التسجيل')
     },
     onError: (error: Error) => {
@@ -256,7 +248,7 @@ export const useVerificationLogs = (filters?: VerificationFilters) => {
   return useQuery({
     queryKey: ['verification-logs', filters],
     queryFn: () => verificationService.getLogs(filters),
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: CACHE_TIMES.AUDIT.LOGS, // 30 seconds
   })
 }
 
@@ -273,7 +265,7 @@ export const useVerificationStats = (startDate?: string, endDate?: string) => {
   return useQuery({
     queryKey: ['verification-stats', startDate, endDate],
     queryFn: () => verificationService.getStats(startDate, endDate),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -296,7 +288,6 @@ export const useExportLogs = () => {
 }
 
 export const useCreateManualEntry = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: {
       employeeId: string
@@ -305,8 +296,8 @@ export const useCreateManualEntry = () => {
       notes?: string
     }) => verificationService.createManualEntry(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['verification-logs'] })
-      queryClient.invalidateQueries({ queryKey: ['verification-live-feed'] })
+      invalidateCache.biometric.verificationLogs()
+      invalidateCache.biometric.verificationLiveFeed()
       toast.success('تم إضافة السجل يدوياً')
     },
     onError: (error: Error) => {
@@ -323,7 +314,7 @@ export const useGeofences = (filters?: GeofenceFilters) => {
   return useQuery({
     queryKey: ['geofences', filters],
     queryFn: () => geofenceService.getZones(filters),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -336,11 +327,10 @@ export const useGeofence = (id: string) => {
 }
 
 export const useCreateGeofence = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateGeofenceData) => geofenceService.createZone(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['geofences'] })
+      invalidateCache.biometric.geofences()
       toast.success('تم إنشاء النطاق الجغرافي بنجاح')
     },
     onError: (error: Error) => {
@@ -350,13 +340,12 @@ export const useCreateGeofence = () => {
 }
 
 export const useUpdateGeofence = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateGeofenceData> }) =>
       geofenceService.updateZone(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['geofences'] })
-      queryClient.invalidateQueries({ queryKey: ['geofence', variables.id] })
+      invalidateCache.biometric.geofences()
+      invalidateCache.biometric.geofence(variables.id)
       toast.success('تم تحديث النطاق بنجاح')
     },
     onError: (error: Error) => {
@@ -366,11 +355,10 @@ export const useUpdateGeofence = () => {
 }
 
 export const useDeleteGeofence = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => geofenceService.deleteZone(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['geofences'] })
+      invalidateCache.biometric.geofences()
       toast.success('تم حذف النطاق بنجاح')
     },
     onError: (error: Error) => {
@@ -380,11 +368,10 @@ export const useDeleteGeofence = () => {
 }
 
 export const useToggleGeofence = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => geofenceService.toggleZone(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['geofences'] })
+      invalidateCache.biometric.geofences()
       toast.success('تم تغيير حالة النطاق')
     },
     onError: (error: Error) => {
@@ -401,12 +388,11 @@ export const useCheckLocation = () => {
 }
 
 export const useAssignEmployeesToZone = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ zoneId, employeeIds }: { zoneId: string; employeeIds: string[] }) =>
       geofenceService.assignEmployees(zoneId, employeeIds),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['geofences'] })
+      invalidateCache.biometric.geofences()
       toast.success('تم تعيين الموظفين للنطاق')
     },
     onError: (error: Error) => {

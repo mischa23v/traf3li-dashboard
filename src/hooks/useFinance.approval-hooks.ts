@@ -4,10 +4,11 @@
  * After the existing time tracking hooks section
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
 import financeService from '@/services/financeService'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ==================== Cache Configuration ====================
 const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
@@ -20,8 +21,6 @@ const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
  * Submit time entry for approval
  */
 export const useSubmitTimeEntryForApproval = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => financeService.submitTimeEntryForApproval(id),
     onSuccess: () => {
@@ -31,8 +30,8 @@ export const useSubmitTimeEntryForApproval = () => {
       toast.error(error.message || 'فشل إرسال السجل للموافقة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
-      return await queryClient.invalidateQueries({ queryKey: ['pendingTimeEntries'] })
+      await invalidateCache.timeEntries.all()
+      return await invalidateCache.timeEntries.pending()
     },
   })
 }
@@ -41,8 +40,6 @@ export const useSubmitTimeEntryForApproval = () => {
  * Approve time entry
  */
 export const useApproveTimeEntry = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => financeService.approveTimeEntry(id),
     onSuccess: () => {
@@ -52,8 +49,8 @@ export const useApproveTimeEntry = () => {
       toast.error(error.message || 'فشلت الموافقة على السجل')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
-      return await queryClient.invalidateQueries({ queryKey: ['pendingTimeEntries'] })
+      await invalidateCache.timeEntries.all()
+      return await invalidateCache.timeEntries.pending()
     },
   })
 }
@@ -62,8 +59,6 @@ export const useApproveTimeEntry = () => {
  * Reject time entry
  */
 export const useRejectTimeEntry = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       financeService.rejectTimeEntry(id, reason),
@@ -74,8 +69,8 @@ export const useRejectTimeEntry = () => {
       toast.error(error.message || 'فشل رفض السجل')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
-      return await queryClient.invalidateQueries({ queryKey: ['pendingTimeEntries'] })
+      await invalidateCache.timeEntries.all()
+      return await invalidateCache.timeEntries.pending()
     },
   })
 }
@@ -84,8 +79,6 @@ export const useRejectTimeEntry = () => {
  * Request changes on time entry
  */
 export const useRequestTimeEntryChanges = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, comments }: { id: string; comments: string }) =>
       financeService.requestTimeEntryChanges(id, comments),
@@ -96,8 +89,8 @@ export const useRequestTimeEntryChanges = () => {
       toast.error(error.message || 'فشل طلب التعديلات')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
-      return await queryClient.invalidateQueries({ queryKey: ['pendingTimeEntries'] })
+      await invalidateCache.timeEntries.all()
+      return await invalidateCache.timeEntries.pending()
     },
   })
 }
@@ -106,8 +99,6 @@ export const useRequestTimeEntryChanges = () => {
  * Bulk submit time entries
  */
 export const useBulkSubmitTimeEntries = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (entryIds: string[]) => financeService.bulkSubmitTimeEntries(entryIds),
     onSuccess: (data) => {
@@ -120,8 +111,8 @@ export const useBulkSubmitTimeEntries = () => {
       toast.error(error.message || 'فشل إرسال السجلات للموافقة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
-      return await queryClient.invalidateQueries({ queryKey: ['pendingTimeEntries'] })
+      await invalidateCache.timeEntries.all()
+      return await invalidateCache.timeEntries.pending()
     },
   })
 }
@@ -130,8 +121,6 @@ export const useBulkSubmitTimeEntries = () => {
  * Bulk approve time entries
  */
 export const useBulkApproveTimeEntries = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (entryIds: string[]) => financeService.bulkApproveTimeEntries(entryIds),
     onSuccess: (data) => {
@@ -144,8 +133,8 @@ export const useBulkApproveTimeEntries = () => {
       toast.error(error.message || 'فشلت الموافقة على السجلات')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
-      return await queryClient.invalidateQueries({ queryKey: ['pendingTimeEntries'] })
+      await invalidateCache.timeEntries.all()
+      return await invalidateCache.timeEntries.pending()
     },
   })
 }
@@ -154,8 +143,6 @@ export const useBulkApproveTimeEntries = () => {
  * Bulk reject time entries
  */
 export const useBulkRejectTimeEntries = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ entryIds, reason }: { entryIds: string[]; reason: string }) =>
       financeService.bulkRejectTimeEntries(entryIds, reason),
@@ -169,8 +156,8 @@ export const useBulkRejectTimeEntries = () => {
       toast.error(error.message || 'فشل رفض السجلات')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
-      return await queryClient.invalidateQueries({ queryKey: ['pendingTimeEntries'] })
+      await invalidateCache.timeEntries.all()
+      return await invalidateCache.timeEntries.pending()
     },
   })
 }

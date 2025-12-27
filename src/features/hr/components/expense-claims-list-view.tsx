@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useExpenseClaims, useExpenseClaimStats, useBulkDeleteExpenseClaims } from '@/hooks/useExpenseClaims'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -156,8 +157,8 @@ export function ExpenseClaimsListView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'مطالبات النفقات', href: '/dashboard/hr/expense-claims', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'مطالبات النفقات', href: ROUTES.dashboard.hr.expenseClaims.list, isActive: true },
   ]
 
   return (
@@ -315,7 +316,7 @@ export function ExpenseClaimsListView() {
                     </Button>
                     <Button
                       size="sm"
-                      onClick={() => navigate({ to: '/dashboard/hr/expense-claims/new' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.hr.expenseClaims.new })}
                       className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
                     >
                       <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
@@ -360,7 +361,7 @@ export function ExpenseClaimsListView() {
                   <Receipt className="w-12 h-12 mx-auto text-slate-300" />
                   <p className="mt-4 text-slate-500">لا توجد مطالبات</p>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/hr/expense-claims/new' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.hr.expenseClaims.new })}
                     className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
                     <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
@@ -410,7 +411,7 @@ export function ExpenseClaimsListView() {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/expense-claims/${claim._id}` })}>
+                                  <DropdownMenuItem onClick={() => navigate({ to: ROUTES.dashboard.hr.expenseClaims.detail(claim._id) })}>
                                     <Eye className="w-4 h-4 ms-2" aria-hidden="true" />
                                     عرض التفاصيل
                                   </DropdownMenuItem>
@@ -483,7 +484,7 @@ export function ExpenseClaimsListView() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => navigate({ to: `/dashboard/hr/expense-claims/${claim._id}` })}
+                              onClick={() => navigate({ to: ROUTES.dashboard.hr.expenseClaims.detail(claim._id) })}
                               className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl"
                             >
                               عرض التفاصيل

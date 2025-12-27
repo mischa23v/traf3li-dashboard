@@ -1,5 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   getEmployeeSkillMaps,
   getEmployeeSkillMap,
@@ -163,35 +164,32 @@ export const useSkillTrends = (employeeId: string, skillId: string) => {
 
 // Update employee skills (bulk)
 export const useUpdateEmployeeSkills = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ employeeId, skills }: { employeeId: string; skills: EmployeeSkillDetail[] }) =>
       updateEmployeeSkills(employeeId, skills),
     onSuccess: (_, { employeeId }) => {
-      queryClient.invalidateQueries({ queryKey: skillMapKeys.detail(employeeId) })
-      queryClient.invalidateQueries({ queryKey: skillMapKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: skillMapKeys.matrix() })
+      invalidateCache.skillMap.detail(employeeId)
+      invalidateCache.skillMap.lists()
+      invalidateCache.skillMap.matrix()
     },
   })
 }
 
 // Add skill to employee
 export const useAddSkillToEmployee = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ employeeId, skillData }: { employeeId: string; skillData: AddEmployeeSkillData }) =>
       addSkillToEmployee(employeeId, skillData),
     onSuccess: (_, { employeeId }) => {
-      queryClient.invalidateQueries({ queryKey: skillMapKeys.detail(employeeId) })
-      queryClient.invalidateQueries({ queryKey: skillMapKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: skillMapKeys.matrix() })
+      invalidateCache.skillMap.detail(employeeId)
+      invalidateCache.skillMap.lists()
+      invalidateCache.skillMap.matrix()
     },
   })
 }
 
 // Update skill proficiency
 export const useUpdateSkillProficiency = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({
       employeeId,
@@ -203,30 +201,28 @@ export const useUpdateSkillProficiency = () => {
       data: UpdateSkillProficiencyData
     }) => updateSkillProficiency(employeeId, skillId, data),
     onSuccess: (_, { employeeId }) => {
-      queryClient.invalidateQueries({ queryKey: skillMapKeys.detail(employeeId) })
-      queryClient.invalidateQueries({ queryKey: skillMapKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: skillMapKeys.matrix() })
+      invalidateCache.skillMap.detail(employeeId)
+      invalidateCache.skillMap.lists()
+      invalidateCache.skillMap.matrix()
     },
   })
 }
 
 // Remove skill from employee
 export const useRemoveSkillFromEmployee = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ employeeId, skillId }: { employeeId: string; skillId: string }) =>
       removeSkillFromEmployee(employeeId, skillId),
     onSuccess: (_, { employeeId }) => {
-      queryClient.invalidateQueries({ queryKey: skillMapKeys.detail(employeeId) })
-      queryClient.invalidateQueries({ queryKey: skillMapKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: skillMapKeys.matrix() })
+      invalidateCache.skillMap.detail(employeeId)
+      invalidateCache.skillMap.lists()
+      invalidateCache.skillMap.matrix()
     },
   })
 }
 
 // Evaluate skill
 export const useEvaluateSkill = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({
       employeeId,
@@ -242,10 +238,10 @@ export const useEvaluateSkill = () => {
       notes?: string
     }) => evaluateSkill(employeeId, skillId, proficiency, evaluatorId, notes),
     onSuccess: (_, { employeeId, skillId }) => {
-      queryClient.invalidateQueries({ queryKey: skillMapKeys.detail(employeeId) })
-      queryClient.invalidateQueries({ queryKey: skillMapKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: skillMapKeys.matrix() })
-      queryClient.invalidateQueries({ queryKey: skillMapKeys.skillTrends(employeeId, skillId) })
+      invalidateCache.skillMap.detail(employeeId)
+      invalidateCache.skillMap.lists()
+      invalidateCache.skillMap.matrix()
+      invalidateCache.skillMap.skillTrends(employeeId, skillId)
     },
   })
 }
@@ -285,7 +281,6 @@ export const useCompareEmployeeSkills = () => {
 
 // Link training to skill map
 export const useLinkTrainingToSkillMap = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({
       employeeId,
@@ -302,14 +297,13 @@ export const useLinkTrainingToSkillMap = () => {
       }
     }) => linkTrainingToSkillMap(employeeId, trainingData),
     onSuccess: (_, { employeeId }) => {
-      queryClient.invalidateQueries({ queryKey: skillMapKeys.detail(employeeId) })
+      invalidateCache.skillMap.detail(employeeId)
     },
   })
 }
 
 // Bulk update employee skills
 export const useBulkUpdateEmployeeSkills = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (
       data: Array<{
@@ -320,8 +314,8 @@ export const useBulkUpdateEmployeeSkills = () => {
       }>
     ) => bulkUpdateEmployeeSkills(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: skillMapKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: skillMapKeys.matrix() })
+      invalidateCache.skillMap.lists()
+      invalidateCache.skillMap.matrix()
     },
   })
 }

@@ -6,6 +6,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useSalarySlips, usePayrollStats, useDeleteSalarySlip } from '@/hooks/usePayroll'
@@ -142,11 +143,11 @@ export function PayrollListView() {
 
     // Single slip actions
     const handleViewSlip = useCallback((slipId: string) => {
-        navigate({ to: '/dashboard/hr/payroll/$slipId', params: { slipId } })
+        navigate({ to: ROUTES.dashboard.hr.payroll.detail(slipId), params: { slipId } })
     }, [navigate])
 
     const handleEditSlip = useCallback((slipId: string) => {
-        navigate({ to: '/dashboard/hr/payroll/new', search: { editId: slipId } })
+        navigate({ to: ROUTES.dashboard.hr.payroll.new, search: { editId: slipId } })
     }, [navigate])
 
     const handleDeleteSlip = useCallback((slipId: string) => {
@@ -207,8 +208,8 @@ export function PayrollListView() {
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-        { title: 'قسائم الرواتب', href: '/dashboard/hr/payroll', isActive: true },
+        { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+        { title: 'قسائم الرواتب', href: ROUTES.dashboard.hr.payroll.list, isActive: true },
     ]
 
     return (
@@ -497,7 +498,7 @@ export function PayrollListView() {
                                         </div>
 
                                         <div className="flex justify-end mt-4">
-                                            <Link to={`/dashboard/hr/payroll/${slip._id}` as any}>
+                                            <Link to={ROUTES.dashboard.hr.payroll.detail(slip._id) as any}>
                                                 <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
                                                     عرض القسيمة
                                                 </Button>

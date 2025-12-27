@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import { StatCard } from '@/components/stat-card'
 import { useDueTodayTasks, useOverdueTasks, useUpcomingTasks } from '@/hooks/useTasks'
 import { useReminderStats } from '@/hooks/useRemindersAndEvents'
+import { ROUTES } from '@/constants/routes'
 
 interface StatItem {
     label: string;
@@ -56,81 +57,81 @@ export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = f
 
     // Button config for "Go to List" mode (used in detail/create pages)
     const listButtonConfig: Record<string, { label: string; href: string }> = {
-        tasks: { label: t('hero.list.tasks'), href: '/dashboard/tasks/list' },
-        reminders: { label: t('hero.list.reminders'), href: '/dashboard/tasks/reminders' },
-        events: { label: t('hero.list.events'), href: '/dashboard/tasks/events' },
-        activities: { label: t('hero.list.activities'), href: '/dashboard/crm/activities' },
-        leads: { label: t('hero.list.leads'), href: '/dashboard/crm/leads' },
-        referrals: { label: t('hero.list.referrals'), href: '/dashboard/crm/referrals' },
-        pipeline: { label: t('hero.list.pipeline'), href: '/dashboard/crm/pipeline' },
-        employees: { label: t('hero.list.employees'), href: '/dashboard/hr/employees' },
-        salaries: { label: t('hero.list.salaries'), href: '/dashboard/hr/salaries' },
-        payroll: { label: t('hero.list.payroll'), href: '/dashboard/hr/payroll' },
-        leaves: { label: t('hero.list.leaves'), href: '/dashboard/hr/leaves' },
-        attendance: { label: t('hero.list.attendance'), href: '/dashboard/hr/attendance' },
-        evaluations: { label: t('hero.list.evaluations'), href: '/dashboard/hr/evaluations' },
-        grievances: { label: t('hero.list.grievances'), href: '/dashboard/hr/grievances' },
-        'organizational-structure': { label: t('hero.list.organizationalStructure'), href: '/dashboard/hr/organizational-structure' },
-        'job-positions': { label: t('hero.list.jobPositions'), href: '/dashboard/hr/job-positions' },
-        'succession-planning': { label: t('hero.list.successionPlanning'), href: '/dashboard/hr/succession-planning' },
-        'compensation': { label: t('hero.list.compensation'), href: '/dashboard/hr/compensation' },
-        'reports': { label: t('hero.list.reports'), href: '/dashboard/hr/reports' },
-        'biometric': { label: t('hero.list.biometric'), href: '/dashboard/hr/biometric' },
-        'hr-reports': { label: t('hero.list.hrReports'), href: '/dashboard/hr/reports' },
-        'finance-reports': { label: t('hero.list.financeReports'), href: '/dashboard/finance/reports' },
-        'tasks-reports': { label: t('hero.list.tasksReports'), href: '/dashboard/tasks/reports' },
-        'crm-reports': { label: t('hero.list.crmReports'), href: '/dashboard/crm/reports' },
-        'sales-reports': { label: t('hero.list.salesReports'), href: '/dashboard/sales/reports' },
-        'email-marketing': { label: t('hero.list.campaigns'), href: '/dashboard/crm/email-marketing' },
-        'lead-scoring': { label: t('hero.list.leads'), href: '/dashboard/crm/leads' },
-        'whatsapp': { label: t('hero.list.leads'), href: '/dashboard/crm/leads' },
+        tasks: { label: t('hero.list.tasks'), href: ROUTES.dashboard.tasks.list },
+        reminders: { label: t('hero.list.reminders'), href: ROUTES.dashboard.tasks.reminders.list },
+        events: { label: t('hero.list.events'), href: ROUTES.dashboard.tasks.events.list },
+        activities: { label: t('hero.list.activities'), href: ROUTES.dashboard.crm.activities.list },
+        leads: { label: t('hero.list.leads'), href: ROUTES.dashboard.crm.leads.list },
+        referrals: { label: t('hero.list.referrals'), href: ROUTES.dashboard.crm.referrals.list },
+        pipeline: { label: t('hero.list.pipeline'), href: ROUTES.dashboard.crm.pipeline },
+        employees: { label: t('hero.list.employees'), href: ROUTES.dashboard.hr.employees.list },
+        salaries: { label: t('hero.list.salaries'), href: '/dashboard/hr/salaries' }, // TODO: Add to ROUTES
+        payroll: { label: t('hero.list.payroll'), href: ROUTES.dashboard.hr.payroll.list },
+        leaves: { label: t('hero.list.leaves'), href: ROUTES.dashboard.hr.leave.list },
+        attendance: { label: t('hero.list.attendance'), href: ROUTES.dashboard.hr.attendance.list },
+        evaluations: { label: t('hero.list.evaluations'), href: '/dashboard/hr/evaluations' }, // TODO: Add to ROUTES
+        grievances: { label: t('hero.list.grievances'), href: ROUTES.dashboard.hr.grievances.list },
+        'organizational-structure': { label: t('hero.list.organizationalStructure'), href: ROUTES.dashboard.hr.organizationalStructure.list },
+        'job-positions': { label: t('hero.list.jobPositions'), href: ROUTES.dashboard.hr.jobPositions.list },
+        'succession-planning': { label: t('hero.list.successionPlanning'), href: ROUTES.dashboard.hr.successionPlanning.list },
+        'compensation': { label: t('hero.list.compensation'), href: ROUTES.dashboard.hr.compensation.list },
+        'reports': { label: t('hero.list.reports'), href: ROUTES.dashboard.hr.reports.list },
+        'biometric': { label: t('hero.list.biometric'), href: ROUTES.dashboard.hr.biometric.list },
+        'hr-reports': { label: t('hero.list.hrReports'), href: ROUTES.dashboard.hr.reports.list },
+        'finance-reports': { label: t('hero.list.financeReports'), href: ROUTES.dashboard.finance.reports.list },
+        'tasks-reports': { label: t('hero.list.tasksReports'), href: ROUTES.dashboard.tasks.reports.list },
+        'crm-reports': { label: t('hero.list.crmReports'), href: ROUTES.dashboard.crm.reports.list },
+        'sales-reports': { label: t('hero.list.salesReports'), href: ROUTES.dashboard.sales.reports.list },
+        'email-marketing': { label: t('hero.list.campaigns'), href: ROUTES.dashboard.crm.emailMarketing.list },
+        'lead-scoring': { label: t('hero.list.leads'), href: ROUTES.dashboard.crm.leads.list },
+        'whatsapp': { label: t('hero.list.leads'), href: ROUTES.dashboard.crm.leads.list },
     }
 
     const buttonConfig: Record<string, { label: string; href: string }> = {
-        tasks: { label: t('hero.new.task'), href: '/dashboard/tasks/new' },
-        reminders: { label: t('hero.new.reminder'), href: '/dashboard/tasks/reminders/new' },
-        events: { label: t('hero.new.event'), href: '/dashboard/tasks/events/new' },
-        clients: { label: t('hero.new.client'), href: '/dashboard/clients/new' },
-        contacts: { label: t('hero.new.contact'), href: '/dashboard/contacts/new' },
-        organizations: { label: t('hero.new.organization'), href: '/dashboard/organizations/new' },
-        staff: { label: t('hero.new.employee'), href: '/dashboard/staff/new' },
-        leads: { label: t('hero.new.lead'), href: '/dashboard/crm/leads/new' },
-        pipeline: { label: t('hero.new.lead'), href: '/dashboard/crm/leads/new' },
-        referrals: { label: t('hero.new.referral'), href: '/dashboard/crm/referrals/new' },
-        activities: { label: t('hero.new.activity'), href: '/dashboard/crm/activities/new' },
-        'email-marketing': { label: t('hero.new.campaign'), href: '/dashboard/crm/email-marketing/new' },
-        'lead-scoring': { label: t('hero.new.lead'), href: '/dashboard/crm/leads/new' },
-        'whatsapp': { label: t('hero.new.lead'), href: '/dashboard/crm/leads/new' },
-        cases: { label: t('hero.new.case'), href: '/dashboard/cases/new' },
-        documents: { label: t('hero.new.document'), href: '/dashboard/documents/new' },
-        invoices: { label: t('hero.new.invoice'), href: '/dashboard/finance/invoices/new' },
-        expenses: { label: t('hero.new.expense'), href: '/dashboard/finance/expenses/new' },
-        payments: { label: t('hero.new.payment'), href: '/dashboard/finance/payments/new' },
-        transactions: { label: t('hero.new.transaction'), href: '/dashboard/finance/transactions/new' },
-        'time-entries': { label: t('hero.new.timeEntry'), href: '/dashboard/finance/time-entries/new' },
-        'time-tracking': { label: t('hero.new.timeEntry'), href: '/dashboard/finance/time-tracking/new' },
-        employees: { label: t('hero.new.employee'), href: '/dashboard/hr/employees/new' },
-        salaries: { label: t('hero.new.salary'), href: '/dashboard/hr/salaries/new' },
-        payroll: { label: t('hero.new.payrollRun'), href: '/dashboard/hr/payroll/new' },
-        leaves: { label: t('hero.new.leave'), href: '/dashboard/hr/leaves/new' },
-        attendance: { label: t('hero.new.attendanceRecord'), href: '/dashboard/hr/attendance/new' },
-        evaluations: { label: t('hero.new.evaluation'), href: '/dashboard/hr/evaluations/new' },
-        grievances: { label: t('hero.new.grievance'), href: '/dashboard/hr/grievances/new' },
-        'organizational-structure': { label: t('hero.new.unit'), href: '/dashboard/hr/organizational-structure/new' },
-        'job-positions': { label: t('hero.new.position'), href: '/dashboard/hr/job-positions/new' },
-        'succession-planning': { label: t('hero.new.successionPlan'), href: '/dashboard/hr/succession-planning/new' },
-        'compensation': { label: t('hero.new.compensationRecord'), href: '/dashboard/hr/compensation/new' },
-        'reports': { label: t('hero.new.report'), href: '/dashboard/hr/reports/new' },
-        'biometric': { label: t('hero.new.device'), href: '/dashboard/hr/biometric/new' },
-        'hr-reports': { label: t('hero.new.hrReport'), href: '/dashboard/hr/reports/new' },
-        'finance-reports': { label: t('hero.new.financeReport'), href: '/dashboard/finance/reports/new' },
-        'tasks-reports': { label: t('hero.new.productivityReport'), href: '/dashboard/tasks/reports/new' },
-        'crm-reports': { label: t('hero.new.crmReport'), href: '/dashboard/crm/reports/new' },
-        'sales-reports': { label: t('hero.new.salesReport'), href: '/dashboard/sales/reports/new' },
-        laws: { label: t('hero.new.law'), href: '/dashboard/knowledge/laws/new' },
-        judgments: { label: t('hero.new.judgment'), href: '/dashboard/knowledge/judgments/new' },
-        forms: { label: t('hero.new.form'), href: '/dashboard/knowledge/forms/new' },
-        jobs: { label: t('hero.new.service'), href: '/dashboard/jobs/new' },
+        tasks: { label: t('hero.new.task'), href: ROUTES.dashboard.tasks.new },
+        reminders: { label: t('hero.new.reminder'), href: ROUTES.dashboard.tasks.reminders.new },
+        events: { label: t('hero.new.event'), href: ROUTES.dashboard.tasks.events.new },
+        clients: { label: t('hero.new.client'), href: ROUTES.dashboard.clients.new },
+        contacts: { label: t('hero.new.contact'), href: ROUTES.dashboard.contacts.new },
+        organizations: { label: t('hero.new.organization'), href: ROUTES.dashboard.organizations.new },
+        staff: { label: t('hero.new.employee'), href: ROUTES.dashboard.staff.new },
+        leads: { label: t('hero.new.lead'), href: ROUTES.dashboard.crm.leads.new },
+        pipeline: { label: t('hero.new.lead'), href: ROUTES.dashboard.crm.leads.new },
+        referrals: { label: t('hero.new.referral'), href: ROUTES.dashboard.crm.referrals.new },
+        activities: { label: t('hero.new.activity'), href: ROUTES.dashboard.crm.activities.new },
+        'email-marketing': { label: t('hero.new.campaign'), href: ROUTES.dashboard.crm.emailMarketing.new },
+        'lead-scoring': { label: t('hero.new.lead'), href: ROUTES.dashboard.crm.leads.new },
+        'whatsapp': { label: t('hero.new.lead'), href: ROUTES.dashboard.crm.leads.new },
+        cases: { label: t('hero.new.case'), href: ROUTES.dashboard.cases.new },
+        documents: { label: t('hero.new.document'), href: '/dashboard/documents/new' }, // TODO: Add to ROUTES
+        invoices: { label: t('hero.new.invoice'), href: ROUTES.dashboard.finance.invoices.new },
+        expenses: { label: t('hero.new.expense'), href: ROUTES.dashboard.finance.expenses.new },
+        payments: { label: t('hero.new.payment'), href: ROUTES.dashboard.finance.payments.new },
+        transactions: { label: t('hero.new.transaction'), href: '/dashboard/finance/transactions/new' }, // TODO: Add to ROUTES
+        'time-entries': { label: t('hero.new.timeEntry'), href: ROUTES.dashboard.finance.timeTracking.new },
+        'time-tracking': { label: t('hero.new.timeEntry'), href: ROUTES.dashboard.finance.timeTracking.new },
+        employees: { label: t('hero.new.employee'), href: ROUTES.dashboard.hr.employees.new },
+        salaries: { label: t('hero.new.salary'), href: '/dashboard/hr/salaries/new' }, // TODO: Add to ROUTES
+        payroll: { label: t('hero.new.payrollRun'), href: ROUTES.dashboard.hr.payroll.new },
+        leaves: { label: t('hero.new.leave'), href: ROUTES.dashboard.hr.leave.new },
+        attendance: { label: t('hero.new.attendanceRecord'), href: ROUTES.dashboard.hr.attendance.new },
+        evaluations: { label: t('hero.new.evaluation'), href: '/dashboard/hr/evaluations/new' }, // TODO: Add to ROUTES
+        grievances: { label: t('hero.new.grievance'), href: ROUTES.dashboard.hr.grievances.new },
+        'organizational-structure': { label: t('hero.new.unit'), href: ROUTES.dashboard.hr.organizationalStructure.new },
+        'job-positions': { label: t('hero.new.position'), href: ROUTES.dashboard.hr.jobPositions.new },
+        'succession-planning': { label: t('hero.new.successionPlan'), href: ROUTES.dashboard.hr.successionPlanning.new },
+        'compensation': { label: t('hero.new.compensationRecord'), href: ROUTES.dashboard.hr.compensation.new },
+        'reports': { label: t('hero.new.report'), href: ROUTES.dashboard.hr.reports.new },
+        'biometric': { label: t('hero.new.device'), href: ROUTES.dashboard.hr.biometric.new },
+        'hr-reports': { label: t('hero.new.hrReport'), href: ROUTES.dashboard.hr.reports.new },
+        'finance-reports': { label: t('hero.new.financeReport'), href: ROUTES.dashboard.finance.reports.new },
+        'tasks-reports': { label: t('hero.new.productivityReport'), href: ROUTES.dashboard.tasks.reports.new },
+        'crm-reports': { label: t('hero.new.crmReport'), href: ROUTES.dashboard.crm.reports.new },
+        'sales-reports': { label: t('hero.new.salesReport'), href: ROUTES.dashboard.sales.reports.new },
+        laws: { label: t('hero.new.law'), href: '/dashboard/knowledge/laws/new' }, // TODO: Add to ROUTES
+        judgments: { label: t('hero.new.judgment'), href: '/dashboard/knowledge/judgments/new' }, // TODO: Add to ROUTES
+        forms: { label: t('hero.new.form'), href: '/dashboard/knowledge/forms/new' }, // TODO: Add to ROUTES
+        jobs: { label: t('hero.new.service'), href: '/dashboard/jobs/new' }, // TODO: Add to ROUTES
     }
 
     const currentButtonConfig = buttonConfig[type]
@@ -200,7 +201,7 @@ export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = f
                                 {listMode ? (
                                     // List mode: Show "Go to List" button
                                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm">
-                                        <Link to={listButtonConfig[type]?.href || '/dashboard/tasks/list'}>
+                                        <Link to={listButtonConfig[type]?.href || ROUTES.dashboard.tasks.list}>
                                             <List className="ms-2 h-4 w-4" />
                                             {listButtonConfig[type]?.label || 'القائمة'}
                                         </Link>
@@ -215,7 +216,7 @@ export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = f
                                     </Button>
                                 )}
                                 <Button asChild variant="outline" className="h-10 px-5 rounded-xl font-bold border-white/10 text-white hover:bg-white/10 hover:text-white bg-transparent text-sm">
-                                    <Link to="/dashboard/tasks/events">
+                                    <Link to={ROUTES.dashboard.tasks.events.list}>
                                         <CalendarIcon className="ms-2 h-4 w-4" />
                                         {t('hero.calendar')}
                                     </Link>

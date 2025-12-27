@@ -1,7 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import api from '@/lib/api'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ==================== Cache Configuration ====================
 const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
@@ -233,14 +234,13 @@ export function useLeanCustomer(customerId: string) {
 
 // Create customer
 export function useCreateLeanCustomer() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (appUserId: string) => {
       const response = await api.post('/saudi-banking/lean/customers', { appUserId })
       return response.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['lean', 'customers'] })
+      invalidateCache.lean.customers()
       toast.success('تم إنشاء العميل بنجاح')
     },
     onError: (error: any) => {
@@ -311,14 +311,13 @@ export function useLeanBalance(accountId: string) {
 
 // Disconnect entity
 export function useDisconnectLeanEntity() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async ({ customerId, entityId }: { customerId: string; entityId: string }) => {
       const response = await api.delete(`/saudi-banking/lean/customers/${customerId}/entities/${entityId}`)
       return response.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['lean'] })
+      invalidateCache.lean.all()
       toast.success('تم إلغاء ربط الحساب البنكي')
     },
     onError: (error: any) => {
@@ -386,7 +385,6 @@ export function useValidateWPS() {
 
 // Generate WPS file
 export function useGenerateWPS() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (data: {
       establishment: WPSEstablishment
@@ -398,7 +396,7 @@ export function useGenerateWPS() {
       return response.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['wps', 'files'] })
+      invalidateCache.wps.files()
       toast.success('تم إنشاء ملف WPS بنجاح')
     },
     onError: (error: any) => {
@@ -477,7 +475,6 @@ export function useInquireSADADBill() {
 
 // Pay bill
 export function usePaySADADBill() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (data: {
       billerCode: string
@@ -491,7 +488,7 @@ export function usePaySADADBill() {
       return response.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['sadad', 'payments'] })
+      invalidateCache.sadad.payments()
       toast.success('تم دفع الفاتورة بنجاح')
     },
     onError: (error: any) => {

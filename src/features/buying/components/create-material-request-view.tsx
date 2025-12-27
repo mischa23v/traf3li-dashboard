@@ -52,6 +52,7 @@ import { useItems } from '@/hooks/use-inventory'
 import { useWarehouses } from '@/hooks/use-inventory'
 import { BuyingSidebar } from './buying-sidebar'
 import type { CreateMaterialRequestData, MaterialRequestType, MaterialRequestItem } from '@/types/buying'
+import { ROUTES } from '@/constants/routes'
 
 // Extended item type for form state
 interface FormMaterialRequestItem extends Omit<MaterialRequestItem, '_id' | 'orderedQty' | 'receivedQty'> {
@@ -285,7 +286,7 @@ export function CreateMaterialRequestView() {
 
     try {
       await createMaterialRequestMutation.mutateAsync(apiData)
-      navigate({ to: '/dashboard/buying/material-requests' })
+      navigate({ to: ROUTES.dashboard.buying.materialRequests.list })
     } catch (error) {
       // Error handled by mutation
     }
@@ -308,11 +309,11 @@ export function CreateMaterialRequestView() {
   }
 
   const topNav = [
-    { title: t('buying.overview', 'نظرة عامة'), href: '/dashboard/buying', isActive: false },
-    { title: t('buying.materialRequests', 'طلبات المواد'), href: '/dashboard/buying/material-requests', isActive: false },
+    { title: t('buying.overview', 'نظرة عامة'), href: ROUTES.dashboard.buying.list, isActive: false },
+    { title: t('buying.materialRequests', 'طلبات المواد'), href: ROUTES.dashboard.buying.materialRequests.list, isActive: false },
     {
       title: t('buying.createMaterialRequest', 'إنشاء طلب مواد'),
-      href: '/dashboard/buying/material-requests/create',
+      href: ROUTES.dashboard.buying.materialRequests.create,
       isActive: true
     },
   ]

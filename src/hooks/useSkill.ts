@@ -1,5 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   getSkills,
   getSkill,
@@ -88,53 +89,49 @@ export const useActiveSkills = () => {
 
 // Create skill
 export const useCreateSkill = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateSkillData) => createSkill(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: skillKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: skillKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: skillKeys.active() })
+      invalidateCache.skills.lists()
+      invalidateCache.skills.stats()
+      invalidateCache.skills.active()
     },
   })
 }
 
 // Update skill
 export const useUpdateSkill = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ skillId, data }: { skillId: string; data: UpdateSkillData }) =>
       updateSkill(skillId, data),
     onSuccess: (_, { skillId }) => {
-      queryClient.invalidateQueries({ queryKey: skillKeys.detail(skillId) })
-      queryClient.invalidateQueries({ queryKey: skillKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: skillKeys.active() })
+      invalidateCache.skills.detail(skillId)
+      invalidateCache.skills.lists()
+      invalidateCache.skills.active()
     },
   })
 }
 
 // Delete skill
 export const useDeleteSkill = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (skillId: string) => deleteSkill(skillId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: skillKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: skillKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: skillKeys.active() })
+      invalidateCache.skills.lists()
+      invalidateCache.skills.stats()
+      invalidateCache.skills.active()
     },
   })
 }
 
 // Bulk delete skills
 export const useBulkDeleteSkills = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteSkills(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: skillKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: skillKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: skillKeys.active() })
+      invalidateCache.skills.lists()
+      invalidateCache.skills.stats()
+      invalidateCache.skills.active()
     },
   })
 }

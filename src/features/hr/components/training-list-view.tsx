@@ -8,6 +8,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useTrainings, useTrainingStats, useBulkDeleteTrainings } from '@/hooks/useTraining'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -158,8 +159,8 @@ export function TrainingListView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'التدريب', href: '/dashboard/hr/training', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'التدريب', href: ROUTES.dashboard.hr.training.list, isActive: true },
   ]
 
   return (
@@ -335,7 +336,7 @@ export function TrainingListView() {
                     </Button>
                     <Button
                       size="sm"
-                      onClick={() => navigate({ to: '/dashboard/hr/training/new' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.hr.training.new })}
                       className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
                     >
                       <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
@@ -380,7 +381,7 @@ export function TrainingListView() {
                   <GraduationCap className="w-12 h-12 mx-auto text-slate-300" />
                   <p className="mt-4 text-slate-500">لا توجد تدريبات</p>
                   <Button
-                    onClick={() => navigate({ to: '/dashboard/hr/training/new' })}
+                    onClick={() => navigate({ to: ROUTES.dashboard.hr.training.new })}
                     className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
                     <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
@@ -435,7 +436,7 @@ export function TrainingListView() {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/training/${training._id}` })}>
+                                  <DropdownMenuItem onClick={() => navigate({ to: ROUTES.dashboard.hr.training.detail(training._id) })}>
                                     <Eye className="w-4 h-4 ms-2" aria-hidden="true" />
                                     عرض التفاصيل
                                   </DropdownMenuItem>
@@ -510,7 +511,7 @@ export function TrainingListView() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => navigate({ to: `/dashboard/hr/training/${training._id}` })}
+                              onClick={() => navigate({ to: ROUTES.dashboard.hr.training.detail(training._id) })}
                               className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl"
                             >
                               عرض التفاصيل

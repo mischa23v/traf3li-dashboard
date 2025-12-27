@@ -146,7 +146,7 @@ export function WhatsAppNewConversation() {
   }, [templates, selectedTemplate])
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+    { title: 'نظرة عامة', href: ROUTES.dashboard.home, isActive: false },
     { title: 'العملاء المحتملين', href: ROUTES.dashboard.crm.leads.list, isActive: false },
     { title: 'واتساب', href: ROUTES.dashboard.crm.whatsapp.list, isActive: true },
     { title: 'التسويق بالبريد', href: ROUTES.dashboard.crm.emailMarketing.list, isActive: false },

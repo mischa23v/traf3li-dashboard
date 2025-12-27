@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -252,7 +253,7 @@ export function PromotionCreateView() {
       } else {
         await createMutation.mutateAsync(promotionData)
       }
-      navigate({ to: '/dashboard/hr/promotions' })
+      navigate({ to: ROUTES.dashboard.hr.promotions.list })
     } catch (error) {
       console.error('Failed to save promotion:', error)
     } finally {
@@ -270,8 +271,8 @@ export function PromotionCreateView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'الترقيات', href: '/dashboard/hr/promotions', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'الترقيات', href: ROUTES.dashboard.hr.promotions.list, isActive: true },
   ]
 
   if (isLoadingPromotion && isEditMode) {
@@ -669,7 +670,7 @@ export function PromotionCreateView() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => navigate({ to: '/dashboard/hr/promotions' })}
+                onClick={() => navigate({ to: ROUTES.dashboard.hr.promotions.list })}
                 disabled={isSubmitting}
               >
                 إلغاء

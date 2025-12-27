@@ -31,6 +31,7 @@ import { formatCurrency } from '@/lib/currency'
 import { VendorsActionDialog } from './vendors-action-dialog'
 import { VendorsDeleteDialog } from './vendors-delete-dialog'
 import { type Vendor } from '@/services/accountingService'
+import { ROUTES } from '@/constants/routes'
 
 export default function VendorsDashboard() {
     const [activeTab, setActiveTab] = useState('all')
@@ -112,10 +113,10 @@ export default function VendorsDashboard() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'الموردين', href: '/dashboard/finance/vendors', isActive: true },
-        { title: 'كشف الحساب', href: '/dashboard/finance/statements', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: false },
+        { title: 'الموردين', href: ROUTES.dashboard.finance.vendors.list, isActive: true },
+        { title: 'كشف الحساب', href: ROUTES.dashboard.finance.statements.list, isActive: false },
     ]
 
     // LOADING STATE

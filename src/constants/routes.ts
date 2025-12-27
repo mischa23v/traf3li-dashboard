@@ -195,6 +195,13 @@ export const ROUTES = {
         detail: (creditNoteId: string) => `/dashboard/finance/credit-notes/${creditNoteId}`,
       },
 
+      // Debit notes
+      debitNotes: {
+        list: '/dashboard/finance/debit-notes',
+        new: '/dashboard/finance/debit-notes/new',
+        detail: (debitNoteId: string) => `/dashboard/finance/debit-notes/${debitNoteId}`,
+      },
+
       // Bills
       bills: {
         list: '/dashboard/finance/bills',

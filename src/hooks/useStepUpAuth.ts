@@ -7,6 +7,7 @@ import { useState, useCallback } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
+import { CACHE_TIMES } from '@/config/cache'
 import stepUpAuthService, {
   type ReauthStatus,
   type ReauthMethod,
@@ -27,7 +28,7 @@ export function useReauthStatus(enabled = true) {
     queryKey: stepUpAuthKeys.status(),
     queryFn: () => stepUpAuthService.checkStatus(),
     enabled,
-    staleTime: 60 * 1000, // 1 minute
+    staleTime: CACHE_TIMES.CALENDAR.GRID, // 1 minute
     retry: 1,
   })
 }
@@ -40,7 +41,7 @@ export function useReauthMethods(enabled = true) {
     queryKey: stepUpAuthKeys.methods(),
     queryFn: () => stepUpAuthService.getAvailableMethods(),
     enabled,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     retry: 1,
   })
 }

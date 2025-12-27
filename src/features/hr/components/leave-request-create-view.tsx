@@ -5,6 +5,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useCreateLeaveRequest, useLeaveBalance, useCheckConflicts } from '@/hooks/useLeave'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -435,7 +436,7 @@ export function LeaveRequestCreateView() {
 
         try {
             const result = await createRequestMutation.mutateAsync(data)
-            navigate({ to: '/dashboard/hr/leave/$requestId', params: { requestId: result._id } })
+            navigate({ to: ROUTES.dashboard.hr.leave.detail(requestId), params: { requestId: result._id } })
         } catch (error) {
             handleApiError(error)
         }
@@ -443,8 +444,8 @@ export function LeaveRequestCreateView() {
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-        { title: 'الإجازات', href: '/dashboard/hr/leave', isActive: true },
+        { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+        { title: 'الإجازات', href: ROUTES.dashboard.hr.leave.list, isActive: true },
     ]
 
     // Determine which advanced sections to show based on office type
@@ -490,7 +491,7 @@ export function LeaveRequestCreateView() {
                                 variant="ghost"
                                 size="icon"
                                 className="rounded-xl hover:bg-white"
-                                onClick={() => navigate({ to: '/dashboard/hr/leave' })}
+                                onClick={() => navigate({ to: ROUTES.dashboard.hr.leave.list })}
                             >
                                 <ArrowRight className="h-5 w-5" />
                             </Button>
@@ -1130,7 +1131,7 @@ export function LeaveRequestCreateView() {
                             type="button"
                             variant="outline"
                             className="rounded-xl px-6"
-                            onClick={() => navigate({ to: '/dashboard/hr/leave' })}
+                            onClick={() => navigate({ to: ROUTES.dashboard.hr.leave.list })}
                         >
                             إلغاء
                         </Button>

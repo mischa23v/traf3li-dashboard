@@ -6,6 +6,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
+import { QueryKeys } from '@/lib/query-keys'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   accountingService,
   Account,
@@ -51,73 +53,8 @@ const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
 const STATS_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour
 const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
 
-// ==================== QUERY KEYS ====================
-
-export const accountingKeys = {
-  all: ['accounting'] as const,
-  // Accounts
-  accounts: () => [...accountingKeys.all, 'accounts'] as const,
-  accountsList: (filters?: AccountFilters) => [...accountingKeys.accounts(), 'list', filters] as const,
-  account: (id: string) => [...accountingKeys.accounts(), id] as const,
-  accountTypes: () => [...accountingKeys.accounts(), 'types'] as const,
-  // GL Entries
-  glEntries: () => [...accountingKeys.all, 'gl-entries'] as const,
-  glEntriesList: (filters?: GLEntryFilters) => [...accountingKeys.glEntries(), 'list', filters] as const,
-  glEntry: (id: string) => [...accountingKeys.glEntries(), id] as const,
-  // Journal Entries
-  journalEntries: () => [...accountingKeys.all, 'journal-entries'] as const,
-  journalEntriesList: (filters?: { status?: string }) => [...accountingKeys.journalEntries(), 'list', filters] as const,
-  journalEntry: (id: string) => [...accountingKeys.journalEntries(), id] as const,
-  // Fiscal Periods
-  fiscalPeriods: () => [...accountingKeys.all, 'fiscal-periods'] as const,
-  fiscalPeriodsList: () => [...accountingKeys.fiscalPeriods(), 'list'] as const,
-  fiscalPeriod: (id: string) => [...accountingKeys.fiscalPeriods(), id] as const,
-  fiscalPeriodBalances: (id: string) => [...accountingKeys.fiscalPeriods(), id, 'balances'] as const,
-  currentFiscalPeriod: () => [...accountingKeys.fiscalPeriods(), 'current'] as const,
-  fiscalYearsSummary: () => [...accountingKeys.fiscalPeriods(), 'years-summary'] as const,
-  canPost: (date: string) => [...accountingKeys.fiscalPeriods(), 'can-post', date] as const,
-  // Recurring Transactions
-  recurring: () => [...accountingKeys.all, 'recurring'] as const,
-  recurringList: (filters?: { status?: RecurringStatus; transactionType?: RecurringTransactionType }) => [...accountingKeys.recurring(), 'list', filters] as const,
-  recurringItem: (id: string) => [...accountingKeys.recurring(), id] as const,
-  recurringUpcoming: () => [...accountingKeys.recurring(), 'upcoming'] as const,
-  // Price Levels
-  priceLevels: () => [...accountingKeys.all, 'price-levels'] as const,
-  priceLevelsList: () => [...accountingKeys.priceLevels(), 'list'] as const,
-  priceLevel: (id: string) => [...accountingKeys.priceLevels(), id] as const,
-  clientRate: (clientId: string, baseRate: number, serviceType?: string) =>
-    [...accountingKeys.priceLevels(), 'client-rate', clientId, baseRate, serviceType] as const,
-  // Bills
-  bills: () => [...accountingKeys.all, 'bills'] as const,
-  billsList: (filters?: BillFilters) => [...accountingKeys.bills(), 'list', filters] as const,
-  bill: (id: string) => [...accountingKeys.bills(), id] as const,
-  // Debit Notes
-  debitNotes: () => [...accountingKeys.all, 'debit-notes'] as const,
-  debitNotesList: (filters?: DebitNoteFilters) => [...accountingKeys.debitNotes(), 'list', filters] as const,
-  debitNote: (id: string) => [...accountingKeys.debitNotes(), id] as const,
-  billDebitNotes: (billId: string) => [...accountingKeys.bills(), billId, 'debit-notes'] as const,
-  // Vendors
-  vendors: () => [...accountingKeys.all, 'vendors'] as const,
-  vendorsList: (filters?: VendorFilters) => [...accountingKeys.vendors(), 'list', filters] as const,
-  vendor: (id: string) => [...accountingKeys.vendors(), id] as const,
-  // Retainers
-  retainers: () => [...accountingKeys.all, 'retainers'] as const,
-  retainersList: (filters?: { clientId?: string; status?: RetainerStatus }) => [...accountingKeys.retainers(), 'list', filters] as const,
-  retainer: (id: string) => [...accountingKeys.retainers(), id] as const,
-  retainerTransactions: (id: string) => [...accountingKeys.retainers(), id, 'transactions'] as const,
-  // Leads
-  leads: () => [...accountingKeys.all, 'leads'] as const,
-  leadsList: (filters?: LeadFilters) => [...accountingKeys.leads(), 'list', filters] as const,
-  lead: (id: string) => [...accountingKeys.leads(), id] as const,
-  leadStats: () => [...accountingKeys.leads(), 'stats'] as const,
-  // Reports
-  reports: () => [...accountingKeys.all, 'reports'] as const,
-  profitLoss: (startDate: string, endDate: string) => [...accountingKeys.reports(), 'profit-loss', startDate, endDate] as const,
-  balanceSheet: (asOfDate?: string) => [...accountingKeys.reports(), 'balance-sheet', asOfDate] as const,
-  trialBalance: (asOfDate?: string) => [...accountingKeys.reports(), 'trial-balance', asOfDate] as const,
-  arAging: () => [...accountingKeys.reports(), 'ar-aging'] as const,
-  caseProfitability: (startDate: string, endDate: string) => [...accountingKeys.reports(), 'case-profitability', startDate, endDate] as const,
-}
+// Use centralized query keys from @/lib/query-keys
+const accountingKeys = QueryKeys.accounting
 
 // ==================== ACCOUNTS HOOKS ====================
 
@@ -148,11 +85,10 @@ export const useAccount = (id: string) => {
 }
 
 export const useCreateAccount = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: Partial<Account>) => accountingService.createAccount(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.accounts() })
+      invalidateCache.accounting.accounts()
       toast.success('تم إنشاء الحساب بنجاح')
     },
     onError: (error: any) => {
@@ -163,12 +99,11 @@ export const useCreateAccount = () => {
 }
 
 export const useUpdateAccount = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Account> }) =>
       accountingService.updateAccount(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.accounts() })
+      invalidateCache.accounting.accounts()
       toast.success('تم تحديث الحساب بنجاح')
     },
     onError: (error: any) => {
@@ -179,11 +114,10 @@ export const useUpdateAccount = () => {
 }
 
 export const useDeleteAccount = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => accountingService.deleteAccount(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.accounts() })
+      invalidateCache.accounting.accounts()
       toast.success('تم حذف الحساب بنجاح')
     },
     onError: (error: any) => {
@@ -232,11 +166,10 @@ export const useJournalEntry = (id: string) => {
 }
 
 export const useCreateJournalEntry = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateJournalEntryData) => accountingService.createJournalEntry(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.journalEntries() })
+      invalidateCache.accounting.journalEntries()
       toast.success('تم إنشاء القيد بنجاح')
     },
     onError: (error: any) => {
@@ -247,11 +180,10 @@ export const useCreateJournalEntry = () => {
 }
 
 export const useCreateSimpleJournalEntry = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: SimpleJournalEntryData) => accountingService.createSimpleJournalEntry(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.journalEntries() })
+      invalidateCache.accounting.journalEntries()
       toast.success('تم إنشاء القيد بنجاح')
     },
     onError: (error: any) => {
@@ -262,12 +194,11 @@ export const useCreateSimpleJournalEntry = () => {
 }
 
 export const usePostJournalEntry = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => accountingService.postJournalEntry(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.journalEntries() })
-      queryClient.invalidateQueries({ queryKey: accountingKeys.glEntries() })
+      invalidateCache.accounting.journalEntries()
+      invalidateCache.accounting.glEntries()
       toast.success('تم ترحيل القيد بنجاح')
     },
     onError: (error: any) => {
@@ -278,11 +209,10 @@ export const usePostJournalEntry = () => {
 }
 
 export const useVoidJournalEntry = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => accountingService.voidJournalEntry(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.journalEntries() })
+      invalidateCache.accounting.journalEntries()
       toast.success('تم إلغاء القيد بنجاح')
     },
     onError: (error: any) => {
@@ -293,11 +223,10 @@ export const useVoidJournalEntry = () => {
 }
 
 export const useDeleteJournalEntry = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => accountingService.deleteJournalEntry(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.journalEntries() })
+      invalidateCache.accounting.journalEntries()
       toast.success('تم حذف القيد بنجاح')
     },
     onError: (error: any) => {
@@ -361,12 +290,11 @@ export const useFiscalPeriodBalances = (id: string) => {
 }
 
 export const useCreateFiscalYear = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ fiscalYear, startMonth }: { fiscalYear: number; startMonth: number }) =>
       accountingService.createFiscalYear(fiscalYear, startMonth),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.fiscalPeriods() })
+      invalidateCache.accounting.fiscalPeriods()
       toast.success('تم إنشاء السنة المالية بنجاح')
     },
     onError: (error: any) => {
@@ -377,11 +305,10 @@ export const useCreateFiscalYear = () => {
 }
 
 export const useOpenFiscalPeriod = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => accountingService.openFiscalPeriod(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.fiscalPeriods() })
+      invalidateCache.accounting.fiscalPeriods()
       toast.success('تم فتح الفترة المالية')
     },
     onError: (error: any) => {
@@ -392,11 +319,10 @@ export const useOpenFiscalPeriod = () => {
 }
 
 export const useCloseFiscalPeriod = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => accountingService.closeFiscalPeriod(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.fiscalPeriods() })
+      invalidateCache.accounting.fiscalPeriods()
       toast.success('تم إغلاق الفترة المالية')
     },
     onError: (error: any) => {
@@ -407,11 +333,10 @@ export const useCloseFiscalPeriod = () => {
 }
 
 export const useReopenFiscalPeriod = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => accountingService.reopenFiscalPeriod(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.fiscalPeriods() })
+      invalidateCache.accounting.fiscalPeriods()
       toast.success('تم إعادة فتح الفترة المالية')
     },
     onError: (error: any) => {
@@ -422,11 +347,10 @@ export const useReopenFiscalPeriod = () => {
 }
 
 export const useLockFiscalPeriod = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => accountingService.lockFiscalPeriod(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.fiscalPeriods() })
+      invalidateCache.accounting.fiscalPeriods()
       toast.success('تم قفل الفترة المالية نهائياً')
     },
     onError: (error: any) => {
@@ -437,12 +361,11 @@ export const useLockFiscalPeriod = () => {
 }
 
 export const useYearEndClosing = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => accountingService.yearEndClosing(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.fiscalPeriods() })
-      queryClient.invalidateQueries({ queryKey: accountingKeys.journalEntries() })
+      invalidateCache.accounting.fiscalPeriods()
+      invalidateCache.accounting.journalEntries()
       toast.success('تم إغلاق نهاية السنة بنجاح')
     },
     onError: (error: any) => {
@@ -481,11 +404,10 @@ export const useRecurringTransaction = (id: string) => {
 }
 
 export const useCreateRecurringTransaction = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateRecurringTransactionData) => accountingService.createRecurringTransaction(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.recurring() })
+      invalidateCache.accounting.recurring()
       toast.success('تم إنشاء المعاملة المتكررة بنجاح')
     },
     onError: (error: any) => {
@@ -496,12 +418,11 @@ export const useCreateRecurringTransaction = () => {
 }
 
 export const useUpdateRecurringTransaction = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateRecurringTransactionData> }) =>
       accountingService.updateRecurringTransaction(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.recurring() })
+      invalidateCache.accounting.recurring()
       toast.success('تم تحديث المعاملة المتكررة')
     },
     onError: (error: any) => {
@@ -512,11 +433,10 @@ export const useUpdateRecurringTransaction = () => {
 }
 
 export const usePauseRecurringTransaction = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => accountingService.pauseRecurringTransaction(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.recurring() })
+      invalidateCache.accounting.recurring()
       toast.success('تم إيقاف المعاملة المتكررة مؤقتاً')
     },
     onError: (error: any) => {
@@ -527,11 +447,10 @@ export const usePauseRecurringTransaction = () => {
 }
 
 export const useResumeRecurringTransaction = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => accountingService.resumeRecurringTransaction(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.recurring() })
+      invalidateCache.accounting.recurring()
       toast.success('تم استئناف المعاملة المتكررة')
     },
     onError: (error: any) => {
@@ -542,11 +461,10 @@ export const useResumeRecurringTransaction = () => {
 }
 
 export const useCancelRecurringTransaction = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => accountingService.cancelRecurringTransaction(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.recurring() })
+      invalidateCache.accounting.recurring()
       toast.success('تم إلغاء المعاملة المتكررة')
     },
     onError: (error: any) => {
@@ -557,11 +475,10 @@ export const useCancelRecurringTransaction = () => {
 }
 
 export const useGenerateRecurringTransaction = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => accountingService.generateRecurringTransaction(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.recurring() })
+      invalidateCache.accounting.recurring()
       toast.success('تم إنشاء المعاملة بنجاح')
     },
     onError: (error: any) => {
@@ -572,11 +489,10 @@ export const useGenerateRecurringTransaction = () => {
 }
 
 export const useDeleteRecurringTransaction = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => accountingService.deleteRecurringTransaction(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.recurring() })
+      invalidateCache.accounting.recurring()
       toast.success('تم حذف المعاملة المتكررة')
     },
     onError: (error: any) => {
@@ -614,11 +530,10 @@ export const useClientRate = (clientId: string, baseRate: number, serviceType?: 
 }
 
 export const useCreatePriceLevel = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: (data: CreatePriceLevelData) => accountingService.createPriceLevel(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.priceLevels() })
+      invalidateCache.accounting.priceLevels()
       toast.success('تم إنشاء مستوى السعر بنجاح')
     },
     onError: (error: any) => {
@@ -629,12 +544,11 @@ export const useCreatePriceLevel = () => {
 }
 
 export const useUpdatePriceLevel = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreatePriceLevelData> }) =>
       accountingService.updatePriceLevel(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.priceLevels() })
+      invalidateCache.accounting.priceLevels()
       toast.success('تم تحديث مستوى السعر')
     },
     onError: (error: any) => {
@@ -645,11 +559,10 @@ export const useUpdatePriceLevel = () => {
 }
 
 export const useDeletePriceLevel = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: (id: string) => accountingService.deletePriceLevel(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.priceLevels() })
+      invalidateCache.accounting.priceLevels()
       toast.success('تم حذف مستوى السعر')
     },
     onError: (error: any) => {
@@ -660,11 +573,10 @@ export const useDeletePriceLevel = () => {
 }
 
 export const useSetDefaultPriceLevel = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: (id: string) => accountingService.setDefaultPriceLevel(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.priceLevels() })
+      invalidateCache.accounting.priceLevels()
       toast.success('تم تعيين المستوى الافتراضي')
     },
     onError: (error: any) => {
@@ -694,11 +606,10 @@ export const useBill = (id: string) => {
 }
 
 export const useCreateBill = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: (data: CreateBillData) => accountingService.createBill(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.bills() })
+      invalidateCache.accounting.bills()
       toast.success('تم إنشاء الفاتورة بنجاح')
     },
     onError: (error: any) => {
@@ -709,12 +620,11 @@ export const useCreateBill = () => {
 }
 
 export const useUpdateBill = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateBillData> }) =>
       accountingService.updateBill(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.bills() })
+      invalidateCache.accounting.bills()
       toast.success('تم تحديث الفاتورة')
     },
     onError: (error: any) => {
@@ -725,11 +635,10 @@ export const useUpdateBill = () => {
 }
 
 export const useApproveBill = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: (id: string) => accountingService.approveBill(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.bills() })
+      invalidateCache.accounting.bills()
       toast.success('تم اعتماد الفاتورة')
     },
     onError: (error: any) => {
@@ -740,13 +649,12 @@ export const useApproveBill = () => {
 }
 
 export const usePayBill = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: { amount: number; paymentMethod: string; notes?: string } }) =>
       accountingService.payBill(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.bills() })
-      queryClient.invalidateQueries({ queryKey: accountingKeys.glEntries() })
+      invalidateCache.accounting.bills()
+      invalidateCache.accounting.glEntries()
       toast.success('تم تسجيل الدفع بنجاح')
     },
     onError: (error: any) => {
@@ -757,12 +665,11 @@ export const usePayBill = () => {
 }
 
 export const usePostBillToGL = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: (id: string) => accountingService.postBillToGL(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.bills() })
-      queryClient.invalidateQueries({ queryKey: accountingKeys.glEntries() })
+      invalidateCache.accounting.bills()
+      invalidateCache.accounting.glEntries()
       toast.success('تم ترحيل الفاتورة للقيود')
     },
     onError: (error: any) => {
@@ -773,11 +680,10 @@ export const usePostBillToGL = () => {
 }
 
 export const useDeleteBill = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: (id: string) => accountingService.deleteBill(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.bills() })
+      invalidateCache.accounting.bills()
       toast.success('تم حذف الفاتورة')
     },
     onError: (error: any) => {
@@ -815,12 +721,11 @@ export const useBillDebitNotes = (billId: string) => {
 }
 
 export const useCreateDebitNote = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: (data: CreateDebitNoteData) => accountingService.createDebitNote(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.debitNotes() })
-      queryClient.invalidateQueries({ queryKey: accountingKeys.bills() })
+      invalidateCache.accounting.debitNotes()
+      invalidateCache.accounting.bills()
       toast.success('تم إنشاء إشعار الخصم بنجاح')
     },
     onError: (error: any) => {
@@ -831,12 +736,11 @@ export const useCreateDebitNote = () => {
 }
 
 export const useUpdateDebitNote = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateDebitNoteData> }) =>
       accountingService.updateDebitNote(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.debitNotes() })
+      invalidateCache.accounting.debitNotes()
       toast.success('تم تحديث إشعار الخصم')
     },
     onError: (error: any) => {
@@ -847,12 +751,11 @@ export const useUpdateDebitNote = () => {
 }
 
 export const useApproveDebitNote = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: ({ id, notes }: { id: string; notes?: string }) =>
       accountingService.approveDebitNote(id, notes),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.debitNotes() })
+      invalidateCache.accounting.debitNotes()
       toast.success('تم اعتماد إشعار الخصم')
     },
     onError: (error: any) => {
@@ -863,14 +766,13 @@ export const useApproveDebitNote = () => {
 }
 
 export const useApplyDebitNote = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: (id: string) => accountingService.applyDebitNote(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.debitNotes() })
-      queryClient.invalidateQueries({ queryKey: accountingKeys.bills() })
-      queryClient.invalidateQueries({ queryKey: accountingKeys.vendors() })
-      queryClient.invalidateQueries({ queryKey: accountingKeys.glEntries() })
+      invalidateCache.accounting.debitNotes()
+      invalidateCache.accounting.bills()
+      invalidateCache.accounting.vendors()
+      invalidateCache.accounting.glEntries()
       toast.success('تم تطبيق إشعار الخصم')
     },
     onError: (error: any) => {
@@ -881,12 +783,11 @@ export const useApplyDebitNote = () => {
 }
 
 export const useCancelDebitNote = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       accountingService.cancelDebitNote(id, { reason }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.debitNotes() })
+      invalidateCache.accounting.debitNotes()
       toast.success('تم إلغاء إشعار الخصم')
     },
     onError: (error: any) => {
@@ -897,11 +798,10 @@ export const useCancelDebitNote = () => {
 }
 
 export const useDeleteDebitNote = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: (id: string) => accountingService.deleteDebitNote(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.debitNotes() })
+      invalidateCache.accounting.debitNotes()
       toast.success('تم حذف إشعار الخصم')
     },
     onError: (error: any) => {
@@ -953,11 +853,10 @@ export const useVendor = (id: string) => {
 }
 
 export const useCreateVendor = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: (data: CreateVendorData) => accountingService.createVendor(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.vendors() })
+      invalidateCache.accounting.vendors()
       toast.success('تم إنشاء المورد بنجاح')
     },
     onError: (error: any) => {
@@ -968,12 +867,11 @@ export const useCreateVendor = () => {
 }
 
 export const useUpdateVendor = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateVendorData> }) =>
       accountingService.updateVendor(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.vendors() })
+      invalidateCache.accounting.vendors()
       toast.success('تم تحديث المورد')
     },
     onError: (error: any) => {
@@ -984,11 +882,10 @@ export const useUpdateVendor = () => {
 }
 
 export const useDeleteVendor = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: (id: string) => accountingService.deleteVendor(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.vendors() })
+      invalidateCache.accounting.vendors()
       toast.success('تم حذف المورد')
     },
     onError: (error: any) => {
@@ -1026,11 +923,10 @@ export const useRetainerTransactions = (id: string) => {
 }
 
 export const useCreateRetainer = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: (data: CreateRetainerData) => accountingService.createRetainer(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.retainers() })
+      invalidateCache.accounting.retainers()
       toast.success('تم إنشاء حساب الأمانة بنجاح')
     },
     onError: (error: any) => {
@@ -1041,13 +937,12 @@ export const useCreateRetainer = () => {
 }
 
 export const useDepositToRetainer = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: RetainerDepositData }) =>
       accountingService.depositToRetainer(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.retainers() })
-      queryClient.invalidateQueries({ queryKey: accountingKeys.glEntries() })
+      invalidateCache.accounting.retainers()
+      invalidateCache.accounting.glEntries()
       toast.success('تم إيداع المبلغ بنجاح')
     },
     onError: (error: any) => {
@@ -1058,13 +953,12 @@ export const useDepositToRetainer = () => {
 }
 
 export const useConsumeFromRetainer = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: RetainerConsumeData }) =>
       accountingService.consumeFromRetainer(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.retainers() })
-      queryClient.invalidateQueries({ queryKey: accountingKeys.glEntries() })
+      invalidateCache.accounting.retainers()
+      invalidateCache.accounting.glEntries()
       toast.success('تم السحب من حساب الأمانة')
     },
     onError: (error: any) => {
@@ -1103,11 +997,10 @@ export const useLeadStats = () => {
 }
 
 export const useCreateLead = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: (data: CreateLeadData) => accountingService.createLead(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.leads() })
+      invalidateCache.accounting.leads()
       toast.success('تم إنشاء العميل المحتمل بنجاح')
     },
     onError: (error: any) => {
@@ -1118,12 +1011,11 @@ export const useCreateLead = () => {
 }
 
 export const useUpdateLead = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateLeadData> }) =>
       accountingService.updateLead(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.leads() })
+      invalidateCache.accounting.leads()
       toast.success('تم تحديث العميل المحتمل')
     },
     onError: (error: any) => {
@@ -1134,11 +1026,10 @@ export const useUpdateLead = () => {
 }
 
 export const useDeleteLead = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: (id: string) => accountingService.deleteLead(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.leads() })
+      invalidateCache.accounting.leads()
       toast.success('تم حذف العميل المحتمل')
     },
     onError: (error: any) => {
@@ -1149,12 +1040,11 @@ export const useDeleteLead = () => {
 }
 
 export const useConvertLead = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: ({ id, data }: { id: string; data?: { createCase?: boolean; caseType?: string } }) =>
       accountingService.convertLead(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.leads() })
+      invalidateCache.accounting.leads()
       toast.success('تم تحويل العميل المحتمل إلى عميل فعلي')
     },
     onError: (error: any) => {
@@ -1165,12 +1055,11 @@ export const useConvertLead = () => {
 }
 
 export const useUpdateLeadStage = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: ({ id, stage }: { id: string; stage: LeadStage }) =>
       accountingService.updateLeadStage(id, stage),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.leads() })
+      invalidateCache.accounting.leads()
       toast.success('تم تحديث مرحلة العميل المحتمل')
     },
     onError: (error: any) => {
@@ -1181,12 +1070,11 @@ export const useUpdateLeadStage = () => {
 }
 
 export const useAddLeadActivity = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: ({ id, activity }: { id: string; activity: Omit<LeadActivity, '_id' | 'createdBy'> }) =>
       accountingService.addLeadActivity(id, activity),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: accountingKeys.leads() })
+      invalidateCache.accounting.leads()
       toast.success('تم إضافة النشاط')
     },
     onError: (error: any) => {
@@ -1248,12 +1136,11 @@ export const useCaseProfitabilityReport = (startDate: string, endDate: string) =
 // ==================== INVOICE GL INTEGRATION HOOKS ====================
 
 export const usePostInvoiceToGL = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: (invoiceId: string) => accountingService.postInvoiceToGL(invoiceId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      queryClient.invalidateQueries({ queryKey: accountingKeys.glEntries() })
+      invalidateCache.invoices.all()
+      invalidateCache.accounting.glEntries()
       toast.success('تم ترحيل الفاتورة للقيود')
     },
     onError: (error: any) => {
@@ -1264,16 +1151,15 @@ export const usePostInvoiceToGL = () => {
 }
 
 export const useRecordPaymentForInvoice = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
+   return useMutation({
     mutationFn: ({ invoiceId, data }: {
       invoiceId: string
       data: { amount: number; paymentDate: string; paymentMethod: string; bankAccountId?: string }
     }) => accountingService.recordPaymentForInvoice(invoiceId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      queryClient.invalidateQueries({ queryKey: ['payments'] })
-      queryClient.invalidateQueries({ queryKey: accountingKeys.glEntries() })
+      invalidateCache.invoices.all()
+      invalidateCache.payments.all()
+      invalidateCache.accounting.glEntries()
       toast.success('تم تسجيل الدفع وترحيله للقيود')
     },
     onError: (error: any) => {

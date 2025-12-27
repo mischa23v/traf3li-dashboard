@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useParams, Link } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useOnboarding, useUpdateOnboardingStatus, useCompleteFirstDay, useCompleteFirstWeek, useCompleteFirstMonth, useCompleteOnboarding, useDeleteOnboarding } from '@/hooks/useOnboarding'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -98,14 +99,14 @@ export function OnboardingDetailsView() {
     if (!onboardingId) return
     if (confirm('هل أنت متأكد من حذف برنامج التأهيل هذا؟')) {
       await deleteOnboardingMutation.mutateAsync(onboardingId)
-      navigate({ to: '/dashboard/hr/onboarding' })
+      navigate({ to: ROUTES.dashboard.hr.onboarding.list })
     }
   }
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'التأهيل', href: '/dashboard/hr/onboarding', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'التأهيل', href: ROUTES.dashboard.hr.onboarding.list, isActive: true },
   ]
 
   return (
@@ -210,7 +211,7 @@ export function OnboardingDetailsView() {
                       variant="ghost"
                       size="icon"
                       className="rounded-xl hover:bg-white"
-                      onClick={() => navigate({ to: '/dashboard/hr/onboarding' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.hr.onboarding.list })}
                     >
                       <ArrowRight className="h-5 w-5" />
                     </Button>
@@ -249,7 +250,7 @@ export function OnboardingDetailsView() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => navigate({ to: '/dashboard/hr/onboarding/new', search: { editId: onboarding._id } })}>
+                        <DropdownMenuItem onClick={() => navigate({ to: ROUTES.dashboard.hr.onboarding.new, search: { editId: onboarding._id } })}>
                           <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                           تعديل
                         </DropdownMenuItem>

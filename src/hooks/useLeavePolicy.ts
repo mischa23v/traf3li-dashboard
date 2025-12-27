@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import {
   getLeavePolicies,
   getLeavePolicy,
@@ -28,6 +28,7 @@ import {
   AssignPolicyData,
   BulkAssignPolicyData,
 } from '@/services/leavePolicyService'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ============================================================================
 // Query Keys
@@ -112,13 +113,11 @@ export const useComparePolicies = (policyIds: string[]) => {
  * Create new leave policy
  */
 export const useCreateLeavePolicy = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateLeavePolicyData) => createLeavePolicy(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.stats() })
+      invalidateCache.leavePolicy.lists()
+      invalidateCache.leavePolicy.stats()
     },
   })
 }
@@ -127,15 +126,13 @@ export const useCreateLeavePolicy = () => {
  * Update leave policy
  */
 export const useUpdateLeavePolicy = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ policyId, data }: { policyId: string; data: UpdateLeavePolicyData }) =>
       updateLeavePolicy(policyId, data),
     onSuccess: (_, { policyId }) => {
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.detail(policyId) })
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.stats() })
+      invalidateCache.leavePolicy.detail(policyId)
+      invalidateCache.leavePolicy.lists()
+      invalidateCache.leavePolicy.stats()
     },
   })
 }
@@ -144,13 +141,11 @@ export const useUpdateLeavePolicy = () => {
  * Delete leave policy
  */
 export const useDeleteLeavePolicy = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (policyId: string) => deleteLeavePolicy(policyId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.stats() })
+      invalidateCache.leavePolicy.lists()
+      invalidateCache.leavePolicy.stats()
     },
   })
 }
@@ -159,14 +154,12 @@ export const useDeleteLeavePolicy = () => {
  * Set policy as default
  */
 export const useSetDefaultLeavePolicy = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (policyId: string) => setDefaultLeavePolicy(policyId),
     onSuccess: (_, policyId) => {
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.detail(policyId) })
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.stats() })
+      invalidateCache.leavePolicy.lists()
+      invalidateCache.leavePolicy.detail(policyId)
+      invalidateCache.leavePolicy.stats()
     },
   })
 }
@@ -175,15 +168,13 @@ export const useSetDefaultLeavePolicy = () => {
  * Toggle policy active status
  */
 export const useToggleLeavePolicyStatus = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ policyId, isActive }: { policyId: string; isActive: boolean }) =>
       toggleLeavePolicyStatus(policyId, isActive),
     onSuccess: (_, { policyId }) => {
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.detail(policyId) })
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.stats() })
+      invalidateCache.leavePolicy.detail(policyId)
+      invalidateCache.leavePolicy.lists()
+      invalidateCache.leavePolicy.stats()
     },
   })
 }
@@ -192,8 +183,6 @@ export const useToggleLeavePolicyStatus = () => {
  * Duplicate policy
  */
 export const useDuplicateLeavePolicy = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       policyId,
@@ -205,8 +194,8 @@ export const useDuplicateLeavePolicy = () => {
       newNameAr: string
     }) => duplicateLeavePolicy(policyId, newName, newNameAr),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.stats() })
+      invalidateCache.leavePolicy.lists()
+      invalidateCache.leavePolicy.stats()
     },
   })
 }
@@ -302,17 +291,13 @@ export const usePreviewPolicyAllocations = (
  * Assign policy to single employee
  */
 export const useAssignPolicyToEmployee = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: AssignPolicyData) => assignPolicyToEmployee(data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.assignments() })
-      queryClient.invalidateQueries({
-        queryKey: leavePolicyKeys.employeePolicy(variables.employeeId),
-      })
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.unassignedEmployees() })
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.stats() })
+      invalidateCache.leavePolicy.assignments()
+      invalidateCache.leavePolicy.employeePolicy(variables.employeeId)
+      invalidateCache.leavePolicy.unassignedEmployees()
+      invalidateCache.leavePolicy.stats()
     },
   })
 }
@@ -321,18 +306,16 @@ export const useAssignPolicyToEmployee = () => {
  * Bulk assign policy to multiple employees
  */
 export const useAssignPolicyBulk = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: BulkAssignPolicyData) => assignPolicyBulk(data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.assignments() })
+      invalidateCache.leavePolicy.assignments()
       // Invalidate each employee's policy
       variables.employeeIds.forEach((employeeId) => {
-        queryClient.invalidateQueries({ queryKey: leavePolicyKeys.employeePolicy(employeeId) })
+        invalidateCache.leavePolicy.employeePolicy(employeeId)
       })
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.unassignedEmployees() })
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.stats() })
+      invalidateCache.leavePolicy.unassignedEmployees()
+      invalidateCache.leavePolicy.stats()
     },
   })
 }
@@ -341,18 +324,14 @@ export const useAssignPolicyBulk = () => {
  * Cancel policy assignment
  */
 export const useCancelPolicyAssignment = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ assignmentId, reason }: { assignmentId: string; reason: string }) =>
       cancelPolicyAssignment(assignmentId, reason),
     onSuccess: (data, { assignmentId }) => {
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.assignmentDetail(assignmentId) })
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.assignments() })
-      queryClient.invalidateQueries({
-        queryKey: leavePolicyKeys.employeePolicy(data.employeeId),
-      })
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.stats() })
+      invalidateCache.leavePolicy.assignmentDetail(assignmentId)
+      invalidateCache.leavePolicy.assignments()
+      invalidateCache.leavePolicy.employeePolicy(data.employeeId)
+      invalidateCache.leavePolicy.stats()
     },
   })
 }
@@ -361,8 +340,6 @@ export const useCancelPolicyAssignment = () => {
  * Update assignment dates
  */
 export const useUpdateAssignmentDates = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       assignmentId,
@@ -374,8 +351,8 @@ export const useUpdateAssignmentDates = () => {
       effectiveTo?: string
     }) => updateAssignmentDates(assignmentId, effectiveFrom, effectiveTo),
     onSuccess: (_, { assignmentId }) => {
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.assignmentDetail(assignmentId) })
-      queryClient.invalidateQueries({ queryKey: leavePolicyKeys.assignments() })
+      invalidateCache.leavePolicy.assignmentDetail(assignmentId)
+      invalidateCache.leavePolicy.assignments()
     },
   })
 }

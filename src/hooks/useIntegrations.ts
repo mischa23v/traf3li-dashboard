@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config/cache'
 import integrationsService, {
   Integration,
   IntegrationCategory,
@@ -38,7 +39,7 @@ export const useIntegrations = () => {
   return useQuery({
     queryKey: ['integrations'],
     queryFn: () => integrationsService.getIntegrations(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 
@@ -49,7 +50,7 @@ export const useIntegrationsByCategory = (category: IntegrationCategory) => {
   return useQuery({
     queryKey: ['integrations', 'category', category],
     queryFn: () => integrationsService.getIntegrationsByCategory(category),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 
@@ -61,7 +62,7 @@ export const useIntegration = (id: string) => {
     queryKey: ['integrations', id],
     queryFn: () => integrationsService.getIntegration(id),
     enabled: !!id,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 }
 

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   getOrganizationalUnits,
   getOrganizationalUnit,
@@ -116,14 +117,13 @@ export const useUnitPath = (unitId: string) => {
 
 // Create organizational unit
 export const useCreateOrganizationalUnit = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateOrganizationalUnitData) => createOrganizationalUnit(data),
     onSuccess: () => {
       toast.success('تم إنشاء الوحدة التنظيمية بنجاح')
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.all })
+      invalidateCache.organizationalStructure.lists()
+      invalidateCache.organizationalStructure.stats()
+      invalidateCache.organizationalStructure.all()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء الوحدة التنظيمية')
@@ -133,14 +133,13 @@ export const useCreateOrganizationalUnit = () => {
 
 // Update organizational unit
 export const useUpdateOrganizationalUnit = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ unitId, data }: { unitId: string; data: UpdateOrganizationalUnitData }) =>
       updateOrganizationalUnit(unitId, data),
     onSuccess: (_, { unitId }) => {
       toast.success('تم تحديث الوحدة التنظيمية بنجاح')
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.detail(unitId) })
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.lists() })
+      invalidateCache.organizationalStructure.detail(unitId)
+      invalidateCache.organizationalStructure.lists()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث الوحدة التنظيمية')
@@ -150,14 +149,13 @@ export const useUpdateOrganizationalUnit = () => {
 
 // Delete organizational unit
 export const useDeleteOrganizationalUnit = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (unitId: string) => deleteOrganizationalUnit(unitId),
     onSuccess: () => {
       toast.success('تم حذف الوحدة التنظيمية بنجاح')
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.all })
+      invalidateCache.organizationalStructure.lists()
+      invalidateCache.organizationalStructure.stats()
+      invalidateCache.organizationalStructure.all()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف الوحدة التنظيمية')
@@ -167,14 +165,13 @@ export const useDeleteOrganizationalUnit = () => {
 
 // Bulk delete organizational units
 export const useBulkDeleteOrganizationalUnits = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteOrganizationalUnits(ids),
     onSuccess: (_, variables) => {
       toast.success(`تم حذف ${variables.length} وحدة تنظيمية بنجاح`)
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.all })
+      invalidateCache.organizationalStructure.lists()
+      invalidateCache.organizationalStructure.stats()
+      invalidateCache.organizationalStructure.all()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف الوحدات التنظيمية')
@@ -184,15 +181,14 @@ export const useBulkDeleteOrganizationalUnits = () => {
 
 // Move organizational unit
 export const useMoveOrganizationalUnit = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ unitId, data }: { unitId: string; data: { newParentId: string; reason?: string } }) =>
       moveOrganizationalUnit(unitId, data),
     onSuccess: (_, { unitId }) => {
       toast.success('تم نقل الوحدة التنظيمية بنجاح')
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.detail(unitId) })
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.all })
+      invalidateCache.organizationalStructure.detail(unitId)
+      invalidateCache.organizationalStructure.lists()
+      invalidateCache.organizationalStructure.all()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل نقل الوحدة التنظيمية')
@@ -202,15 +198,14 @@ export const useMoveOrganizationalUnit = () => {
 
 // Merge organizational units
 export const useMergeOrganizationalUnits = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: { sourceUnitIds: string[]; targetUnitId: string; reason?: string }) =>
       mergeOrganizationalUnits(data),
     onSuccess: () => {
       toast.success('تم دمج الوحدات التنظيمية بنجاح')
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.all })
+      invalidateCache.organizationalStructure.lists()
+      invalidateCache.organizationalStructure.stats()
+      invalidateCache.organizationalStructure.all()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل دمج الوحدات التنظيمية')
@@ -220,15 +215,14 @@ export const useMergeOrganizationalUnits = () => {
 
 // Dissolve organizational unit
 export const useDissolveOrganizationalUnit = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ unitId, data }: { unitId: string; data: { reason: string; effectiveDate?: string; reassignTo?: string } }) =>
       dissolveOrganizationalUnit(unitId, data),
     onSuccess: (_, { unitId }) => {
       toast.success('تم حل الوحدة التنظيمية بنجاح')
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.detail(unitId) })
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.stats() })
+      invalidateCache.organizationalStructure.detail(unitId)
+      invalidateCache.organizationalStructure.lists()
+      invalidateCache.organizationalStructure.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حل الوحدة التنظيمية')
@@ -238,14 +232,13 @@ export const useDissolveOrganizationalUnit = () => {
 
 // Activate organizational unit
 export const useActivateOrganizationalUnit = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (unitId: string) => activateOrganizationalUnit(unitId),
     onSuccess: (_, unitId) => {
       toast.success('تم تفعيل الوحدة التنظيمية بنجاح')
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.detail(unitId) })
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.stats() })
+      invalidateCache.organizationalStructure.detail(unitId)
+      invalidateCache.organizationalStructure.lists()
+      invalidateCache.organizationalStructure.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تفعيل الوحدة التنظيمية')
@@ -255,15 +248,14 @@ export const useActivateOrganizationalUnit = () => {
 
 // Deactivate organizational unit
 export const useDeactivateOrganizationalUnit = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ unitId, data }: { unitId: string; data?: { reason?: string } }) =>
       deactivateOrganizationalUnit(unitId, data),
     onSuccess: (_, { unitId }) => {
       toast.success('تم تعطيل الوحدة التنظيمية بنجاح')
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.detail(unitId) })
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.stats() })
+      invalidateCache.organizationalStructure.detail(unitId)
+      invalidateCache.organizationalStructure.lists()
+      invalidateCache.organizationalStructure.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تعطيل الوحدة التنظيمية')
@@ -273,14 +265,13 @@ export const useDeactivateOrganizationalUnit = () => {
 
 // Update headcount
 export const useUpdateHeadcount = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ unitId, data }: { unitId: string; data: Partial<HeadcountInfo> }) =>
       updateHeadcount(unitId, data),
     onSuccess: (_, { unitId }) => {
       toast.success('تم تحديث العدد الوظيفي بنجاح')
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.detail(unitId) })
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.stats() })
+      invalidateCache.organizationalStructure.detail(unitId)
+      invalidateCache.organizationalStructure.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث العدد الوظيفي')
@@ -290,14 +281,13 @@ export const useUpdateHeadcount = () => {
 
 // Update budget
 export const useUpdateBudget = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ unitId, data }: { unitId: string; data: Partial<BudgetInfo> }) =>
       updateBudget(unitId, data),
     onSuccess: (_, { unitId }) => {
       toast.success('تم تحديث الميزانية بنجاح')
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.detail(unitId) })
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.stats() })
+      invalidateCache.organizationalStructure.detail(unitId)
+      invalidateCache.organizationalStructure.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث الميزانية')
@@ -307,13 +297,12 @@ export const useUpdateBudget = () => {
 
 // Add KPI
 export const useAddKPI = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ unitId, data }: { unitId: string; data: Omit<KPITarget, 'kpiId'> }) =>
       addKPI(unitId, data),
     onSuccess: (_, { unitId }) => {
       toast.success('تم إضافة مؤشر الأداء بنجاح')
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.detail(unitId) })
+      invalidateCache.organizationalStructure.detail(unitId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إضافة مؤشر الأداء')
@@ -323,13 +312,12 @@ export const useAddKPI = () => {
 
 // Update KPI
 export const useUpdateKPI = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ unitId, kpiId, data }: { unitId: string; kpiId: string; data: Partial<KPITarget> }) =>
       updateKPI(unitId, kpiId, data),
     onSuccess: (_, { unitId }) => {
       toast.success('تم تحديث مؤشر الأداء بنجاح')
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.detail(unitId) })
+      invalidateCache.organizationalStructure.detail(unitId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث مؤشر الأداء')
@@ -339,13 +327,12 @@ export const useUpdateKPI = () => {
 
 // Add leadership position
 export const useAddLeadershipPosition = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ unitId, data }: { unitId: string; data: Omit<LeadershipPosition, 'positionId'> }) =>
       addLeadershipPosition(unitId, data),
     onSuccess: (_, { unitId }) => {
       toast.success('تم إضافة المنصب القيادي بنجاح')
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.detail(unitId) })
+      invalidateCache.organizationalStructure.detail(unitId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إضافة المنصب القيادي')
@@ -355,13 +342,12 @@ export const useAddLeadershipPosition = () => {
 
 // Remove leadership position
 export const useRemoveLeadershipPosition = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ unitId, positionId }: { unitId: string; positionId: string }) =>
       removeLeadershipPosition(unitId, positionId),
     onSuccess: (_, { unitId }) => {
       toast.success('تم إزالة المنصب القيادي بنجاح')
-      queryClient.invalidateQueries({ queryKey: organizationalStructureKeys.detail(unitId) })
+      invalidateCache.organizationalStructure.detail(unitId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إزالة المنصب القيادي')

@@ -164,7 +164,7 @@ export const useBankTransactions = (id: string, filters?: BankTransactionFilters
     queryKey: ['bank-transactions', id, filters],
     queryFn: () => bankFeedService.getTransactions(id, filters),
     enabled: !!id,
-    staleTime: 30 * 1000,
+    staleTime: CACHE_TIMES.REALTIME.LIVE_FEED, // 30 seconds
   })
 }
 

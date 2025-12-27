@@ -10,8 +10,9 @@
  * Status: AWAITING BACKEND DEVELOPMENT
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import automatedActionService from '@/services/automatedActionService'
 import type {
   AutomatedAction,
@@ -213,15 +214,13 @@ export function useModelFields(modelName: string, enabled = true) {
  * ⚠️ WILL FAIL - Backend not implemented
  */
 export function useCreateAutomatedAction() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateAutomatedActionData) => {
       logBackendNotImplemented('createAutomatedAction')
       return automatedActionService.createAutomatedAction(data)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: automatedActionKeys.lists() })
+      invalidateCache.automatedActions.lists()
       toast.success('تم إنشاء الإجراء التلقائي بنجاح | Action created successfully')
     },
     onError: (error: Error) => {
@@ -238,16 +237,14 @@ export function useCreateAutomatedAction() {
  * ⚠️ WILL FAIL - Backend not implemented
  */
 export function useUpdateAutomatedAction() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateAutomatedActionData }) => {
       logBackendNotImplemented('updateAutomatedAction')
       return automatedActionService.updateAutomatedAction(id, data)
     },
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: automatedActionKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: automatedActionKeys.lists() })
+      invalidateCache.automatedActions.detail(id)
+      invalidateCache.automatedActions.lists()
       toast.success('تم تحديث الإجراء التلقائي | Action updated successfully')
     },
     onError: (error: Error) => {
@@ -264,15 +261,13 @@ export function useUpdateAutomatedAction() {
  * ⚠️ WILL FAIL - Backend not implemented
  */
 export function useDeleteAutomatedAction() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => {
       logBackendNotImplemented('deleteAutomatedAction')
       return automatedActionService.deleteAutomatedAction(id)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: automatedActionKeys.lists() })
+      invalidateCache.automatedActions.lists()
       toast.success('تم حذف الإجراء التلقائي | Action deleted successfully')
     },
     onError: (error: Error) => {
@@ -289,16 +284,14 @@ export function useDeleteAutomatedAction() {
  * ⚠️ WILL FAIL - Backend not implemented
  */
 export function useToggleAutomatedAction() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => {
       logBackendNotImplemented('toggleAutomatedAction')
       return automatedActionService.toggleAutomatedAction(id)
     },
     onSuccess: (updatedAction, id) => {
-      queryClient.invalidateQueries({ queryKey: automatedActionKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: automatedActionKeys.lists() })
+      invalidateCache.automatedActions.detail(id)
+      invalidateCache.automatedActions.lists()
       toast.success(
         updatedAction.isActive
           ? 'تم تفعيل الإجراء التلقائي | Action enabled successfully'
@@ -348,15 +341,13 @@ export function useTestAutomatedAction() {
  * ⚠️ WILL FAIL - Backend not implemented
  */
 export function useDuplicateAutomatedAction() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => {
       logBackendNotImplemented('duplicateAutomatedAction')
       return automatedActionService.duplicateAutomatedAction(id)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: automatedActionKeys.lists() })
+      invalidateCache.automatedActions.lists()
       toast.success('تم نسخ الإجراء التلقائي | Action duplicated successfully')
     },
     onError: (error: Error) => {
@@ -375,15 +366,13 @@ export function useDuplicateAutomatedAction() {
  * ⚠️ WILL FAIL - Backend not implemented
  */
 export function useEnableAutomatedActions() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (ids: string[]) => {
       logBackendNotImplemented('enableAutomatedActions')
       return automatedActionService.enableAutomatedActions(ids)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: automatedActionKeys.lists() })
+      invalidateCache.automatedActions.lists()
       toast.success('تم تفعيل الإجراءات المحددة | Selected actions enabled successfully')
     },
     onError: (error: Error) => {
@@ -400,15 +389,13 @@ export function useEnableAutomatedActions() {
  * ⚠️ WILL FAIL - Backend not implemented
  */
 export function useDisableAutomatedActions() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (ids: string[]) => {
       logBackendNotImplemented('disableAutomatedActions')
       return automatedActionService.disableAutomatedActions(ids)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: automatedActionKeys.lists() })
+      invalidateCache.automatedActions.lists()
       toast.success('تم تعطيل الإجراءات المحددة | Selected actions disabled successfully')
     },
     onError: (error: Error) => {
@@ -425,15 +412,13 @@ export function useDisableAutomatedActions() {
  * ⚠️ WILL FAIL - Backend not implemented
  */
 export function useDeleteAutomatedActions() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (ids: string[]) => {
       logBackendNotImplemented('deleteAutomatedActions')
       return automatedActionService.deleteAutomatedActions(ids)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: automatedActionKeys.lists() })
+      invalidateCache.automatedActions.lists()
       toast.success('تم حذف الإجراءات المحددة | Selected actions deleted successfully')
     },
     onError: (error: Error) => {

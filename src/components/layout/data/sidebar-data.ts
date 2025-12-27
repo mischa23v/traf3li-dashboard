@@ -31,6 +31,7 @@ import {
 } from 'lucide-react'
 import { ClerkLogo } from '@/assets/clerk-logo'
 import { type SidebarData } from '../types'
+import { ROUTES } from '@/constants/routes'
 
 export const sidebarData: SidebarData = {
   user: {
@@ -80,7 +81,7 @@ export const sidebarData: SidebarData = {
           items: [
             {
               title: 'sidebar.allCases',
-              url: '/dashboard/cases',
+              url: ROUTES.dashboard.cases.list,
             },
           ],
         },
@@ -217,27 +218,27 @@ export const sidebarData: SidebarData = {
           items: [
             {
               title: 'Profile',
-              url: '/settings',
+              url: ROUTES.settings.index,
               icon: UserCog,
             },
             {
               title: 'Account',
-              url: '/settings/account',
+              url: ROUTES.settings.account,
               icon: Wrench,
             },
             {
               title: 'Appearance',
-              url: '/settings/appearance',
+              url: ROUTES.settings.appearance,
               icon: Palette,
             },
             {
               title: 'Notifications',
-              url: '/settings/notifications',
+              url: ROUTES.settings.notifications,
               icon: Bell,
             },
             {
               title: 'Display',
-              url: '/settings/display',
+              url: ROUTES.settings.display,
               icon: Monitor,
             },
           ],

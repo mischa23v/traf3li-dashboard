@@ -3,11 +3,13 @@
  * React Query hooks for sidebar visibility and page access control
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import uiAccessService from '@/services/uiAccessService'
 import apiClient from '@/lib/api'
 import { useAuthStore } from '@/stores/auth-store'
+import { CACHE_TIMES } from '@/config/cache'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import type {
   SidebarItem,
   PageAccessRule,
@@ -47,8 +49,8 @@ export const useVisibleSidebar = () => {
   return useQuery({
     queryKey: uiAccessKeys.visibleSidebar(),
     queryFn: uiAccessService.getVisibleSidebar,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: CACHE_TIMES.MEDIUM,
+    gcTime: CACHE_TIMES.GC_MEDIUM,
   })
 }
 
@@ -59,7 +61,7 @@ export const useAllSidebarItems = () => {
   return useQuery({
     queryKey: uiAccessKeys.allSidebarItems(),
     queryFn: uiAccessService.getAllSidebarItems,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -67,8 +69,6 @@ export const useAllSidebarItems = () => {
  * Update sidebar visibility for a role
  */
 export const useUpdateSidebarVisibility = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ itemId, role, visible }: { itemId: string; role: string; visible: boolean }) =>
       uiAccessService.updateSidebarVisibility(itemId, role, visible),
@@ -79,8 +79,8 @@ export const useUpdateSidebarVisibility = () => {
       toast.error(error.message || 'فشل تحديث إظهار القائمة')
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: uiAccessKeys.sidebar() })
-      queryClient.invalidateQueries({ queryKey: uiAccessKeys.matrix() })
+      invalidateCache.uiAccess.sidebar()
+      invalidateCache.uiAccess.matrix()
     },
   })
 }
@@ -97,7 +97,7 @@ export const usePageAccess = (routePath: string, options?: { enabled?: boolean }
     queryKey: uiAccessKeys.pageAccess(routePath),
     queryFn: () => uiAccessService.checkPageAccess(routePath),
     enabled: options?.enabled !== false && !!routePath,
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
   })
 }
 
@@ -108,7 +108,7 @@ export const useAllPageAccess = () => {
   return useQuery({
     queryKey: uiAccessKeys.allPageAccess(),
     queryFn: uiAccessService.getAllPageAccess,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -116,8 +116,6 @@ export const useAllPageAccess = () => {
  * Update page access for a role
  */
 export const useUpdatePageAccess = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ pageId, role, hasAccess }: { pageId: string; role: string; hasAccess: boolean }) =>
       uiAccessService.updatePageAccess(pageId, role, hasAccess),
@@ -128,8 +126,8 @@ export const useUpdatePageAccess = () => {
       toast.error(error.message || 'فشل تحديث صلاحية الصفحة')
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: uiAccessKeys.pages() })
-      queryClient.invalidateQueries({ queryKey: uiAccessKeys.matrix() })
+      invalidateCache.uiAccess.pages()
+      invalidateCache.uiAccess.matrix()
     },
   })
 }
@@ -145,7 +143,7 @@ export const useUIAccessConfig = () => {
   return useQuery({
     queryKey: uiAccessKeys.config(),
     queryFn: uiAccessService.getUIAccessConfig,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -153,8 +151,6 @@ export const useUIAccessConfig = () => {
  * Update UI access settings
  */
 export const useUpdateUIAccessConfig = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (settings: Partial<UIAccessSettings>) =>
       uiAccessService.updateUIAccessConfig(settings),
@@ -165,7 +161,7 @@ export const useUpdateUIAccessConfig = () => {
       toast.error(error.message || 'فشل تحديث إعدادات الوصول')
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: uiAccessKeys.config() })
+      invalidateCache.uiAccess.config()
     },
   })
 }
@@ -177,7 +173,7 @@ export const useAccessMatrix = () => {
   return useQuery({
     queryKey: uiAccessKeys.matrix(),
     queryFn: uiAccessService.getAccessMatrix,
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
   })
 }
 
@@ -185,8 +181,6 @@ export const useAccessMatrix = () => {
  * Bulk update role access
  */
 export const useBulkUpdateRoleAccess = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       role,
@@ -207,7 +201,7 @@ export const useBulkUpdateRoleAccess = () => {
       toast.error(error.message || 'فشل تحديث صلاحيات الدور')
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: uiAccessKeys.all })
+      invalidateCache.uiAccess.all()
     },
   })
 }
@@ -220,8 +214,6 @@ export const useBulkUpdateRoleAccess = () => {
  * Add user-specific override
  */
 export const useAddUserOverride = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (override: {
       userId: string
@@ -241,8 +233,8 @@ export const useAddUserOverride = () => {
       toast.error(error.message || 'فشل إضافة استثناء المستخدم')
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: uiAccessKeys.config() })
-      queryClient.invalidateQueries({ queryKey: uiAccessKeys.overrides() })
+      invalidateCache.uiAccess.config()
+      invalidateCache.uiAccess.overrides()
     },
   })
 }
@@ -251,8 +243,6 @@ export const useAddUserOverride = () => {
  * Remove user-specific override
  */
 export const useRemoveUserOverride = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (userId: string) => uiAccessService.removeUserOverride(userId),
     onSuccess: () => {
@@ -262,8 +252,8 @@ export const useRemoveUserOverride = () => {
       toast.error(error.message || 'فشل حذف استثناء المستخدم')
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: uiAccessKeys.config() })
-      queryClient.invalidateQueries({ queryKey: uiAccessKeys.overrides() })
+      invalidateCache.uiAccess.config()
+      invalidateCache.uiAccess.overrides()
     },
   })
 }
@@ -287,8 +277,8 @@ export const useAdminDashboardData = () => {
       const response = await apiClient.get('/admin/dashboard')
       return response.data
     },
-    staleTime: 2 * 60 * 1000,
-    gcTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
+    gcTime: CACHE_TIMES.GC_SHORT,
     enabled: isAuthenticated,
     retry: false,
   })

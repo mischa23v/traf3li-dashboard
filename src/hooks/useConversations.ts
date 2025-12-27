@@ -10,6 +10,7 @@ import conversationsService, {
   CreateConversationData,
 } from '@/services/conversationsService'
 import messagesService, { SendMessageData } from '@/services/messagesService'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ==================== Cache Configuration ====================
 const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
@@ -60,7 +61,7 @@ export const useCreateConversation = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['conversations'], refetchType: 'all' })
+      await invalidateCache.conversations.all()
     },
   })
 }
@@ -100,11 +101,8 @@ export const useSendMessage = () => {
     onSettled: async (_, __, variables) => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({
-        queryKey: ['messages', variables.conversationId],
-        refetchType: 'all'
-      })
-      await queryClient.invalidateQueries({ queryKey: ['conversations'], refetchType: 'all' })
+      await invalidateCache.conversations.messages(variables.conversationId)
+      await invalidateCache.conversations.all()
     },
   })
 }
@@ -118,11 +116,8 @@ export const useMarkMessagesAsRead = () => {
     onSettled: async (_, __, conversationId) => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({
-        queryKey: ['messages', conversationId],
-        refetchType: 'all'
-      })
-      await queryClient.invalidateQueries({ queryKey: ['conversations'], refetchType: 'all' })
+      await invalidateCache.conversations.messages(conversationId)
+      await invalidateCache.conversations.all()
     },
   })
 }
@@ -151,11 +146,8 @@ export const useUpdateConversation = () => {
     onSettled: async (_, __, { id }) => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['conversations'], refetchType: 'all' })
-      await queryClient.invalidateQueries({
-        queryKey: ['conversations', 'single'],
-        refetchType: 'all'
-      })
+      await invalidateCache.conversations.all()
+      await invalidateCache.conversations.single()
     },
   })
 }

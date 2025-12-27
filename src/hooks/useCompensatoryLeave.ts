@@ -1,4 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CACHE_TIMES } from '@/config/cache'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   getCompensatoryLeaveRequests,
   getCompensatoryLeaveRequest,
@@ -29,9 +31,7 @@ import {
   CalculationMethod,
   WorkReason,
 } from '@/services/compensatoryLeaveService'
-
 // ==================== QUERY KEYS ====================
-
 export const compensatoryLeaveKeys = {
   all: ['compensatory-leave-requests'] as const,
   lists: () => [...compensatoryLeaveKeys.all, 'list'] as const,
@@ -58,9 +58,7 @@ export const compensatoryLeaveKeys = {
   ) => [...compensatoryLeaveKeys.all, 'holiday-work', employeeId, filters] as const,
   policy: () => [...compensatoryLeaveKeys.all, 'policy'] as const,
 }
-
 // ==================== QUERY HOOKS ====================
-
 /**
  * Get all compensatory leave requests with filters
  */
@@ -70,7 +68,6 @@ export const useCompensatoryLeaveRequests = (filters?: CompensatoryLeaveFilters)
     queryFn: () => getCompensatoryLeaveRequests(filters),
   })
 }
-
 /**
  * Get single compensatory leave request
  */
@@ -81,7 +78,6 @@ export const useCompensatoryLeaveRequest = (id: string) => {
     enabled: !!id,
   })
 }
-
 /**
  * Get employee compensatory leave balance
  */
@@ -92,7 +88,6 @@ export const useEmployeeCompLeaveBalance = (employeeId: string) => {
     enabled: !!employeeId,
   })
 }
-
 /**
  * Get compensatory leave statistics
  */
@@ -106,7 +101,6 @@ export const useCompensatoryLeaveStats = (filters?: {
     queryFn: () => getCompensatoryLeaveStats(filters),
   })
 }
-
 /**
  * Get pending compensatory leave requests (for approvers)
  */
@@ -116,7 +110,6 @@ export const usePendingCompensatoryLeaveRequests = () => {
     queryFn: getPendingCompensatoryLeaveRequests,
   })
 }
-
 /**
  * Get expiring compensatory leave
  */
@@ -126,7 +119,6 @@ export const useExpiringCompensatoryLeave = (daysBeforeExpiry: number = 30) => {
     queryFn: () => getExpiringCompensatoryLeave(daysBeforeExpiry),
   })
 }
-
 /**
  * Get holiday/weekend work records from attendance
  */
@@ -146,7 +138,6 @@ export const useHolidayWorkRecords = (
     enabled: !!employeeId,
   })
 }
-
 /**
  * Get compensatory leave policy/rules
  */
@@ -157,37 +148,26 @@ export const useCompensatoryLeavePolicy = () => {
     staleTime: 1000 * 60 * 60, // 1 hour - policy doesn't change often
   })
 }
-
 // ==================== MUTATION HOOKS ====================
-
 /**
  * Create compensatory leave request
  */
 export const useCreateCompensatoryLeaveRequest = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateCompensatoryLeaveRequestData) =>
       createCompensatoryLeaveRequest(data),
     onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.stats() })
-      queryClient.invalidateQueries({
-        queryKey: compensatoryLeaveKeys.balance(variables.employeeId),
-      })
-      queryClient.invalidateQueries({
-        queryKey: compensatoryLeaveKeys.holidayWorkRecords(variables.employeeId),
-      })
+      invalidateCache.compensatoryLeave.lists()
+      invalidateCache.compensatoryLeave.stats()
+      invalidateCache.compensatoryLeave.balance(variables.employeeId)
+      invalidateCache.compensatoryLeave.holidayWorkRecords(variables.employeeId)
     },
   })
 }
-
 /**
  * Update compensatory leave request
  */
 export const useUpdateCompensatoryLeaveRequest = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       id,
@@ -197,53 +177,42 @@ export const useUpdateCompensatoryLeaveRequest = () => {
       data: UpdateCompensatoryLeaveRequestData
     }) => updateCompensatoryLeaveRequest(id, data),
     onSuccess: (result, { id }) => {
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.lists() })
+      invalidateCache.compensatoryLeave.detail(id)
+      invalidateCache.compensatoryLeave.lists()
       if (result.employeeId) {
-        queryClient.invalidateQueries({
-          queryKey: compensatoryLeaveKeys.balance(result.employeeId),
-        })
+        invalidateCache.compensatoryLeave.balance(result.employeeId)
       }
     },
   })
 }
-
 /**
  * Delete compensatory leave request
  */
 export const useDeleteCompensatoryLeaveRequest = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => deleteCompensatoryLeaveRequest(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.stats() })
+      invalidateCache.compensatoryLeave.lists()
+      invalidateCache.compensatoryLeave.stats()
     },
   })
 }
-
 /**
  * Submit compensatory leave request for approval
  */
 export const useSubmitCompensatoryLeaveRequest = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => submitCompensatoryLeaveRequest(id),
     onSuccess: (result, id) => {
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.pendingApprovals() })
+      invalidateCache.compensatoryLeave.detail(id)
+      invalidateCache.compensatoryLeave.lists()
+      invalidateCache.compensatoryLeave.pendingApprovals()
       if (result.employeeId) {
-        queryClient.invalidateQueries({
-          queryKey: compensatoryLeaveKeys.balance(result.employeeId),
-        })
+        invalidateCache.compensatoryLeave.balance(result.employeeId)
       }
     },
   })
 }
-
 /**
  * Calculate leave days earned from hours worked
  */
@@ -260,92 +229,73 @@ export const useCalculateLeaveDays = () => {
     }) => calculateLeaveDays(hoursWorked, method, reason),
   })
 }
-
 /**
  * Approve compensatory leave request
  */
 export const useApproveCompensatoryLeaveRequest = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data?: ApprovalActionData }) =>
       approveCompensatoryLeaveRequest(id, data),
     onSuccess: (result, { id }) => {
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.pendingApprovals() })
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.stats() })
+      invalidateCache.compensatoryLeave.detail(id)
+      invalidateCache.compensatoryLeave.lists()
+      invalidateCache.compensatoryLeave.pendingApprovals()
+      invalidateCache.compensatoryLeave.stats()
       if (result.employeeId) {
-        queryClient.invalidateQueries({
-          queryKey: compensatoryLeaveKeys.balance(result.employeeId),
-        })
+        invalidateCache.compensatoryLeave.balance(result.employeeId)
         // Invalidate leave allocations if created
-        queryClient.invalidateQueries({ queryKey: ['leave-allocations'] })
+        invalidateCache.leaveAllocation.all()
       }
     },
   })
 }
-
 /**
  * Reject compensatory leave request
  */
 export const useRejectCompensatoryLeaveRequest = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: RejectionActionData }) =>
       rejectCompensatoryLeaveRequest(id, data),
     onSuccess: (result, { id }) => {
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.pendingApprovals() })
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.stats() })
+      invalidateCache.compensatoryLeave.detail(id)
+      invalidateCache.compensatoryLeave.lists()
+      invalidateCache.compensatoryLeave.pendingApprovals()
+      invalidateCache.compensatoryLeave.stats()
     },
   })
 }
-
 /**
  * Cancel compensatory leave request
  */
 export const useCancelCompensatoryLeaveRequest = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       cancelCompensatoryLeaveRequest(id, reason),
     onSuccess: (result, { id }) => {
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.stats() })
+      invalidateCache.compensatoryLeave.detail(id)
+      invalidateCache.compensatoryLeave.lists()
+      invalidateCache.compensatoryLeave.stats()
       if (result.employeeId) {
-        queryClient.invalidateQueries({
-          queryKey: compensatoryLeaveKeys.balance(result.employeeId),
-        })
+        invalidateCache.compensatoryLeave.balance(result.employeeId)
       }
     },
   })
 }
-
 /**
  * Expire unused compensatory leave
  */
 export const useExpireUnusedCompLeave = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (asOfDate?: string) => expireUnusedCompLeave(asOfDate),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.all })
+      invalidateCache.compensatoryLeave.all()
     },
   })
 }
-
 /**
  * Upload supporting document
  */
 export const useUploadCompensatoryLeaveDocument = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       requestId,
@@ -357,11 +307,10 @@ export const useUploadCompensatoryLeaveDocument = () => {
       documentType: 'attendance_report' | 'manager_approval' | 'timesheet' | 'other'
     }) => uploadCompensatoryLeaveDocument(requestId, file, documentType),
     onSuccess: (result, { requestId }) => {
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.detail(requestId) })
+      invalidateCache.compensatoryLeave.detail(requestId)
     },
   })
 }
-
 /**
  * Export compensatory leave requests to Excel
  */
@@ -371,13 +320,10 @@ export const useExportCompensatoryLeaveRequests = () => {
       exportCompensatoryLeaveRequests(filters),
   })
 }
-
 /**
  * Bulk approve compensatory leave requests
  */
 export const useBulkApproveCompensatoryLeaveRequests = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       ids,
@@ -387,23 +333,20 @@ export const useBulkApproveCompensatoryLeaveRequests = () => {
       createLeaveAllocation?: boolean
     }) => bulkApproveCompensatoryLeaveRequests(ids, createLeaveAllocation),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.all })
-      queryClient.invalidateQueries({ queryKey: ['leave-allocations'] })
+      invalidateCache.compensatoryLeave.all()
+      invalidateCache.leaveAllocation.all()
     },
   })
 }
-
 /**
  * Bulk reject compensatory leave requests
  */
 export const useBulkRejectCompensatoryLeaveRequests = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ ids, reason }: { ids: string[]; reason: string }) =>
       bulkRejectCompensatoryLeaveRequests(ids, reason),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: compensatoryLeaveKeys.all })
+      invalidateCache.compensatoryLeave.all()
     },
   })
 }

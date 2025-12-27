@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { CACHE_TIMES } from '@/config'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import notificationService, {
   type Notification,
   type NotificationFilters,
@@ -141,7 +142,7 @@ export const useMarkAsRead = () => {
     },
     onSettled: () => {
       // Batch invalidation - React Query automatically batches these
-      queryClient.invalidateQueries({ queryKey: notificationKeys.all })
+      invalidateCache.notifications.all()
     },
   })
 }
@@ -150,7 +151,6 @@ export const useMarkAsRead = () => {
  * Hook to mark multiple notifications as read
  */
 export const useMarkMultipleAsRead = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
@@ -162,7 +162,7 @@ export const useMarkMultipleAsRead = () => {
       toast.error(error.message || t('notifications.markAsReadError', 'Failed to mark notifications as read'))
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: notificationKeys.all })
+      invalidateCache.notifications.all()
     },
   })
 }
@@ -218,7 +218,7 @@ export const useMarkAllAsRead = () => {
     },
     onSettled: () => {
       // Refetch to ensure consistency
-      queryClient.invalidateQueries({ queryKey: notificationKeys.all })
+      invalidateCache.notifications.all()
     },
   })
 }
@@ -272,7 +272,7 @@ export const useDeleteNotification = () => {
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: notificationKeys.all })
+      invalidateCache.notifications.all()
     },
   })
 }
@@ -281,7 +281,6 @@ export const useDeleteNotification = () => {
  * Hook to delete multiple notifications
  */
 export const useDeleteMultipleNotifications = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
@@ -293,7 +292,7 @@ export const useDeleteMultipleNotifications = () => {
       toast.error(error.message || t('notifications.deleteMultipleError', 'Failed to delete notifications'))
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: notificationKeys.all })
+      invalidateCache.notifications.all()
     },
   })
 }
@@ -302,7 +301,6 @@ export const useDeleteMultipleNotifications = () => {
  * Hook to clear all read notifications
  */
 export const useClearReadNotifications = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
@@ -314,7 +312,7 @@ export const useClearReadNotifications = () => {
       toast.error(error.message || t('notifications.clearReadError', 'Failed to clear read notifications'))
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: notificationKeys.all })
+      invalidateCache.notifications.all()
     },
   })
 }
@@ -337,7 +335,6 @@ export const useNotificationSettings = () => {
  * Hook to update notification settings
  */
 export const useUpdateNotificationSettings = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
@@ -349,7 +346,7 @@ export const useUpdateNotificationSettings = () => {
       toast.error(error.message || t('notifications.settingsUpdateError', 'Failed to update settings'))
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: notificationKeys.settings() })
+      invalidateCache.notifications.settings()
     },
   })
 }
@@ -360,7 +357,6 @@ export const useUpdateNotificationSettings = () => {
  * Hook to create a notification (for admin/system use)
  */
 export const useCreateNotification = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
@@ -372,7 +368,7 @@ export const useCreateNotification = () => {
       toast.error(error.message || t('notifications.createError', 'Failed to create notification'))
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: notificationKeys.all })
+      invalidateCache.notifications.all()
     },
   })
 }

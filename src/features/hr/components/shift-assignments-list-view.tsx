@@ -6,6 +6,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ProductivityHero } from '@/components/productivity-hero'
 import {
@@ -183,7 +184,7 @@ export function ShiftAssignmentsListView() {
   // Single record actions
   const handleViewRecord = (assignmentId: string) => {
     navigate({
-      to: '/dashboard/hr/shift-assignments/$assignmentId',
+      to: ROUTES.dashboard.hr.shiftAssignments.detail(assignmentId),
       params: { assignmentId },
     })
   }
@@ -280,11 +281,11 @@ export function ShiftAssignmentsListView() {
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'الحضور', href: '/dashboard/hr/attendance', isActive: false },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'الحضور', href: ROUTES.dashboard.hr.attendance.list, isActive: false },
     {
       title: 'مهام النوبات',
-      href: '/dashboard/hr/shift-assignments',
+      href: ROUTES.dashboard.hr.shiftAssignments.list,
       isActive: true,
     },
   ]

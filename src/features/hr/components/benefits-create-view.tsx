@@ -7,6 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useSearch } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { useCreateBenefit, useUpdateBenefit, useBenefit } from '@/hooks/useBenefits'
 import { useEmployees } from '@/hooks/useHR'
 import { Button } from '@/components/ui/button'
@@ -370,13 +371,13 @@ export function BenefitsCreateView() {
       await createMutation.mutateAsync(data)
     }
 
-    navigate({ to: '/dashboard/hr/benefits' })
+    navigate({ to: ROUTES.dashboard.hr.benefits.list })
   }
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'المزايا', href: '/dashboard/hr/benefits', isActive: true },
+    { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
+    { title: 'المزايا', href: ROUTES.dashboard.hr.benefits.list, isActive: true },
   ]
 
   const isPending = createMutation.isPending || updateMutation.isPending
@@ -427,7 +428,7 @@ export function BenefitsCreateView() {
                 variant="ghost"
                 size="icon"
                 className="rounded-xl hover:bg-white"
-                onClick={() => navigate({ to: '/dashboard/hr/benefits' })}
+                onClick={() => navigate({ to: ROUTES.dashboard.hr.benefits.list })}
               >
                 <ArrowRight className="h-5 w-5" />
               </Button>
@@ -1111,7 +1112,7 @@ export function BenefitsCreateView() {
             <div className="flex items-center justify-end gap-4">
               <Button
                 variant="outline"
-                onClick={() => navigate({ to: '/dashboard/hr/benefits' })}
+                onClick={() => navigate({ to: ROUTES.dashboard.hr.benefits.list })}
                 className="rounded-xl"
               >
                 إلغاء
