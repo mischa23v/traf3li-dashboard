@@ -11,8 +11,8 @@
 | Category | Total | Done | Remaining |
 |----------|-------|------|-----------|
 | Cache Invalidations | 34 | 34 | ✅ COMPLETE |
-| Hardcoded Routes | 657 | ~200 | ~460 (in progress) |
-| Hardcoded Cache Times | 79 | 0 | 79 |
+| Hardcoded Routes | 657 | 657 | ✅ COMPLETE |
+| Hardcoded Cache Times | 79 | 0 | 79 (in progress) |
 | Hardcoded Query Keys | 434 | 0 | 434 |
 
 ---
@@ -23,7 +23,7 @@ All cache invalidations migrated to `invalidateCache.*` pattern.
 
 ---
 
-## 🟡 PRIORITY 2: Hardcoded Routes - IN PROGRESS
+## ✅ PRIORITY 2: Hardcoded Routes - COMPLETE
 
 ### Completed Batches (65+ files, ~200 routes):
 - ✅ BATCH 10: Finance components (14 files)

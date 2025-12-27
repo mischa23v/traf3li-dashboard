@@ -79,8 +79,8 @@ export const useWebhookSecret = (id: string, enabled: boolean = false) => {
     queryKey: ['webhooks', 'secret', id],
     queryFn: () => webhookService.getWebhookSecret(id),
     enabled: !!id && enabled,
-    staleTime: 0, // Never cache secrets
-    gcTime: 0, // Don't keep in cache
+    staleTime: CACHE_TIMES.INSTANT, // Never cache secrets
+    gcTime: CACHE_TIMES.INSTANT, // Don't keep in cache
   })
 }
 

@@ -40,6 +40,7 @@ import { useQuery, useMutation } from '@tanstack/react-query'
 import { leadScoringService } from '@/services/crmAdvancedService'
 import { toast } from 'sonner'
 import { invalidateCache } from '@/lib/cache-invalidation'
+import { CACHE_TIMES } from '@/config/cache'
 
 type LeadGrade = 'A' | 'B' | 'C' | 'D' | 'F'
 
@@ -72,7 +73,7 @@ export function LeadScoringDashboard() {
   const { data: scoresData, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['lead-scores', filters],
     queryFn: () => leadScoringService.getScores(filters),
-    staleTime: 2 * 60 * 1000,
+    staleTime: CACHE_TIMES.SHORT,
     retry: false,
   })
 
@@ -80,7 +81,7 @@ export function LeadScoringDashboard() {
   const { data: distributionData } = useQuery({
     queryKey: ['lead-score-distribution'],
     queryFn: () => leadScoringService.getDistribution(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE_TIMES.MEDIUM,
     retry: false,
   })
 

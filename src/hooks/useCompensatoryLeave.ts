@@ -145,7 +145,7 @@ export const useCompensatoryLeavePolicy = () => {
   return useQuery({
     queryKey: compensatoryLeaveKeys.policy(),
     queryFn: getCompensatoryLeavePolicy,
-    staleTime: 1000 * 60 * 60, // 1 hour - policy doesn't change often
+    staleTime: CACHE_TIMES.HOUR, // 1 hour - policy doesn't change often
   })
 }
 // ==================== MUTATION HOOKS ====================

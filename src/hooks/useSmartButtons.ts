@@ -18,6 +18,7 @@
 
 import { useQuery, useQueries } from '@tanstack/react-query'
 import { smartButtonsService, type SupportedModel, type SmartButtonCounts } from '@/services/smartButtonsService'
+import { CACHE_TIMES } from '@/config/cache'
 
 // ════════════════════════════════════════════════════════════
 // DEPRECATION WARNING
@@ -107,7 +108,7 @@ export function useSmartButtons(
     },
     enabled: enabled && !!recordId,
     retry: false, // Don't retry deprecated endpoints
-    staleTime: 0, // Don't cache deprecated data
+    staleTime: CACHE_TIMES.INSTANT, // Don't cache deprecated data
   })
 
   return {
@@ -158,7 +159,7 @@ export function useSmartButtonsBatch(
     },
     enabled: enabled && recordIds.length > 0,
     retry: false, // Don't retry deprecated endpoints
-    staleTime: 0, // Don't cache deprecated data
+    staleTime: CACHE_TIMES.INSTANT, // Don't cache deprecated data
   })
 
   return {
@@ -202,7 +203,7 @@ export function useSmartButtonsMulti(
       },
       enabled: enabled && !!recordId,
       retry: false, // Don't retry deprecated endpoints
-      staleTime: 0, // Don't cache deprecated data
+      staleTime: CACHE_TIMES.INSTANT, // Don't cache deprecated data
     })),
   })
 

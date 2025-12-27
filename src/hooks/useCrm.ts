@@ -298,7 +298,7 @@ export const usePreviewLeadConversion = (leadId: string) => {
     queryKey: ['leads', leadId, 'conversion-preview'],
     queryFn: () => leadService.previewConversion(leadId),
     enabled: !!leadId,
-    staleTime: 0, // Always fetch fresh data
+    staleTime: CACHE_TIMES.INSTANT, // Always fetch fresh data
   })
 }
 
@@ -945,7 +945,7 @@ export const useCalculateReferralFee = (
     queryKey: ['referrals', referralId, 'calculate-fee', caseValue],
     queryFn: () => referralService.calculateFee(referralId, caseValue),
     enabled: !!referralId && caseValue > 0 && enabled,
-    staleTime: 0, // Always fresh
+    staleTime: CACHE_TIMES.INSTANT, // Always fresh
   })
 }
 
