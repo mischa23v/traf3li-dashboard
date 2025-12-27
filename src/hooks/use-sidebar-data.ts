@@ -20,11 +20,6 @@ import {
   Factory,
   Building2,
   GitBranch,
-  FileText,
-  Megaphone,
-  Target,
-  Contact,
-  Briefcase,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 import { usePermissionsStore } from '@/stores/permissions-store'
@@ -222,12 +217,6 @@ export function useSidebarData(): SidebarData {
           icon: TrendingUp,
           module: 'leads',
           items: [
-            // CRM Dashboard
-            {
-              title: 'sidebar.nav.crmDashboard',
-              url: ROUTES.dashboard.crm.index,
-              module: 'leads',
-            },
             {
               title: 'sidebar.nav.leads',
               url: ROUTES.dashboard.crm.leads.list,
@@ -238,36 +227,6 @@ export function useSidebarData(): SidebarData {
               url: ROUTES.dashboard.crm.pipeline,
               module: 'leads',
             },
-            // CRM Contacts
-            {
-              title: 'sidebar.nav.crmContacts',
-              url: ROUTES.dashboard.crm.contacts.list,
-              module: 'leads',
-            },
-            // CRM Clients
-            {
-              title: 'sidebar.nav.crmClients',
-              url: ROUTES.dashboard.crm.clients.list,
-              module: 'leads',
-            },
-            // Products
-            {
-              title: 'sidebar.nav.products',
-              url: ROUTES.dashboard.crm.products.list,
-              module: 'leads',
-            },
-            // Quotes
-            {
-              title: 'sidebar.nav.quotes',
-              url: ROUTES.dashboard.crm.quotes.list,
-              module: 'leads',
-            },
-            // Campaigns
-            {
-              title: 'sidebar.nav.campaigns',
-              url: ROUTES.dashboard.crm.campaigns.list,
-              module: 'leads',
-            },
             {
               title: 'sidebar.nav.referrals',
               url: ROUTES.dashboard.crm.referrals.list,
@@ -276,12 +235,6 @@ export function useSidebarData(): SidebarData {
             {
               title: 'sidebar.nav.activities',
               url: ROUTES.dashboard.crm.activities.list,
-              module: 'leads',
-            },
-            // CRM Tasks
-            {
-              title: 'sidebar.nav.crmTasks',
-              url: ROUTES.dashboard.crm.tasks.list,
               module: 'leads',
             },
             // Email Marketing
