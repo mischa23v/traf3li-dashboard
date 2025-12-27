@@ -426,6 +426,18 @@ export const invalidateCache = {
     policies: () => queryClient.invalidateQueries({ queryKey: ['leave-policies'] }),
   },
 
+  // Leave Requests
+  leaveRequests: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['leave-requests'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['leave-requests', 'list'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['leave-requests', 'detail', id] }),
+    balance: (employeeId?: string) => queryClient.invalidateQueries({ queryKey: employeeId ? ['leave-requests', 'balance', employeeId] : ['leave-requests', 'balance'] }),
+    stats: (filters?: { year?: number; department?: string }) => queryClient.invalidateQueries({ queryKey: ['leave-requests', 'stats', filters] }),
+    calendar: (startDate?: string, endDate?: string, department?: string) => queryClient.invalidateQueries({ queryKey: startDate && endDate ? ['leave-requests', 'calendar', startDate, endDate, department] : ['leave-requests', 'calendar'] }),
+    pendingApprovals: () => queryClient.invalidateQueries({ queryKey: ['leave-requests', 'pending-approvals'] }),
+    types: () => queryClient.invalidateQueries({ queryKey: ['leave-requests', 'types'] }),
+  },
+
   // Leave Allocations
   leaveAllocation: {
     all: () => queryClient.invalidateQueries({ queryKey: ['leave-allocations'] }),
@@ -1072,7 +1084,11 @@ export const invalidateCache = {
   permissions: {
     all: () => queryClient.invalidateQueries({ queryKey: ['permissions'] }),
     config: () => queryClient.invalidateQueries({ queryKey: ['permissions', 'config'] }),
+    policies: () => queryClient.invalidateQueries({ queryKey: ['permissions', 'policies'] }),
+    policy: (policyId: string) => queryClient.invalidateQueries({ queryKey: ['permissions', 'policies', policyId] }),
     relations: () => queryClient.invalidateQueries({ queryKey: ['permissions', 'relations'] }),
+    resourceAccess: (resourceType: string, resourceId: string) =>
+      queryClient.invalidateQueries({ queryKey: ['permissions', 'resources', resourceType, resourceId, 'access'] }),
     myPermissions: () => queryClient.invalidateQueries({ queryKey: ['permissions', 'my-permissions'] }),
     ui: () => queryClient.invalidateQueries({ queryKey: ['permissions', 'ui'] }),
     sidebar: () => queryClient.invalidateQueries({ queryKey: ['permissions', 'ui', 'sidebar'] }),
@@ -1290,6 +1306,34 @@ export const invalidateCache = {
     paymentMethods: () => queryClient.invalidateQueries({ queryKey: ['payment-methods'] }),
   },
 
+  // Billing Settings (Company Settings, Taxes, Payment Modes, Finance Settings, Payment Terms)
+  billingSettings: {
+    // Company Settings
+    companySettings: () => queryClient.invalidateQueries({ queryKey: ['company-settings'] }),
+    // Taxes
+    taxes: () => queryClient.invalidateQueries({ queryKey: ['taxes'], refetchType: 'all' }),
+    taxesLight: () => queryClient.invalidateQueries({ queryKey: ['taxes'] }),
+    // Payment Modes
+    paymentModes: () => queryClient.invalidateQueries({ queryKey: ['payment-modes'], refetchType: 'all' }),
+    paymentModesLight: () => queryClient.invalidateQueries({ queryKey: ['payment-modes'] }),
+    // Finance Settings
+    financeSettings: () => queryClient.invalidateQueries({ queryKey: ['finance-settings'] }),
+    // Payment Terms
+    paymentTerms: () => queryClient.invalidateQueries({ queryKey: ['payment-terms'], refetchType: 'all' }),
+    paymentTermsLight: () => queryClient.invalidateQueries({ queryKey: ['payment-terms'] }),
+    paymentTerm: (id: string) => queryClient.invalidateQueries({ queryKey: ['payment-terms', id] }),
+    // Related invalidations
+    all: async () => {
+      await Promise.all([
+        invalidateCache.billingSettings.companySettings(),
+        invalidateCache.billingSettings.taxes(),
+        invalidateCache.billingSettings.paymentModes(),
+        invalidateCache.billingSettings.financeSettings(),
+        invalidateCache.billingSettings.paymentTerms(),
+      ])
+    },
+  },
+
   // Dashboard
   dashboard: {
     summary: () => queryClient.invalidateQueries({ queryKey: ['dashboard', 'summary'] }),
@@ -1477,6 +1521,82 @@ export const invalidateCache = {
         invalidateCache.finance.dashboard(),
       ])
     },
+  },
+
+  // Leave Periods
+  leavePeriods: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['leave-periods'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['leave-periods', 'list'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['leave-periods', 'detail', id] }),
+    active: () => queryClient.invalidateQueries({ queryKey: ['leave-periods', 'active'] }),
+    byYear: (year: number) => queryClient.invalidateQueries({ queryKey: ['leave-periods', 'year', year] }),
+    statistics: (periodId: string) => queryClient.invalidateQueries({ queryKey: ['leave-periods', 'statistics', periodId] }),
+    allocationSummary: (periodId: string) => queryClient.invalidateQueries({ queryKey: ['leave-periods', 'allocation-summary', periodId] }),
+    related: async (periodId?: string) => {
+      await Promise.all([
+        invalidateCache.leavePeriods.all(),
+        invalidateCache.leaveRequests.balance(),
+      ])
+    },
+  },
+
+  // Case Workflows
+  caseWorkflows: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['case-workflows'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['case-workflows', 'list'], refetchType: 'all' }),
+    list: (filters?: any) => queryClient.invalidateQueries({ queryKey: ['case-workflows', 'list', filters] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['case-workflows', 'detail', id] }),
+    byCategory: (category: string) => queryClient.invalidateQueries({ queryKey: ['case-workflows', 'category', category] }),
+    presets: () => queryClient.invalidateQueries({ queryKey: ['case-workflows', 'presets'] }),
+    statistics: () => queryClient.invalidateQueries({ queryKey: ['case-workflows', 'statistics'], refetchType: 'all' }),
+    caseProgress: (caseId: string) => queryClient.invalidateQueries({ queryKey: ['case-workflows', 'case-progress', caseId] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.caseWorkflows.all(),
+        invalidateCache.cases.all(),
+      ])
+    },
+  },
+
+  // Skill Maps
+  skillMap: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['skill-maps'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['skill-maps', 'list'] }),
+    detail: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['skill-maps', 'detail', employeeId] }),
+    matrix: (departmentId?: string) => queryClient.invalidateQueries({ queryKey: ['skill-maps', 'matrix', departmentId] }),
+    skillTrends: (employeeId: string, skillId: string) => queryClient.invalidateQueries({ queryKey: ['skill-maps', 'trends', employeeId, skillId] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.skillMap.all(),
+        invalidateCache.employees.all(),
+      ])
+    },
+  },
+
+  // Retention Bonuses
+  retentionBonus: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['retention-bonuses'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['retention-bonuses', 'list'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['retention-bonuses', 'detail', id] }),
+    employeeHistory: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['retention-bonuses', 'employee-history', employeeId] }),
+    vestingStatus: (id: string) => queryClient.invalidateQueries({ queryKey: ['retention-bonuses', 'vesting-status', id] }),
+    dueForPayment: (date?: string) => queryClient.invalidateQueries({ queryKey: ['retention-bonuses', 'due-for-payment', date] }),
+    stats: (filters?: any) => queryClient.invalidateQueries({ queryKey: ['retention-bonuses', 'stats', filters] }),
+    pendingApprovals: () => queryClient.invalidateQueries({ queryKey: ['retention-bonuses', 'pending-approvals'] }),
+    departmentSummary: (departmentId?: string) => queryClient.invalidateQueries({ queryKey: ['retention-bonuses', 'department-summary', departmentId] }),
+  },
+
+  // Employee Incentives
+  employeeIncentives: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['employee-incentives'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['employee-incentives', 'list'] }),
+    list: (filters?: any) => queryClient.invalidateQueries({ queryKey: ['employee-incentives', 'list', filters] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['employee-incentives', 'detail', id] }),
+    stats: (filters?: any) => queryClient.invalidateQueries({ queryKey: ['employee-incentives', 'stats', filters] }),
+    employeeHistory: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['employee-incentives', 'employee-history', employeeId] }),
+    payroll: (payrollDate: string) => queryClient.invalidateQueries({ queryKey: ['employee-incentives', 'payroll', payrollDate] }),
+    pending: () => queryClient.invalidateQueries({ queryKey: ['employee-incentives', 'pending'] }),
+    awaitingProcessing: () => queryClient.invalidateQueries({ queryKey: ['employee-incentives', 'awaiting-processing'] }),
   },
 
   // Global invalidation (use sparingly!)

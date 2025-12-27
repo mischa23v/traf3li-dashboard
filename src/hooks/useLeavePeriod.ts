@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import {
   getLeavePeriods,
   getLeavePeriod,
@@ -18,6 +18,7 @@ import {
   UpdateLeavePeriodData,
   AllocateLeavesRequest,
 } from '@/services/leavePeriodService'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // Query keys
 export const leavePeriodKeys = {
@@ -86,86 +87,74 @@ export const useAllocationSummary = (periodId: string) => {
 
 // Create leave period
 export const useCreateLeavePeriod = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateLeavePeriodData) => createLeavePeriod(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: leavePeriodKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: leavePeriodKeys.active() })
+      invalidateCache.leavePeriods.lists()
+      invalidateCache.leavePeriods.active()
     },
   })
 }
 
 // Update leave period
 export const useUpdateLeavePeriod = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateLeavePeriodData }) =>
       updateLeavePeriod(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: leavePeriodKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: leavePeriodKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: leavePeriodKeys.active() })
+      invalidateCache.leavePeriods.detail(id)
+      invalidateCache.leavePeriods.lists()
+      invalidateCache.leavePeriods.active()
     },
   })
 }
 
 // Delete leave period
 export const useDeleteLeavePeriod = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => deleteLeavePeriod(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: leavePeriodKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: leavePeriodKeys.active() })
+      invalidateCache.leavePeriods.lists()
+      invalidateCache.leavePeriods.active()
     },
   })
 }
 
 // Activate leave period
 export const useActivateLeavePeriod = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => activateLeavePeriod(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: leavePeriodKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: leavePeriodKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: leavePeriodKeys.active() })
+      invalidateCache.leavePeriods.detail(id)
+      invalidateCache.leavePeriods.lists()
+      invalidateCache.leavePeriods.active()
     },
   })
 }
 
 // Deactivate leave period
 export const useDeactivateLeavePeriod = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => deactivateLeavePeriod(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: leavePeriodKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: leavePeriodKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: leavePeriodKeys.active() })
+      invalidateCache.leavePeriods.detail(id)
+      invalidateCache.leavePeriods.lists()
+      invalidateCache.leavePeriods.active()
     },
   })
 }
 
 // Allocate leaves for period
 export const useAllocateLeavesForPeriod = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ periodId, data }: { periodId: string; data?: Omit<AllocateLeavesRequest, 'periodId'> }) =>
       allocateLeavesForPeriod(periodId, data),
     onSuccess: (_, { periodId }) => {
-      queryClient.invalidateQueries({ queryKey: leavePeriodKeys.detail(periodId) })
-      queryClient.invalidateQueries({ queryKey: leavePeriodKeys.statistics(periodId) })
-      queryClient.invalidateQueries({ queryKey: leavePeriodKeys.allocationSummary(periodId) })
+      invalidateCache.leavePeriods.detail(periodId)
+      invalidateCache.leavePeriods.statistics(periodId)
+      invalidateCache.leavePeriods.allocationSummary(periodId)
       // Also invalidate leave balance queries if they exist
-      queryClient.invalidateQueries({ queryKey: ['leave-requests', 'balance'] })
+      invalidateCache.leaveRequests.balance()
     },
   })
 }
