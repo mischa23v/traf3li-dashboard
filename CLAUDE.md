@@ -110,6 +110,39 @@ This prevents wasted effort and bugs caused by incorrect assumptions. When in do
 
 ---
 
+## 🔍 ANALYZE BEFORE CREATING (MANDATORY)
+
+**Before creating ANY new files or components, you MUST:**
+
+1. **Do NOT create any files until you show a complete analysis** of what exists vs what's missing
+2. **Before any code, list every existing file** related to the feature and what's in it
+3. **Create a task list FIRST** showing exactly what needs to be created vs enhanced
+
+### Required Analysis Steps:
+
+```
+1. Search for existing components/views in the feature folder
+2. Check existing routes that already handle the functionality
+3. Check sidebar/navigation for existing menu items
+4. List what EXISTS vs what's MISSING
+5. Show this analysis to the user BEFORE writing any code
+6. Only proceed after confirming the plan
+```
+
+### Do NOT:
+- Jump straight to creating files without checking what exists
+- Create duplicate components that already exist elsewhere
+- Add sidebar items that are already present
+- Launch parallel agents before completing the analysis
+
+### Why This Matters:
+- Prevents duplicate/redundant code
+- Avoids wasted effort recreating existing functionality
+- Ensures enhancements go to the RIGHT files
+- Saves time by doing it correctly the first time
+
+---
+
 ## 🎨 Visual Development & Testing
 
 ### Design Principles
