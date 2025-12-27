@@ -11,7 +11,7 @@
 | Category | Total | Done | Remaining |
 |----------|-------|------|-----------|
 | Cache Invalidations | 34 | 34 | ✅ COMPLETE |
-| Hardcoded Routes | 657 | 0 | 657 |
+| Hardcoded Routes | 657 | ~200 | ~460 (in progress) |
 | Hardcoded Cache Times | 79 | 0 | 79 |
 | Hardcoded Query Keys | 434 | 0 | 434 |
 
@@ -21,14 +21,20 @@
 
 All cache invalidations migrated to `invalidateCache.*` pattern.
 
-Remaining 7 occurrences are legitimate:
-- `CompanyContext.tsx` - Complex predicate-based invalidation
-- `mutation-utils.ts` - Generic utility with parameterized queryKey
-- `api.ts` - Documentation/JSDoc examples
-
 ---
 
-## 🟡 PRIORITY 2: Hardcoded Routes (657 in 242 files, excluding routeTree.gen.ts)
+## 🟡 PRIORITY 2: Hardcoded Routes - IN PROGRESS
+
+### Completed Batches (65+ files, ~200 routes):
+- ✅ BATCH 10: Finance components (14 files)
+- ✅ BATCH 11: Clients/HR components (3 files)
+- ✅ BATCH 12: Cases/Buying/Dashboard core (10 files)
+- ✅ BATCH 13: Sidebars and config files (10 files)
+- ✅ BATCH 14: Leads, auth, sidebar hooks (7 files)
+- ✅ BATCH 15: CRM, HR, buying, case-notion (7 files)
+- ✅ BATCH 16: Manufacturing/Quality/Subcontracting (17 files)
+
+### Remaining Routes (scanner shows ~460 in 204 files, excluding routeTree.gen.ts)
 
 ### Finance Routes Batch 1 (8 files)
 - [ ] `src/features/finance/components/saudi-banking-list-view.tsx` (8 occurrences)
