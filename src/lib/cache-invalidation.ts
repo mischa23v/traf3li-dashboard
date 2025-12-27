@@ -147,7 +147,7 @@ export const invalidateCache = {
   journalEntries: {
     all: () => queryClient.invalidateQueries({ queryKey: ['journal-entries'] }),
     detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['journal-entry', id] }),
-    stats: () => queryClient.invalidateQueries({ queryKey: ['journal-entries', 'stats'] }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['journal-entries-stats'] }),
     related: async () => {
       await Promise.all([
         invalidateCache.journalEntries.all(),
@@ -1075,6 +1075,22 @@ export const invalidateCache = {
     pending: () => queryClient.invalidateQueries({ queryKey: ['dashboard', 'documents', 'pending'] }),
   },
 
+  // Document Versions
+  documentVersions: {
+    all: (documentId: string) => queryClient.invalidateQueries({ queryKey: ['document-versions', documentId] }),
+    list: (documentId: string) => queryClient.invalidateQueries({ queryKey: ['document-versions', documentId, 'list'] }),
+    detail: (documentId: string, versionId: string) =>
+      queryClient.invalidateQueries({ queryKey: ['document-versions', documentId, 'detail', versionId] }),
+    statistics: (documentId: string) =>
+      queryClient.invalidateQueries({ queryKey: ['document-versions', documentId, 'statistics'] }),
+    comparison: (documentId: string, v1: string, v2: string) =>
+      queryClient.invalidateQueries({ queryKey: ['document-versions', documentId, 'compare', v1, v2] }),
+    diff: (documentId: string, v1: string, v2: string) =>
+      queryClient.invalidateQueries({ queryKey: ['document-versions', documentId, 'diff', v1, v2] }),
+    content: (documentId: string, versionId: string) =>
+      queryClient.invalidateQueries({ queryKey: ['document-versions', documentId, 'content', versionId] }),
+  },
+
   // Time Entries
   timeEntries: {
     all: () => queryClient.invalidateQueries({ queryKey: ['timeEntries'] }),
@@ -1157,7 +1173,10 @@ export const invalidateCache = {
   // Contacts
   contacts: {
     all: () => queryClient.invalidateQueries({ queryKey: ['contacts'] }),
-    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['contacts', id] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['contacts', 'detail', id] }),
+    byCase: (caseId: string) => queryClient.invalidateQueries({ queryKey: ['contacts', 'case', caseId] }),
+    byClient: (clientId: string) => queryClient.invalidateQueries({ queryKey: ['contacts', 'client', clientId] }),
+    search: (query?: string) => queryClient.invalidateQueries({ queryKey: ['contacts', 'search', query] }),
   },
 
   // Activities
@@ -1165,6 +1184,10 @@ export const invalidateCache = {
     all: () => queryClient.invalidateQueries({ queryKey: ['activities'] }),
     detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['activities', id] }),
     timeline: () => queryClient.invalidateQueries({ queryKey: ['activity-timeline'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['activities', 'list'] }),
+    entity: (entityType: string, entityId: string) =>
+      queryClient.invalidateQueries({ queryKey: ['activities', 'entity', entityType, entityId] }),
+    recent: (limit?: number) => queryClient.invalidateQueries({ queryKey: ['activities', 'recent', limit] }),
   },
 
   // Jobs
@@ -1762,6 +1785,122 @@ export const invalidateCache = {
     related: async () => {
       await Promise.all([
         invalidateCache.skills.all(),
+      ])
+    },
+  },
+
+  // Consolidated Reports
+  consolidatedReport: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['consolidated-reports'] }),
+    profitLoss: () => queryClient.invalidateQueries({ queryKey: ['consolidated-reports', 'profit-loss'] }),
+    balanceSheet: () => queryClient.invalidateQueries({ queryKey: ['consolidated-reports', 'balance-sheet'] }),
+    interCompanyTransactions: () => queryClient.invalidateQueries({ queryKey: ['consolidated-reports', 'inter-company-transactions'] }),
+    comparisons: () => queryClient.invalidateQueries({ queryKey: ['consolidated-reports', 'comparisons'] }),
+    summary: () => queryClient.invalidateQueries({ queryKey: ['consolidated-reports', 'summary'] }),
+    eliminationRules: () => queryClient.invalidateQueries({ queryKey: ['consolidated-reports', 'elimination-rules'] }),
+    exchangeRates: () => queryClient.invalidateQueries({ queryKey: ['consolidated-reports', 'exchange-rates'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.consolidatedReport.all(),
+      ])
+    },
+  },
+
+  // Email Settings
+  emailSettings: {
+    smtpConfig: () => queryClient.invalidateQueries({ queryKey: ['smtp-config'] }),
+    signatures: (options?: { refetchType?: 'all' }) =>
+      queryClient.invalidateQueries({ queryKey: ['email-signatures'], refetchType: options?.refetchType }),
+    templates: (options?: { refetchType?: 'all' }) =>
+      queryClient.invalidateQueries({ queryKey: ['email-templates'], refetchType: options?.refetchType }),
+    template: (id: string) => queryClient.invalidateQueries({ queryKey: ['email-templates', id] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.emailSettings.smtpConfig(),
+        invalidateCache.emailSettings.signatures(),
+        invalidateCache.emailSettings.templates(),
+      ])
+    },
+  },
+
+  // Salary Components
+  salaryComponents: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['salary-components'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['salary-components', 'list'] }),
+    list: (filters?: any) => queryClient.invalidateQueries({ queryKey: ['salary-components', 'list', filters] }),
+    details: () => queryClient.invalidateQueries({ queryKey: ['salary-components', 'detail'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['salary-components', 'detail', id] }),
+    earnings: () => queryClient.invalidateQueries({ queryKey: ['salary-components', 'earnings'] }),
+    deductions: () => queryClient.invalidateQueries({ queryKey: ['salary-components', 'deductions'] }),
+    byType: (type: string) => queryClient.invalidateQueries({ queryKey: ['salary-components', 'by-type', type] }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['salary-components', 'stats'] }),
+    usage: (id: string) => queryClient.invalidateQueries({ queryKey: ['salary-components', 'usage', id] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.salaryComponents.all(),
+      ])
+    },
+  },
+
+  // HR Analytics
+  hrAnalytics: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['hr'] }),
+    // Dashboard & Overview
+    dashboard: (params?: any) => queryClient.invalidateQueries({ queryKey: ['hr-dashboard', params] }),
+    workforceOverview: () => queryClient.invalidateQueries({ queryKey: ['hr-workforce-overview'] }),
+    analyticsDashboard: () => queryClient.invalidateQueries({ queryKey: ['hr', 'analytics', 'dashboard'] }),
+    // Demographics & Workforce
+    demographics: (params?: any) => queryClient.invalidateQueries({ queryKey: ['hr-demographics', params] }),
+    departmentBreakdown: () => queryClient.invalidateQueries({ queryKey: ['hr-department-breakdown'] }),
+    tenureDistribution: () => queryClient.invalidateQueries({ queryKey: ['hr-tenure-distribution'] }),
+    diversityAnalytics: () => queryClient.invalidateQueries({ queryKey: ['hr-diversity-analytics'] }),
+    // Trends & History
+    trends: (params?: any) => queryClient.invalidateQueries({ queryKey: ['hr-trends', params] }),
+    headcountTrends: (params?: any) => queryClient.invalidateQueries({ queryKey: ['hr-headcount-trends', params] }),
+    // Turnover & Attrition
+    turnover: (params?: any) => queryClient.invalidateQueries({ queryKey: ['hr-turnover', params] }),
+    attritionRisk: (params?: any) => queryClient.invalidateQueries({ queryKey: ['hr-attrition-risk', params] }),
+    employeeAttritionRisk: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['hr-employee-attrition-risk', employeeId] }),
+    flightRisk: () => queryClient.invalidateQueries({ queryKey: ['hr-flight-risk'] }),
+    // Attendance & Absence
+    absenteeism: (params?: any) => queryClient.invalidateQueries({ queryKey: ['hr-absenteeism', params] }),
+    attendanceAnalytics: (params?: any) => queryClient.invalidateQueries({ queryKey: ['hr-attendance-analytics', params] }),
+    absencePredictions: () => queryClient.invalidateQueries({ queryKey: ['hr-absence-predictions'] }),
+    // Performance & Development
+    performanceAnalytics: (params?: any) => queryClient.invalidateQueries({ queryKey: ['hr-performance-analytics', params] }),
+    trainingAnalytics: (params?: any) => queryClient.invalidateQueries({ queryKey: ['hr-training-analytics', params] }),
+    highPotential: (limit?: number) => queryClient.invalidateQueries({ queryKey: ['hr-high-potential', limit] }),
+    promotionReadiness: (threshold?: number) => queryClient.invalidateQueries({ queryKey: ['hr-promotion-readiness', threshold] }),
+    // Compensation & Payroll
+    compensationAnalytics: (params?: any) => queryClient.invalidateQueries({ queryKey: ['hr-compensation-analytics', params] }),
+    payrollAnalytics: (params?: any) => queryClient.invalidateQueries({ queryKey: ['hr-payroll-analytics', params] }),
+    // Recruitment & Hiring
+    recruitmentAnalytics: (params?: any) => queryClient.invalidateQueries({ queryKey: ['hr-recruitment-analytics', params] }),
+    hiringNeedsForecast: (months?: number) => queryClient.invalidateQueries({ queryKey: ['hr-hiring-needs-forecast', months] }),
+    // Leave & Time Off
+    leaveAnalytics: (params?: any) => queryClient.invalidateQueries({ queryKey: ['hr-leave-analytics', params] }),
+    // Compliance
+    saudization: () => queryClient.invalidateQueries({ queryKey: ['hr-saudization'] }),
+    // Predictions & Forecasting
+    workforceForecast: (months?: number) => queryClient.invalidateQueries({ queryKey: ['hr-workforce-forecast', months] }),
+    engagementPredictions: () => queryClient.invalidateQueries({ queryKey: ['hr-engagement-predictions'] }),
+    // Invalidate all predictions
+    allPredictions: async () => {
+      await Promise.all([
+        invalidateCache.hrAnalytics.attritionRisk(),
+        invalidateCache.hrAnalytics.workforceForecast(),
+        invalidateCache.hrAnalytics.promotionReadiness(),
+        invalidateCache.hrAnalytics.hiringNeedsForecast(),
+        invalidateCache.hrAnalytics.highPotential(),
+        invalidateCache.hrAnalytics.flightRisk(),
+        invalidateCache.hrAnalytics.absencePredictions(),
+        invalidateCache.hrAnalytics.engagementPredictions(),
+      ])
+    },
+    // Invalidate everything HR related
+    related: async () => {
+      await Promise.all([
+        invalidateCache.hrAnalytics.all(),
       ])
     },
   },

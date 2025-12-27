@@ -67,14 +67,14 @@ import { format } from 'date-fns'
 import { ar } from 'date-fns/locale'
 import { toast } from 'sonner'
 import journalEntryService, { type JournalEntry, type JournalEntryStatus, type JournalEntryFilters } from '@/services/journalEntryService'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { cn } from '@/lib/utils'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 export default function JournalEntriesDashboard() {
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
 
   // State
   const [searchQuery, setSearchQuery] = useState('')
@@ -109,9 +109,7 @@ export default function JournalEntriesDashboard() {
   const postMutation = useMutation({
     mutationFn: (id: string) => journalEntryService.postEntry(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['journal-entries'] })
-      queryClient.invalidateQueries({ queryKey: ['journal-entries-stats'] })
-      queryClient.invalidateQueries({ queryKey: ['general-ledger'] })
+      invalidateCache.journalEntries.related()
       toast.success(t('journal.posted'))
     },
     onError: (error: any) => {
@@ -123,9 +121,7 @@ export default function JournalEntriesDashboard() {
     mutationFn: ({ id, reason }: { id: string; reason?: string }) =>
       journalEntryService.voidEntry(id, reason),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['journal-entries'] })
-      queryClient.invalidateQueries({ queryKey: ['journal-entries-stats'] })
-      queryClient.invalidateQueries({ queryKey: ['general-ledger'] })
+      invalidateCache.journalEntries.related()
       setIsVoidDialogOpen(false)
       setVoidReason('')
       toast.success(t('journal.voided'))
@@ -138,8 +134,8 @@ export default function JournalEntriesDashboard() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => journalEntryService.deleteEntry(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['journal-entries'] })
-      queryClient.invalidateQueries({ queryKey: ['journal-entries-stats'] })
+      invalidateCache.journalEntries.all()
+      invalidateCache.journalEntries.stats()
       setIsDeleteDialogOpen(false)
       toast.success(t('journal.deleted'))
     },
@@ -151,7 +147,7 @@ export default function JournalEntriesDashboard() {
   const duplicateMutation = useMutation({
     mutationFn: (id: string) => journalEntryService.duplicateEntry(id),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['journal-entries'] })
+      invalidateCache.journalEntries.all()
       toast.success(t('journal.duplicated'))
       navigate({ to: `/dashboard/finance/journal-entries/${data._id}` })
     },

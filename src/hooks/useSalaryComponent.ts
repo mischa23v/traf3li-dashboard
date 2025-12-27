@@ -1,5 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import { salaryComponentService } from '@/services/salaryComponentService'
 import type {
   SalaryComponentFilters,
@@ -108,13 +109,11 @@ export function useComponentUsage(id: string) {
 
 // Create salary component
 export function useCreateSalaryComponent() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateSalaryComponentData) =>
       salaryComponentService.createSalaryComponent(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: salaryComponentKeys.all })
+      invalidateCache.salaryComponents.all()
       toast.success('تم إنشاء مكون الراتب بنجاح')
     },
     onError: (error: any) => {
@@ -125,14 +124,12 @@ export function useCreateSalaryComponent() {
 
 // Update salary component
 export function useUpdateSalaryComponent() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateSalaryComponentData }) =>
       salaryComponentService.updateSalaryComponent(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: salaryComponentKeys.detail(variables.id) })
-      queryClient.invalidateQueries({ queryKey: salaryComponentKeys.lists() })
+      invalidateCache.salaryComponents.detail(variables.id)
+      invalidateCache.salaryComponents.lists()
       toast.success('تم تحديث مكون الراتب بنجاح')
     },
     onError: (error: any) => {
@@ -143,12 +140,10 @@ export function useUpdateSalaryComponent() {
 
 // Delete salary component
 export function useDeleteSalaryComponent() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => salaryComponentService.deleteSalaryComponent(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: salaryComponentKeys.all })
+      invalidateCache.salaryComponents.all()
       toast.success('تم حذف مكون الراتب بنجاح')
     },
     onError: (error: any) => {
@@ -159,12 +154,10 @@ export function useDeleteSalaryComponent() {
 
 // Bulk delete salary components
 export function useBulkDeleteSalaryComponents() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (ids: string[]) => salaryComponentService.bulkDeleteSalaryComponents(ids),
     onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: salaryComponentKeys.all })
+      invalidateCache.salaryComponents.all()
       toast.success(`تم حذف ${result.deleted} مكون بنجاح`)
     },
     onError: (error: any) => {
@@ -186,12 +179,10 @@ export function useCalculateComponent() {
 
 // Seed default Saudi components
 export function useSeedDefaultComponents() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: () => salaryComponentService.seedDefaultSaudiComponents(),
     onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: salaryComponentKeys.all })
+      invalidateCache.salaryComponents.all()
       toast.success(`تم إنشاء ${result.created} مكون قياسي بنجاح`)
     },
     onError: (error: any) => {
@@ -202,12 +193,10 @@ export function useSeedDefaultComponents() {
 
 // Duplicate component
 export function useDuplicateComponent() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => salaryComponentService.duplicateComponent(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: salaryComponentKeys.all })
+      invalidateCache.salaryComponents.all()
       toast.success('تم نسخ مكون الراتب بنجاح')
     },
     onError: (error: any) => {
@@ -228,13 +217,11 @@ export function useValidateFormula() {
 
 // Toggle component status
 export function useToggleComponentStatus() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => salaryComponentService.toggleComponentStatus(id),
     onSuccess: (component) => {
-      queryClient.invalidateQueries({ queryKey: salaryComponentKeys.detail(component._id) })
-      queryClient.invalidateQueries({ queryKey: salaryComponentKeys.lists() })
+      invalidateCache.salaryComponents.detail(component._id)
+      invalidateCache.salaryComponents.lists()
       const status = component.isActive ? 'تفعيل' : 'تعطيل'
       toast.success(`تم ${status} مكون الراتب بنجاح`)
     },

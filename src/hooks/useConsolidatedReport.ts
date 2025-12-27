@@ -3,9 +3,10 @@
  * React Query hooks for multi-company consolidated reporting
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { CACHE_TIMES } from '@/config/cache'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import consolidatedReportService, {
   type ConsolidationFilters,
   type EliminationRule,
@@ -110,8 +111,6 @@ export const useEliminationRules = () => {
 }
 
 export const useCreateEliminationRule = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (rule: Omit<EliminationRule, 'id'>) =>
       consolidatedReportService.createEliminationRule(rule),
@@ -126,15 +125,13 @@ export const useCreateEliminationRule = () => {
       })
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: consolidatedReportKeys.eliminationRules() })
-      await queryClient.invalidateQueries({ queryKey: consolidatedReportKeys.all })
+      await invalidateCache.consolidatedReport.eliminationRules()
+      await invalidateCache.consolidatedReport.all()
     },
   })
 }
 
 export const useUpdateEliminationRule = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Partial<EliminationRule> }) =>
       consolidatedReportService.updateEliminationRule(id, updates),
@@ -147,15 +144,13 @@ export const useUpdateEliminationRule = () => {
       })
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: consolidatedReportKeys.eliminationRules() })
-      await queryClient.invalidateQueries({ queryKey: consolidatedReportKeys.all })
+      await invalidateCache.consolidatedReport.eliminationRules()
+      await invalidateCache.consolidatedReport.all()
     },
   })
 }
 
 export const useDeleteEliminationRule = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => consolidatedReportService.deleteEliminationRule(id),
     onSuccess: () => {
@@ -167,8 +162,8 @@ export const useDeleteEliminationRule = () => {
       })
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: consolidatedReportKeys.eliminationRules() })
-      await queryClient.invalidateQueries({ queryKey: consolidatedReportKeys.all })
+      await invalidateCache.consolidatedReport.eliminationRules()
+      await invalidateCache.consolidatedReport.all()
     },
   })
 }
@@ -185,8 +180,6 @@ export const useExchangeRates = (currencies: string[], date?: string) => {
 }
 
 export const useSetExchangeRate = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (conversion: Omit<CurrencyConversion, 'source'>) =>
       consolidatedReportService.setExchangeRate(conversion),
@@ -199,8 +192,8 @@ export const useSetExchangeRate = () => {
       })
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: [...consolidatedReportKeys.all, 'exchange-rates'] })
-      await queryClient.invalidateQueries({ queryKey: consolidatedReportKeys.all })
+      await invalidateCache.consolidatedReport.exchangeRates()
+      await invalidateCache.consolidatedReport.all()
     },
   })
 }

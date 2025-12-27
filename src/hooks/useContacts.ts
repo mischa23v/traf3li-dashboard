@@ -6,9 +6,9 @@ import contactsService, {
   type UpdateContactData,
 } from '@/services/contactsService'
 import { toast } from '@/hooks/use-toast'
-import { CACHE_TIMES } from '@/config'
 import { useTranslation } from 'react-i18next'
 import { createOptimisticMutation } from '@/lib/mutation-utils'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ==================== Cache Configuration ====================
 const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
@@ -149,7 +149,7 @@ export const useCreateContact = () => {
     },
     onSettled: async () => {
       // Invalidate without delay
-      await queryClient.invalidateQueries({ queryKey: contactsKeys.all, refetchType: 'all' })
+      await invalidateCache.contacts.all()
     },
   })
 }
@@ -220,8 +220,8 @@ export const useUpdateContact = () => {
     },
     onSettled: async (_, __, { id }) => {
       // Invalidate without delay
-      await queryClient.invalidateQueries({ queryKey: contactsKeys.all })
-      await queryClient.invalidateQueries({ queryKey: contactsKeys.detail(id) })
+      await invalidateCache.contacts.all()
+      await invalidateCache.contacts.detail(id)
     },
   })
 }
@@ -278,7 +278,7 @@ export const useDeleteContact = () => {
     },
     onSettled: async () => {
       // Invalidate without delay
-      await queryClient.invalidateQueries({ queryKey: contactsKeys.all, refetchType: 'all' })
+      await invalidateCache.contacts.all()
     },
   })
 }
@@ -335,7 +335,7 @@ export const useBulkDeleteContacts = () => {
     },
     onSettled: async () => {
       // Invalidate without delay
-      await queryClient.invalidateQueries({ queryKey: contactsKeys.all, refetchType: 'all' })
+      await invalidateCache.contacts.all()
     },
   })
 }
@@ -392,8 +392,8 @@ export const useLinkContactToCase = () => {
     },
     onSettled: async (_, __, { contactId, caseId }) => {
       // Invalidate without delay
-      await queryClient.invalidateQueries({ queryKey: contactsKeys.detail(contactId) })
-      await queryClient.invalidateQueries({ queryKey: contactsKeys.byCase(caseId) })
+      await invalidateCache.contacts.detail(contactId)
+      await invalidateCache.contacts.byCase(caseId)
     },
   })
 }
@@ -447,8 +447,8 @@ export const useUnlinkContactFromCase = () => {
     },
     onSettled: async (_, __, { contactId, caseId }) => {
       // Invalidate without delay
-      await queryClient.invalidateQueries({ queryKey: contactsKeys.detail(contactId) })
-      await queryClient.invalidateQueries({ queryKey: contactsKeys.byCase(caseId) })
+      await invalidateCache.contacts.detail(contactId)
+      await invalidateCache.contacts.byCase(caseId)
     },
   })
 }

@@ -6,6 +6,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { CACHE_TIMES } from '@/config/cache'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import emailSettingsService, {
   UpdateSmtpConfigData,
   TestSmtpConnectionData,
@@ -26,8 +27,6 @@ export const useSmtpConfig = () => {
 }
 
 export const useUpdateSmtpConfig = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: UpdateSmtpConfigData) =>
       emailSettingsService.updateSmtpConfig(data),
@@ -38,7 +37,7 @@ export const useUpdateSmtpConfig = () => {
       toast.error(error.message || 'فشل تحديث إعدادات البريد الإلكتروني')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['smtp-config'] })
+      await invalidateCache.emailSettings.smtpConfig()
     },
   })
 }
@@ -106,14 +105,12 @@ export const useCreateEmailSignature = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['email-signatures'], refetchType: 'all' })
+      await invalidateCache.emailSettings.signatures({ refetchType: 'all' })
     },
   })
 }
 
 export const useUpdateEmailSignature = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateEmailSignatureData> }) =>
       emailSettingsService.updateEmailSignature(id, data),
@@ -124,7 +121,7 @@ export const useUpdateEmailSignature = () => {
       toast.error(error.message || 'فشل تحديث التوقيع')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['email-signatures'] })
+      await invalidateCache.emailSettings.signatures()
     },
   })
 }
@@ -155,14 +152,12 @@ export const useDeleteEmailSignature = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['email-signatures'], refetchType: 'all' })
+      await invalidateCache.emailSettings.signatures({ refetchType: 'all' })
     },
   })
 }
 
 export const useSetDefaultEmailSignature = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => emailSettingsService.setDefaultEmailSignature(id),
     onSuccess: () => {
@@ -172,7 +167,7 @@ export const useSetDefaultEmailSignature = () => {
       toast.error(error.message || 'فشل تعيين التوقيع الافتراضي')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['email-signatures'] })
+      await invalidateCache.emailSettings.signatures()
     },
   })
 }
@@ -223,14 +218,12 @@ export const useCreateEmailTemplate = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['email-templates'], refetchType: 'all' })
+      await invalidateCache.emailSettings.templates({ refetchType: 'all' })
     },
   })
 }
 
 export const useUpdateEmailTemplate = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateEmailTemplateData }) =>
       emailSettingsService.updateEmailTemplate(id, data),
@@ -241,7 +234,7 @@ export const useUpdateEmailTemplate = () => {
       toast.error(error.message || 'فشل تحديث القالب')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['email-templates'] })
+      await invalidateCache.emailSettings.templates()
     },
   })
 }
@@ -272,14 +265,12 @@ export const useDeleteEmailTemplate = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['email-templates'], refetchType: 'all' })
+      await invalidateCache.emailSettings.templates({ refetchType: 'all' })
     },
   })
 }
 
 export const useToggleEmailTemplateStatus = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => emailSettingsService.toggleEmailTemplateStatus(id),
     onSuccess: () => {
@@ -289,7 +280,7 @@ export const useToggleEmailTemplateStatus = () => {
       toast.error(error.message || 'فشل تحديث حالة القالب')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['email-templates'] })
+      await invalidateCache.emailSettings.templates()
     },
   })
 }

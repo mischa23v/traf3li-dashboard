@@ -5,6 +5,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import activityService, {
   type Activity,
   type ActivityFilters,
@@ -131,12 +132,9 @@ export function useCreateActivity() {
 
       // Invalidate relevant queries
       if (newActivity) {
-        await queryClient.invalidateQueries({ queryKey: activityKeys.lists(), refetchType: 'all' })
-        await queryClient.invalidateQueries({
-          queryKey: activityKeys.entity(newActivity.entityType, newActivity.entityId),
-          refetchType: 'all'
-        })
-        return await queryClient.invalidateQueries({ queryKey: activityKeys.recent(), refetchType: 'all' })
+        await invalidateCache.activities.lists()
+        await invalidateCache.activities.entity(newActivity.entityType, newActivity.entityId)
+        return await invalidateCache.activities.recent()
       }
     },
   })
@@ -146,8 +144,6 @@ export function useCreateActivity() {
  * Log a task activity
  */
 export function useLogTaskActivity() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       taskId,
@@ -170,11 +166,8 @@ export function useLogTaskActivity() {
       await new Promise(resolve => setTimeout(resolve, 1000))
 
       if (newActivity) {
-        await queryClient.invalidateQueries({
-          queryKey: activityKeys.entity('task', variables.taskId),
-          refetchType: 'all'
-        })
-        return await queryClient.invalidateQueries({ queryKey: activityKeys.recent(), refetchType: 'all' })
+        await invalidateCache.activities.entity('task', variables.taskId)
+        return await invalidateCache.activities.recent()
       }
     },
   })
@@ -184,8 +177,6 @@ export function useLogTaskActivity() {
  * Log an event activity
  */
 export function useLogEventActivity() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       eventId,
@@ -203,11 +194,8 @@ export function useLogEventActivity() {
       await new Promise(resolve => setTimeout(resolve, 1000))
 
       if (newActivity) {
-        await queryClient.invalidateQueries({
-          queryKey: activityKeys.entity('event', variables.eventId),
-          refetchType: 'all'
-        })
-        return await queryClient.invalidateQueries({ queryKey: activityKeys.recent(), refetchType: 'all' })
+        await invalidateCache.activities.entity('event', variables.eventId)
+        return await invalidateCache.activities.recent()
       }
     },
   })
@@ -217,8 +205,6 @@ export function useLogEventActivity() {
  * Log a reminder activity
  */
 export function useLogReminderActivity() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       reminderId,
@@ -236,11 +222,8 @@ export function useLogReminderActivity() {
       await new Promise(resolve => setTimeout(resolve, 1000))
 
       if (newActivity) {
-        await queryClient.invalidateQueries({
-          queryKey: activityKeys.entity('reminder', variables.reminderId),
-          refetchType: 'all'
-        })
-        return await queryClient.invalidateQueries({ queryKey: activityKeys.recent(), refetchType: 'all' })
+        await invalidateCache.activities.entity('reminder', variables.reminderId)
+        return await invalidateCache.activities.recent()
       }
     },
   })

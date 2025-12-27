@@ -3,7 +3,7 @@
  * React Query hooks for HR analytics and AI predictions
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import {
   hrAnalyticsService,
@@ -27,6 +27,7 @@ import {
 import { useAuthStore } from '@/stores/auth-store'
 import apiClient from '@/lib/api'
 import { CACHE_TIMES } from '@/config/cache'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ═══════════════════════════════════════════════════════════════
 // WORKFORCE ANALYTICS HOOKS
@@ -268,12 +269,11 @@ export const useSaudization = () => {
  * Hook to take a snapshot of current HR metrics
  */
 export const useTakeSnapshot = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: { snapshotType: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly' }) =>
       hrAnalyticsService.takeSnapshot(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['hr-trends'] })
+      invalidateCache.hrAnalytics.trends()
       toast.success('تم حفظ اللقطة بنجاح')
     },
     onError: (error: Error) => {
@@ -435,18 +435,10 @@ export const usePromotionReadiness = (threshold: number = 75) => {
  * Hook to recalculate all predictions
  */
 export const useRecalculatePredictions = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: () => hrPredictionsService.recalculate(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['hr-attrition-risk'] })
-      queryClient.invalidateQueries({ queryKey: ['hr-workforce-forecast'] })
-      queryClient.invalidateQueries({ queryKey: ['hr-promotion-readiness'] })
-      queryClient.invalidateQueries({ queryKey: ['hr-hiring-needs-forecast'] })
-      queryClient.invalidateQueries({ queryKey: ['hr-high-potential'] })
-      queryClient.invalidateQueries({ queryKey: ['hr-flight-risk'] })
-      queryClient.invalidateQueries({ queryKey: ['hr-absence-predictions'] })
-      queryClient.invalidateQueries({ queryKey: ['hr-engagement-predictions'] })
+      invalidateCache.hrAnalytics.allPredictions()
       toast.success('تم إعادة حساب التنبؤات بنجاح')
     },
     onError: (error: Error) => {
