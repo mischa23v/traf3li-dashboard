@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   Building2, User, Briefcase, CheckCircle2, ChevronRight, ChevronLeft,
   Loader2, Check, Upload, X, Sparkles, Rocket, Target, Users,
@@ -353,7 +354,7 @@ export default function InitialSetupWizard() {
 
       // Navigate to dashboard
       setTimeout(() => {
-        navigate({ to: '/dashboard' })
+        navigate({ to: ROUTES.dashboard.home })
       }, 1500)
     } catch (error) {
       console.error('Setup failed:', error)

@@ -125,7 +125,7 @@ export function SubcontractingSidebar() {
               ))}
               {pendingOrders.orders.length > 5 && (
                 <Button asChild variant="ghost" size="sm" className="w-full text-amber-700">
-                  <Link to={ROUTES.dashboard.subcontracting.list + '?status=submitted'}>
+                  <Link to={ROUTES.dashboard.subcontracting.list} search={{ status: 'submitted' }}>
                     {t('subcontracting.viewAll', 'عرض الكل')} ({pendingOrders.orders.length})
                   </Link>
                 </Button>
@@ -158,7 +158,7 @@ export function SubcontractingSidebar() {
                 {t('subcontracting.awaitingReceipt', 'في انتظار الاستلام')}
               </p>
               <Button asChild variant="ghost" size="sm" className="mt-3 text-blue-700">
-                <Link to={ROUTES.dashboard.subcontracting.receipts.list + '?status=pending'}>
+                <Link to={ROUTES.dashboard.subcontracting.receipts.list} search={{ status: 'pending' }}>
                   {t('subcontracting.viewReceipts', 'عرض الإيصالات')}
                 </Link>
               </Button>
@@ -200,7 +200,7 @@ export function SubcontractingSidebar() {
                 </Badge>
               </div>
               <Button asChild variant="ghost" size="sm" className="w-full text-purple-700">
-                <Link to={ROUTES.dashboard.subcontracting.list + '/materials'}>
+                <Link to={ROUTES.dashboard.subcontracting.materials}>
                   {t('subcontracting.viewMaterials', 'عرض المواد')}
                 </Link>
               </Button>

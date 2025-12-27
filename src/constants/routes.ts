@@ -901,6 +901,7 @@ export const ROUTES = {
       list: '/dashboard/subcontracting',
       create: '/dashboard/subcontracting/create',
       settings: '/dashboard/subcontracting/settings',
+      materials: '/dashboard/subcontracting/materials',
       detail: (orderId: string) => `/dashboard/subcontracting/${orderId}`,
 
       // Receipts

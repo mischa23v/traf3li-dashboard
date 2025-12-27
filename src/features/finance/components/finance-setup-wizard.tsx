@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import {
   Building2, Calendar, BookOpen, DollarSign, Receipt, Landmark,
   Wallet, FileText, CreditCard, CheckCircle2, ChevronRight, ChevronLeft,
@@ -335,7 +336,7 @@ export function FinanceSetupWizard() {
 
       // Navigate to finance overview
       setTimeout(() => {
-        navigate({ to: '/dashboard/finance/overview' })
+        navigate({ to: ROUTES.dashboard.finance.overview })
       }, 1500)
 
     } catch (error: any) {
@@ -349,8 +350,8 @@ export function FinanceSetupWizard() {
   }
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-    { title: 'معالج الإعداد', href: '/dashboard/finance/setup-wizard', isActive: true },
+    { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+    { title: 'معالج الإعداد', href: ROUTES.dashboard.finance.setupWizard, isActive: true },
   ]
 
   const renderStepContent = () => {
