@@ -239,9 +239,9 @@ export function EmployeesListView() {
     }, [stats])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
         { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: true },
-        { title: 'الرواتب', href: '/dashboard/hr/salaries', isActive: false },
+        { title: 'الرواتب', href: ROUTES.dashboard.hr.payroll.list, isActive: false },
         { title: 'الإجازات', href: ROUTES.dashboard.hr.leave.list, isActive: false },
     ]
 
