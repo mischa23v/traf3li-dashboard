@@ -689,12 +689,27 @@ export const ROUTES = {
      * CRM (Customer Relationship Management) module routes
      */
     crm: {
+      index: '/dashboard/crm',
       setupWizard: '/dashboard/crm/setup-wizard',
       pipeline: '/dashboard/crm/pipeline',
       appointments: '/dashboard/crm/appointments',
       crmReports: '/dashboard/crm/crm-reports',
       salesPersons: '/dashboard/crm/sales-persons',
       territories: '/dashboard/crm/territories',
+
+      // Contacts (CRM-specific contacts)
+      contacts: {
+        list: '/dashboard/crm/contacts',
+        new: '/dashboard/crm/contacts/new',
+        detail: (contactId: string) => `/dashboard/crm/contacts/${contactId}`,
+      },
+
+      // Campaigns
+      campaigns: {
+        list: '/dashboard/crm/campaigns',
+        new: '/dashboard/crm/campaigns/new',
+        detail: (campaignId: string) => `/dashboard/crm/campaigns/${campaignId}`,
+      },
 
       // Leads
       leads: {
