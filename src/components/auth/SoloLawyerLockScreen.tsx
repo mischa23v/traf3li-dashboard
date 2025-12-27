@@ -10,6 +10,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Building2, Home, Users } from 'lucide-react'
+import { ROUTES } from '@/constants/routes'
 
 interface SoloLawyerLockScreenProps {
   /** Optional title override */
@@ -26,7 +27,7 @@ export function SoloLawyerLockScreen({
   title,
   message,
   showCreateFirm = true,
-  dashboardPath = '/dashboard',
+  dashboardPath = ROUTES.dashboard.overview,
 }: SoloLawyerLockScreenProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -36,9 +37,8 @@ export function SoloLawyerLockScreen({
   }
 
   const handleCreateFirm = () => {
-    // Navigate to firm creation page when available
-    // TODO: Add ROUTES.dashboard.settings.firm to routes constant
-    navigate({ to: '/dashboard/settings/firm', replace: true })
+    // Navigate to company/firm settings page
+    navigate({ to: ROUTES.dashboard.settings.company, replace: true })
   }
 
   return (

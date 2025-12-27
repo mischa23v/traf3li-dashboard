@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/select'
 import { useCreateLead, usePipelines } from '@/hooks/useCrm'
 import { SalesSidebar } from '@/features/crm/components/sales-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 // Status options
 const LEAD_STATUSES = [
@@ -81,10 +82,10 @@ export function CreateLead() {
     const pipelines = pipelinesData?.data || []
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: true },
-        { title: 'خط المبيعات', href: '/dashboard/crm/pipeline', isActive: false },
-        { title: 'العملاء', href: '/dashboard/clients', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
+        { title: 'العملاء المحتملين', href: ROUTES.dashboard.crm.leads.list, isActive: true },
+        { title: 'خط المبيعات', href: ROUTES.dashboard.crm.pipeline, isActive: false },
+        { title: 'العملاء', href: ROUTES.dashboard.clients.list, isActive: false },
     ]
 
     const {
@@ -122,7 +123,7 @@ export function CreateLead() {
         createLeadMutation.mutate(leadData, {
             onSuccess: () => {
                 toast.success('تم إنشاء العميل المحتمل بنجاح')
-                navigate({ to: '/dashboard/crm/leads' })
+                navigate({ to: ROUTES.dashboard.crm.leads.list })
             },
             onError: () => {
                 toast.error('حدث خطأ أثناء إنشاء العميل المحتمل')
@@ -172,7 +173,7 @@ export function CreateLead() {
                     <div className="lg:col-span-2 space-y-4">
 
                         {/* Back Link */}
-                        <Link to="/dashboard/crm/leads" className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-slate-100 hover:border-emerald-200 hover:shadow-md transition-all group">
+                        <Link to={ROUTES.dashboard.crm.leads.list} className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-slate-100 hover:border-emerald-200 hover:shadow-md transition-all group">
                             <div className="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-emerald-100 flex items-center justify-center transition-colors">
                                 <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-emerald-600 transition-colors" />
                             </div>
@@ -434,7 +435,7 @@ export function CreateLead() {
 
                                 {/* Footer / Actions */}
                                 <div className="px-8 py-6 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-4">
-                                    <Link to="/dashboard/crm/leads">
+                                    <Link to={ROUTES.dashboard.crm.leads.list}>
                                         <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-700 h-11 px-6">
                                             إلغاء
                                         </Button>

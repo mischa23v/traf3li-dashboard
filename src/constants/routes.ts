@@ -786,6 +786,16 @@ export const ROUTES = {
         start: (scheduleId: string) => `/dashboard/assets/maintenance/${scheduleId}/start`,
         edit: (scheduleId: string) => `/dashboard/assets/maintenance/${scheduleId}/edit`,
       },
+
+      // Depreciation
+      depreciation: {
+        list: '/dashboard/assets/depreciation',
+      },
+
+      // Movements
+      movements: {
+        list: '/dashboard/assets/movements',
+      },
     },
 
     /**
@@ -820,6 +830,11 @@ export const ROUTES = {
         list: '/dashboard/manufacturing/workstations',
         create: '/dashboard/manufacturing/workstations/create',
       },
+
+      // Production plans
+      productionPlans: {
+        list: '/dashboard/manufacturing/production-plans',
+      },
     },
 
     /**
@@ -843,6 +858,11 @@ export const ROUTES = {
         list: '/dashboard/buying/purchase-orders',
         create: '/dashboard/buying/purchase-orders/create',
         detail: (purchaseOrderId: string) => `/dashboard/buying/purchase-orders/${purchaseOrderId}`,
+      },
+
+      // Purchase receipts
+      purchaseReceipts: {
+        list: '/dashboard/buying/purchase-receipts',
       },
 
       // RFQ (Request for Quotation)
@@ -892,6 +912,11 @@ export const ROUTES = {
         list: '/dashboard/quality/templates',
         create: '/dashboard/quality/templates/create',
       },
+
+      // NCRs (Non-Conformance Reports)
+      ncrs: {
+        list: '/dashboard/quality/ncrs',
+      },
     },
 
     /**
@@ -908,6 +933,11 @@ export const ROUTES = {
       receipts: {
         list: '/dashboard/subcontracting/receipts',
         create: '/dashboard/subcontracting/receipts/create',
+      },
+
+      // BOMs (Bill of Materials)
+      boms: {
+        list: '/dashboard/subcontracting/boms',
       },
     },
 
