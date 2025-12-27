@@ -899,10 +899,16 @@ export const invalidateCache = {
   // Assets
   assets: {
     all: () => queryClient.invalidateQueries({ queryKey: ['assets'] }),
-    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['assets', 'detail', id] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['assets', 'list', id] }),
+    categories: () => queryClient.invalidateQueries({ queryKey: ['assets', 'categories'] }),
+    categoryDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['assets', 'categories', id] }),
+    depreciation: (assetId: string) => queryClient.invalidateQueries({ queryKey: ['assets', 'depreciation', assetId] }),
     maintenance: () => queryClient.invalidateQueries({ queryKey: ['assets', 'maintenance'] }),
     movements: () => queryClient.invalidateQueries({ queryKey: ['assets', 'movements'] }),
     repairs: () => queryClient.invalidateQueries({ queryKey: ['assets', 'repairs'] }),
+    repairDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['assets', 'repairs', id] }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['assets', 'stats'] }),
+    settings: () => queryClient.invalidateQueries({ queryKey: ['assets', 'settings'] }),
   },
 
   // Inventory
@@ -1106,6 +1112,7 @@ export const invalidateCache = {
   notifications: {
     all: () => queryClient.invalidateQueries({ queryKey: ['notifications'] }),
     unread: () => queryClient.invalidateQueries({ queryKey: ['notifications', 'unread'] }),
+    settings: () => queryClient.invalidateQueries({ queryKey: ['notifications', 'settings'] }),
   },
 
   // User/Auth
@@ -1904,6 +1911,91 @@ export const invalidateCache = {
       ])
     },
   },
+
+  // Tags
+  tags: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['tags'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['tags', 'list'] }),
+    list: (filters?: any) => queryClient.invalidateQueries({ queryKey: ['tags', 'list', filters] }),
+    details: () => queryClient.invalidateQueries({ queryKey: ['tags', 'detail'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['tags', 'detail', id] }),
+    search: (query: string, entityType?: string) => queryClient.invalidateQueries({ queryKey: ['tags', 'search', query, entityType] }),
+    popular: (entityType?: string) => queryClient.invalidateQueries({ queryKey: ['tags', 'popular', entityType] }),
+    entity: (entityType: string, entityId: string) => queryClient.invalidateQueries({ queryKey: ['tags', 'entity', entityType, entityId] }),
+    // Invalidate all tag-related queries
+    related: async () => {
+      await Promise.all([
+        invalidateCache.tags.all(),
+      ])
+    },
+  },
+
+  // SSO
+  sso: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['sso'] }),
+    settings: () => queryClient.invalidateQueries({ queryKey: ['sso', 'settings'] }),
+    availableProviders: () => queryClient.invalidateQueries({ queryKey: ['sso', 'available-providers'] }),
+    provider: (id: string) => queryClient.invalidateQueries({ queryKey: ['sso', 'provider', id] }),
+    enabledProviders: () => queryClient.invalidateQueries({ queryKey: ['sso', 'enabled-providers'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.sso.all(),
+      ])
+    },
+  },
+
+  // Users
+  users: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['users'] }),
+    list: (params?: any) => queryClient.invalidateQueries({ queryKey: ['users', 'list', params] }),
+    lawyers: (params?: any) => queryClient.invalidateQueries({ queryKey: ['users', 'lawyers', params] }),
+    team: () => queryClient.invalidateQueries({ queryKey: ['users', 'team'] }),
+    profile: (userId: string) => queryClient.invalidateQueries({ queryKey: ['users', 'profile', userId] }),
+    lawyerProfile: (username: string) => queryClient.invalidateQueries({ queryKey: ['users', 'lawyer', username] }),
+    vapidKey: () => queryClient.invalidateQueries({ queryKey: ['users', 'vapid-key'] }),
+    pushSubscription: () => queryClient.invalidateQueries({ queryKey: ['users', 'push-subscription'] }),
+    notificationPreferences: () => queryClient.invalidateQueries({ queryKey: ['users', 'notification-preferences'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.users.all(),
+      ])
+    },
+  },
+
+  // MFA (Multi-Factor Authentication)
+  mfa: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['mfa'] }),
+    status: () => queryClient.invalidateQueries({ queryKey: ['mfa', 'status'] }),
+    requirement: () => queryClient.invalidateQueries({ queryKey: ['mfa', 'requirement'] }),
+    backupCodesCount: () => queryClient.invalidateQueries({ queryKey: ['mfa', 'backup-codes-count'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.mfa.status(),
+        invalidateCache.mfa.requirement(),
+        invalidateCache.mfa.backupCodesCount(),
+      ])
+    },
+  },
+
+  // Invoice Templates
+  invoiceTemplates: {
+    all: (options?: { refetchType?: 'all' }) =>
+      queryClient.invalidateQueries({ queryKey: ['invoice-templates'], refetchType: options?.refetchType }),
+    lists: (options?: { refetchType?: 'all' }) =>
+      queryClient.invalidateQueries({ queryKey: ['invoice-templates', 'list'], refetchType: options?.refetchType }),
+    list: (filters?: any, options?: { refetchType?: 'all' }) =>
+      queryClient.invalidateQueries({ queryKey: ['invoice-templates', 'list', filters], refetchType: options?.refetchType }),
+    details: () => queryClient.invalidateQueries({ queryKey: ['invoice-templates', 'detail'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['invoice-templates', 'detail', id] }),
+    default: () => queryClient.invalidateQueries({ queryKey: ['invoice-templates', 'default'] }),
+    preview: (id: string) => queryClient.invalidateQueries({ queryKey: ['invoice-templates', 'detail', id, 'preview'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.invoiceTemplates.all(),
+      ])
+    },
+  },
+
 
   // Global invalidation (use sparingly!)
 

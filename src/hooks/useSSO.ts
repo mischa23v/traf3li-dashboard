@@ -3,10 +3,11 @@
  * React Query hooks for SSO operations
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { CACHE_TIMES } from '@/config/cache'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import ssoService, {
   SSOSettings,
   SaveProviderRequest,
@@ -40,7 +41,6 @@ export const useSSOSettings = () => {
  * Hook to update SSO settings
  */
 export const useUpdateSSOSettings = () => {
-  const queryClient = useQueryClient()
   const { i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
 
@@ -48,7 +48,7 @@ export const useUpdateSSOSettings = () => {
     mutationFn: (data: Partial<SSOSettings>) => ssoService.updateSSOSettings(data),
     onSuccess: () => {
       toast.success(isRTL ? 'تم تحديث إعدادات SSO بنجاح' : 'SSO settings updated successfully')
-      queryClient.invalidateQueries({ queryKey: ssoKeys.settings() })
+      invalidateCache.sso.settings()
     },
     onError: (error: Error) => {
       toast.error(error.message || (isRTL ? 'فشل تحديث إعدادات SSO' : 'Failed to update SSO settings'))
@@ -97,7 +97,6 @@ export const useEnabledSSOProviders = () => {
  * Hook to create SSO provider
  */
 export const useCreateSSOProvider = () => {
-  const queryClient = useQueryClient()
   const { i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
 
@@ -105,8 +104,8 @@ export const useCreateSSOProvider = () => {
     mutationFn: (data: SaveProviderRequest) => ssoService.createSSOProvider(data),
     onSuccess: () => {
       toast.success(isRTL ? 'تمت إضافة مزود SSO بنجاح' : 'SSO provider added successfully')
-      queryClient.invalidateQueries({ queryKey: ssoKeys.settings() })
-      queryClient.invalidateQueries({ queryKey: ssoKeys.enabledProviders() })
+      invalidateCache.sso.settings()
+      invalidateCache.sso.enabledProviders()
     },
     onError: (error: Error) => {
       toast.error(error.message || (isRTL ? 'فشلت إضافة مزود SSO' : 'Failed to add SSO provider'))
@@ -118,7 +117,6 @@ export const useCreateSSOProvider = () => {
  * Hook to update SSO provider
  */
 export const useUpdateSSOProvider = () => {
-  const queryClient = useQueryClient()
   const { i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
 
@@ -127,9 +125,9 @@ export const useUpdateSSOProvider = () => {
       ssoService.updateSSOProvider(providerId, data),
     onSuccess: (_, variables) => {
       toast.success(isRTL ? 'تم تحديث مزود SSO بنجاح' : 'SSO provider updated successfully')
-      queryClient.invalidateQueries({ queryKey: ssoKeys.settings() })
-      queryClient.invalidateQueries({ queryKey: ssoKeys.provider(variables.providerId) })
-      queryClient.invalidateQueries({ queryKey: ssoKeys.enabledProviders() })
+      invalidateCache.sso.settings()
+      invalidateCache.sso.provider(variables.providerId)
+      invalidateCache.sso.enabledProviders()
     },
     onError: (error: Error) => {
       toast.error(error.message || (isRTL ? 'فشل تحديث مزود SSO' : 'Failed to update SSO provider'))
@@ -141,7 +139,6 @@ export const useUpdateSSOProvider = () => {
  * Hook to delete SSO provider
  */
 export const useDeleteSSOProvider = () => {
-  const queryClient = useQueryClient()
   const { i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
 
@@ -149,8 +146,8 @@ export const useDeleteSSOProvider = () => {
     mutationFn: (providerId: string) => ssoService.deleteSSOProvider(providerId),
     onSuccess: () => {
       toast.success(isRTL ? 'تم حذف مزود SSO بنجاح' : 'SSO provider deleted successfully')
-      queryClient.invalidateQueries({ queryKey: ssoKeys.settings() })
-      queryClient.invalidateQueries({ queryKey: ssoKeys.enabledProviders() })
+      invalidateCache.sso.settings()
+      invalidateCache.sso.enabledProviders()
     },
     onError: (error: Error) => {
       toast.error(error.message || (isRTL ? 'فشل حذف مزود SSO' : 'Failed to delete SSO provider'))

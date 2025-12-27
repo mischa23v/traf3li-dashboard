@@ -7,6 +7,7 @@ import invoiceTemplatesService, {
   type UpdateTemplateData,
 } from '@/services/invoiceTemplatesService'
 import { useTranslation } from 'react-i18next'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ==================== Cache Configuration ====================
 const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
@@ -83,7 +84,7 @@ export function useCreateTemplate() {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: templateKeys.all, refetchType: 'all' })
+      await invalidateCache.invoiceTemplates.all({ refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast({
@@ -110,8 +111,8 @@ export function useUpdateTemplate() {
       })
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: templateKeys.all })
-      await queryClient.invalidateQueries({ queryKey: templateKeys.detail(id) })
+      await invalidateCache.invoiceTemplates.all()
+      await invalidateCache.invoiceTemplates.detail(id)
     },
     onError: (error: Error) => {
       toast({
@@ -154,7 +155,7 @@ export function useDeleteTemplate() {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: templateKeys.all, refetchType: 'all' })
+      await invalidateCache.invoiceTemplates.all({ refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast({
@@ -198,7 +199,7 @@ export function useDuplicateTemplate() {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: templateKeys.all, refetchType: 'all' })
+      await invalidateCache.invoiceTemplates.all({ refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast({
@@ -224,8 +225,8 @@ export function useSetDefaultTemplate() {
       })
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: templateKeys.all })
-      await queryClient.invalidateQueries({ queryKey: templateKeys.default() })
+      await invalidateCache.invoiceTemplates.all()
+      await invalidateCache.invoiceTemplates.default()
     },
     onError: (error: Error) => {
       toast({
@@ -277,7 +278,7 @@ export function useImportTemplate() {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: templateKeys.all, refetchType: 'all' })
+      await invalidateCache.invoiceTemplates.all({ refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast({

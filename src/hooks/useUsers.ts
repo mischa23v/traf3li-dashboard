@@ -14,6 +14,7 @@ import usersService, {
 } from '@/services/usersService'
 import { toast } from 'sonner'
 import { CACHE_TIMES } from '@/config/cache'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ==================== QUERY KEYS ====================
 
@@ -109,8 +110,8 @@ export const useUpdateUserProfile = () => {
       toast.error(error.message || 'فشل تحديث الملف الشخصي')
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: userKeys.profile(variables.userId) })
-      await queryClient.invalidateQueries({ queryKey: userKeys.lawyers() })
+      await invalidateCache.users.profile(variables.userId)
+      await invalidateCache.users.lawyers()
     },
   })
 }
@@ -119,8 +120,6 @@ export const useUpdateUserProfile = () => {
  * Hook to delete user account (protected)
  */
 export const useDeleteUser = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (userId: string) => usersService.deleteUser(userId),
     onSuccess: () => {
@@ -130,7 +129,7 @@ export const useDeleteUser = () => {
       toast.error(error.message || 'فشل حذف الحساب')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: userKeys.all })
+      await invalidateCache.users.all()
     },
   })
 }
@@ -163,14 +162,12 @@ export const usePushSubscriptionStatus = () => {
  * Hook to save push subscription (protected)
  */
 export const useSavePushSubscription = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (subscription: PushSubscriptionData) =>
       usersService.savePushSubscription(subscription),
     onSuccess: () => {
       toast.success('تم تفعيل الإشعارات بنجاح')
-      queryClient.invalidateQueries({ queryKey: userKeys.pushSubscription() })
+      invalidateCache.users.pushSubscription()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تفعيل الإشعارات')
@@ -182,13 +179,11 @@ export const useSavePushSubscription = () => {
  * Hook to delete push subscription (protected)
  */
 export const useDeletePushSubscription = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: () => usersService.deletePushSubscription(),
     onSuccess: () => {
       toast.success('تم إلغاء الإشعارات بنجاح')
-      queryClient.invalidateQueries({ queryKey: userKeys.pushSubscription() })
+      invalidateCache.users.pushSubscription()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إلغاء الإشعارات')
@@ -211,14 +206,12 @@ export const useNotificationPreferences = () => {
  * Hook to update notification preferences (protected)
  */
 export const useUpdateNotificationPreferences = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (preferences: NotificationPreferences) =>
       usersService.updateNotificationPreferences(preferences),
     onSuccess: () => {
       toast.success('تم تحديث تفضيلات الإشعارات بنجاح')
-      queryClient.invalidateQueries({ queryKey: userKeys.notificationPreferences() })
+      invalidateCache.users.notificationPreferences()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث تفضيلات الإشعارات')
@@ -232,14 +225,12 @@ export const useUpdateNotificationPreferences = () => {
  * Hook to convert solo lawyer to firm owner (protected)
  */
 export const useConvertToFirm = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: ConvertToFirmData) => usersService.convertToFirm(data),
     onSuccess: () => {
       toast.success('تم تحويل الحساب إلى مكتب بنجاح')
       // Invalidate all user-related queries as the user structure changed
-      queryClient.invalidateQueries({ queryKey: userKeys.all })
+      invalidateCache.users.all()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحويل الحساب إلى مكتب')

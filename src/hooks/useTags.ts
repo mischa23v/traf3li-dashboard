@@ -7,6 +7,7 @@ import tagsService, {
 } from '@/services/tagsService'
 import { toast } from '@/hooks/use-toast'
 import { useTranslation } from 'react-i18next'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // Query keys
 export const tagsKeys = {
@@ -90,7 +91,7 @@ export const useCreateTag = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: tagsKeys.all, refetchType: 'all' })
+      await invalidateCache.tags.all()
     },
     onError: (error: any) => {
       toast({
@@ -128,8 +129,8 @@ export const useUpdateTag = () => {
     },
     onSettled: async (_, __, variables) => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: tagsKeys.all, refetchType: 'all' })
-      await queryClient.invalidateQueries({ queryKey: tagsKeys.detail(variables.id), refetchType: 'all' })
+      await invalidateCache.tags.all()
+      await invalidateCache.tags.detail(variables.id)
     },
     onError: (error: any) => {
       toast({
@@ -164,7 +165,7 @@ export const useDeleteTag = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: tagsKeys.all, refetchType: 'all' })
+      await invalidateCache.tags.all()
     },
     onError: (error: any) => {
       toast({
@@ -178,7 +179,6 @@ export const useDeleteTag = () => {
 
 // Add tag to entity
 export const useAddTagToEntity = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
@@ -199,11 +199,8 @@ export const useAddTagToEntity = () => {
     },
     onSettled: async (_, __, variables) => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({
-        queryKey: tagsKeys.entity(variables.entityType, variables.entityId),
-        refetchType: 'all'
-      })
-      await queryClient.invalidateQueries({ queryKey: tagsKeys.all, refetchType: 'all' })
+      await invalidateCache.tags.entity(variables.entityType, variables.entityId)
+      await invalidateCache.tags.all()
     },
     onError: (error: any) => {
       toast({
@@ -217,7 +214,6 @@ export const useAddTagToEntity = () => {
 
 // Remove tag from entity
 export const useRemoveTagFromEntity = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
@@ -238,11 +234,8 @@ export const useRemoveTagFromEntity = () => {
     },
     onSettled: async (_, __, variables) => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({
-        queryKey: tagsKeys.entity(variables.entityType, variables.entityId),
-        refetchType: 'all'
-      })
-      await queryClient.invalidateQueries({ queryKey: tagsKeys.all, refetchType: 'all' })
+      await invalidateCache.tags.entity(variables.entityType, variables.entityId)
+      await invalidateCache.tags.all()
     },
     onError: (error: any) => {
       toast({
