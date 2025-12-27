@@ -20,21 +20,24 @@
  */
 
 // Tax configuration
-export { TAX_CONFIG, default as TAX } from './tax'
+import { TAX_CONFIG, default as TAX } from './tax'
+export { TAX_CONFIG, TAX }
 
 // Pagination configuration
-export { PAGINATION, default as PAGINATION_CONFIG } from './pagination'
+import { PAGINATION, default as PAGINATION_CONFIG } from './pagination'
+export { PAGINATION, PAGINATION_CONFIG }
 
 // Cache configuration
-export {
+import {
   CACHE_TIMES,
   CACHE_CONFIG,
   MEMORY_CACHE,
   default as CACHE,
 } from './cache'
+export { CACHE_TIMES, CACHE_CONFIG, MEMORY_CACHE, CACHE }
 
 // UI constants
-export {
+import {
   CANVAS,
   MAP,
   FILE_LIMITS,
@@ -46,9 +49,21 @@ export {
   ANIMATION,
   default as UI_CONSTANTS,
 } from './ui-constants'
+export {
+  CANVAS,
+  MAP,
+  FILE_LIMITS,
+  TIMEOUTS,
+  CALENDAR,
+  RETENTION,
+  RATE_LIMITS,
+  EXPORT,
+  ANIMATION,
+  UI_CONSTANTS,
+}
 
 // Business rules
-export {
+import {
   MILEAGE_RATES,
   SCORE_THRESHOLDS,
   WORK_HOURS,
@@ -62,6 +77,20 @@ export {
   VALIDATION,
   default as BUSINESS_RULES,
 } from './business'
+export {
+  MILEAGE_RATES,
+  SCORE_THRESHOLDS,
+  WORK_HOURS,
+  FINANCIAL,
+  COMPLIANCE,
+  LEAVE,
+  PERFORMANCE,
+  MATCHING,
+  NOTIFICATIONS,
+  INVENTORY,
+  VALIDATION,
+  BUSINESS_RULES,
+}
 
 // Re-export everything as a single object for convenience
 export const CONFIG = {
