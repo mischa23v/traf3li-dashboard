@@ -1120,6 +1120,15 @@ export const invalidateCache = {
   user: {
     profile: () => queryClient.invalidateQueries({ queryKey: ['user'] }),
     permissions: () => queryClient.invalidateQueries({ queryKey: ['permissions'] }),
+    passwordStatus: () => queryClient.invalidateQueries({ queryKey: ['password', 'status'] }),
+  },
+
+  // Auth
+  auth: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['auth'] }),
+    currentUser: () => queryClient.invalidateQueries({ queryKey: ['auth', 'current-user'] }),
+    otpStatus: () => queryClient.invalidateQueries({ queryKey: ['auth', 'otp-status'] }),
+    clearAll: () => queryClient.clear(),
   },
 
   // Permissions (Enterprise)
@@ -2025,6 +2034,18 @@ export const invalidateCache = {
         invalidateCache.mfa.status(),
         invalidateCache.mfa.requirement(),
         invalidateCache.mfa.backupCodesCount(),
+      ])
+    },
+  },
+
+  // Step-Up Authentication (Reauthentication)
+  stepUpAuth: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['stepUpAuth'] }),
+    status: () => queryClient.invalidateQueries({ queryKey: ['stepUpAuth', 'status'] }),
+    methods: () => queryClient.invalidateQueries({ queryKey: ['stepUpAuth', 'methods'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.stepUpAuth.all(),
       ])
     },
   },

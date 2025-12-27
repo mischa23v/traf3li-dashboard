@@ -61,8 +61,8 @@ import { BuyingSidebar } from './buying-sidebar'
 
 // Hooks
 import { useMaterialRequest } from '@/hooks/use-buying'
-import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // Other
 import { LanguageSwitcher } from '@/components/language-switcher'
@@ -74,7 +74,6 @@ export function MaterialRequestDetailsView() {
   const isArabic = i18n.language === 'ar'
   const { materialRequestId } = useParams({ strict: false }) as { materialRequestId: string }
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
   const [activeTab, setActiveTab] = useState('overview')
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showCancelDialog, setShowCancelDialog] = useState(false)
@@ -211,13 +210,13 @@ export function MaterialRequestDetailsView() {
   const handleSubmit = () => {
     // This will call the submit mutation when implemented
     toast.success(t('buying.toast.materialRequestSubmitted'))
-    queryClient.invalidateQueries({ queryKey: ['buying', 'material-requests'] })
+    invalidateCache.buying.materialRequests()
   }
 
   const handleCancel = () => {
     // This will call the cancel mutation when implemented
     toast.success(t('buying.toast.materialRequestCancelled'))
-    queryClient.invalidateQueries({ queryKey: ['buying', 'material-requests'] })
+    invalidateCache.buying.materialRequests()
     setShowCancelDialog(false)
   }
 

@@ -3,7 +3,7 @@
  * React hooks for authentication operations matching backend auth.route.js
  */
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { CACHE_TIMES } from '@/config/cache'
 import authService, {
@@ -14,6 +14,7 @@ import authService, {
   VerifyOTPData,
 } from '@/services/authService'
 import { useAuthStore } from '@/stores/auth-store'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ==================== QUERY KEYS ====================
 
@@ -63,19 +64,18 @@ export const useRegister = () => {
  */
 export const useLogout = () => {
   const setUser = useAuthStore((state) => state.setUser)
-  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: () => authService.logout(),
     onSuccess: () => {
       setUser(null)
-      queryClient.clear()
+      invalidateCache.auth.clearAll()
       toast.success('تم تسجيل الخروج بنجاح')
     },
     onError: (error: Error) => {
       // Still clear user even if API call fails
       setUser(null)
-      queryClient.clear()
+      invalidateCache.auth.clearAll()
       toast.error(error.message || 'فشل تسجيل الخروج')
     },
   })

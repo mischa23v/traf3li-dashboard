@@ -4,10 +4,11 @@
  */
 
 import { useState, useMemo, useCallback } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { CACHE_TIMES } from '@/config/cache'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import passwordService, {
   type PasswordStatus,
   type PasswordStrength,
@@ -85,7 +86,6 @@ export function useResetPassword() {
  */
 export function useChangePassword() {
   const { t } = useTranslation()
-  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: ({
@@ -96,7 +96,7 @@ export function useChangePassword() {
       newPassword: string
     }) => passwordService.changePassword(currentPassword, newPassword),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: passwordKeys.status() })
+      invalidateCache.user.passwordStatus()
       toast.success(t('auth.passwordChanged', 'تم تغيير كلمة المرور بنجاح'))
     },
     onError: (error: Error) => {
