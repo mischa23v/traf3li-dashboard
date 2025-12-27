@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
@@ -14,6 +14,7 @@ import phoneAuthService, {
   type OTPStatusResponse,
 } from '@/services/phoneAuthService'
 import { useAuthStore } from '@/stores/auth-store'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 /**
  * Hook to send phone OTP
@@ -43,7 +44,6 @@ export function useSendPhoneOTP() {
 export function useVerifyPhoneOTP() {
   const { t } = useTranslation()
   const setUser = useAuthStore((state) => state.setUser)
-  const queryClient = useQueryClient()
   const navigate = useNavigate()
 
   return useMutation({
@@ -59,7 +59,7 @@ export function useVerifyPhoneOTP() {
     onSuccess: (data) => {
       if (data.user) {
         setUser(data.user)
-        queryClient.invalidateQueries({ queryKey: ['user'] })
+        invalidateCache.user.profile()
         toast.success(t('auth.loginSuccess', 'تم تسجيل الدخول بنجاح'))
         navigate({ to: '/dashboard' })
       } else if (data.mfaRequired) {
@@ -111,13 +111,12 @@ export function useCheckPhoneOTPStatus() {
  */
 export function useVerifyPhone() {
   const { t } = useTranslation()
-  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: ({ phone, otp }: { phone: string; otp: string }) =>
       phoneAuthService.verifyPhone(phone, otp),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user'] })
+      invalidateCache.user.profile()
       toast.success(t('auth.phoneVerified', 'تم التحقق من رقم الجوال'))
     },
     onError: (error: Error) => {

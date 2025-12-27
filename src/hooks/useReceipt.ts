@@ -1,13 +1,12 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import financeService from '@/services/financeService'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 /**
  * Hook for managing payment receipts
  */
 export function useReceipt(paymentId: string) {
-    const queryClient = useQueryClient()
-
     // Get receipt data
     const { data: receiptData, isLoading, error } = useQuery({
         queryKey: ['receipt', paymentId],
@@ -20,7 +19,7 @@ export function useReceipt(paymentId: string) {
         mutationFn: (options?: { language?: 'ar' | 'en' | 'both' }) =>
             financeService.generateReceipt(paymentId, options),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['receipt', paymentId] })
+            invalidateCache.payments.receipt(paymentId)
             toast.success('تم إنشاء الإيصال بنجاح')
         },
         onError: (error: any) => {
@@ -85,8 +84,6 @@ export function useReceipt(paymentId: string) {
  * Hook for bulk receipt operations
  */
 export function useBulkReceipts() {
-    const queryClient = useQueryClient()
-
     // Send multiple receipts
     const sendBulkReceiptsMutation = useMutation({
         mutationFn: async (data: {
@@ -105,7 +102,7 @@ export function useBulkReceipts() {
         onSuccess: (_, variables) => {
             toast.success(`تم إرسال ${variables.paymentIds.length} إيصال بنجاح`)
             variables.paymentIds.forEach(id => {
-                queryClient.invalidateQueries({ queryKey: ['receipt', id] })
+                invalidateCache.payments.receipt(id)
             })
         },
         onError: (error: any) => {

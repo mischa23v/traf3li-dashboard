@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config/cache'
 import appsService, { GetAppsParams, ConnectAppData } from '@/services/appsService'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 export const useApps = (params?: GetAppsParams) => {
   return useQuery({
@@ -50,7 +51,7 @@ export const useConnectApp = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['apps'], refetchType: 'all' })
+      return await invalidateCache.apps.all()
     },
   })
 }
@@ -84,7 +85,7 @@ export const useDisconnectApp = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: ['apps'], refetchType: 'all' })
+      return await invalidateCache.apps.all()
     },
   })
 }

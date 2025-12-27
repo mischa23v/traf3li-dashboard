@@ -381,6 +381,7 @@ export const invalidateCache = {
     employees: () => queryClient.invalidateQueries({ queryKey: ['employees'] }),
     employee: (id: string) => queryClient.invalidateQueries({ queryKey: ['employees', id] }),
     stats: () => queryClient.invalidateQueries({ queryKey: ['employees', 'stats'] }),
+    departed: () => queryClient.invalidateQueries({ queryKey: ['departed'] }),
     related: async () => {
       await Promise.all([
         invalidateCache.staff.all(),
@@ -1340,7 +1341,7 @@ export const invalidateCache = {
 
   // Integrations
   integrations: {
-    all: () => queryClient.invalidateQueries({ queryKey: ['integrations'] }),
+    all: () => queryClient.invalidateQueries({ queryKey: ['integrations'], refetchType: 'all' }),
     detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['integrations', id] }),
     category: (category?: string) => queryClient.invalidateQueries({ queryKey: ['integrations', 'category', category] }),
     status: (id: string) => queryClient.invalidateQueries({ queryKey: ['integrations', id, 'status'] }),
@@ -1607,7 +1608,7 @@ export const invalidateCache = {
 
   // Apps
   apps: {
-    all: () => queryClient.invalidateQueries({ queryKey: ['apps'] }),
+    all: () => queryClient.invalidateQueries({ queryKey: ['apps'], refetchType: 'all' }),
   },
 
   // Trust Accounts

@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { useQueryClient } from '@tanstack/react-query'
 import { AlertTriangle } from 'lucide-react'
 import {
   Dialog,
@@ -35,11 +34,11 @@ import { processDepartureSchema, type ProcessDepartureData } from '../data/schem
 import { departureReasons, staffRoles } from '../data/data'
 import firmService from '@/services/firmService'
 import { useAuthStore } from '@/stores/auth-store'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 export function StaffDepartureDialog() {
   const { open, setOpen, currentRow } = useStaffContext()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const queryClient = useQueryClient()
   const user = useAuthStore((state) => state.user)
   const firmId = user?.firmId || user?.lawyerProfile?.firmID
 
@@ -58,8 +57,8 @@ export function StaffDepartureDialog() {
     try {
       await firmService.processDeparture(firmId, currentRow._id, data)
       toast.success('Member departure processed successfully | تمت معالجة مغادرة الموظف بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['staff'] })
-      queryClient.invalidateQueries({ queryKey: ['team'] })
+      await invalidateCache.staff.all()
+      await invalidateCache.users.team()
       setOpen(null)
       form.reset()
     } catch (error: any) {
