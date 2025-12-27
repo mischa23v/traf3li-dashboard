@@ -5,6 +5,7 @@ import apiClient, { handleApiError } from '@/lib/api'
 import { toast } from 'sonner'
 import { useAuthStore, selectFirmId } from '@/stores/auth-store'
 import firmService from '@/services/firmService'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // Extended Staff interfaces for CRUD operations
 export interface CreateStaffData {
@@ -142,7 +143,7 @@ export const useCreateStaff = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['staff'], refetchType: 'all' })
+      await invalidateCache.staff.all()
     },
   })
 }
@@ -176,8 +177,8 @@ export const useUpdateStaff = () => {
     },
     onSettled: async (_, __, variables) => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['staff'], refetchType: 'all' })
-      await queryClient.invalidateQueries({ queryKey: ['staff', variables.staffId], refetchType: 'all' })
+      await invalidateCache.staff.all()
+      await invalidateCache.staff.detail(variables.staffId)
     },
   })
 }
@@ -203,7 +204,7 @@ export const useDeleteStaff = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['staff'], refetchType: 'all' })
+      await invalidateCache.staff.all()
     },
   })
 }
@@ -229,7 +230,7 @@ export const useBulkDeleteStaff = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['staff'], refetchType: 'all' })
+      await invalidateCache.staff.all()
     },
   })
 }
@@ -239,7 +240,6 @@ export const useBulkDeleteStaff = () => {
  * Sends invitation email with code that they use during sign up
  */
 export const useInviteStaff = () => {
-  const queryClient = useQueryClient()
   const firmId = useAuthStore(selectFirmId)
 
   return useMutation({
@@ -257,7 +257,7 @@ export const useInviteStaff = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['staff'], refetchType: 'all' })
+      await invalidateCache.staff.all()
     },
   })
 }

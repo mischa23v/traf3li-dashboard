@@ -1295,11 +1295,11 @@ export const invalidateCache = {
 
   // Conversations & Messages
   conversations: {
-    all: () => queryClient.invalidateQueries({ queryKey: ['conversations'] }),
-    single: (sellerId?: string, buyerId?: string) => queryClient.invalidateQueries({ queryKey: ['conversations', 'single', sellerId, buyerId] }),
-    messages: (conversationId?: string) => queryClient.invalidateQueries({ queryKey: ['messages', conversationId] }),
-    stats: () => queryClient.invalidateQueries({ queryKey: ['messages', 'stats'] }),
-    recent: (limit?: number) => queryClient.invalidateQueries({ queryKey: ['dashboard', 'recent-messages', limit] }),
+    all: () => queryClient.invalidateQueries({ queryKey: ['conversations'], refetchType: 'all' }),
+    single: (sellerId?: string, buyerId?: string) => queryClient.invalidateQueries({ queryKey: ['conversations', 'single', sellerId, buyerId], refetchType: 'all' }),
+    messages: (conversationId?: string) => queryClient.invalidateQueries({ queryKey: ['messages', conversationId], refetchType: 'all' }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['messages', 'stats'], refetchType: 'all' }),
+    recent: (limit?: number) => queryClient.invalidateQueries({ queryKey: ['dashboard', 'recent-messages', limit], refetchType: 'all' }),
   },
 
   // Threaded Messages/Chatter (for records like cases, tasks, etc.)
@@ -1996,8 +1996,63 @@ export const invalidateCache = {
     },
   },
 
+  // Setup Orchestration
+  setupOrchestration: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['setup-orchestration'] }),
+    status: () => queryClient.invalidateQueries({ queryKey: ['setup-orchestration', 'status'] }),
+    module: (module: string) => queryClient.invalidateQueries({ queryKey: ['setup-orchestration', 'module', module] }),
+    progress: (module: string) => queryClient.invalidateQueries({ queryKey: ['setup-orchestration', 'progress', module] }),
+    nextIncomplete: () => queryClient.invalidateQueries({ queryKey: ['setup-orchestration', 'next-incomplete'] }),
+    shouldShowReminder: () => queryClient.invalidateQueries({ queryKey: ['setup-orchestration', 'should-show-reminder'] }),
+    // Invalidate all setup-related queries
+    related: async () => {
+      await Promise.all([
+        invalidateCache.setupOrchestration.all(),
+      ])
+    },
+  },
+
+  // Data Export/Import
+  dataExport: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['data-export'] }),
+    exports: () => queryClient.invalidateQueries({ queryKey: ['data-export', 'exports'] }),
+    exportsList: (entityType?: string) => queryClient.invalidateQueries({ queryKey: ['data-export', 'exports', 'list', entityType] }),
+    exportDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['data-export', 'exports', id] }),
+    imports: (options?: { refetchType?: 'all' }) =>
+      queryClient.invalidateQueries({ queryKey: ['data-export', 'imports'], refetchType: options?.refetchType }),
+    importsList: (entityType?: string, options?: { refetchType?: 'all' }) =>
+      queryClient.invalidateQueries({ queryKey: ['data-export', 'imports', 'list', entityType], refetchType: options?.refetchType }),
+    importDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['data-export', 'imports', id] }),
+    templates: (options?: { refetchType?: 'all' }) =>
+      queryClient.invalidateQueries({ queryKey: ['data-export', 'templates'], refetchType: options?.refetchType }),
+    templatesList: (entityType?: string, options?: { refetchType?: 'all' }) =>
+      queryClient.invalidateQueries({ queryKey: ['data-export', 'templates', 'list', entityType], refetchType: options?.refetchType }),
+    columns: (entityType: string) => queryClient.invalidateQueries({ queryKey: ['data-export', 'columns', entityType] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.dataExport.all(),
+      ])
+    },
+  },
+
 
   // Global invalidation (use sparingly!)
+
+  // PDFme Templates
+  pdfme: {
+    all: (options?: { refetchType?: 'all' }) =>
+      queryClient.invalidateQueries({ queryKey: ['pdfme'], refetchType: options?.refetchType }),
+    templates: () => queryClient.invalidateQueries({ queryKey: ['pdfme', 'templates'] }),
+    template: (id: string) => queryClient.invalidateQueries({ queryKey: ['pdfme', 'template', id] }),
+    defaultTemplate: (category: string) => queryClient.invalidateQueries({ queryKey: ['pdfme', 'default', category] }),
+    list: (filters?: any) => queryClient.invalidateQueries({ queryKey: ['pdfme', 'templates', filters] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.pdfme.all(),
+      ])
+    },
+  },
+
 
   // Selective global (better than invalidating everything)
   allExcept: (exclude: string[]) => queryClient.invalidateQueries({

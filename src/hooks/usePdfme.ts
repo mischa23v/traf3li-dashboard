@@ -5,9 +5,11 @@ import pdfmeService, {
   type CreatePdfmeTemplateData,
   type UpdatePdfmeTemplateData,
   type PdfmeTemplateCategory,
+  type PdfmeTemplate,
 } from '@/services/pdfmeService'
 import { toast } from '@/hooks/use-toast'
 import { useTranslation } from 'react-i18next'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // Query keys
 export const pdfmeKeys = {
@@ -91,7 +93,7 @@ export const useCreatePdfmeTemplate = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: pdfmeKeys.all, refetchType: 'all' })
+      await invalidateCache.pdfme.all({ refetchType: 'all' })
     },
   })
 }
@@ -161,8 +163,8 @@ export const useUpdatePdfmeTemplate = () => {
       })
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: pdfmeKeys.all })
-      return await queryClient.invalidateQueries({ queryKey: pdfmeKeys.template(id) })
+      await invalidateCache.pdfme.all()
+      return await invalidateCache.pdfme.template(id)
     },
   })
 }
@@ -213,7 +215,7 @@ export const useDeletePdfmeTemplate = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: pdfmeKeys.all, refetchType: 'all' })
+      return await invalidateCache.pdfme.all({ refetchType: 'all' })
     },
   })
 }
@@ -264,14 +266,13 @@ export const useClonePdfmeTemplate = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: pdfmeKeys.all, refetchType: 'all' })
+      await invalidateCache.pdfme.all({ refetchType: 'all' })
     },
   })
 }
 
 // Set default template
 export const useSetDefaultPdfmeTemplate = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
@@ -284,9 +285,7 @@ export const useSetDefaultPdfmeTemplate = () => {
 
       // Invalidate the default template cache for this category
       if (data?.category) {
-        queryClient.invalidateQueries({
-          queryKey: pdfmeKeys.defaultTemplate(data.category),
-        })
+        invalidateCache.pdfme.defaultTemplate(data.category)
       }
     },
     onError: (error: any) => {
@@ -299,7 +298,7 @@ export const useSetDefaultPdfmeTemplate = () => {
       })
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: pdfmeKeys.all })
+      await invalidateCache.pdfme.all()
     },
   })
 }

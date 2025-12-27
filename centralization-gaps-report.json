@@ -193,15 +193,6 @@
         ]
       },
       {
-        "path": "src/features/leads/lead-details/index.tsx",
-        "count": 6,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },",
-          "        { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: true },",
-          "        { title: 'خط المبيعات', href: '/dashboard/crm/pipeline', isActive: false },"
-        ]
-      },
-      {
         "path": "src/features/buying/components/material-request-details-view.tsx",
         "count": 6,
         "examples": [
@@ -211,21 +202,21 @@
         ]
       },
       {
+        "path": "src/features/leads/lead-details/index.tsx",
+        "count": 6,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },",
+          "        { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: true },",
+          "        { title: 'خط المبيعات', href: '/dashboard/crm/pipeline', isActive: false },"
+        ]
+      },
+      {
         "path": "src/features/finance/components/invoice-approvals-view.tsx",
         "count": 5,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },",
           "    { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },",
           "    { title: 'الموافقات', href: '/dashboard/finance/invoices/approvals', isActive: true },"
-        ]
-      },
-      {
-        "path": "src/services/setupOrchestrationService.ts",
-        "count": 5,
-        "examples": [
-          "route: '/dashboard/hr/setup-wizard',",
-          "    route: '/dashboard/crm/setup-wizard',",
-          "    route: '/dashboard/finance/setup-wizard',"
         ]
       },
       {
@@ -265,6 +256,15 @@
         ]
       },
       {
+        "path": "src/services/setupOrchestrationService.ts",
+        "count": 5,
+        "examples": [
+          "route: '/dashboard/hr/setup-wizard',",
+          "    route: '/dashboard/crm/setup-wizard',",
+          "    route: '/dashboard/finance/setup-wizard',"
+        ]
+      },
+      {
         "path": "src/features/organizations/index.tsx",
         "count": 5,
         "examples": [
@@ -292,57 +292,12 @@
         ]
       },
       {
-        "path": "src/features/finance/components/time-entries-dashboard.tsx",
-        "count": 5,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },",
-          "        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },",
-          "        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/buying/components/create-rfq-view.tsx",
-        "count": 5,
-        "examples": [
-          "navigate({ to: '/dashboard/buying/rfq' })",
-          "    { title: t('buying.nav.suppliers', 'Suppliers'), href: '/dashboard/buying', isActive: false },",
-          "    { title: t('buying.nav.purchaseOrders', 'Purchase Orders'), href: '/dashboard/buying/purchase-orders', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/buying/components/create-purchase-order-view.tsx",
-        "count": 5,
-        "examples": [
-          "navigate({ to: '/dashboard/buying/purchase-orders' })",
-          "    { title: t('buying.overview', 'نظرة عامة'), href: '/dashboard/buying', isActive: false },",
-          "    { title: t('buying.purchaseOrders', 'أوامر الشراء'), href: '/dashboard/buying/purchase-orders', isActive: false },"
-        ]
-      },
-      {
         "path": "src/features/finance/components/retainer-details-view.tsx",
         "count": 5,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },",
           "        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },",
           "        { title: 'عروض الأسعار', href: '/dashboard/finance/quotes', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/staff/components/create-staff-view.tsx",
-        "count": 5,
-        "examples": [
-          "navigate({ to: '/dashboard/staff' })",
-          "        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },",
-          "        { title: 'العملاء', href: '/dashboard/clients', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/leads/index.tsx",
-        "count": 5,
-        "examples": [
-          "navigate({ to: '/dashboard/crm/leads/$leadId', params: { leadId } })",
-          "        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },",
-          "        { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: true },"
         ]
       },
       {
@@ -355,21 +310,66 @@
         ]
       },
       {
+        "path": "src/features/finance/components/time-entries-dashboard.tsx",
+        "count": 5,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },",
+          "        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },",
+          "        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/clients/components/create-client-view.tsx",
+        "count": 5,
+        "examples": [
+          "navigate({ to: '/dashboard/clients' })",
+          "        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },",
+          "        { title: 'العملاء', href: '/dashboard/clients', isActive: true },"
+        ]
+      },
+      {
+        "path": "src/features/buying/components/create-rfq-view.tsx",
+        "count": 5,
+        "examples": [
+          "navigate({ to: '/dashboard/buying/rfq' })",
+          "    { title: t('buying.nav.suppliers', 'Suppliers'), href: '/dashboard/buying', isActive: false },",
+          "    { title: t('buying.nav.purchaseOrders', 'Purchase Orders'), href: '/dashboard/buying/purchase-orders', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/staff/components/create-staff-view.tsx",
+        "count": 5,
+        "examples": [
+          "navigate({ to: '/dashboard/staff' })",
+          "        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },",
+          "        { title: 'العملاء', href: '/dashboard/clients', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/buying/components/create-purchase-order-view.tsx",
+        "count": 5,
+        "examples": [
+          "navigate({ to: '/dashboard/buying/purchase-orders' })",
+          "    { title: t('buying.overview', 'نظرة عامة'), href: '/dashboard/buying', isActive: false },",
+          "    { title: t('buying.purchaseOrders', 'أوامر الشراء'), href: '/dashboard/buying/purchase-orders', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/leads/index.tsx",
+        "count": 5,
+        "examples": [
+          "navigate({ to: '/dashboard/crm/leads/$leadId', params: { leadId } })",
+          "        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },",
+          "        { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: true },"
+        ]
+      },
+      {
         "path": "src/features/leads/components/create-lead-view.tsx",
         "count": 5,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },",
           "        { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: true },",
           "        { title: 'خط المبيعات', href: '/dashboard/crm/pipeline', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/contacts/index.tsx",
-        "count": 5,
-        "examples": [
-          "navigate({ to: '/dashboard/contacts/$contactId', params: { contactId } })",
-          "    navigate({ to: '/dashboard/contacts/$contactId/edit', params: { contactId } })",
-          "    { title: t('contacts.nav.contacts'), href: '/dashboard/contacts', isActive: true },"
         ]
       },
       {
@@ -391,21 +391,12 @@
         ]
       },
       {
-        "path": "src/features/clients/components/create-client-view.tsx",
+        "path": "src/features/contacts/index.tsx",
         "count": 5,
         "examples": [
-          "navigate({ to: '/dashboard/clients' })",
-          "        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },",
-          "        { title: 'العملاء', href: '/dashboard/clients', isActive: true },"
-        ]
-      },
-      {
-        "path": "src/features/contacts/components/create-contact-view.tsx",
-        "count": 5,
-        "examples": [
-          "navigate({ to: '/dashboard/contacts' })",
-          "        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },",
-          "        { title: 'العملاء', href: '/dashboard/clients', isActive: false },"
+          "navigate({ to: '/dashboard/contacts/$contactId', params: { contactId } })",
+          "    navigate({ to: '/dashboard/contacts/$contactId/edit', params: { contactId } })",
+          "    { title: t('contacts.nav.contacts'), href: '/dashboard/contacts', isActive: true },"
         ]
       },
       {
@@ -415,6 +406,15 @@
           "{ title: 'sidebar.nav.manufacturing', href: '/dashboard/manufacturing' },",
           "  { title: 'manufacturing.boms', href: '/dashboard/manufacturing/bom' },",
           "  { title: 'manufacturing.createBom', href: '/dashboard/manufacturing/bom/create' },"
+        ]
+      },
+      {
+        "path": "src/features/contacts/components/create-contact-view.tsx",
+        "count": 5,
+        "examples": [
+          "navigate({ to: '/dashboard/contacts' })",
+          "        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },",
+          "        { title: 'العملاء', href: '/dashboard/clients', isActive: false },"
         ]
       },
       {
@@ -436,12 +436,30 @@
         ]
       },
       {
+        "path": "src/routes/_authenticated/dashboard.ml.queue.tsx",
+        "count": 4,
+        "examples": [
+          "{ title: t('sidebar.nav.leads', 'Leads'), href: '/dashboard/crm/leads', isActive: false },",
+          "    { title: t('mlScoring.nav.analytics', 'ML Analytics'), href: '/dashboard/ml/analytics', isActive: false },",
+          "    { title: t('mlScoring.nav.queue', 'Priority Queue'), href: '/dashboard/ml/queue', isActive: true },"
+        ]
+      },
+      {
         "path": "src/features/finance/components/fiscal-periods-view.tsx",
         "count": 4,
         "examples": [
           "{ title: isRTL ? 'نظرة عامة' : 'Overview', href: '/dashboard/finance/overview', isActive: false },",
           "    { title: isRTL ? 'الفواتير' : 'Invoices', href: '/dashboard/finance/invoices', isActive: false },",
           "    { title: isRTL ? 'المصروفات' : 'Expenses', href: '/dashboard/finance/expenses', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/routes/_authenticated/dashboard.ml.sla.tsx",
+        "count": 4,
+        "examples": [
+          "{ title: t('sidebar.nav.leads', 'Leads'), href: '/dashboard/crm/leads', isActive: false },",
+          "    { title: t('mlScoring.nav.analytics', 'ML Analytics'), href: '/dashboard/ml/analytics', isActive: false },",
+          "    { title: t('mlScoring.nav.queue', 'Priority Queue'), href: '/dashboard/ml/queue', isActive: false },"
         ]
       },
       {
@@ -481,12 +499,12 @@
         ]
       },
       {
-        "path": "src/routes/_authenticated/dashboard.ml.sla.tsx",
+        "path": "src/features/organizations/components/organization-details-view.tsx",
         "count": 4,
         "examples": [
-          "{ title: t('sidebar.nav.leads', 'Leads'), href: '/dashboard/crm/leads', isActive: false },",
-          "    { title: t('mlScoring.nav.analytics', 'ML Analytics'), href: '/dashboard/ml/analytics', isActive: false },",
-          "    { title: t('mlScoring.nav.queue', 'Priority Queue'), href: '/dashboard/ml/queue', isActive: false },"
+          "navigate({ to: '/dashboard/organizations' })",
+          "    { title: 'جهات الاتصال', href: '/dashboard/contacts', isActive: false },",
+          "    { title: 'العملاء', href: '/dashboard/clients', isActive: false },"
         ]
       },
       {
@@ -496,24 +514,6 @@
           "{ title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },\r",
           "        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: true },\r",
           "        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },\r"
-        ]
-      },
-      {
-        "path": "src/routes/_authenticated/dashboard.ml.queue.tsx",
-        "count": 4,
-        "examples": [
-          "{ title: t('sidebar.nav.leads', 'Leads'), href: '/dashboard/crm/leads', isActive: false },",
-          "    { title: t('mlScoring.nav.analytics', 'ML Analytics'), href: '/dashboard/ml/analytics', isActive: false },",
-          "    { title: t('mlScoring.nav.queue', 'Priority Queue'), href: '/dashboard/ml/queue', isActive: true },"
-        ]
-      },
-      {
-        "path": "src/features/organizations/components/organization-details-view.tsx",
-        "count": 4,
-        "examples": [
-          "navigate({ to: '/dashboard/organizations' })",
-          "    { title: 'جهات الاتصال', href: '/dashboard/contacts', isActive: false },",
-          "    { title: 'العملاء', href: '/dashboard/clients', isActive: false },"
         ]
       },
       {
@@ -535,15 +535,6 @@
         ]
       },
       {
-        "path": "src/features/finance/components/bill-details-view.tsx",
-        "count": 4,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },",
-          "        { title: 'الفواتير', href: '/dashboard/finance/bills', isActive: true },",
-          "        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },"
-        ]
-      },
-      {
         "path": "src/features/case-notion/components/case-notion-list-view.tsx",
         "count": 4,
         "examples": [
@@ -553,7 +544,16 @@
         ]
       },
       {
-        "path": "src/features/finance/components/account-statement-dashboard.tsx",
+        "path": "src/features/finance/components/bill-details-view.tsx",
+        "count": 4,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },",
+          "        { title: 'الفواتير', href: '/dashboard/finance/bills', isActive: true },",
+          "        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/finance/components/currency-details-view.tsx",
         "count": 4,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },",
@@ -568,24 +568,6 @@
           "{ title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },",
           "        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },",
           "        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/finance/components/reconciliation-details-view.tsx",
-        "count": 4,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },",
-          "        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },",
-          "        { title: 'المدفوعات', href: '/dashboard/finance/payments', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/buying/components/supplier-details-view.tsx",
-        "count": 4,
-        "examples": [
-          "href: '/dashboard/buying/overview',",
-          "      href: '/dashboard/buying/suppliers',",
-          "      href: '/dashboard/buying/purchase-orders',"
         ]
       },
       {
@@ -607,12 +589,12 @@
         ]
       },
       {
-        "path": "src/features/buying/components/purchase-order-details-view.tsx",
+        "path": "src/features/finance/components/account-statement-dashboard.tsx",
         "count": 4,
         "examples": [
-          "href: '/dashboard/buying/overview',",
-          "      href: '/dashboard/buying/suppliers',",
-          "      href: '/dashboard/buying/purchase-orders',"
+          "{ title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },",
+          "        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },",
+          "        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },"
         ]
       },
       {
@@ -625,12 +607,30 @@
         ]
       },
       {
-        "path": "src/features/finance/components/currency-details-view.tsx",
+        "path": "src/features/finance/components/reconciliation-details-view.tsx",
         "count": 4,
         "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },",
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },",
           "        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },",
-          "        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },"
+          "        { title: 'المدفوعات', href: '/dashboard/finance/payments', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/buying/components/supplier-details-view.tsx",
+        "count": 4,
+        "examples": [
+          "href: '/dashboard/buying/overview',",
+          "      href: '/dashboard/buying/suppliers',",
+          "      href: '/dashboard/buying/purchase-orders',"
+        ]
+      },
+      {
+        "path": "src/features/buying/components/purchase-order-details-view.tsx",
+        "count": 4,
+        "examples": [
+          "href: '/dashboard/buying/overview',",
+          "      href: '/dashboard/buying/suppliers',",
+          "      href: '/dashboard/buying/purchase-orders',"
         ]
       },
       {
@@ -640,15 +640,6 @@
           "{ title: 'sidebar.nav.quality', href: '/dashboard/quality' },",
           "    navigate({ to: '/dashboard/quality' })",
           "                onClick={() => navigate({ to: '/dashboard/quality' })}"
-        ]
-      },
-      {
-        "path": "src/features/contacts/components/contact-details-view.tsx",
-        "count": 4,
-        "examples": [
-          "navigate({ to: '/dashboard/contacts' })",
-          "    { title: 'جهات الاتصال', href: '/dashboard/contacts', isActive: true },",
-          "    { title: 'العملاء', href: '/dashboard/clients', isActive: false },"
         ]
       },
       {
@@ -697,6 +688,15 @@
         ]
       },
       {
+        "path": "src/features/contacts/components/contact-details-view.tsx",
+        "count": 4,
+        "examples": [
+          "navigate({ to: '/dashboard/contacts' })",
+          "    { title: 'جهات الاتصال', href: '/dashboard/contacts', isActive: true },",
+          "    { title: 'العملاء', href: '/dashboard/clients', isActive: false },"
+        ]
+      },
+      {
         "path": "src/features/reports/components/reports-sidebar.tsx",
         "count": 4,
         "examples": [
@@ -724,15 +724,6 @@
         ]
       },
       {
-        "path": "src/features/tasks/components/gantt-view.tsx",
-        "count": 3,
-        "examples": [
-          "{ title: t('tasks.nav.overview'), href: '/dashboard/overview', isActive: false },",
-          "    { title: t('tasks.nav.cases'), href: '/dashboard/cases', isActive: false },",
-          "    { title: t('tasks.nav.clients'), href: '/dashboard/clients', isActive: false },"
-        ]
-      },
-      {
         "path": "src/features/finance/components/journal-entry-details-view.tsx",
         "count": 3,
         "examples": [
@@ -748,6 +739,15 @@
           "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },",
           "        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },",
           "        { title: 'الخدمات المصرفية', href: '/dashboard/finance/saudi-banking', isActive: true },"
+        ]
+      },
+      {
+        "path": "src/features/tasks/components/gantt-view.tsx",
+        "count": 3,
+        "examples": [
+          "{ title: t('tasks.nav.overview'), href: '/dashboard/overview', isActive: false },",
+          "    { title: t('tasks.nav.cases'), href: '/dashboard/cases', isActive: false },",
+          "    { title: t('tasks.nav.clients'), href: '/dashboard/clients', isActive: false },"
         ]
       },
       {
@@ -778,21 +778,21 @@
         ]
       },
       {
-        "path": "src/features/finance/components/time-entry-details-view.tsx",
-        "count": 3,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },",
-          "        { title: 'تتبع الوقت', href: '/dashboard/finance/time-tracking', isActive: true },",
-          "        { title: 'نشاط الحساب', href: '/dashboard/finance/activity', isActive: false },"
-        ]
-      },
-      {
         "path": "src/features/case-notion/index.tsx",
         "count": 3,
         "examples": [
           "{ title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },",
           "    { title: t('nav.cases', 'القضايا'), href: '/dashboard/cases', isActive: true },",
           "    navigate({ to: '/dashboard/cases/$caseId', params: { caseId } })"
+        ]
+      },
+      {
+        "path": "src/features/finance/components/time-entry-details-view.tsx",
+        "count": 3,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },",
+          "        { title: 'تتبع الوقت', href: '/dashboard/finance/time-tracking', isActive: true },",
+          "        { title: 'نشاط الحساب', href: '/dashboard/finance/activity', isActive: false },"
         ]
       },
       {
@@ -814,6 +814,33 @@
         ]
       },
       {
+        "path": "src/features/ml-scoring/index.tsx",
+        "count": 3,
+        "examples": [
+          "{ title: t('sidebar.nav.overview', 'Overview'), href: '/dashboard/overview', isActive: false },",
+          "    { title: t('sidebar.nav.leads', 'Leads'), href: '/dashboard/crm/leads', isActive: false },",
+          "    { title: t('mlScoring.nav.analytics', 'ML Analytics'), href: '/dashboard/ml/analytics', isActive: true },"
+        ]
+      },
+      {
+        "path": "src/features/messages/components/chat-view.tsx",
+        "count": 3,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },\r",
+          "        { title: 'الدردشة', href: '/dashboard/messages/chat', isActive: true },\r",
+          "        { title: 'البريد الإلكتروني', href: '/dashboard/messages/email', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/clients/client-details/index.tsx",
+        "count": 3,
+        "examples": [
+          "{ title: t('sidebar.nav.clients'), href: '/dashboard/clients', isActive: true },",
+          "    { title: t('sidebar.nav.organizations'), href: '/dashboard/organizations', isActive: false },",
+          "    { title: t('sidebar.nav.cases'), href: '/dashboard/cases', isActive: false },"
+        ]
+      },
+      {
         "path": "src/features/finance/components/edit-expense-view.tsx",
         "count": 3,
         "examples": [
@@ -832,21 +859,21 @@
         ]
       },
       {
+        "path": "src/features/clients/index.tsx",
+        "count": 3,
+        "examples": [
+          "{ title: t('sidebar.nav.clients'), href: '/dashboard/clients', isActive: true },",
+          "    { title: t('sidebar.nav.organizations'), href: '/dashboard/organizations', isActive: false },",
+          "    { title: t('sidebar.nav.cases'), href: '/dashboard/cases', isActive: false },"
+        ]
+      },
+      {
         "path": "src/features/finance/components/saudi-banking-wps-create-view.tsx",
         "count": 3,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },",
           "        { title: 'الخدمات المصرفية', href: '/dashboard/finance/saudi-banking', isActive: true },",
           "        navigate({ to: '/dashboard/finance/saudi-banking/wps' })"
-        ]
-      },
-      {
-        "path": "src/features/ml-scoring/index.tsx",
-        "count": 3,
-        "examples": [
-          "{ title: t('sidebar.nav.overview', 'Overview'), href: '/dashboard/overview', isActive: false },",
-          "    { title: t('sidebar.nav.leads', 'Leads'), href: '/dashboard/crm/leads', isActive: false },",
-          "    { title: t('mlScoring.nav.analytics', 'ML Analytics'), href: '/dashboard/ml/analytics', isActive: true },"
         ]
       },
       {
@@ -868,15 +895,6 @@
         ]
       },
       {
-        "path": "src/features/finance/components/saudi-banking-sadad-view.tsx",
-        "count": 3,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },",
-          "        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },",
-          "        { title: 'الخدمات المصرفية', href: '/dashboard/finance/saudi-banking', isActive: true },"
-        ]
-      },
-      {
         "path": "src/features/data-export/components/data-export-sidebar.tsx",
         "count": 3,
         "examples": [
@@ -886,30 +904,12 @@
         ]
       },
       {
-        "path": "src/features/clients/client-details/index.tsx",
+        "path": "src/features/finance/components/saudi-banking-sadad-view.tsx",
         "count": 3,
         "examples": [
-          "{ title: t('sidebar.nav.clients'), href: '/dashboard/clients', isActive: true },",
-          "    { title: t('sidebar.nav.organizations'), href: '/dashboard/organizations', isActive: false },",
-          "    { title: t('sidebar.nav.cases'), href: '/dashboard/cases', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/messages/components/chat-view.tsx",
-        "count": 3,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },\r",
-          "        { title: 'الدردشة', href: '/dashboard/messages/chat', isActive: true },\r",
-          "        { title: 'البريد الإلكتروني', href: '/dashboard/messages/email', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/clients/index.tsx",
-        "count": 3,
-        "examples": [
-          "{ title: t('sidebar.nav.clients'), href: '/dashboard/clients', isActive: true },",
-          "    { title: t('sidebar.nav.organizations'), href: '/dashboard/organizations', isActive: false },",
-          "    { title: t('sidebar.nav.cases'), href: '/dashboard/cases', isActive: false },"
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },",
+          "        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },",
+          "        { title: 'الخدمات المصرفية', href: '/dashboard/finance/saudi-banking', isActive: true },"
         ]
       },
       {
@@ -931,6 +931,14 @@
         ]
       },
       {
+        "path": "src/routes/_authenticated/dashboard.subcontracting.receipts.tsx",
+        "count": 2,
+        "examples": [
+          "{ title: 'subcontracting.subcontracting', href: '/dashboard/subcontracting' },",
+          "  { title: 'subcontracting.receipts', href: '/dashboard/subcontracting/receipts' },"
+        ]
+      },
+      {
         "path": "src/routes/_authenticated/dashboard.manufacturing.bom.tsx",
         "count": 2,
         "examples": [
@@ -939,7 +947,7 @@
         ]
       },
       {
-        "path": "src/features/invoice-templates/index.tsx",
+        "path": "src/features/tags/index.tsx",
         "count": 2,
         "examples": [
           "{ title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },",
@@ -947,7 +955,7 @@
         ]
       },
       {
-        "path": "src/features/tags/index.tsx",
+        "path": "src/features/invoice-templates/index.tsx",
         "count": 2,
         "examples": [
           "{ title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },",
@@ -971,6 +979,14 @@
         ]
       },
       {
+        "path": "src/features/organizations/components/organizations-primary-buttons.tsx",
+        "count": 2,
+        "examples": [
+          "<Link to='/dashboard/organizations/new'>",
+          "<Link to='/dashboard/organizations/new'>"
+        ]
+      },
+      {
         "path": "src/features/jobs/components/browse-jobs.tsx",
         "count": 2,
         "examples": [
@@ -987,22 +1003,6 @@
         ]
       },
       {
-        "path": "src/features/organizations/components/organizations-primary-buttons.tsx",
-        "count": 2,
-        "examples": [
-          "<Link to='/dashboard/organizations/new'>",
-          "<Link to='/dashboard/organizations/new'>"
-        ]
-      },
-      {
-        "path": "src/routes/_authenticated/dashboard.subcontracting.receipts.tsx",
-        "count": 2,
-        "examples": [
-          "{ title: 'subcontracting.subcontracting', href: '/dashboard/subcontracting' },",
-          "  { title: 'subcontracting.receipts', href: '/dashboard/subcontracting/receipts' },"
-        ]
-      },
-      {
         "path": "src/routes/_authenticated/dashboard.manufacturing.workstations.tsx",
         "count": 2,
         "examples": [
@@ -1011,11 +1011,19 @@
         ]
       },
       {
-        "path": "src/features/billing-rates/index.tsx",
+        "path": "src/features/messages/components/email-view.tsx",
         "count": 2,
         "examples": [
-          "{ title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },",
-          "    { title: t('nav.settings', 'الإعدادات'), href: '/dashboard/settings', isActive: true },"
+          "{ title: isRTL ? 'الدردشة' : 'Chat', href: '/dashboard/messages/chat', isActive: false },",
+          "    { title: isRTL ? 'البريد الإلكتروني' : 'Email', href: '/dashboard/messages/email', isActive: true },"
+        ]
+      },
+      {
+        "path": "src/features/clients/components/clients-primary-buttons.tsx",
+        "count": 2,
+        "examples": [
+          "<Link to='/dashboard/clients/new'>",
+          "<Link to='/dashboard/clients/new'>"
         ]
       },
       {
@@ -1043,14 +1051,6 @@
         ]
       },
       {
-        "path": "src/features/reputation/components/badges-view.tsx",
-        "count": 2,
-        "examples": [
-          "{ title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },",
-          "    { title: t('nav.reputation', 'السمعة'), href: '/dashboard/reputation', isActive: true },"
-        ]
-      },
-      {
         "path": "src/features/buying/components/buying-settings-view.tsx",
         "count": 2,
         "examples": [
@@ -1059,15 +1059,39 @@
         ]
       },
       {
-        "path": "src/features/messages/components/email-view.tsx",
+        "path": "src/features/reputation/components/badges-view.tsx",
         "count": 2,
         "examples": [
-          "{ title: isRTL ? 'الدردشة' : 'Chat', href: '/dashboard/messages/chat', isActive: false },",
-          "    { title: isRTL ? 'البريد الإلكتروني' : 'Email', href: '/dashboard/messages/email', isActive: true },"
+          "{ title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },",
+          "    { title: t('nav.reputation', 'السمعة'), href: '/dashboard/reputation', isActive: true },"
+        ]
+      },
+      {
+        "path": "src/features/followups/index.tsx",
+        "count": 2,
+        "examples": [
+          "{ title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },",
+          "    { title: t('nav.cases', 'القضايا'), href: '/dashboard/cases', isActive: true },"
         ]
       },
       {
         "path": "src/features/pdf-templates/index.tsx",
+        "count": 2,
+        "examples": [
+          "{ title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },",
+          "    { title: t('nav.settings', 'الإعدادات'), href: '/dashboard/settings', isActive: true },"
+        ]
+      },
+      {
+        "path": "src/features/case-workflows/index.tsx",
+        "count": 2,
+        "examples": [
+          "{ title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },",
+          "    { title: t('nav.cases', 'القضايا'), href: '/dashboard/cases', isActive: true },"
+        ]
+      },
+      {
+        "path": "src/features/billing-rates/index.tsx",
         "count": 2,
         "examples": [
           "{ title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },",
@@ -1083,19 +1107,11 @@
         ]
       },
       {
-        "path": "src/features/case-workflows/index.tsx",
+        "path": "src/features/quality/components/quality-settings-view.tsx",
         "count": 2,
         "examples": [
-          "{ title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },",
-          "    { title: t('nav.cases', 'القضايا'), href: '/dashboard/cases', isActive: true },"
-        ]
-      },
-      {
-        "path": "src/features/clients/components/clients-primary-buttons.tsx",
-        "count": 2,
-        "examples": [
-          "<Link to='/dashboard/clients/new'>",
-          "<Link to='/dashboard/clients/new'>"
+          "{ title: 'sidebar.nav.quality', href: '/dashboard/quality' },",
+          "  { title: 'quality.settings', href: '/dashboard/quality/settings' },"
         ]
       },
       {
@@ -1107,22 +1123,6 @@
         ]
       },
       {
-        "path": "src/features/contacts/components/contacts-primary-buttons.tsx",
-        "count": 2,
-        "examples": [
-          "<Link to='/dashboard/contacts/new'>",
-          "<Link to='/dashboard/contacts/new'>"
-        ]
-      },
-      {
-        "path": "src/features/quality/components/quality-settings-view.tsx",
-        "count": 2,
-        "examples": [
-          "{ title: 'sidebar.nav.quality', href: '/dashboard/quality' },",
-          "  { title: 'quality.settings', href: '/dashboard/quality/settings' },"
-        ]
-      },
-      {
         "path": "src/features/manufacturing/components/workstation-list-view.tsx",
         "count": 2,
         "examples": [
@@ -1131,19 +1131,19 @@
         ]
       },
       {
-        "path": "src/features/quality/components/template-list-view.tsx",
-        "count": 2,
-        "examples": [
-          "{ title: 'sidebar.nav.quality', href: '/dashboard/quality' },",
-          "  { title: 'quality.templates', href: '/dashboard/quality/templates' },"
-        ]
-      },
-      {
         "path": "src/features/quality/components/actions-list-view.tsx",
         "count": 2,
         "examples": [
           "{ title: 'sidebar.nav.quality', href: '/dashboard/quality' },",
           "  { title: 'quality.actions', href: '/dashboard/quality/actions' },"
+        ]
+      },
+      {
+        "path": "src/features/quality/components/template-list-view.tsx",
+        "count": 2,
+        "examples": [
+          "{ title: 'sidebar.nav.quality', href: '/dashboard/quality' },",
+          "  { title: 'quality.templates', href: '/dashboard/quality/templates' },"
         ]
       },
       {
@@ -1163,6 +1163,30 @@
         ]
       },
       {
+        "path": "src/features/hr/components/employee-details-view.tsx",
+        "count": 2,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },",
+          "        { title: 'الرواتب', href: '/dashboard/hr/salaries', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/reports/index.tsx",
+        "count": 2,
+        "examples": [
+          "{ title: isRTL ? 'التقارير' : 'Reports', href: '/dashboard/reports', isActive: true },",
+          "    { title: isRTL ? 'التحليلات' : 'Analytics', href: '/dashboard/analytics', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/contacts/components/contacts-primary-buttons.tsx",
+        "count": 2,
+        "examples": [
+          "<Link to='/dashboard/contacts/new'>",
+          "<Link to='/dashboard/contacts/new'>"
+        ]
+      },
+      {
         "path": "src/features/manufacturing/components/manufacturing-settings-view.tsx",
         "count": 2,
         "examples": [
@@ -1179,22 +1203,6 @@
         ]
       },
       {
-        "path": "src/features/reports/index.tsx",
-        "count": 2,
-        "examples": [
-          "{ title: isRTL ? 'التقارير' : 'Reports', href: '/dashboard/reports', isActive: true },",
-          "    { title: isRTL ? 'التحليلات' : 'Analytics', href: '/dashboard/analytics', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/employee-details-view.tsx",
-        "count": 2,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },",
-          "        { title: 'الرواتب', href: '/dashboard/hr/salaries', isActive: false },"
-        ]
-      },
-      {
         "path": "src/features/hr/components/employees-list-view.tsx",
         "count": 2,
         "examples": [
@@ -1203,18 +1211,10 @@
         ]
       },
       {
-        "path": "src/features/followups/index.tsx",
-        "count": 2,
-        "examples": [
-          "{ title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },",
-          "    { title: t('nav.cases', 'القضايا'), href: '/dashboard/cases', isActive: true },"
-        ]
-      },
-      {
-        "path": "src/hooks/use-route-prefetch.ts",
+        "path": "src/config/api.ts",
         "count": 1,
         "examples": [
-          "*   prefetchRoutes(['/dashboard/cases', '/dashboard/clients', '/dashboard/contacts'])"
+          "lowerUrl.includes('/dashboard/stats')"
         ]
       },
       {
@@ -1239,17 +1239,17 @@
         ]
       },
       {
-        "path": "src/features/tasks/components/tasks-reports-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
         "path": "src/features/finance/components/recurring-invoices-list.tsx",
         "count": 1,
         "examples": [
           "to: '/dashboard/finance/recurring-invoices/$id',"
+        ]
+      },
+      {
+        "path": "src/features/tasks/components/tasks-reports-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
         ]
       },
       {
@@ -1316,10 +1316,17 @@
         ]
       },
       {
-        "path": "src/config/api.ts",
+        "path": "src/features/finance/components/gl-transactions-view.example.tsx",
         "count": 1,
         "examples": [
-          "lowerUrl.includes('/dashboard/stats')"
+          "* export const Route = createFileRoute('/dashboard/finance/transactions-history')({"
+        ]
+      },
+      {
+        "path": "src/hooks/use-route-prefetch.ts",
+        "count": 1,
+        "examples": [
+          "*   prefetchRoutes(['/dashboard/cases', '/dashboard/clients', '/dashboard/contacts'])"
         ]
       },
       {
@@ -1330,13 +1337,6 @@
         ]
       },
       {
-        "path": "src/components/auth/SoloLawyerLockScreen.tsx",
-        "count": 1,
-        "examples": [
-          "navigate({ to: '/dashboard/settings/firm', replace: true })"
-        ]
-      },
-      {
         "path": "src/features/buying/components/create-material-request-view.tsx",
         "count": 1,
         "examples": [
@@ -1344,17 +1344,10 @@
         ]
       },
       {
-        "path": "src/features/finance/components/gl-transactions-view.example.tsx",
+        "path": "src/features/documents/index.tsx",
         "count": 1,
         "examples": [
-          "* export const Route = createFileRoute('/dashboard/finance/transactions-history')({"
-        ]
-      },
-      {
-        "path": "src/components/auth/PageAccessGuard.tsx",
-        "count": 1,
-        "examples": [
-          "to: '/dashboard/support/request-access',"
+          "{ title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },"
         ]
       },
       {
@@ -1372,35 +1365,7 @@
         ]
       },
       {
-        "path": "src/features/documents/index.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/manufacturing/components/manufacturing-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'sidebar.nav.manufacturing', href: '/dashboard/manufacturing' },"
-        ]
-      },
-      {
         "path": "src/features/hr/components/attendance-record-details-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/job-positions-create-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/grievances-create-view.tsx",
         "count": 1,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
@@ -1414,98 +1379,7 @@
         ]
       },
       {
-        "path": "src/features/hr/components/asset-assignment-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/offboarding-create-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/applicant-create-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
         "path": "src/features/hr/components/succession-planning-create-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/employee-transfers-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/benefits-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/job-positions-details-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/payroll-run-details-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/leave-policies-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/advances-create-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/organizational-structure-details-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/shift-assignments-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/organizational-structure-create-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/attendance-records-list-view.tsx",
         "count": 1,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
@@ -1519,62 +1393,6 @@
         ]
       },
       {
-        "path": "src/features/hr/components/payroll-run-create-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/payroll-details-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/onboarding-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/loans-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/benefits-create-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/loans-details-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/employee-promotions-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/promotion-details-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
         "path": "src/features/hr/components/biometric-details-view.tsx",
         "count": 1,
         "examples": [
@@ -1582,70 +1400,14 @@
         ]
       },
       {
-        "path": "src/features/hr/components/employee-create-view.tsx",
+        "path": "src/features/manufacturing/components/manufacturing-list-view.tsx",
         "count": 1,
         "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+          "{ title: 'sidebar.nav.manufacturing', href: '/dashboard/manufacturing' },"
         ]
       },
       {
-        "path": "src/features/hr/components/expense-claims-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/expense-claims-create-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/offboarding-details-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/applicant-details-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/advances-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/reports-details-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/applicants-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false }, // TODO: Add overview route to ROUTES constant"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/leave-requests-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/biometric-list-view.tsx",
+        "path": "src/features/hr/components/loans-list-view.tsx",
         "count": 1,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
@@ -1659,126 +1421,14 @@
         ]
       },
       {
-        "path": "src/features/hr/components/biometric-create-view.tsx",
+        "path": "src/features/hr/components/loans-details-view.tsx",
         "count": 1,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
         ]
       },
       {
-        "path": "src/features/hr/components/training-create-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/payroll-create-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/onboarding-details-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/advances-details-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/employee-transfer-details-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/job-posting-create-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/leave-periods-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/training-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/job-posting-details-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false }, // TODO: Add overview route to ROUTES constant"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/succession-planning-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/succession-planning-details-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/performance-reviews-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/leave-allocations-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/compensation-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/payroll-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/organizational-structure-list-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/reports-list-view.tsx",
+        "path": "src/features/hr/components/employee-create-view.tsx",
         "count": 1,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
@@ -1792,28 +1442,28 @@
         ]
       },
       {
-        "path": "src/features/hr/components/leave-request-details-view.tsx",
+        "path": "src/features/hr/components/attendance-records-list-view.tsx",
         "count": 1,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
         ]
       },
       {
-        "path": "src/features/hr/components/benefits-details-view.tsx",
+        "path": "src/features/hr/components/job-posting-create-view.tsx",
         "count": 1,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
         ]
       },
       {
-        "path": "src/features/hr/components/loans-create-view.tsx",
+        "path": "src/features/hr/components/benefits-create-view.tsx",
         "count": 1,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
         ]
       },
       {
-        "path": "src/features/hr/components/leave-request-create-view.tsx",
+        "path": "src/features/hr/components/reports-details-view.tsx",
         "count": 1,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
@@ -1827,6 +1477,55 @@
         ]
       },
       {
+        "path": "src/features/hr/components/advances-create-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/payroll-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/job-positions-details-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/expense-claims-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/leave-periods-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/onboarding-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/organizational-structure-create-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
         "path": "src/features/hr/components/compensation-create-view.tsx",
         "count": 1,
         "examples": [
@@ -1834,21 +1533,42 @@
         ]
       },
       {
-        "path": "src/features/hr/components/job-postings-list-view.tsx",
+        "path": "src/features/hr/components/leave-request-details-view.tsx",
         "count": 1,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
         ]
       },
       {
-        "path": "src/features/hr/components/asset-assignment-details-view.tsx",
+        "path": "src/features/hr/components/payroll-run-details-view.tsx",
         "count": 1,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
         ]
       },
       {
-        "path": "src/features/hr/components/job-positions-list-view.tsx",
+        "path": "src/features/hr/components/biometric-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/shift-assignments-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/leave-request-create-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/organizational-structure-details-view.tsx",
         "count": 1,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
@@ -1862,42 +1582,28 @@
         ]
       },
       {
-        "path": "src/features/hr/components/training-details-view.tsx",
+        "path": "src/features/hr/components/asset-assignment-list-view.tsx",
         "count": 1,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
         ]
       },
       {
-        "path": "src/features/hr/components/geofencing-create-view.tsx",
+        "path": "src/features/hr/components/grievances-create-view.tsx",
         "count": 1,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
         ]
       },
       {
-        "path": "src/features/hr/components/offboarding-list-view.tsx",
+        "path": "src/features/hr/components/job-posting-details-view.tsx",
         "count": 1,
         "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false }, // TODO: Add overview route to ROUTES constant"
         ]
       },
       {
-        "path": "src/features/hr/components/employee-transfer-create-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/grievances-details-view.tsx",
-        "count": 1,
-        "examples": [
-          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/grievances-list-view.tsx",
+        "path": "src/features/hr/components/applicant-create-view.tsx",
         "count": 1,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
@@ -1911,6 +1617,146 @@
         ]
       },
       {
+        "path": "src/features/hr/components/employee-transfers-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/advances-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/payroll-run-create-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/compensation-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/onboarding-details-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/offboarding-details-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/leave-allocations-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/promotion-details-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/succession-planning-details-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/applicants-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false }, // TODO: Add overview route to ROUTES constant"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/employee-promotions-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/job-positions-create-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/loans-create-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/expense-claims-create-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/leave-policies-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/training-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/payroll-details-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/geofencing-create-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/training-create-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/leave-requests-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
         "path": "src/features/hr/components/onboarding-create-view.tsx",
         "count": 1,
         "examples": [
@@ -1918,7 +1764,119 @@
         ]
       },
       {
-        "path": "src/features/hr/components/geofencing-list-view.tsx",
+        "path": "src/features/hr/components/job-postings-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/performance-reviews-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/employee-transfer-details-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/benefits-details-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/offboarding-create-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/reports-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/grievances-details-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/benefits-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/succession-planning-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/applicant-details-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/offboarding-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/organizational-structure-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/components/auth/SoloLawyerLockScreen.tsx",
+        "count": 1,
+        "examples": [
+          "navigate({ to: '/dashboard/settings/firm', replace: true })"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/advances-details-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/payroll-create-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/employee-transfer-create-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/asset-assignment-details-view.tsx",
         "count": 1,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
@@ -1932,6 +1890,13 @@
         ]
       },
       {
+        "path": "src/features/hr/components/biometric-create-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
         "path": "src/features/hr/components/geofencing-details-view.tsx",
         "count": 1,
         "examples": [
@@ -1939,7 +1904,42 @@
         ]
       },
       {
+        "path": "src/features/hr/components/geofencing-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/grievances-list-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
         "path": "src/features/hr/components/reports-create-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/components/auth/PageAccessGuard.tsx",
+        "count": 1,
+        "examples": [
+          "to: '/dashboard/support/request-access',"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/training-details-view.tsx",
+        "count": 1,
+        "examples": [
+          "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/job-positions-list-view.tsx",
         "count": 1,
         "examples": [
           "{ title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },"
@@ -1990,6 +1990,14 @@
         ]
       },
       {
+        "path": "src/hooks/useCrm.ts",
+        "count": 2,
+        "examples": [
+          "staleTime: 0, // Always fetch fresh data",
+          "    staleTime: 0, // Always fresh"
+        ]
+      },
+      {
         "path": "src/hooks/useFinance.ts",
         "count": 2,
         "examples": [
@@ -2014,46 +2022,6 @@
         ]
       },
       {
-        "path": "src/hooks/useCrm.ts",
-        "count": 2,
-        "examples": [
-          "staleTime: 0, // Always fetch fresh data",
-          "    staleTime: 0, // Always fresh"
-        ]
-      },
-      {
-        "path": "src/contexts/CompanyContext.tsx",
-        "count": 2,
-        "examples": [
-          "staleTime: 5 * 60 * 1000, // 5 minutes",
-          "    staleTime: 5 * 60 * 1000, // 5 minutes"
-        ]
-      },
-      {
-        "path": "src/config/business.ts",
-        "count": 2,
-        "examples": [
-          "PER_DAY: 24 * 60 * 60 * 1000,",
-          "    PER_HOUR: 60 * 60 * 1000,"
-        ]
-      },
-      {
-        "path": "src/hooks/useAuditLog.ts",
-        "count": 2,
-        "examples": [
-          "refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes",
-          "    refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes"
-        ]
-      },
-      {
-        "path": "src/lib/data-retention.ts",
-        "count": 2,
-        "examples": [
-          "const futureDate = new Date(now.getTime() + withinDays * 24 * 60 * 60 * 1000)",
-          "  }, intervalHours * 60 * 60 * 1000)"
-        ]
-      },
-      {
         "path": "src/main.tsx",
         "count": 2,
         "examples": [
@@ -2070,6 +2038,22 @@
         ]
       },
       {
+        "path": "src/lib/data-retention.ts",
+        "count": 2,
+        "examples": [
+          "const futureDate = new Date(now.getTime() + withinDays * 24 * 60 * 60 * 1000)",
+          "  }, intervalHours * 60 * 60 * 1000)"
+        ]
+      },
+      {
+        "path": "src/hooks/useAuditLog.ts",
+        "count": 2,
+        "examples": [
+          "refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes",
+          "    refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes"
+        ]
+      },
+      {
         "path": "src/features/crm/components/lead-scoring-dashboard.tsx",
         "count": 2,
         "examples": [
@@ -2078,19 +2062,35 @@
         ]
       },
       {
-        "path": "src/components/hr/recruitment/StaffingPlanDialog.tsx",
-        "count": 2,
-        "examples": [
-          "toDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now",
-          "        toDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),"
-        ]
-      },
-      {
         "path": "src/features/buying/components/material-request-list-view.tsx",
         "count": 2,
         "examples": [
           "const urgentDate = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000) // 7 days from now",
           "    const urgentDate = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)"
+        ]
+      },
+      {
+        "path": "src/config/business.ts",
+        "count": 2,
+        "examples": [
+          "PER_DAY: 24 * 60 * 60 * 1000,",
+          "    PER_HOUR: 60 * 60 * 1000,"
+        ]
+      },
+      {
+        "path": "src/contexts/CompanyContext.tsx",
+        "count": 2,
+        "examples": [
+          "staleTime: 5 * 60 * 1000, // 5 minutes",
+          "    staleTime: 5 * 60 * 1000, // 5 minutes"
+        ]
+      },
+      {
+        "path": "src/components/hr/recruitment/StaffingPlanDialog.tsx",
+        "count": 2,
+        "examples": [
+          "toDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now",
+          "        toDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),"
         ]
       },
       {
@@ -2157,13 +2157,6 @@
         ]
       },
       {
-        "path": "src/config/index.ts",
-        "count": 1,
-        "examples": [
-          "* // Instead of: staleTime: 5 * 60 * 1000"
-        ]
-      },
-      {
         "path": "src/utils/secure-storage.ts",
         "count": 1,
         "examples": [
@@ -2178,10 +2171,10 @@
         ]
       },
       {
-        "path": "src/sdk/integrations/sso-detection/SSODetector.ts",
+        "path": "src/features/finance/components/currency-list-view.tsx",
         "count": 1,
         "examples": [
-          "cacheDuration: 5 * 60 * 1000, // 5 minutes default"
+          "return diff < 24 * 60 * 60 * 1000 // Last 24 hours"
         ]
       },
       {
@@ -2199,10 +2192,17 @@
         ]
       },
       {
-        "path": "src/lib/cookies.ts",
+        "path": "src/services/authService.ts",
         "count": 1,
         "examples": [
-          ": new Date(Date.now() + opts.expires * 24 * 60 * 60 * 1000)"
+          "const AUTH_GRACE_PERIOD = 30 * 60 * 1000 // 30 minutes - trust cached user for extended period"
+        ]
+      },
+      {
+        "path": "src/features/finance/components/currency-details-view.tsx",
+        "count": 1,
+        "examples": [
+          "startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],"
         ]
       },
       {
@@ -2213,17 +2213,10 @@
         ]
       },
       {
-        "path": "src/services/authService.ts",
+        "path": "src/lib/cookies.ts",
         "count": 1,
         "examples": [
-          "const AUTH_GRACE_PERIOD = 30 * 60 * 1000 // 30 minutes - trust cached user for extended period"
-        ]
-      },
-      {
-        "path": "src/components/hr/leave/CompensatoryLeaveDialog.tsx",
-        "count": 1,
-        "examples": [
-          "fromDate: format(new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'),"
+          ": new Date(Date.now() + opts.expires * 24 * 60 * 60 * 1000)"
         ]
       },
       {
@@ -2234,10 +2227,17 @@
         ]
       },
       {
-        "path": "src/features/manufacturing/components/job-card-list-view.tsx",
+        "path": "src/features/dashboard-settings/security-page.tsx",
         "count": 1,
         "examples": [
-          "const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)"
+          "(24 * 60 * 60 * 1000)"
+        ]
+      },
+      {
+        "path": "src/sdk/integrations/sso-detection/SSODetector.ts",
+        "count": 1,
+        "examples": [
+          "cacheDuration: 5 * 60 * 1000, // 5 minutes default"
         ]
       },
       {
@@ -2248,24 +2248,24 @@
         ]
       },
       {
-        "path": "src/features/dashboard-settings/security-page.tsx",
+        "path": "src/config/index.ts",
         "count": 1,
         "examples": [
-          "(24 * 60 * 60 * 1000)"
+          "* // Instead of: staleTime: 5 * 60 * 1000"
         ]
       },
       {
-        "path": "src/features/finance/components/currency-list-view.tsx",
+        "path": "src/features/manufacturing/components/job-card-list-view.tsx",
         "count": 1,
         "examples": [
-          "return diff < 24 * 60 * 60 * 1000 // Last 24 hours"
+          "const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)"
         ]
       },
       {
-        "path": "src/features/finance/components/currency-details-view.tsx",
+        "path": "src/components/hr/leave/CompensatoryLeaveDialog.tsx",
         "count": 1,
         "examples": [
-          "startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],"
+          "fromDate: format(new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'),"
         ]
       }
     ],
@@ -2277,93 +2277,12 @@
     "description": "Files with direct queryClient.invalidateQueries that should use invalidateCache",
     "files": [
       {
-        "path": "src/hooks/useSSO.ts",
-        "count": 8,
-        "examples": [
-          "queryClient.invalidateQueries({ queryKey: ssoKeys.settings() })",
-          "      queryClient.invalidateQueries({ queryKey: ssoKeys.settings() })",
-          "      queryClient.invalidateQueries({ queryKey: ssoKeys.enabledProviders() })"
-        ]
-      },
-      {
-        "path": "src/hooks/useNotifications.ts",
-        "count": 8,
-        "examples": [
-          "queryClient.invalidateQueries({ queryKey: notificationKeys.all })",
-          "      queryClient.invalidateQueries({ queryKey: notificationKeys.all })",
-          "      queryClient.invalidateQueries({ queryKey: notificationKeys.all })"
-        ]
-      },
-      {
-        "path": "src/hooks/useExpensePolicies.ts",
-        "count": 8,
-        "examples": [
-          "await queryClient.invalidateQueries({ queryKey: ['expense-policies'] })",
-          "      await queryClient.invalidateQueries({ queryKey: ['expense-policies'] })",
-          "      await queryClient.invalidateQueries({ queryKey: ['expense-policy', variables.id] })"
-        ]
-      },
-      {
-        "path": "src/hooks/useInvoiceTemplates.ts",
-        "count": 8,
-        "examples": [
-          "await queryClient.invalidateQueries({ queryKey: templateKeys.all, refetchType: 'all' })",
-          "      await queryClient.invalidateQueries({ queryKey: templateKeys.all })",
-          "      await queryClient.invalidateQueries({ queryKey: templateKeys.detail(id) })"
-        ]
-      },
-      {
-        "path": "src/hooks/use-assets.ts",
-        "count": 8,
-        "examples": [
-          "queryClient.invalidateQueries({ queryKey: assetsKeys.categories() })",
-          "      queryClient.invalidateQueries({ queryKey: assetsKeys.categories() })",
-          "      queryClient.invalidateQueries({ queryKey: assetsKeys.categoryDetail(id) })"
-        ]
-      },
-      {
-        "path": "src/hooks/useMFA.ts",
-        "count": 8,
-        "examples": [
-          "queryClient.invalidateQueries({ queryKey: mfaKeys.status() })",
-          "        queryClient.invalidateQueries({ queryKey: mfaKeys.requirement() })",
-          "        queryClient.invalidateQueries({ queryKey: mfaKeys.backupCodesCount() })"
-        ]
-      },
-      {
-        "path": "src/hooks/useTags.ts",
-        "count": 8,
-        "examples": [
-          "await queryClient.invalidateQueries({ queryKey: tagsKeys.all, refetchType: 'all' })",
-          "      await queryClient.invalidateQueries({ queryKey: tagsKeys.all, refetchType: 'all' })",
-          "      await queryClient.invalidateQueries({ queryKey: tagsKeys.detail(variables.id), refetchType: 'all' })"
-        ]
-      },
-      {
-        "path": "src/hooks/useUsers.ts",
-        "count": 7,
-        "examples": [
-          "await queryClient.invalidateQueries({ queryKey: userKeys.profile(variables.userId) })",
-          "      await queryClient.invalidateQueries({ queryKey: userKeys.lawyers() })",
-          "      await queryClient.invalidateQueries({ queryKey: userKeys.all })"
-        ]
-      },
-      {
         "path": "src/hooks/usePdfme.ts",
         "count": 7,
         "examples": [
           "await queryClient.invalidateQueries({ queryKey: pdfmeKeys.all, refetchType: 'all' })",
           "      await queryClient.invalidateQueries({ queryKey: pdfmeKeys.all })",
           "      return await queryClient.invalidateQueries({ queryKey: pdfmeKeys.template(id) })"
-        ]
-      },
-      {
-        "path": "src/hooks/useSetupOrchestration.ts",
-        "count": 7,
-        "examples": [
-          "queryClient.invalidateQueries({ queryKey: setupOrchestrationKeys.status() })",
-          "      queryClient.invalidateQueries({ queryKey: setupOrchestrationKeys.nextIncomplete() })",
-          "      queryClient.invalidateQueries({ queryKey: setupOrchestrationKeys.status() })"
         ]
       },
       {
@@ -2391,15 +2310,6 @@
           "await queryClient.invalidateQueries({ queryKey: ['staff'], refetchType: 'all' })",
           "      await queryClient.invalidateQueries({ queryKey: ['staff'], refetchType: 'all' })",
           "      await queryClient.invalidateQueries({ queryKey: ['staff', variables.staffId], refetchType: 'all' })"
-        ]
-      },
-      {
-        "path": "src/hooks/useOnboardingWizard.ts",
-        "count": 6,
-        "examples": [
-          "queryClient.invalidateQueries({ queryKey: onboardingWizardKeys.status() })",
-          "      queryClient.invalidateQueries({ queryKey: onboardingWizardKeys.status() })",
-          "      queryClient.invalidateQueries({ queryKey: onboardingWizardKeys.status() })"
         ]
       },
       {
@@ -2466,21 +2376,21 @@
         ]
       },
       {
-        "path": "src/lib/api.ts",
-        "count": 3,
-        "examples": [
-          "* - To invalidate specific queries: queryClient.invalidateQueries({ queryKey: ['key'] })\r",
-          "    '  - queryClient.invalidateQueries({ queryKey: [...] }) to invalidate specific queries | لإبطال استعلامات محددة\\n' +\r",
-          "    '  ✅ queryClient.invalidateQueries({ queryKey: [\"case\", \"123\"] })'"
-        ]
-      },
-      {
         "path": "src/hooks/useApiKeys.ts",
         "count": 3,
         "examples": [
           "await queryClient.invalidateQueries({ queryKey: ['api-keys'], refetchType: 'all' })",
           "      await queryClient.invalidateQueries({ queryKey: ['api-keys'], refetchType: 'all' })",
           "      await queryClient.invalidateQueries({ queryKey: ['api-keys'], refetchType: 'all' })"
+        ]
+      },
+      {
+        "path": "src/lib/api.ts",
+        "count": 3,
+        "examples": [
+          "* - To invalidate specific queries: queryClient.invalidateQueries({ queryKey: ['key'] })\r",
+          "    '  - queryClient.invalidateQueries({ queryKey: [...] }) to invalidate specific queries | لإبطال استعلامات محددة\\n' +\r",
+          "    '  ✅ queryClient.invalidateQueries({ queryKey: [\"case\", \"123\"] })'"
         ]
       },
       {
@@ -2543,6 +2453,14 @@
         ]
       },
       {
+        "path": "src/hooks/useAuditLog.ts",
+        "count": 2,
+        "examples": [
+          "queryClient.invalidateQueries({ queryKey: auditKeys.all })",
+          "      queryClient.invalidateQueries({ queryKey: auditKeys.all })"
+        ]
+      },
+      {
         "path": "src/hooks/useApps.ts",
         "count": 2,
         "examples": [
@@ -2556,14 +2474,6 @@
         "examples": [
           "queryClient.invalidateQueries({ queryKey: ['user'] })",
           "      queryClient.invalidateQueries({ queryKey: ['user'] })"
-        ]
-      },
-      {
-        "path": "src/hooks/useAuditLog.ts",
-        "count": 2,
-        "examples": [
-          "queryClient.invalidateQueries({ queryKey: auditKeys.all })",
-          "      queryClient.invalidateQueries({ queryKey: auditKeys.all })"
         ]
       },
       {
@@ -2598,17 +2508,17 @@
         ]
       },
       {
-        "path": "src/hooks/useCompanies.ts",
-        "count": 1,
-        "examples": [
-          "queryClient.invalidateQueries()"
-        ]
-      },
-      {
         "path": "src/hooks/usePassword.ts",
         "count": 1,
         "examples": [
           "queryClient.invalidateQueries({ queryKey: passwordKeys.status() })"
+        ]
+      },
+      {
+        "path": "src/hooks/useCompanies.ts",
+        "count": 1,
+        "examples": [
+          "queryClient.invalidateQueries()"
         ]
       },
       {
@@ -2634,7 +2544,7 @@
       }
     ],
     "priority": "medium",
-    "totalCount": 178
+    "totalCount": 115
   },
   {
     "category": "Cache: Hardcoded Query Keys",
@@ -2642,7 +2552,7 @@
     "files": [
       {
         "path": "src/lib/cache-invalidation.ts",
-        "count": 879,
+        "count": 919,
         "examples": [
           "all: () => queryClient.invalidateQueries({ queryKey: ['tasks'] }),",
           "    lists: () => queryClient.invalidateQueries({ queryKey: ['tasks'] }),",
@@ -2722,15 +2632,6 @@
         ]
       },
       {
-        "path": "src/hooks/useExpensePolicies.ts",
-        "count": 17,
-        "examples": [
-          "queryKey: ['expense-policies'],",
-          "    queryKey: ['expense-policy', id],",
-          "    queryKey: ['expense-policy', 'default'],"
-        ]
-      },
-      {
         "path": "src/hooks/useStaff.ts",
         "count": 13,
         "examples": [
@@ -2749,21 +2650,21 @@
         ]
       },
       {
-        "path": "src/hooks/useCalendar.ts",
-        "count": 12,
-        "examples": [
-          "queryKey: ['calendar', filters],",
-          "    queryKey: ['calendar', 'date', date],",
-          "    queryKey: ['calendar', 'month', year, month],"
-        ]
-      },
-      {
         "path": "src/hooks/useJobs.ts",
         "count": 12,
         "examples": [
           "queryKey: ['jobs', filters],",
           "    queryKey: ['jobs', 'my-jobs'],",
           "    queryKey: ['jobs', id],"
+        ]
+      },
+      {
+        "path": "src/hooks/useCalendar.ts",
+        "count": 12,
+        "examples": [
+          "queryKey: ['calendar', filters],",
+          "    queryKey: ['calendar', 'date', date],",
+          "    queryKey: ['calendar', 'month', year, month],"
         ]
       },
       {
@@ -2803,12 +2704,12 @@
         ]
       },
       {
-        "path": "src/hooks/useCompanies.ts",
-        "count": 8,
+        "path": "src/hooks/useExpensePolicies.ts",
+        "count": 9,
         "examples": [
-          "queryKey: ['firms', filters],",
-          "    queryKey: ['firm', id],",
-          "    queryKey: ['firms', 'tree', rootFirmId],"
+          "queryKey: ['expense-policies'],",
+          "    queryKey: ['expense-policy', id],",
+          "    queryKey: ['expense-policy', 'default'],"
         ]
       },
       {
@@ -2821,21 +2722,21 @@
         ]
       },
       {
+        "path": "src/hooks/useCompanies.ts",
+        "count": 8,
+        "examples": [
+          "queryKey: ['firms', filters],",
+          "    queryKey: ['firm', id],",
+          "    queryKey: ['firms', 'tree', rootFirmId],"
+        ]
+      },
+      {
         "path": "src/hooks/useEmailSettings.ts",
         "count": 8,
         "examples": [
           "queryKey: ['smtp-config'],",
           "    queryKey: ['email-signatures'],",
           "      queryClient.setQueriesData({ queryKey: ['email-signatures'] }, (old: any) => {"
-        ]
-      },
-      {
-        "path": "src/hooks/useEmployeePromotion.ts",
-        "count": 7,
-        "examples": [
-          "queryKey: ['employee-promotions', filters],",
-          "    queryKey: ['employee-promotions', id],",
-          "    queryKey: ['employee-promotions', 'stats', filters],"
         ]
       },
       {
@@ -2848,21 +2749,21 @@
         ]
       },
       {
+        "path": "src/hooks/useEmployeePromotion.ts",
+        "count": 7,
+        "examples": [
+          "queryKey: ['employee-promotions', filters],",
+          "    queryKey: ['employee-promotions', id],",
+          "    queryKey: ['employee-promotions', 'stats', filters],"
+        ]
+      },
+      {
         "path": "src/hooks/useIntegrations.ts",
         "count": 7,
         "examples": [
           "queryKey: ['integrations'],",
           "    queryKey: ['integrations', 'category', category],",
           "    queryKey: ['integrations', id],"
-        ]
-      },
-      {
-        "path": "src/hooks/useLDAP.ts",
-        "count": 6,
-        "examples": [
-          "queryKey: ['ldap-config'],",
-          "    queryKey: ['ldap-sync-status'],",
-          "      await queryClient.invalidateQueries({ queryKey: ['ldap-config'], refetchType: 'all' })"
         ]
       },
       {
@@ -2875,21 +2776,30 @@
         ]
       },
       {
-        "path": "src/hooks/useApps.ts",
-        "count": 6,
-        "examples": [
-          "queryKey: ['apps', params],",
-          "    queryKey: ['apps', appId],",
-          "      queryClient.setQueriesData({ queryKey: ['apps'] }, (old: any) => {"
-        ]
-      },
-      {
         "path": "src/hooks/useBilling.ts",
         "count": 6,
         "examples": [
           "queryKey: ['subscription'],",
           "    queryKey: ['usage-metrics'],",
           "    queryKey: ['upcoming-invoice', planId],"
+        ]
+      },
+      {
+        "path": "src/hooks/useLDAP.ts",
+        "count": 6,
+        "examples": [
+          "queryKey: ['ldap-config'],",
+          "    queryKey: ['ldap-sync-status'],",
+          "      await queryClient.invalidateQueries({ queryKey: ['ldap-config'], refetchType: 'all' })"
+        ]
+      },
+      {
+        "path": "src/hooks/useApps.ts",
+        "count": 6,
+        "examples": [
+          "queryKey: ['apps', params],",
+          "    queryKey: ['apps', appId],",
+          "      queryClient.setQueriesData({ queryKey: ['apps'] }, (old: any) => {"
         ]
       },
       {
@@ -2956,15 +2866,6 @@
         ]
       },
       {
-        "path": "src/hooks/useReceipt.ts",
-        "count": 3,
-        "examples": [
-          "queryKey: ['receipt', paymentId],",
-          "            queryClient.invalidateQueries({ queryKey: ['receipt', paymentId] })",
-          "                queryClient.invalidateQueries({ queryKey: ['receipt', id] })"
-        ]
-      },
-      {
         "path": "src/utils/cache.ts",
         "count": 3,
         "examples": [
@@ -2974,12 +2875,30 @@
         ]
       },
       {
+        "path": "src/hooks/useReceipt.ts",
+        "count": 3,
+        "examples": [
+          "queryKey: ['receipt', paymentId],",
+          "            queryClient.invalidateQueries({ queryKey: ['receipt', paymentId] })",
+          "                queryClient.invalidateQueries({ queryKey: ['receipt', id] })"
+        ]
+      },
+      {
         "path": "src/hooks/useHR.ts",
         "count": 3,
         "examples": [
           "queryKey: ['employees', filters],",
           "    queryKey: ['employees', id],",
           "    queryKey: ['employees', 'stats'],"
+        ]
+      },
+      {
+        "path": "src/features/staff/components/staff-reinstate-dialog.tsx",
+        "count": 3,
+        "examples": [
+          "queryClient.invalidateQueries({ queryKey: ['staff'] })",
+          "      queryClient.invalidateQueries({ queryKey: ['team'] })",
+          "      queryClient.invalidateQueries({ queryKey: ['departed'] })"
         ]
       },
       {
@@ -3019,30 +2938,21 @@
         ]
       },
       {
-        "path": "src/features/companies/examples/advanced-usage.tsx",
-        "count": 3,
-        "examples": [
-          "queryKey: ['dashboard-stats', selectedFirmIds],",
-          "    queryKey: ['reports', 'comparison', selectedFirmIds],",
-          "    queryKey: ['hierarchy-data', activeCompany?._id],"
-        ]
-      },
-      {
-        "path": "src/features/staff/components/staff-reinstate-dialog.tsx",
-        "count": 3,
-        "examples": [
-          "queryClient.invalidateQueries({ queryKey: ['staff'] })",
-          "      queryClient.invalidateQueries({ queryKey: ['team'] })",
-          "      queryClient.invalidateQueries({ queryKey: ['departed'] })"
-        ]
-      },
-      {
         "path": "src/features/finance/components/general-ledger-view.tsx",
         "count": 3,
         "examples": [
           "queryKey: ['general-ledger-entries', filters],",
           "    queryKey: ['general-ledger-stats', { startDate, endDate }],",
           "    queryKey: ['general-ledger-summary', { startDate, endDate }],"
+        ]
+      },
+      {
+        "path": "src/features/companies/examples/advanced-usage.tsx",
+        "count": 3,
+        "examples": [
+          "queryKey: ['dashboard-stats', selectedFirmIds],",
+          "    queryKey: ['reports', 'comparison', selectedFirmIds],",
+          "    queryKey: ['hierarchy-data', activeCompany?._id],"
         ]
       },
       {
@@ -3071,22 +2981,6 @@
         ]
       },
       {
-        "path": "src/hooks/usePhoneAuth.ts",
-        "count": 2,
-        "examples": [
-          "queryClient.invalidateQueries({ queryKey: ['user'] })",
-          "      queryClient.invalidateQueries({ queryKey: ['user'] })"
-        ]
-      },
-      {
-        "path": "src/hooks/use-service-health.ts",
-        "count": 2,
-        "examples": [
-          "queryKey: ['service-health'],",
-          "    queryKey: ['cache-stats'],"
-        ]
-      },
-      {
         "path": "src/features/staff/components/staff-departure-dialog.tsx",
         "count": 2,
         "examples": [
@@ -3100,6 +2994,22 @@
         "examples": [
           "queryClient.invalidateQueries({ queryKey: ['buying', 'material-requests'] })",
           "    queryClient.invalidateQueries({ queryKey: ['buying', 'material-requests'] })"
+        ]
+      },
+      {
+        "path": "src/hooks/usePhoneAuth.ts",
+        "count": 2,
+        "examples": [
+          "queryClient.invalidateQueries({ queryKey: ['user'] })",
+          "      queryClient.invalidateQueries({ queryKey: ['user'] })"
+        ]
+      },
+      {
+        "path": "src/hooks/use-service-health.ts",
+        "count": 2,
+        "examples": [
+          "queryKey: ['service-health'],",
+          "    queryKey: ['cache-stats'],"
         ]
       },
       {
@@ -3119,10 +3029,24 @@
         ]
       },
       {
+        "path": "src/routes/_authenticated/dashboard.crm.appointments.tsx",
+        "count": 1,
+        "examples": [
+          "*     queryKey: ['appointments', filters],"
+        ]
+      },
+      {
         "path": "src/hooks/useContacts.ts",
         "count": 1,
         "examples": [
           "queryKey: ['contacts', filters],  // Simple key like useClients uses"
+        ]
+      },
+      {
+        "path": "src/features/cases/components/case-pipeline-detail-view.tsx",
+        "count": 1,
+        "examples": [
+          "queryClient.invalidateQueries({ queryKey: ['case', caseId] })"
         ]
       },
       {
@@ -3137,20 +3061,6 @@
         "count": 1,
         "examples": [
           "queryKey: ['pendingTimeEntries', filters],"
-        ]
-      },
-      {
-        "path": "src/routes/_authenticated/dashboard.crm.appointments.tsx",
-        "count": 1,
-        "examples": [
-          "*     queryKey: ['appointments', filters],"
-        ]
-      },
-      {
-        "path": "src/features/cases/components/case-pipeline-detail-view.tsx",
-        "count": 1,
-        "examples": [
-          "queryClient.invalidateQueries({ queryKey: ['case', caseId] })"
         ]
       },
       {
@@ -3183,7 +3093,7 @@
       }
     ],
     "priority": "medium",
-    "totalCount": 1360
+    "totalCount": 1392
   },
   {
     "category": "Config: Magic Numbers",
@@ -3296,13 +3206,6 @@
         ]
       },
       {
-        "path": "src/features/users/components/users-table.tsx",
-        "count": 1,
-        "examples": [
-          "// const [pagination, onPaginationChange] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 })"
-        ]
-      },
-      {
         "path": "src/features/organizations/components/organizations-table.tsx",
         "count": 1,
         "examples": [
@@ -3310,10 +3213,31 @@
         ]
       },
       {
+        "path": "src/features/users/components/users-table.tsx",
+        "count": 1,
+        "examples": [
+          "// const [pagination, onPaginationChange] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 })"
+        ]
+      },
+      {
         "path": "src/features/contacts/components/contacts-table.tsx",
         "count": 1,
         "examples": [
           "pageSize: 10,"
+        ]
+      },
+      {
+        "path": "src/hooks/useAuditLog.ts",
+        "count": 1,
+        "examples": [
+          "* Usage: const { data, isLoading } = useAuditLogs({ page: 1, limit: 50 })"
+        ]
+      },
+      {
+        "path": "src/services/hrAnalyticsService.ts",
+        "count": 1,
+        "examples": [
+          "params: { limit: 50 }"
         ]
       },
       {
@@ -3331,24 +3255,10 @@
         ]
       },
       {
-        "path": "src/hooks/useAuditLog.ts",
+        "path": "src/features/crm/components/activities-view.tsx",
         "count": 1,
         "examples": [
-          "* Usage: const { data, isLoading } = useAuditLogs({ page: 1, limit: 50 })"
-        ]
-      },
-      {
-        "path": "src/components/notifications/notification-dropdown.tsx",
-        "count": 1,
-        "examples": [
-          "limit: 20,"
-        ]
-      },
-      {
-        "path": "src/components/permissions/DecisionLogs.tsx",
-        "count": 1,
-        "examples": [
-          "limit: 50,"
+          "const p: any = { limit: 100 }"
         ]
       },
       {
@@ -3359,20 +3269,6 @@
         ]
       },
       {
-        "path": "src/features/crm/components/activities-view.tsx",
-        "count": 1,
-        "examples": [
-          "const p: any = { limit: 100 }"
-        ]
-      },
-      {
-        "path": "src/services/hrAnalyticsService.ts",
-        "count": 1,
-        "examples": [
-          "params: { limit: 50 }"
-        ]
-      },
-      {
         "path": "src/features/crm/components/crm-sidebar.tsx",
         "count": 1,
         "examples": [
@@ -3380,10 +3276,10 @@
         ]
       },
       {
-        "path": "src/features/activities/components/activity-bell.tsx",
+        "path": "src/features/pdf-templates/index.tsx",
         "count": 1,
         "examples": [
-          "{ state: 'scheduled', limit: 5 },"
+          "limit: 1000, // Get a large number to calculate accurate stats"
         ]
       },
       {
@@ -3398,13 +3294,6 @@
         "count": 1,
         "examples": [
           "limit: 100,"
-        ]
-      },
-      {
-        "path": "src/features/pdf-templates/index.tsx",
-        "count": 1,
-        "examples": [
-          "limit: 1000, // Get a large number to calculate accurate stats"
         ]
       },
       {
@@ -3429,6 +3318,27 @@
         ]
       },
       {
+        "path": "src/features/settings/components/billing-history.tsx",
+        "count": 1,
+        "examples": [
+          "limit: 10,"
+        ]
+      },
+      {
+        "path": "src/features/inventory/components/warehouse-details-view.tsx",
+        "count": 1,
+        "examples": [
+          "limit: 10,"
+        ]
+      },
+      {
+        "path": "src/features/settings/components/webhook-logs.tsx",
+        "count": 1,
+        "examples": [
+          "const { data: deliveriesData, isLoading } = useWebhookDeliveries(webhook._id, { limit: 50 })"
+        ]
+      },
+      {
         "path": "src/features/inventory/components/stock-entry-details-view.tsx",
         "count": 1,
         "examples": [
@@ -3443,31 +3353,10 @@
         ]
       },
       {
-        "path": "src/features/settings/components/billing-history.tsx",
+        "path": "src/features/activities/components/activity-bell.tsx",
         "count": 1,
         "examples": [
-          "limit: 10,"
-        ]
-      },
-      {
-        "path": "src/features/settings/components/webhook-logs.tsx",
-        "count": 1,
-        "examples": [
-          "const { data: deliveriesData, isLoading } = useWebhookDeliveries(webhook._id, { limit: 50 })"
-        ]
-      },
-      {
-        "path": "src/features/inventory/components/warehouse-details-view.tsx",
-        "count": 1,
-        "examples": [
-          "limit: 10,"
-        ]
-      },
-      {
-        "path": "src/features/finance/components/journal-entries-dashboard.tsx",
-        "count": 1,
-        "examples": [
-          "limit: 20,"
+          "{ state: 'scheduled', limit: 5 },"
         ]
       },
       {
@@ -3478,10 +3367,52 @@
         ]
       },
       {
+        "path": "src/components/permissions/DecisionLogs.tsx",
+        "count": 1,
+        "examples": [
+          "limit: 50,"
+        ]
+      },
+      {
+        "path": "src/components/notifications/notification-dropdown.tsx",
+        "count": 1,
+        "examples": [
+          "limit: 20,"
+        ]
+      },
+      {
+        "path": "src/features/finance/components/journal-entries-dashboard.tsx",
+        "count": 1,
+        "examples": [
+          "limit: 20,"
+        ]
+      },
+      {
         "path": "src/features/finance/components/accounts-dashboard.tsx",
         "count": 1,
         "examples": [
           "const { data: transactionsData, isLoading: isLoadingTransactions } = useTransactions({ limit: 10 })"
+        ]
+      },
+      {
+        "path": "src/lib/login-throttle.ts",
+        "count": 1,
+        "examples": [
+          "const MAX_ATTEMPTS = 5"
+        ]
+      },
+      {
+        "path": "src/lib/api-debug.ts",
+        "count": 1,
+        "examples": [
+          "const MAX_STORED_CALLS = 100"
+        ]
+      },
+      {
+        "path": "src/services/authService.ts",
+        "count": 1,
+        "examples": [
+          "const MAX_CONSECUTIVE_401 = 10 // Very high threshold - almost never auto-logout"
         ]
       },
       {
@@ -3499,31 +3430,10 @@
         ]
       },
       {
-        "path": "src/lib/login-throttle.ts",
-        "count": 1,
-        "examples": [
-          "const MAX_ATTEMPTS = 5"
-        ]
-      },
-      {
         "path": "src/context/layout-provider.tsx",
         "count": 1,
         "examples": [
           "const LAYOUT_COOKIE_MAX_AGE = 60 * 60 * 24 * 7 // 7 days"
-        ]
-      },
-      {
-        "path": "src/lib/api-debug.ts",
-        "count": 1,
-        "examples": [
-          "const MAX_STORED_CALLS = 100"
-        ]
-      },
-      {
-        "path": "src/services/authService.ts",
-        "count": 1,
-        "examples": [
-          "const MAX_CONSECUTIVE_401 = 10 // Very high threshold - almost never auto-logout"
         ]
       },
       {
@@ -3564,6 +3474,13 @@
         ]
       },
       {
+        "path": "src/features/leads/components/create-lead-view.tsx",
+        "count": 1,
+        "examples": [
+          "email: z.string().email('البريد الإلكتروني غير صحيح').optional().or(z.literal('')),"
+        ]
+      },
+      {
         "path": "src/features/auth/sign-up/data/schema.ts",
         "count": 1,
         "examples": [
@@ -3582,13 +3499,6 @@
         "count": 1,
         "examples": [
           "email: z.string().email(t('settings.profile.validation.emailInvalid')),"
-        ]
-      },
-      {
-        "path": "src/features/leads/components/create-lead-view.tsx",
-        "count": 1,
-        "examples": [
-          "email: z.string().email('البريد الإلكتروني غير صحيح').optional().or(z.literal('')),"
         ]
       }
     ],
@@ -5458,19 +5368,19 @@
         ]
       },
       {
-        "path": "src/utils/cache.ts",
-        "count": 14,
-        "examples": [
-          "console.warn(`[CacheManager] Failed to set key \"${key}\":`, error)",
-          "        console.warn(`[CacheManager] Failed to get key \"${key}\":`, error)"
-        ]
-      },
-      {
         "path": "src/services/documentVersionService.ts",
         "count": 14,
         "examples": [
           "* console.log(`Size changed by ${comparison.metadata.percentageSizeChange}%`)",
           " * console.log(`Document has ${stats.totalVersions} versions using ${stats.totalSize} bytes`)"
+        ]
+      },
+      {
+        "path": "src/utils/cache.ts",
+        "count": 14,
+        "examples": [
+          "console.warn(`[CacheManager] Failed to set key \"${key}\":`, error)",
+          "        console.warn(`[CacheManager] Failed to get key \"${key}\":`, error)"
         ]
       },
       {
@@ -5514,14 +5424,6 @@
         ]
       },
       {
-        "path": "src/hooks/usePayrollRun.ts",
-        "count": 8,
-        "examples": [
-          "console.warn(",
-          "      console.error("
-        ]
-      },
-      {
         "path": "src/utils/offline-storage.ts",
         "count": 8,
         "examples": [
@@ -5538,19 +5440,27 @@
         ]
       },
       {
-        "path": "src/features/case-notion/components/notion-page-view.tsx",
-        "count": 8,
-        "examples": [
-          "console.error('Failed to update title:', error)",
-          "      console.error('Failed to toggle favorite:', error)"
-        ]
-      },
-      {
         "path": "src/services/usersService.ts",
         "count": 8,
         "examples": [
           "console.warn('[usersService] Team endpoint not implemented yet, returning empty array')",
           "        console.warn('[usersService] Team members endpoint not implemented yet, returning empty array')"
+        ]
+      },
+      {
+        "path": "src/hooks/usePayrollRun.ts",
+        "count": 8,
+        "examples": [
+          "console.warn(",
+          "      console.error("
+        ]
+      },
+      {
+        "path": "src/features/case-notion/components/notion-page-view.tsx",
+        "count": 8,
+        "examples": [
+          "console.error('Failed to update title:', error)",
+          "      console.error('Failed to toggle favorite:', error)"
         ]
       },
       {
@@ -5602,11 +5512,11 @@
         ]
       },
       {
-        "path": "src/hooks/usePayrollRun.ts",
+        "path": "src/hooks/usePlanFeatures.tsx",
         "count": 4,
         "examples": [
-          "* TODO: [BACKEND-PENDING] Implement POST /payroll-runs/:id/employees/:empId/exclude endpoint",
-          " * TODO: [BACKEND-PENDING] Implement POST /payroll-runs/:id/employees/:empId/include endpoint"
+          "* TODO: Replace with actual API calls to fetch real usage data",
+          "   * TODO: Implement API endpoint to fetch real usage statistics"
         ]
       },
       {
@@ -5618,11 +5528,11 @@
         ]
       },
       {
-        "path": "src/hooks/usePlanFeatures.tsx",
+        "path": "src/hooks/usePayrollRun.ts",
         "count": 4,
         "examples": [
-          "* TODO: Replace with actual API calls to fetch real usage data",
-          "   * TODO: Implement API endpoint to fetch real usage statistics"
+          "* TODO: [BACKEND-PENDING] Implement POST /payroll-runs/:id/employees/:empId/exclude endpoint",
+          " * TODO: [BACKEND-PENDING] Implement POST /payroll-runs/:id/employees/:empId/include endpoint"
         ]
       },
       {
@@ -5631,14 +5541,6 @@
         "examples": [
           "* TODO: [BACKEND-PENDING] Implement POST /hr/advances/:advanceId/submit endpoint",
           " * TODO: [BACKEND-PENDING] Implement POST /hr/advances/:advanceId/waive endpoint"
-        ]
-      },
-      {
-        "path": "src/services/advancesService.ts",
-        "count": 2,
-        "examples": [
-          "// TODO: [BACKEND-PENDING] Backend needs to implement POST /hr/advances/:advanceId/submit",
-          "  // TODO: [BACKEND-PENDING] Backend needs to implement POST /hr/advances/:advanceId/waive"
         ]
       },
       {
@@ -5666,19 +5568,19 @@
         ]
       },
       {
+        "path": "src/services/advancesService.ts",
+        "count": 2,
+        "examples": [
+          "// TODO: [BACKEND-PENDING] Backend needs to implement POST /hr/advances/:advanceId/submit",
+          "  // TODO: [BACKEND-PENDING] Backend needs to implement POST /hr/advances/:advanceId/waive"
+        ]
+      },
+      {
         "path": "src/features/hr/components/leave-policy-assignments-list-view.tsx",
         "count": 2,
         "examples": [
           "{/* TODO: Load departments dynamically */}",
           "      {/* TODO: Add LeavePolicyAssignDialog component when created */}"
-        ]
-      },
-      {
-        "path": "src/features/hr/components/leave-policy-assign-dialog.tsx",
-        "count": 2,
-        "examples": [
-          "{/* TODO: Replace with actual employee multi-select component */}",
-          "                          {/* TODO: Load leave periods from API */}"
         ]
       },
       {
@@ -5695,6 +5597,14 @@
         "examples": [
           "// TODO: Implement bulk delete",
           "      // TODO: Implement delete"
+        ]
+      },
+      {
+        "path": "src/features/hr/components/leave-policy-assign-dialog.tsx",
+        "count": 2,
+        "examples": [
+          "{/* TODO: Replace with actual employee multi-select component */}",
+          "                          {/* TODO: Load leave periods from API */}"
         ]
       },
       {

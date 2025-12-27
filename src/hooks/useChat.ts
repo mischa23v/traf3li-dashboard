@@ -9,6 +9,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import apiClient from '@/lib/api'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ==================== Cache Configuration ====================
 const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
@@ -118,7 +119,7 @@ export const useCreateConversation = () => {
         onSettled: async () => {
             // Delay to allow DB propagation
             await new Promise(resolve => setTimeout(resolve, 1000))
-            await queryClient.invalidateQueries({ queryKey: ['conversations'], refetchType: 'all' })
+            await invalidateCache.conversations.all()
         },
     })
 }
@@ -163,16 +164,14 @@ export const useSendMessage = () => {
         onSettled: async (_, __, variables) => {
             // Delay to allow DB propagation
             await new Promise(resolve => setTimeout(resolve, 1000))
-            await queryClient.invalidateQueries({ queryKey: ['messages', variables.conversationID], refetchType: 'all' })
-            await queryClient.invalidateQueries({ queryKey: ['conversations'], refetchType: 'all' })
+            await invalidateCache.conversations.messages(variables.conversationID)
+            await invalidateCache.conversations.all()
         },
     })
 }
 
 // Mark messages as read
 export const useMarkAsRead = () => {
-    const queryClient = useQueryClient()
-
     return useMutation({
         mutationFn: async (conversationID: string) => {
             const response = await apiClient.patch(`/messages/${conversationID}/read`)
@@ -181,16 +180,14 @@ export const useMarkAsRead = () => {
         onSettled: async (_, __, conversationID) => {
             // Delay to allow DB propagation
             await new Promise(resolve => setTimeout(resolve, 1000))
-            await queryClient.invalidateQueries({ queryKey: ['messages', conversationID], refetchType: 'all' })
-            await queryClient.invalidateQueries({ queryKey: ['conversations'], refetchType: 'all' })
+            await invalidateCache.conversations.messages(conversationID)
+            await invalidateCache.conversations.all()
         },
     })
 }
 
 // Update conversation (mark as read)
 export const useUpdateConversation = () => {
-    const queryClient = useQueryClient()
-
     return useMutation({
         mutationFn: async (conversationID: string) => {
             const response = await apiClient.patch(`/conversations/${conversationID}`)
@@ -199,7 +196,7 @@ export const useUpdateConversation = () => {
         onSettled: async () => {
             // Delay to allow DB propagation
             await new Promise(resolve => setTimeout(resolve, 1000))
-            await queryClient.invalidateQueries({ queryKey: ['conversations'], refetchType: 'all' })
+            await invalidateCache.conversations.all()
         },
     })
 }

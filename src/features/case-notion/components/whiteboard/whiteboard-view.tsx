@@ -8,8 +8,8 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CANVAS } from '@/config'
@@ -20,7 +20,6 @@ import {
   useUpdateBlock,
   useDeleteBlock,
   useUpdateCaseNotionPage,
-  caseNotionKeys,
 } from '@/hooks/useCaseNotion'
 import { useCase } from '@/hooks/useCasesAndClients'
 import { caseNotionService } from '@/services/caseNotionService'
@@ -39,7 +38,6 @@ interface WhiteboardViewProps {
 export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps) {
   const { t, i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
-  const queryClient = useQueryClient()
 
   // History store for undo/redo
   const {
@@ -184,13 +182,13 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
           console.error('Failed to update block position:', error)
           toast.error(t('whiteboard.moveError', 'Failed to move block'))
           // FIX: Revert optimistic update by refetching data
-          queryClient.invalidateQueries({ queryKey: caseNotionKeys.blocks(caseId, pageId) })
+          invalidateCache.caseNotion.blocks(caseId, pageId)
         }
       }, 300)
 
       pendingMoveUpdates.current.set(blockId, { x, y, timeout })
     },
-    [caseId, pageId, updateBlock, queryClient, t, pushSnapshot, localBlocks, localConnections]
+    [caseId, pageId, updateBlock, t, pushSnapshot, localBlocks, localConnections]
   )
 
   // Handle block resize - DEBOUNCED to prevent continuous API calls during drag
@@ -231,13 +229,13 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
           console.error('Failed to update block size:', error)
           toast.error(t('whiteboard.resizeError', 'Failed to resize block'))
           // FIX: Revert optimistic update by refetching data
-          queryClient.invalidateQueries({ queryKey: caseNotionKeys.blocks(caseId, pageId) })
+          invalidateCache.caseNotion.blocks(caseId, pageId)
         }
       }, 300)
 
       pendingResizeUpdates.current.set(blockId, { width, height, timeout })
     },
-    [caseId, pageId, updateBlock, queryClient, t, pushSnapshot, localBlocks, localConnections]
+    [caseId, pageId, updateBlock, t, pushSnapshot, localBlocks, localConnections]
   )
 
   // Handle block creation - FIX: Send canvas positions at TOP LEVEL, not in properties
@@ -458,10 +456,10 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
         console.error('Failed to delete connection:', error)
         toast.error(t('whiteboard.deleteConnectionError', 'Failed to delete connection'))
         // Revert optimistic update
-        queryClient.invalidateQueries({ queryKey: caseNotionKeys.page(caseId, pageId) })
+        invalidateCache.caseNotion.page(caseId, pageId)
       }
     },
-    [caseId, pageId, updatePage, queryClient, t]
+    [caseId, pageId, updatePage, t]
   )
 
   // Handle connection update (label editing)
@@ -492,10 +490,10 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
         console.error('Failed to update connection:', error)
         toast.error(t('whiteboard.updateConnectionError', 'Failed to update connection'))
         // Revert optimistic update
-        queryClient.invalidateQueries({ queryKey: caseNotionKeys.page(caseId, pageId) })
+        invalidateCache.caseNotion.page(caseId, pageId)
       }
     },
-    [caseId, pageId, updatePage, queryClient, t]
+    [caseId, pageId, updatePage, t]
   )
 
   // Handle whiteboard config change
@@ -552,10 +550,10 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
       } catch (error) {
         console.error('Failed to save block:', error)
         toast.error(t('common.saveError', 'Failed to save'))
-        queryClient.invalidateQueries({ queryKey: caseNotionKeys.blocks(caseId, pageId) })
+        invalidateCache.caseNotion.blocks(caseId, pageId)
       }
     },
-    [caseId, pageId, updateBlock, queryClient, t]
+    [caseId, pageId, updateBlock, t]
   )
 
   // Handle creating block from case entity
@@ -633,7 +631,7 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
         await caseNotionService.updateBlockZIndex(caseId, blockId, action)
 
         // Optimistically update local state by refetching
-        queryClient.invalidateQueries({ queryKey: caseNotionKeys.blocks(caseId, pageId) })
+        invalidateCache.caseNotion.blocks(caseId, pageId)
 
         toast.success(t('whiteboard.zIndexUpdated', 'Layer order updated'))
       } catch (error) {
@@ -641,7 +639,7 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
         toast.error(t('whiteboard.zIndexError', 'Failed to update layer order'))
       }
     },
-    [caseId, pageId, queryClient, t]
+    [caseId, pageId, t]
   )
 
   // Handle frame creation
@@ -749,13 +747,13 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
         } catch (error) {
           console.error('Failed to move frame:', error)
           toast.error(t('whiteboard.moveFrameError', 'Failed to move frame'))
-          queryClient.invalidateQueries({ queryKey: caseNotionKeys.blocks(caseId, pageId) })
+          invalidateCache.caseNotion.blocks(caseId, pageId)
         }
       }, 300)
 
       pendingMoveUpdates.current.set(frameId, { x: newX, y: newY, timeout })
     },
-    [caseId, pageId, localBlocks, queryClient, t]
+    [caseId, pageId, localBlocks, t]
   )
 
   const isLoading = pageLoading || blocksLoading
