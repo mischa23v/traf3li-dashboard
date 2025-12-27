@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
 import quoteService, { QuoteFilters, CreateQuoteData, QuoteStatus } from '@/services/quoteService'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ==================== Cache Configuration ====================
 // Cache data for 30 minutes to reduce API calls
@@ -58,7 +59,7 @@ export const useCreateQuote = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['quotes'], refetchType: 'all' })
+      await invalidateCache.quotes.all()
     },
   })
 }
@@ -88,8 +89,8 @@ export const useUpdateQuote = () => {
     },
     onSettled: async (_, __, { id }) => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['quotes'], refetchType: 'all' })
-      await queryClient.invalidateQueries({ queryKey: ['quotes', id], refetchType: 'all' })
+      await invalidateCache.quotes.all()
+      await invalidateCache.quotes.detail(id)
     },
   })
 }
@@ -116,15 +117,13 @@ export const useDeleteQuote = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['quotes'], refetchType: 'all' })
+      await invalidateCache.quotes.all()
     },
   })
 }
 
 // Send quote
 export const useSendQuote = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => quoteService.sendQuote(id),
     onSuccess: () => {
@@ -135,16 +134,14 @@ export const useSendQuote = () => {
     },
     onSettled: async (_, __, id) => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['quotes'], refetchType: 'all' })
-      await queryClient.invalidateQueries({ queryKey: ['quotes', id], refetchType: 'all' })
+      await invalidateCache.quotes.all()
+      await invalidateCache.quotes.detail(id)
     },
   })
 }
 
 // Update quote status
 export const useUpdateQuoteStatus = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: QuoteStatus }) =>
       quoteService.updateQuoteStatus(id, status),
@@ -156,16 +153,14 @@ export const useUpdateQuoteStatus = () => {
     },
     onSettled: async (_, __, { id }) => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['quotes'], refetchType: 'all' })
-      await queryClient.invalidateQueries({ queryKey: ['quotes', id], refetchType: 'all' })
+      await invalidateCache.quotes.all()
+      await invalidateCache.quotes.detail(id)
     },
   })
 }
 
 // Convert quote to invoice
 export const useConvertQuoteToInvoice = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => quoteService.convertToInvoice(id),
     onSuccess: () => {
@@ -176,9 +171,8 @@ export const useConvertQuoteToInvoice = () => {
     },
     onSettled: async (_, __, id) => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['quotes'], refetchType: 'all' })
-      await queryClient.invalidateQueries({ queryKey: ['quotes', id], refetchType: 'all' })
-      await queryClient.invalidateQueries({ queryKey: ['invoices'], refetchType: 'all' })
+      await invalidateCache.quotes.detail(id)
+      await invalidateCache.quotes.related()
     },
   })
 }
@@ -214,7 +208,7 @@ export const useDuplicateQuote = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['quotes'], refetchType: 'all' })
+      await invalidateCache.quotes.all()
     },
   })
 }

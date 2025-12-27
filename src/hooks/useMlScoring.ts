@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { CACHE_TIMES } from '@/config/cache'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   getMLScores,
   getMLScore,
@@ -121,16 +122,15 @@ export const useHybridScore = (leadId: string, weights?: HybridScoreWeights, ena
  * Calculate/refresh ML score for a lead
  */
 export const useCalculateMLScore = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (leadId: string) => calculateMLScore(leadId),
     onSuccess: (data, leadId) => {
       // Invalidate related queries
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.score(leadId) })
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.scoresList() })
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.priorityQueueList() })
+      invalidateCache.mlScoring.score(leadId)
+      invalidateCache.mlScoring.scoresList()
+      invalidateCache.mlScoring.priorityQueueList()
       toast.success(t('mlScoring.scoreCalculated', 'Score calculated successfully'))
     },
     onError: (error: any) => {
@@ -143,14 +143,13 @@ export const useCalculateMLScore = () => {
  * Batch calculate scores for multiple leads
  */
 export const useBatchCalculateScores = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (leadIds: string[]) => batchCalculateScores(leadIds),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.scores() })
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.priorityQueueList() })
+      invalidateCache.mlScoring.scores()
+      invalidateCache.mlScoring.priorityQueueList()
       const successCount = data.data.results.length
       const failedCount = data.data.failed.length
       if (failedCount > 0) {
@@ -199,15 +198,14 @@ export const useTeamWorkload = () => {
  * Record contact with a lead
  */
 export const useRecordContact = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
     mutationFn: ({ leadId, data }: { leadId: string; data: ContactData }) => recordContact(leadId, data),
     onSuccess: (_, { leadId }) => {
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.priorityQueueList() })
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.score(leadId) })
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.slaBreaches() })
+      invalidateCache.mlScoring.priorityQueueList()
+      invalidateCache.mlScoring.score(leadId)
+      invalidateCache.mlScoring.slaBreaches()
       toast.success(t('mlScoring.contactRecorded', 'Contact recorded successfully'))
     },
     onError: (error: any) => {
@@ -220,15 +218,14 @@ export const useRecordContact = () => {
  * Assign lead to a sales rep
  */
 export const useAssignLead = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
     mutationFn: ({ leadId, userId }: { leadId: string; userId: string }) => assignLead(leadId, userId),
     onSuccess: (_, { leadId }) => {
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.priorityQueueList() })
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.score(leadId) })
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.teamWorkload() })
+      invalidateCache.mlScoring.priorityQueueList()
+      invalidateCache.mlScoring.score(leadId)
+      invalidateCache.mlScoring.teamWorkload()
       toast.success(t('mlScoring.leadAssigned', 'Lead assigned successfully'))
     },
     onError: (error: any) => {
@@ -314,14 +311,13 @@ export const useModelMetrics = () => {
  * Train the ML model
  */
 export const useTrainModel = () => {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (options?: TrainModelOptions) => trainModel(options),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.modelMetrics() })
-      queryClient.invalidateQueries({ queryKey: mlScoringKeys.featureImportance() })
+      invalidateCache.mlScoring.modelMetrics()
+      invalidateCache.mlScoring.featureImportance()
       toast.success(t('mlScoring.modelTrained', 'Model trained successfully'))
     },
     onError: (error: any) => {
@@ -377,10 +373,8 @@ export const usePrefetchMLScore = () => {
  * Invalidate all ML scoring queries (useful after major changes)
  */
 export const useInvalidateMLScoring = () => {
-  const queryClient = useQueryClient()
-
   return () => {
-    queryClient.invalidateQueries({ queryKey: mlScoringKeys.all })
+    invalidateCache.mlScoring.all()
   }
 }
 

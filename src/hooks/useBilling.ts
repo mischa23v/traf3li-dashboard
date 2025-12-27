@@ -3,9 +3,10 @@
  * React Query hooks for billing and subscription operations
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { CACHE_TIMES } from '@/config/cache'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import billingService, {
   type ChangePlanData,
   type CreatePaymentMethodData,
@@ -33,8 +34,6 @@ export const useUsageMetrics = () => {
 }
 
 export const useChangePlan = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: ChangePlanData) => billingService.changePlan(data),
     onSuccess: () => {
@@ -44,16 +43,16 @@ export const useChangePlan = () => {
       toast.error(error.message || 'فشل تغيير الخطة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['subscription'] })
-      await queryClient.invalidateQueries({ queryKey: ['usage-metrics'] })
-      await queryClient.invalidateQueries({ queryKey: ['billing-history'] })
+      await Promise.all([
+        invalidateCache.billing.subscription(),
+        invalidateCache.billing.usageMetrics(),
+        invalidateCache.billing.history(),
+      ])
     },
   })
 }
 
 export const useCancelSubscription = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: () => billingService.cancelSubscription(),
     onSuccess: () => {
@@ -63,14 +62,12 @@ export const useCancelSubscription = () => {
       toast.error(error.message || 'فشل إلغاء الاشتراك')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['subscription'] })
+      await invalidateCache.billing.subscription()
     },
   })
 }
 
 export const useReactivateSubscription = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: () => billingService.reactivateSubscription(),
     onSuccess: () => {
@@ -80,7 +77,7 @@ export const useReactivateSubscription = () => {
       toast.error(error.message || 'فشل إعادة تفعيل الاشتراك')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['subscription'] })
+      await invalidateCache.billing.subscription()
     },
   })
 }
@@ -105,8 +102,6 @@ export const usePaymentMethods = () => {
 }
 
 export const useAddPaymentMethod = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreatePaymentMethodData) => billingService.addPaymentMethod(data),
     onSuccess: () => {
@@ -116,14 +111,12 @@ export const useAddPaymentMethod = () => {
       toast.error(error.message || 'فشل إضافة طريقة الدفع')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['payment-methods'] })
+      await invalidateCache.billing.paymentMethods()
     },
   })
 }
 
 export const useSetDefaultPaymentMethod = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => billingService.setDefaultPaymentMethod(id),
     onSuccess: () => {
@@ -133,14 +126,12 @@ export const useSetDefaultPaymentMethod = () => {
       toast.error(error.message || 'فشل تعيين طريقة الدفع الافتراضية')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['payment-methods'] })
+      await invalidateCache.billing.paymentMethods()
     },
   })
 }
 
 export const useRemovePaymentMethod = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => billingService.removePaymentMethod(id),
     onSuccess: () => {
@@ -150,7 +141,7 @@ export const useRemovePaymentMethod = () => {
       toast.error(error.message || 'فشل حذف طريقة الدفع')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['payment-methods'] })
+      await invalidateCache.billing.paymentMethods()
     },
   })
 }
@@ -206,8 +197,6 @@ export const useDownloadInvoice = () => {
 }
 
 export const usePayInvoice = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => billingService.payInvoice(id),
     onSuccess: () => {
@@ -217,8 +206,10 @@ export const usePayInvoice = () => {
       toast.error(error.message || 'فشل دفع الفاتورة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['billing-history'] })
-      await queryClient.invalidateQueries({ queryKey: ['subscription'] })
+      await Promise.all([
+        invalidateCache.billing.history(),
+        invalidateCache.billing.subscription(),
+      ])
     },
   })
 }

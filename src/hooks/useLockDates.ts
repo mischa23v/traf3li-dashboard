@@ -9,8 +9,9 @@
  * display deprecation warnings and fail gracefully.
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import lockDateService from '@/services/lockDateService'
 import type {
   LockDateConfig,
@@ -132,8 +133,6 @@ export function useDateLockCheck(
  * This mutation will always fail until backend support is added
  */
 export function useUpdateLockDate() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ lockType, data }: { lockType: LockType; data: UpdateLockDateData }) => {
       console.warn(
@@ -143,8 +142,8 @@ export function useUpdateLockDate() {
       return lockDateService.updateLockDate(lockType, data)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: lockDateKeys.config() })
-      queryClient.invalidateQueries({ queryKey: lockDateKeys.history() })
+      invalidateCache.lockDates.config()
+      invalidateCache.lockDates.history()
       toast.success('تم تحديث تاريخ القفل بنجاح | Lock date updated successfully')
     },
     onError: (error: Error) => {
@@ -161,8 +160,6 @@ export function useUpdateLockDate() {
  * This mutation will always fail until backend support is added
  */
 export function useClearLockDate() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (lockType: LockType) => {
       console.warn(
@@ -172,8 +169,8 @@ export function useClearLockDate() {
       return lockDateService.clearLockDate(lockType)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: lockDateKeys.config() })
-      queryClient.invalidateQueries({ queryKey: lockDateKeys.history() })
+      invalidateCache.lockDates.config()
+      invalidateCache.lockDates.history()
       toast.success('تم مسح تاريخ القفل | Lock date cleared successfully')
     },
     onError: (error: Error) => {
@@ -190,8 +187,6 @@ export function useClearLockDate() {
  * This mutation will always fail until backend support is added
  */
 export function useLockPeriod() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: LockPeriodData) => {
       console.warn(
@@ -201,8 +196,8 @@ export function useLockPeriod() {
       return lockDateService.lockPeriod(data)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: lockDateKeys.config() })
-      queryClient.invalidateQueries({ queryKey: lockDateKeys.periods() })
+      invalidateCache.lockDates.config()
+      invalidateCache.lockDates.periods()
       toast.success('تم قفل الفترة بنجاح | Period locked successfully')
     },
     onError: (error: Error) => {
@@ -219,8 +214,6 @@ export function useLockPeriod() {
  * This mutation will always fail until backend support is added
  */
 export function useReopenPeriod() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: ReopenPeriodData) => {
       console.warn(
@@ -230,8 +223,8 @@ export function useReopenPeriod() {
       return lockDateService.reopenPeriod(data)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: lockDateKeys.config() })
-      queryClient.invalidateQueries({ queryKey: lockDateKeys.periods() })
+      invalidateCache.lockDates.config()
+      invalidateCache.lockDates.periods()
       toast.success('تم إعادة فتح الفترة | Period reopened successfully')
     },
     onError: (error: Error) => {
@@ -248,8 +241,6 @@ export function useReopenPeriod() {
  * This mutation will always fail until backend support is added
  */
 export function useUpdateFiscalYearEnd() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ month, day }: { month: number; day: number }) => {
       console.warn(
@@ -259,8 +250,8 @@ export function useUpdateFiscalYearEnd() {
       return lockDateService.updateFiscalYearEnd(month, day)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: lockDateKeys.config() })
-      queryClient.invalidateQueries({ queryKey: lockDateKeys.periods() })
+      invalidateCache.lockDates.config()
+      invalidateCache.lockDates.periods()
       toast.success('تم تحديث نهاية السنة المالية | Fiscal year end updated successfully')
     },
     onError: (error: Error) => {

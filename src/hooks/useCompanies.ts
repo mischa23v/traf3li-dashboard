@@ -14,6 +14,7 @@ import companyService, {
 } from '@/services/companyService'
 import { toast } from 'sonner'
 import { CACHE_TIMES } from '@/config/cache'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ==================== QUERY HOOKS ====================
 
@@ -104,19 +105,15 @@ export const useCompanyAccessList = (firmId: string | undefined) => {
  * Create company
  */
 export const useCreateCompany = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateCompanyData) => companyService.create(data),
     onSuccess: (newCompany) => {
       // Invalidate companies list
-      queryClient.invalidateQueries({ queryKey: ['firms'] })
+      invalidateCache.companies.all()
 
       // Invalidate tree if parent exists
       if (newCompany.parentFirmId) {
-        queryClient.invalidateQueries({
-          queryKey: ['firms', newCompany.parentFirmId, 'children'],
-        })
+        invalidateCache.companies.children(newCompany.parentFirmId)
       }
 
       toast.success('تم إنشاء الشركة بنجاح', {
@@ -135,20 +132,18 @@ export const useCreateCompany = () => {
  * Update company
  */
 export const useUpdateCompany = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateCompanyData }) =>
       companyService.update(id, data),
     onSuccess: (updatedCompany, variables) => {
       // Invalidate specific company
-      queryClient.invalidateQueries({ queryKey: ['firm', variables.id] })
+      invalidateCache.companies.detail(variables.id)
 
       // Invalidate companies list
-      queryClient.invalidateQueries({ queryKey: ['firms'] })
+      invalidateCache.companies.all()
 
       // Invalidate tree
-      queryClient.invalidateQueries({ queryKey: ['firms', 'tree'] })
+      invalidateCache.companies.tree()
 
       toast.success('تم تحديث الشركة بنجاح', {
         description: `${updatedCompany.nameAr || updatedCompany.name}`,
@@ -172,10 +167,10 @@ export const useDeleteCompany = () => {
     mutationFn: (id: string) => companyService.delete(id),
     onSuccess: (_, deletedId) => {
       // Invalidate companies list
-      queryClient.invalidateQueries({ queryKey: ['firms'] })
+      invalidateCache.companies.all()
 
       // Invalidate tree
-      queryClient.invalidateQueries({ queryKey: ['firms', 'tree'] })
+      invalidateCache.companies.tree()
 
       // Remove from cache
       queryClient.removeQueries({ queryKey: ['firm', deletedId] })
@@ -194,14 +189,12 @@ export const useDeleteCompany = () => {
  * Move company to different parent
  */
 export const useMoveCompany = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, newParentId }: { id: string; newParentId: string | null }) =>
       companyService.move(id, newParentId),
     onSuccess: (movedCompany) => {
       // Invalidate companies list and tree
-      queryClient.invalidateQueries({ queryKey: ['firms'] })
+      invalidateCache.companies.all()
 
       toast.success('تم نقل الشركة بنجاح', {
         description: `${movedCompany.nameAr || movedCompany.name}`,
@@ -225,7 +218,7 @@ export const useSwitchCompany = () => {
     mutationFn: (firmId: string) => companyService.switchCompany(firmId),
     onSuccess: (data) => {
       // Invalidate active company
-      queryClient.invalidateQueries({ queryKey: ['firm', 'active'] })
+      invalidateCache.companies.active()
 
       // Invalidate ALL queries since company context changed
       queryClient.invalidateQueries()
@@ -249,8 +242,6 @@ export const useSwitchCompany = () => {
  * Grant user access to company
  */
 export const useGrantCompanyAccess = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       firmId,
@@ -268,7 +259,7 @@ export const useGrantCompanyAccess = () => {
       }
     }) => companyService.grantAccess(firmId, userId, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['firm', variables.firmId, 'access'] })
+      invalidateCache.companies.access(variables.firmId)
 
       toast.success('تم منح الصلاحية بنجاح')
     },
@@ -284,13 +275,11 @@ export const useGrantCompanyAccess = () => {
  * Revoke user access to company
  */
 export const useRevokeCompanyAccess = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ firmId, userId }: { firmId: string; userId: string }) =>
       companyService.revokeAccess(firmId, userId),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['firm', variables.firmId, 'access'] })
+      invalidateCache.companies.access(variables.firmId)
 
       toast.success('تم إلغاء الصلاحية بنجاح')
     },
@@ -306,8 +295,6 @@ export const useRevokeCompanyAccess = () => {
  * Update user access to company
  */
 export const useUpdateCompanyAccess = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       firmId,
@@ -319,7 +306,7 @@ export const useUpdateCompanyAccess = () => {
       data: Partial<UserCompanyAccess>
     }) => companyService.updateAccess(firmId, userId, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['firm', variables.firmId, 'access'] })
+      invalidateCache.companies.access(variables.firmId)
 
       toast.success('تم تحديث الصلاحية بنجاح')
     },

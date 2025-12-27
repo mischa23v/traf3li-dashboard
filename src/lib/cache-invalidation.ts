@@ -253,6 +253,13 @@ export const invalidateCache = {
   quotes: {
     all: () => queryClient.invalidateQueries({ queryKey: ['quotes'] }),
     detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['quotes', id] }),
+    summary: (filters?: any) => queryClient.invalidateQueries({ queryKey: ['quotes', 'summary', filters] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.quotes.all(),
+        invalidateCache.invoices.all(),
+      ])
+    },
   },
 
   // Accounting
@@ -902,6 +909,10 @@ export const invalidateCache = {
   inventory: {
     all: () => queryClient.invalidateQueries({ queryKey: ['inventory'] }),
     detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['inventory', id] }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['inventory', 'stats'] }),
+    stockLedger: () => queryClient.invalidateQueries({ queryKey: ['inventory', 'stock-ledger'] }),
+    reconciliations: () => queryClient.invalidateQueries({ queryKey: ['inventory', 'reconciliations'] }),
+    settings: () => queryClient.invalidateQueries({ queryKey: ['inventory', 'settings'] }),
   },
 
   // Manufacturing
@@ -996,6 +1007,13 @@ export const invalidateCache = {
   // Support
   support: {
     all: () => queryClient.invalidateQueries({ queryKey: ['support'] }),
+    tickets: () => queryClient.invalidateQueries({ queryKey: ['support', 'tickets'] }),
+    ticketDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['support', 'tickets', id] }),
+    ticketCommunications: (id: string) => queryClient.invalidateQueries({ queryKey: ['support', 'tickets', id, 'communications'] }),
+    slas: () => queryClient.invalidateQueries({ queryKey: ['support', 'slas'] }),
+    slaDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['support', 'slas', id] }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['support', 'stats'] }),
+    settings: () => queryClient.invalidateQueries({ queryKey: ['support', 'settings'] }),
   },
 
   // Calendar
@@ -1254,6 +1272,24 @@ export const invalidateCache = {
     recent: (limit?: number) => queryClient.invalidateQueries({ queryKey: ['dashboard', 'recent-messages', limit] }),
   },
 
+  // Threaded Messages/Chatter (for records like cases, tasks, etc.)
+  messages: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['messages'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['messages', 'list'] }),
+    list: (filters?: any) => queryClient.invalidateQueries({ queryKey: ['messages', 'list', filters] }),
+    thread: (resModel: string, resId: string) => queryClient.invalidateQueries({ queryKey: ['messages', 'thread', resModel, resId] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['messages', 'detail', id] }),
+    mentions: () => queryClient.invalidateQueries({ queryKey: ['messages', 'mentions'] }),
+    starred: () => queryClient.invalidateQueries({ queryKey: ['messages', 'starred'] }),
+    search: (query?: string) => queryClient.invalidateQueries({ queryKey: ['messages', 'search', query] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.messages.all(),
+        invalidateCache.notifications.all(),
+      ])
+    },
+  },
+
   // Integrations
   integrations: {
     all: () => queryClient.invalidateQueries({ queryKey: ['integrations'] }),
@@ -1302,6 +1338,7 @@ export const invalidateCache = {
     subscription: () => queryClient.invalidateQueries({ queryKey: ['subscription'] }),
     usageMetrics: () => queryClient.invalidateQueries({ queryKey: ['usage-metrics'] }),
     history: () => queryClient.invalidateQueries({ queryKey: ['billing-history'] }),
+    invoice: (id: string) => queryClient.invalidateQueries({ queryKey: ['invoice', id] }),
     upcomingInvoice: (planId?: string) => queryClient.invalidateQueries({ queryKey: ['upcoming-invoice', planId] }),
     paymentMethods: () => queryClient.invalidateQueries({ queryKey: ['payment-methods'] }),
   },
@@ -1599,8 +1636,137 @@ export const invalidateCache = {
     awaitingProcessing: () => queryClient.invalidateQueries({ queryKey: ['employee-incentives', 'awaiting-processing'] }),
   },
 
+  // Chatter (Followers, Activities, Attachments)
+  // ML Scoring
+  mlScoring: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['ml-scoring'] }),
+    scores: () => queryClient.invalidateQueries({ queryKey: ['ml-scoring', 'scores'] }),
+    scoresList: (params?: any) => queryClient.invalidateQueries({ queryKey: ['ml-scoring', 'scores', 'list', params] }),
+    score: (leadId: string) => queryClient.invalidateQueries({ queryKey: ['ml-scoring', 'scores', 'detail', leadId] }),
+    explanation: (leadId: string) => queryClient.invalidateQueries({ queryKey: ['ml-scoring', 'scores', 'explanation', leadId] }),
+    hybrid: (leadId: string) => queryClient.invalidateQueries({ queryKey: ['ml-scoring', 'scores', 'hybrid', leadId] }),
+    priorityQueue: () => queryClient.invalidateQueries({ queryKey: ['ml-scoring', 'priority-queue'] }),
+    priorityQueueList: (params?: any) => queryClient.invalidateQueries({ queryKey: ['ml-scoring', 'priority-queue', 'list', params] }),
+    teamWorkload: () => queryClient.invalidateQueries({ queryKey: ['ml-scoring', 'priority-queue', 'workload'] }),
+    sla: () => queryClient.invalidateQueries({ queryKey: ['ml-scoring', 'sla'] }),
+    slaMetrics: (period?: string) => queryClient.invalidateQueries({ queryKey: ['ml-scoring', 'sla', 'metrics', period] }),
+    slaBreaches: () => queryClient.invalidateQueries({ queryKey: ['ml-scoring', 'sla', 'breaches'] }),
+    analytics: () => queryClient.invalidateQueries({ queryKey: ['ml-scoring', 'analytics'] }),
+    dashboard: (params?: any) => queryClient.invalidateQueries({ queryKey: ['ml-scoring', 'analytics', 'dashboard', params] }),
+    featureImportance: () => queryClient.invalidateQueries({ queryKey: ['ml-scoring', 'analytics', 'feature-importance'] }),
+    scoreDistribution: () => queryClient.invalidateQueries({ queryKey: ['ml-scoring', 'analytics', 'score-distribution'] }),
+    modelMetrics: () => queryClient.invalidateQueries({ queryKey: ['ml-scoring', 'model-metrics'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.mlScoring.all(),
+      ])
+    },
+  },
+
+  chatter: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['chatter'] }),
+    followers: (resModel: string, resId: string) => queryClient.invalidateQueries({ queryKey: ['chatter', 'followers', resModel, resId] }),
+    isFollowing: (resModel: string, resId: string) => queryClient.invalidateQueries({ queryKey: ['chatter', 'isFollowing', resModel, resId] }),
+    activities: (resModel: string, resId: string, state?: string) => queryClient.invalidateQueries({ queryKey: ['chatter', 'activities', resModel, resId, state] }),
+    myActivities: (state?: string) => queryClient.invalidateQueries({ queryKey: ['chatter', 'myActivities', state] }),
+    activityTypes: () => queryClient.invalidateQueries({ queryKey: ['chatter', 'activityTypes'] }),
+    attachments: (resModel: string, resId: string) => queryClient.invalidateQueries({ queryKey: ['chatter', 'attachments', resModel, resId] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.chatter.all(),
+      ])
+    },
+  },
+
+  // Follow-ups
+  followups: {
+    all: (options?: { refetchType?: 'all' }) =>
+      queryClient.invalidateQueries({ queryKey: ['followups'], refetchType: options?.refetchType }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['followups', 'list'] }),
+    list: (filters?: any) => queryClient.invalidateQueries({ queryKey: ['followups', 'list', filters] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['followups', 'detail', id] }),
+    entity: (entityType: string, entityId: string, options?: { refetchType?: 'all' }) =>
+      queryClient.invalidateQueries({ queryKey: ['followups', 'entity', entityType, entityId], refetchType: options?.refetchType }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['followups', 'stats'] }),
+    overdue: () => queryClient.invalidateQueries({ queryKey: ['followups', 'overdue'] }),
+    upcoming: (days?: number) => queryClient.invalidateQueries({ queryKey: ['followups', 'upcoming', days] }),
+    today: () => queryClient.invalidateQueries({ queryKey: ['followups', 'today'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.followups.all(),
+        invalidateCache.calendar.all(),
+      ])
+    },
+  },
+
+  // Lock Dates
+  lockDates: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['lock-dates'] }),
+    config: () => queryClient.invalidateQueries({ queryKey: ['lock-dates', 'config'] }),
+    periods: (year?: number) => queryClient.invalidateQueries({ queryKey: ['lock-dates', 'periods', year] }),
+    history: (lockType?: string, page?: number, limit?: number) =>
+      queryClient.invalidateQueries({ queryKey: ['lock-dates', 'history', lockType, page, limit] }),
+    check: (date?: string, lockType?: string) =>
+      queryClient.invalidateQueries({ queryKey: ['lock-dates', 'check', date, lockType] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.lockDates.all(),
+      ])
+    },
+  },
+
+  // Automated Actions
+  automatedActions: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['automated-actions'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['automated-actions', 'list'] }),
+    list: (filters?: any) => queryClient.invalidateQueries({ queryKey: ['automated-actions', 'list', filters] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['automated-actions', 'detail', id] }),
+    logs: (actionId: string, filters?: any) => queryClient.invalidateQueries({ queryKey: ['automated-actions', 'logs', actionId, filters] }),
+    allLogs: (filters?: any) => queryClient.invalidateQueries({ queryKey: ['automated-actions', 'all-logs', filters] }),
+    models: () => queryClient.invalidateQueries({ queryKey: ['automated-actions', 'models'] }),
+    modelFields: (modelName: string) => queryClient.invalidateQueries({ queryKey: ['automated-actions', 'fields', modelName] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.automatedActions.all(),
+      ])
+    },
+  },
+
+  // UI Access Control
+  uiAccess: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['ui-access'] }),
+    sidebar: () => queryClient.invalidateQueries({ queryKey: ['ui-access', 'sidebar'] }),
+    visibleSidebar: () => queryClient.invalidateQueries({ queryKey: ['ui-access', 'sidebar', 'visible'] }),
+    allSidebarItems: () => queryClient.invalidateQueries({ queryKey: ['ui-access', 'sidebar', 'all'] }),
+    pages: () => queryClient.invalidateQueries({ queryKey: ['ui-access', 'pages'] }),
+    pageAccess: (path: string) => queryClient.invalidateQueries({ queryKey: ['ui-access', 'pages', 'check', path] }),
+    allPageAccess: () => queryClient.invalidateQueries({ queryKey: ['ui-access', 'pages', 'all'] }),
+    config: () => queryClient.invalidateQueries({ queryKey: ['ui-access', 'config'] }),
+    matrix: () => queryClient.invalidateQueries({ queryKey: ['ui-access', 'matrix'] }),
+    overrides: () => queryClient.invalidateQueries({ queryKey: ['ui-access', 'overrides'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.uiAccess.all(),
+      ])
+    },
+  },
+
+  // Skills
+  skills: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['skills'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['skills', 'list'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['skills', 'detail', id] }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['skills', 'stats'] }),
+    byCategory: (category: string) => queryClient.invalidateQueries({ queryKey: ['skills', 'category', category] }),
+    active: () => queryClient.invalidateQueries({ queryKey: ['skills', 'active'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.skills.all(),
+      ])
+    },
+  },
+
   // Global invalidation (use sparingly!)
-  all: () => queryClient.invalidateQueries(),
 
   // Selective global (better than invalidating everything)
   allExcept: (exclude: string[]) => queryClient.invalidateQueries({

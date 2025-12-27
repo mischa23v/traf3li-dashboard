@@ -59,8 +59,9 @@ import { formatCurrency } from '@/lib/currency'
 import { toast } from 'sonner'
 import journalEntryService, { type JournalEntry, type JournalEntryLine, type UpdateJournalEntryData } from '@/services/journalEntryService'
 import { useAccounts } from '@/hooks/useAccounting'
-import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { cn } from '@/lib/utils'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import { format } from 'date-fns'
 import { ar } from 'date-fns/locale'
 
@@ -76,7 +77,6 @@ export default function JournalEntryDetailsView() {
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
   const params = useParams({ strict: false })
   const entryId = params.id as string
 
@@ -123,8 +123,8 @@ export default function JournalEntryDetailsView() {
   const updateMutation = useMutation({
     mutationFn: (data: UpdateJournalEntryData) => journalEntryService.updateEntry(entryId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['journal-entry', entryId] })
-      queryClient.invalidateQueries({ queryKey: ['journal-entries'] })
+      invalidateCache.journalEntries.detail(entryId)
+      invalidateCache.journalEntries.all()
       setIsEditing(false)
       toast.success(t('journal.updated', 'Entry updated successfully'))
     },
@@ -136,9 +136,9 @@ export default function JournalEntryDetailsView() {
   const postMutation = useMutation({
     mutationFn: () => journalEntryService.postEntry(entryId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['journal-entry', entryId] })
-      queryClient.invalidateQueries({ queryKey: ['journal-entries'] })
-      queryClient.invalidateQueries({ queryKey: ['general-ledger'] })
+      invalidateCache.journalEntries.detail(entryId)
+      invalidateCache.journalEntries.all()
+      invalidateCache.finance.generalLedger()
       toast.success(t('journal.posted', 'Entry posted to general ledger'))
     },
     onError: (error: any) => {
@@ -149,9 +149,9 @@ export default function JournalEntryDetailsView() {
   const voidMutation = useMutation({
     mutationFn: (reason?: string) => journalEntryService.voidEntry(entryId, reason),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['journal-entry', entryId] })
-      queryClient.invalidateQueries({ queryKey: ['journal-entries'] })
-      queryClient.invalidateQueries({ queryKey: ['general-ledger'] })
+      invalidateCache.journalEntries.detail(entryId)
+      invalidateCache.journalEntries.all()
+      invalidateCache.finance.generalLedger()
       setIsVoidDialogOpen(false)
       setVoidReason('')
       toast.success(t('journal.voided', 'Entry voided successfully'))
@@ -164,7 +164,7 @@ export default function JournalEntryDetailsView() {
   const deleteMutation = useMutation({
     mutationFn: () => journalEntryService.deleteEntry(entryId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['journal-entries'] })
+      invalidateCache.journalEntries.all()
       toast.success(t('journal.deleted', 'Entry deleted successfully'))
       navigate({ to: '/dashboard/finance/journal-entries' })
     },
@@ -176,7 +176,7 @@ export default function JournalEntryDetailsView() {
   const duplicateMutation = useMutation({
     mutationFn: () => journalEntryService.duplicateEntry(entryId),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['journal-entries'] })
+      invalidateCache.journalEntries.all()
       toast.success(t('journal.duplicated', 'Entry duplicated successfully'))
       navigate({ to: `/dashboard/finance/journal-entries/${data._id}` })
     },

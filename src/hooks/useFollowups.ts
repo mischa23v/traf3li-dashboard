@@ -8,6 +8,7 @@ import followupsService, {
 } from '@/services/followupsService'
 import { toast } from '@/hooks/use-toast'
 import { useTranslation } from 'react-i18next'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // Query keys
 export const followupsKeys = {
@@ -128,11 +129,8 @@ export const useCreateFollowup = () => {
     onSettled: async (_, __, variables) => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: followupsKeys.all, refetchType: 'all' })
-      return await queryClient.invalidateQueries({
-        queryKey: followupsKeys.entity(variables.entityType, variables.entityId),
-        refetchType: 'all'
-      })
+      await invalidateCache.followups.all({ refetchType: 'all' })
+      return await invalidateCache.followups.entity(variables.entityType, variables.entityId, { refetchType: 'all' })
     },
   })
 }
@@ -159,8 +157,8 @@ export const useUpdateFollowup = () => {
       })
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: followupsKeys.all })
-      return await queryClient.invalidateQueries({ queryKey: followupsKeys.detail(id) })
+      await invalidateCache.followups.all()
+      return await invalidateCache.followups.detail(id)
     },
   })
 }
@@ -203,7 +201,7 @@ export const useDeleteFollowup = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: followupsKeys.all, refetchType: 'all' })
+      return await invalidateCache.followups.all({ refetchType: 'all' })
     },
   })
 }
@@ -230,8 +228,8 @@ export const useCompleteFollowup = () => {
       })
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: followupsKeys.all })
-      return await queryClient.invalidateQueries({ queryKey: followupsKeys.detail(id) })
+      await invalidateCache.followups.all()
+      return await invalidateCache.followups.detail(id)
     },
   })
 }
@@ -258,8 +256,8 @@ export const useCancelFollowup = () => {
       })
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: followupsKeys.all })
-      return await queryClient.invalidateQueries({ queryKey: followupsKeys.detail(id) })
+      await invalidateCache.followups.all()
+      return await invalidateCache.followups.detail(id)
     },
   })
 }
@@ -295,8 +293,8 @@ export const useRescheduleFollowup = () => {
       })
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: followupsKeys.all })
-      return await queryClient.invalidateQueries({ queryKey: followupsKeys.detail(id) })
+      await invalidateCache.followups.all()
+      return await invalidateCache.followups.detail(id)
     },
   })
 }
@@ -323,7 +321,7 @@ export const useAddFollowupNote = () => {
       })
     },
     onSettled: async (_, __, { id }) => {
-      return await queryClient.invalidateQueries({ queryKey: followupsKeys.detail(id) })
+      return await invalidateCache.followups.detail(id)
     },
   })
 }
@@ -351,7 +349,7 @@ export const useBulkCompleteFollowups = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: followupsKeys.all, refetchType: 'all' })
+      return await invalidateCache.followups.all({ refetchType: 'all' })
     },
   })
 }
@@ -394,7 +392,7 @@ export const useBulkDeleteFollowups = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: followupsKeys.all, refetchType: 'all' })
+      return await invalidateCache.followups.all({ refetchType: 'all' })
     },
   })
 }

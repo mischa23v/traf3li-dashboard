@@ -7,7 +7,7 @@
  * Error handling includes bilingual user-facing alerts.
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import chatterService, {
   type Follower,
@@ -22,6 +22,7 @@ import chatterService, {
 } from '@/services/chatterService'
 import type { ThreadResModel } from '@/types/message'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ==================== Cache Configuration ====================
 const FOLLOWERS_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes
@@ -77,19 +78,13 @@ export function useIsFollowing(resModel: ThreadResModel, resId: string, enabled 
  * Add a follower
  */
 export function useAddFollower() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateFollowerData) => chatterService.addFollower(data),
     onSuccess: (newFollower, variables) => {
       // Invalidate followers list
-      queryClient.invalidateQueries({
-        queryKey: chatterKeys.followers(variables.resModel, variables.resId),
-      })
+      invalidateCache.chatter.followers(variables.resModel, variables.resId)
       // Invalidate isFollowing if it's the current user
-      queryClient.invalidateQueries({
-        queryKey: chatterKeys.isFollowing(variables.resModel, variables.resId),
-      })
+      invalidateCache.chatter.isFollowing(variables.resModel, variables.resId)
       toast.success('Follower added | تمت إضافة المتابع')
     },
     onError: () => {
@@ -102,15 +97,11 @@ export function useAddFollower() {
  * Remove a follower
  */
 export function useRemoveFollower() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (followerId: string) => chatterService.removeFollower(followerId),
     onSuccess: () => {
       // Invalidate all follower queries
-      queryClient.invalidateQueries({
-        queryKey: chatterKeys.all,
-      })
+      invalidateCache.chatter.all()
       toast.success('Follower removed | تمت إزالة المتابع')
     },
     onError: () => {
@@ -123,8 +114,6 @@ export function useRemoveFollower() {
  * Update follower preferences
  */
 export function useUpdateFollowerPreferences() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       followerId,
@@ -134,9 +123,7 @@ export function useUpdateFollowerPreferences() {
       preferences: { email?: boolean; push?: boolean; sms?: boolean }
     }) => chatterService.updateFollowerPreferences(followerId, preferences),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: chatterKeys.all,
-      })
+      invalidateCache.chatter.all()
       toast.success('Preferences updated | تم تحديث التفضيلات')
     },
     onError: () => {
@@ -149,18 +136,12 @@ export function useUpdateFollowerPreferences() {
  * Toggle follow status for current user
  */
 export function useToggleFollow() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ resModel, resId }: { resModel: ThreadResModel; resId: string }) =>
       chatterService.toggleFollow(resModel, resId),
     onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: chatterKeys.followers(variables.resModel, variables.resId),
-      })
-      queryClient.invalidateQueries({
-        queryKey: chatterKeys.isFollowing(variables.resModel, variables.resId),
-      })
+      invalidateCache.chatter.followers(variables.resModel, variables.resId)
+      invalidateCache.chatter.isFollowing(variables.resModel, variables.resId)
       toast.success(
         result.following
           ? 'Now following | تتم المتابعة الآن'
@@ -224,17 +205,11 @@ export function useMyActivities(state?: string, limit?: number, enabled = true) 
  * Schedule a new activity
  */
 export function useScheduleActivity() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateActivityData) => chatterService.scheduleActivity(data),
     onSuccess: (newActivity, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: chatterKeys.activities(variables.resModel, variables.resId),
-      })
-      queryClient.invalidateQueries({
-        queryKey: chatterKeys.myActivities(),
-      })
+      invalidateCache.chatter.activities(variables.resModel, variables.resId)
+      invalidateCache.chatter.myActivities()
       toast.success('Activity scheduled | تم جدولة النشاط')
     },
     onError: () => {
@@ -247,15 +222,11 @@ export function useScheduleActivity() {
  * Update an activity
  */
 export function useUpdateActivity() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ activityId, data }: { activityId: string; data: UpdateActivityData }) =>
       chatterService.updateActivity(activityId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: chatterKeys.all,
-      })
+      invalidateCache.chatter.all()
       toast.success('Activity updated | تم تحديث النشاط')
     },
     onError: () => {
@@ -268,15 +239,11 @@ export function useUpdateActivity() {
  * Mark activity as done
  */
 export function useMarkActivityDone() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ activityId, feedback }: { activityId: string; feedback?: string }) =>
       chatterService.markActivityDone(activityId, feedback),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: chatterKeys.all,
-      })
+      invalidateCache.chatter.all()
       toast.success('Activity completed | تم إنجاز النشاط')
     },
     onError: () => {
@@ -289,14 +256,10 @@ export function useMarkActivityDone() {
  * Cancel an activity
  */
 export function useCancelActivity() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (activityId: string) => chatterService.cancelActivity(activityId),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: chatterKeys.all,
-      })
+      invalidateCache.chatter.all()
       toast.success('Activity cancelled | تم إلغاء النشاط')
     },
     onError: () => {
@@ -324,8 +287,6 @@ export function useAttachments(resModel: ThreadResModel, resId: string, enabled 
  * Upload a single attachment
  */
 export function useUploadAttachment() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       file,
@@ -337,9 +298,7 @@ export function useUploadAttachment() {
       resId: string
     }) => chatterService.uploadAttachment(file, resModel, resId),
     onSuccess: (newAttachment, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: chatterKeys.attachments(variables.resModel, variables.resId),
-      })
+      invalidateCache.chatter.attachments(variables.resModel, variables.resId)
       toast.success('File uploaded | تم رفع الملف')
     },
     onError: () => {
@@ -352,8 +311,6 @@ export function useUploadAttachment() {
  * Upload multiple attachments
  */
 export function useUploadAttachments() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       files,
@@ -365,9 +322,7 @@ export function useUploadAttachments() {
       resId: string
     }) => chatterService.uploadAttachments(files, resModel, resId),
     onSuccess: (newAttachments, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: chatterKeys.attachments(variables.resModel, variables.resId),
-      })
+      invalidateCache.chatter.attachments(variables.resModel, variables.resId)
       toast.success(`${newAttachments.length} files uploaded | تم رفع ${newAttachments.length} ملف`)
     },
     onError: () => {
@@ -380,14 +335,10 @@ export function useUploadAttachments() {
  * Delete an attachment
  */
 export function useDeleteAttachment() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (attachmentId: string) => chatterService.deleteAttachment(attachmentId),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: chatterKeys.all,
-      })
+      invalidateCache.chatter.all()
       toast.success('Attachment deleted | تم حذف المرفق')
     },
     onError: () => {
