@@ -126,7 +126,7 @@ export function OffboardingListView() {
   }
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+    { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
     { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
     { title: 'إنهاء الخدمة', href: ROUTES.dashboard.hr.offboarding.list, isActive: true },
   ]
