@@ -1549,6 +1549,26 @@ export const QueryKeys = {
   dashboard: {
     all: () => ['dashboard'] as const,
     stats: () => [...QueryKeys.dashboard.all(), 'stats'] as const,
+    heroStats: () => [...QueryKeys.dashboard.all(), 'hero-stats'] as const,
+    summary: () => [...QueryKeys.dashboard.all(), 'summary'] as const,
+    todayEvents: () => [...QueryKeys.dashboard.all(), 'today-events'] as const,
+    financialSummary: () => [...QueryKeys.dashboard.all(), 'financial-summary'] as const,
+    recentMessages: (limit: number) => [...QueryKeys.dashboard.all(), 'recent-messages', limit] as const,
+    crmStats: () => [...QueryKeys.dashboard.all(), 'crm-stats'] as const,
+    hrStats: () => [...QueryKeys.dashboard.all(), 'hr-stats'] as const,
+    financeStats: () => [...QueryKeys.dashboard.all(), 'finance-stats'] as const,
+    hearings: {
+      upcoming: (days: number) => [...QueryKeys.dashboard.all(), 'hearings', 'upcoming', days] as const,
+    },
+    deadlines: {
+      upcoming: (days: number) => [...QueryKeys.dashboard.all(), 'deadlines', 'upcoming', days] as const,
+    },
+    timeEntries: {
+      summary: () => [...QueryKeys.dashboard.all(), 'time-entries', 'summary'] as const,
+    },
+    documents: {
+      pending: () => [...QueryKeys.dashboard.all(), 'documents', 'pending'] as const,
+    },
     widgets: () => [...QueryKeys.dashboard.all(), 'widgets'] as const,
     widget: (widgetId: string) => [...QueryKeys.dashboard.all(), 'widget', widgetId] as const,
   },
