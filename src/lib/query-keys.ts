@@ -158,6 +158,7 @@ export const QueryKeys = {
     details: () => [...QueryKeys.quotes.all(), 'detail'] as const,
     detail: (id: string) => [...QueryKeys.quotes.details(), id] as const,
     stats: () => [...QueryKeys.quotes.all(), 'stats'] as const,
+    summary: (filters?: Record<string, any>) => [...QueryKeys.quotes.all(), 'summary', filters] as const,
   },
 
   // ==================== CREDIT NOTES ====================
@@ -336,6 +337,8 @@ export const QueryKeys = {
     details: () => [...QueryKeys.staff.all(), 'detail'] as const,
     detail: (id: string) => [...QueryKeys.staff.details(), id] as const,
     stats: () => [...QueryKeys.staff.all(), 'stats'] as const,
+    team: () => [...QueryKeys.staff.all(), 'team'] as const,
+    firmMembers: (firmId: string, filters?: Record<string, any>) => [...QueryKeys.staff.all(), firmId, filters] as const,
   },
 
   // ==================== ATTENDANCE ====================
@@ -1117,6 +1120,8 @@ export const QueryKeys = {
     list: (filters?: Record<string, any>) => [...QueryKeys.conversations.lists(), filters] as const,
     details: () => [...QueryKeys.conversations.all(), 'detail'] as const,
     detail: (id: string) => [...QueryKeys.conversations.details(), id] as const,
+    messages: (conversationId: string) => ['messages', conversationId] as const,
+    single: (sellerId: string, buyerId: string) => ['conversation', sellerId, buyerId] as const,
   },
 
   // ==================== CHATTER ====================

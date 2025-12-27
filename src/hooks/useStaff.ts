@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { useAuthStore, selectFirmId } from '@/stores/auth-store'
 import firmService from '@/services/firmService'
 import { invalidateCache } from '@/lib/cache-invalidation'
+import { QueryKeys } from '@/lib/query-keys'
 
 // Extended Staff interfaces for CRUD operations
 export interface CreateStaffData {
@@ -72,7 +73,7 @@ export const useStaff = (filters?: LawyerFilters & { showDeparted?: boolean }) =
   const firmId = useAuthStore(selectFirmId)
 
   return useQuery({
-    queryKey: ['staff', firmId, filters],
+    queryKey: firmId ? QueryKeys.staff.firmMembers(firmId, filters) : QueryKeys.staff.list(filters),
     queryFn: async () => {
       if (!firmId) {
         if (import.meta.env.DEV) {
@@ -108,7 +109,7 @@ export const useStaff = (filters?: LawyerFilters & { showDeparted?: boolean }) =
 
 export const useStaffMember = (staffId: string) => {
   return useQuery({
-    queryKey: ['staff', staffId],
+    queryKey: QueryKeys.staff.detail(staffId),
     queryFn: () => lawyersService.getById(staffId),
     enabled: !!staffId,
     staleTime: CACHE_TIMES.SHORT,
@@ -117,7 +118,7 @@ export const useStaffMember = (staffId: string) => {
 
 export const useTeamMembers = (isEnabled = true) => {
   return useQuery({
-    queryKey: ['staff', 'team'],
+    queryKey: QueryKeys.staff.team(),
     queryFn: () => lawyersService.getTeamMembers(),
     staleTime: CACHE_TIMES.MEDIUM,
     enabled: isEnabled, // Allow deferred loading for performance
@@ -132,7 +133,7 @@ export const useCreateStaff = () => {
     onSuccess: (data) => {
       toast.success('Team member added successfully | تم إضافة عضو الفريق بنجاح')
       // Optimistically update the cache
-      queryClient.setQueriesData({ queryKey: ['staff'] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: QueryKeys.staff.all() }, (old: any) => {
         if (!old) return old
         if (Array.isArray(old)) return [data, ...old]
         return old
@@ -162,9 +163,9 @@ export const useUpdateStaff = () => {
     onSuccess: (data) => {
       toast.success('Team member updated successfully | تم تحديث بيانات عضو الفريق بنجاح')
       // Update specific staff member in cache
-      queryClient.setQueryData(['staff', data.id], data)
+      queryClient.setQueryData(QueryKeys.staff.detail(data.id), data)
       // Update list cache
-      queryClient.setQueriesData({ queryKey: ['staff'] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: QueryKeys.staff.all() }, (old: any) => {
         if (!old) return old
         if (Array.isArray(old)) {
           return old.map((item: any) => (item.id === data.id ? data : item))
@@ -191,7 +192,7 @@ export const useDeleteStaff = () => {
     onSuccess: (_, staffId) => {
       toast.success('Team member deleted successfully | تم حذف عضو الفريق بنجاح')
       // Remove from cache
-      queryClient.setQueriesData({ queryKey: ['staff'] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: QueryKeys.staff.all() }, (old: any) => {
         if (!old) return old
         if (Array.isArray(old)) {
           return old.filter((item: any) => item.id !== staffId)
@@ -217,7 +218,7 @@ export const useBulkDeleteStaff = () => {
     onSuccess: (_, staffIds) => {
       toast.success('Team members deleted successfully | تم حذف أعضاء الفريق بنجاح')
       // Remove from cache
-      queryClient.setQueriesData({ queryKey: ['staff'] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: QueryKeys.staff.all() }, (old: any) => {
         if (!old) return old
         if (Array.isArray(old)) {
           return old.filter((item: any) => !staffIds.includes(item.id))
