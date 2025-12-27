@@ -212,8 +212,6 @@ export const useMoveCompany = () => {
  * Switch company
  */
 export const useSwitchCompany = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (firmId: string) => companyService.switchCompany(firmId),
     onSuccess: (data) => {
@@ -221,7 +219,7 @@ export const useSwitchCompany = () => {
       invalidateCache.companies.active()
 
       // Invalidate ALL queries since company context changed
-      queryClient.invalidateQueries()
+      invalidateCache.all()
 
       // Update localStorage
       localStorage.setItem('activeFirmId', data.firmId)

@@ -9,6 +9,9 @@ export const setQueryClient = (client: QueryClient) => {
 
 // Invalidation helpers
 export const invalidateCache = {
+  // Global - invalidate everything (use for company context changes)
+  all: () => queryClient.invalidateQueries(),
+
   // Tasks
   tasks: {
     all: () => queryClient.invalidateQueries({ queryKey: ['tasks'] }),

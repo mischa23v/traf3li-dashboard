@@ -36,16 +36,16 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { SalesSidebar } from './sales-sidebar'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { leadScoringService } from '@/services/crmAdvancedService'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 type LeadGrade = 'A' | 'B' | 'C' | 'D' | 'F'
 
 export function LeadScoringDashboard() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
   const isRtl = i18n.language === 'ar'
 
   // Filter states
@@ -88,7 +88,7 @@ export function LeadScoringDashboard() {
   const calculateAllMutation = useMutation({
     mutationFn: () => leadScoringService.calculateAllScores(),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['lead-scores'] })
+      invalidateCache.leads.scoring()
       toast.success(`تم حساب تقييم ${data.calculated} عميل محتمل`)
     },
     onError: (err: Error) => {
