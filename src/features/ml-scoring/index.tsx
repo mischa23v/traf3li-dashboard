@@ -64,6 +64,7 @@ import {
 } from '@/hooks/useMlScoring'
 import { PriorityQueue } from './components/priority-queue'
 import { SLADashboard } from './components/sla-dashboard'
+import { ROUTES } from '@/constants/routes'
 
 // ==================== CONSTANTS ====================
 
@@ -112,9 +113,9 @@ export function MLAnalytics() {
     : []
 
   const topNav = [
-    { title: t('sidebar.nav.overview', 'Overview'), href: '/dashboard/overview', isActive: false },
-    { title: t('sidebar.nav.leads', 'Leads'), href: '/dashboard/crm/leads', isActive: false },
-    { title: t('mlScoring.nav.analytics', 'ML Analytics'), href: '/dashboard/ml/analytics', isActive: true },
+    { title: t('sidebar.nav.overview', 'Overview'), href: ROUTES.dashboard.overview, isActive: false },
+    { title: t('sidebar.nav.leads', 'Leads'), href: ROUTES.dashboard.crm.leads.list, isActive: false },
+    { title: t('mlScoring.nav.analytics', 'ML Analytics'), href: ROUTES.dashboard.ml.analytics, isActive: true },
   ]
 
   return (

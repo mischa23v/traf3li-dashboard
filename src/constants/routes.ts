@@ -844,7 +844,16 @@ export const ROUTES = {
       list: '/dashboard/buying',
       create: '/dashboard/buying/create',
       settings: '/dashboard/buying/settings',
+      overview: '/dashboard/buying/overview',
       detail: (supplierId: string) => `/dashboard/buying/${supplierId}`,
+
+      // Suppliers
+      suppliers: {
+        list: '/dashboard/buying/suppliers',
+        new: '/dashboard/buying/suppliers/new',
+        detail: (supplierId: string) => `/dashboard/buying/suppliers/${supplierId}`,
+        edit: (supplierId: string) => `/dashboard/buying/suppliers/${supplierId}/edit`,
+      },
 
       // Material requests
       materialRequests: {

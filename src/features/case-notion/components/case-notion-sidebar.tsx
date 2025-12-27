@@ -13,6 +13,7 @@ import { useUpcomingReminders } from '@/hooks/useRemindersAndEvents'
 import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 import { useTranslation } from 'react-i18next'
+import { ROUTES } from '@/constants/routes'
 
 interface CaseNotionSidebarProps {
     context?: 'list' | 'details'
@@ -162,7 +163,7 @@ export function CaseNotionSidebar({
                         <>
                             {/* View Case Button */}
                             <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
-                                <Link to={`/dashboard/cases/${caseId}`}>
+                                <Link to={ROUTES.dashboard.cases.detail(caseId)}>
                                     <FolderOpen className="h-7 w-7" aria-hidden="true" />
                                     <span className="text-sm font-bold">{t('caseNotion.sidebar.viewCase', 'عرض القضية')}</span>
                                 </Link>
@@ -170,7 +171,7 @@ export function CaseNotionSidebar({
 
                             {/* New Page Button */}
                             <Button asChild className="bg-white hover:bg-blue-50 text-blue-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
-                                <Link to={`/dashboard/cases/${caseId}/notion`}>
+                                <Link to={ROUTES.dashboard.cases.notion(caseId)}>
                                     <Plus className="h-7 w-7" aria-hidden="true" />
                                     <span className="text-sm font-bold">{t('caseNotion.sidebar.newPage', 'صفحة جديدة')}</span>
                                 </Link>
@@ -195,7 +196,7 @@ export function CaseNotionSidebar({
 
                             {/* View All Button */}
                             <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
-                                <Link to="/dashboard/notion">
+                                <Link to={ROUTES.dashboard.notion}>
                                     <List className="h-6 w-6" aria-hidden="true" />
                                     <span className="text-sm font-bold">{t('caseNotion.sidebar.viewAll', 'عرض الكل')}</span>
                                 </Link>
@@ -206,7 +207,7 @@ export function CaseNotionSidebar({
                         <>
                             {/* View Cases Button - Navigate to cases to create notion pages */}
                             <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
-                                <Link to="/dashboard/cases">
+                                <Link to={ROUTES.dashboard.cases.list}>
                                     <FolderOpen className="h-7 w-7" aria-hidden="true" />
                                     <span className="text-sm font-bold">{t('caseNotion.sidebar.viewCases', 'عرض القضايا')}</span>
                                 </Link>
@@ -242,7 +243,7 @@ export function CaseNotionSidebar({
 
                             {/* Knowledge Base Button */}
                             <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
-                                <Link to="/dashboard/knowledge/laws">
+                                <Link to={ROUTES.dashboard.knowledge.laws.list}>
                                     <BookOpen className="h-6 w-6" aria-hidden="true" />
                                     <span className="text-sm font-bold">{t('caseNotion.sidebar.knowledgeBase', 'قاعدة المعرفة')}</span>
                                 </Link>
@@ -376,7 +377,7 @@ export function CaseNotionSidebar({
                             </div>
 
                             <Button asChild variant="ghost" className="w-full mt-6 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 group cursor-pointer">
-                                <Link to="/dashboard/calendar">
+                                <Link to={ROUTES.dashboard.calendar}>
                                     <span>{t('caseNotion.sidebar.viewFullSchedule', 'عرض الجدول الكامل')}</span>
                                     <ChevronRight className="w-4 h-4 me-2 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1 rtl:rotate-180" aria-hidden="true" />
                                 </Link>
@@ -403,7 +404,7 @@ export function CaseNotionSidebar({
                                         return (
                                             <Link
                                                 key={reminder._id}
-                                                to={`/dashboard/tasks/reminders/${reminder._id}`}
+                                                to={ROUTES.dashboard.tasks.reminders.detail(reminder._id)}
                                                 className="flex gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:shadow-md transition-all cursor-pointer group"
                                             >
                                                 <div className={cn(
@@ -442,7 +443,7 @@ export function CaseNotionSidebar({
                                 </>
                             )}
                             <Button asChild variant="ghost" className="w-full text-xs text-slate-500 hover:text-emerald-600 hover:bg-emerald-50">
-                                <Link to="/dashboard/tasks/reminders">
+                                <Link to={ROUTES.dashboard.tasks.reminders.list}>
                                     {t('caseNotion.sidebar.viewAllReminders', 'عرض كل التنبيهات')}
                                 </Link>
                             </Button>

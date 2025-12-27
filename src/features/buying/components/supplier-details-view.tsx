@@ -69,6 +69,7 @@ import { useSupplier, useDeleteSupplier, usePurchaseOrders } from '@/hooks/use-b
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { ROUTES } from '@/constants/routes'
 
 export function SupplierDetailsView() {
   const { t, i18n } = useTranslation()
@@ -89,17 +90,17 @@ export function SupplierDetailsView() {
   const topNav = [
     {
       title: t('buying.common.overview'),
-      href: '/dashboard/buying/overview',
+      href: ROUTES.dashboard.buying.overview,
       isActive: false
     },
     {
       title: t('buying.suppliers'),
-      href: '/dashboard/buying/suppliers',
+      href: ROUTES.dashboard.buying.suppliers.list,
       isActive: true
     },
     {
       title: t('buying.purchaseOrder.purchaseOrders'),
-      href: '/dashboard/buying/purchase-orders',
+      href: ROUTES.dashboard.buying.purchaseOrders.list,
       isActive: false
     },
   ]
@@ -123,7 +124,7 @@ export function SupplierDetailsView() {
   const handleDelete = () => {
     deleteSupplierMutation.mutate(supplierId, {
       onSuccess: () => {
-        navigate({ to: '/dashboard/buying' })
+        navigate({ to: ROUTES.dashboard.buying.list })
       },
     })
   }
@@ -212,7 +213,7 @@ export function SupplierDetailsView() {
         <Main fluid={true} className="bg-[#f8f9fa] p-6 lg:p-8">
           <div className="max-w-7xl mx-auto">
             <Button asChild variant="ghost" className="mb-6">
-              <Link to="/dashboard/buying/suppliers">
+              <Link to={ROUTES.dashboard.buying.suppliers.list}>
                 <ArrowLeft className="h-4 w-4 me-2" />
                 {t('buying.navigation.backToSuppliers')}
               </Link>
@@ -254,14 +255,14 @@ export function SupplierDetailsView() {
           {/* Back Button & Actions */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <Button asChild variant="ghost" className="text-slate-600 hover:text-navy">
-              <Link to="/dashboard/buying/suppliers">
+              <Link to={ROUTES.dashboard.buying.suppliers.list}>
                 <ArrowLeft className="h-4 w-4 me-2" />
                 {t('buying.navigation.backToSuppliers')}
               </Link>
             </Button>
             <div className="flex gap-2">
               <Button asChild variant="outline">
-                <Link to={`/dashboard/buying/suppliers/${supplierId}/edit`}>
+                <Link to={ROUTES.dashboard.buying.suppliers.edit(supplierId)}>
                   <Edit className="h-4 w-4 me-2" aria-hidden="true" />
                   {t('buying.common.edit')}
                 </Link>
@@ -667,7 +668,7 @@ export function SupplierDetailsView() {
                                     <TableRow key={po._id}>
                                       <TableCell className="font-medium">
                                         <Link
-                                          to={`/dashboard/buying/purchase-orders/${po._id}`}
+                                          to={ROUTES.dashboard.buying.purchaseOrders.detail(po._id)}
                                           className="text-brand-blue hover:underline"
                                         >
                                           {po.poNumber}
