@@ -209,11 +209,18 @@ let cachedCsrfToken: string | null = null
 const getCsrfToken = (): string => {
   const cookies = document.cookie
 
-  // Try cookie first (primary method)
-  const match = cookies.match(/csrf-token=([^;]+)/)
+  // Try cookie first (primary method) - backend uses 'csrfToken' cookie name
+  const match = cookies.match(/csrfToken=([^;]+)/)
   if (match && match[1]) {
     cachedCsrfToken = match[1] // Cache it
     return match[1]
+  }
+
+  // Try legacy cookie names
+  const csrfDashMatch = cookies.match(/csrf-token=([^;]+)/)
+  if (csrfDashMatch && csrfDashMatch[1]) {
+    cachedCsrfToken = csrfDashMatch[1]
+    return csrfDashMatch[1]
   }
 
   // Try alternative cookie names
@@ -233,7 +240,7 @@ const getCsrfToken = (): string => {
     getCsrfToken.hasLoggedWarning = true
     const availableCookies = cookies ? cookies.split(';').map(c => c.trim().split('=')[0]).filter(Boolean) : []
     console.warn('[CSRF] No csrf-token found. Available cookies:', availableCookies,
-      '\nThis may be a cross-origin cookie issue. Backend should set SameSite=None; Secure for the csrf-token cookie.')
+      '\nCalling refreshCsrfToken() to fetch a fresh token from the backend.')
   }
 
   return ''
@@ -247,6 +254,49 @@ getCsrfToken.hasLoggedWarning = false
 export const updateCsrfTokenFromResponse = (token: string) => {
   if (token) {
     cachedCsrfToken = token
+  }
+}
+
+/**
+ * Refresh CSRF token from backend
+ * Call this after login/OAuth to ensure we have a valid CSRF token
+ * Backend endpoint: GET /api/auth/csrf
+ */
+export const refreshCsrfToken = async (): Promise<string | null> => {
+  try {
+    // Use a separate axios instance to avoid circular interceptor issues
+    const response = await axios.get(
+      `${API_BASE_URL_NO_VERSION}/auth/csrf`,
+      {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(cachedDeviceFingerprint && { 'X-Device-Fingerprint': cachedDeviceFingerprint }),
+        },
+      }
+    )
+
+    // Token is set in cookie automatically by backend
+    // Also capture from response body/header as fallback
+    const token = response.data?.csrfToken || response.headers['x-csrf-token']
+    if (token) {
+      cachedCsrfToken = token
+      console.log('[CSRF] Token refreshed successfully')
+      return token
+    }
+
+    // Try reading from cookie after the request
+    const cookieToken = getCsrfToken()
+    if (cookieToken) {
+      console.log('[CSRF] Token available from cookie after refresh')
+      return cookieToken
+    }
+
+    console.warn('[CSRF] Token refresh completed but no token found')
+    return null
+  } catch (error) {
+    console.warn('[CSRF] Token refresh failed:', error)
+    return null
   }
 }
 
@@ -932,23 +982,57 @@ apiClient.interceptors.response.use(
       const message = error.response?.data?.message
       const errorCode = error.response?.data?.code
 
-      // Check for CSRF token errors - reload page to get new token
-      if (errorCode === 'CSRF_TOKEN_INVALID' || errorCode === 'CSRF_TOKEN_MISSING') {
-        import('sonner').then(({ toast }) => {
-          toast.error('انتهت صلاحية الجلسة', {
-            description: 'جارٍ إعادة تحميل الصفحة...',
-            duration: 2000,
-          })
-        })
+      // Check for CSRF token errors - retry once with fresh token
+      if (errorCode === 'CSRF_TOKEN_INVALID' || errorCode === 'CSRF_TOKEN_MISSING' ||
+          errorCode === 'CSRF_ORIGIN_INVALID' || errorCode?.startsWith('CSRF_')) {
+        // Only retry once
+        if (!originalRequest._csrfRetry) {
+          originalRequest._csrfRetry = true
 
-        // Reload page after a short delay to get new CSRF token
-        setTimeout(() => {
-          window.location.reload()
-        }, 2000)
+          try {
+            // Refresh CSRF token
+            await refreshCsrfToken()
+
+            // Get the new token and retry
+            const newToken = getCsrfToken()
+            if (newToken && originalRequest.headers) {
+              originalRequest.headers.set('X-CSRF-Token', newToken)
+            }
+
+            console.log('[CSRF] Retrying request with fresh token')
+            return apiClient(originalRequest)
+          } catch (csrfError) {
+            console.error('[CSRF] Token refresh failed, redirecting to login:', csrfError)
+            // If refresh fails, redirect to login
+            import('sonner').then(({ toast }) => {
+              toast.error('انتهت صلاحية الجلسة | Session expired', {
+                description: 'يرجى تسجيل الدخول مرة أخرى | Please log in again',
+                duration: 3000,
+              })
+            })
+
+            setTimeout(() => {
+              window.location.href = '/sign-in?reason=csrf_failed'
+            }, 2000)
+          }
+        } else {
+          // Already retried once, show error and redirect
+          import('sonner').then(({ toast }) => {
+            toast.error('انتهت صلاحية الجلسة | Session expired', {
+              description: 'يرجى تسجيل الدخول مرة أخرى | Please log in again',
+              duration: 3000,
+            })
+          })
+
+          setTimeout(() => {
+            window.location.href = '/sign-in?reason=csrf_failed'
+          }, 2000)
+        }
 
         return Promise.reject({
           status: 403,
           message: 'CSRF token invalid',
+          code: errorCode,
           error: true,
           requestId: error.response?.data?.requestId,
         })

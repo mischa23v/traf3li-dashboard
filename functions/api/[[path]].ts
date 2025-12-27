@@ -7,6 +7,9 @@
  * - /api/v1/* - Versioned API routes
  * - /api/currency/* - Currency routes
  * - Any other /api/* routes (except /api/ai/*)
+ *
+ * Note: CSRF cookie SameSite handling is now done by the backend.
+ * The backend sets SameSite=None; Secure for cross-origin requests.
  */
 
 interface Env {
@@ -49,42 +52,6 @@ const FORWARDED_RESPONSE_HEADERS = [
   'x-csrf-token',
   'x-xsrf-token',
 ];
-
-/**
- * Modify Set-Cookie headers to ensure proper SameSite and Secure attributes
- * for cross-origin cookie handling (fixes CSRF token cookie issues)
- */
-const fixCookieSameSite = (cookie: string): string => {
-  // Parse cookie to check if it's a csrf-token or XSRF-TOKEN cookie
-  const lowerCookie = cookie.toLowerCase();
-  const isCsrfCookie = lowerCookie.includes('csrf-token=') || lowerCookie.includes('xsrf-token=');
-
-  if (!isCsrfCookie) {
-    return cookie;
-  }
-
-  // Check if SameSite is already set
-  const hasSameSite = lowerCookie.includes('samesite=');
-  const hasSecure = lowerCookie.includes('; secure') || lowerCookie.endsWith('secure');
-
-  let fixedCookie = cookie;
-
-  // If SameSite is already set but not to None, replace it
-  if (hasSameSite) {
-    // Replace existing SameSite with None (case-insensitive)
-    fixedCookie = fixedCookie.replace(/samesite=(strict|lax|none)/i, 'SameSite=None');
-  } else {
-    // Add SameSite=None
-    fixedCookie += '; SameSite=None';
-  }
-
-  // Add Secure flag if not present (required for SameSite=None)
-  if (!hasSecure) {
-    fixedCookie += '; Secure';
-  }
-
-  return fixedCookie;
-};
 
 /**
  * Handle all HTTP methods for API proxy
@@ -157,20 +124,17 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       const value = backendResponse.headers.get(headerName);
       if (value) {
         // Handle multiple Set-Cookie headers
+        // Note: Backend now handles SameSite=None; Secure for cross-origin cookies
         if (headerName === 'set-cookie') {
           // Get all Set-Cookie headers
           const cookies = backendResponse.headers.getSetCookie?.() || [];
           if (cookies.length > 0) {
             // Cloudflare Workers support multiple Set-Cookie headers
-            // Fix SameSite for CSRF cookies to enable cross-origin cookie handling
             cookies.forEach(cookie => {
-              const fixedCookie = fixCookieSameSite(cookie);
-              responseHeaders.append('Set-Cookie', fixedCookie);
+              responseHeaders.append('Set-Cookie', cookie);
             });
           } else if (value) {
-            // Fix SameSite for CSRF cookies
-            const fixedCookie = fixCookieSameSite(value);
-            responseHeaders.set('Set-Cookie', fixedCookie);
+            responseHeaders.set('Set-Cookie', value);
           }
         } else {
           responseHeaders.set(headerName, value);

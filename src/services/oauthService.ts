@@ -12,7 +12,7 @@
  * - Microsoft
  */
 
-import { apiClientNoVersion, handleApiError, storeTokens } from '@/lib/api'
+import { apiClientNoVersion, handleApiError, storeTokens, refreshCsrfToken } from '@/lib/api'
 import type { User } from './authService'
 
 const authApi = apiClientNoVersion
@@ -229,6 +229,12 @@ const oauthService = {
 
       // Store user in localStorage
       localStorage.setItem('user', JSON.stringify(response.data.user))
+
+      // Initialize CSRF token after successful OAuth authentication
+      // This ensures we have a valid token for subsequent API calls
+      refreshCsrfToken().catch((err) => {
+        console.warn('[OAUTH] CSRF token initialization after OAuth failed:', err)
+      })
 
       return {
         user: response.data.user,
