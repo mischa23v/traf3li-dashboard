@@ -19,6 +19,7 @@ import {
     Wallet, Receipt, Banknote, Globe
 } from 'lucide-react'
 import { useLeanCustomers, useWPSFiles, useSADADPayments, useMudadCompliance } from '@/hooks/useSaudiBanking'
+import { ROUTES } from '@/constants/routes'
 
 // Sidebar Widget Component
 function SaudiBankingSidebar() {
@@ -130,10 +131,10 @@ export function SaudiBankingListView() {
     }, [customersData, wpsData, paymentsData])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
-        { title: 'الخدمات المصرفية', href: '/dashboard/finance/saudi-banking', isActive: true },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: false },
+        { title: 'المصروفات', href: ROUTES.dashboard.finance.expenses.list, isActive: false },
+        { title: 'الخدمات المصرفية', href: ROUTES.dashboard.finance.saudiBanking.index, isActive: true },
     ]
 
     // Service cards data
@@ -146,7 +147,7 @@ export function SaudiBankingListView() {
             icon: Landmark,
             color: 'emerald',
             features: ['ربط 14+ بنك سعودي', 'عرض الأرصدة الفورية', 'تاريخ المعاملات', 'تصنيف المعاملات'],
-            link: '/dashboard/finance/saudi-banking/lean',
+            link: ROUTES.dashboard.finance.saudiBanking.lean,
             stats: { label: 'حسابات مربوطة', value: customersData?.data?.length || 0 },
         },
         {
@@ -157,7 +158,7 @@ export function SaudiBankingListView() {
             icon: FileText,
             color: 'blue',
             features: ['إنشاء ملفات SARIE', 'التحقق من البيانات', 'دعم جميع البنوك', 'تاريخ الملفات'],
-            link: '/dashboard/finance/saudi-banking/wps',
+            link: ROUTES.dashboard.finance.saudiBanking.wps.index,
             stats: { label: 'ملفات هذا الشهر', value: wpsData?.data?.length || 0 },
         },
         {
@@ -168,7 +169,7 @@ export function SaudiBankingListView() {
             icon: Receipt,
             color: 'purple',
             features: ['دفع فواتير الحكومة', 'فواتير الاتصالات', 'فواتير الخدمات', 'تاريخ المدفوعات'],
-            link: '/dashboard/finance/saudi-banking/sadad',
+            link: ROUTES.dashboard.finance.saudiBanking.sadad.index,
             stats: { label: 'مدفوعات هذا الشهر', value: paymentsData?.data?.length || 0 },
         },
         {
@@ -179,7 +180,7 @@ export function SaudiBankingListView() {
             icon: Calculator,
             color: 'orange',
             features: ['حساب GOSI', 'التحقق من نطاقات', 'الحد الأدنى للأجور', 'تقارير الامتثال'],
-            link: '/dashboard/finance/saudi-banking/mudad',
+            link: ROUTES.dashboard.finance.saudiBanking.mudad,
             stats: { label: 'تقارير هذا الشهر', value: 3 },
         },
     ]

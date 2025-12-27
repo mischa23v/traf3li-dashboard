@@ -4,6 +4,7 @@ import {
     Building2, Plus, Upload, Link as LinkIcon, ArrowLeft, Search, Bell, Loader2,
     Calendar, CreditCard, DollarSign, Info, Globe, Key, Shield
 } from 'lucide-react'
+import { ROUTES } from '@/constants/routes'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -100,21 +101,21 @@ export function ReconciliationCreateView() {
                         columnMapping,
                         dateFormat,
                     }, {
-                        onSuccess: () => navigate({ to: '/dashboard/finance/reconciliation/$feedId', params: { feedId: data._id } }),
-                        onError: () => navigate({ to: '/dashboard/finance/reconciliation' })
+                        onSuccess: () => navigate({ to: ROUTES.dashboard.finance.reconciliation.detail(data._id) }),
+                        onError: () => navigate({ to: ROUTES.dashboard.finance.reconciliation.list })
                     })
                 } else {
-                    navigate({ to: '/dashboard/finance/reconciliation' })
+                    navigate({ to: ROUTES.dashboard.finance.reconciliation.list })
                 }
             },
         })
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'المدفوعات', href: '/dashboard/finance/payments', isActive: false },
-        { title: 'التسوية البنكية', href: '/dashboard/finance/reconciliation', isActive: true },
+        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false }, // Note: No ROUTES constant exists for '/dashboard/overview'
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: false },
+        { title: 'المدفوعات', href: ROUTES.dashboard.finance.payments.list, isActive: false },
+        { title: 'التسوية البنكية', href: ROUTES.dashboard.finance.reconciliation.list, isActive: true },
     ]
 
     return (

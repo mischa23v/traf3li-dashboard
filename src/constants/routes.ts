@@ -49,6 +49,11 @@ export const ROUTES = {
     home: '/',
 
     /**
+     * Dashboard overview
+     */
+    overview: '/dashboard/overview',
+
+    /**
      * Help and support
      */
     help: '/dashboard/help',
@@ -193,6 +198,7 @@ export const ROUTES = {
         list: '/dashboard/finance/credit-notes',
         new: '/dashboard/finance/credit-notes/new',
         detail: (creditNoteId: string) => `/dashboard/finance/credit-notes/${creditNoteId}`,
+        edit: (creditNoteId: string) => `/dashboard/finance/credit-notes/${creditNoteId}/edit`,
       },
 
       // Debit notes
@@ -351,6 +357,16 @@ export const ROUTES = {
           index: '/dashboard/finance/saudi-banking/wps',
           new: '/dashboard/finance/saudi-banking/wps/new',
         },
+      },
+
+      // Inter-company
+      interCompany: {
+        list: '/dashboard/finance/inter-company',
+        new: '/dashboard/finance/inter-company/new',
+        balances: '/dashboard/finance/inter-company/balances',
+        reconciliation: '/dashboard/finance/inter-company/reconciliation',
+        detail: (transactionId: string) => `/dashboard/finance/inter-company/${transactionId}`,
+        reconciliationDetail: (reconciliationId: string) => `/dashboard/finance/inter-company/reconciliation/${reconciliationId}`,
       },
     },
 
@@ -961,6 +977,7 @@ export const ROUTES = {
      * Dashboard settings
      */
     settings: {
+      index: '/dashboard/settings',
       profile: '/dashboard/settings/profile',
       company: '/dashboard/settings/company',
       security: '/dashboard/settings/security',

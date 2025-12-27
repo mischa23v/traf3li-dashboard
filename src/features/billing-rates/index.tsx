@@ -17,6 +17,7 @@ import { RatesTable } from './components/rates-table'
 import { GroupsTable } from './components/groups-table'
 import { useTranslation } from 'react-i18next'
 import { SettingsSidebar } from '../settings/components/settings-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 // Lazy load dialog components - only loaded when user opens a dialog
 const RateActionDialog = lazy(() => import('./components/rate-action-dialog').then(mod => ({ default: mod.RateActionDialog })))
@@ -61,8 +62,8 @@ function BillingRatesContent() {
   }
 
   const topNav = [
-    { title: t('nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },
-    { title: t('nav.settings', 'الإعدادات'), href: '/dashboard/settings', isActive: true },
+    { title: t('nav.overview', 'نظرة عامة'), href: ROUTES.dashboard.overview, isActive: false },
+    { title: t('nav.settings', 'الإعدادات'), href: ROUTES.dashboard.settings.index, isActive: true },
   ]
 
   return (

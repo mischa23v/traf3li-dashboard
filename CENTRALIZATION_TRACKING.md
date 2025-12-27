@@ -10,36 +10,21 @@
 
 | Category | Total | Done | Remaining |
 |----------|-------|------|-----------|
-| Cache Invalidations | 34 | 0 | 34 |
+| Cache Invalidations | 34 | 34 | ✅ COMPLETE |
 | Hardcoded Routes | 657 | 0 | 657 |
 | Hardcoded Cache Times | 79 | 0 | 79 |
 | Hardcoded Query Keys | 434 | 0 | 434 |
 
 ---
 
-## 🔴 PRIORITY 1: Cache Invalidations (34 remaining in 18 files)
+## ✅ PRIORITY 1: Cache Invalidations - COMPLETE
 
-### Batch A - Cache Invalidations (8 files)
-- [ ] `src/hooks/useAnonymousAuth.ts` (3 occurrences)
-- [ ] `src/hooks/useIntegrations.ts` (3 occurrences)
-- [ ] `src/features/staff/components/staff-reinstate-dialog.tsx` (3 occurrences)
-- [ ] `src/hooks/useReceipt.ts` (2 occurrences)
-- [ ] `src/hooks/usePhoneAuth.ts` (2 occurrences)
-- [ ] `src/hooks/useApps.ts` (2 occurrences)
-- [ ] `src/hooks/useOAuth.ts` (2 occurrences)
-- [ ] `src/features/staff/components/staff-departure-dialog.tsx` (2 occurrences)
+All cache invalidations migrated to `invalidateCache.*` pattern.
 
-### Batch B - Cache Invalidations (8 files)
-- [ ] `src/features/buying/components/material-request-details-view.tsx` (2 occurrences)
-- [ ] `src/hooks/useAuth.ts` (1 occurrence)
-- [ ] `src/hooks/useStepUpAuth.ts` (1 occurrence)
-- [ ] `src/hooks/usePasswordReset.ts` (1 occurrence)
-- [ ] `src/hooks/useEmailVerification.ts` (1 occurrence)
-- [ ] `src/contexts/AuthContext.tsx` (1 occurrence)
-- [ ] `src/features/buying/components/purchase-order-details-view.tsx` (1 occurrence)
-- [ ] `src/features/buying/components/rfq-details-view.tsx` (1 occurrence)
-
-**Note:** `src/lib/api.ts` (3 occurrences) - These are comments/documentation, SKIP
+Remaining 7 occurrences are legitimate:
+- `CompanyContext.tsx` - Complex predicate-based invalidation
+- `mutation-utils.ts` - Generic utility with parameterized queryKey
+- `api.ts` - Documentation/JSDoc examples
 
 ---
 
