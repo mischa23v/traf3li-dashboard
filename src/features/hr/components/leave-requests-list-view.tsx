@@ -249,7 +249,7 @@ export function LeaveRequestsListView() {
     }, [stats])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
         { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
         { title: 'الإجازات', href: ROUTES.dashboard.hr.leave.list, isActive: true },
     ]
@@ -384,7 +384,7 @@ export function LeaveRequestsListView() {
                                         {leaveRequests.length} طلب
                                     </Badge>
                                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
-                                        <Link to="/dashboard/hr/leave/new">
+                                        <Link to={ROUTES.dashboard.hr.leave.new}>
                                             <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                             طلب إجازة
                                         </Link>
@@ -438,7 +438,7 @@ export function LeaveRequestsListView() {
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد طلبات إجازة</h3>
                                         <p className="text-slate-500 mb-4">قدم طلب إجازة جديد للبدء</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                                            <Link to="/dashboard/hr/leave/new">
+                                            <Link to={ROUTES.dashboard.hr.leave.new}>
                                                 <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 طلب إجازة
                                             </Link>

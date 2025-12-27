@@ -195,7 +195,7 @@ export function AssetsSidebar() {
                 </span>
               </div>
               <Button asChild variant="outline" size="sm" className="w-full text-blue-700 border-blue-300 hover:bg-blue-100">
-                <Link to={`${ROUTES.dashboard.assets.list}/depreciation`}>
+                <Link to={ROUTES.dashboard.assets.depreciation.list}>
                   {t('assets.viewDepreciation', 'عرض تفاصيل الإهلاك')}
                 </Link>
               </Button>

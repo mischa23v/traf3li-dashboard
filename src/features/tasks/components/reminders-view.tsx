@@ -317,7 +317,7 @@ export function RemindersView() {
     }, [selectedReminderIds, t, deleteReminder])
 
     const topNav = [
-        { title: t('reminders.nav.overview'), href: '/dashboard/overview', isActive: false },
+        { title: t('reminders.nav.overview'), href: ROUTES.dashboard.overview, isActive: false },
         { title: t('reminders.nav.tasks'), href: ROUTES.dashboard.tasks.list, isActive: false },
         { title: t('reminders.nav.reminders'), href: ROUTES.dashboard.tasks.reminders.list, isActive: true },
         { title: t('reminders.nav.events'), href: ROUTES.dashboard.tasks.events.list, isActive: false },

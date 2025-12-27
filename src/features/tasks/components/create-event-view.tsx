@@ -374,7 +374,7 @@ export function CreateEventView() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
         { title: 'المهام', href: ROUTES.dashboard.tasks.list, isActive: false },
         { title: 'التذكيرات', href: ROUTES.dashboard.tasks.reminders.list, isActive: false },
         { title: 'الأحداث', href: ROUTES.dashboard.tasks.events.list, isActive: true },

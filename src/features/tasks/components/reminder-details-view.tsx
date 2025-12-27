@@ -179,9 +179,9 @@ export function ReminderDetailsView() {
     }, [reminderData])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
         { title: 'المهام', href: ROUTES.dashboard.tasks.list, isActive: false },
-        { title: 'التذكيرات', href: '{ROUTES.dashboard.tasks.reminders.list}', isActive: true },
+        { title: 'التذكيرات', href: ROUTES.dashboard.tasks.reminders.list, isActive: true },
         { title: 'الأحداث', href: ROUTES.dashboard.tasks.events.list, isActive: false },
     ]
 
@@ -265,7 +265,7 @@ export function ReminderDetailsView() {
                             <h4 className="text-lg font-bold text-navy mb-2">لم يتم العثور على التذكير</h4>
                             <p className="text-slate-500 mb-4">التذكير المطلوب غير موجود أو تم حذفه</p>
                             <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
-                                <Link to="{ROUTES.dashboard.tasks.reminders.list}">
+                                <Link to={ROUTES.dashboard.tasks.reminders.list}>
                                     <ArrowLeft className="ms-2 h-4 w-4" />
                                     العودة إلى التذكيرات
                                 </Link>

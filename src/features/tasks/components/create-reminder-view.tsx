@@ -250,7 +250,7 @@ export function CreateReminderView() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
         { title: 'المهام', href: ROUTES.dashboard.tasks.list, isActive: false },
         { title: 'التذكيرات', href: ROUTES.dashboard.tasks.reminders.list, isActive: true },
         { title: 'الأحداث', href: ROUTES.dashboard.tasks.events.list, isActive: false },

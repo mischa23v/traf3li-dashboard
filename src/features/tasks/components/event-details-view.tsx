@@ -146,10 +146,10 @@ export function EventDetailsView() {
     }, [eventData])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
         { title: 'المهام', href: ROUTES.dashboard.tasks.list, isActive: false },
         { title: 'التذكيرات', href: ROUTES.dashboard.tasks.reminders.list, isActive: false },
-        { title: 'الأحداث', href: '{ROUTES.dashboard.tasks.events.list}', isActive: true },
+        { title: 'الأحداث', href: ROUTES.dashboard.tasks.events.list, isActive: true },
     ]
 
     return (
@@ -232,7 +232,7 @@ export function EventDetailsView() {
                             <h4 className="text-lg font-bold text-navy mb-2">لم يتم العثور على الفعالية</h4>
                             <p className="text-slate-500 mb-4">الفعالية المطلوبة غير موجودة أو تم حذفها</p>
                             <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl">
-                                <Link to="{ROUTES.dashboard.tasks.events.list}">
+                                <Link to={ROUTES.dashboard.tasks.events.list}>
                                     <ArrowLeft className="ms-2 h-4 w-4" />
                                     العودة إلى الفعاليات
                                 </Link>
