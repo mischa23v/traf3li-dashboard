@@ -1138,7 +1138,7 @@ export const invalidateCache = {
 
   // Settings
   settings: {
-    all: () => queryClient.invalidateQueries({ queryKey: ['settings'] }),
+    all: () => queryClient.invalidateQueries({ queryKey: ['settings'], refetchType: 'all' }),
     company: () => queryClient.invalidateQueries({ queryKey: ['company-settings'] }),
     finance: () => queryClient.invalidateQueries({ queryKey: ['finance-settings'] }),
     smtp: () => queryClient.invalidateQueries({ queryKey: ['smtp-config'] }),
@@ -1293,6 +1293,24 @@ export const invalidateCache = {
     access: (firmId?: string) => queryClient.invalidateQueries({ queryKey: ['firm', firmId, 'access'] }),
   },
 
+  // Organizations
+  organizations: {
+    all: (options?: { refetchType?: 'all' }) =>
+      queryClient.invalidateQueries({ queryKey: ['organizations'], refetchType: options?.refetchType }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['organizations', 'list'] }),
+    list: (filters?: any) => queryClient.invalidateQueries({ queryKey: ['organizations', 'list', filters] }),
+    details: () => queryClient.invalidateQueries({ queryKey: ['organizations', 'detail'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['organizations', 'detail', id] }),
+    byClient: (clientId: string) => queryClient.invalidateQueries({ queryKey: ['organizations', 'client', clientId] }),
+    search: (query?: string) => queryClient.invalidateQueries({ queryKey: ['organizations', 'search', query] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.organizations.all(),
+        invalidateCache.clients.all(),
+      ])
+    },
+  },
+
   // Conversations & Messages
   conversations: {
     all: () => queryClient.invalidateQueries({ queryKey: ['conversations'], refetchType: 'all' }),
@@ -1336,7 +1354,7 @@ export const invalidateCache = {
 
   // API Keys
   apiKeys: {
-    all: () => queryClient.invalidateQueries({ queryKey: ['api-keys'] }),
+    all: () => queryClient.invalidateQueries({ queryKey: ['api-keys'], refetchType: 'all' }),
     stats: () => queryClient.invalidateQueries({ queryKey: ['api-keys', 'stats'] }),
   },
 
@@ -1549,9 +1567,42 @@ export const invalidateCache = {
     lists: () => queryClient.invalidateQueries({ queryKey: ['vehicle-logs', 'list'] }),
   },
 
-  // Lean
+  // Lean Technologies (Saudi Banking)
   lean: {
     all: () => queryClient.invalidateQueries({ queryKey: ['lean'] }),
+    banks: () => queryClient.invalidateQueries({ queryKey: ['lean', 'banks'] }),
+    customers: () => queryClient.invalidateQueries({ queryKey: ['lean', 'customers'] }),
+    customer: (customerId: string) => queryClient.invalidateQueries({ queryKey: ['lean', 'customers', customerId] }),
+    customerToken: (customerId: string) => queryClient.invalidateQueries({ queryKey: ['lean', 'customers', customerId, 'token'] }),
+    entities: (customerId: string) => queryClient.invalidateQueries({ queryKey: ['lean', 'customers', customerId, 'entities'] }),
+    accounts: (accountId: string) => queryClient.invalidateQueries({ queryKey: ['lean', 'accounts', accountId] }),
+    balance: (accountId: string) => queryClient.invalidateQueries({ queryKey: ['lean', 'accounts', accountId, 'balance'] }),
+    transactions: (accountId: string) => queryClient.invalidateQueries({ queryKey: ['lean', 'accounts', accountId, 'transactions'] }),
+  },
+
+  // WPS (Wage Protection System)
+  wps: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['wps'] }),
+    files: () => queryClient.invalidateQueries({ queryKey: ['wps', 'files'] }),
+    file: (fileId: string) => queryClient.invalidateQueries({ queryKey: ['wps', 'files', fileId] }),
+    sarieBanks: () => queryClient.invalidateQueries({ queryKey: ['wps', 'sarie-banks'] }),
+  },
+
+  // SADAD (Bill Payment System)
+  sadad: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['sadad'] }),
+    billers: () => queryClient.invalidateQueries({ queryKey: ['sadad', 'billers'] }),
+    billersByCategory: (category?: string) => queryClient.invalidateQueries({ queryKey: ['sadad', 'billers', category] }),
+    billerSearch: (query: string) => queryClient.invalidateQueries({ queryKey: ['sadad', 'billers', 'search', query] }),
+    payments: () => queryClient.invalidateQueries({ queryKey: ['sadad', 'payments'] }),
+    payment: (paymentId: string) => queryClient.invalidateQueries({ queryKey: ['sadad', 'payments', paymentId] }),
+  },
+
+  // Mudad (GOSI & Payroll Compliance)
+  mudad: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['mudad'] }),
+    payrolls: () => queryClient.invalidateQueries({ queryKey: ['mudad', 'payrolls'] }),
+    compliance: () => queryClient.invalidateQueries({ queryKey: ['mudad', 'compliance'] }),
   },
 
   // Apps
@@ -2038,6 +2089,24 @@ export const invalidateCache = {
 
   // Global invalidation (use sparingly!)
 
+  // Audit Log
+  auditLog: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['audit-logs'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['audit-logs', 'list'] }),
+    list: (filters?: any) => queryClient.invalidateQueries({ queryKey: ['audit-logs', 'list', filters] }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['audit-logs', 'stats'] }),
+    security: () => queryClient.invalidateQueries({ queryKey: ['audit-logs', 'security'] }),
+    resource: (resource: string, resourceId: string) => queryClient.invalidateQueries({ queryKey: ['audit-logs', 'resource', resource, resourceId] }),
+    user: (userId: string) => queryClient.invalidateQueries({ queryKey: ['audit-logs', 'user', userId] }),
+    failedLogins: () => queryClient.invalidateQueries({ queryKey: ['audit-logs', 'failed-logins'] }),
+    suspicious: () => queryClient.invalidateQueries({ queryKey: ['audit-logs', 'suspicious'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.auditLog.all(),
+      ])
+    },
+  },
+
   // PDFme Templates
   pdfme: {
     all: (options?: { refetchType?: 'all' }) =>
@@ -2049,6 +2118,17 @@ export const invalidateCache = {
     related: async () => {
       await Promise.all([
         invalidateCache.pdfme.all(),
+      ])
+    },
+  },
+
+  // Sessions
+  sessions: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['sessions'] }),
+    list: () => queryClient.invalidateQueries({ queryKey: ['sessions', 'list'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.sessions.all(),
       ])
     },
   },

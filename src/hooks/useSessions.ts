@@ -3,7 +3,7 @@
  * Provides React Query-based hooks for session management
  */
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 
@@ -13,6 +13,8 @@ import {
   revokeAllSessions,
   type Session,
 } from '@/services/sessions.service'
+import { CACHE_TIMES } from '@/config/cache'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // Query keys for sessions
 export const sessionKeys = {
@@ -39,13 +41,12 @@ export function useActiveSessions(enabled = true) {
  */
 export function useRevokeSession() {
   const { t } = useTranslation()
-  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (sessionId: string) => revokeSession(sessionId),
     onSuccess: () => {
       toast.success(t('security.sessions.sessionEnded'))
-      queryClient.invalidateQueries({ queryKey: sessionKeys.list() })
+      invalidateCache.sessions.list()
     },
     onError: (error: any) => {
       toast.error(error.message || t('security.sessions.endSessionError'))
@@ -58,7 +59,6 @@ export function useRevokeSession() {
  */
 export function useRevokeAllSessions() {
   const { t } = useTranslation()
-  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: revokeAllSessions,
@@ -66,7 +66,7 @@ export function useRevokeAllSessions() {
       toast.success(
         t('security.sessions.allSessionsEnded', { count: data.revokedCount })
       )
-      queryClient.invalidateQueries({ queryKey: sessionKeys.list() })
+      invalidateCache.sessions.list()
     },
     onError: (error: any) => {
       toast.error(error.message || t('security.sessions.endAllSessionsError'))

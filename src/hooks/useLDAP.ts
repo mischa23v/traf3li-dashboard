@@ -1,8 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config/cache'
 import ldapService, { LDAPConfigFormData } from '@/services/ldapService'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 /**
  * Hook to fetch LDAP configuration
@@ -31,7 +32,6 @@ export const useLDAPSyncStatus = () => {
  * Hook to save LDAP configuration
  */
 export const useSaveLDAPConfig = () => {
-  const queryClient = useQueryClient()
   const { i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
 
@@ -39,13 +39,10 @@ export const useSaveLDAPConfig = () => {
     mutationFn: (data: LDAPConfigFormData) => ldapService.saveConfig(data),
     onSuccess: () => {
       toast.success(isRTL ? 'تم حفظ إعدادات LDAP بنجاح' : 'LDAP configuration saved successfully')
+      invalidateCache.ldap.config()
     },
     onError: (error: Error) => {
       toast.error(error.message || (isRTL ? 'فشل حفظ إعدادات LDAP' : 'Failed to save LDAP configuration'))
-    },
-    onSettled: async () => {
-      await new Promise(resolve => setTimeout(resolve, 500))
-      await queryClient.invalidateQueries({ queryKey: ['ldap-config'], refetchType: 'all' })
     },
   })
 }
@@ -54,7 +51,6 @@ export const useSaveLDAPConfig = () => {
  * Hook to update LDAP configuration (partial update)
  */
 export const useUpdateLDAPConfig = () => {
-  const queryClient = useQueryClient()
   const { i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
 
@@ -62,13 +58,10 @@ export const useUpdateLDAPConfig = () => {
     mutationFn: (data: Partial<LDAPConfigFormData>) => ldapService.updateConfig(data),
     onSuccess: () => {
       toast.success(isRTL ? 'تم تحديث إعدادات LDAP بنجاح' : 'LDAP configuration updated successfully')
+      invalidateCache.ldap.config()
     },
     onError: (error: Error) => {
       toast.error(error.message || (isRTL ? 'فشل تحديث إعدادات LDAP' : 'Failed to update LDAP configuration'))
-    },
-    onSettled: async () => {
-      await new Promise(resolve => setTimeout(resolve, 500))
-      await queryClient.invalidateQueries({ queryKey: ['ldap-config'], refetchType: 'all' })
     },
   })
 }
@@ -121,7 +114,6 @@ export const useTestLDAPUserLookup = () => {
  * Hook to sync LDAP users
  */
 export const useSyncLDAPUsers = () => {
-  const queryClient = useQueryClient()
   const { i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
 
@@ -129,13 +121,10 @@ export const useSyncLDAPUsers = () => {
     mutationFn: () => ldapService.syncUsers(),
     onSuccess: (data) => {
       toast.success(isRTL ? data.messageAr : data.message)
+      invalidateCache.ldap.syncStatus()
     },
     onError: (error: Error) => {
       toast.error(error.message || (isRTL ? 'فشلت مزامنة المستخدمين' : 'User sync failed'))
-    },
-    onSettled: async () => {
-      await new Promise(resolve => setTimeout(resolve, 500))
-      await queryClient.invalidateQueries({ queryKey: ['ldap-sync-status'], refetchType: 'all' })
     },
   })
 }
@@ -144,7 +133,6 @@ export const useSyncLDAPUsers = () => {
  * Hook to delete LDAP configuration
  */
 export const useDeleteLDAPConfig = () => {
-  const queryClient = useQueryClient()
   const { i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
 
@@ -152,13 +140,10 @@ export const useDeleteLDAPConfig = () => {
     mutationFn: () => ldapService.deleteConfig(),
     onSuccess: () => {
       toast.success(isRTL ? 'تم حذف إعدادات LDAP بنجاح' : 'LDAP configuration deleted successfully')
+      invalidateCache.ldap.config()
     },
     onError: (error: Error) => {
       toast.error(error.message || (isRTL ? 'فشل حذف إعدادات LDAP' : 'Failed to delete LDAP configuration'))
-    },
-    onSettled: async () => {
-      await new Promise(resolve => setTimeout(resolve, 500))
-      await queryClient.invalidateQueries({ queryKey: ['ldap-config'], refetchType: 'all' })
     },
   })
 }

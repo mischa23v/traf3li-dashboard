@@ -4,10 +4,11 @@
  * Provides hooks for logging actions and querying audit logs
  */
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { CACHE_TIMES } from '@/config/cache'
 import { useAuthStore } from '@/stores/auth-store'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import auditService, {
   AuditLogEntry,
   AuditLogFilters,
@@ -39,14 +40,12 @@ export const auditKeys = {
  * Usage: const { mutate: logEvent } = useLogAuditEvent()
  */
 export const useLogAuditEvent = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (entry: Omit<AuditLogEntry, 'id' | '_id' | 'timestamp'>) =>
       auditService.logAuditEvent(entry),
     onSuccess: () => {
       // Invalidate audit log queries to refetch latest data
-      queryClient.invalidateQueries({ queryKey: auditKeys.all })
+      invalidateCache.auditLog.all()
     },
     onError: (error: Error) => {
       // Silent fail for audit logs - don't disrupt user experience
@@ -60,13 +59,11 @@ export const useLogAuditEvent = () => {
  * Usage: const { mutate: logBatch } = useLogAuditEventsBatch()
  */
 export const useLogAuditEventsBatch = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (entries: Array<Omit<AuditLogEntry, 'id' | '_id' | 'timestamp'>>) =>
       auditService.logAuditEventsBatch(entries),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: auditKeys.all })
+      invalidateCache.auditLog.all()
     },
     onError: (error: Error) => {
       console.error('[Audit] Failed to log batch events:', error.message)

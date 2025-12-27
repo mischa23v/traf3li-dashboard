@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config/cache'
 import settingsService, {
   UpdateAccountSettings,
@@ -7,6 +7,7 @@ import settingsService, {
   UpdateNotificationSettings,
 } from '@/services/settingsService'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 export const useSettings = () => {
   return useQuery({
@@ -17,8 +18,6 @@ export const useSettings = () => {
 }
 
 export const useUpdateAccountSettings = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: UpdateAccountSettings) =>
       settingsService.updateAccountSettings(data),
@@ -32,14 +31,12 @@ export const useUpdateAccountSettings = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['settings'], refetchType: 'all' })
+      await invalidateCache.settings.all()
     },
   })
 }
 
 export const useUpdateAppearanceSettings = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: UpdateAppearanceSettings) =>
       settingsService.updateAppearanceSettings(data),
@@ -53,14 +50,12 @@ export const useUpdateAppearanceSettings = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['settings'], refetchType: 'all' })
+      await invalidateCache.settings.all()
     },
   })
 }
 
 export const useUpdateDisplaySettings = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: UpdateDisplaySettings) =>
       settingsService.updateDisplaySettings(data),
@@ -74,14 +69,12 @@ export const useUpdateDisplaySettings = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['settings'], refetchType: 'all' })
+      await invalidateCache.settings.all()
     },
   })
 }
 
 export const useUpdateNotificationSettings = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: UpdateNotificationSettings) =>
       settingsService.updateNotificationSettings(data),
@@ -95,7 +88,7 @@ export const useUpdateNotificationSettings = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['settings'], refetchType: 'all' })
+      await invalidateCache.settings.all()
     },
   })
 }

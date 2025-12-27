@@ -7,6 +7,7 @@ import organizationsService, {
 } from '@/services/organizationsService'
 import { toast } from '@/hooks/use-toast'
 import { useTranslation } from 'react-i18next'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ==================== Cache Configuration ====================
 const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
@@ -105,7 +106,7 @@ export const useCreateOrganization = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: organizationsKeys.all, refetchType: 'all' })
+      return await invalidateCache.organizations.all({ refetchType: 'all' })
     },
   })
 }
@@ -132,8 +133,8 @@ export const useUpdateOrganization = () => {
       })
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: organizationsKeys.all })
-      return await queryClient.invalidateQueries({ queryKey: organizationsKeys.detail(id) })
+      await invalidateCache.organizations.all()
+      return await invalidateCache.organizations.detail(id)
     },
   })
 }
@@ -176,7 +177,7 @@ export const useDeleteOrganization = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: organizationsKeys.all, refetchType: 'all' })
+      return await invalidateCache.organizations.all({ refetchType: 'all' })
     },
   })
 }
@@ -219,7 +220,7 @@ export const useBulkDeleteOrganizations = () => {
     onSettled: async () => {
       // Delay to allow DB propagation
       await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: organizationsKeys.all, refetchType: 'all' })
+      return await invalidateCache.organizations.all({ refetchType: 'all' })
     },
   })
 }
