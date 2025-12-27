@@ -20,7 +20,8 @@
     "test:all": "npm run test:run && npm run test:e2e",
     "test:console": "node check-console.mjs",
     "test:console-playwright": "playwright test console-check.spec.ts --reporter=list",
-    "audit:console": "node scripts/console-audit.js"
+    "audit:console": "node scripts/console-audit.js",
+    "scan:gaps": "npx tsx scripts/scan-centralization-gaps.ts"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.51.0",
