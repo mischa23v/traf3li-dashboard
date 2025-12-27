@@ -586,6 +586,14 @@ const authService = {
         userId: user._id,
       })
 
+      // Ensure CSRF token is available for authenticated session
+      // This helps when restoring session on page refresh
+      if (!document.cookie.includes('csrfToken=')) {
+        refreshCsrfToken().catch((err) => {
+          console.warn('[AUTH] CSRF token initialization on session restore failed:', err)
+        })
+      }
+
       return user
     } catch (error: any) {
       const cachedUser = authService.getCachedUser()
