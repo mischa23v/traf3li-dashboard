@@ -7,6 +7,7 @@ import React, { createContext, useContext, useCallback, useMemo, useEffect, useS
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import companyService, { type Company, type UserCompanyAccess } from '@/services/companyService'
 import { toast } from 'sonner'
+import { CACHE_TIMES } from '@/config/cache'
 
 // ==================== TYPES ====================
 
@@ -74,7 +75,7 @@ export function CompanyProvider({ children }: CompanyProviderProps) {
     queryKey: ['firm', 'active'],
     queryFn: () => companyService.getActiveCompany(),
     retry: 1,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 
   // Fetch accessible companies
@@ -85,7 +86,7 @@ export function CompanyProvider({ children }: CompanyProviderProps) {
   } = useQuery({
     queryKey: ['firms', 'accessible'],
     queryFn: () => companyService.getUserAccessibleCompanies(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
 
   // Switch company mutation

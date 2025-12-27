@@ -246,7 +246,7 @@ export function BiometricListView() {
     }, [deviceStats])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
         { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
         { title: 'الأجهزة البيومترية', href: ROUTES.dashboard.hr.biometric.list, isActive: true },
         { title: 'الإجازات', href: ROUTES.dashboard.hr.leave.list, isActive: false },
@@ -441,7 +441,7 @@ export function BiometricListView() {
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">لا يوجد أجهزة</h3>
                                         <p className="text-slate-500 mb-4">ابدأ بإضافة جهاز بيومتري جديد</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                                            <Link to="/dashboard/hr/biometric/new">
+                                            <Link to={ROUTES.dashboard.hr.biometric.new}>
                                                 <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 إضافة جهاز
                                             </Link>

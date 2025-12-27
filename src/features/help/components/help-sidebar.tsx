@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { ROUTES } from '@/constants/routes'
 
 interface HelpSidebarProps {
     context?: 'center' | 'tickets' | 'docs'
@@ -23,17 +24,17 @@ export function HelpSidebar({ context }: HelpSidebarProps) {
     const links = {
         'center': {
             title: isRTL ? 'مركز المساعدة' : 'Help Center',
-            href: '/dashboard/help',
+            href: ROUTES.dashboard.help,
             icon: HelpCircle
         },
         'tickets': {
             title: isRTL ? 'تذاكر الدعم' : 'Support Tickets',
-            href: '/dashboard/help/tickets',
+            href: '/dashboard/help/tickets', // TODO: Add to ROUTES
             icon: Ticket
         },
         'docs': {
             title: isRTL ? 'الوثائق' : 'Documentation',
-            href: '/dashboard/help/docs',
+            href: '/dashboard/help/docs', // TODO: Add to ROUTES
             icon: Book
         }
     }

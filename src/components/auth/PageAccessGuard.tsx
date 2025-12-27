@@ -14,6 +14,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Lock, ArrowRight, Mail, Home, RefreshCw } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ROUTES } from '@/constants/routes'
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES
@@ -66,7 +67,7 @@ function LockScreen({ title, message, showRequestAccess, redirectPath }: LockScr
   }
 
   const handleGoHome = () => {
-    navigate({ to: redirectPath || '/dashboard', replace: true })
+    navigate({ to: redirectPath || ROUTES.dashboard.overview, replace: true })
   }
 
   const handleRequestAccess = () => {
@@ -150,7 +151,7 @@ function AccessDenied() {
       </p>
       <Button
         variant="outline"
-        onClick={() => navigate({ to: '/dashboard' })}
+        onClick={() => navigate({ to: ROUTES.dashboard.overview })}
       >
         {t('access.goToDashboard')}
       </Button>

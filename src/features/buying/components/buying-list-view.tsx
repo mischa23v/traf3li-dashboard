@@ -196,7 +196,7 @@ export function BuyingListView() {
                     </SelectContent>
                   </Select>
                   <Button asChild className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
-                    <Link to="/dashboard/buying/suppliers/create">
+                    <Link to={ROUTES.dashboard.buying.suppliers.new}>
                       <Plus className="w-4 h-4 ml-2" />
                       {t('buying.addSupplier', 'إضافة مورد')}
                     </Link>
@@ -224,7 +224,7 @@ export function BuyingListView() {
                     <h3 className="text-lg font-medium mb-2">{t('buying.noSuppliers', 'لا يوجد موردين')}</h3>
                     <p className="text-muted-foreground mb-4">{t('buying.noSuppliersDesc', 'ابدأ بإضافة مورد جديد')}</p>
                     <Button asChild className="rounded-xl">
-                      <Link to="/dashboard/buying/suppliers/create">
+                      <Link to={ROUTES.dashboard.buying.suppliers.new}>
                         <Plus className="w-4 h-4 ml-2" />
                         {t('buying.addSupplier', 'إضافة مورد')}
                       </Link>
@@ -246,7 +246,7 @@ export function BuyingListView() {
                         <TableRow
                           key={supplier._id}
                           className="cursor-pointer hover:bg-muted/50"
-                          onClick={() => navigate({ to: `/dashboard/buying/suppliers/${supplier._id}` })}
+                          onClick={() => navigate({ to: ROUTES.dashboard.buying.suppliers.detail(supplier._id) })}
                         >
                           <TableCell>
                             <div className="flex items-center gap-3">
@@ -272,14 +272,14 @@ export function BuyingListView() {
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation()
-                                  navigate({ to: `/dashboard/buying/suppliers/${supplier._id}` })
+                                  navigate({ to: ROUTES.dashboard.buying.suppliers.detail(supplier._id) })
                                 }}>
                                   <Eye className="w-4 h-4 ml-2" />
                                   {t('common.view', 'عرض')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation()
-                                  navigate({ to: `/dashboard/buying/suppliers/${supplier._id}/edit` })
+                                  navigate({ to: ROUTES.dashboard.buying.suppliers.edit(supplier._id) })
                                 }}>
                                   <Edit className="w-4 h-4 ml-2" />
                                   {t('common.edit', 'تعديل')}

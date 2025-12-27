@@ -81,7 +81,7 @@ export function TasksReportsDetailsView() {
   const resumeMutation = useResumeSchedule()
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+    { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
     { title: 'المهام', href: ROUTES.dashboard.tasks.list, isActive: false },
     { title: 'تقارير الإنتاجية', href: ROUTES.dashboard.tasks.reports.list, isActive: true },
   ]

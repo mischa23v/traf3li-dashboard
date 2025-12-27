@@ -453,7 +453,7 @@ export function useSidebarData(): SidebarData {
             },
             {
               title: 'sidebar.nav.purchaseReceipts',
-              url: '/dashboard/buying/purchase-receipts',
+              url: ROUTES.dashboard.buying.purchaseReceipts.list,
             },
             {
               title: 'sidebar.nav.rfqs',
@@ -488,7 +488,7 @@ export function useSidebarData(): SidebarData {
             },
             {
               title: 'sidebar.nav.productionPlans',
-              url: '/dashboard/manufacturing/production-plans',
+              url: ROUTES.dashboard.manufacturing.productionPlans.list,
             },
           ],
         },
@@ -515,7 +515,7 @@ export function useSidebarData(): SidebarData {
             },
             {
               title: 'sidebar.nav.ncrs',
-              url: '/dashboard/quality/ncrs',
+              url: ROUTES.dashboard.quality.ncrs.list,
             },
           ],
         },
@@ -538,7 +538,7 @@ export function useSidebarData(): SidebarData {
             },
             {
               title: 'sidebar.nav.depreciation',
-              url: '/dashboard/assets/depreciation',
+              url: ROUTES.dashboard.assets.depreciation.list,
             },
             {
               title: 'sidebar.nav.assetMaintenance',
@@ -546,7 +546,7 @@ export function useSidebarData(): SidebarData {
             },
             {
               title: 'sidebar.nav.assetMovements',
-              url: '/dashboard/assets/movements',
+              url: ROUTES.dashboard.assets.movements.list,
             },
           ],
         },
@@ -569,7 +569,7 @@ export function useSidebarData(): SidebarData {
             },
             {
               title: 'sidebar.nav.subcontractingBoms',
-              url: '/dashboard/subcontracting/boms',
+              url: ROUTES.dashboard.subcontracting.boms.list,
             },
           ],
         },
@@ -843,15 +843,15 @@ export function useSidebarData(): SidebarData {
           items: [
             {
               title: 'sidebar.nav.laws',
-              url: ROUTES.dashboard.knowledge.laws,
+              url: ROUTES.dashboard.knowledge.laws.list,
             },
             {
               title: 'sidebar.nav.judgments',
-              url: ROUTES.dashboard.knowledge.judgments,
+              url: ROUTES.dashboard.knowledge.judgments.list,
             },
             {
               title: 'sidebar.nav.forms',
-              url: ROUTES.dashboard.knowledge.forms,
+              url: ROUTES.dashboard.knowledge.forms.list,
             },
           ],
         },

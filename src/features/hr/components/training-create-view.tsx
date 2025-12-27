@@ -331,7 +331,7 @@ export function TrainingCreateView() {
   }
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+    { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
     { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
     { title: 'التدريب', href: ROUTES.dashboard.hr.training.list, isActive: true },
   ]

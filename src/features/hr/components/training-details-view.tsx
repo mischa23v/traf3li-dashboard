@@ -76,7 +76,7 @@ export function TrainingDetailsView() {
   const [showEvaluationDialog, setShowEvaluationDialog] = useState(false)
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+    { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
     { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
     { title: 'التدريب', href: ROUTES.dashboard.hr.training.list, isActive: true },
   ]
@@ -272,7 +272,7 @@ export function TrainingDetailsView() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/training/new?editId=${training._id}` })}>
+                    <DropdownMenuItem onClick={() => navigate({ to: ROUTES.dashboard.hr.training.new, search: { editId: training._id } })}>
                       <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                       تعديل
                     </DropdownMenuItem>

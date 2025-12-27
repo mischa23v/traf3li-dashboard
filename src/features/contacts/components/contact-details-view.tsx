@@ -60,6 +60,7 @@ import { ClientsSidebar } from '@/features/clients/components/clients-sidebar'
 import { SmartButton, SmartButtonGroup, getSmartButtons, resolveNavigationPath } from '@/components/smart-button'
 import { useSmartButtonCounts } from '@/hooks/useSmartButtonCounts'
 import { useTranslation } from 'react-i18next'
+import { ROUTES } from '@/constants/routes'
 
 const CONTACT_TYPE_LABELS: Record<string, string> = {
   individual: 'فرد',
@@ -126,7 +127,7 @@ export function ContactDetailsView() {
   const handleDelete = () => {
     deleteContactMutation.mutate(contactId, {
       onSuccess: () => {
-        navigate({ to: '/dashboard/contacts' })
+        navigate({ to: ROUTES.dashboard.contacts.list })
       },
     })
   }
@@ -142,9 +143,9 @@ export function ContactDetailsView() {
     : ''
 
   const topNav = [
-    { title: 'جهات الاتصال', href: '/dashboard/contacts', isActive: true },
-    { title: 'العملاء', href: '/dashboard/clients', isActive: false },
-    { title: 'المنظمات', href: '/dashboard/organizations', isActive: false },
+    { title: 'جهات الاتصال', href: ROUTES.dashboard.contacts.list, isActive: true },
+    { title: 'العملاء', href: ROUTES.dashboard.clients.list, isActive: false },
+    { title: 'المنظمات', href: ROUTES.dashboard.organizations.list, isActive: false },
   ]
 
   return (
@@ -191,7 +192,7 @@ export function ContactDetailsView() {
         {/* Breadcrumb / Back Link */}
         <div className="mb-6">
           <Link
-            to="/dashboard/contacts"
+            to={ROUTES.dashboard.contacts.list}
             className="inline-flex items-center text-slate-500 hover:text-navy transition-colors"
           >
             <ArrowLeft className="h-4 w-4 ms-2" />
@@ -252,7 +253,7 @@ export function ContactDetailsView() {
               لم يتم العثور على جهة الاتصال المطلوبة
             </p>
             <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-              <Link to="/dashboard/contacts">العودة إلى القائمة</Link>
+              <Link to={ROUTES.dashboard.contacts.list}>العودة إلى القائمة</Link>
             </Button>
           </div>
         )}
@@ -269,7 +270,7 @@ export function ContactDetailsView() {
               hideButtons={true}
             >
               <div className="flex flex-wrap gap-3">
-                <Link to={`/dashboard/contacts/${contactId}/edit`}>
+                <Link to={`${ROUTES.dashboard.contacts.detail(contactId)}/edit`}>
                   <Button
                     variant="outline"
                     className="border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm"

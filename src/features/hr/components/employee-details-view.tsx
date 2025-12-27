@@ -104,9 +104,9 @@ export function EmployeeDetailsView() {
     }, [employeeData])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
         { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: true },
-        { title: 'الرواتب', href: '/dashboard/hr/salaries', isActive: false },
+        { title: 'الرواتب', href: ROUTES.dashboard.hr.salaries.list, isActive: false },
         { title: 'الإجازات', href: ROUTES.dashboard.hr.leave.list, isActive: false },
     ]
 
@@ -183,7 +183,7 @@ export function EmployeeDetailsView() {
                         <h3 className="text-lg font-bold text-slate-900 mb-2">الموظف غير موجود</h3>
                         <p className="text-slate-500 mb-4">لم يتم العثور على الموظف المطلوب</p>
                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                            <Link to="/dashboard/hr/employees">
+                            <Link to={ROUTES.dashboard.hr.employees.list}>
                                 العودة إلى القائمة
                             </Link>
                         </Button>

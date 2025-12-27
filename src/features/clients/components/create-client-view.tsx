@@ -53,6 +53,7 @@ import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { ROUTES } from '@/constants/routes'
 import { ClientsSidebar } from '@/features/clients/components/clients-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useCreateClient } from '@/hooks/useClients'
@@ -564,7 +565,7 @@ export function CreateClientView() {
 
         createClient(clientData as any, {
             onSuccess: () => {
-                navigate({ to: '/dashboard/clients' })
+                navigate({ to: ROUTES.dashboard.clients.list })
             },
             onError: (error) => {
                 handleApiError(error)
@@ -573,10 +574,10 @@ export function CreateClientView() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'العملاء', href: '/dashboard/clients', isActive: true },
-        { title: 'القضايا', href: '/dashboard/cases', isActive: false },
-        { title: 'المالية', href: '/dashboard/finance/overview', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
+        { title: 'العملاء', href: ROUTES.dashboard.clients.list, isActive: true },
+        { title: 'القضايا', href: ROUTES.dashboard.cases.list, isActive: false },
+        { title: 'المالية', href: ROUTES.dashboard.finance.overview, isActive: false },
     ]
 
     // Verification badge component
@@ -1845,7 +1846,7 @@ export function CreateClientView() {
 
                             {/* ACTION BUTTONS */}
                             <div className="flex justify-between items-center pt-6 border-t border-slate-100">
-                                <Link to="/dashboard/clients">
+                                <Link to={ROUTES.dashboard.clients.list}>
                                     <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-700 rounded-xl">
                                         <X className="ms-2 h-4 w-4" aria-hidden="true" />
                                         إلغاء

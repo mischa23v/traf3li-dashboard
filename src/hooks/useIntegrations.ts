@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config/cache'
 import integrationsService, {
   Integration,
@@ -8,6 +8,7 @@ import integrationsService, {
 } from '@/services/integrationsService'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 /**
  * Helper to extract bilingual error message from error object
@@ -82,7 +83,6 @@ export const useIntegrationStatus = (id: string) => {
  * Hook to connect an integration
  */
 export const useConnectIntegration = () => {
-  const queryClient = useQueryClient()
   const { t, i18n } = useTranslation()
 
   return useMutation({
@@ -96,7 +96,7 @@ export const useConnectIntegration = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 500))
-      await queryClient.invalidateQueries({ queryKey: ['integrations'], refetchType: 'all' })
+      await invalidateCache.integrations.all()
     },
   })
 }
@@ -105,7 +105,6 @@ export const useConnectIntegration = () => {
  * Hook to disconnect an integration
  */
 export const useDisconnectIntegration = () => {
-  const queryClient = useQueryClient()
   const { t, i18n } = useTranslation()
 
   return useMutation({
@@ -119,7 +118,7 @@ export const useDisconnectIntegration = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 500))
-      await queryClient.invalidateQueries({ queryKey: ['integrations'], refetchType: 'all' })
+      await invalidateCache.integrations.all()
     },
   })
 }
@@ -128,7 +127,6 @@ export const useDisconnectIntegration = () => {
  * Hook to update integration settings
  */
 export const useUpdateIntegrationSettings = () => {
-  const queryClient = useQueryClient()
   const { t, i18n } = useTranslation()
 
   return useMutation({
@@ -143,7 +141,7 @@ export const useUpdateIntegrationSettings = () => {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 500))
-      await queryClient.invalidateQueries({ queryKey: ['integrations'], refetchType: 'all' })
+      await invalidateCache.integrations.all()
     },
   })
 }

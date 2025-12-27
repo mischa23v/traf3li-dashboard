@@ -194,7 +194,7 @@ export function TasksReportsCreateView() {
   }
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+    { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
     { title: 'المهام', href: ROUTES.dashboard.tasks.list, isActive: false },
     { title: 'التقارير', href: ROUTES.dashboard.tasks.reports.list, isActive: true },
   ]

@@ -39,7 +39,8 @@ import { formatCurrency } from '@/lib/currency'
 import { toast } from 'sonner'
 import journalEntryService, { type CreateJournalEntryData } from '@/services/journalEntryService'
 import { useAccounts } from '@/hooks/useAccounting'
-import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 
@@ -55,7 +56,6 @@ export default function CreateJournalEntryView() {
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
 
   // Form state
   const [transactionDate, setTransactionDate] = useState(format(new Date(), 'yyyy-MM-dd'))
@@ -82,7 +82,7 @@ export default function CreateJournalEntryView() {
   const createMutation = useMutation({
     mutationFn: (data: CreateJournalEntryData) => journalEntryService.createEntry(data),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['journal-entries'] })
+      invalidateCache.finance.journalEntries()
       toast.success(t('journal.created', 'Journal entry created successfully'))
       navigate({ to: `/dashboard/finance/journal-entries/${data._id}` })
     },
@@ -100,7 +100,7 @@ export default function CreateJournalEntryView() {
         description,
       }),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['journal-entries'] })
+      invalidateCache.finance.journalEntries()
       toast.success(t('journal.createdFromTemplate', 'Entry created from template'))
       navigate({ to: `/dashboard/finance/journal-entries/${data._id}` })
     },

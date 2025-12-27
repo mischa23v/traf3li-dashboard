@@ -207,7 +207,7 @@ export function PayrollListView() {
     }, [stats])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
         { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
         { title: 'قسائم الرواتب', href: ROUTES.dashboard.hr.payroll.list, isActive: true },
     ]
@@ -352,7 +352,7 @@ export function PayrollListView() {
                                         {salarySlips.length} قسيمة
                                     </Badge>
                                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
-                                        <Link to="/dashboard/hr/payroll/new">
+                                        <Link to={ROUTES.dashboard.hr.payroll.new}>
                                             <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                             إنشاء قسيمة
                                         </Link>
@@ -406,7 +406,7 @@ export function PayrollListView() {
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد قسائم رواتب</h3>
                                         <p className="text-slate-500 mb-4">ابدأ بإنشاء قسيمة راتب جديدة</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                                            <Link to="/dashboard/hr/payroll/new">
+                                            <Link to={ROUTES.dashboard.hr.payroll.new}>
                                                 <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 إنشاء قسيمة
                                             </Link>

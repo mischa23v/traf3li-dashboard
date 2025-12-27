@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { ROUTES } from '@/constants/routes'
 
 interface DataExportSidebarProps {
     context?: 'export' | 'import' | 'history'
@@ -22,17 +23,17 @@ export function DataExportSidebar({ context }: DataExportSidebarProps) {
     const links = {
         'export': {
             title: isRTL ? 'تصدير البيانات' : 'Export Data',
-            href: '/dashboard/data-export',
+            href: ROUTES.dashboard.dataExport.list,
             icon: Download
         },
         'import': {
             title: isRTL ? 'استيراد البيانات' : 'Import Data',
-            href: '/dashboard/data-export/import',
+            href: '/dashboard/data-export/import', // TODO: Add to ROUTES
             icon: Upload
         },
         'history': {
             title: isRTL ? 'سجل العمليات' : 'Job History',
-            href: '/dashboard/data-export/history',
+            href: '/dashboard/data-export/history', // TODO: Add to ROUTES
             icon: History
         }
     }

@@ -40,6 +40,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { ROUTES } from '@/constants/routes'
 
 export function CaseNotionListView() {
     const { t, i18n } = useTranslation()
@@ -151,18 +152,18 @@ export function CaseNotionListView() {
 
     // Single case actions
     const handleViewCase = (caseId: string) => {
-        navigate({ to: `/dashboard/cases/${caseId}` as any })
+        navigate({ to: ROUTES.dashboard.cases.detail(caseId) })
     }
 
     const handleOpenNotion = (caseId: string) => {
-        navigate({ to: `/dashboard/cases/${caseId}/notion` as any })
+        navigate({ to: ROUTES.dashboard.cases.notion(caseId) })
     }
 
     const topNav = [
-        { title: t('caseNotion.nav.overview', 'نظرة عامة'), href: '/dashboard/overview', isActive: false },
-        { title: t('caseNotion.nav.tasks', 'المهام'), href: '/dashboard/tasks/list', isActive: false },
-        { title: t('caseNotion.nav.cases', 'القضايا'), href: '/dashboard/cases', isActive: false },
-        { title: t('caseNotion.nav.brainstorm', 'العصف الذهني'), href: '/dashboard/notion', isActive: true },
+        { title: t('caseNotion.nav.overview', 'نظرة عامة'), href: ROUTES.dashboard.overview, isActive: false },
+        { title: t('caseNotion.nav.tasks', 'المهام'), href: ROUTES.dashboard.tasks.list, isActive: false },
+        { title: t('caseNotion.nav.cases', 'القضايا'), href: ROUTES.dashboard.cases.list, isActive: false },
+        { title: t('caseNotion.nav.brainstorm', 'العصف الذهني'), href: ROUTES.dashboard.notion, isActive: true },
     ]
 
     // Get status badge style
@@ -336,7 +337,7 @@ export function CaseNotionListView() {
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">{t('caseNotion.list.noCases', 'لا توجد قضايا')}</h3>
                                         <p className="text-slate-500 mb-4">{t('caseNotion.list.noCasesDescription', 'أنشئ قضية جديدة لبدء العصف الذهني')}</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                                            <Link to="/dashboard/cases/create">
+                                            <Link to={ROUTES.dashboard.cases.new}>
                                                 <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 {t('caseNotion.list.newCase', 'قضية جديدة')}
                                             </Link>
@@ -398,7 +399,7 @@ export function CaseNotionListView() {
                                                         {t('caseNotion.list.viewCase', 'عرض القضية')}
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
-                                                    <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/cases/${caseItem.id}/edit` as any })}>
+                                                    <DropdownMenuItem onClick={() => navigate({ to: ROUTES.dashboard.cases.detail(caseItem.id) })}>
                                                         <Edit3 className="h-4 w-4 ms-2 text-blue-500" />
                                                         {t('caseNotion.list.editCase', 'تعديل القضية')}
                                                     </DropdownMenuItem>
@@ -429,7 +430,7 @@ export function CaseNotionListView() {
                                                     <div className="text-xs text-slate-500">{caseItem.createdAtFormatted.english}</div>
                                                 </div>
                                             </div>
-                                            <Link to={`/dashboard/cases/${caseItem.id}/notion` as any}>
+                                            <Link to={ROUTES.dashboard.cases.notion(caseItem.id)}>
                                                 <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl px-6 shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.02]">
                                                     <Lightbulb className="h-4 w-4 ms-2" />
                                                     {t('caseNotion.list.openWorkspace', 'فتح مساحة العمل')}
@@ -442,7 +443,7 @@ export function CaseNotionListView() {
 
                             <div className="p-4 pt-0 text-center">
                                 <Button asChild variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
-                                    <Link to="/dashboard/cases">
+                                    <Link to={ROUTES.dashboard.cases.list}>
                                         {t('caseNotion.list.viewAllCases', 'عرض جميع القضايا')}
                                         <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
                                     </Link>

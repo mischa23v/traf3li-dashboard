@@ -417,7 +417,7 @@ export function ReceiptListView() {
                             <TableRow
                               key={receipt._id}
                               className="cursor-pointer hover:bg-muted/50"
-                              onClick={() => navigate({ to: ROUTES.dashboard.subcontracting.receipts.list + `/${receipt._id}` })}
+                              onClick={() => navigate({ to: ROUTES.dashboard.subcontracting.receipts.detail(receipt._id) })}
                             >
                               <TableCell>
                                 <div className="flex items-center gap-3">
@@ -470,7 +470,7 @@ export function ReceiptListView() {
                                     <DropdownMenuItem
                                       onClick={(e) => {
                                         e.stopPropagation()
-                                        navigate({ to: ROUTES.dashboard.subcontracting.receipts.list + `/${receipt._id}` })
+                                        navigate({ to: ROUTES.dashboard.subcontracting.receipts.detail(receipt._id) })
                                       }}
                                     >
                                       <Eye className="w-4 h-4 ml-2" />
@@ -481,7 +481,7 @@ export function ReceiptListView() {
                                         <DropdownMenuItem
                                           onClick={(e) => {
                                             e.stopPropagation()
-                                            navigate({ to: ROUTES.dashboard.subcontracting.receipts.list + `/${receipt._id}/edit` })
+                                            navigate({ to: ROUTES.dashboard.subcontracting.receipts.edit(receipt._id) })
                                           }}
                                         >
                                           <Edit className="w-4 h-4 ml-2" />

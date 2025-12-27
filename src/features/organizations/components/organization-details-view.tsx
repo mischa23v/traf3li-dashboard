@@ -44,6 +44,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ClientsSidebar } from '@/features/clients/components/clients-sidebar'
 import { useTranslation } from 'react-i18next'
+import { ROUTES } from '@/constants/routes'
 
 const ORG_TYPE_LABELS: Record<string, string> = {
   llc: 'شركة ذات مسؤولية محدودة',
@@ -98,7 +99,7 @@ export function OrganizationDetailsView() {
   const handleDelete = () => {
     deleteOrgMutation.mutate(organizationId, {
       onSuccess: () => {
-        navigate({ to: '/dashboard/organizations' })
+        navigate({ to: ROUTES.dashboard.organizations.list })
       },
     })
   }
@@ -112,9 +113,9 @@ export function OrganizationDetailsView() {
     : ''
 
   const topNav = [
-    { title: 'جهات الاتصال', href: '/dashboard/contacts', isActive: false },
-    { title: 'العملاء', href: '/dashboard/clients', isActive: false },
-    { title: 'المنظمات', href: '/dashboard/organizations', isActive: true },
+    { title: 'جهات الاتصال', href: ROUTES.dashboard.contacts.list, isActive: false },
+    { title: 'العملاء', href: ROUTES.dashboard.clients.list, isActive: false },
+    { title: 'المنظمات', href: ROUTES.dashboard.organizations.list, isActive: true },
   ]
 
   const getConflictIcon = (status: string) => {
@@ -149,7 +150,7 @@ export function OrganizationDetailsView() {
 
       <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
         <div className="mb-6">
-          <Link to="/dashboard/organizations" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
+          <Link to={ROUTES.dashboard.organizations.list} className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
             <ArrowLeft className="h-4 w-4 ms-2" />
             العودة إلى قائمة المنظمات
           </Link>
@@ -188,7 +189,7 @@ export function OrganizationDetailsView() {
             <h3 className="text-lg font-bold text-slate-900 mb-2">المنظمة غير موجودة</h3>
             <p className="text-slate-500 mb-4">لم يتم العثور على المنظمة المطلوبة</p>
             <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-              <Link to="/dashboard/organizations">العودة إلى القائمة</Link>
+              <Link to={ROUTES.dashboard.organizations.list}>العودة إلى القائمة</Link>
             </Button>
           </div>
         )}

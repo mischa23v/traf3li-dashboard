@@ -102,7 +102,7 @@ export function BenefitsDetailsView() {
   const [terminationDate, setTerminationDate] = useState('')
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+    { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
     { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
     { title: 'المزايا', href: ROUTES.dashboard.hr.benefits.list, isActive: true },
   ]
@@ -243,7 +243,7 @@ export function BenefitsDetailsView() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/benefits/new?editId=${benefit._id}` })}>
+                    <DropdownMenuItem onClick={() => navigate({ to: `${ROUTES.dashboard.hr.benefits.new}?editId=${benefit._id}` })}>
                       <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                       تعديل
                     </DropdownMenuItem>

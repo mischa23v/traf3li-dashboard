@@ -36,11 +36,12 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 import { useQualitySettings, useUpdateQualitySettings } from '@/hooks/use-quality'
 import { QualitySidebar } from './quality-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.quality', href: '/dashboard/quality' },
-  { title: 'quality.settings', href: '/dashboard/quality/settings' },
+  { title: 'sidebar.nav.quality', href: ROUTES.dashboard.quality.list },
+  { title: 'quality.settings', href: ROUTES.dashboard.quality.settings },
 ]
 
 // Default settings structure

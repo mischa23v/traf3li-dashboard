@@ -5,6 +5,7 @@ import {
   FileSpreadsheet, AlertCircle, CheckCircle2, Info, Loader2,
   ChevronDown, ChevronUp, DollarSign, Calendar, FileText
 } from 'lucide-react'
+import { ROUTES } from '@/constants/routes'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -350,7 +351,7 @@ export function OpeningBalancesView() {
       onSuccess: (data: any) => {
         // Post the entry immediately
         toast.success('تم إنشاء قيد الأرصدة الافتتاحية بنجاح')
-        navigate({ to: '/dashboard/finance/transactions' })
+        navigate({ to: ROUTES.dashboard.finance.transactions.list })
       },
       onError: (error: any) => {
         toast.error(error.message || 'فشل في إنشاء القيد')
@@ -365,11 +366,11 @@ export function OpeningBalancesView() {
 
   // Top navigation
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-    { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-    { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
-    { title: 'المعاملات', href: '/dashboard/finance/transactions', isActive: false },
-    { title: 'الأرصدة الافتتاحية', href: '/dashboard/finance/opening-balances', isActive: true },
+    { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+    { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: false },
+    { title: 'المصروفات', href: ROUTES.dashboard.finance.expenses.list, isActive: false },
+    { title: 'المعاملات', href: ROUTES.dashboard.finance.transactions.list, isActive: false },
+    { title: 'الأرصدة الافتتاحية', href: ROUTES.dashboard.finance.openingBalances, isActive: true },
   ]
 
   return (
@@ -752,7 +753,7 @@ export function OpeningBalancesView() {
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => navigate({ to: '/dashboard/finance/transactions' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.finance.transactions.list })}
                       className="rounded-xl"
                     >
                       <X className="w-4 h-4 ml-2" />

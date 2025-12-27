@@ -40,6 +40,7 @@ import {
 import { useLeads, useDeleteLead, useConvertLead } from '@/hooks/useCrm'
 import { SalesSidebar } from '@/features/crm/components/sales-sidebar'
 import { cn } from '@/lib/utils'
+import { ROUTES } from '@/constants/routes'
 
 // Lead status options with Arabic labels
 const LEAD_STATUSES = [
@@ -151,7 +152,7 @@ export function Leads() {
 
     // Single lead actions
     const handleViewLead = (leadId: string) => {
-        navigate({ to: '/dashboard/crm/leads/$leadId', params: { leadId } })
+        navigate({ to: ROUTES.dashboard.crm.leads.detail(leadId) as any })
     }
 
     const handleDeleteLead = (leadId: string) => {
@@ -185,10 +186,10 @@ export function Leads() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: true },
-        { title: 'خط المبيعات', href: '/dashboard/crm/pipeline', isActive: false },
-        { title: 'العملاء', href: '/dashboard/clients', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
+        { title: 'العملاء المحتملين', href: ROUTES.dashboard.crm.leads.list, isActive: true },
+        { title: 'خط المبيعات', href: ROUTES.dashboard.crm.pipeline, isActive: false },
+        { title: 'العملاء', href: ROUTES.dashboard.clients.list, isActive: false },
     ]
 
     return (
@@ -362,7 +363,7 @@ export function Leads() {
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">لا يوجد عملاء محتملين</h3>
                                         <p className="text-slate-500 mb-4">ابدأ بإضافة عميل محتمل جديد لتتبع فرص المبيعات</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                                            <Link to="/dashboard/crm/leads/new">
+                                            <Link to={ROUTES.dashboard.crm.leads.new}>
                                                 <Plus className="w-4 h-4 ms-2" />
                                                 إضافة عميل محتمل
                                             </Link>
@@ -487,7 +488,7 @@ export function Leads() {
                                                             <div className="font-bold text-slate-600 text-sm">{createdDate.arabic}</div>
                                                         </div>
                                                     </div>
-                                                    <Link to={`/dashboard/crm/leads/${lead._id}` as any}>
+                                                    <Link to={ROUTES.dashboard.crm.leads.detail(lead._id) as any}>
                                                         <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
                                                             عرض التفاصيل
                                                         </Button>

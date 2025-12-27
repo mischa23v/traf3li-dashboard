@@ -42,6 +42,7 @@ import { ContactsProvider } from './components/contacts-provider'
 import { ContactsDialogs } from './components/contacts-dialogs'
 import { contactStatusColors, contactTypes, contactCategories } from './data/data'
 import type { Contact } from './data/schema'
+import { ROUTES } from '@/constants/routes'
 
 // Main export
 export function Contacts() {
@@ -162,11 +163,11 @@ function ContactsListView() {
 
   // Single contact actions
   const handleViewContact = useCallback((contactId: string) => {
-    navigate({ to: '/dashboard/contacts/$contactId', params: { contactId } })
+    navigate({ to: ROUTES.dashboard.contacts.detail(contactId) })
   }, [navigate])
 
   const handleEditContact = useCallback((contactId: string) => {
-    navigate({ to: '/dashboard/contacts/$contactId/edit', params: { contactId } })
+    navigate({ to: `${ROUTES.dashboard.contacts.detail(contactId)}/edit` })
   }, [navigate])
 
   const handleDeleteContact = useCallback((contactId: string) => {
@@ -196,9 +197,9 @@ function ContactsListView() {
   }, [])
 
   const topNav = [
-    { title: t('contacts.nav.contacts'), href: '/dashboard/contacts', isActive: true },
-    { title: t('contacts.nav.clients'), href: '/dashboard/clients', isActive: false },
-    { title: t('contacts.nav.organizations'), href: '/dashboard/organizations', isActive: false },
+    { title: t('contacts.nav.contacts'), href: ROUTES.dashboard.contacts.list, isActive: true },
+    { title: t('contacts.nav.clients'), href: ROUTES.dashboard.clients.list, isActive: false },
+    { title: t('contacts.nav.organizations'), href: ROUTES.dashboard.organizations.list, isActive: false },
   ]
 
   return (
@@ -374,7 +375,7 @@ function ContactsListView() {
                     <h3 className="text-lg font-bold text-slate-900 mb-2">{t('contacts.noContacts')}</h3>
                     <p className="text-slate-500 mb-4">{t('contacts.noContactsDescription')}</p>
                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                      <Link to="/dashboard/contacts/new">
+                      <Link to={ROUTES.dashboard.contacts.new}>
                         <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                         {t('contacts.addNewContact')}
                       </Link>

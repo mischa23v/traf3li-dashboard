@@ -109,7 +109,7 @@ export function GeofencingDetailsView() {
     }, [zone])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
         { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
         { title: 'الحضور', href: ROUTES.dashboard.hr.attendance.list, isActive: false },
         { title: 'النطاق الجغرافي', href: ROUTES.dashboard.hr.geofencing.list, isActive: true },
@@ -188,7 +188,7 @@ export function GeofencingDetailsView() {
                         <h3 className="text-lg font-bold text-slate-900 mb-2">النطاق غير موجود</h3>
                         <p className="text-slate-500 mb-4">لم يتم العثور على النطاق الجغرافي المطلوب</p>
                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                            <Link to="/dashboard/hr/geofencing">
+                            <Link to={ROUTES.dashboard.hr.geofencing.list}>
                                 العودة إلى القائمة
                             </Link>
                         </Button>

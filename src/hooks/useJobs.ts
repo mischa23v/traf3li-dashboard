@@ -14,6 +14,7 @@ import jobsService, {
   JobFilters,
 } from '@/services/jobsService'
 import { invalidateCache } from '@/lib/cache-invalidation'
+import { QueryKeys } from '@/lib/query-keys'
 
 // ==================== Cache Configuration ====================
 const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
@@ -27,7 +28,7 @@ const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
  */
 export const useJobs = (filters?: JobFilters) => {
   return useQuery({
-    queryKey: ['jobs', filters],
+    queryKey: QueryKeys.jobs.list(filters),
     queryFn: () => jobsService.getJobs(filters),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -39,7 +40,7 @@ export const useJobs = (filters?: JobFilters) => {
  */
 export const useMyJobs = () => {
   return useQuery({
-    queryKey: ['jobs', 'my-jobs'],
+    queryKey: QueryKeys.jobs.myJobs(),
     queryFn: () => jobsService.getMyJobs(),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -51,7 +52,7 @@ export const useMyJobs = () => {
  */
 export const useJob = (id: string) => {
   return useQuery({
-    queryKey: ['jobs', id],
+    queryKey: QueryKeys.jobs.detail(id),
     queryFn: () => jobsService.getJob(id),
     enabled: !!id,
     staleTime: LIST_STALE_TIME,
@@ -74,14 +75,14 @@ export const useCreateJob = () => {
       toast.success(t('jobs.createSuccess', 'تم إنشاء الوظيفة بنجاح'))
 
       // Manually update the cache
-      queryClient.setQueriesData({ queryKey: ['jobs'] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: QueryKeys.jobs.all() }, (old: any) => {
         if (!old) return old
         if (Array.isArray(old)) return [data, ...old]
         return old
       })
 
       // Update my-jobs cache
-      queryClient.setQueriesData({ queryKey: ['jobs', 'my-jobs'] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: QueryKeys.jobs.myJobs() }, (old: any) => {
         if (!old) return old
         if (Array.isArray(old)) return [data, ...old]
         return old
@@ -134,13 +135,13 @@ export const useDeleteJob = () => {
       toast.success(t('jobs.deleteSuccess', 'تم حذف الوظيفة بنجاح'))
 
       // Manually update the caches
-      queryClient.setQueriesData({ queryKey: ['jobs'] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: QueryKeys.jobs.all() }, (old: any) => {
         if (!old) return old
         if (Array.isArray(old)) return old.filter((item: Job) => item._id !== id)
         return old
       })
 
-      queryClient.setQueriesData({ queryKey: ['jobs', 'my-jobs'] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: QueryKeys.jobs.myJobs() }, (old: any) => {
         if (!old) return old
         if (Array.isArray(old)) return old.filter((item: Job) => item._id !== id)
         return old

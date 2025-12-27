@@ -1,3 +1,5 @@
+import { ROUTES } from '@/constants/routes'
+
 /**
  * Configuration for route prefetching strategies
  *
@@ -10,10 +12,10 @@
  * These are typically the most commonly accessed routes in your application
  */
 export const HIGH_PRIORITY_ROUTES = [
-  '/dashboard/cases',
-  '/dashboard/clients',
-  '/dashboard/contacts',
-  '/dashboard/calendar',
+  ROUTES.dashboard.cases.list,
+  ROUTES.dashboard.clients.list,
+  ROUTES.dashboard.contacts.list,
+  ROUTES.dashboard.calendar,
 ] as const
 
 /**
@@ -21,9 +23,9 @@ export const HIGH_PRIORITY_ROUTES = [
  * These are less frequently accessed but still important routes
  */
 export const LOW_PRIORITY_ROUTES = [
-  '/dashboard/billing-rates',
-  '/dashboard/cases/pipeline',
-  '/dashboard/cases/pipeline/board',
+  ROUTES.dashboard.billingRates.list,
+  ROUTES.dashboard.cases.pipeline,
+  ROUTES.dashboard.cases.pipelineBoard,
 ] as const
 
 /**
@@ -31,15 +33,15 @@ export const LOW_PRIORITY_ROUTES = [
  */
 export const ROUTE_GROUPS = {
   cases: [
-    '/dashboard/cases',
-    '/dashboard/cases/new',
-    '/dashboard/cases/pipeline',
+    ROUTES.dashboard.cases.list,
+    ROUTES.dashboard.cases.new,
+    ROUTES.dashboard.cases.pipeline,
   ],
   crm: [
-    '/dashboard/clients',
-    '/dashboard/contacts',
+    ROUTES.dashboard.clients.list,
+    ROUTES.dashboard.contacts.list,
   ],
   billing: [
-    '/dashboard/billing-rates',
+    ROUTES.dashboard.billingRates.list,
   ],
 } as const

@@ -69,6 +69,7 @@ import { useCreateTimeEntry } from '@/hooks/useFinance'
 import { useCases, useClients, useTeamMembers } from '@/hooks/useCasesAndClients'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { cn } from '@/lib/utils'
+import { ROUTES } from '@/constants/routes'
 
 // ==================== UTBMS ACTIVITY CODES ====================
 
@@ -425,17 +426,17 @@ export function CreateTimeEntryView() {
 
         createTimeEntryMutation.mutate(timeEntryData, {
             onSuccess: () => {
-                navigate({ to: '/dashboard/finance/time-tracking' })
+                navigate({ to: ROUTES.dashboard.finance.timeTracking.list })
             },
         })
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
-        { title: 'المعاملات', href: '/dashboard/finance/transactions', isActive: false },
-        { title: 'تتبع الوقت', href: '/dashboard/finance/time-tracking', isActive: true },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: false },
+        { title: 'المصروفات', href: ROUTES.dashboard.finance.expenses.list, isActive: false },
+        { title: 'المعاملات', href: ROUTES.dashboard.finance.transactions.list, isActive: false },
+        { title: 'تتبع الوقت', href: ROUTES.dashboard.finance.timeTracking.list, isActive: true },
     ]
 
     return (
@@ -1330,7 +1331,7 @@ export function CreateTimeEntryView() {
                             {/* ACTION BUTTONS */}
                             <div className="flex justify-between items-center pt-6 border-t border-slate-200">
                                 <div className="flex gap-2">
-                                    <Button type="button" variant="outline" onClick={() => navigate({ to: '/dashboard/finance/time-tracking' })} className="rounded-xl">
+                                    <Button type="button" variant="outline" onClick={() => navigate({ to: ROUTES.dashboard.finance.timeTracking.list })} className="rounded-xl">
                                         <X className="ms-2 h-4 w-4" aria-hidden="true" />
                                         إلغاء
                                     </Button>

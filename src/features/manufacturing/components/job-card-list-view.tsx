@@ -76,6 +76,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
+import { ROUTES } from '@/constants/routes'
 
 import {
   useJobCards,
@@ -89,8 +90,8 @@ import { ManufacturingSidebar } from './manufacturing-sidebar'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.manufacturing', href: '/dashboard/manufacturing' },
-  { title: 'manufacturing.jobCards', href: '/dashboard/manufacturing/job-cards' },
+  { title: 'sidebar.nav.manufacturing', href: ROUTES.dashboard.manufacturing.list },
+  { title: 'manufacturing.jobCards', href: ROUTES.dashboard.manufacturing.jobCards.list },
 ]
 
 type TabValue = 'all' | 'open' | 'work_in_progress' | 'completed' | 'cancelled'
@@ -352,7 +353,7 @@ export function JobCardListView() {
                     </SelectContent>
                   </Select>
                   <Button asChild className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
-                    <Link to="/dashboard/manufacturing/job-cards/create">
+                    <Link to={ROUTES.dashboard.manufacturing.jobCards.create}>
                       <Plus className="w-4 h-4 ml-2" />
                       {t('manufacturing.jobCard.createJobCard', 'إنشاء بطاقة عمل')}
                     </Link>
@@ -389,7 +390,7 @@ export function JobCardListView() {
                     </p>
                     {!search && workstationFilter === 'all' && (
                       <Button asChild className="rounded-xl">
-                        <Link to="/dashboard/manufacturing/job-cards/create">
+                        <Link to={ROUTES.dashboard.manufacturing.jobCards.create}>
                           <Plus className="w-4 h-4 ml-2" />
                           {t('manufacturing.jobCard.createJobCard', 'إنشاء بطاقة عمل')}
                         </Link>
@@ -430,7 +431,7 @@ export function JobCardListView() {
                           <TableRow
                             key={jobCard._id}
                             className="cursor-pointer hover:bg-muted/50"
-                            onClick={() => navigate({ to: `/dashboard/manufacturing/job-cards/${jobCard._id}` })}
+                            onClick={() => navigate({ to: ROUTES.dashboard.manufacturing.jobCards.detail(jobCard._id) })}
                           >
                             <TableCell>
                               <div className="flex items-center gap-3">
@@ -496,7 +497,7 @@ export function JobCardListView() {
                                   <DropdownMenuItem
                                     onClick={(e) => {
                                       e.stopPropagation()
-                                      navigate({ to: `/dashboard/manufacturing/job-cards/${jobCard._id}` })
+                                      navigate({ to: ROUTES.dashboard.manufacturing.jobCards.detail(jobCard._id) })
                                     }}
                                   >
                                     <Eye className="w-4 h-4 ml-2" />
@@ -530,7 +531,7 @@ export function JobCardListView() {
                                   <DropdownMenuItem
                                     onClick={(e) => {
                                       e.stopPropagation()
-                                      navigate({ to: `/dashboard/manufacturing/job-cards/${jobCard._id}/edit` })
+                                      navigate({ to: `${ROUTES.dashboard.manufacturing.jobCards.detail(jobCard._id)}/edit` })
                                     }}
                                   >
                                     <Edit className="w-4 h-4 ml-2" />

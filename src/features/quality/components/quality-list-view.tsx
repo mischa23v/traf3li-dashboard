@@ -66,10 +66,11 @@ import {
 import { useInspections, useDeleteInspection, useQualityStats } from '@/hooks/use-quality'
 import type { QualityInspection, QualityFilters, InspectionStatus, InspectionType } from '@/types/quality'
 import { QualitySidebar } from './quality-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.quality', href: '/dashboard/quality' },
+  { title: 'sidebar.nav.quality', href: ROUTES.dashboard.quality.list },
 ]
 
 export function QualityListView() {
@@ -217,7 +218,7 @@ export function QualityListView() {
                     </SelectContent>
                   </Select>
                   <Button asChild className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
-                    <Link to="/dashboard/quality/create">
+                    <Link to={ROUTES.dashboard.quality.create}>
                       <Plus className="w-4 h-4 ml-2" />
                       {t('quality.createInspection', 'إنشاء فحص')}
                     </Link>
@@ -245,7 +246,7 @@ export function QualityListView() {
                     <h3 className="text-lg font-medium mb-2">{t('quality.noInspections', 'لا توجد فحوصات')}</h3>
                     <p className="text-muted-foreground mb-4">{t('quality.noInspectionsDesc', 'ابدأ بإنشاء فحص جديد')}</p>
                     <Button asChild className="rounded-xl">
-                      <Link to="/dashboard/quality/create">
+                      <Link to={ROUTES.dashboard.quality.create}>
                         <Plus className="w-4 h-4 ml-2" />
                         {t('quality.createInspection', 'إنشاء فحص')}
                       </Link>
@@ -267,7 +268,7 @@ export function QualityListView() {
                         <TableRow
                           key={inspection._id}
                           className="cursor-pointer hover:bg-muted/50"
-                          onClick={() => navigate({ to: `/dashboard/quality/${inspection._id}` })}
+                          onClick={() => navigate({ to: ROUTES.dashboard.quality.detail(inspection._id) })}
                         >
                           <TableCell className="font-mono text-sm">{inspection.inspectionNumber}</TableCell>
                           <TableCell>
@@ -286,14 +287,14 @@ export function QualityListView() {
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation()
-                                  navigate({ to: `/dashboard/quality/${inspection._id}` })
+                                  navigate({ to: ROUTES.dashboard.quality.detail(inspection._id) })
                                 }}>
                                   <Eye className="w-4 h-4 ml-2" />
                                   {t('common.view', 'عرض')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation()
-                                  navigate({ to: `/dashboard/quality/${inspection._id}/edit` })
+                                  navigate({ to: `${ROUTES.dashboard.quality.detail(inspection._id)}/edit` })
                                 }}>
                                   <Edit className="w-4 h-4 ml-2" />
                                   {t('common.edit', 'تعديل')}

@@ -73,10 +73,11 @@ import {
 import { useStockEntries } from '@/hooks/use-inventory'
 import type { WorkOrderStatus } from '@/types/manufacturing'
 import { ManufacturingSidebar } from './manufacturing-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.manufacturing', href: '/dashboard/manufacturing' },
+  { title: 'sidebar.nav.manufacturing', href: ROUTES.dashboard.manufacturing.list },
 ]
 
 export function WorkOrderDetailsView() {
@@ -97,7 +98,7 @@ export function WorkOrderDetailsView() {
 
   const handleDelete = async () => {
     await deleteWorkOrderMutation.mutateAsync(workOrderId)
-    navigate({ to: '/dashboard/manufacturing/work-orders' })
+    navigate({ to: ROUTES.dashboard.manufacturing.list })
   }
 
   const handleStatusChange = async (action: 'start' | 'stop' | 'complete') => {
@@ -271,7 +272,7 @@ export function WorkOrderDetailsView() {
               <h3 className="text-lg font-medium mb-2">
                 {t('manufacturing.workOrderNotFound', 'أمر العمل غير موجود')}
               </h3>
-              <Button onClick={() => navigate({ to: '/dashboard/manufacturing/work-orders' })} className="rounded-xl">
+              <Button onClick={() => navigate({ to: ROUTES.dashboard.manufacturing.list })} className="rounded-xl">
                 <ArrowRight className="w-4 h-4 ml-2" />
                 {t('manufacturing.backToList', 'العودة للقائمة')}
               </Button>
@@ -437,7 +438,7 @@ export function WorkOrderDetailsView() {
 
                     {(workOrder.status === 'draft' || workOrder.status === 'not_started') && (
                       <Button
-                        onClick={() => navigate({ to: `/dashboard/manufacturing/work-orders/${workOrderId}/edit` })}
+                        onClick={() => navigate({ to: ROUTES.dashboard.manufacturing.workOrders.edit(workOrderId) })}
                         variant="outline"
                         className="rounded-xl"
                       >
@@ -737,7 +738,7 @@ export function WorkOrderDetailsView() {
                         </p>
                         <Button
                           onClick={() => navigate({
-                            to: '/dashboard/manufacturing/job-cards/create',
+                            to: ROUTES.dashboard.manufacturing.jobCards.create,
                             search: { workOrderId }
                           })}
                           className="rounded-xl"
@@ -784,7 +785,7 @@ export function WorkOrderDetailsView() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => navigate({ to: `/dashboard/manufacturing/job-cards/${jobCard._id}` })}
+                                  onClick={() => navigate({ to: ROUTES.dashboard.manufacturing.jobCards.detail(jobCard._id) })}
                                 >
                                   <ArrowRight className="w-4 h-4" />
                                 </Button>

@@ -11,6 +11,7 @@ import dashboardService from '@/services/dashboardService'
 import type { DashboardSummary } from '@/services/dashboardService'
 import { useAuthStore } from '@/stores/auth-store'
 import { CACHE_TIMES } from '@/config/cache'
+import { QueryKeys } from '@/lib/query-keys'
 
 // ==================== DASHBOARD SUMMARY (GOLD STANDARD) ====================
 // Single API call for all dashboard data - replaces 7 separate calls
@@ -28,7 +29,7 @@ export const useDashboardSummary = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery<DashboardSummary>({
-    queryKey: ['dashboard', 'summary'],
+    queryKey: QueryKeys.dashboard.summary(),
     queryFn: () => dashboardService.getDashboardSummary(),
     staleTime: CACHE_TIMES.MEDIUM, // 5 minutes - dashboard stats don't change frequently
     gcTime: CACHE_TIMES.GC_MEDIUM,   // 10 minutes garbage collection
@@ -46,7 +47,7 @@ export const useDashboardStats = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
-    queryKey: ['dashboard', 'stats'],
+    queryKey: QueryKeys.dashboard.stats(),
     queryFn: () => dashboardService.getDashboardStats(),
     staleTime: CACHE_TIMES.SHORT, // 2 minutes
     enabled: isAuthenticated, // Only fetch when authenticated
@@ -58,7 +59,7 @@ export const useDashboardHeroStats = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
-    queryKey: ['dashboard', 'hero-stats'],
+    queryKey: QueryKeys.dashboard.heroStats(),
     queryFn: () => dashboardService.getDashboardHeroStats(),
     staleTime: CACHE_TIMES.CALENDAR.GRID, // 1 minute
     enabled: isAuthenticated, // Only fetch when authenticated
@@ -70,7 +71,7 @@ export const useTodayEvents = (isEnabled = true) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
-    queryKey: ['dashboard', 'today-events'],
+    queryKey: QueryKeys.dashboard.todayEvents(),
     queryFn: () => dashboardService.getTodayEvents(),
     staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     enabled: isAuthenticated && isEnabled, // Only fetch when authenticated and enabled
@@ -84,7 +85,7 @@ export const useFinancialSummary = (isEnabled = true) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
-    queryKey: ['dashboard', 'financial-summary'],
+    queryKey: QueryKeys.dashboard.financialSummary(),
     queryFn: () => dashboardService.getFinancialSummary(),
     staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     enabled: isAuthenticated && isEnabled, // Only fetch when authenticated and enabled
@@ -98,7 +99,7 @@ export const useRecentMessages = (limit = 5, isEnabled = true) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
-    queryKey: ['dashboard', 'recent-messages', limit],
+    queryKey: QueryKeys.dashboard.recentMessages(limit),
     queryFn: () => dashboardService.getRecentMessages(limit),
     staleTime: CACHE_TIMES.SHORT, // 2 minutes (increased from 30s)
     enabled: isAuthenticated && isEnabled, // Only fetch when authenticated and enabled
@@ -110,7 +111,7 @@ export const useMessageStats = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
-    queryKey: ['messages', 'stats'],
+    queryKey: QueryKeys.messages.stats(),
     queryFn: () => dashboardService.getMessageStats(),
     staleTime: CACHE_TIMES.SHORT, // 2 minutes (increased from 1min)
     enabled: isAuthenticated, // Only fetch when authenticated
@@ -125,7 +126,7 @@ export const useCRMStats = (isTabActive = true) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
-    queryKey: ['dashboard', 'crm-stats'],
+    queryKey: QueryKeys.dashboard.crmStats(),
     queryFn: () => dashboardService.getCRMStats(),
     staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     enabled: isAuthenticated && isTabActive,
@@ -137,7 +138,7 @@ export const useHRStats = (isTabActive = true) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
-    queryKey: ['dashboard', 'hr-stats'],
+    queryKey: QueryKeys.dashboard.hrStats(),
     queryFn: () => dashboardService.getHRStats(),
     staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     enabled: isAuthenticated && isTabActive,
@@ -149,7 +150,7 @@ export const useFinanceStats = (isTabActive = true) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
-    queryKey: ['dashboard', 'finance-stats'],
+    queryKey: QueryKeys.dashboard.financeStats(),
     queryFn: () => dashboardService.getFinanceStats(),
     staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     enabled: isAuthenticated && isTabActive,
@@ -164,7 +165,7 @@ export const useCasesChart = (months = 12, isTabActive = true) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
-    queryKey: ['reports', 'cases-chart', months],
+    queryKey: QueryKeys.reports.casesChart(months),
     queryFn: () => dashboardService.getCasesChart(months),
     staleTime: CACHE_TIMES.LONG, // 30 minutes (was 10 minutes)
     enabled: isAuthenticated && isTabActive,
@@ -176,7 +177,7 @@ export const useRevenueChart = (months = 12, isTabActive = true) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
-    queryKey: ['reports', 'revenue-chart', months],
+    queryKey: QueryKeys.reports.revenueChart(months),
     queryFn: () => dashboardService.getRevenueChart(months),
     staleTime: CACHE_TIMES.LONG, // 30 minutes (was 10 minutes)
     enabled: isAuthenticated && isTabActive,
@@ -188,7 +189,7 @@ export const useTasksChart = (months = 12, isTabActive = true) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
-    queryKey: ['reports', 'tasks-chart', months],
+    queryKey: QueryKeys.reports.tasksChart(months),
     queryFn: () => dashboardService.getTasksChart(months),
     staleTime: CACHE_TIMES.LONG, // 30 minutes (was 10 minutes)
     enabled: isAuthenticated && isTabActive,
@@ -208,7 +209,7 @@ export const useUpcomingHearings = (days = 7) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
-    queryKey: ['dashboard', 'hearings', 'upcoming', days],
+    queryKey: QueryKeys.dashboard.hearings.upcoming(days),
     queryFn: () => dashboardService.getUpcomingHearings(days),
     staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     enabled: isAuthenticated,
@@ -220,7 +221,7 @@ export const useUpcomingDeadlines = (days = 14) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
-    queryKey: ['dashboard', 'deadlines', 'upcoming', days],
+    queryKey: QueryKeys.dashboard.deadlines.upcoming(days),
     queryFn: () => dashboardService.getUpcomingDeadlines(days),
     staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     enabled: isAuthenticated,
@@ -232,7 +233,7 @@ export const useTimeEntrySummary = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
-    queryKey: ['dashboard', 'time-entries', 'summary'],
+    queryKey: QueryKeys.dashboard.timeEntries.summary(),
     queryFn: () => dashboardService.getTimeEntrySummary(),
     staleTime: CACHE_TIMES.SHORT, // 2 minutes
     enabled: isAuthenticated,
@@ -244,7 +245,7 @@ export const usePendingDocuments = (isTabActive = true) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery({
-    queryKey: ['dashboard', 'documents', 'pending'],
+    queryKey: QueryKeys.dashboard.documents.pending(),
     queryFn: () => dashboardService.getPendingDocuments(),
     staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
     enabled: isAuthenticated && isTabActive,

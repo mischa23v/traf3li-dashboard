@@ -313,7 +313,7 @@ export function EmployeePromotionsListView() {
   }, [stats])
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+    { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
     { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
     { title: 'الترقيات', href: ROUTES.dashboard.hr.promotions.list, isActive: true },
     { title: 'الإجازات', href: ROUTES.dashboard.hr.leave.list, isActive: false },
@@ -523,7 +523,7 @@ export function EmployeePromotionsListView() {
                     <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد ترقيات</h3>
                     <p className="text-slate-500 mb-4">ابدأ بإضافة ترقية جديدة</p>
                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                      <Link to="/dashboard/hr/promotions/new">
+                      <Link to={ROUTES.dashboard.hr.promotions.new}>
                         <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                         إضافة ترقية
                       </Link>

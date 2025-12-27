@@ -207,7 +207,7 @@ export function PayrollRunsListView() {
     }, [stats])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
         { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
         { title: 'قسائم الرواتب', href: ROUTES.dashboard.hr.payroll.list, isActive: false },
         { title: 'دورات الرواتب', href: ROUTES.dashboard.hr.payrollRuns.list, isActive: true },
@@ -357,7 +357,7 @@ export function PayrollRunsListView() {
                                         {payrollRuns.length} دورة
                                     </Badge>
                                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
-                                        <Link to="/dashboard/hr/payroll-runs/new">
+                                        <Link to={ROUTES.dashboard.hr.payrollRuns.new}>
                                             <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                             إنشاء دورة جديدة
                                         </Link>
@@ -411,7 +411,7 @@ export function PayrollRunsListView() {
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد دورات رواتب</h3>
                                         <p className="text-slate-500 mb-4">ابدأ بإنشاء دورة رواتب جديدة لمعالجة رواتب الموظفين</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                                            <Link to="/dashboard/hr/payroll-runs/new">
+                                            <Link to={ROUTES.dashboard.hr.payrollRuns.new}>
                                                 <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 إنشاء دورة جديدة
                                             </Link>

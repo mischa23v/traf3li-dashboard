@@ -50,12 +50,13 @@ import { useCreateTemplate } from '@/hooks/use-quality'
 import { useItemGroups } from '@/hooks/use-inventory'
 import type { InspectionType } from '@/types/quality'
 import { QualitySidebar } from './quality-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'quality.quality', href: '/dashboard/quality' },
-  { title: 'quality.templates', href: '/dashboard/quality/templates' },
-  { title: 'quality.createTemplate', href: '/dashboard/quality/templates/create' },
+  { title: 'quality.quality', href: ROUTES.dashboard.quality.list },
+  { title: 'quality.templates', href: ROUTES.dashboard.quality.templates.list },
+  { title: 'quality.createTemplate', href: ROUTES.dashboard.quality.templates.create },
 ]
 
 const INSPECTION_TYPES: { value: InspectionType; translationKey: string }[] = [
@@ -157,7 +158,7 @@ export function CreateTemplateView() {
       }
 
       await createTemplateMutation.mutateAsync(templateData as any)
-      navigate({ to: '/dashboard/quality/templates' })
+      navigate({ to: ROUTES.dashboard.quality.templates.list })
     } catch (error) {
       // Error handled by mutation
     }
@@ -587,7 +588,7 @@ export function CreateTemplateView() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate({ to: '/dashboard/quality/templates' })}
+                  onClick={() => navigate({ to: ROUTES.dashboard.quality.templates.list })}
                   className="rounded-xl"
                 >
                   <X className="w-4 h-4 ml-2" />

@@ -100,7 +100,7 @@ export function NavUser({ user }: NavUserProps) {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to={ROUTES.settings.index}>
+                  <Link to={ROUTES.settings.billing}>
                     <CreditCard aria-hidden='true' />
                     {t('profile.dropdown.billing')}
                   </Link>

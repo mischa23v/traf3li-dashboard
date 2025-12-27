@@ -7,6 +7,7 @@ import { useQuery, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { CACHE_TIMES } from '@/config/cache'
 import { invalidateCache } from '@/lib/cache-invalidation'
+import { QueryKeys } from '@/lib/query-keys'
 import {
   deviceService,
   enrollmentService,
@@ -30,7 +31,7 @@ import type {
 
 export const useDevices = (filters?: DeviceFilters) => {
   return useQuery({
-    queryKey: ['biometric-devices', filters],
+    queryKey: QueryKeys.biometric.deviceList(filters),
     queryFn: () => deviceService.getDevices(filters),
     staleTime: CACHE_TIMES.SHORT,
   })
@@ -38,7 +39,7 @@ export const useDevices = (filters?: DeviceFilters) => {
 
 export const useDevice = (id: string) => {
   return useQuery({
-    queryKey: ['biometric-device', id],
+    queryKey: QueryKeys.biometric.device(id),
     queryFn: () => deviceService.getDevice(id),
     enabled: !!id,
   })
@@ -116,7 +117,7 @@ export const useTestDeviceConnection = () => {
 
 export const useDeviceHealth = (id: string) => {
   return useQuery({
-    queryKey: ['device-health', id],
+    queryKey: QueryKeys.biometric.deviceHealth(id),
     queryFn: () => deviceService.getDeviceHealth(id),
     enabled: !!id,
     refetchInterval: 30000, // Refresh every 30 seconds
@@ -130,7 +131,7 @@ export const useDeviceHealth = (id: string) => {
 
 export const useEnrollments = (filters?: EnrollmentFilters) => {
   return useQuery({
-    queryKey: ['biometric-enrollments', filters],
+    queryKey: QueryKeys.biometric.enrollmentList(filters),
     queryFn: () => enrollmentService.getEnrollments(filters),
     staleTime: CACHE_TIMES.SHORT,
   })
@@ -138,7 +139,7 @@ export const useEnrollments = (filters?: EnrollmentFilters) => {
 
 export const useEnrollment = (id: string) => {
   return useQuery({
-    queryKey: ['biometric-enrollment', id],
+    queryKey: QueryKeys.biometric.enrollment(id),
     queryFn: () => enrollmentService.getEnrollment(id),
     enabled: !!id,
   })
@@ -146,7 +147,7 @@ export const useEnrollment = (id: string) => {
 
 export const useEnrollmentByEmployee = (employeeId: string) => {
   return useQuery({
-    queryKey: ['biometric-enrollment-employee', employeeId],
+    queryKey: QueryKeys.biometric.enrollmentEmployee(employeeId),
     queryFn: () => enrollmentService.getEnrollmentByEmployee(employeeId),
     enabled: !!employeeId,
   })
@@ -246,7 +247,7 @@ export const useReactivateEnrollment = () => {
 
 export const useVerificationLogs = (filters?: VerificationFilters) => {
   return useQuery({
-    queryKey: ['verification-logs', filters],
+    queryKey: QueryKeys.biometric.verificationLogList(filters),
     queryFn: () => verificationService.getLogs(filters),
     staleTime: CACHE_TIMES.AUDIT.LOGS, // 30 seconds
   })
@@ -254,7 +255,7 @@ export const useVerificationLogs = (filters?: VerificationFilters) => {
 
 export const useLiveFeed = (limit: number = 20) => {
   return useQuery({
-    queryKey: ['verification-live-feed', limit],
+    queryKey: QueryKeys.biometric.verificationLiveFeed(limit),
     queryFn: () => verificationService.getLiveFeed(limit),
     refetchInterval: 30000, // Refresh every 30 seconds (reduced from 5s for performance)
     retry: false,
@@ -263,7 +264,7 @@ export const useLiveFeed = (limit: number = 20) => {
 
 export const useVerificationStats = (startDate?: string, endDate?: string) => {
   return useQuery({
-    queryKey: ['verification-stats', startDate, endDate],
+    queryKey: QueryKeys.biometric.verificationStats(startDate, endDate),
     queryFn: () => verificationService.getStats(startDate, endDate),
     staleTime: CACHE_TIMES.MEDIUM,
   })
@@ -312,7 +313,7 @@ export const useCreateManualEntry = () => {
 
 export const useGeofences = (filters?: GeofenceFilters) => {
   return useQuery({
-    queryKey: ['geofences', filters],
+    queryKey: QueryKeys.biometric.geofenceList(filters),
     queryFn: () => geofenceService.getZones(filters),
     staleTime: CACHE_TIMES.MEDIUM,
   })
@@ -320,7 +321,7 @@ export const useGeofences = (filters?: GeofenceFilters) => {
 
 export const useGeofence = (id: string) => {
   return useQuery({
-    queryKey: ['geofence', id],
+    queryKey: QueryKeys.biometric.geofence(id),
     queryFn: () => geofenceService.getZone(id),
     enabled: !!id,
   })

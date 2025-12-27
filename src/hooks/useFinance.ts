@@ -484,7 +484,7 @@ export const useTimerStatus = () => {
     queryKey: ['timer', 'status'],
     queryFn: () => financeService.getTimerStatus(),
     refetchInterval: 10 * 1000, // Refetch every 10 seconds
-    staleTime: 5 * 1000, // 5 seconds
+    staleTime: CACHE_TIMES.INSTANT, // Real-time timer data
     retry: false,
   })
 }
@@ -1621,7 +1621,7 @@ export const usePendingApprovalsCount = () => {
     queryKey: ['invoices', 'pending-approvals-count'],
     queryFn: () => financeService.getPendingApprovalsCount(),
     refetchInterval: 30 * 1000, // Refetch every 30 seconds
-    staleTime: 15 * 1000, // 15 seconds
+    staleTime: CACHE_TIMES.INSTANT, // Real-time approvals count
     retry: false,
   })
 }

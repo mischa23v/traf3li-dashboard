@@ -69,10 +69,11 @@ import {
 } from '@/hooks/use-quality'
 import type { InspectionStatus, InspectionType, ReadingStatus } from '@/types/quality'
 import { QualitySidebar } from './quality-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.quality', href: '/dashboard/quality' },
+  { title: 'sidebar.nav.quality', href: ROUTES.dashboard.quality.list },
 ]
 
 export function InspectionDetailsView() {
@@ -87,7 +88,7 @@ export function InspectionDetailsView() {
 
   const handleDelete = async () => {
     await deleteInspectionMutation.mutateAsync(inspectionId)
-    navigate({ to: '/dashboard/quality' })
+    navigate({ to: ROUTES.dashboard.quality.list })
   }
 
   const handleSubmit = async (status: InspectionStatus) => {
@@ -219,7 +220,7 @@ export function InspectionDetailsView() {
                 {t('quality.inspectionNotFound', 'الفحص غير موجود')}
               </h3>
               <Button
-                onClick={() => navigate({ to: '/dashboard/quality' })}
+                onClick={() => navigate({ to: ROUTES.dashboard.quality.list })}
                 className="rounded-xl"
               >
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -318,7 +319,7 @@ export function InspectionDetailsView() {
                     {inspection.status === 'pending' && (
                       <>
                         <Button
-                          onClick={() => navigate({ to: `/dashboard/quality/${inspectionId}/edit` })}
+                          onClick={() => navigate({ to: `${ROUTES.dashboard.quality.detail(inspectionId)}/edit` })}
                           className="rounded-xl"
                         >
                           <Edit className="w-4 h-4 ml-2" />
@@ -591,7 +592,7 @@ export function InspectionDetailsView() {
                         </p>
                         <Button
                           onClick={() => navigate({
-                            to: '/dashboard/quality/actions/create',
+                            to: ROUTES.dashboard.quality.actions.create,
                             search: { inspectionId }
                           })}
                           className="rounded-xl"
@@ -629,7 +630,7 @@ export function InspectionDetailsView() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => navigate({ to: `/dashboard/quality/actions/${action._id}` })}
+                                  onClick={() => navigate({ to: `${ROUTES.dashboard.quality.actions.list}/${action._id}` })}
                                 >
                                   <ArrowRight className="w-4 h-4" />
                                 </Button>

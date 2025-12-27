@@ -8,6 +8,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { CACHE_TIMES } from '@/config/cache'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import stepUpAuthService, {
   type ReauthStatus,
   type ReauthMethod,
@@ -56,6 +57,7 @@ export function useReauthWithPassword() {
     mutationFn: (password: string) => stepUpAuthService.withPassword(password),
     onSuccess: () => {
       toast.success(t('auth.reauthenticated', 'تم التحقق بنجاح'))
+      invalidateCache.stepUpAuth.status()
     },
     onError: (error: Error) => {
       toast.error(error.message || t('auth.invalidPassword', 'كلمة المرور غير صحيحة'))
@@ -73,6 +75,7 @@ export function useReauthWithTOTP() {
     mutationFn: (code: string) => stepUpAuthService.withTOTP(code),
     onSuccess: () => {
       toast.success(t('auth.reauthenticated', 'تم التحقق بنجاح'))
+      invalidateCache.stepUpAuth.status()
     },
     onError: (error: Error) => {
       toast.error(error.message || t('mfa.verify.invalidCode', 'رمز التحقق غير صحيح'))
@@ -113,9 +116,10 @@ export function useVerifyReauthChallenge() {
     mutationFn: (code: string) => stepUpAuthService.verifyChallenge(code),
     onSuccess: () => {
       toast.success(t('auth.reauthenticated', 'تم التحقق بنجاح'))
+      invalidateCache.stepUpAuth.status()
     },
     onError: (error: Error) => {
-      toast.error(error.message || t('auth.invalidCode', 'رمز التحقق غير صحيح'))
+      toast.error(error.message || t('auth.invalidCode', 'رمز التحقق غير صحيحة'))
     },
   })
 }

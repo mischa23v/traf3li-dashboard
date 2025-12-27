@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { useQueryClient } from '@tanstack/react-query'
 import { UserPlus } from 'lucide-react'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   Dialog,
   DialogContent,
@@ -20,7 +20,6 @@ import { useAuthStore } from '@/stores/auth-store'
 export function StaffReinstateDialog() {
   const { open, setOpen, currentRow } = useStaffContext()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const queryClient = useQueryClient()
   const user = useAuthStore((state) => state.user)
   const firmId = user?.firmId || user?.lawyerProfile?.firmID
 
@@ -31,9 +30,9 @@ export function StaffReinstateDialog() {
     try {
       await firmService.reinstateMember(firmId, currentRow._id)
       toast.success('Member reinstated successfully | تمت إعادة تفعيل الموظف بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['staff'] })
-      queryClient.invalidateQueries({ queryKey: ['team'] })
-      queryClient.invalidateQueries({ queryKey: ['departed'] })
+      invalidateCache.staff.all()
+      invalidateCache.users.team()
+      invalidateCache.staff.departed()
       setOpen(null)
     } catch (error: any) {
       toast.error(error.message || 'Failed to reinstate member | فشل في إعادة تفعيل الموظف')

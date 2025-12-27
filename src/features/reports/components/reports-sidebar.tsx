@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { ROUTES } from '@/constants/routes'
 
 interface ReportsSidebarProps {
     context?: 'overview' | 'financial' | 'performance' | 'custom'
@@ -23,22 +24,22 @@ export function ReportsSidebar({ context }: ReportsSidebarProps) {
     const links = {
         'overview': {
             title: isRTL ? 'نظرة عامة' : 'Overview',
-            href: '/dashboard/reports',
+            href: ROUTES.dashboard.reports.list,
             icon: BarChart2
         },
         'financial': {
             title: isRTL ? 'التقارير المالية' : 'Financial Reports',
-            href: '/dashboard/reports/financial',
+            href: '/dashboard/reports/financial', // TODO: Add to ROUTES
             icon: TrendingUp
         },
         'performance': {
             title: isRTL ? 'تقارير الأداء' : 'Performance Reports',
-            href: '/dashboard/reports/performance',
+            href: '/dashboard/reports/performance', // TODO: Add to ROUTES
             icon: PieChart
         },
         'custom': {
             title: isRTL ? 'تقارير مخصصة' : 'Custom Reports',
-            href: '/dashboard/reports/custom',
+            href: '/dashboard/reports/custom', // TODO: Add to ROUTES
             icon: FileText
         }
     }

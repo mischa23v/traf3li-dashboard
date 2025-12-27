@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
 import { invalidateCache } from '@/lib/cache-invalidation'
+import { QueryKeys } from '@/lib/query-keys'
 import remindersService, {
   ReminderFilters,
   CreateReminderData,
@@ -31,7 +32,7 @@ const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists (more dynamic)
 
 export const useReminders = (filters?: ReminderFilters) => {
   return useQuery({
-    queryKey: ['reminders', filters],
+    queryKey: QueryKeys.reminders.list(filters),
     queryFn: () => remindersService.getReminders(filters),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -40,7 +41,7 @@ export const useReminders = (filters?: ReminderFilters) => {
 
 export const useReminder = (id: string) => {
   return useQuery({
-    queryKey: ['reminders', id],
+    queryKey: QueryKeys.reminders.detail(id),
     queryFn: () => remindersService.getReminder(id),
     enabled: !!id,
     staleTime: LIST_STALE_TIME,
@@ -58,7 +59,7 @@ export const useCreateReminder = () => {
       toast.success('تم إنشاء التذكير بنجاح')
 
       // Manually update the cache with the REAL reminder from server
-      queryClient.setQueriesData({ queryKey: ['reminders'] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: QueryKeys.reminders.all() }, (old: any) => {
         if (!old) return old
 
         // Handle { data: [...] } structure (API response format)
@@ -111,7 +112,7 @@ export const useCreateEvent = () => {
       toast.success('تم إنشاء الحدث بنجاح')
 
       // Manually update the cache with the REAL event from server
-      queryClient.setQueriesData({ queryKey: ['events'] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: QueryKeys.events.all() }, (old: any) => {
         if (!old) return old
 
         // Handle { events: [...] } structure
@@ -160,12 +161,12 @@ export const useUpdateReminder = () => {
       remindersService.updateReminder(id, data),
     // Optimistic update
     onMutate: async ({ id, data }) => {
-      await queryClient.cancelQueries({ queryKey: ['reminders'] })
+      await queryClient.cancelQueries({ queryKey: QueryKeys.reminders.all() })
 
-      const previousQueries = queryClient.getQueriesData({ queryKey: ['reminders'] })
-      const previousReminder = queryClient.getQueryData(['reminders', id])
+      const previousQueries = queryClient.getQueriesData({ queryKey: QueryKeys.reminders.all() })
+      const previousReminder = queryClient.getQueryData(QueryKeys.reminders.detail(id))
 
-      queryClient.setQueriesData({ queryKey: ['reminders'] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: QueryKeys.reminders.all() }, (old: any) => {
         if (!old) return old
 
         const list = Array.isArray(old) ? old : (old.reminders || old.data || [])
@@ -182,7 +183,7 @@ export const useUpdateReminder = () => {
       })
 
       if (previousReminder) {
-        queryClient.setQueryData(['reminders', id], { ...previousReminder, ...data })
+        queryClient.setQueryData(QueryKeys.reminders.detail(id), { ...previousReminder, ...data })
       }
 
       return { previousQueries, previousReminder }
@@ -197,7 +198,7 @@ export const useUpdateReminder = () => {
         })
       }
       if (context?.previousReminder) {
-        queryClient.setQueryData(['reminders', id], context.previousReminder)
+        queryClient.setQueryData(QueryKeys.reminders.detail(id), context.previousReminder)
       }
       toast.error(error.message || 'فشل تحديث التذكير')
     },
@@ -221,7 +222,7 @@ export const useDeleteReminder = () => {
       toast.success('تم حذف التذكير بنجاح')
 
       // Optimistically remove reminder from all lists
-      queryClient.setQueriesData({ queryKey: ['reminders'] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: QueryKeys.reminders.all() }, (old: any) => {
         if (!old) return old
 
         // Handle { data: [...] } structure (API response format)
@@ -265,7 +266,7 @@ export const useDeleteReminder = () => {
 
 export const useUpcomingReminders = (days: number = 7, enabled: boolean = true) => {
   return useQuery({
-    queryKey: ['reminders', 'upcoming', days],
+    queryKey: QueryKeys.reminders.upcoming(days),
     queryFn: () => remindersService.getUpcoming(days),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -275,7 +276,7 @@ export const useUpcomingReminders = (days: number = 7, enabled: boolean = true) 
 
 export const useOverdueReminders = (enabled: boolean = true) => {
   return useQuery({
-    queryKey: ['reminders', 'overdue'],
+    queryKey: QueryKeys.reminders.overdue(),
     queryFn: () => remindersService.getOverdue(),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -287,7 +288,7 @@ export const useReminderStats = (options?: { assignedTo?: string; dateFrom?: str
   const { enabled = true, ...filters } = options || {}
   const hasFilters = Object.keys(filters).length > 0
   return useQuery({
-    queryKey: ['reminders', 'stats', hasFilters ? filters : undefined],
+    queryKey: QueryKeys.reminders.stats(hasFilters ? filters : undefined),
     queryFn: () => remindersService.getStats(hasFilters ? filters : undefined),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -445,7 +446,7 @@ export const useDelegateReminder = () => {
 
 export const useEvents = (filters?: EventFilters) => {
   return useQuery({
-    queryKey: ['events', filters],
+    queryKey: QueryKeys.events.list(filters),
     queryFn: () => eventsService.getEvents(filters),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -454,7 +455,7 @@ export const useEvents = (filters?: EventFilters) => {
 
 export const useEvent = (id: string) => {
   return useQuery({
-    queryKey: ['events', id],
+    queryKey: QueryKeys.events.detail(id),
     queryFn: () => eventsService.getEvent(id),
     enabled: !!id,
   })
@@ -470,12 +471,12 @@ export const useUpdateEvent = () => {
       eventsService.updateEvent(id, data),
     // Optimistic update
     onMutate: async ({ id, data }) => {
-      await queryClient.cancelQueries({ queryKey: ['events'] })
+      await queryClient.cancelQueries({ queryKey: QueryKeys.events.all() })
 
-      const previousQueries = queryClient.getQueriesData({ queryKey: ['events'] })
-      const previousEvent = queryClient.getQueryData(['events', id])
+      const previousQueries = queryClient.getQueriesData({ queryKey: QueryKeys.events.all() })
+      const previousEvent = queryClient.getQueryData(QueryKeys.events.detail(id))
 
-      queryClient.setQueriesData({ queryKey: ['events'] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: QueryKeys.events.all() }, (old: any) => {
         if (!old) return old
 
         const list = Array.isArray(old) ? old : (old.events || old.data || [])
@@ -492,7 +493,7 @@ export const useUpdateEvent = () => {
       })
 
       if (previousEvent) {
-        queryClient.setQueryData(['events', id], { ...previousEvent, ...data })
+        queryClient.setQueryData(QueryKeys.events.detail(id), { ...previousEvent, ...data })
       }
 
       return { previousQueries, previousEvent }
@@ -507,7 +508,7 @@ export const useUpdateEvent = () => {
         })
       }
       if (context?.previousEvent) {
-        queryClient.setQueryData(['events', id], context.previousEvent)
+        queryClient.setQueryData(QueryKeys.events.detail(id), context.previousEvent)
       }
       toast.error(error.message || 'فشل تحديث الحدث')
     },
@@ -531,7 +532,7 @@ export const useDeleteEvent = () => {
       toast.success('تم حذف الحدث بنجاح')
 
       // Optimistically remove event from all lists
-      queryClient.setQueriesData({ queryKey: ['events'] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: QueryKeys.events.all() }, (old: any) => {
         if (!old) return old
 
         // Handle { events: [...] } structure
@@ -663,7 +664,7 @@ export const useRSVPEvent = () => {
 
 export const useUpcomingEvents = (days: number = 7, enabled: boolean = true) => {
   return useQuery({
-    queryKey: ['events', 'upcoming', days],
+    queryKey: QueryKeys.events.upcoming(days),
     queryFn: () => eventsService.getUpcoming(days),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -673,7 +674,7 @@ export const useUpcomingEvents = (days: number = 7, enabled: boolean = true) => 
 
 export const useEventStats = (filters?: { dateFrom?: string; dateTo?: string; caseId?: string }, enabled: boolean = true) => {
   return useQuery({
-    queryKey: ['events', 'stats', filters],
+    queryKey: QueryKeys.events.stats(filters),
     queryFn: () => eventsService.getStats(filters),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -820,7 +821,7 @@ export const useEventsWithStats = (filters: EventFilters = {}) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery<EventsWithStats>({
-    queryKey: ['events', 'with-stats', filters],
+    queryKey: QueryKeys.events.withStats(filters),
     queryFn: async () => {
       const response = await apiClient.get('/events', {
         params: { ...filters, includeStats: true }
@@ -849,10 +850,10 @@ export interface RemindersWithStats {
 }
 
 export const useRemindersWithStats = (filters: ReminderFilters = {}) => {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const isAuthenticated = useAuthStore ((state) => state.isAuthenticated)
 
   return useQuery<RemindersWithStats>({
-    queryKey: ['reminders', 'with-stats', filters],
+    queryKey: QueryKeys.reminders.withStats(filters),
     queryFn: async () => {
       const response = await apiClient.get('/reminders', {
         params: { ...filters, includeStats: true }

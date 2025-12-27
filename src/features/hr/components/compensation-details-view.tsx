@@ -64,7 +64,7 @@ export function CompensationDetailsView() {
   const approveMutation = useApproveReview()
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+    { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
     { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
     { title: 'التعويضات', href: ROUTES.dashboard.hr.compensation.list, isActive: true },
   ]
@@ -252,7 +252,7 @@ export function CompensationDetailsView() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/compensation/new?editId=${compensationId}` })}>
+                        <DropdownMenuItem onClick={() => navigate({ to: `${ROUTES.dashboard.hr.compensation.new}?editId=${compensationId}` })}>
                           <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                           تعديل
                         </DropdownMenuItem>

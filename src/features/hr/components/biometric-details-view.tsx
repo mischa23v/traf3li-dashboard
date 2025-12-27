@@ -106,7 +106,7 @@ export function BiometricDetailsView() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
         { title: 'البصمة', href: ROUTES.dashboard.hr.biometric.list, isActive: true },
     ]
 
@@ -183,7 +183,7 @@ export function BiometricDetailsView() {
                         <h3 className="text-lg font-bold text-slate-900 mb-2">الجهاز غير موجود</h3>
                         <p className="text-slate-500 mb-4">لم يتم العثور على الجهاز المطلوب</p>
                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                            <Link to="/dashboard/hr/biometric">
+                            <Link to={ROUTES.dashboard.hr.biometric.list}>
                                 العودة إلى القائمة
                             </Link>
                         </Button>

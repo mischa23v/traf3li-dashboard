@@ -51,6 +51,7 @@ import { ProductivityHero } from '@/components/productivity-hero'
 import { ClientsSidebar } from '../components/clients-sidebar'
 import { SmartButton, SmartButtonGroup, getSmartButtons, resolveNavigationPath } from '@/components/smart-button'
 import { useSmartButtonCounts } from '@/hooks/useSmartButtonCounts'
+import { ROUTES } from '@/constants/routes'
 
 const route = getRouteApi('/_authenticated/dashboard/clients/$clientId')
 
@@ -85,9 +86,9 @@ export function ClientDetails() {
   const { data, isLoading, isError, error, refetch } = useClient(clientId)
 
   const topNav = [
-    { title: t('sidebar.nav.clients'), href: '/dashboard/clients', isActive: true },
-    { title: t('sidebar.nav.organizations'), href: '/dashboard/organizations', isActive: false },
-    { title: t('sidebar.nav.cases'), href: '/dashboard/cases', isActive: false },
+    { title: t('sidebar.nav.clients'), href: ROUTES.dashboard.clients.list, isActive: true },
+    { title: t('sidebar.nav.organizations'), href: ROUTES.dashboard.organizations.list, isActive: false },
+    { title: t('sidebar.nav.cases'), href: ROUTES.dashboard.cases.list, isActive: false },
   ]
 
   // Transform client data
@@ -176,7 +177,7 @@ export function ClientDetails() {
                 {t('common.retry')}
               </Button>
               <Button variant="outline" asChild>
-                <Link to="/dashboard/clients">{t('clients.backToClients')}</Link>
+                <Link to={ROUTES.dashboard.clients.list}>{t('clients.backToClients')}</Link>
               </Button>
             </div>
           </div>
@@ -193,7 +194,7 @@ export function ClientDetails() {
             <h3 className="text-lg font-bold text-slate-900 mb-2">{t('clients.notFound')}</h3>
             <p className="text-slate-500 mb-4">{t('clients.clientNotFoundDescription')}</p>
             <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-              <Link to="/dashboard/clients">{t('clients.backToClients')}</Link>
+              <Link to={ROUTES.dashboard.clients.list}>{t('clients.backToClients')}</Link>
             </Button>
           </div>
         )}

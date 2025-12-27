@@ -3,7 +3,7 @@
  * React hooks for guest sessions and account conversion
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
@@ -12,6 +12,7 @@ import anonymousAuthService, {
   type ConvertAccountData,
 } from '@/services/anonymousAuthService'
 import { useAuthStore } from '@/stores/auth-store'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 /**
  * Hook to login as guest
@@ -19,13 +20,12 @@ import { useAuthStore } from '@/stores/auth-store'
 export function useLoginAsGuest() {
   const { t } = useTranslation()
   const setUser = useAuthStore((state) => state.setUser)
-  const queryClient = useQueryClient()
 
   return useMutation<AnonymousUser>({
     mutationFn: () => anonymousAuthService.loginAsGuest(),
     onSuccess: (user) => {
       setUser(user)
-      queryClient.invalidateQueries({ queryKey: ['user'] })
+      invalidateCache.user.profile()
       toast.success(t('auth.guestWelcome', 'مرحباً! تم إنشاء جلسة ضيف'))
     },
     onError: (error: Error) => {
@@ -40,7 +40,6 @@ export function useLoginAsGuest() {
 export function useConvertAccount() {
   const { t } = useTranslation()
   const setUser = useAuthStore((state) => state.setUser)
-  const queryClient = useQueryClient()
   const navigate = useNavigate()
 
   return useMutation({
@@ -48,7 +47,7 @@ export function useConvertAccount() {
       anonymousAuthService.convertToFullAccount(data),
     onSuccess: (user) => {
       setUser(user)
-      queryClient.invalidateQueries({ queryKey: ['user'] })
+      invalidateCache.user.profile()
       toast.success(t('auth.accountCreated', 'تم إنشاء حسابك بنجاح!'))
       navigate({ to: '/dashboard' })
     },
@@ -63,12 +62,11 @@ export function useConvertAccount() {
  */
 export function useExtendAnonymousSession() {
   const { t } = useTranslation()
-  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: () => anonymousAuthService.extendSession(),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['user'] })
+      invalidateCache.user.profile()
       toast.success(t('auth.sessionExtended', 'تم تمديد الجلسة'))
     },
     onError: (error: Error) => {

@@ -202,7 +202,7 @@ export function GeofencingListView() {
     }, [geofencesData])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
         { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
         { title: 'الحضور', href: ROUTES.dashboard.hr.attendance.list, isActive: false },
         { title: 'النطاق الجغرافي', href: ROUTES.dashboard.hr.geofencing.list, isActive: true },
@@ -441,7 +441,7 @@ export function GeofencingListView() {
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">لا يوجد نطاقات جغرافية</h3>
                                         <p className="text-slate-500 mb-4">ابدأ بإضافة نطاق جغرافي جديد</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                                            <Link to="/dashboard/hr/geofencing/new">
+                                            <Link to={ROUTES.dashboard.hr.geofencing.new}>
                                                 <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 إضافة نطاق جغرافي
                                             </Link>

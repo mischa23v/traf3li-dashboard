@@ -41,6 +41,7 @@ import {
   useExportInterCompanyReport,
 } from '@/hooks/useInterCompany'
 import { formatCurrency, formatDate } from '@/lib/utils'
+import { ROUTES } from '@/constants/routes'
 
 export default function InterCompanyDashboard() {
   const navigate = useNavigate()
@@ -63,7 +64,7 @@ export default function InterCompanyDashboard() {
   const exportMutation = useExportInterCompanyReport()
 
   const topNav = [
-    { title: t('finance.interCompany.nav.finance'), href: '/finance' },
+    { title: t('finance.interCompany.nav.finance'), href: ROUTES.dashboard.finance.overview },
     {
       title: t('finance.interCompany.nav.interCompany'),
       isCurrentPage: true
@@ -136,7 +137,7 @@ export default function InterCompanyDashboard() {
                 <Download className="h-4 w-4 mr-2" />
                 {t('finance.interCompany.dashboard.export')}
               </Button>
-              <Button onClick={() => navigate({ to: '/finance/inter-company/new' })}>
+              <Button onClick={() => navigate({ to: ROUTES.dashboard.finance.interCompany.new })}>
                 <Plus className="h-4 w-4 mr-2" />
                 {t('finance.interCompany.dashboard.newTransaction')}
               </Button>
@@ -229,7 +230,7 @@ export default function InterCompanyDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <Card
               className="cursor-pointer hover:shadow-lg transition-shadow border-2 hover:border-primary"
-              onClick={() => navigate({ to: '/finance/inter-company/balances' })}
+              onClick={() => navigate({ to: ROUTES.dashboard.finance.interCompany.balances })}
             >
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
@@ -245,7 +246,7 @@ export default function InterCompanyDashboard() {
 
             <Card
               className="cursor-pointer hover:shadow-lg transition-shadow border-2 hover:border-primary"
-              onClick={() => navigate({ to: '/finance/inter-company/reconciliation' })}
+              onClick={() => navigate({ to: ROUTES.dashboard.finance.interCompany.reconciliation })}
             >
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
@@ -261,7 +262,7 @@ export default function InterCompanyDashboard() {
 
             <Card
               className="cursor-pointer hover:shadow-lg transition-shadow border-2 hover:border-primary"
-              onClick={() => navigate({ to: '/finance/inter-company/new' })}
+              onClick={() => navigate({ to: ROUTES.dashboard.finance.interCompany.new })}
             >
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
@@ -308,7 +309,7 @@ export default function InterCompanyDashboard() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => navigate({ to: '/finance/inter-company' })}
+                        onClick={() => navigate({ to: ROUTES.dashboard.finance.interCompany.list })}
                       >
                         {t('finance.interCompany.dashboard.viewAll')}
                       </Button>
@@ -340,7 +341,7 @@ export default function InterCompanyDashboard() {
                           <TableRow
                             key={transaction._id}
                             className="cursor-pointer hover:bg-accent"
-                            onClick={() => navigate({ to: `/finance/inter-company/${transaction._id}` })}
+                            onClick={() => navigate({ to: ROUTES.dashboard.finance.interCompany.detail(transaction._id) })}
                           >
                             <TableCell>{formatDate(transaction.transactionDate)}</TableCell>
                             <TableCell>
@@ -399,7 +400,7 @@ export default function InterCompanyDashboard() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => navigate({ to: '/finance/inter-company/reconciliation' })}
+                      onClick={() => navigate({ to: ROUTES.dashboard.finance.interCompany.reconciliation })}
                     >
                       {t('finance.interCompany.dashboard.viewAll')}
                     </Button>
@@ -429,7 +430,7 @@ export default function InterCompanyDashboard() {
                           <TableRow
                             key={reconciliation._id}
                             className="cursor-pointer hover:bg-accent"
-                            onClick={() => navigate({ to: `/finance/inter-company/reconciliation/${reconciliation._id}` })}
+                            onClick={() => navigate({ to: ROUTES.dashboard.finance.interCompany.reconciliationDetail(reconciliation._id) })}
                           >
                             <TableCell className="font-mono text-sm">
                               {reconciliation.reconciliationNumber}

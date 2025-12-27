@@ -3,10 +3,11 @@
  * React Query hooks for OAuth/Social login operations
  */
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { CACHE_TIMES } from '@/config/cache'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import oauthService, {
   type OAuthProvider,
   type OAuthProviderConfig,
@@ -18,7 +19,6 @@ import { useAuthStore } from '@/stores/auth-store'
  */
 export const useOAuthLogin = () => {
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
   const setUser = useAuthStore((state) => state.setUser)
 
   return useMutation({
@@ -44,7 +44,6 @@ export const useOAuthLogin = () => {
  */
 export const useOAuthCallback = () => {
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
   const setUser = useAuthStore((state) => state.setUser)
 
   return useMutation({
@@ -61,7 +60,7 @@ export const useOAuthCallback = () => {
     },
     onSuccess: (data) => {
       setUser(data.user)
-      queryClient.invalidateQueries({ queryKey: ['user'] })
+      invalidateCache.user.profile()
 
       if (data.isNewUser) {
         toast.success('مرحباً بك!', {
@@ -110,8 +109,6 @@ export const useLinkedProviders = () => {
  * Hook to link OAuth provider
  */
 export const useLinkProvider = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: async ({
       provider,
@@ -132,14 +129,12 @@ export const useLinkProvider = () => {
  * Hook to unlink OAuth provider
  */
 export const useUnlinkProvider = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: async (provider: OAuthProvider) => {
       await oauthService.unlinkProvider(provider)
     },
     onSuccess: (_, provider) => {
-      queryClient.invalidateQueries({ queryKey: ['oauth', 'linked'] })
+      invalidateCache.oauth.linked()
       toast.success('تم إلغاء الربط بنجاح')
     },
     onError: (error: Error) => {

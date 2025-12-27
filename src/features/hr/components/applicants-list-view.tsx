@@ -149,7 +149,7 @@ export function ApplicantsListView() {
   }, [statsData])
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false }, // TODO: Add overview route to ROUTES constant
+    { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
     { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
     { title: 'التوظيف', href: ROUTES.dashboard.hr.recruitment.jobs.list, isActive: true },
   ]

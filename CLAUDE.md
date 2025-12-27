@@ -1,5 +1,92 @@
 ---
 
+## 🔒 CENTRALIZED CONFIGURATION RULES (MANDATORY)
+
+**NEVER hardcode these values. ALWAYS use centralized constants:**
+
+### 1. Routes - Use `ROUTES` Constants
+```typescript
+// ❌ NEVER DO THIS
+navigate('/dashboard/clients')
+<Link to="/dashboard/cases/new">
+
+// ✅ ALWAYS DO THIS
+import { ROUTES } from '@/constants/routes'
+navigate(ROUTES.dashboard.clients.list)
+<Link to={ROUTES.dashboard.cases.new}>
+
+// For dynamic routes:
+navigate(ROUTES.dashboard.clients.detail(clientId))
+```
+
+### 2. Query Keys - Use `QueryKeys` Factory
+```typescript
+// ❌ NEVER DO THIS
+queryKey: ['clients', clientId]
+queryKey: ['invoices', 'list', filters]
+
+// ✅ ALWAYS DO THIS
+import { QueryKeys } from '@/lib/query-keys'
+queryKey: QueryKeys.clients.detail(clientId)
+queryKey: QueryKeys.invoices.list(filters)
+
+// If a key doesn't exist, ADD IT to query-keys.ts first
+```
+
+### 3. Cache Times - Use `CACHE_TIMES` Constants
+```typescript
+// ❌ NEVER DO THIS
+staleTime: 300000
+staleTime: 5 * 60 * 1000
+gcTime: 1800000
+
+// ✅ ALWAYS DO THIS
+import { CACHE_TIMES } from '@/config/cache'
+staleTime: CACHE_TIMES.MEDIUM      // 5 minutes
+staleTime: CACHE_TIMES.LONG        // 30 minutes
+gcTime: CACHE_TIMES.GC_MEDIUM      // 30 minutes
+```
+
+### 4. Cache Invalidation - Use `invalidateCache` Helper
+```typescript
+// ❌ NEVER DO THIS
+queryClient.invalidateQueries({ queryKey: ['clients'] })
+queryClient.invalidateQueries({ queryKey: ['invoices', 'list'] })
+
+// ✅ ALWAYS DO THIS
+import { invalidateCache } from '@/lib/cache-invalidation'
+invalidateCache.clients.all()
+invalidateCache.invoices.lists()
+invalidateCache.all()  // For global invalidation
+```
+
+### 5. API Endpoints - Use Centralized API Config
+```typescript
+// ❌ NEVER DO THIS
+fetch('/api/v1/clients')
+axios.get('/api/v1/invoices')
+
+// ✅ ALWAYS DO THIS
+import { API_ENDPOINTS } from '@/config/api'
+fetch(API_ENDPOINTS.clients.list)
+```
+
+### When Adding New Features:
+
+1. **New Route?** → Add to `src/constants/routes.ts` first
+2. **New Query?** → Add key to `src/lib/query-keys.ts` first
+3. **New Cache Pattern?** → Add to `src/config/cache.ts` if needed
+4. **New Invalidation?** → Add to `src/lib/cache-invalidation.ts` first
+
+### Why This Matters:
+- **Type Safety**: Autocomplete and compile-time checking
+- **Maintainability**: Change once, update everywhere
+- **Consistency**: Same patterns across entire codebase
+- **Refactoring**: Easy to rename/restructure
+- **Debugging**: Single source of truth
+
+---
+
 ## ⚠️ MOST IMPORTANT RULE - ASK BEFORE ASSUMING
 
 **THIS RULE MUST NEVER BE BROKEN:**

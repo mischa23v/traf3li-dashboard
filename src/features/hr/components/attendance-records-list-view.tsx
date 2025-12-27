@@ -213,7 +213,7 @@ export function AttendanceRecordsListView() {
   }, [todayData])
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+    { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
     { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
     { title: 'الحضور', href: ROUTES.dashboard.hr.attendance.list, isActive: true },
     { title: 'الإجازات', href: ROUTES.dashboard.hr.leave.list, isActive: false },
@@ -434,7 +434,7 @@ export function AttendanceRecordsListView() {
                     <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد سجلات</h3>
                     <p className="text-slate-500 mb-4">لا توجد سجلات حضور لهذا اليوم</p>
                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                      <Link to="/dashboard/hr/attendance/new">
+                      <Link to={ROUTES.dashboard.hr.attendance.new}>
                         <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                         تسجيل حضور
                       </Link>

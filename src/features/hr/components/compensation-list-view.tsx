@@ -122,7 +122,7 @@ export function CompensationListView() {
   }
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+    { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
     { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
     { title: 'التعويضات والمكافآت', href: ROUTES.dashboard.hr.compensation.list, isActive: true },
   ]
@@ -420,7 +420,7 @@ export function CompensationListView() {
                                     <Eye className="w-4 h-4 ms-2" aria-hidden="true" />
                                     عرض التفاصيل
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/compensation/new?editId=${record.compensationId}` })}>
+                                  <DropdownMenuItem onClick={() => navigate({ to: `${ROUTES.dashboard.hr.compensation.new}?editId=${record.compensationId}` })}>
                                     <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                                     تعديل
                                   </DropdownMenuItem>

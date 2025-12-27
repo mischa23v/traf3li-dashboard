@@ -10,6 +10,7 @@ import apiClient from '@/lib/api'
 import { useAuthStore } from '@/stores/auth-store'
 import { CACHE_TIMES } from '@/config/cache'
 import { invalidateCache } from '@/lib/cache-invalidation'
+import { QueryKeys } from '@/lib/query-keys'
 import type {
   SidebarItem,
   PageAccessRule,
@@ -272,7 +273,7 @@ export const useAdminDashboardData = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   return useQuery<AdminDashboardData>({
-    queryKey: ['admin', 'dashboard'],
+    queryKey: QueryKeys.admin.dashboard(),
     queryFn: async () => {
       const response = await apiClient.get('/admin/dashboard')
       return response.data

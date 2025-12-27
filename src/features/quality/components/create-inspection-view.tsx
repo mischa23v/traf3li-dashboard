@@ -58,11 +58,12 @@ import type {
   ReadingStatus
 } from '@/types/quality'
 import { QualitySidebar } from './quality-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'quality.quality', href: '/dashboard/quality' },
-  { title: 'quality.createInspection', href: '/dashboard/quality/create' },
+  { title: 'quality.quality', href: ROUTES.dashboard.quality.list },
+  { title: 'quality.createInspection', href: ROUTES.dashboard.quality.create },
 ]
 
 const REFERENCE_TYPES = [
@@ -156,7 +157,7 @@ export function CreateInspectionView() {
 
     try {
       await createInspectionMutation.mutateAsync(formData)
-      navigate({ to: '/dashboard/quality' })
+      navigate({ to: ROUTES.dashboard.quality.list })
     } catch (error) {
       // Error handled by mutation
     }
@@ -602,7 +603,7 @@ export function CreateInspectionView() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate({ to: '/dashboard/quality' })}
+                  onClick={() => navigate({ to: ROUTES.dashboard.quality.list })}
                   className="rounded-xl"
                 >
                   <X className="w-4 h-4 ml-2" />

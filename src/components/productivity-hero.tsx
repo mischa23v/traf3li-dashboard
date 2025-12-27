@@ -65,11 +65,11 @@ export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = f
         referrals: { label: t('hero.list.referrals'), href: ROUTES.dashboard.crm.referrals.list },
         pipeline: { label: t('hero.list.pipeline'), href: ROUTES.dashboard.crm.pipeline },
         employees: { label: t('hero.list.employees'), href: ROUTES.dashboard.hr.employees.list },
-        salaries: { label: t('hero.list.salaries'), href: '/dashboard/hr/salaries' }, // TODO: Add to ROUTES
+        salaries: { label: t('hero.list.salaries'), href: ROUTES.dashboard.hr.salaries.list },
         payroll: { label: t('hero.list.payroll'), href: ROUTES.dashboard.hr.payroll.list },
         leaves: { label: t('hero.list.leaves'), href: ROUTES.dashboard.hr.leave.list },
         attendance: { label: t('hero.list.attendance'), href: ROUTES.dashboard.hr.attendance.list },
-        evaluations: { label: t('hero.list.evaluations'), href: '/dashboard/hr/evaluations' }, // TODO: Add to ROUTES
+        evaluations: { label: t('hero.list.evaluations'), href: ROUTES.dashboard.hr.evaluations.list },
         grievances: { label: t('hero.list.grievances'), href: ROUTES.dashboard.hr.grievances.list },
         'organizational-structure': { label: t('hero.list.organizationalStructure'), href: ROUTES.dashboard.hr.organizationalStructure.list },
         'job-positions': { label: t('hero.list.jobPositions'), href: ROUTES.dashboard.hr.jobPositions.list },
@@ -103,19 +103,19 @@ export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = f
         'lead-scoring': { label: t('hero.new.lead'), href: ROUTES.dashboard.crm.leads.new },
         'whatsapp': { label: t('hero.new.lead'), href: ROUTES.dashboard.crm.leads.new },
         cases: { label: t('hero.new.case'), href: ROUTES.dashboard.cases.new },
-        documents: { label: t('hero.new.document'), href: '/dashboard/documents/new' }, // TODO: Add to ROUTES
+        documents: { label: t('hero.new.document'), href: ROUTES.dashboard.documents.new },
         invoices: { label: t('hero.new.invoice'), href: ROUTES.dashboard.finance.invoices.new },
         expenses: { label: t('hero.new.expense'), href: ROUTES.dashboard.finance.expenses.new },
         payments: { label: t('hero.new.payment'), href: ROUTES.dashboard.finance.payments.new },
-        transactions: { label: t('hero.new.transaction'), href: '/dashboard/finance/transactions/new' }, // TODO: Add to ROUTES
+        transactions: { label: t('hero.new.transaction'), href: ROUTES.dashboard.finance.transactions.new },
         'time-entries': { label: t('hero.new.timeEntry'), href: ROUTES.dashboard.finance.timeTracking.new },
         'time-tracking': { label: t('hero.new.timeEntry'), href: ROUTES.dashboard.finance.timeTracking.new },
         employees: { label: t('hero.new.employee'), href: ROUTES.dashboard.hr.employees.new },
-        salaries: { label: t('hero.new.salary'), href: '/dashboard/hr/salaries/new' }, // TODO: Add to ROUTES
+        salaries: { label: t('hero.new.salary'), href: ROUTES.dashboard.hr.salaries.new },
         payroll: { label: t('hero.new.payrollRun'), href: ROUTES.dashboard.hr.payroll.new },
         leaves: { label: t('hero.new.leave'), href: ROUTES.dashboard.hr.leave.new },
         attendance: { label: t('hero.new.attendanceRecord'), href: ROUTES.dashboard.hr.attendance.new },
-        evaluations: { label: t('hero.new.evaluation'), href: '/dashboard/hr/evaluations/new' }, // TODO: Add to ROUTES
+        evaluations: { label: t('hero.new.evaluation'), href: ROUTES.dashboard.hr.evaluations.new },
         grievances: { label: t('hero.new.grievance'), href: ROUTES.dashboard.hr.grievances.new },
         'organizational-structure': { label: t('hero.new.unit'), href: ROUTES.dashboard.hr.organizationalStructure.new },
         'job-positions': { label: t('hero.new.position'), href: ROUTES.dashboard.hr.jobPositions.new },
@@ -128,10 +128,10 @@ export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = f
         'tasks-reports': { label: t('hero.new.productivityReport'), href: ROUTES.dashboard.tasks.reports.new },
         'crm-reports': { label: t('hero.new.crmReport'), href: ROUTES.dashboard.crm.reports.new },
         'sales-reports': { label: t('hero.new.salesReport'), href: ROUTES.dashboard.sales.reports.new },
-        laws: { label: t('hero.new.law'), href: '/dashboard/knowledge/laws/new' }, // TODO: Add to ROUTES
-        judgments: { label: t('hero.new.judgment'), href: '/dashboard/knowledge/judgments/new' }, // TODO: Add to ROUTES
-        forms: { label: t('hero.new.form'), href: '/dashboard/knowledge/forms/new' }, // TODO: Add to ROUTES
-        jobs: { label: t('hero.new.service'), href: '/dashboard/jobs/new' }, // TODO: Add to ROUTES
+        laws: { label: t('hero.new.law'), href: ROUTES.dashboard.knowledge.laws.new },
+        judgments: { label: t('hero.new.judgment'), href: ROUTES.dashboard.knowledge.judgments.new },
+        forms: { label: t('hero.new.form'), href: ROUTES.dashboard.knowledge.forms.new },
+        jobs: { label: t('hero.new.service'), href: ROUTES.dashboard.jobs.new },
     }
 
     const currentButtonConfig = buttonConfig[type]

@@ -10,6 +10,47 @@
 
 export const ROUTES = {
   /**
+   * API Endpoints (for backend API calls)
+   */
+  api: {
+    /**
+     * Dashboard API endpoints
+     */
+    dashboard: {
+      heroStats: '/dashboard/hero-stats',
+      stats: '/dashboard/stats',
+      summary: '/dashboard/summary',
+      todayEvents: '/dashboard/today-events',
+      financialSummary: '/dashboard/financial-summary',
+      recentMessages: '/dashboard/recent-messages',
+      activity: '/dashboard/activity',
+      crmStats: '/dashboard/crm-stats',
+      hrStats: '/dashboard/hr-stats',
+      financeStats: '/dashboard/finance-stats',
+      hearingsUpcoming: '/dashboard/hearings/upcoming',
+      deadlinesUpcoming: '/dashboard/deadlines/upcoming',
+      timeEntriesSummary: '/dashboard/time-entries/summary',
+      documentsPending: '/dashboard/documents/pending',
+    },
+
+    /**
+     * Reports API endpoints
+     */
+    reports: {
+      casesChart: '/reports/cases-chart',
+      revenueChart: '/reports/revenue-chart',
+      tasksChart: '/reports/tasks-chart',
+    },
+
+    /**
+     * Messages API endpoints
+     */
+    messages: {
+      stats: '/messages/stats',
+    },
+  },
+
+  /**
    * Authentication and onboarding routes
    */
   auth: {
@@ -47,6 +88,11 @@ export const ROUTES = {
      * Dashboard home/index
      */
     home: '/',
+
+    /**
+     * Dashboard overview
+     */
+    overview: '/dashboard/overview',
 
     /**
      * Help and support
@@ -108,7 +154,14 @@ export const ROUTES = {
     staff: {
       list: '/dashboard/staff',
       new: '/dashboard/staff/new',
+      detail: (staffId: string) => `/dashboard/staff/${staffId}`,
+      edit: (staffId: string) => `/dashboard/staff/${staffId}/edit`,
     },
+
+    /**
+     * Activities
+     */
+    activities: '/dashboard/activities',
 
     /**
      * Calendar and scheduling
@@ -125,6 +178,7 @@ export const ROUTES = {
      */
     followups: {
       list: '/dashboard/followups',
+      new: '/dashboard/followups/new',
     },
 
     /**
@@ -193,6 +247,7 @@ export const ROUTES = {
         list: '/dashboard/finance/credit-notes',
         new: '/dashboard/finance/credit-notes/new',
         detail: (creditNoteId: string) => `/dashboard/finance/credit-notes/${creditNoteId}`,
+        edit: (creditNoteId: string) => `/dashboard/finance/credit-notes/${creditNoteId}/edit`,
       },
 
       // Debit notes
@@ -325,6 +380,8 @@ export const ROUTES = {
       // Transactions
       transactions: {
         list: '/dashboard/finance/transactions',
+        new: '/dashboard/finance/transactions/new',
+        detail: (transactionId: string) => `/dashboard/finance/transactions/${transactionId}`,
       },
 
       // Transactions history
@@ -335,7 +392,10 @@ export const ROUTES = {
       // Corporate cards
       corporateCards: {
         list: '/dashboard/finance/corporate-cards',
+        new: '/dashboard/finance/corporate-cards/new',
+        detail: (cardId: string) => `/dashboard/finance/corporate-cards/${cardId}`,
         reconcile: (cardId: string) => `/dashboard/finance/corporate-cards/${cardId}/reconcile`,
+        reconcileAll: '/dashboard/finance/corporate-cards/reconcile',
       },
 
       // Saudi banking
@@ -351,6 +411,16 @@ export const ROUTES = {
           index: '/dashboard/finance/saudi-banking/wps',
           new: '/dashboard/finance/saudi-banking/wps/new',
         },
+      },
+
+      // Inter-company
+      interCompany: {
+        list: '/dashboard/finance/inter-company',
+        new: '/dashboard/finance/inter-company/new',
+        balances: '/dashboard/finance/inter-company/balances',
+        reconciliation: '/dashboard/finance/inter-company/reconciliation',
+        detail: (transactionId: string) => `/dashboard/finance/inter-company/${transactionId}`,
+        reconciliationDetail: (reconciliationId: string) => `/dashboard/finance/inter-company/reconciliation/${reconciliationId}`,
       },
     },
 
@@ -570,6 +640,20 @@ export const ROUTES = {
         detail: (grievanceId: string) => `/dashboard/hr/grievances/${grievanceId}`,
       },
 
+      // Salaries
+      salaries: {
+        list: '/dashboard/hr/salaries',
+        new: '/dashboard/hr/salaries/new',
+        detail: (salaryId: string) => `/dashboard/hr/salaries/${salaryId}`,
+      },
+
+      // Evaluations
+      evaluations: {
+        list: '/dashboard/hr/evaluations',
+        new: '/dashboard/hr/evaluations/new',
+        detail: (evaluationId: string) => `/dashboard/hr/evaluations/${evaluationId}`,
+      },
+
       // Skills
       skills: {
         list: '/dashboard/hr/skills',
@@ -683,6 +767,7 @@ export const ROUTES = {
         list: '/dashboard/inventory/warehouses',
         create: '/dashboard/inventory/warehouses/create',
         detail: (warehouseId: string) => `/dashboard/inventory/warehouses/${warehouseId}`,
+        edit: (warehouseId: string) => `/dashboard/inventory/warehouses/${warehouseId}/edit`,
       },
     },
 
@@ -712,6 +797,16 @@ export const ROUTES = {
         start: (scheduleId: string) => `/dashboard/assets/maintenance/${scheduleId}/start`,
         edit: (scheduleId: string) => `/dashboard/assets/maintenance/${scheduleId}/edit`,
       },
+
+      // Depreciation
+      depreciation: {
+        list: '/dashboard/assets/depreciation',
+      },
+
+      // Movements
+      movements: {
+        list: '/dashboard/assets/movements',
+      },
     },
 
     /**
@@ -732,12 +827,16 @@ export const ROUTES = {
 
       // Work orders
       workOrders: {
+        list: '/dashboard/manufacturing/work-orders',
         create: '/dashboard/manufacturing/work-orders/create',
+        detail: (workOrderId: string) => `/dashboard/manufacturing/work-orders/${workOrderId}`,
+        edit: (workOrderId: string) => `/dashboard/manufacturing/work-orders/${workOrderId}/edit`,
       },
 
       // Job cards
       jobCards: {
         list: '/dashboard/manufacturing/job-cards',
+        create: '/dashboard/manufacturing/job-cards/create',
         detail: (jobCardId: string) => `/dashboard/manufacturing/job-cards/${jobCardId}`,
       },
 
@@ -745,6 +844,11 @@ export const ROUTES = {
       workstations: {
         list: '/dashboard/manufacturing/workstations',
         create: '/dashboard/manufacturing/workstations/create',
+      },
+
+      // Production plans
+      productionPlans: {
+        list: '/dashboard/manufacturing/production-plans',
       },
     },
 
@@ -755,7 +859,16 @@ export const ROUTES = {
       list: '/dashboard/buying',
       create: '/dashboard/buying/create',
       settings: '/dashboard/buying/settings',
+      overview: '/dashboard/buying/overview',
       detail: (supplierId: string) => `/dashboard/buying/${supplierId}`,
+
+      // Suppliers
+      suppliers: {
+        list: '/dashboard/buying/suppliers',
+        new: '/dashboard/buying/suppliers/new',
+        detail: (supplierId: string) => `/dashboard/buying/suppliers/${supplierId}`,
+        edit: (supplierId: string) => `/dashboard/buying/suppliers/${supplierId}/edit`,
+      },
 
       // Material requests
       materialRequests: {
@@ -771,10 +884,21 @@ export const ROUTES = {
         detail: (purchaseOrderId: string) => `/dashboard/buying/purchase-orders/${purchaseOrderId}`,
       },
 
+      // Purchase receipts
+      purchaseReceipts: {
+        list: '/dashboard/buying/purchase-receipts',
+      },
+
       // RFQ (Request for Quotation)
       rfq: {
         list: '/dashboard/buying/rfq',
         create: '/dashboard/buying/rfq/create',
+      },
+
+      // Reports
+      reports: {
+        analytics: '/dashboard/buying/reports/analytics',
+        supplierPerformance: '/dashboard/buying/reports/supplier-performance',
       },
     },
 
@@ -812,6 +936,11 @@ export const ROUTES = {
         list: '/dashboard/quality/templates',
         create: '/dashboard/quality/templates/create',
       },
+
+      // NCRs (Non-Conformance Reports)
+      ncrs: {
+        list: '/dashboard/quality/ncrs',
+      },
     },
 
     /**
@@ -821,12 +950,21 @@ export const ROUTES = {
       list: '/dashboard/subcontracting',
       create: '/dashboard/subcontracting/create',
       settings: '/dashboard/subcontracting/settings',
+      materials: '/dashboard/subcontracting/materials',
       detail: (orderId: string) => `/dashboard/subcontracting/${orderId}`,
+      edit: (orderId: string) => `/dashboard/subcontracting/${orderId}/edit`,
 
       // Receipts
       receipts: {
         list: '/dashboard/subcontracting/receipts',
         create: '/dashboard/subcontracting/receipts/create',
+        detail: (receiptId: string) => `/dashboard/subcontracting/receipts/${receiptId}`,
+        edit: (receiptId: string) => `/dashboard/subcontracting/receipts/${receiptId}/edit`,
+      },
+
+      // BOMs (Bill of Materials)
+      boms: {
+        list: '/dashboard/subcontracting/boms',
       },
     },
 
@@ -867,17 +1005,32 @@ export const ROUTES = {
      * Knowledge base routes
      */
     knowledge: {
-      forms: '/dashboard/knowledge/forms',
-      judgments: '/dashboard/knowledge/judgments',
-      laws: '/dashboard/knowledge/laws',
+      forms: {
+        list: '/dashboard/knowledge/forms',
+        new: '/dashboard/knowledge/forms/new',
+        detail: (formId: string) => `/dashboard/knowledge/forms/${formId}`,
+      },
+      judgments: {
+        list: '/dashboard/knowledge/judgments',
+        new: '/dashboard/knowledge/judgments/new',
+        detail: (judgmentId: string) => `/dashboard/knowledge/judgments/${judgmentId}`,
+      },
+      laws: {
+        list: '/dashboard/knowledge/laws',
+        new: '/dashboard/knowledge/laws/new',
+        detail: (lawId: string) => `/dashboard/knowledge/laws/${lawId}`,
+      },
     },
 
     /**
      * Jobs/Services routes
      */
     jobs: {
+      list: '/dashboard/jobs',
+      new: '/dashboard/jobs/new',
       browse: '/dashboard/jobs/browse',
       myServices: '/dashboard/jobs/my-services',
+      detail: (jobId: string) => `/dashboard/jobs/${jobId}`,
     },
 
     /**
@@ -901,6 +1054,8 @@ export const ROUTES = {
      */
     documents: {
       list: '/dashboard/documents',
+      new: '/dashboard/documents/new',
+      detail: (documentId: string) => `/dashboard/documents/${documentId}`,
     },
 
     /**
@@ -961,6 +1116,7 @@ export const ROUTES = {
      * Dashboard settings
      */
     settings: {
+      index: '/dashboard/settings',
       profile: '/dashboard/settings/profile',
       company: '/dashboard/settings/company',
       security: '/dashboard/settings/security',

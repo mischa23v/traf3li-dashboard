@@ -17,7 +17,9 @@
  */
 
 import { useQuery, useQueries } from '@tanstack/react-query'
+import { QueryKeys } from '@/lib/query-keys'
 import { smartButtonsService, type SupportedModel, type SmartButtonCounts } from '@/services/smartButtonsService'
+import { CACHE_TIMES } from '@/config/cache'
 
 // ════════════════════════════════════════════════════════════
 // DEPRECATION WARNING
@@ -95,7 +97,7 @@ export function useSmartButtons(
   }
 
   const query = useQuery({
-    queryKey: ['smart-buttons', model, recordId],
+    queryKey: QueryKeys.smartButtons.byModel(model, recordId),
     queryFn: async () => {
       try {
         // This will throw an error with bilingual message
@@ -107,7 +109,7 @@ export function useSmartButtons(
     },
     enabled: enabled && !!recordId,
     retry: false, // Don't retry deprecated endpoints
-    staleTime: 0, // Don't cache deprecated data
+    staleTime: CACHE_TIMES.INSTANT, // Don't cache deprecated data
   })
 
   return {
@@ -146,7 +148,7 @@ export function useSmartButtonsBatch(
   }
 
   const query = useQuery({
-    queryKey: ['smart-buttons-batch', model, recordIds],
+    queryKey: QueryKeys.smartButtons.batch(model, recordIds),
     queryFn: async () => {
       try {
         // This will throw an error with bilingual message
@@ -158,7 +160,7 @@ export function useSmartButtonsBatch(
     },
     enabled: enabled && recordIds.length > 0,
     retry: false, // Don't retry deprecated endpoints
-    staleTime: 0, // Don't cache deprecated data
+    staleTime: CACHE_TIMES.INSTANT, // Don't cache deprecated data
   })
 
   return {
@@ -190,7 +192,7 @@ export function useSmartButtonsMulti(
 
   const queries = useQueries({
     queries: recordIds.map((recordId) => ({
-      queryKey: ['smart-buttons', model, recordId],
+      queryKey: QueryKeys.smartButtons.byModel(model, recordId),
       queryFn: async () => {
         try {
           // This will throw an error with bilingual message
@@ -202,7 +204,7 @@ export function useSmartButtonsMulti(
       },
       enabled: enabled && !!recordId,
       retry: false, // Don't retry deprecated endpoints
-      staleTime: 0, // Don't cache deprecated data
+      staleTime: CACHE_TIMES.INSTANT, // Don't cache deprecated data
     })),
   })
 

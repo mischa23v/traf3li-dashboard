@@ -9,6 +9,9 @@ export const setQueryClient = (client: QueryClient) => {
 
 // Invalidation helpers
 export const invalidateCache = {
+  // Global - invalidate everything (use for company context changes)
+  all: () => queryClient.invalidateQueries(),
+
   // Tasks
   tasks: {
     all: () => queryClient.invalidateQueries({ queryKey: ['tasks'] }),
@@ -381,6 +384,7 @@ export const invalidateCache = {
     employees: () => queryClient.invalidateQueries({ queryKey: ['employees'] }),
     employee: (id: string) => queryClient.invalidateQueries({ queryKey: ['employees', id] }),
     stats: () => queryClient.invalidateQueries({ queryKey: ['employees', 'stats'] }),
+    departed: () => queryClient.invalidateQueries({ queryKey: ['departed'] }),
     related: async () => {
       await Promise.all([
         invalidateCache.staff.all(),
@@ -1119,6 +1123,15 @@ export const invalidateCache = {
   user: {
     profile: () => queryClient.invalidateQueries({ queryKey: ['user'] }),
     permissions: () => queryClient.invalidateQueries({ queryKey: ['permissions'] }),
+    passwordStatus: () => queryClient.invalidateQueries({ queryKey: ['password', 'status'] }),
+  },
+
+  // Auth
+  auth: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['auth'] }),
+    currentUser: () => queryClient.invalidateQueries({ queryKey: ['auth', 'current-user'] }),
+    otpStatus: () => queryClient.invalidateQueries({ queryKey: ['auth', 'otp-status'] }),
+    clearAll: () => queryClient.clear(),
   },
 
   // Permissions (Enterprise)
@@ -1340,7 +1353,7 @@ export const invalidateCache = {
 
   // Integrations
   integrations: {
-    all: () => queryClient.invalidateQueries({ queryKey: ['integrations'] }),
+    all: () => queryClient.invalidateQueries({ queryKey: ['integrations'], refetchType: 'all' }),
     detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['integrations', id] }),
     category: (category?: string) => queryClient.invalidateQueries({ queryKey: ['integrations', 'category', category] }),
     status: (id: string) => queryClient.invalidateQueries({ queryKey: ['integrations', id, 'status'] }),
@@ -1607,7 +1620,7 @@ export const invalidateCache = {
 
   // Apps
   apps: {
-    all: () => queryClient.invalidateQueries({ queryKey: ['apps'] }),
+    all: () => queryClient.invalidateQueries({ queryKey: ['apps'], refetchType: 'all' }),
   },
 
   // Trust Accounts
@@ -2024,6 +2037,18 @@ export const invalidateCache = {
         invalidateCache.mfa.status(),
         invalidateCache.mfa.requirement(),
         invalidateCache.mfa.backupCodesCount(),
+      ])
+    },
+  },
+
+  // Step-Up Authentication (Reauthentication)
+  stepUpAuth: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['stepUpAuth'] }),
+    status: () => queryClient.invalidateQueries({ queryKey: ['stepUpAuth', 'status'] }),
+    methods: () => queryClient.invalidateQueries({ queryKey: ['stepUpAuth', 'methods'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.stepUpAuth.all(),
       ])
     },
   },

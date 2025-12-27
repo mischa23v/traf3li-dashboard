@@ -50,11 +50,12 @@ import { useCreateWorkOrder, useBOMs } from '@/hooks/use-manufacturing'
 import { useItems, useWarehouses } from '@/hooks/use-inventory'
 import type { CreateWorkOrderData } from '@/types/manufacturing'
 import { ManufacturingSidebar } from './manufacturing-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.manufacturing', href: '/dashboard/manufacturing' },
-  { title: 'manufacturing.createWorkOrder', href: '/dashboard/manufacturing/work-orders/create' },
+  { title: 'sidebar.nav.manufacturing', href: ROUTES.dashboard.manufacturing.list },
+  { title: 'manufacturing.createWorkOrder', href: ROUTES.dashboard.manufacturing.workOrders.create },
 ]
 
 type WorkOrderPriority = 'low' | 'medium' | 'high' | 'urgent'
@@ -157,7 +158,7 @@ export function CreateWorkOrderView() {
 
     try {
       await createWorkOrderMutation.mutateAsync(workOrderData)
-      navigate({ to: '/dashboard/manufacturing' })
+      navigate({ to: ROUTES.dashboard.manufacturing.list })
     } catch (error) {
       // Error handled by mutation
     }
@@ -552,7 +553,7 @@ export function CreateWorkOrderView() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate({ to: '/dashboard/manufacturing' })}
+                  onClick={() => navigate({ to: ROUTES.dashboard.manufacturing.list })}
                   className="rounded-xl"
                 >
                   <X className="w-4 h-4 ml-2" />

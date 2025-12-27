@@ -9,6 +9,7 @@ import { toast } from '@/hooks/use-toast'
 import { useTranslation } from 'react-i18next'
 import { createOptimisticMutation } from '@/lib/mutation-utils'
 import { invalidateCache } from '@/lib/cache-invalidation'
+import { QueryKeys } from '@/lib/query-keys'
 
 // ==================== Cache Configuration ====================
 const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
@@ -30,7 +31,7 @@ export const contactsKeys = {
 // Get all contacts - match useClients pattern exactly (simple queryKey)
 export const useContacts = (filters?: ContactFilters) => {
   return useQuery({
-    queryKey: ['contacts', filters],  // Simple key like useClients uses
+    queryKey: QueryKeys.contacts.list(filters),  // Simple key like useClients uses
     queryFn: () => contactsService.getContacts(filters),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,

@@ -229,7 +229,7 @@ export function PerformanceReviewsListView() {
   }, [statsData])
 
   const topNav = [
-    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+    { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
     { title: 'الموظفين', href: ROUTES.dashboard.hr.employees.list, isActive: false },
     { title: 'تقييم الأداء', href: ROUTES.dashboard.hr.performance.list, isActive: true },
     { title: 'الحضور', href: ROUTES.dashboard.hr.attendance.list, isActive: false },
@@ -427,7 +427,7 @@ export function PerformanceReviewsListView() {
                     <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد تقييمات</h3>
                     <p className="text-slate-500 mb-4">لا توجد تقييمات أداء مطابقة للبحث</p>
                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                      <Link to="/dashboard/hr/performance/new">
+                      <Link to={ROUTES.dashboard.hr.performance.new}>
                         <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                         تقييم جديد
                       </Link>

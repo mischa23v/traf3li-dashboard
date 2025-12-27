@@ -5,6 +5,7 @@ import {
     History, Link as LinkIcon, Flag, Send, Eye, Download, Search, Bell,
     CreditCard, DollarSign, CheckCircle2, AlertCircle, Loader2
 } from 'lucide-react'
+import { ROUTES } from '@/constants/routes'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -69,10 +70,10 @@ export function InvoiceDetailsView() {
     }, [invoiceData])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: true },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
-        { title: 'المعاملات', href: '/dashboard/finance/transactions', isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.finance.overview, isActive: false },
+        { title: 'الفواتير', href: ROUTES.dashboard.finance.invoices.list, isActive: true },
+        { title: 'المصروفات', href: ROUTES.dashboard.finance.expenses.list, isActive: false },
+        { title: 'المعاملات', href: ROUTES.dashboard.finance.transactions.list, isActive: false },
     ]
 
     // LOADING STATE

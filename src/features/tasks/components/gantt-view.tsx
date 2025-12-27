@@ -112,10 +112,10 @@ export function GanttView() {
   const { mutate: updateProgress } = useUpdateTaskProgress()
 
   const topNav = [
-    { title: t('tasks.nav.overview'), href: '/dashboard/overview', isActive: false },
+    { title: t('tasks.nav.overview'), href: ROUTES.dashboard.overview, isActive: false },
     { title: t('tasks.nav.tasks'), href: ROUTES.dashboard.tasks.list, isActive: false },
-    { title: t('tasks.nav.cases'), href: '/dashboard/cases', isActive: false },
-    { title: t('tasks.nav.clients'), href: '/dashboard/clients', isActive: false },
+    { title: t('tasks.nav.cases'), href: ROUTES.dashboard.cases.list, isActive: false },
+    { title: t('tasks.nav.clients'), href: ROUTES.dashboard.clients.list, isActive: false },
   ]
 
   // Load DHTMLX Gantt

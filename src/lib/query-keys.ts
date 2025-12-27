@@ -158,6 +158,7 @@ export const QueryKeys = {
     details: () => [...QueryKeys.quotes.all(), 'detail'] as const,
     detail: (id: string) => [...QueryKeys.quotes.details(), id] as const,
     stats: () => [...QueryKeys.quotes.all(), 'stats'] as const,
+    summary: (filters?: Record<string, any>) => [...QueryKeys.quotes.all(), 'summary', filters] as const,
   },
 
   // ==================== CREDIT NOTES ====================
@@ -308,6 +309,13 @@ export const QueryKeys = {
     transactions: (filters?: Record<string, any>) => ['inter-company-transactions', filters] as const,
     balances: () => ['inter-company-balances'] as const,
     reconciliations: (filters?: Record<string, any>) => ['inter-company-reconciliations', filters] as const,
+    transaction: (id: string) => ['inter-company-transactions', id] as const,
+    balance: (currency?: string) => ['inter-company-balances', currency] as const,
+    balanceBetween: (sourceFirmId: string, targetFirmId: string, currency?: string) => ['inter-company-balance', sourceFirmId, targetFirmId, currency] as const,
+    transactionsBetween: (sourceFirmId: string, targetFirmId: string, filters?: Record<string, any>) => ['inter-company-transactions-between', sourceFirmId, targetFirmId, filters] as const,
+    reconciliation: (id: string) => ['inter-company-reconciliations', id] as const,
+    exchangeRate: (fromCurrency: string, toCurrency: string, date?: string) => ['exchange-rate', fromCurrency, toCurrency, date] as const,
+    report: (params: Record<string, any>) => ['inter-company-report', params] as const,
   },
 
   // ==================== EMPLOYEES/HR ====================
@@ -329,6 +337,8 @@ export const QueryKeys = {
     details: () => [...QueryKeys.staff.all(), 'detail'] as const,
     detail: (id: string) => [...QueryKeys.staff.details(), id] as const,
     stats: () => [...QueryKeys.staff.all(), 'stats'] as const,
+    team: () => [...QueryKeys.staff.all(), 'team'] as const,
+    firmMembers: (firmId: string, filters?: Record<string, any>) => [...QueryKeys.staff.all(), firmId, filters] as const,
   },
 
   // ==================== ATTENDANCE ====================
@@ -981,10 +991,21 @@ export const QueryKeys = {
   calendar: {
     all: () => ['calendar'] as const,
     list: (filters?: Record<string, any>) => [...QueryKeys.calendar.all(), filters] as const,
+    infiniteList: (filters?: Record<string, any>) => [...QueryKeys.calendar.all(), 'list', filters] as const,
     date: (date: string) => [...QueryKeys.calendar.all(), 'date', date] as const,
     month: (year: number, month: number) => [...QueryKeys.calendar.all(), 'month', year, month] as const,
     upcoming: (days: number) => [...QueryKeys.calendar.all(), 'upcoming', days] as const,
     overdue: () => [...QueryKeys.calendar.all(), 'overdue'] as const,
+    stats: (filters?: Record<string, any>) => [...QueryKeys.calendar.all(), 'stats', filters] as const,
+    gridSummary: (filters: Record<string, any>) => [...QueryKeys.calendar.all(), 'grid-summary', filters] as const,
+    gridItems: (filters: Record<string, any>) => [...QueryKeys.calendar.all(), 'grid-items', filters] as const,
+    item: (type: string, id: string) => [...QueryKeys.calendar.all(), 'item', type, id] as const,
+  },
+
+  // ==================== SIDEBAR ====================
+  sidebar: {
+    all: () => ['sidebar'] as const,
+    data: (date: string) => [...QueryKeys.sidebar.all(), 'data', date] as const,
   },
 
   // ==================== EVENTS ====================
@@ -994,8 +1015,10 @@ export const QueryKeys = {
     list: (filters?: Record<string, any>) => [...QueryKeys.events.lists(), filters] as const,
     details: () => [...QueryKeys.events.all(), 'detail'] as const,
     detail: (id: string) => [...QueryKeys.events.details(), id] as const,
-    upcoming: () => [...QueryKeys.events.all(), 'upcoming'] as const,
+    upcoming: (days?: number) => [...QueryKeys.events.all(), 'upcoming', days] as const,
     today: () => [...QueryKeys.events.all(), 'today'] as const,
+    stats: (filters?: Record<string, any>) => [...QueryKeys.events.all(), 'stats', filters] as const,
+    withStats: (filters?: Record<string, any>) => [...QueryKeys.events.all(), 'with-stats', filters] as const,
   },
 
   // ==================== REMINDERS ====================
@@ -1005,7 +1028,10 @@ export const QueryKeys = {
     list: (filters?: Record<string, any>) => [...QueryKeys.reminders.lists(), filters] as const,
     details: () => [...QueryKeys.reminders.all(), 'detail'] as const,
     detail: (id: string) => [...QueryKeys.reminders.details(), id] as const,
-    upcoming: () => [...QueryKeys.reminders.all(), 'upcoming'] as const,
+    upcoming: (days?: number) => [...QueryKeys.reminders.all(), 'upcoming', days] as const,
+    overdue: () => [...QueryKeys.reminders.all(), 'overdue'] as const,
+    stats: (filters?: Record<string, any>) => [...QueryKeys.reminders.all(), 'stats', filters] as const,
+    withStats: (filters?: Record<string, any>) => [...QueryKeys.reminders.all(), 'with-stats', filters] as const,
   },
 
   // ==================== ACTIVITIES ====================
@@ -1084,6 +1110,7 @@ export const QueryKeys = {
     list: (filters?: Record<string, any>) => [...QueryKeys.messages.lists(), filters] as const,
     thread: (threadId: string) => [...QueryKeys.messages.all(), 'thread', threadId] as const,
     unread: () => [...QueryKeys.messages.all(), 'unread'] as const,
+    stats: () => ['messages', 'stats'] as const,
   },
 
   // ==================== CONVERSATIONS ====================
@@ -1093,6 +1120,8 @@ export const QueryKeys = {
     list: (filters?: Record<string, any>) => [...QueryKeys.conversations.lists(), filters] as const,
     details: () => [...QueryKeys.conversations.all(), 'detail'] as const,
     detail: (id: string) => [...QueryKeys.conversations.details(), id] as const,
+    messages: (conversationId: string) => ['messages', conversationId] as const,
+    single: (sellerId: string, buyerId: string) => ['conversation', sellerId, buyerId] as const,
   },
 
   // ==================== CHATTER ====================
@@ -1145,18 +1174,22 @@ export const QueryKeys = {
     all: () => ['biometric'] as const,
     // Devices
     devices: () => ['biometric-devices'] as const,
+    deviceList: (filters?: Record<string, any>) => ['biometric-devices', filters] as const,
     device: (id: string) => ['biometric-device', id] as const,
     deviceHealth: (id: string) => ['device-health', id] as const,
     // Enrollments
     enrollments: () => ['biometric-enrollments'] as const,
+    enrollmentList: (filters?: Record<string, any>) => ['biometric-enrollments', filters] as const,
     enrollment: (id: string) => ['biometric-enrollment', id] as const,
     enrollmentEmployee: (employeeId: string) => ['biometric-enrollment-employee', employeeId] as const,
     // Verification
     verificationLogs: () => ['verification-logs'] as const,
-    verificationLiveFeed: () => ['verification-live-feed'] as const,
+    verificationLogList: (filters?: Record<string, any>) => ['verification-logs', filters] as const,
+    verificationLiveFeed: (limit?: number) => ['verification-live-feed', limit] as const,
     verificationStats: (startDate?: string, endDate?: string) => ['verification-stats', startDate, endDate] as const,
     // Geofences
     geofences: () => ['geofences'] as const,
+    geofenceList: (filters?: Record<string, any>) => ['geofences', filters] as const,
     geofence: (id: string) => ['geofence', id] as const,
   },
 
@@ -1194,6 +1227,9 @@ export const QueryKeys = {
     details: () => [...QueryKeys.reports.all(), 'detail'] as const,
     detail: (id: string) => [...QueryKeys.reports.details(), id] as const,
     execute: (id: string, params?: Record<string, any>) => [...QueryKeys.reports.all(), 'execute', id, params] as const,
+    casesChart: (months: number) => ['reports', 'cases-chart', months] as const,
+    revenueChart: (months: number) => ['reports', 'revenue-chart', months] as const,
+    tasksChart: (months: number) => ['reports', 'tasks-chart', months] as const,
   },
 
   // ==================== CONSOLIDATED REPORTS ====================
@@ -1206,20 +1242,44 @@ export const QueryKeys = {
   // ==================== HR ANALYTICS ====================
   hrAnalytics: {
     all: () => ['hr-analytics'] as const,
+    // Dashboard & Overview
+    dashboard: (params?: Record<string, any>) => ['hr-dashboard', params] as const,
     workforceOverview: () => ['hr-workforce-overview'] as const,
-    attritionRisk: () => ['hr-attrition-risk'] as const,
+    analyticsDashboard: () => ['hr', 'analytics', 'dashboard'] as const,
+    // Workforce Analytics
+    headcountTrends: (params?: Record<string, any>) => ['hr-headcount-trends', params] as const,
+    demographics: (params?: Record<string, any>) => ['hr-demographics', params] as const,
+    departmentBreakdown: () => ['hr-department-breakdown'] as const,
+    tenureDistribution: () => ['hr-tenure-distribution'] as const,
+    diversityAnalytics: () => ['hr-diversity-analytics'] as const,
+    // Attendance & Absence
+    absenteeism: (params?: Record<string, any>) => ['hr-absenteeism', params] as const,
+    attendanceAnalytics: (params?: Record<string, any>) => ['hr-attendance-analytics', params] as const,
+    leaveAnalytics: (params?: Record<string, any>) => ['hr-leave-analytics', params] as const,
+    // Performance & Turnover
+    performanceAnalytics: (params?: Record<string, any>) => ['hr-performance-analytics', params] as const,
+    turnover: (params?: Record<string, any>) => ['hr-turnover', params] as const,
+    // Compensation & Payroll
+    compensationAnalytics: (params?: Record<string, any>) => ['hr-compensation-analytics', params] as const,
+    payrollAnalytics: (params?: Record<string, any>) => ['hr-payroll-analytics', params] as const,
+    // Training & Development
+    trainingAnalytics: (params?: Record<string, any>) => ['hr-training-analytics', params] as const,
+    // Recruitment
+    recruitmentAnalytics: (params?: Record<string, any>) => ['hr-recruitment-analytics', params] as const,
+    // Compliance
+    saudization: () => ['hr-saudization'] as const,
+    // Trends & History
+    trends: (params?: Record<string, any>) => ['hr-trends', params] as const,
+    // AI Predictions
+    attritionRisk: (params?: Record<string, any>) => ['hr-attrition-risk', params] as const,
+    employeeAttritionRisk: (employeeId: string) => ['hr-employee-attrition-risk', employeeId] as const,
     flightRisk: () => ['hr-flight-risk'] as const,
-    highPotential: () => ['hr-high-potential'] as const,
+    highPotential: (limit: number) => ['hr-high-potential', limit] as const,
     engagementPredictions: () => ['hr-engagement-predictions'] as const,
     absencePredictions: () => ['hr-absence-predictions'] as const,
-    promotionReadiness: () => ['hr-promotion-readiness'] as const,
-    saudization: () => ['hr-saudization'] as const,
-    diversityAnalytics: () => ['hr-diversity-analytics'] as const,
-    tenureDistribution: () => ['hr-tenure-distribution'] as const,
-    departmentBreakdown: () => ['hr-department-breakdown'] as const,
-    trends: () => ['hr-trends'] as const,
-    workforceForecast: () => ['hr-workforce-forecast'] as const,
-    hiringNeedsForecast: () => ['hr-hiring-needs-forecast'] as const,
+    promotionReadiness: (threshold: number) => ['hr-promotion-readiness', threshold] as const,
+    workforceForecast: (months: number) => ['hr-workforce-forecast', months] as const,
+    hiringNeedsForecast: (months: number) => ['hr-hiring-needs-forecast', months] as const,
   },
 
   // ==================== ML SCORING ====================
@@ -1229,6 +1289,16 @@ export const QueryKeys = {
     cases: () => [...QueryKeys.mlScoring.all(), 'cases'] as const,
     employees: () => [...QueryKeys.mlScoring.all(), 'employees'] as const,
     config: () => [...QueryKeys.mlScoring.all(), 'config'] as const,
+  },
+
+  // ==================== JOBS (MARKETPLACE/SERVICES) ====================
+  jobs: {
+    all: () => ['jobs'] as const,
+    lists: () => [...QueryKeys.jobs.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.jobs.lists(), filters] as const,
+    details: () => [...QueryKeys.jobs.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.jobs.details(), id] as const,
+    myJobs: () => ['jobs', 'my-jobs'] as const,
   },
 
   // ==================== USERS ====================
@@ -1307,6 +1377,12 @@ export const QueryKeys = {
     role: (roleId: string) => [...QueryKeys.uiAccess.all(), 'role', roleId] as const,
   },
 
+  // ==================== ADMIN ====================
+  admin: {
+    all: () => ['admin'] as const,
+    dashboard: () => [...QueryKeys.admin.all(), 'dashboard'] as const,
+  },
+
   // ==================== AUDIT LOG ====================
   auditLog: {
     all: () => ['audit-log'] as const,
@@ -1365,12 +1441,26 @@ export const QueryKeys = {
     lists: () => [...QueryKeys.integrations.all(), 'list'] as const,
     list: () => [...QueryKeys.integrations.lists()] as const,
     detail: (id: string) => [...QueryKeys.integrations.all(), id] as const,
-    webhooks: () => ['webhooks'] as const,
+  },
+
+  // ==================== WEBHOOKS ====================
+  webhooks: {
+    all: () => ['webhooks'] as const,
+    lists: () => [...QueryKeys.webhooks.all(), 'list'] as const,
+    list: (params?: Record<string, any>) => [...QueryKeys.webhooks.lists(), params] as const,
+    details: () => [...QueryKeys.webhooks.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.webhooks.details(), id] as const,
+    stats: () => [...QueryKeys.webhooks.all(), 'stats'] as const,
+    events: () => [...QueryKeys.webhooks.all(), 'events'] as const,
+    deliveries: (id: string, params?: Record<string, any>) => [...QueryKeys.webhooks.all(), 'deliveries', id, params] as const,
+    secret: (id: string) => [...QueryKeys.webhooks.all(), 'secret', id] as const,
   },
 
   // ==================== APPS ====================
   apps: {
     all: () => ['apps'] as const,
+    list: (params?: Record<string, any>) => [...QueryKeys.apps.all(), params] as const,
+    detail: (id: string) => [...QueryKeys.apps.all(), id] as const,
     installed: () => [...QueryKeys.apps.all(), 'installed'] as const,
     available: () => [...QueryKeys.apps.all(), 'available'] as const,
   },
@@ -1438,6 +1528,8 @@ export const QueryKeys = {
   // ==================== SMART BUTTONS ====================
   smartButtons: {
     all: () => ['smart-buttons'] as const,
+    byModel: (model: string, recordId: string) => [...QueryKeys.smartButtons.all(), model, recordId] as const,
+    batch: (model: string, recordIds: string[]) => ['smart-buttons-batch', model, recordIds] as const,
     count: (entityType: string, entityId: string, buttonId: string) =>
       ['smart-button-count', entityType, entityId, buttonId] as const,
     countsBatch: (entityType: string, entityId: string, buttonIds: string[]) =>
