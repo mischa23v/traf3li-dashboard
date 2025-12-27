@@ -201,6 +201,32 @@ export const invalidateCache = {
     },
   },
 
+  // Billing Rates
+  billingRates: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['billing'] }),
+    // Rates
+    rates: () => queryClient.invalidateQueries({ queryKey: ['billing', 'rates'], refetchType: 'all' }),
+    ratesLight: () => queryClient.invalidateQueries({ queryKey: ['billing', 'rates'] }),
+    // Groups
+    groups: () => queryClient.invalidateQueries({ queryKey: ['billing', 'groups'], refetchType: 'all' }),
+    groupsLight: () => queryClient.invalidateQueries({ queryKey: ['billing', 'groups'] }),
+    // Rate Cards
+    rateCards: () => queryClient.invalidateQueries({ queryKey: ['billing', 'rate-cards'], refetchType: 'all' }),
+    rateCardsLight: () => queryClient.invalidateQueries({ queryKey: ['billing', 'rate-cards'] }),
+    // Time Entries
+    timeEntries: () => queryClient.invalidateQueries({ queryKey: ['billing', 'time-entries'], refetchType: 'all' }),
+    timeEntriesLight: () => queryClient.invalidateQueries({ queryKey: ['billing', 'time-entries'] }),
+    // Statistics
+    statistics: () => queryClient.invalidateQueries({ queryKey: ['billing', 'statistics'], refetchType: 'all' }),
+    // Related invalidations
+    related: async () => {
+      await Promise.all([
+        invalidateCache.billingRates.all(),
+        invalidateCache.finance.dashboard(),
+      ])
+    },
+  },
+
   // Inter-company
   interCompany: {
     balances: () => queryClient.invalidateQueries({ queryKey: ['inter-company-balances'] }),
@@ -728,6 +754,25 @@ export const invalidateCache = {
     },
   },
 
+  // Shift Types
+  shiftTypes: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['shift-types'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['shift-types', 'list'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['shift-types', 'detail', id] }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['shift-types', 'stats'] }),
+    default: () => queryClient.invalidateQueries({ queryKey: ['shift-types', 'default'] }),
+    byDay: (day: string) => queryClient.invalidateQueries({ queryKey: ['shift-types', 'by-day', day] }),
+    active: () => queryClient.invalidateQueries({ queryKey: ['shift-types', 'active'] }),
+    ramadan: () => queryClient.invalidateQueries({ queryKey: ['shift-types', 'ramadan'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.shiftTypes.all(),
+        invalidateCache.shiftAssignments.all(),
+        invalidateCache.attendance.all(),
+      ])
+    },
+  },
+
   // Shift Assignments
   shiftAssignments: {
     all: () => queryClient.invalidateQueries({ queryKey: ['shift-assignments'] }),
@@ -1219,11 +1264,29 @@ export const invalidateCache = {
     upcomingDeadlines: (days?: number) => queryClient.invalidateQueries({ queryKey: ['dashboard', 'deadlines', 'upcoming', days] }),
   },
 
-  // Reports
+  // Reports (Data & Analytics - Report Builder)
   reports: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['reports'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['reports', 'list'] }),
+    list: (filters?: any) => queryClient.invalidateQueries({ queryKey: ['reports', 'list', filters] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['reports', 'detail', id] }),
+    byCategory: (category: string) => queryClient.invalidateQueries({ queryKey: ['reports', 'by-category', category] }),
+    bySection: (section: string) => queryClient.invalidateQueries({ queryKey: ['reports', 'by-section', section] }),
+    stats: (officeId?: string) => queryClient.invalidateQueries({ queryKey: ['reports', 'stats', officeId] }),
+    favorites: () => queryClient.invalidateQueries({ queryKey: ['reports', 'favorites'] }),
+    executionHistory: (id: string) => queryClient.invalidateQueries({ queryKey: ['reports', 'execution-history', id] }),
+    dataSources: () => queryClient.invalidateQueries({ queryKey: ['reports', 'data-sources'] }),
+    // Dashboard reports (legacy/charts)
     casesChart: (months?: number) => queryClient.invalidateQueries({ queryKey: ['reports', 'cases-chart', months] }),
     revenueChart: (months?: number) => queryClient.invalidateQueries({ queryKey: ['reports', 'revenue-chart', months] }),
     tasksChart: (months?: number) => queryClient.invalidateQueries({ queryKey: ['reports', 'tasks-chart', months] }),
+    // Related invalidations
+    related: async () => {
+      await Promise.all([
+        invalidateCache.reports.all(),
+        invalidateCache.reports.stats(),
+      ])
+    },
   },
 
   // Gantt
@@ -1314,6 +1377,31 @@ export const invalidateCache = {
     syncStatus: () => queryClient.invalidateQueries({ queryKey: ['ldap-sync-status'] }),
   },
 
+  // Vehicles
+  vehicles: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['vehicles'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['vehicles', 'list'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['vehicles', 'detail', id] }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['vehicles', 'stats'] }),
+    fleetSummary: () => queryClient.invalidateQueries({ queryKey: ['vehicles', 'fleet-summary'] }),
+    serviceDue: () => queryClient.invalidateQueries({ queryKey: ['vehicles', 'service-due'] }),
+    utilization: (vehicleId: string) => queryClient.invalidateQueries({ queryKey: ['vehicles', 'utilization', vehicleId] }),
+    expenses: (vehicleId: string) => queryClient.invalidateQueries({ queryKey: ['vehicles', 'expenses', vehicleId] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.vehicles.all(),
+        invalidateCache.vehicles.stats(),
+        invalidateCache.vehicles.fleetSummary(),
+      ])
+    },
+  },
+
+  // Vehicle Logs
+  vehicleLogs: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['vehicle-logs'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['vehicle-logs', 'list'] }),
+  },
+
   // Lean
   lean: {
     all: () => queryClient.invalidateQueries({ queryKey: ['lean'] }),
@@ -1322,6 +1410,37 @@ export const invalidateCache = {
   // Apps
   apps: {
     all: () => queryClient.invalidateQueries({ queryKey: ['apps'] }),
+  },
+
+  // Trust Accounts
+  trustAccounts: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['trust-accounts'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['trust-accounts', 'list'], refetchType: 'all' }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['trust-accounts', 'detail', id], refetchType: 'all' }),
+    // Client Balances
+    clientBalances: () => queryClient.invalidateQueries({ queryKey: ['trust-accounts', 'client-balances'], refetchType: 'all' }),
+    clientBalance: (accountId: string, clientId: string) => queryClient.invalidateQueries({ queryKey: ['trust-accounts', 'client-balances', accountId, clientId], refetchType: 'all' }),
+    // Transactions
+    transactions: () => queryClient.invalidateQueries({ queryKey: ['trust-accounts', 'transactions'], refetchType: 'all' }),
+    transactionList: (filters?: Record<string, unknown>) => queryClient.invalidateQueries({ queryKey: ['trust-accounts', 'transactions', filters], refetchType: 'all' }),
+    transaction: (id: string) => queryClient.invalidateQueries({ queryKey: ['trust-accounts', 'transactions', id], refetchType: 'all' }),
+    // Reconciliations
+    reconciliations: () => queryClient.invalidateQueries({ queryKey: ['trust-accounts', 'reconciliations'], refetchType: 'all' }),
+    reconciliationList: (filters?: Record<string, unknown>) => queryClient.invalidateQueries({ queryKey: ['trust-accounts', 'reconciliations', filters], refetchType: 'all' }),
+    reconciliation: (id: string) => queryClient.invalidateQueries({ queryKey: ['trust-accounts', 'reconciliations', id], refetchType: 'all' }),
+    // Three-Way Reconciliation
+    threeWay: (accountId: string) => queryClient.invalidateQueries({ queryKey: ['trust-accounts', 'three-way', accountId], refetchType: 'all' }),
+    // Client Ledger
+    clientLedger: (accountId: string, clientId: string) => queryClient.invalidateQueries({ queryKey: ['trust-accounts', 'ledger', accountId, clientId], refetchType: 'all' }),
+    // Related invalidations for trust account mutations
+    related: async () => {
+      await Promise.all([
+        invalidateCache.trustAccounts.all(),
+        invalidateCache.trustAccounts.transactions(),
+        invalidateCache.trustAccounts.clientBalances(),
+        invalidateCache.finance.dashboard(),
+      ])
+    },
   },
 
   // Global invalidation (use sparingly!)

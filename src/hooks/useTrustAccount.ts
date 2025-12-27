@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   trustAccountService,
   type TrustAccount,
@@ -79,7 +80,7 @@ export function useCreateTrustAccount() {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists(), refetchType: 'all' })
+      await invalidateCache.trustAccounts.lists()
     },
   })
 }
@@ -104,8 +105,8 @@ export function useUpdateTrustAccount() {
     },
     onSettled: async (_, __, variables) => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists(), refetchType: 'all' })
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.detail(variables.id), refetchType: 'all' })
+      await invalidateCache.trustAccounts.lists()
+      await invalidateCache.trustAccounts.detail(variables.id)
     },
   })
 }
@@ -130,8 +131,8 @@ export function useCloseTrustAccount() {
     },
     onSettled: async (_, __, variables) => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists(), refetchType: 'all' })
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.detail(variables.id), refetchType: 'all' })
+      await invalidateCache.trustAccounts.lists()
+      await invalidateCache.trustAccounts.detail(variables.id)
     },
   })
 }
@@ -213,9 +214,9 @@ export function useCreateTrustDeposit() {
     },
     onSettled: async (_, __, variables) => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions(), refetchType: 'all' })
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.clientBalances(), refetchType: 'all' })
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.detail(variables.accountId), refetchType: 'all' })
+      await invalidateCache.trustAccounts.transactions()
+      await invalidateCache.trustAccounts.clientBalances()
+      await invalidateCache.trustAccounts.detail(variables.accountId)
     },
   })
 }
@@ -248,9 +249,9 @@ export function useCreateTrustWithdrawal() {
     },
     onSettled: async (_, __, variables) => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions(), refetchType: 'all' })
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.clientBalances(), refetchType: 'all' })
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.detail(variables.accountId), refetchType: 'all' })
+      await invalidateCache.trustAccounts.transactions()
+      await invalidateCache.trustAccounts.clientBalances()
+      await invalidateCache.trustAccounts.detail(variables.accountId)
     },
   })
 }
@@ -280,9 +281,9 @@ export function useCreateTrustTransfer() {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions(), refetchType: 'all' })
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.clientBalances(), refetchType: 'all' })
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists(), refetchType: 'all' })
+      await invalidateCache.trustAccounts.transactions()
+      await invalidateCache.trustAccounts.clientBalances()
+      await invalidateCache.trustAccounts.lists()
     },
   })
 }
@@ -307,9 +308,9 @@ export function useVoidTransaction() {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions(), refetchType: 'all' })
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.clientBalances(), refetchType: 'all' })
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists(), refetchType: 'all' })
+      await invalidateCache.trustAccounts.transactions()
+      await invalidateCache.trustAccounts.clientBalances()
+      await invalidateCache.trustAccounts.lists()
     },
   })
 }
@@ -334,7 +335,7 @@ export function useMarkTransactionCleared() {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions(), refetchType: 'all' })
+      await invalidateCache.trustAccounts.transactions()
     },
   })
 }
@@ -384,7 +385,7 @@ export function useStartReconciliation() {
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.reconciliations(), refetchType: 'all' })
+      await invalidateCache.trustAccounts.reconciliations()
     },
   })
 }
@@ -406,10 +407,7 @@ export function useUpdateReconciliation() {
     },
     onSettled: async (_, __, variables) => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({
-        queryKey: trustAccountKeys.reconciliation(variables.id),
-        refetchType: 'all'
-      })
+      await invalidateCache.trustAccounts.reconciliation(variables.id)
     },
   })
 }
@@ -426,11 +424,8 @@ export function useCompleteReconciliation() {
     },
     onSettled: async (_, __, variables) => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.reconciliations(), refetchType: 'all' })
-      await queryClient.invalidateQueries({
-        queryKey: trustAccountKeys.reconciliation(variables.id),
-        refetchType: 'all'
-      })
+      await invalidateCache.trustAccounts.reconciliations()
+      await invalidateCache.trustAccounts.reconciliation(variables.id)
     },
   })
 }
@@ -452,10 +447,7 @@ export function useAddReconciliationAdjustment() {
     },
     onSettled: async (_, __, variables) => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({
-        queryKey: trustAccountKeys.reconciliation(variables.id),
-        refetchType: 'all'
-      })
+      await invalidateCache.trustAccounts.reconciliation(variables.id)
     },
   })
 }
@@ -487,10 +479,7 @@ export function useRunThreeWayReconciliation() {
     },
     onSettled: async (_, __, accountId) => {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({
-        queryKey: trustAccountKeys.threeWay(accountId),
-        refetchType: 'all'
-      })
+      await invalidateCache.trustAccounts.threeWay(accountId)
     },
   })
 }

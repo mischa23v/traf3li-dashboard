@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import {
   reportsApi,
   Report,
@@ -14,6 +14,7 @@ import {
   DistributionRecipient
 } from '@/services/reportsService'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // Query Keys
 export const reportKeys = {
@@ -104,12 +105,10 @@ export function useDataSources() {
 
 // Create report
 export function useCreateReport() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateReportInput) => reportsApi.create(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      invalidateCache.reports.all()
       toast.success('تم إنشاء التقرير بنجاح')
     },
     onError: (error: Error) => {
@@ -120,14 +119,12 @@ export function useCreateReport() {
 
 // Update report
 export function useUpdateReport() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateReportInput }) =>
       reportsApi.update(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.all })
-      queryClient.invalidateQueries({ queryKey: reportKeys.detail(variables.id) })
+      invalidateCache.reports.all()
+      invalidateCache.reports.detail(variables.id)
       toast.success('تم تحديث التقرير بنجاح')
     },
     onError: (error: Error) => {
@@ -138,12 +135,10 @@ export function useUpdateReport() {
 
 // Delete report
 export function useDeleteReport() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => reportsApi.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      invalidateCache.reports.all()
       toast.success('تم حذف التقرير بنجاح')
     },
     onError: (error: Error) => {
@@ -154,12 +149,10 @@ export function useDeleteReport() {
 
 // Bulk delete reports
 export function useBulkDeleteReports() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (ids: string[]) => reportsApi.bulkDelete(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      invalidateCache.reports.all()
       toast.success('تم حذف التقارير المحددة بنجاح')
     },
     onError: (error: Error) => {
@@ -172,14 +165,12 @@ export function useBulkDeleteReports() {
 
 // Run report
 export function useRunReport() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, parameters }: { id: string; parameters?: Record<string, any> }) =>
       reportsApi.runReport(id, parameters),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.detail(variables.id) })
-      queryClient.invalidateQueries({ queryKey: reportKeys.stats() })
+      invalidateCache.reports.detail(variables.id)
+      invalidateCache.reports.stats()
       toast.success('تم تشغيل التقرير بنجاح')
     },
     onError: (error: Error) => {
@@ -228,8 +219,6 @@ export function usePreviewReportData() {
 
 // Schedule report
 export function useScheduleReport() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, schedule }: {
       id: string
@@ -242,8 +231,8 @@ export function useScheduleReport() {
       }
     }) => reportsApi.scheduleReport(id, schedule),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.detail(variables.id) })
-      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      invalidateCache.reports.detail(variables.id)
+      invalidateCache.reports.all()
       toast.success('تم جدولة التقرير بنجاح')
     },
     onError: (error: Error) => {
@@ -254,13 +243,11 @@ export function useScheduleReport() {
 
 // Pause schedule
 export function usePauseSchedule() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => reportsApi.pauseSchedule(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      invalidateCache.reports.detail(id)
+      invalidateCache.reports.all()
       toast.success('تم إيقاف جدولة التقرير مؤقتاً')
     },
     onError: (error: Error) => {
@@ -271,13 +258,11 @@ export function usePauseSchedule() {
 
 // Resume schedule
 export function useResumeSchedule() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => reportsApi.resumeSchedule(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      invalidateCache.reports.detail(id)
+      invalidateCache.reports.all()
       toast.success('تم استئناف جدولة التقرير')
     },
     onError: (error: Error) => {
@@ -290,14 +275,12 @@ export function useResumeSchedule() {
 
 // Add to favorites
 export function useAddToFavorites() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => reportsApi.addToFavorites(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: reportKeys.favorites() })
-      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      invalidateCache.reports.detail(id)
+      invalidateCache.reports.favorites()
+      invalidateCache.reports.all()
       toast.success('تم إضافة التقرير إلى المفضلة')
     },
     onError: (error: Error) => {
@@ -308,14 +291,12 @@ export function useAddToFavorites() {
 
 // Remove from favorites
 export function useRemoveFromFavorites() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => reportsApi.removeFromFavorites(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: reportKeys.favorites() })
-      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      invalidateCache.reports.detail(id)
+      invalidateCache.reports.favorites()
+      invalidateCache.reports.all()
       toast.success('تم إزالة التقرير من المفضلة')
     },
     onError: (error: Error) => {
@@ -328,13 +309,11 @@ export function useRemoveFromFavorites() {
 
 // Duplicate report
 export function useDuplicateReport() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, newName }: { id: string; newName: string }) =>
       reportsApi.duplicate(id, newName),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      invalidateCache.reports.all()
       toast.success('تم نسخ التقرير بنجاح')
     },
     onError: (error: Error) => {
@@ -345,8 +324,6 @@ export function useDuplicateReport() {
 
 // Share report
 export function useShareReport() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, recipients }: {
       id: string
@@ -357,7 +334,7 @@ export function useShareReport() {
       }>
     }) => reportsApi.shareReport(id, recipients),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.detail(variables.id) })
+      invalidateCache.reports.detail(variables.id)
       toast.success('تم مشاركة التقرير بنجاح')
     },
     onError: (error: Error) => {
@@ -395,8 +372,6 @@ export function useSavedReports(filters?: { search?: string }) {
 // Delete saved report
 // [BACKEND-PENDING] Ensure /saved-reports/reports/:id DELETE endpoint is fully implemented
 export function useDeleteSavedReport() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: async (id: string) => {
       try {
@@ -411,7 +386,7 @@ export function useDeleteSavedReport() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      invalidateCache.reports.all()
       toast.success('Report deleted successfully | تم حذف التقرير المحفوظ بنجاح')
     },
     onError: (error: Error) => {
@@ -457,8 +432,6 @@ export function useGenerateReport() {
 // Create saved report
 // [BACKEND-PENDING] Ensure /saved-reports/reports POST endpoint is fully implemented
 export function useCreateSavedReport() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: async (data: any) => {
       try {
@@ -474,7 +447,7 @@ export function useCreateSavedReport() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      invalidateCache.reports.all()
       toast.success('Report created successfully | تم إنشاء التقرير المحفوظ بنجاح')
     },
     onError: (error: Error) => {
@@ -486,8 +459,6 @@ export function useCreateSavedReport() {
 // Update saved report
 // [BACKEND-PENDING] Ensure /saved-reports/reports/:id PATCH endpoint is fully implemented
 export function useUpdateSavedReport() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
       try {
@@ -503,8 +474,8 @@ export function useUpdateSavedReport() {
       }
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.all })
-      queryClient.invalidateQueries({ queryKey: reportKeys.detail(variables.id) })
+      invalidateCache.reports.all()
+      invalidateCache.reports.detail(variables.id)
       toast.success('Report updated successfully | تم تحديث التقرير المحفوظ بنجاح')
     },
     onError: (error: Error) => {
