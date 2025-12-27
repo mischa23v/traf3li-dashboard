@@ -66,7 +66,7 @@ export const useWebhookDeliveries = (
     queryKey: ['webhooks', 'deliveries', id, params],
     queryFn: () => webhookService.getWebhookDeliveries(id, params),
     enabled: !!id,
-    staleTime: 30 * 1000, // 30 seconds (logs should be fresh)
+    staleTime: CACHE_TIMES.AUDIT.LOGS, // 30 seconds (logs should be fresh)
   })
 }
 

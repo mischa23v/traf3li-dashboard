@@ -543,7 +543,7 @@ export const useWhatsAppConversations = (filters?: ConversationFilters, enabled:
   return useQuery({
     queryKey: QueryKeys.crmAdvanced.whatsAppConversationsList(filters),
     queryFn: () => whatsAppService.getConversations(filters),
-    staleTime: 30 * 1000,
+    staleTime: CACHE_TIMES.REALTIME.LIVE_FEED, // 30 seconds
     gcTime: STATS_GC_TIME,
     enabled,
     refetchInterval: 30000, // Refresh every 30 seconds (reduced from 10s for performance)
@@ -556,7 +556,7 @@ export const useWhatsAppConversation = (id: string, enabled: boolean = true) => 
     queryKey: QueryKeys.crmAdvanced.whatsAppConversation(id),
     queryFn: () => whatsAppService.getConversation(id),
     enabled: !!id && enabled,
-    staleTime: 30 * 1000,
+    staleTime: CACHE_TIMES.REALTIME.LIVE_FEED, // 30 seconds
     gcTime: STATS_GC_TIME,
     refetchInterval: 5000, // Refresh every 5 seconds for active chat
     retry: false,

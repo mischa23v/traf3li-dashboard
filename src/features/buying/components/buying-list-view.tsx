@@ -68,10 +68,11 @@ import {
 import { useSuppliers, useDeleteSupplier, useBuyingStats } from '@/hooks/use-buying'
 import type { Supplier, SupplierFilters, SupplierStatus } from '@/types/buying'
 import { BuyingSidebar } from './buying-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
-  { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.buying', href: '/dashboard/buying' },
+  { title: 'sidebar.nav.overview', href: ROUTES.dashboard.home },
+  { title: 'sidebar.nav.buying', href: ROUTES.dashboard.buying.list },
 ]
 
 export function BuyingListView() {

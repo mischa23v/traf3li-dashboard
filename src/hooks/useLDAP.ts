@@ -22,7 +22,7 @@ export const useLDAPSyncStatus = () => {
   return useQuery({
     queryKey: ['ldap-sync-status'],
     queryFn: () => ldapService.getSyncStatus(),
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: CACHE_TIMES.REALTIME.LIVE_FEED, // 30 seconds
     refetchInterval: 30 * 1000, // Refetch every 30 seconds when sync is running
   })
 }

@@ -99,9 +99,9 @@ const CALENDAR_PLUGINS = [dayGridPlugin, timeGridPlugin, listPlugin, interaction
 
 // Navigation links - stable reference
 const TOP_NAV_LINKS = [
-  { title: 'الرئيسية', href: '/', isActive: false, disabled: false },
+  { title: 'الرئيسية', href: ROUTES.dashboard.home, isActive: false, disabled: false },
   { title: 'التقويم', href: ROUTES.dashboard.calendar, isActive: true, disabled: false },
-  { title: 'المهام', href: '/dashboard/tasks', isActive: false, disabled: false },
+  { title: 'المهام', href: ROUTES.dashboard.tasks.list, isActive: false, disabled: false },
 ]
 
 // Event type colors
@@ -573,11 +573,11 @@ export function FullCalendarView() {
 
     const [type, id] = selectedEvent.id.split('-')
     if (type === 'event') {
-      navigate({ to: '/dashboard/tasks/events/$eventId', params: { eventId: id } })
+      navigate({ to: ROUTES.dashboard.tasks.events.detail(id) as any })
     } else if (type === 'task') {
-      navigate({ to: '/tasks/$taskId', params: { taskId: id } })
+      navigate({ to: ROUTES.dashboard.tasks.detail(id) as any })
     } else if (type === 'reminder') {
-      navigate({ to: '/dashboard/tasks/reminders/$reminderId', params: { reminderId: id } })
+      navigate({ to: ROUTES.dashboard.tasks.reminders.detail(id) as any })
     }
     setIsEventDialogOpen(false)
   }

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   getAssetAssignments,
   getAssetAssignment,
@@ -115,8 +116,8 @@ export const useCreateAssetAssignment = () => {
   return useMutation({
     mutationFn: (data: CreateAssetAssignmentData) => createAssetAssignment(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.stats() })
+      invalidateCache.assetAssignments.lists()
+      invalidateCache.assetAssignments.stats()
     },
   })
 }
@@ -128,8 +129,8 @@ export const useUpdateAssetAssignment = () => {
     mutationFn: ({ assignmentId, data }: { assignmentId: string; data: UpdateAssetAssignmentData }) =>
       updateAssetAssignment(assignmentId, data),
     onSuccess: (_, { assignmentId }) => {
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.detail(assignmentId) })
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.lists() })
+      invalidateCache.assetAssignments.detail(assignmentId)
+      invalidateCache.assetAssignments.lists()
     },
   })
 }
@@ -140,8 +141,8 @@ export const useDeleteAssetAssignment = () => {
   return useMutation({
     mutationFn: (assignmentId: string) => deleteAssetAssignment(assignmentId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.stats() })
+      invalidateCache.assetAssignments.lists()
+      invalidateCache.assetAssignments.stats()
     },
   })
 }
@@ -158,8 +159,8 @@ export const useAcknowledgeAssignment = () => {
       }
     }) => acknowledgeAssignment(assignmentId, data),
     onSuccess: (_, { assignmentId }) => {
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.detail(assignmentId) })
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.lists() })
+      invalidateCache.assetAssignments.detail(assignmentId)
+      invalidateCache.assetAssignments.lists()
     },
   })
 }
@@ -177,9 +178,9 @@ export const useInitiateReturn = () => {
       }
     }) => initiateReturn(assignmentId, data),
     onSuccess: (_, { assignmentId }) => {
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.detail(assignmentId) })
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.stats() })
+      invalidateCache.assetAssignments.detail(assignmentId)
+      invalidateCache.assetAssignments.lists()
+      invalidateCache.assetAssignments.stats()
     },
   })
 }
@@ -209,10 +210,10 @@ export const useCompleteReturn = () => {
       }
     }) => completeReturn(assignmentId, data),
     onSuccess: (_, { assignmentId }) => {
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.detail(assignmentId) })
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.overdueReturns() })
+      invalidateCache.assetAssignments.detail(assignmentId)
+      invalidateCache.assetAssignments.lists()
+      invalidateCache.assetAssignments.stats()
+      invalidateCache.assetAssignments.overdueReturns()
     },
   })
 }
@@ -243,8 +244,8 @@ export const useRecordMaintenance = () => {
       }
     }) => recordMaintenance(assignmentId, data),
     onSuccess: (_, { assignmentId }) => {
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.detail(assignmentId) })
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.maintenanceDue() })
+      invalidateCache.assetAssignments.detail(assignmentId)
+      invalidateCache.assetAssignments.maintenanceDue()
     },
   })
 }
@@ -267,8 +268,8 @@ export const useReportIncident = () => {
       }
     }) => reportIncident(assignmentId, data),
     onSuccess: (_, { assignmentId }) => {
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.detail(assignmentId) })
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.stats() })
+      invalidateCache.assetAssignments.detail(assignmentId)
+      invalidateCache.assetAssignments.stats()
     },
   })
 }
@@ -287,7 +288,7 @@ export const useResolveIncident = () => {
       }
     }) => resolveIncident(assignmentId, incidentId, data),
     onSuccess: (_, { assignmentId }) => {
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.detail(assignmentId) })
+      invalidateCache.assetAssignments.detail(assignmentId)
     },
   })
 }
@@ -304,9 +305,9 @@ export const useUpdateAssetStatus = () => {
       }
     }) => updateAssetStatus(assignmentId, data),
     onSuccess: (_, { assignmentId }) => {
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.detail(assignmentId) })
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.stats() })
+      invalidateCache.assetAssignments.detail(assignmentId)
+      invalidateCache.assetAssignments.lists()
+      invalidateCache.assetAssignments.stats()
     },
   })
 }
@@ -317,8 +318,8 @@ export const useBulkDeleteAssetAssignments = () => {
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteAssetAssignments(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.stats() })
+      invalidateCache.assetAssignments.lists()
+      invalidateCache.assetAssignments.stats()
     },
   })
 }
@@ -336,7 +337,7 @@ export const useIssueClearanceCertificate = () => {
   return useMutation({
     mutationFn: (assignmentId: string) => issueClearanceCertificate(assignmentId),
     onSuccess: (_, assignmentId) => {
-      queryClient.invalidateQueries({ queryKey: assetAssignmentKeys.detail(assignmentId) })
+      invalidateCache.assetAssignments.detail(assignmentId)
     },
   })
 }

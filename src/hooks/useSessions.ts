@@ -28,7 +28,7 @@ export function useActiveSessions(enabled = true) {
     queryKey: sessionKeys.list(),
     queryFn: getActiveSessions,
     enabled,
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: CACHE_TIMES.REALTIME.LIVE_FEED, // 30 seconds
     retry: 1,
     select: (data) => data.data.sessions,
   })

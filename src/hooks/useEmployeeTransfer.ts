@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import employeeTransferService, {
   type EmployeeTransferFilters,
   type CreateEmployeeTransferData,
@@ -96,8 +97,6 @@ export const usePendingHandovers = () => {
 // ==================== MUTATIONS ====================
 
 export const useCreateEmployeeTransfer = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateEmployeeTransferData) => employeeTransferService.createTransfer(data),
     onSuccess: () => {
@@ -107,15 +106,13 @@ export const useCreateEmployeeTransfer = () => {
       toast.error(error.message || 'فشل إنشاء طلب النقل')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.lists() })
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.stats() })
+      await invalidateCache.employeeTransfer.lists()
+      await invalidateCache.employeeTransfer.stats()
     },
   })
 }
 
 export const useUpdateEmployeeTransfer = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateEmployeeTransferData }) =>
       employeeTransferService.updateTransfer(id, data),
@@ -126,16 +123,14 @@ export const useUpdateEmployeeTransfer = () => {
       toast.error(error.message || 'فشل تحديث طلب النقل')
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.lists() })
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.detail(variables.id) })
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.stats() })
+      await invalidateCache.employeeTransfer.lists()
+      await invalidateCache.employeeTransfer.detail(variables.id)
+      await invalidateCache.employeeTransfer.stats()
     },
   })
 }
 
 export const useDeleteEmployeeTransfer = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => employeeTransferService.deleteTransfer(id),
     onSuccess: () => {
@@ -145,15 +140,13 @@ export const useDeleteEmployeeTransfer = () => {
       toast.error(error.message || 'فشل حذف طلب النقل')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.lists() })
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.stats() })
+      await invalidateCache.employeeTransfer.lists()
+      await invalidateCache.employeeTransfer.stats()
     },
   })
 }
 
 export const useBulkDeleteEmployeeTransfers = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (ids: string[]) => employeeTransferService.bulkDeleteTransfers(ids),
     onSuccess: (_, variables) => {
@@ -163,8 +156,8 @@ export const useBulkDeleteEmployeeTransfers = () => {
       toast.error(error.message || 'فشل حذف طلبات النقل')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.lists() })
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.stats() })
+      await invalidateCache.employeeTransfer.lists()
+      await invalidateCache.employeeTransfer.stats()
     },
   })
 }
@@ -172,8 +165,6 @@ export const useBulkDeleteEmployeeTransfers = () => {
 // ==================== TRANSFER OPERATIONS ====================
 
 export const useApplyTransfer = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => employeeTransferService.applyTransfer(id),
     onSuccess: () => {
@@ -183,17 +174,15 @@ export const useApplyTransfer = () => {
       toast.error(error.message || 'فشل تطبيق النقل')
     },
     onSettled: async (_, __, id) => {
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.lists() })
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.detail(id) })
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.stats() })
-      await queryClient.invalidateQueries({ queryKey: ['employees'] })
+      await invalidateCache.employeeTransfer.lists()
+      await invalidateCache.employeeTransfer.detail(id)
+      await invalidateCache.employeeTransfer.stats()
+      await invalidateCache.staff.employees()
     },
   })
 }
 
 export const useApproveTransfer = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, comments }: { id: string; comments?: string }) =>
       employeeTransferService.approveTransfer(id, comments),
@@ -204,17 +193,15 @@ export const useApproveTransfer = () => {
       toast.error(error.message || 'فشل الموافقة على طلب النقل')
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.lists() })
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.detail(variables.id) })
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.pendingApprovals() })
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.stats() })
+      await invalidateCache.employeeTransfer.lists()
+      await invalidateCache.employeeTransfer.detail(variables.id)
+      await invalidateCache.employeeTransfer.pendingApprovals()
+      await invalidateCache.employeeTransfer.stats()
     },
   })
 }
 
 export const useRejectTransfer = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, comments }: { id: string; comments: string }) =>
       employeeTransferService.rejectTransfer(id, comments),
@@ -225,17 +212,15 @@ export const useRejectTransfer = () => {
       toast.error(error.message || 'فشل رفض طلب النقل')
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.lists() })
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.detail(variables.id) })
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.pendingApprovals() })
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.stats() })
+      await invalidateCache.employeeTransfer.lists()
+      await invalidateCache.employeeTransfer.detail(variables.id)
+      await invalidateCache.employeeTransfer.pendingApprovals()
+      await invalidateCache.employeeTransfer.stats()
     },
   })
 }
 
 export const useUpdateTransferStatus = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: TransferStatus }) =>
       employeeTransferService.updateTransferStatus(id, status),
@@ -246,9 +231,9 @@ export const useUpdateTransferStatus = () => {
       toast.error(error.message || 'فشل تحديث حالة النقل')
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.lists() })
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.detail(variables.id) })
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.stats() })
+      await invalidateCache.employeeTransfer.lists()
+      await invalidateCache.employeeTransfer.detail(variables.id)
+      await invalidateCache.employeeTransfer.stats()
     },
   })
 }
@@ -256,8 +241,6 @@ export const useUpdateTransferStatus = () => {
 // ==================== HANDOVER ====================
 
 export const useUpdateHandoverItem = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, itemIndex, completed }: { id: string; itemIndex: number; completed: boolean }) =>
       employeeTransferService.updateHandoverItem(id, itemIndex, completed),
@@ -268,15 +251,13 @@ export const useUpdateHandoverItem = () => {
       toast.error(error.message || 'فشل تحديث عنصر التسليم')
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.detail(variables.id) })
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.pendingHandovers() })
+      await invalidateCache.employeeTransfer.detail(variables.id)
+      await invalidateCache.employeeTransfer.pendingHandovers()
     },
   })
 }
 
 export const useAddHandoverItem = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, item }: { id: string; item: Partial<HandoverChecklistItem> }) =>
       employeeTransferService.addHandoverItem(id, item),
@@ -287,7 +268,7 @@ export const useAddHandoverItem = () => {
       toast.error(error.message || 'فشل إضافة عنصر التسليم')
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.detail(variables.id) })
+      await invalidateCache.employeeTransfer.detail(variables.id)
     },
   })
 }
@@ -295,8 +276,6 @@ export const useAddHandoverItem = () => {
 // ==================== APPROVAL WORKFLOW ====================
 
 export const useAddApprovalStep = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, approver }: { id: string; approver: Partial<ApprovalStep> }) =>
       employeeTransferService.addApprovalStep(id, approver),
@@ -307,14 +286,12 @@ export const useAddApprovalStep = () => {
       toast.error(error.message || 'فشل إضافة خطوة الموافقة')
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.detail(variables.id) })
+      await invalidateCache.employeeTransfer.detail(variables.id)
     },
   })
 }
 
 export const useUpdateApprovalStep = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, stepIndex, data }: { id: string; stepIndex: number; data: Partial<ApprovalStep> }) =>
       employeeTransferService.updateApprovalStep(id, stepIndex, data),
@@ -325,8 +302,8 @@ export const useUpdateApprovalStep = () => {
       toast.error(error.message || 'فشل تحديث خطوة الموافقة')
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.detail(variables.id) })
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.pendingApprovals() })
+      await invalidateCache.employeeTransfer.detail(variables.id)
+      await invalidateCache.employeeTransfer.pendingApprovals()
     },
   })
 }
@@ -334,8 +311,6 @@ export const useUpdateApprovalStep = () => {
 // ==================== NOTIFICATIONS ====================
 
 export const useNotifyEmployee = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => employeeTransferService.notifyEmployee(id),
     onSuccess: () => {
@@ -345,7 +320,7 @@ export const useNotifyEmployee = () => {
       toast.error(error.message || 'فشل إرسال الإشعار')
     },
     onSettled: async (_, __, id) => {
-      await queryClient.invalidateQueries({ queryKey: employeeTransferKeys.detail(id) })
+      await invalidateCache.employeeTransfer.detail(id)
     },
   })
 }

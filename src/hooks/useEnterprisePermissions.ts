@@ -301,7 +301,7 @@ export const useDecisionLogs = (filters?: DecisionLogFilters) => {
   return useQuery({
     queryKey: permissionKeys.decisionList(filters || {}),
     queryFn: () => permissionService.getDecisionLogs(filters),
-    staleTime: 30 * 1000, // 30 seconds for logs
+    staleTime: CACHE_TIMES.AUDIT.LOGS, // 30 seconds for logs
   })
 }
 
@@ -606,7 +606,7 @@ export const useCacheStats = () => {
   return useQuery({
     queryKey: [...permissionKeys.all, 'cache', 'stats'],
     queryFn: () => permissionService.getCacheStats(),
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: CACHE_TIMES.AUDIT.LOGS, // 30 seconds
   })
 }
 

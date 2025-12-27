@@ -75,11 +75,12 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useMaterialRequests } from '@/hooks/use-buying'
 import type { MaterialRequest, MaterialRequestType, MaterialRequestStatus } from '@/types/buying'
 import { BuyingSidebar } from './buying-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
-  { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.buying', href: '/dashboard/buying' },
-  { title: 'buying.materialRequests', href: '/dashboard/buying/material-requests' },
+  { title: 'sidebar.nav.overview', href: ROUTES.dashboard.home },
+  { title: 'sidebar.nav.buying', href: ROUTES.dashboard.buying.list },
+  { title: 'buying.materialRequests', href: ROUTES.dashboard.buying.materialRequests.list },
 ]
 
 export function MaterialRequestListView() {
@@ -369,7 +370,7 @@ export function MaterialRequestListView() {
                     </SelectContent>
                   </Select>
                   <Button asChild className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
-                    <Link to="/dashboard/buying/material-requests/create">
+                    <Link to={ROUTES.dashboard.buying.materialRequests.create}>
                       <Plus className="w-4 h-4 ml-2" />
                       {t('buying.materialRequest.createRequest', 'طلب جديد')}
                     </Link>
@@ -401,7 +402,7 @@ export function MaterialRequestListView() {
                       {t('buying.materialRequest.noRequestsDesc', 'ابدأ بإنشاء طلب مواد جديد')}
                     </p>
                     <Button asChild className="rounded-xl">
-                      <Link to="/dashboard/buying/material-requests/create">
+                      <Link to={ROUTES.dashboard.buying.materialRequests.create}>
                         <Plus className="w-4 h-4 ml-2" />
                         {t('buying.materialRequest.createRequest', 'طلب جديد')}
                       </Link>
@@ -439,7 +440,7 @@ export function MaterialRequestListView() {
                             key={request._id}
                             className="cursor-pointer hover:bg-muted/50"
                             onClick={() =>
-                              navigate({ to: `/dashboard/buying/material-requests/${request._id}` })
+                              navigate({ to: ROUTES.dashboard.buying.materialRequests.detail(request._id) })
                             }
                           >
                             <TableCell className="font-mono text-sm font-medium">
@@ -479,7 +480,7 @@ export function MaterialRequestListView() {
                                     onClick={(e) => {
                                       e.stopPropagation()
                                       navigate({
-                                        to: `/dashboard/buying/material-requests/${request._id}`,
+                                        to: ROUTES.dashboard.buying.materialRequests.detail(request._id),
                                       })
                                     }}
                                   >
@@ -492,7 +493,7 @@ export function MaterialRequestListView() {
                                         onClick={(e) => {
                                           e.stopPropagation()
                                           navigate({
-                                            to: `/dashboard/buying/material-requests/${request._id}/edit`,
+                                            to: ROUTES.dashboard.buying.materialRequests.detail(request._id),
                                           })
                                         }}
                                       >

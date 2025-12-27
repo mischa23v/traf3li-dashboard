@@ -71,6 +71,7 @@ function LockScreen({ title, message, showRequestAccess, redirectPath }: LockScr
 
   const handleRequestAccess = () => {
     // Could navigate to support page with context
+    // TODO: Add ROUTES.dashboard.support.requestAccess to routes constant
     navigate({
       to: '/dashboard/support/request-access',
       search: { requestedPath: location.pathname },

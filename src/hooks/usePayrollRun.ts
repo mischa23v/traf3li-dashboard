@@ -1,5 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   getPayrollRuns,
   getPayrollRun,
@@ -63,117 +64,99 @@ export const usePayrollRunStats = () => {
 
 // Create payroll run
 export const useCreatePayrollRun = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreatePayrollRunData) => createPayrollRun(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.stats() })
+      invalidateCache.payroll.runsList()
+      invalidateCache.payroll.runStats()
     },
   })
 }
 
 // Update payroll run
 export const useUpdatePayrollRun = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ runId, data }: { runId: string; data: UpdatePayrollRunData }) =>
       updatePayrollRun(runId, data),
     onSuccess: (_, { runId }) => {
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.detail(runId) })
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.lists() })
+      invalidateCache.payroll.runDetail(runId)
+      invalidateCache.payroll.runsList()
     },
   })
 }
 
 // Delete payroll run
 export const useDeletePayrollRun = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (runId: string) => deletePayrollRun(runId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.stats() })
+      invalidateCache.payroll.runsList()
+      invalidateCache.payroll.runStats()
     },
   })
 }
 
 // Calculate payroll run
 export const useCalculatePayrollRun = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (runId: string) => calculatePayrollRun(runId),
     onSuccess: (_, runId) => {
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.detail(runId) })
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.lists() })
+      invalidateCache.payroll.runDetail(runId)
+      invalidateCache.payroll.runsList()
     },
   })
 }
 
 // Validate payroll run
 export const useValidatePayrollRun = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (runId: string) => validatePayrollRun(runId),
     onSuccess: (_, runId) => {
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.detail(runId) })
+      invalidateCache.payroll.runDetail(runId)
     },
   })
 }
 
 // Approve payroll run
 export const useApprovePayrollRun = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ runId, comments }: { runId: string; comments?: string }) =>
       approvePayrollRun(runId, comments),
     onSuccess: (_, { runId }) => {
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.detail(runId) })
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.stats() })
+      invalidateCache.payroll.runDetail(runId)
+      invalidateCache.payroll.runsList()
+      invalidateCache.payroll.runStats()
     },
   })
 }
 
 // Process payments
 export const useProcessPayments = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (runId: string) => processPayments(runId),
     onSuccess: (_, runId) => {
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.detail(runId) })
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.lists() })
+      invalidateCache.payroll.runDetail(runId)
+      invalidateCache.payroll.runsList()
     },
   })
 }
 
 // Generate WPS file
 export const useGenerateWPSFile = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (runId: string) => generateWPSFile(runId),
     onSuccess: (_, runId) => {
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.detail(runId) })
+      invalidateCache.payroll.runDetail(runId)
     },
   })
 }
 
 // Submit WPS
 export const useSubmitWPS = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (runId: string) => submitWPS(runId),
     onSuccess: (_, runId) => {
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.detail(runId) })
+      invalidateCache.payroll.runDetail(runId)
     },
   })
 }
@@ -187,41 +170,35 @@ export const useSendPayslipNotifications = () => {
 
 // Cancel payroll run
 export const useCancelPayrollRun = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ runId, reason }: { runId: string; reason: string }) =>
       cancelPayrollRun(runId, reason),
     onSuccess: (_, { runId }) => {
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.detail(runId) })
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.stats() })
+      invalidateCache.payroll.runDetail(runId)
+      invalidateCache.payroll.runsList()
+      invalidateCache.payroll.runStats()
     },
   })
 }
 
 // Hold employee
 export const useHoldEmployee = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ runId, employeeId, reason }: { runId: string; employeeId: string; reason: string }) =>
       holdEmployee(runId, employeeId, reason),
     onSuccess: (_, { runId }) => {
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.detail(runId) })
+      invalidateCache.payroll.runDetail(runId)
     },
   })
 }
 
 // Unhold employee
 export const useUnholdEmployee = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ runId, employeeId }: { runId: string; employeeId: string }) =>
       unholdEmployee(runId, employeeId),
     onSuccess: (_, { runId }) => {
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.detail(runId) })
+      invalidateCache.payroll.runDetail(runId)
     },
   })
 }
@@ -233,8 +210,6 @@ export const useUnholdEmployee = () => {
  * TODO: [BACKEND-PENDING] Implement POST /payroll-runs/:id/employees/:empId/exclude endpoint
  */
 export const useExcludeEmployee = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ runId, employeeId, reason }: { runId: string; employeeId: string; reason: string }) => {
       console.warn(
@@ -246,7 +221,7 @@ export const useExcludeEmployee = () => {
       return excludeEmployee(runId, employeeId, reason)
     },
     onSuccess: (_, { runId }) => {
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.detail(runId) })
+      invalidateCache.payroll.runDetail(runId)
     },
     onError: (error) => {
       console.error(
@@ -271,8 +246,6 @@ export const useExcludeEmployee = () => {
  * TODO: [BACKEND-PENDING] Implement POST /payroll-runs/:id/employees/:empId/include endpoint
  */
 export const useIncludeEmployee = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ runId, employeeId }: { runId: string; employeeId: string }) => {
       console.warn(
@@ -283,7 +256,7 @@ export const useIncludeEmployee = () => {
       return includeEmployee(runId, employeeId)
     },
     onSuccess: (_, { runId }) => {
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.detail(runId) })
+      invalidateCache.payroll.runDetail(runId)
     },
     onError: (error) => {
       console.error(
@@ -308,8 +281,6 @@ export const useIncludeEmployee = () => {
  * TODO: [BACKEND-PENDING] Implement POST /payroll-runs/:id/employees/:empId/recalculate endpoint
  */
 export const useRecalculateEmployee = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ runId, employeeId }: { runId: string; employeeId: string }) => {
       console.warn(
@@ -321,7 +292,7 @@ export const useRecalculateEmployee = () => {
       return recalculateEmployee(runId, employeeId)
     },
     onSuccess: (_, { runId }) => {
-      queryClient.invalidateQueries({ queryKey: payrollRunKeys.detail(runId) })
+      invalidateCache.payroll.runDetail(runId)
     },
     onError: (error) => {
       console.error(

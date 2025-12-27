@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   getOffboardings,
   getOffboarding,
@@ -116,8 +117,8 @@ export const useCreateOffboarding = () => {
     mutationFn: (data: CreateOffboardingData) => createOffboarding(data),
     onSuccess: () => {
       toast.success('تم إنشاء سجل إنهاء الخدمة بنجاح')
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.stats() })
+      invalidateCache.offboarding.lists()
+      invalidateCache.offboarding.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إنشاء سجل إنهاء الخدمة')
@@ -134,8 +135,8 @@ export const useUpdateOffboarding = () => {
       updateOffboarding(offboardingId, data),
     onSuccess: (_, variables) => {
       toast.success('تم تحديث سجل إنهاء الخدمة بنجاح')
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.detail(variables.offboardingId) })
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.lists() })
+      invalidateCache.offboarding.detail(variables.offboardingId)
+      invalidateCache.offboarding.lists()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في تحديث سجل إنهاء الخدمة')
@@ -151,8 +152,8 @@ export const useDeleteOffboarding = () => {
     mutationFn: (offboardingId: string) => deleteOffboarding(offboardingId),
     onSuccess: () => {
       toast.success('تم حذف سجل إنهاء الخدمة بنجاح')
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.stats() })
+      invalidateCache.offboarding.lists()
+      invalidateCache.offboarding.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في حذف سجل إنهاء الخدمة')
@@ -168,8 +169,8 @@ export const useBulkDeleteOffboardings = () => {
     mutationFn: (ids: string[]) => bulkDeleteOffboardings(ids),
     onSuccess: (data) => {
       toast.success(`تم حذف ${data.deleted} سجل إنهاء خدمة بنجاح`)
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.stats() })
+      invalidateCache.offboarding.lists()
+      invalidateCache.offboarding.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في حذف السجلات')
@@ -186,9 +187,9 @@ export const useUpdateOffboardingStatus = () => {
       updateOffboardingStatus(offboardingId, status),
     onSuccess: (_, variables) => {
       toast.success('تم تحديث الحالة بنجاح')
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.detail(variables.offboardingId) })
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.stats() })
+      invalidateCache.offboarding.detail(variables.offboardingId)
+      invalidateCache.offboarding.lists()
+      invalidateCache.offboarding.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في تحديث الحالة')
@@ -205,8 +206,8 @@ export const useCompleteExitInterview = () => {
       completeExitInterview(offboardingId, data),
     onSuccess: (_, variables) => {
       toast.success('تم إكمال مقابلة الخروج بنجاح')
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.detail(variables.offboardingId) })
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.lists() })
+      invalidateCache.offboarding.detail(variables.offboardingId)
+      invalidateCache.offboarding.lists()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إكمال مقابلة الخروج')
@@ -223,7 +224,7 @@ export const useAddClearanceItem = () => {
       addClearanceItem(offboardingId, item),
     onSuccess: (_, variables) => {
       toast.success('تم إضافة عنصر الإخلاء بنجاح')
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.detail(variables.offboardingId) })
+      invalidateCache.offboarding.detail(variables.offboardingId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إضافة عنصر الإخلاء')
@@ -240,7 +241,7 @@ export const useUpdateClearanceItem = () => {
       updateClearanceItem(offboardingId, itemId, data),
     onSuccess: (_, variables) => {
       toast.success('تم تحديث عنصر الإخلاء بنجاح')
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.detail(variables.offboardingId) })
+      invalidateCache.offboarding.detail(variables.offboardingId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في تحديث عنصر الإخلاء')
@@ -264,8 +265,8 @@ export const useCompleteClearanceSection = () => {
         manager: 'المدير',
       }
       toast.success(`تم إكمال إخلاء ${sectionNames[variables.section]} بنجاح`)
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.detail(variables.offboardingId) })
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.pendingClearances() })
+      invalidateCache.offboarding.detail(variables.offboardingId)
+      invalidateCache.offboarding.pendingClearances()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إكمال الإخلاء')
@@ -281,7 +282,7 @@ export const useCalculateFinalSettlement = () => {
     mutationFn: (offboardingId: string) => calculateFinalSettlement(offboardingId),
     onSuccess: (_, offboardingId) => {
       toast.success('تم حساب التسوية النهائية بنجاح')
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.detail(offboardingId) })
+      invalidateCache.offboarding.detail(offboardingId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في حساب التسوية النهائية')
@@ -297,8 +298,8 @@ export const useApproveFinalSettlement = () => {
     mutationFn: (offboardingId: string) => approveFinalSettlement(offboardingId),
     onSuccess: (_, offboardingId) => {
       toast.success('تم اعتماد التسوية النهائية بنجاح')
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.detail(offboardingId) })
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.pendingSettlements() })
+      invalidateCache.offboarding.detail(offboardingId)
+      invalidateCache.offboarding.pendingSettlements()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في اعتماد التسوية النهائية')
@@ -325,8 +326,8 @@ export const useProcessSettlementPayment = () => {
     }) => processSettlementPayment(offboardingId, paymentData),
     onSuccess: (_, variables) => {
       toast.success('تم صرف التسوية النهائية بنجاح')
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.detail(variables.offboardingId) })
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.pendingSettlements() })
+      invalidateCache.offboarding.detail(variables.offboardingId)
+      invalidateCache.offboarding.pendingSettlements()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في صرف التسوية النهائية')
@@ -342,7 +343,7 @@ export const useIssueExperienceCertificate = () => {
     mutationFn: (offboardingId: string) => issueExperienceCertificate(offboardingId),
     onSuccess: (_, offboardingId) => {
       toast.success('تم إصدار شهادة الخبرة بنجاح')
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.detail(offboardingId) })
+      invalidateCache.offboarding.detail(offboardingId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إصدار شهادة الخبرة')
@@ -358,9 +359,9 @@ export const useCompleteOffboarding = () => {
     mutationFn: (offboardingId: string) => completeOffboarding(offboardingId),
     onSuccess: (_, offboardingId) => {
       toast.success('تم إكمال إنهاء الخدمة بنجاح')
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.detail(offboardingId) })
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.stats() })
+      invalidateCache.offboarding.detail(offboardingId)
+      invalidateCache.offboarding.lists()
+      invalidateCache.offboarding.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إكمال إنهاء الخدمة')
@@ -384,7 +385,7 @@ export const useUpdateRehireEligibility = () => {
     }) => updateRehireEligibility(offboardingId, data),
     onSuccess: (_, variables) => {
       toast.success('تم تحديث أهلية إعادة التوظيف بنجاح')
-      queryClient.invalidateQueries({ queryKey: offboardingKeys.detail(variables.offboardingId) })
+      invalidateCache.offboarding.detail(variables.offboardingId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في تحديث أهلية إعادة التوظيف')

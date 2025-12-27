@@ -44,7 +44,7 @@ export const useSearchTags = (query: string, entityType?: string) => {
     queryKey: tagsKeys.search(query, entityType),
     queryFn: () => tagsService.searchTags(query, entityType),
     enabled: query.length >= 1,
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: CACHE_TIMES.REALTIME.LIVE_FEED, // 30 seconds
   })
 }
 

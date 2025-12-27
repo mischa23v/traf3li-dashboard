@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   successionPlanningApi,
   SuccessionPlan,
@@ -124,7 +125,7 @@ export function useCreateSuccessionPlan() {
   return useMutation({
     mutationFn: (data: CreateSuccessionPlanInput) => successionPlanningApi.create(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: successionPlanningKeys.all })
+      invalidateCache.successionPlanning.all()
       toast.success('تم إنشاء خطة التعاقب بنجاح')
     },
     onError: (error: Error) => {
@@ -141,8 +142,8 @@ export function useUpdateSuccessionPlan() {
     mutationFn: ({ id, data }: { id: string; data: UpdateSuccessionPlanInput }) =>
       successionPlanningApi.update(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: successionPlanningKeys.all })
-      queryClient.invalidateQueries({ queryKey: successionPlanningKeys.detail(variables.id) })
+      invalidateCache.successionPlanning.all()
+      invalidateCache.successionPlanning.detail(variables.id)
       toast.success('تم تحديث خطة التعاقب بنجاح')
     },
     onError: (error: Error) => {
@@ -158,7 +159,7 @@ export function useDeleteSuccessionPlan() {
   return useMutation({
     mutationFn: (id: string) => successionPlanningApi.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: successionPlanningKeys.all })
+      invalidateCache.successionPlanning.all()
       toast.success('تم حذف خطة التعاقب بنجاح')
     },
     onError: (error: Error) => {
@@ -174,7 +175,7 @@ export function useBulkDeleteSuccessionPlans() {
   return useMutation({
     mutationFn: (ids: string[]) => successionPlanningApi.bulkDelete(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: successionPlanningKeys.all })
+      invalidateCache.successionPlanning.all()
       toast.success('تم حذف خطط التعاقب المحددة بنجاح')
     },
     onError: (error: Error) => {
@@ -193,8 +194,8 @@ export function useAddSuccessor() {
     mutationFn: ({ planId, successor }: { planId: string; successor: Omit<Successor, 'successorId'> }) =>
       successionPlanningApi.addSuccessor(planId, successor),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: successionPlanningKeys.detail(variables.planId) })
-      queryClient.invalidateQueries({ queryKey: successionPlanningKeys.all })
+      invalidateCache.successionPlanning.detail(variables.planId)
+      invalidateCache.successionPlanning.all()
       toast.success('تم إضافة المرشح للتعاقب بنجاح')
     },
     onError: (error: Error) => {
@@ -211,8 +212,8 @@ export function useUpdateSuccessor() {
     mutationFn: ({ planId, successorId, data }: { planId: string; successorId: string; data: Partial<Successor> }) =>
       successionPlanningApi.updateSuccessor(planId, successorId, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: successionPlanningKeys.detail(variables.planId) })
-      queryClient.invalidateQueries({ queryKey: successionPlanningKeys.all })
+      invalidateCache.successionPlanning.detail(variables.planId)
+      invalidateCache.successionPlanning.all()
       toast.success('تم تحديث بيانات المرشح بنجاح')
     },
     onError: (error: Error) => {
@@ -229,8 +230,8 @@ export function useRemoveSuccessor() {
     mutationFn: ({ planId, successorId }: { planId: string; successorId: string }) =>
       successionPlanningApi.removeSuccessor(planId, successorId),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: successionPlanningKeys.detail(variables.planId) })
-      queryClient.invalidateQueries({ queryKey: successionPlanningKeys.all })
+      invalidateCache.successionPlanning.detail(variables.planId)
+      invalidateCache.successionPlanning.all()
       toast.success('تم إزالة المرشح من خطة التعاقب')
     },
     onError: (error: Error) => {
@@ -248,8 +249,8 @@ export function useSubmitForApproval() {
   return useMutation({
     mutationFn: (id: string) => successionPlanningApi.submitForApproval(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: successionPlanningKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: successionPlanningKeys.all })
+      invalidateCache.successionPlanning.detail(id)
+      invalidateCache.successionPlanning.all()
       toast.success('تم تقديم خطة التعاقب للموافقة')
     },
     onError: (error: Error) => {
@@ -266,8 +267,8 @@ export function useApproveSuccessionPlan() {
     mutationFn: ({ id, comments }: { id: string; comments?: string }) =>
       successionPlanningApi.approve(id, comments),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: successionPlanningKeys.detail(variables.id) })
-      queryClient.invalidateQueries({ queryKey: successionPlanningKeys.all })
+      invalidateCache.successionPlanning.detail(variables.id)
+      invalidateCache.successionPlanning.all()
       toast.success('تم اعتماد خطة التعاقب بنجاح')
     },
     onError: (error: Error) => {
@@ -284,8 +285,8 @@ export function useRejectSuccessionPlan() {
     mutationFn: ({ id, comments }: { id: string; comments: string }) =>
       successionPlanningApi.reject(id, comments),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: successionPlanningKeys.detail(variables.id) })
-      queryClient.invalidateQueries({ queryKey: successionPlanningKeys.all })
+      invalidateCache.successionPlanning.detail(variables.id)
+      invalidateCache.successionPlanning.all()
       toast.success('تم رفض خطة التعاقب')
     },
     onError: (error: Error) => {

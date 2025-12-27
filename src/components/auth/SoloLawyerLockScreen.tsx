@@ -37,6 +37,7 @@ export function SoloLawyerLockScreen({
 
   const handleCreateFirm = () => {
     // Navigate to firm creation page when available
+    // TODO: Add ROUTES.dashboard.settings.firm to routes constant
     navigate({ to: '/dashboard/settings/firm', replace: true })
   }
 

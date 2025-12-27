@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import Confetti from 'react-confetti'
 import { useWindowSize } from '@/hooks/useWindowSize'
 import { useTranslation } from 'react-i18next'
+import { ROUTES } from '@/constants/routes'
 
 interface SetupCelebrationProps {
   completedModules?: string[]
@@ -20,7 +21,7 @@ export function SetupCelebration({ completedModules = [], onContinue }: SetupCel
     if (onContinue) {
       onContinue()
     } else {
-      navigate({ to: '/dashboard' as any })
+      navigate({ to: ROUTES.dashboard.home as any })
     }
   }
 
@@ -30,7 +31,7 @@ export function SetupCelebration({ completedModules = [], onContinue }: SetupCel
       title: t('onboarding.celebration.inviteTeam'),
       description: t('onboarding.celebration.inviteTeamDesc'),
       action: t('onboarding.celebration.invite'),
-      route: '/dashboard/settings/team',
+      route: ROUTES.dashboard.staff.list,
     },
     {
       icon: FileText,
@@ -43,14 +44,14 @@ export function SetupCelebration({ completedModules = [], onContinue }: SetupCel
       title: t('onboarding.celebration.exploreReports'),
       description: t('onboarding.celebration.exploreReportsDesc'),
       action: t('onboarding.celebration.viewReports'),
-      route: '/dashboard/reports',
+      route: ROUTES.dashboard.reports.list,
     },
     {
       icon: Settings,
       title: t('onboarding.celebration.customizeSettings'),
       description: t('onboarding.celebration.customizeSettingsDesc'),
       action: t('onboarding.celebration.settings'),
-      route: '/dashboard/settings',
+      route: ROUTES.settings.index,
     },
   ]
 

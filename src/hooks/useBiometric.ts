@@ -248,7 +248,7 @@ export const useVerificationLogs = (filters?: VerificationFilters) => {
   return useQuery({
     queryKey: ['verification-logs', filters],
     queryFn: () => verificationService.getLogs(filters),
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: CACHE_TIMES.AUDIT.LOGS, // 30 seconds
   })
 }
 

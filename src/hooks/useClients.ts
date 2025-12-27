@@ -102,7 +102,7 @@ export const useSearchClients = (query: string) => {
     queryKey: ['clients', 'search', query],
     queryFn: () => clientsService.searchClients(query),
     enabled: query.length >= 2,
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: CACHE_TIMES.REALTIME.LIVE_FEED, // 30 seconds
     gcTime: STATS_GC_TIME,
   })
 }

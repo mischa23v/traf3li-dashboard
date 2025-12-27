@@ -62,7 +62,7 @@ export const useSearchOrganizations = (query: string) => {
     queryKey: organizationsKeys.search(query),
     queryFn: () => organizationsService.searchOrganizations(query),
     enabled: query.length >= 2,
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: CACHE_TIMES.REALTIME.LIVE_FEED, // 30 seconds
     gcTime: STATS_GC_TIME,
   })
 }

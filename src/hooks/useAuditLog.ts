@@ -85,7 +85,7 @@ export const useAuditLogs = (filters: AuditLogFilters = {}, enabled: boolean = t
     queryKey: auditKeys.list(filters),
     queryFn: () => auditService.getAuditLogs(filters),
     enabled,
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: CACHE_TIMES.AUDIT.LOGS, // 30 seconds
   })
 }
 
@@ -103,7 +103,7 @@ export const useResourceAuditTrail = (
     queryKey: auditKeys.resource(resource, resourceId),
     queryFn: () => auditService.getResourceAuditTrail(resource, resourceId, filters),
     enabled: enabled && !!resourceId,
-    staleTime: 60 * 1000, // 1 minute
+    staleTime: CACHE_TIMES.AUDIT.STATS, // 1 minute
   })
 }
 
@@ -120,7 +120,7 @@ export const useUserActivity = (
     queryKey: auditKeys.user(userId),
     queryFn: () => auditService.getUserActivity(userId, filters),
     enabled: enabled && !!userId,
-    staleTime: 60 * 1000, // 1 minute
+    staleTime: CACHE_TIMES.AUDIT.STATS, // 1 minute
   })
 }
 
@@ -162,7 +162,7 @@ export const useSecurityEvents = (
     queryKey: auditKeys.security(),
     queryFn: () => auditService.getSecurityEvents(filters),
     enabled,
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: CACHE_TIMES.AUDIT.LOGS, // 30 seconds
   })
 }
 
@@ -181,7 +181,7 @@ export const useFailedLogins = (
     queryKey: auditKeys.failedLogins(),
     queryFn: () => auditService.getFailedLogins(params),
     enabled,
-    staleTime: 60 * 1000, // 1 minute
+    staleTime: CACHE_TIMES.AUDIT.STATS, // 1 minute
     refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes
     retry: false,
   })
@@ -202,7 +202,7 @@ export const useSuspiciousActivity = (
     queryKey: auditKeys.suspicious(),
     queryFn: () => auditService.getSuspiciousActivity(params),
     enabled,
-    staleTime: 60 * 1000, // 1 minute
+    staleTime: CACHE_TIMES.AUDIT.STATS, // 1 minute
     refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes
     retry: false,
   })

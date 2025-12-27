@@ -379,6 +379,17 @@ export const invalidateCache = {
     detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['payroll', 'detail', id] }),
     stats: (month?: number, year?: number) => queryClient.invalidateQueries({ queryKey: ['payroll', 'stats', month, year] }),
     employee: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['payroll', 'employee', employeeId] }),
+    // Payroll Runs
+    runs: () => queryClient.invalidateQueries({ queryKey: ['payroll-runs'] }),
+    runsList: () => queryClient.invalidateQueries({ queryKey: ['payroll-runs', 'list'] }),
+    runDetail: (runId: string) => queryClient.invalidateQueries({ queryKey: ['payroll-runs', 'detail', runId] }),
+    runStats: () => queryClient.invalidateQueries({ queryKey: ['payroll-runs', 'stats'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.payroll.all(),
+        invalidateCache.staff.all(),
+      ])
+    },
   },
 
   // Leaves
@@ -416,6 +427,98 @@ export const invalidateCache = {
         invalidateCache.leaveAllocation.all(),
         invalidateCache.leaves.all(),
         invalidateCache.staff.all(),
+      ])
+    },
+  },
+
+  // Leave Policies
+  leavePolicy: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['leave-policies'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['leave-policies', 'list'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['leave-policies', 'detail', id] }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['leave-policies', 'stats'] }),
+    comparison: (ids: string[]) => queryClient.invalidateQueries({ queryKey: ['leave-policies', 'comparison', ids] }),
+    // Assignments
+    assignments: () => queryClient.invalidateQueries({ queryKey: ['leave-policies', 'assignments'] }),
+    assignmentDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['leave-policies', 'assignments', 'detail', id] }),
+    employeePolicy: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['leave-policies', 'assignments', 'employee', employeeId] }),
+    employeePolicyHistory: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['leave-policies', 'assignments', 'employee', employeeId, 'history'] }),
+    employeeAllocation: (employeeId: string, periodId?: string) => queryClient.invalidateQueries({ queryKey: ['leave-policies', 'assignments', 'employee', employeeId, 'allocation', periodId] }),
+    unassignedEmployees: () => queryClient.invalidateQueries({ queryKey: ['leave-policies', 'assignments', 'unassigned'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.leavePolicy.all(),
+        invalidateCache.leaveAllocation.all(),
+        invalidateCache.leaves.all(),
+      ])
+    },
+  },
+
+  // Employee Transfer
+  employeeTransfer: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['employee-transfers'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['employee-transfers', 'list'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['employee-transfers', 'detail', id] }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['employee-transfers', 'stats'] }),
+    history: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['employee-transfers', 'history', employeeId] }),
+    pendingApprovals: (approverId?: string) => queryClient.invalidateQueries({ queryKey: ['employee-transfers', 'pending-approvals', approverId] }),
+    pendingHandovers: () => queryClient.invalidateQueries({ queryKey: ['employee-transfers', 'pending-handovers'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.employeeTransfer.all(),
+        invalidateCache.staff.all(),
+      ])
+    },
+  },
+
+  // Onboarding
+  onboarding: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['onboarding'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['onboarding', 'list'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['onboarding', 'detail', id] }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['onboarding', 'stats'] }),
+    byEmployee: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['onboarding', 'by-employee', employeeId] }),
+    upcomingReviews: (days?: number) => queryClient.invalidateQueries({ queryKey: ['onboarding', 'upcoming-reviews', days] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.onboarding.all(),
+        invalidateCache.staff.all(),
+      ])
+    },
+  },
+
+  // Performance Reviews
+  performanceReviews: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['performance-reviews'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['performance-reviews', 'list'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['performance-reviews', 'detail', id] }),
+    stats: (filters?: any) => queryClient.invalidateQueries({ queryKey: ['performance-reviews', 'stats', filters] }),
+    templates: () => queryClient.invalidateQueries({ queryKey: ['performance-reviews', 'templates'] }),
+    templatesByType: (type?: string) => queryClient.invalidateQueries({ queryKey: ['performance-reviews', 'templates', type] }),
+    calibrationSessions: () => queryClient.invalidateQueries({ queryKey: ['performance-reviews', 'calibration-sessions'] }),
+    employeeHistory: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['performance-reviews', 'employee-history', employeeId] }),
+    teamSummary: (managerId: string, periodYear?: number) => queryClient.invalidateQueries({ queryKey: ['performance-reviews', 'team-summary', managerId, periodYear] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.performanceReviews.all(),
+        invalidateCache.staff.all(),
+      ])
+    },
+  },
+
+  // Case Notion
+  caseNotion: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['case-notion'] }),
+    pages: (caseId: string) => queryClient.invalidateQueries({ queryKey: ['case-notion', 'pages', caseId] }),
+    page: (caseId: string, pageId: string) => queryClient.invalidateQueries({ queryKey: ['case-notion', 'pages', caseId, pageId] }),
+    blocks: (caseId: string, pageId: string) => queryClient.invalidateQueries({ queryKey: ['case-notion', 'pages', caseId, pageId, 'blocks'] }),
+    comments: (caseId: string, blockId: string) => queryClient.invalidateQueries({ queryKey: ['case-notion', 'comments', caseId, blockId] }),
+    activity: (caseId: string, pageId: string) => queryClient.invalidateQueries({ queryKey: ['case-notion', 'pages', caseId, pageId, 'activity'] }),
+    templates: (category?: string) => queryClient.invalidateQueries({ queryKey: ['case-notion', 'templates', category] }),
+    related: async (caseId?: string) => {
+      await Promise.all([
+        caseId ? invalidateCache.caseNotion.pages(caseId) : invalidateCache.caseNotion.all(),
+        caseId ? invalidateCache.cases.detail(caseId) : Promise.resolve(),
       ])
     },
   },
@@ -477,6 +580,94 @@ export const invalidateCache = {
         invalidateCache.leaves.all(),
         invalidateCache.leaveAllocation.all(),
         invalidateCache.attendance.all(),
+      ])
+    },
+  },
+
+  // Grievances
+  grievances: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['grievances'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['grievances', 'list'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['grievances', 'detail', id] }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['grievances', 'stats'] }),
+    byEmployee: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['grievances', 'employee', employeeId] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.grievances.all(),
+        invalidateCache.grievances.stats(),
+        invalidateCache.staff.all(),
+      ])
+    },
+  },
+
+  // Offboarding
+  offboarding: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['offboarding'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['offboarding', 'list'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['offboarding', 'detail', id] }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['offboarding', 'stats'] }),
+    byEmployee: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['offboarding', 'by-employee', employeeId] }),
+    pendingClearances: () => queryClient.invalidateQueries({ queryKey: ['offboarding', 'pending-clearances'] }),
+    pendingSettlements: () => queryClient.invalidateQueries({ queryKey: ['offboarding', 'pending-settlements'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.offboarding.all(),
+        invalidateCache.offboarding.stats(),
+        invalidateCache.staff.all(),
+      ])
+    },
+  },
+
+  // Succession Planning
+  successionPlanning: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['succession-plans'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['succession-plans', 'list'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['succession-plans', 'detail', id] }),
+    stats: (officeId?: string) => queryClient.invalidateQueries({ queryKey: ['succession-plans', 'stats', officeId] }),
+    byPosition: (positionId: string) => queryClient.invalidateQueries({ queryKey: ['succession-plans', 'by-position', positionId] }),
+    byIncumbent: (incumbentId: string) => queryClient.invalidateQueries({ queryKey: ['succession-plans', 'by-incumbent', incumbentId] }),
+    reviewDue: () => queryClient.invalidateQueries({ queryKey: ['succession-plans', 'review-due'] }),
+    highRisk: () => queryClient.invalidateQueries({ queryKey: ['succession-plans', 'high-risk'] }),
+    criticalWithoutSuccessors: () => queryClient.invalidateQueries({ queryKey: ['succession-plans', 'critical-without-successors'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.successionPlanning.all(),
+        invalidateCache.staff.all(),
+        invalidateCache.jobPositions.all(),
+      ])
+    },
+  },
+
+  // Benefits
+  benefits: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['benefits'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['benefits', 'list'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['benefits', 'detail', id] }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['benefits', 'stats'] }),
+    byEmployee: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['benefits', 'employee', employeeId] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.benefits.all(),
+        invalidateCache.benefits.stats(),
+        invalidateCache.staff.all(),
+      ])
+    },
+  },
+
+  // Asset Assignments
+  assetAssignments: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['asset-assignments'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['asset-assignments', 'list'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['asset-assignments', 'detail', id] }),
+    stats: () => queryClient.invalidateQueries({ queryKey: ['asset-assignments', 'stats'] }),
+    byEmployee: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['asset-assignments', 'employee', employeeId] }),
+    overdueReturns: () => queryClient.invalidateQueries({ queryKey: ['asset-assignments', 'overdue-returns'] }),
+    maintenanceDue: () => queryClient.invalidateQueries({ queryKey: ['asset-assignments', 'maintenance-due'] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.assetAssignments.all(),
+        invalidateCache.assetAssignments.stats(),
+        invalidateCache.staff.all(),
       ])
     },
   },
@@ -623,23 +814,90 @@ export const invalidateCache = {
   // Manufacturing
   manufacturing: {
     all: () => queryClient.invalidateQueries({ queryKey: ['manufacturing'] }),
+    // BOMs
+    boms: () => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'boms'] }),
+    bomDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'boms', id] }),
+    // Workstations
+    workstations: () => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'workstations'] }),
+    workstationDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'workstations', id] }),
+    // Work Orders
+    workOrders: () => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'work-orders'] }),
+    workOrderDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'work-orders', id] }),
+    // Job Cards
+    jobCards: () => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'job-cards'] }),
+    jobCardDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'job-cards', id] }),
+    // Production Plans
+    productionPlans: () => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'production-plans'] }),
+    productionPlanDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'production-plans', id] }),
+    // Stats & Settings
+    stats: () => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'stats'] }),
+    settings: () => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'settings'] }),
   },
 
   // Buying
   buying: {
     all: () => queryClient.invalidateQueries({ queryKey: ['buying'] }),
+    // Suppliers
+    suppliers: () => queryClient.invalidateQueries({ queryKey: ['buying', 'suppliers'] }),
+    supplierDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['buying', 'suppliers', 'detail', id] }),
+    supplierGroups: () => queryClient.invalidateQueries({ queryKey: ['buying', 'supplier-groups'] }),
+    // Purchase Orders
+    purchaseOrders: () => queryClient.invalidateQueries({ queryKey: ['buying', 'purchase-orders'] }),
+    purchaseOrderDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['buying', 'purchase-orders', 'detail', id] }),
+    // Purchase Receipts
+    purchaseReceipts: () => queryClient.invalidateQueries({ queryKey: ['buying', 'purchase-receipts'] }),
+    purchaseReceiptDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['buying', 'purchase-receipts', 'detail', id] }),
+    // Purchase Invoices
+    purchaseInvoices: () => queryClient.invalidateQueries({ queryKey: ['buying', 'purchase-invoices'] }),
+    purchaseInvoiceDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['buying', 'purchase-invoices', 'detail', id] }),
+    // Material Requests
+    materialRequests: () => queryClient.invalidateQueries({ queryKey: ['buying', 'material-requests'] }),
+    materialRequestDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['buying', 'material-requests', 'detail', id] }),
+    // RFQs (Request for Quotations)
+    rfqs: () => queryClient.invalidateQueries({ queryKey: ['buying', 'rfqs'] }),
+    rfqDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['buying', 'rfqs', 'detail', id] }),
+    // Stats & Settings
+    stats: () => queryClient.invalidateQueries({ queryKey: ['buying', 'stats'] }),
+    settings: () => queryClient.invalidateQueries({ queryKey: ['buying', 'settings'] }),
   },
 
   // Quality
   quality: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['quality'] }),
+    // Inspections
+    inspections: () => queryClient.invalidateQueries({ queryKey: ['quality', 'inspections'] }),
+    inspectionDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['quality', 'inspections', id] }),
+    // Templates
+    templates: () => queryClient.invalidateQueries({ queryKey: ['quality', 'templates'] }),
+    templateDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['quality', 'templates', id] }),
+    // Parameters
+    parameters: () => queryClient.invalidateQueries({ queryKey: ['quality', 'parameters'] }),
+    // Actions
     actions: () => queryClient.invalidateQueries({ queryKey: ['quality', 'actions'] }),
+    actionDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['quality', 'actions', id] }),
+    // NCRs (Non-Conformance Reports)
     ncrs: () => queryClient.invalidateQueries({ queryKey: ['quality', 'ncrs'] }),
+    ncrDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['quality', 'ncrs', id] }),
+    // Stats & Settings
+    stats: () => queryClient.invalidateQueries({ queryKey: ['quality', 'stats'] }),
+    settings: () => queryClient.invalidateQueries({ queryKey: ['quality', 'settings'] }),
   },
 
   // Subcontracting
   subcontracting: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['subcontracting'] }),
+    // Orders
+    orders: () => queryClient.invalidateQueries({ queryKey: ['subcontracting', 'orders'] }),
+    orderDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['subcontracting', 'orders', id] }),
+    // Receipts
     receipts: () => queryClient.invalidateQueries({ queryKey: ['subcontracting', 'receipts'] }),
+    receiptDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['subcontracting', 'receipts', id] }),
+    // BOMs
     boms: () => queryClient.invalidateQueries({ queryKey: ['subcontracting', 'boms'] }),
+    bomDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['subcontracting', 'boms', id] }),
+    // Stats & Settings
+    stats: () => queryClient.invalidateQueries({ queryKey: ['subcontracting', 'stats'] }),
+    settings: () => queryClient.invalidateQueries({ queryKey: ['subcontracting', 'settings'] }),
   },
 
   // Support

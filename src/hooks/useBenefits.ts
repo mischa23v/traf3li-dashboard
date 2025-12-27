@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import {
   getBenefits,
   getBenefit,
@@ -89,8 +90,8 @@ export const useCreateBenefit = () => {
     mutationFn: (data: CreateBenefitData) => createBenefit(data),
     onSuccess: () => {
       toast.success('تم إضافة الميزة بنجاح')
-      queryClient.invalidateQueries({ queryKey: benefitKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: benefitKeys.stats() })
+      invalidateCache.benefits.lists()
+      invalidateCache.benefits.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إضافة الميزة')
@@ -106,8 +107,8 @@ export const useUpdateBenefit = () => {
       updateBenefit(benefitId, data),
     onSuccess: (_, { benefitId }) => {
       toast.success('تم تحديث الميزة بنجاح')
-      queryClient.invalidateQueries({ queryKey: benefitKeys.detail(benefitId) })
-      queryClient.invalidateQueries({ queryKey: benefitKeys.lists() })
+      invalidateCache.benefits.detail(benefitId)
+      invalidateCache.benefits.lists()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث الميزة')
@@ -122,8 +123,8 @@ export const useDeleteBenefit = () => {
     mutationFn: (benefitId: string) => deleteBenefit(benefitId),
     onSuccess: () => {
       toast.success('تم حذف الميزة بنجاح')
-      queryClient.invalidateQueries({ queryKey: benefitKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: benefitKeys.stats() })
+      invalidateCache.benefits.lists()
+      invalidateCache.benefits.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف الميزة')
@@ -138,8 +139,8 @@ export const useBulkDeleteBenefits = () => {
     mutationFn: (ids: string[]) => bulkDeleteBenefits(ids),
     onSuccess: (_, variables) => {
       toast.success(`تم حذف ${variables.length} ميزة بنجاح`)
-      queryClient.invalidateQueries({ queryKey: benefitKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: benefitKeys.stats() })
+      invalidateCache.benefits.lists()
+      invalidateCache.benefits.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف المزايا')
@@ -155,9 +156,9 @@ export const useActivateBenefit = () => {
       activateBenefit(benefitId, data),
     onSuccess: (_, { benefitId }) => {
       toast.success('تم تفعيل الميزة بنجاح')
-      queryClient.invalidateQueries({ queryKey: benefitKeys.detail(benefitId) })
-      queryClient.invalidateQueries({ queryKey: benefitKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: benefitKeys.stats() })
+      invalidateCache.benefits.detail(benefitId)
+      invalidateCache.benefits.lists()
+      invalidateCache.benefits.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تفعيل الميزة')
@@ -173,8 +174,8 @@ export const useSuspendBenefit = () => {
       suspendBenefit(benefitId, data),
     onSuccess: (_, { benefitId }) => {
       toast.success('تم إيقاف الميزة بنجاح')
-      queryClient.invalidateQueries({ queryKey: benefitKeys.detail(benefitId) })
-      queryClient.invalidateQueries({ queryKey: benefitKeys.lists() })
+      invalidateCache.benefits.detail(benefitId)
+      invalidateCache.benefits.lists()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إيقاف الميزة')
@@ -190,9 +191,9 @@ export const useTerminateBenefit = () => {
       terminateBenefit(benefitId, data),
     onSuccess: (_, { benefitId }) => {
       toast.success('تم إنهاء الميزة بنجاح')
-      queryClient.invalidateQueries({ queryKey: benefitKeys.detail(benefitId) })
-      queryClient.invalidateQueries({ queryKey: benefitKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: benefitKeys.stats() })
+      invalidateCache.benefits.detail(benefitId)
+      invalidateCache.benefits.lists()
+      invalidateCache.benefits.stats()
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنهاء الميزة')
@@ -208,7 +209,7 @@ export const useAddDependent = () => {
       addDependent(benefitId, data),
     onSuccess: (_, { benefitId }) => {
       toast.success('تم إضافة المعال بنجاح')
-      queryClient.invalidateQueries({ queryKey: benefitKeys.detail(benefitId) })
+      invalidateCache.benefits.detail(benefitId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إضافة المعال')
@@ -224,7 +225,7 @@ export const useRemoveDependent = () => {
       removeDependent(benefitId, memberId),
     onSuccess: (_, { benefitId }) => {
       toast.success('تم إزالة المعال بنجاح')
-      queryClient.invalidateQueries({ queryKey: benefitKeys.detail(benefitId) })
+      invalidateCache.benefits.detail(benefitId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إزالة المعال')
@@ -243,7 +244,7 @@ export const useUpdateBeneficiary = () => {
     }) => updateBeneficiary(benefitId, beneficiaryId, data),
     onSuccess: (_, { benefitId }) => {
       toast.success('تم تحديث المستفيد بنجاح')
-      queryClient.invalidateQueries({ queryKey: benefitKeys.detail(benefitId) })
+      invalidateCache.benefits.detail(benefitId)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث المستفيد')

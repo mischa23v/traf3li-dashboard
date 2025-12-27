@@ -108,7 +108,7 @@ export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = f
         expenses: { label: t('hero.new.expense'), href: ROUTES.dashboard.finance.expenses.new },
         payments: { label: t('hero.new.payment'), href: ROUTES.dashboard.finance.payments.new },
         transactions: { label: t('hero.new.transaction'), href: '/dashboard/finance/transactions/new' }, // TODO: Add to ROUTES
-        'time-entries': { label: t('hero.new.timeEntry'), href: '/dashboard/finance/time-entries/new' }, // TODO: Use timeTracking
+        'time-entries': { label: t('hero.new.timeEntry'), href: ROUTES.dashboard.finance.timeTracking.new },
         'time-tracking': { label: t('hero.new.timeEntry'), href: ROUTES.dashboard.finance.timeTracking.new },
         employees: { label: t('hero.new.employee'), href: ROUTES.dashboard.hr.employees.new },
         salaries: { label: t('hero.new.salary'), href: '/dashboard/hr/salaries/new' }, // TODO: Add to ROUTES

@@ -3,8 +3,9 @@
  * React Query hooks for Subcontracting operations
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import subcontractingService from '@/services/subcontractingService'
 import type { SubcontractingFilters, CreateSubcontractingOrderData, SubcontractingSettings } from '@/types/subcontracting'
 
@@ -39,11 +40,11 @@ export function useSubcontractingOrder(id: string) {
 }
 
 export function useCreateSubcontractingOrder() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (data: CreateSubcontractingOrderData) => subcontractingService.createOrder(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: subcontractingKeys.orders() })
+      invalidateCache.subcontracting.orders()
       toast.success('تم إنشاء أمر التصنيع الخارجي بنجاح | Subcontracting order created successfully')
     },
     onError: () => {
@@ -53,12 +54,12 @@ export function useCreateSubcontractingOrder() {
 }
 
 export function useUpdateSubcontractingOrder() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateSubcontractingOrderData> }) => subcontractingService.updateOrder(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: subcontractingKeys.orders() })
-      queryClient.invalidateQueries({ queryKey: subcontractingKeys.orderDetail(id) })
+      invalidateCache.subcontracting.orders()
+      invalidateCache.subcontracting.orderDetail(id)
       toast.success('تم تحديث أمر التصنيع الخارجي بنجاح | Subcontracting order updated successfully')
     },
     onError: () => {
@@ -68,11 +69,11 @@ export function useUpdateSubcontractingOrder() {
 }
 
 export function useDeleteSubcontractingOrder() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (id: string) => subcontractingService.deleteOrder(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: subcontractingKeys.orders() })
+      invalidateCache.subcontracting.orders()
       toast.success('تم حذف أمر التصنيع الخارجي بنجاح | Subcontracting order deleted successfully')
     },
     onError: () => {
@@ -82,12 +83,12 @@ export function useDeleteSubcontractingOrder() {
 }
 
 export function useSubmitSubcontractingOrder() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (id: string) => subcontractingService.submitOrder(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: subcontractingKeys.orders() })
-      queryClient.invalidateQueries({ queryKey: subcontractingKeys.orderDetail(id) })
+      invalidateCache.subcontracting.orders()
+      invalidateCache.subcontracting.orderDetail(id)
       toast.success('تم تقديم الأمر | Order submitted')
     },
     onError: () => {
@@ -97,12 +98,12 @@ export function useSubmitSubcontractingOrder() {
 }
 
 export function useCancelSubcontractingOrder() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (id: string) => subcontractingService.cancelOrder(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: subcontractingKeys.orders() })
-      queryClient.invalidateQueries({ queryKey: subcontractingKeys.orderDetail(id) })
+      invalidateCache.subcontracting.orders()
+      invalidateCache.subcontracting.orderDetail(id)
       toast.success('تم إلغاء الأمر | Order cancelled')
     },
     onError: () => {
@@ -128,12 +129,12 @@ export function useSubcontractingReceipt(id: string) {
 }
 
 export function useCreateSubcontractingReceipt() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (data: any) => subcontractingService.createReceipt(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: subcontractingKeys.receipts() })
-      queryClient.invalidateQueries({ queryKey: subcontractingKeys.orders() })
+      invalidateCache.subcontracting.receipts()
+      invalidateCache.subcontracting.orders()
       toast.success('تم إنشاء إيصال الاستلام بنجاح | Subcontracting receipt created')
     },
     onError: () => {
@@ -143,12 +144,12 @@ export function useCreateSubcontractingReceipt() {
 }
 
 export function useUpdateSubcontractingReceipt() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => subcontractingService.updateReceipt(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: subcontractingKeys.receipts() })
-      queryClient.invalidateQueries({ queryKey: subcontractingKeys.receiptDetail(id) })
+      invalidateCache.subcontracting.receipts()
+      invalidateCache.subcontracting.receiptDetail(id)
       toast.success('تم تحديث إيصال الاستلام بنجاح | Receipt updated successfully')
     },
     onError: () => {
@@ -158,13 +159,13 @@ export function useUpdateSubcontractingReceipt() {
 }
 
 export function useSubmitSubcontractingReceipt() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (id: string) => subcontractingService.submitReceipt(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: subcontractingKeys.receipts() })
-      queryClient.invalidateQueries({ queryKey: subcontractingKeys.receiptDetail(id) })
-      queryClient.invalidateQueries({ queryKey: subcontractingKeys.orders() })
+      invalidateCache.subcontracting.receipts()
+      invalidateCache.subcontracting.receiptDetail(id)
+      invalidateCache.subcontracting.orders()
       toast.success('تم تقديم الإيصال | Receipt submitted')
     },
     onError: () => {
@@ -190,11 +191,11 @@ export function useSubcontractingBom(id: string) {
 }
 
 export function useCreateSubcontractingBom() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (data: any) => subcontractingService.createBom(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: subcontractingKeys.boms() })
+      invalidateCache.subcontracting.boms()
       toast.success('تم إنشاء قائمة مواد التصنيع الخارجي بنجاح | Subcontracting BOM created')
     },
     onError: () => {
@@ -204,12 +205,12 @@ export function useCreateSubcontractingBom() {
 }
 
 export function useUpdateSubcontractingBom() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => subcontractingService.updateBom(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: subcontractingKeys.boms() })
-      queryClient.invalidateQueries({ queryKey: subcontractingKeys.bomDetail(id) })
+      invalidateCache.subcontracting.boms()
+      invalidateCache.subcontracting.bomDetail(id)
       toast.success('تم تحديث قائمة المواد بنجاح | BOM updated successfully')
     },
     onError: () => {
@@ -219,11 +220,11 @@ export function useUpdateSubcontractingBom() {
 }
 
 export function useDeleteSubcontractingBom() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (id: string) => subcontractingService.deleteBom(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: subcontractingKeys.boms() })
+      invalidateCache.subcontracting.boms()
       toast.success('تم حذف قائمة المواد بنجاح | BOM deleted successfully')
     },
     onError: () => {
@@ -249,11 +250,11 @@ export function useSubcontractingSettings() {
 }
 
 export function useUpdateSubcontractingSettings() {
-  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (data: Partial<SubcontractingSettings>) => subcontractingService.updateSubcontractingSettings(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: subcontractingKeys.settings() })
+      invalidateCache.subcontracting.settings()
       toast.success('تم تحديث الإعدادات بنجاح | Settings updated successfully')
     },
     onError: () => {

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Link } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
+import { ROUTES } from '@/constants/routes'
 
 interface SettingsSidebarProps {
     context?: 'tags' | 'billing-rates' | 'invoice-templates'
@@ -27,16 +28,16 @@ export function SettingsSidebar({
 
     const links = {
         tags: {
-            create: '/dashboard/tags/new',
-            viewAll: '/dashboard/tags'
+            create: `${ROUTES.dashboard.tags.list}/new`,
+            viewAll: ROUTES.dashboard.tags.list
         },
         'billing-rates': {
-            create: '/dashboard/billing-rates/new',
-            viewAll: '/dashboard/billing-rates'
+            create: `${ROUTES.dashboard.billingRates.list}/new`,
+            viewAll: ROUTES.dashboard.billingRates.list
         },
         'invoice-templates': {
-            create: '/dashboard/invoice-templates/new',
-            viewAll: '/dashboard/invoice-templates'
+            create: `${ROUTES.dashboard.invoiceTemplates.list}/new`,
+            viewAll: ROUTES.dashboard.invoiceTemplates.list
         }
     }
 

@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import { Crown, Lock, Sparkles, Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Plan } from './plan-gate'
+import { ROUTES } from '@/constants/routes'
 
 // Plan display configuration
 const PLAN_CONFIG: Record<Plan, {
@@ -156,7 +157,7 @@ export function PlanBadge({
           className
         )}
       >
-        <a href="/dashboard/settings/billing">
+        <a href={ROUTES.settings.billing}>
           {content}
         </a>
       </Badge>

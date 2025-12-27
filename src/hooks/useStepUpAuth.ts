@@ -28,7 +28,7 @@ export function useReauthStatus(enabled = true) {
     queryKey: stepUpAuthKeys.status(),
     queryFn: () => stepUpAuthService.checkStatus(),
     enabled,
-    staleTime: 60 * 1000, // 1 minute
+    staleTime: CACHE_TIMES.CALENDAR.GRID, // 1 minute
     retry: 1,
   })
 }
