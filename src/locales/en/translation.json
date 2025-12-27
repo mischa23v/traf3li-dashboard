@@ -6713,6 +6713,176 @@
   "crm": {
     "title": "CRM",
     "reports": "Reports",
+    "dashboard": {
+      "title": "CRM Dashboard",
+      "totalLeads": "Total Leads",
+      "openPipeline": "Open Pipeline",
+      "weightedValue": "Weighted Value",
+      "wonThisMonth": "Won This Month",
+      "lostThisMonth": "Lost This Month",
+      "conversionRate": "Conversion Rate",
+      "avgDealSize": "Avg Deal Size",
+      "avgSalesCycle": "Avg Sales Cycle",
+      "activitiesDueToday": "Activities Due Today",
+      "recentLeads": "Recent Leads",
+      "pipelineByStage": "Pipeline by Stage",
+      "leadsBySource": "Leads by Source"
+    },
+    "leads": {
+      "title": "Leads",
+      "create": "Create Lead",
+      "edit": "Edit Lead",
+      "name": "Name",
+      "company": "Company",
+      "email": "Email",
+      "phone": "Phone",
+      "status": "Status",
+      "source": "Source",
+      "assignedTo": "Assigned To",
+      "expectedRevenue": "Expected Revenue",
+      "probability": "Probability",
+      "expectedCloseDate": "Expected Close Date"
+    },
+    "leadStatus": {
+      "new": "New",
+      "contacted": "Contacted",
+      "qualified": "Qualified",
+      "proposal": "Proposal",
+      "negotiation": "Negotiation",
+      "won": "Won",
+      "lost": "Lost",
+      "dormant": "Dormant"
+    },
+    "contacts": {
+      "title": "Contacts",
+      "create": "Create Contact",
+      "edit": "Edit Contact",
+      "fullName": "Full Name",
+      "conflictStatus": "Conflict Status",
+      "vip": "VIP",
+      "linkToCase": "Link to Case"
+    },
+    "conflictStatus": {
+      "not_checked": "Not Checked",
+      "clear": "Clear",
+      "potential_conflict": "Potential Conflict",
+      "confirmed_conflict": "Confirmed Conflict"
+    },
+    "clients": {
+      "title": "Clients",
+      "create": "Create Client",
+      "edit": "Edit Client",
+      "clientNumber": "Client Number",
+      "lifetimeValue": "Lifetime Value",
+      "creditStatus": "Credit Status",
+      "outstanding": "Outstanding"
+    },
+    "creditStatus": {
+      "good": "Good",
+      "warning": "Warning",
+      "hold": "Hold",
+      "blacklisted": "Blacklisted"
+    },
+    "quotes": {
+      "title": "Quotes",
+      "create": "Create Quote",
+      "edit": "Edit Quote",
+      "quoteId": "Quote ID",
+      "validUntil": "Valid Until",
+      "lineItems": "Line Items",
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "tax": "Tax",
+      "grandTotal": "Grand Total",
+      "sendToCustomer": "Send to Customer",
+      "downloadPdf": "Download PDF",
+      "convertToInvoice": "Convert to Invoice"
+    },
+    "quoteStatus": {
+      "draft": "Draft",
+      "sent": "Sent",
+      "viewed": "Viewed",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "expired": "Expired",
+      "revised": "Revised"
+    },
+    "products": {
+      "title": "Products & Services",
+      "create": "Create Product",
+      "edit": "Edit Product",
+      "code": "Code",
+      "type": "Type",
+      "category": "Category",
+      "unitPrice": "Unit Price",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "productType": {
+      "service": "Service",
+      "product": "Product",
+      "subscription": "Subscription",
+      "retainer": "Retainer",
+      "hourly": "Hourly"
+    },
+    "campaigns": {
+      "title": "Campaigns",
+      "create": "Create Campaign",
+      "edit": "Edit Campaign",
+      "budget": "Budget",
+      "leadsGenerated": "Leads Generated",
+      "conversions": "Conversions",
+      "roi": "ROI"
+    },
+    "campaignStatus": {
+      "draft": "Draft",
+      "scheduled": "Scheduled",
+      "active": "Active",
+      "paused": "Paused",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "activities": {
+      "title": "Activities",
+      "create": "Create Activity",
+      "call": "Call",
+      "email": "Email",
+      "meeting": "Meeting",
+      "task": "Task",
+      "note": "Note",
+      "whatsapp": "WhatsApp",
+      "calendar": "Calendar",
+      "dueDate": "Due Date",
+      "reminder": "Reminder"
+    },
+    "settings": {
+      "title": "CRM Settings",
+      "teams": "Sales Teams",
+      "territories": "Territories",
+      "lostReasons": "Lost Reasons",
+      "tags": "Tags",
+      "emailTemplates": "Email Templates",
+      "general": "General Settings"
+    },
+    "pipeline": {
+      "title": "Pipeline",
+      "kanban": "Kanban View",
+      "moveToStage": "Move to Stage",
+      "daysInStage": "Days in Stage"
+    },
+    "common": {
+      "search": "Search",
+      "filter": "Filter",
+      "actions": "Actions",
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete",
+      "duplicate": "Duplicate",
+      "export": "Export",
+      "viewAll": "View All",
+      "noData": "No data available",
+      "loading": "Loading..."
+    },
     "prospectsEngagedReport": {
       "title": "Prospects Engaged Not Converted",
       "engagedProspects": "Engaged Prospects",
@@ -7205,5 +7375,18 @@
       "manageUsers": "Manage Users",
       "noManagementPermission": "You don't have management permissions for this company"
     }
+  },
+  "dealHealth": {
+    "label": "Deal Health",
+    "grade": "Grade",
+    "overallScore": "Overall Score",
+    "factors": "Factors"
+  },
+  "userPicker": {
+    "selectUser": "Select user",
+    "selectUsers": "Select users",
+    "search": "Search users...",
+    "loading": "Loading...",
+    "noResults": "No users found"
   }
 }

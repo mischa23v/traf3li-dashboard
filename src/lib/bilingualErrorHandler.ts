@@ -191,6 +191,35 @@ const ENTITY_ERRORS = {
     en: 'Conflict check failed. Please try again.',
     ar: 'فشل فحص التعارض. يرجى المحاولة مرة أخرى.',
   },
+  // Quote errors
+  QUOTE_NOT_FOUND: {
+    en: 'Quote not found.',
+    ar: 'عرض السعر غير موجود.',
+  },
+  QUOTE_CREATE_FAILED: {
+    en: 'Failed to create quote. Please try again.',
+    ar: 'فشل إنشاء عرض السعر. يرجى المحاولة مرة أخرى.',
+  },
+  QUOTE_UPDATE_FAILED: {
+    en: 'Failed to update quote. Please try again.',
+    ar: 'فشل تحديث عرض السعر. يرجى المحاولة مرة أخرى.',
+  },
+  QUOTE_DELETE_FAILED: {
+    en: 'Failed to delete quote. Please try again.',
+    ar: 'فشل حذف عرض السعر. يرجى المحاولة مرة أخرى.',
+  },
+  QUOTE_SEND_FAILED: {
+    en: 'Failed to send quote. Please try again.',
+    ar: 'فشل إرسال عرض السعر. يرجى المحاولة مرة أخرى.',
+  },
+  QUOTE_CONVERT_FAILED: {
+    en: 'Failed to convert quote to invoice. Please try again.',
+    ar: 'فشل تحويل عرض السعر إلى فاتورة. يرجى المحاولة مرة أخرى.',
+  },
+  QUOTE_PDF_FAILED: {
+    en: 'Failed to generate quote PDF. Please try again.',
+    ar: 'فشل إنشاء ملف PDF لعرض السعر. يرجى المحاولة مرة أخرى.',
+  },
 } as const
 
 /**

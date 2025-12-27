@@ -63,6 +63,10 @@ export const invalidateCache = {
     stats: () => queryClient.invalidateQueries({ queryKey: ['clients', 'stats'] }),
     search: (query?: string) => queryClient.invalidateQueries({ queryKey: ['clients', 'search', query] }),
     topRevenue: (limit?: number) => queryClient.invalidateQueries({ queryKey: ['clients', 'top-revenue', limit] }),
+    cases: (clientId: string) => queryClient.invalidateQueries({ queryKey: ['clients', clientId, 'cases'] }),
+    invoices: (clientId: string) => queryClient.invalidateQueries({ queryKey: ['clients', clientId, 'invoices'] }),
+    quotes: (clientId: string) => queryClient.invalidateQueries({ queryKey: ['clients', clientId, 'quotes'] }),
+    activities: (clientId: string) => queryClient.invalidateQueries({ queryKey: ['clients', clientId, 'activities'] }),
     payments: (clientId: string) => queryClient.invalidateQueries({ queryKey: ['clients', clientId, 'payments'] }),
     billingInfo: (clientId: string) => queryClient.invalidateQueries({ queryKey: ['clients', clientId, 'billing-info'] }),
     wathq: (clientId: string, dataType?: string) => queryClient.invalidateQueries({ queryKey: ['clients', clientId, 'wathq', dataType] }),
@@ -1188,6 +1192,23 @@ export const invalidateCache = {
     all: () => queryClient.invalidateQueries({ queryKey: ['referrals'] }),
     detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['referrals', id] }),
     stats: () => queryClient.invalidateQueries({ queryKey: ['referrals', 'stats'] }),
+  },
+
+  // Campaigns
+  campaigns: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['campaigns'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['campaigns', id] }),
+    leads: (id: string) => queryClient.invalidateQueries({ queryKey: ['campaigns', id, 'leads'] }),
+    stats: (id: string) => queryClient.invalidateQueries({ queryKey: ['campaigns', id, 'stats'] }),
+    analytics: (id: string) => queryClient.invalidateQueries({ queryKey: ['campaigns', id, 'analytics'] }),
+  },
+
+  // Products
+  products: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['products'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['products', 'detail', id] }),
+    categories: () => queryClient.invalidateQueries({ queryKey: ['products', 'categories'] }),
+    stats: (id: string) => queryClient.invalidateQueries({ queryKey: ['products', 'detail', id, 'stats'] }),
   },
 
   // Contacts

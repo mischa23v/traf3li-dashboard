@@ -712,6 +712,7 @@ export const ROUTES = {
       activities: {
         list: '/dashboard/crm/activities',
         new: '/dashboard/crm/activities/new',
+        calendar: '/dashboard/crm/activities/calendar',
         detail: (activityId: string) => `/dashboard/crm/activities/${activityId}`,
       },
 
@@ -742,6 +743,21 @@ export const ROUTES = {
         list: '/dashboard/crm/reports',
         new: '/dashboard/crm/reports/new',
         detail: (reportId: string) => `/dashboard/crm/reports/${reportId}`,
+      },
+
+      // Products
+      products: {
+        list: '/dashboard/crm/products',
+        new: '/dashboard/crm/products/new',
+        detail: (productId: string) => `/dashboard/crm/products/${productId}`,
+        edit: (productId: string) => `/dashboard/crm/products/${productId}/edit`,
+      },
+
+      // Quotes
+      quotes: {
+        list: '/dashboard/crm/quotes',
+        new: '/dashboard/crm/quotes/new',
+        detail: (quoteId: string) => `/dashboard/crm/quotes/${quoteId}`,
       },
     },
 
