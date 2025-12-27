@@ -2,6 +2,7 @@ import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
 import { invalidateCache } from '@/lib/cache-invalidation'
+import { useAuthStore } from '@/stores/auth-store'
 import onboardingWizardService, {
   type WizardData,
   type WizardCompanyInfo,
@@ -24,14 +25,18 @@ export const onboardingWizardKeys = {
 
 /**
  * Check if the current user has completed the onboarding wizard
+ * Only runs when user is authenticated to prevent 401 errors
  */
 export const useOnboardingWizardStatus = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
   return useQuery({
     queryKey: onboardingWizardKeys.status(),
     queryFn: () => onboardingWizardService.checkOnboardingStatus(),
     staleTime: STATUS_STALE_TIME,
     gcTime: STATUS_GC_TIME,
-    retry: 1, // Only retry once on failure
+    retry: false, // Don't retry on failure (401 means not authenticated)
+    enabled: isAuthenticated, // Only fetch when user is authenticated
   })
 }
 

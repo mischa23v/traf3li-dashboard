@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { CACHE_TIMES } from '@/config'
 import { invalidateCache } from '@/lib/cache-invalidation'
+import { useAuthStore } from '@/stores/auth-store'
 import notificationService, {
   type Notification,
   type NotificationFilters,
@@ -40,8 +41,11 @@ export const notificationKeys = {
 /**
  * Hook to get all notifications with filters
  * Optimized with proper caching and stale time configuration
+ * Only runs when user is authenticated to prevent 401 errors
  */
 export const useNotifications = (filters?: NotificationFilters) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
   return useQuery({
     queryKey: notificationKeys.list(filters),
     queryFn: () => notificationService.getNotifications(filters),
@@ -49,48 +53,62 @@ export const useNotifications = (filters?: NotificationFilters) => {
     gcTime: STATS_GC_TIME,
     refetchOnWindowFocus: false, // Prevent unnecessary refetches on window focus
     refetchOnMount: false, // Use cached data if available
+    retry: false, // Don't retry on 401
+    enabled: isAuthenticated, // Only fetch when user is authenticated
   })
 }
 
 /**
  * Hook to get a single notification
+ * Only runs when user is authenticated
  */
 export const useNotification = (id: string) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
   return useQuery({
     queryKey: notificationKeys.detail(id),
     queryFn: () => notificationService.getNotification(id),
-    enabled: !!id,
+    enabled: !!id && isAuthenticated,
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
+    retry: false,
   })
 }
 
 /**
  * Hook to get unread notification count
  * Optimized with batched refetch interval (2 minutes instead of 1)
+ * Only runs when user is authenticated
  */
 export const useUnreadCount = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
   return useQuery({
     queryKey: notificationKeys.unreadCount(),
     queryFn: () => notificationService.getUnreadCount(),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
-    refetchInterval: UNREAD_COUNT_REFETCH_INTERVAL, // Batched updates every 2 minutes
+    refetchInterval: isAuthenticated ? UNREAD_COUNT_REFETCH_INTERVAL : false, // Batched updates every 2 minutes
     refetchIntervalInBackground: false, // Don't refetch in background to save resources
     retry: false,
+    enabled: isAuthenticated,
   })
 }
 
 /**
  * Hook to get notifications by type
+ * Only runs when user is authenticated
  */
 export const useNotificationsByType = (type: string, params?: { page?: number; limit?: number }) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
   return useQuery({
     queryKey: notificationKeys.byType(type),
     queryFn: () => notificationService.getNotificationsByType(type, params),
-    enabled: !!type,
+    enabled: !!type && isAuthenticated,
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
+    retry: false,
   })
 }
 
@@ -321,13 +339,18 @@ export const useClearReadNotifications = () => {
 
 /**
  * Hook to get notification settings
+ * Only runs when user is authenticated
  */
 export const useNotificationSettings = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
   return useQuery({
     queryKey: notificationKeys.settings(),
     queryFn: () => notificationService.getSettings(),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
+    retry: false,
+    enabled: isAuthenticated,
   })
 }
 
