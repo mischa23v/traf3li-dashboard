@@ -46,7 +46,45 @@ const FORWARDED_RESPONSE_HEADERS = [
   'cache-control',
   'etag',
   'last-modified',
+  'x-csrf-token',
+  'x-xsrf-token',
 ];
+
+/**
+ * Modify Set-Cookie headers to ensure proper SameSite and Secure attributes
+ * for cross-origin cookie handling (fixes CSRF token cookie issues)
+ */
+const fixCookieSameSite = (cookie: string): string => {
+  // Parse cookie to check if it's a csrf-token or XSRF-TOKEN cookie
+  const lowerCookie = cookie.toLowerCase();
+  const isCsrfCookie = lowerCookie.includes('csrf-token=') || lowerCookie.includes('xsrf-token=');
+
+  if (!isCsrfCookie) {
+    return cookie;
+  }
+
+  // Check if SameSite is already set
+  const hasSameSite = lowerCookie.includes('samesite=');
+  const hasSecure = lowerCookie.includes('; secure') || lowerCookie.endsWith('secure');
+
+  let fixedCookie = cookie;
+
+  // If SameSite is already set but not to None, replace it
+  if (hasSameSite) {
+    // Replace existing SameSite with None (case-insensitive)
+    fixedCookie = fixedCookie.replace(/samesite=(strict|lax|none)/i, 'SameSite=None');
+  } else {
+    // Add SameSite=None
+    fixedCookie += '; SameSite=None';
+  }
+
+  // Add Secure flag if not present (required for SameSite=None)
+  if (!hasSecure) {
+    fixedCookie += '; Secure';
+  }
+
+  return fixedCookie;
+};
 
 /**
  * Handle all HTTP methods for API proxy
@@ -124,11 +162,15 @@ export const onRequest: PagesFunction<Env> = async (context) => {
           const cookies = backendResponse.headers.getSetCookie?.() || [];
           if (cookies.length > 0) {
             // Cloudflare Workers support multiple Set-Cookie headers
+            // Fix SameSite for CSRF cookies to enable cross-origin cookie handling
             cookies.forEach(cookie => {
-              responseHeaders.append('Set-Cookie', cookie);
+              const fixedCookie = fixCookieSameSite(cookie);
+              responseHeaders.append('Set-Cookie', fixedCookie);
             });
           } else if (value) {
-            responseHeaders.set('Set-Cookie', value);
+            // Fix SameSite for CSRF cookies
+            const fixedCookie = fixCookieSameSite(value);
+            responseHeaders.set('Set-Cookie', fixedCookie);
           }
         } else {
           responseHeaders.set(headerName, value);
