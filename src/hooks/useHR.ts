@@ -3,6 +3,7 @@ import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
 import { CACHE_TIMES } from '@/config'
 import { invalidateCache } from '@/lib/cache-invalidation'
+import { QueryKeys } from '@/lib/query-keys'
 import hrService, {
   EmployeeFilters,
   CreateEmployeeData,
@@ -19,7 +20,7 @@ const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
 
 export const useEmployees = (filters?: EmployeeFilters) => {
   return useQuery({
-    queryKey: ['employees', filters],
+    queryKey: QueryKeys.employees.list(filters),
     queryFn: () => hrService.getEmployees(filters),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -29,7 +30,7 @@ export const useEmployees = (filters?: EmployeeFilters) => {
 
 export const useEmployee = (id: string) => {
   return useQuery({
-    queryKey: ['employees', id],
+    queryKey: QueryKeys.employees.detail(id),
     queryFn: () => hrService.getEmployee(id),
     enabled: !!id,
     staleTime: LIST_STALE_TIME,
@@ -40,7 +41,7 @@ export const useEmployee = (id: string) => {
 
 export const useEmployeeStats = () => {
   return useQuery({
-    queryKey: ['employees', 'stats'],
+    queryKey: QueryKeys.employees.stats(),
     queryFn: () => hrService.getEmployeeStats(),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,

@@ -7,6 +7,7 @@ import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
 import { invalidateCache } from '@/lib/cache-invalidation'
+import { QueryKeys } from '@/lib/query-keys'
 import interCompanyService, {
   InterCompanyTransaction,
   InterCompanyTransactionFilters,
@@ -24,7 +25,7 @@ const CACHE_GC_TIME = CACHE_TIMES.LONG // 30 minutes
 
 export const useInterCompanyTransactions = (filters?: InterCompanyTransactionFilters) => {
   return useQuery({
-    queryKey: ['inter-company-transactions', filters],
+    queryKey: QueryKeys.interCompany.transactions(filters),
     queryFn: () => interCompanyService.getTransactions(filters),
     staleTime: CACHE_STALE_TIME,
     gcTime: CACHE_GC_TIME,
@@ -33,7 +34,7 @@ export const useInterCompanyTransactions = (filters?: InterCompanyTransactionFil
 
 export const useInterCompanyTransaction = (id: string) => {
   return useQuery({
-    queryKey: ['inter-company-transactions', id],
+    queryKey: QueryKeys.interCompany.transaction(id),
     queryFn: () => interCompanyService.getTransaction(id),
     enabled: !!id,
   })
@@ -130,7 +131,7 @@ export const useCancelInterCompanyTransaction = () => {
 
 export const useInterCompanyBalances = (currency?: string) => {
   return useQuery({
-    queryKey: ['inter-company-balances', currency],
+    queryKey: QueryKeys.interCompany.balance(currency),
     queryFn: () => interCompanyService.getBalances(currency),
     staleTime: CACHE_STALE_TIME,
     gcTime: CACHE_GC_TIME,
@@ -143,7 +144,7 @@ export const useInterCompanyBalanceBetween = (
   currency?: string
 ) => {
   return useQuery({
-    queryKey: ['inter-company-balance', sourceFirmId, targetFirmId, currency],
+    queryKey: QueryKeys.interCompany.balanceBetween(sourceFirmId, targetFirmId, currency),
     queryFn: () => interCompanyService.getBalanceBetweenCompanies(sourceFirmId, targetFirmId, currency),
     enabled: !!sourceFirmId && !!targetFirmId,
     staleTime: CACHE_STALE_TIME,
@@ -157,7 +158,7 @@ export const useInterCompanyTransactionsBetween = (
   filters?: Partial<InterCompanyTransactionFilters>
 ) => {
   return useQuery({
-    queryKey: ['inter-company-transactions-between', sourceFirmId, targetFirmId, filters],
+    queryKey: QueryKeys.interCompany.transactionsBetween(sourceFirmId, targetFirmId, filters),
     queryFn: () => interCompanyService.getTransactionsBetweenCompanies(sourceFirmId, targetFirmId, filters),
     enabled: !!sourceFirmId && !!targetFirmId,
     staleTime: CACHE_STALE_TIME,
@@ -169,7 +170,7 @@ export const useInterCompanyTransactionsBetween = (
 
 export const useInterCompanyReconciliations = (filters?: ReconciliationFilters) => {
   return useQuery({
-    queryKey: ['inter-company-reconciliations', filters],
+    queryKey: QueryKeys.interCompany.reconciliations(filters),
     queryFn: () => interCompanyService.getReconciliations(filters),
     staleTime: CACHE_STALE_TIME,
     gcTime: CACHE_GC_TIME,
@@ -178,7 +179,7 @@ export const useInterCompanyReconciliations = (filters?: ReconciliationFilters) 
 
 export const useInterCompanyReconciliation = (id: string) => {
   return useQuery({
-    queryKey: ['inter-company-reconciliations', id],
+    queryKey: QueryKeys.interCompany.reconciliation(id),
     queryFn: () => interCompanyService.getReconciliation(id),
     enabled: !!id,
   })
@@ -317,7 +318,7 @@ export const useApproveReconciliation = () => {
 
 export const useInterCompanyCompanies = () => {
   return useQuery({
-    queryKey: ['inter-company-firms'],
+    queryKey: QueryKeys.interCompany.firms(),
     queryFn: () => interCompanyService.getCompanies(),
     staleTime: CACHE_TIMES.LONG, // 30 minutes - companies don't change often
     gcTime: CACHE_TIMES.GC_LONG, // 1 hour
@@ -328,7 +329,7 @@ export const useInterCompanyCompanies = () => {
 
 export const useExchangeRate = (fromCurrency: string, toCurrency: string, date?: string) => {
   return useQuery({
-    queryKey: ['exchange-rate', fromCurrency, toCurrency, date],
+    queryKey: QueryKeys.interCompany.exchangeRate(fromCurrency, toCurrency, date),
     queryFn: () => interCompanyService.getExchangeRate(fromCurrency, toCurrency, date),
     enabled: !!fromCurrency && !!toCurrency && fromCurrency !== toCurrency,
     staleTime: CACHE_TIMES.HOUR, // 1 hour
@@ -345,7 +346,7 @@ export const useInterCompanyReport = (params: {
   currency?: string
 }) => {
   return useQuery({
-    queryKey: ['inter-company-report', params],
+    queryKey: QueryKeys.interCompany.report(params),
     queryFn: () => interCompanyService.getInterCompanyReport(params),
     enabled: !!params.startDate && !!params.endDate,
     staleTime: CACHE_STALE_TIME,

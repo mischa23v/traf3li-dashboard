@@ -2,6 +2,7 @@ import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
 import { invalidateCache } from '@/lib/cache-invalidation'
+import { QueryKeys } from '@/lib/query-keys'
 import employeePromotionService, {
   PromotionFilters,
   CreatePromotionInput,
@@ -20,7 +21,7 @@ const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
  */
 export const usePromotions = (filters?: PromotionFilters) => {
   return useQuery({
-    queryKey: ['employee-promotions', filters],
+    queryKey: QueryKeys.employeePromotion.list(filters),
     queryFn: () => employeePromotionService.getPromotions(filters),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -33,7 +34,7 @@ export const usePromotions = (filters?: PromotionFilters) => {
  */
 export const usePromotion = (id: string) => {
   return useQuery({
-    queryKey: ['employee-promotions', id],
+    queryKey: QueryKeys.employeePromotion.detail(id),
     queryFn: () => employeePromotionService.getPromotion(id),
     enabled: !!id,
     staleTime: LIST_STALE_TIME,
@@ -51,7 +52,7 @@ export const usePromotionStats = (filters?: {
   dateTo?: string
 }) => {
   return useQuery({
-    queryKey: ['employee-promotions', 'stats', filters],
+    queryKey: QueryKeys.employeePromotion.stats(filters),
     queryFn: () => employeePromotionService.getPromotionStats(filters),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
@@ -64,7 +65,7 @@ export const usePromotionStats = (filters?: {
  */
 export const usePendingPromotions = () => {
   return useQuery({
-    queryKey: ['employee-promotions', 'pending'],
+    queryKey: QueryKeys.employeePromotion.pending(),
     queryFn: () => employeePromotionService.getPendingPromotions(),
     staleTime: CACHE_TIMES.SHORT,
     gcTime: STATS_GC_TIME,
@@ -77,7 +78,7 @@ export const usePendingPromotions = () => {
  */
 export const usePromotionsAwaitingApplication = () => {
   return useQuery({
-    queryKey: ['employee-promotions', 'awaiting-application'],
+    queryKey: QueryKeys.employeePromotion.awaitingApplication(),
     queryFn: () => employeePromotionService.getPromotionsAwaitingApplication(),
     staleTime: CACHE_TIMES.SHORT,
     gcTime: STATS_GC_TIME,
@@ -90,7 +91,7 @@ export const usePromotionsAwaitingApplication = () => {
  */
 export const usePromotionHistory = (employeeId: string) => {
   return useQuery({
-    queryKey: ['employee-promotions', 'history', employeeId],
+    queryKey: QueryKeys.employeePromotion.history(employeeId),
     queryFn: () => employeePromotionService.getPromotionHistory(employeeId),
     enabled: !!employeeId,
     staleTime: STATS_STALE_TIME,
@@ -107,7 +108,7 @@ export const useEmployeePromotions = (
   filters?: Omit<PromotionFilters, 'employeeId'>
 ) => {
   return useQuery({
-    queryKey: ['employee-promotions', 'employee', employeeId, filters],
+    queryKey: QueryKeys.employeePromotion.employee(employeeId, filters),
     queryFn: () => employeePromotionService.getEmployeePromotions(employeeId, filters),
     enabled: !!employeeId,
     staleTime: LIST_STALE_TIME,

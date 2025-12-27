@@ -11,6 +11,7 @@ import { Reminder } from '@/services/remindersService'
 import { apiClientNoVersion as apiClient } from '@/lib/api'
 import { useAuthStore } from '@/stores/auth-store'
 
+import { QueryKeys } from '@/lib/query-keys'
 // ==================== Cache Configuration ====================
 // Cache data for 30 minutes to reduce API calls
 // Data is refreshed automatically when tasks/reminders/events are created/updated/deleted
@@ -22,7 +23,7 @@ const CALENDAR_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour (keep in cache)
  */
 export const useCalendar = (filters: CalendarFilters, enabled: boolean = true) => {
   return useQuery({
-    queryKey: ['calendar', filters],
+    queryKey: QueryKeys.calendar.list(filters),
     queryFn: () => calendarService.getCalendar(filters),
     staleTime: CALENDAR_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
@@ -36,7 +37,7 @@ export const useCalendar = (filters: CalendarFilters, enabled: boolean = true) =
  */
 export const useCalendarByDate = (date: string, enabled: boolean = true) => {
   return useQuery({
-    queryKey: ['calendar', 'date', date],
+    queryKey: QueryKeys.calendar.date(date),
     queryFn: () => calendarService.getCalendarByDate(date),
     staleTime: CALENDAR_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
@@ -50,7 +51,7 @@ export const useCalendarByDate = (date: string, enabled: boolean = true) => {
  */
 export const useCalendarByMonth = (year: number, month: number, enabled: boolean = true) => {
   return useQuery({
-    queryKey: ['calendar', 'month', year, month],
+    queryKey: QueryKeys.calendar.month(year, month),
     queryFn: () => calendarService.getCalendarByMonth(year, month),
     staleTime: CALENDAR_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
@@ -64,7 +65,7 @@ export const useCalendarByMonth = (year: number, month: number, enabled: boolean
  */
 export const useUpcomingCalendar = (days: number = 7, enabled: boolean = true) => {
   return useQuery({
-    queryKey: ['calendar', 'upcoming', days],
+    queryKey: QueryKeys.calendar.upcoming(days),
     queryFn: () => calendarService.getUpcoming(days),
     staleTime: CALENDAR_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
@@ -78,7 +79,7 @@ export const useUpcomingCalendar = (days: number = 7, enabled: boolean = true) =
  */
 export const useOverdueCalendar = (enabled: boolean = true) => {
   return useQuery({
-    queryKey: ['calendar', 'overdue'],
+    queryKey: QueryKeys.calendar.overdue(),
     queryFn: () => calendarService.getOverdue(),
     staleTime: CALENDAR_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
@@ -95,7 +96,7 @@ export const useCalendarStats = (filters?: {
   endDate?: string
 }, enabled: boolean = true) => {
   return useQuery({
-    queryKey: ['calendar', 'stats', filters],
+    queryKey: QueryKeys.calendar.stats(filters),
     queryFn: () => calendarService.getStats(filters),
     staleTime: CALENDAR_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
@@ -129,10 +130,10 @@ export const usePrefetchAdjacentMonths = (currentDate: Date) => {
     }
 
     // Only prefetch if not already in cache
-    const cached = queryClient.getQueryData(['calendar', filters])
+    const cached = queryClient.getQueryData(QueryKeys.calendar.list(filters))
     if (!cached) {
       queryClient.prefetchQuery({
-        queryKey: ['calendar', filters],
+        queryKey: QueryKeys.calendar.list(filters),
         queryFn: () => calendarService.getCalendar(filters),
         staleTime: CALENDAR_STALE_TIME,
       })
@@ -171,7 +172,7 @@ export const useCalendarGridSummary = (
   enabled: boolean = true
 ) => {
   return useQuery({
-    queryKey: ['calendar', 'grid-summary', filters],
+    queryKey: QueryKeys.calendar.gridSummary(filters),
     queryFn: () => calendarService.getGridSummary(filters),
     staleTime: GRID_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
@@ -189,7 +190,7 @@ export const useCalendarGridItems = (
   enabled: boolean = true
 ) => {
   return useQuery({
-    queryKey: ['calendar', 'grid-items', filters],
+    queryKey: QueryKeys.calendar.gridItems(filters),
     queryFn: () => calendarService.getGridItems(filters),
     staleTime: GRID_ITEMS_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
@@ -208,7 +209,7 @@ export const useCalendarItemDetails = (
   enabled: boolean = true
 ) => {
   return useQuery({
-    queryKey: ['calendar', 'item', type, id],
+    queryKey: QueryKeys.calendar.item(type!, id!),
     queryFn: () => calendarService.getItemDetails(type!, id!),
     staleTime: ITEM_DETAILS_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
@@ -226,7 +227,7 @@ export const useCalendarList = (
   enabled: boolean = true
 ) => {
   return useInfiniteQuery({
-    queryKey: ['calendar', 'list', filters],
+    queryKey: QueryKeys.calendar.infiniteList(filters),
     queryFn: ({ pageParam }) =>
       calendarService.getList({ ...filters, cursor: pageParam }),
     initialPageParam: undefined as string | undefined,
@@ -262,8 +263,8 @@ export const usePrefetchAdjacentMonthsOptimized = (currentDate: Date) => {
     }
 
     // Prefetch both summary and items in parallel
-    const summaryKey = ['calendar', 'grid-summary', filters]
-    const itemsKey = ['calendar', 'grid-items', filters]
+    const summaryKey = QueryKeys.calendar.gridSummary(filters)
+    const itemsKey = QueryKeys.calendar.gridItems(filters)
 
     if (!queryClient.getQueryData(summaryKey)) {
       queryClient.prefetchQuery({
@@ -325,7 +326,7 @@ export const useSidebarData = (isEnabled = true) => {
   endDate.setDate(endDate.getDate() + 5)
 
   return useQuery<SidebarData>({
-    queryKey: ['sidebar', 'data', today.toISOString().split('T')[0]],
+    queryKey: QueryKeys.sidebar.data(today.toISOString().split('T')[0]),
     queryFn: async () => {
       try {
         const response = await apiClient.get('/calendar/sidebar-data', {

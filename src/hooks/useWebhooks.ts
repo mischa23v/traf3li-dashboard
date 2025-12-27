@@ -10,13 +10,14 @@ import webhookService, {
 } from '@/services/webhookService'
 import { toast } from 'sonner'
 import { invalidateCache } from '@/lib/cache-invalidation'
+import { QueryKeys } from '@/lib/query-keys'
 
 /**
  * Get webhook statistics
  */
 export const useWebhookStats = () => {
   return useQuery({
-    queryKey: ['webhooks', 'stats'],
+    queryKey: QueryKeys.webhooks.stats(),
     queryFn: () => webhookService.getStats(),
     staleTime: CACHE_TIMES.SHORT, // 2 minutes
   })
@@ -27,7 +28,7 @@ export const useWebhookStats = () => {
  */
 export const useWebhookEvents = () => {
   return useQuery({
-    queryKey: ['webhooks', 'events'],
+    queryKey: QueryKeys.webhooks.events(),
     queryFn: () => webhookService.getAvailableEvents(),
     staleTime: CACHE_TIMES.LONG, // 30 minutes (was 10 minutes, events don't change often)
   })
@@ -38,7 +39,7 @@ export const useWebhookEvents = () => {
  */
 export const useWebhooks = (params?: { page?: number; limit?: number }) => {
   return useQuery({
-    queryKey: ['webhooks', 'list', params],
+    queryKey: QueryKeys.webhooks.list(params),
     queryFn: () => webhookService.getWebhooks(params),
     staleTime: CACHE_TIMES.CALENDAR.GRID, // 1 minute
   })
@@ -49,7 +50,7 @@ export const useWebhooks = (params?: { page?: number; limit?: number }) => {
  */
 export const useWebhook = (id: string) => {
   return useQuery({
-    queryKey: ['webhooks', 'detail', id],
+    queryKey: QueryKeys.webhooks.detail(id),
     queryFn: () => webhookService.getWebhook(id),
     enabled: !!id,
     staleTime: CACHE_TIMES.CALENDAR.GRID,
@@ -64,7 +65,7 @@ export const useWebhookDeliveries = (
   params?: { page?: number; limit?: number }
 ) => {
   return useQuery({
-    queryKey: ['webhooks', 'deliveries', id, params],
+    queryKey: QueryKeys.webhooks.deliveries(id, params),
     queryFn: () => webhookService.getWebhookDeliveries(id, params),
     enabled: !!id,
     staleTime: CACHE_TIMES.AUDIT.LOGS, // 30 seconds (logs should be fresh)
@@ -76,7 +77,7 @@ export const useWebhookDeliveries = (
  */
 export const useWebhookSecret = (id: string, enabled: boolean = false) => {
   return useQuery({
-    queryKey: ['webhooks', 'secret', id],
+    queryKey: QueryKeys.webhooks.secret(id),
     queryFn: () => webhookService.getWebhookSecret(id),
     enabled: !!id && enabled,
     staleTime: CACHE_TIMES.INSTANT, // Never cache secrets

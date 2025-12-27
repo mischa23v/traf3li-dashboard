@@ -17,6 +17,7 @@
  */
 
 import { useQuery, useQueries } from '@tanstack/react-query'
+import { QueryKeys } from '@/lib/query-keys'
 import { smartButtonsService, type SupportedModel, type SmartButtonCounts } from '@/services/smartButtonsService'
 import { CACHE_TIMES } from '@/config/cache'
 
@@ -96,7 +97,7 @@ export function useSmartButtons(
   }
 
   const query = useQuery({
-    queryKey: ['smart-buttons', model, recordId],
+    queryKey: QueryKeys.smartButtons.byModel(model, recordId),
     queryFn: async () => {
       try {
         // This will throw an error with bilingual message
@@ -147,7 +148,7 @@ export function useSmartButtonsBatch(
   }
 
   const query = useQuery({
-    queryKey: ['smart-buttons-batch', model, recordIds],
+    queryKey: QueryKeys.smartButtons.batch(model, recordIds),
     queryFn: async () => {
       try {
         // This will throw an error with bilingual message
@@ -191,7 +192,7 @@ export function useSmartButtonsMulti(
 
   const queries = useQueries({
     queries: recordIds.map((recordId) => ({
-      queryKey: ['smart-buttons', model, recordId],
+      queryKey: QueryKeys.smartButtons.byModel(model, recordId),
       queryFn: async () => {
         try {
           // This will throw an error with bilingual message

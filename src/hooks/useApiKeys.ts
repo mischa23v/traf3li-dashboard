@@ -6,13 +6,14 @@ import apiKeysService, {
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { invalidateCache } from '@/lib/cache-invalidation'
+import { QueryKeys } from '@/lib/query-keys'
 
 /**
  * Hook to fetch all API keys for the current user
  */
 export const useApiKeys = () => {
   return useQuery({
-    queryKey: ['api-keys'],
+    queryKey: QueryKeys.apiKeys.all(),
     queryFn: () => apiKeysService.getUserApiKeys(),
     staleTime: CACHE_TIMES.SHORT, // 2 minutes
   })
@@ -23,7 +24,7 @@ export const useApiKeys = () => {
  */
 export const useApiKeyStats = () => {
   return useQuery({
-    queryKey: ['api-keys', 'stats'],
+    queryKey: QueryKeys.apiKeys.stats(),
     queryFn: () => apiKeysService.getApiKeyStats(),
     staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })

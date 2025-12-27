@@ -4,13 +4,14 @@ import ldapService, { LDAPConfigFormData } from '@/services/ldapService'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { invalidateCache } from '@/lib/cache-invalidation'
+import { QueryKeys } from '@/lib/query-keys'
 
 /**
  * Hook to fetch LDAP configuration
  */
 export const useLDAPConfig = () => {
   return useQuery({
-    queryKey: ['ldap-config'],
+    queryKey: QueryKeys.ldap.config(),
     queryFn: () => ldapService.getConfig(),
     staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
@@ -21,7 +22,7 @@ export const useLDAPConfig = () => {
  */
 export const useLDAPSyncStatus = () => {
   return useQuery({
-    queryKey: ['ldap-sync-status'],
+    queryKey: QueryKeys.ldap.syncStatus(),
     queryFn: () => ldapService.getSyncStatus(),
     staleTime: CACHE_TIMES.REALTIME.LIVE_FEED, // 30 seconds
     refetchInterval: 30 * 1000, // Refetch every 30 seconds when sync is running

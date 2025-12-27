@@ -1,12 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config/cache'
+import { QueryKeys } from '@/lib/query-keys'
 import appsService, { GetAppsParams, ConnectAppData } from '@/services/appsService'
 import { toast } from 'sonner'
 import { invalidateCache } from '@/lib/cache-invalidation'
 
 export const useApps = (params?: GetAppsParams) => {
   return useQuery({
-    queryKey: ['apps', params],
+    queryKey: QueryKeys.apps.list(params),
     queryFn: () => appsService.getApps(params),
     staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
   })
@@ -14,7 +15,7 @@ export const useApps = (params?: GetAppsParams) => {
 
 export const useApp = (appId: string) => {
   return useQuery({
-    queryKey: ['apps', appId],
+    queryKey: QueryKeys.apps.detail(appId),
     queryFn: () => appsService.getApp(appId),
     enabled: !!appId,
     staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
@@ -32,7 +33,7 @@ export const useConnectApp = () => {
       toast.success('تم ربط التطبيق بنجاح')
 
       // Manually update the cache
-      queryClient.setQueriesData({ queryKey: ['apps'] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: QueryKeys.apps.all() }, (old: any) => {
         if (!old) return old
         // Handle { apps: [...] } structure
         if (old.apps && Array.isArray(old.apps)) {
@@ -66,7 +67,7 @@ export const useDisconnectApp = () => {
       toast.success('تم فصل التطبيق بنجاح')
 
       // Manually update the cache
-      queryClient.setQueriesData({ queryKey: ['apps'] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: QueryKeys.apps.all() }, (old: any) => {
         if (!old) return old
         // Handle { apps: [...] } structure
         if (old.apps && Array.isArray(old.apps)) {
