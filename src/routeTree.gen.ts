@@ -77,6 +77,7 @@ import { Route as AuthenticatedDashboardInventoryRouteImport } from './routes/_a
 import { Route as AuthenticatedDashboardHrRouteImport } from './routes/_authenticated/dashboard.hr'
 import { Route as AuthenticatedDashboardHelpRouteImport } from './routes/_authenticated/dashboard.help'
 import { Route as AuthenticatedDashboardFinanceRouteImport } from './routes/_authenticated/dashboard.finance'
+import { Route as AuthenticatedDashboardDateRangePickerTestRouteImport } from './routes/_authenticated/dashboard.date-range-picker-test'
 import { Route as AuthenticatedDashboardCrmRouteImport } from './routes/_authenticated/dashboard.crm'
 import { Route as AuthenticatedDashboardCasesRouteImport } from './routes/_authenticated/dashboard.cases'
 import { Route as AuthenticatedDashboardCalendarRouteImport } from './routes/_authenticated/dashboard.calendar'
@@ -97,6 +98,7 @@ import { Route as AuthenticatedDashboardInventoryIndexRouteImport } from './rout
 import { Route as AuthenticatedDashboardFollowupsIndexRouteImport } from './routes/_authenticated/dashboard.followups.index'
 import { Route as AuthenticatedDashboardDocumentsIndexRouteImport } from './routes/_authenticated/dashboard.documents.index'
 import { Route as AuthenticatedDashboardDataExportIndexRouteImport } from './routes/_authenticated/dashboard.data-export.index'
+import { Route as AuthenticatedDashboardCrmIndexRouteImport } from './routes/_authenticated/dashboard.crm.index'
 import { Route as AuthenticatedDashboardContactsIndexRouteImport } from './routes/_authenticated/dashboard.contacts.index'
 import { Route as AuthenticatedDashboardClientsIndexRouteImport } from './routes/_authenticated/dashboard.clients.index'
 import { Route as AuthenticatedDashboardCasesIndexRouteImport } from './routes/_authenticated/dashboard.cases.index'
@@ -255,11 +257,17 @@ import { Route as AuthenticatedDashboardFinanceCreditNotesIndexRouteImport } fro
 import { Route as AuthenticatedDashboardFinanceBillsIndexRouteImport } from './routes/_authenticated/dashboard.finance.bills.index'
 import { Route as AuthenticatedDashboardFinanceActivityIndexRouteImport } from './routes/_authenticated/dashboard.finance.activity.index'
 import { Route as AuthenticatedDashboardCrmWhatsappIndexRouteImport } from './routes/_authenticated/dashboard.crm.whatsapp.index'
+import { Route as AuthenticatedDashboardCrmSettingsIndexRouteImport } from './routes/_authenticated/dashboard.crm.settings.index'
 import { Route as AuthenticatedDashboardCrmReportsIndexRouteImport } from './routes/_authenticated/dashboard.crm.reports.index'
 import { Route as AuthenticatedDashboardCrmReferralsIndexRouteImport } from './routes/_authenticated/dashboard.crm.referrals.index'
+import { Route as AuthenticatedDashboardCrmQuotesIndexRouteImport } from './routes/_authenticated/dashboard.crm.quotes.index'
+import { Route as AuthenticatedDashboardCrmProductsIndexRouteImport } from './routes/_authenticated/dashboard.crm.products.index'
 import { Route as AuthenticatedDashboardCrmLeadsIndexRouteImport } from './routes/_authenticated/dashboard.crm.leads.index'
 import { Route as AuthenticatedDashboardCrmLeadScoringIndexRouteImport } from './routes/_authenticated/dashboard.crm.lead-scoring.index'
 import { Route as AuthenticatedDashboardCrmEmailMarketingIndexRouteImport } from './routes/_authenticated/dashboard.crm.email-marketing.index'
+import { Route as AuthenticatedDashboardCrmContactsIndexRouteImport } from './routes/_authenticated/dashboard.crm.contacts.index'
+import { Route as AuthenticatedDashboardCrmClientsIndexRouteImport } from './routes/_authenticated/dashboard.crm.clients.index'
+import { Route as AuthenticatedDashboardCrmCampaignsIndexRouteImport } from './routes/_authenticated/dashboard.crm.campaigns.index'
 import { Route as AuthenticatedDashboardCrmActivitiesIndexRouteImport } from './routes/_authenticated/dashboard.crm.activities.index'
 import { Route as AuthenticatedDashboardBuyingRfqIndexRouteImport } from './routes/_authenticated/dashboard.buying.rfq.index'
 import { Route as AuthenticatedDashboardBuyingMaterialRequestsIndexRouteImport } from './routes/_authenticated/dashboard.buying.material-requests.index'
@@ -391,14 +399,28 @@ import { Route as AuthenticatedDashboardFinanceActivityActivityIdRouteImport } f
 import { Route as AuthenticatedDashboardCrmWhatsappStartRouteImport } from './routes/_authenticated/dashboard.crm.whatsapp.start'
 import { Route as AuthenticatedDashboardCrmWhatsappNewRouteImport } from './routes/_authenticated/dashboard.crm.whatsapp.new'
 import { Route as AuthenticatedDashboardCrmWhatsappConversationIdRouteImport } from './routes/_authenticated/dashboard.crm.whatsapp.$conversationId'
+import { Route as AuthenticatedDashboardCrmSettingsTerritoriesRouteImport } from './routes/_authenticated/dashboard.crm.settings.territories'
+import { Route as AuthenticatedDashboardCrmSettingsTeamsRouteImport } from './routes/_authenticated/dashboard.crm.settings.teams'
+import { Route as AuthenticatedDashboardCrmSettingsTagsRouteImport } from './routes/_authenticated/dashboard.crm.settings.tags'
+import { Route as AuthenticatedDashboardCrmSettingsLostReasonsRouteImport } from './routes/_authenticated/dashboard.crm.settings.lost-reasons'
+import { Route as AuthenticatedDashboardCrmSettingsEmailTemplatesRouteImport } from './routes/_authenticated/dashboard.crm.settings.email-templates'
 import { Route as AuthenticatedDashboardCrmReportsNewRouteImport } from './routes/_authenticated/dashboard.crm.reports.new'
 import { Route as AuthenticatedDashboardCrmReportsReportIdRouteImport } from './routes/_authenticated/dashboard.crm.reports.$reportId'
 import { Route as AuthenticatedDashboardCrmReferralsNewRouteImport } from './routes/_authenticated/dashboard.crm.referrals.new'
 import { Route as AuthenticatedDashboardCrmReferralsReferralIdRouteImport } from './routes/_authenticated/dashboard.crm.referrals.$referralId'
+import { Route as AuthenticatedDashboardCrmQuotesNewRouteImport } from './routes/_authenticated/dashboard.crm.quotes.new'
+import { Route as AuthenticatedDashboardCrmQuotesQuoteIdRouteImport } from './routes/_authenticated/dashboard.crm.quotes.$quoteId'
+import { Route as AuthenticatedDashboardCrmProductsNewRouteImport } from './routes/_authenticated/dashboard.crm.products.new'
+import { Route as AuthenticatedDashboardCrmProductsProductIdRouteImport } from './routes/_authenticated/dashboard.crm.products.$productId'
 import { Route as AuthenticatedDashboardCrmLeadsNewRouteImport } from './routes/_authenticated/dashboard.crm.leads.new'
 import { Route as AuthenticatedDashboardCrmLeadsLeadIdRouteImport } from './routes/_authenticated/dashboard.crm.leads.$leadId'
 import { Route as AuthenticatedDashboardCrmEmailMarketingNewRouteImport } from './routes/_authenticated/dashboard.crm.email-marketing.new'
 import { Route as AuthenticatedDashboardCrmEmailMarketingCampaignIdRouteImport } from './routes/_authenticated/dashboard.crm.email-marketing.$campaignId'
+import { Route as AuthenticatedDashboardCrmContactsNewRouteImport } from './routes/_authenticated/dashboard.crm.contacts.new'
+import { Route as AuthenticatedDashboardCrmContactsContactIdRouteImport } from './routes/_authenticated/dashboard.crm.contacts.$contactId'
+import { Route as AuthenticatedDashboardCrmClientsClientIdRouteImport } from './routes/_authenticated/dashboard.crm.clients.$clientId'
+import { Route as AuthenticatedDashboardCrmCampaignsNewRouteImport } from './routes/_authenticated/dashboard.crm.campaigns.new'
+import { Route as AuthenticatedDashboardCrmCampaignsCampaignIdRouteImport } from './routes/_authenticated/dashboard.crm.campaigns.$campaignId'
 import { Route as AuthenticatedDashboardCrmActivitiesNewRouteImport } from './routes/_authenticated/dashboard.crm.activities.new'
 import { Route as AuthenticatedDashboardCrmActivitiesActivityIdRouteImport } from './routes/_authenticated/dashboard.crm.activities.$activityId'
 import { Route as AuthenticatedDashboardCasesPipelineBoardRouteImport } from './routes/_authenticated/dashboard.cases.pipeline.board'
@@ -793,6 +815,12 @@ const AuthenticatedDashboardFinanceRoute =
     path: '/dashboard/finance',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardDateRangePickerTestRoute =
+  AuthenticatedDashboardDateRangePickerTestRouteImport.update({
+    id: '/dashboard/date-range-picker-test',
+    path: '/dashboard/date-range-picker-test',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardCrmRoute =
   AuthenticatedDashboardCrmRouteImport.update({
     id: '/dashboard/crm',
@@ -912,6 +940,12 @@ const AuthenticatedDashboardDataExportIndexRoute =
     id: '/dashboard/data-export/',
     path: '/dashboard/data-export/',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardCrmIndexRoute =
+  AuthenticatedDashboardCrmIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardContactsIndexRoute =
   AuthenticatedDashboardContactsIndexRouteImport.update({
@@ -1861,6 +1895,12 @@ const AuthenticatedDashboardCrmWhatsappIndexRoute =
     path: '/whatsapp/',
     getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
+const AuthenticatedDashboardCrmSettingsIndexRoute =
+  AuthenticatedDashboardCrmSettingsIndexRouteImport.update({
+    id: '/settings/',
+    path: '/settings/',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
 const AuthenticatedDashboardCrmReportsIndexRoute =
   AuthenticatedDashboardCrmReportsIndexRouteImport.update({
     id: '/reports/',
@@ -1871,6 +1911,18 @@ const AuthenticatedDashboardCrmReferralsIndexRoute =
   AuthenticatedDashboardCrmReferralsIndexRouteImport.update({
     id: '/referrals/',
     path: '/referrals/',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmQuotesIndexRoute =
+  AuthenticatedDashboardCrmQuotesIndexRouteImport.update({
+    id: '/quotes/',
+    path: '/quotes/',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmProductsIndexRoute =
+  AuthenticatedDashboardCrmProductsIndexRouteImport.update({
+    id: '/products/',
+    path: '/products/',
     getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmLeadsIndexRoute =
@@ -1889,6 +1941,24 @@ const AuthenticatedDashboardCrmEmailMarketingIndexRoute =
   AuthenticatedDashboardCrmEmailMarketingIndexRouteImport.update({
     id: '/email-marketing/',
     path: '/email-marketing/',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmContactsIndexRoute =
+  AuthenticatedDashboardCrmContactsIndexRouteImport.update({
+    id: '/contacts/',
+    path: '/contacts/',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmClientsIndexRoute =
+  AuthenticatedDashboardCrmClientsIndexRouteImport.update({
+    id: '/clients/',
+    path: '/clients/',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmCampaignsIndexRoute =
+  AuthenticatedDashboardCrmCampaignsIndexRouteImport.update({
+    id: '/campaigns/',
+    path: '/campaigns/',
     getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmActivitiesIndexRoute =
@@ -2677,6 +2747,36 @@ const AuthenticatedDashboardCrmWhatsappConversationIdRoute =
     path: '/whatsapp/$conversationId',
     getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
+const AuthenticatedDashboardCrmSettingsTerritoriesRoute =
+  AuthenticatedDashboardCrmSettingsTerritoriesRouteImport.update({
+    id: '/settings/territories',
+    path: '/settings/territories',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmSettingsTeamsRoute =
+  AuthenticatedDashboardCrmSettingsTeamsRouteImport.update({
+    id: '/settings/teams',
+    path: '/settings/teams',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmSettingsTagsRoute =
+  AuthenticatedDashboardCrmSettingsTagsRouteImport.update({
+    id: '/settings/tags',
+    path: '/settings/tags',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmSettingsLostReasonsRoute =
+  AuthenticatedDashboardCrmSettingsLostReasonsRouteImport.update({
+    id: '/settings/lost-reasons',
+    path: '/settings/lost-reasons',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmSettingsEmailTemplatesRoute =
+  AuthenticatedDashboardCrmSettingsEmailTemplatesRouteImport.update({
+    id: '/settings/email-templates',
+    path: '/settings/email-templates',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
 const AuthenticatedDashboardCrmReportsNewRoute =
   AuthenticatedDashboardCrmReportsNewRouteImport.update({
     id: '/reports/new',
@@ -2701,6 +2801,30 @@ const AuthenticatedDashboardCrmReferralsReferralIdRoute =
     path: '/referrals/$referralId',
     getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
+const AuthenticatedDashboardCrmQuotesNewRoute =
+  AuthenticatedDashboardCrmQuotesNewRouteImport.update({
+    id: '/quotes/new',
+    path: '/quotes/new',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmQuotesQuoteIdRoute =
+  AuthenticatedDashboardCrmQuotesQuoteIdRouteImport.update({
+    id: '/quotes/$quoteId',
+    path: '/quotes/$quoteId',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmProductsNewRoute =
+  AuthenticatedDashboardCrmProductsNewRouteImport.update({
+    id: '/products/new',
+    path: '/products/new',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmProductsProductIdRoute =
+  AuthenticatedDashboardCrmProductsProductIdRouteImport.update({
+    id: '/products/$productId',
+    path: '/products/$productId',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
 const AuthenticatedDashboardCrmLeadsNewRoute =
   AuthenticatedDashboardCrmLeadsNewRouteImport.update({
     id: '/leads/new',
@@ -2723,6 +2847,36 @@ const AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute =
   AuthenticatedDashboardCrmEmailMarketingCampaignIdRouteImport.update({
     id: '/email-marketing/$campaignId',
     path: '/email-marketing/$campaignId',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmContactsNewRoute =
+  AuthenticatedDashboardCrmContactsNewRouteImport.update({
+    id: '/contacts/new',
+    path: '/contacts/new',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmContactsContactIdRoute =
+  AuthenticatedDashboardCrmContactsContactIdRouteImport.update({
+    id: '/contacts/$contactId',
+    path: '/contacts/$contactId',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmClientsClientIdRoute =
+  AuthenticatedDashboardCrmClientsClientIdRouteImport.update({
+    id: '/clients/$clientId',
+    path: '/clients/$clientId',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmCampaignsNewRoute =
+  AuthenticatedDashboardCrmCampaignsNewRouteImport.update({
+    id: '/campaigns/new',
+    path: '/campaigns/new',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmCampaignsCampaignIdRoute =
+  AuthenticatedDashboardCrmCampaignsCampaignIdRouteImport.update({
+    id: '/campaigns/$campaignId',
+    path: '/campaigns/$campaignId',
     getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmActivitiesNewRoute =
@@ -2978,6 +3132,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/dashboard/cases': typeof AuthenticatedDashboardCasesRouteWithChildren
   '/dashboard/crm': typeof AuthenticatedDashboardCrmRouteWithChildren
+  '/dashboard/date-range-picker-test': typeof AuthenticatedDashboardDateRangePickerTestRoute
   '/dashboard/finance': typeof AuthenticatedDashboardFinanceRouteWithChildren
   '/dashboard/help': typeof AuthenticatedDashboardHelpRoute
   '/dashboard/hr': typeof AuthenticatedDashboardHrRouteWithChildren
@@ -3096,6 +3251,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/cases/': typeof AuthenticatedDashboardCasesIndexRoute
   '/dashboard/clients': typeof AuthenticatedDashboardClientsIndexRoute
   '/dashboard/contacts': typeof AuthenticatedDashboardContactsIndexRoute
+  '/dashboard/crm/': typeof AuthenticatedDashboardCrmIndexRoute
   '/dashboard/data-export': typeof AuthenticatedDashboardDataExportIndexRoute
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsIndexRoute
   '/dashboard/followups': typeof AuthenticatedDashboardFollowupsIndexRoute
@@ -3123,14 +3279,28 @@ export interface FileRoutesByFullPath {
   '/dashboard/cases/pipeline/board': typeof AuthenticatedDashboardCasesPipelineBoardRoute
   '/dashboard/crm/activities/$activityId': typeof AuthenticatedDashboardCrmActivitiesActivityIdRoute
   '/dashboard/crm/activities/new': typeof AuthenticatedDashboardCrmActivitiesNewRoute
+  '/dashboard/crm/campaigns/$campaignId': typeof AuthenticatedDashboardCrmCampaignsCampaignIdRoute
+  '/dashboard/crm/campaigns/new': typeof AuthenticatedDashboardCrmCampaignsNewRoute
+  '/dashboard/crm/clients/$clientId': typeof AuthenticatedDashboardCrmClientsClientIdRoute
+  '/dashboard/crm/contacts/$contactId': typeof AuthenticatedDashboardCrmContactsContactIdRoute
+  '/dashboard/crm/contacts/new': typeof AuthenticatedDashboardCrmContactsNewRoute
   '/dashboard/crm/email-marketing/$campaignId': typeof AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute
   '/dashboard/crm/email-marketing/new': typeof AuthenticatedDashboardCrmEmailMarketingNewRoute
   '/dashboard/crm/leads/$leadId': typeof AuthenticatedDashboardCrmLeadsLeadIdRoute
   '/dashboard/crm/leads/new': typeof AuthenticatedDashboardCrmLeadsNewRoute
+  '/dashboard/crm/products/$productId': typeof AuthenticatedDashboardCrmProductsProductIdRoute
+  '/dashboard/crm/products/new': typeof AuthenticatedDashboardCrmProductsNewRoute
+  '/dashboard/crm/quotes/$quoteId': typeof AuthenticatedDashboardCrmQuotesQuoteIdRoute
+  '/dashboard/crm/quotes/new': typeof AuthenticatedDashboardCrmQuotesNewRoute
   '/dashboard/crm/referrals/$referralId': typeof AuthenticatedDashboardCrmReferralsReferralIdRoute
   '/dashboard/crm/referrals/new': typeof AuthenticatedDashboardCrmReferralsNewRoute
   '/dashboard/crm/reports/$reportId': typeof AuthenticatedDashboardCrmReportsReportIdRoute
   '/dashboard/crm/reports/new': typeof AuthenticatedDashboardCrmReportsNewRoute
+  '/dashboard/crm/settings/email-templates': typeof AuthenticatedDashboardCrmSettingsEmailTemplatesRoute
+  '/dashboard/crm/settings/lost-reasons': typeof AuthenticatedDashboardCrmSettingsLostReasonsRoute
+  '/dashboard/crm/settings/tags': typeof AuthenticatedDashboardCrmSettingsTagsRoute
+  '/dashboard/crm/settings/teams': typeof AuthenticatedDashboardCrmSettingsTeamsRoute
+  '/dashboard/crm/settings/territories': typeof AuthenticatedDashboardCrmSettingsTerritoriesRoute
   '/dashboard/crm/whatsapp/$conversationId': typeof AuthenticatedDashboardCrmWhatsappConversationIdRoute
   '/dashboard/crm/whatsapp/new': typeof AuthenticatedDashboardCrmWhatsappNewRoute
   '/dashboard/crm/whatsapp/start': typeof AuthenticatedDashboardCrmWhatsappStartRoute
@@ -3262,11 +3432,17 @@ export interface FileRoutesByFullPath {
   '/dashboard/buying/material-requests': typeof AuthenticatedDashboardBuyingMaterialRequestsIndexRoute
   '/dashboard/buying/rfq': typeof AuthenticatedDashboardBuyingRfqIndexRoute
   '/dashboard/crm/activities': typeof AuthenticatedDashboardCrmActivitiesIndexRoute
+  '/dashboard/crm/campaigns': typeof AuthenticatedDashboardCrmCampaignsIndexRoute
+  '/dashboard/crm/clients': typeof AuthenticatedDashboardCrmClientsIndexRoute
+  '/dashboard/crm/contacts': typeof AuthenticatedDashboardCrmContactsIndexRoute
   '/dashboard/crm/email-marketing': typeof AuthenticatedDashboardCrmEmailMarketingIndexRoute
   '/dashboard/crm/lead-scoring': typeof AuthenticatedDashboardCrmLeadScoringIndexRoute
   '/dashboard/crm/leads': typeof AuthenticatedDashboardCrmLeadsIndexRoute
+  '/dashboard/crm/products': typeof AuthenticatedDashboardCrmProductsIndexRoute
+  '/dashboard/crm/quotes': typeof AuthenticatedDashboardCrmQuotesIndexRoute
   '/dashboard/crm/referrals': typeof AuthenticatedDashboardCrmReferralsIndexRoute
   '/dashboard/crm/reports': typeof AuthenticatedDashboardCrmReportsIndexRoute
+  '/dashboard/crm/settings': typeof AuthenticatedDashboardCrmSettingsIndexRoute
   '/dashboard/crm/whatsapp': typeof AuthenticatedDashboardCrmWhatsappIndexRoute
   '/dashboard/finance/activity': typeof AuthenticatedDashboardFinanceActivityIndexRoute
   '/dashboard/finance/bills': typeof AuthenticatedDashboardFinanceBillsIndexRoute
@@ -3397,7 +3573,7 @@ export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
   '/sign-up/complete-profile': typeof authSignUpCompleteProfileRoute
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
-  '/dashboard/crm': typeof AuthenticatedDashboardCrmRouteWithChildren
+  '/dashboard/date-range-picker-test': typeof AuthenticatedDashboardDateRangePickerTestRoute
   '/dashboard/finance': typeof AuthenticatedDashboardFinanceRouteWithChildren
   '/dashboard/help': typeof AuthenticatedDashboardHelpRoute
   '/dashboard/hr': typeof AuthenticatedDashboardHrRouteWithChildren
@@ -3507,6 +3683,7 @@ export interface FileRoutesByTo {
   '/dashboard/cases': typeof AuthenticatedDashboardCasesIndexRoute
   '/dashboard/clients': typeof AuthenticatedDashboardClientsIndexRoute
   '/dashboard/contacts': typeof AuthenticatedDashboardContactsIndexRoute
+  '/dashboard/crm': typeof AuthenticatedDashboardCrmIndexRoute
   '/dashboard/data-export': typeof AuthenticatedDashboardDataExportIndexRoute
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsIndexRoute
   '/dashboard/followups': typeof AuthenticatedDashboardFollowupsIndexRoute
@@ -3534,14 +3711,28 @@ export interface FileRoutesByTo {
   '/dashboard/cases/pipeline/board': typeof AuthenticatedDashboardCasesPipelineBoardRoute
   '/dashboard/crm/activities/$activityId': typeof AuthenticatedDashboardCrmActivitiesActivityIdRoute
   '/dashboard/crm/activities/new': typeof AuthenticatedDashboardCrmActivitiesNewRoute
+  '/dashboard/crm/campaigns/$campaignId': typeof AuthenticatedDashboardCrmCampaignsCampaignIdRoute
+  '/dashboard/crm/campaigns/new': typeof AuthenticatedDashboardCrmCampaignsNewRoute
+  '/dashboard/crm/clients/$clientId': typeof AuthenticatedDashboardCrmClientsClientIdRoute
+  '/dashboard/crm/contacts/$contactId': typeof AuthenticatedDashboardCrmContactsContactIdRoute
+  '/dashboard/crm/contacts/new': typeof AuthenticatedDashboardCrmContactsNewRoute
   '/dashboard/crm/email-marketing/$campaignId': typeof AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute
   '/dashboard/crm/email-marketing/new': typeof AuthenticatedDashboardCrmEmailMarketingNewRoute
   '/dashboard/crm/leads/$leadId': typeof AuthenticatedDashboardCrmLeadsLeadIdRoute
   '/dashboard/crm/leads/new': typeof AuthenticatedDashboardCrmLeadsNewRoute
+  '/dashboard/crm/products/$productId': typeof AuthenticatedDashboardCrmProductsProductIdRoute
+  '/dashboard/crm/products/new': typeof AuthenticatedDashboardCrmProductsNewRoute
+  '/dashboard/crm/quotes/$quoteId': typeof AuthenticatedDashboardCrmQuotesQuoteIdRoute
+  '/dashboard/crm/quotes/new': typeof AuthenticatedDashboardCrmQuotesNewRoute
   '/dashboard/crm/referrals/$referralId': typeof AuthenticatedDashboardCrmReferralsReferralIdRoute
   '/dashboard/crm/referrals/new': typeof AuthenticatedDashboardCrmReferralsNewRoute
   '/dashboard/crm/reports/$reportId': typeof AuthenticatedDashboardCrmReportsReportIdRoute
   '/dashboard/crm/reports/new': typeof AuthenticatedDashboardCrmReportsNewRoute
+  '/dashboard/crm/settings/email-templates': typeof AuthenticatedDashboardCrmSettingsEmailTemplatesRoute
+  '/dashboard/crm/settings/lost-reasons': typeof AuthenticatedDashboardCrmSettingsLostReasonsRoute
+  '/dashboard/crm/settings/tags': typeof AuthenticatedDashboardCrmSettingsTagsRoute
+  '/dashboard/crm/settings/teams': typeof AuthenticatedDashboardCrmSettingsTeamsRoute
+  '/dashboard/crm/settings/territories': typeof AuthenticatedDashboardCrmSettingsTerritoriesRoute
   '/dashboard/crm/whatsapp/$conversationId': typeof AuthenticatedDashboardCrmWhatsappConversationIdRoute
   '/dashboard/crm/whatsapp/new': typeof AuthenticatedDashboardCrmWhatsappNewRoute
   '/dashboard/crm/whatsapp/start': typeof AuthenticatedDashboardCrmWhatsappStartRoute
@@ -3673,11 +3864,17 @@ export interface FileRoutesByTo {
   '/dashboard/buying/material-requests': typeof AuthenticatedDashboardBuyingMaterialRequestsIndexRoute
   '/dashboard/buying/rfq': typeof AuthenticatedDashboardBuyingRfqIndexRoute
   '/dashboard/crm/activities': typeof AuthenticatedDashboardCrmActivitiesIndexRoute
+  '/dashboard/crm/campaigns': typeof AuthenticatedDashboardCrmCampaignsIndexRoute
+  '/dashboard/crm/clients': typeof AuthenticatedDashboardCrmClientsIndexRoute
+  '/dashboard/crm/contacts': typeof AuthenticatedDashboardCrmContactsIndexRoute
   '/dashboard/crm/email-marketing': typeof AuthenticatedDashboardCrmEmailMarketingIndexRoute
   '/dashboard/crm/lead-scoring': typeof AuthenticatedDashboardCrmLeadScoringIndexRoute
   '/dashboard/crm/leads': typeof AuthenticatedDashboardCrmLeadsIndexRoute
+  '/dashboard/crm/products': typeof AuthenticatedDashboardCrmProductsIndexRoute
+  '/dashboard/crm/quotes': typeof AuthenticatedDashboardCrmQuotesIndexRoute
   '/dashboard/crm/referrals': typeof AuthenticatedDashboardCrmReferralsIndexRoute
   '/dashboard/crm/reports': typeof AuthenticatedDashboardCrmReportsIndexRoute
+  '/dashboard/crm/settings': typeof AuthenticatedDashboardCrmSettingsIndexRoute
   '/dashboard/crm/whatsapp': typeof AuthenticatedDashboardCrmWhatsappIndexRoute
   '/dashboard/finance/activity': typeof AuthenticatedDashboardFinanceActivityIndexRoute
   '/dashboard/finance/bills': typeof AuthenticatedDashboardFinanceBillsIndexRoute
@@ -3816,6 +4013,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/_authenticated/dashboard/cases': typeof AuthenticatedDashboardCasesRouteWithChildren
   '/_authenticated/dashboard/crm': typeof AuthenticatedDashboardCrmRouteWithChildren
+  '/_authenticated/dashboard/date-range-picker-test': typeof AuthenticatedDashboardDateRangePickerTestRoute
   '/_authenticated/dashboard/finance': typeof AuthenticatedDashboardFinanceRouteWithChildren
   '/_authenticated/dashboard/help': typeof AuthenticatedDashboardHelpRoute
   '/_authenticated/dashboard/hr': typeof AuthenticatedDashboardHrRouteWithChildren
@@ -3934,6 +4132,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/cases/': typeof AuthenticatedDashboardCasesIndexRoute
   '/_authenticated/dashboard/clients/': typeof AuthenticatedDashboardClientsIndexRoute
   '/_authenticated/dashboard/contacts/': typeof AuthenticatedDashboardContactsIndexRoute
+  '/_authenticated/dashboard/crm/': typeof AuthenticatedDashboardCrmIndexRoute
   '/_authenticated/dashboard/data-export/': typeof AuthenticatedDashboardDataExportIndexRoute
   '/_authenticated/dashboard/documents/': typeof AuthenticatedDashboardDocumentsIndexRoute
   '/_authenticated/dashboard/followups/': typeof AuthenticatedDashboardFollowupsIndexRoute
@@ -3961,14 +4160,28 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/cases/pipeline/board': typeof AuthenticatedDashboardCasesPipelineBoardRoute
   '/_authenticated/dashboard/crm/activities/$activityId': typeof AuthenticatedDashboardCrmActivitiesActivityIdRoute
   '/_authenticated/dashboard/crm/activities/new': typeof AuthenticatedDashboardCrmActivitiesNewRoute
+  '/_authenticated/dashboard/crm/campaigns/$campaignId': typeof AuthenticatedDashboardCrmCampaignsCampaignIdRoute
+  '/_authenticated/dashboard/crm/campaigns/new': typeof AuthenticatedDashboardCrmCampaignsNewRoute
+  '/_authenticated/dashboard/crm/clients/$clientId': typeof AuthenticatedDashboardCrmClientsClientIdRoute
+  '/_authenticated/dashboard/crm/contacts/$contactId': typeof AuthenticatedDashboardCrmContactsContactIdRoute
+  '/_authenticated/dashboard/crm/contacts/new': typeof AuthenticatedDashboardCrmContactsNewRoute
   '/_authenticated/dashboard/crm/email-marketing/$campaignId': typeof AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute
   '/_authenticated/dashboard/crm/email-marketing/new': typeof AuthenticatedDashboardCrmEmailMarketingNewRoute
   '/_authenticated/dashboard/crm/leads/$leadId': typeof AuthenticatedDashboardCrmLeadsLeadIdRoute
   '/_authenticated/dashboard/crm/leads/new': typeof AuthenticatedDashboardCrmLeadsNewRoute
+  '/_authenticated/dashboard/crm/products/$productId': typeof AuthenticatedDashboardCrmProductsProductIdRoute
+  '/_authenticated/dashboard/crm/products/new': typeof AuthenticatedDashboardCrmProductsNewRoute
+  '/_authenticated/dashboard/crm/quotes/$quoteId': typeof AuthenticatedDashboardCrmQuotesQuoteIdRoute
+  '/_authenticated/dashboard/crm/quotes/new': typeof AuthenticatedDashboardCrmQuotesNewRoute
   '/_authenticated/dashboard/crm/referrals/$referralId': typeof AuthenticatedDashboardCrmReferralsReferralIdRoute
   '/_authenticated/dashboard/crm/referrals/new': typeof AuthenticatedDashboardCrmReferralsNewRoute
   '/_authenticated/dashboard/crm/reports/$reportId': typeof AuthenticatedDashboardCrmReportsReportIdRoute
   '/_authenticated/dashboard/crm/reports/new': typeof AuthenticatedDashboardCrmReportsNewRoute
+  '/_authenticated/dashboard/crm/settings/email-templates': typeof AuthenticatedDashboardCrmSettingsEmailTemplatesRoute
+  '/_authenticated/dashboard/crm/settings/lost-reasons': typeof AuthenticatedDashboardCrmSettingsLostReasonsRoute
+  '/_authenticated/dashboard/crm/settings/tags': typeof AuthenticatedDashboardCrmSettingsTagsRoute
+  '/_authenticated/dashboard/crm/settings/teams': typeof AuthenticatedDashboardCrmSettingsTeamsRoute
+  '/_authenticated/dashboard/crm/settings/territories': typeof AuthenticatedDashboardCrmSettingsTerritoriesRoute
   '/_authenticated/dashboard/crm/whatsapp/$conversationId': typeof AuthenticatedDashboardCrmWhatsappConversationIdRoute
   '/_authenticated/dashboard/crm/whatsapp/new': typeof AuthenticatedDashboardCrmWhatsappNewRoute
   '/_authenticated/dashboard/crm/whatsapp/start': typeof AuthenticatedDashboardCrmWhatsappStartRoute
@@ -4100,11 +4313,17 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/buying/material-requests/': typeof AuthenticatedDashboardBuyingMaterialRequestsIndexRoute
   '/_authenticated/dashboard/buying/rfq/': typeof AuthenticatedDashboardBuyingRfqIndexRoute
   '/_authenticated/dashboard/crm/activities/': typeof AuthenticatedDashboardCrmActivitiesIndexRoute
+  '/_authenticated/dashboard/crm/campaigns/': typeof AuthenticatedDashboardCrmCampaignsIndexRoute
+  '/_authenticated/dashboard/crm/clients/': typeof AuthenticatedDashboardCrmClientsIndexRoute
+  '/_authenticated/dashboard/crm/contacts/': typeof AuthenticatedDashboardCrmContactsIndexRoute
   '/_authenticated/dashboard/crm/email-marketing/': typeof AuthenticatedDashboardCrmEmailMarketingIndexRoute
   '/_authenticated/dashboard/crm/lead-scoring/': typeof AuthenticatedDashboardCrmLeadScoringIndexRoute
   '/_authenticated/dashboard/crm/leads/': typeof AuthenticatedDashboardCrmLeadsIndexRoute
+  '/_authenticated/dashboard/crm/products/': typeof AuthenticatedDashboardCrmProductsIndexRoute
+  '/_authenticated/dashboard/crm/quotes/': typeof AuthenticatedDashboardCrmQuotesIndexRoute
   '/_authenticated/dashboard/crm/referrals/': typeof AuthenticatedDashboardCrmReferralsIndexRoute
   '/_authenticated/dashboard/crm/reports/': typeof AuthenticatedDashboardCrmReportsIndexRoute
+  '/_authenticated/dashboard/crm/settings/': typeof AuthenticatedDashboardCrmSettingsIndexRoute
   '/_authenticated/dashboard/crm/whatsapp/': typeof AuthenticatedDashboardCrmWhatsappIndexRoute
   '/_authenticated/dashboard/finance/activity/': typeof AuthenticatedDashboardFinanceActivityIndexRoute
   '/_authenticated/dashboard/finance/bills/': typeof AuthenticatedDashboardFinanceBillsIndexRoute
@@ -4241,6 +4460,7 @@ export interface FileRouteTypes {
     | '/dashboard/calendar'
     | '/dashboard/cases'
     | '/dashboard/crm'
+    | '/dashboard/date-range-picker-test'
     | '/dashboard/finance'
     | '/dashboard/help'
     | '/dashboard/hr'
@@ -4359,6 +4579,7 @@ export interface FileRouteTypes {
     | '/dashboard/cases/'
     | '/dashboard/clients'
     | '/dashboard/contacts'
+    | '/dashboard/crm/'
     | '/dashboard/data-export'
     | '/dashboard/documents'
     | '/dashboard/followups'
@@ -4386,14 +4607,28 @@ export interface FileRouteTypes {
     | '/dashboard/cases/pipeline/board'
     | '/dashboard/crm/activities/$activityId'
     | '/dashboard/crm/activities/new'
+    | '/dashboard/crm/campaigns/$campaignId'
+    | '/dashboard/crm/campaigns/new'
+    | '/dashboard/crm/clients/$clientId'
+    | '/dashboard/crm/contacts/$contactId'
+    | '/dashboard/crm/contacts/new'
     | '/dashboard/crm/email-marketing/$campaignId'
     | '/dashboard/crm/email-marketing/new'
     | '/dashboard/crm/leads/$leadId'
     | '/dashboard/crm/leads/new'
+    | '/dashboard/crm/products/$productId'
+    | '/dashboard/crm/products/new'
+    | '/dashboard/crm/quotes/$quoteId'
+    | '/dashboard/crm/quotes/new'
     | '/dashboard/crm/referrals/$referralId'
     | '/dashboard/crm/referrals/new'
     | '/dashboard/crm/reports/$reportId'
     | '/dashboard/crm/reports/new'
+    | '/dashboard/crm/settings/email-templates'
+    | '/dashboard/crm/settings/lost-reasons'
+    | '/dashboard/crm/settings/tags'
+    | '/dashboard/crm/settings/teams'
+    | '/dashboard/crm/settings/territories'
     | '/dashboard/crm/whatsapp/$conversationId'
     | '/dashboard/crm/whatsapp/new'
     | '/dashboard/crm/whatsapp/start'
@@ -4525,11 +4760,17 @@ export interface FileRouteTypes {
     | '/dashboard/buying/material-requests'
     | '/dashboard/buying/rfq'
     | '/dashboard/crm/activities'
+    | '/dashboard/crm/campaigns'
+    | '/dashboard/crm/clients'
+    | '/dashboard/crm/contacts'
     | '/dashboard/crm/email-marketing'
     | '/dashboard/crm/lead-scoring'
     | '/dashboard/crm/leads'
+    | '/dashboard/crm/products'
+    | '/dashboard/crm/quotes'
     | '/dashboard/crm/referrals'
     | '/dashboard/crm/reports'
+    | '/dashboard/crm/settings'
     | '/dashboard/crm/whatsapp'
     | '/dashboard/finance/activity'
     | '/dashboard/finance/bills'
@@ -4660,7 +4901,7 @@ export interface FileRouteTypes {
     | '/'
     | '/sign-up/complete-profile'
     | '/dashboard/calendar'
-    | '/dashboard/crm'
+    | '/dashboard/date-range-picker-test'
     | '/dashboard/finance'
     | '/dashboard/help'
     | '/dashboard/hr'
@@ -4770,6 +5011,7 @@ export interface FileRouteTypes {
     | '/dashboard/cases'
     | '/dashboard/clients'
     | '/dashboard/contacts'
+    | '/dashboard/crm'
     | '/dashboard/data-export'
     | '/dashboard/documents'
     | '/dashboard/followups'
@@ -4797,14 +5039,28 @@ export interface FileRouteTypes {
     | '/dashboard/cases/pipeline/board'
     | '/dashboard/crm/activities/$activityId'
     | '/dashboard/crm/activities/new'
+    | '/dashboard/crm/campaigns/$campaignId'
+    | '/dashboard/crm/campaigns/new'
+    | '/dashboard/crm/clients/$clientId'
+    | '/dashboard/crm/contacts/$contactId'
+    | '/dashboard/crm/contacts/new'
     | '/dashboard/crm/email-marketing/$campaignId'
     | '/dashboard/crm/email-marketing/new'
     | '/dashboard/crm/leads/$leadId'
     | '/dashboard/crm/leads/new'
+    | '/dashboard/crm/products/$productId'
+    | '/dashboard/crm/products/new'
+    | '/dashboard/crm/quotes/$quoteId'
+    | '/dashboard/crm/quotes/new'
     | '/dashboard/crm/referrals/$referralId'
     | '/dashboard/crm/referrals/new'
     | '/dashboard/crm/reports/$reportId'
     | '/dashboard/crm/reports/new'
+    | '/dashboard/crm/settings/email-templates'
+    | '/dashboard/crm/settings/lost-reasons'
+    | '/dashboard/crm/settings/tags'
+    | '/dashboard/crm/settings/teams'
+    | '/dashboard/crm/settings/territories'
     | '/dashboard/crm/whatsapp/$conversationId'
     | '/dashboard/crm/whatsapp/new'
     | '/dashboard/crm/whatsapp/start'
@@ -4936,11 +5192,17 @@ export interface FileRouteTypes {
     | '/dashboard/buying/material-requests'
     | '/dashboard/buying/rfq'
     | '/dashboard/crm/activities'
+    | '/dashboard/crm/campaigns'
+    | '/dashboard/crm/clients'
+    | '/dashboard/crm/contacts'
     | '/dashboard/crm/email-marketing'
     | '/dashboard/crm/lead-scoring'
     | '/dashboard/crm/leads'
+    | '/dashboard/crm/products'
+    | '/dashboard/crm/quotes'
     | '/dashboard/crm/referrals'
     | '/dashboard/crm/reports'
+    | '/dashboard/crm/settings'
     | '/dashboard/crm/whatsapp'
     | '/dashboard/finance/activity'
     | '/dashboard/finance/bills'
@@ -5078,6 +5340,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/calendar'
     | '/_authenticated/dashboard/cases'
     | '/_authenticated/dashboard/crm'
+    | '/_authenticated/dashboard/date-range-picker-test'
     | '/_authenticated/dashboard/finance'
     | '/_authenticated/dashboard/help'
     | '/_authenticated/dashboard/hr'
@@ -5196,6 +5459,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/cases/'
     | '/_authenticated/dashboard/clients/'
     | '/_authenticated/dashboard/contacts/'
+    | '/_authenticated/dashboard/crm/'
     | '/_authenticated/dashboard/data-export/'
     | '/_authenticated/dashboard/documents/'
     | '/_authenticated/dashboard/followups/'
@@ -5223,14 +5487,28 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/cases/pipeline/board'
     | '/_authenticated/dashboard/crm/activities/$activityId'
     | '/_authenticated/dashboard/crm/activities/new'
+    | '/_authenticated/dashboard/crm/campaigns/$campaignId'
+    | '/_authenticated/dashboard/crm/campaigns/new'
+    | '/_authenticated/dashboard/crm/clients/$clientId'
+    | '/_authenticated/dashboard/crm/contacts/$contactId'
+    | '/_authenticated/dashboard/crm/contacts/new'
     | '/_authenticated/dashboard/crm/email-marketing/$campaignId'
     | '/_authenticated/dashboard/crm/email-marketing/new'
     | '/_authenticated/dashboard/crm/leads/$leadId'
     | '/_authenticated/dashboard/crm/leads/new'
+    | '/_authenticated/dashboard/crm/products/$productId'
+    | '/_authenticated/dashboard/crm/products/new'
+    | '/_authenticated/dashboard/crm/quotes/$quoteId'
+    | '/_authenticated/dashboard/crm/quotes/new'
     | '/_authenticated/dashboard/crm/referrals/$referralId'
     | '/_authenticated/dashboard/crm/referrals/new'
     | '/_authenticated/dashboard/crm/reports/$reportId'
     | '/_authenticated/dashboard/crm/reports/new'
+    | '/_authenticated/dashboard/crm/settings/email-templates'
+    | '/_authenticated/dashboard/crm/settings/lost-reasons'
+    | '/_authenticated/dashboard/crm/settings/tags'
+    | '/_authenticated/dashboard/crm/settings/teams'
+    | '/_authenticated/dashboard/crm/settings/territories'
     | '/_authenticated/dashboard/crm/whatsapp/$conversationId'
     | '/_authenticated/dashboard/crm/whatsapp/new'
     | '/_authenticated/dashboard/crm/whatsapp/start'
@@ -5362,11 +5640,17 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/buying/material-requests/'
     | '/_authenticated/dashboard/buying/rfq/'
     | '/_authenticated/dashboard/crm/activities/'
+    | '/_authenticated/dashboard/crm/campaigns/'
+    | '/_authenticated/dashboard/crm/clients/'
+    | '/_authenticated/dashboard/crm/contacts/'
     | '/_authenticated/dashboard/crm/email-marketing/'
     | '/_authenticated/dashboard/crm/lead-scoring/'
     | '/_authenticated/dashboard/crm/leads/'
+    | '/_authenticated/dashboard/crm/products/'
+    | '/_authenticated/dashboard/crm/quotes/'
     | '/_authenticated/dashboard/crm/referrals/'
     | '/_authenticated/dashboard/crm/reports/'
+    | '/_authenticated/dashboard/crm/settings/'
     | '/_authenticated/dashboard/crm/whatsapp/'
     | '/_authenticated/dashboard/finance/activity/'
     | '/_authenticated/dashboard/finance/bills/'
@@ -5977,6 +6261,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardFinanceRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/date-range-picker-test': {
+      id: '/_authenticated/dashboard/date-range-picker-test'
+      path: '/dashboard/date-range-picker-test'
+      fullPath: '/dashboard/date-range-picker-test'
+      preLoaderRoute: typeof AuthenticatedDashboardDateRangePickerTestRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/crm': {
       id: '/_authenticated/dashboard/crm'
       path: '/dashboard/crm'
@@ -6116,6 +6407,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/data-export'
       preLoaderRoute: typeof AuthenticatedDashboardDataExportIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/crm/': {
+      id: '/_authenticated/dashboard/crm/'
+      path: '/'
+      fullPath: '/dashboard/crm/'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/contacts/': {
       id: '/_authenticated/dashboard/contacts/'
@@ -7223,6 +7521,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCrmWhatsappIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
+    '/_authenticated/dashboard/crm/settings/': {
+      id: '/_authenticated/dashboard/crm/settings/'
+      path: '/settings'
+      fullPath: '/dashboard/crm/settings'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmSettingsIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
     '/_authenticated/dashboard/crm/reports/': {
       id: '/_authenticated/dashboard/crm/reports/'
       path: '/reports'
@@ -7235,6 +7540,20 @@ declare module '@tanstack/react-router' {
       path: '/referrals'
       fullPath: '/dashboard/crm/referrals'
       preLoaderRoute: typeof AuthenticatedDashboardCrmReferralsIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/quotes/': {
+      id: '/_authenticated/dashboard/crm/quotes/'
+      path: '/quotes'
+      fullPath: '/dashboard/crm/quotes'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmQuotesIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/products/': {
+      id: '/_authenticated/dashboard/crm/products/'
+      path: '/products'
+      fullPath: '/dashboard/crm/products'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmProductsIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/leads/': {
@@ -7256,6 +7575,27 @@ declare module '@tanstack/react-router' {
       path: '/email-marketing'
       fullPath: '/dashboard/crm/email-marketing'
       preLoaderRoute: typeof AuthenticatedDashboardCrmEmailMarketingIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/contacts/': {
+      id: '/_authenticated/dashboard/crm/contacts/'
+      path: '/contacts'
+      fullPath: '/dashboard/crm/contacts'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmContactsIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/clients/': {
+      id: '/_authenticated/dashboard/crm/clients/'
+      path: '/clients'
+      fullPath: '/dashboard/crm/clients'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmClientsIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/campaigns/': {
+      id: '/_authenticated/dashboard/crm/campaigns/'
+      path: '/campaigns'
+      fullPath: '/dashboard/crm/campaigns'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmCampaignsIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/activities/': {
@@ -8175,6 +8515,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCrmWhatsappConversationIdRouteImport
       parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
+    '/_authenticated/dashboard/crm/settings/territories': {
+      id: '/_authenticated/dashboard/crm/settings/territories'
+      path: '/settings/territories'
+      fullPath: '/dashboard/crm/settings/territories'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmSettingsTerritoriesRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/settings/teams': {
+      id: '/_authenticated/dashboard/crm/settings/teams'
+      path: '/settings/teams'
+      fullPath: '/dashboard/crm/settings/teams'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmSettingsTeamsRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/settings/tags': {
+      id: '/_authenticated/dashboard/crm/settings/tags'
+      path: '/settings/tags'
+      fullPath: '/dashboard/crm/settings/tags'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmSettingsTagsRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/settings/lost-reasons': {
+      id: '/_authenticated/dashboard/crm/settings/lost-reasons'
+      path: '/settings/lost-reasons'
+      fullPath: '/dashboard/crm/settings/lost-reasons'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmSettingsLostReasonsRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/settings/email-templates': {
+      id: '/_authenticated/dashboard/crm/settings/email-templates'
+      path: '/settings/email-templates'
+      fullPath: '/dashboard/crm/settings/email-templates'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmSettingsEmailTemplatesRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
     '/_authenticated/dashboard/crm/reports/new': {
       id: '/_authenticated/dashboard/crm/reports/new'
       path: '/reports/new'
@@ -8203,6 +8578,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCrmReferralsReferralIdRouteImport
       parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
+    '/_authenticated/dashboard/crm/quotes/new': {
+      id: '/_authenticated/dashboard/crm/quotes/new'
+      path: '/quotes/new'
+      fullPath: '/dashboard/crm/quotes/new'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmQuotesNewRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/quotes/$quoteId': {
+      id: '/_authenticated/dashboard/crm/quotes/$quoteId'
+      path: '/quotes/$quoteId'
+      fullPath: '/dashboard/crm/quotes/$quoteId'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmQuotesQuoteIdRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/products/new': {
+      id: '/_authenticated/dashboard/crm/products/new'
+      path: '/products/new'
+      fullPath: '/dashboard/crm/products/new'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmProductsNewRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/products/$productId': {
+      id: '/_authenticated/dashboard/crm/products/$productId'
+      path: '/products/$productId'
+      fullPath: '/dashboard/crm/products/$productId'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmProductsProductIdRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
     '/_authenticated/dashboard/crm/leads/new': {
       id: '/_authenticated/dashboard/crm/leads/new'
       path: '/leads/new'
@@ -8229,6 +8632,41 @@ declare module '@tanstack/react-router' {
       path: '/email-marketing/$campaignId'
       fullPath: '/dashboard/crm/email-marketing/$campaignId'
       preLoaderRoute: typeof AuthenticatedDashboardCrmEmailMarketingCampaignIdRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/contacts/new': {
+      id: '/_authenticated/dashboard/crm/contacts/new'
+      path: '/contacts/new'
+      fullPath: '/dashboard/crm/contacts/new'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmContactsNewRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/contacts/$contactId': {
+      id: '/_authenticated/dashboard/crm/contacts/$contactId'
+      path: '/contacts/$contactId'
+      fullPath: '/dashboard/crm/contacts/$contactId'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmContactsContactIdRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/clients/$clientId': {
+      id: '/_authenticated/dashboard/crm/clients/$clientId'
+      path: '/clients/$clientId'
+      fullPath: '/dashboard/crm/clients/$clientId'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmClientsClientIdRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/campaigns/new': {
+      id: '/_authenticated/dashboard/crm/campaigns/new'
+      path: '/campaigns/new'
+      fullPath: '/dashboard/crm/campaigns/new'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmCampaignsNewRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/campaigns/$campaignId': {
+      id: '/_authenticated/dashboard/crm/campaigns/$campaignId'
+      path: '/campaigns/$campaignId'
+      fullPath: '/dashboard/crm/campaigns/$campaignId'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmCampaignsCampaignIdRouteImport
       parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/activities/new': {
@@ -8653,25 +9091,46 @@ interface AuthenticatedDashboardCrmRouteChildren {
   AuthenticatedDashboardCrmSalesPersonsRoute: typeof AuthenticatedDashboardCrmSalesPersonsRoute
   AuthenticatedDashboardCrmSetupWizardRoute: typeof AuthenticatedDashboardCrmSetupWizardRoute
   AuthenticatedDashboardCrmTerritoriesRoute: typeof AuthenticatedDashboardCrmTerritoriesRoute
+  AuthenticatedDashboardCrmIndexRoute: typeof AuthenticatedDashboardCrmIndexRoute
   AuthenticatedDashboardCrmActivitiesActivityIdRoute: typeof AuthenticatedDashboardCrmActivitiesActivityIdRoute
   AuthenticatedDashboardCrmActivitiesNewRoute: typeof AuthenticatedDashboardCrmActivitiesNewRoute
+  AuthenticatedDashboardCrmCampaignsCampaignIdRoute: typeof AuthenticatedDashboardCrmCampaignsCampaignIdRoute
+  AuthenticatedDashboardCrmCampaignsNewRoute: typeof AuthenticatedDashboardCrmCampaignsNewRoute
+  AuthenticatedDashboardCrmClientsClientIdRoute: typeof AuthenticatedDashboardCrmClientsClientIdRoute
+  AuthenticatedDashboardCrmContactsContactIdRoute: typeof AuthenticatedDashboardCrmContactsContactIdRoute
+  AuthenticatedDashboardCrmContactsNewRoute: typeof AuthenticatedDashboardCrmContactsNewRoute
   AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute: typeof AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute
   AuthenticatedDashboardCrmEmailMarketingNewRoute: typeof AuthenticatedDashboardCrmEmailMarketingNewRoute
   AuthenticatedDashboardCrmLeadsLeadIdRoute: typeof AuthenticatedDashboardCrmLeadsLeadIdRoute
   AuthenticatedDashboardCrmLeadsNewRoute: typeof AuthenticatedDashboardCrmLeadsNewRoute
+  AuthenticatedDashboardCrmProductsProductIdRoute: typeof AuthenticatedDashboardCrmProductsProductIdRoute
+  AuthenticatedDashboardCrmProductsNewRoute: typeof AuthenticatedDashboardCrmProductsNewRoute
+  AuthenticatedDashboardCrmQuotesQuoteIdRoute: typeof AuthenticatedDashboardCrmQuotesQuoteIdRoute
+  AuthenticatedDashboardCrmQuotesNewRoute: typeof AuthenticatedDashboardCrmQuotesNewRoute
   AuthenticatedDashboardCrmReferralsReferralIdRoute: typeof AuthenticatedDashboardCrmReferralsReferralIdRoute
   AuthenticatedDashboardCrmReferralsNewRoute: typeof AuthenticatedDashboardCrmReferralsNewRoute
   AuthenticatedDashboardCrmReportsReportIdRoute: typeof AuthenticatedDashboardCrmReportsReportIdRoute
   AuthenticatedDashboardCrmReportsNewRoute: typeof AuthenticatedDashboardCrmReportsNewRoute
+  AuthenticatedDashboardCrmSettingsEmailTemplatesRoute: typeof AuthenticatedDashboardCrmSettingsEmailTemplatesRoute
+  AuthenticatedDashboardCrmSettingsLostReasonsRoute: typeof AuthenticatedDashboardCrmSettingsLostReasonsRoute
+  AuthenticatedDashboardCrmSettingsTagsRoute: typeof AuthenticatedDashboardCrmSettingsTagsRoute
+  AuthenticatedDashboardCrmSettingsTeamsRoute: typeof AuthenticatedDashboardCrmSettingsTeamsRoute
+  AuthenticatedDashboardCrmSettingsTerritoriesRoute: typeof AuthenticatedDashboardCrmSettingsTerritoriesRoute
   AuthenticatedDashboardCrmWhatsappConversationIdRoute: typeof AuthenticatedDashboardCrmWhatsappConversationIdRoute
   AuthenticatedDashboardCrmWhatsappNewRoute: typeof AuthenticatedDashboardCrmWhatsappNewRoute
   AuthenticatedDashboardCrmWhatsappStartRoute: typeof AuthenticatedDashboardCrmWhatsappStartRoute
   AuthenticatedDashboardCrmActivitiesIndexRoute: typeof AuthenticatedDashboardCrmActivitiesIndexRoute
+  AuthenticatedDashboardCrmCampaignsIndexRoute: typeof AuthenticatedDashboardCrmCampaignsIndexRoute
+  AuthenticatedDashboardCrmClientsIndexRoute: typeof AuthenticatedDashboardCrmClientsIndexRoute
+  AuthenticatedDashboardCrmContactsIndexRoute: typeof AuthenticatedDashboardCrmContactsIndexRoute
   AuthenticatedDashboardCrmEmailMarketingIndexRoute: typeof AuthenticatedDashboardCrmEmailMarketingIndexRoute
   AuthenticatedDashboardCrmLeadScoringIndexRoute: typeof AuthenticatedDashboardCrmLeadScoringIndexRoute
   AuthenticatedDashboardCrmLeadsIndexRoute: typeof AuthenticatedDashboardCrmLeadsIndexRoute
+  AuthenticatedDashboardCrmProductsIndexRoute: typeof AuthenticatedDashboardCrmProductsIndexRoute
+  AuthenticatedDashboardCrmQuotesIndexRoute: typeof AuthenticatedDashboardCrmQuotesIndexRoute
   AuthenticatedDashboardCrmReferralsIndexRoute: typeof AuthenticatedDashboardCrmReferralsIndexRoute
   AuthenticatedDashboardCrmReportsIndexRoute: typeof AuthenticatedDashboardCrmReportsIndexRoute
+  AuthenticatedDashboardCrmSettingsIndexRoute: typeof AuthenticatedDashboardCrmSettingsIndexRoute
   AuthenticatedDashboardCrmWhatsappIndexRoute: typeof AuthenticatedDashboardCrmWhatsappIndexRoute
 }
 
@@ -8689,10 +9148,21 @@ const AuthenticatedDashboardCrmRouteChildren: AuthenticatedDashboardCrmRouteChil
       AuthenticatedDashboardCrmSetupWizardRoute,
     AuthenticatedDashboardCrmTerritoriesRoute:
       AuthenticatedDashboardCrmTerritoriesRoute,
+    AuthenticatedDashboardCrmIndexRoute: AuthenticatedDashboardCrmIndexRoute,
     AuthenticatedDashboardCrmActivitiesActivityIdRoute:
       AuthenticatedDashboardCrmActivitiesActivityIdRoute,
     AuthenticatedDashboardCrmActivitiesNewRoute:
       AuthenticatedDashboardCrmActivitiesNewRoute,
+    AuthenticatedDashboardCrmCampaignsCampaignIdRoute:
+      AuthenticatedDashboardCrmCampaignsCampaignIdRoute,
+    AuthenticatedDashboardCrmCampaignsNewRoute:
+      AuthenticatedDashboardCrmCampaignsNewRoute,
+    AuthenticatedDashboardCrmClientsClientIdRoute:
+      AuthenticatedDashboardCrmClientsClientIdRoute,
+    AuthenticatedDashboardCrmContactsContactIdRoute:
+      AuthenticatedDashboardCrmContactsContactIdRoute,
+    AuthenticatedDashboardCrmContactsNewRoute:
+      AuthenticatedDashboardCrmContactsNewRoute,
     AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute:
       AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute,
     AuthenticatedDashboardCrmEmailMarketingNewRoute:
@@ -8701,6 +9171,14 @@ const AuthenticatedDashboardCrmRouteChildren: AuthenticatedDashboardCrmRouteChil
       AuthenticatedDashboardCrmLeadsLeadIdRoute,
     AuthenticatedDashboardCrmLeadsNewRoute:
       AuthenticatedDashboardCrmLeadsNewRoute,
+    AuthenticatedDashboardCrmProductsProductIdRoute:
+      AuthenticatedDashboardCrmProductsProductIdRoute,
+    AuthenticatedDashboardCrmProductsNewRoute:
+      AuthenticatedDashboardCrmProductsNewRoute,
+    AuthenticatedDashboardCrmQuotesQuoteIdRoute:
+      AuthenticatedDashboardCrmQuotesQuoteIdRoute,
+    AuthenticatedDashboardCrmQuotesNewRoute:
+      AuthenticatedDashboardCrmQuotesNewRoute,
     AuthenticatedDashboardCrmReferralsReferralIdRoute:
       AuthenticatedDashboardCrmReferralsReferralIdRoute,
     AuthenticatedDashboardCrmReferralsNewRoute:
@@ -8709,6 +9187,16 @@ const AuthenticatedDashboardCrmRouteChildren: AuthenticatedDashboardCrmRouteChil
       AuthenticatedDashboardCrmReportsReportIdRoute,
     AuthenticatedDashboardCrmReportsNewRoute:
       AuthenticatedDashboardCrmReportsNewRoute,
+    AuthenticatedDashboardCrmSettingsEmailTemplatesRoute:
+      AuthenticatedDashboardCrmSettingsEmailTemplatesRoute,
+    AuthenticatedDashboardCrmSettingsLostReasonsRoute:
+      AuthenticatedDashboardCrmSettingsLostReasonsRoute,
+    AuthenticatedDashboardCrmSettingsTagsRoute:
+      AuthenticatedDashboardCrmSettingsTagsRoute,
+    AuthenticatedDashboardCrmSettingsTeamsRoute:
+      AuthenticatedDashboardCrmSettingsTeamsRoute,
+    AuthenticatedDashboardCrmSettingsTerritoriesRoute:
+      AuthenticatedDashboardCrmSettingsTerritoriesRoute,
     AuthenticatedDashboardCrmWhatsappConversationIdRoute:
       AuthenticatedDashboardCrmWhatsappConversationIdRoute,
     AuthenticatedDashboardCrmWhatsappNewRoute:
@@ -8717,16 +9205,28 @@ const AuthenticatedDashboardCrmRouteChildren: AuthenticatedDashboardCrmRouteChil
       AuthenticatedDashboardCrmWhatsappStartRoute,
     AuthenticatedDashboardCrmActivitiesIndexRoute:
       AuthenticatedDashboardCrmActivitiesIndexRoute,
+    AuthenticatedDashboardCrmCampaignsIndexRoute:
+      AuthenticatedDashboardCrmCampaignsIndexRoute,
+    AuthenticatedDashboardCrmClientsIndexRoute:
+      AuthenticatedDashboardCrmClientsIndexRoute,
+    AuthenticatedDashboardCrmContactsIndexRoute:
+      AuthenticatedDashboardCrmContactsIndexRoute,
     AuthenticatedDashboardCrmEmailMarketingIndexRoute:
       AuthenticatedDashboardCrmEmailMarketingIndexRoute,
     AuthenticatedDashboardCrmLeadScoringIndexRoute:
       AuthenticatedDashboardCrmLeadScoringIndexRoute,
     AuthenticatedDashboardCrmLeadsIndexRoute:
       AuthenticatedDashboardCrmLeadsIndexRoute,
+    AuthenticatedDashboardCrmProductsIndexRoute:
+      AuthenticatedDashboardCrmProductsIndexRoute,
+    AuthenticatedDashboardCrmQuotesIndexRoute:
+      AuthenticatedDashboardCrmQuotesIndexRoute,
     AuthenticatedDashboardCrmReferralsIndexRoute:
       AuthenticatedDashboardCrmReferralsIndexRoute,
     AuthenticatedDashboardCrmReportsIndexRoute:
       AuthenticatedDashboardCrmReportsIndexRoute,
+    AuthenticatedDashboardCrmSettingsIndexRoute:
+      AuthenticatedDashboardCrmSettingsIndexRoute,
     AuthenticatedDashboardCrmWhatsappIndexRoute:
       AuthenticatedDashboardCrmWhatsappIndexRoute,
   }
@@ -9698,6 +10198,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardCalendarRoute: typeof AuthenticatedDashboardCalendarRoute
   AuthenticatedDashboardCasesRoute: typeof AuthenticatedDashboardCasesRouteWithChildren
   AuthenticatedDashboardCrmRoute: typeof AuthenticatedDashboardCrmRouteWithChildren
+  AuthenticatedDashboardDateRangePickerTestRoute: typeof AuthenticatedDashboardDateRangePickerTestRoute
   AuthenticatedDashboardFinanceRoute: typeof AuthenticatedDashboardFinanceRouteWithChildren
   AuthenticatedDashboardHelpRoute: typeof AuthenticatedDashboardHelpRoute
   AuthenticatedDashboardHrRoute: typeof AuthenticatedDashboardHrRouteWithChildren
@@ -9796,6 +10297,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardCasesRoute:
     AuthenticatedDashboardCasesRouteWithChildren,
   AuthenticatedDashboardCrmRoute: AuthenticatedDashboardCrmRouteWithChildren,
+  AuthenticatedDashboardDateRangePickerTestRoute:
+    AuthenticatedDashboardDateRangePickerTestRoute,
   AuthenticatedDashboardFinanceRoute:
     AuthenticatedDashboardFinanceRouteWithChildren,
   AuthenticatedDashboardHelpRoute: AuthenticatedDashboardHelpRoute,
