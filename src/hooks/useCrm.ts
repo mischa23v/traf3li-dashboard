@@ -177,8 +177,6 @@ export const useCreateLead = () => {
  * Update lead
  */
 export const useUpdateLead = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ leadId, data }: { leadId: string; data: Partial<Lead> }) =>
       leadService.updateLead(leadId, data),
@@ -243,8 +241,6 @@ export const useDeleteLead = () => {
  * Update lead status
  */
 export const useUpdateLeadStatus = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       leadId,
@@ -274,8 +270,6 @@ export const useUpdateLeadStatus = () => {
  * Move lead to different pipeline stage
  */
 export const useMoveLeadToStage = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       leadId,
@@ -312,8 +306,6 @@ export const usePreviewLeadConversion = (leadId: string) => {
  * Convert lead to client
  */
 export const useConvertLead = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (leadId: string) => leadService.convertToClient(leadId),
     onSuccess: () => {
@@ -333,8 +325,6 @@ export const useConvertLead = () => {
  * Schedule follow-up for lead
  */
 export const useScheduleFollowUp = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       leadId,
@@ -362,8 +352,6 @@ export const useScheduleFollowUp = () => {
  * Log activity for lead
  */
 export const useLogLeadActivity = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       leadId,
@@ -463,8 +451,6 @@ export const useCreatePipeline = () => {
  * Update pipeline
  */
 export const useUpdatePipeline = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       pipelineId,
@@ -521,8 +507,6 @@ export const useDeletePipeline = () => {
  * Add stage to pipeline
  */
 export const useAddPipelineStage = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       pipelineId,
@@ -547,8 +531,6 @@ export const useAddPipelineStage = () => {
  * Update pipeline stage
  */
 export const useUpdatePipelineStage = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       pipelineId,
@@ -575,8 +557,6 @@ export const useUpdatePipelineStage = () => {
  * Remove stage from pipeline
  */
 export const useRemovePipelineStage = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       pipelineId,
@@ -601,8 +581,6 @@ export const useRemovePipelineStage = () => {
  * Reorder pipeline stages
  */
 export const useReorderPipelineStages = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       pipelineId,
@@ -624,8 +602,6 @@ export const useReorderPipelineStages = () => {
  * Set pipeline as default
  */
 export const useSetDefaultPipeline = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (pipelineId: string) =>
       pipelineService.setDefault(pipelineId),
@@ -645,8 +621,6 @@ export const useSetDefaultPipeline = () => {
  * Duplicate pipeline
  */
 export const useDuplicatePipeline = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       pipelineId,
@@ -771,8 +745,6 @@ export const useCreateReferral = () => {
  * Update referral
  */
 export const useUpdateReferral = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       referralId,
@@ -839,8 +811,6 @@ export const useDeleteReferral = () => {
  * Update referral status
  */
 export const useUpdateReferralStatus = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       referralId,
@@ -866,8 +836,6 @@ export const useUpdateReferralStatus = () => {
  * Mark referral reward as paid
  */
 export const useMarkReferralPaid = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (referralId: string) =>
       referralService.updateReferral(referralId, {
@@ -891,8 +859,6 @@ export const useMarkReferralPaid = () => {
  * Add lead referral
  */
 export const useAddLeadReferral = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       referralId,
@@ -919,8 +885,6 @@ export const useAddLeadReferral = () => {
  * Mark referral lead as converted
  */
 export const useMarkReferralConverted = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       referralId,
@@ -948,8 +912,6 @@ export const useMarkReferralConverted = () => {
  * Record referral fee payment
  */
 export const useRecordReferralPayment = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       referralId,
@@ -1090,8 +1052,6 @@ export const useUpcomingTasks = (params?: {
  * Create activity
  */
 export const useCreateActivity = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateActivityData) =>
       crmActivityService.createActivity(data),
@@ -1112,8 +1072,6 @@ export const useCreateActivity = () => {
  * Update activity
  */
 export const useUpdateActivity = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       activityId,
@@ -1140,8 +1098,6 @@ export const useUpdateActivity = () => {
  * Delete activity
  */
 export const useDeleteActivity = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (activityId: string) =>
       crmActivityService.deleteActivity(activityId),
@@ -1162,8 +1118,6 @@ export const useDeleteActivity = () => {
  * Update activity status
  */
 export const useUpdateActivityStatus = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       activityId,
@@ -1190,8 +1144,6 @@ export const useUpdateActivityStatus = () => {
  * Complete task
  */
 export const useCompleteTask = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       activityId,
@@ -1217,8 +1169,6 @@ export const useCompleteTask = () => {
  * Log call activity
  */
 export const useLogCall = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: LogCallData) => crmActivityService.logCall(data),
     onSuccess: () => {
@@ -1238,8 +1188,6 @@ export const useLogCall = () => {
  * Log email activity
  */
 export const useLogEmail = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: LogEmailData) => crmActivityService.logEmail(data),
     onSuccess: () => {
@@ -1259,8 +1207,6 @@ export const useLogEmail = () => {
  * Log meeting activity
  */
 export const useLogMeeting = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: LogMeetingData) => crmActivityService.logMeeting(data),
     onSuccess: () => {
@@ -1280,8 +1226,6 @@ export const useLogMeeting = () => {
  * Add note activity
  */
 export const useAddNote = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: AddNoteData) => crmActivityService.addNote(data),
     onSuccess: () => {

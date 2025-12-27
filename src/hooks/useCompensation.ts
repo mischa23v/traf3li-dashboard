@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import {
   compensationApi,
@@ -12,6 +12,7 @@ import {
   BonusType
 } from '@/services/compensationService'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 
 // ==================== Cache Configuration ====================
 const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
@@ -89,12 +90,10 @@ export function usePayGradeAnalysis(payGrade: string) {
 
 // Create compensation record
 export function useCreateCompensation() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateCompensationInput) => compensationApi.create(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: compensationKeys.all })
+      invalidateCache.compensation.all()
       toast.success('تم إنشاء سجل التعويضات بنجاح')
     },
     onError: (error: Error) => {
@@ -105,14 +104,12 @@ export function useCreateCompensation() {
 
 // Update compensation record
 export function useUpdateCompensation() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateCompensationInput }) =>
       compensationApi.update(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: compensationKeys.all })
-      queryClient.invalidateQueries({ queryKey: compensationKeys.detail(variables.id) })
+      invalidateCache.compensation.all()
+      invalidateCache.compensation.detail(variables.id)
       toast.success('تم تحديث سجل التعويضات بنجاح')
     },
     onError: (error: Error) => {
@@ -123,12 +120,10 @@ export function useUpdateCompensation() {
 
 // Delete compensation record
 export function useDeleteCompensation() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => compensationApi.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: compensationKeys.all })
+      invalidateCache.compensation.all()
       toast.success('تم حذف سجل التعويضات بنجاح')
     },
     onError: (error: Error) => {
@@ -139,12 +134,10 @@ export function useDeleteCompensation() {
 
 // Bulk delete compensation records
 export function useBulkDeleteCompensation() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (ids: string[]) => compensationApi.bulkDelete(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: compensationKeys.all })
+      invalidateCache.compensation.all()
       toast.success('تم حذف سجلات التعويضات المحددة بنجاح')
     },
     onError: (error: Error) => {
@@ -157,8 +150,6 @@ export function useBulkDeleteCompensation() {
 
 // Process salary increase
 export function useProcessSalaryIncrease() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: {
       id: string
@@ -171,8 +162,8 @@ export function useProcessSalaryIncrease() {
       }
     }) => compensationApi.processSalaryIncrease(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: compensationKeys.detail(variables.id) })
-      queryClient.invalidateQueries({ queryKey: compensationKeys.all })
+      invalidateCache.compensation.detail(variables.id)
+      invalidateCache.compensation.all()
       toast.success('تم معالجة زيادة الراتب بنجاح')
     },
     onError: (error: Error) => {
@@ -185,14 +176,12 @@ export function useProcessSalaryIncrease() {
 
 // Add allowance
 export function useAddAllowance() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, allowance }: { id: string; allowance: Omit<Allowance, 'allowanceId'> }) =>
       compensationApi.addAllowance(id, allowance),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: compensationKeys.detail(variables.id) })
-      queryClient.invalidateQueries({ queryKey: compensationKeys.all })
+      invalidateCache.compensation.detail(variables.id)
+      invalidateCache.compensation.all()
       toast.success('تم إضافة البدل بنجاح')
     },
     onError: (error: Error) => {
@@ -203,14 +192,12 @@ export function useAddAllowance() {
 
 // Update allowance
 export function useUpdateAllowance() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, allowanceId, data }: { id: string; allowanceId: string; data: Partial<Allowance> }) =>
       compensationApi.updateAllowance(id, allowanceId, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: compensationKeys.detail(variables.id) })
-      queryClient.invalidateQueries({ queryKey: compensationKeys.all })
+      invalidateCache.compensation.detail(variables.id)
+      invalidateCache.compensation.all()
       toast.success('تم تحديث البدل بنجاح')
     },
     onError: (error: Error) => {
@@ -221,14 +208,12 @@ export function useUpdateAllowance() {
 
 // Remove allowance
 export function useRemoveAllowance() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, allowanceId }: { id: string; allowanceId: string }) =>
       compensationApi.removeAllowance(id, allowanceId),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: compensationKeys.detail(variables.id) })
-      queryClient.invalidateQueries({ queryKey: compensationKeys.all })
+      invalidateCache.compensation.detail(variables.id)
+      invalidateCache.compensation.all()
       toast.success('تم إزالة البدل بنجاح')
     },
     onError: (error: Error) => {
@@ -241,8 +226,6 @@ export function useRemoveAllowance() {
 
 // Process bonus
 export function useProcessBonus() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: {
       id: string
@@ -255,8 +238,8 @@ export function useProcessBonus() {
       }
     }) => compensationApi.processBonus(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: compensationKeys.detail(variables.id) })
-      queryClient.invalidateQueries({ queryKey: compensationKeys.all })
+      invalidateCache.compensation.detail(variables.id)
+      invalidateCache.compensation.all()
       toast.success('تم معالجة المكافأة بنجاح')
     },
     onError: (error: Error) => {
@@ -269,13 +252,11 @@ export function useProcessBonus() {
 
 // Submit for salary review
 export function useSubmitForReview() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => compensationApi.submitForReview(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: compensationKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: compensationKeys.all })
+      invalidateCache.compensation.detail(id)
+      invalidateCache.compensation.all()
       toast.success('تم تقديم الطلب للمراجعة بنجاح')
     },
     onError: (error: Error) => {
@@ -286,8 +267,6 @@ export function useSubmitForReview() {
 
 // Approve salary review
 export function useApproveReview() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: {
       id: string
@@ -299,8 +278,8 @@ export function useApproveReview() {
       }
     }) => compensationApi.approveReview(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: compensationKeys.detail(variables.id) })
-      queryClient.invalidateQueries({ queryKey: compensationKeys.all })
+      invalidateCache.compensation.detail(variables.id)
+      invalidateCache.compensation.all()
       toast.success('تم اعتماد المراجعة بنجاح')
     },
     onError: (error: Error) => {
@@ -313,14 +292,12 @@ export function useApproveReview() {
 
 // Add recognition award
 export function useAddRecognition() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, award }: { id: string; award: Omit<RecognitionAward, 'programId'> }) =>
       compensationApi.addRecognition(id, award),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: compensationKeys.detail(variables.id) })
-      queryClient.invalidateQueries({ queryKey: compensationKeys.all })
+      invalidateCache.compensation.detail(variables.id)
+      invalidateCache.compensation.all()
       toast.success('تم إضافة جائزة التقدير بنجاح')
     },
     onError: (error: Error) => {
@@ -331,8 +308,6 @@ export function useAddRecognition() {
 
 // Generate total rewards statement
 export function useGenerateTotalRewardsStatement() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => compensationApi.generateTotalRewardsStatement(id),
     onSuccess: () => {

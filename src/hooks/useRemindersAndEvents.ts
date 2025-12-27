@@ -90,6 +90,12 @@ export const useCreateReminder = () => {
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء التذكير')
     },
+    onSettled: async () => {
+      await Promise.all([
+        invalidateCache.reminders.all(),
+        invalidateCache.calendar.all(),
+      ])
+    },
   })
 }
 
@@ -136,6 +142,12 @@ export const useCreateEvent = () => {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء الحدث')
+    },
+    onSettled: async () => {
+      await Promise.all([
+        invalidateCache.events.all(),
+        invalidateCache.calendar.all(),
+      ])
     },
   })
 }
@@ -240,6 +252,13 @@ export const useDeleteReminder = () => {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف التذكير')
+    },
+    onSettled: async (_, __, id) => {
+      await Promise.all([
+        invalidateCache.reminders.all(),
+        invalidateCache.reminders.detail(id),
+        invalidateCache.calendar.all(),
+      ])
     },
   })
 }
@@ -544,6 +563,13 @@ export const useDeleteEvent = () => {
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف الحدث')
     },
+    onSettled: async (_, __, id) => {
+      await Promise.all([
+        invalidateCache.events.all(),
+        invalidateCache.events.detail(id),
+        invalidateCache.calendar.all(),
+      ])
+    },
   })
 }
 
@@ -656,8 +682,6 @@ export const useEventStats = (filters?: { dateFrom?: string; dateTo?: string; ca
 }
 
 export const useCheckAvailability = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ attendeeIds, startDate, endDate }: { attendeeIds: string[]; startDate: string; endDate: string }) =>
       eventsService.checkAvailability(attendeeIds, startDate, endDate),

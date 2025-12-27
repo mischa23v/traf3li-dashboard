@@ -680,6 +680,23 @@ export const invalidateCache = {
     },
   },
 
+  // Compensation
+  compensation: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['compensation'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['compensation', 'list'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['compensation', 'detail', id] }),
+    byEmployee: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['compensation', 'by-employee', employeeId] }),
+    stats: (officeId?: string) => queryClient.invalidateQueries({ queryKey: ['compensation', 'stats', officeId] }),
+    payGradeAnalysis: (payGrade: string) => queryClient.invalidateQueries({ queryKey: ['compensation', 'pay-grade-analysis', payGrade] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.compensation.all(),
+        invalidateCache.compensation.stats(),
+        invalidateCache.staff.all(),
+      ])
+    },
+  },
+
   // Asset Assignments
   assetAssignments: {
     all: () => queryClient.invalidateQueries({ queryKey: ['asset-assignments'] }),
@@ -814,9 +831,28 @@ export const invalidateCache = {
     trends: () => queryClient.invalidateQueries({ queryKey: ['hr-trends'] }),
     workforceForecast: () => queryClient.invalidateQueries({ queryKey: ['hr-workforce-forecast'] }),
     workforceOverview: () => queryClient.invalidateQueries({ queryKey: ['hr-workforce-overview'] }),
-    // Employee promotions
+    // Employee promotions (legacy aliases - use employeePromotions instead)
     promotions: () => queryClient.invalidateQueries({ queryKey: ['employee-promotions'] }),
     promotion: (id: string) => queryClient.invalidateQueries({ queryKey: ['employee-promotions', id] }),
+  },
+
+  // Employee Promotions
+  employeePromotions: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['employee-promotions'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['employee-promotions'] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['employee-promotions', id] }),
+    stats: (filters?: any) => queryClient.invalidateQueries({ queryKey: ['employee-promotions', 'stats', filters] }),
+    pending: () => queryClient.invalidateQueries({ queryKey: ['employee-promotions', 'pending'] }),
+    awaitingApplication: () => queryClient.invalidateQueries({ queryKey: ['employee-promotions', 'awaiting-application'] }),
+    history: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['employee-promotions', 'history', employeeId] }),
+    employee: (employeeId: string) => queryClient.invalidateQueries({ queryKey: ['employee-promotions', 'employee', employeeId] }),
+    related: async () => {
+      await Promise.all([
+        invalidateCache.employeePromotions.all(),
+        invalidateCache.staff.all(),
+        invalidateCache.hr.stats(),
+      ])
+    },
   },
 
   // Training

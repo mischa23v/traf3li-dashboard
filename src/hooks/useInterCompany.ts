@@ -3,9 +3,10 @@
  * TanStack Query hooks for all inter-company operations
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
+import { invalidateCache } from '@/lib/cache-invalidation'
 import interCompanyService, {
   InterCompanyTransaction,
   InterCompanyTransactionFilters,
@@ -39,8 +40,6 @@ export const useInterCompanyTransaction = (id: string) => {
 }
 
 export const useCreateInterCompanyTransaction = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateInterCompanyTransactionData) =>
       interCompanyService.createTransaction(data),
@@ -50,8 +49,8 @@ export const useCreateInterCompanyTransaction = () => {
           ? 'تم إنشاء المعاملة المقابلة تلقائياً'
           : undefined
       })
-      queryClient.invalidateQueries({ queryKey: ['inter-company-transactions'] })
-      queryClient.invalidateQueries({ queryKey: ['inter-company-balances'] })
+      invalidateCache.interCompany.transactions()
+      invalidateCache.interCompany.balances()
     },
     onError: (error: Error) => {
       toast.error('فشل إنشاء المعاملة بين الشركات', {
@@ -62,15 +61,13 @@ export const useCreateInterCompanyTransaction = () => {
 }
 
 export const useUpdateInterCompanyTransaction = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateInterCompanyTransactionData> }) =>
       interCompanyService.updateTransaction(id, data),
     onSuccess: (data) => {
       toast.success('تم تحديث المعاملة بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['inter-company-transactions'] })
-      queryClient.invalidateQueries({ queryKey: ['inter-company-balances'] })
+      invalidateCache.interCompany.transactions()
+      invalidateCache.interCompany.balances()
     },
     onError: (error: Error) => {
       toast.error('فشل تحديث المعاملة', {
@@ -81,14 +78,12 @@ export const useUpdateInterCompanyTransaction = () => {
 }
 
 export const useDeleteInterCompanyTransaction = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => interCompanyService.deleteTransaction(id),
     onSuccess: () => {
       toast.success('تم حذف المعاملة بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['inter-company-transactions'] })
-      queryClient.invalidateQueries({ queryKey: ['inter-company-balances'] })
+      invalidateCache.interCompany.transactions()
+      invalidateCache.interCompany.balances()
     },
     onError: (error: Error) => {
       toast.error('فشل حذف المعاملة', {
@@ -99,14 +94,12 @@ export const useDeleteInterCompanyTransaction = () => {
 }
 
 export const usePostInterCompanyTransaction = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => interCompanyService.postTransaction(id),
     onSuccess: () => {
       toast.success('تم ترحيل المعاملة بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['inter-company-transactions'] })
-      queryClient.invalidateQueries({ queryKey: ['inter-company-balances'] })
+      invalidateCache.interCompany.transactions()
+      invalidateCache.interCompany.balances()
     },
     onError: (error: Error) => {
       toast.error('فشل ترحيل المعاملة', {
@@ -117,15 +110,13 @@ export const usePostInterCompanyTransaction = () => {
 }
 
 export const useCancelInterCompanyTransaction = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       interCompanyService.cancelTransaction(id, reason),
     onSuccess: () => {
       toast.success('تم إلغاء المعاملة بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['inter-company-transactions'] })
-      queryClient.invalidateQueries({ queryKey: ['inter-company-balances'] })
+      invalidateCache.interCompany.transactions()
+      invalidateCache.interCompany.balances()
     },
     onError: (error: Error) => {
       toast.error('فشل إلغاء المعاملة', {
@@ -194,14 +185,12 @@ export const useInterCompanyReconciliation = (id: string) => {
 }
 
 export const useCreateInterCompanyReconciliation = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreateReconciliationData) =>
       interCompanyService.createReconciliation(data),
     onSuccess: () => {
       toast.success('تم إنشاء التسوية بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['inter-company-reconciliations'] })
+      invalidateCache.interCompany.reconciliations()
     },
     onError: (error: Error) => {
       toast.error('فشل إنشاء التسوية', {
@@ -212,8 +201,6 @@ export const useCreateInterCompanyReconciliation = () => {
 }
 
 export const useAutoMatchTransactions = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (reconciliationId: string) =>
       interCompanyService.autoMatchTransactions(reconciliationId),
@@ -221,7 +208,7 @@ export const useAutoMatchTransactions = () => {
       toast.success('تم المطابقة التلقائية بنجاح', {
         description: `تم مطابقة ${data.matchedCount || 0} معاملة`
       })
-      queryClient.invalidateQueries({ queryKey: ['inter-company-reconciliations'] })
+      invalidateCache.interCompany.reconciliations()
     },
     onError: (error: Error) => {
       toast.error('فشلت المطابقة التلقائية', {
@@ -232,8 +219,6 @@ export const useAutoMatchTransactions = () => {
 }
 
 export const useManualMatchTransactions = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       reconciliationId,
@@ -247,7 +232,7 @@ export const useManualMatchTransactions = () => {
       interCompanyService.manualMatchTransactions(reconciliationId, sourceTransactionId, targetTransactionId),
     onSuccess: () => {
       toast.success('تم مطابقة المعاملات بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['inter-company-reconciliations'] })
+      invalidateCache.interCompany.reconciliations()
     },
     onError: (error: Error) => {
       toast.error('فشلت المطابقة', {
@@ -258,14 +243,12 @@ export const useManualMatchTransactions = () => {
 }
 
 export const useUnmatchTransactions = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ reconciliationId, matchId }: { reconciliationId: string; matchId: string }) =>
       interCompanyService.unmatchTransactions(reconciliationId, matchId),
     onSuccess: () => {
       toast.success('تم إلغاء المطابقة بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['inter-company-reconciliations'] })
+      invalidateCache.interCompany.reconciliations()
     },
     onError: (error: Error) => {
       toast.error('فشل إلغاء المطابقة', {
@@ -276,8 +259,6 @@ export const useUnmatchTransactions = () => {
 }
 
 export const useCreateAdjustmentEntry = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       reconciliationId,
@@ -289,7 +270,7 @@ export const useCreateAdjustmentEntry = () => {
       interCompanyService.createAdjustmentEntry(reconciliationId, adjustment),
     onSuccess: () => {
       toast.success('تم إنشاء قيد التسوية بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['inter-company-reconciliations'] })
+      invalidateCache.interCompany.reconciliations()
     },
     onError: (error: Error) => {
       toast.error('فشل إنشاء قيد التسوية', {
@@ -300,15 +281,13 @@ export const useCreateAdjustmentEntry = () => {
 }
 
 export const useCompleteReconciliation = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (reconciliationId: string) =>
       interCompanyService.completeReconciliation(reconciliationId),
     onSuccess: () => {
       toast.success('تم إكمال التسوية بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['inter-company-reconciliations'] })
-      queryClient.invalidateQueries({ queryKey: ['inter-company-balances'] })
+      invalidateCache.interCompany.reconciliations()
+      invalidateCache.interCompany.balances()
     },
     onError: (error: Error) => {
       toast.error('فشل إكمال التسوية', {
@@ -319,14 +298,12 @@ export const useCompleteReconciliation = () => {
 }
 
 export const useApproveReconciliation = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (reconciliationId: string) =>
       interCompanyService.approveReconciliation(reconciliationId),
     onSuccess: () => {
       toast.success('تم اعتماد التسوية بنجاح')
-      queryClient.invalidateQueries({ queryKey: ['inter-company-reconciliations'] })
+      invalidateCache.interCompany.reconciliations()
     },
     onError: (error: Error) => {
       toast.error('فشل اعتماد التسوية', {

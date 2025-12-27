@@ -91,8 +91,6 @@ export const useCreateInvoice = () => {
 }
 
 export const useUpdateInvoice = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateInvoiceData> }) =>
       financeService.updateInvoice(id, data),
@@ -110,8 +108,6 @@ export const useUpdateInvoice = () => {
 }
 
 export const useSendInvoice = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => financeService.sendInvoice(id),
     onSuccess: (data) => {
@@ -233,8 +229,6 @@ export const useCreateCreditNote = () => {
 }
 
 export const useUpdateCreditNote = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateCreditNoteData> }) =>
       financeService.updateCreditNote(id, data),
@@ -285,8 +279,6 @@ export const useDeleteCreditNote = () => {
 }
 
 export const useIssueCreditNote = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => financeService.issueCreditNote(id),
     onSuccess: () => {
@@ -303,8 +295,6 @@ export const useIssueCreditNote = () => {
 }
 
 export const useApplyCreditNote = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => financeService.applyCreditNote(id),
     onSuccess: () => {
@@ -322,8 +312,6 @@ export const useApplyCreditNote = () => {
 }
 
 export const useVoidCreditNote = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason?: string }) =>
       financeService.voidCreditNote(id, reason),
@@ -351,8 +339,6 @@ export const useCreditNotesForInvoice = (invoiceId: string) => {
 }
 
 export const useSubmitCreditNoteToZATCA = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => financeService.submitCreditNoteToZATCA(id),
     onSuccess: () => {
@@ -446,8 +432,6 @@ export const useCreateExpense = () => {
 }
 
 export const useUpdateExpense = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateExpenseData> }) =>
       financeService.updateExpense(id, data),
@@ -465,8 +449,6 @@ export const useUpdateExpense = () => {
 }
 
 export const useUploadReceipt = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, file }: { id: string; file: File }) =>
       financeService.uploadReceipt(id, file),
@@ -508,8 +490,6 @@ export const useTimerStatus = () => {
 }
 
 export const useStartTimer = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: {
       caseId: string
@@ -530,8 +510,6 @@ export const useStartTimer = () => {
 }
 
 export const usePauseTimer = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: () => financeService.pauseTimer(),
     onSuccess: () => {
@@ -547,8 +525,6 @@ export const usePauseTimer = () => {
 }
 
 export const useResumeTimer = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: () => financeService.resumeTimer(),
     onSuccess: () => {
@@ -564,8 +540,6 @@ export const useResumeTimer = () => {
 }
 
 export const useStopTimer = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: { notes?: string; isBillable?: boolean }) =>
       financeService.stopTimer(data),
@@ -656,8 +630,6 @@ export const useTimeStats = (filters?: {
 // ==================== TIME ENTRY LOCKING ====================
 
 export const useLockTimeEntry = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: 'approved' | 'billed' | 'period_closed' | 'manual' }) =>
       financeService.lockTimeEntry(id, reason),
@@ -675,8 +647,6 @@ export const useLockTimeEntry = () => {
 }
 
 export const useUnlockTimeEntry = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       financeService.unlockTimeEntry(id, reason),
@@ -694,8 +664,6 @@ export const useUnlockTimeEntry = () => {
 }
 
 export const useBulkLockTimeEntries = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: {
       entryIds: string[]
@@ -728,8 +696,6 @@ export const useCheckTimeEntryLock = (id: string) => {
 }
 
 export const useLockTimeEntriesByDateRange = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: {
       startDate: string
@@ -765,8 +731,6 @@ export const usePayments = (filters?: any) => {
 }
 
 export const useCreatePayment = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: CreatePaymentData) =>
       financeService.createPayment(data),
@@ -795,8 +759,6 @@ export const usePayment = (id: string) => {
 }
 
 export const useCompletePayment = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => financeService.completePayment(id),
     onSuccess: () => {
@@ -813,8 +775,6 @@ export const useCompletePayment = () => {
 }
 
 export const useRecordPaymentForInvoice = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ invoiceId, data }: { invoiceId: string; data: any }) =>
       financeService.recordPaymentForInvoice(invoiceId, data),
@@ -998,8 +958,6 @@ export const useStatement = (id: string) => {
 }
 
 export const useCreateStatement = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: any) => financeService.createStatement(data),
     onSuccess: () => {
@@ -1015,8 +973,6 @@ export const useCreateStatement = () => {
 }
 
 export const useUpdateStatement = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) =>
       financeService.updateStatement(id, data),
@@ -1034,8 +990,6 @@ export const useUpdateStatement = () => {
 }
 
 export const useDeleteStatement = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => financeService.deleteStatement(id),
     onSuccess: () => {
@@ -1051,8 +1005,6 @@ export const useDeleteStatement = () => {
 }
 
 export const useSendStatement = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => financeService.sendStatement(id),
     onSuccess: () => {
@@ -1088,8 +1040,6 @@ export const useActivity = (id: string) => {
 }
 
 export const useCreateActivity = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (data: any) => financeService.createActivity(data),
     onSuccess: () => {
@@ -1339,8 +1289,6 @@ export const useDeleteExpense = () => {
 }
 
 export const useUpdateTimeEntry = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateTimeEntryData> }) =>
       financeService.updateTimeEntry(id, data),
@@ -1395,8 +1343,6 @@ export const useDeleteTimeEntry = () => {
 }
 
 export const useUpdateTransaction = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateTransactionData> }) =>
       financeService.updateTransaction(id, data),
@@ -1482,8 +1428,6 @@ export const useAccountActivity = (id: string) => {
 }
 
 export const useUpdateAccountActivity = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) =>
       financeService.updateActivity(id, data),
@@ -1501,8 +1445,6 @@ export const useUpdateAccountActivity = () => {
 }
 
 export const useDeleteAccountActivity = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => financeService.deleteActivity(id),
     onSuccess: () => {
@@ -1538,8 +1480,6 @@ export const useInvoicesPendingApproval = (filters?: {
 }
 
 export const useSubmitInvoiceForApproval = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ invoiceId, comments }: { invoiceId: string; comments?: string }) =>
       financeService.submitInvoiceForApproval(invoiceId, { comments }),
@@ -1558,8 +1498,6 @@ export const useSubmitInvoiceForApproval = () => {
 }
 
 export const useApproveInvoice = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ invoiceId, comments, approverLevel }: { invoiceId: string; comments?: string; approverLevel: number }) =>
       financeService.approveInvoice(invoiceId, { comments, approverLevel }),
@@ -1579,8 +1517,6 @@ export const useApproveInvoice = () => {
 }
 
 export const useRejectInvoice = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ invoiceId, reason, comments }: { invoiceId: string; reason: string; comments?: string }) =>
       financeService.rejectInvoice(invoiceId, { reason, comments }),
@@ -1600,8 +1536,6 @@ export const useRejectInvoice = () => {
 }
 
 export const useRequestInvoiceChanges = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ invoiceId, requestedChanges, comments }: { invoiceId: string; requestedChanges: string; comments?: string }) =>
       financeService.requestInvoiceChanges(invoiceId, { requestedChanges, comments }),
@@ -1620,8 +1554,6 @@ export const useRequestInvoiceChanges = () => {
 }
 
 export const useEscalateInvoiceApproval = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ invoiceId, reason, comments }: { invoiceId: string; reason: string; comments?: string }) =>
       financeService.escalateInvoiceApproval(invoiceId, { reason, comments }),
@@ -1640,8 +1572,6 @@ export const useEscalateInvoiceApproval = () => {
 }
 
 export const useBulkApproveInvoices = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ invoiceIds, comments }: { invoiceIds: string[]; comments?: string }) =>
       financeService.bulkApproveInvoices({ invoiceIds, comments }),
@@ -1672,8 +1602,6 @@ export const useApprovalWorkflowConfig = () => {
 }
 
 export const useUpdateApprovalWorkflowConfig = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (config: any) => financeService.updateApprovalWorkflowConfig(config),
     onSuccess: () => {
@@ -1759,8 +1687,6 @@ export const useCreateRecurringInvoice = () => {
 }
 
 export const useUpdateRecurringInvoice = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateRecurringInvoiceData }) =>
       recurringInvoiceService.update(id, data),
@@ -1812,8 +1738,6 @@ export const useDeleteRecurringInvoice = () => {
 }
 
 export const usePauseRecurringInvoice = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => recurringInvoiceService.pause(id),
     onSuccess: () => {
@@ -1830,8 +1754,6 @@ export const usePauseRecurringInvoice = () => {
 }
 
 export const useResumeRecurringInvoice = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => recurringInvoiceService.resume(id),
     onSuccess: () => {
@@ -1848,8 +1770,6 @@ export const useResumeRecurringInvoice = () => {
 }
 
 export const useCancelRecurringInvoice = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => recurringInvoiceService.cancel(id),
     onSuccess: () => {
@@ -1866,8 +1786,6 @@ export const useCancelRecurringInvoice = () => {
 }
 
 export const useGenerateFromRecurring = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => recurringInvoiceService.generateNext(id),
     onSuccess: () => {
@@ -1913,8 +1831,6 @@ export const usePreviewNextInvoice = (id: string) => {
 }
 
 export const useDuplicateRecurringInvoice = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ id, name, nameAr }: { id: string; name: string; nameAr?: string }) =>
       recurringInvoiceService.duplicate(id, name, nameAr),
