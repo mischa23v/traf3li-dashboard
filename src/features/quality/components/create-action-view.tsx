@@ -44,12 +44,13 @@ import { useCreateAction, useInspections } from '@/hooks/use-quality'
 import { useStaff } from '@/hooks/useStaff'
 import type { QualityAction, ActionType, ActionStatus } from '@/types/quality'
 import { QualitySidebar } from './quality-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'quality.quality', href: '/dashboard/quality' },
-  { title: 'quality.actions', href: '/dashboard/quality/actions' },
-  { title: 'quality.createAction', href: '/dashboard/quality/actions/create' },
+  { title: 'quality.quality', href: ROUTES.dashboard.quality.list },
+  { title: 'quality.actions', href: ROUTES.dashboard.quality.actions.list },
+  { title: 'quality.createAction', href: ROUTES.dashboard.quality.actions.create },
 ]
 
 const ACTION_TYPES: { value: ActionType; translationKey: string; icon: any }[] = [
@@ -200,7 +201,7 @@ export function CreateActionView() {
       }
 
       await createActionMutation.mutateAsync(dataToSubmit)
-      navigate({ to: '/dashboard/quality/actions' })
+      navigate({ to: ROUTES.dashboard.quality.actions.list })
     } catch (error) {
       // Error handled by mutation
     }
@@ -632,7 +633,7 @@ export function CreateActionView() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate({ to: '/dashboard/quality/actions' })}
+                  onClick={() => navigate({ to: ROUTES.dashboard.quality.actions.list })}
                   className="rounded-xl"
                 >
                   <X className="w-4 h-4 ml-2" />

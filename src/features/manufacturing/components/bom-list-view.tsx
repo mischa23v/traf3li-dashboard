@@ -63,11 +63,12 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useBOMs, useDeleteBOM, useManufacturingStats } from '@/hooks/use-manufacturing'
 import type { BillOfMaterials, BomType } from '@/types/manufacturing'
 import { ManufacturingSidebar } from './manufacturing-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
-  { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.manufacturing', href: '/dashboard/manufacturing' },
-  { title: 'manufacturing.boms', href: '/dashboard/manufacturing/boms' },
+  { title: 'sidebar.nav.overview', href: ROUTES.dashboard.home },
+  { title: 'sidebar.nav.manufacturing', href: ROUTES.dashboard.manufacturing.list },
+  { title: 'manufacturing.boms', href: ROUTES.dashboard.manufacturing.bom.list },
 ]
 
 type TabValue = 'all' | 'active' | 'inactive'
@@ -129,7 +130,7 @@ export function BOMListView() {
     if (!bomToDuplicate) return
     // Navigate to create page with duplicate data
     navigate({
-      to: '/dashboard/manufacturing/boms/create',
+      to: ROUTES.dashboard.manufacturing.bom.create,
       search: { duplicate: bomToDuplicate._id },
     })
     setDuplicateDialogOpen(false)
@@ -260,7 +261,7 @@ export function BOMListView() {
                     />
                   </div>
                   <Button asChild className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
-                    <Link to="/dashboard/manufacturing/boms/create">
+                    <Link to={ROUTES.dashboard.manufacturing.bom.create}>
                       <Plus className="w-4 h-4 ml-2" />
                       {t('manufacturing.bom.createBOM', 'إنشاء قائمة مواد')}
                     </Link>
@@ -297,7 +298,7 @@ export function BOMListView() {
                     </p>
                     {!search && (
                       <Button asChild className="rounded-xl">
-                        <Link to="/dashboard/manufacturing/boms/create">
+                        <Link to={ROUTES.dashboard.manufacturing.bom.create}>
                           <Plus className="w-4 h-4 ml-2" />
                           {t('manufacturing.bom.createBOM', 'إنشاء قائمة مواد')}
                         </Link>
@@ -335,7 +336,7 @@ export function BOMListView() {
                           <TableRow
                             key={bom._id}
                             className="cursor-pointer hover:bg-muted/50"
-                            onClick={() => navigate({ to: `/dashboard/manufacturing/boms/${bom._id}` })}
+                            onClick={() => navigate({ to: ROUTES.dashboard.manufacturing.bom.detail(bom._id) })}
                           >
                             <TableCell>
                               <div className="flex items-center gap-3">
@@ -403,7 +404,7 @@ export function BOMListView() {
                                   <DropdownMenuItem
                                     onClick={(e) => {
                                       e.stopPropagation()
-                                      navigate({ to: `/dashboard/manufacturing/boms/${bom._id}` })
+                                      navigate({ to: ROUTES.dashboard.manufacturing.bom.detail(bom._id) })
                                     }}
                                   >
                                     <Eye className="w-4 h-4 ml-2" />
@@ -412,7 +413,7 @@ export function BOMListView() {
                                   <DropdownMenuItem
                                     onClick={(e) => {
                                       e.stopPropagation()
-                                      navigate({ to: `/dashboard/manufacturing/boms/${bom._id}/edit` })
+                                      navigate({ to: `${ROUTES.dashboard.manufacturing.bom.detail(bom._id)}/edit` })
                                     }}
                                   >
                                     <Edit className="w-4 h-4 ml-2" />

@@ -306,7 +306,7 @@ export function SubcontractingOrderDetailsView() {
               {isDraft && (
                 <>
                   <Button asChild variant="outline">
-                    <Link to={ROUTES.dashboard.subcontracting.detail(orderId) + '/edit'}>
+                    <Link to={ROUTES.dashboard.subcontracting.edit(orderId)}>
                       <Edit className="h-4 w-4 me-2" aria-hidden="true" />
                       {t('subcontracting.edit')}
                     </Link>
@@ -328,7 +328,7 @@ export function SubcontractingOrderDetailsView() {
               )}
               {isSubmitted && (
                 <Button asChild variant="default" className="bg-brand-blue hover:bg-blue-600">
-                  <Link to={ROUTES.dashboard.subcontracting.receipts.create + `?orderId=${orderId}`}>
+                  <Link to={`${ROUTES.dashboard.subcontracting.receipts.create}?orderId=${orderId}`}>
                     <Package className="h-4 w-4 me-2" aria-hidden="true" />
                     {t('subcontracting.createReceipt')}
                   </Link>
@@ -759,7 +759,7 @@ export function SubcontractingOrderDetailsView() {
                           </CardTitle>
                           {isSubmitted && (
                             <Button asChild size="sm" className="bg-brand-blue hover:bg-blue-600">
-                              <Link to={ROUTES.dashboard.subcontracting.receipts.create + `?orderId=${orderId}`}>
+                              <Link to={`${ROUTES.dashboard.subcontracting.receipts.create}?orderId=${orderId}`}>
                                 <Plus className="h-4 w-4 me-2" aria-hidden="true" />
                                 {t('subcontracting.newReceipt')}
                               </Link>
@@ -801,7 +801,7 @@ export function SubcontractingOrderDetailsView() {
                                     <TableRow key={receipt._id}>
                                       <TableCell className="font-medium font-mono">
                                         <Link
-                                          to={ROUTES.dashboard.subcontracting.receipts.list + `/${receipt._id}`}
+                                          to={ROUTES.dashboard.subcontracting.receipts.detail(receipt._id)}
                                           className="text-brand-blue hover:underline"
                                         >
                                           {receipt.receiptNumber}

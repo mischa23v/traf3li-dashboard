@@ -281,7 +281,7 @@ export function SubcontractingListView() {
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation()
-                                  navigate({ to: ROUTES.dashboard.subcontracting.detail(order._id) + '/edit' })
+                                  navigate({ to: ROUTES.dashboard.subcontracting.edit(order._id) })
                                 }}>
                                   <Edit className="w-4 h-4 ml-2" />
                                   {t('common.edit', 'تعديل')}

@@ -757,6 +757,7 @@ export const ROUTES = {
         list: '/dashboard/inventory/warehouses',
         create: '/dashboard/inventory/warehouses/create',
         detail: (warehouseId: string) => `/dashboard/inventory/warehouses/${warehouseId}`,
+        edit: (warehouseId: string) => `/dashboard/inventory/warehouses/${warehouseId}/edit`,
       },
     },
 
@@ -816,12 +817,16 @@ export const ROUTES = {
 
       // Work orders
       workOrders: {
+        list: '/dashboard/manufacturing/work-orders',
         create: '/dashboard/manufacturing/work-orders/create',
+        detail: (workOrderId: string) => `/dashboard/manufacturing/work-orders/${workOrderId}`,
+        edit: (workOrderId: string) => `/dashboard/manufacturing/work-orders/${workOrderId}/edit`,
       },
 
       // Job cards
       jobCards: {
         list: '/dashboard/manufacturing/job-cards',
+        create: '/dashboard/manufacturing/job-cards/create',
         detail: (jobCardId: string) => `/dashboard/manufacturing/job-cards/${jobCardId}`,
       },
 
@@ -937,11 +942,14 @@ export const ROUTES = {
       settings: '/dashboard/subcontracting/settings',
       materials: '/dashboard/subcontracting/materials',
       detail: (orderId: string) => `/dashboard/subcontracting/${orderId}`,
+      edit: (orderId: string) => `/dashboard/subcontracting/${orderId}/edit`,
 
       // Receipts
       receipts: {
         list: '/dashboard/subcontracting/receipts',
         create: '/dashboard/subcontracting/receipts/create',
+        detail: (receiptId: string) => `/dashboard/subcontracting/receipts/${receiptId}`,
+        edit: (receiptId: string) => `/dashboard/subcontracting/receipts/${receiptId}/edit`,
       },
 
       // BOMs (Bill of Materials)

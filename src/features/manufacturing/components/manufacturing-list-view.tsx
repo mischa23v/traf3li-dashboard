@@ -67,10 +67,11 @@ import {
 import { useWorkOrders, useDeleteWorkOrder, useManufacturingStats } from '@/hooks/use-manufacturing'
 import type { WorkOrder, ManufacturingFilters, WorkOrderStatus } from '@/types/manufacturing'
 import { ManufacturingSidebar } from './manufacturing-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.manufacturing', href: '/dashboard/manufacturing' },
+  { title: 'sidebar.nav.manufacturing', href: ROUTES.dashboard.manufacturing.list },
 ]
 
 export function ManufacturingListView() {
@@ -199,7 +200,7 @@ export function ManufacturingListView() {
                     </SelectContent>
                   </Select>
                   <Button asChild className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
-                    <Link to="/dashboard/manufacturing/work-orders/create">
+                    <Link to={ROUTES.dashboard.manufacturing.workOrders.create}>
                       <Plus className="w-4 h-4 ml-2" />
                       {t('manufacturing.createWorkOrder', 'إنشاء أمر عمل')}
                     </Link>
@@ -227,7 +228,7 @@ export function ManufacturingListView() {
                     <h3 className="text-lg font-medium mb-2">{t('manufacturing.noWorkOrders', 'لا توجد أوامر عمل')}</h3>
                     <p className="text-muted-foreground mb-4">{t('manufacturing.noWorkOrdersDesc', 'ابدأ بإنشاء أمر عمل جديد')}</p>
                     <Button asChild className="rounded-xl">
-                      <Link to="/dashboard/manufacturing/work-orders/create">
+                      <Link to={ROUTES.dashboard.manufacturing.workOrders.create}>
                         <Plus className="w-4 h-4 ml-2" />
                         {t('manufacturing.createWorkOrder', 'إنشاء أمر عمل')}
                       </Link>
@@ -249,7 +250,7 @@ export function ManufacturingListView() {
                         <TableRow
                           key={order._id}
                           className="cursor-pointer hover:bg-muted/50"
-                          onClick={() => navigate({ to: `/dashboard/manufacturing/work-orders/${order._id}` })}
+                          onClick={() => navigate({ to: ROUTES.dashboard.manufacturing.workOrders.detail(order._id) })}
                         >
                           <TableCell className="font-mono text-sm">{order.workOrderNumber}</TableCell>
                           <TableCell>
@@ -270,14 +271,14 @@ export function ManufacturingListView() {
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation()
-                                  navigate({ to: `/dashboard/manufacturing/work-orders/${order._id}` })
+                                  navigate({ to: ROUTES.dashboard.manufacturing.workOrders.detail(order._id) })
                                 }}>
                                   <Eye className="w-4 h-4 ml-2" />
                                   {t('common.view', 'عرض')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation()
-                                  navigate({ to: `/dashboard/manufacturing/work-orders/${order._id}/edit` })
+                                  navigate({ to: ROUTES.dashboard.manufacturing.workOrders.edit(order._id) })
                                 }}>
                                   <Edit className="w-4 h-4 ml-2" />
                                   {t('common.edit', 'تعديل')}

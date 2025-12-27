@@ -70,11 +70,12 @@ import {
 import { useTemplates, useDeleteTemplate, useCreateTemplate } from '@/hooks/use-quality'
 import type { QualityInspectionTemplate, InspectionType } from '@/types/quality'
 import { QualitySidebar } from './quality-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.quality', href: '/dashboard/quality' },
-  { title: 'quality.templates', href: '/dashboard/quality/templates' },
+  { title: 'sidebar.nav.quality', href: ROUTES.dashboard.quality.list },
+  { title: 'quality.templates', href: ROUTES.dashboard.quality.templates.list },
 ]
 
 type StatusFilter = 'all' | 'active' | 'inactive'
@@ -296,7 +297,7 @@ export function TemplateListView() {
                       />
                     </div>
                     <Button asChild className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
-                      <Link to="/dashboard/quality/templates/create">
+                      <Link to={ROUTES.dashboard.quality.templates.create}>
                         <Plus className="w-4 h-4 ml-2" />
                         {t('quality.template.createTemplate', 'إنشاء قالب')}
                       </Link>
@@ -366,7 +367,7 @@ export function TemplateListView() {
                       {t('quality.template.noTemplatesDesc', 'ابدأ بإنشاء قالب فحص جديد')}
                     </p>
                     <Button asChild className="rounded-xl">
-                      <Link to="/dashboard/quality/templates/create">
+                      <Link to={ROUTES.dashboard.quality.templates.create}>
                         <Plus className="w-4 h-4 ml-2" />
                         {t('quality.template.createTemplate', 'إنشاء قالب')}
                       </Link>
@@ -400,7 +401,7 @@ export function TemplateListView() {
                           <TableRow
                             key={template._id}
                             className="cursor-pointer hover:bg-muted/50"
-                            onClick={() => navigate({ to: `/dashboard/quality/templates/${template._id}` })}
+                            onClick={() => navigate({ to: `${ROUTES.dashboard.quality.templates.list}/${template._id}` })}
                           >
                             <TableCell>
                               <div className="flex items-center gap-3">
@@ -462,7 +463,7 @@ export function TemplateListView() {
                                   <DropdownMenuItem
                                     onClick={(e) => {
                                       e.stopPropagation()
-                                      navigate({ to: `/dashboard/quality/templates/${template._id}` })
+                                      navigate({ to: `${ROUTES.dashboard.quality.templates.list}/${template._id}` })
                                     }}
                                   >
                                     <Eye className="w-4 h-4 ml-2" />
@@ -471,7 +472,7 @@ export function TemplateListView() {
                                   <DropdownMenuItem
                                     onClick={(e) => {
                                       e.stopPropagation()
-                                      navigate({ to: `/dashboard/quality/templates/${template._id}/edit` })
+                                      navigate({ to: `${ROUTES.dashboard.quality.templates.list}/${template._id}/edit` })
                                     }}
                                   >
                                     <Edit className="w-4 h-4 ml-2" />

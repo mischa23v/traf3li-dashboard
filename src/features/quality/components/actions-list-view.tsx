@@ -72,11 +72,12 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useActions } from '@/hooks/use-quality'
 import type { QualityAction, ActionStatus, ActionType } from '@/types/quality'
 import { QualitySidebar } from './quality-sidebar'
+import { ROUTES } from '@/constants/routes'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
-  { title: 'sidebar.nav.quality', href: '/dashboard/quality' },
-  { title: 'quality.actions', href: '/dashboard/quality/actions' },
+  { title: 'sidebar.nav.quality', href: ROUTES.dashboard.quality.list },
+  { title: 'quality.actions', href: ROUTES.dashboard.quality.actions.list },
 ]
 
 export function ActionsListView() {
@@ -351,7 +352,7 @@ export function ActionsListView() {
                     </SelectContent>
                   </Select>
                   <Button asChild className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
-                    <Link to="/dashboard/quality/actions/create">
+                    <Link to={ROUTES.dashboard.quality.actions.create}>
                       <Plus className="w-4 h-4 ml-2" />
                       {t('quality.actions.create', 'إنشاء إجراء')}
                     </Link>
@@ -383,7 +384,7 @@ export function ActionsListView() {
                       {t('quality.actions.noActionsDesc', 'ابدأ بإنشاء إجراء تصحيحي أو وقائي جديد')}
                     </p>
                     <Button asChild className="rounded-xl">
-                      <Link to="/dashboard/quality/actions/create">
+                      <Link to={ROUTES.dashboard.quality.actions.create}>
                         <Plus className="w-4 h-4 ml-2" />
                         {t('quality.actions.create', 'إنشاء إجراء')}
                       </Link>
@@ -425,7 +426,7 @@ export function ActionsListView() {
                             className={`cursor-pointer hover:bg-muted/50 ${
                               isOverdue(action) ? 'bg-red-50/50' : ''
                             }`}
-                            onClick={() => navigate({ to: `/dashboard/quality/actions/${action._id}` })}
+                            onClick={() => navigate({ to: `${ROUTES.dashboard.quality.actions.list}/${action._id}` })}
                           >
                             <TableCell className="font-mono text-sm">
                               <div className="flex items-center gap-2">
@@ -483,7 +484,7 @@ export function ActionsListView() {
                                   <DropdownMenuItem
                                     onClick={(e) => {
                                       e.stopPropagation()
-                                      navigate({ to: `/dashboard/quality/actions/${action._id}` })
+                                      navigate({ to: `${ROUTES.dashboard.quality.actions.list}/${action._id}` })
                                     }}
                                   >
                                     <Eye className="w-4 h-4 ml-2" />
@@ -492,7 +493,7 @@ export function ActionsListView() {
                                   <DropdownMenuItem
                                     onClick={(e) => {
                                       e.stopPropagation()
-                                      navigate({ to: `/dashboard/quality/actions/${action._id}/edit` })
+                                      navigate({ to: `${ROUTES.dashboard.quality.actions.list}/${action._id}/edit` })
                                     }}
                                   >
                                     <Edit className="w-4 h-4 ml-2" />
