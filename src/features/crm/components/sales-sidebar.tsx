@@ -2,7 +2,9 @@ import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
     Clock, Bell, MapPin, Calendar as CalendarIcon,
-    Plus, CheckSquare, Trash2, List, X, ChevronRight, Loader2, AlertCircle
+    Plus, CheckSquare, Trash2, List, X, ChevronRight, Loader2, AlertCircle,
+    Users, TrendingUp, UserPlus, Receipt, Settings, ShoppingCart,
+    FileText, Package, Truck, BarChart3, Share2, Mail, MessageCircle, Target
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -15,7 +17,7 @@ import { arSA, enUS } from 'date-fns/locale'
 import { ROUTES } from '@/constants/routes'
 
 interface SalesSidebarProps {
-    context?: 'leads' | 'pipeline' | 'referrals' | 'activities' | 'email-marketing' | 'lead-scoring' | 'whatsapp'
+    context?: 'leads' | 'pipeline' | 'referrals' | 'activities' | 'email-marketing' | 'lead-scoring' | 'whatsapp' | 'transactions' | 'settings' | 'quotes' | 'orders' | 'customers' | 'reports'
     isSelectionMode?: boolean
     onToggleSelectionMode?: () => void
     selectedCount?: number
@@ -36,7 +38,6 @@ export function SalesSidebar({
     const [selectedDate, setSelectedDate] = useState(new Date())
 
     // Calculate date range for the strip (Today + 4 days)
-    // Fixed: Move date calculation outside useMemo to prevent infinite re-renders
     const today = useMemo(() => new Date(), [])
     const startDate = useMemo(() => startOfDay(today).toISOString(), [today])
     const endDate = useMemo(() => endOfDay(addDays(today, 4)).toISOString(), [today])
@@ -69,12 +70,12 @@ export function SalesSidebar({
 
     const links = {
         leads: {
-            create: ROUTES.dashboard.crm.leads.new,
-            viewAll: ROUTES.dashboard.crm.leads.list
+            create: ROUTES.dashboard.sales.leads.new,
+            viewAll: ROUTES.dashboard.sales.leads.list
         },
         pipeline: {
-            create: ROUTES.dashboard.crm.leads.new,
-            viewAll: ROUTES.dashboard.crm.pipeline
+            create: ROUTES.dashboard.sales.leads.new,
+            viewAll: ROUTES.dashboard.sales.pipeline
         },
         referrals: {
             create: ROUTES.dashboard.crm.referrals.new,
@@ -92,13 +93,52 @@ export function SalesSidebar({
             create: '',
             viewAll: ROUTES.dashboard.crm.leadScoring.list
         },
-        'whatsapp': {
+        whatsapp: {
             create: ROUTES.dashboard.crm.whatsapp.start,
             viewAll: ROUTES.dashboard.crm.whatsapp.list
+        },
+        transactions: {
+            viewAll: ROUTES.dashboard.sales.transactions
+        },
+        settings: {
+            viewAll: ROUTES.dashboard.sales.settings
+        },
+        quotes: {
+            create: ROUTES.dashboard.sales.quotes.new,
+            viewAll: ROUTES.dashboard.sales.quotes.list
+        },
+        orders: {
+            create: ROUTES.dashboard.sales.orders.new,
+            viewAll: ROUTES.dashboard.sales.orders.list
+        },
+        customers: {
+            create: ROUTES.dashboard.sales.customers.new,
+            viewAll: ROUTES.dashboard.sales.customers.list
+        },
+        reports: {
+            create: ROUTES.dashboard.sales.reports.new,
+            viewAll: ROUTES.dashboard.sales.reports.list
         }
     }
 
     const currentLinks = links[context] || links.leads
+
+    // Navigation links for the sidebar
+    const navigationLinks = [
+        { key: 'leads', icon: UserPlus, label: isRTL ? 'العملاء المحتملين' : 'Leads', route: links.leads.viewAll, color: 'text-emerald-600' },
+        { key: 'pipeline', icon: TrendingUp, label: isRTL ? 'مسار المبيعات' : 'Pipeline', route: links.pipeline.viewAll, color: 'text-blue-600' },
+        { key: 'customers', icon: Users, label: isRTL ? 'العملاء' : 'Customers', route: links.customers.viewAll, color: 'text-indigo-600' },
+        { key: 'quotes', icon: FileText, label: isRTL ? 'عروض الأسعار' : 'Quotes', route: links.quotes.viewAll, color: 'text-purple-600' },
+        { key: 'orders', icon: ShoppingCart, label: isRTL ? 'الطلبات' : 'Orders', route: links.orders.viewAll, color: 'text-orange-600' },
+        { key: 'activities', icon: Clock, label: isRTL ? 'الأنشطة' : 'Activities', route: links.activities.viewAll, color: 'text-amber-600' },
+        { key: 'referrals', icon: Share2, label: isRTL ? 'الإحالات' : 'Referrals', route: links.referrals.viewAll, color: 'text-cyan-600' },
+        { key: 'email-marketing', icon: Mail, label: isRTL ? 'التسويق بالبريد' : 'Email Marketing', route: links['email-marketing'].viewAll, color: 'text-rose-600' },
+        { key: 'whatsapp', icon: MessageCircle, label: isRTL ? 'واتساب' : 'WhatsApp', route: links.whatsapp.viewAll, color: 'text-green-600' },
+        { key: 'lead-scoring', icon: Target, label: isRTL ? 'تقييم العملاء' : 'Lead Scoring', route: links['lead-scoring'].viewAll, color: 'text-pink-600' },
+        { key: 'transactions', icon: Receipt, label: isRTL ? 'المعاملات' : 'Transactions', route: links.transactions.viewAll, color: 'text-slate-600' },
+        { key: 'reports', icon: BarChart3, label: isRTL ? 'التقارير' : 'Reports', route: links.reports.viewAll, color: 'text-violet-600' },
+        { key: 'settings', icon: Settings, label: isRTL ? 'الإعدادات' : 'Settings', route: links.settings.viewAll, color: 'text-gray-600' },
+    ]
 
     // Generate 5 days for the strip
     const calendarStripDays = useMemo(() => {
@@ -194,12 +234,14 @@ export function SalesSidebar({
                 {/* Content */}
                 <div className="relative z-10 grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
                     {/* Create Button - White + Green Text + Glow */}
-                    <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
-                        <Link to={currentLinks.create}>
-                            <Plus className="h-7 w-7" aria-hidden="true" />
-                            <span className="text-sm font-bold">{t('sidebar.quickActions.create')}</span>
-                        </Link>
-                    </Button>
+                    {currentLinks.create && (
+                        <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
+                            <Link to={currentLinks.create}>
+                                <Plus className="h-7 w-7" aria-hidden="true" />
+                                <span className="text-sm font-bold">{t('sidebar.quickActions.create')}</span>
+                            </Link>
+                        </Button>
+                    )}
 
                     {/* Select Button - White + Dark Text + Glow */}
                     <Button
@@ -236,6 +278,37 @@ export function SalesSidebar({
                             <span className="text-sm font-bold">{t('sidebar.quickActions.viewAll')}</span>
                         </Link>
                     </Button>
+                </div>
+            </div>
+
+            {/* NAVIGATION LINKS */}
+            <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+                <h3 className="font-bold text-navy text-lg mb-4">
+                    {isRTL ? 'التنقل السريع' : 'Quick Navigation'}
+                </h3>
+                <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                    {navigationLinks.map((link) => {
+                        const Icon = link.icon
+                        const isActive = context === link.key
+                        return (
+                            <Button
+                                key={link.key}
+                                asChild
+                                variant={isActive ? 'default' : 'ghost'}
+                                className={cn(
+                                    "w-full rounded-xl h-11 justify-start",
+                                    isActive
+                                        ? "bg-emerald-500 hover:bg-emerald-600 text-white"
+                                        : "hover:bg-slate-50 text-slate-700"
+                                )}
+                            >
+                                <Link to={link.route}>
+                                    <Icon className={cn("ms-3 h-4 w-4", isActive ? "text-white" : link.color)} aria-hidden="true" />
+                                    <span className="text-sm">{link.label}</span>
+                                </Link>
+                            </Button>
+                        )
+                    })}
                 </div>
             </div>
 
