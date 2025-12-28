@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
     ArrowRight, Save, User, Phone, Mail, Building,
-    DollarSign, Calendar, FileText, Target, Loader2
+    DollarSign, Calendar, FileText, Target, Loader2,
+    Building2, Users, ChevronDown, ChevronUp
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,6 +15,19 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "@/components/ui/collapsible"
+import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
@@ -25,6 +39,18 @@ import { useCreateLead, useUpdateLead, useLead } from '@/hooks/useAccounting'
 import { useStaff } from '@/hooks/useStaff'
 import type { LeadSource } from '@/services/accountingService'
 import { ROUTES } from '@/constants/routes'
+import { cn } from '@/lib/utils'
+
+// Firm Size Type - Controls form complexity
+type FirmSize = 'solo' | 'small' | 'medium' | 'large'
+
+// Firm Size Options
+const FIRM_SIZE_OPTIONS = [
+  { value: 'solo' as FirmSize, label: 'محامي فردي', labelEn: 'Solo Practice', icon: User, description: 'ممارسة فردية' },
+  { value: 'small' as FirmSize, label: 'مكتب صغير', labelEn: 'Small Firm (2-10)', icon: Users, description: '2-10 محامين' },
+  { value: 'medium' as FirmSize, label: 'مكتب متوسط', labelEn: 'Medium Firm (11-50)', icon: Building2, description: '11-50 محامي' },
+  { value: 'large' as FirmSize, label: 'شركة محاماة', labelEn: 'Large Firm (50+)', icon: Building2, description: '50+ محامي' },
+]
 
 const getSourceOptions = (t: any) => [
   { value: 'website' as LeadSource, label: t('sales.leads.sources.website') },
@@ -49,9 +75,8 @@ interface CreateLeadViewProps {
     editMode?: boolean
 }
 
-export function CreateLeadView({
+export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
   const { t } = useTranslation()
- editMode = false }: CreateLeadViewProps) {
     const navigate = useNavigate()
     const params = editMode ? useParams({ from: '/_authenticated/dashboard/sales/leads/$leadId/edit' }) : null
     const leadId = params?.leadId
@@ -62,6 +87,10 @@ export function CreateLeadView({
     const { data: leadData, isLoading: isLoadingLead } = useLead(leadId || '', { enabled: editMode && !!leadId })
 
     const lead = leadData?.data
+
+    // Firm size selection - controls visibility of organizational fields
+    const [firmSize, setFirmSize] = useState<FirmSize>('solo')
+    const [showOrgFields, setShowOrgFields] = useState(false)
 
     const [formData, setFormData] = useState({
         firstName: lead?.firstName || '',
@@ -171,6 +200,53 @@ export function CreateLeadView({
                     <div className="lg:col-span-2 space-y-8">
                         <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
                             <form onSubmit={handleSubmit} className="space-y-8">
+
+                                {/* FIRM SIZE SELECTOR - Like Finance Module */}
+                                <Card className="border-0 shadow-sm">
+                                    <CardHeader className="pb-4">
+                                        <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                            <Building2 className="w-5 h-5 text-emerald-500" aria-hidden="true" />
+                                            نوع المكتب
+                                        </CardTitle>
+                                        <p className="text-sm text-slate-500 mt-1">
+                                            اختر حجم مكتبك لتخصيص النموذج حسب احتياجاتك
+                                        </p>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                            {FIRM_SIZE_OPTIONS.map((option) => {
+                                                const Icon = option.icon
+                                                return (
+                                                    <button
+                                                        key={option.value}
+                                                        type="button"
+                                                        onClick={() => setFirmSize(option.value)}
+                                                        className={cn(
+                                                            "p-4 rounded-xl border-2 transition-all text-center",
+                                                            firmSize === option.value
+                                                                ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                                                                : "border-slate-200 hover:border-slate-300 text-slate-600"
+                                                        )}
+                                                    >
+                                                        <Icon className="w-6 h-6 mx-auto mb-2" />
+                                                        <span className="text-sm font-medium block">{option.label}</span>
+                                                        <span className="text-xs text-slate-400 block mt-1">{option.description}</span>
+                                                    </button>
+                                                )
+                                            })}
+                                        </div>
+                                        {firmSize !== 'solo' && (
+                                            <div className="mt-4 flex items-center gap-2">
+                                                <Switch
+                                                    checked={showOrgFields}
+                                                    onCheckedChange={setShowOrgFields}
+                                                />
+                                                <Label className="text-sm text-slate-600">إظهار الحقول التنظيمية المتقدمة</Label>
+                                            </div>
+                                        )}
+                                    </CardContent>
+                                </Card>
+
                                 {/* Basic Info */}
                                 <div className="space-y-6">
                                     <h3 className="text-lg font-bold text-navy flex items-center gap-2">
@@ -301,6 +377,44 @@ export function CreateLeadView({
                                         </div>
                                     </div>
                                 </div>
+
+                                {/* ORGANIZATIONAL FIELDS - Only for non-solo firms */}
+                                {firmSize !== 'solo' && (
+                                    <Collapsible open={showOrgFields} onOpenChange={setShowOrgFields}>
+                                        <Card className="border-0 shadow-sm border-s-4 border-s-blue-500">
+                                            <CollapsibleTrigger asChild>
+                                                <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors">
+                                                    <CardTitle className="flex items-center justify-between">
+                                                        <span className="flex items-center gap-2">
+                                                            <Building2 className="w-5 h-5 text-blue-500" aria-hidden="true" />
+                                                            الحقول التنظيمية المتقدمة
+                                                        </span>
+                                                        <ChevronDown className={cn("w-5 h-5 text-slate-600 transition-transform", showOrgFields && "rotate-180")} />
+                                                    </CardTitle>
+                                                </CardHeader>
+                                            </CollapsibleTrigger>
+                                            <CollapsibleContent>
+                                                <CardContent className="space-y-6 pt-0">
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium text-slate-700">القسم / الفريق</label>
+                                                        <Input
+                                                            placeholder="مثال: قسم المبيعات"
+                                                            className="rounded-xl"
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium text-slate-700">رقم الفرصة</label>
+                                                        <Input
+                                                            placeholder="مثال: LEAD-2024-001"
+                                                            className="rounded-xl"
+                                                            dir="ltr"
+                                                        />
+                                                    </div>
+                                                </CardContent>
+                                            </CollapsibleContent>
+                                        </Card>
+                                    </Collapsible>
+                                )}
 
                                 {/* Financial Info */}
                                 <div className="border-t border-slate-100 pt-6 space-y-6">
