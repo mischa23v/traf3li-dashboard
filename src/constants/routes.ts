@@ -696,6 +696,7 @@ export const ROUTES = {
       crmReports: '/dashboard/crm/crm-reports',
       salesPersons: '/dashboard/crm/sales-persons',
       territories: '/dashboard/crm/territories',
+      transactions: '/dashboard/crm/transactions',
 
       // Contacts (CRM-specific contacts)
       contacts: {
@@ -773,6 +774,19 @@ export const ROUTES = {
         list: '/dashboard/crm/quotes',
         new: '/dashboard/crm/quotes/new',
         detail: (quoteId: string) => `/dashboard/crm/quotes/${quoteId}`,
+      },
+
+      // CRM Settings
+      settings: {
+        general: '/dashboard/crm/settings/general',
+        duplicateDetection: '/dashboard/crm/settings/duplicate-detection',
+        activityPlans: '/dashboard/crm/settings/activity-plans',
+        quotas: '/dashboard/crm/settings/quotas',
+        lostReasons: '/dashboard/crm/settings/lost-reasons',
+        salesTeams: '/dashboard/crm/settings/sales-teams',
+        tags: '/dashboard/crm/settings/tags',
+        territories: '/dashboard/crm/settings/territories',
+        emailTemplates: '/dashboard/crm/settings/email-templates',
       },
     },
 
