@@ -6,7 +6,7 @@ import {
   DollarSign, Target, ChevronDown, ChevronUp,
   MessageSquare, Shield, AlertTriangle, CheckCircle,
   Star, TrendingUp, Clock, Scale, Gauge, Award,
-  Zap, UserCheck, Banknote, Timer
+  Zap, UserCheck, Banknote, Timer, Building2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -27,6 +27,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
+import { Label } from '@/components/ui/label'
 import {
   Card,
   CardContent,
@@ -189,6 +195,17 @@ const COMPETITION_OPTIONS = [
   { value: 'preferred', label: 'مفضل لدى العميل' },
 ]
 
+// Firm Size Type - Controls form complexity
+type FirmSize = 'solo' | 'small' | 'medium' | 'large'
+
+// Firm Size Options
+const FIRM_SIZE_OPTIONS = [
+  { value: 'solo' as FirmSize, label: 'محامي فردي', labelEn: 'Solo Practice', icon: User, description: 'ممارسة فردية' },
+  { value: 'small' as FirmSize, label: 'مكتب صغير', labelEn: 'Small Firm (2-10)', icon: Users, description: '2-10 محامين' },
+  { value: 'medium' as FirmSize, label: 'مكتب متوسط', labelEn: 'Medium Firm (11-50)', icon: Building2, description: '11-50 محامي' },
+  { value: 'large' as FirmSize, label: 'شركة محاماة', labelEn: 'Large Firm (50+)', icon: Building2, description: '50+ محامي' },
+]
+
 export function CreateLeadView() {
   const navigate = useNavigate()
   const createLeadMutation = useCreateLead()
@@ -197,6 +214,10 @@ export function CreateLeadView() {
   const { data: organizationsData } = useOrganizations({})
   const { data: contactsData } = useContacts({})
   const { handleApiError, validationErrors, ErrorDisplay } = useApiError()
+
+  // Firm size selection - controls visibility of organizational fields
+  const [firmSize, setFirmSize] = useState<FirmSize>('solo')
+  const [showOrgFields, setShowOrgFields] = useState(false)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -637,6 +658,52 @@ export function CreateLeadView() {
               {/* API Validation Errors */}
               <ErrorDisplay />
 
+              {/* FIRM SIZE SELECTOR - Like Finance Module */}
+              <Card className="border-0 shadow-sm">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <Building2 className="w-5 h-5 text-emerald-500" aria-hidden="true" />
+                    نوع المكتب
+                  </CardTitle>
+                  <p className="text-sm text-slate-500 mt-1">
+                    اختر حجم مكتبك لتخصيص النموذج حسب احتياجاتك
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {FIRM_SIZE_OPTIONS.map((option) => {
+                      const Icon = option.icon
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => setFirmSize(option.value)}
+                          className={cn(
+                            "p-4 rounded-xl border-2 transition-all text-center",
+                            firmSize === option.value
+                              ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                              : "border-slate-200 hover:border-slate-300 text-slate-600"
+                          )}
+                        >
+                          <Icon className="w-6 h-6 mx-auto mb-2" />
+                          <span className="text-sm font-medium block">{option.label}</span>
+                          <span className="text-xs text-slate-400 block mt-1">{option.description}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                  {firmSize !== 'solo' && (
+                    <div className="mt-4 flex items-center gap-2">
+                      <Switch
+                        checked={showOrgFields}
+                        onCheckedChange={setShowOrgFields}
+                      />
+                      <Label className="text-sm text-slate-600">إظهار الحقول التنظيمية المتقدمة</Label>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
               {/* Lead Score Card */}
               <Card className="border-0 shadow-sm">
                 <CardHeader className="pb-2">
@@ -941,6 +1008,137 @@ export function CreateLeadView() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* ORGANIZATIONAL FIELDS - Only for non-solo firms */}
+              {firmSize !== 'solo' && (
+                <Collapsible open={showOrgFields} onOpenChange={setShowOrgFields}>
+                  <Card className="border-0 shadow-sm border-s-4 border-s-blue-500">
+                    <CollapsibleTrigger asChild>
+                      <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors">
+                        <CardTitle className="flex items-center justify-between">
+                          <span className="flex items-center gap-2">
+                            <Building2 className="w-5 h-5 text-blue-500" aria-hidden="true" />
+                            الحقول التنظيمية المتقدمة
+                            <Badge variant="outline" className="text-blue-600 border-blue-200">
+                              {firmSize === 'small' ? 'مكتب صغير' : firmSize === 'medium' ? 'مكتب متوسط' : 'شركة محاماة'}
+                            </Badge>
+                          </span>
+                          <ChevronDown className={cn("w-5 h-5 text-slate-600 transition-transform", showOrgFields && "rotate-180")} />
+                        </CardTitle>
+                      </CardHeader>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <CardContent className="space-y-6 pt-0">
+                        {/* Department & Team Assignment - For Small+ */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700">القسم / الفريق</label>
+                            <Select value={formData.assignedTeam} onValueChange={(v) => handleChange('assignedTeam', v)}>
+                              <SelectTrigger className="rounded-xl">
+                                <SelectValue placeholder="اختر القسم" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="litigation">التقاضي</SelectItem>
+                                <SelectItem value="corporate">الشركات</SelectItem>
+                                <SelectItem value="real_estate">العقارات</SelectItem>
+                                <SelectItem value="labor">العمل</SelectItem>
+                                <SelectItem value="ip">الملكية الفكرية</SelectItem>
+                                <SelectItem value="family">الأسرة</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700">المحامي المسؤول</label>
+                            <Select value={formData.assignedTo} onValueChange={(v) => handleChange('assignedTo', v)}>
+                              <SelectTrigger className="rounded-xl">
+                                <SelectValue placeholder="اختر المحامي" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {staffData?.map((staff: any) => (
+                                  <SelectItem key={staff._id} value={staff._id}>
+                                    {staff.firstName} {staff.lastName}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+
+                        {/* Medium & Large Firm Fields */}
+                        {(firmSize === 'medium' || firmSize === 'large') && (
+                          <>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700">رقم الفرع / الموقع</label>
+                                <Select>
+                                  <SelectTrigger className="rounded-xl">
+                                    <SelectValue placeholder="اختر الفرع" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="riyadh_hq">الرياض - المقر الرئيسي</SelectItem>
+                                    <SelectItem value="jeddah">جدة</SelectItem>
+                                    <SelectItem value="dammam">الدمام</SelectItem>
+                                    <SelectItem value="mecca">مكة المكرمة</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700">مستوى الأولوية التنظيمية</label>
+                                <Select value={formData.priority} onValueChange={(v) => handleChange('priority', v)}>
+                                  <SelectTrigger className="rounded-xl">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="low">منخفضة</SelectItem>
+                                    <SelectItem value="normal">عادية</SelectItem>
+                                    <SelectItem value="high">عالية</SelectItem>
+                                    <SelectItem value="urgent">عاجلة</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                          </>
+                        )}
+
+                        {/* Large Firm Only Fields */}
+                        {firmSize === 'large' && (
+                          <>
+                            <div className="p-4 bg-amber-50 rounded-xl border border-amber-200">
+                              <h4 className="font-medium text-amber-800 mb-3 flex items-center gap-2">
+                                <Shield className="w-4 h-4" />
+                                إعدادات الشركات الكبرى
+                              </h4>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                  <label className="text-sm font-medium text-slate-700">رقم الملف الداخلي</label>
+                                  <Input placeholder="CASE-2024-XXXX" className="rounded-xl" dir="ltr" />
+                                </div>
+                                <div className="space-y-2">
+                                  <label className="text-sm font-medium text-slate-700">مركز التكلفة</label>
+                                  <Select>
+                                    <SelectTrigger className="rounded-xl">
+                                      <SelectValue placeholder="اختر مركز التكلفة" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="cc_litigation">قسم التقاضي</SelectItem>
+                                      <SelectItem value="cc_corporate">قسم الشركات</SelectItem>
+                                      <SelectItem value="cc_advisory">الاستشارات</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                              <div className="mt-4 flex items-center gap-2">
+                                <Switch />
+                                <Label className="text-sm text-amber-700">يتطلب موافقة الشريك المسؤول</Label>
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </CardContent>
+                    </CollapsibleContent>
+                  </Card>
+                </Collapsible>
+              )}
 
               {/* Status & Source */}
               <Card className="border-0 shadow-sm">
