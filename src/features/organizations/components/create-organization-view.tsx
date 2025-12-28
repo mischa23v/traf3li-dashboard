@@ -18,7 +18,8 @@ import {
     Save, Building2, Phone, Mail, MapPin, FileText, Loader2, Tag,
     Plus, X, Globe, Hash, Users, Shield, AlertTriangle, CheckCircle,
     Calendar, Star, CreditCard, Scale, Link as LinkIcon, Briefcase,
-    ChevronDown, ChevronUp, Percent, Building, UserCheck
+    ChevronDown, ChevronUp, Percent, Building, UserCheck, DollarSign,
+    Banknote, TrendingUp, Award, FileCheck, Upload, Settings
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -146,10 +147,76 @@ const CONTACT_ROLES = [
     { value: 'primary_contact', label: 'جهة الاتصال الرئيسية' },
     { value: 'billing_contact', label: 'جهة اتصال الفواتير' },
     { value: 'legal_contact', label: 'جهة الاتصال القانونية' },
-    { value: 'ceo', label: 'الرئيس التنفيذي' },
+    { value: 'ceo', label: 'الرئيس التنفيذي / المالك' },
     { value: 'cfo', label: 'المدير المالي' },
     { value: 'legal_counsel', label: 'المستشار القانوني' },
+    { value: 'hr_contact', label: 'جهة اتصال الموارد البشرية' },
+    { value: 'finance_contact', label: 'جهة الاتصال المالية' },
     { value: 'other', label: 'أخرى' },
+]
+
+const ANNUAL_REVENUE_RANGES = [
+    { value: 'under_1m', label: 'أقل من مليون ريال' },
+    { value: '1m_5m', label: '1-5 مليون ريال' },
+    { value: '5m_10m', label: '5-10 مليون ريال' },
+    { value: '10m_50m', label: '10-50 مليون ريال' },
+    { value: '50m_100m', label: '50-100 مليون ريال' },
+    { value: '100m_500m', label: '100-500 مليون ريال' },
+    { value: '500m_1b', label: '500 مليون - مليار ريال' },
+    { value: 'over_1b', label: 'أكثر من مليار ريال' },
+]
+
+const CURRENCIES = [
+    { value: 'SAR', label: 'ريال سعودي (SAR)' },
+    { value: 'USD', label: 'دولار أمريكي (USD)' },
+    { value: 'EUR', label: 'يورو (EUR)' },
+    { value: 'GBP', label: 'جنيه إسترليني (GBP)' },
+    { value: 'AED', label: 'درهم إماراتي (AED)' },
+    { value: 'KWD', label: 'دينار كويتي (KWD)' },
+]
+
+const PAYMENT_TERMS = [
+    { value: 'immediate', label: 'فوري' },
+    { value: 'net_7', label: 'خلال 7 أيام' },
+    { value: 'net_15', label: 'خلال 15 يوم' },
+    { value: 'net_30', label: 'خلال 30 يوم' },
+    { value: 'net_60', label: 'خلال 60 يوم' },
+    { value: 'net_90', label: 'خلال 90 يوم' },
+    { value: 'custom', label: 'مخصص' },
+]
+
+const CREDIT_RATINGS = [
+    { value: 'aaa', label: 'AAA - ممتاز' },
+    { value: 'aa', label: 'AA - جيد جداً' },
+    { value: 'a', label: 'A - جيد' },
+    { value: 'bbb', label: 'BBB - متوسط' },
+    { value: 'bb', label: 'BB - منخفض' },
+    { value: 'b', label: 'B - ضعيف' },
+    { value: 'c', label: 'C - مخاطر عالية' },
+    { value: 'not_rated', label: 'غير مصنف' },
+]
+
+const ENGAGEMENT_STATUSES = [
+    { value: 'active', label: 'نشط' },
+    { value: 'inactive', label: 'غير نشط' },
+    { value: 'on_hold', label: 'معلق' },
+    { value: 'completed', label: 'مكتمل' },
+]
+
+const LICENSE_TYPES = [
+    { value: 'commercial', label: 'تجاري' },
+    { value: 'professional', label: 'مهني' },
+    { value: 'industrial', label: 'صناعي' },
+    { value: 'franchise', label: 'امتياز تجاري' },
+    { value: 'other', label: 'أخرى' },
+]
+
+const FIRM_SIZES = [
+    { value: 'startup', label: 'ناشئة', icon: '🚀', employees: '1-10', color: 'bg-blue-50 border-blue-200 text-blue-700' },
+    { value: 'small', label: 'صغيرة', icon: '🏢', employees: '11-50', color: 'bg-green-50 border-green-200 text-green-700' },
+    { value: 'medium', label: 'متوسطة', icon: '🏗️', employees: '51-200', color: 'bg-purple-50 border-purple-200 text-purple-700' },
+    { value: 'large', label: 'كبيرة', icon: '🏛️', employees: '201-500', color: 'bg-orange-50 border-orange-200 text-orange-700' },
+    { value: 'enterprise', label: 'مؤسسة', icon: '🏰', employees: '500+', color: 'bg-red-50 border-red-200 text-red-700' },
 ]
 
 // ==================== COMPONENT ====================
@@ -160,6 +227,10 @@ export function CreateOrganizationView() {
     const { mutate: createOrganization, isPending } = useCreateOrganization()
     const { data: contactsData } = useContacts()
 
+    // UI State
+    const [showAdvanced, setShowAdvanced] = useState(false)
+    const [selectedFirmSize, setSelectedFirmSize] = useState('')
+
     // Form state
     const [formData, setFormData] = useState({
         // Basic Info
@@ -167,13 +238,17 @@ export function CreateOrganizationView() {
         nameAr: '',
         tradeName: '',
         tradeNameAr: '',
+        shortName: '',
 
         // Type & Classification
         type: 'company',
         legalStructure: '',
         industry: '',
         sector: '',
+        subIndustry: '',
         size: '',
+        annualRevenue: '',
+        isPublic: false,
 
         // Registration (Saudi specific)
         commercialRegistration: '',
@@ -183,10 +258,14 @@ export function CreateOrganizationView() {
 
         vatNumber: '',
         taxRegistrationDate: '',
+        taxId: '',
 
         licenseNumber: '',
         licenseType: '',
         licenseExpiryDate: '',
+
+        gosiNumber: '',
+        zakatCertificate: '',
 
         // Contact Info
         mainPhone: '',
@@ -194,21 +273,62 @@ export function CreateOrganizationView() {
         website: '',
         emails: [{ type: 'main', email: '', isPrimary: true }],
 
-        // Address
-        street: '',
-        buildingNumber: '',
-        district: '',
-        city: '',
-        province: '',
-        postalCode: '',
-        country: 'المملكة العربية السعودية',
+        // Addresses
+        headquartersAddress: {
+            street: '',
+            buildingNumber: '',
+            district: '',
+            city: '',
+            province: '',
+            postalCode: '',
+            country: 'المملكة العربية السعودية',
+        },
+        registeredAddress: {
+            street: '',
+            buildingNumber: '',
+            district: '',
+            city: '',
+            province: '',
+            postalCode: '',
+            country: 'المملكة العربية السعودية',
+            sameAsHeadquarters: true,
+        },
+        branchAddresses: [] as Array<{
+            name: string;
+            street: string;
+            city: string;
+            country: string;
+        }>,
+
+        // Financial
+        bankName: '',
+        accountNumber: '',
+        iban: '',
+        creditRating: '',
+        creditLimit: '',
+        paymentTerms: '',
+        currency: 'SAR',
+        fiscalYearEnd: '',
 
         // Key Contacts
         keyContacts: [] as Array<{ contactId: string; role: string; isPrimary: boolean }>,
+        primaryContact: '',
+        ceoOwner: '',
+        financeContact: '',
+        legalContact: '',
+        hrContact: '',
 
-        // Relationships
+        // Ownership & Relationships
         relationshipTypes: [] as string[],
         parentOrganizationId: '',
+        subsidiaries: [] as string[],
+        shareholders: [] as Array<{ name: string; percentage: string }>,
+
+        // Legal/Law Firm Specific
+        clientSince: '',
+        engagementStatus: 'active',
+        retainer: '',
+        preferredPracticeAreas: [] as string[],
 
         // Conflict Check
         conflictCheckStatus: 'not_checked',
@@ -223,12 +343,21 @@ export function CreateOrganizationView() {
         tags: [] as string[],
         practiceAreas: [] as string[],
 
+        // Custom Fields
+        customField1: '',
+        customField2: '',
+        customField3: '',
+        customField4: '',
+        customField5: '',
+
         // Notes
         notes: '',
+        internalNotes: '',
     })
 
     // Tags input
     const [tagInput, setTagInput] = useState('')
+    const [shareholderInput, setShareholderInput] = useState({ name: '', percentage: '' })
 
     // Handle form changes
     const handleChange = (field: string, value: any) => {
@@ -299,6 +428,68 @@ export function CreateOrganizationView() {
         } else {
             handleChange('relationshipTypes', [...current, type])
         }
+    }
+
+    // Handle branch addresses
+    const addBranchAddress = () => {
+        setFormData(prev => ({
+            ...prev,
+            branchAddresses: [...prev.branchAddresses, { name: '', street: '', city: '', country: 'المملكة العربية السعودية' }]
+        }))
+    }
+
+    const removeBranchAddress = (index: number) => {
+        setFormData(prev => ({
+            ...prev,
+            branchAddresses: prev.branchAddresses.filter((_, i) => i !== index)
+        }))
+    }
+
+    const updateBranchAddress = (index: number, field: string, value: any) => {
+        setFormData(prev => ({
+            ...prev,
+            branchAddresses: prev.branchAddresses.map((b, i) => i === index ? { ...b, [field]: value } : b)
+        }))
+    }
+
+    // Handle shareholders
+    const addShareholder = () => {
+        if (shareholderInput.name && shareholderInput.percentage) {
+            setFormData(prev => ({
+                ...prev,
+                shareholders: [...prev.shareholders, { ...shareholderInput }]
+            }))
+            setShareholderInput({ name: '', percentage: '' })
+        }
+    }
+
+    const removeShareholder = (index: number) => {
+        setFormData(prev => ({
+            ...prev,
+            shareholders: prev.shareholders.filter((_, i) => i !== index)
+        }))
+    }
+
+    // Handle nested address changes
+    const handleAddressChange = (addressType: 'headquartersAddress' | 'registeredAddress', field: string, value: any) => {
+        setFormData(prev => ({
+            ...prev,
+            [addressType]: {
+                ...prev[addressType],
+                [field]: value
+            }
+        }))
+    }
+
+    // Copy headquarters to registered address
+    const copyHeadquartersToRegistered = () => {
+        setFormData(prev => ({
+            ...prev,
+            registeredAddress: {
+                ...prev.headquartersAddress,
+                sameAsHeadquarters: true
+            }
+        }))
     }
 
     // Handle submit
@@ -403,6 +594,69 @@ export function CreateOrganizationView() {
                     <div className="lg:col-span-2 space-y-6">
                         <form onSubmit={handleSubmit}>
 
+                            {/* FIRM SIZE SELECTOR */}
+                            <Card className="border-slate-200 mb-6 bg-gradient-to-br from-slate-50 to-white">
+                                <CardHeader>
+                                    <CardTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                        <Building className="w-5 h-5 text-emerald-500" />
+                                        اختر حجم المنظمة
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="grid grid-cols-5 gap-3">
+                                        {FIRM_SIZES.map((size) => (
+                                            <button
+                                                key={size.value}
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectedFirmSize(size.value)
+                                                    handleChange('size', size.value)
+                                                }}
+                                                className={cn(
+                                                    "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
+                                                    selectedFirmSize === size.value
+                                                        ? size.color + " border-current"
+                                                        : "border-slate-200 hover:border-slate-300 bg-white"
+                                                )}
+                                            >
+                                                <span className="text-3xl">{size.icon}</span>
+                                                <span className="text-sm font-bold">{size.label}</span>
+                                                <span className="text-xs text-slate-500">{size.employees}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* BASIC/ADVANCED TOGGLE */}
+                            <div className="flex items-center justify-between mb-6 p-4 bg-slate-100 rounded-xl">
+                                <div className="flex items-center gap-2">
+                                    <Settings className="w-5 h-5 text-slate-600" />
+                                    <span className="font-semibold text-slate-700">
+                                        {showAdvanced ? 'الوضع المتقدم' : 'الوضع الأساسي'}
+                                    </span>
+                                </div>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setShowAdvanced(!showAdvanced)}
+                                    className="rounded-xl"
+                                >
+                                    {showAdvanced ? (
+                                        <>
+                                            <ChevronUp className="w-4 h-4 ms-1" />
+                                            إخفاء الحقول المتقدمة
+                                        </>
+                                    ) : (
+                                        <>
+                                            <ChevronDown className="w-4 h-4 ms-1" />
+                                            عرض جميع الحقول
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
+
                             {/* BASIC INFO CARD */}
                             <Card className="border-slate-200 mb-6">
                                 <CardHeader>
@@ -416,7 +670,7 @@ export function CreateOrganizationView() {
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700">
-                                                الاسم القانوني (إنجليزي)
+                                                الاسم القانوني (إنجليزي) <span className="text-red-500">*</span>
                                             </Label>
                                             <Input
                                                 placeholder="Legal Company Name LLC"
@@ -424,6 +678,7 @@ export function CreateOrganizationView() {
                                                 className="rounded-xl border-slate-200"
                                                 value={formData.name}
                                                 onChange={(e) => handleChange('name', e.target.value)}
+                                                required
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -457,6 +712,43 @@ export function CreateOrganizationView() {
                                                 value={formData.tradeNameAr}
                                                 onChange={(e) => handleChange('tradeNameAr', e.target.value)}
                                             />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-sm font-medium text-slate-700">الاسم المختصر</Label>
+                                        <Input
+                                            placeholder="اسم مختصر للمنظمة"
+                                            className="rounded-xl border-slate-200"
+                                            value={formData.shortName}
+                                            onChange={(e) => handleChange('shortName', e.target.value)}
+                                        />
+                                    </div>
+
+                                    {/* Organization Status */}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <Label className="text-sm font-medium text-slate-700">الحالة</Label>
+                                            <Select value={formData.status} onValueChange={(v) => handleChange('status', v)}>
+                                                <SelectTrigger className="rounded-xl border-slate-200">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="active">نشطة</SelectItem>
+                                                    <SelectItem value="inactive">غير نشطة</SelectItem>
+                                                    <SelectItem value="prospect">عميل محتمل</SelectItem>
+                                                    <SelectItem value="former">عميل سابق</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="flex items-center gap-4 pt-6">
+                                            <label className="flex items-center gap-2">
+                                                <Switch
+                                                    checked={formData.isPublic}
+                                                    onCheckedChange={(v) => handleChange('isPublic', v)}
+                                                />
+                                                <span className="text-sm text-slate-700">شركة مساهمة عامة</span>
+                                            </label>
                                         </div>
                                     </div>
                                 </CardContent>
@@ -512,14 +804,14 @@ export function CreateOrganizationView() {
                                             </Select>
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-sm font-medium text-slate-700">حجم المنظمة</Label>
-                                            <Select value={formData.size} onValueChange={(v) => handleChange('size', v)}>
+                                            <Label className="text-sm font-medium text-slate-700">نطاق الإيرادات السنوية</Label>
+                                            <Select value={formData.annualRevenue} onValueChange={(v) => handleChange('annualRevenue', v)}>
                                                 <SelectTrigger className="rounded-xl border-slate-200">
-                                                    <SelectValue placeholder="اختر الحجم" />
+                                                    <SelectValue placeholder="اختر النطاق" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    {ORGANIZATION_SIZES.map(s => (
-                                                        <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                                                    {ANNUAL_REVENUE_RANGES.map(r => (
+                                                        <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
@@ -545,8 +837,8 @@ export function CreateOrganizationView() {
                                             <Input
                                                 placeholder="مثال: البرمجيات، التجزئة"
                                                 className="rounded-xl border-slate-200"
-                                                value={formData.sector}
-                                                onChange={(e) => handleChange('sector', e.target.value)}
+                                                value={formData.subIndustry}
+                                                onChange={(e) => handleChange('subIndustry', e.target.value)}
                                             />
                                         </div>
                                     </div>
@@ -633,9 +925,9 @@ export function CreateOrganizationView() {
 
                                     <Separator />
 
-                                    {/* VAT */}
+                                    {/* VAT & Tax */}
                                     <div className="space-y-4">
-                                        <h4 className="font-semibold text-slate-700">الرقم الضريبي</h4>
+                                        <h4 className="font-semibold text-slate-700">المعلومات الضريبية</h4>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
                                                 <Label>الرقم الضريبي (VAT)</Label>
@@ -649,16 +941,98 @@ export function CreateOrganizationView() {
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label>تاريخ التسجيل الضريبي</Label>
+                                                <Label>الرقم الضريبي (Tax ID)</Label>
                                                 <Input
-                                                    type="date"
+                                                    placeholder="Tax ID"
+                                                    dir="ltr"
                                                     className="rounded-xl border-slate-200"
-                                                    value={formData.taxRegistrationDate}
-                                                    onChange={(e) => handleChange('taxRegistrationDate', e.target.value)}
+                                                    value={formData.taxId}
+                                                    onChange={(e) => handleChange('taxId', e.target.value)}
                                                 />
                                             </div>
                                         </div>
+                                        <div className="space-y-2">
+                                            <Label>تاريخ التسجيل الضريبي</Label>
+                                            <Input
+                                                type="date"
+                                                className="rounded-xl border-slate-200"
+                                                value={formData.taxRegistrationDate}
+                                                onChange={(e) => handleChange('taxRegistrationDate', e.target.value)}
+                                            />
+                                        </div>
                                     </div>
+
+                                    <Separator />
+
+                                    {/* License */}
+                                    <div className="space-y-4">
+                                        <h4 className="font-semibold text-slate-700">الترخيص</h4>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <Label>رقم الترخيص</Label>
+                                                <Input
+                                                    placeholder="رقم الترخيص"
+                                                    className="rounded-xl border-slate-200"
+                                                    value={formData.licenseNumber}
+                                                    onChange={(e) => handleChange('licenseNumber', e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label>نوع الترخيص</Label>
+                                                <Select value={formData.licenseType} onValueChange={(v) => handleChange('licenseType', v)}>
+                                                    <SelectTrigger className="rounded-xl border-slate-200">
+                                                        <SelectValue placeholder="اختر النوع" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {LICENSE_TYPES.map(lt => (
+                                                            <SelectItem key={lt.value} value={lt.value}>{lt.label}</SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>تاريخ انتهاء الترخيص</Label>
+                                            <Input
+                                                type="date"
+                                                className="rounded-xl border-slate-200"
+                                                value={formData.licenseExpiryDate}
+                                                onChange={(e) => handleChange('licenseExpiryDate', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {showAdvanced && (
+                                        <>
+                                            <Separator />
+
+                                            {/* Additional Registrations */}
+                                            <div className="space-y-4">
+                                                <h4 className="font-semibold text-slate-700">تسجيلات إضافية</h4>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label>رقم التأمينات الاجتماعية (GOSI)</Label>
+                                                        <Input
+                                                            placeholder="GOSI Number"
+                                                            dir="ltr"
+                                                            className="rounded-xl border-slate-200"
+                                                            value={formData.gosiNumber}
+                                                            onChange={(e) => handleChange('gosiNumber', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label>شهادة الزكاة</Label>
+                                                        <Input
+                                                            placeholder="رقم شهادة الزكاة"
+                                                            className="rounded-xl border-slate-200"
+                                                            value={formData.zakatCertificate}
+                                                            onChange={(e) => handleChange('zakatCertificate', e.target.value)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
                                 </CardContent>
                             </Card>
 
@@ -745,86 +1119,219 @@ export function CreateOrganizationView() {
 
                             {/* ADVANCED SECTIONS */}
                             <Accordion type="multiple" className="mb-6">
-                                {/* Address */}
-                                <AccordionItem value="address" className="border rounded-xl mb-2 px-4">
+                                {/* Addresses */}
+                                <AccordionItem value="addresses" className="border rounded-xl mb-2 px-4">
                                     <AccordionTrigger className="hover:no-underline">
                                         <div className="flex items-center gap-2">
                                             <MapPin className="h-4 w-4 text-slate-500" aria-hidden="true" />
-                                            <span className="font-semibold">العنوان</span>
+                                            <span className="font-semibold">العناوين</span>
                                         </div>
                                     </AccordionTrigger>
-                                    <AccordionContent className="space-y-4 pb-4">
-                                        <div className="grid grid-cols-3 gap-4">
-                                            <div className="col-span-2 space-y-2">
-                                                <Label>الشارع</Label>
-                                                <Input
-                                                    placeholder="شارع الملك فهد"
-                                                    className="rounded-xl border-slate-200"
-                                                    value={formData.street}
-                                                    onChange={(e) => handleChange('street', e.target.value)}
-                                                />
+                                    <AccordionContent className="space-y-6 pb-4">
+                                        {/* Headquarters Address */}
+                                        <div className="space-y-4">
+                                            <h4 className="font-semibold text-slate-700 flex items-center gap-2">
+                                                <Building2 className="w-4 h-4" />
+                                                عنوان المقر الرئيسي
+                                            </h4>
+                                            <div className="grid grid-cols-3 gap-4">
+                                                <div className="col-span-2 space-y-2">
+                                                    <Label>الشارع</Label>
+                                                    <Input
+                                                        placeholder="شارع الملك فهد"
+                                                        className="rounded-xl border-slate-200"
+                                                        value={formData.headquartersAddress.street}
+                                                        onChange={(e) => handleAddressChange('headquartersAddress', 'street', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label>رقم المبنى</Label>
+                                                    <Input
+                                                        placeholder="1234"
+                                                        dir="ltr"
+                                                        className="rounded-xl border-slate-200"
+                                                        value={formData.headquartersAddress.buildingNumber}
+                                                        onChange={(e) => handleAddressChange('headquartersAddress', 'buildingNumber', e.target.value)}
+                                                    />
+                                                </div>
                                             </div>
-                                            <div className="space-y-2">
-                                                <Label>رقم المبنى</Label>
-                                                <Input
-                                                    placeholder="1234"
-                                                    dir="ltr"
-                                                    className="rounded-xl border-slate-200"
-                                                    value={formData.buildingNumber}
-                                                    onChange={(e) => handleChange('buildingNumber', e.target.value)}
-                                                />
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label>الحي</Label>
+                                                    <Input
+                                                        placeholder="العليا"
+                                                        className="rounded-xl border-slate-200"
+                                                        value={formData.headquartersAddress.district}
+                                                        onChange={(e) => handleAddressChange('headquartersAddress', 'district', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label>المدينة</Label>
+                                                    <Input
+                                                        placeholder="الرياض"
+                                                        className="rounded-xl border-slate-200"
+                                                        value={formData.headquartersAddress.city}
+                                                        onChange={(e) => handleAddressChange('headquartersAddress', 'city', e.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-3 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label>المنطقة</Label>
+                                                    <Input
+                                                        placeholder="منطقة الرياض"
+                                                        className="rounded-xl border-slate-200"
+                                                        value={formData.headquartersAddress.province}
+                                                        onChange={(e) => handleAddressChange('headquartersAddress', 'province', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label>الرمز البريدي</Label>
+                                                    <Input
+                                                        placeholder="12345"
+                                                        dir="ltr"
+                                                        className="rounded-xl border-slate-200"
+                                                        value={formData.headquartersAddress.postalCode}
+                                                        onChange={(e) => handleAddressChange('headquartersAddress', 'postalCode', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label>الدولة</Label>
+                                                    <Input
+                                                        placeholder="المملكة العربية السعودية"
+                                                        className="rounded-xl border-slate-200"
+                                                        value={formData.headquartersAddress.country}
+                                                        onChange={(e) => handleAddressChange('headquartersAddress', 'country', e.target.value)}
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <Label>الحي</Label>
-                                                <Input
-                                                    placeholder="العليا"
-                                                    className="rounded-xl border-slate-200"
-                                                    value={formData.district}
-                                                    onChange={(e) => handleChange('district', e.target.value)}
-                                                />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label>المدينة</Label>
-                                                <Input
-                                                    placeholder="الرياض"
-                                                    className="rounded-xl border-slate-200"
-                                                    value={formData.city}
-                                                    onChange={(e) => handleChange('city', e.target.value)}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="grid grid-cols-3 gap-4">
-                                            <div className="space-y-2">
-                                                <Label>المنطقة</Label>
-                                                <Input
-                                                    placeholder="منطقة الرياض"
-                                                    className="rounded-xl border-slate-200"
-                                                    value={formData.province}
-                                                    onChange={(e) => handleChange('province', e.target.value)}
-                                                />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label>الرمز البريدي</Label>
-                                                <Input
-                                                    placeholder="12345"
-                                                    dir="ltr"
-                                                    className="rounded-xl border-slate-200"
-                                                    value={formData.postalCode}
-                                                    onChange={(e) => handleChange('postalCode', e.target.value)}
-                                                />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label>الدولة</Label>
-                                                <Input
-                                                    placeholder="المملكة العربية السعودية"
-                                                    className="rounded-xl border-slate-200"
-                                                    value={formData.country}
-                                                    onChange={(e) => handleChange('country', e.target.value)}
-                                                />
-                                            </div>
-                                        </div>
+
+                                        {showAdvanced && (
+                                            <>
+                                                <Separator />
+
+                                                {/* Registered Address */}
+                                                <div className="space-y-4">
+                                                    <div className="flex items-center justify-between">
+                                                        <h4 className="font-semibold text-slate-700 flex items-center gap-2">
+                                                            <FileCheck className="w-4 h-4" />
+                                                            العنوان المسجل
+                                                        </h4>
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={copyHeadquartersToRegistered}
+                                                            className="text-xs"
+                                                        >
+                                                            نسخ من المقر الرئيسي
+                                                        </Button>
+                                                    </div>
+                                                    <div className="grid grid-cols-3 gap-4">
+                                                        <div className="col-span-2 space-y-2">
+                                                            <Label>الشارع</Label>
+                                                            <Input
+                                                                placeholder="شارع الملك فهد"
+                                                                className="rounded-xl border-slate-200"
+                                                                value={formData.registeredAddress.street}
+                                                                onChange={(e) => handleAddressChange('registeredAddress', 'street', e.target.value)}
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label>رقم المبنى</Label>
+                                                            <Input
+                                                                placeholder="1234"
+                                                                dir="ltr"
+                                                                className="rounded-xl border-slate-200"
+                                                                value={formData.registeredAddress.buildingNumber}
+                                                                onChange={(e) => handleAddressChange('registeredAddress', 'buildingNumber', e.target.value)}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div className="space-y-2">
+                                                            <Label>المدينة</Label>
+                                                            <Input
+                                                                placeholder="الرياض"
+                                                                className="rounded-xl border-slate-200"
+                                                                value={formData.registeredAddress.city}
+                                                                onChange={(e) => handleAddressChange('registeredAddress', 'city', e.target.value)}
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label>الرمز البريدي</Label>
+                                                            <Input
+                                                                placeholder="12345"
+                                                                dir="ltr"
+                                                                className="rounded-xl border-slate-200"
+                                                                value={formData.registeredAddress.postalCode}
+                                                                onChange={(e) => handleAddressChange('registeredAddress', 'postalCode', e.target.value)}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <Separator />
+
+                                                {/* Branch Addresses */}
+                                                <div className="space-y-4">
+                                                    <div className="flex items-center justify-between">
+                                                        <h4 className="font-semibold text-slate-700">عناوين الفروع</h4>
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={addBranchAddress}
+                                                            className="text-emerald-600"
+                                                        >
+                                                            <Plus className="w-4 h-4 ms-1" />
+                                                            إضافة فرع
+                                                        </Button>
+                                                    </div>
+                                                    {formData.branchAddresses.length === 0 ? (
+                                                        <p className="text-sm text-slate-500 text-center py-4">لا توجد فروع مضافة</p>
+                                                    ) : (
+                                                        formData.branchAddresses.map((branch, index) => (
+                                                            <div key={index} className="p-4 bg-slate-50 rounded-xl space-y-3">
+                                                                <div className="flex items-center justify-between">
+                                                                    <Label className="font-semibold">الفرع {index + 1}</Label>
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={() => removeBranchAddress(index)}
+                                                                        className="text-red-500"
+                                                                    >
+                                                                        <X className="w-4 h-4" />
+                                                                    </Button>
+                                                                </div>
+                                                                <div className="grid grid-cols-2 gap-3">
+                                                                    <Input
+                                                                        placeholder="اسم الفرع"
+                                                                        value={branch.name}
+                                                                        onChange={(e) => updateBranchAddress(index, 'name', e.target.value)}
+                                                                        className="rounded-xl"
+                                                                    />
+                                                                    <Input
+                                                                        placeholder="المدينة"
+                                                                        value={branch.city}
+                                                                        onChange={(e) => updateBranchAddress(index, 'city', e.target.value)}
+                                                                        className="rounded-xl"
+                                                                    />
+                                                                </div>
+                                                                <Input
+                                                                    placeholder="العنوان"
+                                                                    value={branch.street}
+                                                                    onChange={(e) => updateBranchAddress(index, 'street', e.target.value)}
+                                                                    className="rounded-xl"
+                                                                />
+                                                            </div>
+                                                        ))
+                                                    )}
+                                                </div>
+                                            </>
+                                        )}
                                     </AccordionContent>
                                 </AccordionItem>
 
@@ -944,6 +1451,278 @@ export function CreateOrganizationView() {
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>
+
+                                {/* Financial Details - Advanced Only */}
+                                {showAdvanced && (
+                                    <AccordionItem value="financial" className="border rounded-xl mb-2 px-4 border-blue-200">
+                                        <AccordionTrigger className="hover:no-underline">
+                                            <div className="flex items-center gap-2">
+                                                <Banknote className="h-4 w-4 text-blue-500" />
+                                                <span className="font-semibold text-blue-700">المعلومات المالية</span>
+                                            </div>
+                                        </AccordionTrigger>
+                                        <AccordionContent className="space-y-6 pb-4">
+                                            {/* Banking Details */}
+                                            <div className="space-y-4">
+                                                <h4 className="font-semibold text-slate-700">التفاصيل المصرفية</h4>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label>اسم البنك</Label>
+                                                        <Input
+                                                            placeholder="البنك الأهلي السعودي"
+                                                            className="rounded-xl border-slate-200"
+                                                            value={formData.bankName}
+                                                            onChange={(e) => handleChange('bankName', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label>رقم الحساب</Label>
+                                                        <Input
+                                                            placeholder="Account Number"
+                                                            dir="ltr"
+                                                            className="rounded-xl border-slate-200"
+                                                            value={formData.accountNumber}
+                                                            onChange={(e) => handleChange('accountNumber', e.target.value)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label>رقم الآيبان (IBAN)</Label>
+                                                    <Input
+                                                        placeholder="SA00 0000 0000 0000 0000 0000"
+                                                        dir="ltr"
+                                                        className="rounded-xl border-slate-200"
+                                                        value={formData.iban}
+                                                        onChange={(e) => handleChange('iban', e.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <Separator />
+
+                                            {/* Credit & Payment Terms */}
+                                            <div className="space-y-4">
+                                                <h4 className="font-semibold text-slate-700">الائتمان والشروط</h4>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label>التصنيف الائتماني</Label>
+                                                        <Select value={formData.creditRating} onValueChange={(v) => handleChange('creditRating', v)}>
+                                                            <SelectTrigger className="rounded-xl border-slate-200">
+                                                                <SelectValue placeholder="اختر التصنيف" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {CREDIT_RATINGS.map(cr => (
+                                                                    <SelectItem key={cr.value} value={cr.value}>{cr.label}</SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label>حد الائتمان</Label>
+                                                        <Input
+                                                            placeholder="100,000 SAR"
+                                                            className="rounded-xl border-slate-200"
+                                                            value={formData.creditLimit}
+                                                            onChange={(e) => handleChange('creditLimit', e.target.value)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label>شروط الدفع</Label>
+                                                        <Select value={formData.paymentTerms} onValueChange={(v) => handleChange('paymentTerms', v)}>
+                                                            <SelectTrigger className="rounded-xl border-slate-200">
+                                                                <SelectValue placeholder="اختر الشروط" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {PAYMENT_TERMS.map(pt => (
+                                                                    <SelectItem key={pt.value} value={pt.value}>{pt.label}</SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label>العملة</Label>
+                                                        <Select value={formData.currency} onValueChange={(v) => handleChange('currency', v)}>
+                                                            <SelectTrigger className="rounded-xl border-slate-200">
+                                                                <SelectValue />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {CURRENCIES.map(c => (
+                                                                    <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label>نهاية السنة المالية</Label>
+                                                    <Input
+                                                        type="date"
+                                                        className="rounded-xl border-slate-200"
+                                                        value={formData.fiscalYearEnd}
+                                                        onChange={(e) => handleChange('fiscalYearEnd', e.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                )}
+
+                                {/* Ownership & Relationships - Advanced Only */}
+                                {showAdvanced && (
+                                    <AccordionItem value="ownership" className="border rounded-xl mb-2 px-4 border-purple-200">
+                                        <AccordionTrigger className="hover:no-underline">
+                                            <div className="flex items-center gap-2">
+                                                <Users className="h-4 w-4 text-purple-500" />
+                                                <span className="font-semibold text-purple-700">الملكية والعلاقات</span>
+                                            </div>
+                                        </AccordionTrigger>
+                                        <AccordionContent className="space-y-6 pb-4">
+                                            {/* Parent Company */}
+                                            <div className="space-y-2">
+                                                <Label>الشركة الأم</Label>
+                                                <Input
+                                                    placeholder="اسم الشركة الأم (إن وجدت)"
+                                                    className="rounded-xl border-slate-200"
+                                                    value={formData.parentOrganizationId}
+                                                    onChange={(e) => handleChange('parentOrganizationId', e.target.value)}
+                                                />
+                                            </div>
+
+                                            <Separator />
+
+                                            {/* Shareholders */}
+                                            <div className="space-y-4">
+                                                <div className="flex items-center justify-between">
+                                                    <Label className="font-semibold">المساهمون / الشركاء</Label>
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <Input
+                                                        placeholder="اسم المساهم"
+                                                        className="rounded-xl flex-1"
+                                                        value={shareholderInput.name}
+                                                        onChange={(e) => setShareholderInput(prev => ({ ...prev, name: e.target.value }))}
+                                                    />
+                                                    <Input
+                                                        placeholder="النسبة %"
+                                                        className="rounded-xl w-24"
+                                                        value={shareholderInput.percentage}
+                                                        onChange={(e) => setShareholderInput(prev => ({ ...prev, percentage: e.target.value }))}
+                                                    />
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        onClick={addShareholder}
+                                                        className="rounded-xl"
+                                                    >
+                                                        <Plus className="w-4 h-4" />
+                                                    </Button>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    {formData.shareholders.map((sh, index) => (
+                                                        <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                                                            <span className="font-medium">{sh.name}</span>
+                                                            <div className="flex items-center gap-2">
+                                                                <Badge variant="secondary">{sh.percentage}%</Badge>
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    onClick={() => removeShareholder(index)}
+                                                                    className="text-red-500"
+                                                                >
+                                                                    <X className="w-4 h-4" />
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                )}
+
+                                {/* Law Firm Specific - Advanced Only */}
+                                {showAdvanced && (
+                                    <AccordionItem value="law-firm" className="border rounded-xl mb-2 px-4 border-emerald-200">
+                                        <AccordionTrigger className="hover:no-underline">
+                                            <div className="flex items-center gap-2">
+                                                <Scale className="h-4 w-4 text-emerald-500" />
+                                                <span className="font-semibold text-emerald-700">معلومات مكتب المحاماة</span>
+                                            </div>
+                                        </AccordionTrigger>
+                                        <AccordionContent className="space-y-6 pb-4">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label>عميل منذ</Label>
+                                                    <Input
+                                                        type="date"
+                                                        className="rounded-xl border-slate-200"
+                                                        value={formData.clientSince}
+                                                        onChange={(e) => handleChange('clientSince', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label>حالة التعاقد</Label>
+                                                    <Select value={formData.engagementStatus} onValueChange={(v) => handleChange('engagementStatus', v)}>
+                                                        <SelectTrigger className="rounded-xl border-slate-200">
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {ENGAGEMENT_STATUSES.map(es => (
+                                                                <SelectItem key={es.value} value={es.value}>{es.label}</SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label>الأتعاب الثابتة (Retainer)</Label>
+                                                <Input
+                                                    placeholder="50,000 SAR سنوياً"
+                                                    className="rounded-xl border-slate-200"
+                                                    value={formData.retainer}
+                                                    onChange={(e) => handleChange('retainer', e.target.value)}
+                                                />
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label>مجالات الممارسة المفضلة</Label>
+                                                <Textarea
+                                                    placeholder="القانون التجاري، قانون الشركات، العقود..."
+                                                    className="min-h-[80px] rounded-xl border-slate-200"
+                                                    value={formData.preferredPracticeAreas.join(', ')}
+                                                    onChange={(e) => handleChange('preferredPracticeAreas', e.target.value.split(',').map(s => s.trim()))}
+                                                />
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                )}
+
+                                {/* Documents - Advanced Only */}
+                                {showAdvanced && (
+                                    <AccordionItem value="documents" className="border rounded-xl mb-2 px-4">
+                                        <AccordionTrigger className="hover:no-underline">
+                                            <div className="flex items-center gap-2">
+                                                <Upload className="h-4 w-4 text-slate-500" />
+                                                <span className="font-semibold">المستندات</span>
+                                            </div>
+                                        </AccordionTrigger>
+                                        <AccordionContent className="space-y-4 pb-4">
+                                            <Alert className="bg-blue-50 border-blue-200">
+                                                <FileCheck className="h-4 w-4 text-blue-500" />
+                                                <AlertDescription className="text-blue-700">
+                                                    يمكنك رفع المستندات المطلوبة مثل شهادة السجل التجاري، شهادة الضريبة، الرخصة التجارية، والنظام الأساسي
+                                                </AlertDescription>
+                                            </Alert>
+                                            <div className="space-y-3">
+                                                <p className="text-sm text-slate-500">سيتم إضافة نظام رفع المستندات قريباً</p>
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                )}
                             </Accordion>
 
                             {/* STATUS & TAGS CARD */}
@@ -1035,14 +1814,85 @@ export function CreateOrganizationView() {
 
                                     {/* Notes */}
                                     <div className="space-y-2">
-                                        <Label>ملاحظات</Label>
+                                        <Label>ملاحظات عامة</Label>
                                         <Textarea
-                                            placeholder="أدخل أي ملاحظات إضافية..."
-                                            className="min-h-[120px] rounded-xl border-slate-200"
+                                            placeholder="أدخل أي ملاحظات عامة..."
+                                            className="min-h-[100px] rounded-xl border-slate-200"
                                             value={formData.notes}
                                             onChange={(e) => handleChange('notes', e.target.value)}
                                         />
                                     </div>
+
+                                    {showAdvanced && (
+                                        <>
+                                            <div className="space-y-2">
+                                                <Label>ملاحظات داخلية (خاصة)</Label>
+                                                <Textarea
+                                                    placeholder="ملاحظات داخلية للاستخدام الخاص بالمكتب..."
+                                                    className="min-h-[80px] rounded-xl border-slate-200 bg-slate-50"
+                                                    value={formData.internalNotes}
+                                                    onChange={(e) => handleChange('internalNotes', e.target.value)}
+                                                />
+                                            </div>
+
+                                            <Separator />
+
+                                            {/* Custom Fields */}
+                                            <div className="space-y-4">
+                                                <h4 className="font-semibold text-slate-700 flex items-center gap-2">
+                                                    <Settings className="w-4 h-4" />
+                                                    حقول مخصصة
+                                                </h4>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label>حقل مخصص 1</Label>
+                                                        <Input
+                                                            placeholder="قيمة مخصصة..."
+                                                            className="rounded-xl border-slate-200"
+                                                            value={formData.customField1}
+                                                            onChange={(e) => handleChange('customField1', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label>حقل مخصص 2</Label>
+                                                        <Input
+                                                            placeholder="قيمة مخصصة..."
+                                                            className="rounded-xl border-slate-200"
+                                                            value={formData.customField2}
+                                                            onChange={(e) => handleChange('customField2', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label>حقل مخصص 3</Label>
+                                                        <Input
+                                                            placeholder="قيمة مخصصة..."
+                                                            className="rounded-xl border-slate-200"
+                                                            value={formData.customField3}
+                                                            onChange={(e) => handleChange('customField3', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label>حقل مخصص 4</Label>
+                                                        <Input
+                                                            placeholder="قيمة مخصصة..."
+                                                            className="rounded-xl border-slate-200"
+                                                            value={formData.customField4}
+                                                            onChange={(e) => handleChange('customField4', e.target.value)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label>حقل مخصص 5 (نص طويل)</Label>
+                                                    <Textarea
+                                                        placeholder="نص طويل..."
+                                                        className="min-h-[60px] rounded-xl border-slate-200"
+                                                        value={formData.customField5}
+                                                        onChange={(e) => handleChange('customField5', e.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
                                 </CardContent>
                             </Card>
 

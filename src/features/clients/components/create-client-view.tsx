@@ -8,7 +8,7 @@ import {
     CheckCircle, Search, Briefcase, CreditCard, Users, Shield,
     Clock, Bell, AlertTriangle, Tag, Paperclip, ChevronDown,
     Scale, UserCheck, BadgePercent, Receipt, Globe, Home,
-    Calendar, DollarSign, FileCheck, X, Plus, Trash2, Lock
+    Calendar, DollarSign, FileCheck, X, Plus, Trash2, Lock, Gauge
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -73,7 +73,8 @@ import {
 } from '@/utils/validation-patterns'
 
 // Types
-type ClientType = 'individual' | 'company'
+type ClientType = 'individual' | 'corporate' | 'government'
+type FirmSize = 'solo' | 'small' | 'medium' | 'large'
 type VerificationStatus = 'idle' | 'loading' | 'verified' | 'error'
 
 // Verification response interfaces
@@ -112,6 +113,14 @@ const saudiCities = [
     'الأحساء', 'القطيف', 'خميس مشيط', 'نجران', 'جازان', 'أبها'
 ]
 
+// Firm Size Options
+const FIRM_SIZE_OPTIONS = [
+    { value: 'solo' as const, label: 'ممارس فردي', icon: User, color: 'bg-blue-500' },
+    { value: 'small' as const, label: 'مكتب صغير', icon: Users, color: 'bg-emerald-500' },
+    { value: 'medium' as const, label: 'مكتب متوسط', icon: Building2, color: 'bg-purple-500' },
+    { value: 'large' as const, label: 'شركة محاماة', icon: Building2, color: 'bg-orange-500' },
+]
+
 export function CreateClientView() {
     const { t, i18n } = useTranslation()
     const isArabic = i18n.language === 'ar'
@@ -127,6 +136,10 @@ export function CreateClientView() {
 
     // Client type
     const [clientType, setClientType] = useState<ClientType>('individual')
+
+    // Firm size and advanced view
+    const [firmSize, setFirmSize] = useState<FirmSize>('solo')
+    const [advancedView, setAdvancedView] = useState(false)
 
     // Name entry mode toggle
     const [nameEntryMode, setNameEntryMode] = useState<'full' | 'parts'>('full')
@@ -297,6 +310,72 @@ export function CreateClientView() {
     const [tags, setTags] = useState<string[]>([])
     const [newTag, setNewTag] = useState('')
 
+    // Additional Personal Details (Individual)
+    const [passportNumber, setPassportNumber] = useState('')
+    const [passportExpiry, setPassportExpiry] = useState('')
+    const [maritalStatus, setMaritalStatus] = useState<'single' | 'married' | 'divorced' | 'widowed' | ''>('')
+    const [dependentsCount, setDependentsCount] = useState<number | null>(null)
+
+    // Additional Company Details (Corporate)
+    const [legalName, setLegalName] = useState('')
+    const [tradeName, setTradeName] = useState('')
+    const [iban, setIban] = useState('')
+    const [industry, setIndustry] = useState('')
+    const [companySize, setCompanySize] = useState<'micro' | 'small' | 'medium' | 'large' | 'enterprise' | ''>('')
+    const [foundedDate, setFoundedDate] = useState('')
+    const [fiscalYearEnd, setFiscalYearEnd] = useState('')
+    const [parentCompany, setParentCompany] = useState('')
+
+    // Multiple Addresses
+    const [shippingCity, setShippingCity] = useState('')
+    const [shippingDistrict, setShippingDistrict] = useState('')
+    const [shippingStreet, setShippingStreet] = useState('')
+    const [shippingBuildingNumber, setShippingBuildingNumber] = useState('')
+    const [shippingPostalCode, setShippingPostalCode] = useState('')
+    const [shippingFullAddress, setShippingFullAddress] = useState('')
+    const [registeredCity, setRegisteredCity] = useState('')
+    const [registeredDistrict, setRegisteredDistrict] = useState('')
+    const [registeredStreet, setRegisteredStreet] = useState('')
+    const [registeredBuildingNumber, setRegisteredBuildingNumber] = useState('')
+    const [registeredPostalCode, setRegisteredPostalCode] = useState('')
+    const [registeredFullAddress, setRegisteredFullAddress] = useState('')
+
+    // Financial Details
+    const [bankName, setBankName] = useState('')
+    const [accountNumber, setAccountNumber] = useState('')
+    const [taxExempt, setTaxExempt] = useState(false)
+    const [taxExemptReason, setTaxExemptReason] = useState('')
+
+    // Legal Details (Law Firm)
+    const [clientSinceDate, setClientSinceDate] = useState('')
+    const [engagementLetterStatus, setEngagementLetterStatus] = useState<'pending' | 'sent' | 'signed' | 'expired' | ''>('')
+    const [retainerStatus, setRetainerStatus] = useState<'none' | 'active' | 'expired' | ''>('')
+    const [billingArrangement, setBillingArrangement] = useState<'hourly' | 'flat_fee' | 'contingency' | 'retainer' | 'mixed' | ''>('')
+
+    // Communication Preferences (Extended)
+    const [preferredContactMethod, setPreferredContactMethod] = useState<'phone' | 'email' | 'whatsapp' | 'sms' | ''>('')
+    const [emailOptIn, setEmailOptIn] = useState(true)
+    const [smsOptIn, setSmsOptIn] = useState(true)
+    const [doNotContact, setDoNotContact] = useState(false)
+    const [doNotContactReason, setDoNotContactReason] = useState('')
+
+    // Relationships
+    const [primaryContactName, setPrimaryContactName] = useState('')
+    const [primaryContactPhone, setPrimaryContactPhone] = useState('')
+    const [primaryContactEmail, setPrimaryContactEmail] = useState('')
+    const [billingContactName, setBillingContactName] = useState('')
+    const [billingContactPhone, setBillingContactPhone] = useState('')
+    const [billingContactEmail, setBillingContactEmail] = useState('')
+    const [relatedEntities, setRelatedEntities] = useState<string[]>([])
+    const [newRelatedEntity, setNewRelatedEntity] = useState('')
+    const [referralSourceName, setReferralSourceName] = useState('')
+    const [referralSourceType, setReferralSourceType] = useState<'client' | 'lawyer' | 'website' | 'social' | 'other' | ''>('')
+
+    // Custom Fields
+    const [customFields, setCustomFields] = useState<Array<{ key: string; value: string }>>([])
+    const [newCustomFieldKey, setNewCustomFieldKey] = useState('')
+    const [newCustomFieldValue, setNewCustomFieldValue] = useState('')
+
     // Attachments
     const [attachments, setAttachments] = useState<File[]>([])
 
@@ -413,7 +492,7 @@ export function CreateClientView() {
                     message: getErrorMessage('nationalId', isArabic ? 'ar' : 'en')
                 })
             }
-        } else if (clientType === 'company') {
+        } else if (clientType === 'corporate' || clientType === 'government') {
             // Commercial Registration validation
             if (crNumber && !isValidCrNumber(crNumber)) {
                 errors.push({
@@ -622,10 +701,11 @@ export function CreateClientView() {
                                 <CardHeader className="pb-4">
                                     <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
                                         <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
-                                        نوع العميل                                     </CardTitle>
+                                        نوع العميل
+                                    </CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-3 gap-4">
                                         <button
                                             type="button"
                                             onClick={() => setClientType('individual')}
@@ -644,23 +724,107 @@ export function CreateClientView() {
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={() => setClientType('company')}
+                                            onClick={() => setClientType('corporate')}
                                             className={cn(
                                                 "p-6 rounded-xl border-2 transition-all text-center",
-                                                clientType === 'company'
+                                                clientType === 'corporate'
                                                     ? "border-emerald-500 bg-emerald-50"
                                                     : "border-slate-200 hover:border-slate-300"
                                             )}
                                         >
-                                            <Building2 className={cn("w-8 h-8 mx-auto mb-2", clientType === 'company' ? "text-emerald-600" : "text-slate-500")} />
-                                            <span className={cn("text-lg font-medium", clientType === 'company' ? "text-emerald-700" : "text-slate-600")}>
+                                            <Building2 className={cn("w-8 h-8 mx-auto mb-2", clientType === 'corporate' ? "text-emerald-600" : "text-slate-500")} />
+                                            <span className={cn("text-lg font-medium", clientType === 'corporate' ? "text-emerald-700" : "text-slate-600")}>
                                                 شركة
                                             </span>
                                             <p className="text-xs text-slate-500 mt-1">منشأة تجارية</p>
                                         </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setClientType('government')}
+                                            className={cn(
+                                                "p-6 rounded-xl border-2 transition-all text-center",
+                                                clientType === 'government'
+                                                    ? "border-emerald-500 bg-emerald-50"
+                                                    : "border-slate-200 hover:border-slate-300"
+                                            )}
+                                        >
+                                            <Scale className={cn("w-8 h-8 mx-auto mb-2", clientType === 'government' ? "text-emerald-600" : "text-slate-500")} />
+                                            <span className={cn("text-lg font-medium", clientType === 'government' ? "text-emerald-700" : "text-slate-600")}>
+                                                حكومي
+                                            </span>
+                                            <p className="text-xs text-slate-500 mt-1">جهة حكومية</p>
+                                        </button>
                                     </div>
                                 </CardContent>
                             </Card>
+
+                            {/* FIRM SIZE SELECTOR */}
+                            <Card className="rounded-3xl shadow-sm border-slate-100 bg-gradient-to-br from-blue-50 to-purple-50">
+                                <CardHeader className="pb-4">
+                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                        <Building2 className="w-5 h-5 text-blue-500" aria-hidden="true" />
+                                        حجم المكتب / الشركة
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                        {FIRM_SIZE_OPTIONS.map((option) => {
+                                            const Icon = option.icon
+                                            return (
+                                                <button
+                                                    key={option.value}
+                                                    type="button"
+                                                    onClick={() => setFirmSize(option.value)}
+                                                    className={cn(
+                                                        "p-4 rounded-xl border-2 transition-all text-center relative overflow-hidden",
+                                                        firmSize === option.value
+                                                            ? "border-emerald-500 bg-white shadow-lg scale-105"
+                                                            : "border-slate-200 bg-white/50 hover:border-slate-300 hover:bg-white"
+                                                    )}
+                                                >
+                                                    <Icon className={cn("w-6 h-6 mx-auto mb-2", firmSize === option.value ? "text-emerald-600" : "text-slate-500")} />
+                                                    <span className={cn("text-sm font-medium block", firmSize === option.value ? "text-emerald-700" : "text-slate-600")}>
+                                                        {option.label}
+                                                    </span>
+                                                    {firmSize === option.value && (
+                                                        <div className="absolute top-2 left-2">
+                                                            <CheckCircle className="w-4 h-4 text-emerald-500" />
+                                                        </div>
+                                                    )}
+                                                </button>
+                                            )
+                                        })}
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* ADVANCED VIEW TOGGLE */}
+                            {firmSize !== 'solo' && (
+                                <Card className="rounded-3xl shadow-sm border-slate-100">
+                                    <CardContent className="pt-6">
+                                        <div className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-purple-50 to-blue-50">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 rounded-lg bg-white shadow-sm">
+                                                    <Gauge className="w-5 h-5 text-purple-600" />
+                                                </div>
+                                                <div>
+                                                    <Label className="text-sm font-bold text-slate-800 cursor-pointer">
+                                                        العرض المتقدم
+                                                    </Label>
+                                                    <p className="text-xs text-slate-600">
+                                                        {advancedView ? 'عرض جميع الحقول والخيارات المتقدمة' : 'عرض الحقول الأساسية فقط'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <Switch
+                                                checked={advancedView}
+                                                onCheckedChange={setAdvancedView}
+                                                className="data-[state=checked]:bg-emerald-500"
+                                            />
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )}
 
                             {/* INDIVIDUAL FORM */}
                             {clientType === 'individual' && (
@@ -813,13 +977,13 @@ export function CreateClientView() {
                             )}
 
                             {/* COMPANY FORM */}
-                            {clientType === 'company' && (
+                            {(clientType === 'corporate' || clientType === 'government') && (
                                 <Card className="rounded-3xl shadow-sm border-slate-100">
                                     <CardHeader className="pb-4">
                                         <div className="flex items-center justify-between">
                                             <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
                                                 <Building2 className="w-5 h-5 text-emerald-500" aria-hidden="true" />
-                                                معلومات الشركة
+                                                {clientType === 'government' ? 'معلومات الجهة الحكومية' : 'معلومات الشركة'}
                                             </CardTitle>
                                             <VerificationBadge service="وثق" status={wathqStatus} />
                                         </div>
@@ -1842,6 +2006,784 @@ export function CreateClientView() {
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>
+
+                                {/* ADVANCED SECTIONS - Only show if advancedView is enabled */}
+                                {advancedView && (
+                                    <>
+                                        {/* Personal Details (Individual) */}
+                                        {clientType === 'individual' && (
+                                            <AccordionItem value="personal_details" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
+                                                <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
+                                                    <div className="flex items-center gap-2">
+                                                        <UserCheck className="h-5 w-5 text-blue-500" />
+                                                        <span className="font-bold text-slate-800">التفاصيل الشخصية</span>
+                                                    </div>
+                                                </AccordionTrigger>
+                                                <AccordionContent className="px-6 pb-6">
+                                                    <div className="space-y-4">
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">رقم جواز السفر</Label>
+                                                                <Input
+                                                                    value={passportNumber}
+                                                                    onChange={(e) => setPassportNumber(e.target.value)}
+                                                                    placeholder="A12345678"
+                                                                    className="rounded-xl border-slate-200"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">تاريخ انتهاء الجواز</Label>
+                                                                <Input
+                                                                    type="date"
+                                                                    value={passportExpiry}
+                                                                    onChange={(e) => setPassportExpiry(e.target.value)}
+                                                                    className="rounded-xl border-slate-200"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">الحالة الاجتماعية</Label>
+                                                                <Select value={maritalStatus} onValueChange={(v) => setMaritalStatus(v as any)}>
+                                                                    <SelectTrigger className="rounded-xl border-slate-200">
+                                                                        <SelectValue placeholder="اختر الحالة" />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        <SelectItem value="single">أعزب/عزباء</SelectItem>
+                                                                        <SelectItem value="married">متزوج/متزوجة</SelectItem>
+                                                                        <SelectItem value="divorced">مطلق/مطلقة</SelectItem>
+                                                                        <SelectItem value="widowed">أرمل/أرملة</SelectItem>
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">عدد المعالين</Label>
+                                                                <Input
+                                                                    type="number"
+                                                                    value={dependentsCount || ''}
+                                                                    onChange={(e) => setDependentsCount(e.target.value ? parseInt(e.target.value) : null)}
+                                                                    placeholder="0"
+                                                                    className="rounded-xl border-slate-200"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </AccordionContent>
+                                            </AccordionItem>
+                                        )}
+
+                                        {/* Company Details (Corporate) */}
+                                        {(clientType === 'corporate' || clientType === 'government') && (
+                                            <AccordionItem value="company_details" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
+                                                <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
+                                                    <div className="flex items-center gap-2">
+                                                        <Building2 className="h-5 w-5 text-purple-500" />
+                                                        <span className="font-bold text-slate-800">تفاصيل الشركة المتقدمة</span>
+                                                    </div>
+                                                </AccordionTrigger>
+                                                <AccordionContent className="px-6 pb-6">
+                                                    <div className="space-y-4">
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">الاسم القانوني</Label>
+                                                                <Input
+                                                                    value={legalName}
+                                                                    onChange={(e) => setLegalName(e.target.value)}
+                                                                    placeholder="الاسم القانوني الكامل"
+                                                                    className="rounded-xl border-slate-200"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">الاسم التجاري</Label>
+                                                                <Input
+                                                                    value={tradeName}
+                                                                    onChange={(e) => setTradeName(e.target.value)}
+                                                                    placeholder="الاسم التجاري"
+                                                                    className="rounded-xl border-slate-200"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">رقم الآيبان</Label>
+                                                                <Input
+                                                                    value={iban}
+                                                                    onChange={(e) => setIban(e.target.value)}
+                                                                    placeholder="SA00 0000 0000 0000 0000 0000"
+                                                                    className="rounded-xl border-slate-200"
+                                                                    dir="ltr"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">القطاع / الصناعة</Label>
+                                                                <Input
+                                                                    value={industry}
+                                                                    onChange={(e) => setIndustry(e.target.value)}
+                                                                    placeholder="مثال: تقنية المعلومات"
+                                                                    className="rounded-xl border-slate-200"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">حجم الشركة</Label>
+                                                                <Select value={companySize} onValueChange={(v) => setCompanySize(v as any)}>
+                                                                    <SelectTrigger className="rounded-xl border-slate-200">
+                                                                        <SelectValue placeholder="اختر الحجم" />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        <SelectItem value="micro">صغيرة جداً (1-5)</SelectItem>
+                                                                        <SelectItem value="small">صغيرة (6-50)</SelectItem>
+                                                                        <SelectItem value="medium">متوسطة (51-250)</SelectItem>
+                                                                        <SelectItem value="large">كبيرة (251-1000)</SelectItem>
+                                                                        <SelectItem value="enterprise">مؤسسة (1000+)</SelectItem>
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">تاريخ التأسيس</Label>
+                                                                <Input
+                                                                    type="date"
+                                                                    value={foundedDate}
+                                                                    onChange={(e) => setFoundedDate(e.target.value)}
+                                                                    className="rounded-xl border-slate-200"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">نهاية السنة المالية</Label>
+                                                                <Input
+                                                                    type="date"
+                                                                    value={fiscalYearEnd}
+                                                                    onChange={(e) => setFiscalYearEnd(e.target.value)}
+                                                                    className="rounded-xl border-slate-200"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">الشركة الأم</Label>
+                                                                <Input
+                                                                    value={parentCompany}
+                                                                    onChange={(e) => setParentCompany(e.target.value)}
+                                                                    placeholder="اسم الشركة الأم (إن وجد)"
+                                                                    className="rounded-xl border-slate-200"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </AccordionContent>
+                                            </AccordionItem>
+                                        )}
+
+                                        {/* Multiple Addresses */}
+                                        <AccordionItem value="addresses" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
+                                            <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
+                                                <div className="flex items-center gap-2">
+                                                    <MapPin className="h-5 w-5 text-orange-500" />
+                                                    <span className="font-bold text-slate-800">العناوين المتعددة</span>
+                                                </div>
+                                            </AccordionTrigger>
+                                            <AccordionContent className="px-6 pb-6">
+                                                <div className="space-y-6">
+                                                    {/* Shipping Address */}
+                                                    <div className="p-4 bg-blue-50 rounded-xl space-y-4">
+                                                        <h4 className="font-bold text-blue-900 flex items-center gap-2">
+                                                            <Home className="w-4 h-4" />
+                                                            عنوان الشحن
+                                                        </h4>
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">المدينة</Label>
+                                                                <Select value={shippingCity} onValueChange={setShippingCity}>
+                                                                    <SelectTrigger className="rounded-xl border-slate-200 bg-white">
+                                                                        <SelectValue placeholder="اختر المدينة" />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        {saudiCities.map((cityName) => (
+                                                                            <SelectItem key={cityName} value={cityName}>{cityName}</SelectItem>
+                                                                        ))}
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">الحي</Label>
+                                                                <Input
+                                                                    value={shippingDistrict}
+                                                                    onChange={(e) => setShippingDistrict(e.target.value)}
+                                                                    placeholder="اسم الحي"
+                                                                    className="rounded-xl border-slate-200 bg-white"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">الشارع</Label>
+                                                                <Input
+                                                                    value={shippingStreet}
+                                                                    onChange={(e) => setShippingStreet(e.target.value)}
+                                                                    placeholder="اسم الشارع"
+                                                                    className="rounded-xl border-slate-200 bg-white"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">رقم المبنى</Label>
+                                                                <Input
+                                                                    value={shippingBuildingNumber}
+                                                                    onChange={(e) => setShippingBuildingNumber(e.target.value)}
+                                                                    placeholder="1234"
+                                                                    className="rounded-xl border-slate-200 bg-white"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">الرمز البريدي</Label>
+                                                                <Input
+                                                                    value={shippingPostalCode}
+                                                                    onChange={(e) => setShippingPostalCode(e.target.value)}
+                                                                    placeholder="12345"
+                                                                    className="rounded-xl border-slate-200 bg-white"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2 md:col-span-2">
+                                                                <Label className="text-sm font-medium text-slate-700">العنوان الكامل</Label>
+                                                                <Textarea
+                                                                    value={shippingFullAddress}
+                                                                    onChange={(e) => setShippingFullAddress(e.target.value)}
+                                                                    placeholder="العنوان الكامل"
+                                                                    className="rounded-xl border-slate-200 bg-white min-h-[80px]"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Registered Address */}
+                                                    <div className="p-4 bg-purple-50 rounded-xl space-y-4">
+                                                        <h4 className="font-bold text-purple-900 flex items-center gap-2">
+                                                            <Building2 className="w-4 h-4" />
+                                                            العنوان المسجل
+                                                        </h4>
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">المدينة</Label>
+                                                                <Select value={registeredCity} onValueChange={setRegisteredCity}>
+                                                                    <SelectTrigger className="rounded-xl border-slate-200 bg-white">
+                                                                        <SelectValue placeholder="اختر المدينة" />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        {saudiCities.map((cityName) => (
+                                                                            <SelectItem key={cityName} value={cityName}>{cityName}</SelectItem>
+                                                                        ))}
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">الحي</Label>
+                                                                <Input
+                                                                    value={registeredDistrict}
+                                                                    onChange={(e) => setRegisteredDistrict(e.target.value)}
+                                                                    placeholder="اسم الحي"
+                                                                    className="rounded-xl border-slate-200 bg-white"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">الشارع</Label>
+                                                                <Input
+                                                                    value={registeredStreet}
+                                                                    onChange={(e) => setRegisteredStreet(e.target.value)}
+                                                                    placeholder="اسم الشارع"
+                                                                    className="rounded-xl border-slate-200 bg-white"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">رقم المبنى</Label>
+                                                                <Input
+                                                                    value={registeredBuildingNumber}
+                                                                    onChange={(e) => setRegisteredBuildingNumber(e.target.value)}
+                                                                    placeholder="1234"
+                                                                    className="rounded-xl border-slate-200 bg-white"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">الرمز البريدي</Label>
+                                                                <Input
+                                                                    value={registeredPostalCode}
+                                                                    onChange={(e) => setRegisteredPostalCode(e.target.value)}
+                                                                    placeholder="12345"
+                                                                    className="rounded-xl border-slate-200 bg-white"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2 md:col-span-2">
+                                                                <Label className="text-sm font-medium text-slate-700">العنوان الكامل</Label>
+                                                                <Textarea
+                                                                    value={registeredFullAddress}
+                                                                    onChange={(e) => setRegisteredFullAddress(e.target.value)}
+                                                                    placeholder="العنوان الكامل"
+                                                                    className="rounded-xl border-slate-200 bg-white min-h-[80px]"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </AccordionContent>
+                                        </AccordionItem>
+
+                                        {/* Financial Details */}
+                                        <AccordionItem value="financial" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
+                                            <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
+                                                <div className="flex items-center gap-2">
+                                                    <DollarSign className="h-5 w-5 text-green-500" />
+                                                    <span className="font-bold text-slate-800">التفاصيل المالية المتقدمة</span>
+                                                </div>
+                                            </AccordionTrigger>
+                                            <AccordionContent className="px-6 pb-6">
+                                                <div className="space-y-4">
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <div className="space-y-2">
+                                                            <Label className="text-sm font-medium text-slate-700">اسم البنك</Label>
+                                                            <Input
+                                                                value={bankName}
+                                                                onChange={(e) => setBankName(e.target.value)}
+                                                                placeholder="مثال: البنك الأهلي السعودي"
+                                                                className="rounded-xl border-slate-200"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label className="text-sm font-medium text-slate-700">رقم الحساب</Label>
+                                                            <Input
+                                                                value={accountNumber}
+                                                                onChange={(e) => setAccountNumber(e.target.value)}
+                                                                placeholder="1234567890"
+                                                                className="rounded-xl border-slate-200"
+                                                                dir="ltr"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-4 p-4 bg-amber-50 rounded-xl">
+                                                        <Checkbox
+                                                            checked={taxExempt}
+                                                            onCheckedChange={(checked) => setTaxExempt(!!checked)}
+                                                        />
+                                                        <div className="flex-1">
+                                                            <Label className="text-sm font-medium text-slate-700 cursor-pointer">
+                                                                معفى من الضريبة
+                                                            </Label>
+                                                            {taxExempt && (
+                                                                <div className="mt-2">
+                                                                    <Label className="text-xs text-slate-600">سبب الإعفاء</Label>
+                                                                    <Input
+                                                                        value={taxExemptReason}
+                                                                        onChange={(e) => setTaxExemptReason(e.target.value)}
+                                                                        placeholder="أدخل سبب الإعفاء"
+                                                                        className="rounded-xl border-slate-200 bg-white mt-1"
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </AccordionContent>
+                                        </AccordionItem>
+
+                                        {/* Legal Details (Law Firm) */}
+                                        <AccordionItem value="legal_details" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
+                                            <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
+                                                <div className="flex items-center gap-2">
+                                                    <Scale className="h-5 w-5 text-indigo-500" />
+                                                    <span className="font-bold text-slate-800">التفاصيل القانونية (مكتب المحاماة)</span>
+                                                </div>
+                                            </AccordionTrigger>
+                                            <AccordionContent className="px-6 pb-6">
+                                                <div className="space-y-4">
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <div className="space-y-2">
+                                                            <Label className="text-sm font-medium text-slate-700">تاريخ بدء التعامل</Label>
+                                                            <Input
+                                                                type="date"
+                                                                value={clientSinceDate}
+                                                                onChange={(e) => setClientSinceDate(e.target.value)}
+                                                                className="rounded-xl border-slate-200"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label className="text-sm font-medium text-slate-700">حالة خطاب التعاقد</Label>
+                                                            <Select value={engagementLetterStatus} onValueChange={(v) => setEngagementLetterStatus(v as any)}>
+                                                                <SelectTrigger className="rounded-xl border-slate-200">
+                                                                    <SelectValue placeholder="اختر الحالة" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="pending">قيد الانتظار</SelectItem>
+                                                                    <SelectItem value="sent">تم الإرسال</SelectItem>
+                                                                    <SelectItem value="signed">موقع</SelectItem>
+                                                                    <SelectItem value="expired">منتهي</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label className="text-sm font-medium text-slate-700">حالة الاتفاقية السنوية</Label>
+                                                            <Select value={retainerStatus} onValueChange={(v) => setRetainerStatus(v as any)}>
+                                                                <SelectTrigger className="rounded-xl border-slate-200">
+                                                                    <SelectValue placeholder="اختر الحالة" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="none">لا يوجد</SelectItem>
+                                                                    <SelectItem value="active">نشط</SelectItem>
+                                                                    <SelectItem value="expired">منتهي</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label className="text-sm font-medium text-slate-700">نظام الفوترة</Label>
+                                                            <Select value={billingArrangement} onValueChange={(v) => setBillingArrangement(v as any)}>
+                                                                <SelectTrigger className="rounded-xl border-slate-200">
+                                                                    <SelectValue placeholder="اختر النظام" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="hourly">بالساعة</SelectItem>
+                                                                    <SelectItem value="flat_fee">رسوم ثابتة</SelectItem>
+                                                                    <SelectItem value="contingency">نسبة من النتيجة</SelectItem>
+                                                                    <SelectItem value="retainer">اتفاقية سنوية</SelectItem>
+                                                                    <SelectItem value="mixed">مختلط</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </AccordionContent>
+                                        </AccordionItem>
+
+                                        {/* Communication Preferences */}
+                                        <AccordionItem value="comm_preferences" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
+                                            <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
+                                                <div className="flex items-center gap-2">
+                                                    <Bell className="h-5 w-5 text-cyan-500" />
+                                                    <span className="font-bold text-slate-800">تفضيلات التواصل المتقدمة</span>
+                                                </div>
+                                            </AccordionTrigger>
+                                            <AccordionContent className="px-6 pb-6">
+                                                <div className="space-y-4">
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <div className="space-y-2">
+                                                            <Label className="text-sm font-medium text-slate-700">طريقة التواصل المفضلة</Label>
+                                                            <Select value={preferredContactMethod} onValueChange={(v) => setPreferredContactMethod(v as any)}>
+                                                                <SelectTrigger className="rounded-xl border-slate-200">
+                                                                    <SelectValue placeholder="اختر الطريقة" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="phone">هاتف</SelectItem>
+                                                                    <SelectItem value="email">بريد إلكتروني</SelectItem>
+                                                                    <SelectItem value="whatsapp">واتساب</SelectItem>
+                                                                    <SelectItem value="sms">رسائل نصية</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-3 p-4 bg-slate-50 rounded-xl">
+                                                        <div className="flex items-center justify-between">
+                                                            <Label className="text-sm font-medium text-slate-700">الموافقة على البريد الإلكتروني</Label>
+                                                            <Switch
+                                                                checked={emailOptIn}
+                                                                onCheckedChange={setEmailOptIn}
+                                                                className="data-[state=checked]:bg-emerald-500"
+                                                            />
+                                                        </div>
+                                                        <div className="flex items-center justify-between">
+                                                            <Label className="text-sm font-medium text-slate-700">الموافقة على الرسائل النصية</Label>
+                                                            <Switch
+                                                                checked={smsOptIn}
+                                                                onCheckedChange={setSmsOptIn}
+                                                                className="data-[state=checked]:bg-emerald-500"
+                                                            />
+                                                        </div>
+                                                        <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                                                            <Label className="text-sm font-medium text-red-700">عدم التواصل</Label>
+                                                            <Switch
+                                                                checked={doNotContact}
+                                                                onCheckedChange={setDoNotContact}
+                                                                className="data-[state=checked]:bg-red-500"
+                                                            />
+                                                        </div>
+                                                        {doNotContact && (
+                                                            <div className="space-y-2">
+                                                                <Label className="text-xs text-slate-600">سبب عدم التواصل</Label>
+                                                                <Textarea
+                                                                    value={doNotContactReason}
+                                                                    onChange={(e) => setDoNotContactReason(e.target.value)}
+                                                                    placeholder="أدخل السبب"
+                                                                    className="rounded-xl border-slate-200 bg-white min-h-[60px]"
+                                                                />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </AccordionContent>
+                                        </AccordionItem>
+
+                                        {/* Relationships */}
+                                        <AccordionItem value="relationships" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
+                                            <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
+                                                <div className="flex items-center gap-2">
+                                                    <Users className="h-5 w-5 text-pink-500" />
+                                                    <span className="font-bold text-slate-800">العلاقات والجهات المرتبطة</span>
+                                                </div>
+                                            </AccordionTrigger>
+                                            <AccordionContent className="px-6 pb-6">
+                                                <div className="space-y-6">
+                                                    {/* Primary Contact */}
+                                                    <div className="p-4 bg-blue-50 rounded-xl space-y-4">
+                                                        <h4 className="font-bold text-blue-900 flex items-center gap-2">
+                                                            <User className="w-4 h-4" />
+                                                            جهة الاتصال الرئيسية
+                                                        </h4>
+                                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">الاسم</Label>
+                                                                <Input
+                                                                    value={primaryContactName}
+                                                                    onChange={(e) => setPrimaryContactName(e.target.value)}
+                                                                    placeholder="اسم جهة الاتصال"
+                                                                    className="rounded-xl border-slate-200 bg-white"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">الهاتف</Label>
+                                                                <Input
+                                                                    value={primaryContactPhone}
+                                                                    onChange={(e) => setPrimaryContactPhone(e.target.value)}
+                                                                    placeholder="05xxxxxxxx"
+                                                                    className="rounded-xl border-slate-200 bg-white"
+                                                                    dir="ltr"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">البريد الإلكتروني</Label>
+                                                                <Input
+                                                                    type="email"
+                                                                    value={primaryContactEmail}
+                                                                    onChange={(e) => setPrimaryContactEmail(e.target.value)}
+                                                                    placeholder="email@example.com"
+                                                                    className="rounded-xl border-slate-200 bg-white"
+                                                                    dir="ltr"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Billing Contact */}
+                                                    <div className="p-4 bg-green-50 rounded-xl space-y-4">
+                                                        <h4 className="font-bold text-green-900 flex items-center gap-2">
+                                                            <Receipt className="w-4 h-4" />
+                                                            جهة الاتصال المالية
+                                                        </h4>
+                                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">الاسم</Label>
+                                                                <Input
+                                                                    value={billingContactName}
+                                                                    onChange={(e) => setBillingContactName(e.target.value)}
+                                                                    placeholder="اسم المسؤول المالي"
+                                                                    className="rounded-xl border-slate-200 bg-white"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">الهاتف</Label>
+                                                                <Input
+                                                                    value={billingContactPhone}
+                                                                    onChange={(e) => setBillingContactPhone(e.target.value)}
+                                                                    placeholder="05xxxxxxxx"
+                                                                    className="rounded-xl border-slate-200 bg-white"
+                                                                    dir="ltr"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-medium text-slate-700">البريد الإلكتروني</Label>
+                                                                <Input
+                                                                    type="email"
+                                                                    value={billingContactEmail}
+                                                                    onChange={(e) => setBillingContactEmail(e.target.value)}
+                                                                    placeholder="billing@example.com"
+                                                                    className="rounded-xl border-slate-200 bg-white"
+                                                                    dir="ltr"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Related Entities */}
+                                                    <div className="space-y-2">
+                                                        <Label className="text-sm font-medium text-slate-700">الجهات المرتبطة</Label>
+                                                        <div className="flex gap-2">
+                                                            <Input
+                                                                value={newRelatedEntity}
+                                                                onChange={(e) => setNewRelatedEntity(e.target.value)}
+                                                                placeholder="أضف جهة مرتبطة"
+                                                                className="flex-1 rounded-xl border-slate-200"
+                                                                onKeyPress={(e) => {
+                                                                    if (e.key === 'Enter') {
+                                                                        e.preventDefault()
+                                                                        if (newRelatedEntity.trim()) {
+                                                                            setRelatedEntities([...relatedEntities, newRelatedEntity.trim()])
+                                                                            setNewRelatedEntity('')
+                                                                        }
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <Button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    if (newRelatedEntity.trim()) {
+                                                                        setRelatedEntities([...relatedEntities, newRelatedEntity.trim()])
+                                                                        setNewRelatedEntity('')
+                                                                    }
+                                                                }}
+                                                                variant="outline"
+                                                                className="rounded-xl"
+                                                            >
+                                                                <Plus className="w-4 h-4" />
+                                                            </Button>
+                                                        </div>
+                                                        {relatedEntities.length > 0 && (
+                                                            <div className="flex flex-wrap gap-2 mt-2">
+                                                                {relatedEntities.map((entity, index) => (
+                                                                    <Badge key={index} variant="secondary" className="rounded-full">
+                                                                        {entity}
+                                                                        <button
+                                                                            onClick={() => setRelatedEntities(relatedEntities.filter((_, i) => i !== index))}
+                                                                            className="ms-1 hover:text-red-500"
+                                                                        >
+                                                                            <X className="w-3 h-3" />
+                                                                        </button>
+                                                                    </Badge>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Referral Source */}
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <div className="space-y-2">
+                                                            <Label className="text-sm font-medium text-slate-700">مصدر الإحالة</Label>
+                                                            <Input
+                                                                value={referralSourceName}
+                                                                onChange={(e) => setReferralSourceName(e.target.value)}
+                                                                placeholder="اسم الجهة المحيلة"
+                                                                className="rounded-xl border-slate-200"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label className="text-sm font-medium text-slate-700">نوع المصدر</Label>
+                                                            <Select value={referralSourceType} onValueChange={(v) => setReferralSourceType(v as any)}>
+                                                                <SelectTrigger className="rounded-xl border-slate-200">
+                                                                    <SelectValue placeholder="اختر النوع" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="client">عميل حالي</SelectItem>
+                                                                    <SelectItem value="lawyer">محامي آخر</SelectItem>
+                                                                    <SelectItem value="website">موقع إلكتروني</SelectItem>
+                                                                    <SelectItem value="social">وسائل التواصل</SelectItem>
+                                                                    <SelectItem value="other">أخرى</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </AccordionContent>
+                                        </AccordionItem>
+
+                                        {/* Documents */}
+                                        <AccordionItem value="documents" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
+                                            <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
+                                                <div className="flex items-center gap-2">
+                                                    <Paperclip className="h-5 w-5 text-teal-500" />
+                                                    <span className="font-bold text-slate-800">المستندات والمرفقات</span>
+                                                </div>
+                                            </AccordionTrigger>
+                                            <AccordionContent className="px-6 pb-6">
+                                                <div className="space-y-4">
+                                                    <Alert className="border-blue-200 bg-blue-50">
+                                                        <FileText className="h-4 w-4 text-blue-600" />
+                                                        <AlertDescription className="text-blue-800">
+                                                            يمكنك تحميل المستندات الداعمة مثل: الهوية الوطنية، السجل التجاري، العقود، التوكيلات، إلخ.
+                                                        </AlertDescription>
+                                                    </Alert>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <div className="p-6 border-2 border-dashed border-slate-300 rounded-xl text-center hover:border-emerald-400 transition-colors cursor-pointer">
+                                                            <Paperclip className="w-8 h-8 mx-auto mb-2 text-slate-400" />
+                                                            <p className="text-sm font-medium text-slate-600">الهوية الوطنية / الإقامة</p>
+                                                            <p className="text-xs text-slate-500 mt-1">اضغط لتحميل</p>
+                                                        </div>
+                                                        <div className="p-6 border-2 border-dashed border-slate-300 rounded-xl text-center hover:border-emerald-400 transition-colors cursor-pointer">
+                                                            <Paperclip className="w-8 h-8 mx-auto mb-2 text-slate-400" />
+                                                            <p className="text-sm font-medium text-slate-600">السجل التجاري</p>
+                                                            <p className="text-xs text-slate-500 mt-1">اضغط لتحميل</p>
+                                                        </div>
+                                                        <div className="p-6 border-2 border-dashed border-slate-300 rounded-xl text-center hover:border-emerald-400 transition-colors cursor-pointer">
+                                                            <Paperclip className="w-8 h-8 mx-auto mb-2 text-slate-400" />
+                                                            <p className="text-sm font-medium text-slate-600">عقد التأسيس</p>
+                                                            <p className="text-xs text-slate-500 mt-1">اضغط لتحميل</p>
+                                                        </div>
+                                                        <div className="p-6 border-2 border-dashed border-slate-300 rounded-xl text-center hover:border-emerald-400 transition-colors cursor-pointer">
+                                                            <Paperclip className="w-8 h-8 mx-auto mb-2 text-slate-400" />
+                                                            <p className="text-sm font-medium text-slate-600">مستندات أخرى</p>
+                                                            <p className="text-xs text-slate-500 mt-1">اضغط لتحميل</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </AccordionContent>
+                                        </AccordionItem>
+
+                                        {/* Custom Fields */}
+                                        <AccordionItem value="custom_fields" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
+                                            <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
+                                                <div className="flex items-center gap-2">
+                                                    <Globe className="h-5 w-5 text-violet-500" />
+                                                    <span className="font-bold text-slate-800">الحقول المخصصة</span>
+                                                </div>
+                                            </AccordionTrigger>
+                                            <AccordionContent className="px-6 pb-6">
+                                                <div className="space-y-4">
+                                                    <div className="flex gap-2">
+                                                        <Input
+                                                            value={newCustomFieldKey}
+                                                            onChange={(e) => setNewCustomFieldKey(e.target.value)}
+                                                            placeholder="اسم الحقل"
+                                                            className="flex-1 rounded-xl border-slate-200"
+                                                        />
+                                                        <Input
+                                                            value={newCustomFieldValue}
+                                                            onChange={(e) => setNewCustomFieldValue(e.target.value)}
+                                                            placeholder="القيمة"
+                                                            className="flex-1 rounded-xl border-slate-200"
+                                                        />
+                                                        <Button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                if (newCustomFieldKey.trim() && newCustomFieldValue.trim()) {
+                                                                    setCustomFields([...customFields, { key: newCustomFieldKey.trim(), value: newCustomFieldValue.trim() }])
+                                                                    setNewCustomFieldKey('')
+                                                                    setNewCustomFieldValue('')
+                                                                }
+                                                            }}
+                                                            variant="outline"
+                                                            className="rounded-xl"
+                                                        >
+                                                            <Plus className="w-4 h-4" />
+                                                        </Button>
+                                                    </div>
+                                                    {customFields.length > 0 && (
+                                                        <div className="space-y-2">
+                                                            {customFields.map((field, index) => (
+                                                                <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                                                                    <div>
+                                                                        <span className="font-medium text-slate-700">{field.key}:</span>
+                                                                        <span className="text-slate-600 ms-2">{field.value}</span>
+                                                                    </div>
+                                                                    <Button
+                                                                        type="button"
+                                                                        onClick={() => setCustomFields(customFields.filter((_, i) => i !== index))}
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        className="text-red-500 hover:text-red-700"
+                                                                    >
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                    </Button>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    </>
+                                )}
                             </Accordion>
 
                             {/* ACTION BUTTONS */}

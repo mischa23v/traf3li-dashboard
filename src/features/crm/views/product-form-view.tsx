@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import i18n from '@/i18n'
 import {
     Save, FileText, Package, DollarSign, Settings,
     Plus, X, ChevronDown, ChevronUp, Loader2, Tag,
     Barcode, Truck, Box, Layers, Image, Calculator,
     Warehouse, Scale, Ruler, Globe, Percent, Building2,
     Users, ShoppingCart, TrendingUp, Clock, Calendar,
-    AlertTriangle, Info, Star, Target, Zap
+    AlertTriangle, Info, Star, Target, Zap, Upload,
+    File, Download, Briefcase, GraduationCap, FileCheck,
+    Search, PenTool, Shield, BadgeCheck, ToggleLeft, ToggleRight
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -123,6 +126,33 @@ const OFFICE_TYPES = [
     { value: 'firm', labelAr: 'شركة محاماة', labelEn: 'Law Firm' },
 ]
 
+const PRODUCT_STATUS = [
+    { value: 'active', labelAr: 'نشط', labelEn: 'Active', color: 'text-green-600 bg-green-50' },
+    { value: 'inactive', labelAr: 'غير نشط', labelEn: 'Inactive', color: 'text-slate-600 bg-slate-50' },
+    { value: 'discontinued', labelAr: 'متوقف', labelEn: 'Discontinued', color: 'text-red-600 bg-red-50' },
+]
+
+const SERVICE_TYPES = [
+    { value: 'consultation', labelAr: 'استشارة قانونية', labelEn: 'Legal Consultation', icon: Briefcase },
+    { value: 'representation', labelAr: 'تمثيل قانوني', labelEn: 'Legal Representation', icon: Shield },
+    { value: 'document_review', labelAr: 'مراجعة مستندات', labelEn: 'Document Review', icon: FileCheck },
+    { value: 'document_drafting', labelAr: 'صياغة عقود', labelEn: 'Contract Drafting', icon: PenTool },
+    { value: 'research', labelAr: 'بحث قانوني', labelEn: 'Legal Research', icon: Search },
+    { value: 'litigation', labelAr: 'تقاضي', labelEn: 'Litigation', icon: GraduationCap },
+    { value: 'compliance', labelAr: 'امتثال', labelEn: 'Compliance Review', icon: BadgeCheck },
+]
+
+const PRACTICE_AREAS = [
+    { value: 'commercial', labelAr: 'قانون تجاري', labelEn: 'Commercial Law' },
+    { value: 'corporate', labelAr: 'قانون الشركات', labelEn: 'Corporate Law' },
+    { value: 'labor', labelAr: 'قانون العمل', labelEn: 'Labor Law' },
+    { value: 'real_estate', labelAr: 'قانون العقارات', labelEn: 'Real Estate Law' },
+    { value: 'family', labelAr: 'قانون الأسرة', labelEn: 'Family Law' },
+    { value: 'criminal', labelAr: 'قانون جنائي', labelEn: 'Criminal Law' },
+    { value: 'intellectual_property', labelAr: 'الملكية الفكرية', labelEn: 'Intellectual Property' },
+    { value: 'banking', labelAr: 'قانون مصرفي', labelEn: 'Banking & Finance' },
+]
+
 interface ProductFormViewProps {
     editMode?: boolean
     productId?: string
@@ -136,6 +166,9 @@ export function ProductFormView({ editMode = false, productId, initialData }: Pr
     const updateProductMutation = useUpdateProduct()
 
     const isArabic = i18n.language === 'ar'
+
+    // UI Mode state
+    const [isAdvancedMode, setIsAdvancedMode] = useState(false)
 
     // Form state - Ultimate Enterprise Version (Odoo/ERPNext/SAP Compatible)
     const [formData, setFormData] = useState({
@@ -155,12 +188,14 @@ export function ProductFormView({ editMode = false, productId, initialData }: Pr
         // ═══ PRODUCT TYPE ═══
         productType: 'service', // service, stockable, consumable, digital, subscription, bundle
         officeType: 'individual', // individual, small, medium, firm
+        status: 'active', // active, inactive, discontinued
 
         // ═══ PRICING - Multi-tier like Odoo/ERPNext ═══
         basePrice: 0,
         cost: 0,
         currency: 'SAR',
         minimumPrice: 0,
+        maximumDiscountPercent: 0,
         wholesalePrice: 0,
         retailPrice: 0,
         memberPrice: 0,
@@ -168,6 +203,15 @@ export function ProductFormView({ editMode = false, productId, initialData }: Pr
         costingMethod: 'average', // standard, average, fifo, lifo, specific
         marginPercent: 0,
         markupPercent: 0,
+
+        // ═══ VOLUME PRICING TIERS ═══
+        volumePricing: [] as { minQty: number; maxQty: number; price: number; discountPercent: number }[],
+
+        // ═══ CUSTOMER TIER PRICING ═══
+        customerTierPricing: [] as { tierName: string; tierNameAr: string; price: number; discountPercent: number }[],
+
+        // ═══ TIME-BASED PRICING (PROMOTIONS) ═══
+        promotionalPricing: [] as { name: string; nameAr: string; price: number; startDate: string; endDate: string; active: boolean }[],
 
         // ═══ TAX ═══
         taxCategory: 'standard',
@@ -232,6 +276,10 @@ export function ProductFormView({ editMode = false, productId, initialData }: Pr
         // ═══ SERVICE-SPECIFIC (for law firms) ═══
         practiceArea: '',
         serviceType: '', // consultation, representation, document, research
+        hourlyRate: 0,
+        fixedFee: 0,
+        estimatedHoursMin: 0,
+        estimatedHoursMax: 0,
         estimatedDuration: 0,
         durationUnit: 'hour',
         requiresAppointment: false,
@@ -275,11 +323,25 @@ export function ProductFormView({ editMode = false, productId, initialData }: Pr
         allowReturn: true,
         requiresShipping: false,
         isDigitalDelivery: false,
+        availableOnline: true,
+
+        // ═══ SALES SETTINGS ═══
+        salesStartDate: '',
+        salesEndDate: '',
+
+        // ═══ MEDIA & DOCUMENTS ═══
+        gallery: [] as { url: string; type: string; name: string }[],
+        documents: [] as { url: string; type: string; name: string; description: string }[],
 
         // ═══ NOTES & CUSTOM ═══
         tags: [] as string[],
         internalNotes: '',
         customerNotes: '',
+        customField1: '',
+        customField2: '',
+        customField3: '',
+        customField4: '',
+        customField5: '',
         customFields: {} as Record<string, any>,
     })
 
@@ -544,29 +606,82 @@ export function ProductFormView({ editMode = false, productId, initialData }: Pr
                                 <Separator />
 
                                 {/* ═══════════════════════════════════════════════════════════════ */}
+                                {/* BASIC/ADVANCED MODE TOGGLE */}
+                                {/* ═══════════════════════════════════════════════════════════════ */}
+                                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border-2 border-purple-200">
+                                    <div className="flex items-center gap-3">
+                                        {isAdvancedMode ? (
+                                            <ToggleRight className="w-6 h-6 text-purple-600" />
+                                        ) : (
+                                            <ToggleLeft className="w-6 h-6 text-slate-500" />
+                                        )}
+                                        <div>
+                                            <h3 className="text-sm font-semibold text-slate-800">
+                                                {isArabic ? 'وضع العرض' : 'Display Mode'}
+                                            </h3>
+                                            <p className="text-xs text-slate-600">
+                                                {isAdvancedMode
+                                                    ? (isArabic ? 'الوضع المتقدم - كل الحقول' : 'Advanced Mode - All Fields')
+                                                    : (isArabic ? 'الوضع الأساسي - الحقول الضرورية فقط' : 'Basic Mode - Essential Fields Only')
+                                                }
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <span className={cn(
+                                            "text-sm font-medium transition-colors",
+                                            !isAdvancedMode ? "text-emerald-600" : "text-slate-400"
+                                        )}>
+                                            {isArabic ? 'أساسي' : 'Basic'}
+                                        </span>
+                                        <Switch
+                                            checked={isAdvancedMode}
+                                            onCheckedChange={setIsAdvancedMode}
+                                            className="data-[state=checked]:bg-purple-600"
+                                        />
+                                        <span className={cn(
+                                            "text-sm font-medium transition-colors",
+                                            isAdvancedMode ? "text-purple-600" : "text-slate-400"
+                                        )}>
+                                            {isArabic ? 'متقدم' : 'Advanced'}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <Separator />
+
+                                {/* ═══════════════════════════════════════════════════════════════ */}
                                 {/* TABBED SECTIONS - Enterprise ERP Style */}
                                 {/* ═══════════════════════════════════════════════════════════════ */}
                                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                                    <TabsList className="grid w-full grid-cols-5 bg-slate-100 rounded-xl p-1">
-                                        <TabsTrigger value="basic" className="rounded-lg data-[state=active]:bg-white">
-                                            <FileText className="w-4 h-4 me-2" />
-                                            {isArabic ? 'أساسي' : 'Basic'}
+                                    <TabsList className="grid w-full grid-cols-3 md:grid-cols-7 bg-slate-100 rounded-xl p-1">
+                                        <TabsTrigger value="basic" className="rounded-lg data-[state=active]:bg-white text-xs md:text-sm">
+                                            <FileText className="w-3 h-3 md:w-4 md:h-4 md:me-2" />
+                                            <span className="hidden md:inline">{isArabic ? 'أساسي' : 'Basic'}</span>
                                         </TabsTrigger>
-                                        <TabsTrigger value="pricing" className="rounded-lg data-[state=active]:bg-white">
-                                            <DollarSign className="w-4 h-4 me-2" />
-                                            {isArabic ? 'التسعير' : 'Pricing'}
+                                        <TabsTrigger value="pricing" className="rounded-lg data-[state=active]:bg-white text-xs md:text-sm">
+                                            <DollarSign className="w-3 h-3 md:w-4 md:h-4 md:me-2" />
+                                            <span className="hidden md:inline">{isArabic ? 'التسعير' : 'Pricing'}</span>
                                         </TabsTrigger>
-                                        <TabsTrigger value="inventory" className="rounded-lg data-[state=active]:bg-white">
-                                            <Warehouse className="w-4 h-4 me-2" />
-                                            {isArabic ? 'المخزون' : 'Inventory'}
+                                        <TabsTrigger value="inventory" className="rounded-lg data-[state=active]:bg-white text-xs md:text-sm">
+                                            <Warehouse className="w-3 h-3 md:w-4 md:h-4 md:me-2" />
+                                            <span className="hidden md:inline">{isArabic ? 'المخزون' : 'Inventory'}</span>
                                         </TabsTrigger>
-                                        <TabsTrigger value="attributes" className="rounded-lg data-[state=active]:bg-white">
-                                            <Scale className="w-4 h-4 me-2" />
-                                            {isArabic ? 'السمات' : 'Attributes'}
+                                        <TabsTrigger value="attributes" className="rounded-lg data-[state=active]:bg-white text-xs md:text-sm">
+                                            <Scale className="w-3 h-3 md:w-4 md:h-4 md:me-2" />
+                                            <span className="hidden md:inline">{isArabic ? 'السمات' : 'Attributes'}</span>
                                         </TabsTrigger>
-                                        <TabsTrigger value="suppliers" className="rounded-lg data-[state=active]:bg-white">
-                                            <Truck className="w-4 h-4 me-2" />
-                                            {isArabic ? 'الموردين' : 'Suppliers'}
+                                        <TabsTrigger value="media" className="rounded-lg data-[state=active]:bg-white text-xs md:text-sm">
+                                            <Image className="w-3 h-3 md:w-4 md:h-4 md:me-2" />
+                                            <span className="hidden md:inline">{isArabic ? 'الوسائط' : 'Media'}</span>
+                                        </TabsTrigger>
+                                        <TabsTrigger value="variants" className="rounded-lg data-[state=active]:bg-white text-xs md:text-sm">
+                                            <Layers className="w-3 h-3 md:w-4 md:h-4 md:me-2" />
+                                            <span className="hidden md:inline">{isArabic ? 'الخيارات' : 'Variants'}</span>
+                                        </TabsTrigger>
+                                        <TabsTrigger value="suppliers" className="rounded-lg data-[state=active]:bg-white text-xs md:text-sm">
+                                            <Truck className="w-3 h-3 md:w-4 md:h-4 md:me-2" />
+                                            <span className="hidden md:inline">{isArabic ? 'الموردين' : 'Suppliers'}</span>
                                         </TabsTrigger>
                                     </TabsList>
 
@@ -649,7 +764,7 @@ export function ProductFormView({ editMode = false, productId, initialData }: Pr
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                             <div className="space-y-2">
                                                 <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                     <Tag className="w-4 h-4 text-emerald-500" />
@@ -673,6 +788,26 @@ export function ProductFormView({ editMode = false, productId, initialData }: Pr
                                                     value={formData.subCategory}
                                                     onChange={(e) => handleChange('subCategory', e.target.value)}
                                                 />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                    <Zap className="w-4 h-4 text-emerald-500" />
+                                                    {isArabic ? 'الحالة' : 'Status'}
+                                                </label>
+                                                <Select value={formData.status} onValueChange={(v) => handleChange('status', v)}>
+                                                    <SelectTrigger className="rounded-xl">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {PRODUCT_STATUS.map((status) => (
+                                                            <SelectItem key={status.value} value={status.value}>
+                                                                <span className={cn("px-2 py-1 rounded", status.color)}>
+                                                                    {isArabic ? status.labelAr : status.labelEn}
+                                                                </span>
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
                                             </div>
                                         </div>
 
@@ -719,29 +854,59 @@ export function ProductFormView({ editMode = false, productId, initialData }: Pr
                                             </div>
                                         </div>
 
-                                        {/* Description */}
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700">
-                                                {isArabic ? 'الوصف (إنجليزي)' : 'Description (English)'}
-                                            </label>
-                                            <Textarea
-                                                placeholder={isArabic ? "وصف المنتج بالإنجليزية..." : "Product description..."}
-                                                className="min-h-[100px] rounded-xl border-slate-200"
-                                                value={formData.description}
-                                                onChange={(e) => handleChange('description', e.target.value)}
-                                            />
+                                        {/* Short Description */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-slate-700">
+                                                    {isArabic ? 'وصف مختصر (إنجليزي)' : 'Short Description (English)'}
+                                                </label>
+                                                <Textarea
+                                                    placeholder={isArabic ? "وصف قصير للمنتج..." : "Brief product summary..."}
+                                                    className="min-h-[80px] rounded-xl border-slate-200"
+                                                    value={formData.shortDescription}
+                                                    onChange={(e) => handleChange('shortDescription', e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-slate-700">
+                                                    {isArabic ? 'وصف مختصر (عربي)' : 'Short Description (Arabic)'}
+                                                </label>
+                                                <Textarea
+                                                    placeholder={isArabic ? "وصف قصير..." : "وصف قصير..."}
+                                                    className="min-h-[80px] rounded-xl border-slate-200"
+                                                    value={formData.shortDescriptionAr}
+                                                    onChange={(e) => handleChange('shortDescriptionAr', e.target.value)}
+                                                />
+                                            </div>
                                         </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700">
-                                                {isArabic ? 'الوصف (عربي)' : 'Description (Arabic)'}
-                                            </label>
-                                            <Textarea
-                                                placeholder={isArabic ? "وصف المنتج بالعربية..." : "وصف المنتج..."}
-                                                className="min-h-[100px] rounded-xl border-slate-200"
-                                                value={formData.descriptionAr}
-                                                onChange={(e) => handleChange('descriptionAr', e.target.value)}
-                                            />
-                                        </div>
+
+                                        {/* Long Description */}
+                                        {isAdvancedMode && (
+                                            <>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700">
+                                                        {isArabic ? 'الوصف الكامل (إنجليزي)' : 'Full Description (English)'}
+                                                    </label>
+                                                    <Textarea
+                                                        placeholder={isArabic ? "وصف المنتج الكامل بالإنجليزية..." : "Complete product description..."}
+                                                        className="min-h-[120px] rounded-xl border-slate-200"
+                                                        value={formData.description}
+                                                        onChange={(e) => handleChange('description', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700">
+                                                        {isArabic ? 'الوصف الكامل (عربي)' : 'Full Description (Arabic)'}
+                                                    </label>
+                                                    <Textarea
+                                                        placeholder={isArabic ? "وصف المنتج الكامل بالعربية..." : "وصف كامل..."}
+                                                        className="min-h-[120px] rounded-xl border-slate-200"
+                                                        value={formData.descriptionAr}
+                                                        onChange={(e) => handleChange('descriptionAr', e.target.value)}
+                                                    />
+                                                </div>
+                                            </>
+                                        )}
                                     </TabsContent>
 
                                     {/* ═══ TAB 2: PRICING ═══ */}
@@ -805,12 +970,18 @@ export function ProductFormView({ editMode = false, productId, initialData }: Pr
                                                 <TrendingUp className="w-4 h-4" />
                                                 {isArabic ? 'تسعير متعدد المستويات' : 'Multi-tier Pricing'}
                                             </h4>
-                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                                                 <div className="space-y-2">
                                                     <label className="text-xs text-slate-600">{isArabic ? 'الحد الأدنى للسعر' : 'Minimum Price'}</label>
                                                     <Input type="number" min="0" step="0.01" className="rounded-lg"
                                                         value={formData.minimumPrice || ''}
                                                         onChange={(e) => handleChange('minimumPrice', parseFloat(e.target.value) || 0)} />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-xs text-slate-600">{isArabic ? 'أقصى خصم %' : 'Max Discount %'}</label>
+                                                    <Input type="number" min="0" max="100" step="0.01" className="rounded-lg"
+                                                        value={formData.maximumDiscountPercent || ''}
+                                                        onChange={(e) => handleChange('maximumDiscountPercent', parseFloat(e.target.value) || 0)} />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <label className="text-xs text-slate-600">{isArabic ? 'سعر الجملة' : 'Wholesale Price'}</label>
@@ -832,6 +1003,102 @@ export function ProductFormView({ editMode = false, productId, initialData }: Pr
                                                 </div>
                                             </div>
                                         </div>
+
+                                        {/* Volume Pricing Tiers (Advanced Mode) */}
+                                        {isAdvancedMode && (
+                                            <div className="p-4 bg-purple-50 rounded-xl space-y-4">
+                                                <div className="flex items-center justify-between">
+                                                    <h4 className="font-medium text-purple-800 flex items-center gap-2">
+                                                        <Layers className="w-4 h-4" />
+                                                        {isArabic ? 'تسعير حسب الكمية' : 'Volume Pricing Tiers'}
+                                                    </h4>
+                                                    <Button type="button" size="sm" variant="outline" className="rounded-lg">
+                                                        <Plus className="w-3 h-3 me-1" />
+                                                        {isArabic ? 'إضافة شريحة' : 'Add Tier'}
+                                                    </Button>
+                                                </div>
+                                                {formData.volumePricing.length === 0 ? (
+                                                    <p className="text-xs text-slate-500 text-center py-4">
+                                                        {isArabic ? 'لا توجد شرائح أسعار بعد' : 'No volume pricing tiers yet'}
+                                                    </p>
+                                                ) : (
+                                                    <div className="space-y-2">
+                                                        {formData.volumePricing.map((tier, idx) => (
+                                                            <div key={idx} className="flex gap-2 items-center p-2 bg-white rounded border">
+                                                                <Input type="number" placeholder={isArabic ? 'من' : 'Min'} className="w-20" value={tier.minQty} readOnly />
+                                                                <span>-</span>
+                                                                <Input type="number" placeholder={isArabic ? 'إلى' : 'Max'} className="w-20" value={tier.maxQty} readOnly />
+                                                                <Input type="number" placeholder={isArabic ? 'السعر' : 'Price'} className="flex-1" value={tier.price} readOnly />
+                                                                <Input type="number" placeholder="%" className="w-20" value={tier.discountPercent} readOnly />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {/* Customer Tier Pricing (Advanced Mode) */}
+                                        {isAdvancedMode && (
+                                            <div className="p-4 bg-green-50 rounded-xl space-y-4">
+                                                <div className="flex items-center justify-between">
+                                                    <h4 className="font-medium text-green-800 flex items-center gap-2">
+                                                        <Users className="w-4 h-4" />
+                                                        {isArabic ? 'تسعير حسب فئة العميل' : 'Customer Tier Pricing'}
+                                                    </h4>
+                                                    <Button type="button" size="sm" variant="outline" className="rounded-lg">
+                                                        <Plus className="w-3 h-3 me-1" />
+                                                        {isArabic ? 'إضافة فئة' : 'Add Tier'}
+                                                    </Button>
+                                                </div>
+                                                {formData.customerTierPricing.length === 0 ? (
+                                                    <p className="text-xs text-slate-500 text-center py-4">
+                                                        {isArabic ? 'لا توجد فئات عملاء بعد' : 'No customer tier pricing yet'}
+                                                    </p>
+                                                ) : (
+                                                    <div className="space-y-2">
+                                                        {formData.customerTierPricing.map((tier, idx) => (
+                                                            <div key={idx} className="flex gap-2 items-center p-2 bg-white rounded border">
+                                                                <Input placeholder={isArabic ? 'اسم الفئة' : 'Tier Name'} className="flex-1" value={tier.tierName} readOnly />
+                                                                <Input type="number" placeholder={isArabic ? 'السعر' : 'Price'} className="w-28" value={tier.price} readOnly />
+                                                                <Input type="number" placeholder="%" className="w-20" value={tier.discountPercent} readOnly />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {/* Time-based Pricing / Promotions (Advanced Mode) */}
+                                        {isAdvancedMode && (
+                                            <div className="p-4 bg-amber-50 rounded-xl space-y-4">
+                                                <div className="flex items-center justify-between">
+                                                    <h4 className="font-medium text-amber-800 flex items-center gap-2">
+                                                        <Clock className="w-4 h-4" />
+                                                        {isArabic ? 'تسعير ترويجي / موسمي' : 'Promotional Pricing'}
+                                                    </h4>
+                                                    <Button type="button" size="sm" variant="outline" className="rounded-lg">
+                                                        <Plus className="w-3 h-3 me-1" />
+                                                        {isArabic ? 'إضافة عرض' : 'Add Promo'}
+                                                    </Button>
+                                                </div>
+                                                {formData.promotionalPricing.length === 0 ? (
+                                                    <p className="text-xs text-slate-500 text-center py-4">
+                                                        {isArabic ? 'لا توجد عروض ترويجية بعد' : 'No promotional pricing yet'}
+                                                    </p>
+                                                ) : (
+                                                    <div className="space-y-2">
+                                                        {formData.promotionalPricing.map((promo, idx) => (
+                                                            <div key={idx} className="flex gap-2 items-center p-2 bg-white rounded border">
+                                                                <Input placeholder={isArabic ? 'اسم العرض' : 'Promo Name'} className="flex-1" value={promo.name} readOnly />
+                                                                <Input type="number" placeholder={isArabic ? 'السعر' : 'Price'} className="w-24" value={promo.price} readOnly />
+                                                                <Input type="date" className="w-32" value={promo.startDate} readOnly />
+                                                                <Input type="date" className="w-32" value={promo.endDate} readOnly />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
 
                                         {/* Costing Method */}
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1045,19 +1312,71 @@ export function ProductFormView({ editMode = false, productId, initialData }: Pr
                                             </div>
                                         </div>
 
-                                        {/* Service-specific fields */}
+                                        {/* Legal Service-specific fields */}
                                         {formData.productType === 'service' && (
                                             <div className="p-4 bg-purple-50 rounded-xl space-y-4">
                                                 <h4 className="font-medium text-purple-800 flex items-center gap-2">
-                                                    <Users className="w-4 h-4" />
-                                                    {isArabic ? 'تفاصيل الخدمة' : 'Service Details'}
+                                                    <Briefcase className="w-4 h-4" />
+                                                    {isArabic ? 'تفاصيل الخدمة القانونية' : 'Legal Service Details'}
                                                 </h4>
-                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                                                {/* Service Type Selection */}
+                                                <div className="space-y-2">
+                                                    <label className="text-xs text-slate-600 font-medium">{isArabic ? 'نوع الخدمة' : 'Service Type'}</label>
+                                                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
+                                                        {SERVICE_TYPES.map((type) => {
+                                                            const Icon = type.icon
+                                                            return (
+                                                                <button
+                                                                    key={type.value}
+                                                                    type="button"
+                                                                    onClick={() => handleChange('serviceType', type.value)}
+                                                                    className={cn(
+                                                                        "p-2 rounded-lg border text-center transition-all",
+                                                                        formData.serviceType === type.value
+                                                                            ? "border-purple-500 bg-purple-100 text-purple-700"
+                                                                            : "border-slate-200 hover:border-purple-300 hover:bg-slate-50"
+                                                                    )}
+                                                                >
+                                                                    <Icon className={cn(
+                                                                        "w-4 h-4 mx-auto mb-1",
+                                                                        formData.serviceType === type.value ? "text-purple-600" : "text-slate-400"
+                                                                    )} />
+                                                                    <span className="text-[10px] font-medium block">
+                                                                        {isArabic ? type.labelAr : type.labelEn}
+                                                                    </span>
+                                                                </button>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                </div>
+
+                                                {/* Practice Area & Pricing */}
+                                                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                                     <div className="space-y-2">
                                                         <label className="text-xs text-slate-600">{isArabic ? 'مجال الممارسة' : 'Practice Area'}</label>
-                                                        <Input className="rounded-lg" placeholder={isArabic ? "قانون تجاري" : "Commercial Law"}
-                                                            value={formData.practiceArea}
-                                                            onChange={(e) => handleChange('practiceArea', e.target.value)} />
+                                                        <Select value={formData.practiceArea} onValueChange={(v) => handleChange('practiceArea', v)}>
+                                                            <SelectTrigger className="rounded-lg"><SelectValue placeholder={isArabic ? "اختر المجال" : "Select area"} /></SelectTrigger>
+                                                            <SelectContent>
+                                                                {PRACTICE_AREAS.map((area) => (
+                                                                    <SelectItem key={area.value} value={area.value}>
+                                                                        {isArabic ? area.labelAr : area.labelEn}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'سعر الساعة' : 'Hourly Rate'}</label>
+                                                        <Input type="number" min="0" step="0.01" className="rounded-lg"
+                                                            value={formData.hourlyRate || ''}
+                                                            onChange={(e) => handleChange('hourlyRate', parseFloat(e.target.value) || 0)} />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'رسوم ثابتة' : 'Fixed Fee'}</label>
+                                                        <Input type="number" min="0" step="0.01" className="rounded-lg"
+                                                            value={formData.fixedFee || ''}
+                                                            onChange={(e) => handleChange('fixedFee', parseFloat(e.target.value) || 0)} />
                                                     </div>
                                                     <div className="space-y-2">
                                                         <label className="text-xs text-slate-600">{isArabic ? 'المدة المتوقعة' : 'Estimated Duration'}</label>
@@ -1066,26 +1385,44 @@ export function ProductFormView({ editMode = false, productId, initialData }: Pr
                                                                 value={formData.estimatedDuration || ''}
                                                                 onChange={(e) => handleChange('estimatedDuration', parseInt(e.target.value) || 0)} />
                                                             <Select value={formData.durationUnit} onValueChange={(v) => handleChange('durationUnit', v)}>
-                                                                <SelectTrigger className="w-24 rounded-lg"><SelectValue /></SelectTrigger>
+                                                                <SelectTrigger className="w-20 rounded-lg"><SelectValue /></SelectTrigger>
                                                                 <SelectContent>
-                                                                    <SelectItem value="hour">{isArabic ? 'ساعة' : 'Hour'}</SelectItem>
-                                                                    <SelectItem value="day">{isArabic ? 'يوم' : 'Day'}</SelectItem>
-                                                                    <SelectItem value="week">{isArabic ? 'أسبوع' : 'Week'}</SelectItem>
+                                                                    <SelectItem value="hour">{isArabic ? 'س' : 'h'}</SelectItem>
+                                                                    <SelectItem value="day">{isArabic ? 'ي' : 'd'}</SelectItem>
+                                                                    <SelectItem value="week">{isArabic ? 'أ' : 'w'}</SelectItem>
                                                                 </SelectContent>
                                                             </Select>
                                                         </div>
                                                     </div>
-                                                    <div className="space-y-4 pt-4">
-                                                        <div className="flex items-center gap-2">
-                                                            <Switch checked={formData.requiresAppointment}
-                                                                onCheckedChange={(c) => handleChange('requiresAppointment', c)} />
-                                                            <label className="text-xs">{isArabic ? 'يتطلب موعد' : 'Requires Appointment'}</label>
-                                                        </div>
-                                                        <div className="flex items-center gap-2">
-                                                            <Switch checked={formData.allowOnlineBooking}
-                                                                onCheckedChange={(c) => handleChange('allowOnlineBooking', c)} />
-                                                            <label className="text-xs">{isArabic ? 'حجز أونلاين' : 'Allow Online Booking'}</label>
-                                                        </div>
+                                                </div>
+
+                                                {/* Estimated Hours Range */}
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'الحد الأدنى للساعات المتوقعة' : 'Minimum Estimated Hours'}</label>
+                                                        <Input type="number" min="0" step="0.5" className="rounded-lg"
+                                                            value={formData.estimatedHoursMin || ''}
+                                                            onChange={(e) => handleChange('estimatedHoursMin', parseFloat(e.target.value) || 0)} />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'الحد الأقصى للساعات المتوقعة' : 'Maximum Estimated Hours'}</label>
+                                                        <Input type="number" min="0" step="0.5" className="rounded-lg"
+                                                            value={formData.estimatedHoursMax || ''}
+                                                            onChange={(e) => handleChange('estimatedHoursMax', parseFloat(e.target.value) || 0)} />
+                                                    </div>
+                                                </div>
+
+                                                {/* Service Flags */}
+                                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                                    <div className="flex items-center gap-2 p-3 bg-white rounded-lg border">
+                                                        <Switch checked={formData.requiresAppointment}
+                                                            onCheckedChange={(c) => handleChange('requiresAppointment', c)} />
+                                                        <label className="text-xs">{isArabic ? 'يتطلب موعد' : 'Requires Appointment'}</label>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 p-3 bg-white rounded-lg border">
+                                                        <Switch checked={formData.allowOnlineBooking}
+                                                            onCheckedChange={(c) => handleChange('allowOnlineBooking', c)} />
+                                                        <label className="text-xs">{isArabic ? 'حجز أونلاين' : 'Allow Online Booking'}</label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1119,20 +1456,188 @@ export function ProductFormView({ editMode = false, productId, initialData }: Pr
                                         </div>
                                     </TabsContent>
 
-                                    {/* ═══ TAB 5: SUPPLIERS ═══ */}
-                                    <TabsContent value="suppliers" className="space-y-6 mt-6">
-                                        <div className="text-center p-8 bg-slate-50 rounded-xl">
-                                            <Truck className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                                            <h4 className="font-medium text-slate-600 mb-2">
-                                                {isArabic ? 'إدارة الموردين' : 'Supplier Management'}
+                                    {/* ═══ TAB 5: MEDIA & DOCUMENTS ═══ */}
+                                    <TabsContent value="media" className="space-y-6 mt-6">
+                                        {/* Product Images */}
+                                        <div className="p-4 bg-blue-50 rounded-xl space-y-4">
+                                            <h4 className="font-medium text-blue-800 flex items-center gap-2">
+                                                <Image className="w-4 h-4" />
+                                                {isArabic ? 'صور المنتج' : 'Product Images'}
                                             </h4>
-                                            <p className="text-sm text-slate-500 mb-4">
-                                                {isArabic ? 'أضف موردين متعددين مع أسعارهم ومهل التسليم' : 'Add multiple suppliers with their prices and lead times'}
-                                            </p>
-                                            <Button type="button" variant="outline" className="rounded-xl">
-                                                <Plus className="w-4 h-4 me-2" />
-                                                {isArabic ? 'إضافة مورد' : 'Add Supplier'}
-                                            </Button>
+                                            <div className="grid grid-cols-1 gap-4">
+                                                <div className="space-y-2">
+                                                    <label className="text-xs text-slate-600">{isArabic ? 'الصورة الرئيسية' : 'Primary Image'}</label>
+                                                    <div className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-blue-400 transition-colors cursor-pointer">
+                                                        <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                                                        <p className="text-sm text-slate-600 mb-1">{isArabic ? 'انقر للرفع أو اسحب وأفلت' : 'Click to upload or drag and drop'}</p>
+                                                        <p className="text-xs text-slate-400">PNG, JPG, WEBP {isArabic ? 'حتى' : 'up to'} 5MB</p>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-xs text-slate-600">{isArabic ? 'معرض الصور' : 'Image Gallery'}</label>
+                                                    <div className="grid grid-cols-4 gap-3">
+                                                        {[1, 2, 3, 4].map((i) => (
+                                                            <div key={i} className="border-2 border-dashed border-slate-200 rounded-lg p-4 text-center hover:border-blue-300 transition-colors cursor-pointer aspect-square flex items-center justify-center">
+                                                                <Plus className="w-6 h-6 text-slate-300" />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Documents & Attachments */}
+                                        <div className="p-4 bg-green-50 rounded-xl space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <h4 className="font-medium text-green-800 flex items-center gap-2">
+                                                    <File className="w-4 h-4" />
+                                                    {isArabic ? 'المستندات والمرفقات' : 'Documents & Attachments'}
+                                                </h4>
+                                                <Button type="button" size="sm" variant="outline" className="rounded-lg">
+                                                    <Upload className="w-3 h-3 me-1" />
+                                                    {isArabic ? 'رفع مستند' : 'Upload Document'}
+                                                </Button>
+                                            </div>
+                                            {formData.documents.length === 0 ? (
+                                                <div className="text-center p-6 bg-white rounded-lg border-2 border-dashed border-slate-200">
+                                                    <File className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+                                                    <p className="text-sm text-slate-500">{isArabic ? 'لا توجد مستندات مرفقة بعد' : 'No documents attached yet'}</p>
+                                                    <p className="text-xs text-slate-400 mt-1">{isArabic ? 'PDF, DOCX, XLSX حتى 10MB' : 'PDF, DOCX, XLSX up to 10MB'}</p>
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-2">
+                                                    {formData.documents.map((doc, idx) => (
+                                                        <div key={idx} className="flex items-center gap-3 p-3 bg-white rounded-lg border">
+                                                            <File className="w-5 h-5 text-blue-500" />
+                                                            <div className="flex-1">
+                                                                <p className="text-sm font-medium">{doc.name}</p>
+                                                                <p className="text-xs text-slate-500">{doc.description}</p>
+                                                            </div>
+                                                            <Button type="button" size="sm" variant="ghost" className="text-red-500">
+                                                                <X className="w-4 h-4" />
+                                                            </Button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </TabsContent>
+
+                                    {/* ═══ TAB 6: VARIANTS ═══ */}
+                                    <TabsContent value="variants" className="space-y-6 mt-6">
+                                        <div className="flex items-center justify-between p-4 bg-purple-50 rounded-xl">
+                                            <div className="flex items-center gap-3">
+                                                <Layers className="w-5 h-5 text-purple-500" />
+                                                <div>
+                                                    <p className="font-medium">{isArabic ? 'هل المنتج له خيارات؟' : 'Does this product have variants?'}</p>
+                                                    <p className="text-xs text-slate-500">{isArabic ? 'مثل الحجم، اللون، المقاس، إلخ' : 'Such as size, color, model, etc.'}</p>
+                                                </div>
+                                            </div>
+                                            <Switch
+                                                checked={formData.hasVariants}
+                                                onCheckedChange={(checked) => handleChange('hasVariants', checked)}
+                                            />
+                                        </div>
+
+                                        {formData.hasVariants ? (
+                                            <div className="space-y-4">
+                                                <div className="flex items-center justify-between">
+                                                    <h4 className="font-medium text-slate-800">{isArabic ? 'سمات الخيارات' : 'Variant Attributes'}</h4>
+                                                    <Button type="button" size="sm" variant="outline" className="rounded-xl">
+                                                        <Plus className="w-3 h-3 me-1" />
+                                                        {isArabic ? 'إضافة سمة' : 'Add Attribute'}
+                                                    </Button>
+                                                </div>
+                                                {formData.variantAttributes.length === 0 ? (
+                                                    <div className="text-center p-8 bg-slate-50 rounded-xl">
+                                                        <Layers className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                                                        <p className="text-sm text-slate-600 mb-1">{isArabic ? 'أضف سمات الخيارات' : 'Add variant attributes'}</p>
+                                                        <p className="text-xs text-slate-400">{isArabic ? 'مثل: اللون (أحمر، أزرق) - الحجم (صغير، متوسط، كبير)' : 'e.g., Color (Red, Blue) - Size (S, M, L)'}</p>
+                                                    </div>
+                                                ) : (
+                                                    <div className="space-y-3">
+                                                        {formData.variantAttributes.map((attr, idx) => (
+                                                            <div key={idx} className="p-4 bg-white rounded-xl border">
+                                                                <div className="flex items-center justify-between mb-2">
+                                                                    <p className="font-medium text-sm">{attr.name} / {attr.nameAr}</p>
+                                                                    <Button type="button" size="sm" variant="ghost" className="text-red-500">
+                                                                        <X className="w-3 h-3" />
+                                                                    </Button>
+                                                                </div>
+                                                                <div className="flex flex-wrap gap-2">
+                                                                    {attr.values.map((val, vidx) => (
+                                                                        <Badge key={vidx} variant="secondary">{val}</Badge>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="text-center p-12 bg-slate-50 rounded-xl">
+                                                <Package className="w-16 h-16 text-slate-200 mx-auto mb-3" />
+                                                <p className="text-slate-500">{isArabic ? 'هذا منتج بسيط بدون خيارات' : 'This is a simple product without variants'}</p>
+                                            </div>
+                                        )}
+                                    </TabsContent>
+
+                                    {/* ═══ TAB 7: SUPPLIERS ═══ */}
+                                    <TabsContent value="suppliers" className="space-y-6 mt-6">
+                                        <div className="p-4 bg-amber-50 rounded-xl space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <h4 className="font-medium text-amber-800 flex items-center gap-2">
+                                                    <Truck className="w-4 h-4" />
+                                                    {isArabic ? 'الموردين' : 'Suppliers'}
+                                                </h4>
+                                                <Button type="button" size="sm" variant="outline" className="rounded-lg">
+                                                    <Plus className="w-3 h-3 me-1" />
+                                                    {isArabic ? 'إضافة مورد' : 'Add Supplier'}
+                                                </Button>
+                                            </div>
+                                            {formData.suppliers.length === 0 ? (
+                                                <div className="text-center p-8 bg-white rounded-xl border-2 border-dashed border-amber-200">
+                                                    <Truck className="w-12 h-12 text-amber-300 mx-auto mb-3" />
+                                                    <h4 className="font-medium text-slate-600 mb-1">
+                                                        {isArabic ? 'إدارة الموردين' : 'Supplier Management'}
+                                                    </h4>
+                                                    <p className="text-sm text-slate-500">
+                                                        {isArabic ? 'أضف موردين متعددين مع أسعارهم ومهل التسليم' : 'Add multiple suppliers with prices and lead times'}
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-3">
+                                                    {formData.suppliers.map((supplier, idx) => (
+                                                        <div key={idx} className="p-4 bg-white rounded-lg border">
+                                                            <div className="flex items-center justify-between mb-2">
+                                                                <div className="flex items-center gap-2">
+                                                                    <p className="font-medium">{supplier.supplierName}</p>
+                                                                    {supplier.isPrimary && (
+                                                                        <Badge variant="default" className="bg-emerald-500">{isArabic ? 'أساسي' : 'Primary'}</Badge>
+                                                                    )}
+                                                                </div>
+                                                                <Button type="button" size="sm" variant="ghost" className="text-red-500">
+                                                                    <X className="w-3 h-3" />
+                                                                </Button>
+                                                            </div>
+                                                            <div className="grid grid-cols-3 gap-3 text-xs">
+                                                                <div>
+                                                                    <span className="text-slate-500">{isArabic ? 'السعر:' : 'Price:'} </span>
+                                                                    <span className="font-medium">{supplier.price} {supplier.currency}</span>
+                                                                </div>
+                                                                <div>
+                                                                    <span className="text-slate-500">{isArabic ? 'مهلة التسليم:' : 'Lead Time:'} </span>
+                                                                    <span className="font-medium">{supplier.leadTimeDays} {isArabic ? 'يوم' : 'days'}</span>
+                                                                </div>
+                                                                <div>
+                                                                    <span className="text-slate-500">{isArabic ? 'الحد الأدنى:' : 'Min Qty:'} </span>
+                                                                    <span className="font-medium">{supplier.minOrderQty}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     </TabsContent>
                                 </Tabs>
@@ -1203,6 +1708,32 @@ export function ProductFormView({ editMode = false, productId, initialData }: Pr
                                                     <div className="flex items-center gap-2 p-3 bg-white rounded-lg border">
                                                         <Switch checked={formData.requiresShipping} onCheckedChange={(c) => handleChange('requiresShipping', c)} />
                                                         <label className="text-sm">{isArabic ? 'يتطلب شحن' : 'Requires Shipping'}</label>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 p-3 bg-white rounded-lg border">
+                                                        <Switch checked={formData.availableOnline} onCheckedChange={(c) => handleChange('availableOnline', c)} />
+                                                        <label className="text-sm">{isArabic ? 'متاح أونلاين' : 'Available Online'}</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Sales Settings */}
+                                            <div className="p-4 bg-indigo-50 rounded-xl space-y-4">
+                                                <h4 className="font-medium text-indigo-800 flex items-center gap-2">
+                                                    <ShoppingCart className="w-4 h-4" />
+                                                    {isArabic ? 'إعدادات المبيعات' : 'Sales Settings'}
+                                                </h4>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'تاريخ بدء المبيعات' : 'Sales Start Date'}</label>
+                                                        <Input type="date" className="rounded-lg"
+                                                            value={formData.salesStartDate}
+                                                            onChange={(e) => handleChange('salesStartDate', e.target.value)} />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'تاريخ انتهاء المبيعات' : 'Sales End Date'}</label>
+                                                        <Input type="date" className="rounded-lg"
+                                                            value={formData.salesEndDate}
+                                                            onChange={(e) => handleChange('salesEndDate', e.target.value)} />
                                                     </div>
                                                 </div>
                                             </div>
@@ -1313,6 +1844,46 @@ export function ProductFormView({ editMode = false, productId, initialData }: Pr
                                                         <Input className="rounded-lg" placeholder="1300"
                                                             value={formData.inventoryAccount}
                                                             onChange={(e) => handleChange('inventoryAccount', e.target.value)} />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Custom Fields */}
+                                            <div className="p-4 bg-rose-50 rounded-xl space-y-4">
+                                                <h4 className="font-medium text-rose-800 flex items-center gap-2">
+                                                    <Star className="w-4 h-4" />
+                                                    {isArabic ? 'حقول مخصصة' : 'Custom Fields'}
+                                                </h4>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'حقل مخصص 1' : 'Custom Field 1'}</label>
+                                                        <Input className="rounded-lg" placeholder={isArabic ? "قيمة مخصصة..." : "Custom value..."}
+                                                            value={formData.customField1}
+                                                            onChange={(e) => handleChange('customField1', e.target.value)} />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'حقل مخصص 2' : 'Custom Field 2'}</label>
+                                                        <Input className="rounded-lg" placeholder={isArabic ? "قيمة مخصصة..." : "Custom value..."}
+                                                            value={formData.customField2}
+                                                            onChange={(e) => handleChange('customField2', e.target.value)} />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'حقل مخصص 3' : 'Custom Field 3'}</label>
+                                                        <Input className="rounded-lg" placeholder={isArabic ? "قيمة مخصصة..." : "Custom value..."}
+                                                            value={formData.customField3}
+                                                            onChange={(e) => handleChange('customField3', e.target.value)} />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'حقل مخصص 4' : 'Custom Field 4'}</label>
+                                                        <Input className="rounded-lg" placeholder={isArabic ? "قيمة مخصصة..." : "Custom value..."}
+                                                            value={formData.customField4}
+                                                            onChange={(e) => handleChange('customField4', e.target.value)} />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'حقل مخصص 5' : 'Custom Field 5'}</label>
+                                                        <Input className="rounded-lg" placeholder={isArabic ? "قيمة مخصصة..." : "Custom value..."}
+                                                            value={formData.customField5}
+                                                            onChange={(e) => handleChange('customField5', e.target.value)} />
                                                     </div>
                                                 </div>
                                             </div>
