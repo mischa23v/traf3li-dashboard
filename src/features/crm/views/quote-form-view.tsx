@@ -24,7 +24,7 @@ import {
     Building, Search, Loader2, Check, X, Package, Percent,
     FileSignature, AlertCircle, ChevronDown, ChevronUp,
     Settings, Users, Receipt, Clock, Target, TrendingUp,
-    Shield, CheckCircle2, XCircle, Pause, PlayCircle
+    Shield, CheckCircle2, XCircle, Pause, PlayCircle, Zap
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -201,6 +201,7 @@ export function QuoteFormView({ editMode = false }: QuoteFormViewProps) {
     const [showProductCatalog, setShowProductCatalog] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const [advancedSettingsOpen, setAdvancedSettingsOpen] = useState(false)
+    const [isAdvancedMode, setIsAdvancedMode] = useState(false)
 
     // Multi-tier pricing state
     const [volumePriceTiers, setVolumePriceTiers] = useState<TierPrice[]>([])
@@ -1572,8 +1573,8 @@ export function QuoteFormView({ editMode = false }: QuoteFormViewProps) {
                 {/* Form Card */}
                 <div className="max-w-7xl mx-auto">
                     <div className="bg-white rounded-3xl shadow-lg border border-slate-100">
-                        {/* Header with Office Type and Status */}
-                        <div className="p-6 border-b border-slate-100">
+                        {/* Header with Office Type, Mode Toggle, and Status */}
+                        <div className="p-6 border-b border-slate-100 space-y-6">
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                 {/* Office Type Selector */}
                                 <div>
@@ -1614,12 +1615,67 @@ export function QuoteFormView({ editMode = false }: QuoteFormViewProps) {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Basic/Advanced Mode Toggle */}
+                            <div className="flex items-center justify-center">
+                                <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl border border-blue-100">
+                                    <div className="flex items-center gap-2">
+                                        <Label
+                                            htmlFor="mode-toggle"
+                                            className={cn(
+                                                "text-sm font-semibold transition-colors cursor-pointer",
+                                                !isAdvancedMode ? "text-blue-700" : "text-slate-500"
+                                            )}
+                                        >
+                                            وضع أساسي
+                                        </Label>
+                                        <span className="text-slate-400">|</span>
+                                        <Label
+                                            htmlFor="mode-toggle"
+                                            className={cn(
+                                                "text-sm font-semibold transition-colors cursor-pointer flex items-center gap-1",
+                                                isAdvancedMode ? "text-purple-700" : "text-slate-500"
+                                            )}
+                                        >
+                                            <Zap className="w-4 h-4" />
+                                            وضع متقدم
+                                        </Label>
+                                    </div>
+                                    <div className="relative">
+                                        <Checkbox
+                                            id="mode-toggle"
+                                            checked={isAdvancedMode}
+                                            onCheckedChange={(checked) => {
+                                                setIsAdvancedMode(!!checked)
+                                                // Reset to basic tab when switching to basic mode
+                                                if (!checked && activeTab !== 'basic' && activeTab !== 'items') {
+                                                    setActiveTab('basic')
+                                                }
+                                            }}
+                                            className="data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Mode Description */}
+                            <div className="text-center">
+                                <p className="text-xs text-slate-500">
+                                    {isAdvancedMode
+                                        ? "الوضع المتقدم: الوصول إلى جميع الخيارات المتقدمة (التسعير متعدد المستويات، الموافقات، الشروط)"
+                                        : "الوضع الأساسي: إنشاء عرض سعر سريع بالحقول الأساسية فقط"
+                                    }
+                                </p>
+                            </div>
                         </div>
 
                         {/* Tabs */}
                         <form onSubmit={form.handleSubmit(onSubmit)} className="p-6">
                             <Tabs value={activeTab} onValueChange={setActiveTab}>
-                                <TabsList className="grid w-full grid-cols-5 mb-6">
+                                <TabsList className={cn(
+                                    "grid w-full mb-6",
+                                    isAdvancedMode ? "grid-cols-5" : "grid-cols-2"
+                                )}>
                                     <TabsTrigger value="basic">
                                         <FileText className="w-4 h-4 me-2" />
                                         معلومات أساسية
@@ -1628,25 +1684,33 @@ export function QuoteFormView({ editMode = false }: QuoteFormViewProps) {
                                         <Package className="w-4 h-4 me-2" />
                                         البنود
                                     </TabsTrigger>
-                                    <TabsTrigger value="pricing">
-                                        <DollarSign className="w-4 h-4 me-2" />
-                                        التسعير والخصم
-                                    </TabsTrigger>
-                                    <TabsTrigger value="terms">
-                                        <FileSignature className="w-4 h-4 me-2" />
-                                        الشروط
-                                    </TabsTrigger>
-                                    <TabsTrigger value="advanced">
-                                        <Settings className="w-4 h-4 me-2" />
-                                        متقدم
-                                    </TabsTrigger>
+                                    {isAdvancedMode && (
+                                        <>
+                                            <TabsTrigger value="pricing">
+                                                <DollarSign className="w-4 h-4 me-2" />
+                                                التسعير والخصم
+                                            </TabsTrigger>
+                                            <TabsTrigger value="terms">
+                                                <FileSignature className="w-4 h-4 me-2" />
+                                                الشروط
+                                            </TabsTrigger>
+                                            <TabsTrigger value="advanced">
+                                                <Settings className="w-4 h-4 me-2" />
+                                                متقدم
+                                            </TabsTrigger>
+                                        </>
+                                    )}
                                 </TabsList>
 
                                 <TabsContent value="basic">{renderBasicInfoTab()}</TabsContent>
                                 <TabsContent value="items">{renderLineItemsTab()}</TabsContent>
-                                <TabsContent value="pricing">{renderPricingTab()}</TabsContent>
-                                <TabsContent value="terms">{renderTermsTab()}</TabsContent>
-                                <TabsContent value="advanced">{renderAdvancedTab()}</TabsContent>
+                                {isAdvancedMode && (
+                                    <>
+                                        <TabsContent value="pricing">{renderPricingTab()}</TabsContent>
+                                        <TabsContent value="terms">{renderTermsTab()}</TabsContent>
+                                        <TabsContent value="advanced">{renderAdvancedTab()}</TabsContent>
+                                    </>
+                                )}
                             </Tabs>
 
                             {/* Action Buttons */}
