@@ -18,6 +18,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios'
 import { API_CONFIG, getApiUrl, getTimeoutForUrl } from '@/config/api'
 import { captureApiCall } from './api-debug'
+import { captureApiError } from './aggressive-debug'
 import {
   generateRequestKey,
   getPendingRequest,
@@ -521,7 +522,7 @@ apiClientNoVersion.interceptors.response.use(
     const errorMessage = errorObj?.messageAr || errorObj?.message || error.response?.data?.message || 'حدث خطأ غير متوقع'
     const errorCode = errorObj?.code || error.response?.data?.code
 
-    return Promise.reject({
+    const formattedError = {
       status: error.response?.status || 500,
       message: errorMessage,
       code: errorCode,
@@ -529,7 +530,24 @@ apiClientNoVersion.interceptors.response.use(
       requestId: error.response?.data?.meta?.requestId || error.response?.data?.requestId,
       errors: error.response?.data?.errors,
       retryAfter: (error as any).retryAfter,
-    })
+    }
+
+    // Capture error with aggressive debug (non-versioned client)
+    captureApiError(
+      formattedError.status,
+      formattedError.message,
+      error.config?.url || '',
+      error.config?.method?.toUpperCase() || 'UNKNOWN',
+      {
+        requestId: formattedError.requestId,
+        code: formattedError.code,
+        errors: formattedError.errors,
+        responseData: error.response?.data,
+        client: 'apiClientNoVersion',
+      }
+    )
+
+    return Promise.reject(formattedError)
   }
 )
 
@@ -1100,6 +1118,23 @@ apiClient.interceptors.response.use(
       requestId: error.response?.data?.meta?.requestId || error.response?.data?.requestId,
       errors: error.response?.data?.errors, // Validation errors array
     }
+
+    // Capture error with aggressive debug
+    captureApiError(
+      formattedError.status,
+      formattedError.message,
+      error.config?.url || '',
+      error.config?.method?.toUpperCase() || 'UNKNOWN',
+      {
+        requestId: formattedError.requestId,
+        code: formattedError.code,
+        errors: formattedError.errors,
+        responseData: error.response?.data,
+        requestData: error.config?.data,
+        headers: error.response?.headers,
+      }
+    )
+
     return Promise.reject(formattedError)
   }
 )
