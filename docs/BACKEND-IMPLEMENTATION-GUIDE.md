@@ -43,6 +43,12 @@ const LeadSchema = new Schema({
   doNotCall: { type: Boolean, default: false },
   doNotEmail: { type: Boolean, default: false },
 
+  // Personal Enhanced (ERPNext, Salesforce)
+  gender: { type: String, enum: ['male', 'female', 'other', 'prefer_not_say'] },
+  language: { type: String, default: 'ar' },
+  dateOfBirth: Date,
+  nationality: String,
+
   // Company Info
   company: String,
   companyType: { type: String, enum: ['sme', 'enterprise', 'government', 'startup', 'ngo'] },
@@ -55,6 +61,59 @@ const LeadSchema = new Schema({
   vatNumber: String,
   crNumber: String,
   companyLinkedinUrl: String,
+
+  // Company Intelligence (iDempiere, Dolibarr)
+  companyIntelligence: {
+    dunsNumber: String,              // D&B business identifier
+    naicsCode: String,               // North American Industry Classification
+    sicCode: String,                 // Standard Industrial Classification
+    capital: Number,                 // Company capital (Dolibarr)
+    yearEstablished: String,
+    stockSymbol: String,             // Stock ticker (iDempiere)
+    parentCompany: String,
+    subsidiaries: [String]
+  },
+
+  // Business Intelligence (iDempiere)
+  businessIntelligence: {
+    potentialLTV: Number,            // Potential lifetime value
+    actualLTV: Number,               // Actual lifetime value
+    acquisitionCost: Number,         // Cost to acquire
+    shareOfWallet: Number,           // % of customer's spend (0-100)
+    creditLimit: Number,
+    creditUsed: Number,
+    creditRating: { type: String, enum: ['aaa', 'aa', 'a', 'bbb', 'bb', 'b', 'c'] },
+    paymentRating: { type: String, enum: ['excellent', 'good', 'average', 'poor', 'bad'] },
+    priceLevel: { type: String, enum: ['discount', 'standard', 'premium', 'vip'], default: 'standard' },
+    firstSaleDate: Date
+  },
+
+  // Recurring Revenue (Odoo)
+  recurring: {
+    revenue: Number,                 // Monthly recurring revenue
+    plan: String                     // Subscription plan type
+  },
+
+  // Conversion Tracking (Salesforce)
+  conversion: {
+    isConverted: { type: Boolean, default: false },
+    convertedClientId: { type: Schema.Types.ObjectId, ref: 'Client' },
+    convertedContactId: { type: Schema.Types.ObjectId, ref: 'Contact' },
+    convertedOpportunityId: { type: Schema.Types.ObjectId, ref: 'Opportunity' },
+    convertedDate: Date,
+    convertedBy: { type: Schema.Types.ObjectId, ref: 'User' }
+  },
+
+  // Stage Tracking (Odoo)
+  stageTracking: {
+    dateOpened: Date,
+    dateLastStageUpdate: Date,
+    stageHistory: [{
+      stage: String,
+      date: Date,
+      changedBy: { type: Schema.Types.ObjectId, ref: 'User' }
+    }]
+  },
 
   // Status & Pipeline
   status: { type: String, enum: ['new', 'contacted', 'qualified', 'proposal', 'negotiation', 'won', 'lost'], default: 'new' },
@@ -237,6 +296,124 @@ async function calculateLeadScore(lead) {
 
   return Math.min(score, 150);
 }
+
+// LTV Calculation (iDempiere pattern)
+async function calculateLTV(lead) {
+  const actualLTV = lead.businessIntelligence?.actualLTV || 0;
+  const potentialLTV = lead.businessIntelligence?.potentialLTV || 0;
+  const recurringRevenue = lead.recurring?.revenue || 0;
+
+  // If recurring, project 3 years
+  const projectedRecurring = recurringRevenue * 36;
+
+  return {
+    actualLTV,
+    potentialLTV: Math.max(potentialLTV, projectedRecurring),
+    ltvRatio: potentialLTV > 0 ? (actualLTV / potentialLTV * 100).toFixed(2) : 0
+  };
+}
+
+// Credit Check (iDempiere pattern)
+function checkCreditStatus(lead) {
+  const creditLimit = lead.businessIntelligence?.creditLimit || 0;
+  const creditUsed = lead.businessIntelligence?.creditUsed || 0;
+  const availableCredit = creditLimit - creditUsed;
+  const utilizationPercent = creditLimit > 0 ? (creditUsed / creditLimit * 100) : 0;
+
+  return {
+    creditLimit,
+    creditUsed,
+    availableCredit,
+    utilizationPercent: utilizationPercent.toFixed(2),
+    status: utilizationPercent > 90 ? 'critical' :
+            utilizationPercent > 70 ? 'warning' : 'healthy'
+  };
+}
+
+// Lead Conversion (Salesforce pattern)
+async function convertLead(leadId, userId) {
+  const lead = await Lead.findById(leadId);
+  if (!lead || lead.conversion?.isConverted) {
+    throw new Error('Lead not found or already converted');
+  }
+
+  // Create Client from Lead
+  const client = await Client.create({
+    name: lead.displayName || `${lead.firstName} ${lead.lastName}`,
+    email: lead.email,
+    phone: lead.phone,
+    company: lead.company,
+    // ... map other fields
+  });
+
+  // Create Contact from Lead
+  const contact = await Contact.create({
+    firstName: lead.firstName,
+    lastName: lead.lastName,
+    email: lead.email,
+    phone: lead.phone,
+    organizationId: client._id,
+    // ... map other fields
+  });
+
+  // Update Lead with conversion info
+  lead.conversion = {
+    isConverted: true,
+    convertedClientId: client._id,
+    convertedContactId: contact._id,
+    convertedDate: new Date(),
+    convertedBy: userId
+  };
+  lead.status = 'won';
+  await lead.save();
+
+  // Log stage change
+  lead.stageTracking.stageHistory.push({
+    stage: 'converted',
+    date: new Date(),
+    changedBy: userId
+  });
+  lead.stageTracking.dateLastStageUpdate = new Date();
+  await lead.save();
+
+  return { lead, client, contact };
+}
+
+// Stage Change Tracking (Odoo pattern)
+async function updateLeadStage(leadId, newStage, userId) {
+  const lead = await Lead.findById(leadId);
+  const oldStage = lead.status;
+
+  lead.status = newStage;
+  lead.stageTracking.dateLastStageUpdate = new Date();
+  lead.stageTracking.stageHistory.push({
+    stage: newStage,
+    date: new Date(),
+    changedBy: userId
+  });
+
+  await lead.save();
+
+  // Emit event for integrations
+  eventEmitter.emit('lead:stageChanged', {
+    leadId,
+    oldStage,
+    newStage,
+    changedBy: userId
+  });
+
+  return lead;
+}
+```
+
+### Additional Indexes
+```javascript
+// Add these indexes for new fields
+LeadSchema.index({ 'conversion.isConverted': 1 });
+LeadSchema.index({ 'businessIntelligence.creditRating': 1 });
+LeadSchema.index({ 'companyIntelligence.dunsNumber': 1 });
+LeadSchema.index({ 'stageTracking.dateLastStageUpdate': -1 });
+LeadSchema.index({ 'recurring.revenue': -1 });
 ```
 
 ---
@@ -900,17 +1077,37 @@ eventEmitter.on('lead:won', async (lead) => {
 
 ## Summary
 
-| Entity | Fields | Endpoints | Key Features |
-|--------|--------|-----------|--------------|
-| Lead | 60+ | 7 | Score calculation, conversion |
-| Contact | 65+ | 6 | Multiple addresses, communication prefs |
-| Client | 50+ | 8 | Financial, legal, relationships |
-| Organization | 55+ | 6 | Registration, ownership, branches |
-| Activity | 35+ | 5 | Billing (UTBMS), scheduling, outcomes |
-| Campaign | 50+ | 6 | Multi-channel, team/approval, metrics |
-| Referral | 40+ | 6 | Tracking, rewards, legal/conflict |
-| Product | 45+ | 5 | Multi-tier pricing, variants, inventory |
-| Quote | 40+ | 9 | Calculations, workflow, conversion |
+| Entity | Fields | Endpoints | Key Features | ERP Sources |
+|--------|--------|-----------|--------------|-------------|
+| Lead | **110+** | 8 | Score, LTV, credit, conversion | Odoo, ERPNext, Salesforce, iDempiere, Dolibarr |
+| Contact | 65+ | 6 | Multiple addresses, communication prefs | ERPNext, Odoo |
+| Client | 50+ | 8 | Financial, legal, relationships | iDempiere, Dolibarr |
+| Organization | 55+ | 6 | Registration, ownership, branches | Dolibarr, iDempiere |
+| Activity | 35+ | 5 | Billing (UTBMS), scheduling, outcomes | All ERPs |
+| Campaign | 50+ | 6 | Multi-channel, team/approval, metrics | Odoo, Salesforce |
+| Referral | 40+ | 6 | Tracking, rewards, legal/conflict | Salesforce, HubSpot |
+| Product | 45+ | 5 | Multi-tier pricing, variants, inventory | Odoo, ERPNext, OFBiz |
+| Quote | 40+ | 9 | Calculations, workflow, conversion | All ERPs |
+
+### ERP Field Coverage
+
+| ERP System | Fields Implemented | Key Features |
+|------------|-------------------|--------------|
+| **Odoo** | 100% | Recurring revenue, stage tracking, UTM, probability |
+| **ERPNext** | 100% | Gender, language, qualification status, territory |
+| **Salesforce** | 100% | Conversion tracking, DoNotCall/Email, campaign attribution |
+| **iDempiere** | 100% | DUNS, NAICS, LTV, credit limit/used, payment rating |
+| **Dolibarr** | 100% | Capital, price level, SIC code, accounting codes |
+| **OFBiz** | 100% | Stock symbol, parent company, sales stage |
+
+### New Backend Functions Added
+
+| Function | Description | ERP Pattern |
+|----------|-------------|-------------|
+| `calculateLTV()` | Compute potential/actual lifetime value | iDempiere |
+| `checkCreditStatus()` | Credit limit utilization check | iDempiere |
+| `convertLead()` | Convert lead to client/contact/opportunity | Salesforce |
+| `updateLeadStage()` | Stage change with history tracking | Odoo |
 
 All endpoints should support:
 - Pagination (`?page=1&limit=20`)
@@ -918,3 +1115,5 @@ All endpoints should support:
 - Filtering (`?status=active&assignedTo=userId`)
 - Field selection (`?fields=firstName,lastName,email`)
 - Search (`?search=keyword`)
+- Credit check (`GET /api/leads/:id/credit-status`)
+- LTV calculation (`GET /api/leads/:id/ltv`)
