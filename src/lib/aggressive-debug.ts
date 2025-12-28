@@ -111,6 +111,60 @@ const cleanPath = (path: string): string => {
 }
 
 /**
+ * Format backend stack trace if available
+ */
+const formatBackendStack = (responseData: any): void => {
+  // Check if backend sent stack trace info
+  const backendStack = responseData?.stack || responseData?.error?.stack || responseData?.debug?.stack
+  const backendSource = responseData?.source || responseData?.error?.source || responseData?.debug?.source
+
+  if (backendStack || backendSource) {
+    console.log('%c🖥️ BACKEND ERROR DETAILS:', 'font-weight: bold; color: #ff6600; font-size: 12px;')
+    console.log('════════════════════════════════════════════════════════════════')
+
+    if (backendSource) {
+      console.log('%c📍 Backend Source:', 'font-weight: bold; color: #ff6600;')
+      console.log(`   File: ${backendSource.file || 'unknown'}`)
+      if (backendSource.line) console.log(`   Line: ${backendSource.line}`)
+      if (backendSource.function) console.log(`   Function: ${backendSource.function}`)
+    }
+
+    if (backendStack) {
+      console.log('%c📚 Backend Stack:', 'font-weight: bold; color: #ff6600;')
+      if (typeof backendStack === 'string') {
+        console.log(backendStack)
+      } else if (Array.isArray(backendStack)) {
+        backendStack.forEach((frame: any, i: number) => {
+          console.log(`   ${i + 1}. ${frame.function || 'anonymous'} @ ${frame.file}:${frame.line}`)
+        })
+      }
+    }
+
+    console.log('════════════════════════════════════════════════════════════════')
+  }
+
+  // Check for validation errors from backend
+  const validationErrors = responseData?.errors || responseData?.error?.errors
+  if (validationErrors && Array.isArray(validationErrors)) {
+    console.log('%c⚠️ Validation Errors:', 'font-weight: bold; color: #ff9900;')
+    validationErrors.forEach((err: any, i: number) => {
+      console.log(`   ${i + 1}. ${err.field || err.path || 'unknown'}: ${err.message || err.msg || JSON.stringify(err)}`)
+    })
+  }
+
+  // Check for backend debug info
+  const debugInfo = responseData?.debug || responseData?.meta?.debug
+  if (debugInfo && typeof debugInfo === 'object') {
+    console.log('%c🔍 Backend Debug Info:', 'font-weight: bold; color: #0099ff;')
+    Object.entries(debugInfo).forEach(([key, value]) => {
+      if (key !== 'stack' && key !== 'source') {
+        console.log(`   ${key}:`, value)
+      }
+    })
+  }
+}
+
+/**
  * Log error with aggressive formatting
  */
 const logAggressiveError = (error: DebugError): void => {
@@ -163,11 +217,18 @@ const logAggressiveError = (error: DebugError): void => {
   }
 
   if (error.requestId) {
-    console.log('%c🆔 Request ID:', 'font-weight: bold; color: #333;', error.requestId)
+    console.log(
+      '%c🆔 Request ID:%c %s %c(use this to find in backend logs)',
+      'font-weight: bold; color: #333;',
+      'color: #0066cc; font-family: monospace; font-size: 12px;',
+      error.requestId,
+      'color: #888; font-style: italic;'
+    )
   }
 
+  // Show frontend stack trace
   if (error.stack) {
-    console.log('%c📚 Stack Trace:', 'font-weight: bold; color: #333;')
+    console.log('%c📚 Frontend Stack Trace:', 'font-weight: bold; color: #333;')
     const frames = parseStackTrace(error.stack)
     if (frames.length > 0) {
       frames.slice(0, 10).forEach((frame, i) => {
@@ -184,13 +245,23 @@ const logAggressiveError = (error: DebugError): void => {
     }
   }
 
+  // Show backend error details if available
+  if (error.extra?.responseData) {
+    formatBackendStack(error.extra.responseData)
+  }
+
   if (error.componentStack) {
     console.log('%c⚛️ React Component Stack:', 'font-weight: bold; color: #cc00ff;')
     console.log(error.componentStack)
   }
 
+  // Show other extra data (excluding responseData which we already formatted)
   if (error.extra && Object.keys(error.extra).length > 0) {
-    console.log('%c📦 Extra Data:', 'font-weight: bold; color: #333;', error.extra)
+    const filteredExtra = { ...error.extra }
+    delete filteredExtra.responseData
+    if (Object.keys(filteredExtra).length > 0) {
+      console.log('%c📦 Extra Data:', 'font-weight: bold; color: #333;', filteredExtra)
+    }
   }
 
   console.log('%c⏰ Time:', 'font-weight: bold; color: #333;', error.timestamp)
