@@ -15,7 +15,7 @@ import { arSA, enUS } from 'date-fns/locale'
 import { ROUTES } from '@/constants/routes'
 
 interface FinanceSidebarProps {
-    context?: 'invoices' | 'quotes' | 'payments' | 'expenses' | 'statements' | 'transactions' | 'activity' | 'time-tracking' | 'bills' | 'vendors' | 'retainers' | 'recurring' | 'reports' | 'fiscal-periods' | 'reconciliation' | 'currency' | 'chart-of-accounts' | 'credit-notes' | 'journal-entries' | 'general-ledger' | 'inter-company' | 'inter-company-balances' | 'inter-company-reconciliation'
+    context?: 'invoices' | 'quotes' | 'payments' | 'expenses' | 'statements' | 'transactions' | 'activity' | 'time-tracking' | 'bills' | 'vendors' | 'retainers' | 'recurring' | 'reports' | 'fiscal-periods' | 'reconciliation' | 'currency' | 'chart-of-accounts' | 'credit-notes' | 'journal-entries' | 'general-ledger' | 'inter-company' | 'inter-company-balances' | 'inter-company-reconciliation' | 'budgets'
     isSelectionMode?: boolean
     onToggleSelectionMode?: () => void
     selectedCount?: number
@@ -158,6 +158,10 @@ export function FinanceSidebar({
         'inter-company-reconciliation': {
             create: '',
             viewAll: ''
+        },
+        'budgets': {
+            create: ROUTES.dashboard.finance.budgets.new,
+            viewAll: ROUTES.dashboard.finance.budgets.list
         }
     }
 

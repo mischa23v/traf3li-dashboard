@@ -56,6 +56,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { ProductVariantsTab } from './product-variants-tab'
+import { ProductBarcodesTab } from './product-barcodes-tab'
+import { ProductSuppliersTab } from './product-suppliers-tab'
+import { VariantGeneratorDialog } from './variant-generator-dialog'
+import { BarcodeScannerDialog } from './barcode-scanner-dialog'
 
 // ═══════════════════════════════════════════════════════════════
 // LABEL MAPPINGS
@@ -91,6 +96,8 @@ export function ProductDetailView() {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState('overview')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [showVariantGenerator, setShowVariantGenerator] = useState(false)
+  const [showBarcodeScanner, setShowBarcodeScanner] = useState(false)
 
   // Fetch product data
   const { data: productData, isLoading, isError, error, refetch } = useProduct(productId)
@@ -415,12 +422,12 @@ export function ProductDetailView() {
                     {/* Gosi Premium Tabs Header */}
                     <div className="border-b border-slate-100/50 px-4 sm:px-6 py-4">
                       <TabsList className="inline-flex h-12 items-center justify-center rounded-2xl bg-slate-100/80 p-1.5 text-slate-500 w-full sm:w-auto gap-1">
-                        {['overview', 'pricing', 'quotes'].map((tab) => (
+                        {['overview', 'pricing', 'variants', 'barcodes', 'suppliers', 'quotes'].map((tab) => (
                           <TabsTrigger
                             key={tab}
                             value={tab}
                             className="
-                              inline-flex items-center justify-center whitespace-nowrap rounded-xl px-4 sm:px-6 py-2.5 text-sm font-semibold ring-offset-white transition-all duration-200
+                              inline-flex items-center justify-center whitespace-nowrap rounded-xl px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold ring-offset-white transition-all duration-200
                               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2
                               disabled:pointer-events-none disabled:opacity-50
                               data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600 data-[state=active]:to-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-500/20
@@ -432,7 +439,13 @@ export function ProductDetailView() {
                               ? 'نظرة عامة'
                               : tab === 'pricing'
                                 ? 'التسعير'
-                                : 'عروض الأسعار'}
+                                : tab === 'variants'
+                                  ? 'المتغيرات'
+                                  : tab === 'barcodes'
+                                    ? 'الباركودات'
+                                    : tab === 'suppliers'
+                                      ? 'الموردون'
+                                      : 'عروض الأسعار'}
                           </TabsTrigger>
                         ))}
                       </TabsList>
@@ -700,6 +713,27 @@ export function ProductDetailView() {
                         )}
                       </TabsContent>
 
+                      {/* Variants Tab */}
+                      <TabsContent value="variants" className="mt-0">
+                        <ProductVariantsTab
+                          productId={productId}
+                          onGenerateClick={() => setShowVariantGenerator(true)}
+                        />
+                      </TabsContent>
+
+                      {/* Barcodes Tab */}
+                      <TabsContent value="barcodes" className="mt-0">
+                        <ProductBarcodesTab
+                          productId={productId}
+                          onScanClick={() => setShowBarcodeScanner(true)}
+                        />
+                      </TabsContent>
+
+                      {/* Suppliers Tab */}
+                      <TabsContent value="suppliers" className="mt-0">
+                        <ProductSuppliersTab productId={productId} />
+                      </TabsContent>
+
                       {/* Quotes Tab */}
                       <TabsContent value="quotes" className="mt-0">
                         <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
@@ -824,6 +858,19 @@ export function ProductDetailView() {
           </GosiCard>
         </div>
       )}
+
+      {/* Variant Generator Dialog */}
+      <VariantGeneratorDialog
+        productId={productId}
+        open={showVariantGenerator}
+        onOpenChange={setShowVariantGenerator}
+      />
+
+      {/* Barcode Scanner Dialog */}
+      <BarcodeScannerDialog
+        open={showBarcodeScanner}
+        onOpenChange={setShowBarcodeScanner}
+      />
     </>
   )
 }
