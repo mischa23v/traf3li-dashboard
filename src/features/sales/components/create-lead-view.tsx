@@ -3,11 +3,14 @@ import { useTranslation } from 'react-i18next'
 import {
     ArrowRight, Save, User, Phone, Mail, Building,
     DollarSign, Calendar, FileText, Target, Loader2,
-    Building2, Users, ChevronDown, ChevronUp
+    Building2, Users, ChevronDown, ChevronUp, MapPin,
+    Globe, Upload, Plus, X, Hash, Tag, Boxes,
+    ExternalLink, RefreshCw, Database, FolderOpen
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
 import {
     Select,
     SelectContent,
@@ -15,6 +18,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion"
 import {
     Collapsible,
     CollapsibleContent,
@@ -91,8 +100,10 @@ export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
     // Firm size selection - controls visibility of organizational fields
     const [firmSize, setFirmSize] = useState<FirmSize>('solo')
     const [showOrgFields, setShowOrgFields] = useState(false)
+    const [advancedView, setAdvancedView] = useState(false)
 
     const [formData, setFormData] = useState({
+        // Basic Fields
         firstName: lead?.firstName || '',
         lastName: lead?.lastName || '',
         email: lead?.email || '',
@@ -105,6 +116,62 @@ export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
         description: lead?.description || '',
         notes: lead?.notes || '',
         assignedTo: typeof lead?.assignedTo === 'object' ? lead?.assignedTo?._id : lead?.assignedTo || '',
+
+        // Enhanced Contact Details
+        linkedinUrl: '',
+        twitterHandle: '',
+        website: '',
+        alternateEmail: '',
+        alternatePhone: '',
+        whatsapp: '',
+
+        // Enhanced Company Details
+        jobTitle: '',
+        department: '',
+        industry: '',
+        vatNumber: '',
+        crNumber: '',
+        companyLinkedinUrl: '',
+        annualRevenue: 0,
+        employeeCount: 0,
+
+        // Marketing Section
+        utmSource: '',
+        utmMedium: '',
+        utmCampaign: '',
+        utmTerm: '',
+        utmContent: '',
+        leadMagnet: '',
+        landingPageUrl: '',
+        marketingScore: 0,
+
+        // Territory/Region Section
+        territory: '',
+        region: '',
+        escalationPath: '',
+        backupAssignee: '',
+
+        // Integration Section
+        externalId: '',
+        sourceSystem: 'manual',
+        lastSyncDate: '',
+        syncStatus: 'synced',
+
+        // Documents (storing URLs/paths)
+        documentUrls: [] as string[],
+
+        // Custom Fields
+        customField1: '',
+        customField2: '',
+        customField3: '',
+        customField4: '',
+        customField5: '',
+
+        // Address
+        street: '',
+        city: '',
+        postalCode: '',
+        country: 'المملكة العربية السعودية',
     })
 
     const handleChange = (field: string, value: any) => {
@@ -246,6 +313,15 @@ export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
                                         )}
                                     </CardContent>
                                 </Card>
+
+                                {/* BASIC/ADVANCED TOGGLE */}
+                                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                                    <div>
+                                        <Label className="text-sm font-medium">العرض المتقدم</Label>
+                                        <p className="text-xs text-slate-500">إظهار جميع الحقول ({advancedView ? '50+' : '12'} حقل)</p>
+                                    </div>
+                                    <Switch checked={advancedView} onCheckedChange={setAdvancedView} />
+                                </div>
 
                                 {/* Basic Info */}
                                 <div className="space-y-6">
@@ -507,6 +583,563 @@ export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
                                         />
                                     </div>
                                 </div>
+
+                                {/* Advanced Sections Accordion */}
+                                {advancedView && (
+                                <Accordion type="multiple" className="space-y-4">
+
+                                    {/* Enhanced Contact Details */}
+                                    <AccordionItem value="contact_enhanced" className="border rounded-2xl bg-white shadow-sm">
+                                        <AccordionTrigger className="px-6 hover:no-underline">
+                                            <span className="flex items-center gap-2 text-lg font-semibold">
+                                                <Phone className="w-5 h-5 text-emerald-500" />
+                                                معلومات الاتصال الموسعة
+                                            </span>
+                                        </AccordionTrigger>
+                                        <AccordionContent className="px-6 pb-6">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                        <Mail className="w-4 h-4" />
+                                                        البريد البديل
+                                                    </label>
+                                                    <Input
+                                                        type="email"
+                                                        placeholder="alternate@example.com"
+                                                        className="rounded-xl"
+                                                        dir="ltr"
+                                                        value={formData.alternateEmail}
+                                                        onChange={(e) => handleChange('alternateEmail', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                        <Phone className="w-4 h-4" />
+                                                        هاتف بديل
+                                                    </label>
+                                                    <Input
+                                                        placeholder="+966 5x xxx xxxx"
+                                                        className="rounded-xl"
+                                                        dir="ltr"
+                                                        value={formData.alternatePhone}
+                                                        onChange={(e) => handleChange('alternatePhone', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700">واتساب</label>
+                                                    <Input
+                                                        placeholder="+966 5x xxx xxxx"
+                                                        className="rounded-xl"
+                                                        dir="ltr"
+                                                        value={formData.whatsapp}
+                                                        onChange={(e) => handleChange('whatsapp', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                        <ExternalLink className="w-4 h-4" />
+                                                        LinkedIn
+                                                    </label>
+                                                    <Input
+                                                        placeholder="https://linkedin.com/in/..."
+                                                        className="rounded-xl"
+                                                        dir="ltr"
+                                                        value={formData.linkedinUrl}
+                                                        onChange={(e) => handleChange('linkedinUrl', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700">Twitter</label>
+                                                    <Input
+                                                        placeholder="@username"
+                                                        className="rounded-xl"
+                                                        dir="ltr"
+                                                        value={formData.twitterHandle}
+                                                        onChange={(e) => handleChange('twitterHandle', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                        <Globe className="w-4 h-4" />
+                                                        الموقع الإلكتروني
+                                                    </label>
+                                                    <Input
+                                                        placeholder="https://example.com"
+                                                        className="rounded-xl"
+                                                        dir="ltr"
+                                                        value={formData.website}
+                                                        onChange={(e) => handleChange('website', e.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+
+                                    {/* Enhanced Company Details */}
+                                    <AccordionItem value="company_enhanced" className="border rounded-2xl bg-white shadow-sm">
+                                        <AccordionTrigger className="px-6 hover:no-underline">
+                                            <span className="flex items-center gap-2 text-lg font-semibold">
+                                                <Building className="w-5 h-5 text-emerald-500" />
+                                                معلومات الشركة الموسعة
+                                            </span>
+                                        </AccordionTrigger>
+                                        <AccordionContent className="px-6 pb-6">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700">المسمى الوظيفي</label>
+                                                    <Input
+                                                        placeholder="مدير المشتريات"
+                                                        className="rounded-xl"
+                                                        value={formData.jobTitle}
+                                                        onChange={(e) => handleChange('jobTitle', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700">القسم</label>
+                                                    <Input
+                                                        placeholder="المبيعات"
+                                                        className="rounded-xl"
+                                                        value={formData.department}
+                                                        onChange={(e) => handleChange('department', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700">الصناعة</label>
+                                                    <Input
+                                                        placeholder="التكنولوجيا"
+                                                        className="rounded-xl"
+                                                        value={formData.industry}
+                                                        onChange={(e) => handleChange('industry', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700">رقم السجل التجاري</label>
+                                                    <Input
+                                                        placeholder="1010XXXXXX"
+                                                        className="rounded-xl"
+                                                        dir="ltr"
+                                                        value={formData.crNumber}
+                                                        onChange={(e) => handleChange('crNumber', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700">الرقم الضريبي</label>
+                                                    <Input
+                                                        placeholder="3XXXXXXXXXX3"
+                                                        className="rounded-xl"
+                                                        dir="ltr"
+                                                        value={formData.vatNumber}
+                                                        onChange={(e) => handleChange('vatNumber', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700">عدد الموظفين</label>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="0"
+                                                        className="rounded-xl"
+                                                        min="0"
+                                                        value={formData.employeeCount}
+                                                        onChange={(e) => handleChange('employeeCount', parseInt(e.target.value) || 0)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700">الإيرادات السنوية (ريال)</label>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="0"
+                                                        className="rounded-xl"
+                                                        dir="ltr"
+                                                        min="0"
+                                                        value={formData.annualRevenue}
+                                                        onChange={(e) => handleChange('annualRevenue', parseFloat(e.target.value) || 0)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700">LinkedIn الشركة</label>
+                                                    <Input
+                                                        placeholder="https://linkedin.com/company/..."
+                                                        className="rounded-xl"
+                                                        dir="ltr"
+                                                        value={formData.companyLinkedinUrl}
+                                                        onChange={(e) => handleChange('companyLinkedinUrl', e.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+
+                                    {/* Marketing Section */}
+                                    <AccordionItem value="marketing" className="border rounded-2xl bg-white shadow-sm">
+                                        <AccordionTrigger className="px-6 hover:no-underline">
+                                            <span className="flex items-center gap-2 text-lg font-semibold">
+                                                <Target className="w-5 h-5 text-emerald-500" />
+                                                تتبع التسويق
+                                            </span>
+                                        </AccordionTrigger>
+                                        <AccordionContent className="px-6 pb-6">
+                                            <div className="space-y-4">
+                                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                                                    <p className="text-sm text-blue-800 flex items-center gap-2">
+                                                        <Tag className="w-4 h-4" />
+                                                        معلومات UTM والحملات التسويقية
+                                                    </p>
+                                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium text-slate-700">UTM Source</label>
+                                                        <Input
+                                                            placeholder="google, facebook, email"
+                                                            className="rounded-xl"
+                                                            dir="ltr"
+                                                            value={formData.utmSource}
+                                                            onChange={(e) => handleChange('utmSource', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium text-slate-700">UTM Medium</label>
+                                                        <Input
+                                                            placeholder="cpc, banner, email"
+                                                            className="rounded-xl"
+                                                            dir="ltr"
+                                                            value={formData.utmMedium}
+                                                            onChange={(e) => handleChange('utmMedium', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium text-slate-700">UTM Campaign</label>
+                                                        <Input
+                                                            placeholder="spring_sale"
+                                                            className="rounded-xl"
+                                                            dir="ltr"
+                                                            value={formData.utmCampaign}
+                                                            onChange={(e) => handleChange('utmCampaign', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium text-slate-700">UTM Term</label>
+                                                        <Input
+                                                            placeholder="keyword"
+                                                            className="rounded-xl"
+                                                            dir="ltr"
+                                                            value={formData.utmTerm}
+                                                            onChange={(e) => handleChange('utmTerm', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium text-slate-700">UTM Content</label>
+                                                        <Input
+                                                            placeholder="logolink, textlink"
+                                                            className="rounded-xl"
+                                                            dir="ltr"
+                                                            value={formData.utmContent}
+                                                            onChange={(e) => handleChange('utmContent', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium text-slate-700">Lead Magnet</label>
+                                                        <Input
+                                                            placeholder="ebook, webinar, free_trial"
+                                                            className="rounded-xl"
+                                                            value={formData.leadMagnet}
+                                                            onChange={(e) => handleChange('leadMagnet', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2 md:col-span-2">
+                                                        <label className="text-sm font-medium text-slate-700">Landing Page URL</label>
+                                                        <Input
+                                                            placeholder="https://example.com/landing-page"
+                                                            className="rounded-xl"
+                                                            dir="ltr"
+                                                            value={formData.landingPageUrl}
+                                                            onChange={(e) => handleChange('landingPageUrl', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium text-slate-700">Marketing Score</label>
+                                                        <Input
+                                                            type="number"
+                                                            placeholder="0-100"
+                                                            className="rounded-xl"
+                                                            min="0"
+                                                            max="100"
+                                                            value={formData.marketingScore}
+                                                            onChange={(e) => handleChange('marketingScore', parseInt(e.target.value) || 0)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+
+                                    {/* Territory/Region Section */}
+                                    <AccordionItem value="territory" className="border rounded-2xl bg-white shadow-sm">
+                                        <AccordionTrigger className="px-6 hover:no-underline">
+                                            <span className="flex items-center gap-2 text-lg font-semibold">
+                                                <MapPin className="w-5 h-5 text-emerald-500" />
+                                                المنطقة والإقليم
+                                            </span>
+                                        </AccordionTrigger>
+                                        <AccordionContent className="px-6 pb-6">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700">الإقليم</label>
+                                                    <Select value={formData.territory} onValueChange={(v) => handleChange('territory', v)}>
+                                                        <SelectTrigger className="rounded-xl">
+                                                            <SelectValue placeholder="اختر الإقليم" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="central">المنطقة الوسطى</SelectItem>
+                                                            <SelectItem value="western">المنطقة الغربية</SelectItem>
+                                                            <SelectItem value="eastern">المنطقة الشرقية</SelectItem>
+                                                            <SelectItem value="northern">المنطقة الشمالية</SelectItem>
+                                                            <SelectItem value="southern">المنطقة الجنوبية</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700">المنطقة</label>
+                                                    <Input
+                                                        placeholder="الرياض، جدة، الدمام..."
+                                                        className="rounded-xl"
+                                                        value={formData.region}
+                                                        onChange={(e) => handleChange('region', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700">مسار التصعيد</label>
+                                                    <Input
+                                                        placeholder="المدير > المدير العام"
+                                                        className="rounded-xl"
+                                                        value={formData.escalationPath}
+                                                        onChange={(e) => handleChange('escalationPath', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700">المُعيّن الاحتياطي</label>
+                                                    <Select value={formData.backupAssignee} onValueChange={(v) => handleChange('backupAssignee', v)}>
+                                                        <SelectTrigger className="rounded-xl">
+                                                            <SelectValue placeholder="اختر موظف" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {staffData?.map((staff: any) => (
+                                                                <SelectItem key={staff._id} value={staff._id}>
+                                                                    {staff.firstName} {staff.lastName}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+
+                                    {/* Address Section */}
+                                    <AccordionItem value="address" className="border rounded-2xl bg-white shadow-sm">
+                                        <AccordionTrigger className="px-6 hover:no-underline">
+                                            <span className="flex items-center gap-2 text-lg font-semibold">
+                                                <MapPin className="w-5 h-5 text-emerald-500" />
+                                                العنوان
+                                            </span>
+                                        </AccordionTrigger>
+                                        <AccordionContent className="px-6 pb-6">
+                                            <div className="space-y-4">
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700">الشارع</label>
+                                                    <Input
+                                                        placeholder="شارع الملك فهد"
+                                                        className="rounded-xl"
+                                                        value={formData.street}
+                                                        onChange={(e) => handleChange('street', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium text-slate-700">المدينة</label>
+                                                        <Input
+                                                            placeholder="الرياض"
+                                                            className="rounded-xl"
+                                                            value={formData.city}
+                                                            onChange={(e) => handleChange('city', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium text-slate-700">الرمز البريدي</label>
+                                                        <Input
+                                                            placeholder="12345"
+                                                            className="rounded-xl"
+                                                            dir="ltr"
+                                                            value={formData.postalCode}
+                                                            onChange={(e) => handleChange('postalCode', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium text-slate-700">الدولة</label>
+                                                        <Input
+                                                            placeholder="المملكة العربية السعودية"
+                                                            className="rounded-xl"
+                                                            value={formData.country}
+                                                            onChange={(e) => handleChange('country', e.target.value)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+
+                                    {/* Integration Section */}
+                                    <AccordionItem value="integration" className="border rounded-2xl bg-white shadow-sm">
+                                        <AccordionTrigger className="px-6 hover:no-underline">
+                                            <span className="flex items-center gap-2 text-lg font-semibold">
+                                                <RefreshCw className="w-5 h-5 text-emerald-500" />
+                                                التكامل والمزامنة
+                                            </span>
+                                        </AccordionTrigger>
+                                        <AccordionContent className="px-6 pb-6">
+                                            <div className="space-y-4">
+                                                <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
+                                                    <p className="text-sm text-purple-800 flex items-center gap-2">
+                                                        <Database className="w-4 h-4" />
+                                                        معلومات المزامنة مع الأنظمة الخارجية
+                                                    </p>
+                                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium text-slate-700">External ID</label>
+                                                        <Input
+                                                            placeholder="EXT-12345"
+                                                            className="rounded-xl"
+                                                            dir="ltr"
+                                                            value={formData.externalId}
+                                                            onChange={(e) => handleChange('externalId', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium text-slate-700">النظام المصدر</label>
+                                                        <Select value={formData.sourceSystem} onValueChange={(v) => handleChange('sourceSystem', v)}>
+                                                            <SelectTrigger className="rounded-xl">
+                                                                <SelectValue />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="manual">يدوي</SelectItem>
+                                                                <SelectItem value="website">الموقع الإلكتروني</SelectItem>
+                                                                <SelectItem value="crm">نظام CRM</SelectItem>
+                                                                <SelectItem value="api">API خارجي</SelectItem>
+                                                                <SelectItem value="import">استيراد</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium text-slate-700">حالة المزامنة</label>
+                                                        <Select value={formData.syncStatus} onValueChange={(v) => handleChange('syncStatus', v)}>
+                                                            <SelectTrigger className="rounded-xl">
+                                                                <SelectValue />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="synced">متزامن</SelectItem>
+                                                                <SelectItem value="pending">قيد الانتظار</SelectItem>
+                                                                <SelectItem value="error">خطأ</SelectItem>
+                                                                <SelectItem value="not_synced">غير متزامن</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium text-slate-700">تاريخ آخر مزامنة</label>
+                                                        <Input
+                                                            type="datetime-local"
+                                                            className="rounded-xl"
+                                                            dir="ltr"
+                                                            value={formData.lastSyncDate}
+                                                            onChange={(e) => handleChange('lastSyncDate', e.target.value)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+
+                                    {/* Documents Section */}
+                                    <AccordionItem value="documents" className="border rounded-2xl bg-white shadow-sm">
+                                        <AccordionTrigger className="px-6 hover:no-underline">
+                                            <span className="flex items-center gap-2 text-lg font-semibold">
+                                                <FolderOpen className="w-5 h-5 text-emerald-500" />
+                                                المستندات المرفقة
+                                            </span>
+                                        </AccordionTrigger>
+                                        <AccordionContent className="px-6 pb-6">
+                                            <div className="space-y-4">
+                                                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                                                    <p className="text-sm text-amber-800 flex items-center gap-2">
+                                                        <Upload className="w-4 h-4" />
+                                                        قم بإضافة روابط المستندات المتعلقة بهذا العميل المحتمل
+                                                    </p>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700">رابط المستند</label>
+                                                    <div className="flex gap-2">
+                                                        <Input
+                                                            placeholder="https://..."
+                                                            className="rounded-xl"
+                                                            dir="ltr"
+                                                        />
+                                                        <Button type="button" variant="outline" className="rounded-xl">
+                                                            <Plus className="w-4 h-4" />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                                {formData.documentUrls.length > 0 && (
+                                                    <div className="space-y-2">
+                                                        {formData.documentUrls.map((url, index) => (
+                                                            <div key={index} className="flex items-center justify-between p-2 bg-slate-50 rounded-lg">
+                                                                <span className="text-sm text-slate-600 truncate">{url}</span>
+                                                                <Button type="button" variant="ghost" size="sm">
+                                                                    <X className="w-4 h-4 text-red-500" />
+                                                                </Button>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+
+                                    {/* Custom Fields Section */}
+                                    <AccordionItem value="custom_fields" className="border rounded-2xl bg-white shadow-sm">
+                                        <AccordionTrigger className="px-6 hover:no-underline">
+                                            <span className="flex items-center gap-2 text-lg font-semibold">
+                                                <Boxes className="w-5 h-5 text-emerald-500" />
+                                                حقول مخصصة
+                                            </span>
+                                        </AccordionTrigger>
+                                        <AccordionContent className="px-6 pb-6">
+                                            <div className="space-y-4">
+                                                <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-4">
+                                                    <p className="text-sm text-indigo-800 flex items-center gap-2">
+                                                        <Hash className="w-4 h-4" />
+                                                        استخدم هذه الحقول لتخزين معلومات إضافية خاصة بمؤسستك
+                                                    </p>
+                                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    {[1, 2, 3, 4, 5].map((num) => (
+                                                        <div key={num} className="space-y-2">
+                                                            <label className="text-sm font-medium text-slate-700">
+                                                                حقل مخصص {num}
+                                                            </label>
+                                                            <Input
+                                                                placeholder={`قيمة الحقل المخصص ${num}`}
+                                                                className="rounded-xl"
+                                                                value={formData[`customField${num}` as keyof typeof formData] as string}
+                                                                onChange={(e) => handleChange(`customField${num}`, e.target.value)}
+                                                            />
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+
+                                </Accordion>
+                                )}
 
                                 {/* Form Actions */}
                                 <div className="flex gap-4 pt-6">

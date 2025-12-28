@@ -4,7 +4,8 @@ import {
   FileText, Loader2, Calendar,
   Phone, Mail, MessageSquare, Video,
   Clock, Users, MapPin, ChevronDown, ChevronUp,
-  Building2
+  Building2, AlertCircle, Globe, Eye, Link2,
+  DollarSign, Bell, CalendarClock, MapPinned
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -21,6 +22,12 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import {
@@ -87,6 +94,85 @@ const ACTIVITY_STATUS = [
   { value: 'completed', label: 'مكتمل' },
 ]
 
+const PRIORITY_OPTIONS = [
+  { value: 'low', label: 'منخفضة', color: 'text-slate-500' },
+  { value: 'medium', label: 'متوسطة', color: 'text-blue-500' },
+  { value: 'high', label: 'عالية', color: 'text-orange-500' },
+  { value: 'urgent', label: 'عاجلة', color: 'text-red-500' },
+]
+
+const TIME_ZONES = [
+  { value: 'Asia/Riyadh', label: 'الرياض (GMT+3)' },
+  { value: 'Asia/Dubai', label: 'دبي (GMT+4)' },
+  { value: 'Asia/Kuwait', label: 'الكويت (GMT+3)' },
+  { value: 'Asia/Bahrain', label: 'البحرين (GMT+3)' },
+  { value: 'Asia/Qatar', label: 'قطر (GMT+3)' },
+]
+
+const RECURRENCE_OPTIONS = [
+  { value: 'none', label: 'بدون تكرار' },
+  { value: 'daily', label: 'يومي' },
+  { value: 'weekly', label: 'أسبوعي' },
+  { value: 'biweekly', label: 'كل أسبوعين' },
+  { value: 'monthly', label: 'شهري' },
+  { value: 'quarterly', label: 'ربع سنوي' },
+  { value: 'yearly', label: 'سنوي' },
+]
+
+const REMINDER_OPTIONS = [
+  { value: 'none', label: 'بدون تذكير' },
+  { value: '15min', label: 'قبل 15 دقيقة' },
+  { value: '30min', label: 'قبل 30 دقيقة' },
+  { value: '1hour', label: 'قبل ساعة' },
+  { value: '1day', label: 'قبل يوم' },
+  { value: '1week', label: 'قبل أسبوع' },
+]
+
+const LOCATION_TYPES = [
+  { value: 'in_person', label: 'حضوري' },
+  { value: 'phone', label: 'هاتفي' },
+  { value: 'video_call', label: 'اجتماع فيديو' },
+  { value: 'online', label: 'عبر الإنترنت' },
+]
+
+const CALL_OUTCOMES = [
+  { value: 'connected', label: 'تم التواصل' },
+  { value: 'no_answer', label: 'لم يرد' },
+  { value: 'busy', label: 'مشغول' },
+  { value: 'voicemail', label: 'بريد صوتي' },
+  { value: 'left_message', label: 'ترك رسالة' },
+  { value: 'wrong_number', label: 'رقم خاطئ' },
+]
+
+const MEETING_OUTCOMES = [
+  { value: 'held', label: 'تم عقده' },
+  { value: 'cancelled', label: 'ملغي' },
+  { value: 'rescheduled', label: 'معاد جدولته' },
+  { value: 'no_show', label: 'لم يحضر' },
+  { value: 'postponed', label: 'مؤجل' },
+]
+
+const VISIBILITY_OPTIONS = [
+  { value: 'private', label: 'خاص' },
+  { value: 'team', label: 'الفريق' },
+  { value: 'public', label: 'عام' },
+]
+
+const CALENDAR_SYNC_OPTIONS = [
+  { value: 'none', label: 'بدون مزامنة' },
+  { value: 'google', label: 'Google Calendar' },
+  { value: 'outlook', label: 'Outlook Calendar' },
+  { value: 'both', label: 'كلاهما' },
+]
+
+const UTBMS_CODES = [
+  { value: 'L110', label: 'L110 - مؤتمر قضائي' },
+  { value: 'L120', label: 'L120 - بحث قانوني' },
+  { value: 'L130', label: 'L130 - صياغة' },
+  { value: 'L140', label: 'L140 - مراجعة مستندات' },
+  { value: 'L210', label: 'L210 - استشارة عميل' },
+]
+
 export function CreateActivityView() {
   const navigate = useNavigate()
   const createActivityMutation = useCreateActivity()
@@ -96,6 +182,9 @@ export function CreateActivityView() {
   const [firmSize, setFirmSize] = useState<FirmSize>('solo')
   const [showOrgFields, setShowOrgFields] = useState(false)
 
+  // Advanced view toggle
+  const [advancedView, setAdvancedView] = useState(false)
+
   // Form state
   const [formData, setFormData] = useState({
     type: 'call' as ActivityType,
@@ -104,6 +193,12 @@ export function CreateActivityView() {
     title: '',
     description: '',
     status: 'completed',
+    // Enhanced Basic Info
+    dueDate: '',
+    dueTime: '',
+    durationHours: 0,
+    durationMinutes: 0,
+    priority: 'medium',
     // Call data
     callDirection: 'outbound',
     phoneNumber: '',
@@ -119,6 +214,44 @@ export function CreateActivityView() {
     // Email data
     emailSubject: '',
     emailTo: '',
+    // Scheduling Section
+    startDateTime: '',
+    endDateTime: '',
+    allDayEvent: false,
+    timeZone: 'Asia/Riyadh',
+    recurring: 'none',
+    recurrenceEndDate: '',
+    reminder: 'none',
+    // Location Section
+    locationType: 'in_person',
+    addressLocation: '',
+    meetingRoom: '',
+    videoLink: '',
+    dialInNumber: '',
+    // Participants Section
+    internalAttendees: [] as string[],
+    externalParticipants: '',
+    sendCalendarInvite: false,
+    // Outcome Section
+    callOutcomeAdvanced: '',
+    meetingOutcome: '',
+    nextSteps: '',
+    followUpRequired: false,
+    followUpDate: '',
+    // Billing Section
+    billable: false,
+    billableHours: 0,
+    hourlyRate: 0,
+    activityCode: '',
+    matterNumber: '',
+    billingNotes: '',
+    // Visibility Section
+    visibility: 'private',
+    showOnCalendar: true,
+    markAsImportant: false,
+    // Integration Section
+    syncToCalendar: 'none',
+    externalEventId: '',
   })
 
   // Section toggles
@@ -258,6 +391,37 @@ export function CreateActivityView() {
                   </CardContent>
                 </Card>
 
+                {/* BASIC/ADVANCED TOGGLE */}
+                <Card className="border-2 border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50">
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={cn(
+                          "p-2 rounded-lg transition-colors",
+                          advancedView ? "bg-blue-500 text-white" : "bg-white text-slate-600"
+                        )}>
+                          <AlertCircle className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-slate-800">
+                            {advancedView ? 'الوضع المتقدم' : 'الوضع الأساسي'}
+                          </h3>
+                          <p className="text-sm text-slate-500">
+                            {advancedView
+                              ? 'عرض جميع الخيارات المتقدمة والحقول التفصيلية'
+                              : 'عرض الحقول الأساسية فقط'}
+                          </p>
+                        </div>
+                      </div>
+                      <Switch
+                        checked={advancedView}
+                        onCheckedChange={setAdvancedView}
+                        className="data-[state=checked]:bg-blue-500"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
                 {/* Activity Type Selection */}
                 <div className="space-y-6">
                   <h3 className="text-lg font-bold text-navy flex items-center gap-2">
@@ -335,7 +499,7 @@ export function CreateActivityView() {
                   </div>
                 </div>
 
-                {/* Basic Info */}
+                {/* Enhanced Basic Info */}
                 <div className="border-t border-slate-100 pt-6 space-y-6">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700">
@@ -366,6 +530,85 @@ export function CreateActivityView() {
                           ))}
                         </SelectContent>
                       </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4 text-orange-500" />
+                        الأولوية
+                      </label>
+                      <Select value={formData.priority} onValueChange={(value) => handleChange('priority', value)}>
+                        <SelectTrigger className="rounded-xl border-slate-200 focus:ring-blue-500">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {PRIORITY_OPTIONS.map(option => (
+                            <SelectItem key={option.value} value={option.value}>
+                              <span className={option.color}>{option.label}</span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-blue-500" />
+                        تاريخ الاستحقاق
+                      </label>
+                      <Input
+                        type="date"
+                        className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
+                        value={formData.dueDate}
+                        onChange={(e) => handleChange('dueDate', e.target.value)}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-blue-500" />
+                        وقت الاستحقاق
+                      </label>
+                      <Input
+                        type="time"
+                        className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
+                        value={formData.dueTime}
+                        onChange={(e) => handleChange('dueTime', e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700">
+                        المدة - ساعات
+                      </label>
+                      <Input
+                        type="number"
+                        min="0"
+                        max="24"
+                        placeholder="0"
+                        className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
+                        value={formData.durationHours || ''}
+                        onChange={(e) => handleChange('durationHours', parseInt(e.target.value) || 0)}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700">
+                        المدة - دقائق
+                      </label>
+                      <Input
+                        type="number"
+                        min="0"
+                        max="59"
+                        placeholder="0"
+                        className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
+                        value={formData.durationMinutes || ''}
+                        onChange={(e) => handleChange('durationMinutes', parseInt(e.target.value) || 0)}
+                      />
                     </div>
                   </div>
 
@@ -589,6 +832,490 @@ export function CreateActivityView() {
                     </CollapsibleContent>
                   </div>
                 </Collapsible>
+
+                {/* ADVANCED SECTIONS - Only visible in advanced mode */}
+                {advancedView && (
+                  <div className="border-t border-slate-100 pt-6">
+                    <Accordion type="multiple" className="space-y-4">
+
+                      {/* Scheduling Section */}
+                      <AccordionItem value="scheduling" className="border border-slate-200 rounded-xl px-6 bg-white shadow-sm">
+                        <AccordionTrigger className="hover:no-underline py-4">
+                          <div className="flex items-center gap-2">
+                            <CalendarClock className="w-5 h-5 text-purple-500" />
+                            <span className="font-bold text-slate-800">الجدولة والتكرار</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-4 pb-6 space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium text-slate-700">تاريخ ووقت البداية</label>
+                              <Input
+                                type="datetime-local"
+                                className="rounded-xl"
+                                value={formData.startDateTime}
+                                onChange={(e) => handleChange('startDateTime', e.target.value)}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium text-slate-700">تاريخ ووقت النهاية</label>
+                              <Input
+                                type="datetime-local"
+                                className="rounded-xl"
+                                value={formData.endDateTime}
+                                onChange={(e) => handleChange('endDateTime', e.target.value)}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 p-3 bg-slate-50 rounded-xl">
+                            <Switch
+                              checked={formData.allDayEvent}
+                              onCheckedChange={(checked) => handleChange('allDayEvent', checked)}
+                            />
+                            <Label className="text-sm text-slate-700">حدث يوم كامل</Label>
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                              <Globe className="w-4 h-4 text-blue-500" />
+                              المنطقة الزمنية
+                            </label>
+                            <Select value={formData.timeZone} onValueChange={(value) => handleChange('timeZone', value)}>
+                              <SelectTrigger className="rounded-xl">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {TIME_ZONES.map(option => (
+                                  <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium text-slate-700">التكرار</label>
+                              <Select value={formData.recurring} onValueChange={(value) => handleChange('recurring', value)}>
+                                <SelectTrigger className="rounded-xl">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {RECURRENCE_OPTIONS.map(option => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                      {option.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            {formData.recurring !== 'none' && (
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700">تاريخ انتهاء التكرار</label>
+                                <Input
+                                  type="date"
+                                  className="rounded-xl"
+                                  value={formData.recurrenceEndDate}
+                                  onChange={(e) => handleChange('recurrenceEndDate', e.target.value)}
+                                />
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                              <Bell className="w-4 h-4 text-yellow-500" />
+                              التذكير
+                            </label>
+                            <Select value={formData.reminder} onValueChange={(value) => handleChange('reminder', value)}>
+                              <SelectTrigger className="rounded-xl">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {REMINDER_OPTIONS.map(option => (
+                                  <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+
+                      {/* Location Section */}
+                      <AccordionItem value="location" className="border border-slate-200 rounded-xl px-6 bg-white shadow-sm">
+                        <AccordionTrigger className="hover:no-underline py-4">
+                          <div className="flex items-center gap-2">
+                            <MapPinned className="w-5 h-5 text-green-500" />
+                            <span className="font-bold text-slate-800">الموقع وتفاصيل الاجتماع</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-4 pb-6 space-y-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700">نوع الموقع</label>
+                            <Select value={formData.locationType} onValueChange={(value) => handleChange('locationType', value)}>
+                              <SelectTrigger className="rounded-xl">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {LOCATION_TYPES.map(option => (
+                                  <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700">العنوان / الموقع</label>
+                            <Input
+                              placeholder="الرياض، المملكة العربية السعودية"
+                              className="rounded-xl"
+                              value={formData.addressLocation}
+                              onChange={(e) => handleChange('addressLocation', e.target.value)}
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700">قاعة الاجتماع</label>
+                            <Input
+                              placeholder="قاعة المؤتمرات A"
+                              className="rounded-xl"
+                              value={formData.meetingRoom}
+                              onChange={(e) => handleChange('meetingRoom', e.target.value)}
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700">رابط الفيديو (Zoom/Teams/Meet)</label>
+                            <Input
+                              placeholder="https://zoom.us/j/..."
+                              className="rounded-xl"
+                              dir="ltr"
+                              value={formData.videoLink}
+                              onChange={(e) => handleChange('videoLink', e.target.value)}
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700">رقم الاتصال الهاتفي</label>
+                            <Input
+                              placeholder="+966 11 xxx xxxx"
+                              className="rounded-xl"
+                              dir="ltr"
+                              value={formData.dialInNumber}
+                              onChange={(e) => handleChange('dialInNumber', e.target.value)}
+                            />
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+
+                      {/* Participants Section */}
+                      <AccordionItem value="participants" className="border border-slate-200 rounded-xl px-6 bg-white shadow-sm">
+                        <AccordionTrigger className="hover:no-underline py-4">
+                          <div className="flex items-center gap-2">
+                            <Users className="w-5 h-5 text-blue-500" />
+                            <span className="font-bold text-slate-800">المشاركون والحضور</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-4 pb-6 space-y-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700">الحضور الداخليون</label>
+                            <Textarea
+                              placeholder="اختر من الموظفين... (قريباً: Multi-select)"
+                              className="min-h-[80px] rounded-xl"
+                              value={formData.internalAttendees.join(', ')}
+                              onChange={(e) => handleChange('internalAttendees', e.target.value.split(',').map(s => s.trim()))}
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700">المشاركون الخارجيون</label>
+                            <Textarea
+                              placeholder="البريد الإلكتروني مفصول بفواصل: email1@example.com, email2@example.com"
+                              className="min-h-[80px] rounded-xl"
+                              dir="ltr"
+                              value={formData.externalParticipants}
+                              onChange={(e) => handleChange('externalParticipants', e.target.value)}
+                            />
+                          </div>
+
+                          <div className="flex items-center gap-2 p-3 bg-slate-50 rounded-xl">
+                            <Switch
+                              checked={formData.sendCalendarInvite}
+                              onCheckedChange={(checked) => handleChange('sendCalendarInvite', checked)}
+                            />
+                            <Label className="text-sm text-slate-700">إرسال دعوة تقويم</Label>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+
+                      {/* Outcome Section */}
+                      <AccordionItem value="outcome" className="border border-slate-200 rounded-xl px-6 bg-white shadow-sm">
+                        <AccordionTrigger className="hover:no-underline py-4">
+                          <div className="flex items-center gap-2">
+                            <FileText className="w-5 h-5 text-indigo-500" />
+                            <span className="font-bold text-slate-800">النتيجة والمتابعة</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-4 pb-6 space-y-4">
+                          {formData.type === 'call' && (
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium text-slate-700">نتيجة المكالمة</label>
+                              <Select value={formData.callOutcomeAdvanced} onValueChange={(value) => handleChange('callOutcomeAdvanced', value)}>
+                                <SelectTrigger className="rounded-xl">
+                                  <SelectValue placeholder="اختر النتيجة..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {CALL_OUTCOMES.map(option => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                      {option.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
+
+                          {formData.type === 'meeting' && (
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium text-slate-700">نتيجة الاجتماع</label>
+                              <Select value={formData.meetingOutcome} onValueChange={(value) => handleChange('meetingOutcome', value)}>
+                                <SelectTrigger className="rounded-xl">
+                                  <SelectValue placeholder="اختر النتيجة..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {MEETING_OUTCOMES.map(option => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                      {option.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
+
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700">الخطوات التالية</label>
+                            <Textarea
+                              placeholder="اكتب الخطوات والإجراءات المطلوبة..."
+                              className="min-h-[100px] rounded-xl"
+                              value={formData.nextSteps}
+                              onChange={(e) => handleChange('nextSteps', e.target.value)}
+                            />
+                          </div>
+
+                          <div className="flex items-center gap-2 p-3 bg-slate-50 rounded-xl">
+                            <Switch
+                              checked={formData.followUpRequired}
+                              onCheckedChange={(checked) => handleChange('followUpRequired', checked)}
+                            />
+                            <Label className="text-sm text-slate-700">يتطلب متابعة</Label>
+                          </div>
+
+                          {formData.followUpRequired && (
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium text-slate-700">تاريخ المتابعة</label>
+                              <Input
+                                type="date"
+                                className="rounded-xl"
+                                value={formData.followUpDate}
+                                onChange={(e) => handleChange('followUpDate', e.target.value)}
+                              />
+                            </div>
+                          )}
+                        </AccordionContent>
+                      </AccordionItem>
+
+                      {/* Billing Section - Law Firm */}
+                      <AccordionItem value="billing" className="border border-slate-200 rounded-xl px-6 bg-white shadow-sm">
+                        <AccordionTrigger className="hover:no-underline py-4">
+                          <div className="flex items-center gap-2">
+                            <DollarSign className="w-5 h-5 text-emerald-500" />
+                            <span className="font-bold text-slate-800">الفوترة والمحاسبة</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-4 pb-6 space-y-4">
+                          <div className="flex items-center gap-2 p-3 bg-emerald-50 rounded-xl">
+                            <Switch
+                              checked={formData.billable}
+                              onCheckedChange={(checked) => handleChange('billable', checked)}
+                            />
+                            <Label className="text-sm text-slate-700 font-medium">نشاط قابل للفوترة</Label>
+                          </div>
+
+                          {formData.billable && (
+                            <>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                  <label className="text-sm font-medium text-slate-700">الساعات القابلة للفوترة</label>
+                                  <Input
+                                    type="number"
+                                    step="0.25"
+                                    min="0"
+                                    placeholder="0.00"
+                                    className="rounded-xl"
+                                    value={formData.billableHours || ''}
+                                    onChange={(e) => handleChange('billableHours', parseFloat(e.target.value) || 0)}
+                                  />
+                                </div>
+
+                                <div className="space-y-2">
+                                  <label className="text-sm font-medium text-slate-700">السعر بالساعة (ريال)</label>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    placeholder="0"
+                                    className="rounded-xl"
+                                    value={formData.hourlyRate || ''}
+                                    onChange={(e) => handleChange('hourlyRate', parseFloat(e.target.value) || 0)}
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700">رمز النشاط (UTBMS)</label>
+                                <Select value={formData.activityCode} onValueChange={(value) => handleChange('activityCode', value)}>
+                                  <SelectTrigger className="rounded-xl">
+                                    <SelectValue placeholder="اختر رمز النشاط..." />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {UTBMS_CODES.map(option => (
+                                      <SelectItem key={option.value} value={option.value}>
+                                        {option.label}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700">رقم الملف / القضية</label>
+                                <Input
+                                  placeholder="MATTER-2024-001"
+                                  className="rounded-xl"
+                                  dir="ltr"
+                                  value={formData.matterNumber}
+                                  onChange={(e) => handleChange('matterNumber', e.target.value)}
+                                />
+                              </div>
+
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700">ملاحظات الفوترة</label>
+                                <Textarea
+                                  placeholder="ملاحظات للفاتورة..."
+                                  className="min-h-[80px] rounded-xl"
+                                  value={formData.billingNotes}
+                                  onChange={(e) => handleChange('billingNotes', e.target.value)}
+                                />
+                              </div>
+
+                              {formData.billableHours > 0 && formData.hourlyRate > 0 && (
+                                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-sm font-medium text-slate-700">المبلغ الإجمالي:</span>
+                                    <span className="text-lg font-bold text-emerald-600">
+                                      {(formData.billableHours * formData.hourlyRate).toFixed(2)} ريال
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </AccordionContent>
+                      </AccordionItem>
+
+                      {/* Visibility Section */}
+                      <AccordionItem value="visibility" className="border border-slate-200 rounded-xl px-6 bg-white shadow-sm">
+                        <AccordionTrigger className="hover:no-underline py-4">
+                          <div className="flex items-center gap-2">
+                            <Eye className="w-5 h-5 text-amber-500" />
+                            <span className="font-bold text-slate-800">الخصوصية والرؤية</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-4 pb-6 space-y-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700">مستوى الرؤية</label>
+                            <Select value={formData.visibility} onValueChange={(value) => handleChange('visibility', value)}>
+                              <SelectTrigger className="rounded-xl">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {VISIBILITY_OPTIONS.map(option => (
+                                  <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="flex items-center gap-2 p-3 bg-slate-50 rounded-xl">
+                            <Switch
+                              checked={formData.showOnCalendar}
+                              onCheckedChange={(checked) => handleChange('showOnCalendar', checked)}
+                            />
+                            <Label className="text-sm text-slate-700">إظهار في التقويم</Label>
+                          </div>
+
+                          <div className="flex items-center gap-2 p-3 bg-slate-50 rounded-xl">
+                            <Switch
+                              checked={formData.markAsImportant}
+                              onCheckedChange={(checked) => handleChange('markAsImportant', checked)}
+                            />
+                            <Label className="text-sm text-slate-700">تحديد كمهم</Label>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+
+                      {/* Integration Section */}
+                      <AccordionItem value="integration" className="border border-slate-200 rounded-xl px-6 bg-white shadow-sm">
+                        <AccordionTrigger className="hover:no-underline py-4">
+                          <div className="flex items-center gap-2">
+                            <Link2 className="w-5 h-5 text-cyan-500" />
+                            <span className="font-bold text-slate-800">التكامل مع التقويمات</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-4 pb-6 space-y-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700">المزامنة مع التقويم</label>
+                            <Select value={formData.syncToCalendar} onValueChange={(value) => handleChange('syncToCalendar', value)}>
+                              <SelectTrigger className="rounded-xl">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {CALENDAR_SYNC_OPTIONS.map(option => (
+                                  <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700">معرّف الحدث الخارجي</label>
+                            <Input
+                              placeholder="يتم إنشاؤه تلقائياً..."
+                              className="rounded-xl bg-slate-50"
+                              dir="ltr"
+                              value={formData.externalEventId}
+                              onChange={(e) => handleChange('externalEventId', e.target.value)}
+                              readOnly
+                            />
+                            <p className="text-xs text-slate-500">هذا الحقل للقراءة فقط ويتم ملؤه تلقائياً بعد المزامنة</p>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+
+                    </Accordion>
+                  </div>
+                )}
 
                 {/* Submit */}
                 <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
