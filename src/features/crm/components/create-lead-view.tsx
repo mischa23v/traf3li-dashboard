@@ -335,6 +335,12 @@ export function CreateLeadView() {
     doNotCall: false,
     doNotEmail: false,
 
+    // Personal Enhanced (ERPNext, Salesforce)
+    gender: '',
+    language: 'ar',
+    dateOfBirth: '',
+    nationality: '',
+
     // Company Enhanced
     companyType: '',
     industry: '',
@@ -343,6 +349,45 @@ export function CreateLeadView() {
     vatNumber: '',
     crNumber: '',
     companyLinkedinUrl: '',
+
+    // Company Intelligence (iDempiere, Dolibarr)
+    dunsNumber: '',           // iDempiere - D&B business identifier
+    naicsCode: '',            // iDempiere - Industry classification
+    sicCode: '',              // Standard Industrial Classification
+    capital: 0,               // Dolibarr - Company capital
+    yearEstablished: '',      // Year founded
+    stockSymbol: '',          // iDempiere - Stock ticker
+    parentCompany: '',        // iDempiere - Parent company name
+    subsidiaries: [] as string[],
+
+    // Business Intelligence (iDempiere)
+    potentialLTV: 0,          // Potential lifetime value
+    actualLTV: 0,             // Actual lifetime value
+    acquisitionCost: 0,       // Cost to acquire this lead
+    shareOfWallet: 0,         // % of customer's spend
+    creditLimit: 0,           // Credit limit if customer
+    creditUsed: 0,            // Credit currently used
+    creditRating: '',         // Credit rating (A, B, C, D)
+    paymentRating: '',        // Payment behavior rating
+    priceLevel: 'standard',   // Dolibarr - Price level tier
+    firstSaleDate: '',        // iDempiere - First sale date
+
+    // Recurring Revenue (Odoo)
+    recurringRevenue: 0,      // Monthly recurring revenue
+    recurringPlan: '',        // Subscription plan type
+
+    // Conversion Tracking (Salesforce)
+    isConverted: false,
+    convertedClientId: '',
+    convertedContactId: '',
+    convertedOpportunityId: '',
+    convertedDate: '',
+    convertedBy: '',
+
+    // Stage Tracking (Odoo)
+    dateOpened: '',
+    dateLastStageUpdate: '',
+    stageHistory: [] as { stage: string; date: string; by: string }[],
 
     // Marketing Section
     utmSource: '',
@@ -2449,6 +2494,415 @@ export function CreateLeadView() {
                           value={formData.customField5}
                           onChange={(e) => handleChange('customField5', e.target.value)}
                         />
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Company Intelligence (iDempiere, Dolibarr) */}
+                <AccordionItem value="company-intelligence" className="border rounded-2xl bg-white shadow-sm">
+                  <AccordionTrigger className="px-6 hover:no-underline">
+                    <span className="flex items-center gap-2 text-lg font-semibold">
+                      <Building className="w-5 h-5 text-emerald-500" aria-hidden="true" />
+                      معلومات الشركة المتقدمة (iDempiere/Dolibarr)
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">رقم DUNS</label>
+                        <Input
+                          placeholder="123456789"
+                          className="rounded-xl"
+                          value={formData.dunsNumber}
+                          onChange={(e) => handleChange('dunsNumber', e.target.value)}
+                        />
+                        <p className="text-xs text-slate-500">معرف D&B للأعمال</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">رمز NAICS</label>
+                        <Input
+                          placeholder="541110"
+                          className="rounded-xl"
+                          value={formData.naicsCode}
+                          onChange={(e) => handleChange('naicsCode', e.target.value)}
+                        />
+                        <p className="text-xs text-slate-500">تصنيف الصناعة الأمريكية</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">رمز SIC</label>
+                        <Input
+                          placeholder="8111"
+                          className="rounded-xl"
+                          value={formData.sicCode}
+                          onChange={(e) => handleChange('sicCode', e.target.value)}
+                        />
+                        <p className="text-xs text-slate-500">التصنيف الصناعي القياسي</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">رأس المال</label>
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          className="rounded-xl"
+                          value={formData.capital || ''}
+                          onChange={(e) => handleChange('capital', parseFloat(e.target.value) || 0)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">سنة التأسيس</label>
+                        <Input
+                          placeholder="2020"
+                          className="rounded-xl"
+                          value={formData.yearEstablished}
+                          onChange={(e) => handleChange('yearEstablished', e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">رمز السهم</label>
+                        <Input
+                          placeholder="ACME"
+                          className="rounded-xl"
+                          value={formData.stockSymbol}
+                          onChange={(e) => handleChange('stockSymbol', e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">الشركة الأم</label>
+                        <Input
+                          placeholder="اسم الشركة الأم"
+                          className="rounded-xl"
+                          value={formData.parentCompany}
+                          onChange={(e) => handleChange('parentCompany', e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Business Intelligence (iDempiere) */}
+                <AccordionItem value="business-intelligence" className="border rounded-2xl bg-white shadow-sm">
+                  <AccordionTrigger className="px-6 hover:no-underline">
+                    <span className="flex items-center gap-2 text-lg font-semibold">
+                      <TrendingUp className="w-5 h-5 text-emerald-500" aria-hidden="true" />
+                      الذكاء التجاري (iDempiere)
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">القيمة المحتملة مدى الحياة</label>
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          className="rounded-xl"
+                          value={formData.potentialLTV || ''}
+                          onChange={(e) => handleChange('potentialLTV', parseFloat(e.target.value) || 0)}
+                        />
+                        <p className="text-xs text-slate-500">Potential LTV</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">القيمة الفعلية مدى الحياة</label>
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          className="rounded-xl"
+                          value={formData.actualLTV || ''}
+                          onChange={(e) => handleChange('actualLTV', parseFloat(e.target.value) || 0)}
+                        />
+                        <p className="text-xs text-slate-500">Actual LTV</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">تكلفة الاستحواذ</label>
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          className="rounded-xl"
+                          value={formData.acquisitionCost || ''}
+                          onChange={(e) => handleChange('acquisitionCost', parseFloat(e.target.value) || 0)}
+                        />
+                        <p className="text-xs text-slate-500">Acquisition Cost</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">حصة المحفظة %</label>
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          min="0"
+                          max="100"
+                          className="rounded-xl"
+                          value={formData.shareOfWallet || ''}
+                          onChange={(e) => handleChange('shareOfWallet', parseFloat(e.target.value) || 0)}
+                        />
+                        <p className="text-xs text-slate-500">Share of Wallet</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">حد الائتمان</label>
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          className="rounded-xl"
+                          value={formData.creditLimit || ''}
+                          onChange={(e) => handleChange('creditLimit', parseFloat(e.target.value) || 0)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">الائتمان المستخدم</label>
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          className="rounded-xl"
+                          value={formData.creditUsed || ''}
+                          onChange={(e) => handleChange('creditUsed', parseFloat(e.target.value) || 0)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">التصنيف الائتماني</label>
+                        <Select value={formData.creditRating} onValueChange={(v) => handleChange('creditRating', v)}>
+                          <SelectTrigger className="rounded-xl">
+                            <SelectValue placeholder="اختر التصنيف" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="aaa">AAA - ممتاز</SelectItem>
+                            <SelectItem value="aa">AA - جيد جداً</SelectItem>
+                            <SelectItem value="a">A - جيد</SelectItem>
+                            <SelectItem value="bbb">BBB - متوسط</SelectItem>
+                            <SelectItem value="bb">BB - أقل من المتوسط</SelectItem>
+                            <SelectItem value="b">B - ضعيف</SelectItem>
+                            <SelectItem value="c">C - مخاطر عالية</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">تصنيف الدفع</label>
+                        <Select value={formData.paymentRating} onValueChange={(v) => handleChange('paymentRating', v)}>
+                          <SelectTrigger className="rounded-xl">
+                            <SelectValue placeholder="اختر التصنيف" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="excellent">ممتاز - دائماً في الوقت</SelectItem>
+                            <SelectItem value="good">جيد - عادة في الوقت</SelectItem>
+                            <SelectItem value="average">متوسط - أحياناً متأخر</SelectItem>
+                            <SelectItem value="poor">ضعيف - غالباً متأخر</SelectItem>
+                            <SelectItem value="bad">سيء - متخلف عن السداد</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">مستوى السعر</label>
+                        <Select value={formData.priceLevel} onValueChange={(v) => handleChange('priceLevel', v)}>
+                          <SelectTrigger className="rounded-xl">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="discount">خصم</SelectItem>
+                            <SelectItem value="standard">قياسي</SelectItem>
+                            <SelectItem value="premium">مميز</SelectItem>
+                            <SelectItem value="vip">VIP</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">تاريخ أول بيعة</label>
+                        <Input
+                          type="date"
+                          className="rounded-xl"
+                          value={formData.firstSaleDate}
+                          onChange={(e) => handleChange('firstSaleDate', e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">الإيراد المتكرر الشهري</label>
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          className="rounded-xl"
+                          value={formData.recurringRevenue || ''}
+                          onChange={(e) => handleChange('recurringRevenue', parseFloat(e.target.value) || 0)}
+                        />
+                        <p className="text-xs text-slate-500">MRR (Odoo)</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">خطة الاشتراك</label>
+                        <Input
+                          placeholder="شهري، سنوي، إلخ"
+                          className="rounded-xl"
+                          value={formData.recurringPlan}
+                          onChange={(e) => handleChange('recurringPlan', e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Conversion Tracking (Salesforce) */}
+                <AccordionItem value="conversion" className="border rounded-2xl bg-white shadow-sm">
+                  <AccordionTrigger className="px-6 hover:no-underline">
+                    <span className="flex items-center gap-2 text-lg font-semibold">
+                      <ArrowRight className="w-5 h-5 text-emerald-500" aria-hidden="true" />
+                      تتبع التحويل (Salesforce)
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2 md:col-span-2">
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={formData.isConverted}
+                            onCheckedChange={(v) => handleChange('isConverted', v)}
+                          />
+                          <label className="text-sm font-medium text-slate-700">تم التحويل إلى عميل</label>
+                        </div>
+                      </div>
+                      {formData.isConverted && (
+                        <>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700">معرف العميل المحول</label>
+                            <Input
+                              placeholder="Client ID"
+                              className="rounded-xl"
+                              value={formData.convertedClientId}
+                              onChange={(e) => handleChange('convertedClientId', e.target.value)}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700">معرف جهة الاتصال المحولة</label>
+                            <Input
+                              placeholder="Contact ID"
+                              className="rounded-xl"
+                              value={formData.convertedContactId}
+                              onChange={(e) => handleChange('convertedContactId', e.target.value)}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700">معرف الفرصة المحولة</label>
+                            <Input
+                              placeholder="Opportunity ID"
+                              className="rounded-xl"
+                              value={formData.convertedOpportunityId}
+                              onChange={(e) => handleChange('convertedOpportunityId', e.target.value)}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700">تاريخ التحويل</label>
+                            <Input
+                              type="date"
+                              className="rounded-xl"
+                              value={formData.convertedDate}
+                              onChange={(e) => handleChange('convertedDate', e.target.value)}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700">تم التحويل بواسطة</label>
+                            <Select value={formData.convertedBy} onValueChange={(v) => handleChange('convertedBy', v)}>
+                              <SelectTrigger className="rounded-xl">
+                                <SelectValue placeholder="اختر الموظف" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {staffData?.data?.map((staff: any) => (
+                                  <SelectItem key={staff._id} value={staff._id}>
+                                    {staff.firstName} {staff.lastName}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Personal Enhanced (ERPNext, Salesforce) */}
+                <AccordionItem value="personal-enhanced" className="border rounded-2xl bg-white shadow-sm">
+                  <AccordionTrigger className="px-6 hover:no-underline">
+                    <span className="flex items-center gap-2 text-lg font-semibold">
+                      <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
+                      معلومات شخصية إضافية (ERPNext)
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">الجنس</label>
+                        <Select value={formData.gender} onValueChange={(v) => handleChange('gender', v)}>
+                          <SelectTrigger className="rounded-xl">
+                            <SelectValue placeholder="اختر الجنس" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="male">ذكر</SelectItem>
+                            <SelectItem value="female">أنثى</SelectItem>
+                            <SelectItem value="other">آخر</SelectItem>
+                            <SelectItem value="prefer_not_say">أفضل عدم الذكر</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">اللغة المفضلة</label>
+                        <Select value={formData.language} onValueChange={(v) => handleChange('language', v)}>
+                          <SelectTrigger className="rounded-xl">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="ar">العربية</SelectItem>
+                            <SelectItem value="en">English</SelectItem>
+                            <SelectItem value="fr">Français</SelectItem>
+                            <SelectItem value="ur">اردو</SelectItem>
+                            <SelectItem value="hi">हिन्दी</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">تاريخ الميلاد</label>
+                        <Input
+                          type="date"
+                          className="rounded-xl"
+                          value={formData.dateOfBirth}
+                          onChange={(e) => handleChange('dateOfBirth', e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">الجنسية</label>
+                        <Input
+                          placeholder="سعودي، مصري، إلخ"
+                          className="rounded-xl"
+                          value={formData.nationality}
+                          onChange={(e) => handleChange('nationality', e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Stage Tracking (Odoo) */}
+                <AccordionItem value="stage-tracking" className="border rounded-2xl bg-white shadow-sm">
+                  <AccordionTrigger className="px-6 hover:no-underline">
+                    <span className="flex items-center gap-2 text-lg font-semibold">
+                      <Clock className="w-5 h-5 text-emerald-500" aria-hidden="true" />
+                      تتبع المراحل (Odoo)
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">تاريخ الفتح</label>
+                        <Input
+                          type="date"
+                          className="rounded-xl"
+                          value={formData.dateOpened}
+                          onChange={(e) => handleChange('dateOpened', e.target.value)}
+                        />
+                        <p className="text-xs text-slate-500">تاريخ إنشاء العميل المحتمل</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">آخر تحديث للمرحلة</label>
+                        <Input
+                          type="date"
+                          className="rounded-xl"
+                          value={formData.dateLastStageUpdate}
+                          onChange={(e) => handleChange('dateLastStageUpdate', e.target.value)}
+                        />
+                        <p className="text-xs text-slate-500">تاريخ آخر تغيير في الحالة</p>
                       </div>
                     </div>
                   </AccordionContent>
