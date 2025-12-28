@@ -185,6 +185,12 @@ export function useSidebarData(): SidebarData {
           title: 'sidebar.nav.clientsCommunication',
           icon: Users,
           items: [
+            // CRM Dashboard
+            {
+              title: 'sidebar.nav.crmDashboard',
+              url: ROUTES.dashboard.crm.index,
+              module: 'leads',
+            },
             {
               title: 'sidebar.nav.clients',
               url: ROUTES.dashboard.clients.list,
@@ -199,6 +205,18 @@ export function useSidebarData(): SidebarData {
               title: 'sidebar.nav.organizations',
               url: ROUTES.dashboard.organizations.list,
               module: 'clients',
+            },
+            // Leads - moved from Sales
+            {
+              title: 'sidebar.nav.leads',
+              url: ROUTES.dashboard.crm.leads.list,
+              module: 'leads',
+            },
+            // CRM Reports/Transactions - NEW
+            {
+              title: 'sidebar.nav.crmTransactions',
+              url: ROUTES.dashboard.crm.transactions,
+              module: 'leads',
             },
             {
               title: 'sidebar.nav.staff',
@@ -217,26 +235,9 @@ export function useSidebarData(): SidebarData {
           icon: TrendingUp,
           module: 'leads',
           items: [
-            // CRM Dashboard
-            {
-              title: 'sidebar.nav.crmDashboard',
-              url: ROUTES.dashboard.crm.index,
-              module: 'leads',
-            },
-            {
-              title: 'sidebar.nav.leads',
-              url: ROUTES.dashboard.crm.leads.list,
-              module: 'leads',
-            },
             {
               title: 'sidebar.nav.pipeline',
               url: ROUTES.dashboard.crm.pipeline,
-              module: 'leads',
-            },
-            // CRM Contacts
-            {
-              title: 'sidebar.nav.crmContacts',
-              url: ROUTES.dashboard.crm.contacts.list,
               module: 'leads',
             },
             // CRM Products
@@ -273,46 +274,10 @@ export function useSidebarData(): SidebarData {
               url: ROUTES.dashboard.crm.emailMarketing.list,
               module: 'leads',
             },
-            // Lead Scoring
-            {
-              title: 'sidebar.nav.leadScoring',
-              url: ROUTES.dashboard.crm.leadScoring.list,
-              module: 'leads',
-            },
             // WhatsApp Integration
             {
               title: 'sidebar.nav.whatsapp',
               url: ROUTES.dashboard.crm.whatsapp.list,
-              module: 'leads',
-            },
-            // Appointments
-            {
-              title: 'sidebar.nav.appointments',
-              url: ROUTES.dashboard.crm.appointments,
-              module: 'leads',
-            },
-            // Territories
-            {
-              title: 'sidebar.nav.territories',
-              url: ROUTES.dashboard.crm.territories,
-              module: 'leads',
-            },
-            // Sales Persons
-            {
-              title: 'sidebar.nav.salesPersons',
-              url: ROUTES.dashboard.crm.salesPersons,
-              module: 'leads',
-            },
-            // CRM Reports
-            {
-              title: 'sidebar.nav.crmReports',
-              url: ROUTES.dashboard.crm.crmReports,
-              module: 'leads',
-            },
-            // CRM Setup Wizard
-            {
-              title: 'sidebar.nav.crmSetup',
-              url: ROUTES.dashboard.crm.setupWizard,
               module: 'leads',
             },
           ],
