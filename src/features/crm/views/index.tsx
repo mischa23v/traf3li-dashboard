@@ -20,6 +20,10 @@ export { TasksListView } from './tasks-list-view'
 export { ProductFormView } from './product-form-view'
 export { ProductDetailView } from './product-detail-view'
 
+// CRM Transactions & Reports Views
+export { CrmTransactionsView } from './crm-transactions-view'
+export { CrmReportsDashboardView } from './crm-reports-dashboard-view'
+
 // Settings Views
 export { GeneralSettingsView } from './settings/general-settings-view'
 export { CrmSettingsView } from './settings/crm-settings-view'
@@ -28,3 +32,6 @@ export { TerritoriesView } from './settings/territories-view'
 export { LostReasonsView } from './settings/lost-reasons-view'
 export { TagsView } from './settings/tags-view'
 export { EmailTemplatesView } from './settings/email-templates-view'
+export { DuplicateDetectionSettingsView } from './settings/duplicate-detection-settings-view'
+export { ActivityPlansSettingsView } from './settings/activity-plans-settings-view'
+export { QuotasSettingsView } from './settings/quotas-settings-view'
