@@ -959,13 +959,34 @@ export const ROUTES = {
      * Sales module routes
      */
     sales: {
+      index: '/dashboard/sales',
       leads: {
         list: '/dashboard/sales/leads',
+        new: '/dashboard/sales/leads/new',
+        detail: (leadId: string) => `/dashboard/sales/leads/${leadId}`,
       },
       reports: {
         list: '/dashboard/sales/reports',
         new: '/dashboard/sales/reports/new',
         detail: (reportId: string) => `/dashboard/sales/reports/${reportId}`,
+      },
+      transactions: '/dashboard/sales/transactions',
+      settings: '/dashboard/sales/settings',
+      pipeline: '/dashboard/sales/pipeline',
+      quotes: {
+        list: '/dashboard/sales/quotes',
+        new: '/dashboard/sales/quotes/new',
+        detail: (quoteId: string) => `/dashboard/sales/quotes/${quoteId}`,
+      },
+      orders: {
+        list: '/dashboard/sales/orders',
+        new: '/dashboard/sales/orders/new',
+        detail: (orderId: string) => `/dashboard/sales/orders/${orderId}`,
+      },
+      customers: {
+        list: '/dashboard/sales/customers',
+        new: '/dashboard/sales/customers/new',
+        detail: (customerId: string) => `/dashboard/sales/customers/${customerId}`,
       },
     },
 

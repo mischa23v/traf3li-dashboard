@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
+import { useTranslation } from 'react-i18next'
 import {
   Plus,
   Users,
@@ -13,15 +14,25 @@ import {
   Calendar,
   FileBarChart,
   BarChart3,
+  Package,
+  FileText,
+  Megaphone,
+  Receipt,
+  Settings,
+  Share2,
+  Mail,
+  MessageCircle,
+  UserCheck,
 } from 'lucide-react'
 import { useLeadStats, useLeadsNeedingFollowUp, useUpcomingTasks } from '@/hooks/useCrm'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatDistanceToNow } from 'date-fns'
-import { ar } from 'date-fns/locale'
+import { ar, enUS } from 'date-fns/locale'
 import { ROUTES } from '@/constants/routes'
+import { cn } from '@/lib/utils'
 
 interface CrmSidebarProps {
-  context: 'leads' | 'pipeline' | 'referrals' | 'activities' | 'reports'
+  context: 'leads' | 'pipeline' | 'referrals' | 'activities' | 'reports' | 'products' | 'quotes' | 'campaigns' | 'transactions' | 'settings' | 'contacts' | 'email-marketing' | 'whatsapp'
   isSelectionMode?: boolean
   onToggleSelectionMode?: () => void
   selectedCount?: number
@@ -37,6 +48,7 @@ const links = {
     viewAll: ROUTES.dashboard.crm.pipeline,
   },
   activities: {
+    create: ROUTES.dashboard.crm.activities.new,
     viewAll: ROUTES.dashboard.crm.activities.list,
   },
   referrals: {
@@ -47,6 +59,36 @@ const links = {
     create: ROUTES.dashboard.crm.reports.new,
     viewAll: ROUTES.dashboard.crm.reports.list,
   },
+  products: {
+    create: ROUTES.dashboard.crm.products.new,
+    viewAll: ROUTES.dashboard.crm.products.list,
+  },
+  quotes: {
+    create: ROUTES.dashboard.crm.quotes.new,
+    viewAll: ROUTES.dashboard.crm.quotes.list,
+  },
+  campaigns: {
+    create: ROUTES.dashboard.crm.campaigns.new,
+    viewAll: ROUTES.dashboard.crm.campaigns.list,
+  },
+  transactions: {
+    viewAll: ROUTES.dashboard.crm.transactions,
+  },
+  settings: {
+    viewAll: ROUTES.dashboard.crm.settings.general,
+  },
+  contacts: {
+    create: ROUTES.dashboard.crm.contacts.new,
+    viewAll: ROUTES.dashboard.crm.contacts.list,
+  },
+  'email-marketing': {
+    create: ROUTES.dashboard.crm.emailMarketing.new,
+    viewAll: ROUTES.dashboard.crm.emailMarketing.list,
+  },
+  whatsapp: {
+    create: ROUTES.dashboard.crm.whatsapp.start,
+    viewAll: ROUTES.dashboard.crm.whatsapp.list,
+  },
 }
 
 export function CrmSidebar({
@@ -56,65 +98,61 @@ export function CrmSidebar({
   selectedCount = 0,
   onDeleteSelected,
 }: CrmSidebarProps) {
+  const { t, i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
+  const dateLocale = isRTL ? ar : enUS
   const { data: statsData, isLoading: statsLoading } = useLeadStats()
   const { data: followUpData, isLoading: followUpLoading } = useLeadsNeedingFollowUp(5)
   const { data: tasksData, isLoading: tasksLoading } = useUpcomingTasks({ limit: 5 })
 
   const stats = statsData?.stats
 
+  // Navigation links for the current context
+  const navigationLinks = [
+    { key: 'leads', icon: UserPlus, label: isRTL ? 'العملاء المحتملين' : 'Leads', route: links.leads.viewAll, color: 'text-emerald-600' },
+    { key: 'pipeline', icon: TrendingUp, label: isRTL ? 'مسار المبيعات' : 'Pipeline', route: links.pipeline.viewAll, color: 'text-blue-600' },
+    { key: 'contacts', icon: Users, label: isRTL ? 'جهات الاتصال' : 'Contacts', route: links.contacts.viewAll, color: 'text-indigo-600' },
+    { key: 'products', icon: Package, label: isRTL ? 'المنتجات' : 'Products', route: links.products.viewAll, color: 'text-orange-600' },
+    { key: 'quotes', icon: FileText, label: isRTL ? 'عروض الأسعار' : 'Quotes', route: links.quotes.viewAll, color: 'text-purple-600' },
+    { key: 'campaigns', icon: Megaphone, label: isRTL ? 'الحملات' : 'Campaigns', route: links.campaigns.viewAll, color: 'text-pink-600' },
+    { key: 'activities', icon: Clock, label: isRTL ? 'الأنشطة' : 'Activities', route: links.activities.viewAll, color: 'text-amber-600' },
+    { key: 'referrals', icon: Share2, label: isRTL ? 'الإحالات' : 'Referrals', route: links.referrals.viewAll, color: 'text-cyan-600' },
+    { key: 'email-marketing', icon: Mail, label: isRTL ? 'التسويق بالبريد' : 'Email Marketing', route: links['email-marketing'].viewAll, color: 'text-rose-600' },
+    { key: 'whatsapp', icon: MessageCircle, label: isRTL ? 'واتساب' : 'WhatsApp', route: links.whatsapp.viewAll, color: 'text-green-600' },
+    { key: 'transactions', icon: Receipt, label: isRTL ? 'المعاملات' : 'Transactions', route: links.transactions.viewAll, color: 'text-slate-600' },
+    { key: 'reports', icon: BarChart3, label: isRTL ? 'التقارير' : 'Reports', route: links.reports.viewAll, color: 'text-violet-600' },
+    { key: 'settings', icon: Settings, label: isRTL ? 'الإعدادات' : 'Settings', route: links.settings.viewAll, color: 'text-gray-600' },
+  ]
+
+  const currentLinks = links[context] || links.leads
+
   return (
     <div className="space-y-6">
       {/* Quick Actions */}
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-        <h3 className="font-bold text-navy text-lg mb-4">إجراءات سريعة</h3>
+        <h3 className="font-bold text-navy text-lg mb-4">
+          {isRTL ? 'إجراءات سريعة' : 'Quick Actions'}
+        </h3>
         <div className="space-y-3">
-          <Button
-            asChild
-            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-12 justify-start"
-          >
-            <Link to={links.leads.create}>
-              <UserPlus className="ms-3 h-5 w-5" aria-hidden="true" />
-              إضافة عميل محتمل
-            </Link>
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            className="w-full rounded-xl h-12 justify-start border-slate-200 hover:bg-slate-50"
-          >
-            <Link to={links.pipeline.viewAll}>
-              <TrendingUp className="ms-3 h-5 w-5 text-emerald-600" aria-hidden="true" />
-              عرض مسار المبيعات
-            </Link>
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            className="w-full rounded-xl h-12 justify-start border-slate-200 hover:bg-slate-50"
-          >
-            <Link to={links.activities.viewAll}>
-              <Clock className="ms-3 h-5 w-5 text-blue-600" aria-hidden="true" />
-              سجل الأنشطة
-            </Link>
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            className="w-full rounded-xl h-12 justify-start border-slate-200 hover:bg-slate-50"
-          >
-            <Link to={links.reports.viewAll}>
-              <BarChart3 className="ms-3 h-5 w-5 text-purple-600" aria-hidden="true" />
-              التقارير والتحليلات
-            </Link>
-          </Button>
-          {context === 'reports' && (
+          {/* Dynamic Create Button based on context */}
+          {currentLinks.create && (
             <Button
               asChild
-              className="w-full bg-purple-500 hover:bg-purple-600 text-white rounded-xl h-12 justify-start"
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-12 justify-start"
             >
-              <Link to={links.reports.create}>
-                <FileBarChart className="ms-3 h-5 w-5" aria-hidden="true" />
-                إنشاء تقرير جديد
+              <Link to={currentLinks.create}>
+                <Plus className="ms-3 h-5 w-5" aria-hidden="true" />
+                {context === 'leads' && (isRTL ? 'إضافة عميل محتمل' : 'Add Lead')}
+                {context === 'products' && (isRTL ? 'إضافة منتج' : 'Add Product')}
+                {context === 'quotes' && (isRTL ? 'إنشاء عرض سعر' : 'Create Quote')}
+                {context === 'campaigns' && (isRTL ? 'إنشاء حملة' : 'Create Campaign')}
+                {context === 'activities' && (isRTL ? 'إضافة نشاط' : 'Add Activity')}
+                {context === 'referrals' && (isRTL ? 'إضافة إحالة' : 'Add Referral')}
+                {context === 'reports' && (isRTL ? 'إنشاء تقرير' : 'Create Report')}
+                {context === 'contacts' && (isRTL ? 'إضافة جهة اتصال' : 'Add Contact')}
+                {context === 'email-marketing' && (isRTL ? 'إنشاء حملة بريدية' : 'Create Email Campaign')}
+                {context === 'whatsapp' && (isRTL ? 'بدء محادثة' : 'Start Conversation')}
+                {!['leads', 'products', 'quotes', 'campaigns', 'activities', 'referrals', 'reports', 'contacts', 'email-marketing', 'whatsapp'].includes(context) && (isRTL ? 'إضافة جديد' : 'Add New')}
               </Link>
             </Button>
           )}
@@ -127,7 +165,7 @@ export function CrmSidebar({
               className="w-full rounded-xl h-12 justify-start"
             >
               <Trash2 className="ms-3 h-5 w-5" aria-hidden="true" />
-              حذف المحدد ({selectedCount})
+              {isRTL ? `حذف المحدد (${selectedCount})` : `Delete Selected (${selectedCount})`}
             </Button>
           )}
 
@@ -137,15 +175,51 @@ export function CrmSidebar({
               variant="ghost"
               className="w-full rounded-xl h-12 justify-start text-slate-600"
             >
-              {isSelectionMode ? 'إلغاء التحديد' : 'تحديد متعدد'}
+              {isSelectionMode
+                ? (isRTL ? 'إلغاء التحديد' : 'Cancel Selection')
+                : (isRTL ? 'تحديد متعدد' : 'Multi-Select')
+              }
             </Button>
           )}
         </div>
       </div>
 
+      {/* Navigation Links */}
+      <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+        <h3 className="font-bold text-navy text-lg mb-4">
+          {isRTL ? 'التنقل السريع' : 'Quick Navigation'}
+        </h3>
+        <div className="space-y-2">
+          {navigationLinks.map((link) => {
+            const Icon = link.icon
+            const isActive = context === link.key
+            return (
+              <Button
+                key={link.key}
+                asChild
+                variant={isActive ? 'default' : 'ghost'}
+                className={cn(
+                  "w-full rounded-xl h-11 justify-start",
+                  isActive
+                    ? "bg-emerald-500 hover:bg-emerald-600 text-white"
+                    : "hover:bg-slate-50 text-slate-700"
+                )}
+              >
+                <Link to={link.route}>
+                  <Icon className={cn("ms-3 h-4 w-4", isActive ? "text-white" : link.color)} aria-hidden="true" />
+                  <span className="text-sm">{link.label}</span>
+                </Link>
+              </Button>
+            )
+          })}
+        </div>
+      </div>
+
       {/* Stats Overview */}
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-        <h3 className="font-bold text-navy text-lg mb-4">إحصائيات المبيعات</h3>
+        <h3 className="font-bold text-navy text-lg mb-4">
+          {isRTL ? 'إحصائيات المبيعات' : 'Sales Statistics'}
+        </h3>
         {statsLoading ? (
           <div className="space-y-4">
             {[1, 2, 3, 4].map((i) => (
@@ -160,7 +234,7 @@ export function CrmSidebar({
             <div className="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
               <span className="text-slate-600 flex items-center gap-2">
                 <Users className="h-4 w-4" aria-hidden="true" />
-                إجمالي العملاء المحتملين
+                {isRTL ? 'إجمالي العملاء المحتملين' : 'Total Leads'}
               </span>
               <span className="font-bold text-navy text-lg">
                 {stats?.total || 0}
@@ -169,7 +243,7 @@ export function CrmSidebar({
             <div className="flex justify-between items-center p-3 bg-emerald-50 rounded-xl">
               <span className="text-emerald-700 flex items-center gap-2">
                 <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-                تم التحويل
+                {isRTL ? 'تم التحويل' : 'Converted'}
               </span>
               <span className="font-bold text-emerald-700 text-lg">
                 {stats?.converted || 0}
@@ -178,7 +252,7 @@ export function CrmSidebar({
             <div className="flex justify-between items-center p-3 bg-blue-50 rounded-xl">
               <span className="text-blue-700 flex items-center gap-2">
                 <Target className="h-4 w-4" aria-hidden="true" />
-                معدل التحويل
+                {isRTL ? 'معدل التحويل' : 'Conversion Rate'}
               </span>
               <span className="font-bold text-blue-700 text-lg">
                 {stats?.conversionRate || '0'}%
@@ -191,9 +265,13 @@ export function CrmSidebar({
       {/* Needs Follow Up */}
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-navy text-lg">يحتاج متابعة</h3>
+          <h3 className="font-bold text-navy text-lg">
+            {isRTL ? 'يحتاج متابعة' : 'Needs Follow Up'}
+          </h3>
           <Button variant="ghost" size="sm" className="text-emerald-600" asChild>
-            <Link to={`${ROUTES.dashboard.crm.leads.list}?filter=followup`}>عرض الكل</Link>
+            <Link to={`${ROUTES.dashboard.crm.leads.list}?filter=followup`}>
+              {isRTL ? 'عرض الكل' : 'View All'}
+            </Link>
           </Button>
         </div>
         {followUpLoading ? (
@@ -222,7 +300,7 @@ export function CrmSidebar({
                     <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded-md">
                       {formatDistanceToNow(new Date(lead.nextFollowUpDate), {
                         addSuffix: true,
-                        locale: ar,
+                        locale: dateLocale,
                       })}
                     </span>
                   )}
@@ -231,16 +309,22 @@ export function CrmSidebar({
             ))}
           </div>
         ) : (
-          <p className="text-slate-500 text-center py-4">لا توجد متابعات قادمة</p>
+          <p className="text-slate-500 text-center py-4">
+            {isRTL ? 'لا توجد متابعات قادمة' : 'No upcoming follow-ups'}
+          </p>
         )}
       </div>
 
       {/* Upcoming Tasks */}
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-navy text-lg">المهام القادمة</h3>
+          <h3 className="font-bold text-navy text-lg">
+            {isRTL ? 'المهام القادمة' : 'Upcoming Tasks'}
+          </h3>
           <Button variant="ghost" size="sm" className="text-emerald-600" asChild>
-            <Link to={links.activities.viewAll}>عرض الكل</Link>
+            <Link to={links.activities.viewAll}>
+              {isRTL ? 'عرض الكل' : 'View All'}
+            </Link>
           </Button>
         </div>
         {tasksLoading ? (
@@ -260,14 +344,16 @@ export function CrmSidebar({
                 {task.taskData?.dueDate && (
                   <p className="text-xs text-slate-500 flex items-center gap-1 mt-1">
                     <Calendar className="h-3 w-3" aria-hidden="true" />
-                    {new Date(task.taskData.dueDate).toLocaleDateString('ar-SA')}
+                    {new Date(task.taskData.dueDate).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US')}
                   </p>
                 )}
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-slate-500 text-center py-4">لا توجد مهام قادمة</p>
+          <p className="text-slate-500 text-center py-4">
+            {isRTL ? 'لا توجد مهام قادمة' : 'No upcoming tasks'}
+          </p>
         )}
       </div>
     </div>
