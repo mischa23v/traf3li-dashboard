@@ -75,6 +75,63 @@ const FIRM_SIZE_OPTIONS = [
   { value: 'large' as FirmSize, label: 'شركة محاماة', labelEn: 'Large Firm (50+)', icon: Building2, description: '50+ محامي' },
 ]
 
+// Referrer Tier Options
+const REFERRER_TIERS = [
+  { value: 'bronze', label: 'برونزي', labelEn: 'Bronze', color: 'text-amber-700' },
+  { value: 'silver', label: 'فضي', labelEn: 'Silver', color: 'text-slate-400' },
+  { value: 'gold', label: 'ذهبي', labelEn: 'Gold', color: 'text-yellow-500' },
+  { value: 'platinum', label: 'بلاتينيوم', labelEn: 'Platinum', color: 'text-slate-300' },
+  { value: 'diamond', label: 'ماسي', labelEn: 'Diamond', color: 'text-blue-400' },
+]
+
+// Interest Level Options
+const INTEREST_LEVELS = [
+  { value: 'hot', label: 'ساخن', labelEn: 'Hot', color: 'bg-red-500' },
+  { value: 'warm', label: 'دافئ', labelEn: 'Warm', color: 'bg-orange-500' },
+  { value: 'cold', label: 'بارد', labelEn: 'Cold', color: 'bg-blue-500' },
+  { value: 'unknown', label: 'غير معروف', labelEn: 'Unknown', color: 'bg-slate-400' },
+]
+
+// Preferred Contact Methods
+const CONTACT_METHODS = [
+  { value: 'email', label: 'البريد الإلكتروني', labelEn: 'Email' },
+  { value: 'phone', label: 'الهاتف', labelEn: 'Phone' },
+  { value: 'whatsapp', label: 'واتساب', labelEn: 'WhatsApp' },
+  { value: 'in_person', label: 'شخصياً', labelEn: 'In-Person' },
+]
+
+// Best Time to Contact
+const CONTACT_TIMES = [
+  { value: 'morning', label: 'صباحاً', labelEn: 'Morning' },
+  { value: 'afternoon', label: 'بعد الظهر', labelEn: 'Afternoon' },
+  { value: 'evening', label: 'مساءً', labelEn: 'Evening' },
+  { value: 'anytime', label: 'أي وقت', labelEn: 'Anytime' },
+]
+
+// Urgency Levels
+const URGENCY_LEVELS = [
+  { value: 'low', label: 'منخفض', labelEn: 'Low', color: 'bg-slate-400' },
+  { value: 'medium', label: 'متوسط', labelEn: 'Medium', color: 'bg-blue-500' },
+  { value: 'high', label: 'عالي', labelEn: 'High', color: 'bg-orange-500' },
+  { value: 'urgent', label: 'عاجل', labelEn: 'Urgent', color: 'bg-red-500' },
+]
+
+// Conflict Check Status
+const CONFLICT_CHECK_STATUS = [
+  { value: 'not_checked', label: 'لم يتم الفحص', labelEn: 'Not Checked', color: 'bg-slate-400' },
+  { value: 'clear', label: 'نظيف', labelEn: 'Clear', color: 'bg-green-500' },
+  { value: 'potential', label: 'محتمل', labelEn: 'Potential', color: 'bg-yellow-500' },
+  { value: 'confirmed', label: 'مؤكد', labelEn: 'Confirmed', color: 'bg-red-500' },
+]
+
+// Payment Methods
+const PAYMENT_METHODS = [
+  { value: 'bank_transfer', label: 'تحويل بنكي', labelEn: 'Bank Transfer' },
+  { value: 'check', label: 'شيك', labelEn: 'Check' },
+  { value: 'cash', label: 'نقداً', labelEn: 'Cash' },
+  { value: 'credit', label: 'رصيد', labelEn: 'Credit' },
+]
+
 // Referrer Types
 const REFERRER_TYPES: { value: ReferralType; label: string; labelEn: string; icon: any }[] = [
   { value: 'client', label: 'عميل حالي', labelEn: 'Existing Client', icon: UserCheck },
@@ -200,6 +257,9 @@ export function CreateReferralView() {
   const [activeTab, setActiveTab] = useState('referrer')
   const [advancedSettingsOpen, setAdvancedSettingsOpen] = useState(false)
 
+  // Basic/Advanced Mode Toggle
+  const [isAdvancedMode, setIsAdvancedMode] = useState(false)
+
   // Firm size selection - controls visibility of organizational fields
   const [firmSize, setFirmSize] = useState<FirmSize>('solo')
   const [showOrgFields, setShowOrgFields] = useState(false)
@@ -216,6 +276,10 @@ export function CreateReferralView() {
     referrerJobTitle: '',
     referrerRelationship: 'new', // new, occasional, regular, strategic, preferred
     referrerLinkedEntityId: '', // clientId, contactId, etc.
+    referrerTier: 'bronze', // Bronze, Silver, Gold, Platinum, Diamond
+    referrerHistory: 0, // Number of previous referrals
+    referrerCommissionRate: 10, // Commission rate percentage
+    linkedAccountId: '', // Link to client/contact account
 
     // ═══ TAB 2: REFERRED PERSON/COMPANY ═══
     referredType: 'individual', // individual, company
@@ -233,12 +297,22 @@ export function CreateReferralView() {
     referredAddress: '',
     referredCity: '',
     referredCountry: 'المملكة العربية السعودية',
+    interestLevel: 'warm', // Hot, Warm, Cold, Unknown
+    preferredContactMethod: 'email', // Email, Phone, WhatsApp, In-Person
+    bestTimeToContact: 'anytime', // Morning, Afternoon, Evening, Anytime
+    urgencyLevel: 'medium', // Low, Medium, High, Urgent
 
     // Referral Source & Tracking
     referralSource: 'word_of_mouth',
     referralSourceDetails: '',
     referralDate: new Date().toISOString().split('T')[0],
     referralCampaign: '',
+
+    // ═══ LEGAL/CONFLICT (for law firms) ═══
+    practiceAreaNeeded: '',
+    caseType: '',
+    conflictCheckStatus: 'not_checked',
+    opposingParty: '',
 
     // ═══ TAB 3: PROGRAM & REWARDS ═══
     referralProgram: 'standard',
@@ -253,6 +327,17 @@ export function CreateReferralView() {
     // Expected value
     expectedDealValue: 0,
     estimatedClosingDate: '',
+
+    // Referral Code & Tracking Links
+    referralCode: '',
+    trackingLink: '',
+    utmSource: '',
+    utmMedium: '',
+    utmCampaign: '',
+
+    // Payment Method & Reward Conditions
+    paymentMethod: 'bank_transfer',
+    rewardConditions: '',
 
     // Services of Interest
     servicesOfInterest: [] as string[],
@@ -312,6 +397,25 @@ export function CreateReferralView() {
     internalNotes: '',
     tags: [] as string[],
     customFields: {} as Record<string, any>,
+
+    // ═══ TRACKING SECTION ═══
+    firstContactDate: '',
+    qualificationDate: '',
+    conversionDate: '',
+    touchCount: 0,
+    revenueGenerated: 0,
+    commissionPaid: 0,
+
+    // ═══ COMMUNICATION SECTION ═══
+    thankYouSentToReferrer: false,
+    thankYouSentDate: '',
+    welcomeSentToReferred: false,
+    welcomeSentDate: '',
+    followUpReminderSet: false,
+
+    // ═══ DOCUMENTS SECTION ═══
+    referralAgreementUploaded: false,
+    rewardAgreementUploaded: false,
   })
 
   // Tags input
@@ -319,6 +423,27 @@ export function CreateReferralView() {
 
   const handleChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  // Generate random referral code
+  const generateReferralCode = () => {
+    const code = 'REF-' + Math.random().toString(36).substring(2, 10).toUpperCase()
+    handleChange('referralCode', code)
+    // Auto-generate tracking link
+    const trackingUrl = `https://app.example.com/ref/${code}`
+    handleChange('trackingLink', trackingUrl)
+  }
+
+  // Calculate time to conversion in days
+  const calculateTimeToConversion = () => {
+    if (formData.firstContactDate && formData.conversionDate) {
+      const first = new Date(formData.firstContactDate)
+      const conversion = new Date(formData.conversionDate)
+      const diffTime = Math.abs(conversion.getTime() - first.getTime())
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+      return diffDays
+    }
+    return 0
   }
 
   const toggleService = (service: string) => {
@@ -553,6 +678,57 @@ export function CreateReferralView() {
                 </CardContent>
               </Card>
 
+              {/* BASIC/ADVANCED TOGGLE */}
+              <Card className="border-0 shadow-sm">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "p-2 rounded-lg transition-colors",
+                        isAdvancedMode ? "bg-purple-100" : "bg-blue-100"
+                      )}>
+                        {isAdvancedMode ? (
+                          <Settings className="w-5 h-5 text-purple-600" />
+                        ) : (
+                          <Zap className="w-5 h-5 text-blue-600" />
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-slate-800">
+                          {isAdvancedMode ? 'الوضع المتقدم' : 'الوضع الأساسي'}
+                        </h3>
+                        <p className="text-xs text-slate-500">
+                          {isAdvancedMode
+                            ? 'عرض جميع الحقول والإعدادات المتقدمة'
+                            : 'عرض الحقول الأساسية فقط'}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant={isAdvancedMode ? "default" : "outline"}
+                      onClick={() => setIsAdvancedMode(!isAdvancedMode)}
+                      className={cn(
+                        "rounded-xl min-w-[120px]",
+                        isAdvancedMode && "bg-purple-500 hover:bg-purple-600"
+                      )}
+                    >
+                      {isAdvancedMode ? (
+                        <>
+                          <ChevronDown className="w-4 h-4 ms-2" />
+                          تبسيط
+                        </>
+                      ) : (
+                        <>
+                          <ChevronUp className="w-4 h-4 ms-2" />
+                          توسيع
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* TABS */}
               <Card className="border-0 shadow-lg rounded-3xl overflow-hidden">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -767,6 +943,84 @@ export function CreateReferralView() {
                           </div>
                         )}
 
+                        {/* NEW ENHANCED FIELDS - Advanced Mode Only */}
+                        {isAdvancedMode && (
+                          <>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl">
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                  <Award className="w-4 h-4 text-purple-500" />
+                                  مستوى المُحيل
+                                </Label>
+                                <Select value={formData.referrerTier} onValueChange={(value) => handleChange('referrerTier', value)}>
+                                  <SelectTrigger className="rounded-xl bg-white">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {REFERRER_TIERS.map(tier => (
+                                      <SelectItem key={tier.value} value={tier.value}>
+                                        <div className="flex items-center gap-2">
+                                          <Star className={cn("w-4 h-4", tier.color)} />
+                                          {tier.label}
+                                        </div>
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                  <TrendingUp className="w-4 h-4 text-emerald-500" />
+                                  معدل العمولة (%)
+                                </Label>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  max="100"
+                                  step="0.1"
+                                  placeholder="10"
+                                  className="rounded-xl bg-white"
+                                  value={formData.referrerCommissionRate || ''}
+                                  onChange={(e) => handleChange('referrerCommissionRate', parseFloat(e.target.value) || 0)}
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium text-slate-700">سجل الإحالات السابقة</Label>
+                                <Input
+                                  type="number"
+                                  placeholder="عدد الإحالات السابقة"
+                                  className="rounded-xl bg-slate-50"
+                                  value={formData.referrerHistory || ''}
+                                  onChange={(e) => handleChange('referrerHistory', parseInt(e.target.value) || 0)}
+                                  readOnly
+                                />
+                                <p className="text-xs text-slate-500">
+                                  لدى المُحيل {formData.referrerHistory} إحالة سابقة
+                                </p>
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium text-slate-700">ربط بحساب</Label>
+                                <Select value={formData.linkedAccountId} onValueChange={(value) => handleChange('linkedAccountId', value)}>
+                                  <SelectTrigger className="rounded-xl">
+                                    <SelectValue placeholder="اختر حساب عميل أو جهة اتصال" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="client_001">عميل: شركة النور التجارية</SelectItem>
+                                    <SelectItem value="client_002">عميل: مؤسسة الفجر</SelectItem>
+                                    <SelectItem value="contact_001">جهة اتصال: أحمد المنصور</SelectItem>
+                                    <SelectItem value="contact_002">جهة اتصال: فاطمة العلي</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                          </>
+                        )}
+
                         {/* ORGANIZATIONAL FIELDS - Only for non-solo firms */}
                         {firmSize !== 'solo' && (
                           <Collapsible open={showOrgFields} onOpenChange={setShowOrgFields}>
@@ -975,6 +1229,162 @@ export function CreateReferralView() {
                             />
                           </div>
                         </div>
+
+                        {/* NEW ENHANCED FIELDS FOR REFERRED PERSON - Advanced Mode */}
+                        {isAdvancedMode && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl">
+                            <div className="space-y-2">
+                              <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                <ThumbsUp className="w-4 h-4 text-orange-500" />
+                                مستوى الاهتمام
+                              </Label>
+                              <Select value={formData.interestLevel} onValueChange={(value) => handleChange('interestLevel', value)}>
+                                <SelectTrigger className="rounded-xl bg-white">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {INTEREST_LEVELS.map(level => (
+                                    <SelectItem key={level.value} value={level.value}>
+                                      <div className="flex items-center gap-2">
+                                        <span className={cn("w-2 h-2 rounded-full", level.color)} />
+                                        {level.label}
+                                      </div>
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                <Phone className="w-4 h-4 text-green-500" />
+                                طريقة التواصل المفضلة
+                              </Label>
+                              <Select value={formData.preferredContactMethod} onValueChange={(value) => handleChange('preferredContactMethod', value)}>
+                                <SelectTrigger className="rounded-xl bg-white">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {CONTACT_METHODS.map(method => (
+                                    <SelectItem key={method.value} value={method.value}>
+                                      {method.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                <Clock className="w-4 h-4 text-blue-500" />
+                                أفضل وقت للتواصل
+                              </Label>
+                              <Select value={formData.bestTimeToContact} onValueChange={(value) => handleChange('bestTimeToContact', value)}>
+                                <SelectTrigger className="rounded-xl bg-white">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {CONTACT_TIMES.map(time => (
+                                    <SelectItem key={time.value} value={time.value}>
+                                      {time.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                <AlertTriangle className="w-4 h-4 text-red-500" />
+                                مستوى الاستعجال
+                              </Label>
+                              <Select value={formData.urgencyLevel} onValueChange={(value) => handleChange('urgencyLevel', value)}>
+                                <SelectTrigger className="rounded-xl bg-white">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {URGENCY_LEVELS.map(level => (
+                                    <SelectItem key={level.value} value={level.value}>
+                                      <div className="flex items-center gap-2">
+                                        <span className={cn("w-2 h-2 rounded-full", level.color)} />
+                                        {level.label}
+                                      </div>
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* LEGAL/CONFLICT SECTION - Advanced Mode Only (for law firms) */}
+                        {isAdvancedMode && (
+                          <div className="p-4 bg-amber-50 rounded-xl space-y-4">
+                            <h4 className="font-semibold text-navy flex items-center gap-2">
+                              <Scale className="w-5 h-5 text-amber-600" />
+                              الفحص القانوني وتعارض المصالح
+                            </h4>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium text-slate-700">مجال الممارسة المطلوب</Label>
+                                <Select value={formData.practiceAreaNeeded} onValueChange={(value) => handleChange('practiceAreaNeeded', value)}>
+                                  <SelectTrigger className="rounded-xl bg-white">
+                                    <SelectValue placeholder="اختر مجال الممارسة" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {SERVICES_OF_INTEREST.map(service => (
+                                      <SelectItem key={service.value} value={service.value}>
+                                        {service.label}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium text-slate-700">نوع القضية</Label>
+                                <Input
+                                  placeholder="مثال: قضية تجارية"
+                                  className="rounded-xl bg-white"
+                                  value={formData.caseType}
+                                  onChange={(e) => handleChange('caseType', e.target.value)}
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium text-slate-700">حالة فحص التعارض</Label>
+                                <Select value={formData.conflictCheckStatus} onValueChange={(value) => handleChange('conflictCheckStatus', value)}>
+                                  <SelectTrigger className="rounded-xl bg-white">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {CONFLICT_CHECK_STATUS.map(status => (
+                                      <SelectItem key={status.value} value={status.value}>
+                                        <div className="flex items-center gap-2">
+                                          <span className={cn("w-2 h-2 rounded-full", status.color)} />
+                                          {status.label}
+                                        </div>
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium text-slate-700">الطرف المقابل</Label>
+                                <Input
+                                  placeholder="اسم الطرف المقابل (للفحص)"
+                                  className="rounded-xl bg-white"
+                                  value={formData.opposingParty}
+                                  onChange={(e) => handleChange('opposingParty', e.target.value)}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
 
                         {/* Referral Source Tracking */}
                         <div className="p-4 bg-indigo-50 rounded-xl space-y-4">
@@ -1237,6 +1647,121 @@ export function CreateReferralView() {
                                 className="rounded-xl bg-white"
                                 value={formData.rewardFixedAmount || ''}
                                 onChange={(e) => handleChange('rewardFixedAmount', parseFloat(e.target.value) || 0)}
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {/* NEW TRACKING & UTM FIELDS - Advanced Mode */}
+                        {isAdvancedMode && (
+                          <div className="p-4 bg-slate-50 rounded-xl space-y-4">
+                            <h4 className="font-semibold text-navy flex items-center gap-2">
+                              <Link2 className="w-5 h-5 text-slate-600" />
+                              رمز الإحالة والتتبع
+                            </h4>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium text-slate-700">رمز الإحالة</Label>
+                                <div className="flex gap-2">
+                                  <Input
+                                    placeholder="REF-XXXXXXXX"
+                                    className="rounded-xl bg-white flex-1"
+                                    dir="ltr"
+                                    value={formData.referralCode}
+                                    onChange={(e) => handleChange('referralCode', e.target.value)}
+                                  />
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={generateReferralCode}
+                                    className="rounded-xl"
+                                  >
+                                    <Zap className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium text-slate-700">رابط التتبع</Label>
+                                <Input
+                                  placeholder="https://..."
+                                  className="rounded-xl bg-slate-100"
+                                  dir="ltr"
+                                  value={formData.trackingLink}
+                                  readOnly
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium text-slate-700">UTM Source</Label>
+                                <Input
+                                  placeholder="referral"
+                                  className="rounded-xl bg-white"
+                                  dir="ltr"
+                                  value={formData.utmSource}
+                                  onChange={(e) => handleChange('utmSource', e.target.value)}
+                                />
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium text-slate-700">UTM Medium</Label>
+                                <Input
+                                  placeholder="email"
+                                  className="rounded-xl bg-white"
+                                  dir="ltr"
+                                  value={formData.utmMedium}
+                                  onChange={(e) => handleChange('utmMedium', e.target.value)}
+                                />
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium text-slate-700">UTM Campaign</Label>
+                                <Input
+                                  placeholder="q4-2024"
+                                  className="rounded-xl bg-white"
+                                  dir="ltr"
+                                  value={formData.utmCampaign}
+                                  onChange={(e) => handleChange('utmCampaign', e.target.value)}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* PAYMENT METHOD & REWARD CONDITIONS - Advanced Mode */}
+                        {isAdvancedMode && (
+                          <div className="p-4 bg-emerald-50 rounded-xl space-y-4">
+                            <h4 className="font-semibold text-navy flex items-center gap-2">
+                              <CreditCard className="w-5 h-5 text-emerald-600" />
+                              طريقة الدفع وشروط المكافأة
+                            </h4>
+
+                            <div className="space-y-2">
+                              <Label className="text-sm font-medium text-slate-700">طريقة الدفع</Label>
+                              <Select value={formData.paymentMethod} onValueChange={(value) => handleChange('paymentMethod', value)}>
+                                <SelectTrigger className="rounded-xl bg-white">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {PAYMENT_METHODS.map(method => (
+                                    <SelectItem key={method.value} value={method.value}>
+                                      {method.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label className="text-sm font-medium text-slate-700">شروط المكافأة</Label>
+                              <Textarea
+                                placeholder="اكتب شروط استحقاق المكافأة..."
+                                className="rounded-xl min-h-[80px] bg-white"
+                                value={formData.rewardConditions}
+                                onChange={(e) => handleChange('rewardConditions', e.target.value)}
                               />
                             </div>
                           </div>
@@ -1755,6 +2280,238 @@ export function CreateReferralView() {
                             </Button>
                           </div>
                         </div>
+
+                        {/* TRACKING SECTION - Advanced Mode */}
+                        {isAdvancedMode && (
+                          <div className="p-4 bg-blue-50 rounded-xl space-y-4">
+                            <h4 className="font-semibold text-navy flex items-center gap-2">
+                              <Target className="w-5 h-5 text-blue-600" />
+                              تتبع مراحل الإحالة
+                            </h4>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium text-slate-700">تاريخ أول تواصل</Label>
+                                <Input
+                                  type="date"
+                                  className="rounded-xl bg-white"
+                                  value={formData.firstContactDate}
+                                  onChange={(e) => handleChange('firstContactDate', e.target.value)}
+                                />
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium text-slate-700">تاريخ التأهيل</Label>
+                                <Input
+                                  type="date"
+                                  className="rounded-xl bg-white"
+                                  value={formData.qualificationDate}
+                                  onChange={(e) => handleChange('qualificationDate', e.target.value)}
+                                />
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium text-slate-700">تاريخ التحويل</Label>
+                                <Input
+                                  type="date"
+                                  className="rounded-xl bg-white"
+                                  value={formData.conversionDate}
+                                  onChange={(e) => handleChange('conversionDate', e.target.value)}
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium text-slate-700">الوقت حتى التحويل</Label>
+                                <Input
+                                  placeholder="يتم الحساب تلقائياً"
+                                  className="rounded-xl bg-slate-100"
+                                  value={calculateTimeToConversion() ? `${calculateTimeToConversion()} يوم` : ''}
+                                  readOnly
+                                />
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium text-slate-700">عدد نقاط التواصل</Label>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  placeholder="0"
+                                  className="rounded-xl bg-white"
+                                  value={formData.touchCount || ''}
+                                  onChange={(e) => handleChange('touchCount', parseInt(e.target.value) || 0)}
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium text-slate-700">الإيرادات المحققة (ر.س)</Label>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  placeholder="0"
+                                  className="rounded-xl bg-white"
+                                  value={formData.revenueGenerated || ''}
+                                  onChange={(e) => handleChange('revenueGenerated', parseFloat(e.target.value) || 0)}
+                                />
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium text-slate-700">العمولة المدفوعة (ر.س)</Label>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  placeholder="0"
+                                  className="rounded-xl bg-white"
+                                  value={formData.commissionPaid || ''}
+                                  onChange={(e) => handleChange('commissionPaid', parseFloat(e.target.value) || 0)}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* COMMUNICATION SECTION - Advanced Mode */}
+                        {isAdvancedMode && (
+                          <div className="p-4 bg-green-50 rounded-xl space-y-4">
+                            <h4 className="font-semibold text-navy flex items-center gap-2">
+                              <MessageSquare className="w-5 h-5 text-green-600" />
+                              إدارة التواصل والإشعارات
+                            </h4>
+
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between p-3 bg-white rounded-xl">
+                                <div className="flex-1">
+                                  <p className="font-medium text-slate-700 text-sm">إرسال شكر للمُحيل</p>
+                                  <p className="text-xs text-slate-500">تم الإرسال في: {formData.thankYouSentDate || 'لم يتم'}</p>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  {formData.thankYouSentToReferrer && (
+                                    <Input
+                                      type="date"
+                                      className="rounded-lg h-9 w-36 text-xs"
+                                      value={formData.thankYouSentDate}
+                                      onChange={(e) => handleChange('thankYouSentDate', e.target.value)}
+                                    />
+                                  )}
+                                  <Switch
+                                    checked={formData.thankYouSentToReferrer}
+                                    onCheckedChange={(checked) => {
+                                      handleChange('thankYouSentToReferrer', checked)
+                                      if (checked && !formData.thankYouSentDate) {
+                                        handleChange('thankYouSentDate', new Date().toISOString().split('T')[0])
+                                      }
+                                    }}
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="flex items-center justify-between p-3 bg-white rounded-xl">
+                                <div className="flex-1">
+                                  <p className="font-medium text-slate-700 text-sm">إرسال ترحيب للمُحال</p>
+                                  <p className="text-xs text-slate-500">تم الإرسال في: {formData.welcomeSentDate || 'لم يتم'}</p>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  {formData.welcomeSentToReferred && (
+                                    <Input
+                                      type="date"
+                                      className="rounded-lg h-9 w-36 text-xs"
+                                      value={formData.welcomeSentDate}
+                                      onChange={(e) => handleChange('welcomeSentDate', e.target.value)}
+                                    />
+                                  )}
+                                  <Switch
+                                    checked={formData.welcomeSentToReferred}
+                                    onCheckedChange={(checked) => {
+                                      handleChange('welcomeSentToReferred', checked)
+                                      if (checked && !formData.welcomeSentDate) {
+                                        handleChange('welcomeSentDate', new Date().toISOString().split('T')[0])
+                                      }
+                                    }}
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="flex items-center justify-between p-3 bg-white rounded-xl">
+                                <div className="flex-1">
+                                  <p className="font-medium text-slate-700 text-sm">تعيين تذكير متابعة</p>
+                                  <p className="text-xs text-slate-500">تفعيل تذكير تلقائي للمتابعة</p>
+                                </div>
+                                <Switch
+                                  checked={formData.followUpReminderSet}
+                                  onCheckedChange={(checked) => handleChange('followUpReminderSet', checked)}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* DOCUMENTS SECTION - Advanced Mode */}
+                        {isAdvancedMode && (
+                          <div className="p-4 bg-purple-50 rounded-xl space-y-4">
+                            <h4 className="font-semibold text-navy flex items-center gap-2">
+                              <FileText className="w-5 h-5 text-purple-600" />
+                              المستندات والاتفاقيات
+                            </h4>
+
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between p-3 bg-white rounded-xl border-2 border-dashed border-slate-200">
+                                <div className="flex items-center gap-3">
+                                  <div className="p-2 bg-purple-100 rounded-lg">
+                                    <FileText className="w-5 h-5 text-purple-600" />
+                                  </div>
+                                  <div>
+                                    <p className="font-medium text-slate-700 text-sm">اتفاقية الإحالة</p>
+                                    <p className="text-xs text-slate-500">
+                                      {formData.referralAgreementUploaded ? 'تم الرفع ✓' : 'لم يتم الرفع'}
+                                    </p>
+                                  </div>
+                                </div>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  className="rounded-xl"
+                                  onClick={() => handleChange('referralAgreementUploaded', !formData.referralAgreementUploaded)}
+                                >
+                                  <Plus className="w-4 h-4 ms-1" />
+                                  رفع ملف
+                                </Button>
+                              </div>
+
+                              <div className="flex items-center justify-between p-3 bg-white rounded-xl border-2 border-dashed border-slate-200">
+                                <div className="flex items-center gap-3">
+                                  <div className="p-2 bg-emerald-100 rounded-lg">
+                                    <Gift className="w-5 h-5 text-emerald-600" />
+                                  </div>
+                                  <div>
+                                    <p className="font-medium text-slate-700 text-sm">اتفاقية المكافأة</p>
+                                    <p className="text-xs text-slate-500">
+                                      {formData.rewardAgreementUploaded ? 'تم الرفع ✓' : 'لم يتم الرفع'}
+                                    </p>
+                                  </div>
+                                </div>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  className="rounded-xl"
+                                  onClick={() => handleChange('rewardAgreementUploaded', !formData.rewardAgreementUploaded)}
+                                >
+                                  <Plus className="w-4 h-4 ms-1" />
+                                  رفع ملف
+                                </Button>
+                              </div>
+
+                              <p className="text-xs text-slate-500 text-center pt-2">
+                                <FileText className="w-4 h-4 inline ms-1" />
+                                يمكنك رفع المستندات بصيغة PDF أو DOC أو DOCX
+                              </p>
+                            </div>
+                          </div>
+                        )}
 
                         {/* Notes */}
                         <div className="space-y-4">

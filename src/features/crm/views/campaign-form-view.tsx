@@ -7,7 +7,10 @@ import {
     Video, BookOpen, UserPlus, Tv, BarChart3, Percent,
     Hash, Link2, TestTube, Lightbulb, Building2, Tag,
     Clock, CheckCircle, XCircle, PauseCircle, PlayCircle,
-    Plus, X, Zap, Calculator, Star, LayoutGrid
+    Plus, X, Zap, Calculator, Star, LayoutGrid, User,
+    Shield, MapPin, Briefcase, Users2, MessageCircle, Send,
+    Smartphone, AtSign, Clock3, FileCode, Activity, Brain,
+    BookMarked, Network, ExternalLink
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -110,6 +113,74 @@ const AUDIENCE_SEGMENTS = [
     { value: 'partners', labelAr: 'شركاء', labelEn: 'Partners' },
 ]
 
+const SAUDI_REGIONS = [
+    { value: 'riyadh', labelAr: 'الرياض', labelEn: 'Riyadh' },
+    { value: 'makkah', labelAr: 'مكة المكرمة', labelEn: 'Makkah' },
+    { value: 'madinah', labelAr: 'المدينة المنورة', labelEn: 'Madinah' },
+    { value: 'eastern', labelAr: 'المنطقة الشرقية', labelEn: 'Eastern Province' },
+    { value: 'asir', labelAr: 'عسير', labelEn: 'Asir' },
+    { value: 'tabuk', labelAr: 'تبوك', labelEn: 'Tabuk' },
+    { value: 'qassim', labelAr: 'القصيم', labelEn: 'Qassim' },
+    { value: 'hail', labelAr: 'حائل', labelEn: 'Hail' },
+    { value: 'jazan', labelAr: 'جازان', labelEn: 'Jazan' },
+    { value: 'najran', labelAr: 'نجران', labelEn: 'Najran' },
+    { value: 'bahah', labelAr: 'الباحة', labelEn: 'Al Bahah' },
+    { value: 'jouf', labelAr: 'الجوف', labelEn: 'Al Jouf' },
+    { value: 'northern', labelAr: 'الحدود الشمالية', labelEn: 'Northern Borders' },
+]
+
+const INDUSTRIES = [
+    { value: 'legal', labelAr: 'قانوني', labelEn: 'Legal Services' },
+    { value: 'finance', labelAr: 'مالي', labelEn: 'Finance & Banking' },
+    { value: 'technology', labelAr: 'تقنية', labelEn: 'Technology' },
+    { value: 'healthcare', labelAr: 'رعاية صحية', labelEn: 'Healthcare' },
+    { value: 'construction', labelAr: 'إنشاءات', labelEn: 'Construction' },
+    { value: 'realestate', labelAr: 'عقارات', labelEn: 'Real Estate' },
+    { value: 'education', labelAr: 'تعليم', labelEn: 'Education' },
+    { value: 'retail', labelAr: 'تجزئة', labelEn: 'Retail' },
+    { value: 'manufacturing', labelAr: 'تصنيع', labelEn: 'Manufacturing' },
+    { value: 'hospitality', labelAr: 'ضيافة', labelEn: 'Hospitality' },
+]
+
+const COMPANY_SIZES = [
+    { value: '1-10', labelAr: '1-10 موظفين', labelEn: '1-10 Employees' },
+    { value: '11-50', labelAr: '11-50 موظف', labelEn: '11-50 Employees' },
+    { value: '51-200', labelAr: '51-200 موظف', labelEn: '51-200 Employees' },
+    { value: '201-500', labelAr: '201-500 موظف', labelEn: '201-500 Employees' },
+    { value: '500+', labelAr: '+500 موظف', labelEn: '500+ Employees' },
+]
+
+const MARKETING_PLATFORMS = [
+    { value: 'none', labelAr: 'لا يوجد', labelEn: 'None' },
+    { value: 'mailchimp', labelAr: 'MailChimp', labelEn: 'MailChimp' },
+    { value: 'hubspot', labelAr: 'HubSpot', labelEn: 'HubSpot' },
+    { value: 'activecampaign', labelAr: 'ActiveCampaign', labelEn: 'ActiveCampaign' },
+    { value: 'sendgrid', labelAr: 'SendGrid', labelEn: 'SendGrid' },
+    { value: 'marketo', labelAr: 'Marketo', labelEn: 'Marketo' },
+]
+
+const SEND_TIME_OPTIONS = [
+    { value: 'immediate', labelAr: 'فوري', labelEn: 'Immediate' },
+    { value: 'scheduled', labelAr: 'مجدول', labelEn: 'Scheduled' },
+    { value: 'optimized', labelAr: 'محسّن', labelEn: 'Optimized' },
+]
+
+const APPROVAL_STATUSES = [
+    { value: 'pending', labelAr: 'قيد الانتظار', labelEn: 'Pending' },
+    { value: 'approved', labelAr: 'موافق عليه', labelEn: 'Approved' },
+    { value: 'rejected', labelAr: 'مرفوض', labelEn: 'Rejected' },
+    { value: 'changes-requested', labelAr: 'تعديلات مطلوبة', labelEn: 'Changes Requested' },
+]
+
+// Mock staff members - in production, this would come from API
+const STAFF_MEMBERS = [
+    { value: 'staff-1', labelAr: 'أحمد محمد', labelEn: 'Ahmed Mohammed' },
+    { value: 'staff-2', labelAr: 'فاطمة علي', labelEn: 'Fatima Ali' },
+    { value: 'staff-3', labelAr: 'خالد عبدالله', labelEn: 'Khaled Abdullah' },
+    { value: 'staff-4', labelAr: 'سارة حسن', labelEn: 'Sarah Hassan' },
+    { value: 'staff-5', labelAr: 'محمد يوسف', labelEn: 'Mohammed Youssef' },
+]
+
 interface CampaignFormViewProps {
     editMode?: boolean
     campaignId?: string
@@ -127,6 +198,9 @@ export function CampaignFormView({ editMode = false, campaignId, initialData }: 
     // Firm size selection - controls visibility of organizational fields
     const [firmSize, setFirmSize] = useState<FirmSize>('solo')
     const [showOrgFields, setShowOrgFields] = useState(false)
+
+    // Basic/Advanced mode toggle
+    const [isAdvancedMode, setIsAdvancedMode] = useState(false)
 
     // Form state - ULTIMATE ENTERPRISE VERSION
     const [formData, setFormData] = useState({
@@ -234,6 +308,52 @@ export function CampaignFormView({ editMode = false, campaignId, initialData }: 
         approvedBy: '',
         approvalDate: '',
         complianceChecked: false,
+
+        // ═══ EMAIL & SMS SETTINGS ═══
+        fromName: '',
+        fromEmail: '',
+        replyToEmail: '',
+        preheaderText: '',
+        subjectLineA: '',
+        subjectLineB: '',
+        sendTimeOption: 'immediate',
+        scheduledDateTime: '',
+        frequencyCap: 0,
+        emailTemplate: '',
+        smsTemplate: '',
+
+        // ═══ TEAM & APPROVAL ═══
+        campaignManager: '',
+        contentCreator: '',
+        designer: '',
+        approvers: [] as string[],
+        approvalStatus: 'pending',
+        approvalComments: '',
+        approvalDateTeam: '',
+
+        // ═══ ENHANCED TARGETING ═══
+        geographicTargeting: [] as string[],
+        industryTargeting: [] as string[],
+        companySizeTargeting: [] as string[],
+        inclusionCriteria: '',
+        exclusionCriteria: '',
+
+        // ═══ ENHANCED BUDGET ═══
+        agencyCosts: 0,
+        creativeCosts: 0,
+        costPerLeadTarget: 0,
+        costPerAcquisitionTarget: 0,
+        targetROIPercent: 0,
+
+        // ═══ INTEGRATION ═══
+        crmSync: false,
+        marketingPlatform: 'none',
+        ga4TrackingId: '',
+        reportingDashboardUrl: '',
+
+        // ═══ STRATEGY & LEARNING ═══
+        strategyNotes: '',
+        lessonsLearned: '',
     })
 
     // Section toggles
@@ -331,6 +451,34 @@ export function CampaignFormView({ editMode = false, campaignId, initialData }: 
             ? formData.targetAudience.filter(s => s !== segment)
             : [...formData.targetAudience, segment]
         handleChange('targetAudience', segments)
+    }
+
+    const toggleRegion = (region: string) => {
+        const regions = formData.geographicTargeting.includes(region)
+            ? formData.geographicTargeting.filter(r => r !== region)
+            : [...formData.geographicTargeting, region]
+        handleChange('geographicTargeting', regions)
+    }
+
+    const toggleIndustry = (industry: string) => {
+        const industries = formData.industryTargeting.includes(industry)
+            ? formData.industryTargeting.filter(i => i !== industry)
+            : [...formData.industryTargeting, industry]
+        handleChange('industryTargeting', industries)
+    }
+
+    const toggleCompanySize = (size: string) => {
+        const sizes = formData.companySizeTargeting.includes(size)
+            ? formData.companySizeTargeting.filter(s => s !== size)
+            : [...formData.companySizeTargeting, size]
+        handleChange('companySizeTargeting', sizes)
+    }
+
+    const toggleApprover = (approver: string) => {
+        const approvers = formData.approvers.includes(approver)
+            ? formData.approvers.filter(a => a !== approver)
+            : [...formData.approvers, approver]
+        handleChange('approvers', approvers)
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -450,6 +598,27 @@ export function CampaignFormView({ editMode = false, campaignId, initialData }: 
                                 <Separator />
 
                                 {/* ═══════════════════════════════════════════════════════════════ */}
+                                {/* BASIC / ADVANCED MODE TOGGLE */}
+                                {/* ═══════════════════════════════════════════════════════════════ */}
+                                <div className="flex items-center justify-center p-4 bg-gradient-to-r from-purple-50 via-indigo-50 to-purple-50 rounded-2xl border border-purple-200">
+                                    <div className="flex items-center gap-4">
+                                        <div className={cn("px-4 py-2 rounded-lg font-medium transition-all", !isAdvancedMode ? "bg-white text-purple-700 shadow-md" : "text-slate-500")}>
+                                            {isArabic ? 'عرض أساسي' : 'Basic View'}
+                                        </div>
+                                        <Switch
+                                            checked={isAdvancedMode}
+                                            onCheckedChange={setIsAdvancedMode}
+                                            className="data-[state=checked]:bg-purple-600"
+                                        />
+                                        <div className={cn("px-4 py-2 rounded-lg font-medium transition-all", isAdvancedMode ? "bg-white text-purple-700 shadow-md" : "text-slate-500")}>
+                                            {isArabic ? 'عرض متقدم' : 'Advanced View'}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <Separator />
+
+                                {/* ═══════════════════════════════════════════════════════════════ */}
                                 {/* CAMPAIGN TYPE SELECTOR */}
                                 {/* ═══════════════════════════════════════════════════════════════ */}
                                 <div className="space-y-4">
@@ -565,7 +734,7 @@ export function CampaignFormView({ editMode = false, campaignId, initialData }: 
                                 {/* TABBED SECTIONS - Enterprise Campaign Management */}
                                 {/* ═══════════════════════════════════════════════════════════════ */}
                                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                                    <TabsList className="grid w-full grid-cols-5 bg-slate-100 rounded-xl p-1">
+                                    <TabsList className={cn("grid w-full bg-slate-100 rounded-xl p-1", isAdvancedMode ? "grid-cols-7" : "grid-cols-5")}>
                                         <TabsTrigger value="basic" className="rounded-lg data-[state=active]:bg-white">
                                             <FileText className="w-4 h-4 me-2" />
                                             {isArabic ? 'أساسي' : 'Basic'}
@@ -586,6 +755,18 @@ export function CampaignFormView({ editMode = false, campaignId, initialData }: 
                                             <Globe className="w-4 h-4 me-2" />
                                             {isArabic ? 'القنوات' : 'Channels'}
                                         </TabsTrigger>
+                                        {isAdvancedMode && (
+                                            <>
+                                                <TabsTrigger value="email-sms" className="rounded-lg data-[state=active]:bg-white">
+                                                    <Send className="w-4 h-4 me-2" />
+                                                    {isArabic ? 'البريد والرسائل' : 'Email & SMS'}
+                                                </TabsTrigger>
+                                                <TabsTrigger value="team" className="rounded-lg data-[state=active]:bg-white">
+                                                    <Users2 className="w-4 h-4 me-2" />
+                                                    {isArabic ? 'الفريق والموافقة' : 'Team & Approval'}
+                                                </TabsTrigger>
+                                            </>
+                                        )}
                                     </TabsList>
 
                                     {/* ═══ TAB 1: BASIC INFO ═══ */}
@@ -774,6 +955,130 @@ export function CampaignFormView({ editMode = false, campaignId, initialData }: 
                                             </div>
                                         </div>
 
+                                        {/* Geographic Targeting */}
+                                        <div className="space-y-4">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <MapPin className="w-4 h-4 text-blue-500" />
+                                                {isArabic ? 'الاستهداف الجغرافي (المناطق السعودية)' : 'Geographic Targeting (Saudi Regions)'}
+                                            </label>
+                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                                {SAUDI_REGIONS.map((region) => (
+                                                    <div
+                                                        key={region.value}
+                                                        className={cn(
+                                                            "p-3 rounded-xl border-2 cursor-pointer transition-all",
+                                                            formData.geographicTargeting.includes(region.value)
+                                                                ? "border-blue-500 bg-blue-50"
+                                                                : "border-slate-200 hover:border-blue-300"
+                                                        )}
+                                                        onClick={() => toggleRegion(region.value)}
+                                                    >
+                                                        <div className="flex items-center gap-2">
+                                                            <Checkbox
+                                                                checked={formData.geographicTargeting.includes(region.value)}
+                                                                onCheckedChange={() => toggleRegion(region.value)}
+                                                            />
+                                                            <span className="text-xs font-medium">
+                                                                {isArabic ? region.labelAr : region.labelEn}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Industry Targeting */}
+                                        <div className="space-y-4">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Briefcase className="w-4 h-4 text-purple-500" />
+                                                {isArabic ? 'استهداف الصناعة' : 'Industry Targeting'}
+                                            </label>
+                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                                {INDUSTRIES.map((industry) => (
+                                                    <div
+                                                        key={industry.value}
+                                                        className={cn(
+                                                            "p-3 rounded-xl border-2 cursor-pointer transition-all",
+                                                            formData.industryTargeting.includes(industry.value)
+                                                                ? "border-purple-500 bg-purple-50"
+                                                                : "border-slate-200 hover:border-purple-300"
+                                                        )}
+                                                        onClick={() => toggleIndustry(industry.value)}
+                                                    >
+                                                        <div className="flex items-center gap-2">
+                                                            <Checkbox
+                                                                checked={formData.industryTargeting.includes(industry.value)}
+                                                                onCheckedChange={() => toggleIndustry(industry.value)}
+                                                            />
+                                                            <span className="text-xs font-medium">
+                                                                {isArabic ? industry.labelAr : industry.labelEn}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Company Size Targeting */}
+                                        <div className="space-y-4">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Building2 className="w-4 h-4 text-orange-500" />
+                                                {isArabic ? 'استهداف حجم الشركة' : 'Company Size Targeting'}
+                                            </label>
+                                            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                                {COMPANY_SIZES.map((size) => (
+                                                    <div
+                                                        key={size.value}
+                                                        className={cn(
+                                                            "p-3 rounded-xl border-2 cursor-pointer transition-all",
+                                                            formData.companySizeTargeting.includes(size.value)
+                                                                ? "border-orange-500 bg-orange-50"
+                                                                : "border-slate-200 hover:border-orange-300"
+                                                        )}
+                                                        onClick={() => toggleCompanySize(size.value)}
+                                                    >
+                                                        <div className="flex items-center gap-2">
+                                                            <Checkbox
+                                                                checked={formData.companySizeTargeting.includes(size.value)}
+                                                                onCheckedChange={() => toggleCompanySize(size.value)}
+                                                            />
+                                                            <span className="text-xs font-medium">
+                                                                {isArabic ? size.labelAr : size.labelEn}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Inclusion/Exclusion Criteria */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                    <CheckCircle className="w-4 h-4 text-emerald-500" />
+                                                    {isArabic ? 'معايير التضمين' : 'Inclusion Criteria'}
+                                                </label>
+                                                <Textarea
+                                                    placeholder={isArabic ? "صف من يجب تضمينه في هذه الحملة..." : "Describe who should be included in this campaign..."}
+                                                    className="min-h-[100px] rounded-xl border-slate-200"
+                                                    value={formData.inclusionCriteria}
+                                                    onChange={(e) => handleChange('inclusionCriteria', e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                    <XCircle className="w-4 h-4 text-red-500" />
+                                                    {isArabic ? 'معايير الاستبعاد' : 'Exclusion Criteria'}
+                                                </label>
+                                                <Textarea
+                                                    placeholder={isArabic ? "صف من يجب استبعاده من هذه الحملة..." : "Describe who should be excluded from this campaign..."}
+                                                    className="min-h-[100px] rounded-xl border-slate-200"
+                                                    value={formData.exclusionCriteria}
+                                                    onChange={(e) => handleChange('exclusionCriteria', e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Target className="w-4 h-4 text-emerald-500" />
@@ -848,6 +1153,79 @@ export function CampaignFormView({ editMode = false, campaignId, initialData }: 
                                                         </SelectContent>
                                                     </Select>
                                                 </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Enhanced Budget Breakdown */}
+                                        <div className="p-4 bg-blue-50 rounded-xl space-y-4">
+                                            <h4 className="font-medium text-blue-800 flex items-center gap-2">
+                                                <Calculator className="w-4 h-4" />
+                                                {isArabic ? 'تفصيل التكاليف' : 'Cost Breakdown'}
+                                            </h4>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <label className="text-xs text-slate-600">{isArabic ? 'تكاليف الوكالة' : 'Agency Costs'}</label>
+                                                    <Input
+                                                        type="number"
+                                                        min="0"
+                                                        step="0.01"
+                                                        className="rounded-lg"
+                                                        value={formData.agencyCosts || ''}
+                                                        onChange={(e) => handleChange('agencyCosts', parseFloat(e.target.value) || 0)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-xs text-slate-600">{isArabic ? 'تكاليف الإبداع' : 'Creative Costs'}</label>
+                                                    <Input
+                                                        type="number"
+                                                        min="0"
+                                                        step="0.01"
+                                                        className="rounded-lg"
+                                                        value={formData.creativeCosts || ''}
+                                                        onChange={(e) => handleChange('creativeCosts', parseFloat(e.target.value) || 0)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-xs text-slate-600">{isArabic ? 'هدف تكلفة العميل المحتمل' : 'Cost per Lead Target'}</label>
+                                                    <Input
+                                                        type="number"
+                                                        min="0"
+                                                        step="0.01"
+                                                        className="rounded-lg"
+                                                        value={formData.costPerLeadTarget || ''}
+                                                        onChange={(e) => handleChange('costPerLeadTarget', parseFloat(e.target.value) || 0)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-xs text-slate-600">{isArabic ? 'هدف تكلفة الاكتساب' : 'Cost per Acquisition Target'}</label>
+                                                    <Input
+                                                        type="number"
+                                                        min="0"
+                                                        step="0.01"
+                                                        className="rounded-lg"
+                                                        value={formData.costPerAcquisitionTarget || ''}
+                                                        onChange={(e) => handleChange('costPerAcquisitionTarget', parseFloat(e.target.value) || 0)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Target ROI */}
+                                        <div className="p-4 bg-purple-50 rounded-xl space-y-4">
+                                            <h4 className="font-medium text-purple-800 flex items-center gap-2">
+                                                <Percent className="w-4 h-4" />
+                                                {isArabic ? 'هدف عائد الاستثمار' : 'Target ROI'}
+                                            </h4>
+                                            <div className="space-y-2">
+                                                <label className="text-xs text-slate-600">{isArabic ? 'نسبة عائد الاستثمار المستهدفة (%)' : 'Target ROI Percentage (%)'}</label>
+                                                <Input
+                                                    type="number"
+                                                    min="0"
+                                                    step="0.1"
+                                                    className="rounded-lg"
+                                                    value={formData.targetROIPercent || ''}
+                                                    onChange={(e) => handleChange('targetROIPercent', parseFloat(e.target.value) || 0)}
+                                                />
                                             </div>
                                         </div>
 
@@ -1149,6 +1527,320 @@ export function CampaignFormView({ editMode = false, campaignId, initialData }: 
                                             )}
                                         </div>
                                     </TabsContent>
+
+                                    {/* ═══ TAB 6: EMAIL & SMS SETTINGS (Advanced Only) ═══ */}
+                                    {isAdvancedMode && (
+                                        <TabsContent value="email-sms" className="space-y-6 mt-6">
+                                            {/* Email Settings */}
+                                            <div className="p-4 bg-blue-50 rounded-xl space-y-4">
+                                                <h4 className="font-medium text-blue-800 flex items-center gap-2">
+                                                    <Mail className="w-4 h-4" />
+                                                    {isArabic ? 'إعدادات البريد الإلكتروني' : 'Email Settings'}
+                                                </h4>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600 flex items-center gap-1">
+                                                            <AtSign className="w-3 h-3" />
+                                                            {isArabic ? 'اسم المرسل' : 'From Name'}
+                                                        </label>
+                                                        <Input
+                                                            placeholder={isArabic ? "مثال: شركة المحاماة" : "e.g., Law Firm"}
+                                                            className="rounded-lg"
+                                                            value={formData.fromName}
+                                                            onChange={(e) => handleChange('fromName', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600 flex items-center gap-1">
+                                                            <Mail className="w-3 h-3" />
+                                                            {isArabic ? 'بريد المرسل' : 'From Email'}
+                                                        </label>
+                                                        <Input
+                                                            type="email"
+                                                            placeholder="info@lawfirm.com"
+                                                            className="rounded-lg"
+                                                            value={formData.fromEmail}
+                                                            onChange={(e) => handleChange('fromEmail', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600 flex items-center gap-1">
+                                                            <MessageCircle className="w-3 h-3" />
+                                                            {isArabic ? 'بريد الرد' : 'Reply-to Email'}
+                                                        </label>
+                                                        <Input
+                                                            type="email"
+                                                            placeholder="reply@lawfirm.com"
+                                                            className="rounded-lg"
+                                                            value={formData.replyToEmail}
+                                                            onChange={(e) => handleChange('replyToEmail', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'نص ما قبل العنوان' : 'Preheader Text'}</label>
+                                                        <Input
+                                                            placeholder={isArabic ? "نص المعاينة..." : "Preview text..."}
+                                                            className="rounded-lg"
+                                                            value={formData.preheaderText}
+                                                            onChange={(e) => handleChange('preheaderText', e.target.value)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* A/B Testing Subject Lines */}
+                                            <div className="p-4 bg-purple-50 rounded-xl space-y-4">
+                                                <h4 className="font-medium text-purple-800 flex items-center gap-2">
+                                                    <TestTube className="w-4 h-4" />
+                                                    {isArabic ? 'اختبار A/B لسطر الموضوع' : 'Subject Line A/B Testing'}
+                                                </h4>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'سطر الموضوع A' : 'Subject Line A'}</label>
+                                                        <Input
+                                                            placeholder={isArabic ? "الخيار الأول..." : "First option..."}
+                                                            className="rounded-lg"
+                                                            value={formData.subjectLineA}
+                                                            onChange={(e) => handleChange('subjectLineA', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'سطر الموضوع B' : 'Subject Line B'}</label>
+                                                        <Input
+                                                            placeholder={isArabic ? "الخيار الثاني..." : "Second option..."}
+                                                            className="rounded-lg"
+                                                            value={formData.subjectLineB}
+                                                            onChange={(e) => handleChange('subjectLineB', e.target.value)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Send Time & Frequency */}
+                                            <div className="p-4 bg-amber-50 rounded-xl space-y-4">
+                                                <h4 className="font-medium text-amber-800 flex items-center gap-2">
+                                                    <Clock3 className="w-4 h-4" />
+                                                    {isArabic ? 'وقت الإرسال والتكرار' : 'Send Time & Frequency'}
+                                                </h4>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'وقت الإرسال' : 'Send Time'}</label>
+                                                        <Select value={formData.sendTimeOption} onValueChange={(v) => handleChange('sendTimeOption', v)}>
+                                                            <SelectTrigger className="rounded-lg">
+                                                                <SelectValue />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {SEND_TIME_OPTIONS.map((option) => (
+                                                                    <SelectItem key={option.value} value={option.value}>
+                                                                        {isArabic ? option.labelAr : option.labelEn}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    {formData.sendTimeOption === 'scheduled' && (
+                                                        <div className="space-y-2">
+                                                            <label className="text-xs text-slate-600">{isArabic ? 'التاريخ والوقت المجدول' : 'Scheduled Date & Time'}</label>
+                                                            <Input
+                                                                type="datetime-local"
+                                                                className="rounded-lg"
+                                                                value={formData.scheduledDateTime}
+                                                                onChange={(e) => handleChange('scheduledDateTime', e.target.value)}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'حد التكرار (رسائل/يوم)' : 'Frequency Cap (emails/day)'}</label>
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            placeholder="0 = unlimited"
+                                                            className="rounded-lg"
+                                                            value={formData.frequencyCap || ''}
+                                                            onChange={(e) => handleChange('frequencyCap', parseInt(e.target.value) || 0)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Templates */}
+                                            <div className="p-4 bg-green-50 rounded-xl space-y-4">
+                                                <h4 className="font-medium text-green-800 flex items-center gap-2">
+                                                    <FileCode className="w-4 h-4" />
+                                                    {isArabic ? 'القوالب' : 'Templates'}
+                                                </h4>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600 flex items-center gap-1">
+                                                            <Mail className="w-3 h-3" />
+                                                            {isArabic ? 'قالب البريد الإلكتروني' : 'Email Template'}
+                                                        </label>
+                                                        <Select value={formData.emailTemplate} onValueChange={(v) => handleChange('emailTemplate', v)}>
+                                                            <SelectTrigger className="rounded-lg">
+                                                                <SelectValue placeholder={isArabic ? "اختر قالب..." : "Select template..."} />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="template-1">{isArabic ? 'قالب احترافي' : 'Professional Template'}</SelectItem>
+                                                                <SelectItem value="template-2">{isArabic ? 'قالب حديث' : 'Modern Template'}</SelectItem>
+                                                                <SelectItem value="template-3">{isArabic ? 'قالب بسيط' : 'Simple Template'}</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600 flex items-center gap-1">
+                                                            <Smartphone className="w-3 h-3" />
+                                                            {isArabic ? 'قالب الرسائل النصية' : 'SMS Template'}
+                                                        </label>
+                                                        <Select value={formData.smsTemplate} onValueChange={(v) => handleChange('smsTemplate', v)}>
+                                                            <SelectTrigger className="rounded-lg">
+                                                                <SelectValue placeholder={isArabic ? "اختر قالب..." : "Select template..."} />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="sms-1">{isArabic ? 'قالب قصير' : 'Short Template'}</SelectItem>
+                                                                <SelectItem value="sms-2">{isArabic ? 'قالب متوسط' : 'Medium Template'}</SelectItem>
+                                                                <SelectItem value="sms-3">{isArabic ? 'قالب مع رابط' : 'Template with Link'}</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </TabsContent>
+                                    )}
+
+                                    {/* ═══ TAB 7: TEAM & APPROVAL (Advanced Only) ═══ */}
+                                    {isAdvancedMode && (
+                                        <TabsContent value="team" className="space-y-6 mt-6">
+                                            {/* Team Members */}
+                                            <div className="p-4 bg-indigo-50 rounded-xl space-y-4">
+                                                <h4 className="font-medium text-indigo-800 flex items-center gap-2">
+                                                    <Users2 className="w-4 h-4" />
+                                                    {isArabic ? 'أعضاء الفريق' : 'Team Members'}
+                                                </h4>
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'مدير الحملة' : 'Campaign Manager'}</label>
+                                                        <Select value={formData.campaignManager} onValueChange={(v) => handleChange('campaignManager', v)}>
+                                                            <SelectTrigger className="rounded-lg">
+                                                                <SelectValue placeholder={isArabic ? "اختر..." : "Select..."} />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {STAFF_MEMBERS.map((staff) => (
+                                                                    <SelectItem key={staff.value} value={staff.value}>
+                                                                        {isArabic ? staff.labelAr : staff.labelEn}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'كاتب المحتوى' : 'Content Creator'}</label>
+                                                        <Select value={formData.contentCreator} onValueChange={(v) => handleChange('contentCreator', v)}>
+                                                            <SelectTrigger className="rounded-lg">
+                                                                <SelectValue placeholder={isArabic ? "اختر..." : "Select..."} />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {STAFF_MEMBERS.map((staff) => (
+                                                                    <SelectItem key={staff.value} value={staff.value}>
+                                                                        {isArabic ? staff.labelAr : staff.labelEn}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'المصمم' : 'Designer'}</label>
+                                                        <Select value={formData.designer} onValueChange={(v) => handleChange('designer', v)}>
+                                                            <SelectTrigger className="rounded-lg">
+                                                                <SelectValue placeholder={isArabic ? "اختر..." : "Select..."} />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {STAFF_MEMBERS.map((staff) => (
+                                                                    <SelectItem key={staff.value} value={staff.value}>
+                                                                        {isArabic ? staff.labelAr : staff.labelEn}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Approvers */}
+                                            <div className="p-4 bg-purple-50 rounded-xl space-y-4">
+                                                <h4 className="font-medium text-purple-800 flex items-center gap-2">
+                                                    <Shield className="w-4 h-4" />
+                                                    {isArabic ? 'الموافقون' : 'Approvers'}
+                                                </h4>
+                                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                                    {STAFF_MEMBERS.map((staff) => (
+                                                        <div
+                                                            key={staff.value}
+                                                            className={cn(
+                                                                "p-3 rounded-xl border-2 cursor-pointer transition-all",
+                                                                formData.approvers.includes(staff.value)
+                                                                    ? "border-purple-500 bg-purple-100"
+                                                                    : "border-slate-200 hover:border-purple-300"
+                                                            )}
+                                                            onClick={() => toggleApprover(staff.value)}
+                                                        >
+                                                            <div className="flex items-center gap-2">
+                                                                <Checkbox
+                                                                    checked={formData.approvers.includes(staff.value)}
+                                                                    onCheckedChange={() => toggleApprover(staff.value)}
+                                                                />
+                                                                <span className="text-xs font-medium">
+                                                                    {isArabic ? staff.labelAr : staff.labelEn}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            {/* Approval Status */}
+                                            <div className="p-4 bg-emerald-50 rounded-xl space-y-4">
+                                                <h4 className="font-medium text-emerald-800 flex items-center gap-2">
+                                                    <CheckCircle className="w-4 h-4" />
+                                                    {isArabic ? 'حالة الموافقة' : 'Approval Status'}
+                                                </h4>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'الحالة' : 'Status'}</label>
+                                                        <Select value={formData.approvalStatus} onValueChange={(v) => handleChange('approvalStatus', v)}>
+                                                            <SelectTrigger className="rounded-lg">
+                                                                <SelectValue />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {APPROVAL_STATUSES.map((status) => (
+                                                                    <SelectItem key={status.value} value={status.value}>
+                                                                        {isArabic ? status.labelAr : status.labelEn}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'تاريخ الموافقة' : 'Approval Date'}</label>
+                                                        <Input
+                                                            type="date"
+                                                            className="rounded-lg"
+                                                            value={formData.approvalDateTeam}
+                                                            onChange={(e) => handleChange('approvalDateTeam', e.target.value)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-xs text-slate-600">{isArabic ? 'ملاحظات الموافقة' : 'Approval Comments'}</label>
+                                                    <Textarea
+                                                        placeholder={isArabic ? "أضف ملاحظات أو طلبات تعديل..." : "Add comments or change requests..."}
+                                                        className="min-h-[100px] rounded-lg"
+                                                        value={formData.approvalComments}
+                                                        onChange={(e) => handleChange('approvalComments', e.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </TabsContent>
+                                    )}
                                 </Tabs>
 
                                 {/* ═══════════════════════════════════════════════════════════════ */}
@@ -1285,6 +1977,94 @@ export function CampaignFormView({ editMode = false, campaignId, initialData }: 
                                                     <div className="flex items-center gap-2 p-3 bg-white rounded-lg border">
                                                         <Switch checked={formData.notifyOnComplete} onCheckedChange={(c) => handleChange('notifyOnComplete', c)} />
                                                         <label className="text-sm">{isArabic ? 'إشعار عند الاكتمال' : 'Notify on Complete'}</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Integration Settings */}
+                                            <div className="p-4 bg-cyan-50 rounded-xl space-y-4">
+                                                <h4 className="font-medium text-cyan-800 flex items-center gap-2">
+                                                    <Network className="w-4 h-4" />
+                                                    {isArabic ? 'إعدادات التكامل' : 'Integration Settings'}
+                                                </h4>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="flex items-center gap-2 p-3 bg-white rounded-lg border">
+                                                        <Switch checked={formData.crmSync} onCheckedChange={(c) => handleChange('crmSync', c)} />
+                                                        <label className="text-sm">{isArabic ? 'مزامنة CRM' : 'CRM Sync'}</label>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600">{isArabic ? 'منصة التسويق' : 'Marketing Platform'}</label>
+                                                        <Select value={formData.marketingPlatform} onValueChange={(v) => handleChange('marketingPlatform', v)}>
+                                                            <SelectTrigger className="rounded-lg">
+                                                                <SelectValue />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {MARKETING_PLATFORMS.map((platform) => (
+                                                                    <SelectItem key={platform.value} value={platform.value}>
+                                                                        {isArabic ? platform.labelAr : platform.labelEn}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600 flex items-center gap-1">
+                                                            <Activity className="w-3 h-3" />
+                                                            {isArabic ? 'معرف تتبع GA4' : 'GA4 Tracking ID'}
+                                                        </label>
+                                                        <Input
+                                                            placeholder="G-XXXXXXXXXX"
+                                                            className="rounded-lg"
+                                                            value={formData.ga4TrackingId}
+                                                            onChange={(e) => handleChange('ga4TrackingId', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600 flex items-center gap-1">
+                                                            <ExternalLink className="w-3 h-3" />
+                                                            {isArabic ? 'رابط لوحة التقارير' : 'Reporting Dashboard URL'}
+                                                        </label>
+                                                        <Input
+                                                            type="url"
+                                                            placeholder="https://dashboard.example.com"
+                                                            className="rounded-lg"
+                                                            value={formData.reportingDashboardUrl}
+                                                            onChange={(e) => handleChange('reportingDashboardUrl', e.target.value)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Strategy & Learning */}
+                                            <div className="p-4 bg-indigo-50 rounded-xl space-y-4">
+                                                <h4 className="font-medium text-indigo-800 flex items-center gap-2">
+                                                    <Brain className="w-4 h-4" />
+                                                    {isArabic ? 'الاستراتيجية والتعلم' : 'Strategy & Learning'}
+                                                </h4>
+                                                <div className="space-y-4">
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600 flex items-center gap-1">
+                                                            <Lightbulb className="w-3 h-3" />
+                                                            {isArabic ? 'ملاحظات الاستراتيجية' : 'Strategy Notes'}
+                                                        </label>
+                                                        <Textarea
+                                                            className="rounded-lg min-h-[100px]"
+                                                            placeholder={isArabic ? "وثق استراتيجية الحملة والنهج..." : "Document campaign strategy and approach..."}
+                                                            value={formData.strategyNotes}
+                                                            onChange={(e) => handleChange('strategyNotes', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs text-slate-600 flex items-center gap-1">
+                                                            <BookMarked className="w-3 h-3" />
+                                                            {isArabic ? 'الدروس المستفادة' : 'Lessons Learned'}
+                                                        </label>
+                                                        <Textarea
+                                                            className="rounded-lg min-h-[100px]"
+                                                            placeholder={isArabic ? "ماذا نجح؟ ماذا لم ينجح؟ ماذا ستفعل بشكل مختلف؟ (للحملات المكتملة)" : "What worked? What didn't? What would you do differently? (For completed campaigns)"}
+                                                            value={formData.lessonsLearned}
+                                                            onChange={(e) => handleChange('lessonsLearned', e.target.value)}
+                                                        />
                                                     </div>
                                                 </div>
                                             </div>
