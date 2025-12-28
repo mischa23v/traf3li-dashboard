@@ -20,6 +20,7 @@ import { initSentry } from '@/lib/sentry'
 import { initAnalytics, trackPageView } from '@/lib/analytics'
 import { initWebVitals } from '@/lib/web-vitals'
 import { consoleLogger } from '@/utils/console-logger'
+import { initAggressiveDebug } from '@/lib/aggressive-debug'
 // Import i18n configuration
 import './i18n'
 // Generated Routes
@@ -34,6 +35,10 @@ initSentry()
 if (import.meta.env.DEV) {
   consoleLogger.init()
 }
+
+// Initialize aggressive debug system (captures all errors with full details)
+// Disable with: localStorage.setItem('AGGRESSIVE_DEBUG', 'false')
+initAggressiveDebug()
 
 // Initialize analytics
 initAnalytics()
@@ -135,7 +140,7 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <StrictMode>
-      <ErrorBoundary>
+      <ErrorBoundary componentName="RootApp">
         <QueryClientProvider client={queryClient}>
           <ThemeProvider>
             <FontProvider>
