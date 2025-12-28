@@ -422,6 +422,14 @@ export const ROUTES = {
         detail: (transactionId: string) => `/dashboard/finance/inter-company/${transactionId}`,
         reconciliationDetail: (reconciliationId: string) => `/dashboard/finance/inter-company/reconciliation/${reconciliationId}`,
       },
+
+      // Budgets
+      budgets: {
+        list: '/dashboard/finance/budgets',
+        new: '/dashboard/finance/budgets/new',
+        detail: (budgetId: string) => `/dashboard/finance/budgets/${budgetId}`,
+        edit: (budgetId: string) => `/dashboard/finance/budgets/${budgetId}/edit`,
+      },
     },
 
     /**
@@ -1168,6 +1176,7 @@ export const ROUTES = {
       preferences: '/dashboard/settings/preferences',
       finance: '/dashboard/settings/finance',
       crm: '/dashboard/settings/crm',
+      sales: '/dashboard/settings/sales',
       taxes: '/dashboard/settings/taxes',
       paymentModes: '/dashboard/settings/payment-modes',
       paymentTerms: '/dashboard/settings/payment-terms',
