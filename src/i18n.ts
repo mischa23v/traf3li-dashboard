@@ -4,6 +4,7 @@ import { initReactI18next } from 'react-i18next'
 import translationAR from './locales/ar/translation.json'
 import translationEN from './locales/en/translation.json'
 
+// IMPORTANT: Arabic (ar) is listed FIRST - this is the default language
 const resources = {
   ar: {
     translation: translationAR,
@@ -13,43 +14,42 @@ const resources = {
   },
 }
 
-// Check if language is stored in localStorage
-// Default to Arabic if not set (most Saudi lawyers prefer Arabic)
-const getInitialLanguage = (): string => {
+// Get stored language preference, default to Arabic
+const getStoredLanguage = (): 'ar' | 'en' => {
   if (typeof window === 'undefined') return 'ar'
 
-  const storedLang = localStorage.getItem('i18nextLng')
+  const stored = localStorage.getItem('i18nextLng')
 
-  // If no language stored, set Arabic as default
-  if (!storedLang) {
-    localStorage.setItem('i18nextLng', 'ar')
-    return 'ar'
-  }
+  // Only return English if explicitly set, otherwise always Arabic
+  if (stored === 'en') return 'en'
 
-  // Only accept valid languages (ar or en), default to ar otherwise
-  if (storedLang === 'en' || storedLang === 'ar') {
-    return storedLang
-  }
-
-  // Invalid stored value, reset to Arabic
-  localStorage.setItem('i18nextLng', 'ar')
+  // For any other value (null, undefined, 'ar', or invalid), use Arabic
   return 'ar'
 }
 
-const initialLanguage = getInitialLanguage()
+const initialLanguage = getStoredLanguage()
 
+// Ensure localStorage has the language set (for new visitors)
+if (typeof window !== 'undefined') {
+  localStorage.setItem('i18nextLng', initialLanguage)
+}
+
+// Initialize i18next with explicit Arabic default
+// initSync ensures synchronous initialization
 i18n
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: 'ar',
-    lng: initialLanguage,
-    debug: false,
+    lng: initialLanguage,           // Explicit language setting
+    fallbackLng: 'ar',              // Fallback to Arabic
+    supportedLngs: ['ar', 'en'],    // Only these languages supported
+    nonExplicitSupportedLngs: false, // Don't support language variants like 'en-US'
+    load: 'languageOnly',           // Don't load 'en-US', just 'en'
+    debug: import.meta.env.DEV,     // Only debug in development
     interpolation: {
       escapeValue: false,
     },
-    // No language detector plugin - we manually handle language persistence
-    // This ensures Arabic is ALWAYS the default on first load
+    initImmediate: true,            // Initialize immediately (sync)
   })
 
 // Set document direction based on language
@@ -63,9 +63,17 @@ i18n.on('languageChanged', (lng) => {
   }
 })
 
-// Set initial direction
-const initialDir = initialLanguage === 'ar' ? 'rtl' : 'ltr'
+// FORCE the language after init (belt and suspenders approach)
+// This ensures Arabic is set even if something else overrides it
+if (i18n.language !== initialLanguage) {
+  console.warn(`[i18n] Language mismatch! Expected ${initialLanguage}, got ${i18n.language}. Forcing...`)
+  i18n.changeLanguage(initialLanguage)
+}
+
+// Set initial direction based on ACTUAL current language
+const currentLang = i18n.language || initialLanguage
+const initialDir = currentLang === 'ar' ? 'rtl' : 'ltr'
 document.documentElement.dir = initialDir
-document.documentElement.lang = initialLanguage
+document.documentElement.lang = currentLang
 
 export default i18n
