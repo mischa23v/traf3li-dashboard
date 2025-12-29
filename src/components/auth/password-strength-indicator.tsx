@@ -4,6 +4,7 @@
  */
 
 import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { IconCheck, IconX } from '@tabler/icons-react'
@@ -19,6 +20,10 @@ interface PasswordStrengthIndicatorProps {
   requireLowercase?: boolean
   requireNumbers?: boolean
   requireSpecialChars?: boolean
+  /** Auto-hide when all requirements are met (default: true) */
+  autoHide?: boolean
+  /** Delay in ms before auto-hiding (default: 1500) */
+  autoHideDelay?: number
   className?: string
 }
 
@@ -31,13 +36,37 @@ export function PasswordStrengthIndicator({
   requireLowercase = true,
   requireNumbers = true,
   requireSpecialChars = true,
+  autoHide = true,
+  autoHideDelay = 1500,
   className,
 }: PasswordStrengthIndicatorProps) {
   const { t, i18n } = useTranslation()
   const isRTL = i18n.dir() === 'rtl'
   const strength = usePasswordStrength(password)
+  const [isHidden, setIsHidden] = useState(false)
 
-  if (!password) return null
+  // Check individual requirements inline first to use in useEffect
+  const meetsMinLength = password.length >= minLength
+  const meetsUppercase = !requireUppercase || /[A-Z]/.test(password)
+  const meetsLowercase = !requireLowercase || /[a-z]/.test(password)
+  const meetsNumbers = !requireNumbers || /\d/.test(password)
+  const meetsSpecialChars = !requireSpecialChars || /[!@#$%^&*(),.?":{}|<>]/.test(password)
+
+  const allRequirementsMet = meetsMinLength && meetsUppercase && meetsLowercase && meetsNumbers && meetsSpecialChars
+
+  // Auto-hide when all requirements are met
+  useEffect(() => {
+    if (autoHide && allRequirementsMet && password) {
+      const timer = setTimeout(() => {
+        setIsHidden(true)
+      }, autoHideDelay)
+      return () => clearTimeout(timer)
+    } else {
+      setIsHidden(false)
+    }
+  }, [autoHide, allRequirementsMet, autoHideDelay, password])
+
+  if (!password || isHidden) return null
 
   // Check individual requirements
   const requirements = [
@@ -84,10 +113,8 @@ export function PasswordStrengthIndicator({
       : []),
   ]
 
-  const allMet = requirements.every((r) => r.met)
-
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn('space-y-2 transition-all duration-300', allRequirementsMet && 'opacity-80', className)}>
       {/* Strength Bar */}
       <div className="space-y-1">
         <div className="flex gap-1">
@@ -140,7 +167,7 @@ export function PasswordStrengthIndicator({
       )}
 
       {/* Feedback */}
-      {showFeedback && strength.feedbackAr.length > 0 && !allMet && (
+      {showFeedback && strength.feedbackAr.length > 0 && !allRequirementsMet && (
         <ul className="space-y-0.5 text-xs text-muted-foreground">
           {(isRTL ? strength.feedbackAr : strength.feedback).map(
             (feedback, index) => (
