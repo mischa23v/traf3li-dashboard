@@ -40,7 +40,7 @@
  * Users can authenticate via LDAP using their directory credentials.
  */
 
-import apiClient, { handleApiError } from '@/lib/api'
+import apiClient, { handleApiError, storeTokens } from '@/lib/api'
 import type { User } from './authService'
 
 /**
@@ -280,6 +280,15 @@ const ldapService = {
 
       if (response.data.error || !response.data.user) {
         throw new Error(response.data.message || 'LDAP authentication failed')
+      }
+
+      // Store tokens if provided - supports both OAuth 2.0 (snake_case) and legacy (camelCase)
+      const accessToken = response.data.access_token || response.data.accessToken
+      const refreshToken = response.data.refresh_token || response.data.refreshToken
+      const expiresIn = response.data.expires_in // seconds until access token expires
+
+      if (accessToken && refreshToken) {
+        storeTokens(accessToken, refreshToken, expiresIn)
       }
 
       const user = response.data.user

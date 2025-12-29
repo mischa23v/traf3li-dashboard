@@ -52,6 +52,10 @@ export interface GoogleOneTapResult {
   };
   accessToken?: string;
   refreshToken?: string;
+  /** Seconds until access token expires (OAuth 2.0 standard) */
+  expiresIn?: number;
+  /** Token type, typically 'Bearer' (OAuth 2.0 standard) */
+  tokenType?: string;
   error?: string;
 }
 
