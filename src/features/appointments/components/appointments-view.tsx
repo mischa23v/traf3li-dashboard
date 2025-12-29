@@ -93,6 +93,7 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { ROUTES } from '@/constants/routes'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { useAuthStore } from '@/stores/auth-store'
 
 import {
   useAvailability,
@@ -169,6 +170,9 @@ export function AppointmentsView() {
   const navigate = useNavigate()
   const isRtl = i18n.language === 'ar'
   const locale = isRtl ? ar : enUS
+
+  // Get current user from auth store
+  const user = useAuthStore((state) => state.user)
 
   // State
   const [statusFilter, setStatusFilter] = useState<string>('all')
@@ -817,12 +821,12 @@ function BookAppointmentDialog({
   // Fetch available slots for selected date
   const { data: availableSlotsData, isLoading: isSlotsLoading } = useAvailableSlots(
     {
-      lawyerId: 'current', // Backend should handle getting current user's ID
+      lawyerId: user?._id || '', // Use actual user ID from auth store
       startDate: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '',
       endDate: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '',
       duration: formData.duration,
     },
-    !!selectedDate
+    !!selectedDate && !!user?._id // Only fetch when user is authenticated
   )
 
   const availableSlots = availableSlotsData?.data || []
