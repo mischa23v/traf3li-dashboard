@@ -7,7 +7,9 @@ import { useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-quer
 import { useCallback } from 'react'
 import { CACHE_TIMES } from '@/config'
 import calendarService, { CalendarFilters, ListFilters, CalendarEvent } from '@/services/calendarService'
-import { Reminder } from '@/services/remindersService'
+import remindersService, { Reminder } from '@/services/remindersService'
+import eventsService from '@/services/eventsService'
+import tasksService from '@/services/tasksService'
 import { apiClientNoVersion as apiClient } from '@/lib/api'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -166,6 +168,8 @@ const LIST_STALE_TIME = CACHE_TIMES.CALENDAR.GRID // 1 minute
 /**
  * Get grid summary - counts per day for calendar badges
  * Use this for showing event counts on calendar cells
+ *
+ * Falls back to legacy /calendar endpoint if optimized endpoint is not available
  */
 export const useCalendarGridSummary = (
   filters: { startDate: string; endDate: string; types?: string },
@@ -173,7 +177,73 @@ export const useCalendarGridSummary = (
 ) => {
   return useQuery({
     queryKey: QueryKeys.calendar.gridSummary(filters),
-    queryFn: () => calendarService.getGridSummary(filters),
+    queryFn: async () => {
+      try {
+        // Try optimized endpoint first
+        return await calendarService.getGridSummary(filters)
+      } catch (error) {
+        // Fallback to legacy endpoint and transform the data
+        console.log('[Calendar] Grid summary endpoint not available, using legacy fallback')
+        const legacyData = await calendarService.getCalendar({
+          startDate: filters.startDate,
+          endDate: filters.endDate,
+        })
+
+        // Transform legacy data to grid summary format
+        const dayMap = new Map<string, { events: number; tasks: number; reminders: number; hasHighPriority: boolean; hasOverdue: boolean }>()
+
+        // Process events
+        legacyData.data.events?.forEach((item) => {
+          const date = item.startDate.split('T')[0]
+          const existing = dayMap.get(date) || { events: 0, tasks: 0, reminders: 0, hasHighPriority: false, hasOverdue: false }
+          existing.events++
+          if (item.priority === 'high' || item.priority === 'critical') existing.hasHighPriority = true
+          if (item.isOverdue) existing.hasOverdue = true
+          dayMap.set(date, existing)
+        })
+
+        // Process tasks
+        legacyData.data.tasks?.forEach((item) => {
+          const date = item.startDate.split('T')[0]
+          const existing = dayMap.get(date) || { events: 0, tasks: 0, reminders: 0, hasHighPriority: false, hasOverdue: false }
+          existing.tasks++
+          if (item.priority === 'high' || item.priority === 'critical') existing.hasHighPriority = true
+          if (item.isOverdue) existing.hasOverdue = true
+          dayMap.set(date, existing)
+        })
+
+        // Process reminders
+        legacyData.data.reminders?.forEach((item) => {
+          const date = item.startDate.split('T')[0]
+          const existing = dayMap.get(date) || { events: 0, tasks: 0, reminders: 0, hasHighPriority: false, hasOverdue: false }
+          existing.reminders++
+          if (item.priority === 'high' || item.priority === 'critical') existing.hasHighPriority = true
+          if (item.isOverdue) existing.hasOverdue = true
+          dayMap.set(date, existing)
+        })
+
+        const days = Array.from(dayMap.entries()).map(([date, counts]) => ({
+          date,
+          total: counts.events + counts.tasks + counts.reminders,
+          events: counts.events,
+          tasks: counts.tasks,
+          reminders: counts.reminders,
+          caseDocuments: 0,
+          hasHighPriority: counts.hasHighPriority,
+          hasOverdue: counts.hasOverdue,
+        }))
+
+        return {
+          success: true,
+          data: {
+            days,
+            totalDays: days.length,
+            dateRange: { start: filters.startDate, end: filters.endDate },
+          },
+          cached: false,
+        }
+      }
+    },
     staleTime: GRID_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
     enabled: enabled && !!(filters.startDate && filters.endDate),
@@ -184,6 +254,8 @@ export const useCalendarGridSummary = (
 /**
  * Get grid items - minimal event data for calendar display
  * ~150 bytes per item vs 2-5KB for full objects
+ *
+ * Falls back to legacy /calendar endpoint if optimized endpoint is not available
  */
 export const useCalendarGridItems = (
   filters: { startDate: string; endDate: string; types?: string; caseId?: string },
@@ -191,7 +263,70 @@ export const useCalendarGridItems = (
 ) => {
   return useQuery({
     queryKey: QueryKeys.calendar.gridItems(filters),
-    queryFn: () => calendarService.getGridItems(filters),
+    queryFn: async () => {
+      try {
+        // Try optimized endpoint first
+        return await calendarService.getGridItems(filters)
+      } catch (error) {
+        // Fallback to legacy endpoint and transform the data
+        console.log('[Calendar] Grid items endpoint not available, using legacy fallback')
+        const legacyData = await calendarService.getCalendar({
+          startDate: filters.startDate,
+          endDate: filters.endDate,
+          caseId: filters.caseId,
+        })
+
+        // Color mapping for event types
+        const typeColors: Record<string, string> = {
+          hearing: '#ef4444',
+          court_session: '#ef4444',
+          meeting: '#3b82f6',
+          deadline: '#f97316',
+          task: '#8b5cf6',
+          reminder: '#a855f7',
+          conference: '#06b6d4',
+          consultation: '#10b981',
+          document_review: '#6366f1',
+          training: '#ec4899',
+          other: '#64748b',
+        }
+
+        // Transform legacy calendar items to grid items format
+        const transformItem = (item: CalendarEvent, type: 'event' | 'task' | 'reminder') => ({
+          id: item.id,
+          type,
+          title: item.title,
+          startDate: item.startDate,
+          endDate: item.endDate,
+          allDay: item.allDay,
+          eventType: item.eventType || type,
+          status: item.status,
+          priority: item.priority,
+          color: item.color || typeColors[item.eventType as string] || typeColors[type] || typeColors.other,
+        })
+
+        const gridItems = [
+          ...(legacyData.data.events?.map((item) => transformItem(item, 'event')) || []),
+          ...(legacyData.data.tasks?.map((item) => transformItem(item, 'task')) || []),
+          ...(legacyData.data.reminders?.map((item) => transformItem(item, 'reminder')) || []),
+        ]
+
+        // Filter by types if specified
+        const filteredItems = filters.types
+          ? gridItems.filter((item) => {
+              const types = filters.types!.split(',')
+              return types.includes(item.type) || types.includes(item.eventType || '')
+            })
+          : gridItems
+
+        return {
+          success: true,
+          data: filteredItems,
+          count: filteredItems.length,
+          dateRange: { start: filters.startDate, end: filters.endDate },
+        }
+      }
+    },
     staleTime: GRID_ITEMS_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
     enabled: enabled && !!(filters.startDate && filters.endDate),
@@ -202,6 +337,8 @@ export const useCalendarGridItems = (
 /**
  * Get full item details - lazy loaded on click
  * Only fetches when user clicks an event
+ *
+ * Falls back to individual service endpoints if unified endpoint is not available
  */
 export const useCalendarItemDetails = (
   type: string | null,
@@ -210,7 +347,81 @@ export const useCalendarItemDetails = (
 ) => {
   return useQuery({
     queryKey: QueryKeys.calendar.item(type!, id!),
-    queryFn: () => calendarService.getItemDetails(type!, id!),
+    queryFn: async () => {
+      try {
+        // Try unified endpoint first
+        return await calendarService.getItemDetails(type!, id!)
+      } catch (error) {
+        // Fallback to individual service endpoints
+        console.log('[Calendar] Item details endpoint not available, using legacy fallback')
+
+        let data: CalendarEvent | null = null
+
+        if (type === 'event') {
+          const event = await eventsService.getEvent(id!)
+          data = {
+            id: event._id || event.id,
+            type: 'event',
+            title: event.title,
+            description: event.description,
+            startDate: event.startDate,
+            endDate: event.endDate,
+            allDay: event.allDay || false,
+            eventType: event.type,
+            location: event.location?.address || event.location?.name,
+            status: event.status,
+            color: '',
+            caseId: event.caseId?._id || event.caseId,
+            caseName: event.caseId?.title,
+            caseNumber: event.caseId?.caseNumber,
+            attendees: event.attendees,
+            priority: event.priority,
+          }
+        } else if (type === 'task') {
+          const task = await tasksService.getTask(id!)
+          data = {
+            id: task._id || task.id,
+            type: 'task',
+            title: task.title,
+            description: task.description,
+            startDate: task.dueDate || task.startDate,
+            endDate: task.dueDate,
+            allDay: true,
+            eventType: 'task',
+            status: task.status,
+            color: '#8b5cf6',
+            caseId: task.caseId?._id || task.caseId,
+            caseName: task.caseId?.title,
+            caseNumber: task.caseId?.caseNumber,
+            priority: task.priority,
+          }
+        } else if (type === 'reminder') {
+          const reminder = await remindersService.getReminder(id!)
+          data = {
+            id: reminder._id || reminder.id,
+            type: 'reminder',
+            title: reminder.title,
+            description: reminder.description || reminder.notes,
+            startDate: reminder.reminderTime || reminder.dueDate,
+            endDate: reminder.reminderTime || reminder.dueDate,
+            allDay: false,
+            eventType: 'reminder',
+            status: reminder.status,
+            color: '#a855f7',
+            caseId: reminder.caseId?._id || reminder.caseId,
+            caseName: reminder.caseId?.title,
+            caseNumber: reminder.caseId?.caseNumber,
+            priority: reminder.priority,
+          }
+        }
+
+        if (!data) {
+          throw new Error(`Unknown item type: ${type}`)
+        }
+
+        return { success: true, data }
+      }
+    },
     staleTime: ITEM_DETAILS_STALE_TIME,
     gcTime: CALENDAR_GC_TIME,
     enabled: enabled && !!type && !!id,
