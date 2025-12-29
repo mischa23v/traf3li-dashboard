@@ -18,14 +18,12 @@ const resources = {
 const DEFAULT_LANGUAGE = 'ar' as const
 
 // First visit detection - ensures new visitors ALWAYS get Arabic
-// This protects against any edge cases where localStorage might have stale data
 const ensureFirstVisitArabic = (): void => {
   if (typeof window === 'undefined') return
 
   try {
     const isFirstVisit = !localStorage.getItem('traf3li_visited')
     if (isFirstVisit) {
-      console.log('[i18n] First visit detected - forcing Arabic')
       localStorage.setItem('i18nextLng', 'ar')
       localStorage.setItem('traf3li_visited', 'true')
     }
@@ -37,53 +35,36 @@ const ensureFirstVisitArabic = (): void => {
 // Run first visit check BEFORE anything else
 ensureFirstVisitArabic()
 
-// Get stored language preference
-// ONLY returns 'en' if user EXPLICITLY chose English
-// Everything else defaults to Arabic
+// Get stored language preference - ONLY returns 'en' if explicitly set
 const getStoredLanguage = (): 'ar' | 'en' => {
-  if (typeof window === 'undefined') {
-    console.log('[i18n] SSR environment, using default:', DEFAULT_LANGUAGE)
-    return DEFAULT_LANGUAGE
-  }
+  if (typeof window === 'undefined') return DEFAULT_LANGUAGE
 
   try {
     const stored = localStorage.getItem('i18nextLng')
-    console.log('[i18n] localStorage i18nextLng:', stored)
-
-    // ONLY English if explicitly set to 'en'
-    const result = stored === 'en' ? 'en' : DEFAULT_LANGUAGE
-    console.log('[i18n] Resolved language:', result)
-    return result
-  } catch (e) {
-    // localStorage might be blocked in some browsers
-    console.warn('[i18n] localStorage blocked:', e)
+    return stored === 'en' ? 'en' : DEFAULT_LANGUAGE
+  } catch {
     return DEFAULT_LANGUAGE
   }
 }
 
 const initialLanguage = getStoredLanguage()
-console.log('[i18n] Initial language:', initialLanguage)
 
-// Set direction IMMEDIATELY before i18n even initializes
-// This prevents flash of wrong direction
+// Set direction IMMEDIATELY before i18n initializes
 if (typeof document !== 'undefined') {
-  const dir = initialLanguage === 'ar' ? 'rtl' : 'ltr'
-  document.documentElement.dir = dir
+  document.documentElement.dir = initialLanguage === 'ar' ? 'rtl' : 'ltr'
   document.documentElement.lang = initialLanguage
-  console.log('[i18n] Set document dir:', dir, 'lang:', initialLanguage)
 }
 
 // Save the language choice to localStorage
 if (typeof window !== 'undefined') {
   try {
     localStorage.setItem('i18nextLng', initialLanguage)
-    console.log('[i18n] Saved to localStorage:', initialLanguage)
-  } catch (e) {
-    console.warn('[i18n] Failed to save to localStorage:', e)
+  } catch {
+    // Ignore
   }
 }
 
-// Initialize i18next SYNCHRONOUSLY with Arabic as absolute default
+// Initialize i18next
 i18n
   .use(initReactI18next)
   .init({
@@ -96,27 +77,19 @@ i18n
     interpolation: {
       escapeValue: false,
     },
-    // These ensure synchronous initialization
     initImmediate: false,
     react: {
       useSuspense: false,
     },
   })
 
-console.log('[i18n] After init - i18n.language:', i18n.language, 'i18n.resolvedLanguage:', i18n.resolvedLanguage)
-
-// After init, FORCE the language if it doesn't match
-// This is the nuclear option to ensure Arabic is set
+// Force language if mismatch after init
 if (i18n.language !== initialLanguage) {
-  console.warn('[i18n] Language mismatch! Expected:', initialLanguage, 'Got:', i18n.language, '- FORCING change')
   i18n.changeLanguage(initialLanguage)
-} else {
-  console.log('[i18n] Language matches expected:', initialLanguage)
 }
 
 // Listen for language changes and update DOM + localStorage
 i18n.on('languageChanged', (lng) => {
-  console.log('[i18n] Language changed to:', lng)
   if (typeof document !== 'undefined') {
     document.documentElement.dir = lng === 'ar' ? 'rtl' : 'ltr'
     document.documentElement.lang = lng
@@ -129,7 +102,5 @@ i18n.on('languageChanged', (lng) => {
     }
   }
 })
-
-console.log('[i18n] Initialization complete. Final language:', i18n.language)
 
 export default i18n

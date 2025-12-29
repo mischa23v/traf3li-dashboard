@@ -75,6 +75,68 @@ const TOKEN_KEYS = {
   REFRESH: 'refreshToken',
 } as const
 
+// ==================== TOKEN DEBUG LOGGING ====================
+// Always enabled to help diagnose auth issues on production
+const tokenLog = (message: string, data?: any) => {
+  console.log(`[TOKEN] ${message}`, data !== undefined ? data : '')
+}
+const tokenWarn = (message: string, data?: any) => {
+  console.warn(`[TOKEN] ⚠️ ${message}`, data !== undefined ? data : '')
+}
+
+/**
+ * Decode JWT to see its contents (without verifying signature)
+ * This is safe for debugging - verification happens on backend
+ */
+const decodeJWTForDebug = (token: string): { payload: any; valid: boolean; isExpired: boolean } => {
+  try {
+    const parts = token.split('.')
+    if (parts.length !== 3) {
+      return { payload: null, valid: false, isExpired: true }
+    }
+    const payload = JSON.parse(atob(parts[1]))
+    const now = Math.floor(Date.now() / 1000)
+    const isExpired = payload.exp && payload.exp < now
+    return { payload, valid: true, isExpired }
+  } catch {
+    return { payload: null, valid: false, isExpired: true }
+  }
+}
+
+/**
+ * Log request token state for debugging
+ */
+const logRequestTokenState = (method: string, url: string, accessToken: string | null) => {
+  // Only log for auth-related or important requests
+  if (!url.includes('/auth/') && !url.includes('/me')) {
+    return
+  }
+
+  if (!accessToken) {
+    tokenWarn(`Request WITHOUT token: ${method.toUpperCase()} ${url}`)
+    return
+  }
+
+  const decoded = decodeJWTForDebug(accessToken)
+  if (!decoded.valid) {
+    tokenWarn(`Request with INVALID token: ${method.toUpperCase()} ${url}`, {
+      tokenPreview: accessToken.substring(0, 30) + '...',
+    })
+    return
+  }
+
+  const now = Math.floor(Date.now() / 1000)
+  const exp = decoded.payload.exp
+  const expiresIn = exp ? Math.round((exp - now) / 60) : 0
+
+  tokenLog(`Request with token: ${method.toUpperCase()} ${url}`, {
+    tokenPreview: accessToken.substring(0, 20) + '...' + accessToken.substring(accessToken.length - 10),
+    userId: decoded.payload.userId || decoded.payload.sub,
+    isExpired: decoded.isExpired,
+    expiresIn: `${expiresIn} minutes`,
+  })
+}
+
 /**
  * Get access token from localStorage
  */
@@ -93,14 +155,33 @@ export const getRefreshToken = (): string | null => {
  * Store tokens in localStorage
  */
 export const storeTokens = (accessToken: string, refreshToken: string): void => {
+  tokenLog('Storing tokens in localStorage...', {
+    accessTokenLength: accessToken?.length,
+    refreshTokenLength: refreshToken?.length,
+  })
+
   localStorage.setItem(TOKEN_KEYS.ACCESS, accessToken)
   localStorage.setItem(TOKEN_KEYS.REFRESH, refreshToken)
+
+  // Verify storage
+  const storedAccess = localStorage.getItem(TOKEN_KEYS.ACCESS)
+  const storedRefresh = localStorage.getItem(TOKEN_KEYS.REFRESH)
+
+  if (storedAccess !== accessToken || storedRefresh !== refreshToken) {
+    tokenWarn('Token storage verification FAILED!', {
+      accessMatch: storedAccess === accessToken,
+      refreshMatch: storedRefresh === refreshToken,
+    })
+  } else {
+    tokenLog('Tokens stored successfully')
+  }
 }
 
 /**
  * Clear tokens from localStorage
  */
 export const clearTokens = (): void => {
+  tokenLog('Clearing tokens from localStorage')
   localStorage.removeItem(TOKEN_KEYS.ACCESS)
   localStorage.removeItem(TOKEN_KEYS.REFRESH)
 }
@@ -362,6 +443,8 @@ const shouldBypassCircuitBreaker = (url: string): boolean => {
 apiClientNoVersion.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const method = config.method?.toLowerCase()
+    const url = config.url || ''
+
     if (method && ['post', 'put', 'patch', 'delete'].includes(method)) {
       const csrfToken = getCsrfToken()
       if (csrfToken) {
@@ -371,6 +454,10 @@ apiClientNoVersion.interceptors.request.use(
 
     // Add Authorization header with access token (dual token auth)
     const accessToken = getAccessToken()
+
+    // Log token state for auth-related requests
+    logRequestTokenState(method || 'get', url, accessToken)
+
     if (accessToken) {
       config.headers.set('Authorization', `Bearer ${accessToken}`)
     }
@@ -387,8 +474,6 @@ apiClientNoVersion.interceptors.request.use(
     if (activeFirmId) {
       // config.headers.set('X-Company-Id', activeFirmId) // Disabled: firmId is in JWT
     }
-
-    const url = config.url || ''
 
     // Apply tiered timeout based on URL pattern
     if (!config.timeout || config.timeout === API_CONFIG.timeout) {
@@ -534,6 +619,45 @@ apiClientNoVersion.interceptors.response.use(
       ;(error as any).retryAfter = retryAfter
     }
 
+    // Handle 401 with detailed token logging for debugging
+    if (error.response?.status === 401) {
+      const currentToken = getAccessToken()
+      const authHeader = originalRequest?.headers?.get?.('Authorization') || originalRequest?.headers?.Authorization
+
+      console.error('[TOKEN] ❌ 401 UNAUTHORIZED - Full Debug Info:', {
+        endpoint: `${method.toUpperCase()} ${url}`,
+        errorMessage: error.response?.data?.message || error.response?.data?.error?.message,
+        errorCode: error.response?.data?.code || error.response?.data?.error?.code,
+        // Token info
+        hasAccessToken: !!currentToken,
+        accessTokenLength: currentToken?.length,
+        accessTokenPreview: currentToken ? currentToken.substring(0, 30) + '...' : 'NO TOKEN',
+        // Auth header info
+        authHeaderSent: !!authHeader,
+        authHeaderValue: authHeader ? String(authHeader).substring(0, 40) + '...' : 'NO HEADER',
+        // Decoded token info
+        tokenDecoded: currentToken ? (() => {
+          const decoded = decodeJWTForDebug(currentToken)
+          if (!decoded.valid) return { valid: false }
+          return {
+            valid: true,
+            userId: decoded.payload.userId || decoded.payload.sub,
+            email: decoded.payload.email,
+            exp: decoded.payload.exp ? new Date(decoded.payload.exp * 1000).toISOString() : 'N/A',
+            isExpired: decoded.isExpired,
+          }
+        })() : null,
+        // Response details
+        responseData: error.response?.data,
+        responseHeaders: Object.fromEntries(
+          Object.entries(error.response?.headers || {}).filter(([k]) =>
+            ['content-type', 'x-request-id', 'www-authenticate'].includes(k.toLowerCase())
+          )
+        ),
+        timestamp: new Date().toISOString(),
+      })
+    }
+
     // DON'T auto-redirect on 401 for auth routes
     // Let the auth service decide what to do based on the specific endpoint
     // Support both nested error object (error.error.message) and root-level message
@@ -578,6 +702,8 @@ apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // Add CSRF token to mutating requests
     const method = config.method?.toLowerCase()
+    const url = config.url || ''
+
     if (method && ['post', 'put', 'patch', 'delete'].includes(method)) {
       const csrfToken = getCsrfToken()
       if (csrfToken) {
@@ -587,6 +713,10 @@ apiClient.interceptors.request.use(
 
     // Add Authorization header with access token (dual token auth)
     const accessToken = getAccessToken()
+
+    // Log token state for auth-related requests
+    logRequestTokenState(method || 'get', url, accessToken)
+
     if (accessToken) {
       config.headers.set('Authorization', `Bearer ${accessToken}`)
     }
@@ -603,8 +733,6 @@ apiClient.interceptors.request.use(
     if (activeFirmId) {
       // config.headers.set('X-Company-Id', activeFirmId) // Disabled: firmId is in JWT
     }
-
-    const url = config.url || ''
 
     // Apply tiered timeout based on URL pattern (auth: 5s, default: 10s, upload: 120s)
     if (!config.timeout || config.timeout === API_CONFIG.timeout) {
