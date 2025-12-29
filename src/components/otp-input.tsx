@@ -4,6 +4,7 @@ import { Loader2, Mail, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
 import { apiClientNoVersion } from '@/lib/api'
+import type { OtpPurpose } from '@/services/otpService'
 
 // Auth routes are NOT versioned - they're at /api/auth/*, not /api/v1/auth/*
 const authApi = apiClientNoVersion
@@ -11,12 +12,14 @@ import { toast } from 'sonner'
 
 interface OtpInputProps {
   email: string
+  /** Purpose of the OTP (login, registration, password_reset, email_verification) */
+  purpose?: OtpPurpose
   onVerify: (data: any) => void
   onResend?: () => void
   className?: string
 }
 
-export function OtpInput({ email, onVerify, onResend, className }: OtpInputProps) {
+export function OtpInput({ email, purpose = 'login', onVerify, onResend, className }: OtpInputProps) {
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
 
@@ -124,7 +127,7 @@ export function OtpInput({ email, onVerify, onResend, className }: OtpInputProps
     setError('')
 
     try {
-      await authApi.post('/auth/send-otp', { email })
+      await authApi.post('/auth/send-otp', { email, purpose })
 
       toast.success(
         isRTL ? 'تم إرسال رمز التحقق' : 'OTP sent successfully',
@@ -183,6 +186,7 @@ export function OtpInput({ email, onVerify, onResend, className }: OtpInputProps
       const response = await authApi.post('/auth/verify-otp', {
         email,
         otp: code,
+        purpose,
       })
 
       toast.success(
