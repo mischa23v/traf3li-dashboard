@@ -91,7 +91,15 @@ export async function initDeviceFingerprint(): Promise<string> {
 const TOKEN_KEYS = {
   ACCESS: 'accessToken',
   REFRESH: 'refreshToken',
+  EXPIRES_AT: 'tokenExpiresAt',  // Timestamp when access token expires
 } as const
+
+/**
+ * Token refresh scheduler
+ * Automatically refreshes the access token before it expires
+ */
+let tokenRefreshTimeoutId: ReturnType<typeof setTimeout> | null = null
+const TOKEN_REFRESH_BUFFER_SECONDS = 60 // Refresh 1 minute before expiry
 
 // ==================== TOKEN DEBUG LOGGING ====================
 // Always enabled to help diagnose auth issues on production
@@ -170,16 +178,95 @@ export const getRefreshToken = (): string | null => {
 }
 
 /**
- * Store tokens in localStorage
+ * Schedule automatic token refresh before expiry
+ * Called internally by storeTokens when expires_in is provided
  */
-export const storeTokens = (accessToken: string, refreshToken: string): void => {
+const scheduleTokenRefresh = (expiresIn: number): void => {
+  // Clear any existing scheduled refresh
+  if (tokenRefreshTimeoutId) {
+    clearTimeout(tokenRefreshTimeoutId)
+    tokenRefreshTimeoutId = null
+  }
+
+  // Calculate refresh time (expires_in - buffer, minimum 10 seconds)
+  const refreshInSeconds = Math.max(expiresIn - TOKEN_REFRESH_BUFFER_SECONDS, 10)
+  const refreshInMs = refreshInSeconds * 1000
+
+  tokenLog('Scheduling automatic token refresh', {
+    expiresIn: `${expiresIn}s (${Math.round(expiresIn / 60)}min)`,
+    refreshIn: `${refreshInSeconds}s (${Math.round(refreshInSeconds / 60)}min)`,
+    refreshAt: new Date(Date.now() + refreshInMs).toISOString(),
+  })
+
+  tokenRefreshTimeoutId = setTimeout(async () => {
+    tokenLog('Executing scheduled token refresh...')
+    try {
+      const success = await refreshAccessToken()
+      if (success) {
+        tokenLog('Scheduled token refresh succeeded')
+      } else {
+        tokenWarn('Scheduled token refresh failed - user may need to re-authenticate')
+      }
+    } catch (error) {
+      tokenWarn('Scheduled token refresh error:', error)
+    }
+  }, refreshInMs)
+}
+
+/**
+ * Cancel any scheduled token refresh
+ * Called on logout or when tokens are cleared
+ */
+export const cancelScheduledTokenRefresh = (): void => {
+  if (tokenRefreshTimeoutId) {
+    clearTimeout(tokenRefreshTimeoutId)
+    tokenRefreshTimeoutId = null
+    tokenLog('Cancelled scheduled token refresh')
+  }
+}
+
+/**
+ * Get token expiration time from localStorage
+ */
+export const getTokenExpiresAt = (): number | null => {
+  const expiresAt = localStorage.getItem(TOKEN_KEYS.EXPIRES_AT)
+  return expiresAt ? parseInt(expiresAt, 10) : null
+}
+
+/**
+ * Check if token is expired or about to expire
+ */
+export const isTokenExpiringSoon = (bufferSeconds: number = TOKEN_REFRESH_BUFFER_SECONDS): boolean => {
+  const expiresAt = getTokenExpiresAt()
+  if (!expiresAt) return false
+  return Date.now() >= (expiresAt - bufferSeconds * 1000)
+}
+
+/**
+ * Store tokens in localStorage
+ * @param accessToken - The access token to store
+ * @param refreshToken - The refresh token to store
+ * @param expiresIn - Optional: seconds until access token expires (enables automatic refresh scheduling)
+ */
+export const storeTokens = (accessToken: string, refreshToken: string, expiresIn?: number): void => {
   tokenLog('Storing tokens in localStorage...', {
     accessTokenLength: accessToken?.length,
     refreshTokenLength: refreshToken?.length,
+    hasExpiresIn: !!expiresIn,
+    expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
   })
 
   localStorage.setItem(TOKEN_KEYS.ACCESS, accessToken)
   localStorage.setItem(TOKEN_KEYS.REFRESH, refreshToken)
+
+  // Store expiration time if expires_in was provided
+  if (expiresIn && expiresIn > 0) {
+    const expiresAt = Date.now() + (expiresIn * 1000)
+    localStorage.setItem(TOKEN_KEYS.EXPIRES_AT, expiresAt.toString())
+
+    // Schedule automatic token refresh
+    scheduleTokenRefresh(expiresIn)
+  }
 
   // Verify storage
   const storedAccess = localStorage.getItem(TOKEN_KEYS.ACCESS)
@@ -202,6 +289,10 @@ export const clearTokens = (): void => {
   tokenLog('Clearing tokens from localStorage')
   localStorage.removeItem(TOKEN_KEYS.ACCESS)
   localStorage.removeItem(TOKEN_KEYS.REFRESH)
+  localStorage.removeItem(TOKEN_KEYS.EXPIRES_AT)
+
+  // Cancel any scheduled token refresh
+  cancelScheduledTokenRefresh()
 }
 
 /**
@@ -291,7 +382,7 @@ const refreshAccessToken = async (): Promise<boolean> => {
 
   try {
     // Use a separate axios instance to avoid interceptor loops
-    // BACKEND_TODO: Endpoint must accept refreshToken in body, return both tokens
+    // Supports both OAuth 2.0 (snake_case) and legacy (camelCase) response format
     const response = await axios.post(
       `${API_BASE_URL_NO_VERSION}/auth/refresh`,
       { refreshToken },  // ← Sending token in body as expected by backend
@@ -304,16 +395,25 @@ const refreshAccessToken = async (): Promise<boolean> => {
       }
     )
 
-    // BACKEND_TODO: Must return both accessToken AND refreshToken
-    if (response.data.accessToken && response.data.refreshToken) {
-      storeTokens(response.data.accessToken, response.data.refreshToken)
+    // Support both OAuth 2.0 (snake_case) and legacy (camelCase) token fields
+    const accessToken = response.data.access_token || response.data.accessToken
+    const newRefreshToken = response.data.refresh_token || response.data.refreshToken
+    const expiresIn = response.data.expires_in  // seconds until access token expires
+
+    if (accessToken && newRefreshToken) {
+      tokenLog('Token refresh successful', {
+        hasExpiresIn: !!expiresIn,
+        expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
+        tokenFormat: response.data.access_token ? 'OAuth 2.0 (snake_case)' : 'Legacy (camelCase)',
+      })
+      storeTokens(accessToken, newRefreshToken, expiresIn)
       return true
     }
 
-    // BACKEND_TODO: If only accessToken is returned, token rotation is broken
-    console.warn('[TOKEN] ⚠️ Token refresh response missing tokens:', {
-      hasAccessToken: !!response.data.accessToken,
-      hasRefreshToken: !!response.data.refreshToken,
+    // If only accessToken is returned, token rotation may be broken
+    tokenWarn('Token refresh response missing tokens:', {
+      hasAccessToken: !!accessToken,
+      hasRefreshToken: !!newRefreshToken,
       responseKeys: Object.keys(response.data),
     })
     return false
@@ -1493,7 +1593,7 @@ export const getCacheSize = () => {
 }
 
 /**
- * Reset all API state (pending requests, circuit breakers, idempotency keys, tokens)
+ * Reset all API state (pending requests, circuit breakers, idempotency keys, tokens, scheduled refresh)
  * Call this on logout to ensure clean state
  */
 export const resetApiState = () => {
@@ -1501,7 +1601,7 @@ export const resetApiState = () => {
   clearPendingRequests()
   resetAllCircuits()
   clearAllIdempotencyKeys()
-  clearTokens() // Clear access and refresh tokens
+  clearTokens() // Clear access and refresh tokens (also cancels scheduled refresh)
   // Reset token refresh state
   isRefreshing = false
   failedQueue = []
