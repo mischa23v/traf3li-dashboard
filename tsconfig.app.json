@@ -15,6 +15,7 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
+    "resolveJsonModule": true,
 
     /* Alias */
     "baseUrl": ".",
@@ -29,6 +30,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/@types/**/*.d.ts"],
   "exclude": ["node_modules", "newdesigns", "test", "miru-web-develop", "dist", "**/*.test.ts", "**/*.test.tsx"]
 }

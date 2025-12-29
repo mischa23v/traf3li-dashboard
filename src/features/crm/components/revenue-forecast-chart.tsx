@@ -7,7 +7,7 @@
 
 import { useMemo } from 'react'
 import { cn } from '@/lib/utils'
-import { useLanguage } from '@/hooks/use-language'
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -401,7 +401,8 @@ export function RevenueForecastChart({
   currency = 'SAR',
   className,
 }: RevenueForecastChartProps) {
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   return (
     <Card className={className}>

@@ -5,7 +5,7 @@
  */
 
 import { cn } from '@/lib/utils'
-import { useLanguage } from '@/hooks/use-language'
+import { useTranslation } from 'react-i18next'
 import {
   OFFICE_TYPES,
   type OfficeType,
@@ -61,7 +61,8 @@ function OfficeTypeCards({
   showFeatures?: boolean
   disabled?: boolean
 }) {
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -185,7 +186,8 @@ function OfficeTypeSelect({
   onChange: (value: OfficeType) => void
   disabled?: boolean
 }) {
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   return (
     <Select
@@ -236,7 +238,8 @@ function OfficeTypeCompact({
   onChange: (value: OfficeType) => void
   disabled?: boolean
 }) {
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   return (
     <div className="flex gap-2 flex-wrap">
@@ -292,7 +295,8 @@ export function OfficeTypeSelector({
   error,
   className,
 }: OfficeTypeSelectorProps) {
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   return (
     <div className={cn('space-y-2', className)}>
@@ -347,7 +351,8 @@ export function OfficeTypeBadge({
   showLabel?: boolean
   size?: 'sm' | 'default' | 'lg'
 }) {
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
   const config = OFFICE_TYPES.find((t) => t.id === type) || OFFICE_TYPES[0]
   const Icon = config.icon
 

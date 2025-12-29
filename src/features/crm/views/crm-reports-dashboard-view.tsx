@@ -7,8 +7,8 @@
 'use client'
 
 import { useState, useMemo, lazy, Suspense } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useLanguage } from '@/hooks/use-language'
+import { useNavigate } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { ar, enUS } from 'date-fns/locale'
@@ -26,8 +26,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
-import { DatePickerWithRange } from '@/components/ui/date-range-picker'
-import { TopNav } from '@/components/top-nav'
+import { DateRangePicker } from '@/components/date-range-picker'
+import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 
 // Icons
@@ -292,8 +292,8 @@ function RecentActivityItem({ type, title, description, time, value, isRTL }: Re
 
 // Main Component
 export function CrmReportsDashboardView() {
-  const { language, t } = useLanguage()
-  const isRTL = language === 'ar'
+  const { t, i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
   const navigate = useNavigate()
 
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
@@ -532,9 +532,9 @@ export function CrmReportsDashboardView() {
               </div>
 
               <div className={cn("flex items-center gap-3 flex-wrap", isRTL && "flex-row-reverse")}>
-                <DatePickerWithRange
-                  date={dateRange}
-                  onDateChange={(range) => range && setDateRange({ from: range.from!, to: range.to! })}
+                <DateRangePicker
+                  value={dateRange}
+                  onChange={(range) => range && setDateRange({ from: range.from!, to: range.to! })}
                   className="bg-white/10 border-white/20 text-white [&>button]:text-white"
                 />
 

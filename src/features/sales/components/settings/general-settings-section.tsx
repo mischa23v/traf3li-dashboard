@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Settings } from 'lucide-react'
 import { SettingsField } from './settings-field'
 import { GeneralSettings } from '@/types/salesSettings'
-import { useLanguage } from '@/hooks/use-language'
+import { useTranslation } from 'react-i18next'
 
 interface GeneralSettingsSectionProps {
   settings: GeneralSettings
@@ -16,8 +16,8 @@ interface GeneralSettingsSectionProps {
 }
 
 export function GeneralSettingsSection({ settings, onChange }: GeneralSettingsSectionProps) {
-  const { language } = useLanguage()
-  const isRTL = language === 'ar'
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   const handleFieldChange = (field: keyof GeneralSettings, value: any) => {
     onChange({ ...settings, [field]: value })

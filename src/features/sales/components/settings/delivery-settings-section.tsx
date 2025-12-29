@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Truck } from 'lucide-react'
 import { SettingsField } from './settings-field'
 import { DeliverySettings } from '@/types/salesSettings'
-import { useLanguage } from '@/hooks/use-language'
+import { useTranslation } from 'react-i18next'
 
 interface DeliverySettingsSectionProps {
   settings: DeliverySettings
@@ -14,8 +14,8 @@ interface DeliverySettingsSectionProps {
 }
 
 export function DeliverySettingsSection({ settings, onChange }: DeliverySettingsSectionProps) {
-  const { language } = useLanguage()
-  const isRTL = language === 'ar'
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   const handleFieldChange = (field: keyof DeliverySettings, value: any) => {
     onChange({ ...settings, [field]: value })

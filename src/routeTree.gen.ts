@@ -122,6 +122,7 @@ import { Route as AuthenticatedDashboardSubcontractingOrderIdRouteImport } from 
 import { Route as AuthenticatedDashboardStaffNewRouteImport } from './routes/_authenticated/dashboard.staff.new'
 import { Route as AuthenticatedDashboardSettingsTaxesRouteImport } from './routes/_authenticated/dashboard.settings.taxes'
 import { Route as AuthenticatedDashboardSettingsSecurityRouteImport } from './routes/_authenticated/dashboard.settings.security'
+import { Route as AuthenticatedDashboardSettingsSalesRouteImport } from './routes/_authenticated/dashboard/settings/sales'
 import { Route as AuthenticatedDashboardSettingsProfileRouteImport } from './routes/_authenticated/dashboard.settings.profile'
 import { Route as AuthenticatedDashboardSettingsPreferencesRouteImport } from './routes/_authenticated/dashboard.settings.preferences'
 import { Route as AuthenticatedDashboardSettingsPaymentTermsRouteImport } from './routes/_authenticated/dashboard.settings.payment-terms'
@@ -404,7 +405,13 @@ import { Route as AuthenticatedDashboardCrmSettingsTeamsRouteImport } from './ro
 import { Route as AuthenticatedDashboardCrmSettingsTagsRouteImport } from './routes/_authenticated/dashboard.crm.settings.tags'
 import { Route as AuthenticatedDashboardCrmSettingsLostReasonsRouteImport } from './routes/_authenticated/dashboard.crm.settings.lost-reasons'
 import { Route as AuthenticatedDashboardCrmSettingsEmailTemplatesRouteImport } from './routes/_authenticated/dashboard.crm.settings.email-templates'
+import { Route as AuthenticatedDashboardCrmReportsWinLossRouteImport } from './routes/_authenticated/dashboard.crm.reports.win-loss'
 import { Route as AuthenticatedDashboardCrmReportsNewRouteImport } from './routes/_authenticated/dashboard.crm.reports.new'
+import { Route as AuthenticatedDashboardCrmReportsLeadsSourceRouteImport } from './routes/_authenticated/dashboard.crm.reports.leads-source'
+import { Route as AuthenticatedDashboardCrmReportsFunnelRouteImport } from './routes/_authenticated/dashboard.crm.reports.funnel'
+import { Route as AuthenticatedDashboardCrmReportsForecastRouteImport } from './routes/_authenticated/dashboard.crm.reports.forecast'
+import { Route as AuthenticatedDashboardCrmReportsAgingRouteImport } from './routes/_authenticated/dashboard.crm.reports.aging'
+import { Route as AuthenticatedDashboardCrmReportsActivitiesRouteImport } from './routes/_authenticated/dashboard.crm.reports.activities'
 import { Route as AuthenticatedDashboardCrmReportsReportIdRouteImport } from './routes/_authenticated/dashboard.crm.reports.$reportId'
 import { Route as AuthenticatedDashboardCrmReferralsNewRouteImport } from './routes/_authenticated/dashboard.crm.referrals.new'
 import { Route as AuthenticatedDashboardCrmReferralsReferralIdRouteImport } from './routes/_authenticated/dashboard.crm.referrals.$referralId'
@@ -1083,6 +1090,12 @@ const AuthenticatedDashboardSettingsSecurityRoute =
   AuthenticatedDashboardSettingsSecurityRouteImport.update({
     id: '/security',
     path: '/security',
+    getParentRoute: () => AuthenticatedDashboardSettingsRoute,
+  } as any)
+const AuthenticatedDashboardSettingsSalesRoute =
+  AuthenticatedDashboardSettingsSalesRouteImport.update({
+    id: '/sales',
+    path: '/sales',
     getParentRoute: () => AuthenticatedDashboardSettingsRoute,
   } as any)
 const AuthenticatedDashboardSettingsProfileRoute =
@@ -2777,10 +2790,46 @@ const AuthenticatedDashboardCrmSettingsEmailTemplatesRoute =
     path: '/settings/email-templates',
     getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
+const AuthenticatedDashboardCrmReportsWinLossRoute =
+  AuthenticatedDashboardCrmReportsWinLossRouteImport.update({
+    id: '/reports/win-loss',
+    path: '/reports/win-loss',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
 const AuthenticatedDashboardCrmReportsNewRoute =
   AuthenticatedDashboardCrmReportsNewRouteImport.update({
     id: '/reports/new',
     path: '/reports/new',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmReportsLeadsSourceRoute =
+  AuthenticatedDashboardCrmReportsLeadsSourceRouteImport.update({
+    id: '/reports/leads-source',
+    path: '/reports/leads-source',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmReportsFunnelRoute =
+  AuthenticatedDashboardCrmReportsFunnelRouteImport.update({
+    id: '/reports/funnel',
+    path: '/reports/funnel',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmReportsForecastRoute =
+  AuthenticatedDashboardCrmReportsForecastRouteImport.update({
+    id: '/reports/forecast',
+    path: '/reports/forecast',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmReportsAgingRoute =
+  AuthenticatedDashboardCrmReportsAgingRouteImport.update({
+    id: '/reports/aging',
+    path: '/reports/aging',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmReportsActivitiesRoute =
+  AuthenticatedDashboardCrmReportsActivitiesRouteImport.update({
+    id: '/reports/activities',
+    path: '/reports/activities',
     getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmReportsReportIdRoute =
@@ -3228,6 +3277,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings/payment-terms': typeof AuthenticatedDashboardSettingsPaymentTermsRoute
   '/dashboard/settings/preferences': typeof AuthenticatedDashboardSettingsPreferencesRoute
   '/dashboard/settings/profile': typeof AuthenticatedDashboardSettingsProfileRoute
+  '/dashboard/settings/sales': typeof AuthenticatedDashboardSettingsSalesRoute
   '/dashboard/settings/security': typeof AuthenticatedDashboardSettingsSecurityRoute
   '/dashboard/settings/taxes': typeof AuthenticatedDashboardSettingsTaxesRoute
   '/dashboard/staff/new': typeof AuthenticatedDashboardStaffNewRoute
@@ -3295,7 +3345,13 @@ export interface FileRoutesByFullPath {
   '/dashboard/crm/referrals/$referralId': typeof AuthenticatedDashboardCrmReferralsReferralIdRoute
   '/dashboard/crm/referrals/new': typeof AuthenticatedDashboardCrmReferralsNewRoute
   '/dashboard/crm/reports/$reportId': typeof AuthenticatedDashboardCrmReportsReportIdRoute
+  '/dashboard/crm/reports/activities': typeof AuthenticatedDashboardCrmReportsActivitiesRoute
+  '/dashboard/crm/reports/aging': typeof AuthenticatedDashboardCrmReportsAgingRoute
+  '/dashboard/crm/reports/forecast': typeof AuthenticatedDashboardCrmReportsForecastRoute
+  '/dashboard/crm/reports/funnel': typeof AuthenticatedDashboardCrmReportsFunnelRoute
+  '/dashboard/crm/reports/leads-source': typeof AuthenticatedDashboardCrmReportsLeadsSourceRoute
   '/dashboard/crm/reports/new': typeof AuthenticatedDashboardCrmReportsNewRoute
+  '/dashboard/crm/reports/win-loss': typeof AuthenticatedDashboardCrmReportsWinLossRoute
   '/dashboard/crm/settings/email-templates': typeof AuthenticatedDashboardCrmSettingsEmailTemplatesRoute
   '/dashboard/crm/settings/lost-reasons': typeof AuthenticatedDashboardCrmSettingsLostReasonsRoute
   '/dashboard/crm/settings/tags': typeof AuthenticatedDashboardCrmSettingsTagsRoute
@@ -3662,6 +3718,7 @@ export interface FileRoutesByTo {
   '/dashboard/settings/payment-terms': typeof AuthenticatedDashboardSettingsPaymentTermsRoute
   '/dashboard/settings/preferences': typeof AuthenticatedDashboardSettingsPreferencesRoute
   '/dashboard/settings/profile': typeof AuthenticatedDashboardSettingsProfileRoute
+  '/dashboard/settings/sales': typeof AuthenticatedDashboardSettingsSalesRoute
   '/dashboard/settings/security': typeof AuthenticatedDashboardSettingsSecurityRoute
   '/dashboard/settings/taxes': typeof AuthenticatedDashboardSettingsTaxesRoute
   '/dashboard/staff/new': typeof AuthenticatedDashboardStaffNewRoute
@@ -3727,7 +3784,13 @@ export interface FileRoutesByTo {
   '/dashboard/crm/referrals/$referralId': typeof AuthenticatedDashboardCrmReferralsReferralIdRoute
   '/dashboard/crm/referrals/new': typeof AuthenticatedDashboardCrmReferralsNewRoute
   '/dashboard/crm/reports/$reportId': typeof AuthenticatedDashboardCrmReportsReportIdRoute
+  '/dashboard/crm/reports/activities': typeof AuthenticatedDashboardCrmReportsActivitiesRoute
+  '/dashboard/crm/reports/aging': typeof AuthenticatedDashboardCrmReportsAgingRoute
+  '/dashboard/crm/reports/forecast': typeof AuthenticatedDashboardCrmReportsForecastRoute
+  '/dashboard/crm/reports/funnel': typeof AuthenticatedDashboardCrmReportsFunnelRoute
+  '/dashboard/crm/reports/leads-source': typeof AuthenticatedDashboardCrmReportsLeadsSourceRoute
   '/dashboard/crm/reports/new': typeof AuthenticatedDashboardCrmReportsNewRoute
+  '/dashboard/crm/reports/win-loss': typeof AuthenticatedDashboardCrmReportsWinLossRoute
   '/dashboard/crm/settings/email-templates': typeof AuthenticatedDashboardCrmSettingsEmailTemplatesRoute
   '/dashboard/crm/settings/lost-reasons': typeof AuthenticatedDashboardCrmSettingsLostReasonsRoute
   '/dashboard/crm/settings/tags': typeof AuthenticatedDashboardCrmSettingsTagsRoute
@@ -4109,6 +4172,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/settings/payment-terms': typeof AuthenticatedDashboardSettingsPaymentTermsRoute
   '/_authenticated/dashboard/settings/preferences': typeof AuthenticatedDashboardSettingsPreferencesRoute
   '/_authenticated/dashboard/settings/profile': typeof AuthenticatedDashboardSettingsProfileRoute
+  '/_authenticated/dashboard/settings/sales': typeof AuthenticatedDashboardSettingsSalesRoute
   '/_authenticated/dashboard/settings/security': typeof AuthenticatedDashboardSettingsSecurityRoute
   '/_authenticated/dashboard/settings/taxes': typeof AuthenticatedDashboardSettingsTaxesRoute
   '/_authenticated/dashboard/staff/new': typeof AuthenticatedDashboardStaffNewRoute
@@ -4176,7 +4240,13 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/crm/referrals/$referralId': typeof AuthenticatedDashboardCrmReferralsReferralIdRoute
   '/_authenticated/dashboard/crm/referrals/new': typeof AuthenticatedDashboardCrmReferralsNewRoute
   '/_authenticated/dashboard/crm/reports/$reportId': typeof AuthenticatedDashboardCrmReportsReportIdRoute
+  '/_authenticated/dashboard/crm/reports/activities': typeof AuthenticatedDashboardCrmReportsActivitiesRoute
+  '/_authenticated/dashboard/crm/reports/aging': typeof AuthenticatedDashboardCrmReportsAgingRoute
+  '/_authenticated/dashboard/crm/reports/forecast': typeof AuthenticatedDashboardCrmReportsForecastRoute
+  '/_authenticated/dashboard/crm/reports/funnel': typeof AuthenticatedDashboardCrmReportsFunnelRoute
+  '/_authenticated/dashboard/crm/reports/leads-source': typeof AuthenticatedDashboardCrmReportsLeadsSourceRoute
   '/_authenticated/dashboard/crm/reports/new': typeof AuthenticatedDashboardCrmReportsNewRoute
+  '/_authenticated/dashboard/crm/reports/win-loss': typeof AuthenticatedDashboardCrmReportsWinLossRoute
   '/_authenticated/dashboard/crm/settings/email-templates': typeof AuthenticatedDashboardCrmSettingsEmailTemplatesRoute
   '/_authenticated/dashboard/crm/settings/lost-reasons': typeof AuthenticatedDashboardCrmSettingsLostReasonsRoute
   '/_authenticated/dashboard/crm/settings/tags': typeof AuthenticatedDashboardCrmSettingsTagsRoute
@@ -4556,6 +4626,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings/payment-terms'
     | '/dashboard/settings/preferences'
     | '/dashboard/settings/profile'
+    | '/dashboard/settings/sales'
     | '/dashboard/settings/security'
     | '/dashboard/settings/taxes'
     | '/dashboard/staff/new'
@@ -4623,7 +4694,13 @@ export interface FileRouteTypes {
     | '/dashboard/crm/referrals/$referralId'
     | '/dashboard/crm/referrals/new'
     | '/dashboard/crm/reports/$reportId'
+    | '/dashboard/crm/reports/activities'
+    | '/dashboard/crm/reports/aging'
+    | '/dashboard/crm/reports/forecast'
+    | '/dashboard/crm/reports/funnel'
+    | '/dashboard/crm/reports/leads-source'
     | '/dashboard/crm/reports/new'
+    | '/dashboard/crm/reports/win-loss'
     | '/dashboard/crm/settings/email-templates'
     | '/dashboard/crm/settings/lost-reasons'
     | '/dashboard/crm/settings/tags'
@@ -4990,6 +5067,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings/payment-terms'
     | '/dashboard/settings/preferences'
     | '/dashboard/settings/profile'
+    | '/dashboard/settings/sales'
     | '/dashboard/settings/security'
     | '/dashboard/settings/taxes'
     | '/dashboard/staff/new'
@@ -5055,7 +5133,13 @@ export interface FileRouteTypes {
     | '/dashboard/crm/referrals/$referralId'
     | '/dashboard/crm/referrals/new'
     | '/dashboard/crm/reports/$reportId'
+    | '/dashboard/crm/reports/activities'
+    | '/dashboard/crm/reports/aging'
+    | '/dashboard/crm/reports/forecast'
+    | '/dashboard/crm/reports/funnel'
+    | '/dashboard/crm/reports/leads-source'
     | '/dashboard/crm/reports/new'
+    | '/dashboard/crm/reports/win-loss'
     | '/dashboard/crm/settings/email-templates'
     | '/dashboard/crm/settings/lost-reasons'
     | '/dashboard/crm/settings/tags'
@@ -5436,6 +5520,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/settings/payment-terms'
     | '/_authenticated/dashboard/settings/preferences'
     | '/_authenticated/dashboard/settings/profile'
+    | '/_authenticated/dashboard/settings/sales'
     | '/_authenticated/dashboard/settings/security'
     | '/_authenticated/dashboard/settings/taxes'
     | '/_authenticated/dashboard/staff/new'
@@ -5503,7 +5588,13 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/crm/referrals/$referralId'
     | '/_authenticated/dashboard/crm/referrals/new'
     | '/_authenticated/dashboard/crm/reports/$reportId'
+    | '/_authenticated/dashboard/crm/reports/activities'
+    | '/_authenticated/dashboard/crm/reports/aging'
+    | '/_authenticated/dashboard/crm/reports/forecast'
+    | '/_authenticated/dashboard/crm/reports/funnel'
+    | '/_authenticated/dashboard/crm/reports/leads-source'
     | '/_authenticated/dashboard/crm/reports/new'
+    | '/_authenticated/dashboard/crm/reports/win-loss'
     | '/_authenticated/dashboard/crm/settings/email-templates'
     | '/_authenticated/dashboard/crm/settings/lost-reasons'
     | '/_authenticated/dashboard/crm/settings/tags'
@@ -6574,6 +6665,13 @@ declare module '@tanstack/react-router' {
       path: '/security'
       fullPath: '/dashboard/settings/security'
       preLoaderRoute: typeof AuthenticatedDashboardSettingsSecurityRouteImport
+      parentRoute: typeof AuthenticatedDashboardSettingsRoute
+    }
+    '/_authenticated/dashboard/settings/sales': {
+      id: '/_authenticated/dashboard/settings/sales'
+      path: '/sales'
+      fullPath: '/dashboard/settings/sales'
+      preLoaderRoute: typeof AuthenticatedDashboardSettingsSalesRouteImport
       parentRoute: typeof AuthenticatedDashboardSettingsRoute
     }
     '/_authenticated/dashboard/settings/profile': {
@@ -8550,11 +8648,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCrmSettingsEmailTemplatesRouteImport
       parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
+    '/_authenticated/dashboard/crm/reports/win-loss': {
+      id: '/_authenticated/dashboard/crm/reports/win-loss'
+      path: '/reports/win-loss'
+      fullPath: '/dashboard/crm/reports/win-loss'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmReportsWinLossRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
     '/_authenticated/dashboard/crm/reports/new': {
       id: '/_authenticated/dashboard/crm/reports/new'
       path: '/reports/new'
       fullPath: '/dashboard/crm/reports/new'
       preLoaderRoute: typeof AuthenticatedDashboardCrmReportsNewRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/reports/leads-source': {
+      id: '/_authenticated/dashboard/crm/reports/leads-source'
+      path: '/reports/leads-source'
+      fullPath: '/dashboard/crm/reports/leads-source'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmReportsLeadsSourceRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/reports/funnel': {
+      id: '/_authenticated/dashboard/crm/reports/funnel'
+      path: '/reports/funnel'
+      fullPath: '/dashboard/crm/reports/funnel'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmReportsFunnelRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/reports/forecast': {
+      id: '/_authenticated/dashboard/crm/reports/forecast'
+      path: '/reports/forecast'
+      fullPath: '/dashboard/crm/reports/forecast'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmReportsForecastRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/reports/aging': {
+      id: '/_authenticated/dashboard/crm/reports/aging'
+      path: '/reports/aging'
+      fullPath: '/dashboard/crm/reports/aging'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmReportsAgingRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
+    '/_authenticated/dashboard/crm/reports/activities': {
+      id: '/_authenticated/dashboard/crm/reports/activities'
+      path: '/reports/activities'
+      fullPath: '/dashboard/crm/reports/activities'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmReportsActivitiesRouteImport
       parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
     '/_authenticated/dashboard/crm/reports/$reportId': {
@@ -9110,7 +9250,13 @@ interface AuthenticatedDashboardCrmRouteChildren {
   AuthenticatedDashboardCrmReferralsReferralIdRoute: typeof AuthenticatedDashboardCrmReferralsReferralIdRoute
   AuthenticatedDashboardCrmReferralsNewRoute: typeof AuthenticatedDashboardCrmReferralsNewRoute
   AuthenticatedDashboardCrmReportsReportIdRoute: typeof AuthenticatedDashboardCrmReportsReportIdRoute
+  AuthenticatedDashboardCrmReportsActivitiesRoute: typeof AuthenticatedDashboardCrmReportsActivitiesRoute
+  AuthenticatedDashboardCrmReportsAgingRoute: typeof AuthenticatedDashboardCrmReportsAgingRoute
+  AuthenticatedDashboardCrmReportsForecastRoute: typeof AuthenticatedDashboardCrmReportsForecastRoute
+  AuthenticatedDashboardCrmReportsFunnelRoute: typeof AuthenticatedDashboardCrmReportsFunnelRoute
+  AuthenticatedDashboardCrmReportsLeadsSourceRoute: typeof AuthenticatedDashboardCrmReportsLeadsSourceRoute
   AuthenticatedDashboardCrmReportsNewRoute: typeof AuthenticatedDashboardCrmReportsNewRoute
+  AuthenticatedDashboardCrmReportsWinLossRoute: typeof AuthenticatedDashboardCrmReportsWinLossRoute
   AuthenticatedDashboardCrmSettingsEmailTemplatesRoute: typeof AuthenticatedDashboardCrmSettingsEmailTemplatesRoute
   AuthenticatedDashboardCrmSettingsLostReasonsRoute: typeof AuthenticatedDashboardCrmSettingsLostReasonsRoute
   AuthenticatedDashboardCrmSettingsTagsRoute: typeof AuthenticatedDashboardCrmSettingsTagsRoute
@@ -9185,8 +9331,20 @@ const AuthenticatedDashboardCrmRouteChildren: AuthenticatedDashboardCrmRouteChil
       AuthenticatedDashboardCrmReferralsNewRoute,
     AuthenticatedDashboardCrmReportsReportIdRoute:
       AuthenticatedDashboardCrmReportsReportIdRoute,
+    AuthenticatedDashboardCrmReportsActivitiesRoute:
+      AuthenticatedDashboardCrmReportsActivitiesRoute,
+    AuthenticatedDashboardCrmReportsAgingRoute:
+      AuthenticatedDashboardCrmReportsAgingRoute,
+    AuthenticatedDashboardCrmReportsForecastRoute:
+      AuthenticatedDashboardCrmReportsForecastRoute,
+    AuthenticatedDashboardCrmReportsFunnelRoute:
+      AuthenticatedDashboardCrmReportsFunnelRoute,
+    AuthenticatedDashboardCrmReportsLeadsSourceRoute:
+      AuthenticatedDashboardCrmReportsLeadsSourceRoute,
     AuthenticatedDashboardCrmReportsNewRoute:
       AuthenticatedDashboardCrmReportsNewRoute,
+    AuthenticatedDashboardCrmReportsWinLossRoute:
+      AuthenticatedDashboardCrmReportsWinLossRoute,
     AuthenticatedDashboardCrmSettingsEmailTemplatesRoute:
       AuthenticatedDashboardCrmSettingsEmailTemplatesRoute,
     AuthenticatedDashboardCrmSettingsLostReasonsRoute:
@@ -9980,6 +10138,7 @@ interface AuthenticatedDashboardSettingsRouteChildren {
   AuthenticatedDashboardSettingsPaymentTermsRoute: typeof AuthenticatedDashboardSettingsPaymentTermsRoute
   AuthenticatedDashboardSettingsPreferencesRoute: typeof AuthenticatedDashboardSettingsPreferencesRoute
   AuthenticatedDashboardSettingsProfileRoute: typeof AuthenticatedDashboardSettingsProfileRoute
+  AuthenticatedDashboardSettingsSalesRoute: typeof AuthenticatedDashboardSettingsSalesRoute
   AuthenticatedDashboardSettingsSecurityRoute: typeof AuthenticatedDashboardSettingsSecurityRoute
   AuthenticatedDashboardSettingsTaxesRoute: typeof AuthenticatedDashboardSettingsTaxesRoute
 }
@@ -10002,6 +10161,8 @@ const AuthenticatedDashboardSettingsRouteChildren: AuthenticatedDashboardSetting
       AuthenticatedDashboardSettingsPreferencesRoute,
     AuthenticatedDashboardSettingsProfileRoute:
       AuthenticatedDashboardSettingsProfileRoute,
+    AuthenticatedDashboardSettingsSalesRoute:
+      AuthenticatedDashboardSettingsSalesRoute,
     AuthenticatedDashboardSettingsSecurityRoute:
       AuthenticatedDashboardSettingsSecurityRoute,
     AuthenticatedDashboardSettingsTaxesRoute:

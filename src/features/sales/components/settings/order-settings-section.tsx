@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ShoppingCart } from 'lucide-react'
 import { SettingsField } from './settings-field'
 import { OrderSettings } from '@/types/salesSettings'
-import { useLanguage } from '@/hooks/use-language'
+import { useTranslation } from 'react-i18next'
 
 interface OrderSettingsSectionProps {
   settings: OrderSettings
@@ -14,8 +14,8 @@ interface OrderSettingsSectionProps {
 }
 
 export function OrderSettingsSection({ settings, onChange }: OrderSettingsSectionProps) {
-  const { language } = useLanguage()
-  const isRTL = language === 'ar'
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   const handleFieldChange = (field: keyof OrderSettings, value: any) => {
     onChange({ ...settings, [field]: value })

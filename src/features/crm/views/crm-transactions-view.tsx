@@ -7,7 +7,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { useLanguage } from '@/hooks/use-language'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { ar, enUS } from 'date-fns/locale'
@@ -288,8 +288,9 @@ const MOCK_TRANSACTIONS: CrmTransaction[] = [
 // ═══════════════════════════════════════════════════════════════
 
 export default function CrmTransactionsView() {
-  const { isRTL, language } = useLanguage()
-  const dateLocale = language === 'ar' ? ar : enUS
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
+  const dateLocale = i18n.language === 'ar' ? ar : enUS
 
   // State
   const [filters, setFilters] = useState<FilterState>({

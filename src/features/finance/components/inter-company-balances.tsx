@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { useLanguage } from '@/hooks/useLanguage'
 import {
   Building2, TrendingUp, TrendingDown, ArrowRight,
   FileText, RefreshCw, Download, Filter
@@ -49,9 +48,8 @@ import type { InterCompanyBalance } from '@/services/interCompanyService'
 
 export default function InterCompanyBalances() {
   const navigate = useNavigate()
-  const { t } = useTranslation()
-  const { language } = useLanguage()
-  const isArabic = language === 'ar'
+  const { t, i18n } = useTranslation()
+  const isArabic = i18n.language === 'ar'
   const [selectedCurrency, setSelectedCurrency] = useState<string>('SAR')
   const [selectedBalance, setSelectedBalance] = useState<InterCompanyBalance | null>(null)
   const [showTransactionsDialog, setShowTransactionsDialog] = useState(false)

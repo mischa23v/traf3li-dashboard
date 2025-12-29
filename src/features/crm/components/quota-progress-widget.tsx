@@ -7,7 +7,7 @@
 
 import { useState, useMemo } from 'react'
 import { cn } from '@/lib/utils'
-import { useLanguage } from '@/hooks/use-language'
+import { useTranslation } from 'react-i18next'
 
 // UI Components
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -235,7 +235,8 @@ export function QuotaProgressWidget({
   onViewDetails,
   className,
 }: QuotaProgressWidgetProps) {
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   // Loading state
   if (isLoading) {
@@ -445,7 +446,8 @@ export function QuotaLeaderboard({
   isLoading = false,
   className,
 }: QuotaLeaderboardProps) {
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   if (isLoading) {
     return (
@@ -572,7 +574,8 @@ export function QuotaComparison({
   isLoading = false,
   className,
 }: QuotaComparisonProps) {
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   if (isLoading) {
     return (

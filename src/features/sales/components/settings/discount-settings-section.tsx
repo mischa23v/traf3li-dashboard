@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Percent } from 'lucide-react'
 import { SettingsField } from './settings-field'
 import { DiscountSettings } from '@/types/salesSettings'
-import { useLanguage } from '@/hooks/use-language'
+import { useTranslation } from 'react-i18next'
 
 interface DiscountSettingsSectionProps {
   settings: DiscountSettings
@@ -14,8 +14,8 @@ interface DiscountSettingsSectionProps {
 }
 
 export function DiscountSettingsSection({ settings, onChange }: DiscountSettingsSectionProps) {
-  const { language } = useLanguage()
-  const isRTL = language === 'ar'
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   const handleFieldChange = (field: keyof DiscountSettings, value: any) => {
     onChange({ ...settings, [field]: value })

@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { TrendingUp } from 'lucide-react'
 import { SettingsField } from './settings-field'
 import { CommissionSettings } from '@/types/salesSettings'
-import { useLanguage } from '@/hooks/use-language'
+import { useTranslation } from 'react-i18next'
 
 interface CommissionSettingsSectionProps {
   settings: CommissionSettings
@@ -14,8 +14,8 @@ interface CommissionSettingsSectionProps {
 }
 
 export function CommissionSettingsSection({ settings, onChange }: CommissionSettingsSectionProps) {
-  const { language } = useLanguage()
-  const isRTL = language === 'ar'
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   const handleFieldChange = (field: keyof CommissionSettings, value: any) => {
     onChange({ ...settings, [field]: value })

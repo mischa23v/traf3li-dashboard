@@ -12,7 +12,7 @@ import organizationsService, {
   type OrganizationsResponse,
 } from '@/services/organizationsService'
 import { useToast } from '@/hooks/use-toast'
-import { useLanguage } from '@/hooks/use-language'
+import { useTranslation } from 'react-i18next'
 
 // Query Keys
 export const organizationKeys = {
@@ -79,7 +79,8 @@ export function useOrganizationsByClient(clientId: string) {
 export function useCreateOrganization() {
   const queryClient = useQueryClient()
   const { toast } = useToast()
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   return useMutation({
     mutationFn: (data: CreateOrganizationData) =>
@@ -110,7 +111,8 @@ export function useCreateOrganization() {
 export function useUpdateOrganization() {
   const queryClient = useQueryClient()
   const { toast } = useToast()
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateOrganizationData }) =>
@@ -142,7 +144,8 @@ export function useUpdateOrganization() {
 export function useDeleteOrganization() {
   const queryClient = useQueryClient()
   const { toast } = useToast()
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   return useMutation({
     mutationFn: (id: string) => organizationsService.deleteOrganization(id),
@@ -172,7 +175,8 @@ export function useDeleteOrganization() {
 export function useBulkDeleteOrganizations() {
   const queryClient = useQueryClient()
   const { toast } = useToast()
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   return useMutation({
     mutationFn: (ids: string[]) => organizationsService.bulkDeleteOrganizations(ids),
@@ -202,7 +206,8 @@ export function useBulkDeleteOrganizations() {
 export function useLinkOrganizationToCase() {
   const queryClient = useQueryClient()
   const { toast } = useToast()
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   return useMutation({
     mutationFn: ({ organizationId, caseId }: { organizationId: string; caseId: string }) =>
@@ -233,7 +238,8 @@ export function useLinkOrganizationToCase() {
 export function useLinkOrganizationToClient() {
   const queryClient = useQueryClient()
   const { toast } = useToast()
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   return useMutation({
     mutationFn: ({ organizationId, clientId }: { organizationId: string; clientId: string }) =>
@@ -264,7 +270,8 @@ export function useLinkOrganizationToClient() {
 export function useLinkOrganizationToContact() {
   const queryClient = useQueryClient()
   const { toast } = useToast()
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   return useMutation({
     mutationFn: ({ organizationId, contactId }: { organizationId: string; contactId: string }) =>

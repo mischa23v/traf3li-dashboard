@@ -7,7 +7,7 @@
 
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import { useLanguage } from '@/hooks/use-language'
+import { useTranslation } from 'react-i18next'
 
 // UI Components
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -71,7 +71,8 @@ interface DuplicateDetectionPanelProps {
 // ═══════════════════════════════════════════════════════════════
 
 function MatchScoreIndicator({ score }: { score: number }) {
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   const getScoreColor = (s: number) => {
     if (s >= 80) return 'text-red-600 bg-red-100'
@@ -121,7 +122,8 @@ function DuplicateCard({
   onSelect: (id: string) => void
   onDismiss?: (id: string) => void
 }) {
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
   const [isExpanded, setIsExpanded] = useState(false)
 
   return (
@@ -235,7 +237,8 @@ function MergeDialog({
   onConfirm: () => Promise<void>
   isLoading: boolean
 }) {
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -288,7 +291,8 @@ export function DuplicateDetectionPanel({
   onDismiss,
   className,
 }: DuplicateDetectionPanelProps) {
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [isMergeDialogOpen, setIsMergeDialogOpen] = useState(false)
   const [isMerging, setIsMerging] = useState(false)

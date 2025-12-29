@@ -33,7 +33,7 @@ import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ProfileDropdown } from '@/components/profile-dropdown'
-import { useLanguage } from '@/hooks/use-language'
+import { useTranslation } from 'react-i18next'
 import {
   useSalesSettings,
   useUpdateSalesSettings,
@@ -56,8 +56,8 @@ import { DocumentSettingsSection } from './document-settings-section'
 import { SequenceSettingsSection } from './sequence-settings-section'
 
 export function SalesSettingsPage() {
-  const { language } = useLanguage()
-  const isRTL = language === 'ar'
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   const { data: settingsData, isLoading } = useSalesSettings()
   const updateSettingsMutation = useUpdateSalesSettings()
