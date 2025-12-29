@@ -184,6 +184,7 @@ export interface LoginCredentials {
   username: string // Can be username OR email
   password: string
   captchaToken?: string
+  rememberMe?: boolean // Extended session (30 days vs 24 hours)
 }
 
 /**
