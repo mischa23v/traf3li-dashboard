@@ -5,6 +5,8 @@ import otpService from '@/services/otpService';
 import passwordService from '@/services/passwordService';
 import { PasswordStrengthIndicator } from '@/components/auth/password-strength-indicator';
 import { ROUTES } from '@/constants/routes';
+import { AuthHeader } from '@/components/auth/auth-header';
+import { AuthFooter } from '@/components/auth/auth-footer';
 
 // ============================================
 // SVG ICONS
@@ -427,8 +429,9 @@ export function ForgotPassword() {
   // ============================================
   if (step === 'success') {
     return (
-      <div className="min-h-screen bg-[#F8F9FA]" dir={isRtl ? 'rtl' : 'ltr'} style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-        <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="min-h-screen flex flex-col bg-[#F8F9FA]" dir={isRtl ? 'rtl' : 'ltr'} style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+        <AuthHeader />
+        <div className="flex-1 flex items-center justify-center p-6">
           <div className="w-full max-w-md text-center">
             <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-10">
               <div className="inline-flex items-center justify-center text-emerald-500 mb-6 animate-scaleIn">
@@ -449,6 +452,7 @@ export function ForgotPassword() {
             </div>
           </div>
         </div>
+        <AuthFooter />
         <style>{`
           @keyframes scaleIn {
             from { opacity: 0; transform: scale(0.5); }
@@ -465,8 +469,9 @@ export function ForgotPassword() {
   // ============================================
   if (step === 'newPassword') {
     return (
-      <div className="min-h-screen bg-[#F8F9FA]" dir={isRtl ? 'rtl' : 'ltr'} style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-        <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="min-h-screen flex flex-col bg-[#F8F9FA]" dir={isRtl ? 'rtl' : 'ltr'} style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+        <AuthHeader />
+        <div className="flex-1 flex items-center justify-center p-6">
           <div className="w-full max-w-md">
             {/* Header */}
             <div className="text-center mb-8">
@@ -583,6 +588,7 @@ export function ForgotPassword() {
             </div>
           </div>
         </div>
+        <AuthFooter />
       </div>
     );
   }
@@ -592,8 +598,9 @@ export function ForgotPassword() {
   // ============================================
   if (step === 'otp') {
     return (
-      <div className="min-h-screen bg-[#F8F9FA]" dir={isRtl ? 'rtl' : 'ltr'} style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-        <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="min-h-screen flex flex-col bg-[#F8F9FA]" dir={isRtl ? 'rtl' : 'ltr'} style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+        <AuthHeader />
+        <div className="flex-1 flex items-center justify-center p-6">
           <div className="w-full max-w-md">
             {/* Header */}
             <div className="text-center mb-8">
@@ -708,14 +715,14 @@ export function ForgotPassword() {
                   onClick={() => { setStep('email'); setOtp(''); setOtpError(''); }}
                   className="w-full flex items-center justify-center gap-2 text-slate-600 hover:text-[#0f172a] font-medium text-sm"
                 >
-                  <Icons.ChevronRight />
+                  {isRtl ? <Icons.ChevronLeft /> : <Icons.ChevronRight />}
                   {t('forgotPassword.otp.changeEmail')}
                 </button>
               </div>
             </div>
           </div>
         </div>
-
+        <AuthFooter />
         <style>{`
           @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -732,8 +739,9 @@ export function ForgotPassword() {
   // EMAIL STEP
   // ============================================
   return (
-    <div className="min-h-screen bg-[#F8F9FA]" dir={isRtl ? 'rtl' : 'ltr'} style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-      <div className="min-h-screen flex items-center justify-center p-6">
+    <div className="min-h-screen flex flex-col bg-[#F8F9FA]" dir={isRtl ? 'rtl' : 'ltr'} style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      <AuthHeader />
+      <div className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-md">
           {/* Header */}
           <div className="text-center mb-8">
@@ -794,7 +802,7 @@ export function ForgotPassword() {
                 ) : (
                   <>
                     {t('forgotPassword.email.sendCode')}
-                    <Icons.ChevronLeft />
+                    {isRtl ? <Icons.ChevronRight /> : <Icons.ChevronLeft />}
                   </>
                 )}
               </button>
@@ -819,6 +827,7 @@ export function ForgotPassword() {
           </p>
         </div>
       </div>
+      <AuthFooter />
     </div>
   );
 }
