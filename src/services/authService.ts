@@ -330,12 +330,20 @@ export interface EmailVerificationResponse {
 
 /**
  * API Response Interface with optional tokens
+ * Supports both OAuth 2.0 standard fields (snake_case) and backwards-compatible fields (camelCase)
  */
 interface AuthResponse {
   error: boolean
   message: string
   user?: User
-  // Dual token authentication
+
+  // OAuth 2.0 Standard (snake_case) - recommended for new code
+  access_token?: string
+  refresh_token?: string
+  token_type?: 'Bearer'
+  expires_in?: number  // seconds until access token expires
+
+  // Backwards compatibility (camelCase) - existing code continues to work
   accessToken?: string
   refreshToken?: string
 }
@@ -479,14 +487,22 @@ const authService = {
         throw new Error(response.data.message || 'فشل تسجيل الدخول')
       }
 
-      // Store dual tokens if provided
-      // BACKEND_TODO: Login MUST return accessToken and refreshToken
-      if (response.data.accessToken && response.data.refreshToken) {
-        storeTokens(response.data.accessToken, response.data.refreshToken)
+      // Store dual tokens if provided - supports both OAuth 2.0 (snake_case) and backwards-compatible (camelCase)
+      const accessToken = response.data.access_token || response.data.accessToken
+      const refreshToken = response.data.refresh_token || response.data.refreshToken
+      const expiresIn = response.data.expires_in // seconds until access token expires
+
+      if (accessToken && refreshToken) {
+        storeTokens(accessToken, refreshToken, expiresIn)
+        authLog('Login tokens stored successfully', {
+          hasExpiresIn: !!expiresIn,
+          expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
+          tokenFormat: response.data.access_token ? 'OAuth 2.0 (snake_case)' : 'Legacy (camelCase)',
+        })
       } else {
-        console.warn('[AUTH] ⚠️ Login response did not include tokens!')
-        console.warn('[AUTH] 📋 BACKEND FIX: Return accessToken & refreshToken from /auth/login')
-        console.warn('[AUTH] Response keys:', Object.keys(response.data))
+        authWarn('Login response did not include tokens!')
+        authWarn('📋 BACKEND FIX: Return access_token & refresh_token from /auth/login')
+        authLog('Response keys:', Object.keys(response.data))
       }
 
       // Normalize user data to ensure firmId is set
@@ -995,13 +1011,21 @@ const authService = {
         throw new Error(response.data.message || 'فشل التحقق من رمز OTP')
       }
 
-      // Store dual tokens if provided
-      // BACKEND_TODO: This endpoint MUST return accessToken and refreshToken
-      if (response.data.accessToken && response.data.refreshToken) {
-        storeTokens(response.data.accessToken, response.data.refreshToken)
+      // Store dual tokens if provided - supports both OAuth 2.0 (snake_case) and backwards-compatible (camelCase)
+      const accessToken = response.data.access_token || response.data.accessToken
+      const refreshToken = response.data.refresh_token || response.data.refreshToken
+      const expiresIn = response.data.expires_in // seconds until access token expires
+
+      if (accessToken && refreshToken) {
+        storeTokens(accessToken, refreshToken, expiresIn)
+        authLog('OTP verify tokens stored successfully', {
+          hasExpiresIn: !!expiresIn,
+          expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
+          tokenFormat: response.data.access_token ? 'OAuth 2.0 (snake_case)' : 'Legacy (camelCase)',
+        })
       } else {
-        console.warn('[AUTH] ⚠️ OTP verify did not return tokens - user will not be authenticated!')
-        console.warn('[AUTH] 📋 BACKEND FIX: Return accessToken & refreshToken from /auth/verify-otp')
+        authWarn('OTP verify did not return tokens - user will not be authenticated!')
+        authWarn('📋 BACKEND FIX: Return access_token & refresh_token from /auth/verify-otp')
       }
 
       // Normalize user data to ensure firmId is set
@@ -1117,9 +1141,21 @@ const authService = {
         )
       }
 
-      // Store dual tokens if provided
-      if (response.data.accessToken && response.data.refreshToken) {
-        storeTokens(response.data.accessToken, response.data.refreshToken)
+      // Store dual tokens if provided - supports both OAuth 2.0 (snake_case) and backwards-compatible (camelCase)
+      const accessToken = response.data.access_token || response.data.accessToken
+      const refreshToken = response.data.refresh_token || response.data.refreshToken
+      const expiresIn = response.data.expires_in // seconds until access token expires
+
+      if (accessToken && refreshToken) {
+        storeTokens(accessToken, refreshToken, expiresIn)
+        authLog('Magic link tokens stored successfully', {
+          hasExpiresIn: !!expiresIn,
+          expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
+          tokenFormat: response.data.access_token ? 'OAuth 2.0 (snake_case)' : 'Legacy (camelCase)',
+        })
+      } else {
+        authWarn('Magic link verify did not return tokens!')
+        authWarn('📋 BACKEND FIX: Return access_token & refresh_token from /auth/magic-link/verify')
       }
 
       // Normalize user data to ensure firmId is set

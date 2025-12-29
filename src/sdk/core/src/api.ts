@@ -128,18 +128,20 @@ export class AuthAPI {
    */
   async login(credentials: LoginCredentials): Promise<AuthResult> {
     const response = await this.request<
-      ApiResponse<AuthResult> & { user?: User; accessToken?: string; refreshToken?: string }
+      ApiResponse<AuthResult> & { user?: User; accessToken?: string; refreshToken?: string; access_token?: string; refresh_token?: string; expires_in?: number }
     >(AUTH_ENDPOINTS.LOGIN, {
       method: 'POST',
       body: credentials,
       skipAuth: true,
     });
 
-    // Handle dual token response
-    if (response.accessToken && response.refreshToken) {
+    // Handle dual token response - supports both OAuth 2.0 (snake_case) and legacy (camelCase)
+    const accessToken = response.access_token || response.accessToken;
+    const refreshToken = response.refresh_token || response.refreshToken;
+    if (accessToken && refreshToken) {
       this.tokenManager.setTokens({
-        accessToken: response.accessToken,
-        refreshToken: response.refreshToken,
+        accessToken,
+        refreshToken,
       });
     }
 
@@ -276,17 +278,19 @@ export class AuthAPI {
    */
   async verifyMfa(data: MfaChallengeData): Promise<AuthResult> {
     const response = await this.request<
-      ApiResponse<AuthResult> & { user?: User; accessToken?: string; refreshToken?: string }
+      ApiResponse<AuthResult> & { user?: User; accessToken?: string; refreshToken?: string; access_token?: string; refresh_token?: string; expires_in?: number }
     >(AUTH_ENDPOINTS.MFA_VERIFY, {
       method: 'POST',
       body: data,
     });
 
-    // Store tokens if provided
-    if (response.accessToken && response.refreshToken) {
+    // Store tokens if provided - supports both OAuth 2.0 (snake_case) and legacy (camelCase)
+    const accessToken = response.access_token || response.accessToken;
+    const refreshToken = response.refresh_token || response.refreshToken;
+    if (accessToken && refreshToken) {
       this.tokenManager.setTokens({
-        accessToken: response.accessToken,
-        refreshToken: response.refreshToken,
+        accessToken,
+        refreshToken,
       });
     }
 
@@ -393,18 +397,20 @@ export class AuthAPI {
    */
   async verifyOtp(data: VerifyOtpData): Promise<AuthResult> {
     const response = await this.request<
-      ApiResponse<AuthResult> & { user?: User; accessToken?: string; refreshToken?: string }
+      ApiResponse<AuthResult> & { user?: User; accessToken?: string; refreshToken?: string; access_token?: string; refresh_token?: string; expires_in?: number }
     >(AUTH_ENDPOINTS.VERIFY_OTP, {
       method: 'POST',
       body: data,
       skipAuth: true,
     });
 
-    // Store tokens if provided
-    if (response.accessToken && response.refreshToken) {
+    // Store tokens if provided - supports both OAuth 2.0 (snake_case) and legacy (camelCase)
+    const accessToken = response.access_token || response.accessToken;
+    const refreshToken = response.refresh_token || response.refreshToken;
+    if (accessToken && refreshToken) {
       this.tokenManager.setTokens({
-        accessToken: response.accessToken,
-        refreshToken: response.refreshToken,
+        accessToken,
+        refreshToken,
       });
     }
 
@@ -450,18 +456,20 @@ export class AuthAPI {
    */
   async verifyMagicLink(token: string): Promise<AuthResult> {
     const response = await this.request<
-      ApiResponse<AuthResult> & { user?: User; accessToken?: string; refreshToken?: string }
+      ApiResponse<AuthResult> & { user?: User; accessToken?: string; refreshToken?: string; access_token?: string; refresh_token?: string; expires_in?: number }
     >(AUTH_ENDPOINTS.MAGIC_LINK_VERIFY, {
       method: 'POST',
       body: { token },
       skipAuth: true,
     });
 
-    // Store tokens if provided
-    if (response.accessToken && response.refreshToken) {
+    // Store tokens if provided - supports both OAuth 2.0 (snake_case) and legacy (camelCase)
+    const accessToken = response.access_token || response.accessToken;
+    const refreshToken = response.refresh_token || response.refreshToken;
+    if (accessToken && refreshToken) {
       this.tokenManager.setTokens({
-        accessToken: response.accessToken,
-        refreshToken: response.refreshToken,
+        accessToken,
+        refreshToken,
       });
     }
 
@@ -495,18 +503,20 @@ export class AuthAPI {
     firmId?: string
   ): Promise<AuthResult> {
     const response = await this.request<
-      ApiResponse<AuthResult> & { user?: User; accessToken?: string; refreshToken?: string }
+      ApiResponse<AuthResult> & { user?: User; accessToken?: string; refreshToken?: string; access_token?: string; refresh_token?: string; expires_in?: number }
     >(AUTH_ENDPOINTS.GOOGLE_ONE_TAP, {
       method: 'POST',
       body: { credential, firmId },
       skipAuth: true,
     });
 
-    // Store tokens if provided
-    if (response.accessToken && response.refreshToken) {
+    // Store tokens if provided - supports both OAuth 2.0 (snake_case) and legacy (camelCase)
+    const accessToken = response.access_token || response.accessToken;
+    const refreshToken = response.refresh_token || response.refreshToken;
+    if (accessToken && refreshToken) {
       this.tokenManager.setTokens({
-        accessToken: response.accessToken,
-        refreshToken: response.refreshToken,
+        accessToken,
+        refreshToken,
       });
     }
 

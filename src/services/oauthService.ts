@@ -197,13 +197,23 @@ interface OAuthAuthorizeResponse {
 
 /**
  * OAuth Callback Response
+ * Supports both OAuth 2.0 standard fields (snake_case) and backwards-compatible fields (camelCase)
  */
 interface OAuthCallbackResponse {
   error: boolean
   message: string
   user?: User
+
+  // OAuth 2.0 Standard (snake_case) - recommended for new code
+  access_token?: string
+  refresh_token?: string
+  token_type?: 'Bearer'
+  expires_in?: number  // seconds until access token expires
+
+  // Backwards compatibility (camelCase) - existing code continues to work
   accessToken?: string
   refreshToken?: string
+
   csrfToken?: string
   isNewUser?: boolean
 }
@@ -347,40 +357,48 @@ const oauthService = {
       // 🚨 BACKEND_TODO: CRITICAL CHECK - Backend must return tokens!
       // =========================================================================
       // If this error appears, the backend /auth/sso/callback endpoint is NOT
-      // returning accessToken and refreshToken. This is a BACKEND BUG.
+      // returning tokens. This is a BACKEND BUG.
       //
-      // BACKEND FIX REQUIRED:
+      // BACKEND FIX REQUIRED (OAuth 2.0 format):
       // In the SSO callback controller, add to the response:
       //
       // res.json({
       //   error: false,
       //   message: 'Login successful',
       //   user: userData,
-      //   accessToken: jwt.sign({ userId, email, role, firmId }, ACCESS_SECRET, { expiresIn: '15m' }),
-      //   refreshToken: jwt.sign({ userId }, REFRESH_SECRET, { expiresIn: '7d' }),
+      //   access_token: jwt.sign({ userId, email, role, firmId }, ACCESS_SECRET, { expiresIn: '15m' }),
+      //   refresh_token: jwt.sign({ userId }, REFRESH_SECRET, { expiresIn: '7d' }),
+      //   token_type: 'Bearer',
+      //   expires_in: 900,  // 15 minutes in seconds
       //   isNewUser: isNewUser
       // });
       //
       // See: src/config/BACKEND_AUTH_ISSUES.ts for full documentation
       // =========================================================================
-      if (!response.data.accessToken || !response.data.refreshToken) {
+      const hasOAuth2Tokens = response.data.access_token && response.data.refresh_token
+      const hasLegacyTokens = response.data.accessToken && response.data.refreshToken
+
+      if (!hasOAuth2Tokens && !hasLegacyTokens) {
         console.error('🚨🚨🚨 BACKEND DID NOT RETURN TOKENS! 🚨🚨🚨')
         console.error('[OAUTH] ❌ CRITICAL: Backend SSO callback returned user but NO TOKENS!')
-        console.error('[OAUTH] This is a BACKEND BUG - the /auth/sso/callback endpoint must return accessToken and refreshToken')
+        console.error('[OAUTH] This is a BACKEND BUG - the /auth/sso/callback endpoint must return tokens')
         console.error('[OAUTH] Full response data:', JSON.stringify(response.data, null, 2))
-        console.error('[OAUTH] Expected response shape: { user: {...}, accessToken: "...", refreshToken: "...", isNewUser: boolean }')
+        console.error('[OAUTH] Expected OAuth 2.0 format: { user: {...}, access_token: "...", refresh_token: "...", token_type: "Bearer", expires_in: 900, isNewUser: boolean }')
+        console.error('[OAUTH] Legacy format also supported: { user: {...}, accessToken: "...", refreshToken: "...", isNewUser: boolean }')
         console.error('[OAUTH] Actual response keys:', Object.keys(response.data))
         console.error('[OAUTH] 📋 See src/config/BACKEND_AUTH_ISSUES.ts for fix instructions')
 
         // Check if tokens might be in a nested structure (common backend mistake)
         const possibleTokenLocations = {
-          'response.data.accessToken': response.data.accessToken,
-          'response.data.refreshToken': response.data.refreshToken,
+          'response.data.access_token (OAuth 2.0)': response.data.access_token,
+          'response.data.refresh_token (OAuth 2.0)': response.data.refresh_token,
+          'response.data.accessToken (legacy)': response.data.accessToken,
+          'response.data.refreshToken (legacy)': response.data.refreshToken,
           'response.data.token': (response.data as any).token,
           'response.data.tokens': (response.data as any).tokens,
+          'response.data.data?.access_token': (response.data as any).data?.access_token,
           'response.data.data?.accessToken': (response.data as any).data?.accessToken,
-          'response.data.data?.token': (response.data as any).data?.token,
-          'response.data.auth?.accessToken': (response.data as any).auth?.accessToken,
+          'response.data.auth?.access_token': (response.data as any).auth?.access_token,
         }
         console.error('[OAUTH] Checking alternate token locations:', possibleTokenLocations)
       }
@@ -395,16 +413,18 @@ const oauthService = {
         )
       }
 
-      // Try to extract tokens - check multiple possible locations
-      let accessToken = response.data.accessToken
-      let refreshToken = response.data.refreshToken
+      // Try to extract tokens - supports both OAuth 2.0 (snake_case) and backwards-compatible (camelCase)
+      // OAuth 2.0 format takes precedence
+      let accessToken = response.data.access_token || response.data.accessToken
+      let refreshToken = response.data.refresh_token || response.data.refreshToken
+      const expiresIn = response.data.expires_in // seconds until access token expires
 
       // Check alternate locations if not found at root level
       if (!accessToken || !refreshToken) {
         const data = response.data as any
-        // Try nested structures
-        accessToken = accessToken || data.token || data.tokens?.accessToken || data.data?.accessToken || data.auth?.accessToken
-        refreshToken = refreshToken || data.tokens?.refreshToken || data.data?.refreshToken || data.auth?.refreshToken
+        // Try nested structures (common backend variations)
+        accessToken = accessToken || data.token || data.tokens?.access_token || data.tokens?.accessToken || data.data?.access_token || data.data?.accessToken || data.auth?.access_token || data.auth?.accessToken
+        refreshToken = refreshToken || data.tokens?.refresh_token || data.tokens?.refreshToken || data.data?.refresh_token || data.data?.refreshToken || data.auth?.refresh_token || data.auth?.refreshToken
 
         if (accessToken || refreshToken) {
           oauthWarn('Found tokens in alternate location!', {
@@ -416,11 +436,15 @@ const oauthService = {
 
       // Store tokens if provided
       if (accessToken && refreshToken) {
-        oauthLog('Storing tokens from callback response...')
+        oauthLog('Storing tokens from callback response...', {
+          hasExpiresIn: !!expiresIn,
+          expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
+          tokenFormat: response.data.access_token ? 'OAuth 2.0 (snake_case)' : 'Legacy (camelCase)',
+        })
         logTokenDetails('  New accessToken', accessToken)
         logTokenDetails('  New refreshToken', refreshToken)
 
-        storeTokens(accessToken, refreshToken)
+        storeTokens(accessToken, refreshToken, expiresIn)
 
         // Verify tokens were stored correctly
         const storedAccess = getAccessToken()

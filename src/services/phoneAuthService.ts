@@ -148,9 +148,13 @@ const phoneAuthService = {
         }
       }
 
-      // Store tokens if provided
-      if (response.data.accessToken && response.data.refreshToken) {
-        storeTokens(response.data.accessToken, response.data.refreshToken)
+      // Store tokens if provided - supports both OAuth 2.0 (snake_case) and legacy (camelCase)
+      const accessToken = (response.data as any).access_token || response.data.accessToken
+      const refreshToken = (response.data as any).refresh_token || response.data.refreshToken
+      const expiresIn = (response.data as any).expires_in // seconds until access token expires
+
+      if (accessToken && refreshToken) {
+        storeTokens(accessToken, refreshToken, expiresIn)
       }
 
       // Store user in localStorage
