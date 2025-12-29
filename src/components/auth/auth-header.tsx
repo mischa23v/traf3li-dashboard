@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next'
+import { LanguageSwitcher } from '@/components/language-switcher'
 
 // Trafli Logo SVG Component
 const TrafliLogo = () => (
-  <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -19,26 +20,19 @@ export function AuthHeader() {
   return (
     <header className="w-full bg-white border-b border-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-14">
           {/* Logo */}
-          <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <div className="flex items-center gap-2">
             <div className="text-emerald-600">
               <TrafliLogo />
             </div>
-            <span className="text-xl font-bold text-slate-800">
-              {isRTL ? 'ترافعلي' : 'Traf3li'}
+            <span className="text-lg font-bold">
+              <span className="text-emerald-600">{isRTL ? 'ترافعلي' : 'Traf3li'}</span>
             </span>
           </div>
 
-          {/* Tagline - Hidden on mobile */}
-          <div className="hidden md:block">
-            <span className="text-sm text-slate-500">
-              {isRTL
-                ? 'المنصة القانونية الأولى في المملكة'
-                : 'The Leading Legal Platform in Saudi Arabia'
-              }
-            </span>
-          </div>
+          {/* Language Switcher */}
+          <LanguageSwitcher />
         </div>
       </div>
     </header>
