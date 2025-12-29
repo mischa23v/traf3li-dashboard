@@ -20,6 +20,7 @@ import {
   getCaptchaSiteKey,
 } from '@/components/auth/captcha-config';
 import { ROUTES } from '@/constants/routes';
+import { LanguageSwitcher } from '@/components/language-switcher';
 
 // ============================================
 // SVG ICONS
@@ -301,7 +302,12 @@ export function SignIn() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA]" dir="rtl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+    <div className="min-h-screen bg-[#F8F9FA]" dir={isRTL ? 'rtl' : 'ltr'} style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      {/* Language Switcher - Top Corner */}
+      <div className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} z-10`}>
+        <LanguageSwitcher />
+      </div>
+
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-md">
           {/* Header */}
