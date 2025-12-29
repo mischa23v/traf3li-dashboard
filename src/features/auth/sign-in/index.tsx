@@ -20,7 +20,6 @@ import {
   getCaptchaSiteKey,
 } from '@/components/auth/captcha-config';
 import { ROUTES } from '@/constants/routes';
-import { LanguageSwitcher } from '@/components/language-switcher';
 import { AuthHeader } from '@/components/auth/auth-header';
 import { AuthFooter } from '@/components/auth/auth-footer';
 
@@ -122,6 +121,9 @@ export function SignIn() {
     usernameOrEmail: '',
     password: '',
   });
+
+  // Keep me signed in
+  const [keepSignedIn, setKeepSignedIn] = useState(false);
 
   // Show logout reason message on mount
   useEffect(() => {
@@ -308,11 +310,6 @@ export function SignIn() {
       {/* Header */}
       <AuthHeader />
 
-      {/* Language Switcher - Below Header */}
-      <div className={`absolute top-20 ${isRTL ? 'left-4' : 'right-4'} z-10`}>
-        <LanguageSwitcher />
-      </div>
-
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-md">
           {/* Header */}
@@ -438,6 +435,26 @@ export function SignIn() {
                 )}
               </div>
 
+              {/* Keep me signed in */}
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  id="keepSignedIn"
+                  checked={keepSignedIn}
+                  onChange={(e) => setKeepSignedIn(e.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                  disabled={isLoading || waitTime > 0}
+                />
+                <div>
+                  <label htmlFor="keepSignedIn" className="text-sm font-medium text-[#0f172a] cursor-pointer">
+                    {isRTL ? 'تذكرني' : 'Keep me signed in'}
+                  </label>
+                  <p className="text-xs text-slate-500">
+                    {isRTL ? 'يوصى به على الأجهزة الموثوقة' : 'Recommended on trusted devices'}
+                  </p>
+                </div>
+              </div>
+
               {/* Invisible CAPTCHA */}
               {captchaEnabled && captchaProvider !== 'none' && captchaSiteKey && (
                 <InvisibleCaptcha
@@ -480,20 +497,6 @@ export function SignIn() {
               {/* SSO Login Buttons */}
               <SSOLoginButtons disabled={isLoading || waitTime > 0} />
             </form>
-
-            {/* Footer */}
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100">
-              <p className="text-center text-sm text-slate-500">
-                {t('auth.signIn.termsPrefix')}{' '}
-                <Link to="/terms" className="text-emerald-600 hover:text-emerald-700 font-medium">
-                  {t('auth.signIn.termsOfService')}
-                </Link>{' '}
-                {t('auth.signIn.and')}{' '}
-                <Link to="/privacy" className="text-emerald-600 hover:text-emerald-700 font-medium">
-                  {t('auth.signIn.privacyPolicy')}
-                </Link>
-              </p>
-            </div>
           </div>
 
           {/* Sign Up Link */}
