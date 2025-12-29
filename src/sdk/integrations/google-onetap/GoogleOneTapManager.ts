@@ -236,11 +236,14 @@ export class GoogleOneTapManager {
 
     const data = await response.json();
 
+    // Support both OAuth 2.0 (snake_case) and legacy (camelCase) token formats
     return {
       success: true,
       user: data.user,
-      accessToken: data.accessToken,
-      refreshToken: data.refreshToken,
+      accessToken: data.access_token || data.accessToken,
+      refreshToken: data.refresh_token || data.refreshToken,
+      expiresIn: data.expires_in,
+      tokenType: data.token_type,
     };
   }
 
