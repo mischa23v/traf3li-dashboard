@@ -213,6 +213,9 @@ export function ForgotPassword() {
   const [otpError, setOtpError] = useState('');
   const [resendTimer, setResendTimer] = useState(60);
   const [canResend, setCanResend] = useState(false);
+  // OTP expiry timer (OTP typically expires in 5 minutes = 300 seconds)
+  const [otpExpiryTimer, setOtpExpiryTimer] = useState(300);
+  const [isOtpExpired, setIsOtpExpired] = useState(false);
 
   // New password step
   const [newPassword, setNewPassword] = useState('');
@@ -232,6 +235,24 @@ export function ForgotPassword() {
       setCanResend(true);
     }
   }, [resendTimer, canResend, step]);
+
+  // OTP expiry countdown timer
+  useEffect(() => {
+    if (step === 'otp' && otpExpiryTimer > 0 && !isOtpExpired) {
+      const timer = setTimeout(() => setOtpExpiryTimer(otpExpiryTimer - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (otpExpiryTimer === 0 && !isOtpExpired) {
+      setIsOtpExpired(true);
+      setOtpError(isRtl ? 'انتهت صلاحية رمز التحقق. يرجى طلب رمز جديد.' : 'Verification code has expired. Please request a new code.');
+    }
+  }, [otpExpiryTimer, isOtpExpired, step, isRtl]);
+
+  // Format time for display (mm:ss)
+  const formatExpiryTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   // Validation
   const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -263,6 +284,9 @@ export function ForgotPassword() {
       setStep('otp');
       setResendTimer(60);
       setCanResend(false);
+      // Reset OTP expiry timer (5 minutes)
+      setOtpExpiryTimer(300);
+      setIsOtpExpired(false);
     } catch (error: any) {
       if (error.isRateLimited) {
         setApiError(isRtl ? `يرجى الانتظار ${error.waitTime} ثانية` : `Please wait ${error.waitTime} seconds`);
@@ -381,6 +405,10 @@ export function ForgotPassword() {
       setCanResend(false);
       setResendTimer(60);
       setOtp('');
+      // Reset OTP expiry timer (5 minutes)
+      setOtpExpiryTimer(300);
+      setIsOtpExpired(false);
+      setOtpError('');
     } catch (error: any) {
       if (error.isRateLimited) {
         setOtpError(isRtl ? `يرجى الانتظار ${error.waitTime} ثانية` : `Please wait ${error.waitTime} seconds`);
@@ -593,6 +621,32 @@ export function ForgotPassword() {
                     {email}
                   </p>
                 </div>
+
+                {/* OTP Expiry Timer */}
+                <div className={`text-center py-2 px-4 rounded-lg ${
+                  isOtpExpired
+                    ? 'bg-red-50 border border-red-200'
+                    : otpExpiryTimer <= 60
+                      ? 'bg-orange-50 border border-orange-200'
+                      : 'bg-slate-50 border border-slate-200'
+                }`}>
+                  <p className={`text-sm font-medium ${
+                    isOtpExpired
+                      ? 'text-red-600'
+                      : otpExpiryTimer <= 60
+                        ? 'text-orange-600'
+                        : 'text-slate-600'
+                  }`}>
+                    {isOtpExpired ? (
+                      isRtl ? '⏰ انتهت صلاحية الرمز' : '⏰ Code expired'
+                    ) : (
+                      <>
+                        {isRtl ? 'صلاحية الرمز: ' : 'Code expires in: '}
+                        <span className="font-bold tabular-nums">{formatExpiryTime(otpExpiryTimer)}</span>
+                      </>
+                    )}
+                  </p>
+                </div>
               </div>
 
               <form onSubmit={handleOtpSubmit} className="px-6 pb-6 space-y-5">
@@ -616,7 +670,7 @@ export function ForgotPassword() {
 
                 <button
                   type="submit"
-                  disabled={otp.length !== 6 || isLoading}
+                  disabled={otp.length !== 6 || isLoading || isOtpExpired}
                   className="w-full h-12 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isLoading ? (
@@ -624,6 +678,8 @@ export function ForgotPassword() {
                       <Icons.Spinner />
                       {t('forgotPassword.otp.verifying')}
                     </>
+                  ) : isOtpExpired ? (
+                    isRtl ? 'انتهت صلاحية الرمز' : 'Code expired'
                   ) : (
                     t('forgotPassword.otp.confirm')
                   )}

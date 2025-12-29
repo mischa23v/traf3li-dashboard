@@ -94,7 +94,7 @@ const passwordService = {
         message: string
       }>('/auth/reset-password', {
         token,
-        password: newPassword,
+        newPassword,
       })
       return response.data
     } catch (error: any) {
