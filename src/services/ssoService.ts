@@ -51,7 +51,7 @@
  * - View all linked authentication methods
  */
 
-import apiClient, { handleApiError, refreshCsrfToken } from '@/lib/api'
+import apiClient, { apiClientNoVersion, handleApiError, refreshCsrfToken } from '@/lib/api'
 
 // ==================== SSO DEBUG LOGGING ====================
 // Always enabled to help diagnose auth issues on production
@@ -64,6 +64,10 @@ const ssoWarn = (message: string, data?: any) => {
 const ssoError = (message: string, error?: any) => {
   console.error(`[SSO] ❌ ${message}`, error || '')
 }
+
+// NOTE: SSO auth endpoints use apiClientNoVersion (base: /api)
+// because they're in PUBLIC_ROUTES which only allows /api/auth/sso/* not /api/v1/auth/sso/*
+// Settings endpoints use apiClient (base: /api/v1) because they require authentication
 
 /**
  * Supported SSO providers
@@ -411,8 +415,9 @@ export const initiateSSOLogin = async (provider: SSOProvider): Promise<SSOLoginI
     const csrfToken = await refreshCsrfToken()
     ssoLog('CSRF token refresh result:', csrfToken ? 'SUCCESS' : 'FAILED (will try anyway)')
 
-    ssoLog('Calling POST /auth/sso/initiate', { provider })
-    const response = await apiClient.post('/auth/sso/initiate', { provider })
+    // Use apiClientNoVersion for /api/auth/sso/* (PUBLIC_ROUTES, no v1 prefix)
+    ssoLog('Calling POST /api/auth/sso/initiate (no v1 prefix)', { provider })
+    const response = await apiClientNoVersion.post('/auth/sso/initiate', { provider })
     ssoLog('SSO initiate response:', {
       hasAuthorizationUrl: !!response.data?.authorizationUrl,
       hasState: !!response.data?.state,
@@ -450,9 +455,10 @@ export const initiateSSOLogin = async (provider: SSOProvider): Promise<SSOLoginI
  * })
  */
 export const getEnabledSSOProviders = async (): Promise<SSOProviderConfig[]> => {
-  ssoLog('Fetching enabled SSO providers...')
+  ssoLog('Fetching enabled SSO providers (using /api/auth/sso/providers, no v1 prefix)...')
   try {
-    const response = await apiClient.get('/auth/sso/providers')
+    // Use apiClientNoVersion for /api/auth/sso/* (PUBLIC_ROUTES, no v1 prefix)
+    const response = await apiClientNoVersion.get('/auth/sso/providers')
     const providers = response.data.data || response.data.providers || []
     ssoLog('Enabled SSO providers:', {
       count: providers.length,
