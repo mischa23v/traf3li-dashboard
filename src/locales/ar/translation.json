@@ -744,6 +744,75 @@
     }
   },
   "tasks": {
+    "title": "المهام",
+    "management": "إدارة المهام",
+    "nav": {
+      "overview": "نظرة عامة",
+      "tasks": "المهام",
+      "cases": "القضايا",
+      "clients": "العملاء"
+    },
+    "list": {
+      "search": "البحث في المهام...",
+      "searchPlaceholder": "ابحث في المهام بالعنوان أو الوصف...",
+      "filters": "تصفية",
+      "status": "الحالة",
+      "active": "نشطة",
+      "completed": "مكتملة",
+      "priorityLabel": "الأولوية",
+      "allPriorities": "جميع الأولويات",
+      "responsible": "المسؤول",
+      "all": "الكل",
+      "myTasks": "مهامي",
+      "unassigned": "غير مُسندة",
+      "dueDate": "تاريخ الاستحقاق",
+      "allDates": "جميع التواريخ",
+      "today": "اليوم",
+      "thisWeek": "هذا الأسبوع",
+      "thisMonth": "هذا الشهر",
+      "overdue": "متأخرة",
+      "noDueDate": "بدون تاريخ",
+      "case": "القضية",
+      "allCases": "جميع القضايا",
+      "sortBy": "ترتيب حسب",
+      "creationDate": "تاريخ الإنشاء",
+      "clearFilters": "مسح الفلاتر",
+      "noTasks": "لا توجد مهام",
+      "noTasksDescription": "ليس لديك أي مهام بعد. أنشئ مهمتك الأولى للبدء!",
+      "newTask": "مهمة جديدة",
+      "notSet": "غير محدد",
+      "linkedEvent": "حدث",
+      "editTask": "تعديل المهمة",
+      "viewDetails": "عرض التفاصيل",
+      "completeTask": "إتمام المهمة",
+      "reopenTask": "إعادة فتح المهمة",
+      "deleteTask": "حذف المهمة",
+      "showMore": "عرض المزيد",
+      "viewAllTasks": "عرض جميع المهام"
+    },
+    "priorities": {
+      "urgent": "عاجل",
+      "high": "عالية",
+      "medium": "متوسطة",
+      "low": "منخفضة"
+    },
+    "smartDates": {
+      "today": "اليوم",
+      "tomorrow": "غداً",
+      "overdue": "متأخر",
+      "thisWeek": "هذا الأسبوع",
+      "daysRemaining": "متبقي {{days}} أيام",
+      "remaining": "متبقي",
+      "days": "أيام"
+    },
+    "timeline": {
+      "overdue": "متأخر",
+      "atRisk": "قريب"
+    },
+    "statuses": {
+      "inProgress": "قيد التنفيذ",
+      "done": "مكتمل"
+    },
     "versionHistory": "سجل النسخ",
     "versionHistoryFor": "سجل نسخ الملف: {{fileName}}",
     "availableVersions": "النسخ المتوفرة",
