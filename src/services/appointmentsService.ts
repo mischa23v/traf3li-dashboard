@@ -276,12 +276,11 @@ export interface BlockedTimesResponse {
 
 export interface AppointmentsResponse {
   success: boolean
-  data: Appointment[]
-  pagination?: {
+  data: {
+    appointments: Appointment[]
+    total: number
     page: number
     limit: number
-    total: number
-    totalPages: number
   }
 }
 
