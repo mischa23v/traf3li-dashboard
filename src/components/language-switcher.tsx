@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Languages } from 'lucide-react'
+import { Globe, ChevronDown } from 'lucide-react'
 
 export function LanguageSwitcher({ className }: { className?: string }) {
   const { i18n } = useTranslation()
@@ -15,12 +15,15 @@ export function LanguageSwitcher({ className }: { className?: string }) {
     i18n.changeLanguage(lng)
   }
 
+  const currentLanguage = i18n.language === 'ar' ? 'العربية' : 'English'
+
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
-        <Button variant='ghost' size='icon' className={className}>
-          <Languages className='h-5 w-5' />
-          <span className='sr-only'>Toggle language</span>
+        <Button variant='ghost' className={`gap-1.5 px-2 ${className || ''}`}>
+          <Globe className='h-4 w-4' />
+          <span className='text-sm'>{currentLanguage}</span>
+          <ChevronDown className='h-3 w-3 opacity-60' />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
