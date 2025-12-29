@@ -17,6 +17,26 @@ const resources = {
 // DEFAULT_LANGUAGE - Arabic is the primary language for this Saudi law firm app
 const DEFAULT_LANGUAGE = 'ar' as const
 
+// First visit detection - ensures new visitors ALWAYS get Arabic
+// This protects against any edge cases where localStorage might have stale data
+const ensureFirstVisitArabic = (): void => {
+  if (typeof window === 'undefined') return
+
+  try {
+    const isFirstVisit = !localStorage.getItem('traf3li_visited')
+    if (isFirstVisit) {
+      console.log('[i18n] First visit detected - forcing Arabic')
+      localStorage.setItem('i18nextLng', 'ar')
+      localStorage.setItem('traf3li_visited', 'true')
+    }
+  } catch {
+    // Ignore localStorage errors
+  }
+}
+
+// Run first visit check BEFORE anything else
+ensureFirstVisitArabic()
+
 // Get stored language preference
 // ONLY returns 'en' if user EXPLICITLY chose English
 // Everything else defaults to Arabic
