@@ -231,6 +231,7 @@ export function SignIn() {
         username: formData.usernameOrEmail,
         password: formData.password,
         captchaToken: token || undefined,
+        rememberMe: keepSignedIn,
       });
 
       // Record successful login - clears throttle data
