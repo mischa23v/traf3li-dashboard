@@ -661,6 +661,75 @@
     }
   },
   "tasks": {
+    "title": "Tasks",
+    "management": "Task Management",
+    "nav": {
+      "overview": "Overview",
+      "tasks": "Tasks",
+      "cases": "Cases",
+      "clients": "Clients"
+    },
+    "list": {
+      "search": "Search tasks...",
+      "searchPlaceholder": "Search tasks by title or description...",
+      "filters": "Filters",
+      "status": "Status",
+      "active": "Active",
+      "completed": "Completed",
+      "priorityLabel": "Priority",
+      "allPriorities": "All Priorities",
+      "responsible": "Assigned To",
+      "all": "All",
+      "myTasks": "My Tasks",
+      "unassigned": "Unassigned",
+      "dueDate": "Due Date",
+      "allDates": "All Dates",
+      "today": "Today",
+      "thisWeek": "This Week",
+      "thisMonth": "This Month",
+      "overdue": "Overdue",
+      "noDueDate": "No Due Date",
+      "case": "Case",
+      "allCases": "All Cases",
+      "sortBy": "Sort By",
+      "creationDate": "Creation Date",
+      "clearFilters": "Clear Filters",
+      "noTasks": "No Tasks",
+      "noTasksDescription": "You don't have any tasks yet. Create your first task to get started!",
+      "newTask": "New Task",
+      "notSet": "Not set",
+      "linkedEvent": "Event",
+      "editTask": "Edit Task",
+      "viewDetails": "View Details",
+      "completeTask": "Complete Task",
+      "reopenTask": "Reopen Task",
+      "deleteTask": "Delete Task",
+      "showMore": "Show More",
+      "viewAllTasks": "View All Tasks"
+    },
+    "priorities": {
+      "urgent": "Urgent",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "smartDates": {
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "overdue": "Overdue",
+      "thisWeek": "This Week",
+      "daysRemaining": "{{days}} days remaining",
+      "remaining": "Remaining",
+      "days": "days"
+    },
+    "timeline": {
+      "overdue": "Overdue",
+      "atRisk": "At Risk"
+    },
+    "statuses": {
+      "inProgress": "In Progress",
+      "done": "Completed"
+    },
     "versionHistory": "Version History",
     "versionHistoryFor": "Version history for: {{fileName}}",
     "availableVersions": "Available Versions",
