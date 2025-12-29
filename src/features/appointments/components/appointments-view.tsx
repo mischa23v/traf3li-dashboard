@@ -186,7 +186,7 @@ export function AppointmentsView() {
   })
 
   const stats = statsData?.data
-  const appointments = appointmentsData?.data || []
+  const appointments = appointmentsData?.data?.appointments || []
 
   // Filter appointments
   const filteredAppointments = useMemo(() => {

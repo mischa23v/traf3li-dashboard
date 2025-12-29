@@ -209,8 +209,9 @@ export function useInfiniteAppointments(params?: {
     queryFn: ({ pageParam = 1 }) =>
       appointmentsService.getAppointments({ ...params, page: pageParam, limit: params?.limit || 20 }),
     getNextPageParam: (lastPage) => {
-      if (!lastPage.pagination) return undefined
-      const { page, totalPages } = lastPage.pagination
+      if (!lastPage.data) return undefined
+      const { page, total, limit } = lastPage.data
+      const totalPages = Math.ceil(total / limit)
       return page < totalPages ? page + 1 : undefined
     },
     initialPageParam: 1,
