@@ -8,6 +8,36 @@
  * - OTP-based authentication
  * - Email verification
  * - Token refresh
+ *
+ * ============================================================================
+ * 🚨 BACKEND_TODO: AUTH ENDPOINT REQUIREMENTS
+ * ============================================================================
+ * See src/config/BACKEND_AUTH_ISSUES.ts for full documentation.
+ *
+ * CRITICAL - All auth endpoints must return:
+ * 1. accessToken - JWT for API authorization (15min expiry)
+ * 2. refreshToken - JWT for token refresh (7 day expiry)
+ * 3. user - Complete user object with MFA flags
+ *
+ * REQUIRED user object fields:
+ * {
+ *   _id, email, role,
+ *   mfaEnabled: boolean,     // ← Is MFA enabled for this user?
+ *   mfaPending: boolean,     // ← Does user need to verify MFA now?
+ *   mfaMethod?: 'totp'|'sms'|'email',
+ *   firmId?: string,         // ← For firm members
+ *   firm?: { id, name, status },
+ *   isSoloLawyer?: boolean,  // ← For solo lawyers
+ *   permissions?: { ... }    // ← For RBAC
+ * }
+ *
+ * Endpoints that MUST return tokens:
+ * - POST /api/auth/login
+ * - POST /api/auth/sso/callback
+ * - POST /api/auth/verify-otp
+ * - POST /api/auth/mfa/verify
+ * - POST /api/auth/magic-link/verify
+ * ============================================================================
  */
 
 import { apiClientNoVersion, handleApiError, storeTokens, clearTokens, resetApiState, refreshCsrfToken, getAccessToken, getRefreshToken } from '@/lib/api'
@@ -396,6 +426,43 @@ const authService = {
    * Login user
    * Backend returns access and refresh tokens for dual token auth
    * Also sets HttpOnly cookie for backward compatibility
+   *
+   * =========================================================================
+   * 🚨 BACKEND_TODO: LOGIN ENDPOINT REQUIREMENTS
+   * =========================================================================
+   * POST /api/auth/login MUST return:
+   *
+   * SUCCESS (normal login):
+   * {
+   *   "error": false,
+   *   "message": "Success",
+   *   "user": {
+   *     "_id": "...",
+   *     "email": "...",
+   *     "role": "lawyer",
+   *     "mfaEnabled": true,       // ← REQUIRED
+   *     "mfaPending": false,      // ← REQUIRED
+   *     "firmId": "...",          // ← REQUIRED for firm members
+   *     "firm": { "id": "...", "name": "...", "status": "active" },
+   *     "isSoloLawyer": false,    // ← REQUIRED
+   *     "permissions": { ... }    // ← REQUIRED for RBAC
+   *   },
+   *   "accessToken": "eyJhbG...",  // ← REQUIRED
+   *   "refreshToken": "eyJhbG..." // ← REQUIRED
+   * }
+   *
+   * SUCCESS (MFA required):
+   * {
+   *   "error": false,
+   *   "mfaRequired": true,       // ← Triggers MFA verification
+   *   "userId": "...",            // ← Needed for MFA verify call
+   *   "user": null,               // ← No user until MFA verified
+   *   "accessToken": null,
+   *   "refreshToken": null
+   * }
+   *
+   * See: src/config/BACKEND_AUTH_ISSUES.ts for full documentation
+   * =========================================================================
    */
   login: async (credentials: LoginCredentials): Promise<User> => {
     try {
@@ -413,8 +480,13 @@ const authService = {
       }
 
       // Store dual tokens if provided
+      // BACKEND_TODO: Login MUST return accessToken and refreshToken
       if (response.data.accessToken && response.data.refreshToken) {
         storeTokens(response.data.accessToken, response.data.refreshToken)
+      } else {
+        console.warn('[AUTH] ⚠️ Login response did not include tokens!')
+        console.warn('[AUTH] 📋 BACKEND FIX: Return accessToken & refreshToken from /auth/login')
+        console.warn('[AUTH] Response keys:', Object.keys(response.data))
       }
 
       // Normalize user data to ensure firmId is set
@@ -887,6 +959,30 @@ const authService = {
 
   /**
    * Verify OTP code and login
+   *
+   * =========================================================================
+   * 🚨 BACKEND_TODO: OTP VERIFY ENDPOINT MUST RETURN TOKENS
+   * =========================================================================
+   * POST /api/auth/verify-otp MUST return:
+   *
+   * SUCCESS:
+   * {
+   *   "error": false,
+   *   "message": "Success",
+   *   "user": { "_id": "...", "email": "...", ... },
+   *   "accessToken": "eyJhbG...",  // ← REQUIRED
+   *   "refreshToken": "eyJhbG..." // ← REQUIRED
+   * }
+   *
+   * FAILURE (wrong code):
+   * {
+   *   "error": true,
+   *   "message": "Invalid OTP",
+   *   "attemptsLeft": 2          // ← Remaining attempts before lockout
+   * }
+   *
+   * See: src/config/BACKEND_AUTH_ISSUES.ts for full documentation
+   * =========================================================================
    */
   verifyOTP: async (data: VerifyOTPData): Promise<User> => {
     try {
@@ -900,8 +996,12 @@ const authService = {
       }
 
       // Store dual tokens if provided
+      // BACKEND_TODO: This endpoint MUST return accessToken and refreshToken
       if (response.data.accessToken && response.data.refreshToken) {
         storeTokens(response.data.accessToken, response.data.refreshToken)
+      } else {
+        console.warn('[AUTH] ⚠️ OTP verify did not return tokens - user will not be authenticated!')
+        console.warn('[AUTH] 📋 BACKEND FIX: Return accessToken & refreshToken from /auth/verify-otp')
       }
 
       // Normalize user data to ensure firmId is set

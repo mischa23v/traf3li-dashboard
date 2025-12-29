@@ -10,6 +10,24 @@
  * - LinkedIn
  * - GitHub
  * - Microsoft
+ *
+ * ============================================================================
+ * 🚨 BACKEND_TODO: SSO CALLBACK TOKEN ISSUE
+ * ============================================================================
+ * The POST /api/auth/sso/callback endpoint MUST return tokens in the response.
+ *
+ * REQUIRED response format:
+ * {
+ *   "error": false,
+ *   "message": "Success",
+ *   "user": { "_id": "...", "email": "...", "role": "...", ... },
+ *   "accessToken": "eyJhbG...",    // ← REQUIRED at root level
+ *   "refreshToken": "eyJhbG...",   // ← REQUIRED at root level
+ *   "isNewUser": false
+ * }
+ *
+ * See: src/config/BACKEND_AUTH_ISSUES.ts for full documentation
+ * ============================================================================
  */
 
 import { apiClientNoVersion, handleApiError, storeTokens, refreshCsrfToken, getAccessToken, getRefreshToken } from '@/lib/api'
@@ -262,6 +280,24 @@ const oauthService = {
    * Called after provider redirects back to our app
    * Backend handles the actual token exchange
    *
+   * =========================================================================
+   * 🚨 BACKEND_TODO: This endpoint MUST return accessToken and refreshToken!
+   * =========================================================================
+   * Currently the backend may NOT be returning tokens in the response.
+   * This causes users to appear logged in but fail on all API calls.
+   *
+   * REQUIRED backend response:
+   * {
+   *   error: false,
+   *   user: { _id, email, role, mfaEnabled, firmId, ... },
+   *   accessToken: "jwt_token_here",    // ← CRITICAL: Must be at root level
+   *   refreshToken: "jwt_token_here",   // ← CRITICAL: Must be at root level
+   *   isNewUser: boolean
+   * }
+   *
+   * See: src/config/BACKEND_AUTH_ISSUES.ts for full documentation
+   * =========================================================================
+   *
    * @param provider - OAuth provider
    * @param code - Authorization code from provider
    * @param state - State parameter for CSRF protection
@@ -307,7 +343,26 @@ const oauthService = {
         userId: response.data.user?._id,
       })
 
-      // CRITICAL: Check if backend returned tokens
+      // =========================================================================
+      // 🚨 BACKEND_TODO: CRITICAL CHECK - Backend must return tokens!
+      // =========================================================================
+      // If this error appears, the backend /auth/sso/callback endpoint is NOT
+      // returning accessToken and refreshToken. This is a BACKEND BUG.
+      //
+      // BACKEND FIX REQUIRED:
+      // In the SSO callback controller, add to the response:
+      //
+      // res.json({
+      //   error: false,
+      //   message: 'Login successful',
+      //   user: userData,
+      //   accessToken: jwt.sign({ userId, email, role, firmId }, ACCESS_SECRET, { expiresIn: '15m' }),
+      //   refreshToken: jwt.sign({ userId }, REFRESH_SECRET, { expiresIn: '7d' }),
+      //   isNewUser: isNewUser
+      // });
+      //
+      // See: src/config/BACKEND_AUTH_ISSUES.ts for full documentation
+      // =========================================================================
       if (!response.data.accessToken || !response.data.refreshToken) {
         console.error('🚨🚨🚨 BACKEND DID NOT RETURN TOKENS! 🚨🚨🚨')
         console.error('[OAUTH] ❌ CRITICAL: Backend SSO callback returned user but NO TOKENS!')
@@ -315,8 +370,9 @@ const oauthService = {
         console.error('[OAUTH] Full response data:', JSON.stringify(response.data, null, 2))
         console.error('[OAUTH] Expected response shape: { user: {...}, accessToken: "...", refreshToken: "...", isNewUser: boolean }')
         console.error('[OAUTH] Actual response keys:', Object.keys(response.data))
+        console.error('[OAUTH] 📋 See src/config/BACKEND_AUTH_ISSUES.ts for fix instructions')
 
-        // Check if tokens might be in a nested structure
+        // Check if tokens might be in a nested structure (common backend mistake)
         const possibleTokenLocations = {
           'response.data.accessToken': response.data.accessToken,
           'response.data.refreshToken': response.data.refreshToken,
@@ -376,9 +432,25 @@ const oauthService = {
           refreshTokenInLocalStorage: !!localStorage.getItem('refreshToken'),
         })
       } else {
+        // =========================================================================
+        // 🚨 BACKEND_TODO: This is where the SSO flow breaks!
+        // =========================================================================
+        // The backend /auth/sso/callback endpoint did NOT return tokens.
+        // The user will appear logged in but ALL API calls will fail with 401.
+        //
+        // SYMPTOMS:
+        // - User sees dashboard briefly then gets redirected to login
+        // - Console shows "401 Unauthorized" on subsequent requests
+        // - User data in localStorage but no tokens
+        //
+        // BACKEND FIX: Return tokens in /auth/sso/callback response
+        // See: src/config/BACKEND_AUTH_ISSUES.ts for full fix instructions
+        // =========================================================================
         console.error('🚨 NO TOKENS TO STORE - User will NOT be authenticated!')
         console.error('[OAUTH] Without tokens, subsequent API calls will fail with 401')
         console.error('[OAUTH] The user appears logged in but actually is not authenticated')
+        console.error('[OAUTH] 📋 BACKEND FIX REQUIRED: Return accessToken & refreshToken from /auth/sso/callback')
+        console.error('[OAUTH] 📋 See src/config/BACKEND_AUTH_ISSUES.ts for complete fix instructions')
         oauthWarn('No tokens in callback response!', {
           hasAccessToken: !!accessToken,
           hasRefreshToken: !!refreshToken,
