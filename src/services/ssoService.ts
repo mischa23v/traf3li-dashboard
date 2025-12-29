@@ -51,7 +51,19 @@
  * - View all linked authentication methods
  */
 
-import apiClient, { handleApiError } from '@/lib/api'
+import apiClient, { handleApiError, refreshCsrfToken } from '@/lib/api'
+
+// ==================== SSO DEBUG LOGGING ====================
+// Always enabled to help diagnose auth issues on production
+const ssoLog = (message: string, data?: any) => {
+  console.log(`[SSO] ${message}`, data !== undefined ? data : '')
+}
+const ssoWarn = (message: string, data?: any) => {
+  console.warn(`[SSO] ⚠️ ${message}`, data !== undefined ? data : '')
+}
+const ssoError = (message: string, error?: any) => {
+  console.error(`[SSO] ❌ ${message}`, error || '')
+}
 
 /**
  * Supported SSO providers
@@ -391,10 +403,30 @@ export const testSSOConnection = async (data: TestConnectionRequest): Promise<Te
  * window.location.href = authorizationUrl
  */
 export const initiateSSOLogin = async (provider: SSOProvider): Promise<SSOLoginInitiateResponse> => {
+  ssoLog('Initiating SSO login', { provider })
+  ssoLog('Refreshing CSRF token before SSO initiate...')
+
   try {
+    // Always refresh CSRF token before SSO initiate to ensure we have a valid token
+    const csrfToken = await refreshCsrfToken()
+    ssoLog('CSRF token refresh result:', csrfToken ? 'SUCCESS' : 'FAILED (will try anyway)')
+
+    ssoLog('Calling POST /auth/sso/initiate', { provider })
     const response = await apiClient.post('/auth/sso/initiate', { provider })
+    ssoLog('SSO initiate response:', {
+      hasAuthorizationUrl: !!response.data?.authorizationUrl,
+      hasState: !!response.data?.state,
+      status: response.status,
+    })
     return response.data
-  } catch (error) {
+  } catch (error: any) {
+    ssoError('SSO initiate failed', {
+      provider,
+      status: error?.status || error?.response?.status,
+      message: error?.message,
+      code: error?.code,
+      data: error?.response?.data,
+    })
     throw handleApiError(error)
   }
 }
@@ -418,10 +450,26 @@ export const initiateSSOLogin = async (provider: SSOProvider): Promise<SSOLoginI
  * })
  */
 export const getEnabledSSOProviders = async (): Promise<SSOProviderConfig[]> => {
+  ssoLog('Fetching enabled SSO providers...')
   try {
     const response = await apiClient.get('/auth/sso/providers')
-    return response.data.data || response.data.providers || []
-  } catch (error) {
+    const providers = response.data.data || response.data.providers || []
+    ssoLog('Enabled SSO providers:', {
+      count: providers.length,
+      providers: providers.map((p: SSOProviderConfig) => ({
+        provider: p.provider,
+        displayName: p.displayName,
+        enabled: p.enabled,
+        status: p.status,
+      })),
+    })
+    return providers
+  } catch (error: any) {
+    ssoError('Failed to fetch SSO providers', {
+      status: error?.status || error?.response?.status,
+      message: error?.message,
+      code: error?.code,
+    })
     throw handleApiError(error)
   }
 }
