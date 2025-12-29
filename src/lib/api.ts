@@ -209,11 +209,13 @@ let cachedCsrfToken: string | null = null
  */
 const getCsrfToken = (): string => {
   const cookies = document.cookie
+  console.log('[CSRF] getCsrfToken called. Document cookies:', cookies ? cookies.substring(0, 100) + '...' : '(empty)')
 
   // Try cookie first (primary method) - backend uses 'csrfToken' cookie name
   const match = cookies.match(/csrfToken=([^;]+)/)
   if (match && match[1]) {
     cachedCsrfToken = match[1] // Cache it
+    console.log('[CSRF] Found csrfToken cookie:', match[1].substring(0, 20) + '...')
     return match[1]
   }
 
@@ -221,6 +223,7 @@ const getCsrfToken = (): string => {
   const csrfDashMatch = cookies.match(/csrf-token=([^;]+)/)
   if (csrfDashMatch && csrfDashMatch[1]) {
     cachedCsrfToken = csrfDashMatch[1]
+    console.log('[CSRF] Found csrf-token cookie:', csrfDashMatch[1].substring(0, 20) + '...')
     return csrfDashMatch[1]
   }
 
@@ -228,21 +231,23 @@ const getCsrfToken = (): string => {
   const xsrfMatch = cookies.match(/XSRF-TOKEN=([^;]+)/)
   if (xsrfMatch && xsrfMatch[1]) {
     cachedCsrfToken = xsrfMatch[1]
+    console.log('[CSRF] Found XSRF-TOKEN cookie:', xsrfMatch[1].substring(0, 20) + '...')
     return xsrfMatch[1]
   }
 
   // Fallback to cached token from response headers
   if (cachedCsrfToken) {
+    console.log('[CSRF] Using cached token from response headers:', cachedCsrfToken.substring(0, 20) + '...')
     return cachedCsrfToken
   }
 
-  // Debug logging for CSRF token issues (only log once per session to avoid spam)
-  if (!getCsrfToken.hasLoggedWarning) {
-    getCsrfToken.hasLoggedWarning = true
-    const availableCookies = cookies ? cookies.split(';').map(c => c.trim().split('=')[0]).filter(Boolean) : []
-    console.warn('[CSRF] No csrf-token found. Available cookies:', availableCookies,
-      '\nCalling refreshCsrfToken() to fetch a fresh token from the backend.')
-  }
+  // Always log when no token found (important for debugging)
+  const availableCookies = cookies ? cookies.split(';').map(c => c.trim().split('=')[0]).filter(Boolean) : []
+  console.warn('[CSRF] ⚠️ No csrf-token found!', {
+    availableCookies,
+    cachedToken: cachedCsrfToken ? 'exists' : 'none',
+    documentCookieLength: cookies?.length || 0,
+  })
 
   return ''
 }
@@ -264,6 +269,9 @@ export const updateCsrfTokenFromResponse = (token: string) => {
  * Backend endpoint: GET /api/auth/csrf
  */
 export const refreshCsrfToken = async (): Promise<string | null> => {
+  console.log('[CSRF] Refreshing token from backend...')
+  console.log('[CSRF] Request URL:', `${API_BASE_URL_NO_VERSION}/auth/csrf`)
+
   try {
     // Use a separate axios instance to avoid circular interceptor issues
     const response = await axios.get(
@@ -277,26 +285,37 @@ export const refreshCsrfToken = async (): Promise<string | null> => {
       }
     )
 
+    console.log('[CSRF] Refresh response:', {
+      status: response.status,
+      hasBodyToken: !!response.data?.csrfToken,
+      hasHeaderToken: !!response.headers['x-csrf-token'],
+      setCookieHeader: response.headers['set-cookie'] ? 'present' : 'absent',
+    })
+
     // Token is set in cookie automatically by backend
     // Also capture from response body/header as fallback
     const token = response.data?.csrfToken || response.headers['x-csrf-token']
     if (token) {
       cachedCsrfToken = token
-      console.log('[CSRF] Token refreshed successfully')
+      console.log('[CSRF] ✅ Token refreshed successfully from response:', token.substring(0, 20) + '...')
       return token
     }
 
     // Try reading from cookie after the request
     const cookieToken = getCsrfToken()
     if (cookieToken) {
-      console.log('[CSRF] Token available from cookie after refresh')
+      console.log('[CSRF] ✅ Token available from cookie after refresh')
       return cookieToken
     }
 
-    console.warn('[CSRF] Token refresh completed but no token found')
+    console.warn('[CSRF] ⚠️ Token refresh completed but no token found in response or cookies')
     return null
-  } catch (error) {
-    console.warn('[CSRF] Token refresh failed:', error)
+  } catch (error: any) {
+    console.error('[CSRF] ❌ Token refresh failed:', {
+      message: error?.message,
+      status: error?.response?.status,
+      data: error?.response?.data,
+    })
     return null
   }
 }
