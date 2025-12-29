@@ -21,6 +21,8 @@ import {
 } from '@/components/auth/captcha-config';
 import { ROUTES } from '@/constants/routes';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { AuthHeader } from '@/components/auth/auth-header';
+import { AuthFooter } from '@/components/auth/auth-footer';
 
 // ============================================
 // SVG ICONS
@@ -302,13 +304,16 @@ export function SignIn() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA]" dir={isRTL ? 'rtl' : 'ltr'} style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-      {/* Language Switcher - Top Corner */}
-      <div className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} z-10`}>
+    <div className="min-h-screen flex flex-col bg-[#F8F9FA]" dir={isRTL ? 'rtl' : 'ltr'} style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      {/* Header */}
+      <AuthHeader />
+
+      {/* Language Switcher - Below Header */}
+      <div className={`absolute top-20 ${isRTL ? 'left-4' : 'right-4'} z-10`}>
         <LanguageSwitcher />
       </div>
 
-      <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-md">
           {/* Header */}
           <div className="text-center mb-8">
@@ -500,6 +505,9 @@ export function SignIn() {
           </p>
         </div>
       </div>
+
+      {/* Footer */}
+      <AuthFooter />
     </div>
   );
 }
