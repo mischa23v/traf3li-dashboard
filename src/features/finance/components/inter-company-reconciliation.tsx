@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { useLanguage } from '@/hooks/useLanguage'
 import {
   Building2, CheckCircle2, XCircle, AlertTriangle,
   Play, Link2, Unlink, Plus, Save, FileText, Loader2
@@ -74,9 +73,8 @@ export default function InterCompanyReconciliation({
   mode = 'view'
 }: InterCompanyReconciliationProps) {
   const navigate = useNavigate()
-  const { t } = useTranslation()
-  const { language } = useLanguage()
-  const isArabic = language === 'ar'
+  const { t, i18n } = useTranslation()
+  const isArabic = i18n.language === 'ar'
 
   // Create mode state
   const [sourceFirmId, setSourceFirmId] = useState('')

@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { useLanguage } from '@/hooks/useLanguage'
 import {
   Building2, ArrowRightLeft, TrendingUp, TrendingDown,
   FileText, Plus, Search, Download, RefreshCw, CheckCircle2
@@ -45,9 +44,8 @@ import { ROUTES } from '@/constants/routes'
 
 export default function InterCompanyDashboard() {
   const navigate = useNavigate()
-  const { t } = useTranslation()
-  const { language } = useLanguage()
-  const isArabic = language === 'ar'
+  const { t, i18n } = useTranslation()
+  const isArabic = i18n.language === 'ar'
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCurrency, setSelectedCurrency] = useState('SAR')
   const [selectedStatus, setSelectedStatus] = useState('all')

@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Hash } from 'lucide-react'
 import { SettingsField } from './settings-field'
 import { SequencesSettings, SequenceConfig } from '@/types/salesSettings'
-import { useLanguage } from '@/hooks/use-language'
+import { useTranslation } from 'react-i18next'
 
 interface SequenceSettingsSectionProps {
   settings: SequencesSettings
@@ -14,8 +14,8 @@ interface SequenceSettingsSectionProps {
 }
 
 export function SequenceSettingsSection({ settings, onChange }: SequenceSettingsSectionProps) {
-  const { language } = useLanguage()
-  const isRTL = language === 'ar'
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   const handleSequenceChange = (
     sequenceKey: keyof SequencesSettings,

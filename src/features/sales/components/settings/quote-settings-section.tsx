@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { FileText } from 'lucide-react'
 import { SettingsField } from './settings-field'
 import { QuoteSettings } from '@/types/salesSettings'
-import { useLanguage } from '@/hooks/use-language'
+import { useTranslation } from 'react-i18next'
 
 interface QuoteSettingsSectionProps {
   settings: QuoteSettings
@@ -14,8 +14,8 @@ interface QuoteSettingsSectionProps {
 }
 
 export function QuoteSettingsSection({ settings, onChange }: QuoteSettingsSectionProps) {
-  const { language } = useLanguage()
-  const isRTL = language === 'ar'
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   const handleFieldChange = (field: keyof QuoteSettings, value: any) => {
     onChange({ ...settings, [field]: value })

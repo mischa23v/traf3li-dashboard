@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Receipt } from 'lucide-react'
 import { SettingsField } from './settings-field'
 import { TaxSettings } from '@/types/salesSettings'
-import { useLanguage } from '@/hooks/use-language'
+import { useTranslation } from 'react-i18next'
 
 interface TaxSettingsSectionProps {
   settings: TaxSettings
@@ -14,8 +14,8 @@ interface TaxSettingsSectionProps {
 }
 
 export function TaxSettingsSection({ settings, onChange }: TaxSettingsSectionProps) {
-  const { language } = useLanguage()
-  const isRTL = language === 'ar'
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   const handleFieldChange = (field: keyof TaxSettings, value: any) => {
     onChange({ ...settings, [field]: value })

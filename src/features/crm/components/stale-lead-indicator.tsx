@@ -6,7 +6,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { useLanguage } from '@/hooks/use-language'
+import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import {
   Tooltip,
@@ -118,7 +118,8 @@ export function StaleLeadIndicator({
   variant = 'badge',
   className,
 }: StaleLeadIndicatorProps) {
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
   const config = getStaleLevel(daysInStage, threshold)
   const Icon = config.icon
 
@@ -237,7 +238,8 @@ export function StaleLeadAlert({
   onSnooze,
   className,
 }: StaleLeadAlertProps) {
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
   const config = getStaleLevel(daysInStage, threshold)
 
   // Don't show alert for fresh leads
@@ -324,7 +326,8 @@ export function StaleLeadsSummary({
   warningCount,
   className,
 }: StaleLeadsSummaryProps) {
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
   const freshCount = totalLeads - staleCount - dormantCount - warningCount
 
   const segments = [

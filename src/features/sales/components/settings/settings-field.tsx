@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { SalesSettingsField } from '@/types/salesSettings'
-import { useLanguage } from '@/hooks/use-language'
+import { useTranslation } from 'react-i18next'
 
 interface SettingsFieldProps {
   field: SalesSettingsField
@@ -29,8 +29,8 @@ interface SettingsFieldProps {
 }
 
 export function SettingsField({ field, value, onChange, disabled = false }: SettingsFieldProps) {
-  const { language } = useLanguage()
-  const isRTL = language === 'ar'
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   const label = isRTL ? field.labelAr : field.label
   const placeholder = isRTL ? field.placeholderAr : field.placeholder

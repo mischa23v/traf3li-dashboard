@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { useLanguage } from '@/hooks/useLanguage'
 import {
   Building2, ArrowRightLeft, Calendar, DollarSign,
   FileText, Plus, Save, X, AlertCircle, Info
@@ -46,9 +45,8 @@ export default function InterCompanyTransactionForm({
   mode = 'create'
 }: InterCompanyTransactionFormProps) {
   const navigate = useNavigate()
-  const { t } = useTranslation()
-  const { language } = useLanguage()
-  const isArabic = language === 'ar'
+  const { t, i18n } = useTranslation()
+  const isArabic = i18n.language === 'ar'
 
   // Form state
   const [sourceFirmId, setSourceFirmId] = useState('')

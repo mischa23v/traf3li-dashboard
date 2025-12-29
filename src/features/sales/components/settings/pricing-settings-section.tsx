@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { DollarSign } from 'lucide-react'
 import { SettingsField } from './settings-field'
 import { PricingSettings } from '@/types/salesSettings'
-import { useLanguage } from '@/hooks/use-language'
+import { useTranslation } from 'react-i18next'
 
 interface PricingSettingsSectionProps {
   settings: PricingSettings
@@ -14,8 +14,8 @@ interface PricingSettingsSectionProps {
 }
 
 export function PricingSettingsSection({ settings, onChange }: PricingSettingsSectionProps) {
-  const { language } = useLanguage()
-  const isRTL = language === 'ar'
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   const handleFieldChange = (field: keyof PricingSettings, value: any) => {
     onChange({ ...settings, [field]: value })

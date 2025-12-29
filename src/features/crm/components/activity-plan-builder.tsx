@@ -7,7 +7,7 @@
 
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import { useLanguage } from '@/hooks/use-language'
+import { useTranslation } from 'react-i18next'
 
 // UI Components
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -116,7 +116,8 @@ function ActivityStepCard({
   onMoveUp: () => void
   onMoveDown: () => void
 }) {
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
   const [isExpanded, setIsExpanded] = useState(false)
 
   const activityType = ACTIVITY_TYPES.find(t => t.id === step.activity_type)
@@ -257,7 +258,8 @@ function AddStepDialog({
   onClose: () => void
   onAdd: (step: ActivityPlanStep) => void
 }) {
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
   const [formData, setFormData] = useState<Partial<ActivityPlanStep>>({
     activity_type: 'email',
     name: '',
@@ -400,7 +402,8 @@ function RecurringSettings({
     day_of_month?: number
   }) => void
 }) {
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   const weekDays = [
     { value: 0, labelAr: 'الأحد', labelEn: 'Sunday' },
@@ -512,7 +515,8 @@ export function ActivityPlanBuilder({
   isLoading = false,
   className,
 }: ActivityPlanBuilderProps) {
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
   const [isSaving, setIsSaving] = useState(false)
   const [isAddStepOpen, setIsAddStepOpen] = useState(false)
 
@@ -826,7 +830,8 @@ export function ActivityPlansList({
   onToggleActive,
   className,
 }: ActivityPlansListProps) {
-  const { isRTL } = useLanguage()
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   if (isLoading) {
     return (

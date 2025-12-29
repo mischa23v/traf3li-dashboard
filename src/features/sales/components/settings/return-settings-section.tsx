@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Undo2 } from 'lucide-react'
 import { SettingsField } from './settings-field'
 import { ReturnSettings } from '@/types/salesSettings'
-import { useLanguage } from '@/hooks/use-language'
+import { useTranslation } from 'react-i18next'
 
 interface ReturnSettingsSectionProps {
   settings: ReturnSettings
@@ -14,8 +14,8 @@ interface ReturnSettingsSectionProps {
 }
 
 export function ReturnSettingsSection({ settings, onChange }: ReturnSettingsSectionProps) {
-  const { language } = useLanguage()
-  const isRTL = language === 'ar'
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   const handleFieldChange = (field: keyof ReturnSettings, value: any) => {
     onChange({ ...settings, [field]: value })
