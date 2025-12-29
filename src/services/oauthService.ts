@@ -307,6 +307,28 @@ const oauthService = {
         userId: response.data.user?._id,
       })
 
+      // CRITICAL: Check if backend returned tokens
+      if (!response.data.accessToken || !response.data.refreshToken) {
+        console.error('🚨🚨🚨 BACKEND DID NOT RETURN TOKENS! 🚨🚨🚨')
+        console.error('[OAUTH] ❌ CRITICAL: Backend SSO callback returned user but NO TOKENS!')
+        console.error('[OAUTH] This is a BACKEND BUG - the /auth/sso/callback endpoint must return accessToken and refreshToken')
+        console.error('[OAUTH] Full response data:', JSON.stringify(response.data, null, 2))
+        console.error('[OAUTH] Expected response shape: { user: {...}, accessToken: "...", refreshToken: "...", isNewUser: boolean }')
+        console.error('[OAUTH] Actual response keys:', Object.keys(response.data))
+
+        // Check if tokens might be in a nested structure
+        const possibleTokenLocations = {
+          'response.data.accessToken': response.data.accessToken,
+          'response.data.refreshToken': response.data.refreshToken,
+          'response.data.token': (response.data as any).token,
+          'response.data.tokens': (response.data as any).tokens,
+          'response.data.data?.accessToken': (response.data as any).data?.accessToken,
+          'response.data.data?.token': (response.data as any).data?.token,
+          'response.data.auth?.accessToken': (response.data as any).auth?.accessToken,
+        }
+        console.error('[OAUTH] Checking alternate token locations:', possibleTokenLocations)
+      }
+
       if (response.data.error || !response.data.user) {
         oauthError('Callback returned error or no user:', {
           error: response.data.error,
@@ -317,27 +339,50 @@ const oauthService = {
         )
       }
 
-      // Store tokens if provided
-      if (response.data.accessToken && response.data.refreshToken) {
-        oauthLog('Storing tokens from callback response...')
-        logTokenDetails('  New accessToken', response.data.accessToken)
-        logTokenDetails('  New refreshToken', response.data.refreshToken)
+      // Try to extract tokens - check multiple possible locations
+      let accessToken = response.data.accessToken
+      let refreshToken = response.data.refreshToken
 
-        storeTokens(response.data.accessToken, response.data.refreshToken)
+      // Check alternate locations if not found at root level
+      if (!accessToken || !refreshToken) {
+        const data = response.data as any
+        // Try nested structures
+        accessToken = accessToken || data.token || data.tokens?.accessToken || data.data?.accessToken || data.auth?.accessToken
+        refreshToken = refreshToken || data.tokens?.refreshToken || data.data?.refreshToken || data.auth?.refreshToken
+
+        if (accessToken || refreshToken) {
+          oauthWarn('Found tokens in alternate location!', {
+            accessTokenLocation: accessToken ? 'found' : 'missing',
+            refreshTokenLocation: refreshToken ? 'found' : 'missing',
+          })
+        }
+      }
+
+      // Store tokens if provided
+      if (accessToken && refreshToken) {
+        oauthLog('Storing tokens from callback response...')
+        logTokenDetails('  New accessToken', accessToken)
+        logTokenDetails('  New refreshToken', refreshToken)
+
+        storeTokens(accessToken, refreshToken)
 
         // Verify tokens were stored correctly
         const storedAccess = getAccessToken()
         const storedRefresh = getRefreshToken()
         oauthLog('Token storage verification:', {
-          accessTokenStored: storedAccess === response.data.accessToken,
-          refreshTokenStored: storedRefresh === response.data.refreshToken,
+          accessTokenStored: storedAccess === accessToken,
+          refreshTokenStored: storedRefresh === refreshToken,
           accessTokenInLocalStorage: !!localStorage.getItem('accessToken'),
           refreshTokenInLocalStorage: !!localStorage.getItem('refreshToken'),
         })
       } else {
+        console.error('🚨 NO TOKENS TO STORE - User will NOT be authenticated!')
+        console.error('[OAUTH] Without tokens, subsequent API calls will fail with 401')
+        console.error('[OAUTH] The user appears logged in but actually is not authenticated')
         oauthWarn('No tokens in callback response!', {
-          hasAccessToken: !!response.data.accessToken,
-          hasRefreshToken: !!response.data.refreshToken,
+          hasAccessToken: !!accessToken,
+          hasRefreshToken: !!refreshToken,
+          responseKeys: Object.keys(response.data),
         })
       }
 
