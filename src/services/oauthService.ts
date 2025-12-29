@@ -12,10 +12,75 @@
  * - Microsoft
  */
 
-import { apiClientNoVersion, handleApiError, storeTokens, refreshCsrfToken } from '@/lib/api'
+import { apiClientNoVersion, handleApiError, storeTokens, refreshCsrfToken, getAccessToken, getRefreshToken } from '@/lib/api'
 import type { User } from './authService'
 
 const authApi = apiClientNoVersion
+
+// ==================== SSO/OAUTH DEBUG LOGGING ====================
+// Always enabled to help diagnose token/auth issues on production
+const oauthLog = (message: string, data?: any) => {
+  console.log(`[OAUTH] ${message}`, data !== undefined ? data : '')
+}
+const oauthWarn = (message: string, data?: any) => {
+  console.warn(`[OAUTH] ⚠️ ${message}`, data !== undefined ? data : '')
+}
+const oauthError = (message: string, error?: any) => {
+  console.error(`[OAUTH] ❌ ${message}`, error || '')
+}
+
+/**
+ * Decode JWT to see its contents (without verifying signature)
+ * This is safe for debugging - verification happens on backend
+ */
+const decodeJWT = (token: string): { header: any; payload: any; valid: boolean } => {
+  try {
+    const parts = token.split('.')
+    if (parts.length !== 3) {
+      return { header: null, payload: null, valid: false }
+    }
+    const header = JSON.parse(atob(parts[0]))
+    const payload = JSON.parse(atob(parts[1]))
+    return { header, payload, valid: true }
+  } catch {
+    return { header: null, payload: null, valid: false }
+  }
+}
+
+/**
+ * Log token details for debugging
+ */
+const logTokenDetails = (label: string, token: string | null) => {
+  if (!token) {
+    oauthWarn(`${label}: NO TOKEN`)
+    return
+  }
+
+  const decoded = decodeJWT(token)
+  if (!decoded.valid) {
+    oauthWarn(`${label}: INVALID JWT FORMAT`, { token: token.substring(0, 50) + '...' })
+    return
+  }
+
+  const now = Math.floor(Date.now() / 1000)
+  const exp = decoded.payload.exp
+  const iat = decoded.payload.iat
+  const isExpired = exp && exp < now
+
+  oauthLog(`${label}:`, {
+    tokenPreview: token.substring(0, 30) + '...' + token.substring(token.length - 10),
+    algorithm: decoded.header.alg,
+    type: decoded.header.typ,
+    userId: decoded.payload.userId || decoded.payload.sub || decoded.payload.id,
+    email: decoded.payload.email,
+    role: decoded.payload.role,
+    firmId: decoded.payload.firmId,
+    issuedAt: iat ? new Date(iat * 1000).toISOString() : 'N/A',
+    expiresAt: exp ? new Date(exp * 1000).toISOString() : 'N/A',
+    isExpired,
+    expiresIn: exp ? `${Math.round((exp - now) / 60)} minutes` : 'N/A',
+  })
+}
 
 /**
  * OAuth Provider Types
@@ -206,7 +271,21 @@ const oauthService = {
     code: string,
     state?: string
   ): Promise<{ user: User; isNewUser: boolean }> => {
+    oauthLog('=== OAUTH CALLBACK START ===')
+    oauthLog('Callback params:', {
+      provider,
+      codeLength: code?.length,
+      codePreview: code ? code.substring(0, 20) + '...' : 'NO CODE',
+      state: state || 'NO STATE',
+    })
+
+    // Log current token state BEFORE callback
+    oauthLog('Token state BEFORE callback:')
+    logTokenDetails('  Current accessToken', getAccessToken())
+    logTokenDetails('  Current refreshToken', getRefreshToken())
+
     try {
+      oauthLog('Calling POST /auth/sso/callback...')
       const response = await authApi.post<OAuthCallbackResponse>(
         '/auth/sso/callback',
         {
@@ -216,7 +295,23 @@ const oauthService = {
         }
       )
 
+      oauthLog('Callback response received:', {
+        hasError: response.data.error,
+        hasUser: !!response.data.user,
+        hasAccessToken: !!response.data.accessToken,
+        hasRefreshToken: !!response.data.refreshToken,
+        hasCsrfToken: !!response.data.csrfToken,
+        isNewUser: response.data.isNewUser,
+        message: response.data.message,
+        userEmail: response.data.user?.email,
+        userId: response.data.user?._id,
+      })
+
       if (response.data.error || !response.data.user) {
+        oauthError('Callback returned error or no user:', {
+          error: response.data.error,
+          message: response.data.message,
+        })
         throw new Error(
           response.data.message || 'فشل المصادقة عبر المزود الخارجي'
         )
@@ -224,23 +319,56 @@ const oauthService = {
 
       // Store tokens if provided
       if (response.data.accessToken && response.data.refreshToken) {
+        oauthLog('Storing tokens from callback response...')
+        logTokenDetails('  New accessToken', response.data.accessToken)
+        logTokenDetails('  New refreshToken', response.data.refreshToken)
+
         storeTokens(response.data.accessToken, response.data.refreshToken)
+
+        // Verify tokens were stored correctly
+        const storedAccess = getAccessToken()
+        const storedRefresh = getRefreshToken()
+        oauthLog('Token storage verification:', {
+          accessTokenStored: storedAccess === response.data.accessToken,
+          refreshTokenStored: storedRefresh === response.data.refreshToken,
+          accessTokenInLocalStorage: !!localStorage.getItem('accessToken'),
+          refreshTokenInLocalStorage: !!localStorage.getItem('refreshToken'),
+        })
+      } else {
+        oauthWarn('No tokens in callback response!', {
+          hasAccessToken: !!response.data.accessToken,
+          hasRefreshToken: !!response.data.refreshToken,
+        })
       }
 
       // Store user in localStorage
+      oauthLog('Storing user in localStorage:', {
+        userId: response.data.user._id,
+        email: response.data.user.email,
+        role: response.data.user.role,
+      })
       localStorage.setItem('user', JSON.stringify(response.data.user))
 
       // Initialize CSRF token after successful OAuth authentication
       // This ensures we have a valid token for subsequent API calls
+      oauthLog('Refreshing CSRF token...')
       refreshCsrfToken().catch((err) => {
-        console.warn('[OAUTH] CSRF token initialization after OAuth failed:', err)
+        oauthWarn('CSRF token initialization after OAuth failed:', err)
       })
+
+      oauthLog('=== OAUTH CALLBACK SUCCESS ===')
 
       return {
         user: response.data.user,
         isNewUser: response.data.isNewUser || false,
       }
     } catch (error: any) {
+      oauthError('Callback failed:', {
+        message: error?.message,
+        status: error?.status || error?.response?.status,
+        code: error?.code,
+        data: error?.response?.data,
+      })
       throw new Error(handleApiError(error))
     }
   },

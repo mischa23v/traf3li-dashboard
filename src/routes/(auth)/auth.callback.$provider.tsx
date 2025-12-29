@@ -11,6 +11,14 @@ import { useAuthStore } from '@/stores/auth-store'
 import oauthService from '@/services/oauthService'
 import { Loader2 } from 'lucide-react'
 
+// Debug logging for OAuth callback
+const callbackLog = (message: string, data?: any) => {
+  console.log(`[OAUTH-CALLBACK] ${message}`, data !== undefined ? data : '')
+}
+const callbackError = (message: string, error?: any) => {
+  console.error(`[OAUTH-CALLBACK] ❌ ${message}`, error || '')
+}
+
 export const Route = createFileRoute('/(auth)/auth/callback/$provider')({
   component: OAuthCallback,
 })
@@ -26,30 +34,51 @@ function OAuthCallback() {
 
   useEffect(() => {
     const handleCallback = async () => {
+      callbackLog('=== OAUTH CALLBACK ROUTE START ===')
+      callbackLog('Current URL:', window.location.href)
+
       // Get authorization code and state from URL
       const urlParams = new URLSearchParams(window.location.search)
       const code = urlParams.get('code')
       const state = urlParams.get('state')
       const errorParam = urlParams.get('error')
 
+      callbackLog('URL params:', {
+        hasCode: !!code,
+        codeLength: code?.length,
+        hasState: !!state,
+        hasError: !!errorParam,
+        provider,
+      })
+
       if (errorParam) {
+        callbackError('Provider returned error:', errorParam)
         setError(isRTL ? 'فشل تسجيل الدخول: ' + errorParam : 'Login failed: ' + errorParam)
         return
       }
 
       if (!code) {
+        callbackError('No authorization code in URL')
         setError(isRTL ? 'لم يتم استلام رمز التفويض' : 'No authorization code received')
         return
       }
 
       try {
+        callbackLog('Calling oauthService.handleCallback...')
         const { user, isNewUser } = await oauthService.handleCallback(
           provider as any,
           code,
           state || undefined
         )
 
+        callbackLog('handleCallback returned:', {
+          userEmail: user.email,
+          userId: user._id,
+          isNewUser,
+        })
+
         if (isNewUser) {
+          callbackLog('New user - redirecting to sign-up')
           // New user - redirect to sign-up with pre-filled data
           const oauthData = {
             email: user.email,
@@ -65,12 +94,31 @@ function OAuthCallback() {
           navigate({ to: '/sign-up', search: params.toString() })
         } else {
           // Existing user - log them in
+          callbackLog('Existing user - setting user in store and navigating to /')
+          callbackLog('Token state before setUser:', {
+            accessToken: localStorage.getItem('accessToken') ? 'present' : 'missing',
+            refreshToken: localStorage.getItem('refreshToken') ? 'present' : 'missing',
+            user: localStorage.getItem('user') ? 'present' : 'missing',
+          })
+
           setUser(user)
+
+          callbackLog('Token state after setUser:', {
+            accessToken: localStorage.getItem('accessToken') ? 'present' : 'missing',
+            refreshToken: localStorage.getItem('refreshToken') ? 'present' : 'missing',
+            user: localStorage.getItem('user') ? 'present' : 'missing',
+          })
+
           toast.success(isRTL ? 'تم تسجيل الدخول بنجاح' : 'Logged in successfully')
+          callbackLog('=== OAUTH CALLBACK SUCCESS - Navigating to / ===')
           navigate({ to: '/' })
         }
       } catch (err: any) {
-        console.error('OAuth callback error:', err)
+        callbackError('OAuth callback failed:', {
+          message: err?.message,
+          status: err?.status,
+          code: err?.code,
+        })
         setError(err.message || (isRTL ? 'فشل المصادقة' : 'Authentication failed'))
       }
     }

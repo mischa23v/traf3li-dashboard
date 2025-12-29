@@ -10,11 +10,23 @@
  * - Token refresh
  */
 
-import { apiClientNoVersion, handleApiError, storeTokens, clearTokens, resetApiState, refreshCsrfToken } from '@/lib/api'
+import { apiClientNoVersion, handleApiError, storeTokens, clearTokens, resetApiState, refreshCsrfToken, getAccessToken, getRefreshToken } from '@/lib/api'
 
 // Auth routes are NOT versioned - they're at /api/auth/*, not /api/v1/auth/*
 // So we use apiClientNoVersion (baseURL: https://api.traf3li.com/api)
 const authApi = apiClientNoVersion
+
+// ==================== AUTH DEBUG LOGGING ====================
+// Always enabled to help diagnose auth issues on production
+const authLog = (message: string, data?: any) => {
+  console.log(`[AUTH-SVC] ${message}`, data !== undefined ? data : '')
+}
+const authWarn = (message: string, data?: any) => {
+  console.warn(`[AUTH-SVC] ⚠️ ${message}`, data !== undefined ? data : '')
+}
+const authError = (message: string, error?: any) => {
+  console.error(`[AUTH-SVC] ❌ ${message}`, error || '')
+}
 
 /**
  * Firm info returned with user
@@ -515,11 +527,19 @@ const authService = {
       return pendingAuthRequest
     }
 
+    authLog('=== GET CURRENT USER START ===')
+    authLog('Token state before /auth/me:', {
+      hasAccessToken: !!getAccessToken(),
+      hasRefreshToken: !!getRefreshToken(),
+      accessTokenPreview: getAccessToken() ? getAccessToken()!.substring(0, 20) + '...' : 'NONE',
+    })
+
     logAuthEvent('GET_CURRENT_USER_START', { action: 'calling /auth/me' })
 
     // Create the actual request and store the promise
     pendingAuthRequest = (async (): Promise<User | null> => {
     try {
+      authLog('Calling GET /auth/me...')
       const response = await authApi.get<AuthResponse>('/auth/me')
 
       if (response.data.error || !response.data.user) {
