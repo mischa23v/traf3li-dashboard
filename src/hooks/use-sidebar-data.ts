@@ -1,6 +1,7 @@
 import {
   LayoutDashboard,
   Calendar,
+  CalendarClock,
   CheckSquare,
   MessageSquare,
   Users,
@@ -129,6 +130,11 @@ export function useSidebarData(): SidebarData {
             {
               title: 'sidebar.nav.calendar',
               url: ROUTES.dashboard.calendar,
+              module: 'events',
+            },
+            {
+              title: 'sidebar.nav.appointments',
+              url: ROUTES.dashboard.appointments,
               module: 'events',
             },
           ],

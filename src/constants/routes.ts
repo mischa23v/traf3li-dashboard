@@ -169,6 +169,11 @@ export const ROUTES = {
     calendar: '/dashboard/calendar',
 
     /**
+     * Appointments management
+     */
+    appointments: '/dashboard/appointments',
+
+    /**
      * Notion integration
      */
     notion: '/dashboard/notion',
