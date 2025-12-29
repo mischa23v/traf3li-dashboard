@@ -82,6 +82,7 @@ import { Route as AuthenticatedDashboardCrmRouteImport } from './routes/_authent
 import { Route as AuthenticatedDashboardCasesRouteImport } from './routes/_authenticated/dashboard.cases'
 import { Route as AuthenticatedDashboardCalendarRouteImport } from './routes/_authenticated/dashboard.calendar'
 import { Route as AuthenticatedDashboardAssetsRouteImport } from './routes/_authenticated/dashboard.assets'
+import { Route as AuthenticatedDashboardAppointmentsRouteImport } from './routes/_authenticated/dashboard.appointments'
 import { Route as authSignUpCompleteProfileRouteImport } from './routes/(auth)/sign-up.complete-profile'
 import { Route as AuthenticatedDashboardTagsIndexRouteImport } from './routes/_authenticated/dashboard.tags.index'
 import { Route as AuthenticatedDashboardSupportIndexRouteImport } from './routes/_authenticated/dashboard.support.index'
@@ -850,6 +851,12 @@ const AuthenticatedDashboardAssetsRoute =
   AuthenticatedDashboardAssetsRouteImport.update({
     id: '/dashboard/assets',
     path: '/dashboard/assets',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardAppointmentsRoute =
+  AuthenticatedDashboardAppointmentsRouteImport.update({
+    id: '/dashboard/appointments',
+    path: '/dashboard/appointments',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const authSignUpCompleteProfileRoute =
@@ -3177,6 +3184,7 @@ export interface FileRoutesByFullPath {
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
   '/sign-up/complete-profile': typeof authSignUpCompleteProfileRoute
+  '/dashboard/appointments': typeof AuthenticatedDashboardAppointmentsRoute
   '/dashboard/assets': typeof AuthenticatedDashboardAssetsRouteWithChildren
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/dashboard/cases': typeof AuthenticatedDashboardCasesRouteWithChildren
@@ -3628,6 +3636,7 @@ export interface FileRoutesByTo {
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
   '/sign-up/complete-profile': typeof authSignUpCompleteProfileRoute
+  '/dashboard/appointments': typeof AuthenticatedDashboardAppointmentsRoute
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/dashboard/date-range-picker-test': typeof AuthenticatedDashboardDateRangePickerTestRoute
   '/dashboard/finance': typeof AuthenticatedDashboardFinanceRouteWithChildren
@@ -4072,6 +4081,7 @@ export interface FileRoutesById {
   '/(errors)/503': typeof errors503Route
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/(auth)/sign-up/complete-profile': typeof authSignUpCompleteProfileRoute
+  '/_authenticated/dashboard/appointments': typeof AuthenticatedDashboardAppointmentsRoute
   '/_authenticated/dashboard/assets': typeof AuthenticatedDashboardAssetsRouteWithChildren
   '/_authenticated/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/_authenticated/dashboard/cases': typeof AuthenticatedDashboardCasesRouteWithChildren
@@ -4526,6 +4536,7 @@ export interface FileRouteTypes {
     | '/503'
     | '/'
     | '/sign-up/complete-profile'
+    | '/dashboard/appointments'
     | '/dashboard/assets'
     | '/dashboard/calendar'
     | '/dashboard/cases'
@@ -4977,6 +4988,7 @@ export interface FileRouteTypes {
     | '/503'
     | '/'
     | '/sign-up/complete-profile'
+    | '/dashboard/appointments'
     | '/dashboard/calendar'
     | '/dashboard/date-range-picker-test'
     | '/dashboard/finance'
@@ -5420,6 +5432,7 @@ export interface FileRouteTypes {
     | '/(errors)/503'
     | '/_authenticated/'
     | '/(auth)/sign-up/complete-profile'
+    | '/_authenticated/dashboard/appointments'
     | '/_authenticated/dashboard/assets'
     | '/_authenticated/dashboard/calendar'
     | '/_authenticated/dashboard/cases'
@@ -6385,6 +6398,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/assets'
       fullPath: '/dashboard/assets'
       preLoaderRoute: typeof AuthenticatedDashboardAssetsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/appointments': {
+      id: '/_authenticated/dashboard/appointments'
+      path: '/dashboard/appointments'
+      fullPath: '/dashboard/appointments'
+      preLoaderRoute: typeof AuthenticatedDashboardAppointmentsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/(auth)/sign-up/complete-profile': {
@@ -10355,6 +10375,7 @@ const AuthenticatedDashboardSupportSlaRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedDashboardAppointmentsRoute: typeof AuthenticatedDashboardAppointmentsRoute
   AuthenticatedDashboardAssetsRoute: typeof AuthenticatedDashboardAssetsRouteWithChildren
   AuthenticatedDashboardCalendarRoute: typeof AuthenticatedDashboardCalendarRoute
   AuthenticatedDashboardCasesRoute: typeof AuthenticatedDashboardCasesRouteWithChildren
@@ -10452,6 +10473,8 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedDashboardAppointmentsRoute:
+    AuthenticatedDashboardAppointmentsRoute,
   AuthenticatedDashboardAssetsRoute:
     AuthenticatedDashboardAssetsRouteWithChildren,
   AuthenticatedDashboardCalendarRoute: AuthenticatedDashboardCalendarRoute,
