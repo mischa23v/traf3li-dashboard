@@ -13,6 +13,24 @@
  * - Idempotency keys for financial operations
  * - Dual token authentication (access + refresh tokens)
  * - Automatic token refresh on 401
+ *
+ * ============================================================================
+ * 🚨 BACKEND_TODO: CRITICAL AUTH ISSUES DOCUMENTED
+ * ============================================================================
+ * Several backend issues are documented in this file with BACKEND_TODO comments.
+ * See src/config/BACKEND_AUTH_ISSUES.ts for full documentation.
+ *
+ * CRITICAL ISSUES:
+ * 1. CSRF Cookie - Must set httpOnly:false, sameSite:'none', secure:true
+ * 2. Token Refresh - POST /api/auth/refresh must accept body & return both tokens
+ * 3. SSO Callback - POST /api/auth/sso/callback must return tokens
+ *
+ * HIGH PRIORITY:
+ * 4. CORS - Must allow credentials:true for dashboard.traf3li.com
+ * 5. MFA Flags - Login must return mfaEnabled, mfaPending in user object
+ *
+ * Search for "BACKEND_TODO" in this file to find all documented issues.
+ * ============================================================================
  */
 
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios'
@@ -228,6 +246,42 @@ const processQueue = (error: any = null): void => {
 /**
  * Refresh the access token using the refresh token
  * Returns true if refresh was successful, false otherwise
+ *
+ * ============================================================================
+ * 🚨 BACKEND_TODO: TOKEN REFRESH ENDPOINT
+ * ============================================================================
+ * The POST /api/auth/refresh endpoint MUST:
+ *
+ * 1. Accept refreshToken in REQUEST BODY (not header):
+ *    Request: { "refreshToken": "jwt_token" }
+ *
+ * 2. Return BOTH new tokens in response:
+ *    Response: { "accessToken": "new_jwt", "refreshToken": "new_jwt" }
+ *
+ * BACKEND IMPLEMENTATION:
+ * ```javascript
+ * app.post('/api/auth/refresh', async (req, res) => {
+ *   const { refreshToken } = req.body;  // ← Get from BODY
+ *
+ *   // Validate refresh token
+ *   const decoded = jwt.verify(refreshToken, REFRESH_SECRET);
+ *
+ *   // Generate NEW tokens (token rotation for security)
+ *   const newAccessToken = jwt.sign({ userId, email, role }, ACCESS_SECRET, { expiresIn: '15m' });
+ *   const newRefreshToken = jwt.sign({ userId }, REFRESH_SECRET, { expiresIn: '7d' });
+ *
+ *   // Invalidate old refresh token (optional but recommended)
+ *   // await RefreshToken.deleteOne({ token: refreshToken });
+ *
+ *   res.json({
+ *     accessToken: newAccessToken,   // ← REQUIRED
+ *     refreshToken: newRefreshToken  // ← REQUIRED
+ *   });
+ * });
+ * ```
+ *
+ * See: src/config/BACKEND_AUTH_ISSUES.ts for full documentation
+ * ============================================================================
  */
 const refreshAccessToken = async (): Promise<boolean> => {
   const refreshToken = getRefreshToken()
@@ -237,9 +291,10 @@ const refreshAccessToken = async (): Promise<boolean> => {
 
   try {
     // Use a separate axios instance to avoid interceptor loops
+    // BACKEND_TODO: Endpoint must accept refreshToken in body, return both tokens
     const response = await axios.post(
       `${API_BASE_URL_NO_VERSION}/auth/refresh`,
-      { refreshToken },
+      { refreshToken },  // ← Sending token in body as expected by backend
       {
         withCredentials: true,
         headers: {
@@ -249,14 +304,22 @@ const refreshAccessToken = async (): Promise<boolean> => {
       }
     )
 
+    // BACKEND_TODO: Must return both accessToken AND refreshToken
     if (response.data.accessToken && response.data.refreshToken) {
       storeTokens(response.data.accessToken, response.data.refreshToken)
       return true
     }
 
+    // BACKEND_TODO: If only accessToken is returned, token rotation is broken
+    console.warn('[TOKEN] ⚠️ Token refresh response missing tokens:', {
+      hasAccessToken: !!response.data.accessToken,
+      hasRefreshToken: !!response.data.refreshToken,
+      responseKeys: Object.keys(response.data),
+    })
     return false
-  } catch {
+  } catch (error: any) {
     // Refresh failed - clear tokens
+    console.error('[TOKEN] ❌ Token refresh failed:', error?.message || error)
     clearTokens()
     return false
   }
@@ -287,6 +350,34 @@ let cachedCsrfToken: string | null = null
  * Extract CSRF token from cookies or use cached token
  * The cookie is NOT httpOnly, so JavaScript can read it
  * Falls back to cached token from response headers for cross-origin requests
+ *
+ * ============================================================================
+ * 🚨 BACKEND_TODO: CSRF COOKIE CONFIGURATION
+ * ============================================================================
+ * The CSRF cookie is often NOT accessible from JavaScript because:
+ * 1. httpOnly: true - JS can't read httpOnly cookies
+ * 2. sameSite: 'strict' or 'lax' - Blocks cross-origin cookies
+ * 3. Missing domain - Subdomain cookies not shared
+ *
+ * REQUIRED cookie settings for cross-origin (frontend on different domain):
+ * ```javascript
+ * res.cookie('csrfToken', token, {
+ *   httpOnly: false,         // ← MUST be false so JS can read it!
+ *   secure: true,            // ← Required for HTTPS
+ *   sameSite: 'none',        // ← Required for cross-origin
+ *   domain: '.traf3li.com',  // ← Optional: share across subdomains
+ *   path: '/',
+ *   maxAge: 3600000
+ * });
+ * ```
+ *
+ * ALSO: Return token in response header as fallback:
+ * ```javascript
+ * res.setHeader('x-csrf-token', token);
+ * ```
+ *
+ * See: src/config/BACKEND_AUTH_ISSUES.ts for full documentation
+ * ============================================================================
  */
 const getCsrfToken = (): string => {
   const cookies = document.cookie
