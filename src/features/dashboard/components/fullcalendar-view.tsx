@@ -37,7 +37,6 @@ import {
 } from 'lucide-react'
 import {
   useCalendarGridItems,
-  useCalendarGridSummary,
   useCalendarItemDetails,
   usePrefetchAdjacentMonthsOptimized,
 } from '@/hooks/useCalendar'
@@ -214,7 +213,6 @@ export function FullCalendarView() {
 
   // Track API calls
   const gridItemsLoadStart = useRef(performance.now())
-  const summaryLoadStart = useRef(performance.now())
 
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
@@ -260,9 +258,6 @@ export function FullCalendarView() {
   // Grid items: minimal data (~150 bytes/item) for calendar display
   const { data: gridItemsData, isLoading, isError, error, refetch } = useCalendarGridItems(dateRange)
 
-  // Grid summary: counts per day for the banner
-  const { data: summaryData } = useCalendarGridSummary(dateRange)
-
   // Lazy load full details when user clicks an event
   const { data: itemDetailsData, isLoading: isLoadingDetails } = useCalendarItemDetails(
     selectedItemForDetails?.type ?? null,
@@ -288,16 +283,6 @@ export function FullCalendarView() {
       })
     }
   }, [gridItemsData])
-
-  useEffect(() => {
-    if (summaryData) {
-      const loadTime = (performance.now() - summaryLoadStart.current).toFixed(2)
-      perfLog('API LOADED: calendarGridSummary', {
-        days: summaryData?.data?.days?.length,
-        loadTime: loadTime + 'ms'
-      })
-    }
-  }, [summaryData])
 
   useEffect(() => {
     if (itemDetailsData) {
@@ -382,21 +367,6 @@ export function FullCalendarView() {
       },
     }))
   }, [gridItemsData])
-
-  // Calculate summary counts from grid summary
-  const summaryCounts = useMemo(() => {
-    if (!summaryData?.data?.days) {
-      return { eventCount: 0, taskCount: 0, reminderCount: 0 }
-    }
-    return summaryData.data.days.reduce(
-      (acc, day) => ({
-        eventCount: acc.eventCount + day.events,
-        taskCount: acc.taskCount + day.tasks,
-        reminderCount: acc.reminderCount + day.reminders,
-      }),
-      { eventCount: 0, taskCount: 0, reminderCount: 0 }
-    )
-  }, [summaryData])
 
   // ==================== Memoized FullCalendar Props ====================
   // These prevent unnecessary re-initialization of FullCalendar
@@ -757,18 +727,9 @@ export function FullCalendarView() {
                 <div className="p-2.5 bg-white/10 rounded-xl">
                   <CalendarIcon className="w-6 h-6 text-emerald-400" />
                 </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-white tracking-tight">
-                    {t('calendar.hero.title', 'جدول القضايا والجلسات')}
-                  </h1>
-                  <p className="text-sm text-white/60 mt-0.5">
-                    {t('calendar.hero.subtitle', 'لديك {{events}} أحداث و {{tasks}} مهام و {{reminders}} تذكيرات', {
-                      events: summaryCounts.eventCount,
-                      tasks: summaryCounts.taskCount,
-                      reminders: summaryCounts.reminderCount
-                    })}
-                  </p>
-                </div>
+                <h1 className="text-2xl font-bold text-white tracking-tight">
+                  {t('calendar.hero.title', 'جدول القضايا والجلسات')}
+                </h1>
               </div>
 
               {/* Action Buttons - Same style as dashboard hero */}
