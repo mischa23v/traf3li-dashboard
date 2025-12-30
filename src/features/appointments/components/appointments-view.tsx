@@ -1053,8 +1053,7 @@ function BookAppointmentDialog({
   const { data: availableSlotsData, isLoading: isSlotsLoading, isError: isSlotsError } = useAvailableSlots(
     {
       lawyerId: effectiveLawyerId,
-      startDate: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '',
-      endDate: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '',
+      date: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '',
       duration: formData.duration,
     },
     !!selectedDate && !!effectiveLawyerId

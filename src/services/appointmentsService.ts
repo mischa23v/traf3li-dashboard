@@ -239,9 +239,8 @@ export interface UpdateAppointmentRequest {
 }
 
 export interface GetAvailableSlotsRequest {
-  lawyerId: string
-  startDate: string
-  endDate: string
+  lawyerId?: string
+  date: string           // Single date: "2026-01-20"
   duration?: AppointmentDuration
 }
 
