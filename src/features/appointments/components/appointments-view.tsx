@@ -1194,17 +1194,17 @@ function BookAppointmentDialog({
                 <div className="grid grid-cols-3 gap-2 max-h-[300px] overflow-y-auto">
                   {availableSlots.map((slot) => (
                     <button
-                      key={slot.startTime}
-                      onClick={() => setSelectedTime(slot.startTime)}
-                      disabled={!slot.isAvailable}
+                      key={slot.start}
+                      onClick={() => setSelectedTime(slot.start)}
+                      disabled={!slot.available}
                       className={cn(
                         'py-3 px-4 rounded-xl text-sm font-medium transition-all border',
-                        !slot.isAvailable && 'bg-slate-100 text-slate-400 cursor-not-allowed',
-                        slot.isAvailable && selectedTime !== slot.startTime && 'bg-white hover:bg-emerald-50 hover:border-emerald-300',
-                        selectedTime === slot.startTime && 'bg-emerald-500 text-white border-emerald-500'
+                        !slot.available && 'bg-slate-100 text-slate-400 cursor-not-allowed',
+                        slot.available && selectedTime !== slot.start && 'bg-white hover:bg-emerald-50 hover:border-emerald-300',
+                        selectedTime === slot.start && 'bg-emerald-500 text-white border-emerald-500'
                       )}
                     >
-                      {slot.startTime}
+                      {slot.start}
                     </button>
                   ))}
                 </div>
