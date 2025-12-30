@@ -278,6 +278,11 @@
         "saturday": "Saturday"
       },
       "hero": {
+        "title": "Cases & Sessions Schedule",
+        "subtitle": "You have {{events}} events, {{tasks}} tasks, and {{reminders}} reminders",
+        "newEvent": "New Event",
+        "sync": "Sync",
+        "filter": "Filter",
         "lawFirmBadge": "Law Firm",
         "scheduleTitle": "Cases and Sessions Schedule",
         "youHave": "You have",

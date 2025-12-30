@@ -19,7 +19,6 @@ import type { EventClickArg, DateSelectArg, EventDropArg, EventContentArg } from
 const FullCalendarComponent = lazy(() => import('@fullcalendar/react'))
 import {
   Plus,
-  Filter,
   Clock,
   MapPin,
   Users,
@@ -32,13 +31,9 @@ import {
   Loader2,
   AlertCircle,
   RefreshCw,
-  Download,
-  Upload,
   Settings,
   ExternalLink,
-  X,
   Check,
-  ChevronDown,
 } from 'lucide-react'
 import {
   useCalendarGridItems,
@@ -69,14 +64,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuCheckboxItem,
-} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -234,7 +221,6 @@ export function FullCalendarView() {
   const [selectedItemForDetails, setSelectedItemForDetails] = useState<{ type: string; id: string } | null>(null)
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const [filterTypes, setFilterTypes] = useState<string[]>([])
   const [isSyncDialogOpen, setIsSyncDialogOpen] = useState(false)
 
   // Create event form state
@@ -272,10 +258,7 @@ export function FullCalendarView() {
 
   // Fetch calendar data using optimized endpoints
   // Grid items: minimal data (~150 bytes/item) for calendar display
-  const { data: gridItemsData, isLoading, isError, error, refetch } = useCalendarGridItems({
-    ...dateRange,
-    types: filterTypes.length > 0 ? filterTypes.join(',') : undefined,
-  })
+  const { data: gridItemsData, isLoading, isError, error, refetch } = useCalendarGridItems(dateRange)
 
   // Grid summary: counts per day for the banner
   const { data: summaryData } = useCalendarGridSummary(dateRange)
@@ -734,121 +717,78 @@ export function FullCalendarView() {
       </Header>
 
       <Main fluid className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6">
-        {/* Hero Banner */}
-        <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 group">
-          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Badge className="bg-blue-500/20 text-blue-100 hover:bg-blue-500/30 border-0 px-3 py-1">
-                  <Briefcase className="w-3 h-3 ms-2" />
-                  مكتب المحاماة
-                </Badge>
-                <span className="text-slate-500 text-sm">
-                  {new Date().toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' })}
-                </span>
+        {/* Hero Banner - Dashboard Style */}
+        <div className="bg-[#022c22] rounded-2xl p-6 relative overflow-hidden text-white shadow-lg">
+          {/* Subtle Animated Gradient Background */}
+          <div className="absolute inset-0 z-0">
+            <div
+              className="absolute inset-0 opacity-20"
+              style={{
+                background: 'linear-gradient(-45deg, #022c22, #064e3b, #022c22, #0f766e)',
+                backgroundSize: '400% 400%',
+                animation: 'gradientShift 20s ease infinite'
+              }}
+            />
+            <style>{`
+              @keyframes gradientShift {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+              }
+            `}</style>
+          </div>
+
+          {/* Background Pattern */}
+          <div className="absolute inset-0 z-0">
+            <img
+              src="/images/hero-wave.png"
+              alt=""
+              className="w-full h-full object-cover opacity-25 mix-blend-overlay"
+            />
+          </div>
+
+          {/* Subtle accent glow */}
+          <div className="absolute top-0 end-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-2xl -me-32 -mt-32 pointer-events-none" />
+
+          <div className="relative z-10">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              {/* Title Section */}
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-white/10 rounded-xl">
+                  <CalendarIcon className="w-6 h-6 text-emerald-400" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-white tracking-tight">
+                    {t('calendar.hero.title', 'جدول القضايا والجلسات')}
+                  </h1>
+                  <p className="text-sm text-white/60 mt-0.5">
+                    {t('calendar.hero.subtitle', 'لديك {{events}} أحداث و {{tasks}} مهام و {{reminders}} تذكيرات', {
+                      events: summaryCounts.eventCount,
+                      tasks: summaryCounts.taskCount,
+                      reminders: summaryCounts.reminderCount
+                    })}
+                  </p>
+                </div>
               </div>
-              <h1 className="text-4xl font-bold leading-tight mb-2">جدول القضايا والجلسات</h1>
-              <p className="text-slate-300 text-lg max-w-xl">
-                لديك{' '}
-                <span className="text-white font-bold border-b-2 border-brand-blue">
-                  {summaryCounts.eventCount} أحداث
-                </span>
-                {' '}و{' '}
-                <span className="text-white font-bold border-b-2 border-orange-500">
-                  {summaryCounts.taskCount} مهام
-                </span>
-                {' '}و{' '}
-                <span className="text-white font-bold border-b-2 border-purple-500">
-                  {summaryCounts.reminderCount} تذكيرات
-                </span>
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <Button
-                onClick={() => setIsCreateDialogOpen(true)}
-                className="bg-brand-blue hover:bg-blue-600 text-white rounded-xl h-12 px-8 font-bold shadow-lg shadow-blue-600/30 hover:scale-105 transition-all duration-300 border-0 text-base"
-              >
-                <Plus className="ms-2 h-5 w-5" aria-hidden="true" />
-                حدث جديد
-              </Button>
-              <Button
-                onClick={() => setIsSyncDialogOpen(true)}
-                className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-12 px-6 font-bold shadow-lg shadow-emerald-600/30 hover:scale-105 transition-all duration-300 border-0"
-              >
-                <Settings className="ms-2 h-5 w-5" aria-hidden="true" />
-                مزامنة
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button className="bg-white/10 hover:bg-white/20 text-white rounded-xl h-12 px-6 font-bold backdrop-blur-md border border-white/10 transition-all duration-300">
-                    <Filter className="ms-2 h-5 w-5" aria-hidden="true" />
-                    تصفية
-                    {filterTypes.length > 0 && (
-                      <Badge className="me-2 bg-brand-blue text-white">{filterTypes.length}</Badge>
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuCheckboxItem
-                    checked={filterTypes.includes('hearing')}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setFilterTypes([...filterTypes, 'hearing', 'court_session'])
-                      } else {
-                        setFilterTypes(filterTypes.filter(t => t !== 'hearing' && t !== 'court_session'))
-                      }
-                    }}
-                  >
-                    <Gavel className="ms-2 h-4 w-4 text-red-500" />
-                    جلسات المحكمة
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={filterTypes.includes('meeting')}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setFilterTypes([...filterTypes, 'meeting'])
-                      } else {
-                        setFilterTypes(filterTypes.filter(t => t !== 'meeting'))
-                      }
-                    }}
-                  >
-                    <Users className="ms-2 h-4 w-4 text-blue-500" aria-hidden="true" />
-                    اجتماعات
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={filterTypes.includes('task')}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setFilterTypes([...filterTypes, 'task'])
-                      } else {
-                        setFilterTypes(filterTypes.filter(t => t !== 'task'))
-                      }
-                    }}
-                  >
-                    <AlertTriangle className="ms-2 h-4 w-4 text-purple-500" aria-hidden="true" />
-                    مهام
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={filterTypes.includes('reminder')}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setFilterTypes([...filterTypes, 'reminder'])
-                      } else {
-                        setFilterTypes(filterTypes.filter(t => t !== 'reminder'))
-                      }
-                    }}
-                  >
-                    <Bell className="ms-2 h-4 w-4 text-orange-500" />
-                    تذكيرات
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setFilterTypes([])}>
-                    <X className="ms-2 h-4 w-4" aria-hidden="true" />
-                    إزالة الفلاتر
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+
+              {/* Action Buttons - Same style as dashboard hero */}
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  onClick={() => setIsCreateDialogOpen(true)}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-semibold shadow-lg shadow-emerald-500/20 border-0 text-sm"
+                >
+                  <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
+                  {t('calendar.hero.newEvent', 'حدث جديد')}
+                </Button>
+                <Button
+                  onClick={() => setIsSyncDialogOpen(true)}
+                  variant="outline"
+                  className="h-10 px-5 rounded-xl font-semibold border-white/20 text-white hover:bg-white/10 hover:text-white bg-transparent text-sm"
+                >
+                  <Settings className="ms-2 h-4 w-4" aria-hidden="true" />
+                  {t('calendar.hero.sync', 'مزامنة')}
+                </Button>
+              </div>
             </div>
           </div>
         </div>

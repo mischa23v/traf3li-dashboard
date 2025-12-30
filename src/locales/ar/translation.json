@@ -278,6 +278,11 @@
         "saturday": "السبت"
       },
       "hero": {
+        "title": "جدول القضايا والجلسات",
+        "subtitle": "لديك {{events}} أحداث و {{tasks}} مهام و {{reminders}} تذكيرات",
+        "newEvent": "حدث جديد",
+        "sync": "مزامنة",
+        "filter": "تصفية",
         "lawFirmBadge": "مكتب المحاماة",
         "scheduleTitle": "جدول القضايا والجلسات",
         "youHave": "لديك",
