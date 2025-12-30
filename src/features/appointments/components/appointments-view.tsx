@@ -490,6 +490,7 @@ export function AppointmentsView() {
         onOpenChange={setShowBookingDialog}
         isRtl={isRtl}
         locale={locale}
+        user={user}
       />
 
       <BlockTimeDialog
@@ -797,11 +798,13 @@ function BookAppointmentDialog({
   onOpenChange,
   isRtl,
   locale,
+  user,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
   isRtl: boolean
   locale: any
+  user: any
 }) {
   const bookMutation = useBookAppointment()
   const [step, setStep] = useState<1 | 2>(1) // 1: Select date/time, 2: Enter details
