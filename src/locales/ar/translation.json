@@ -4636,6 +4636,8 @@
     "attachment": "مرفق",
     "sar": "ر.س",
     "currency": "ر.س",
+    "guest": "ضيف",
+    "user": "مستخدم",
     "errorOccurred": "حدث خطأ",
     "somethingWentWrong": "حدث خطأ غير متوقع",
     "copiedSuccessfully": "تم النسخ بنجاح",

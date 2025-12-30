@@ -22,11 +22,13 @@ import {
   Building2,
   GitBranch,
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
 import { usePermissionsStore } from '@/stores/permissions-store'
 import type { ModuleKey } from '@/types/rbac'
 import { canView } from '@/lib/permissions'
 import { ROUTES } from '@/constants/routes'
+import { getLocalizedFullName } from '@/lib/arabic-names'
 
 type NavItem = {
   title: string
@@ -60,18 +62,23 @@ type SidebarData = {
 }
 
 export function useSidebarData(): SidebarData {
+  const { t, i18n } = useTranslation()
   const authUser = useAuthStore((state) => state.user)
   const permissions = usePermissionsStore((state) => state.permissions)
 
-  // Build full name from firstName and lastName, fallback to username
+  // Build full name with locale-aware name detection
   const getFullName = () => {
-    if (authUser?.firstName && authUser?.lastName) {
-      return `${authUser.firstName} ${authUser.lastName}`
-    }
-    if (authUser?.firstName) {
-      return authUser.firstName
-    }
-    return authUser?.username || 'Guest'
+    const locale = i18n.language
+    const localizedName = getLocalizedFullName(
+      authUser?.firstName,
+      authUser?.lastName,
+      authUser?.firstNameAr,
+      authUser?.lastNameAr,
+      locale
+    )
+    if (localizedName) return localizedName
+    if (authUser?.username) return authUser.username
+    return t('common.guest', 'ضيف')
   }
 
   // Check if user can view a module

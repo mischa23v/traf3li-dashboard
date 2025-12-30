@@ -1521,6 +1521,8 @@
     "attachment": "Attachment",
     "sar": "SAR",
     "currency": "SAR",
+    "guest": "Guest",
+    "user": "User",
     "errorOccurred": "Error Occurred",
     "somethingWentWrong": "Something went wrong",
     "copiedSuccessfully": "Copied successfully",
