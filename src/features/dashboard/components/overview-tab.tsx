@@ -273,7 +273,7 @@ const FinanceSummaryCard = memo(function FinanceSummaryCard({
 }: FinanceSummaryCardProps) {
   return (
     <Card className="rounded-3xl border-slate-100 shadow-sm">
-      <CardHeader>
+      <CardHeader className="pb-2">
         <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
           <TrendingUp className="h-5 w-5 text-green-600" />
           {t('dashboard.finance.title')}
@@ -290,46 +290,51 @@ const FinanceSummaryCard = memo(function FinanceSummaryCard({
             <p className="text-sm font-medium">{t('dashboard.finance.noData')}</p>
           </div>
         ) : (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center shadow-sm text-green-600">
-                  <ArrowUpRight className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-xs text-slate-600 font-bold">{t('dashboard.finance.revenue')}</p>
-                  <p className="font-bold text-navy">
-                    {financialSummary.totalRevenue?.toLocaleString('ar-SA') || 0} {t('common.currency')}
-                  </p>
+          <div className="space-y-4">
+            {/* Revenue/Collections - Main stat */}
+            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+              <span className="text-sm text-slate-600 font-medium">{t('dashboard.finance.revenue')}</span>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-navy">
+                  {financialSummary.totalRevenue?.toLocaleString('ar-SA') || 0}
+                </span>
+                <span className="text-sm text-slate-500">{t('common.currency')}</span>
+                <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center">
+                  <ArrowUpRight className="h-3 w-3 text-green-600" />
                 </div>
               </div>
             </div>
 
+            {/* Pending & Overdue - Side by side */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 bg-amber-50 rounded-xl">
-                <p className="text-xs text-slate-600 font-bold">{t('dashboard.finance.pending')}</p>
-                <p className="font-bold text-amber-600">
-                  {financialSummary.pendingAmount?.toLocaleString('ar-SA') || 0} {t('common.currency')}
+              <div className="p-3 bg-amber-50 rounded-xl border border-amber-100">
+                <p className="text-xs text-slate-500 mb-1">{t('dashboard.finance.pending')}</p>
+                <p className="font-bold text-amber-600 text-sm">
+                  {financialSummary.pendingAmount?.toLocaleString('ar-SA') || 0}
+                  <span className="text-xs text-amber-500 ms-1">{t('common.currency')}</span>
                 </p>
               </div>
-              <div className="p-3 bg-red-50 rounded-xl">
-                <p className="text-xs text-slate-600 font-bold">{t('dashboard.finance.overdue', 'متأخرة')}</p>
-                <p className="font-bold text-red-600">
-                  {financialSummary.overdueAmount?.toLocaleString('ar-SA') || 0} {t('common.currency')}
-                </p>
-              </div>
-            </div>
-
-            <div className="p-4 bg-slate-50 rounded-2xl">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-bold text-slate-600">{t('dashboard.finance.expenses', 'المصروفات')}</p>
-                <p className="font-bold text-navy text-lg">
-                  {financialSummary.totalExpenses?.toLocaleString('ar-SA') || 0} {t('common.currency')}
+              <div className="p-3 bg-red-50 rounded-xl border border-red-100">
+                <p className="text-xs text-slate-500 mb-1">{t('dashboard.finance.overdue', 'متأخرة')}</p>
+                <p className="font-bold text-red-600 text-sm">
+                  {financialSummary.overdueAmount?.toLocaleString('ar-SA') || 0}
+                  <span className="text-xs text-red-500 ms-1">{t('common.currency')}</span>
                 </p>
               </div>
             </div>
 
-            <Button className="w-full bg-navy text-white hover:bg-navy/90 rounded-xl">
+            {/* Expenses */}
+            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+              <span className="text-sm text-slate-600 font-medium">{t('dashboard.finance.expenses', 'المصروفات')}</span>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-navy">
+                  {financialSummary.totalExpenses?.toLocaleString('ar-SA') || 0}
+                </span>
+                <span className="text-sm text-slate-500">{t('common.currency')}</span>
+              </div>
+            </div>
+
+            <Button className="w-full bg-navy text-white hover:bg-navy/90 rounded-xl h-10">
               {t('dashboard.finance.goToFinance')}
             </Button>
           </div>
