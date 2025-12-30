@@ -400,47 +400,78 @@ export function getArabicLastName(englishName: string | undefined): string | und
 
 /**
  * Get display name based on locale
- * Priority:
- * 1. Arabic locale: Use Arabic name if available, else lookup from English, else fallback to English
- * 2. English locale: Use English name
+ * Smart detection: checks actual content of fields, not just field names
+ * Handles cases where Arabic is stored in English field or vice versa
  */
 export function getLocalizedFirstName(
   firstName: string | undefined,
   firstNameAr: string | undefined,
   locale: string
 ): string {
+  // Detect actual content type of each field
+  const firstNameIsArabic = isArabicText(firstName)
+  const firstNameArIsArabic = isArabicText(firstNameAr)
+
   if (locale === 'ar') {
-    // First try user's stored Arabic name
-    if (firstNameAr) return firstNameAr
-    // Then try lookup from English name
-    const lookupArabic = getArabicFirstName(firstName)
-    if (lookupArabic) return lookupArabic
-    // Fallback to English name
-    return firstName || ''
+    // For Arabic locale, prefer Arabic text from any field
+    // 1. If Arabic field has Arabic text, use it
+    if (firstNameAr && firstNameArIsArabic) return firstNameAr
+    // 2. If English field has Arabic text, use it
+    if (firstName && firstNameIsArabic) return firstName
+    // 3. Try to translate English name to Arabic
+    if (firstName && !firstNameIsArabic) {
+      const lookupArabic = getArabicFirstName(firstName)
+      if (lookupArabic) return lookupArabic
+    }
+    // 4. Use whatever is available (Arabic field even if English, then English field)
+    return firstNameAr || firstName || ''
   }
-  // English locale - use English name
-  return firstName || ''
+
+  // For English locale, prefer English/Latin text
+  // 1. If English field has non-Arabic text, use it
+  if (firstName && !firstNameIsArabic) return firstName
+  // 2. If Arabic field has non-Arabic text (English in wrong field), use it
+  if (firstNameAr && !firstNameArIsArabic) return firstNameAr
+  // 3. Fallback to whatever is available (even if Arabic)
+  return firstName || firstNameAr || ''
 }
 
 /**
  * Get display last name based on locale
+ * Smart detection: checks actual content of fields, not just field names
+ * Handles cases where Arabic is stored in English field or vice versa
  */
 export function getLocalizedLastName(
   lastName: string | undefined,
   lastNameAr: string | undefined,
   locale: string
 ): string {
+  // Detect actual content type of each field
+  const lastNameIsArabic = isArabicText(lastName)
+  const lastNameArIsArabic = isArabicText(lastNameAr)
+
   if (locale === 'ar') {
-    // First try user's stored Arabic name
-    if (lastNameAr) return lastNameAr
-    // Then try lookup from English name
-    const lookupArabic = getArabicLastName(lastName)
-    if (lookupArabic) return lookupArabic
-    // Fallback to English name
-    return lastName || ''
+    // For Arabic locale, prefer Arabic text from any field
+    // 1. If Arabic field has Arabic text, use it
+    if (lastNameAr && lastNameArIsArabic) return lastNameAr
+    // 2. If English field has Arabic text, use it
+    if (lastName && lastNameIsArabic) return lastName
+    // 3. Try to translate English name to Arabic
+    if (lastName && !lastNameIsArabic) {
+      const lookupArabic = getArabicLastName(lastName)
+      if (lookupArabic) return lookupArabic
+    }
+    // 4. Use whatever is available (Arabic field even if English, then English field)
+    return lastNameAr || lastName || ''
   }
-  // English locale - use English name
-  return lastName || ''
+
+  // For English locale, prefer English/Latin text
+  // 1. If English field has non-Arabic text, use it
+  if (lastName && !lastNameIsArabic) return lastName
+  // 2. If Arabic field has non-Arabic text (English in wrong field), use it
+  if (lastNameAr && !lastNameArIsArabic) return lastNameAr
+  // 3. Fallback to whatever is available (even if Arabic)
+  return lastName || lastNameAr || ''
 }
 
 /**
