@@ -19,7 +19,6 @@ import type { EventClickArg, DateSelectArg, EventDropArg, EventContentArg } from
 const FullCalendarComponent = lazy(() => import('@fullcalendar/react'))
 import {
   Plus,
-  Filter,
   Clock,
   MapPin,
   Users,
@@ -32,13 +31,9 @@ import {
   Loader2,
   AlertCircle,
   RefreshCw,
-  Download,
-  Upload,
   Settings,
   ExternalLink,
-  X,
   Check,
-  ChevronDown,
 } from 'lucide-react'
 import {
   useCalendarGridItems,
@@ -69,14 +64,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuCheckboxItem,
-} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -234,7 +221,6 @@ export function FullCalendarView() {
   const [selectedItemForDetails, setSelectedItemForDetails] = useState<{ type: string; id: string } | null>(null)
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const [filterTypes, setFilterTypes] = useState<string[]>([])
   const [isSyncDialogOpen, setIsSyncDialogOpen] = useState(false)
 
   // Create event form state
@@ -272,10 +258,7 @@ export function FullCalendarView() {
 
   // Fetch calendar data using optimized endpoints
   // Grid items: minimal data (~150 bytes/item) for calendar display
-  const { data: gridItemsData, isLoading, isError, error, refetch } = useCalendarGridItems({
-    ...dateRange,
-    types: filterTypes.length > 0 ? filterTypes.join(',') : undefined,
-  })
+  const { data: gridItemsData, isLoading, isError, error, refetch } = useCalendarGridItems(dateRange)
 
   // Grid summary: counts per day for the banner
   const { data: summaryData } = useCalendarGridSummary(dateRange)
@@ -788,7 +771,7 @@ export function FullCalendarView() {
                 </div>
               </div>
 
-              {/* Action Buttons */}
+              {/* Action Buttons - Same style as dashboard hero */}
               <div className="flex flex-wrap gap-3">
                 <Button
                   onClick={() => setIsCreateDialogOpen(true)}
@@ -805,76 +788,6 @@ export function FullCalendarView() {
                   <Settings className="ms-2 h-4 w-4" aria-hidden="true" />
                   {t('calendar.hero.sync', 'مزامنة')}
                 </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="h-10 px-5 rounded-xl font-semibold border-white/20 text-white hover:bg-white/10 hover:text-white bg-transparent text-sm">
-                      <Filter className="ms-2 h-4 w-4" aria-hidden="true" />
-                      {t('calendar.hero.filter', 'تصفية')}
-                      {filterTypes.length > 0 && (
-                        <Badge className="me-2 bg-emerald-500 text-white text-xs">{filterTypes.length}</Badge>
-                      )}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuCheckboxItem
-                      checked={filterTypes.includes('hearing')}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setFilterTypes([...filterTypes, 'hearing', 'court_session'])
-                        } else {
-                          setFilterTypes(filterTypes.filter(t => t !== 'hearing' && t !== 'court_session'))
-                        }
-                      }}
-                    >
-                      <Gavel className="ms-2 h-4 w-4 text-red-500" />
-                      جلسات المحكمة
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem
-                      checked={filterTypes.includes('meeting')}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setFilterTypes([...filterTypes, 'meeting'])
-                        } else {
-                          setFilterTypes(filterTypes.filter(t => t !== 'meeting'))
-                        }
-                      }}
-                    >
-                      <Users className="ms-2 h-4 w-4 text-blue-500" aria-hidden="true" />
-                      اجتماعات
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem
-                      checked={filterTypes.includes('task')}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setFilterTypes([...filterTypes, 'task'])
-                        } else {
-                          setFilterTypes(filterTypes.filter(t => t !== 'task'))
-                        }
-                      }}
-                    >
-                      <AlertTriangle className="ms-2 h-4 w-4 text-purple-500" aria-hidden="true" />
-                      مهام
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem
-                      checked={filterTypes.includes('reminder')}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setFilterTypes([...filterTypes, 'reminder'])
-                        } else {
-                          setFilterTypes(filterTypes.filter(t => t !== 'reminder'))
-                        }
-                      }}
-                    >
-                      <Bell className="ms-2 h-4 w-4 text-orange-500" />
-                      تذكيرات
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setFilterTypes([])}>
-                      <X className="ms-2 h-4 w-4" aria-hidden="true" />
-                      إزالة الفلاتر
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               </div>
             </div>
           </div>
