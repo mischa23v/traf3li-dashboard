@@ -523,7 +523,7 @@ export function AppointmentsView() {
                 {/* Center: Navigation with Back to Today */}
                 <div className="flex items-center gap-1">
                   <Button variant="ghost" size="icon" onClick={goToPreviousWeek} className="h-10 w-10 rounded-xl hover:bg-slate-100">
-                    <ChevronRight className="h-5 w-5" />
+                    {isRtl ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
                   </Button>
                   <Button
                     variant="outline"
@@ -533,7 +533,7 @@ export function AppointmentsView() {
                     {isRtl ? 'العودة لليوم' : 'Today'}
                   </Button>
                   <Button variant="ghost" size="icon" onClick={goToNextWeek} className="h-10 w-10 rounded-xl hover:bg-slate-100">
-                    <ChevronLeft className="h-5 w-5" />
+                    {isRtl ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
                   </Button>
                 </div>
 
@@ -1050,7 +1050,7 @@ function BookAppointmentDialog({
     notes: '',
   })
 
-  const { data: availableSlotsData, isLoading: isSlotsLoading } = useAvailableSlots(
+  const { data: availableSlotsData, isLoading: isSlotsLoading, isError: isSlotsError } = useAvailableSlots(
     {
       lawyerId: effectiveLawyerId,
       startDate: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '',
@@ -1061,6 +1061,7 @@ function BookAppointmentDialog({
   )
 
   const availableSlots = availableSlotsData?.data?.slots || []
+  const hasNoAvailability = !isSlotsLoading && !isSlotsError && availableSlots.length === 0
 
   const calendarDays = useMemo(() => {
     const start = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1)
@@ -1141,9 +1142,13 @@ function BookAppointmentDialog({
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addDays(currentMonth, -30))}><ChevronLeft className="h-5 w-5" /></Button>
+                <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addDays(currentMonth, -30))}>
+                  {isRtl ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+                </Button>
                 <span className="font-semibold">{format(currentMonth, 'MMMM yyyy', { locale })}</span>
-                <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addDays(currentMonth, 30))}><ChevronRight className="h-5 w-5" /></Button>
+                <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addDays(currentMonth, 30))}>
+                  {isRtl ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+                </Button>
               </div>
               <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-slate-500">
                 {(isRtl ? ['أح', 'إث', 'ثل', 'أر', 'خم', 'جم', 'سب'] : ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']).map((d) => <div key={d} className="p-2">{d}</div>)}
@@ -1178,10 +1183,21 @@ function BookAppointmentDialog({
                 </div>
               ) : isSlotsLoading ? (
                 <div className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-slate-400" /></div>
-              ) : availableSlots.length === 0 ? (
+              ) : isSlotsError ? (
+                <div className="text-center py-12 text-red-400">
+                  <AlertCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>{isRtl ? 'فشل في تحميل الأوقات' : 'Failed to load times'}</p>
+                  <p className="text-xs mt-2">{isRtl ? 'تحقق من إعدادات أوقات العمل' : 'Check availability settings'}</p>
+                </div>
+              ) : hasNoAvailability ? (
                 <div className="text-center py-12 text-slate-400">
                   <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>{isRtl ? 'لا توجد أوقات متاحة' : 'No available times'}</p>
+                  <p className="font-medium">{isRtl ? 'لا توجد أوقات متاحة' : 'No available times'}</p>
+                  <p className="text-xs mt-2 max-w-xs mx-auto">
+                    {isRtl
+                      ? 'تأكد من إعداد أوقات العمل من خلال "إدارة أوقات العمل"'
+                      : 'Make sure to set up working hours via "Manage Availability"'}
+                  </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-3 gap-2 max-h-[300px] overflow-y-auto">
