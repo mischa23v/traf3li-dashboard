@@ -35,6 +35,11 @@ export interface VerifyOtpResponse {
   success: boolean
   message: string
   messageAr?: string
+  verified?: boolean
+  // Password reset flow fields (when purpose is 'password_reset')
+  resetToken?: string // 64 hex chars - use this in reset-password endpoint
+  expiresInMinutes?: number // Token validity period (30 minutes)
+  // Login/registration flow fields
   user?: {
     _id: string
     username: string
