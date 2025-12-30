@@ -64,10 +64,16 @@ type SidebarData = {
 export function useSidebarData(): SidebarData {
   const { t, i18n } = useTranslation()
   const authUser = useAuthStore((state) => state.user)
+  const isLoading = useAuthStore((state) => state.isLoading)
   const permissions = usePermissionsStore((state) => state.permissions)
 
   // Build full name with locale-aware name detection
   const getFullName = () => {
+    // Don't show "Guest" while auth is loading - show loading indicator or empty
+    if (isLoading && !authUser) {
+      return '...'
+    }
+
     const locale = i18n.language
     const localizedName = getLocalizedFullName(
       authUser?.firstName,

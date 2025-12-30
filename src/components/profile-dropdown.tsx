@@ -22,9 +22,15 @@ export function ProfileDropdown({ className }: { className?: string }) {
   const { t, i18n } = useTranslation()
   const [open, setOpen] = useDialogState()
   const user = useAuthStore((state) => state.user)
+  const isLoading = useAuthStore((state) => state.isLoading)
 
   // Build full name with locale-aware name detection
   const getFullName = () => {
+    // Don't show "Guest" while auth is loading
+    if (isLoading && !user) {
+      return '...'
+    }
+
     const locale = i18n.language
     const localizedName = getLocalizedFullName(
       user?.firstName,
