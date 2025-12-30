@@ -211,6 +211,8 @@ export function Dashboard() {
             eventsLoading={eventsLoading}
             financialSummary={financialSummary}
             financialLoading={financialLoading}
+            caseStats={caseStats}
+            upcomingEventsCount={heroStats?.upcomingEventsCount || 0}
           />
         )}
 

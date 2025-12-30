@@ -76,6 +76,8 @@ export interface OverviewTabProps {
   eventsLoading: boolean
   financialSummary: DashboardFinancialSummary | undefined
   financialLoading: boolean
+  caseStats?: CaseStats
+  upcomingEventsCount?: number
 }
 
 /** Analytics tab props */

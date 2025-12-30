@@ -1179,6 +1179,7 @@
       },
       "productivity": "الإنتاجية",
       "calendar": "التقويم",
+      "welcomeMessage": "مرحباً بك في لوحة التحكم",
       "new": {
         "task": "مهمة جديدة",
         "reminder": "تذكير جديد",
@@ -1297,12 +1298,27 @@
         "change": "+201 منذ الساعة الأخيرة"
       }
     },
+    "overview": {
+      "totalRevenue": "إجمالي الإيرادات",
+      "activeCases": "القضايا النشطة",
+      "pendingInvoices": "الفواتير المعلقة",
+      "upcomingEvents": "الأحداث القادمة",
+      "fromLastMonth": "من الشهر الماضي",
+      "pendingCases": "معلقة",
+      "overdue": "متأخرة",
+      "thisWeek": "هذا الأسبوع",
+      "chartTitle": "نظرة عامة",
+      "noChartData": "لا توجد بيانات متاحة حتى الآن",
+      "chartDataHint": "ستظهر بيانات الإيرادات هنا عند إتمام القضايا"
+    },
     "schedule": {
       "title": "جدول اليوم",
       "viewFullCalendar": "عرض التقويم الكامل",
       "noAppointments": "لا توجد مواعيد اليوم",
+      "noAppointmentsHint": "جدولك فارغ",
       "notSpecified": "غير محدد",
       "remote": "عن بعد",
+      "viewMore": "عرض {{count}} المزيد",
       "eventTypes": {
         "session": "جلسة",
         "meeting": "اجتماع",
