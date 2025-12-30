@@ -1329,6 +1329,13 @@
         "provider": "مركز التدريب العدلي"
       }
     },
+    "quickActions": {
+      "title": "إجراءات سريعة",
+      "newCase": "قضية جديدة",
+      "newAppointment": "موعد جديد",
+      "newDocument": "مستند جديد",
+      "notifications": "الإشعارات"
+    },
     "finance": {
       "title": "الملخص المالي",
       "noData": "لا توجد بيانات مالية",

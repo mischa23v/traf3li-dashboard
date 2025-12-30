@@ -10,6 +10,10 @@ import {
   Loader2,
   GraduationCap,
   MapPin,
+  Bell,
+  FileText,
+  Calendar,
+  Plus,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -33,7 +37,7 @@ export const OverviewTab = memo(function OverviewTab({
       {/* MAIN GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* RIGHT COLUMN (2/3) */}
-        <div className="lg:col-span-2 space-y-8">
+        <div className="lg:col-span-2 flex flex-col gap-8">
           {/* Schedule / Calendar */}
           <ScheduleCard
             t={t}
@@ -49,13 +53,15 @@ export const OverviewTab = memo(function OverviewTab({
         </div>
 
         {/* LEFT COLUMN (1/3) */}
-        <div className="space-y-8">
+        <div className="flex flex-col gap-8">
           {/* Finance Summary */}
           <FinanceSummaryCard
             t={t}
             financialSummary={financialSummary}
             financialLoading={financialLoading}
           />
+          {/* Quick Actions */}
+          <QuickActionsCard t={t} />
         </div>
       </div>
     </>
@@ -339,6 +345,70 @@ const FinanceSummaryCard = memo(function FinanceSummaryCard({
             </Button>
           </div>
         )}
+      </CardContent>
+    </Card>
+  )
+})
+
+interface QuickActionsCardProps {
+  t: OverviewTabProps['t']
+}
+
+const QuickActionsCard = memo(function QuickActionsCard({ t }: QuickActionsCardProps) {
+  const quickActions = [
+    {
+      icon: Plus,
+      label: t('dashboard.quickActions.newCase', 'قضية جديدة'),
+      href: '/cases/new',
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50 hover:bg-blue-100',
+    },
+    {
+      icon: Calendar,
+      label: t('dashboard.quickActions.newAppointment', 'موعد جديد'),
+      href: '/tasks/new',
+      color: 'text-green-600',
+      bgColor: 'bg-green-50 hover:bg-green-100',
+    },
+    {
+      icon: FileText,
+      label: t('dashboard.quickActions.newDocument', 'مستند جديد'),
+      href: '/documents/new',
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-50 hover:bg-purple-100',
+    },
+    {
+      icon: Bell,
+      label: t('dashboard.quickActions.notifications', 'الإشعارات'),
+      href: '/notifications',
+      color: 'text-amber-600',
+      bgColor: 'bg-amber-50 hover:bg-amber-100',
+    },
+  ]
+
+  return (
+    <Card className="rounded-3xl border-slate-100 shadow-sm flex-1">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+          <Plus className="h-5 w-5 text-brand-blue" />
+          {t('dashboard.quickActions.title', 'إجراءات سريعة')}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 gap-3">
+          {quickActions.map((action, index) => (
+            <Link
+              key={index}
+              to={action.href}
+              className={`flex flex-col items-center justify-center p-4 rounded-xl ${action.bgColor} transition-colors`}
+            >
+              <action.icon className={`h-6 w-6 ${action.color} mb-2`} />
+              <span className="text-xs font-medium text-slate-700 text-center">
+                {action.label}
+              </span>
+            </Link>
+          ))}
+        </div>
       </CardContent>
     </Card>
   )

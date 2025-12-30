@@ -1244,6 +1244,13 @@
         "provider": "Justice Training Center"
       }
     },
+    "quickActions": {
+      "title": "Quick Actions",
+      "newCase": "New Case",
+      "newAppointment": "New Appointment",
+      "newDocument": "New Document",
+      "notifications": "Notifications"
+    },
     "finance": {
       "title": "Financial Summary",
       "noData": "No financial data available",
