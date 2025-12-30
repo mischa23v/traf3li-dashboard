@@ -1088,6 +1088,7 @@
       "newInvoice": "New Invoice",
       "productivity": "Productivity",
       "calendar": "Calendar",
+      "welcomeMessage": "Welcome to your dashboard",
       "new": {
         "task": "New Task",
         "reminder": "New Reminder",
@@ -1212,12 +1213,27 @@
         "change": "+201 since last hour"
       }
     },
+    "overview": {
+      "totalRevenue": "Total Revenue",
+      "activeCases": "Active Cases",
+      "pendingInvoices": "Pending Invoices",
+      "upcomingEvents": "Upcoming Events",
+      "fromLastMonth": "from last month",
+      "pendingCases": "pending",
+      "overdue": "overdue",
+      "thisWeek": "this week",
+      "chartTitle": "Overview",
+      "noChartData": "No data available yet",
+      "chartDataHint": "Revenue data will appear here as cases are completed"
+    },
     "schedule": {
       "title": "Today's Schedule",
       "viewFullCalendar": "View Full Calendar",
       "noAppointments": "No appointments today",
+      "noAppointmentsHint": "Your schedule is clear",
       "notSpecified": "Not specified",
       "remote": "Remote",
+      "viewMore": "View {{count}} more",
       "eventTypes": {
         "session": "Session",
         "meeting": "Meeting",
