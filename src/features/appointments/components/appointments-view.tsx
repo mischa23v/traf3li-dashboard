@@ -79,6 +79,8 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { ROUTES } from '@/constants/routes'
 import { useAuthStore } from '@/stores/auth-store'
+import { usePermissionsStore } from '@/stores/permissions-store'
+import { useTeamMembers } from '@/hooks/useCasesAndClients'
 
 import {
   useAppointments,
@@ -89,6 +91,7 @@ import {
   useMarkNoShow,
   useAppointmentStats,
   useAvailableSlots,
+  useCreateBlockedTime,
 } from '@/hooks/useAppointments'
 
 import type {
@@ -137,6 +140,13 @@ export function AppointmentsView() {
 
   // Get current user from auth store
   const user = useAuthStore((state) => state.user)
+
+  // Check if user can manage other lawyers (firm admin with full permissions)
+  const { isAdminOrOwner, isSoloLawyer } = usePermissionsStore()
+  const canManageOtherLawyers = isAdminOrOwner() && !isSoloLawyer
+
+  // Fetch team members for cross-lawyer management (only if user can manage others)
+  const { data: teamMembers = [] } = useTeamMembers(canManageOtherLawyers)
 
   // View & Filter state
   const [viewMode, setViewMode] = useState<'week' | 'list'>('week')
@@ -771,6 +781,18 @@ export function AppointmentsView() {
         isRtl={isRtl}
         locale={locale}
         user={user}
+        canManageOtherLawyers={canManageOtherLawyers}
+        teamMembers={teamMembers}
+      />
+
+      {/* Block Time Dialog */}
+      <BlockTimeDialog
+        open={showBlockDialog}
+        onOpenChange={setShowBlockDialog}
+        isRtl={isRtl}
+        canManageOtherLawyers={canManageOtherLawyers}
+        teamMembers={teamMembers}
+        currentUserId={user?._id}
       />
 
       {/* Appointment Details Dialog */}
@@ -949,18 +971,26 @@ function BookAppointmentDialog({
   isRtl,
   locale,
   user,
+  canManageOtherLawyers,
+  teamMembers,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
   isRtl: boolean
   locale: any
   user: any
+  canManageOtherLawyers: boolean
+  teamMembers: Array<{ _id: string; firstName: string; lastName: string }>
 }) {
   const bookMutation = useBookAppointment()
   const [step, setStep] = useState<1 | 2>(1)
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
   const [currentMonth, setCurrentMonth] = useState(new Date())
+  const [targetLawyerId, setTargetLawyerId] = useState<string>('')
+
+  // Determine which lawyer to book for (self or selected team member)
+  const effectiveLawyerId = targetLawyerId || user?._id || ''
 
   const [formData, setFormData] = useState({
     clientName: '',
@@ -973,12 +1003,12 @@ function BookAppointmentDialog({
 
   const { data: availableSlotsData, isLoading: isSlotsLoading } = useAvailableSlots(
     {
-      lawyerId: user?._id || '',
+      lawyerId: effectiveLawyerId,
       startDate: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '',
       endDate: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '',
       duration: formData.duration,
     },
-    !!selectedDate && !!user?._id
+    !!selectedDate && !!effectiveLawyerId
   )
 
   const availableSlots = availableSlotsData?.data?.slots || []
@@ -1003,16 +1033,23 @@ function BookAppointmentDialog({
         date: format(selectedDate, 'yyyy-MM-dd'),
         startTime: selectedTime,
         source: 'manual',
+        // Include targetLawyerId only if booking for another lawyer
+        ...(targetLawyerId ? { targetLawyerId } : {}),
       })
       toast.success(isRtl ? 'تم حجز الموعد بنجاح' : 'Appointment booked successfully')
       onOpenChange(false)
-      setStep(1)
-      setSelectedDate(null)
-      setSelectedTime(null)
-      setFormData({ clientName: '', clientEmail: '', clientPhone: '', duration: 30, type: 'consultation', notes: '' })
+      resetForm()
     } catch {
       toast.error(isRtl ? 'فشل في حجز الموعد' : 'Failed to book appointment')
     }
+  }
+
+  const resetForm = () => {
+    setStep(1)
+    setSelectedDate(null)
+    setSelectedTime(null)
+    setTargetLawyerId('')
+    setFormData({ clientName: '', clientEmail: '', clientPhone: '', duration: 30, type: 'consultation', notes: '' })
   }
 
   return (
@@ -1028,9 +1065,32 @@ function BookAppointmentDialog({
         </DialogHeader>
 
         {step === 1 ? (
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
+          <div className="space-y-6">
+            {/* Lawyer Selector - Only show for firm admins */}
+            {canManageOtherLawyers && teamMembers.length > 0 && (
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl space-y-2">
+                <Label className="text-sm font-medium text-blue-800">
+                  {isRtl ? 'حجز موعد لـ' : 'Book appointment for'}
+                </Label>
+                <Select value={targetLawyerId} onValueChange={setTargetLawyerId}>
+                  <SelectTrigger className="bg-white">
+                    <SelectValue placeholder={isRtl ? 'نفسي (الافتراضي)' : 'Myself (default)'} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">{isRtl ? 'نفسي' : 'Myself'}</SelectItem>
+                    {teamMembers.filter(m => m._id !== user?._id).map((member) => (
+                      <SelectItem key={member._id} value={member._id}>
+                        {member.firstName} {member.lastName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
                 <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addDays(currentMonth, -30))}><ChevronLeft className="h-5 w-5" /></Button>
                 <span className="font-semibold">{format(currentMonth, 'MMMM yyyy', { locale })}</span>
                 <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addDays(currentMonth, 30))}><ChevronRight className="h-5 w-5" /></Button>
@@ -1094,6 +1154,7 @@ function BookAppointmentDialog({
               )}
             </div>
           </div>
+          </div>
         ) : (
           <div className="space-y-4">
             <div className="bg-emerald-50 p-4 rounded-xl flex items-center gap-4">
@@ -1156,6 +1217,188 @@ function BookAppointmentDialog({
               {isRtl ? 'حجز الموعد' : 'Book Appointment'}
             </Button>
           )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// ==================== Block Time Dialog ====================
+
+function BlockTimeDialog({
+  open,
+  onOpenChange,
+  isRtl,
+  canManageOtherLawyers,
+  teamMembers,
+  currentUserId,
+}: {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  isRtl: boolean
+  canManageOtherLawyers: boolean
+  teamMembers: Array<{ _id: string; firstName: string; lastName: string }>
+  currentUserId?: string
+}) {
+  const createBlockedTime = useCreateBlockedTime()
+  const [targetLawyerId, setTargetLawyerId] = useState<string>('')
+  const [formData, setFormData] = useState({
+    startDate: '',
+    startTime: '09:00',
+    endDate: '',
+    endTime: '17:00',
+    reason: '',
+    isAllDay: false,
+  })
+
+  const handleSubmit = async () => {
+    if (!formData.startDate || !formData.endDate) return
+    try {
+      const startDateTime = formData.isAllDay
+        ? `${formData.startDate}T00:00:00`
+        : `${formData.startDate}T${formData.startTime}:00`
+      const endDateTime = formData.isAllDay
+        ? `${formData.endDate}T23:59:59`
+        : `${formData.endDate}T${formData.endTime}:00`
+
+      await createBlockedTime.mutateAsync({
+        startDateTime,
+        endDateTime,
+        reason: formData.reason || undefined,
+        isAllDay: formData.isAllDay,
+        ...(targetLawyerId ? { targetLawyerId } : {}),
+      })
+      toast.success(isRtl ? 'تم حظر الوقت بنجاح' : 'Time blocked successfully')
+      onOpenChange(false)
+      resetForm()
+    } catch {
+      toast.error(isRtl ? 'فشل في حظر الوقت' : 'Failed to block time')
+    }
+  }
+
+  const resetForm = () => {
+    setTargetLawyerId('')
+    setFormData({
+      startDate: '',
+      startTime: '09:00',
+      endDate: '',
+      endTime: '17:00',
+      reason: '',
+      isAllDay: false,
+    })
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-xl flex items-center gap-2">
+            <Ban className="h-5 w-5 text-red-500" />
+            {isRtl ? 'حظر وقت' : 'Block Time'}
+          </DialogTitle>
+          <DialogDescription>
+            {isRtl ? 'حدد الفترة التي تريد حظرها' : 'Specify the time period to block'}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          {/* Lawyer Selector - Only show for firm admins */}
+          {canManageOtherLawyers && teamMembers.length > 0 && (
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl space-y-2">
+              <Label className="text-sm font-medium text-blue-800">
+                {isRtl ? 'حظر وقت لـ' : 'Block time for'}
+              </Label>
+              <Select value={targetLawyerId} onValueChange={setTargetLawyerId}>
+                <SelectTrigger className="bg-white">
+                  <SelectValue placeholder={isRtl ? 'نفسي (الافتراضي)' : 'Myself (default)'} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">{isRtl ? 'نفسي' : 'Myself'}</SelectItem>
+                  {teamMembers.filter(m => m._id !== currentUserId).map((member) => (
+                    <SelectItem key={member._id} value={member._id}>
+                      {member.firstName} {member.lastName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="allDay"
+              checked={formData.isAllDay}
+              onCheckedChange={(checked) => setFormData({ ...formData, isAllDay: checked as boolean })}
+            />
+            <Label htmlFor="allDay" className="cursor-pointer">
+              {isRtl ? 'طوال اليوم' : 'All day'}
+            </Label>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>{isRtl ? 'تاريخ البداية' : 'Start Date'}</Label>
+              <Input
+                type="date"
+                value={formData.startDate}
+                onChange={(e) => setFormData({ ...formData, startDate: e.target.value, endDate: formData.endDate || e.target.value })}
+              />
+            </div>
+            <div>
+              <Label>{isRtl ? 'تاريخ النهاية' : 'End Date'}</Label>
+              <Input
+                type="date"
+                value={formData.endDate}
+                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                min={formData.startDate}
+              />
+            </div>
+          </div>
+
+          {!formData.isAllDay && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>{isRtl ? 'وقت البداية' : 'Start Time'}</Label>
+                <Input
+                  type="time"
+                  value={formData.startTime}
+                  onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label>{isRtl ? 'وقت النهاية' : 'End Time'}</Label>
+                <Input
+                  type="time"
+                  value={formData.endTime}
+                  onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+                />
+              </div>
+            </div>
+          )}
+
+          <div>
+            <Label>{isRtl ? 'السبب (اختياري)' : 'Reason (optional)'}</Label>
+            <Textarea
+              value={formData.reason}
+              onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+              placeholder={isRtl ? 'مثال: إجازة، اجتماع، تدريب...' : 'e.g., Vacation, Meeting, Training...'}
+              rows={2}
+            />
+          </div>
+        </div>
+
+        <DialogFooter className="gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            {isRtl ? 'إلغاء' : 'Cancel'}
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={createBlockedTime.isPending || !formData.startDate || !formData.endDate}
+            className="bg-red-500 hover:bg-red-600"
+          >
+            {createBlockedTime.isPending && <Loader2 className="h-4 w-4 animate-spin ms-2" />}
+            {isRtl ? 'حظر الوقت' : 'Block Time'}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
