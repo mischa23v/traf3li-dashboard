@@ -92,6 +92,10 @@ import {
   useAppointmentStats,
   useAvailableSlots,
   useCreateBlockedTime,
+  useAvailability,
+  useCreateAvailability,
+  useDeleteAvailability,
+  useBulkUpdateAvailability,
 } from '@/hooks/useAppointments'
 
 import type {
@@ -99,6 +103,8 @@ import type {
   AppointmentType,
   AppointmentStatus,
   AppointmentDuration,
+  DayOfWeek,
+  AvailabilitySlot,
 } from '@/services/appointmentsService'
 
 // ==================== Constants ====================
@@ -163,6 +169,7 @@ export function AppointmentsView() {
   // Filters
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [typeFilter, setTypeFilter] = useState<string>('all')
+  const [assignedToFilter, setAssignedToFilter] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<string>('date')
 
@@ -170,6 +177,7 @@ export function AppointmentsView() {
   const { data: statsData } = useAppointmentStats()
   const { data: appointmentsData, isLoading, isError, error, refetch } = useAppointments({
     status: statusFilter !== 'all' ? statusFilter as AppointmentStatus : undefined,
+    // Note: assignedTo filter would need backend support if not already present
   })
 
   const stats = statsData?.data
@@ -185,6 +193,11 @@ export function AppointmentsView() {
     // Filter by type
     if (typeFilter !== 'all') {
       result = result.filter(apt => apt.type === typeFilter)
+    }
+
+    // Filter by assigned lawyer (client-side filter since backend returns all for admins)
+    if (assignedToFilter !== 'all') {
+      result = result.filter(apt => apt.lawyerId === assignedToFilter)
     }
 
     // Filter by search
@@ -293,11 +306,12 @@ export function AppointmentsView() {
   }
 
   // Clear filters
-  const hasActiveFilters = searchQuery || statusFilter !== 'all' || typeFilter !== 'all'
+  const hasActiveFilters = searchQuery || statusFilter !== 'all' || typeFilter !== 'all' || assignedToFilter !== 'all'
   const clearFilters = () => {
     setSearchQuery('')
     setStatusFilter('all')
     setTypeFilter('all')
+    setAssignedToFilter('all')
   }
 
   // Stats for hero
@@ -444,6 +458,29 @@ export function AppointmentsView() {
                     </GosiSelectContent>
                   </GosiSelect>
                 </div>
+
+                {/* Lawyer Filter - Only for firm admins */}
+                {canManageOtherLawyers && teamMembers.length > 0 && (
+                  <div className="flex-1 min-w-[180px]">
+                    <GosiSelect value={assignedToFilter} onValueChange={setAssignedToFilter}>
+                      <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm">
+                        <div className="flex items-center gap-2 truncate">
+                          <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{isRtl ? 'المحامي' : 'Lawyer'}:</span>
+                          <GosiSelectValue />
+                        </div>
+                      </GosiSelectTrigger>
+                      <GosiSelectContent>
+                        <GosiSelectItem value="all">{isRtl ? 'الكل' : 'All'}</GosiSelectItem>
+                        <GosiSelectItem value={user?._id || ''}>{isRtl ? 'أنا' : 'Me'}</GosiSelectItem>
+                        {teamMembers.filter(m => m._id !== user?._id).map((member) => (
+                          <GosiSelectItem key={member._id} value={member._id}>
+                            {member.firstName} {member.lastName}
+                          </GosiSelectItem>
+                        ))}
+                      </GosiSelectContent>
+                    </GosiSelect>
+                  </div>
+                )}
 
                 {/* Clear Filters Button */}
                 {hasActiveFilters && (
@@ -795,6 +832,16 @@ export function AppointmentsView() {
         currentUserId={user?._id}
       />
 
+      {/* Manage Availability Dialog */}
+      <ManageAvailabilityDialog
+        open={showAvailabilityDialog}
+        onOpenChange={setShowAvailabilityDialog}
+        isRtl={isRtl}
+        canManageOtherLawyers={canManageOtherLawyers}
+        teamMembers={teamMembers}
+        currentUserId={user?._id}
+      />
+
       {/* Appointment Details Dialog */}
       <AppointmentDetailsDialog
         appointment={selectedAppointment}
@@ -1033,8 +1080,8 @@ function BookAppointmentDialog({
         date: format(selectedDate, 'yyyy-MM-dd'),
         startTime: selectedTime,
         source: 'manual',
-        // Include targetLawyerId only if booking for another lawyer
-        ...(targetLawyerId ? { targetLawyerId } : {}),
+        // Include assignedTo only if booking for another lawyer
+        ...(targetLawyerId ? { assignedTo: targetLawyerId } : {}),
       })
       toast.success(isRtl ? 'تم حجز الموعد بنجاح' : 'Appointment booked successfully')
       onOpenChange(false)
@@ -1398,6 +1445,260 @@ function BlockTimeDialog({
           >
             {createBlockedTime.isPending && <Loader2 className="h-4 w-4 animate-spin ms-2" />}
             {isRtl ? 'حظر الوقت' : 'Block Time'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// ==================== Manage Availability Dialog ====================
+
+const DAYS_OF_WEEK: { value: DayOfWeek; labelAr: string; labelEn: string }[] = [
+  { value: 0, labelAr: 'الأحد', labelEn: 'Sunday' },
+  { value: 1, labelAr: 'الإثنين', labelEn: 'Monday' },
+  { value: 2, labelAr: 'الثلاثاء', labelEn: 'Tuesday' },
+  { value: 3, labelAr: 'الأربعاء', labelEn: 'Wednesday' },
+  { value: 4, labelAr: 'الخميس', labelEn: 'Thursday' },
+  { value: 5, labelAr: 'الجمعة', labelEn: 'Friday' },
+  { value: 6, labelAr: 'السبت', labelEn: 'Saturday' },
+]
+
+function ManageAvailabilityDialog({
+  open,
+  onOpenChange,
+  isRtl,
+  canManageOtherLawyers,
+  teamMembers,
+  currentUserId,
+}: {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  isRtl: boolean
+  canManageOtherLawyers: boolean
+  teamMembers: Array<{ _id: string; firstName: string; lastName: string }>
+  currentUserId?: string
+}) {
+  const [targetLawyerId, setTargetLawyerId] = useState<string>('')
+  const [showAddSlot, setShowAddSlot] = useState(false)
+  const [newSlot, setNewSlot] = useState({
+    dayOfWeek: 0 as DayOfWeek,
+    startTime: '09:00',
+    endTime: '17:00',
+    slotDuration: 30 as AppointmentDuration,
+  })
+
+  // Fetch availability for selected lawyer
+  const effectiveLawyerId = targetLawyerId || currentUserId
+  const { data: availabilityData, isLoading } = useAvailability(effectiveLawyerId)
+  const createAvailability = useCreateAvailability()
+  const deleteAvailability = useDeleteAvailability()
+
+  const availability = availabilityData?.data || []
+
+  // Group by day of week
+  const availabilityByDay = DAYS_OF_WEEK.map(day => ({
+    ...day,
+    slots: availability.filter(slot => slot.dayOfWeek === day.value),
+  }))
+
+  const handleAddSlot = async () => {
+    try {
+      await createAvailability.mutateAsync({
+        ...newSlot,
+        ...(targetLawyerId ? { targetLawyerId } : {}),
+      })
+      toast.success(isRtl ? 'تمت إضافة وقت العمل' : 'Availability added')
+      setShowAddSlot(false)
+      setNewSlot({ dayOfWeek: 0, startTime: '09:00', endTime: '17:00', slotDuration: 30 })
+    } catch {
+      toast.error(isRtl ? 'فشل في إضافة وقت العمل' : 'Failed to add availability')
+    }
+  }
+
+  const handleDeleteSlot = async (slotId: string) => {
+    try {
+      await deleteAvailability.mutateAsync(slotId)
+      toast.success(isRtl ? 'تم حذف وقت العمل' : 'Availability deleted')
+    } catch {
+      toast.error(isRtl ? 'فشل في حذف وقت العمل' : 'Failed to delete availability')
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-xl flex items-center gap-2">
+            <Settings className="h-5 w-5 text-emerald-500" />
+            {isRtl ? 'إدارة أوقات العمل' : 'Manage Availability'}
+          </DialogTitle>
+          <DialogDescription>
+            {isRtl ? 'حدد أوقات العمل المتاحة للمواعيد' : 'Set your available hours for appointments'}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          {/* Lawyer Selector - Only show for firm admins */}
+          {canManageOtherLawyers && teamMembers.length > 0 && (
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl space-y-2">
+              <Label className="text-sm font-medium text-blue-800">
+                {isRtl ? 'إدارة أوقات لـ' : 'Manage availability for'}
+              </Label>
+              <Select value={targetLawyerId} onValueChange={setTargetLawyerId}>
+                <SelectTrigger className="bg-white">
+                  <SelectValue placeholder={isRtl ? 'نفسي (الافتراضي)' : 'Myself (default)'} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">{isRtl ? 'نفسي' : 'Myself'}</SelectItem>
+                  {teamMembers.filter(m => m._id !== currentUserId).map((member) => (
+                    <SelectItem key={member._id} value={member._id}>
+                      {member.firstName} {member.lastName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {/* Weekly Schedule */}
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {availabilityByDay.map((day) => (
+                <div key={day.value} className="p-3 border rounded-xl bg-slate-50">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium text-slate-700">
+                      {isRtl ? day.labelAr : day.labelEn}
+                    </span>
+                    {day.slots.length === 0 && (
+                      <Badge variant="outline" className="text-slate-400">
+                        {isRtl ? 'غير متاح' : 'Unavailable'}
+                      </Badge>
+                    )}
+                  </div>
+                  {day.slots.length > 0 && (
+                    <div className="space-y-2">
+                      {day.slots.map((slot) => (
+                        <div key={slot.id} className="flex items-center justify-between p-2 bg-white rounded-lg border">
+                          <div className="flex items-center gap-3">
+                            <Clock className="h-4 w-4 text-emerald-500" />
+                            <span className="text-sm font-medium">
+                              {slot.startTime} - {slot.endTime}
+                            </span>
+                            <Badge variant="secondary" className="text-xs">
+                              {slot.slotDuration} {isRtl ? 'دقيقة' : 'min'}
+                            </Badge>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => handleDeleteSlot(slot.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Add New Slot */}
+          {showAddSlot ? (
+            <div className="p-4 border-2 border-dashed border-emerald-300 rounded-xl bg-emerald-50 space-y-4">
+              <h4 className="font-medium text-emerald-800">
+                {isRtl ? 'إضافة وقت عمل جديد' : 'Add New Availability'}
+              </h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>{isRtl ? 'اليوم' : 'Day'}</Label>
+                  <Select
+                    value={String(newSlot.dayOfWeek)}
+                    onValueChange={(v) => setNewSlot({ ...newSlot, dayOfWeek: Number(v) as DayOfWeek })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {DAYS_OF_WEEK.map((day) => (
+                        <SelectItem key={day.value} value={String(day.value)}>
+                          {isRtl ? day.labelAr : day.labelEn}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>{isRtl ? 'مدة الموعد' : 'Slot Duration'}</Label>
+                  <Select
+                    value={String(newSlot.slotDuration)}
+                    onValueChange={(v) => setNewSlot({ ...newSlot, slotDuration: Number(v) as AppointmentDuration })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {DURATIONS.map((d) => (
+                        <SelectItem key={d.value} value={String(d.value)}>
+                          {isRtl ? d.labelAr : d.labelEn}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>{isRtl ? 'وقت البداية' : 'Start Time'}</Label>
+                  <Input
+                    type="time"
+                    value={newSlot.startTime}
+                    onChange={(e) => setNewSlot({ ...newSlot, startTime: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>{isRtl ? 'وقت النهاية' : 'End Time'}</Label>
+                  <Input
+                    type="time"
+                    value={newSlot.endTime}
+                    onChange={(e) => setNewSlot({ ...newSlot, endTime: e.target.value })}
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleAddSlot}
+                  disabled={createAvailability.isPending}
+                  className="bg-emerald-500 hover:bg-emerald-600"
+                >
+                  {createAvailability.isPending && <Loader2 className="h-4 w-4 animate-spin ms-2" />}
+                  {isRtl ? 'إضافة' : 'Add'}
+                </Button>
+                <Button variant="outline" onClick={() => setShowAddSlot(false)}>
+                  {isRtl ? 'إلغاء' : 'Cancel'}
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Button
+              variant="outline"
+              className="w-full border-dashed border-2"
+              onClick={() => setShowAddSlot(true)}
+            >
+              <Plus className="h-4 w-4 ms-2" />
+              {isRtl ? 'إضافة وقت عمل' : 'Add Availability'}
+            </Button>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            {isRtl ? 'إغلاق' : 'Close'}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -223,6 +223,7 @@ export interface BookAppointmentRequest {
   source?: BookingSource
   meetingLink?: string
   location?: string
+  assignedTo?: string // For firm admins to assign appointment to another lawyer
 }
 
 export interface UpdateAppointmentRequest {
