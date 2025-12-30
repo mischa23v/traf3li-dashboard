@@ -135,10 +135,11 @@ export interface Appointment {
  * فترة زمنية متاحة للحجز
  */
 export interface AvailableTimeSlot {
-  date: string
-  startTime: string
-  endTime: string
-  isAvailable: boolean
+  start: string           // Time string "09:00"
+  end: string             // Time string "09:30"
+  startTime?: Date        // Full Date object (optional)
+  endTime?: Date          // Full Date object (optional)
+  available: boolean      // Is slot available
   conflictReason?: 'booked' | 'blocked' | 'outside_hours' | 'past'
 }
 

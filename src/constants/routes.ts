@@ -1224,6 +1224,7 @@ export const ROUTES = {
     webhooks: '/settings/webhooks',
     apiKeys: '/settings/api-keys',
     email: '/settings/email',
+    modules: '/settings/modules',
   },
 
   /**

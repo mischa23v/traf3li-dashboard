@@ -1,7 +1,7 @@
 import { Outlet } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { useMemo } from 'react'
-import { Monitor, Bell, Palette, Wrench, UserCog, Key, Plug, Webhook, Mail, CreditCard } from 'lucide-react'
+import { Monitor, Bell, Palette, Wrench, UserCog, Key, Plug, Webhook, Mail, CreditCard, LayoutGrid } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
@@ -66,6 +66,11 @@ export function Settings() {
       title: t('settings.tabs.integrations'),
       href: ROUTES.settings.integrations,
       icon: <Plug size={18} />,
+    },
+    {
+      title: t('settings.tabs.modules', 'الوحدات'),
+      href: ROUTES.settings.modules,
+      icon: <LayoutGrid size={18} />,
     },
   ], [t])
 
