@@ -1052,10 +1052,12 @@ function BookAppointmentDialog({
   })
 
   // Use backend API to get available slots (checks appointments, blocked times, events)
+  const formattedDate = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : ''
   const { data: availableSlotsData, isLoading: isSlotsLoading, isError: isSlotsError } = useAvailableSlots(
     {
       lawyerId: effectiveLawyerId,
-      date: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '',
+      startDate: formattedDate,
+      endDate: formattedDate,
       duration: formData.duration,
     },
     !!selectedDate && !!effectiveLawyerId
