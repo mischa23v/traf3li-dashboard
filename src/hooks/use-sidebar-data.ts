@@ -25,6 +25,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
 import { usePermissionsStore } from '@/stores/permissions-store'
+import { useModuleVisibilityStore } from '@/stores/module-visibility-store'
 import type { ModuleKey } from '@/types/rbac'
 import { canView } from '@/lib/permissions'
 import { ROUTES } from '@/constants/routes'
@@ -66,6 +67,7 @@ export function useSidebarData(): SidebarData {
   const authUser = useAuthStore((state) => state.user)
   const isLoading = useAuthStore((state) => state.isLoading)
   const permissions = usePermissionsStore((state) => state.permissions)
+  const isNavGroupVisible = useModuleVisibilityStore((state) => state.isNavGroupVisible)
 
   // Build full name with locale-aware name detection
   const getFullName = () => {
@@ -116,9 +118,12 @@ export function useSidebarData(): SidebarData {
       .filter((item): item is NavItem => item !== null)
   }
 
-  // Filter navigation groups
+  // Filter navigation groups (based on permissions AND module visibility settings)
   const filterNavGroups = (groups: NavGroup[]): NavGroup[] => {
     return groups
+      // First filter by module visibility settings
+      .filter((group) => isNavGroupVisible(group.title))
+      // Then filter items by permissions
       .map((group) => ({
         ...group,
         items: filterNavItems(group.items),
