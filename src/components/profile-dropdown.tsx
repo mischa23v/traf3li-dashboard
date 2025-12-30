@@ -16,21 +16,26 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { SignOutDialog } from '@/components/sign-out-dialog'
 import { useAuthStore } from '@/stores/auth-store'
+import { getLocalizedFullName } from '@/lib/arabic-names'
 
 export function ProfileDropdown({ className }: { className?: string }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [open, setOpen] = useDialogState()
   const user = useAuthStore((state) => state.user)
 
-  // Build full name from firstName and lastName, fallback to username
+  // Build full name with locale-aware name detection
   const getFullName = () => {
-    if (user?.firstName && user?.lastName) {
-      return `${user.firstName} ${user.lastName}`
-    }
-    if (user?.firstName) {
-      return user.firstName
-    }
-    return user?.username || 'Guest'
+    const locale = i18n.language
+    const localizedName = getLocalizedFullName(
+      user?.firstName,
+      user?.lastName,
+      user?.firstNameAr,
+      user?.lastNameAr,
+      locale
+    )
+    if (localizedName) return localizedName
+    if (user?.username) return user.username
+    return t('common.guest', 'ضيف')
   }
 
   const fullName = getFullName()
