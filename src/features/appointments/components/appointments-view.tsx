@@ -1,14 +1,11 @@
 /**
- * Appointments View - Redesigned with Week View
- * Weekly calendar view for easy appointment management
- *
- * عرض المواعيد - إعادة تصميم مع عرض أسبوعي
- * عرض تقويم أسبوعي لإدارة المواعيد بسهولة
+ * Appointments View - Weekly Calendar with Sidebar
+ * عرض المواعيد - تقويم أسبوعي مع الشريط الجانبي
  */
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, addWeeks, subWeeks, isBefore, startOfDay, parseISO } from 'date-fns'
+import { format, addDays, startOfWeek, isSameDay, isToday, addWeeks, subWeeks, isBefore, startOfDay } from 'date-fns'
 import { ar, enUS } from 'date-fns/locale'
 import {
   Calendar as CalendarIcon,
@@ -34,6 +31,8 @@ import {
   MapPin,
   List,
   LayoutGrid,
+  Settings,
+  SortAsc,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -45,6 +44,7 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { ProductivityHero } from '@/components/productivity-hero'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -55,13 +55,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -72,6 +65,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  GosiCard,
+  GosiInput,
+  GosiSelect,
+  GosiSelectContent,
+  GosiSelectItem,
+  GosiSelectTrigger,
+  GosiSelectValue,
+  GosiButton
+} from '@/components/ui/gosi-ui'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { ROUTES } from '@/constants/routes'
@@ -135,25 +138,65 @@ export function AppointmentsView() {
   // Get current user from auth store
   const user = useAuthStore((state) => state.user)
 
-  // View state
+  // View & Filter state
   const [viewMode, setViewMode] = useState<'week' | 'list'>('week')
   const [currentWeekStart, setCurrentWeekStart] = useState(() => startOfWeek(new Date(), { weekStartsOn: 0 }))
   const [selectedAppointments, setSelectedAppointments] = useState<Set<string>>(new Set())
   const [showBookingDialog, setShowBookingDialog] = useState(false)
+  const [showBlockDialog, setShowBlockDialog] = useState(false)
+  const [showAvailabilityDialog, setShowAvailabilityDialog] = useState(false)
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null)
   const [showDetailsDialog, setShowDetailsDialog] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [appointmentToDelete, setAppointmentToDelete] = useState<string | null>(null)
 
+  // Filters
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [typeFilter, setTypeFilter] = useState<string>('all')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [sortBy, setSortBy] = useState<string>('date')
+
   // Fetch data
   const { data: statsData } = useAppointmentStats()
-  const { data: appointmentsData, isLoading, isError, error, refetch } = useAppointments({})
+  const { data: appointmentsData, isLoading, isError, error, refetch } = useAppointments({
+    status: statusFilter !== 'all' ? statusFilter as AppointmentStatus : undefined,
+  })
 
   const stats = statsData?.data
   const appointments = appointmentsData?.data?.appointments || []
 
   // Cancel mutation for delete
   const cancelMutation = useCancelAppointment()
+
+  // Filter appointments
+  const filteredAppointments = useMemo(() => {
+    let result = [...appointments]
+
+    // Filter by type
+    if (typeFilter !== 'all') {
+      result = result.filter(apt => apt.type === typeFilter)
+    }
+
+    // Filter by search
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      result = result.filter(apt =>
+        apt.clientName?.toLowerCase().includes(query) ||
+        apt.clientEmail?.toLowerCase().includes(query) ||
+        apt.clientPhone?.includes(query)
+      )
+    }
+
+    // Sort
+    result.sort((a, b) => {
+      if (sortBy === 'date') {
+        return new Date(a.date).getTime() - new Date(b.date).getTime()
+      }
+      return 0
+    })
+
+    return result
+  }, [appointments, typeFilter, searchQuery, sortBy])
 
   // Get week days
   const weekDays = useMemo(() => {
@@ -163,7 +206,7 @@ export function AppointmentsView() {
   // Group appointments by date
   const appointmentsByDate = useMemo(() => {
     const grouped: Record<string, Appointment[]> = {}
-    appointments.forEach((apt) => {
+    filteredAppointments.forEach((apt) => {
       if (apt.date) {
         const dateKey = format(new Date(apt.date), 'yyyy-MM-dd')
         if (!grouped[dateKey]) {
@@ -181,7 +224,7 @@ export function AppointmentsView() {
       })
     })
     return grouped
-  }, [appointments])
+  }, [filteredAppointments])
 
   // Navigation handlers
   const goToPreviousWeek = () => setCurrentWeekStart(subWeeks(currentWeekStart, 1))
@@ -196,14 +239,6 @@ export function AppointmentsView() {
     } else {
       newSelected.add(id)
     }
-    setSelectedAppointments(newSelected)
-  }
-
-  const selectAllInDay = (date: Date) => {
-    const dateKey = format(date, 'yyyy-MM-dd')
-    const dayAppointments = appointmentsByDate[dateKey] || []
-    const newSelected = new Set(selectedAppointments)
-    dayAppointments.forEach((apt) => newSelected.add(apt.id))
     setSelectedAppointments(newSelected)
   }
 
@@ -247,6 +282,42 @@ export function AppointmentsView() {
     setShowDetailsDialog(true)
   }
 
+  // Clear filters
+  const hasActiveFilters = searchQuery || statusFilter !== 'all' || typeFilter !== 'all'
+  const clearFilters = () => {
+    setSearchQuery('')
+    setStatusFilter('all')
+    setTypeFilter('all')
+  }
+
+  // Stats for hero
+  const heroStats = useMemo(() => [
+    {
+      label: isRtl ? 'مواعيد اليوم' : "Today's",
+      value: stats?.todayCount || 0,
+      icon: CalendarDays,
+      status: 'normal' as const,
+    },
+    {
+      label: isRtl ? 'معلقة' : 'Pending',
+      value: stats?.pending || 0,
+      icon: Clock,
+      status: (stats?.pending || 0) > 0 ? 'attention' as const : 'zero' as const,
+    },
+    {
+      label: isRtl ? 'مؤكدة' : 'Confirmed',
+      value: stats?.confirmed || 0,
+      icon: CheckCircle,
+      status: 'normal' as const,
+    },
+    {
+      label: isRtl ? 'هذا الأسبوع' : 'This Week',
+      value: stats?.weekCount || 0,
+      icon: CalendarClock,
+      status: 'normal' as const,
+    },
+  ], [stats, isRtl])
+
   const topNav = [
     { title: isRtl ? 'الرئيسية' : 'Overview', href: ROUTES.dashboard.home, isActive: false },
     { title: isRtl ? 'التقويم' : 'Calendar', href: ROUTES.dashboard.calendar, isActive: false },
@@ -264,6 +335,10 @@ export function AppointmentsView() {
           <DynamicIsland />
         </div>
         <div className='ms-auto flex items-center gap-4'>
+          <div className="relative hidden md:block">
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder={isRtl ? 'بحث...' : 'Search...'} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+          </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
             <Bell className="h-5 w-5" />
             <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
@@ -276,431 +351,417 @@ export function AppointmentsView() {
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
-      <Main fluid className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6">
-        {/* Hero Banner - Dashboard Style */}
-        <div className="bg-[#022c22] rounded-2xl p-6 relative overflow-hidden text-white shadow-lg">
-          {/* Animated Gradient Background */}
-          <div className="absolute inset-0 z-0">
-            <div
-              className="absolute inset-0 opacity-20"
-              style={{
-                background: 'linear-gradient(-45deg, #022c22, #064e3b, #022c22, #0f766e)',
-                backgroundSize: '400% 400%',
-                animation: 'gradientShift 20s ease infinite'
-              }}
-            />
-            <style>{`
-              @keyframes gradientShift {
-                0% { background-position: 0% 50%; }
-                50% { background-position: 100% 50%; }
-                100% { background-position: 0% 50%; }
-              }
-            `}</style>
-          </div>
+      <Main fluid className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8">
+        {/* HERO CARD & STATS */}
+        <ProductivityHero
+          badge={isRtl ? 'إدارة المواعيد' : 'Appointments Management'}
+          title={isRtl ? 'المواعيد' : 'Appointments'}
+          type="appointments"
+          stats={heroStats}
+          hideButtons
+        >
+          <Button
+            onClick={() => setShowBookingDialog(true)}
+            className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm"
+          >
+            <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
+            {isRtl ? 'موعد جديد' : 'New Appointment'}
+          </Button>
+          <Button
+            onClick={() => setShowBlockDialog(true)}
+            variant="outline"
+            className="h-10 px-5 rounded-xl font-bold border-white/10 text-white hover:bg-white/10 hover:text-white bg-transparent text-sm"
+          >
+            <Ban className="ms-2 h-4 w-4" />
+            {isRtl ? 'حظر وقت' : 'Block Time'}
+          </Button>
+        </ProductivityHero>
 
-          {/* Background Pattern */}
-          <div className="absolute inset-0 z-0">
-            <img
-              src="/images/hero-wave.png"
-              alt=""
-              className="w-full h-full object-cover opacity-25 mix-blend-overlay"
-            />
-          </div>
-
-          {/* Accent glow */}
-          <div className="absolute top-0 end-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-2xl -me-32 -mt-32 pointer-events-none" />
-
-          <div className="relative z-10">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              {/* Title Section */}
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-white/10 rounded-xl">
-                  <CalendarDays className="w-6 h-6 text-emerald-400" />
+        {/* MAIN GRID LAYOUT */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* MAIN CONTENT (Week View) */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* FILTERS BAR */}
+            <GosiCard className="p-4 md:p-6 rounded-[2rem]">
+              <div className="flex flex-wrap items-center gap-3">
+                {/* Search Input */}
+                <div className="relative flex-1 min-w-[200px]">
+                  <Search className="absolute end-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" aria-hidden="true" />
+                  <GosiInput
+                    type="text"
+                    placeholder={isRtl ? 'بحث بالاسم أو الهاتف...' : 'Search by name or phone...'}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pe-12 h-14 w-full text-base"
+                  />
                 </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-white tracking-tight">
-                    {isRtl ? 'إدارة المواعيد' : 'Appointments'}
-                  </h1>
-                  <p className="text-sm text-white/60 mt-0.5">
-                    {isRtl
-                      ? `${stats?.todayCount || 0} مواعيد اليوم • ${stats?.pending || 0} معلقة`
-                      : `${stats?.todayCount || 0} today • ${stats?.pending || 0} pending`}
-                  </p>
+
+                {/* Status Filter */}
+                <div className="flex-1 min-w-[150px]">
+                  <GosiSelect value={statusFilter} onValueChange={setStatusFilter}>
+                    <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm">
+                      <div className="flex items-center gap-2 truncate">
+                        <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{isRtl ? 'الحالة' : 'Status'}:</span>
+                        <GosiSelectValue />
+                      </div>
+                    </GosiSelectTrigger>
+                    <GosiSelectContent>
+                      <GosiSelectItem value="all">{isRtl ? 'الكل' : 'All'}</GosiSelectItem>
+                      <GosiSelectItem value="pending">{isRtl ? 'معلق' : 'Pending'}</GosiSelectItem>
+                      <GosiSelectItem value="confirmed">{isRtl ? 'مؤكد' : 'Confirmed'}</GosiSelectItem>
+                      <GosiSelectItem value="completed">{isRtl ? 'مكتمل' : 'Completed'}</GosiSelectItem>
+                      <GosiSelectItem value="cancelled">{isRtl ? 'ملغي' : 'Cancelled'}</GosiSelectItem>
+                    </GosiSelectContent>
+                  </GosiSelect>
                 </div>
+
+                {/* Type Filter */}
+                <div className="flex-1 min-w-[150px]">
+                  <GosiSelect value={typeFilter} onValueChange={setTypeFilter}>
+                    <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm">
+                      <div className="flex items-center gap-2 truncate">
+                        <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{isRtl ? 'النوع' : 'Type'}:</span>
+                        <GosiSelectValue />
+                      </div>
+                    </GosiSelectTrigger>
+                    <GosiSelectContent>
+                      <GosiSelectItem value="all">{isRtl ? 'الكل' : 'All'}</GosiSelectItem>
+                      {APPOINTMENT_TYPES.map((type) => (
+                        <GosiSelectItem key={type.value} value={type.value}>
+                          {isRtl ? type.labelAr : type.labelEn}
+                        </GosiSelectItem>
+                      ))}
+                    </GosiSelectContent>
+                  </GosiSelect>
+                </div>
+
+                {/* Clear Filters Button */}
+                {hasActiveFilters && (
+                  <GosiButton
+                    variant="ghost"
+                    onClick={clearFilters}
+                    className="h-14 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-2xl border border-dashed border-red-200 px-6"
+                  >
+                    <X className="h-5 w-5 ms-2" aria-hidden="true" />
+                    {isRtl ? 'مسح الفلاتر' : 'Clear Filters'}
+                  </GosiButton>
+                )}
               </div>
+            </GosiCard>
 
-              {/* Action Buttons */}
-              <div className="flex flex-wrap gap-3">
-                <Button
-                  onClick={() => setShowBookingDialog(true)}
-                  className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-semibold shadow-lg shadow-emerald-500/20 border-0 text-sm"
-                >
-                  <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
-                  {isRtl ? 'موعد جديد' : 'New Appointment'}
-                </Button>
+            {/* WEEK VIEW CONTROLS */}
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                {/* Left: Month Selector */}
+                <Select value={format(currentWeekStart, 'yyyy-MM')} onValueChange={(val) => {
+                  const [year, month] = val.split('-').map(Number)
+                  setCurrentWeekStart(startOfWeek(new Date(year, month - 1, 1), { weekStartsOn: 0 }))
+                }}>
+                  <SelectTrigger className="w-40 h-10 rounded-xl border-slate-200">
+                    <SelectValue>{currentMonthName}</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 12 }, (_, i) => {
+                      const date = new Date(new Date().getFullYear(), i, 1)
+                      return (
+                        <SelectItem key={i} value={format(date, 'yyyy-MM')}>
+                          {format(date, 'MMMM yyyy', { locale })}
+                        </SelectItem>
+                      )
+                    })}
+                  </SelectContent>
+                </Select>
+
+                {/* Center: Navigation with Back to Today */}
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="icon" onClick={goToPreviousWeek} className="h-10 w-10 rounded-xl hover:bg-slate-100">
+                    <ChevronRight className="h-5 w-5" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={goToToday}
+                    className="h-10 px-4 rounded-xl text-emerald-600 border-emerald-200 hover:bg-emerald-50 text-sm font-medium"
+                  >
+                    {isRtl ? 'العودة لليوم' : 'Today'}
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={goToNextWeek} className="h-10 w-10 rounded-xl hover:bg-slate-100">
+                    <ChevronLeft className="h-5 w-5" />
+                  </Button>
+                </div>
+
+                {/* Right: View Toggle & Bulk Actions */}
+                <div className="flex items-center gap-3">
+                  {selectedAppointments.size > 0 && (
+                    <div className="flex items-center gap-2 pe-3 border-e border-slate-200">
+                      <span className="text-sm text-slate-600">
+                        {isRtl ? `${selectedAppointments.size} محدد` : `${selectedAppointments.size} selected`}
+                      </span>
+                      <Button variant="ghost" size="sm" onClick={clearSelection} className="h-8 text-slate-500">
+                        {isRtl ? 'إلغاء' : 'Clear'}
+                      </Button>
+                      <Button variant="destructive" size="sm" onClick={handleDeleteSelected} className="h-8 bg-red-500 hover:bg-red-600">
+                        <Trash2 className="h-4 w-4 ms-1" />
+                        {isRtl ? 'حذف' : 'Delete'}
+                      </Button>
+                    </div>
+                  )}
+
+                  <div className="flex items-center bg-slate-100 rounded-xl p-1">
+                    <Button
+                      variant={viewMode === 'week' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setViewMode('week')}
+                      className={cn('h-8 px-3 rounded-lg', viewMode === 'week' ? 'bg-white shadow-sm' : 'hover:bg-slate-200')}
+                    >
+                      <LayoutGrid className="h-4 w-4 ms-1" />
+                      {isRtl ? 'أسبوعي' : 'Week'}
+                    </Button>
+                    <Button
+                      variant={viewMode === 'list' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setViewMode('list')}
+                      className={cn('h-8 px-3 rounded-lg', viewMode === 'list' ? 'bg-white shadow-sm' : 'hover:bg-slate-200')}
+                    >
+                      <List className="h-4 w-4 ms-1" />
+                      {isRtl ? 'قائمة' : 'List'}
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Week View Controls */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            {/* Left: Month & Navigation */}
-            <div className="flex items-center gap-4">
-              <Select value={format(currentWeekStart, 'yyyy-MM')} onValueChange={(val) => {
-                const [year, month] = val.split('-').map(Number)
-                setCurrentWeekStart(startOfWeek(new Date(year, month - 1, 1), { weekStartsOn: 0 }))
-              }}>
-                <SelectTrigger className="w-40 h-10 rounded-xl border-slate-200">
-                  <SelectValue>{currentMonthName}</SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {Array.from({ length: 12 }, (_, i) => {
-                    const date = new Date(new Date().getFullYear(), i, 1)
+            {/* Loading State */}
+            {isLoading && (
+              <div className="bg-white rounded-2xl p-8">
+                <div className="grid grid-cols-7 gap-4">
+                  {Array.from({ length: 7 }).map((_, i) => (
+                    <div key={i} className="space-y-3">
+                      <Skeleton className="h-16 w-full rounded-xl" />
+                      <Skeleton className="h-20 w-full rounded-xl" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Error State */}
+            {isError && (
+              <div className="bg-red-50 rounded-2xl p-12 text-center border border-red-100">
+                <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+                <h3 className="text-lg font-bold text-slate-900 mb-2">{isRtl ? 'خطأ في التحميل' : 'Loading Error'}</h3>
+                <p className="text-slate-500 mb-4">{error?.message}</p>
+                <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600">
+                  {isRtl ? 'إعادة المحاولة' : 'Retry'}
+                </Button>
+              </div>
+            )}
+
+            {/* Week View */}
+            {!isLoading && !isError && viewMode === 'week' && (
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                {/* Week Header */}
+                <div className="grid grid-cols-7 border-b border-slate-100">
+                  {weekDays.map((day, idx) => {
+                    const isCurrentDay = isToday(day)
+                    const dateKey = format(day, 'yyyy-MM-dd')
+                    const dayAppointments = appointmentsByDate[dateKey] || []
+
                     return (
-                      <SelectItem key={i} value={format(date, 'yyyy-MM')}>
-                        {format(date, 'MMMM yyyy', { locale })}
-                      </SelectItem>
+                      <div key={idx} className={cn('p-4 text-center border-e border-slate-100 last:border-e-0', isCurrentDay && 'bg-emerald-50')}>
+                        <div className={cn('text-xs font-bold uppercase tracking-wider mb-1', isCurrentDay ? 'text-emerald-600' : 'text-slate-400')}>
+                          {isRtl ? WEEKDAYS_AR[day.getDay()] : WEEKDAYS_EN[day.getDay()]}
+                        </div>
+                        <div className={cn('text-2xl font-bold', isCurrentDay ? 'text-emerald-600' : 'text-slate-900')}>
+                          {format(day, 'd')}
+                        </div>
+                        {dayAppointments.length > 0 && (
+                          <Badge variant="secondary" className="text-xs bg-slate-100 mt-1">{dayAppointments.length}</Badge>
+                        )}
+                      </div>
                     )
                   })}
-                </SelectContent>
-              </Select>
-
-              <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon" onClick={goToPreviousWeek} className="h-10 w-10 rounded-xl hover:bg-slate-100">
-                  <ChevronLeft className="h-5 w-5" />
-                </Button>
-                <Button variant="ghost" size="icon" onClick={goToNextWeek} className="h-10 w-10 rounded-xl hover:bg-slate-100">
-                  <ChevronRight className="h-5 w-5" />
-                </Button>
-              </div>
-
-              <Button variant="link" onClick={goToToday} className="text-emerald-600 hover:text-emerald-700 text-sm font-medium">
-                {isRtl ? 'العودة لليوم' : 'Back to Today'}
-              </Button>
-            </div>
-
-            {/* Right: View Toggle & Bulk Actions */}
-            <div className="flex items-center gap-3">
-              {selectedAppointments.size > 0 && (
-                <div className="flex items-center gap-2 pe-3 border-e border-slate-200">
-                  <span className="text-sm text-slate-600">
-                    {isRtl ? `${selectedAppointments.size} محدد` : `${selectedAppointments.size} selected`}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={clearSelection}
-                    className="h-8 text-slate-500 hover:text-slate-700"
-                  >
-                    {isRtl ? 'إلغاء' : 'Clear'}
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={handleDeleteSelected}
-                    className="h-8 bg-red-500 hover:bg-red-600"
-                  >
-                    <Trash2 className="h-4 w-4 ms-1" />
-                    {isRtl ? 'حذف' : 'Delete'}
-                  </Button>
                 </div>
-              )}
 
-              <div className="flex items-center bg-slate-100 rounded-xl p-1">
-                <Button
-                  variant={viewMode === 'week' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('week')}
-                  className={cn(
-                    'h-8 px-3 rounded-lg',
-                    viewMode === 'week' ? 'bg-white shadow-sm' : 'hover:bg-slate-200'
-                  )}
-                >
-                  <LayoutGrid className="h-4 w-4 ms-1" />
-                  {isRtl ? 'أسبوعي' : 'Week'}
-                </Button>
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                  className={cn(
-                    'h-8 px-3 rounded-lg',
-                    viewMode === 'list' ? 'bg-white shadow-sm' : 'hover:bg-slate-200'
-                  )}
-                >
-                  <List className="h-4 w-4 ms-1" />
-                  {isRtl ? 'قائمة' : 'List'}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
+                {/* Week Body */}
+                <div className="grid grid-cols-7 min-h-[400px]">
+                  {weekDays.map((day, idx) => {
+                    const dateKey = format(day, 'yyyy-MM-dd')
+                    const dayAppointments = appointmentsByDate[dateKey] || []
+                    const isCurrentDay = isToday(day)
 
-        {/* Loading State */}
-        {isLoading && (
-          <div className="bg-white rounded-2xl p-8">
-            <div className="grid grid-cols-7 gap-4">
-              {Array.from({ length: 7 }).map((_, i) => (
-                <div key={i} className="space-y-3">
-                  <Skeleton className="h-16 w-full rounded-xl" />
-                  <Skeleton className="h-20 w-full rounded-xl" />
-                  <Skeleton className="h-20 w-full rounded-xl" />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+                    return (
+                      <div key={idx} className={cn('p-2 border-e border-slate-100 last:border-e-0 min-h-[400px]', isCurrentDay && 'bg-emerald-50/30')}>
+                        <div className="space-y-2">
+                          {dayAppointments.map((apt) => {
+                            const typeConfig = APPOINTMENT_TYPES.find((t) => t.value === apt.type)
+                            const statusConfig = STATUS_CONFIG[apt.status]
+                            const isSelected = selectedAppointments.has(apt.id)
 
-        {/* Error State */}
-        {isError && (
-          <div className="bg-red-50 rounded-2xl p-12 text-center border border-red-100">
-            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-            <h3 className="text-lg font-bold text-slate-900 mb-2">
-              {isRtl ? 'خطأ في التحميل' : 'Loading Error'}
-            </h3>
-            <p className="text-slate-500 mb-4">{error?.message}</p>
-            <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600">
-              {isRtl ? 'إعادة المحاولة' : 'Retry'}
-            </Button>
-          </div>
-        )}
+                            return (
+                              <div
+                                key={apt.id}
+                                onClick={() => handleViewDetails(apt)}
+                                className={cn('p-3 rounded-xl border cursor-pointer transition-all hover:shadow-md group relative', statusConfig.bgColor, isSelected && 'ring-2 ring-emerald-500')}
+                              >
+                                <div
+                                  className="absolute top-2 end-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={(e) => { e.stopPropagation(); toggleSelectAppointment(apt.id) }}
+                                >
+                                  <Checkbox checked={isSelected} />
+                                </div>
 
-        {/* Week View */}
-        {!isLoading && !isError && viewMode === 'week' && (
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            {/* Week Header */}
-            <div className="grid grid-cols-7 border-b border-slate-100">
-              {weekDays.map((day, idx) => {
-                const isCurrentDay = isToday(day)
-                const dateKey = format(day, 'yyyy-MM-dd')
-                const dayAppointments = appointmentsByDate[dateKey] || []
-                const hasAppointments = dayAppointments.length > 0
+                                <div className="text-sm font-bold text-slate-900 mb-1">{apt.startTime || '00:00'}</div>
+                                <div className="text-xs font-medium text-slate-700 truncate">{apt.clientName || (isRtl ? 'بدون اسم' : 'No name')}</div>
+                                <div className="mt-2">
+                                  <span className={cn('inline-block px-2 py-0.5 rounded-full text-[10px] font-medium text-white', typeConfig?.color || 'bg-gray-500')}>
+                                    {isRtl ? typeConfig?.labelAr : typeConfig?.labelEn}
+                                  </span>
+                                </div>
 
-                return (
-                  <div
-                    key={idx}
-                    className={cn(
-                      'p-4 text-center border-e border-slate-100 last:border-e-0',
-                      isCurrentDay && 'bg-emerald-50'
-                    )}
-                  >
-                    <div className={cn(
-                      'text-xs font-bold uppercase tracking-wider mb-1',
-                      isCurrentDay ? 'text-emerald-600' : 'text-slate-400'
-                    )}>
-                      {isRtl ? WEEKDAYS_AR[idx] : WEEKDAYS_EN[idx]}
-                    </div>
-                    <div className={cn(
-                      'text-2xl font-bold',
-                      isCurrentDay ? 'text-emerald-600' : 'text-slate-900'
-                    )}>
-                      {format(day, 'd')}
-                    </div>
-                    {hasAppointments && (
-                      <div className="mt-1">
-                        <Badge variant="secondary" className="text-xs bg-slate-100">
-                          {dayAppointments.length}
-                        </Badge>
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleDeleteSingle(apt.id) }}
+                                  className="absolute bottom-2 end-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-red-100 text-red-500"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </button>
+                              </div>
+                            )
+                          })}
 
-            {/* Week Body - Appointments */}
-            <div className="grid grid-cols-7 min-h-[400px]">
-              {weekDays.map((day, idx) => {
-                const dateKey = format(day, 'yyyy-MM-dd')
-                const dayAppointments = appointmentsByDate[dateKey] || []
-                const isCurrentDay = isToday(day)
-
-                return (
-                  <div
-                    key={idx}
-                    className={cn(
-                      'p-2 border-e border-slate-100 last:border-e-0 min-h-[400px]',
-                      isCurrentDay && 'bg-emerald-50/30'
-                    )}
-                  >
-                    <div className="space-y-2">
-                      {dayAppointments.map((apt) => {
-                        const typeConfig = APPOINTMENT_TYPES.find((t) => t.value === apt.type)
-                        const statusConfig = STATUS_CONFIG[apt.status]
-                        const isSelected = selectedAppointments.has(apt.id)
-
-                        return (
-                          <div
-                            key={apt.id}
-                            onClick={() => handleViewDetails(apt)}
-                            className={cn(
-                              'p-3 rounded-xl border cursor-pointer transition-all hover:shadow-md group relative',
-                              statusConfig.bgColor,
-                              isSelected && 'ring-2 ring-emerald-500'
-                            )}
-                          >
-                            {/* Selection checkbox */}
-                            <div
-                              className="absolute top-2 end-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                toggleSelectAppointment(apt.id)
-                              }}
-                            >
-                              <Checkbox checked={isSelected} />
+                          {dayAppointments.length === 0 && (
+                            <div className="text-center py-8 text-slate-300">
+                              <CalendarIcon className="h-6 w-6 mx-auto mb-1 opacity-50" />
+                              <span className="text-xs">{isRtl ? 'لا مواعيد' : 'No appts'}</span>
                             </div>
-
-                            {/* Time */}
-                            <div className="text-sm font-bold text-slate-900 mb-1">
-                              {apt.startTime || '00:00'}
-                            </div>
-
-                            {/* Client Name */}
-                            <div className="text-xs font-medium text-slate-700 truncate">
-                              {apt.clientName || (isRtl ? 'بدون اسم' : 'No name')}
-                            </div>
-
-                            {/* Type badge */}
-                            <div className="mt-2">
-                              <span className={cn(
-                                'inline-block px-2 py-0.5 rounded-full text-[10px] font-medium text-white',
-                                typeConfig?.color || 'bg-gray-500'
-                              )}>
-                                {isRtl ? typeConfig?.labelAr : typeConfig?.labelEn}
-                              </span>
-                            </div>
-
-                            {/* Delete button on hover */}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleDeleteSingle(apt.id)
-                              }}
-                              className="absolute bottom-2 end-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-red-100 text-red-500"
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </button>
-                          </div>
-                        )
-                      })}
-
-                      {dayAppointments.length === 0 && (
-                        <div className="text-center py-8 text-slate-300">
-                          <CalendarIcon className="h-6 w-6 mx-auto mb-1 opacity-50" />
-                          <span className="text-xs">{isRtl ? 'لا مواعيد' : 'No appts'}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* List View */}
-        {!isLoading && !isError && viewMode === 'list' && (
-          <div className="space-y-4">
-            {appointments.length === 0 ? (
-              <div className="bg-white rounded-2xl p-12 text-center border border-slate-100">
-                <CalendarClock className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
-                <h3 className="text-lg font-bold text-slate-900 mb-2">
-                  {isRtl ? 'لا توجد مواعيد' : 'No Appointments'}
-                </h3>
-                <p className="text-slate-500 mb-4">
-                  {isRtl ? 'لا توجد مواعيد حالياً' : 'No appointments scheduled'}
-                </p>
-                <Button onClick={() => setShowBookingDialog(true)} className="bg-emerald-500 hover:bg-emerald-600">
-                  <Plus className="w-4 h-4 ms-2" />
-                  {isRtl ? 'موعد جديد' : 'New Appointment'}
-                </Button>
-              </div>
-            ) : (
-              appointments.map((apt) => {
-                const typeConfig = APPOINTMENT_TYPES.find((t) => t.value === apt.type)
-                const statusConfig = STATUS_CONFIG[apt.status]
-                const isSelected = selectedAppointments.has(apt.id)
-
-                return (
-                  <div
-                    key={apt.id}
-                    className={cn(
-                      'bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer group',
-                      isSelected && 'ring-2 ring-emerald-500'
-                    )}
-                    onClick={() => handleViewDetails(apt)}
-                  >
-                    <div className="flex items-start gap-4">
-                      {/* Checkbox */}
-                      <div
-                        className="pt-1"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          toggleSelectAppointment(apt.id)
-                        }}
-                      >
-                        <Checkbox checked={isSelected} />
-                      </div>
-
-                      {/* Main content */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className={cn(
-                            'px-2 py-1 rounded-lg text-xs font-medium',
-                            statusConfig.bgColor,
-                            statusConfig.color
-                          )}>
-                            {isRtl ? statusConfig.labelAr : statusConfig.labelEn}
-                          </span>
-                          <span className={cn(
-                            'px-2 py-1 rounded-lg text-xs font-medium text-white',
-                            typeConfig?.color || 'bg-gray-500'
-                          )}>
-                            {isRtl ? typeConfig?.labelAr : typeConfig?.labelEn}
-                          </span>
-                        </div>
-
-                        <h3 className="font-bold text-slate-900 mb-1">
-                          {apt.clientName || (isRtl ? 'بدون اسم' : 'No name')}
-                        </h3>
-
-                        <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
-                          <span className="flex items-center gap-1">
-                            <CalendarIcon className="h-4 w-4" />
-                            {apt.date ? format(new Date(apt.date), 'MMM d, yyyy', { locale }) : '-'}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" />
-                            {apt.startTime || '00:00'}
-                          </span>
-                          {apt.clientPhone && (
-                            <span className="flex items-center gap-1">
-                              <Phone className="h-4 w-4" />
-                              {apt.clientPhone}
-                            </span>
                           )}
                         </div>
                       </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
 
-                      {/* Delete button */}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleDeleteSingle(apt.id)
-                        }}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-xl hover:bg-red-50 text-red-500"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
-                    </div>
+            {/* List View */}
+            {!isLoading && !isError && viewMode === 'list' && (
+              <div className="space-y-4">
+                {filteredAppointments.length === 0 ? (
+                  <div className="bg-white rounded-2xl p-12 text-center border border-slate-100">
+                    <CalendarClock className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
+                    <h3 className="text-lg font-bold text-slate-900 mb-2">{isRtl ? 'لا توجد مواعيد' : 'No Appointments'}</h3>
+                    <p className="text-slate-500 mb-4">{isRtl ? 'لا توجد مواعيد حالياً' : 'No appointments scheduled'}</p>
+                    <Button onClick={() => setShowBookingDialog(true)} className="bg-emerald-500 hover:bg-emerald-600">
+                      <Plus className="w-4 h-4 ms-2" />
+                      {isRtl ? 'موعد جديد' : 'New Appointment'}
+                    </Button>
                   </div>
-                )
-              })
+                ) : (
+                  filteredAppointments.map((apt) => {
+                    const typeConfig = APPOINTMENT_TYPES.find((t) => t.value === apt.type)
+                    const statusConfig = STATUS_CONFIG[apt.status]
+                    const isSelected = selectedAppointments.has(apt.id)
+
+                    return (
+                      <div
+                        key={apt.id}
+                        className={cn('bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer group', isSelected && 'ring-2 ring-emerald-500')}
+                        onClick={() => handleViewDetails(apt)}
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="pt-1" onClick={(e) => { e.stopPropagation(); toggleSelectAppointment(apt.id) }}>
+                            <Checkbox checked={isSelected} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className={cn('px-2 py-1 rounded-lg text-xs font-medium', statusConfig.bgColor, statusConfig.color)}>
+                                {isRtl ? statusConfig.labelAr : statusConfig.labelEn}
+                              </span>
+                              <span className={cn('px-2 py-1 rounded-lg text-xs font-medium text-white', typeConfig?.color || 'bg-gray-500')}>
+                                {isRtl ? typeConfig?.labelAr : typeConfig?.labelEn}
+                              </span>
+                            </div>
+                            <h3 className="font-bold text-slate-900 mb-1">{apt.clientName || (isRtl ? 'بدون اسم' : 'No name')}</h3>
+                            <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
+                              <span className="flex items-center gap-1"><CalendarIcon className="h-4 w-4" />{apt.date ? format(new Date(apt.date), 'MMM d, yyyy', { locale }) : '-'}</span>
+                              <span className="flex items-center gap-1"><Clock className="h-4 w-4" />{apt.startTime || '00:00'}</span>
+                              {apt.clientPhone && <span className="flex items-center gap-1"><Phone className="h-4 w-4" />{apt.clientPhone}</span>}
+                            </div>
+                          </div>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDeleteSingle(apt.id) }}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-xl hover:bg-red-50 text-red-500"
+                          >
+                            <Trash2 className="h-5 w-5" />
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  })
+                )}
+              </div>
             )}
           </div>
-        )}
+
+          {/* SIDEBAR */}
+          <div className="space-y-6">
+            {/* Quick Actions */}
+            <div className="bg-white rounded-3xl p-6 shadow-lg border border-slate-100">
+              <h3 className="font-bold text-slate-900 mb-4">{isRtl ? 'إجراءات سريعة' : 'Quick Actions'}</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setShowBookingDialog(true)}
+                  className="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 border-dashed border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50 transition-all group"
+                >
+                  <Plus className="h-6 w-6 text-emerald-500 group-hover:scale-110 transition-transform" />
+                  <span className="text-sm font-medium text-slate-700">{isRtl ? 'موعد جديد' : 'New Appointment'}</span>
+                </button>
+                <button
+                  onClick={() => setShowBlockDialog(true)}
+                  className="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 border-dashed border-red-200 hover:border-red-400 hover:bg-red-50 transition-all group"
+                >
+                  <Ban className="h-6 w-6 text-red-500 group-hover:scale-110 transition-transform" />
+                  <span className="text-sm font-medium text-slate-700">{isRtl ? 'حظر وقت' : 'Block Time'}</span>
+                </button>
+              </div>
+              <button
+                onClick={() => setShowAvailabilityDialog(true)}
+                className="w-full mt-3 flex items-center justify-center gap-2 p-4 rounded-2xl border-2 border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-50 transition-all group"
+              >
+                <Settings className="h-5 w-5 text-slate-500 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium text-slate-700">{isRtl ? 'إدارة أوقات العمل' : 'Manage Availability'}</span>
+              </button>
+            </div>
+
+            {/* Today's Appointments */}
+            <div className="bg-white rounded-3xl p-6 shadow-lg border border-slate-100">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-slate-900">{isRtl ? 'مواعيد اليوم' : "Today's Appointments"}</h3>
+                <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200">
+                  {format(new Date(), 'd MMM')}
+                </Badge>
+              </div>
+              <div className="space-y-3">
+                {appointments.filter(apt => apt.date && isToday(new Date(apt.date))).length === 0 ? (
+                  <div className="text-center py-6 text-slate-400 text-sm">
+                    {isRtl ? 'لا توجد مواعيد اليوم' : 'No appointments today'}
+                  </div>
+                ) : (
+                  appointments
+                    .filter(apt => apt.date && isToday(new Date(apt.date)))
+                    .slice(0, 5)
+                    .map((apt) => (
+                      <div key={apt.id} className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100 cursor-pointer" onClick={() => handleViewDetails(apt)}>
+                        <div className="text-sm font-bold text-emerald-600">{apt.startTime || '00:00'}</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-slate-900 truncate">{apt.clientName}</div>
+                        </div>
+                      </div>
+                    ))
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </Main>
 
       {/* Book Appointment Dialog */}
@@ -733,25 +794,13 @@ export function AppointmentsView() {
             <DialogDescription>
               {appointmentToDelete
                 ? (isRtl ? 'هل أنت متأكد من حذف هذا الموعد؟' : 'Are you sure you want to delete this appointment?')
-                : (isRtl
-                    ? `هل أنت متأكد من حذف ${selectedAppointments.size} موعد؟`
-                    : `Are you sure you want to delete ${selectedAppointments.size} appointment(s)?`)}
+                : (isRtl ? `هل أنت متأكد من حذف ${selectedAppointments.size} موعد؟` : `Are you sure you want to delete ${selectedAppointments.size} appointment(s)?`)}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>
-              {isRtl ? 'إلغاء' : 'Cancel'}
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={confirmDelete}
-              disabled={cancelMutation.isPending}
-            >
-              {cancelMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin ms-2" />
-              ) : (
-                <Trash2 className="h-4 w-4 ms-2" />
-              )}
+            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>{isRtl ? 'إلغاء' : 'Cancel'}</Button>
+            <Button variant="destructive" onClick={confirmDelete} disabled={cancelMutation.isPending}>
+              {cancelMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin ms-2" /> : <Trash2 className="h-4 w-4 ms-2" />}
               {isRtl ? 'حذف' : 'Delete'}
             </Button>
           </DialogFooter>
@@ -820,38 +869,24 @@ function AppointmentDetailsDialog({
             {appointment.clientName || (isRtl ? 'بدون اسم' : 'No name')}
           </DialogTitle>
           <DialogDescription className="flex items-center gap-2 mt-2">
-            <span className={cn(
-              'px-2 py-1 rounded-lg text-xs font-medium',
-              statusConfig.bgColor,
-              statusConfig.color
-            )}>
+            <span className={cn('px-2 py-1 rounded-lg text-xs font-medium', statusConfig.bgColor, statusConfig.color)}>
               {isRtl ? statusConfig.labelAr : statusConfig.labelEn}
             </span>
-            <span className={cn(
-              'px-2 py-1 rounded-lg text-xs font-medium text-white',
-              typeConfig?.color || 'bg-gray-500'
-            )}>
+            <span className={cn('px-2 py-1 rounded-lg text-xs font-medium text-white', typeConfig?.color || 'bg-gray-500')}>
               {isRtl ? typeConfig?.labelAr : typeConfig?.labelEn}
             </span>
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          {/* Date & Time */}
           <div className="flex items-center gap-3 text-slate-700">
             <CalendarIcon className="h-5 w-5 text-slate-400" />
-            <span>
-              {appointment.date
-                ? format(new Date(appointment.date), 'EEEE، d MMMM yyyy', { locale })
-                : '-'}
-            </span>
+            <span>{appointment.date ? format(new Date(appointment.date), 'EEEE، d MMMM yyyy', { locale }) : '-'}</span>
           </div>
           <div className="flex items-center gap-3 text-slate-700">
             <Clock className="h-5 w-5 text-slate-400" />
             <span>{appointment.startTime || '00:00'} - {appointment.endTime || '--:--'}</span>
           </div>
-
-          {/* Contact Info */}
           {appointment.clientEmail && (
             <div className="flex items-center gap-3 text-slate-700">
               <Mail className="h-5 w-5 text-slate-400" />
@@ -864,24 +899,12 @@ function AppointmentDetailsDialog({
               <span>{appointment.clientPhone}</span>
             </div>
           )}
-
-          {/* Location */}
           {appointment.location && (
             <div className="flex items-center gap-3 text-slate-700">
-              {appointment.location.type === 'video' ? (
-                <Video className="h-5 w-5 text-slate-400" />
-              ) : (
-                <MapPin className="h-5 w-5 text-slate-400" />
-              )}
-              <span>
-                {appointment.location.type === 'video'
-                  ? (isRtl ? 'اجتماع عن بعد' : 'Video Call')
-                  : appointment.location.address}
-              </span>
+              {appointment.location.type === 'video' ? <Video className="h-5 w-5 text-slate-400" /> : <MapPin className="h-5 w-5 text-slate-400" />}
+              <span>{appointment.location.type === 'video' ? (isRtl ? 'اجتماع عن بعد' : 'Video Call') : appointment.location.address}</span>
             </div>
           )}
-
-          {/* Notes */}
           {appointment.notes && (
             <div className="bg-slate-50 rounded-xl p-4">
               <p className="text-sm text-slate-600">{appointment.notes}</p>
@@ -891,39 +914,24 @@ function AppointmentDetailsDialog({
 
         <DialogFooter className="flex-col sm:flex-row gap-2">
           {appointment.status === 'pending' && (
-            <Button
-              onClick={() => handleAction('confirm')}
-              className="bg-blue-500 hover:bg-blue-600"
-              disabled={confirmMutation.isPending}
-            >
+            <Button onClick={() => handleAction('confirm')} className="bg-blue-500 hover:bg-blue-600" disabled={confirmMutation.isPending}>
               <Check className="h-4 w-4 ms-2" />
               {isRtl ? 'تأكيد' : 'Confirm'}
             </Button>
           )}
           {appointment.status === 'confirmed' && (
             <>
-              <Button
-                onClick={() => handleAction('complete')}
-                className="bg-green-500 hover:bg-green-600"
-                disabled={completeMutation.isPending}
-              >
+              <Button onClick={() => handleAction('complete')} className="bg-green-500 hover:bg-green-600" disabled={completeMutation.isPending}>
                 <CheckCircle className="h-4 w-4 ms-2" />
                 {isRtl ? 'إكمال' : 'Complete'}
               </Button>
-              <Button
-                onClick={() => handleAction('no_show')}
-                variant="outline"
-                disabled={noShowMutation.isPending}
-              >
+              <Button onClick={() => handleAction('no_show')} variant="outline" disabled={noShowMutation.isPending}>
                 <X className="h-4 w-4 ms-2" />
                 {isRtl ? 'لم يحضر' : 'No Show'}
               </Button>
             </>
           )}
-          <Button
-            variant="destructive"
-            onClick={() => onDelete(appointment.id)}
-          >
+          <Button variant="destructive" onClick={() => onDelete(appointment.id)}>
             <Trash2 className="h-4 w-4 ms-2" />
             {isRtl ? 'حذف' : 'Delete'}
           </Button>
@@ -963,7 +971,6 @@ function BookAppointmentDialog({
     notes: '',
   })
 
-  // Fetch available slots for selected date
   const { data: availableSlotsData, isLoading: isSlotsLoading } = useAvailableSlots(
     {
       lawyerId: user?._id || '',
@@ -976,23 +983,13 @@ function BookAppointmentDialog({
 
   const availableSlots = availableSlotsData?.data?.slots || []
 
-  // Generate calendar days
   const calendarDays = useMemo(() => {
     const start = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1)
     const end = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0)
     const days: (Date | null)[] = []
-
-    // Add padding for first week
     const startDay = start.getDay()
-    for (let i = 0; i < startDay; i++) {
-      days.push(null)
-    }
-
-    // Add days of month
-    for (let d = 1; d <= end.getDate(); d++) {
-      days.push(new Date(currentMonth.getFullYear(), currentMonth.getMonth(), d))
-    }
-
+    for (let i = 0; i < startDay; i++) days.push(null)
+    for (let d = 1; d <= end.getDate(); d++) days.push(new Date(currentMonth.getFullYear(), currentMonth.getMonth(), d))
     return days
   }, [currentMonth])
 
@@ -1000,7 +997,6 @@ function BookAppointmentDialog({
 
   const handleSubmit = async () => {
     if (!selectedDate || !selectedTime) return
-
     try {
       await bookMutation.mutateAsync({
         ...formData,
@@ -1013,14 +1009,7 @@ function BookAppointmentDialog({
       setStep(1)
       setSelectedDate(null)
       setSelectedTime(null)
-      setFormData({
-        clientName: '',
-        clientEmail: '',
-        clientPhone: '',
-        duration: 30,
-        type: 'consultation',
-        notes: '',
-      })
+      setFormData({ clientName: '', clientEmail: '', clientPhone: '', duration: 30, type: 'consultation', notes: '' })
     } catch {
       toast.error(isRtl ? 'فشل في حجز الموعد' : 'Failed to book appointment')
     }
@@ -1031,37 +1020,24 @@ function BookAppointmentDialog({
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl">
-            {step === 1
-              ? (isRtl ? 'اختر التاريخ والوقت' : 'Select Date & Time')
-              : (isRtl ? 'تفاصيل العميل' : 'Client Details')}
+            {step === 1 ? (isRtl ? 'اختر التاريخ والوقت' : 'Select Date & Time') : (isRtl ? 'تفاصيل العميل' : 'Client Details')}
           </DialogTitle>
           <DialogDescription>
-            {step === 1
-              ? (isRtl ? 'اختر تاريخ الموعد ثم اختر الوقت المناسب' : 'Choose the appointment date and then select a time slot')
-              : (isRtl ? 'أدخل بيانات العميل لإتمام الحجز' : 'Enter client details to complete the booking')}
+            {step === 1 ? (isRtl ? 'اختر تاريخ الموعد ثم اختر الوقت المناسب' : 'Choose the appointment date and then select a time slot') : (isRtl ? 'أدخل بيانات العميل لإتمام الحجز' : 'Enter client details to complete the booking')}
           </DialogDescription>
         </DialogHeader>
 
         {step === 1 ? (
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Calendar */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addDays(currentMonth, -30))}>
-                  <ChevronLeft className="h-5 w-5" />
-                </Button>
+                <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addDays(currentMonth, -30))}><ChevronLeft className="h-5 w-5" /></Button>
                 <span className="font-semibold">{format(currentMonth, 'MMMM yyyy', { locale })}</span>
-                <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addDays(currentMonth, 30))}>
-                  <ChevronRight className="h-5 w-5" />
-                </Button>
+                <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addDays(currentMonth, 30))}><ChevronRight className="h-5 w-5" /></Button>
               </div>
-
               <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-slate-500">
-                {(isRtl ? ['أح', 'إث', 'ثل', 'أر', 'خم', 'جم', 'سب'] : ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']).map((d) => (
-                  <div key={d} className="p-2">{d}</div>
-                ))}
+                {(isRtl ? ['أح', 'إث', 'ثل', 'أر', 'خم', 'جم', 'سب'] : ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']).map((d) => <div key={d} className="p-2">{d}</div>)}
               </div>
-
               <div className="grid grid-cols-7 gap-1">
                 {calendarDays.map((day, idx) => (
                   <button
@@ -1083,19 +1059,15 @@ function BookAppointmentDialog({
               </div>
             </div>
 
-            {/* Time Slots */}
             <div className="space-y-4">
               <h4 className="font-semibold">{isRtl ? 'الأوقات المتاحة' : 'Available Times'}</h4>
-
               {!selectedDate ? (
                 <div className="text-center py-12 text-slate-400">
                   <CalendarIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p>{isRtl ? 'اختر تاريخاً أولاً' : 'Select a date first'}</p>
                 </div>
               ) : isSlotsLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
-                </div>
+                <div className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-slate-400" /></div>
               ) : availableSlots.length === 0 ? (
                 <div className="text-center py-12 text-slate-400">
                   <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -1127,103 +1099,59 @@ function BookAppointmentDialog({
             <div className="bg-emerald-50 p-4 rounded-xl flex items-center gap-4">
               <CalendarIcon className="h-6 w-6 text-emerald-600" />
               <div>
-                <p className="font-semibold text-emerald-900">
-                  {selectedDate && format(selectedDate, 'EEEE، d MMMM yyyy', { locale })}
-                </p>
+                <p className="font-semibold text-emerald-900">{selectedDate && format(selectedDate, 'EEEE، d MMMM yyyy', { locale })}</p>
                 <p className="text-sm text-emerald-700">{selectedTime}</p>
               </div>
             </div>
-
             <div className="grid gap-4">
               <div>
                 <Label>{isRtl ? 'اسم العميل' : 'Client Name'}</Label>
-                <Input
-                  value={formData.clientName}
-                  onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
-                  placeholder={isRtl ? 'أدخل اسم العميل' : 'Enter client name'}
-                />
+                <Input value={formData.clientName} onChange={(e) => setFormData({ ...formData, clientName: e.target.value })} placeholder={isRtl ? 'أدخل اسم العميل' : 'Enter client name'} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>{isRtl ? 'البريد الإلكتروني' : 'Email'}</Label>
-                  <Input
-                    type="email"
-                    value={formData.clientEmail}
-                    onChange={(e) => setFormData({ ...formData, clientEmail: e.target.value })}
-                  />
+                  <Input type="email" value={formData.clientEmail} onChange={(e) => setFormData({ ...formData, clientEmail: e.target.value })} />
                 </div>
                 <div>
                   <Label>{isRtl ? 'رقم الهاتف' : 'Phone'}</Label>
-                  <Input
-                    value={formData.clientPhone}
-                    onChange={(e) => setFormData({ ...formData, clientPhone: e.target.value })}
-                  />
+                  <Input value={formData.clientPhone} onChange={(e) => setFormData({ ...formData, clientPhone: e.target.value })} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>{isRtl ? 'نوع الموعد' : 'Type'}</Label>
                   <Select value={formData.type} onValueChange={(v) => setFormData({ ...formData, type: v as AppointmentType })}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      {APPOINTMENT_TYPES.map((t) => (
-                        <SelectItem key={t.value} value={t.value}>
-                          {isRtl ? t.labelAr : t.labelEn}
-                        </SelectItem>
-                      ))}
+                      {APPOINTMENT_TYPES.map((t) => <SelectItem key={t.value} value={t.value}>{isRtl ? t.labelAr : t.labelEn}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
                   <Label>{isRtl ? 'المدة' : 'Duration'}</Label>
                   <Select value={String(formData.duration)} onValueChange={(v) => setFormData({ ...formData, duration: Number(v) as AppointmentDuration })}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      {DURATIONS.map((d) => (
-                        <SelectItem key={d.value} value={String(d.value)}>
-                          {isRtl ? d.labelAr : d.labelEn}
-                        </SelectItem>
-                      ))}
+                      {DURATIONS.map((d) => <SelectItem key={d.value} value={String(d.value)}>{isRtl ? d.labelAr : d.labelEn}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <div>
                 <Label>{isRtl ? 'ملاحظات' : 'Notes'}</Label>
-                <Textarea
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  rows={3}
-                />
+                <Textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} rows={3} />
               </div>
             </div>
           </div>
         )}
 
         <DialogFooter className="gap-2">
-          {step === 2 && (
-            <Button variant="outline" onClick={() => setStep(1)}>
-              {isRtl ? 'رجوع' : 'Back'}
-            </Button>
-          )}
+          {step === 2 && <Button variant="outline" onClick={() => setStep(1)}>{isRtl ? 'رجوع' : 'Back'}</Button>}
           {step === 1 ? (
-            <Button
-              onClick={() => setStep(2)}
-              disabled={!selectedDate || !selectedTime}
-              className="bg-emerald-500 hover:bg-emerald-600"
-            >
-              {isRtl ? 'التالي' : 'Next'}
-            </Button>
+            <Button onClick={() => setStep(2)} disabled={!selectedDate || !selectedTime} className="bg-emerald-500 hover:bg-emerald-600">{isRtl ? 'التالي' : 'Next'}</Button>
           ) : (
-            <Button
-              onClick={handleSubmit}
-              disabled={bookMutation.isPending || !formData.clientName}
-              className="bg-emerald-500 hover:bg-emerald-600"
-            >
+            <Button onClick={handleSubmit} disabled={bookMutation.isPending || !formData.clientName} className="bg-emerald-500 hover:bg-emerald-600">
               {bookMutation.isPending && <Loader2 className="h-4 w-4 animate-spin ms-2" />}
               {isRtl ? 'حجز الموعد' : 'Book Appointment'}
             </Button>
