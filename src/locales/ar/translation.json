@@ -1252,6 +1252,7 @@
       }
     },
     "overview": {
+      "title": "نظرة عامة",
       "totalRevenue": "إجمالي الإيرادات",
       "activeCases": "القضايا النشطة",
       "pendingInvoices": "الفواتير المعلقة",
@@ -1262,7 +1263,9 @@
       "thisWeek": "هذا الأسبوع",
       "chartTitle": "نظرة عامة",
       "noChartData": "لا توجد بيانات متاحة بعد",
-      "chartDataHint": "ستظهر بيانات الإيرادات هنا عند اكتمال القضايا"
+      "chartDataHint": "ستظهر بيانات الإيرادات هنا عند اكتمال القضايا",
+      "recentSales": "المبيعات الأخيرة",
+      "salesThisMonth": "لقد قمت بـ 265 عملية بيع هذا الشهر."
     },
     "analytics": {
       "caseOverview": "نظرة عامة على القضايا",
@@ -1345,19 +1348,6 @@
         "value": "+573",
         "change": "+201 منذ الساعة الأخيرة"
       }
-    },
-    "overview": {
-      "totalRevenue": "إجمالي الإيرادات",
-      "activeCases": "القضايا النشطة",
-      "pendingInvoices": "الفواتير المعلقة",
-      "upcomingEvents": "الأحداث القادمة",
-      "fromLastMonth": "من الشهر الماضي",
-      "pendingCases": "معلقة",
-      "overdue": "متأخرة",
-      "thisWeek": "هذا الأسبوع",
-      "chartTitle": "نظرة عامة",
-      "noChartData": "لا توجد بيانات متاحة حتى الآن",
-      "chartDataHint": "ستظهر بيانات الإيرادات هنا عند إتمام القضايا"
     },
     "schedule": {
       "title": "جدول اليوم",
@@ -1574,11 +1564,6 @@
       "viewAll": "عرض الكل",
       "noMessages": "لا توجد رسائل حديثة",
       "defaultUser": "مستخدم"
-    },
-    "overview": {
-      "title": "نظرة عامة",
-      "recentSales": "المبيعات الأخيرة",
-      "salesThisMonth": "لقد قمت بـ 265 عملية بيع هذا الشهر."
     }
   },
   "hrPredictions": {

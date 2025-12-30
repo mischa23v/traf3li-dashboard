@@ -1167,6 +1167,7 @@
       }
     },
     "overview": {
+      "title": "Overview",
       "totalRevenue": "Total Revenue",
       "activeCases": "Active Cases",
       "pendingInvoices": "Pending Invoices",
@@ -1177,7 +1178,9 @@
       "thisWeek": "this week",
       "chartTitle": "Overview",
       "noChartData": "No data available yet",
-      "chartDataHint": "Revenue data will appear here as cases are completed"
+      "chartDataHint": "Revenue data will appear here as cases are completed",
+      "recentSales": "Recent Sales",
+      "salesThisMonth": "You made 265 sales this month."
     },
     "analytics": {
       "caseOverview": "Case Overview",
@@ -1260,19 +1263,6 @@
         "value": "+573",
         "change": "+201 since last hour"
       }
-    },
-    "overview": {
-      "totalRevenue": "Total Revenue",
-      "activeCases": "Active Cases",
-      "pendingInvoices": "Pending Invoices",
-      "upcomingEvents": "Upcoming Events",
-      "fromLastMonth": "from last month",
-      "pendingCases": "pending",
-      "overdue": "overdue",
-      "thisWeek": "this week",
-      "chartTitle": "Overview",
-      "noChartData": "No data available yet",
-      "chartDataHint": "Revenue data will appear here as cases are completed"
     },
     "schedule": {
       "title": "Today's Schedule",
@@ -1489,11 +1479,6 @@
       "viewAll": "View All",
       "noMessages": "No recent messages",
       "defaultUser": "User"
-    },
-    "overview": {
-      "title": "Overview",
-      "recentSales": "Recent Sales",
-      "salesThisMonth": "You made 265 sales this month."
     }
   },
   "dataTable": {
