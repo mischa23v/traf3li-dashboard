@@ -333,11 +333,26 @@ export const arabicLastNames: Record<string, string> = {
 }
 
 /**
+ * Check if a string contains Arabic characters
+ */
+export function isArabicText(text: string | undefined): boolean {
+  if (!text) return false
+  // Arabic Unicode range: \u0600-\u06FF (includes Arabic letters, numbers, and diacritics)
+  const arabicRegex = /[\u0600-\u06FF]/
+  return arabicRegex.test(text)
+}
+
+/**
  * Get Arabic first name from English name
  * Case-insensitive lookup with fallback to original name
  */
 export function getArabicFirstName(englishName: string | undefined): string | undefined {
   if (!englishName) return undefined
+
+  // If the name is already in Arabic, return it as-is
+  if (isArabicText(englishName)) {
+    return englishName
+  }
 
   // Try exact match first
   if (arabicFirstNames[englishName]) {
@@ -361,6 +376,11 @@ export function getArabicFirstName(englishName: string | undefined): string | un
  */
 export function getArabicLastName(englishName: string | undefined): string | undefined {
   if (!englishName) return undefined
+
+  // If the name is already in Arabic, return it as-is
+  if (isArabicText(englishName)) {
+    return englishName
+  }
 
   // Try exact match first
   if (arabicLastNames[englishName]) {
