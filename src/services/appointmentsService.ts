@@ -509,12 +509,14 @@ const appointmentsService = {
   },
 
   /**
-   * Cancel appointment
+   * Cancel appointment (DELETE with optional reason in body)
    * إلغاء الموعد
    */
   cancelAppointment: async (id: string, reason?: string): Promise<AppointmentResponse> => {
     try {
-      const response = await apiClient.post<AppointmentResponse>(`/appointments/${id}/cancel`, { reason })
+      const response = await apiClient.delete<AppointmentResponse>(`/appointments/${id}`, {
+        data: { reason }
+      })
       return response.data
     } catch (error: any) {
       const errorMessage = handleApiError(error) || 'Failed to cancel appointment | فشل في إلغاء الموعد'
@@ -523,12 +525,12 @@ const appointmentsService = {
   },
 
   /**
-   * Confirm appointment
+   * Confirm appointment (PUT)
    * تأكيد الموعد
    */
   confirmAppointment: async (id: string): Promise<AppointmentResponse> => {
     try {
-      const response = await apiClient.post<AppointmentResponse>(`/appointments/${id}/confirm`)
+      const response = await apiClient.put<AppointmentResponse>(`/appointments/${id}/confirm`)
       return response.data
     } catch (error: any) {
       const errorMessage = handleApiError(error) || 'Failed to confirm appointment | فشل في تأكيد الموعد'
@@ -537,12 +539,12 @@ const appointmentsService = {
   },
 
   /**
-   * Complete appointment
+   * Complete appointment (PUT)
    * إكمال الموعد
    */
   completeAppointment: async (id: string, notes?: string): Promise<AppointmentResponse> => {
     try {
-      const response = await apiClient.post<AppointmentResponse>(`/appointments/${id}/complete`, { notes })
+      const response = await apiClient.put<AppointmentResponse>(`/appointments/${id}/complete`, { notes })
       return response.data
     } catch (error: any) {
       const errorMessage = handleApiError(error) || 'Failed to complete appointment | فشل في إكمال الموعد'
@@ -551,12 +553,12 @@ const appointmentsService = {
   },
 
   /**
-   * Mark as no-show
+   * Mark as no-show (PUT)
    * وضع علامة عدم الحضور
    */
   markNoShow: async (id: string): Promise<AppointmentResponse> => {
     try {
-      const response = await apiClient.post<AppointmentResponse>(`/appointments/${id}/no-show`)
+      const response = await apiClient.put<AppointmentResponse>(`/appointments/${id}/no-show`)
       return response.data
     } catch (error: any) {
       const errorMessage = handleApiError(error) || 'Failed to mark as no-show | فشل في وضع علامة عدم الحضور'
