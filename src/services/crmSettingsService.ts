@@ -223,13 +223,42 @@ export interface CompetitorStats {
   winRate: number
 }
 
+// Working Hours Types (for Appointments)
+export interface WorkingHoursDay {
+  enabled: boolean
+  start: string  // "HH:mm" format
+  end: string    // "HH:mm" format
+}
+
+export interface WorkingHours {
+  sunday: WorkingHoursDay
+  monday: WorkingHoursDay
+  tuesday: WorkingHoursDay
+  wednesday: WorkingHoursDay
+  thursday: WorkingHoursDay
+  friday: WorkingHoursDay
+  saturday: WorkingHoursDay
+}
+
+export interface AppointmentSettings {
+  enabled: boolean
+  defaultDuration: number
+  allowedDurations: number[]
+  bufferBetweenAppointments: number
+  workingHours: WorkingHours
+}
+
 // CRM Settings Types
 export interface CrmSettings {
   id: string
+  _id?: string
+  firmId?: string
+  lawyerId?: string
   leadSettings: LeadSettings
   opportunitySettings: OpportunitySettings
   quoteSettings: QuoteSettings
   generalSettings: GeneralSettings
+  appointmentSettings?: AppointmentSettings
   updatedAt: string
 }
 
@@ -931,6 +960,69 @@ export const crmSettingsService = {
     try {
       const response = await apiClient.put('/crm-settings/quote', data)
       return response.data.data || response.data.settings
+    } catch (error: any) {
+      throwBilingualError(error)
+    }
+  },
+
+  /**
+   * Get appointment settings (including working hours)
+   */
+  getAppointmentSettings: async (): Promise<AppointmentSettings | null> => {
+    try {
+      const response = await apiClient.get('/crm-settings')
+      const data = response.data.data || response.data.settings || response.data
+      return data?.appointmentSettings || null
+    } catch (error: any) {
+      throwBilingualError(error)
+    }
+  },
+
+  /**
+   * Update working hours for a specific day
+   */
+  updateWorkingHours: async (
+    day: keyof WorkingHours,
+    hours: Partial<WorkingHoursDay>
+  ): Promise<CrmSettings> => {
+    try {
+      const response = await apiClient.put('/crm-settings', {
+        appointmentSettings: {
+          workingHours: {
+            [day]: hours,
+          },
+        },
+      })
+      return response.data.data || response.data.settings || response.data
+    } catch (error: any) {
+      throwBilingualError(error)
+    }
+  },
+
+  /**
+   * Update all working hours at once
+   */
+  updateAllWorkingHours: async (
+    workingHours: Partial<WorkingHours>
+  ): Promise<CrmSettings> => {
+    try {
+      const response = await apiClient.put('/crm-settings', {
+        appointmentSettings: {
+          workingHours,
+        },
+      })
+      return response.data.data || response.data.settings || response.data
+    } catch (error: any) {
+      throwBilingualError(error)
+    }
+  },
+
+  /**
+   * Reset CRM settings to defaults
+   */
+  resetSettings: async (): Promise<void> => {
+    try {
+      await apiClient.delete('/crm-settings/reset')
     } catch (error: any) {
       throwBilingualError(error)
     }

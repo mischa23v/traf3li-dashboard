@@ -3,7 +3,8 @@
  * عرض المواعيد - تقويم أسبوعي مع الشريط الجانبي
  */
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { format, addDays, startOfWeek, isSameDay, isToday, addWeeks, subWeeks, isBefore, startOfDay } from 'date-fns'
 import { ar, enUS } from 'date-fns/locale'
@@ -47,6 +48,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Switch } from '@/components/ui/switch'
 import {
   Dialog,
   DialogContent,
@@ -1464,76 +1466,113 @@ function BlockTimeDialog({
 
 // ==================== Manage Availability Dialog ====================
 
-const DAYS_OF_WEEK: { value: DayOfWeek; labelAr: string; labelEn: string }[] = [
-  { value: 0, labelAr: 'الأحد', labelEn: 'Sunday' },
-  { value: 1, labelAr: 'الإثنين', labelEn: 'Monday' },
-  { value: 2, labelAr: 'الثلاثاء', labelEn: 'Tuesday' },
-  { value: 3, labelAr: 'الأربعاء', labelEn: 'Wednesday' },
-  { value: 4, labelAr: 'الخميس', labelEn: 'Thursday' },
-  { value: 5, labelAr: 'الجمعة', labelEn: 'Friday' },
-  { value: 6, labelAr: 'السبت', labelEn: 'Saturday' },
-]
+// Day names for working hours (keyed by API day names)
+const WORKING_DAYS = [
+  { key: 'sunday', labelAr: 'الأحد', labelEn: 'Sunday' },
+  { key: 'monday', labelAr: 'الإثنين', labelEn: 'Monday' },
+  { key: 'tuesday', labelAr: 'الثلاثاء', labelEn: 'Tuesday' },
+  { key: 'wednesday', labelAr: 'الأربعاء', labelEn: 'Wednesday' },
+  { key: 'thursday', labelAr: 'الخميس', labelEn: 'Thursday' },
+  { key: 'friday', labelAr: 'الجمعة', labelEn: 'Friday' },
+  { key: 'saturday', labelAr: 'السبت', labelEn: 'Saturday' },
+] as const
+
+type DayKey = typeof WORKING_DAYS[number]['key']
+
+interface WorkingHoursDay {
+  enabled: boolean
+  start: string
+  end: string
+}
+
+interface WorkingHours {
+  sunday: WorkingHoursDay
+  monday: WorkingHoursDay
+  tuesday: WorkingHoursDay
+  wednesday: WorkingHoursDay
+  thursday: WorkingHoursDay
+  friday: WorkingHoursDay
+  saturday: WorkingHoursDay
+}
+
+// Default working hours (Sun-Thu, Sat: 9-5, Friday: off)
+const DEFAULT_WORKING_HOURS: WorkingHours = {
+  sunday: { enabled: true, start: '09:00', end: '17:00' },
+  monday: { enabled: true, start: '09:00', end: '17:00' },
+  tuesday: { enabled: true, start: '09:00', end: '17:00' },
+  wednesday: { enabled: true, start: '09:00', end: '17:00' },
+  thursday: { enabled: true, start: '09:00', end: '17:00' },
+  friday: { enabled: false, start: '09:00', end: '17:00' },
+  saturday: { enabled: true, start: '09:00', end: '17:00' },
+}
 
 function ManageAvailabilityDialog({
   open,
   onOpenChange,
   isRtl,
-  canManageOtherLawyers,
-  teamMembers,
-  currentUserId,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
   isRtl: boolean
-  canManageOtherLawyers: boolean
-  teamMembers: Array<{ _id: string; firstName: string; lastName: string }>
+  canManageOtherLawyers?: boolean
+  teamMembers?: Array<{ _id: string; firstName: string; lastName: string }>
   currentUserId?: string
 }) {
-  const [targetLawyerId, setTargetLawyerId] = useState<string>('')
-  const [showAddSlot, setShowAddSlot] = useState(false)
-  const [newSlot, setNewSlot] = useState({
-    dayOfWeek: 0 as DayOfWeek,
-    startTime: '09:00',
-    endTime: '17:00',
-    slotDuration: 30 as AppointmentDuration,
+  const queryClient = useQueryClient()
+  const [workingHours, setWorkingHours] = useState<WorkingHours>(DEFAULT_WORKING_HOURS)
+  const [isSaving, setIsSaving] = useState(false)
+  const [hasChanges, setHasChanges] = useState(false)
+
+  // Fetch current settings
+  const { data: settingsData, isLoading } = useQuery({
+    queryKey: ['crm-settings'],
+    queryFn: async () => {
+      const { crmSettingsService } = await import('@/services/crmSettingsService')
+      return crmSettingsService.getSettings()
+    },
+    enabled: open,
   })
 
-  // Fetch availability for selected lawyer
-  const effectiveLawyerId = targetLawyerId || currentUserId
-  const { data: availabilityData, isLoading } = useAvailability(effectiveLawyerId)
-  const createAvailability = useCreateAvailability()
-  const deleteAvailability = useDeleteAvailability()
-
-  const availability = availabilityData?.data || []
-
-  // Group by day of week
-  const availabilityByDay = DAYS_OF_WEEK.map(day => ({
-    ...day,
-    slots: availability.filter(slot => slot.dayOfWeek === day.value),
-  }))
-
-  const handleAddSlot = async () => {
-    try {
-      await createAvailability.mutateAsync({
-        ...newSlot,
-        ...(targetLawyerId ? { targetLawyerId } : {}),
-      })
-      toast.success(isRtl ? 'تمت إضافة وقت العمل' : 'Availability added')
-      setShowAddSlot(false)
-      setNewSlot({ dayOfWeek: 0, startTime: '09:00', endTime: '17:00', slotDuration: 30 })
-    } catch (error: any) {
-      const errorMessage = error?.message || (isRtl ? 'فشل في إضافة وقت العمل' : 'Failed to add availability')
-      toast.error(errorMessage)
+  // Update local state when data loads
+  useEffect(() => {
+    if (settingsData?.appointmentSettings?.workingHours) {
+      setWorkingHours(settingsData.appointmentSettings.workingHours as WorkingHours)
+      setHasChanges(false)
     }
+  }, [settingsData])
+
+  // Handle day toggle
+  const handleDayToggle = (day: DayKey, enabled: boolean) => {
+    setWorkingHours(prev => ({
+      ...prev,
+      [day]: { ...prev[day], enabled },
+    }))
+    setHasChanges(true)
   }
 
-  const handleDeleteSlot = async (slotId: string) => {
+  // Handle time change
+  const handleTimeChange = (day: DayKey, field: 'start' | 'end', value: string) => {
+    setWorkingHours(prev => ({
+      ...prev,
+      [day]: { ...prev[day], [field]: value },
+    }))
+    setHasChanges(true)
+  }
+
+  // Save changes
+  const handleSave = async () => {
+    setIsSaving(true)
     try {
-      await deleteAvailability.mutateAsync(slotId)
-      toast.success(isRtl ? 'تم حذف وقت العمل' : 'Availability deleted')
+      const { crmSettingsService } = await import('@/services/crmSettingsService')
+      await crmSettingsService.updateAllWorkingHours(workingHours)
+      toast.success(isRtl ? 'تم حفظ أوقات العمل' : 'Working hours saved')
+      setHasChanges(false)
+      queryClient.invalidateQueries({ queryKey: ['crm-settings'] })
+      queryClient.invalidateQueries({ queryKey: ['appointments'] })
     } catch (error: any) {
-      const errorMessage = error?.message || (isRtl ? 'فشل في حذف وقت العمل' : 'Failed to delete availability')
-      toast.error(errorMessage)
+      toast.error(error?.message || (isRtl ? 'فشل في حفظ الإعدادات' : 'Failed to save settings'))
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -1543,174 +1582,96 @@ function ManageAvailabilityDialog({
         <DialogHeader>
           <DialogTitle className="text-xl flex items-center gap-2">
             <Settings className="h-5 w-5 text-emerald-500" />
-            {isRtl ? 'إدارة أوقات العمل' : 'Manage Availability'}
+            {isRtl ? 'إدارة أوقات العمل' : 'Manage Working Hours'}
           </DialogTitle>
           <DialogDescription>
-            {isRtl ? 'حدد أوقات العمل المتاحة للمواعيد' : 'Set your available hours for appointments'}
+            {isRtl ? 'حدد أيام وأوقات العمل للمواعيد' : 'Set your working days and hours for appointments'}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Lawyer Selector - Only show for firm admins */}
-          {canManageOtherLawyers && teamMembers.length > 0 && (
-            <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl space-y-2">
-              <Label className="text-sm font-medium text-blue-800">
-                {isRtl ? 'إدارة أوقات لـ' : 'Manage availability for'}
-              </Label>
-              <Select value={targetLawyerId} onValueChange={setTargetLawyerId}>
-                <SelectTrigger className="bg-white">
-                  <SelectValue placeholder={isRtl ? 'نفسي (الافتراضي)' : 'Myself (default)'} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">{isRtl ? 'نفسي' : 'Myself'}</SelectItem>
-                  {teamMembers.filter(m => m._id !== currentUserId).map((member) => (
-                    <SelectItem key={member._id} value={member._id}>
-                      {member.firstName} {member.lastName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          {/* Weekly Schedule */}
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
             </div>
           ) : (
             <div className="space-y-3">
-              {availabilityByDay.map((day) => (
-                <div key={day.value} className="p-3 border rounded-xl bg-slate-50">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium text-slate-700">
-                      {isRtl ? day.labelAr : day.labelEn}
-                    </span>
-                    {day.slots.length === 0 && (
-                      <Badge variant="outline" className="text-slate-400">
-                        {isRtl ? 'غير متاح' : 'Unavailable'}
-                      </Badge>
+              {WORKING_DAYS.map((day) => {
+                const dayHours = workingHours[day.key]
+                return (
+                  <div
+                    key={day.key}
+                    className={cn(
+                      'p-4 border rounded-xl transition-colors',
+                      dayHours.enabled ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200'
                     )}
-                  </div>
-                  {day.slots.length > 0 && (
-                    <div className="space-y-2">
-                      {day.slots.map((slot) => (
-                        <div key={slot.id} className="flex items-center justify-between p-2 bg-white rounded-lg border">
-                          <div className="flex items-center gap-3">
-                            <Clock className="h-4 w-4 text-emerald-500" />
-                            <span className="text-sm font-medium">
-                              {slot.startTime} - {slot.endTime}
-                            </span>
-                            <Badge variant="secondary" className="text-xs">
-                              {slot.slotDuration} {isRtl ? 'دقيقة' : 'min'}
-                            </Badge>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
-                            onClick={() => handleDeleteSlot(slot.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                  >
+                    <div className="flex items-center justify-between">
+                      {/* Day name and toggle */}
+                      <div className="flex items-center gap-3">
+                        <Switch
+                          checked={dayHours.enabled}
+                          onCheckedChange={(checked) => handleDayToggle(day.key, checked)}
+                          className="data-[state=checked]:bg-emerald-500"
+                        />
+                        <span className={cn(
+                          'font-medium',
+                          dayHours.enabled ? 'text-emerald-800' : 'text-slate-500'
+                        )}>
+                          {isRtl ? day.labelAr : day.labelEn}
+                        </span>
+                      </div>
+
+                      {/* Time inputs */}
+                      {dayHours.enabled ? (
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="time"
+                            value={dayHours.start}
+                            onChange={(e) => handleTimeChange(day.key, 'start', e.target.value)}
+                            className="w-28 text-center bg-white"
+                          />
+                          <span className="text-slate-400">-</span>
+                          <Input
+                            type="time"
+                            value={dayHours.end}
+                            onChange={(e) => handleTimeChange(day.key, 'end', e.target.value)}
+                            className="w-28 text-center bg-white"
+                          />
                         </div>
-                      ))}
+                      ) : (
+                        <Badge variant="outline" className="text-slate-400">
+                          {isRtl ? 'يوم إجازة' : 'Day Off'}
+                        </Badge>
+                      )}
                     </div>
-                  )}
-                </div>
-              ))}
+                  </div>
+                )
+              })}
             </div>
           )}
 
-          {/* Add New Slot */}
-          {showAddSlot ? (
-            <div className="p-4 border-2 border-dashed border-emerald-300 rounded-xl bg-emerald-50 space-y-4">
-              <h4 className="font-medium text-emerald-800">
-                {isRtl ? 'إضافة وقت عمل جديد' : 'Add New Availability'}
-              </h4>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>{isRtl ? 'اليوم' : 'Day'}</Label>
-                  <Select
-                    value={String(newSlot.dayOfWeek)}
-                    onValueChange={(v) => setNewSlot({ ...newSlot, dayOfWeek: Number(v) as DayOfWeek })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {DAYS_OF_WEEK.map((day) => (
-                        <SelectItem key={day.value} value={String(day.value)}>
-                          {isRtl ? day.labelAr : day.labelEn}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>{isRtl ? 'مدة الموعد' : 'Slot Duration'}</Label>
-                  <Select
-                    value={String(newSlot.slotDuration)}
-                    onValueChange={(v) => setNewSlot({ ...newSlot, slotDuration: Number(v) as AppointmentDuration })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {DURATIONS.map((d) => (
-                        <SelectItem key={d.value} value={String(d.value)}>
-                          {isRtl ? d.labelAr : d.labelEn}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>{isRtl ? 'وقت البداية' : 'Start Time'}</Label>
-                  <Input
-                    type="time"
-                    value={newSlot.startTime}
-                    onChange={(e) => setNewSlot({ ...newSlot, startTime: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label>{isRtl ? 'وقت النهاية' : 'End Time'}</Label>
-                  <Input
-                    type="time"
-                    value={newSlot.endTime}
-                    onChange={(e) => setNewSlot({ ...newSlot, endTime: e.target.value })}
-                  />
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleAddSlot}
-                  disabled={createAvailability.isPending}
-                  className="bg-emerald-500 hover:bg-emerald-600"
-                >
-                  {createAvailability.isPending && <Loader2 className="h-4 w-4 animate-spin ms-2" />}
-                  {isRtl ? 'إضافة' : 'Add'}
-                </Button>
-                <Button variant="outline" onClick={() => setShowAddSlot(false)}>
-                  {isRtl ? 'إلغاء' : 'Cancel'}
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <Button
-              variant="outline"
-              className="w-full border-dashed border-2"
-              onClick={() => setShowAddSlot(true)}
-            >
-              <Plus className="h-4 w-4 ms-2" />
-              {isRtl ? 'إضافة وقت عمل' : 'Add Availability'}
-            </Button>
-          )}
+          {/* Info box */}
+          <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl">
+            <p className="text-sm text-blue-700">
+              {isRtl
+                ? 'هذه الإعدادات تحدد أيام وأوقات العمل المتاحة للمواعيد. يمكنك حظر أوقات محددة باستخدام "حظر وقت" في القائمة.'
+                : 'These settings define your available days and hours for appointments. You can block specific times using "Block Time" from the menu.'}
+            </p>
+          </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {isRtl ? 'إغلاق' : 'Close'}
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={isSaving || !hasChanges}
+            className="bg-emerald-500 hover:bg-emerald-600"
+          >
+            {isSaving && <Loader2 className="h-4 w-4 animate-spin me-2" />}
+            {isRtl ? 'حفظ التغييرات' : 'Save Changes'}
           </Button>
         </DialogFooter>
       </DialogContent>
