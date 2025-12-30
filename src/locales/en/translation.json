@@ -1166,6 +1166,19 @@
         "reminders": "Reminders"
       }
     },
+    "overview": {
+      "totalRevenue": "Total Revenue",
+      "activeCases": "Active Cases",
+      "pendingInvoices": "Pending Invoices",
+      "upcomingEvents": "Upcoming Events",
+      "fromLastMonth": "from last month",
+      "pendingCases": "pending",
+      "overdue": "overdue",
+      "thisWeek": "this week",
+      "chartTitle": "Overview",
+      "noChartData": "No data available yet",
+      "chartDataHint": "Revenue data will appear here as cases are completed"
+    },
     "stats": {
       "noDataAvailable": "No data available at the moment",
       "statsNotFound": "Statistics not found",

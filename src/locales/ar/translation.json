@@ -1251,6 +1251,19 @@
         "biometric": "أجهزة البصمة"
       }
     },
+    "overview": {
+      "totalRevenue": "إجمالي الإيرادات",
+      "activeCases": "القضايا النشطة",
+      "pendingInvoices": "الفواتير المعلقة",
+      "upcomingEvents": "الأحداث القادمة",
+      "fromLastMonth": "من الشهر الماضي",
+      "pendingCases": "قيد الانتظار",
+      "overdue": "متأخرة",
+      "thisWeek": "هذا الأسبوع",
+      "chartTitle": "نظرة عامة",
+      "noChartData": "لا توجد بيانات متاحة بعد",
+      "chartDataHint": "ستظهر بيانات الإيرادات هنا عند اكتمال القضايا"
+    },
     "stats": {
       "noDataAvailable": "لا توجد بيانات متاحة حالياً",
       "statsNotFound": "لم يتم العثور على إحصائيات",
