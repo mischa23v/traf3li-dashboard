@@ -184,6 +184,7 @@ export interface CreateAvailabilityRequest {
   slotDuration?: AppointmentDuration
   breakBetweenSlots?: number
   isActive?: boolean
+  targetLawyerId?: string // For firm admins to manage another lawyer's availability
 }
 
 export interface UpdateAvailabilityRequest {
@@ -205,6 +206,7 @@ export interface CreateBlockedTimeRequest {
     interval: number
     endDate?: string
   }
+  targetLawyerId?: string // For firm admins to block time for another lawyer
 }
 
 export interface BookAppointmentRequest {
@@ -221,6 +223,7 @@ export interface BookAppointmentRequest {
   source?: BookingSource
   meetingLink?: string
   location?: string
+  assignedTo?: string // For firm admins to assign appointment to another lawyer
 }
 
 export interface UpdateAppointmentRequest {
@@ -404,7 +407,7 @@ const appointmentsService = {
    * Get blocked times
    * الحصول على الأوقات المحجوبة
    */
-  getBlockedTimes: async (params?: { startDate?: string; endDate?: string }): Promise<BlockedTimesResponse> => {
+  getBlockedTimes: async (params?: { startDate?: string; endDate?: string; targetLawyerId?: string }): Promise<BlockedTimesResponse> => {
     try {
       const response = await apiClient.get<BlockedTimesResponse>('/appointments/blocked-times', { params })
       return response.data

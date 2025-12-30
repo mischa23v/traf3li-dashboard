@@ -130,7 +130,7 @@ export function useBulkUpdateAvailability() {
  * Get blocked times
  * الحصول على الأوقات المحجوبة
  */
-export function useBlockedTimes(params?: { startDate?: string; endDate?: string }) {
+export function useBlockedTimes(params?: { startDate?: string; endDate?: string; targetLawyerId?: string }) {
   return useQuery({
     queryKey: appointmentKeys.blockedTimesFiltered(params || {}),
     queryFn: () => appointmentsService.getBlockedTimes(params),
