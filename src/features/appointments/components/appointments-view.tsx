@@ -832,7 +832,7 @@ function BookAppointmentDialog({
     !!selectedDate && !!user?._id // Only fetch when user is authenticated
   )
 
-  const availableSlots = availableSlotsData?.data || []
+  const availableSlots = availableSlotsData?.data?.slots || []
 
   // Generate calendar days
   const calendarDays = useMemo(() => {
