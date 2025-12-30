@@ -18,28 +18,33 @@ export const OverviewStats = memo(function OverviewStats({
   caseStats,
   upcomingEventsCount,
 }: OverviewStatsProps) {
+  // Only show change/label when there's actual data
+  const revenueChange = financialSummary?.revenueChangePercent
+  const pendingCasesCount = caseStats?.pending || 0
+  const overdueAmount = financialSummary?.overdueAmount || 0
+
   const stats = [
     {
       title: t('dashboard.overview.totalRevenue', 'Total Revenue'),
       value: financialSummary?.totalRevenue || 0,
-      change: '+20.1%',
-      changeLabel: t('dashboard.overview.fromLastMonth', 'from last month'),
+      change: revenueChange ? `${revenueChange > 0 ? '+' : ''}${revenueChange}%` : '',
+      changeLabel: revenueChange ? t('dashboard.overview.fromLastMonth', 'from last month') : '',
       icon: DollarSign,
       format: 'currency',
     },
     {
       title: t('dashboard.overview.activeCases', 'Active Cases'),
       value: caseStats?.active || 0,
-      change: caseStats?.pending ? `+${caseStats.pending}` : '+0',
-      changeLabel: t('dashboard.overview.pendingCases', 'pending'),
+      change: pendingCasesCount > 0 ? `+${pendingCasesCount}` : '',
+      changeLabel: pendingCasesCount > 0 ? t('dashboard.overview.pendingCases', 'pending') : '',
       icon: Briefcase,
       format: 'number',
     },
     {
       title: t('dashboard.overview.pendingInvoices', 'Pending Invoices'),
       value: financialSummary?.pendingAmount || 0,
-      change: financialSummary?.overdueAmount ? `-${financialSummary.overdueAmount.toLocaleString()}` : '',
-      changeLabel: t('dashboard.overview.overdue', 'overdue'),
+      change: overdueAmount > 0 ? `${overdueAmount.toLocaleString()}` : '',
+      changeLabel: overdueAmount > 0 ? t('dashboard.overview.overdue', 'overdue') : '',
       icon: Receipt,
       format: 'currency',
     },
@@ -47,7 +52,7 @@ export const OverviewStats = memo(function OverviewStats({
       title: t('dashboard.overview.upcomingEvents', 'Upcoming Events'),
       value: upcomingEventsCount,
       change: '',
-      changeLabel: t('dashboard.overview.thisWeek', 'this week'),
+      changeLabel: upcomingEventsCount > 0 ? t('dashboard.overview.thisWeek', 'this week') : '',
       icon: CalendarDays,
       format: 'number',
     },
