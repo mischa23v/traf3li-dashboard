@@ -90,6 +90,7 @@ import {
   useCompleteAppointment,
   useMarkNoShow,
   useAppointmentStats,
+  useAvailableSlots,
   useCreateBlockedTime,
   useAvailability,
   useCreateAvailability,
@@ -1048,57 +1049,18 @@ function BookAppointmentDialog({
     notes: '',
   })
 
-  // Fetch existing appointments for the selected date to check conflicts
-  const selectedDateStr = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : ''
-  const { data: appointmentsData, isLoading: isAppointmentsLoading } = useAppointments(
+  // Use backend API to get available slots (checks appointments, blocked times, events)
+  const { data: availableSlotsData, isLoading: isSlotsLoading, isError: isSlotsError } = useAvailableSlots(
     {
-      startDate: selectedDateStr,
-      endDate: selectedDateStr,
+      lawyerId: effectiveLawyerId,
+      startDate: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '',
+      endDate: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '',
+      duration: formData.duration,
     },
-    // Only fetch when we have a selected date
+    !!selectedDate && !!effectiveLawyerId
   )
 
-  // Generate all time slots for the day (08:00 - 18:00, every 30 minutes)
-  const allTimeSlots = useMemo(() => {
-    const slots: { time: string; available: boolean }[] = []
-    const startHour = 8  // 8 AM
-    const endHour = 18   // 6 PM
-
-    for (let hour = startHour; hour < endHour; hour++) {
-      for (let min = 0; min < 60; min += 30) {
-        const time = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`
-        slots.push({ time, available: true })
-      }
-    }
-    return slots
-  }, [])
-
-  // Filter appointments for the target lawyer and mark conflicting slots
-  const availableSlots = useMemo(() => {
-    if (!selectedDate) return []
-
-    const appointments = appointmentsData?.data?.appointments || []
-    // Filter appointments for the specific lawyer we're booking for
-    const lawyerAppointments = appointments.filter(apt =>
-      apt.lawyerId === effectiveLawyerId &&
-      apt.status !== 'cancelled'
-    )
-
-    return allTimeSlots.map(slot => {
-      // Check if this slot conflicts with any existing appointment
-      const slotTime = slot.time
-      const isBooked = lawyerAppointments.some(apt => {
-        if (!apt.startTime) return false
-        // Simple check: if appointment starts at this time, it's booked
-        // For more accuracy, we'd check duration overlap
-        return apt.startTime === slotTime
-      })
-
-      return { ...slot, available: !isBooked }
-    })
-  }, [selectedDate, appointmentsData, effectiveLawyerId, allTimeSlots])
-
-  const isSlotsLoading = isAppointmentsLoading
+  const availableSlots = availableSlotsData?.data?.slots || []
 
   const calendarDays = useMemo(() => {
     const start = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1)
@@ -1220,6 +1182,14 @@ function BookAppointmentDialog({
                 </div>
               ) : isSlotsLoading ? (
                 <div className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-slate-400" /></div>
+              ) : isSlotsError || availableSlots.length === 0 ? (
+                <div className="text-center py-8 text-slate-400">
+                  <Clock className="h-10 w-10 mx-auto mb-3 opacity-50" />
+                  <p className="font-medium text-sm">{isRtl ? 'لا توجد أوقات متاحة' : 'No available times'}</p>
+                  <p className="text-xs mt-1 text-slate-400">
+                    {isRtl ? 'قد يكون هناك مواعيد أو حجوزات أخرى' : 'May have appointments or blocked times'}
+                  </p>
+                </div>
               ) : (
                 <div className="grid grid-cols-3 gap-2 max-h-[300px] overflow-y-auto">
                   {availableSlots.map((slot) => (
