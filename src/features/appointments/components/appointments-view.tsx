@@ -294,8 +294,9 @@ export function AppointmentsView() {
       setAppointmentToDelete(null)
       setShowDeleteConfirm(false)
       refetch()
-    } catch {
-      toast.error(isRtl ? 'حدث خطأ أثناء الحذف' : 'Error deleting appointment(s)')
+    } catch (error: any) {
+      const errorMessage = error?.message || (isRtl ? 'حدث خطأ أثناء الحذف' : 'Error deleting appointment(s)')
+      toast.error(errorMessage)
     }
   }
 
@@ -922,8 +923,9 @@ function AppointmentDetailsDialog({
           break
       }
       onOpenChange(false)
-    } catch {
-      toast.error(isRtl ? 'حدث خطأ' : 'An error occurred')
+    } catch (error: any) {
+      const errorMessage = error?.message || (isRtl ? 'حدث خطأ' : 'An error occurred')
+      toast.error(errorMessage)
     }
   }
 
@@ -1086,8 +1088,9 @@ function BookAppointmentDialog({
       toast.success(isRtl ? 'تم حجز الموعد بنجاح' : 'Appointment booked successfully')
       onOpenChange(false)
       resetForm()
-    } catch {
-      toast.error(isRtl ? 'فشل في حجز الموعد' : 'Failed to book appointment')
+    } catch (error: any) {
+      const errorMessage = error?.message || (isRtl ? 'فشل في حجز الموعد' : 'Failed to book appointment')
+      toast.error(errorMessage)
     }
   }
 
@@ -1318,8 +1321,9 @@ function BlockTimeDialog({
       toast.success(isRtl ? 'تم حظر الوقت بنجاح' : 'Time blocked successfully')
       onOpenChange(false)
       resetForm()
-    } catch {
-      toast.error(isRtl ? 'فشل في حظر الوقت' : 'Failed to block time')
+    } catch (error: any) {
+      const errorMessage = error?.message || (isRtl ? 'فشل في حظر الوقت' : 'Failed to block time')
+      toast.error(errorMessage)
     }
   }
 
@@ -1511,8 +1515,9 @@ function ManageAvailabilityDialog({
       toast.success(isRtl ? 'تمت إضافة وقت العمل' : 'Availability added')
       setShowAddSlot(false)
       setNewSlot({ dayOfWeek: 0, startTime: '09:00', endTime: '17:00', slotDuration: 30 })
-    } catch {
-      toast.error(isRtl ? 'فشل في إضافة وقت العمل' : 'Failed to add availability')
+    } catch (error: any) {
+      const errorMessage = error?.message || (isRtl ? 'فشل في إضافة وقت العمل' : 'Failed to add availability')
+      toast.error(errorMessage)
     }
   }
 
@@ -1520,8 +1525,9 @@ function ManageAvailabilityDialog({
     try {
       await deleteAvailability.mutateAsync(slotId)
       toast.success(isRtl ? 'تم حذف وقت العمل' : 'Availability deleted')
-    } catch {
-      toast.error(isRtl ? 'فشل في حذف وقت العمل' : 'Failed to delete availability')
+    } catch (error: any) {
+      const errorMessage = error?.message || (isRtl ? 'فشل في حذف وقت العمل' : 'Failed to delete availability')
+      toast.error(errorMessage)
     }
   }
 
