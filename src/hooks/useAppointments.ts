@@ -367,7 +367,7 @@ export function useAvailableSlots(params: GetAvailableSlotsRequest, enabled = tr
   return useQuery({
     queryKey: appointmentKeys.availableSlotsFiltered(params),
     queryFn: () => appointmentsService.getAvailableSlots(params),
-    enabled: enabled && !!params.lawyerId && !!params.startDate && !!params.endDate,
+    enabled: enabled && !!params.date,
     staleTime: 1 * 60 * 1000, // 1 minute - slots can change quickly
   })
 }
