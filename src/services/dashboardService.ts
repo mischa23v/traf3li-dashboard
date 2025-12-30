@@ -126,6 +126,8 @@ export interface DashboardFinancialSummary {
   totalExpenses: number
   pendingAmount: number
   overdueAmount: number
+  /** Revenue change percentage compared to last month (e.g., 20.1 for +20.1%) */
+  revenueChangePercent?: number
 }
 
 /**
