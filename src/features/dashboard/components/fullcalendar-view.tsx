@@ -40,6 +40,8 @@ import {
   useCalendarItemDetails,
   usePrefetchAdjacentMonthsOptimized,
 } from '@/hooks/useCalendar'
+import { useAppointmentSettings, useBlockedTimes } from '@/hooks/useAppointments'
+import { DEFAULT_WORKING_HOURS, type WorkingHours } from '@/types/crmSettings'
 import type { GridItem } from '@/services/calendarService'
 import { useCreateEvent, useUpdateEvent } from '@/hooks/useRemindersAndEvents'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -83,11 +85,11 @@ import { CalendarSyncDialog } from './calendar-sync-dialog'
 // FullCalendar plugins array - must be stable reference
 const CALENDAR_PLUGINS = [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]
 
-// Navigation links - stable reference
-const TOP_NAV_LINKS = [
-  { title: 'الرئيسية', href: ROUTES.dashboard.home, isActive: false, disabled: false },
-  { title: 'التقويم', href: ROUTES.dashboard.calendar, isActive: true, disabled: false },
-  { title: 'المهام', href: ROUTES.dashboard.tasks.list, isActive: false, disabled: false },
+// Navigation links - will be populated with translations in component
+const TOP_NAV_LINKS_KEYS = [
+  { titleKey: 'nav.home', href: ROUTES.dashboard.home, isActive: false, disabled: false },
+  { titleKey: 'nav.calendar', href: ROUTES.dashboard.calendar, isActive: true, disabled: false },
+  { titleKey: 'nav.tasks', href: ROUTES.dashboard.tasks.list, isActive: false, disabled: false },
 ]
 
 // Event type colors
@@ -118,6 +120,82 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
   document_review: 'مراجعة مستند',
   training: 'تدريب',
   other: 'أخرى',
+}
+
+// Day name mapping for FullCalendar (0 = Sunday, 1 = Monday, etc.)
+const DAY_NAME_TO_DOW: Record<string, number> = {
+  sunday: 0,
+  monday: 1,
+  tuesday: 2,
+  wednesday: 3,
+  thursday: 4,
+  friday: 5,
+  saturday: 6,
+}
+
+// Blocked time colors
+const BLOCKED_TIME_COLORS = {
+  vacation: { bg: '#fef3c7', border: '#f59e0b', text: '#92400e' },
+  meeting: { bg: '#dbeafe', border: '#3b82f6', text: '#1e40af' },
+  unavailable: { bg: '#fee2e2', border: '#ef4444', text: '#991b1b' },
+  other: { bg: '#f3f4f6', border: '#9ca3af', text: '#374151' },
+}
+
+/**
+ * Convert working hours config to FullCalendar businessHours format
+ * Enterprise-grade: Proper mapping for Saudi Arabia week (Sun-Thu working days)
+ */
+function convertWorkingHoursToBusinessHours(
+  workingHours: Record<string, WorkingHours>
+): { daysOfWeek: number[]; startTime: string; endTime: string }[] {
+  const businessHours: { daysOfWeek: number[]; startTime: string; endTime: string }[] = []
+
+  // Group days with same working hours for efficiency
+  const hoursMap = new Map<string, number[]>()
+
+  Object.entries(workingHours).forEach(([day, hours]) => {
+    if (hours.enabled) {
+      const key = `${hours.start}-${hours.end}`
+      const dow = DAY_NAME_TO_DOW[day]
+      if (!hoursMap.has(key)) {
+        hoursMap.set(key, [])
+      }
+      hoursMap.get(key)!.push(dow)
+    }
+  })
+
+  hoursMap.forEach((daysOfWeek, timeRange) => {
+    const [startTime, endTime] = timeRange.split('-')
+    businessHours.push({ daysOfWeek, startTime, endTime })
+  })
+
+  return businessHours
+}
+
+/**
+ * Get the earliest and latest working hours for calendar display optimization
+ */
+function getWorkingHoursRange(workingHours: Record<string, WorkingHours>): { slotMinTime: string; slotMaxTime: string } {
+  let minHour = 24
+  let maxHour = 0
+
+  Object.values(workingHours).forEach((hours) => {
+    if (hours.enabled) {
+      const startHour = parseInt(hours.start.split(':')[0], 10)
+      const endHour = parseInt(hours.end.split(':')[0], 10)
+      minHour = Math.min(minHour, startHour)
+      maxHour = Math.max(maxHour, endHour)
+    }
+  })
+
+  // Add 1-hour buffer before and after, clamp to valid range
+  const bufferMin = Math.max(0, minHour - 1)
+  const bufferMax = Math.min(24, maxHour + 1)
+
+  return {
+    slotMinTime: `${bufferMin.toString().padStart(2, '0')}:00:00`,
+    slotMaxTime: `${bufferMax.toString().padStart(2, '0')}:00:00`,
+  }
 }
 
 // FullCalendar Library Loading Skeleton
@@ -195,6 +273,19 @@ export function FullCalendarView() {
   const calendarRef = useRef<FullCalendar>(null)
   const isRTL = i18n.language === 'ar'
 
+  // State for screen reader announcements
+  const [srAnnouncement, setSrAnnouncement] = useState('')
+  const [currentMonthName, setCurrentMonthName] = useState('')
+
+  // Translate navigation links
+  const topNavLinks = useMemo(() =>
+    TOP_NAV_LINKS_KEYS.map(link => ({
+      ...link,
+      title: t(link.titleKey, link.titleKey === 'nav.home' ? 'الرئيسية' : link.titleKey === 'nav.calendar' ? 'التقويم' : 'المهام')
+    })),
+    [t]
+  )
+
   // Performance profiling
   const renderCount = useRef(0)
   const mountTime = useRef(performance.now())
@@ -257,6 +348,15 @@ export function FullCalendarView() {
   // Fetch calendar data using optimized endpoints
   // Grid items: minimal data (~150 bytes/item) for calendar display
   const { data: gridItemsData, isLoading, isError, error, refetch } = useCalendarGridItems(dateRange)
+
+  // Fetch appointment settings for working hours display
+  const { data: appointmentSettingsData } = useAppointmentSettings()
+
+  // Fetch blocked times for the current date range
+  const { data: blockedTimesData } = useBlockedTimes({
+    startDate: dateRange.startDate,
+    endDate: dateRange.endDate,
+  })
 
   // Lazy load full details when user clicks an event
   const { data: itemDetailsData, isLoading: isLoadingDetails } = useCalendarItemDetails(
@@ -368,6 +468,63 @@ export function FullCalendarView() {
     }))
   }, [gridItemsData])
 
+  // ==================== Working Hours Configuration ====================
+  // Get working hours from settings or use defaults
+  const workingHoursConfig = useMemo(() => {
+    const settings = appointmentSettingsData?.data?.workingHours
+    return settings || DEFAULT_WORKING_HOURS
+  }, [appointmentSettingsData])
+
+  // Convert working hours to FullCalendar businessHours format
+  // This displays non-working hours with gray background
+  const businessHours = useMemo(() => {
+    return convertWorkingHoursToBusinessHours(workingHoursConfig)
+  }, [workingHoursConfig])
+
+  // Get optimized time range for week/day views
+  const { slotMinTime, slotMaxTime } = useMemo(() => {
+    return getWorkingHoursRange(workingHoursConfig)
+  }, [workingHoursConfig])
+
+  // ==================== Blocked Times as Background Events ====================
+  // Convert blocked times to FullCalendar background events
+  const blockedTimeEvents = useMemo(() => {
+    if (!blockedTimesData?.data) return []
+
+    return blockedTimesData.data.map((blocked) => {
+      const colors = BLOCKED_TIME_COLORS[blocked.reason as keyof typeof BLOCKED_TIME_COLORS] || BLOCKED_TIME_COLORS.other
+
+      return {
+        id: `blocked-${blocked.id}`,
+        title: blocked.reason === 'vacation'
+          ? t('calendar.blockedTime.vacation', 'إجازة')
+          : blocked.reason === 'meeting'
+          ? t('calendar.blockedTime.meeting', 'اجتماع')
+          : blocked.reason === 'unavailable'
+          ? t('calendar.blockedTime.unavailable', 'غير متاح')
+          : blocked.notes || t('calendar.blockedTime.blocked', 'محجوب'),
+        start: blocked.startDate,
+        end: blocked.endDate,
+        display: 'background' as const,
+        backgroundColor: colors.bg,
+        borderColor: colors.border,
+        textColor: colors.text,
+        classNames: ['blocked-time-event'],
+        extendedProps: {
+          type: 'blocked',
+          reason: blocked.reason,
+          notes: blocked.notes,
+          targetLawyerId: blocked.targetLawyerId,
+        },
+      }
+    })
+  }, [blockedTimesData, t])
+
+  // Combine regular events with blocked time background events
+  const allCalendarEvents = useMemo(() => {
+    return [...calendarEvents, ...blockedTimeEvents]
+  }, [calendarEvents, blockedTimeEvents])
+
   // ==================== Memoized FullCalendar Props ====================
   // These prevent unnecessary re-initialization of FullCalendar
 
@@ -380,15 +537,15 @@ export function FullCalendarView() {
 
   // Button text - depends on language direction
   const buttonText = useMemo(() => ({
-    today: isRTL ? 'اليوم' : 'Today',
-    month: isRTL ? 'شهر' : 'Month',
-    week: isRTL ? 'أسبوع' : 'Week',
-    day: isRTL ? 'يوم' : 'Day',
-    list: isRTL ? 'قائمة' : 'List',
-  }), [isRTL])
+    today: t('calendar.views.today', 'اليوم'),
+    month: t('calendar.views.month', 'شهر'),
+    week: t('calendar.views.week', 'أسبوع'),
+    day: t('calendar.views.day', 'يوم'),
+    list: t('calendar.views.list', 'قائمة'),
+  }), [t])
 
   // More link text callback - stable reference
-  const moreLinkText = useCallback((num: number) => `+${num} المزيد`, [])
+  const moreLinkText = useCallback((num: number) => `+${num} ${t('calendar.moreLink', 'المزيد')}`, [t])
 
   // Event click handler - triggers lazy load for full details
   const handleEventClick = useCallback((info: EventClickArg) => {
@@ -433,9 +590,18 @@ export function FullCalendarView() {
         from: prev.toISOString().split('T')[0],
         to: viewCenter.toISOString().split('T')[0]
       })
+
+      // Update screen reader announcement for calendar navigation
+      const monthName = viewCenter.toLocaleDateString(i18n.language === 'ar' ? 'ar-SA' : 'en-US', {
+        month: 'long',
+        year: 'numeric',
+      })
+      setCurrentMonthName(monthName)
+      setSrAnnouncement(`${t('calendar.viewing', 'عرض')} ${monthName}`)
+
       return viewCenter
     })
-  }, [])
+  }, [i18n.language, t])
 
   // Date select handler (for creating new events) - use functional update to avoid dependency on createForm
   const handleDateSelect = useCallback((info: DateSelectArg) => {
@@ -462,22 +628,22 @@ export function FullCalendarView() {
             endDate: info.event.endStr || info.event.startStr,
           },
         })
-        toast.success('تم تحديث موعد الحدث بنجاح')
+        toast.success(t('calendar.success.eventUpdated', 'تم تحديث موعد الحدث بنجاح'))
       } catch (error) {
         info.revert()
-        toast.error('فشل تحديث موعد الحدث')
+        toast.error(t('calendar.errors.eventUpdateFailed', 'فشل تحديث موعد الحدث'))
       }
     } else {
       // For tasks and reminders, revert as they need different handling
       info.revert()
-      toast.info('اسحب الأحداث فقط لتغيير موعدها')
+      toast.info(t('calendar.info.dragEventsOnly', 'اسحب الأحداث فقط لتغيير موعدها'))
     }
-  }, [updateEventMutation])
+  }, [updateEventMutation, t])
 
   // Create event handler
   const handleCreateEvent = async () => {
     if (!createForm.title.trim()) {
-      toast.error('يرجى إدخال عنوان الحدث')
+      toast.error(t('calendar.errors.titleRequired', 'يرجى إدخال عنوان الحدث'))
       return
     }
 
@@ -500,7 +666,7 @@ export function FullCalendarView() {
         caseId: createForm.caseId || undefined,
       })
 
-      toast.success('تم إنشاء الحدث بنجاح')
+      toast.success(t('calendar.success.eventCreated', 'تم إنشاء الحدث بنجاح'))
       setIsCreateDialogOpen(false)
       setCreateForm({
         title: '',
@@ -516,7 +682,7 @@ export function FullCalendarView() {
       })
       refetch()
     } catch (error) {
-      toast.error('فشل إنشاء الحدث')
+      toast.error(t('calendar.errors.eventCreateFailed', 'فشل إنشاء الحدث'))
     }
   }
 
@@ -556,13 +722,13 @@ export function FullCalendarView() {
       >
         <div className="flex items-center gap-1 truncate">
           {eventType === 'hearing' || eventType === 'court_session' ? (
-            <Gavel className="h-3 w-3 flex-shrink-0" />
+            <Gavel className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
           ) : eventType === 'meeting' ? (
             <Users className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
           ) : eventType === 'deadline' || eventType === 'task' ? (
             <AlertTriangle className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
           ) : (
-            <CalendarIcon className="h-3 w-3 flex-shrink-0" />
+            <CalendarIcon className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
           )}
           <span className="truncate">{event.title}</span>
         </div>
@@ -575,13 +741,18 @@ export function FullCalendarView() {
     return (
       <>
         <Header className="bg-navy shadow-none relative">
-          <TopNav links={TOP_NAV_LINKS} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+          <TopNav links={topNavLinks} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
             <DynamicIsland />
           </div>
           <div className="ms-auto flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-              <Bell className="h-5 w-5" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white"
+              aria-label={t('common.notifications', 'الإشعارات')}
+            >
+              <Bell className="h-5 w-5" aria-hidden="true" />
             </Button>
             <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
             <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -589,7 +760,13 @@ export function FullCalendarView() {
             <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
           </div>
         </Header>
-        <Main fluid className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8">
+        <Main
+          fluid
+          className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8"
+          aria-busy="true"
+          aria-live="polite"
+        >
+          <div className="sr-only">{t('calendar.states.loading', 'جاري تحميل التقويم...')}</div>
           <Skeleton className="h-48 w-full rounded-3xl" />
           <Skeleton className="h-[700px] w-full rounded-3xl" />
         </Main>
@@ -605,7 +782,7 @@ export function FullCalendarView() {
     return (
       <>
         <Header className="bg-navy shadow-none relative">
-          <TopNav links={TOP_NAV_LINKS} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+          <TopNav links={topNavLinks} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
             <DynamicIsland />
           </div>
@@ -617,18 +794,18 @@ export function FullCalendarView() {
         </Header>
         <Main fluid className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
           <Card className="rounded-3xl border-0 shadow-lg">
-            <CardContent className="p-12 text-center">
+            <CardContent className="p-12 text-center" role="alert" aria-live="assertive">
               <div className={`w-16 h-16 ${isBackendPending ? 'bg-orange-50' : 'bg-red-50'} rounded-full flex items-center justify-center mx-auto mb-4`}>
                 <AlertCircle className={`h-8 w-8 ${isBackendPending ? 'text-orange-500' : 'text-red-500'}`} aria-hidden="true" />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">
                 {isBackendPending ? (
                   <>
-                    {isRTL ? '[بانتظار التطبيق] فشل تحميل التقويم' : '[BACKEND-PENDING] Failed to load calendar'}
+                    {t('calendar.errors.backendPendingTitle', '[بانتظار التطبيق] فشل تحميل التقويم')}
                   </>
                 ) : (
                   <>
-                    {isRTL ? 'فشل تحميل التقويم' : 'Failed to load calendar'}
+                    {t('calendar.errors.loadFailed', 'فشل تحميل التقويم')}
                   </>
                 )}
               </h3>
@@ -637,19 +814,17 @@ export function FullCalendarView() {
                 <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6 text-right">
                   <p className="text-sm text-orange-800 mb-2">
                     <strong className="font-bold">
-                      {isRTL ? '⚠️ هذه الميزة بانتظار تطبيق الخادم' : '⚠️ This feature is pending backend implementation'}
+                      {t('calendar.errors.backendPendingWarning', '⚠️ هذه الميزة بانتظار تطبيق الخادم')}
                     </strong>
                   </p>
                   <p className="text-xs text-orange-700">
-                    {isRTL
-                      ? 'يستخدم التقويم حاليًا نقاط نهاية محسّنة غير مطبقة بعد في الخادم. يرجى الاتصال بفريق التطوير لتطبيق النقاط النهائية المطلوبة أو استخدام التقويم القديم مؤقتًا.'
-                      : 'The calendar is currently using optimized endpoints that are not yet implemented in the backend. Please contact the development team to implement the required endpoints or use the legacy calendar temporarily.'}
+                    {t('calendar.errors.backendPendingDescription', 'يستخدم التقويم حاليًا نقاط نهاية محسّنة غير مطبقة بعد في الخادم. يرجى الاتصال بفريق التطوير لتطبيق النقاط النهائية المطلوبة أو استخدام التقويم القديم مؤقتًا.')}
                   </p>
                 </div>
               )}
               <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
-                <RefreshCw className="ms-2 h-4 w-4" />
-                {isRTL ? 'إعادة المحاولة' : 'Retry'}
+                <RefreshCw className="ms-2 h-4 w-4" aria-hidden="true" />
+                {t('calendar.actions.retry', 'إعادة المحاولة')}
               </Button>
             </CardContent>
           </Card>
@@ -670,13 +845,19 @@ export function FullCalendarView() {
             <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
-              placeholder="بحث..."
+              placeholder={t('common.search', 'بحث...')}
               className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              aria-label={t('common.search', 'بحث...')}
             />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white"
+            aria-label={t('common.notifications', 'الإشعارات')}
+          >
+            <Bell className="h-5 w-5" aria-hidden="true" />
+            <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy" aria-hidden="true"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -724,7 +905,7 @@ export function FullCalendarView() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               {/* Title Section */}
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-white/10 rounded-xl">
+                <div className="p-2.5 bg-white/10 rounded-xl" aria-hidden="true">
                   <CalendarIcon className="w-6 h-6 text-emerald-400" />
                 </div>
                 <h1 className="text-2xl font-bold text-white tracking-tight">
@@ -754,12 +935,27 @@ export function FullCalendarView() {
           </div>
         </div>
 
+        {/* Screen reader announcements for calendar navigation */}
+        <div
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          className="sr-only"
+        >
+          {srAnnouncement}
+        </div>
+
         {/* Calendar */}
         <Card className="rounded-3xl border-0 shadow-lg overflow-hidden">
           <CardContent className="p-0">
+            {/* Screen reader helper text */}
+            <span className="sr-only">
+              {t('calendar.eventCount', `${calendarEvents.length} ${calendarEvents.length === 1 ? 'حدث' : 'أحداث'} في هذا الشهر`)}
+            </span>
             <div
               className="fullcalendar-wrapper p-4"
               style={{ direction: isRTL ? 'rtl' : 'ltr' }}
+              aria-busy={isLoading}
             >
               <Suspense fallback={<FullCalendarLibrarySkeleton />}>
                 <FullCalendarComponent
@@ -770,7 +966,7 @@ export function FullCalendarView() {
                   direction={isRTL ? 'rtl' : 'ltr'}
                   headerToolbar={headerToolbar}
                   buttonText={buttonText}
-                  events={calendarEvents}
+                  events={allCalendarEvents}
                   eventClick={handleEventClick}
                   select={handleDateSelect}
                   eventDrop={handleEventDrop}
@@ -788,6 +984,18 @@ export function FullCalendarView() {
                   rerenderDelay={10}
                   progressiveEventRendering={true}
                   datesSet={handleDatesSet}
+                  // ==================== Working Hours Display ====================
+                  // Shows working hours with white background, non-working with gray
+                  businessHours={businessHours}
+                  // Optimize week/day views to focus on working hours range
+                  slotMinTime={slotMinTime}
+                  slotMaxTime={slotMaxTime}
+                  // Visual distinction for outside business hours
+                  slotLabelFormat={{
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                  }}
                 />
               </Suspense>
             </div>
@@ -800,20 +1008,20 @@ export function FullCalendarView() {
         setIsEventDialogOpen(open)
         if (!open) setSelectedItemForDetails(null) // Clear lazy load state when closing
       }}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md" aria-describedby="event-description">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle id="event-title" className="flex items-center gap-2">
               {selectedEvent?.extendedProps.eventType === 'hearing' ||
               selectedEvent?.extendedProps.eventType === 'court_session' ? (
-                <Gavel className="h-5 w-5 text-red-500" />
+                <Gavel className="h-5 w-5 text-red-500" aria-hidden="true" />
               ) : selectedEvent?.extendedProps.eventType === 'meeting' ? (
                 <Users className="h-5 w-5 text-blue-500" aria-hidden="true" />
               ) : (
-                <CalendarIcon className="h-5 w-5 text-purple-500" />
+                <CalendarIcon className="h-5 w-5 text-purple-500" aria-hidden="true" />
               )}
               {selectedEvent?.title}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription id="event-description">
               {selectedEvent?.extendedProps.eventType &&
                 EVENT_TYPE_LABELS[selectedEvent.extendedProps.eventType]}
             </DialogDescription>
@@ -845,20 +1053,20 @@ export function FullCalendarView() {
                   }
                 >
                   {selectedEvent.extendedProps.priority === 'critical'
-                    ? 'حرج'
+                    ? t('calendar.priority.critical', 'حرج')
                     : selectedEvent.extendedProps.priority === 'high'
-                    ? 'عالي'
+                    ? t('calendar.priority.high', 'عالي')
                     : selectedEvent.extendedProps.priority === 'medium'
-                    ? 'متوسط'
-                    : 'منخفض'}
+                    ? t('calendar.priority.medium', 'متوسط')
+                    : t('calendar.priority.low', 'منخفض')}
                 </Badge>
               )}
 
               {/* Lazy-loaded details */}
               {isLoadingDetails ? (
-                <div className="flex items-center justify-center py-4">
-                  <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
-                  <span className="ms-2 text-sm text-slate-500">جاري تحميل التفاصيل...</span>
+                <div className="flex items-center justify-center py-4" aria-live="polite" aria-busy="true">
+                  <Loader2 className="h-5 w-5 animate-spin text-slate-400" aria-hidden="true" />
+                  <span className="ms-2 text-sm text-slate-500">{t('calendar.states.loadingDetails', 'جاري تحميل التفاصيل...')}</span>
                 </div>
               ) : itemDetailsData?.data && (
                 <>
@@ -871,7 +1079,7 @@ export function FullCalendarView() {
 
                   {itemDetailsData.data.caseName && (
                     <div className="flex items-center gap-2 text-sm text-slate-600">
-                      <Briefcase className="h-4 w-4" />
+                      <Briefcase className="h-4 w-4" aria-hidden="true" />
                       <span>
                         {itemDetailsData.data.caseName}
                         {itemDetailsData.data.caseNumber &&
@@ -890,7 +1098,7 @@ export function FullCalendarView() {
                     <div className="flex items-start gap-2 text-sm text-slate-600">
                       <Users className="h-4 w-4 mt-0.5" aria-hidden="true" />
                       <div>
-                        <span className="font-medium">الحضور:</span>
+                        <span className="font-medium">{t('calendar.labels.attendees', 'الحضور')}:</span>
                         <span className="ms-1">
                           {itemDetailsData.data.attendees.map((a: any) => a.name || a.username).join('، ')}
                         </span>
@@ -903,12 +1111,16 @@ export function FullCalendarView() {
           )}
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEventDialogOpen(false)}>
-              إغلاق
+            <Button
+              variant="outline"
+              onClick={() => setIsEventDialogOpen(false)}
+              aria-label={t('calendar.actions.close', 'إغلاق')}
+            >
+              {t('calendar.actions.close', 'إغلاق')}
             </Button>
             <Button onClick={handleViewEventDetails}>
               <ExternalLink className="ms-2 h-4 w-4" aria-hidden="true" />
-              عرض التفاصيل
+              {t('calendar.actions.viewDetails', 'عرض التفاصيل')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -916,25 +1128,25 @@ export function FullCalendarView() {
 
       {/* Create Event Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg" aria-describedby="create-event-description">
           <DialogHeader>
-            <DialogTitle>إنشاء حدث جديد</DialogTitle>
-            <DialogDescription>أضف حدث جديد إلى التقويم</DialogDescription>
+            <DialogTitle id="create-event-title">{t('calendar.dialogs.createEvent.title', 'إنشاء حدث جديد')}</DialogTitle>
+            <DialogDescription id="create-event-description">{t('calendar.dialogs.createEvent.description', 'أضف حدث جديد إلى التقويم')}</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div>
-              <Label htmlFor="title">العنوان *</Label>
+              <Label htmlFor="title">{t('calendar.labels.title', 'العنوان')} *</Label>
               <Input
                 id="title"
                 value={createForm.title}
                 onChange={(e) => setCreateForm({ ...createForm, title: e.target.value })}
-                placeholder="عنوان الحدث"
+                placeholder={t('calendar.placeholders.eventTitle', 'عنوان الحدث')}
               />
             </div>
 
             <div>
-              <Label htmlFor="type">نوع الحدث</Label>
+              <Label htmlFor="type">{t('calendar.labels.eventType', 'نوع الحدث')}</Label>
               <Select
                 value={createForm.type}
                 onValueChange={(value) => setCreateForm({ ...createForm, type: value })}
@@ -943,14 +1155,14 @@ export function FullCalendarView() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="hearing">جلسة محكمة</SelectItem>
-                  <SelectItem value="meeting">اجتماع</SelectItem>
-                  <SelectItem value="deadline">موعد نهائي</SelectItem>
-                  <SelectItem value="conference">مؤتمر</SelectItem>
-                  <SelectItem value="consultation">استشارة</SelectItem>
-                  <SelectItem value="document_review">مراجعة مستند</SelectItem>
-                  <SelectItem value="training">تدريب</SelectItem>
-                  <SelectItem value="other">أخرى</SelectItem>
+                  <SelectItem value="hearing">{t('calendar.eventTypes.hearing', 'جلسة محكمة')}</SelectItem>
+                  <SelectItem value="meeting">{t('calendar.eventTypes.meeting', 'اجتماع')}</SelectItem>
+                  <SelectItem value="deadline">{t('calendar.eventTypes.deadline', 'موعد نهائي')}</SelectItem>
+                  <SelectItem value="conference">{t('calendar.eventTypes.conference', 'مؤتمر')}</SelectItem>
+                  <SelectItem value="consultation">{t('calendar.eventTypes.consultation', 'استشارة')}</SelectItem>
+                  <SelectItem value="document_review">{t('calendar.eventTypes.documentReview', 'مراجعة مستند')}</SelectItem>
+                  <SelectItem value="training">{t('calendar.eventTypes.training', 'تدريب')}</SelectItem>
+                  <SelectItem value="other">{t('calendar.eventTypes.other', 'أخرى')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -964,13 +1176,13 @@ export function FullCalendarView() {
                 }
               />
               <Label htmlFor="allDay" className="cursor-pointer">
-                طوال اليوم
+                {t('calendar.labels.allDay', 'طوال اليوم')}
               </Label>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="startDate">تاريخ البدء *</Label>
+                <Label htmlFor="startDate">{t('calendar.labels.startDate', 'تاريخ البدء')} *</Label>
                 <Input
                   id="startDate"
                   type="date"
@@ -980,7 +1192,7 @@ export function FullCalendarView() {
               </div>
               {!createForm.allDay && (
                 <div>
-                  <Label htmlFor="startTime">وقت البدء</Label>
+                  <Label htmlFor="startTime">{t('calendar.labels.startTime', 'وقت البدء')}</Label>
                   <Input
                     id="startTime"
                     type="time"
@@ -993,7 +1205,7 @@ export function FullCalendarView() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="endDate">تاريخ الانتهاء</Label>
+                <Label htmlFor="endDate">{t('calendar.labels.endDate', 'تاريخ الانتهاء')}</Label>
                 <Input
                   id="endDate"
                   type="date"
@@ -1003,7 +1215,7 @@ export function FullCalendarView() {
               </div>
               {!createForm.allDay && (
                 <div>
-                  <Label htmlFor="endTime">وقت الانتهاء</Label>
+                  <Label htmlFor="endTime">{t('calendar.labels.endTime', 'وقت الانتهاء')}</Label>
                   <Input
                     id="endTime"
                     type="time"
@@ -1015,42 +1227,47 @@ export function FullCalendarView() {
             </div>
 
             <div>
-              <Label htmlFor="location">الموقع</Label>
+              <Label htmlFor="location">{t('calendar.labels.location', 'الموقع')}</Label>
               <Input
                 id="location"
                 value={createForm.location}
                 onChange={(e) => setCreateForm({ ...createForm, location: e.target.value })}
-                placeholder="موقع الحدث"
+                placeholder={t('calendar.placeholders.eventLocation', 'موقع الحدث')}
               />
             </div>
 
             <div>
-              <Label htmlFor="description">الوصف</Label>
+              <Label htmlFor="description">{t('calendar.labels.description', 'الوصف')}</Label>
               <Textarea
                 id="description"
                 value={createForm.description}
                 onChange={(e) => setCreateForm({ ...createForm, description: e.target.value })}
-                placeholder="وصف الحدث"
+                placeholder={t('calendar.placeholders.eventDescription', 'وصف الحدث')}
                 rows={3}
               />
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-              إلغاء
+            <Button
+              variant="outline"
+              onClick={() => setIsCreateDialogOpen(false)}
+              aria-label={t('calendar.actions.cancel', 'إلغاء')}
+            >
+              {t('calendar.actions.cancel', 'إلغاء')}
             </Button>
             <Button
               onClick={handleCreateEvent}
               disabled={createEventMutation.isPending}
               className="bg-brand-blue hover:bg-blue-600"
+              aria-busy={createEventMutation.isPending}
             >
               {createEventMutation.isPending ? (
-                <Loader2 className="ms-2 h-4 w-4 animate-spin" />
+                <Loader2 className="ms-2 h-4 w-4 animate-spin" aria-hidden="true" />
               ) : (
                 <Check className="ms-2 h-4 w-4" aria-hidden="true" />
               )}
-              إنشاء الحدث
+              {t('calendar.actions.createEvent', 'إنشاء الحدث')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1132,6 +1349,70 @@ export function FullCalendarView() {
         }
         .fullcalendar-wrapper .fc-list-event:hover td {
           background-color: #f1f5f9;
+        }
+
+        /* ==================== Working Hours Display ==================== */
+        /* Non-working hours (outside business hours) - subtle gray background */
+        .fullcalendar-wrapper .fc-timegrid-slot.fc-non-business {
+          background-color: #f8fafc;
+        }
+        .fullcalendar-wrapper .fc-daygrid-day.fc-non-business {
+          background-color: #f8fafc;
+        }
+        /* Business hours - white background for contrast */
+        .fullcalendar-wrapper .fc-timegrid-slot:not(.fc-non-business) {
+          background-color: #ffffff;
+        }
+        /* Weekend days visual distinction */
+        .fullcalendar-wrapper .fc-day-fri:not(.fc-day-today),
+        .fullcalendar-wrapper .fc-day-sat:not(.fc-day-today) {
+          background-color: #f1f5f9 !important;
+        }
+        .fullcalendar-wrapper .fc-day-fri .fc-daygrid-day-number,
+        .fullcalendar-wrapper .fc-day-sat .fc-daygrid-day-number {
+          color: #94a3b8;
+        }
+
+        /* ==================== Blocked Times Display ==================== */
+        /* Blocked time background events */
+        .fullcalendar-wrapper .blocked-time-event {
+          opacity: 0.7;
+          border-radius: 0.25rem;
+        }
+        .fullcalendar-wrapper .fc-bg-event {
+          opacity: 0.6;
+          border-left: 3px solid;
+        }
+        /* Striped pattern for blocked/unavailable times */
+        .fullcalendar-wrapper .fc-bg-event.blocked-time-event {
+          background-image: repeating-linear-gradient(
+            135deg,
+            transparent,
+            transparent 5px,
+            rgba(0, 0, 0, 0.03) 5px,
+            rgba(0, 0, 0, 0.03) 10px
+          );
+        }
+        /* Blocked time hover effect */
+        .fullcalendar-wrapper .fc-bg-event:hover {
+          opacity: 0.8;
+        }
+
+        /* ==================== Time Grid Enhancements ==================== */
+        /* Better time slot visualization */
+        .fullcalendar-wrapper .fc-timegrid-slot-minor {
+          border-top-style: dashed;
+          border-top-color: #e2e8f0;
+        }
+        /* Current time indicator */
+        .fullcalendar-wrapper .fc-timegrid-now-indicator-line {
+          border-color: #10b981;
+          border-width: 2px;
+        }
+        .fullcalendar-wrapper .fc-timegrid-now-indicator-arrow {
+          border-color: #10b981;
+          border-top-color: transparent;
+          border-bottom-color: transparent;
         }
       `}</style>
     </>
