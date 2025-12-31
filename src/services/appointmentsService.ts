@@ -588,10 +588,19 @@ const appointmentsService = {
   /**
    * Get available time slots for booking
    * الحصول على الفترات الزمنية المتاحة للحجز
+   *
+   * Note: Backend expects startDate and endDate, so we transform the date parameter
    */
   getAvailableSlots: async (params: GetAvailableSlotsRequest): Promise<AvailableSlotsResponse> => {
     try {
-      const response = await apiClient.get<AvailableSlotsResponse>('/appointments/available-slots', { params })
+      // Transform date to startDate/endDate as required by the backend API
+      const { date, ...rest } = params
+      const apiParams = {
+        ...rest,
+        startDate: date,
+        endDate: date,
+      }
+      const response = await apiClient.get<AvailableSlotsResponse>('/appointments/available-slots', { params: apiParams })
       return response.data
     } catch (error: any) {
       const errorMessage = handleApiError(error) || 'Failed to fetch available slots | فشل في جلب الفترات المتاحة'
