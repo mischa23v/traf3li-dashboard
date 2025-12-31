@@ -2045,13 +2045,12 @@ function BookAppointmentDialog({
                 <Input
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  placeholder={t('appointments.labels.subjectPlaceholder', 'مثال: استشارة قانونية، مراجعة عقد')}
                   maxLength={200}
                 />
               </div>
               <div>
                 <Label>{t('appointments.labels.clientName', 'اسم العميل')}</Label>
-                <Input value={formData.clientName} onChange={(e) => setFormData({ ...formData, clientName: e.target.value })} placeholder={t('appointments.labels.clientNamePlaceholder', 'أدخل اسم العميل')} maxLength={100} />
+                <Input value={formData.clientName} onChange={(e) => setFormData({ ...formData, clientName: e.target.value })} maxLength={100} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -2061,7 +2060,6 @@ function BookAppointmentDialog({
                     value={formData.clientEmail}
                     onChange={(e) => setFormData({ ...formData, clientEmail: e.target.value })}
                     className={emailError ? 'border-red-500 focus:ring-red-500' : ''}
-                    placeholder="example@email.com"
                     maxLength={254}
                     aria-invalid={emailError ? 'true' : 'false'}
                     aria-describedby={emailError ? 'email-error' : undefined}
@@ -2078,7 +2076,6 @@ function BookAppointmentDialog({
                     value={formData.clientPhone}
                     onChange={(e) => setFormData({ ...formData, clientPhone: e.target.value })}
                     className={phoneError ? 'border-red-500 focus:ring-red-500' : ''}
-                    placeholder="05XXXXXXXX"
                     maxLength={20}
                     aria-invalid={phoneError ? 'true' : 'false'}
                     aria-describedby={phoneError ? 'phone-error' : undefined}

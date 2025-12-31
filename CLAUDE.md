@@ -238,6 +238,30 @@ fetch(API_ENDPOINTS.clients.list)
 
 ---
 
+## 🚫 NO PLACEHOLDER HINTS IN FORM FIELDS
+
+**NEVER add placeholder text with examples or hints inside form inputs.**
+
+```typescript
+// ❌ NEVER DO THIS
+<Input placeholder="مثال: استشارة قانونية" />
+<Input placeholder="أدخل اسم العميل" />
+<Input placeholder="example@email.com" />
+<Input placeholder="05XXXXXXXX" />
+
+// ✅ ALWAYS DO THIS - Clean inputs with labels only
+<Label>{t('field.label', 'اسم العميل')}</Label>
+<Input value={value} onChange={onChange} maxLength={100} />
+```
+
+**Why:**
+- Labels already describe the field purpose
+- Placeholder text disappears when typing (bad UX)
+- Clutters the interface unnecessarily
+- Users don't need "helpful" examples - the label is enough
+
+---
+
 ## ⚠️ MOST IMPORTANT RULE - ASK BEFORE ASSUMING
 
 **THIS RULE MUST NEVER BE BROKEN:**
