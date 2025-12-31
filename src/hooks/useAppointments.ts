@@ -34,6 +34,81 @@ import appointmentsService, {
 } from '@/services/appointmentsService'
 import { queryRetryConfig, mutationRetryConfig } from '@/lib/query-retry-config'
 
+// ==================== Data Normalization ====================
+
+/**
+ * Normalize appointment data from backend
+ * Backend may return scheduledTime as ISO datetime, but frontend expects date/startTime/endTime
+ * تطبيع بيانات الموعد من الخادم
+ */
+function normalizeAppointment(apt: any): Appointment {
+  // If date and startTime already exist, return as-is
+  if (apt.date && apt.startTime) {
+    return apt
+  }
+
+  // If scheduledTime exists, extract date and time from it
+  if (apt.scheduledTime) {
+    const scheduledDate = new Date(apt.scheduledTime)
+
+    // Check if date is valid
+    if (!isNaN(scheduledDate.getTime())) {
+      const date = scheduledDate.toISOString().split('T')[0] // YYYY-MM-DD
+      const hours = scheduledDate.getHours().toString().padStart(2, '0')
+      const minutes = scheduledDate.getMinutes().toString().padStart(2, '0')
+      const startTime = `${hours}:${minutes}` // HH:MM
+
+      // Calculate endTime based on duration (default 30 min if not provided)
+      const duration = apt.duration || 30
+      const endDate = new Date(scheduledDate.getTime() + duration * 60000)
+      const endHours = endDate.getHours().toString().padStart(2, '0')
+      const endMinutes = endDate.getMinutes().toString().padStart(2, '0')
+      const endTime = `${endHours}:${endMinutes}`
+
+      console.log(`[NORMALIZE] Converted scheduledTime "${apt.scheduledTime}" → date: "${date}", startTime: "${startTime}", endTime: "${endTime}"`)
+
+      return {
+        ...apt,
+        date,
+        startTime,
+        endTime: apt.endTime || endTime,
+      }
+    }
+  }
+
+  // If timeRange exists (alternative format from backend), extract times
+  if (apt.timeRange) {
+    const [startTime, endTime] = apt.timeRange.split(' - ')
+    console.log(`[NORMALIZE] Extracted from timeRange "${apt.timeRange}" → startTime: "${startTime}", endTime: "${endTime}"`)
+    return {
+      ...apt,
+      startTime: startTime || apt.startTime || '00:00',
+      endTime: endTime || apt.endTime || '--:--',
+    }
+  }
+
+  console.warn('[NORMALIZE] Appointment missing date/time fields:', apt.id)
+
+  // Return with fallback values to prevent crashes
+  return {
+    ...apt,
+    date: apt.date || new Date().toISOString().split('T')[0],
+    startTime: apt.startTime || '00:00',
+    endTime: apt.endTime || '--:--',
+  }
+}
+
+/**
+ * Normalize array of appointments
+ */
+function normalizeAppointments(appointments: any[]): Appointment[] {
+  if (!Array.isArray(appointments)) {
+    console.warn('[NORMALIZE] Expected array, got:', typeof appointments)
+    return []
+  }
+  return appointments.map(normalizeAppointment)
+}
+
 // ==================== Filter Types (Strict, No Record<string, any>) ====================
 
 export interface AppointmentFilters {
@@ -289,9 +364,15 @@ export function useAppointments(params?: AppointmentFilters) {
 
       try {
         const result = await appointmentsService.getAppointments(params)
+
+        // Normalize appointments to ensure date/startTime/endTime fields exist
+        if (result?.data?.appointments) {
+          console.log('[NORMALIZE] Processing', result.data.appointments.length, 'appointments')
+          result.data.appointments = normalizeAppointments(result.data.appointments)
+        }
+
         console.group('✅ [QUERY-DEBUG] useAppointments SUCCESS')
         console.log('⏰ Time:', new Date().toISOString())
-        console.log('📦 Full Response:', JSON.stringify(result, null, 2))
         console.log('📊 Response Structure:', {
           success: result?.success,
           hasData: !!result?.data,
@@ -301,7 +382,7 @@ export function useAppointments(params?: AppointmentFilters) {
           limit: result?.data?.limit,
         })
         if (result?.data?.appointments?.length > 0) {
-          console.log('📝 First Appointment:', JSON.stringify(result.data.appointments[0], null, 2))
+          console.log('📝 First Appointment (normalized):', JSON.stringify(result.data.appointments[0], null, 2))
         }
         console.groupEnd()
         return result
@@ -330,8 +411,14 @@ export function useAppointments(params?: AppointmentFilters) {
 export function useInfiniteAppointments(params?: Omit<AppointmentFilters, 'page'>) {
   return useInfiniteQuery({
     queryKey: appointmentKeys.listInfinite(params),
-    queryFn: ({ pageParam = 1 }) =>
-      appointmentsService.getAppointments({ ...params, page: pageParam, limit: params?.limit || 20 }),
+    queryFn: async ({ pageParam = 1 }) => {
+      const result = await appointmentsService.getAppointments({ ...params, page: pageParam, limit: params?.limit || 20 })
+      // Normalize appointments
+      if (result?.data?.appointments) {
+        result.data.appointments = normalizeAppointments(result.data.appointments)
+      }
+      return result
+    },
     getNextPageParam: (lastPage) => {
       if (!lastPage.data) return undefined
       const { page, total, limit } = lastPage.data
@@ -351,7 +438,14 @@ export function useInfiniteAppointments(params?: Omit<AppointmentFilters, 'page'
 export function useAppointment(id: string) {
   return useQuery({
     queryKey: appointmentKeys.detail(id),
-    queryFn: () => appointmentsService.getAppointment(id),
+    queryFn: async () => {
+      const result = await appointmentsService.getAppointment(id)
+      // Normalize single appointment
+      if (result?.data) {
+        result.data = normalizeAppointment(result.data)
+      }
+      return result
+    },
     enabled: !!id,
     staleTime: 2 * 60 * 1000, // 2 minutes
     ...defaultQueryOptions,
