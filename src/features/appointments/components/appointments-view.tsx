@@ -1472,9 +1472,31 @@ function BookAppointmentDialog({
     !!selectedDate && !!effectiveLawyerId
   )
 
-  const availableSlots = availableSlotsData?.data?.slots || []
+  const rawAvailableSlots = availableSlotsData?.data?.slots || []
   const isWorkingDay = availableSlotsData?.data?.working ?? true
   const workingHours = availableSlotsData?.data?.workingHours
+
+  // Filter out past time slots when today is selected
+  const availableSlots = useMemo(() => {
+    if (!selectedDate || !isToday(selectedDate)) {
+      return rawAvailableSlots
+    }
+
+    const now = new Date()
+    const currentHour = now.getHours()
+    const currentMinute = now.getMinutes()
+
+    return rawAvailableSlots.map(slot => {
+      const [slotHour, slotMinute] = slot.start.split(':').map(Number)
+      const isPastTime = slotHour < currentHour || (slotHour === currentHour && slotMinute <= currentMinute)
+
+      // Mark past times as unavailable
+      if (isPastTime && slot.available) {
+        return { ...slot, available: false, reason: 'past' }
+      }
+      return slot
+    })
+  }, [rawAvailableSlots, selectedDate])
 
   const calendarDays = useMemo(() => {
     const start = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1)
@@ -1565,8 +1587,8 @@ function BookAppointmentDialog({
         date: format(selectedDate, 'yyyy-MM-dd'),
         startTime: selectedTime,
         source: 'manual',
-        // Include assignedTo only if booking for another lawyer
-        ...(targetLawyerId ? { assignedTo: targetLawyerId } : {}),
+        // Always send lawyerId - backend requires it (normalizes to assignedTo)
+        lawyerId: effectiveLawyerId,
       })
       toast.success(t('appointments.success.booked', 'تم حجز الموعد بنجاح'))
       onOpenChange(false)
