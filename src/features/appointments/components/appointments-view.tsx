@@ -135,11 +135,15 @@ const APPOINTMENT_TYPES: { value: AppointmentType; labelAr: string; labelEn: str
 
 const STATUS_CONFIG: Record<AppointmentStatus, { labelAr: string; labelEn: string; color: string; bgColor: string }> = {
   pending: { labelAr: 'معلق', labelEn: 'Pending', color: 'text-yellow-700', bgColor: 'bg-yellow-100 border-yellow-300' },
+  scheduled: { labelAr: 'مجدول', labelEn: 'Scheduled', color: 'text-yellow-700', bgColor: 'bg-yellow-100 border-yellow-300' },
   confirmed: { labelAr: 'مؤكد', labelEn: 'Confirmed', color: 'text-blue-700', bgColor: 'bg-blue-100 border-blue-300' },
   completed: { labelAr: 'مكتمل', labelEn: 'Completed', color: 'text-green-700', bgColor: 'bg-green-100 border-green-300' },
   cancelled: { labelAr: 'ملغي', labelEn: 'Cancelled', color: 'text-red-700', bgColor: 'bg-red-100 border-red-300' },
   no_show: { labelAr: 'لم يحضر', labelEn: 'No Show', color: 'text-gray-700', bgColor: 'bg-gray-100 border-gray-300' },
 }
+
+// Fallback for unknown statuses to prevent crashes
+const DEFAULT_STATUS_CONFIG = { labelAr: 'غير معروف', labelEn: 'Unknown', color: 'text-gray-700', bgColor: 'bg-gray-100 border-gray-300' }
 
 const WEEKDAYS_AR = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت']
 const WEEKDAYS_EN = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
@@ -814,7 +818,7 @@ export function AppointmentsView() {
                         <div className="space-y-2">
                           {dayAppointments.map((apt) => {
                             const typeConfig = APPOINTMENT_TYPES.find((t) => t.value === apt.type)
-                            const statusConfig = STATUS_CONFIG[apt.status]
+                            const statusConfig = STATUS_CONFIG[apt.status] || DEFAULT_STATUS_CONFIG
                             const isSelected = selectedAppointments.has(apt.id)
 
                             return (
@@ -880,7 +884,7 @@ export function AppointmentsView() {
                 ) : (
                   filteredAppointments.map((apt) => {
                     const typeConfig = APPOINTMENT_TYPES.find((t) => t.value === apt.type)
-                    const statusConfig = STATUS_CONFIG[apt.status]
+                    const statusConfig = STATUS_CONFIG[apt.status] || DEFAULT_STATUS_CONFIG
                     const isSelected = selectedAppointments.has(apt.id)
 
                     return (
@@ -1273,7 +1277,7 @@ function AppointmentDetailsDialog({
   if (!appointment) return null
 
   const typeConfig = APPOINTMENT_TYPES.find((t) => t.value === appointment.type)
-  const statusConfig = STATUS_CONFIG[appointment.status]
+  const statusConfig = STATUS_CONFIG[appointment.status] || DEFAULT_STATUS_CONFIG
 
   const handleAction = async (action: string) => {
     try {

@@ -101,7 +101,7 @@ export type AppointmentType = 'consultation' | 'follow_up' | 'case_review' | 'in
 /**
  * Appointment status
  */
-export type AppointmentStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'no_show'
+export type AppointmentStatus = 'pending' | 'scheduled' | 'confirmed' | 'cancelled' | 'completed' | 'no_show'
 
 /**
  * Booking source
