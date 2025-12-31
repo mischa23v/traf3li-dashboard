@@ -843,6 +843,47 @@ export function AppointmentsView() {
             {/* Week View */}
             {!isLoading && !isError && viewMode === 'week' && (
               <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                {/* Debug: Show if appointments exist but not in current week */}
+                {(() => {
+                  const weekDateKeys = weekDays.map(d => format(d, 'yyyy-MM-dd'))
+                  const groupedDateKeys = Object.keys(appointmentsByDate)
+                  const appointmentsInWeek = groupedDateKeys.filter(dk => weekDateKeys.includes(dk))
+                  const appointmentsOutsideWeek = groupedDateKeys.filter(dk => !weekDateKeys.includes(dk))
+
+                  console.log('[WEEK-VIEW-RENDER]', {
+                    totalAppointments: filteredAppointments.length,
+                    weekRange: `${weekDateKeys[0]} to ${weekDateKeys[6]}`,
+                    appointmentDates: groupedDateKeys,
+                    inWeek: appointmentsInWeek,
+                    outsideWeek: appointmentsOutsideWeek,
+                  })
+
+                  if (filteredAppointments.length > 0 && appointmentsInWeek.length === 0 && appointmentsOutsideWeek.length > 0) {
+                    const firstAppointmentDate = appointmentsOutsideWeek.length > 0 ? new Date(appointmentsOutsideWeek[0]) : null
+                    return (
+                      <div className="bg-amber-50 border-b border-amber-200 p-3 text-center">
+                        <p className="text-sm text-amber-700">
+                          {t('appointments.info.appointmentsOutsideWeek', '⚠️ لديك {{count}} موعد في تواريخ أخرى: {{dates}}', {
+                            count: filteredAppointments.length,
+                            dates: appointmentsOutsideWeek.join(', ')
+                          })}
+                        </p>
+                        {firstAppointmentDate && !isNaN(firstAppointmentDate.getTime()) && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="mt-2 text-amber-700 border-amber-300 hover:bg-amber-100"
+                            onClick={() => setCurrentWeekStart(startOfWeek(firstAppointmentDate, { weekStartsOn: 0 }))}
+                          >
+                            {t('appointments.actions.goToAppointments', 'الانتقال إلى المواعيد')}
+                          </Button>
+                        )}
+                      </div>
+                    )
+                  }
+                  return null
+                })()}
+
                 {/* Week Header */}
                 <div className="grid grid-cols-7 border-b border-slate-100">
                   {weekDays.map((day, idx) => {
