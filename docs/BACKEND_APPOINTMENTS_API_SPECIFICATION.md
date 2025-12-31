@@ -1008,6 +1008,39 @@ Common error codes:
 
 ---
 
+## Field Name Mapping (Backend Auto-Converts)
+
+The backend now supports BOTH frontend and backend field names. Auto-mapping is applied:
+
+| Frontend Sends | Backend Also Accepts | Description |
+|----------------|---------------------|-------------|
+| `clientName` | `customerName` | Both work - auto-mapped |
+| `clientEmail` | `customerEmail` | Both work - auto-mapped |
+| `clientPhone` | `customerPhone` | Both work - auto-mapped |
+| `notes` | `customerNotes` | Both work - auto-mapped |
+| `lawyerId` | `assignedTo` | Both work - auto-mapped |
+| `date` + `startTime` | `scheduledTime` | Both work - auto-converted |
+
+### Location Type Mapping
+
+| Frontend Sends | Backend Stores |
+|----------------|---------------|
+| `video` | `virtual` |
+| `in-person` | `office` |
+| `phone` | `phone` |
+
+### Status Mapping
+
+| Frontend Sends | Backend Stores |
+|----------------|---------------|
+| `pending` | `scheduled` |
+| `confirmed` | `confirmed` |
+| `cancelled` | `cancelled` |
+| `completed` | `completed` |
+| `no_show` | `no_show` |
+
+---
+
 ## Summary
 
 | Category | Count |
