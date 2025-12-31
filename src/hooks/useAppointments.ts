@@ -678,10 +678,16 @@ export function useCancelAppointment() {
 
     // Optimistic update for instant feedback - REMOVE from cache (hard delete)
     onMutate: async ({ id }) => {
+      console.log('[DELETE-OPTIMISTIC] Starting optimistic update for ID:', id)
+
+      // Cancel any in-flight queries to prevent race conditions
       await queryClient.cancelQueries({ queryKey: appointmentKeys.detail(id) })
+      await queryClient.cancelQueries({ queryKey: appointmentKeys.lists() })
 
       const previousDetail = queryClient.getQueryData<AppointmentResponse>(appointmentKeys.detail(id))
       const previousLists = queryClient.getQueriesData<AppointmentsResponse>({ queryKey: appointmentKeys.lists() })
+
+      console.log('[DELETE-OPTIMISTIC] Found', previousLists.length, 'list queries to update')
 
       // Optimistically REMOVE detail from cache (hard delete)
       queryClient.removeQueries({ queryKey: appointmentKeys.detail(id) })
@@ -689,28 +695,45 @@ export function useCancelAppointment() {
       // Optimistically REMOVE from lists (hard delete - filter out)
       previousLists.forEach(([key, data]) => {
         if (data?.data?.appointments) {
+          const originalCount = data.data.appointments.length
+          const filtered = data.data.appointments.filter((apt) => apt.id !== id)
+          console.log('[DELETE-OPTIMISTIC] Filtering list:', {
+            queryKey: key,
+            originalCount,
+            filteredCount: filtered.length,
+            removedCount: originalCount - filtered.length,
+          })
+
           queryClient.setQueryData<AppointmentsResponse>(key, {
             ...data,
             data: {
               ...data.data,
               // Filter out the deleted appointment instead of updating status
-              appointments: data.data.appointments.filter((apt) => apt.id !== id),
+              appointments: filtered,
               total: Math.max(0, (data.data.total || 0) - 1),
             },
           })
         }
       })
 
+      console.log('[DELETE-OPTIMISTIC] Optimistic update complete')
       return { previousDetail, previousLists }
     },
 
     onError: (error, { id }, context) => {
+      console.error('[DELETE-OPTIMISTIC] ❌ Error - rolling back for ID:', id)
+      console.error('[DELETE-OPTIMISTIC] Error:', error)
+
       // Rollback: restore previous data on error
       if (context?.previousDetail) {
+        console.log('[DELETE-OPTIMISTIC] Restoring detail cache')
         queryClient.setQueryData(appointmentKeys.detail(id), context.previousDetail)
       }
       context?.previousLists?.forEach(([key, data]) => {
-        if (data) queryClient.setQueryData(key, data)
+        if (data) {
+          console.log('[DELETE-OPTIMISTIC] Restoring list cache:', key)
+          queryClient.setQueryData(key, data)
+        }
       })
       toast.error('فشل في حذف الموعد | Failed to delete appointment')
     },
