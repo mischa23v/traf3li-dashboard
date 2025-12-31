@@ -101,7 +101,7 @@ export type AppointmentType = 'consultation' | 'follow_up' | 'case_review' | 'in
 /**
  * Appointment status
  */
-export type AppointmentStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'no_show'
+export type AppointmentStatus = 'pending' | 'scheduled' | 'confirmed' | 'cancelled' | 'completed' | 'no_show'
 
 /**
  * Booking source
@@ -287,8 +287,12 @@ export interface CreateBlockedTimeRequest {
 /**
  * Location type for appointments
  * نوع الموقع للمواعيد
+ *
+ * Frontend sends: 'video', 'in-person', 'phone'
+ * Backend stores: 'virtual', 'office', 'phone', 'client_site', 'other'
+ * Backend middleware auto-converts: video → virtual, in-person → office
  */
-export type LocationType = 'video' | 'in-person' | 'phone'
+export type LocationType = 'video' | 'virtual' | 'in-person' | 'office' | 'phone' | 'client_site' | 'other'
 
 export interface BookAppointmentRequest {
   date: string

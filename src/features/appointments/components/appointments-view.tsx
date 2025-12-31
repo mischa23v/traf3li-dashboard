@@ -135,11 +135,15 @@ const APPOINTMENT_TYPES: { value: AppointmentType; labelAr: string; labelEn: str
 
 const STATUS_CONFIG: Record<AppointmentStatus, { labelAr: string; labelEn: string; color: string; bgColor: string }> = {
   pending: { labelAr: 'معلق', labelEn: 'Pending', color: 'text-yellow-700', bgColor: 'bg-yellow-100 border-yellow-300' },
+  scheduled: { labelAr: 'مجدول', labelEn: 'Scheduled', color: 'text-yellow-700', bgColor: 'bg-yellow-100 border-yellow-300' },
   confirmed: { labelAr: 'مؤكد', labelEn: 'Confirmed', color: 'text-blue-700', bgColor: 'bg-blue-100 border-blue-300' },
   completed: { labelAr: 'مكتمل', labelEn: 'Completed', color: 'text-green-700', bgColor: 'bg-green-100 border-green-300' },
   cancelled: { labelAr: 'ملغي', labelEn: 'Cancelled', color: 'text-red-700', bgColor: 'bg-red-100 border-red-300' },
   no_show: { labelAr: 'لم يحضر', labelEn: 'No Show', color: 'text-gray-700', bgColor: 'bg-gray-100 border-gray-300' },
 }
+
+// Fallback for unknown statuses to prevent crashes
+const DEFAULT_STATUS_CONFIG = { labelAr: 'غير معروف', labelEn: 'Unknown', color: 'text-gray-700', bgColor: 'bg-gray-100 border-gray-300' }
 
 const WEEKDAYS_AR = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت']
 const WEEKDAYS_EN = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
@@ -149,6 +153,18 @@ const LOCATION_TYPES: { value: LocationType; labelAr: string; labelEn: string; i
   { value: 'in-person', labelAr: 'حضوري', labelEn: 'In Person', icon: 'map' },
   { value: 'phone', labelAr: 'مكالمة هاتفية', labelEn: 'Phone Call', icon: 'phone' },
 ]
+
+/**
+ * Normalize backend location type to frontend value for form display
+ * Backend stores: virtual, office, phone, client_site, other
+ * Frontend uses: video, in-person, phone
+ */
+const normalizeLocationType = (locationType: LocationType | undefined): LocationType => {
+  if (!locationType) return 'video'
+  if (locationType === 'virtual') return 'video'
+  if (locationType === 'office' || locationType === 'client_site') return 'in-person'
+  return locationType
+}
 
 // ==================== Main Component ====================
 
@@ -264,7 +280,7 @@ export function AppointmentsView() {
     })
 
     return result
-  }, [appointments, typeFilter, searchQuery, sortBy])
+  }, [appointments, typeFilter, searchQuery, sortBy, assignedToFilter])
 
   // Get week days
   const weekDays = useMemo(() => {
@@ -349,7 +365,7 @@ export function AppointmentsView() {
 
     try {
       const ids = Array.from(selectedAppointments)
-      await bulkConfirmMutation.mutateAsync({ appointmentIds: ids })
+      await bulkConfirmMutation.mutateAsync(ids)
 
       toast.success(t('appointments.success.confirmed', { count: ids.length }, `تم تأكيد ${ids.length} موعد بنجاح`))
 
@@ -367,7 +383,7 @@ export function AppointmentsView() {
 
     try {
       const ids = Array.from(selectedAppointments)
-      await bulkCompleteMutation.mutateAsync({ appointmentIds: ids })
+      await bulkCompleteMutation.mutateAsync(ids)
 
       toast.success(t('appointments.success.completed', { count: ids.length }, `تم إكمال ${ids.length} موعد بنجاح`))
 
@@ -419,7 +435,8 @@ export function AppointmentsView() {
     setEditFormData({
       type: appointment.type,
       notes: appointment.notes || '',
-      locationType: appointment.locationType || 'video',
+      // Normalize backend values (virtual → video, office → in-person) for form display
+      locationType: normalizeLocationType(appointment.locationType),
       meetingLink: appointment.meetingLink || '',
       location: appointment.location || '',
     })
@@ -814,7 +831,7 @@ export function AppointmentsView() {
                         <div className="space-y-2">
                           {dayAppointments.map((apt) => {
                             const typeConfig = APPOINTMENT_TYPES.find((t) => t.value === apt.type)
-                            const statusConfig = STATUS_CONFIG[apt.status]
+                            const statusConfig = STATUS_CONFIG[apt.status] || DEFAULT_STATUS_CONFIG
                             const isSelected = selectedAppointments.has(apt.id)
 
                             return (
@@ -827,7 +844,7 @@ export function AppointmentsView() {
                                   className="absolute top-2 end-2 opacity-0 group-hover:opacity-100 transition-opacity"
                                   onClick={(e) => { e.stopPropagation(); toggleSelectAppointment(apt.id) }}
                                 >
-                                  <Checkbox checked={isSelected} />
+                                  <Checkbox checked={isSelected} aria-label="Select appointment" />
                                 </div>
 
                                 <div className="text-sm font-bold text-slate-900 mb-1">{apt.startTime || '00:00'}</div>
@@ -869,7 +886,7 @@ export function AppointmentsView() {
               <div className="space-y-4">
                 {filteredAppointments.length === 0 ? (
                   <div className="bg-white rounded-2xl p-12 text-center border border-slate-100">
-                    <CalendarClock className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
+                    <CalendarClock className="w-12 h-12 text-emerald-500 mx-auto mb-4" aria-hidden="true" />
                     <h3 className="text-lg font-bold text-slate-900 mb-2">{t('appointments.empty.title', 'لا توجد مواعيد')}</h3>
                     <p className="text-slate-500 mb-4">{t('appointments.empty.description', 'لا توجد مواعيد حالياً')}</p>
                     <Button onClick={() => setShowBookingDialog(true)} className="bg-emerald-500 hover:bg-emerald-600">
@@ -880,7 +897,7 @@ export function AppointmentsView() {
                 ) : (
                   filteredAppointments.map((apt) => {
                     const typeConfig = APPOINTMENT_TYPES.find((t) => t.value === apt.type)
-                    const statusConfig = STATUS_CONFIG[apt.status]
+                    const statusConfig = STATUS_CONFIG[apt.status] || DEFAULT_STATUS_CONFIG
                     const isSelected = selectedAppointments.has(apt.id)
 
                     return (
@@ -890,8 +907,8 @@ export function AppointmentsView() {
                         onClick={() => handleViewDetails(apt)}
                       >
                         <div className="flex items-start gap-4">
-                          <div className="pt-1" onClick={(e) => { e.stopPropagation(); toggleSelectAppointment(apt.id) }} aria-hidden="true">
-                            <Checkbox checked={isSelected} />
+                          <div className="pt-1" onClick={(e) => { e.stopPropagation(); toggleSelectAppointment(apt.id) }}>
+                            <Checkbox checked={isSelected} aria-label="Select appointment" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-3 mb-2">
@@ -1024,7 +1041,10 @@ export function AppointmentsView() {
       <AppointmentDetailsDialog
         appointment={selectedAppointment}
         open={showDetailsDialog}
-        onOpenChange={setShowDetailsDialog}
+        onOpenChange={(open) => {
+          setShowDetailsDialog(open)
+          if (!open) setSelectedAppointment(null)
+        }}
         isRtl={isRtl}
         locale={locale}
         onDelete={(id) => {
@@ -1064,7 +1084,7 @@ export function AppointmentsView() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <CalendarClock className="h-5 w-5" />
+              <CalendarClock className="h-5 w-5" aria-hidden="true" />
               {t('appointments.dialogs.reschedule.title', 'إعادة جدولة الموعد')}
             </DialogTitle>
             <DialogDescription>
@@ -1118,7 +1138,7 @@ export function AppointmentsView() {
               {/* Client Info */}
               <div className="p-3 bg-blue-50 rounded-lg">
                 <p className="text-sm text-blue-600 flex items-center gap-2">
-                  <User className="h-4 w-4" />
+                  <User className="h-4 w-4" aria-hidden="true" />
                   {selectedAppointment.clientName}
                 </p>
               </div>
@@ -1133,7 +1153,7 @@ export function AppointmentsView() {
               onClick={handleSaveReschedule}
               disabled={rescheduleMutation.isPending || !rescheduleData.date || !rescheduleData.startTime}
             >
-              {rescheduleMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin me-2" /> : <CalendarClock className="h-4 w-4 me-2" />}
+              {rescheduleMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin me-2" aria-hidden="true" /> : <CalendarClock className="h-4 w-4 me-2" aria-hidden="true" />}
               {t('appointments.actions.reschedule', 'إعادة جدولة')}
             </Button>
           </DialogFooter>
@@ -1175,24 +1195,26 @@ export function AppointmentsView() {
             {/* Location Type */}
             <div>
               <Label>{t('appointments.labels.locationType', 'نوع الموقع')}</Label>
-              <div className="flex gap-2 mt-2">
+              <div className="flex gap-2 mt-2" role="radiogroup" aria-label={t('appointments.labels.locationType', 'نوع الموقع')}>
                 {LOCATION_TYPES.map(lt => (
                   <Button
                     key={lt.value}
                     type="button"
+                    role="radio"
+                    aria-checked={editFormData.locationType === lt.value}
                     variant={editFormData.locationType === lt.value ? 'default' : 'outline'}
                     onClick={() => setEditFormData(prev => ({ ...prev, locationType: lt.value }))}
                     className="flex-1"
                   >
-                    {lt.icon === 'video' ? <Video className="h-4 w-4 me-1" /> : lt.icon === 'map' ? <MapPin className="h-4 w-4 me-1" /> : <Phone className="h-4 w-4 me-1" />}
+                    {lt.icon === 'video' ? <Video className="h-4 w-4 me-1" aria-hidden="true" /> : lt.icon === 'map' ? <MapPin className="h-4 w-4 me-1" aria-hidden="true" /> : <Phone className="h-4 w-4 me-1" aria-hidden="true" />}
                     {isRtl ? lt.labelAr : lt.labelEn}
                   </Button>
                 ))}
               </div>
             </div>
 
-            {/* Meeting Link (for video) */}
-            {editFormData.locationType === 'video' && (
+            {/* Meeting Link (for video/virtual) */}
+            {['video', 'virtual'].includes(editFormData.locationType) && (
               <div>
                 <Label>{t('appointments.labels.meetingLink', 'رابط الاجتماع')}</Label>
                 <Input
@@ -1204,8 +1226,8 @@ export function AppointmentsView() {
               </div>
             )}
 
-            {/* Location (for in-person) */}
-            {editFormData.locationType === 'in-person' && (
+            {/* Location (for in-person/office) */}
+            {['in-person', 'office'].includes(editFormData.locationType) && (
               <div>
                 <Label>{t('appointments.labels.location', 'العنوان')}</Label>
                 <Input
@@ -1234,7 +1256,7 @@ export function AppointmentsView() {
               {t('common.cancel', 'إلغاء')}
             </Button>
             <Button onClick={handleSaveEdit} disabled={updateMutation.isPending}>
-              {updateMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin me-2" /> : null}
+              {updateMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin me-2" aria-hidden="true" /> : null}
               {t('common.save', 'حفظ')}
             </Button>
           </DialogFooter>
@@ -1273,7 +1295,7 @@ function AppointmentDetailsDialog({
   if (!appointment) return null
 
   const typeConfig = APPOINTMENT_TYPES.find((t) => t.value === appointment.type)
-  const statusConfig = STATUS_CONFIG[appointment.status]
+  const statusConfig = STATUS_CONFIG[appointment.status] || DEFAULT_STATUS_CONFIG
 
   const handleAction = async (action: string) => {
     try {
@@ -1304,7 +1326,7 @@ function AppointmentDetailsDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <div className={cn('p-2 rounded-xl', typeConfig?.color || 'bg-gray-500')}>
-              <User className="h-5 w-5 text-white" />
+              <User className="h-5 w-5 text-white" aria-hidden="true" />
             </div>
             {appointment.clientName || t('appointments.labels.noName', 'بدون اسم')}
           </DialogTitle>
@@ -1320,37 +1342,38 @@ function AppointmentDetailsDialog({
 
         <div className="space-y-4 py-4">
           <div className="flex items-center gap-3 text-slate-700">
-            <CalendarIcon className="h-5 w-5 text-slate-400" />
+            <CalendarIcon className="h-5 w-5 text-slate-400" aria-hidden="true" />
             <span>{appointment.date ? format(new Date(appointment.date), 'EEEE، d MMMM yyyy', { locale }) : '-'}</span>
           </div>
           <div className="flex items-center gap-3 text-slate-700">
-            <Clock className="h-5 w-5 text-slate-400" />
+            <Clock className="h-5 w-5 text-slate-400" aria-hidden="true" />
             <span>{appointment.startTime || '00:00'} - {appointment.endTime || '--:--'}</span>
           </div>
           {appointment.clientEmail && (
             <div className="flex items-center gap-3 text-slate-700">
-              <Mail className="h-5 w-5 text-slate-400" />
+              <Mail className="h-5 w-5 text-slate-400" aria-hidden="true" />
               <span>{appointment.clientEmail}</span>
             </div>
           )}
           {appointment.clientPhone && (
             <div className="flex items-center gap-3 text-slate-700">
-              <Phone className="h-5 w-5 text-slate-400" />
+              <Phone className="h-5 w-5 text-slate-400" aria-hidden="true" />
               <span>{appointment.clientPhone}</span>
             </div>
           )}
           {/* Location/Meeting Type Display */}
+          {/* Backend stores: virtual, office, phone. Frontend sends: video, in-person, phone */}
           {(appointment.locationType || appointment.meetingLink || appointment.location) && (
             <div className="flex items-center gap-3 text-slate-700">
-              {appointment.locationType === 'video' || appointment.meetingLink ? (
-                <Video className="h-5 w-5 text-slate-400" />
+              {['video', 'virtual'].includes(appointment.locationType || '') || appointment.meetingLink ? (
+                <Video className="h-5 w-5 text-slate-400" aria-hidden="true" />
               ) : appointment.locationType === 'phone' ? (
-                <Phone className="h-5 w-5 text-slate-400" />
+                <Phone className="h-5 w-5 text-slate-400" aria-hidden="true" />
               ) : (
-                <MapPin className="h-5 w-5 text-slate-400" />
+                <MapPin className="h-5 w-5 text-slate-400" aria-hidden="true" />
               )}
               <span>
-                {appointment.locationType === 'video' || appointment.meetingLink
+                {['video', 'virtual'].includes(appointment.locationType || '') || appointment.meetingLink
                   ? t('appointments.locationTypes.video', 'اجتماع عن بعد')
                   : appointment.locationType === 'phone'
                     ? t('appointments.locationTypes.phone', 'مكالمة هاتفية')
@@ -1368,7 +1391,7 @@ function AppointmentDetailsDialog({
         <DialogFooter className="flex-col sm:flex-row gap-2">
           {appointment.status === 'pending' && (
             <Button onClick={() => handleAction('confirm')} className="bg-blue-500 hover:bg-blue-600" disabled={confirmMutation.isPending}>
-              <Check className="h-4 w-4 ms-2" />
+              <Check className="h-4 w-4 ms-2" aria-hidden="true" />
               {t('appointments.actions.confirm', 'تأكيد')}
             </Button>
           )}
@@ -1385,7 +1408,7 @@ function AppointmentDetailsDialog({
             </>
           )}
           <Button variant="outline" onClick={() => onReschedule(appointment)}>
-            <CalendarClock className="h-4 w-4 me-2" />
+            <CalendarClock className="h-4 w-4 me-2" aria-hidden="true" />
             {t('appointments.actions.reschedule', 'إعادة جدولة')}
           </Button>
           <Button variant="outline" onClick={() => { onOpenChange(false); onEdit(appointment) }} aria-hidden="true">
@@ -1573,7 +1596,10 @@ function BookAppointmentDialog({
   }, [availableSlots, selectedDate])
 
   const handleSubmit = async () => {
+    // Guard against double-submission (race condition prevention)
     if (!selectedDate || !selectedTime) return
+    if (bookMutation.isPending) return // Prevent re-entry while mutation is in progress
+
     try {
       // Normalize phone to E.164 format before sending (backend requires 10-15 digit format)
       const normalizedPhone = formData.clientPhone ? toE164Phone(formData.clientPhone) : ''
@@ -1659,12 +1685,12 @@ function BookAppointmentDialog({
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addDays(currentMonth, -30))}>
-                  {isRtl ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+                <Button variant="ghost" size="icon" aria-label={t('appointments.labels.previousMonth', 'الشهر السابق')} onClick={() => setCurrentMonth(addDays(currentMonth, -30))}>
+                  {isRtl ? <ChevronRight className="h-5 w-5" aria-hidden="true" /> : <ChevronLeft className="h-5 w-5" aria-hidden="true" />}
                 </Button>
                 <span className="font-semibold">{format(currentMonth, 'MMMM yyyy', { locale })}</span>
-                <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addDays(currentMonth, 30))}>
-                  {isRtl ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+                <Button variant="ghost" size="icon" aria-label={t('appointments.labels.nextMonth', 'الشهر التالي')} onClick={() => setCurrentMonth(addDays(currentMonth, 30))}>
+                  {isRtl ? <ChevronLeft className="h-5 w-5" aria-hidden="true" /> : <ChevronRight className="h-5 w-5" aria-hidden="true" />}
                 </Button>
               </div>
               <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-slate-500">
@@ -1862,11 +1888,13 @@ function BookAppointmentDialog({
               </div>
               <div>
                 <Label>{t('appointments.labels.meetingType', 'طريقة الاجتماع')}</Label>
-                <div className="grid grid-cols-3 gap-2 mt-2">
+                <div className="grid grid-cols-3 gap-2 mt-2" role="radiogroup" aria-label={t('appointments.labels.meetingType', 'طريقة الاجتماع')}>
                   {LOCATION_TYPES.map((loc) => (
                     <button
                       key={loc.value}
                       type="button"
+                      role="radio"
+                      aria-checked={formData.locationType === loc.value}
                       onClick={() => setFormData({ ...formData, locationType: loc.value })}
                       className={cn(
                         'flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all',
@@ -1875,9 +1903,9 @@ function BookAppointmentDialog({
                           : 'border-slate-200 hover:border-slate-300 text-slate-600'
                       )}
                     >
-                      {loc.icon === 'video' && <Video className="h-5 w-5" />}
-                      {loc.icon === 'map' && <MapPin className="h-5 w-5" />}
-                      {loc.icon === 'phone' && <Phone className="h-5 w-5" />}
+                      {loc.icon === 'video' && <Video className="h-5 w-5" aria-hidden="true" />}
+                      {loc.icon === 'map' && <MapPin className="h-5 w-5" aria-hidden="true" />}
+                      {loc.icon === 'phone' && <Phone className="h-5 w-5" aria-hidden="true" />}
                       <span className="text-xs font-medium">{isRtl ? loc.labelAr : loc.labelEn}</span>
                     </button>
                   ))}
@@ -1897,7 +1925,7 @@ function BookAppointmentDialog({
             <Button onClick={() => setStep(2)} disabled={!selectedDate || !selectedTime} className="bg-emerald-500 hover:bg-emerald-600">{t('common.next', 'التالي')}</Button>
           ) : (
             <Button onClick={handleSubmit} disabled={bookMutation.isPending || !isFormValid} className="bg-emerald-500 hover:bg-emerald-600">
-              {bookMutation.isPending && <Loader2 className="h-4 w-4 animate-spin ms-2" />}
+              {bookMutation.isPending && <Loader2 className="h-4 w-4 animate-spin ms-2" aria-hidden="true" />}
               {t('appointments.actions.bookAppointment', 'حجز الموعد')}
             </Button>
           )}
@@ -2095,7 +2123,7 @@ function BlockTimeDialog({
             disabled={createBlockedTime.isPending || !formData.startDate || !formData.endDate}
             className="bg-red-500 hover:bg-red-600"
           >
-            {createBlockedTime.isPending && <Loader2 className="h-4 w-4 animate-spin ms-2" />}
+            {createBlockedTime.isPending && <Loader2 className="h-4 w-4 animate-spin ms-2" aria-hidden="true" />}
             {t('appointments.actions.blockTime', 'حظر الوقت')}
           </Button>
         </DialogFooter>
@@ -2318,7 +2346,7 @@ function ManageAvailabilityDialog({
             disabled={isSaving || !hasChanges}
             className="bg-emerald-500 hover:bg-emerald-600"
           >
-            {isSaving && <Loader2 className="h-4 w-4 animate-spin me-2" />}
+            {isSaving && <Loader2 className="h-4 w-4 animate-spin me-2" aria-hidden="true" />}
             {t('common.saveChanges', 'حفظ التغييرات')}
           </Button>
         </DialogFooter>

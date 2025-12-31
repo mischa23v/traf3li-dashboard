@@ -141,16 +141,22 @@ export const queryRetryConfig = {
 }
 
 /**
- * Mutation retry configuration (more conservative)
+ * Mutation retry configuration (very conservative - POST requests may have succeeded)
+ *
+ * IMPORTANT: We do NOT retry network errors (!error.response) for mutations because:
+ * 1. The request might have succeeded on the server but the response was lost
+ * 2. Retrying would create duplicate records (e.g., duplicate appointments)
+ * 3. Only 429 (rate limit) is safe to retry because the request wasn't processed
  */
 export const mutationRetryConfig = {
   retry: (failureCount: number, error: unknown): boolean => {
-    // Only retry network errors for mutations (not 5xx)
-    if (failureCount >= 2) return false
+    // Maximum 1 retry for mutations (conservative approach)
+    if (failureCount >= 1) return false
 
     if (error instanceof AxiosError) {
-      // Only retry on network errors or 429
-      return !error.response || error.response.status === 429
+      // ONLY retry on 429 (rate limit) - the request wasn't processed
+      // DO NOT retry on network errors - the request might have succeeded!
+      return error.response?.status === 429
     }
 
     return false
