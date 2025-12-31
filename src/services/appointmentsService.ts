@@ -8,6 +8,53 @@
 
 import { apiClientNoVersion as apiClient, handleApiError } from '@/lib/api'
 
+// ==================== Debug Helper ====================
+
+const DEBUG_PREFIX = '[APPOINTMENTS-SVC]'
+
+/**
+ * Debug logger for appointments service
+ * Logs request/response details to help diagnose API issues
+ */
+const debugLog = {
+  request: (method: string, endpoint: string, data?: unknown, params?: unknown) => {
+    console.group(`${DEBUG_PREFIX} 📤 ${method} ${endpoint}`)
+    console.log('⏰ Time:', new Date().toISOString())
+    if (data) console.log('📦 Request Body:', JSON.stringify(data, null, 2))
+    if (params) console.log('🔍 Query Params:', JSON.stringify(params, null, 2))
+    console.groupEnd()
+  },
+
+  response: (method: string, endpoint: string, response: unknown) => {
+    console.group(`${DEBUG_PREFIX} 📥 ${method} ${endpoint} - SUCCESS`)
+    console.log('⏰ Time:', new Date().toISOString())
+    console.log('✅ Response:', JSON.stringify(response, null, 2))
+    console.groupEnd()
+  },
+
+  error: (method: string, endpoint: string, error: any, requestData?: unknown) => {
+    console.group(`${DEBUG_PREFIX} 🔴 ${method} ${endpoint} - ERROR`)
+    console.log('⏰ Time:', new Date().toISOString())
+    if (requestData) console.log('📦 Request Body:', JSON.stringify(requestData, null, 2))
+    console.log('❌ Error Message:', error?.message || 'Unknown error')
+    console.log('🔢 Status:', error?.response?.status || 'N/A')
+    console.log('📄 Status Text:', error?.response?.statusText || 'N/A')
+    console.log('🔧 Response Data:', JSON.stringify(error?.response?.data, null, 2) || 'N/A')
+    console.log('📋 Error Config:', {
+      url: error?.config?.url,
+      method: error?.config?.method,
+      headers: error?.config?.headers,
+    })
+    if (error?.response?.data?.errors) {
+      console.log('⚠️ Validation Errors:', JSON.stringify(error.response.data.errors, null, 2))
+    }
+    if (error?.response?.data?.stack) {
+      console.log('🔥 Backend Stack:', error.response.data.stack)
+    }
+    console.groupEnd()
+  },
+}
+
 // ==================== Types ====================
 
 /**
@@ -515,10 +562,14 @@ const appointmentsService = {
    * الحصول على الأوقات المحجوبة
    */
   getBlockedTimes: async (params?: { startDate?: string; endDate?: string; targetLawyerId?: string }): Promise<BlockedTimesResponse> => {
+    const endpoint = '/appointments/blocked-times'
+    debugLog.request('GET', endpoint, undefined, params)
     try {
-      const response = await apiClient.get<BlockedTimesResponse>('/appointments/blocked-times', { params })
+      const response = await apiClient.get<BlockedTimesResponse>(endpoint, { params })
+      debugLog.response('GET', endpoint, { count: response.data?.data?.length })
       return response.data
     } catch (error: any) {
+      debugLog.error('GET', endpoint, error)
       const errorMessage = handleApiError(error) || 'Failed to fetch blocked times | فشل في جلب الأوقات المحجوبة'
       throw new Error(errorMessage)
     }
@@ -529,10 +580,14 @@ const appointmentsService = {
    * إنشاء وقت محجوب
    */
   createBlockedTime: async (data: CreateBlockedTimeRequest): Promise<{ success: boolean; data: BlockedTime }> => {
+    const endpoint = '/appointments/blocked-times'
+    debugLog.request('POST', endpoint, data)
     try {
-      const response = await apiClient.post<{ success: boolean; data: BlockedTime }>('/appointments/blocked-times', data)
+      const response = await apiClient.post<{ success: boolean; data: BlockedTime }>(endpoint, data)
+      debugLog.response('POST', endpoint, response.data)
       return response.data
     } catch (error: any) {
+      debugLog.error('POST', endpoint, error, data)
       const errorMessage = handleApiError(error) || 'Failed to create blocked time | فشل في إنشاء الوقت المحجوب'
       throw new Error(errorMessage)
     }
@@ -543,10 +598,14 @@ const appointmentsService = {
    * حذف الوقت المحجوب
    */
   deleteBlockedTime: async (id: string): Promise<{ success: boolean }> => {
+    const endpoint = `/appointments/blocked-times/${id}`
+    debugLog.request('DELETE', endpoint)
     try {
-      const response = await apiClient.delete<{ success: boolean }>(`/appointments/blocked-times/${id}`)
+      const response = await apiClient.delete<{ success: boolean }>(endpoint)
+      debugLog.response('DELETE', endpoint, response.data)
       return response.data
     } catch (error: any) {
+      debugLog.error('DELETE', endpoint, error)
       const errorMessage = handleApiError(error) || 'Failed to delete blocked time | فشل في حذف الوقت المحجوب'
       throw new Error(errorMessage)
     }
@@ -567,10 +626,14 @@ const appointmentsService = {
     clientId?: string
     caseId?: string
   }): Promise<AppointmentsResponse> => {
+    const endpoint = '/appointments'
+    debugLog.request('GET', endpoint, undefined, params)
     try {
-      const response = await apiClient.get<AppointmentsResponse>('/appointments', { params })
+      const response = await apiClient.get<AppointmentsResponse>(endpoint, { params })
+      debugLog.response('GET', endpoint, { total: response.data?.data?.total, count: response.data?.data?.appointments?.length })
       return response.data
     } catch (error: any) {
+      debugLog.error('GET', endpoint, error)
       const errorMessage = handleApiError(error) || 'Failed to fetch appointments | فشل في جلب المواعيد'
       throw new Error(errorMessage)
     }
@@ -581,10 +644,14 @@ const appointmentsService = {
    * الحصول على موعد واحد
    */
   getAppointment: async (id: string): Promise<AppointmentResponse> => {
+    const endpoint = `/appointments/${id}`
+    debugLog.request('GET', endpoint)
     try {
-      const response = await apiClient.get<AppointmentResponse>(`/appointments/${id}`)
+      const response = await apiClient.get<AppointmentResponse>(endpoint)
+      debugLog.response('GET', endpoint, response.data)
       return response.data
     } catch (error: any) {
+      debugLog.error('GET', endpoint, error)
       const errorMessage = handleApiError(error) || 'Failed to fetch appointment | فشل في جلب الموعد'
       throw new Error(errorMessage)
     }
@@ -595,10 +662,13 @@ const appointmentsService = {
    * حجز موعد (إنشاء)
    */
   bookAppointment: async (data: BookAppointmentRequest): Promise<AppointmentResponse> => {
+    debugLog.request('POST', '/appointments', data)
     try {
       const response = await apiClient.post<AppointmentResponse>('/appointments', data)
+      debugLog.response('POST', '/appointments', response.data)
       return response.data
     } catch (error: any) {
+      debugLog.error('POST', '/appointments', error, data)
       const errorMessage = handleApiError(error) || 'Failed to book appointment | فشل في حجز الموعد'
       throw new Error(errorMessage)
     }
@@ -609,10 +679,14 @@ const appointmentsService = {
    * تحديث الموعد
    */
   updateAppointment: async (id: string, data: UpdateAppointmentRequest): Promise<AppointmentResponse> => {
+    const endpoint = `/appointments/${id}`
+    debugLog.request('PUT', endpoint, data)
     try {
-      const response = await apiClient.put<AppointmentResponse>(`/appointments/${id}`, data)
+      const response = await apiClient.put<AppointmentResponse>(endpoint, data)
+      debugLog.response('PUT', endpoint, response.data)
       return response.data
     } catch (error: any) {
+      debugLog.error('PUT', endpoint, error, data)
       const errorMessage = handleApiError(error) || 'Failed to update appointment | فشل في تحديث الموعد'
       throw new Error(errorMessage)
     }
@@ -623,12 +697,15 @@ const appointmentsService = {
    * إلغاء الموعد
    */
   cancelAppointment: async (id: string, reason?: string): Promise<AppointmentResponse> => {
+    const endpoint = `/appointments/${id}`
+    const data = { reason }
+    debugLog.request('DELETE', endpoint, data)
     try {
-      const response = await apiClient.delete<AppointmentResponse>(`/appointments/${id}`, {
-        data: { reason }
-      })
+      const response = await apiClient.delete<AppointmentResponse>(endpoint, { data })
+      debugLog.response('DELETE', endpoint, response.data)
       return response.data
     } catch (error: any) {
+      debugLog.error('DELETE', endpoint, error, data)
       const errorMessage = handleApiError(error) || 'Failed to cancel appointment | فشل في إلغاء الموعد'
       throw new Error(errorMessage)
     }
@@ -639,10 +716,14 @@ const appointmentsService = {
    * تأكيد الموعد
    */
   confirmAppointment: async (id: string): Promise<AppointmentResponse> => {
+    const endpoint = `/appointments/${id}/confirm`
+    debugLog.request('PUT', endpoint)
     try {
-      const response = await apiClient.put<AppointmentResponse>(`/appointments/${id}/confirm`)
+      const response = await apiClient.put<AppointmentResponse>(endpoint)
+      debugLog.response('PUT', endpoint, response.data)
       return response.data
     } catch (error: any) {
+      debugLog.error('PUT', endpoint, error)
       const errorMessage = handleApiError(error) || 'Failed to confirm appointment | فشل في تأكيد الموعد'
       throw new Error(errorMessage)
     }
@@ -653,10 +734,15 @@ const appointmentsService = {
    * إكمال الموعد
    */
   completeAppointment: async (id: string, notes?: string): Promise<AppointmentResponse> => {
+    const endpoint = `/appointments/${id}/complete`
+    const data = { notes }
+    debugLog.request('PUT', endpoint, data)
     try {
-      const response = await apiClient.put<AppointmentResponse>(`/appointments/${id}/complete`, { notes })
+      const response = await apiClient.put<AppointmentResponse>(endpoint, data)
+      debugLog.response('PUT', endpoint, response.data)
       return response.data
     } catch (error: any) {
+      debugLog.error('PUT', endpoint, error, data)
       const errorMessage = handleApiError(error) || 'Failed to complete appointment | فشل في إكمال الموعد'
       throw new Error(errorMessage)
     }
@@ -667,10 +753,14 @@ const appointmentsService = {
    * وضع علامة عدم الحضور
    */
   markNoShow: async (id: string): Promise<AppointmentResponse> => {
+    const endpoint = `/appointments/${id}/no-show`
+    debugLog.request('PUT', endpoint)
     try {
-      const response = await apiClient.put<AppointmentResponse>(`/appointments/${id}/no-show`)
+      const response = await apiClient.put<AppointmentResponse>(endpoint)
+      debugLog.response('PUT', endpoint, response.data)
       return response.data
     } catch (error: any) {
+      debugLog.error('PUT', endpoint, error)
       const errorMessage = handleApiError(error) || 'Failed to mark as no-show | فشل في وضع علامة عدم الحضور'
       throw new Error(errorMessage)
     }
@@ -681,10 +771,14 @@ const appointmentsService = {
    * إعادة جدولة الموعد
    */
   rescheduleAppointment: async (id: string, data: { date: string; startTime: string }): Promise<AppointmentResponse> => {
+    const endpoint = `/appointments/${id}/reschedule`
+    debugLog.request('POST', endpoint, data)
     try {
-      const response = await apiClient.post<AppointmentResponse>(`/appointments/${id}/reschedule`, data)
+      const response = await apiClient.post<AppointmentResponse>(endpoint, data)
+      debugLog.response('POST', endpoint, response.data)
       return response.data
     } catch (error: any) {
+      debugLog.error('POST', endpoint, error, data)
       const errorMessage = handleApiError(error) || 'Failed to reschedule appointment | فشل في إعادة جدولة الموعد'
       throw new Error(errorMessage)
     }
@@ -702,20 +796,24 @@ const appointmentsService = {
    * API: GET /appointments/slots?date=YYYY-MM-DD&assignedTo=lawyerId&duration=30
    */
   getAvailableSlots: async (params: GetAvailableSlotsRequest): Promise<SlotsResponse> => {
+    const endpoint = '/appointments/slots'
+    // Transform lawyerId to assignedTo as required by /slots endpoint
+    const { lawyerId, date, duration } = params
+    const apiParams: Record<string, string | number | undefined> = {
+      date,
+      duration,
+    }
+    // /slots endpoint uses 'assignedTo' instead of 'lawyerId'
+    if (lawyerId) {
+      apiParams.assignedTo = lawyerId
+    }
+    debugLog.request('GET', endpoint, undefined, apiParams)
     try {
-      // Transform lawyerId to assignedTo as required by /slots endpoint
-      const { lawyerId, date, duration } = params
-      const apiParams: Record<string, string | number | undefined> = {
-        date,
-        duration,
-      }
-      // /slots endpoint uses 'assignedTo' instead of 'lawyerId'
-      if (lawyerId) {
-        apiParams.assignedTo = lawyerId
-      }
-      const response = await apiClient.get<SlotsResponse>('/appointments/slots', { params: apiParams })
+      const response = await apiClient.get<SlotsResponse>(endpoint, { params: apiParams })
+      debugLog.response('GET', endpoint, response.data)
       return response.data
     } catch (error: any) {
+      debugLog.error('GET', endpoint, error)
       const errorMessage = handleApiError(error) || 'Failed to fetch available slots | فشل في جلب الفترات المتاحة'
       throw new Error(errorMessage)
     }
