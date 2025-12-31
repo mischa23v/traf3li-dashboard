@@ -1284,7 +1284,7 @@ export function AppointmentsView() {
                   ? t('appointments.dialogs.delete.messageSingle', 'هل أنت متأكد من حذف هذا الموعد؟')
                   : t('appointments.dialogs.delete.messageMultiple', { count: selectedAppointments.size }, `هل أنت متأكد من حذف ${selectedAppointments.size} موعد؟`)}
               </span>
-              <span className="block text-red-600 font-medium">
+              <span className="block text-red-600 font-medium" role="alert" aria-live="assertive">
                 {t('appointments.dialogs.delete.permanentWarning', 'سيتم حذف الموعد نهائياً ولا يمكن التراجع عن هذا الإجراء. استخدم "إعادة جدولة" إذا كنت تريد تغيير التاريخ بدلاً من الحذف.')}
               </span>
             </DialogDescription>
