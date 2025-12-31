@@ -80,6 +80,9 @@ import {
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { ROUTES } from '@/constants/routes'
+import { QueryKeys } from '@/lib/query-keys'
+import { CACHE_TIMES } from '@/config/cache'
+import crmSettingsService from '@/services/crmSettingsService'
 import { useAuthStore } from '@/stores/auth-store'
 import { usePermissionsStore } from '@/stores/permissions-store'
 import { useTeamMembers } from '@/hooks/useCasesAndClients'
@@ -2488,14 +2491,13 @@ function ManageAvailabilityDialog({
   const [isSaving, setIsSaving] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
 
-  // Fetch current settings
+  // Fetch current settings - using proper QueryKeys and caching
   const { data: settingsData, isLoading } = useQuery({
-    queryKey: ['crm-settings'],
-    queryFn: async () => {
-      const { crmSettingsService } = await import('@/services/crmSettingsService')
-      return crmSettingsService.getSettings()
-    },
+    queryKey: QueryKeys.appointments.crmSettings(),
+    queryFn: () => crmSettingsService.getSettings(),
     enabled: open,
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
+    gcTime: CACHE_TIMES.GC_MEDIUM, // 30 minutes
   })
 
   // Update local state when data loads
@@ -2528,12 +2530,11 @@ function ManageAvailabilityDialog({
   const handleSave = async () => {
     setIsSaving(true)
     try {
-      const { crmSettingsService } = await import('@/services/crmSettingsService')
       await crmSettingsService.updateAllWorkingHours(workingHours)
       toast.success(t('appointments.success.workingHoursSaved', 'تم حفظ أوقات العمل'))
       setHasChanges(false)
-      queryClient.invalidateQueries({ queryKey: ['crm-settings'] })
-      queryClient.invalidateQueries({ queryKey: ['appointments'] })
+      queryClient.invalidateQueries({ queryKey: QueryKeys.appointments.crmSettings() })
+      queryClient.invalidateQueries({ queryKey: QueryKeys.appointments.all() })
     } catch (error: any) {
       toast.error(error?.message || t('appointments.errors.saveSettingsFailed', 'فشل في حفظ الإعدادات'))
     } finally {
