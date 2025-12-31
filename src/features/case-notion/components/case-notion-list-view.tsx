@@ -287,7 +287,7 @@ export function CaseNotionListView() {
                                     {t('caseNotion.list.casesWithNotion', 'القضايا ومساحات العمل')}
                                 </h3>
                                 <Badge className="bg-slate-100 text-slate-600 border-0 rounded-full px-4 py-1">
-                                    {t('caseNotion.list.caseCount', { count: cases.length }, `${cases.length} قضية`)}
+                                    {t('caseNotion.list.caseCount', { count: cases.length, defaultValue: '{{count}} قضية' })}
                                 </Badge>
                             </div>
 

@@ -683,7 +683,7 @@ export function AppointmentsView() {
                   {selectedAppointments.size > 0 && (
                     <div className="flex items-center gap-2 pe-3 border-e border-slate-200">
                       <span className="text-sm text-slate-600">
-                        {t('appointments.labels.selected', { count: selectedAppointments.size }, `${selectedAppointments.size} محدد`)}
+                        {t('appointments.labels.selected', { count: selectedAppointments.size, defaultValue: '{{count}} محدد' })}
                       </span>
                       <Button variant="ghost" size="sm" onClick={clearSelection} className="h-8 text-slate-500">
                         {t('common.clear', 'إلغاء')}
@@ -1686,7 +1686,7 @@ function BookAppointmentDialog({
               </div>
               {workingHours && (
                 <p className="text-xs text-slate-500">
-                  {t('appointments.labels.workingHours', { start: workingHours.start, end: workingHours.end }, `ساعات العمل: ${workingHours.start} - ${workingHours.end}`)}
+                  {t('appointments.labels.workingHours', { start: workingHours.start, end: workingHours.end, defaultValue: 'ساعات العمل: {{start}} - {{end}}' })}
                 </p>
               )}
               {!selectedDate ? (
