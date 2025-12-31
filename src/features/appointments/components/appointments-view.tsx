@@ -1341,6 +1341,9 @@ export function AppointmentsView() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>{t('appointments.dialogs.edit.title', 'تعديل الموعد')}</DialogTitle>
+            <DialogDescription>
+              {t('appointments.dialogs.edit.description', 'تعديل بيانات الموعد')}
+            </DialogDescription>
           </DialogHeader>
           <div
             className="space-y-4 py-4"
