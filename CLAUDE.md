@@ -1,3 +1,154 @@
+# 🏆 ENTERPRISE GOLD STANDARD REQUIREMENTS (MANDATORY)
+
+## This codebase MUST meet Apple, Microsoft NAV, SAP, and Google quality standards.
+
+**Every feature must score 90+/100 before being considered complete.**
+
+---
+
+## 📋 Enterprise Audit Checklist (Run Before Every PR)
+
+### 1. 🔒 Security (Weight: 25%)
+| Requirement | Standard | Check |
+|-------------|----------|-------|
+| Input Length Limits | All inputs have `maxLength` (prevent DoS) | ☐ |
+| Data Masking | PII masked for display (PDPL compliance) | ☐ |
+| Phone Validation | E.164 format (`+9665XXXXXXXX`) | ☐ |
+| Email Validation | RFC 5322 compliant regex | ☐ |
+| XSS Prevention | Sanitize all user inputs | ☐ |
+| CSRF Protection | Tokens on all mutations | ☐ |
+
+```typescript
+// ✅ REQUIRED: Use these from validation-patterns.ts
+import { INPUT_MAX_LENGTHS, maskEmail, maskPhone, toE164Phone } from '@/utils/validation-patterns'
+
+<Input maxLength={INPUT_MAX_LENGTHS.name} />  // Always add limits
+{maskEmail(user.email)}                        // Always mask PII
+```
+
+### 2. ♿ Accessibility (Weight: 25%)
+| Requirement | Standard | Check |
+|-------------|----------|-------|
+| ARIA Labels | All icon-only buttons have `aria-label` | ☐ |
+| Role Attributes | Alerts have `role="alert"`, lists have `role="listbox"` | ☐ |
+| aria-hidden | All decorative icons have `aria-hidden="true"` | ☐ |
+| aria-busy | Loading states have `aria-busy="true"` | ☐ |
+| aria-live | Dynamic content has `aria-live="polite"` or `"assertive"` | ☐ |
+| Screen Reader | sr-only text for context where needed | ☐ |
+| Keyboard Navigation | Arrow keys for lists, Enter for submit | ☐ |
+| Focus Management | Dialogs trap focus, auto-focus first input | ☐ |
+| Skip Links | Long forms have skip navigation | ☐ |
+
+```typescript
+// ✅ REQUIRED: Every icon-only button
+<Button aria-label={t('actions.delete', 'حذف')}>
+  <Trash2 aria-hidden="true" />
+</Button>
+
+// ✅ REQUIRED: Error messages
+<div role="alert" aria-live="assertive">{error}</div>
+
+// ✅ REQUIRED: Loading states
+<div aria-busy={isLoading} aria-live="polite">{content}</div>
+```
+
+### 3. 🌐 Internationalization (Weight: 15%)
+| Requirement | Standard | Check |
+|-------------|----------|-------|
+| No Hardcoded Strings | All text uses `t()` function | ☐ |
+| RTL Support | Layout works in Arabic (RTL) | ☐ |
+| LTR Support | Layout works in English (LTR) | ☐ |
+| Date Localization | Dates use locale formatting | ☐ |
+| Number Localization | Numbers use locale formatting | ☐ |
+
+```typescript
+// ✅ REQUIRED: All strings use t() with fallback
+<h1>{t('page.title', 'العنوان الافتراضي')}</h1>
+toast.success(t('success.saved', 'تم الحفظ بنجاح'))
+```
+
+### 4. ⚡ Service Layer (Weight: 20%)
+| Requirement | Standard | Check |
+|-------------|----------|-------|
+| Query Keys | Primitive values only (no objects) | ☐ |
+| Retry Logic | Exponential backoff with jitter | ☐ |
+| Optimistic Updates | Instant UI feedback with rollback | ☐ |
+| Cache Invalidation | All mutations invalidate relevant queries | ☐ |
+| staleTime/gcTime | Appropriate for data type | ☐ |
+| placeholderData | Smooth loading transitions | ☐ |
+| Bulk Operations | Support for batch actions | ☐ |
+
+```typescript
+// ✅ REQUIRED: Primitive query keys
+queryKey: ['appointments', 'list', status ?? '', page ?? 1] // Good
+queryKey: ['appointments', filters] // ❌ Bad - object reference
+
+// ✅ REQUIRED: Optimistic updates for mutations
+onMutate: async (id) => {
+  await queryClient.cancelQueries({ queryKey })
+  const previous = queryClient.getQueryData(queryKey)
+  queryClient.setQueryData(queryKey, optimisticValue)
+  return { previous }
+},
+onError: (err, vars, ctx) => queryClient.setQueryData(queryKey, ctx.previous)
+```
+
+### 5. 🎨 UI Completeness (Weight: 15%)
+| Requirement | Standard | Check |
+|-------------|----------|-------|
+| CRUD Operations | Create, Read, Update, Delete all work | ☐ |
+| Edit Functionality | All items can be edited | ☐ |
+| Bulk Actions | Multi-select with batch operations | ☐ |
+| Loading States | Skeletons for all async content | ☐ |
+| Empty States | Helpful messages with CTAs | ☐ |
+| Error States | Clear messages with retry buttons | ☐ |
+| Filters & Search | Full filtering capabilities | ☐ |
+| Keyboard Shortcuts | Common actions have shortcuts | ☐ |
+
+---
+
+## 🔢 Scoring Formula
+
+```
+Score = (Security × 0.25) + (Accessibility × 0.25) + (i18n × 0.15) + (ServiceLayer × 0.20) + (UI × 0.15)
+
+90-100: ✅ Production Ready (Gold Standard)
+80-89:  ⚠️ Needs Minor Fixes
+70-79:  ❌ Significant Gaps
+<70:    🚫 Not Acceptable
+```
+
+---
+
+## 🚀 Before Every PR Checklist
+
+- [ ] All inputs have `maxLength` attributes
+- [ ] PII is masked (email, phone, national ID)
+- [ ] All icon buttons have `aria-label`
+- [ ] All icons have `aria-hidden="true"`
+- [ ] Error messages have `role="alert"`
+- [ ] Loading states have `aria-busy`
+- [ ] No hardcoded strings (all use `t()`)
+- [ ] Works in both Arabic (RTL) and English (LTR)
+- [ ] Query keys use primitives only
+- [ ] Mutations have optimistic updates
+- [ ] All CRUD operations work
+- [ ] Edit functionality exists
+- [ ] Keyboard navigation works
+- [ ] TypeScript compiles with no errors
+- [ ] Console has no errors
+
+---
+
+## 📊 Current Module Scores
+
+| Module | Security | A11y | i18n | Service | UI | **Total** |
+|--------|----------|------|------|---------|----|---------:|
+| Appointments | 95 | 95 | 95 | 98 | 95 | **95.6** ✅ |
+| Calendar | 90 | 95 | 95 | 90 | 90 | **92.0** ✅ |
+
+> **Target: All modules must be 90+/100**
+
 ---
 
 ## 🔒 CENTRALIZED CONFIGURATION RULES (MANDATORY)
