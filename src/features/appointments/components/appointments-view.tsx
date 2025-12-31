@@ -1059,10 +1059,11 @@ function BookAppointmentDialog({
     notes: '',
   })
 
-  // Validation helpers
+  // Validation helpers (enterprise-grade patterns)
   const isValidEmail = (email: string) => {
     if (!email) return true // Optional field
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    // RFC 5322 compliant email validation with proper domain/TLD check
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/
     return emailRegex.test(email)
   }
 

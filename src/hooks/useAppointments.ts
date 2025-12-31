@@ -39,7 +39,13 @@ export const appointmentKeys = {
   blockedTimesFiltered: (filters: Record<string, any>) => [...appointmentKeys.blockedTimes, filters] as const,
 
   availableSlots: ['appointments', 'available-slots'] as const,
-  availableSlotsFiltered: (params: GetAvailableSlotsRequest) => [...appointmentKeys.availableSlots, params] as const,
+  // Use primitive values for stable cache key (avoids object reference issues)
+  availableSlotsFiltered: (params: GetAvailableSlotsRequest) => [
+    ...appointmentKeys.availableSlots,
+    params.lawyerId ?? '',
+    params.date,
+    params.duration ?? 30,
+  ] as const,
 
   settings: ['appointments', 'settings'] as const,
   stats: ['appointments', 'stats'] as const,
@@ -263,6 +269,7 @@ export function useUpdateAppointment() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: appointmentKeys.detail(variables.id) })
       queryClient.invalidateQueries({ queryKey: appointmentKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: appointmentKeys.availableSlots }) // Slot availability may change
       queryClient.invalidateQueries({ queryKey: appointmentKeys.stats })
     },
   })
@@ -299,6 +306,7 @@ export function useConfirmAppointment() {
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: appointmentKeys.detail(id) })
       queryClient.invalidateQueries({ queryKey: appointmentKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: appointmentKeys.availableSlots }) // Status change may affect slot display
       queryClient.invalidateQueries({ queryKey: appointmentKeys.stats })
     },
   })
@@ -317,6 +325,7 @@ export function useCompleteAppointment() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: appointmentKeys.detail(variables.id) })
       queryClient.invalidateQueries({ queryKey: appointmentKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: appointmentKeys.availableSlots }) // Completed slots are freed up
       queryClient.invalidateQueries({ queryKey: appointmentKeys.stats })
     },
   })
@@ -334,6 +343,7 @@ export function useMarkNoShow() {
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: appointmentKeys.detail(id) })
       queryClient.invalidateQueries({ queryKey: appointmentKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: appointmentKeys.availableSlots }) // No-show slots may be rebookable
       queryClient.invalidateQueries({ queryKey: appointmentKeys.stats })
     },
   })
