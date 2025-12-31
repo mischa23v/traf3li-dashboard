@@ -308,15 +308,43 @@ export function AppointmentsView() {
   // Group appointments by date
   const appointmentsByDate = useMemo(() => {
     const grouped: Record<string, Appointment[]> = {}
+    console.log('[WEEK-VIEW-DEBUG] Grouping', filteredAppointments.length, 'appointments by date')
+
     filteredAppointments.forEach((apt) => {
+      console.log('[WEEK-VIEW-DEBUG] Processing appointment:', {
+        id: apt.id,
+        clientName: apt.clientName,
+        date: apt.date,
+        startTime: apt.startTime,
+        dateType: typeof apt.date,
+      })
+
       if (apt.date) {
-        const dateKey = format(new Date(apt.date), 'yyyy-MM-dd')
+        // Handle both "YYYY-MM-DD" and ISO datetime strings
+        let dateKey: string
+        try {
+          const dateObj = new Date(apt.date)
+          if (!isNaN(dateObj.getTime())) {
+            dateKey = format(dateObj, 'yyyy-MM-dd')
+          } else {
+            // If parsing fails, try using the date string directly if it's already in YYYY-MM-DD format
+            dateKey = apt.date.split('T')[0]
+          }
+        } catch {
+          dateKey = apt.date.split('T')[0]
+        }
+
+        console.log('[WEEK-VIEW-DEBUG] → dateKey:', dateKey)
+
         if (!grouped[dateKey]) {
           grouped[dateKey] = []
         }
         grouped[dateKey].push(apt)
+      } else {
+        console.warn('[WEEK-VIEW-DEBUG] ⚠️ Appointment has no date:', apt.id)
       }
     })
+
     // Sort appointments within each day by time
     Object.keys(grouped).forEach((date) => {
       grouped[date].sort((a, b) => {
@@ -325,8 +353,12 @@ export function AppointmentsView() {
         return timeA.localeCompare(timeB)
       })
     })
+
+    console.log('[WEEK-VIEW-DEBUG] Grouped dates:', Object.keys(grouped))
+    console.log('[WEEK-VIEW-DEBUG] Week days in view:', weekDays.map(d => format(d, 'yyyy-MM-dd')))
+
     return grouped
-  }, [filteredAppointments])
+  }, [filteredAppointments, weekDays])
 
   // Navigation handlers
   const goToPreviousWeek = () => setCurrentWeekStart(subWeeks(currentWeekStart, 1))
@@ -865,8 +897,11 @@ export function AppointmentsView() {
                                   <Checkbox checked={isSelected} aria-label="Select appointment" />
                                 </div>
 
-                                <div className="text-sm font-bold text-slate-900 mb-1">{apt.startTime || '00:00'}</div>
+                                <div className="text-sm font-bold text-slate-900 mb-1">{apt.startTime || '00:00'} - {apt.endTime || '--:--'}</div>
                                 <div className="text-xs font-medium text-slate-700 truncate">{apt.clientName || t('appointments.labels.noName', 'بدون اسم')}</div>
+                                {apt.notes && (
+                                  <div className="text-[10px] text-slate-500 truncate mt-0.5">{apt.notes}</div>
+                                )}
                                 <div className="mt-2">
                                   <span className={cn('inline-block px-2 py-0.5 rounded-full text-[10px] font-medium text-white', typeConfig?.color || 'bg-gray-500')}>
                                     <span className="sr-only">{t('appointments.labels.appointmentType', 'نوع الموعد')}: </span>
@@ -940,9 +975,12 @@ export function AppointmentsView() {
                               </span>
                             </div>
                             <h3 className="font-bold text-slate-900 mb-1">{apt.clientName || t('appointments.labels.noName', 'بدون اسم')}</h3>
+                            {apt.notes && (
+                              <p className="text-sm text-slate-600 mb-2 line-clamp-1">{apt.notes}</p>
+                            )}
                             <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
                               <span className="flex items-center gap-1"><CalendarIcon className="h-4 w-4" aria-hidden="true" />{apt.date ? format(new Date(apt.date), 'MMM d, yyyy', { locale }) : '-'}</span>
-                              <span className="flex items-center gap-1"><Clock className="h-4 w-4" aria-hidden="true" />{apt.startTime || '00:00'}</span>
+                              <span className="flex items-center gap-1"><Clock className="h-4 w-4" aria-hidden="true" />{apt.startTime || '00:00'} - {apt.endTime || '--:--'}</span>
                               {apt.clientPhone && <span className="flex items-center gap-1"><Phone className="h-4 w-4" aria-hidden="true" />{maskPhone(apt.clientPhone)}</span>}
                             </div>
                           </div>

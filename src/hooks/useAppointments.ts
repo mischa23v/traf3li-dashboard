@@ -34,6 +34,137 @@ import appointmentsService, {
 } from '@/services/appointmentsService'
 import { queryRetryConfig, mutationRetryConfig } from '@/lib/query-retry-config'
 
+// ==================== Data Normalization ====================
+
+/**
+ * Helper to extract HH:MM from ISO datetime or return as-is if already HH:MM format
+ */
+function extractTime(isoOrTime: string | undefined): string {
+  if (!isoOrTime) return ''
+  // If it's already in HH:MM format, return as-is
+  if (/^\d{2}:\d{2}$/.test(isoOrTime)) return isoOrTime
+  // Try parsing as ISO datetime
+  try {
+    const date = new Date(isoOrTime)
+    if (!isNaN(date.getTime())) {
+      const hours = date.getUTCHours().toString().padStart(2, '0')
+      const minutes = date.getUTCMinutes().toString().padStart(2, '0')
+      return `${hours}:${minutes}`
+    }
+  } catch {
+    // Fall through
+  }
+  return ''
+}
+
+/**
+ * Helper to extract YYYY-MM-DD from ISO datetime
+ */
+function extractDate(isoDatetime: string | undefined): string {
+  if (!isoDatetime) return ''
+  // If it's already in YYYY-MM-DD format, return as-is
+  if (/^\d{4}-\d{2}-\d{2}$/.test(isoDatetime)) return isoDatetime
+  // Try parsing as ISO datetime
+  try {
+    const date = new Date(isoDatetime)
+    if (!isNaN(date.getTime())) {
+      return date.toISOString().split('T')[0]
+    }
+  } catch {
+    // Fall through
+  }
+  // Try extracting date portion directly
+  if (isoDatetime.includes('T')) {
+    return isoDatetime.split('T')[0]
+  }
+  return ''
+}
+
+/**
+ * Normalize appointment data from backend
+ * Backend returns: scheduledTime (ISO), endTime (ISO), timeRange ("HH:MM - HH:MM")
+ * Frontend expects: date (YYYY-MM-DD), startTime (HH:MM), endTime (HH:MM)
+ * تطبيع بيانات الموعد من الخادم
+ */
+function normalizeAppointment(apt: any): Appointment {
+  // Debug: Log raw fields
+  console.log('[NORMALIZE] Raw appointment:', {
+    id: apt.id,
+    scheduledTime: apt.scheduledTime,
+    endTime: apt.endTime,
+    timeRange: apt.timeRange,
+    date: apt.date,
+    startTime: apt.startTime,
+  })
+
+  // Extract date from scheduledTime or use existing date
+  let date = apt.date
+  if (!date || date === '') {
+    date = extractDate(apt.scheduledTime)
+  }
+
+  // Extract startTime from scheduledTime or use existing
+  let startTime = apt.startTime
+  if (!startTime || startTime === '' || startTime === '00:00') {
+    // First try scheduledTime
+    startTime = extractTime(apt.scheduledTime)
+    // Fallback to timeRange if available
+    if (!startTime && apt.timeRange) {
+      const [start] = apt.timeRange.split(' - ')
+      startTime = start || ''
+    }
+  }
+
+  // Extract endTime - backend sends ISO datetime, we need HH:MM
+  let endTime = apt.endTime
+  // Check if endTime is ISO datetime (contains 'T') and convert to HH:MM
+  if (endTime && endTime.includes('T')) {
+    endTime = extractTime(endTime)
+  }
+  // Fallback to timeRange if endTime is still not valid
+  if (!endTime || endTime === '' || endTime === '--:--') {
+    if (apt.timeRange) {
+      const parts = apt.timeRange.split(' - ')
+      endTime = parts[1] || ''
+    }
+  }
+  // Calculate from duration if still no endTime
+  if (!endTime && startTime && apt.duration) {
+    const [h, m] = startTime.split(':').map(Number)
+    const totalMinutes = h * 60 + m + (apt.duration || 30)
+    const endH = Math.floor(totalMinutes / 60) % 24
+    const endM = totalMinutes % 60
+    endTime = `${endH.toString().padStart(2, '0')}:${endM.toString().padStart(2, '0')}`
+  }
+
+  const normalized = {
+    ...apt,
+    date: date || new Date().toISOString().split('T')[0],
+    startTime: startTime || '00:00',
+    endTime: endTime || '--:--',
+  }
+
+  console.log('[NORMALIZE] Result:', {
+    id: normalized.id,
+    date: normalized.date,
+    startTime: normalized.startTime,
+    endTime: normalized.endTime,
+  })
+
+  return normalized
+}
+
+/**
+ * Normalize array of appointments
+ */
+function normalizeAppointments(appointments: any[]): Appointment[] {
+  if (!Array.isArray(appointments)) {
+    console.warn('[NORMALIZE] Expected array, got:', typeof appointments)
+    return []
+  }
+  return appointments.map(normalizeAppointment)
+}
+
 // ==================== Filter Types (Strict, No Record<string, any>) ====================
 
 export interface AppointmentFilters {
@@ -289,9 +420,15 @@ export function useAppointments(params?: AppointmentFilters) {
 
       try {
         const result = await appointmentsService.getAppointments(params)
+
+        // Normalize appointments to ensure date/startTime/endTime fields exist
+        if (result?.data?.appointments) {
+          console.log('[NORMALIZE] Processing', result.data.appointments.length, 'appointments')
+          result.data.appointments = normalizeAppointments(result.data.appointments)
+        }
+
         console.group('✅ [QUERY-DEBUG] useAppointments SUCCESS')
         console.log('⏰ Time:', new Date().toISOString())
-        console.log('📦 Full Response:', JSON.stringify(result, null, 2))
         console.log('📊 Response Structure:', {
           success: result?.success,
           hasData: !!result?.data,
@@ -301,7 +438,7 @@ export function useAppointments(params?: AppointmentFilters) {
           limit: result?.data?.limit,
         })
         if (result?.data?.appointments?.length > 0) {
-          console.log('📝 First Appointment:', JSON.stringify(result.data.appointments[0], null, 2))
+          console.log('📝 First Appointment (normalized):', JSON.stringify(result.data.appointments[0], null, 2))
         }
         console.groupEnd()
         return result
@@ -330,8 +467,14 @@ export function useAppointments(params?: AppointmentFilters) {
 export function useInfiniteAppointments(params?: Omit<AppointmentFilters, 'page'>) {
   return useInfiniteQuery({
     queryKey: appointmentKeys.listInfinite(params),
-    queryFn: ({ pageParam = 1 }) =>
-      appointmentsService.getAppointments({ ...params, page: pageParam, limit: params?.limit || 20 }),
+    queryFn: async ({ pageParam = 1 }) => {
+      const result = await appointmentsService.getAppointments({ ...params, page: pageParam, limit: params?.limit || 20 })
+      // Normalize appointments
+      if (result?.data?.appointments) {
+        result.data.appointments = normalizeAppointments(result.data.appointments)
+      }
+      return result
+    },
     getNextPageParam: (lastPage) => {
       if (!lastPage.data) return undefined
       const { page, total, limit } = lastPage.data
@@ -351,7 +494,14 @@ export function useInfiniteAppointments(params?: Omit<AppointmentFilters, 'page'
 export function useAppointment(id: string) {
   return useQuery({
     queryKey: appointmentKeys.detail(id),
-    queryFn: () => appointmentsService.getAppointment(id),
+    queryFn: async () => {
+      const result = await appointmentsService.getAppointment(id)
+      // Normalize single appointment
+      if (result?.data) {
+        result.data = normalizeAppointment(result.data)
+      }
+      return result
+    },
     enabled: !!id,
     staleTime: 2 * 60 * 1000, // 2 minutes
     ...defaultQueryOptions,
