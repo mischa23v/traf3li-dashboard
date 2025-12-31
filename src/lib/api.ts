@@ -178,6 +178,64 @@ export const getRefreshToken = (): string | null => {
 }
 
 /**
+ * Get refresh token from cookies (fallback when localStorage is empty)
+ * Backend sets refreshToken cookie with httpOnly:false so JS can read it
+ */
+export const getRefreshTokenFromCookie = (): string | null => {
+  const cookies = document.cookie
+  const match = cookies.match(/refreshToken=([^;]+)/)
+  if (match && match[1]) {
+    return match[1]
+  }
+  return null
+}
+
+/**
+ * Get refresh token from any available source (localStorage first, then cookies)
+ */
+export const getAnyRefreshToken = (): string | null => {
+  // Try localStorage first (faster, no parsing)
+  const localStorageToken = getRefreshToken()
+  if (localStorageToken) {
+    return localStorageToken
+  }
+
+  // Fallback to cookie
+  const cookieToken = getRefreshTokenFromCookie()
+  if (cookieToken) {
+    tokenLog('Using refresh token from cookie (localStorage empty)')
+    return cookieToken
+  }
+
+  return null
+}
+
+/**
+ * Check if access token is missing or expired and needs refresh
+ */
+export const needsTokenRefresh = (): boolean => {
+  const accessToken = getAccessToken()
+
+  // No access token at all - definitely need refresh
+  if (!accessToken) {
+    return true
+  }
+
+  // Check if token is expired by decoding it
+  const decoded = decodeJWTForDebug(accessToken)
+  if (!decoded.valid || decoded.isExpired) {
+    return true
+  }
+
+  // Check stored expiration time (more reliable if backend provided expires_in)
+  if (isTokenExpiringSoon(30)) { // 30 second buffer
+    return true
+  }
+
+  return false
+}
+
+/**
  * Schedule automatic token refresh before expiry
  * Called internally by storeTokens when expires_in is provided
  */
@@ -375,10 +433,17 @@ const processQueue = (error: any = null): void => {
  * ============================================================================
  */
 const refreshAccessToken = async (): Promise<boolean> => {
-  const refreshToken = getRefreshToken()
+  // Try localStorage first, then fall back to cookie
+  const refreshToken = getAnyRefreshToken()
   if (!refreshToken) {
+    tokenWarn('No refresh token available (checked localStorage and cookies)')
     return false
   }
+
+  tokenLog('Attempting token refresh...', {
+    tokenSource: getRefreshToken() ? 'localStorage' : 'cookie',
+    tokenPreview: refreshToken.substring(0, 20) + '...',
+  })
 
   try {
     // Use a separate axios instance to avoid interceptor loops
@@ -632,7 +697,7 @@ const shouldBypassCircuitBreaker = (url: string): boolean => {
 
 // Apply same interceptors to non-versioned client (with gold standard protections)
 apiClientNoVersion.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
+  async (config: InternalAxiosRequestConfig) => {
     const method = config.method?.toLowerCase()
     const url = config.url || ''
 
@@ -640,6 +705,35 @@ apiClientNoVersion.interceptors.request.use(
       const csrfToken = getCsrfToken()
       if (csrfToken) {
         config.headers.set('X-CSRF-Token', csrfToken)
+      }
+    }
+
+    // PROACTIVE TOKEN REFRESH:
+    // Check if access token is missing/expired and refresh token is available
+    // Skip for auth endpoints to avoid loops
+    const isAuthEndpoint = url.includes('/auth/')
+    if (!isAuthEndpoint && needsTokenRefresh()) {
+      const hasRefreshToken = getAnyRefreshToken()
+      if (hasRefreshToken && !isRefreshing) {
+        tokenLog('Proactive token refresh triggered (noVersion)', {
+          reason: 'Access token missing or expired',
+          url,
+        })
+
+        // Only one refresh at a time
+        isRefreshing = true
+        try {
+          const refreshed = await refreshAccessToken()
+          if (refreshed) {
+            tokenLog('Proactive token refresh succeeded (noVersion)')
+          } else {
+            tokenWarn('Proactive token refresh failed (noVersion) - request will proceed without token')
+          }
+        } catch (error) {
+          tokenWarn('Proactive token refresh error (noVersion):', error)
+        } finally {
+          isRefreshing = false
+        }
       }
     }
 
@@ -888,9 +982,13 @@ apiClientNoVersion.interceptors.response.use(
 /**
  * Request Interceptor
  * Adds tiered timeouts, request cancellation, deduplication, circuit breaker, idempotency, CSRF token, and Authorization handling
+ *
+ * PROACTIVE TOKEN REFRESH:
+ * If access token is missing/expired but refresh token exists, we proactively
+ * refresh before the request to avoid a 401 round-trip.
  */
 apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
+  async (config: InternalAxiosRequestConfig) => {
     // Add CSRF token to mutating requests
     const method = config.method?.toLowerCase()
     const url = config.url || ''
@@ -899,6 +997,35 @@ apiClient.interceptors.request.use(
       const csrfToken = getCsrfToken()
       if (csrfToken) {
         config.headers.set('X-CSRF-Token', csrfToken)
+      }
+    }
+
+    // PROACTIVE TOKEN REFRESH:
+    // Check if access token is missing/expired and refresh token is available
+    // Skip for auth endpoints to avoid loops
+    const isAuthEndpoint = url.includes('/auth/')
+    if (!isAuthEndpoint && needsTokenRefresh()) {
+      const hasRefreshToken = getAnyRefreshToken()
+      if (hasRefreshToken && !isRefreshing) {
+        tokenLog('Proactive token refresh triggered', {
+          reason: 'Access token missing or expired',
+          url,
+        })
+
+        // Only one refresh at a time
+        isRefreshing = true
+        try {
+          const refreshed = await refreshAccessToken()
+          if (refreshed) {
+            tokenLog('Proactive token refresh succeeded')
+          } else {
+            tokenWarn('Proactive token refresh failed - request will proceed without token')
+          }
+        } catch (error) {
+          tokenWarn('Proactive token refresh error:', error)
+        } finally {
+          isRefreshing = false
+        }
       }
     }
 
@@ -1210,14 +1337,16 @@ apiClient.interceptors.response.use(
       // Don't try to refresh if:
       // 1. Already tried once (_retry flag set)
       // 2. This is a refresh token request itself
-      // 3. No refresh token available
+      // 3. No refresh token available (check both localStorage AND cookies)
       const isRefreshRequest = originalRequest?.url?.includes('/auth/refresh')
-      if (originalRequest?._retry || isRefreshRequest || !getRefreshToken()) {
+      const anyRefreshToken = getAnyRefreshToken()
+      if (originalRequest?._retry || isRefreshRequest || !anyRefreshToken) {
         // Log and let auth system handle it
         console.warn('[API] 401 Unauthorized (no refresh possible):', {
           url: error.config?.url,
           method: error.config?.method,
-          hasRefreshToken: !!getRefreshToken(),
+          hasRefreshTokenLocalStorage: !!getRefreshToken(),
+          hasRefreshTokenCookie: !!getRefreshTokenFromCookie(),
           isRetry: !!originalRequest?._retry,
           isRefreshRequest,
           timestamp: new Date().toISOString(),
