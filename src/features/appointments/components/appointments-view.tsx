@@ -978,10 +978,23 @@ function AppointmentDetailsDialog({
               <span>{appointment.clientPhone}</span>
             </div>
           )}
-          {appointment.location && (
+          {/* Location/Meeting Type Display */}
+          {(appointment.locationType || appointment.meetingLink || appointment.location) && (
             <div className="flex items-center gap-3 text-slate-700">
-              {appointment.location.type === 'video' ? <Video className="h-5 w-5 text-slate-400" /> : <MapPin className="h-5 w-5 text-slate-400" />}
-              <span>{appointment.location.type === 'video' ? (isRtl ? 'اجتماع عن بعد' : 'Video Call') : appointment.location.address}</span>
+              {appointment.locationType === 'video' || appointment.meetingLink ? (
+                <Video className="h-5 w-5 text-slate-400" />
+              ) : appointment.locationType === 'phone' ? (
+                <Phone className="h-5 w-5 text-slate-400" />
+              ) : (
+                <MapPin className="h-5 w-5 text-slate-400" />
+              )}
+              <span>
+                {appointment.locationType === 'video' || appointment.meetingLink
+                  ? (isRtl ? 'اجتماع عن بعد' : 'Video Call')
+                  : appointment.locationType === 'phone'
+                    ? (isRtl ? 'مكالمة هاتفية' : 'Phone Call')
+                    : appointment.location || (isRtl ? 'حضوري' : 'In Person')}
+              </span>
             </div>
           )}
           {appointment.notes && (

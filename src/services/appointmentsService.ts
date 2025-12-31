@@ -103,7 +103,8 @@ export interface Appointment {
   caseId?: string
   caseName?: string
   meetingLink?: string // For virtual appointments
-  location?: string // For in-person appointments
+  location?: string // For in-person appointments (address)
+  locationType?: LocationType // Meeting type: video, in-person, or phone
 
   // Pricing (optional)
   price?: number
