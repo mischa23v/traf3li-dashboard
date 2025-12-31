@@ -232,6 +232,7 @@ export interface BookAppointmentRequest {
   meetingLink?: string
   location?: string
   locationType?: LocationType // Meeting type: video, in-person, or phone
+  lawyerId?: string // Lawyer ID to assign appointment to (normalized to assignedTo by backend)
   assignedTo?: string // For firm admins to assign appointment to another lawyer
 }
 
