@@ -867,10 +867,44 @@ export const crmSettingsService = {
    * Get all CRM settings
    */
   getSettings: async (): Promise<CrmSettings> => {
+    const startTime = performance.now()
+    console.log('[CRM-SETTINGS-DEBUG] ========== GET SETTINGS START ==========')
+    console.log('[CRM-SETTINGS-DEBUG] Endpoint: GET /crm-settings')
+    console.log('[CRM-SETTINGS-DEBUG] Request started at:', new Date().toISOString())
+
     try {
       const response = await apiClient.get('/crm-settings')
+      const endTime = performance.now()
+      const duration = ((endTime - startTime) / 1000).toFixed(2)
+
+      console.log('[CRM-SETTINGS-DEBUG] ✅ Response received')
+      console.log('[CRM-SETTINGS-DEBUG] Duration:', duration, 'seconds')
+      console.log('[CRM-SETTINGS-DEBUG] Response status:', response.status)
+      console.log('[CRM-SETTINGS-DEBUG] Response headers:', JSON.stringify(response.headers, null, 2))
+      console.log('[CRM-SETTINGS-DEBUG] Raw response.data:', JSON.stringify(response.data, null, 2))
+      console.log('[CRM-SETTINGS-DEBUG] Has data.data?', !!response.data?.data)
+      console.log('[CRM-SETTINGS-DEBUG] Has data.settings?', !!response.data?.settings)
+      console.log('[CRM-SETTINGS-DEBUG] appointmentSettings:', JSON.stringify(response.data?.data?.appointmentSettings || response.data?.settings?.appointmentSettings, null, 2))
+      console.log('[CRM-SETTINGS-DEBUG] workingHours:', JSON.stringify(response.data?.data?.appointmentSettings?.workingHours || response.data?.settings?.appointmentSettings?.workingHours, null, 2))
+      console.log('[CRM-SETTINGS-DEBUG] ========== GET SETTINGS END ==========')
+
       return response.data.data || response.data.settings
     } catch (error: any) {
+      const endTime = performance.now()
+      const duration = ((endTime - startTime) / 1000).toFixed(2)
+
+      console.error('[CRM-SETTINGS-DEBUG] ❌ ERROR in getSettings')
+      console.error('[CRM-SETTINGS-DEBUG] Duration until error:', duration, 'seconds')
+      console.error('[CRM-SETTINGS-DEBUG] Error name:', error?.name)
+      console.error('[CRM-SETTINGS-DEBUG] Error message:', error?.message)
+      console.error('[CRM-SETTINGS-DEBUG] Error response status:', error?.response?.status)
+      console.error('[CRM-SETTINGS-DEBUG] Error response statusText:', error?.response?.statusText)
+      console.error('[CRM-SETTINGS-DEBUG] Error response data:', JSON.stringify(error?.response?.data, null, 2))
+      console.error('[CRM-SETTINGS-DEBUG] Error config URL:', error?.config?.url)
+      console.error('[CRM-SETTINGS-DEBUG] Error config method:', error?.config?.method)
+      console.error('[CRM-SETTINGS-DEBUG] Full error:', error)
+      console.error('[CRM-SETTINGS-DEBUG] ========== GET SETTINGS ERROR END ==========')
+
       throwBilingualError(error)
     }
   },
@@ -1005,14 +1039,46 @@ export const crmSettingsService = {
   updateAllWorkingHours: async (
     workingHours: Partial<WorkingHours>
   ): Promise<CrmSettings> => {
+    const startTime = performance.now()
+    const payload = {
+      appointmentSettings: {
+        workingHours,
+      },
+    }
+
+    console.log('[CRM-SETTINGS-DEBUG] ========== UPDATE WORKING HOURS START ==========')
+    console.log('[CRM-SETTINGS-DEBUG] Endpoint: PUT /crm-settings')
+    console.log('[CRM-SETTINGS-DEBUG] Request started at:', new Date().toISOString())
+    console.log('[CRM-SETTINGS-DEBUG] Payload being sent:', JSON.stringify(payload, null, 2))
+    console.log('[CRM-SETTINGS-DEBUG] Working hours data:', JSON.stringify(workingHours, null, 2))
+
     try {
-      const response = await apiClient.put('/crm-settings', {
-        appointmentSettings: {
-          workingHours,
-        },
-      })
+      const response = await apiClient.put('/crm-settings', payload)
+      const endTime = performance.now()
+      const duration = ((endTime - startTime) / 1000).toFixed(2)
+
+      console.log('[CRM-SETTINGS-DEBUG] ✅ Update successful')
+      console.log('[CRM-SETTINGS-DEBUG] Duration:', duration, 'seconds')
+      console.log('[CRM-SETTINGS-DEBUG] Response status:', response.status)
+      console.log('[CRM-SETTINGS-DEBUG] Response data:', JSON.stringify(response.data, null, 2))
+      console.log('[CRM-SETTINGS-DEBUG] ========== UPDATE WORKING HOURS END ==========')
+
       return response.data.data || response.data.settings || response.data
     } catch (error: any) {
+      const endTime = performance.now()
+      const duration = ((endTime - startTime) / 1000).toFixed(2)
+
+      console.error('[CRM-SETTINGS-DEBUG] ❌ ERROR in updateAllWorkingHours')
+      console.error('[CRM-SETTINGS-DEBUG] Duration until error:', duration, 'seconds')
+      console.error('[CRM-SETTINGS-DEBUG] Payload that failed:', JSON.stringify(payload, null, 2))
+      console.error('[CRM-SETTINGS-DEBUG] Error name:', error?.name)
+      console.error('[CRM-SETTINGS-DEBUG] Error message:', error?.message)
+      console.error('[CRM-SETTINGS-DEBUG] Error response status:', error?.response?.status)
+      console.error('[CRM-SETTINGS-DEBUG] Error response statusText:', error?.response?.statusText)
+      console.error('[CRM-SETTINGS-DEBUG] Error response data:', JSON.stringify(error?.response?.data, null, 2))
+      console.error('[CRM-SETTINGS-DEBUG] Full error:', error)
+      console.error('[CRM-SETTINGS-DEBUG] ========== UPDATE WORKING HOURS ERROR END ==========')
+
       throwBilingualError(error)
     }
   },

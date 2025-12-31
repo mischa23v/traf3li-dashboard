@@ -610,13 +610,54 @@ const appointmentsService = {
    * إنشاء وقت محجوب
    */
   createBlockedTime: async (data: CreateBlockedTimeRequest): Promise<{ success: boolean; data: BlockedTime }> => {
+    const startTime = performance.now()
     const endpoint = '/appointments/blocked-times'
+
+    console.log('[BLOCK-TIME-SVC] ========== CREATE BLOCKED TIME SERVICE START ==========')
+    console.log('[BLOCK-TIME-SVC] Endpoint:', 'POST', endpoint)
+    console.log('[BLOCK-TIME-SVC] Full URL:', apiClient.defaults.baseURL + endpoint)
+    console.log('[BLOCK-TIME-SVC] Request payload:', JSON.stringify(data, null, 2))
+    console.log('[BLOCK-TIME-SVC] startDateTime:', data.startDateTime)
+    console.log('[BLOCK-TIME-SVC] endDateTime:', data.endDateTime)
+    console.log('[BLOCK-TIME-SVC] reason:', data.reason)
+    console.log('[BLOCK-TIME-SVC] isAllDay:', data.isAllDay)
+    console.log('[BLOCK-TIME-SVC] isRecurring:', data.isRecurring)
+    console.log('[BLOCK-TIME-SVC] targetLawyerId:', (data as any).targetLawyerId || '(not set - will use current user)')
+    console.log('[BLOCK-TIME-SVC] Auth header present?:', !!apiClient.defaults.headers.common['Authorization'])
+
     debugLog.request('POST', endpoint, data)
     try {
       const response = await apiClient.post<{ success: boolean; data: BlockedTime }>(endpoint, data)
+      const endTime = performance.now()
+
+      console.log('[BLOCK-TIME-SVC] ✅ Success')
+      console.log('[BLOCK-TIME-SVC] Duration:', ((endTime - startTime) / 1000).toFixed(2), 'seconds')
+      console.log('[BLOCK-TIME-SVC] Response status:', response.status)
+      console.log('[BLOCK-TIME-SVC] Response data:', JSON.stringify(response.data, null, 2))
+      console.log('[BLOCK-TIME-SVC] Created blocked time ID:', response.data?.data?.id)
+      console.log('[BLOCK-TIME-SVC] ========== CREATE BLOCKED TIME SERVICE END ==========')
+
       debugLog.response('POST', endpoint, response.data)
       return response.data
     } catch (error: any) {
+      const endTime = performance.now()
+
+      console.error('[BLOCK-TIME-SVC] ❌ ERROR in createBlockedTime service')
+      console.error('[BLOCK-TIME-SVC] Duration until error:', ((endTime - startTime) / 1000).toFixed(2), 'seconds')
+      console.error('[BLOCK-TIME-SVC] Request payload that failed:', JSON.stringify(data, null, 2))
+      console.error('[BLOCK-TIME-SVC] Error name:', error?.name)
+      console.error('[BLOCK-TIME-SVC] Error message:', error?.message)
+      console.error('[BLOCK-TIME-SVC] Error code:', error?.code)
+      console.error('[BLOCK-TIME-SVC] Response status:', error?.response?.status)
+      console.error('[BLOCK-TIME-SVC] Response statusText:', error?.response?.statusText)
+      console.error('[BLOCK-TIME-SVC] Response data:', JSON.stringify(error?.response?.data, null, 2))
+      console.error('[BLOCK-TIME-SVC] Response headers:', JSON.stringify(error?.response?.headers, null, 2))
+      console.error('[BLOCK-TIME-SVC] Request URL:', error?.config?.url)
+      console.error('[BLOCK-TIME-SVC] Request method:', error?.config?.method)
+      console.error('[BLOCK-TIME-SVC] Request data sent:', error?.config?.data)
+      console.error('[BLOCK-TIME-SVC] Is network error?:', error?.message === 'Network Error')
+      console.error('[BLOCK-TIME-SVC] ========== CREATE BLOCKED TIME SERVICE ERROR END ==========')
+
       debugLog.error('POST', endpoint, error, data)
       const errorMessage = handleApiError(error) || 'Failed to create blocked time | فشل في إنشاء الوقت المحجوب'
       throw new Error(errorMessage)
@@ -727,14 +768,51 @@ const appointmentsService = {
    * إلغاء الموعد
    */
   cancelAppointment: async (id: string, reason?: string): Promise<AppointmentResponse> => {
+    const startTime = performance.now()
     const endpoint = `/appointments/${id}`
     const data = { reason }
+
+    console.log('[CANCEL-APT-SVC] ========== CANCEL APPOINTMENT SERVICE START ==========')
+    console.log('[CANCEL-APT-SVC] Endpoint:', 'DELETE', endpoint)
+    console.log('[CANCEL-APT-SVC] Full URL:', apiClient.defaults.baseURL + endpoint)
+    console.log('[CANCEL-APT-SVC] Appointment ID:', id)
+    console.log('[CANCEL-APT-SVC] ID format valid ObjectId?:', /^[a-f\d]{24}$/i.test(id))
+    console.log('[CANCEL-APT-SVC] Reason:', reason)
+    console.log('[CANCEL-APT-SVC] Request body:', JSON.stringify(data, null, 2))
+    console.log('[CANCEL-APT-SVC] Auth header present?:', !!apiClient.defaults.headers.common['Authorization'])
+
     debugLog.request('DELETE', endpoint, data)
     try {
       const response = await apiClient.delete<AppointmentResponse>(endpoint, { data })
+      const endTime = performance.now()
+
+      console.log('[CANCEL-APT-SVC] ✅ Success')
+      console.log('[CANCEL-APT-SVC] Duration:', ((endTime - startTime) / 1000).toFixed(2), 'seconds')
+      console.log('[CANCEL-APT-SVC] Response status:', response.status)
+      console.log('[CANCEL-APT-SVC] Response data:', JSON.stringify(response.data, null, 2))
+      console.log('[CANCEL-APT-SVC] ========== CANCEL APPOINTMENT SERVICE END ==========')
+
       debugLog.response('DELETE', endpoint, response.data)
       return response.data
     } catch (error: any) {
+      const endTime = performance.now()
+
+      console.error('[CANCEL-APT-SVC] ❌ ERROR in cancelAppointment service')
+      console.error('[CANCEL-APT-SVC] Duration until error:', ((endTime - startTime) / 1000).toFixed(2), 'seconds')
+      console.error('[CANCEL-APT-SVC] Appointment ID:', id)
+      console.error('[CANCEL-APT-SVC] Error name:', error?.name)
+      console.error('[CANCEL-APT-SVC] Error message:', error?.message)
+      console.error('[CANCEL-APT-SVC] Error code:', error?.code)
+      console.error('[CANCEL-APT-SVC] Response status:', error?.response?.status)
+      console.error('[CANCEL-APT-SVC] Response statusText:', error?.response?.statusText)
+      console.error('[CANCEL-APT-SVC] Response data:', JSON.stringify(error?.response?.data, null, 2))
+      console.error('[CANCEL-APT-SVC] Response headers:', JSON.stringify(error?.response?.headers, null, 2))
+      console.error('[CANCEL-APT-SVC] Request URL:', error?.config?.url)
+      console.error('[CANCEL-APT-SVC] Request method:', error?.config?.method)
+      console.error('[CANCEL-APT-SVC] Request data:', error?.config?.data)
+      console.error('[CANCEL-APT-SVC] Is network error?:', error?.message === 'Network Error')
+      console.error('[CANCEL-APT-SVC] ========== CANCEL APPOINTMENT SERVICE ERROR END ==========')
+
       debugLog.error('DELETE', endpoint, error, data)
       const errorMessage = handleApiError(error) || 'Failed to cancel appointment | فشل في إلغاء الموعد'
       throw new Error(errorMessage)
