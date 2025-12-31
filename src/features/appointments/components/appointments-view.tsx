@@ -154,6 +154,18 @@ const LOCATION_TYPES: { value: LocationType; labelAr: string; labelEn: string; i
   { value: 'phone', labelAr: 'مكالمة هاتفية', labelEn: 'Phone Call', icon: 'phone' },
 ]
 
+/**
+ * Normalize backend location type to frontend value for form display
+ * Backend stores: virtual, office, phone, client_site, other
+ * Frontend uses: video, in-person, phone
+ */
+const normalizeLocationType = (locationType: LocationType | undefined): LocationType => {
+  if (!locationType) return 'video'
+  if (locationType === 'virtual') return 'video'
+  if (locationType === 'office' || locationType === 'client_site') return 'in-person'
+  return locationType
+}
+
 // ==================== Main Component ====================
 
 export function AppointmentsView() {
@@ -423,7 +435,8 @@ export function AppointmentsView() {
     setEditFormData({
       type: appointment.type,
       notes: appointment.notes || '',
-      locationType: appointment.locationType || 'video',
+      // Normalize backend values (virtual → video, office → in-person) for form display
+      locationType: normalizeLocationType(appointment.locationType),
       meetingLink: appointment.meetingLink || '',
       location: appointment.location || '',
     })
@@ -1200,8 +1213,8 @@ export function AppointmentsView() {
               </div>
             </div>
 
-            {/* Meeting Link (for video) */}
-            {editFormData.locationType === 'video' && (
+            {/* Meeting Link (for video/virtual) */}
+            {['video', 'virtual'].includes(editFormData.locationType) && (
               <div>
                 <Label>{t('appointments.labels.meetingLink', 'رابط الاجتماع')}</Label>
                 <Input
@@ -1213,8 +1226,8 @@ export function AppointmentsView() {
               </div>
             )}
 
-            {/* Location (for in-person) */}
-            {editFormData.locationType === 'in-person' && (
+            {/* Location (for in-person/office) */}
+            {['in-person', 'office'].includes(editFormData.locationType) && (
               <div>
                 <Label>{t('appointments.labels.location', 'العنوان')}</Label>
                 <Input
@@ -1349,9 +1362,10 @@ function AppointmentDetailsDialog({
             </div>
           )}
           {/* Location/Meeting Type Display */}
+          {/* Backend stores: virtual, office, phone. Frontend sends: video, in-person, phone */}
           {(appointment.locationType || appointment.meetingLink || appointment.location) && (
             <div className="flex items-center gap-3 text-slate-700">
-              {appointment.locationType === 'video' || appointment.meetingLink ? (
+              {['video', 'virtual'].includes(appointment.locationType || '') || appointment.meetingLink ? (
                 <Video className="h-5 w-5 text-slate-400" aria-hidden="true" />
               ) : appointment.locationType === 'phone' ? (
                 <Phone className="h-5 w-5 text-slate-400" aria-hidden="true" />
@@ -1359,7 +1373,7 @@ function AppointmentDetailsDialog({
                 <MapPin className="h-5 w-5 text-slate-400" aria-hidden="true" />
               )}
               <span>
-                {appointment.locationType === 'video' || appointment.meetingLink
+                {['video', 'virtual'].includes(appointment.locationType || '') || appointment.meetingLink
                   ? t('appointments.locationTypes.video', 'اجتماع عن بعد')
                   : appointment.locationType === 'phone'
                     ? t('appointments.locationTypes.phone', 'مكالمة هاتفية')
