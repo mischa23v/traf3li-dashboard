@@ -226,13 +226,31 @@ export function AppointmentsView() {
 
   // Fetch data
   const { data: statsData } = useAppointmentStats()
-  const { data: appointmentsData, isLoading, isError, error, refetch } = useAppointments({
+  const { data: appointmentsData, isLoading, isError, error, refetch, dataUpdatedAt, isFetching } = useAppointments({
     status: statusFilter !== 'all' ? statusFilter as AppointmentStatus : undefined,
     // Note: assignedTo filter would need backend support if not already present
   })
 
   const stats = statsData?.data
   const appointments = appointmentsData?.data?.appointments || []
+
+  // ==================== DEBUG: Appointments Display Issue ====================
+  useEffect(() => {
+    console.group('🔍 [APPOINTMENTS-DEBUG] Data State')
+    console.log('⏰ Time:', new Date().toISOString())
+    console.log('📊 isLoading:', isLoading)
+    console.log('🔄 isFetching:', isFetching)
+    console.log('❌ isError:', isError)
+    if (error) console.log('💥 Error:', error)
+    console.log('📦 Raw appointmentsData:', JSON.stringify(appointmentsData, null, 2))
+    console.log('📋 Extracted appointments array:', appointments)
+    console.log('📈 Appointments count:', appointments.length)
+    console.log('🕐 Data updated at:', dataUpdatedAt ? new Date(dataUpdatedAt).toISOString() : 'never')
+    if (appointments.length > 0) {
+      console.log('📝 First appointment:', JSON.stringify(appointments[0], null, 2))
+    }
+    console.groupEnd()
+  }, [appointmentsData, isLoading, isFetching, isError, error, appointments, dataUpdatedAt])
 
   // Cancel mutation for delete
   const cancelMutation = useCancelAppointment()
@@ -1598,20 +1616,41 @@ function BookAppointmentDialog({
   }, [availableSlots, selectedDate])
 
   const handleSubmit = async () => {
+    // ==================== DEBUG: Double Submission Trace ====================
+    const callId = Math.random().toString(36).substring(7)
+    console.group(`🚀 [BOOK-DEBUG] handleSubmit called [${callId}]`)
+    console.log('⏰ Time:', new Date().toISOString())
+    console.log('🔒 isSubmitting (local guard):', isSubmitting)
+    console.log('⏳ bookMutation.isPending:', bookMutation.isPending)
+    console.log('📅 selectedDate:', selectedDate)
+    console.log('🕐 selectedTime:', selectedTime)
+    console.trace('📍 Call stack trace:')
+    console.groupEnd()
+
     // Guard against double-submission (race condition prevention)
     // Using both local state AND mutation state for maximum protection
-    if (!selectedDate || !selectedTime) return
-    if (isSubmitting) return // Synchronous local guard - immediate block
-    if (bookMutation.isPending) return // Mutation state guard - may have slight delay
+    if (!selectedDate || !selectedTime) {
+      console.warn(`⚠️ [BOOK-DEBUG] [${callId}] BLOCKED: No date/time selected`)
+      return
+    }
+    if (isSubmitting) {
+      console.warn(`⚠️ [BOOK-DEBUG] [${callId}] BLOCKED: isSubmitting=true (local guard)`)
+      return
+    }
+    if (bookMutation.isPending) {
+      console.warn(`⚠️ [BOOK-DEBUG] [${callId}] BLOCKED: mutation isPending=true`)
+      return
+    }
 
     // Set local guard IMMEDIATELY to block rapid clicks
+    console.log(`✅ [BOOK-DEBUG] [${callId}] Guards passed, setting isSubmitting=true`)
     setIsSubmitting(true)
 
     try {
       // Normalize phone to E.164 format before sending (backend requires 10-15 digit format)
       const normalizedPhone = formData.clientPhone ? toE164Phone(formData.clientPhone) : ''
 
-      await bookMutation.mutateAsync({
+      const requestData = {
         clientName: formData.clientName,
         clientEmail: formData.clientEmail,
         clientPhone: normalizedPhone,
@@ -1624,16 +1663,32 @@ function BookAppointmentDialog({
         source: 'manual',
         // Always send lawyerId - backend requires it (normalizes to assignedTo)
         lawyerId: effectiveLawyerId,
-      })
+      }
+
+      console.log(`📤 [BOOK-DEBUG] [${callId}] Calling mutateAsync with:`, JSON.stringify(requestData, null, 2))
+
+      await bookMutation.mutateAsync(requestData)
+
+      console.log(`✅ [BOOK-DEBUG] [${callId}] Mutation SUCCESS`)
       toast.success(t('appointments.success.booked', 'تم حجز الموعد بنجاح'))
       onOpenChange(false)
       resetForm()
     } catch (error: any) {
+      console.error(`❌ [BOOK-DEBUG] [${callId}] Mutation FAILED:`, error)
+      console.error(`❌ [BOOK-DEBUG] [${callId}] Error details:`, {
+        message: error?.message,
+        status: error?.status || error?.response?.status,
+        data: error?.response?.data,
+      })
       const errorMessage = error?.message || t('appointments.errors.bookFailed', 'فشل في حجز الموعد')
       toast.error(errorMessage)
     } finally {
       // Reset local guard after a cooldown to prevent immediate re-clicks
-      setTimeout(() => setIsSubmitting(false), 1500)
+      console.log(`🔓 [BOOK-DEBUG] [${callId}] Scheduling isSubmitting reset in 1.5s`)
+      setTimeout(() => {
+        console.log(`🔓 [BOOK-DEBUG] [${callId}] Resetting isSubmitting=false`)
+        setIsSubmitting(false)
+      }, 1500)
     }
   }
 
