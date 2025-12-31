@@ -2137,13 +2137,18 @@ function BlockTimeDialog({
         ? `${formData.endDate}T23:59:59`
         : `${formData.endDate}T${formData.endTime}:00`
 
-      await createBlockedTime.mutateAsync({
-        startDateTime,
-        endDateTime,
+      // Debug log to see exact payload
+      const payload = {
+        startDateTime: `${startDateTime}.000Z`,  // Add timezone
+        endDateTime: `${endDateTime}.000Z`,      // Add timezone
         reason: formData.reason || undefined,
         isAllDay: formData.isAllDay,
+        isRecurring: false,  // Explicitly send false
         ...(targetLawyerId ? { targetLawyerId } : {}),
-      })
+      }
+      console.log('[BLOCK-TIME] Sending payload:', JSON.stringify(payload, null, 2))
+
+      await createBlockedTime.mutateAsync(payload)
       toast.success(t('appointments.success.timeBlocked', 'تم حظر الوقت بنجاح'))
       onOpenChange(false)
       resetForm()
