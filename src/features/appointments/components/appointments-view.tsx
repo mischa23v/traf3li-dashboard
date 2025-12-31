@@ -1577,7 +1577,10 @@ function BookAppointmentDialog({
   }, [availableSlots, selectedDate])
 
   const handleSubmit = async () => {
+    // Guard against double-submission (race condition prevention)
     if (!selectedDate || !selectedTime) return
+    if (bookMutation.isPending) return // Prevent re-entry while mutation is in progress
+
     try {
       // Normalize phone to E.164 format before sending (backend requires 10-15 digit format)
       const normalizedPhone = formData.clientPhone ? toE164Phone(formData.clientPhone) : ''
