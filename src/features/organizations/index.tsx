@@ -273,7 +273,7 @@ function OrganizationsListView() {
                   {t('organizations.organizationsList', 'قائمة المنظمات')}
                 </h3>
                 <Badge className="bg-slate-100 text-slate-600 border-0 rounded-full px-4 py-1">
-                  {t('organizations.organizationCount', { count: organizations.length }, `${organizations.length} منظمة`)}
+                  {t('organizations.organizationCount', { count: organizations.length, defaultValue: '{{count}} منظمة' })}
                 </Badge>
               </div>
 
