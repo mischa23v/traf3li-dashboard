@@ -61,6 +61,7 @@ import { Route as ClerkauthSignUpRouteImport } from './routes/clerk/(auth)/sign-
 import { Route as ClerkauthSignInRouteImport } from './routes/clerk/(auth)/sign-in'
 import { Route as AuthenticatedSettingsWebhooksRouteImport } from './routes/_authenticated/settings/webhooks'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings/notifications'
+import { Route as AuthenticatedSettingsModulesRouteImport } from './routes/_authenticated/settings/modules'
 import { Route as AuthenticatedSettingsIntegrationsRouteImport } from './routes/_authenticated/settings/integrations'
 import { Route as AuthenticatedSettingsEmailRouteImport } from './routes/_authenticated/settings/email'
 import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_authenticated/settings/display'
@@ -725,6 +726,12 @@ const AuthenticatedSettingsNotificationsRoute =
   AuthenticatedSettingsNotificationsRouteImport.update({
     id: '/notifications',
     path: '/notifications',
+    getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any)
+const AuthenticatedSettingsModulesRoute =
+  AuthenticatedSettingsModulesRouteImport.update({
+    id: '/modules',
+    path: '/modules',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
 const AuthenticatedSettingsIntegrationsRoute =
@@ -3206,6 +3213,7 @@ export interface FileRoutesByFullPath {
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/email': typeof AuthenticatedSettingsEmailRoute
   '/settings/integrations': typeof AuthenticatedSettingsIntegrationsRoute
+  '/settings/modules': typeof AuthenticatedSettingsModulesRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/settings/webhooks': typeof AuthenticatedSettingsWebhooksRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
@@ -3654,6 +3662,7 @@ export interface FileRoutesByTo {
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/email': typeof AuthenticatedSettingsEmailRoute
   '/settings/integrations': typeof AuthenticatedSettingsIntegrationsRoute
+  '/settings/modules': typeof AuthenticatedSettingsModulesRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/settings/webhooks': typeof AuthenticatedSettingsWebhooksRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
@@ -4103,6 +4112,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/_authenticated/settings/email': typeof AuthenticatedSettingsEmailRoute
   '/_authenticated/settings/integrations': typeof AuthenticatedSettingsIntegrationsRoute
+  '/_authenticated/settings/modules': typeof AuthenticatedSettingsModulesRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/_authenticated/settings/webhooks': typeof AuthenticatedSettingsWebhooksRoute
   '/clerk/(auth)/sign-in': typeof ClerkauthSignInRoute
@@ -4558,6 +4568,7 @@ export interface FileRouteTypes {
     | '/settings/display'
     | '/settings/email'
     | '/settings/integrations'
+    | '/settings/modules'
     | '/settings/notifications'
     | '/settings/webhooks'
     | '/clerk/sign-in'
@@ -5006,6 +5017,7 @@ export interface FileRouteTypes {
     | '/settings/display'
     | '/settings/email'
     | '/settings/integrations'
+    | '/settings/modules'
     | '/settings/notifications'
     | '/settings/webhooks'
     | '/clerk/sign-in'
@@ -5454,6 +5466,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/email'
     | '/_authenticated/settings/integrations'
+    | '/_authenticated/settings/modules'
     | '/_authenticated/settings/notifications'
     | '/_authenticated/settings/webhooks'
     | '/clerk/(auth)/sign-in'
@@ -6251,6 +6264,13 @@ declare module '@tanstack/react-router' {
       path: '/notifications'
       fullPath: '/settings/notifications'
       preLoaderRoute: typeof AuthenticatedSettingsNotificationsRouteImport
+      parentRoute: typeof AuthenticatedSettingsRouteRoute
+    }
+    '/_authenticated/settings/modules': {
+      id: '/_authenticated/settings/modules'
+      path: '/modules'
+      fullPath: '/settings/modules'
+      preLoaderRoute: typeof AuthenticatedSettingsModulesRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
     '/_authenticated/settings/integrations': {
@@ -9078,6 +9098,7 @@ interface AuthenticatedSettingsRouteRouteChildren {
   AuthenticatedSettingsDisplayRoute: typeof AuthenticatedSettingsDisplayRoute
   AuthenticatedSettingsEmailRoute: typeof AuthenticatedSettingsEmailRoute
   AuthenticatedSettingsIntegrationsRoute: typeof AuthenticatedSettingsIntegrationsRoute
+  AuthenticatedSettingsModulesRoute: typeof AuthenticatedSettingsModulesRoute
   AuthenticatedSettingsNotificationsRoute: typeof AuthenticatedSettingsNotificationsRoute
   AuthenticatedSettingsWebhooksRoute: typeof AuthenticatedSettingsWebhooksRoute
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
@@ -9093,6 +9114,7 @@ const AuthenticatedSettingsRouteRouteChildren: AuthenticatedSettingsRouteRouteCh
     AuthenticatedSettingsEmailRoute: AuthenticatedSettingsEmailRoute,
     AuthenticatedSettingsIntegrationsRoute:
       AuthenticatedSettingsIntegrationsRoute,
+    AuthenticatedSettingsModulesRoute: AuthenticatedSettingsModulesRoute,
     AuthenticatedSettingsNotificationsRoute:
       AuthenticatedSettingsNotificationsRoute,
     AuthenticatedSettingsWebhooksRoute: AuthenticatedSettingsWebhooksRoute,

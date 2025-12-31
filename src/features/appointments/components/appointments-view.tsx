@@ -937,14 +937,14 @@ export function AppointmentsView() {
                   onClick={() => setShowBookingDialog(true)}
                   className="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 border-dashed border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50 transition-all group"
                 >
-                  <Plus className="h-6 w-6 aria-hidden="true" text-emerald-500 group-hover:scale-110 transition-transform" />
+                  <Plus className="h-6 w-6 text-emerald-500 group-hover:scale-110 transition-transform" aria-hidden="true" />
                   <span className="text-sm font-medium text-slate-700">{t('appointments.actions.newAppointment', 'موعد جديد')}</span>
                 </button>
                 <button
                   onClick={() => setShowBlockDialog(true)}
                   className="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 border-dashed border-red-200 hover:border-red-400 hover:bg-red-50 transition-all group"
                 >
-                  <Ban className="h-6 w-6 aria-hidden="true" text-red-500 group-hover:scale-110 transition-transform" />
+                  <Ban className="h-6 w-6 text-red-500 group-hover:scale-110 transition-transform" aria-hidden="true" />
                   <span className="text-sm font-medium text-slate-700">{t('appointments.actions.blockTime', 'حظر وقت')}</span>
                 </button>
               </div>
@@ -952,7 +952,7 @@ export function AppointmentsView() {
                 onClick={() => setShowAvailabilityDialog(true)}
                 className="w-full mt-3 flex items-center justify-center gap-2 p-4 rounded-2xl border-2 border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-50 transition-all group"
               >
-                <Settings className="h-5 w-5 aria-hidden="true" text-slate-500 group-hover:scale-110 transition-transform" />
+                <Settings className="h-5 w-5 text-slate-500 group-hover:scale-110 transition-transform" aria-hidden="true" />
                 <span className="text-sm font-medium text-slate-700">{t('appointments.actions.manageAvailability', 'إدارة أوقات العمل')}</span>
               </button>
             </div>
@@ -1768,7 +1768,7 @@ function BookAppointmentDialog({
             }}
           >
             <div className="bg-emerald-50 p-4 rounded-xl flex items-center gap-4">
-              <CalendarIcon className="h-6 w-6 aria-hidden="true" text-emerald-600" />
+              <CalendarIcon className="h-6 w-6 text-emerald-600" aria-hidden="true" />
               <div>
                 <p className="font-semibold text-emerald-900">{selectedDate && format(selectedDate, 'EEEE، d MMMM yyyy', { locale })}</p>
                 <p className="text-sm text-emerald-700">{selectedTime}</p>
@@ -2198,7 +2198,7 @@ function ManageAvailabilityDialog({
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl flex items-center gap-2">
-            <Settings className="h-5 w-5 aria-hidden="true" text-emerald-500" />
+            <Settings className="h-5 w-5 text-emerald-500" aria-hidden="true" />
             {t('appointments.dialogs.availability.title', 'إدارة أوقات العمل')}
           </DialogTitle>
           <DialogDescription>
