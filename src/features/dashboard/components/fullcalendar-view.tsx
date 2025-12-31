@@ -40,7 +40,7 @@ import {
   useCalendarItemDetails,
   usePrefetchAdjacentMonthsOptimized,
 } from '@/hooks/useCalendar'
-import { useAppointmentSettings, useBlockedTimes } from '@/hooks/useAppointments'
+import { useAppointmentSettings, useBlockedTimes, useAppointments } from '@/hooks/useAppointments'
 import { DEFAULT_WORKING_HOURS, type WorkingHours } from '@/types/crmSettings'
 import type { GridItem } from '@/services/calendarService'
 import { useCreateEvent, useUpdateEvent } from '@/hooks/useRemindersAndEvents'
@@ -352,8 +352,6 @@ export function FullCalendarView() {
     return {
       startDate: startDate.toISOString().split('T')[0],
       endDate: endDate.toISOString().split('T')[0],
-      // Include appointments in single API call - optimized!
-      types: 'event,task,reminder,case-document,appointment',
     }
   }, [currentDate])
 
@@ -370,7 +368,11 @@ export function FullCalendarView() {
     endDate: dateRange.endDate,
   })
 
-  // Note: Appointments are now included in grid-items via types parameter (optimized single API call)
+  // Fetch appointments for the current date range
+  const { data: appointmentsData } = useAppointments({
+    startDate: dateRange.startDate,
+    endDate: dateRange.endDate,
+  })
 
   // Lazy load full details when user clicks an event
   const { data: itemDetailsData, isLoading: isLoadingDetails } = useCalendarItemDetails(
@@ -534,11 +536,49 @@ export function FullCalendarView() {
     })
   }, [blockedTimesData, t])
 
-  // Combine regular events (including appointments from grid-items) with blocked time background events
-  // Note: Appointments are now included in calendarEvents via types=appointment parameter (single API call)
+  // ==================== Appointments as Calendar Events ====================
+  // Convert appointments to FullCalendar format
+  const appointmentEvents = useMemo<CalendarEvent[]>(() => {
+    if (!appointmentsData?.data?.appointments) return []
+
+    return appointmentsData.data.appointments.map((apt: any) => {
+      // Get color based on appointment type
+      const appointmentType = apt.type || 'consultation'
+      const colors = EVENT_COLORS[appointmentType as keyof typeof EVENT_COLORS] || EVENT_COLORS.appointment
+
+      // Build datetime from date and startTime/endTime
+      const startDateTime = apt.scheduledTime || (apt.date && apt.startTime ? `${apt.date}T${apt.startTime}:00` : apt.date)
+      const endDateTime = apt.endTime && apt.date
+        ? (apt.endTime.includes('T') ? apt.endTime : `${apt.date}T${apt.endTime}:00`)
+        : startDateTime
+
+      return {
+        id: `appointment-${apt.id}`,
+        title: apt.subject || apt.clientName || t('appointments.labels.appointment', 'موعد'),
+        start: startDateTime,
+        end: endDateTime,
+        allDay: false,
+        backgroundColor: colors.bg,
+        borderColor: colors.border,
+        textColor: colors.text,
+        extendedProps: {
+          type: 'appointment',
+          eventType: appointmentType,
+          status: apt.status,
+          clientName: apt.clientName,
+          clientEmail: apt.clientEmail || apt.customerEmail,
+          clientPhone: apt.clientPhone || apt.customerPhone,
+          notes: apt.notes,
+          subject: apt.subject,
+        },
+      }
+    })
+  }, [appointmentsData, t])
+
+  // Combine regular events with blocked time background events and appointments
   const allCalendarEvents = useMemo(() => {
-    return [...calendarEvents, ...blockedTimeEvents]
-  }, [calendarEvents, blockedTimeEvents])
+    return [...calendarEvents, ...blockedTimeEvents, ...appointmentEvents]
+  }, [calendarEvents, blockedTimeEvents, appointmentEvents])
 
   // ==================== Memoized FullCalendar Props ====================
   // These prevent unnecessary re-initialization of FullCalendar
@@ -965,7 +1005,7 @@ export function FullCalendarView() {
           <CardContent className="p-0">
             {/* Screen reader helper text */}
             <span className="sr-only">
-              {t('calendar.eventCount', `${calendarEvents.length} ${calendarEvents.length === 1 ? 'حدث' : 'أحداث'} في هذا الشهر`)}
+              {t('calendar.eventCount', `${calendarEvents.length + appointmentEvents.length} ${(calendarEvents.length + appointmentEvents.length) === 1 ? 'حدث' : 'أحداث'} في هذا الشهر`)}
             </span>
             <div
               className="fullcalendar-wrapper p-4"
