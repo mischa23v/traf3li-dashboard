@@ -1451,11 +1451,10 @@ function BookAppointmentDialog({
     return emailRegex.test(email)
   }
 
+  // Use centralized phone validation - accepts Saudi formats that can be normalized to E.164
   const isValidPhone = (phone: string) => {
     if (!phone) return true // Optional field
-    // Saudi phone: +966, 05, or 5 followed by 8 digits
-    const phoneRegex = /^(\+966|966|05|5)?[0-9]{8,9}$/
-    return phoneRegex.test(phone.replace(/[\s-]/g, ''))
+    return isValidPhoneLenient(phone.replace(/[\s-]/g, ''))
   }
 
   const emailError = formData.clientEmail && !isValidEmail(formData.clientEmail)
@@ -1576,10 +1575,13 @@ function BookAppointmentDialog({
   const handleSubmit = async () => {
     if (!selectedDate || !selectedTime) return
     try {
+      // Normalize phone to E.164 format before sending (backend requires 10-15 digit format)
+      const normalizedPhone = formData.clientPhone ? toE164Phone(formData.clientPhone) : ''
+
       await bookMutation.mutateAsync({
         clientName: formData.clientName,
         clientEmail: formData.clientEmail,
-        clientPhone: formData.clientPhone,
+        clientPhone: normalizedPhone,
         duration: formData.duration,
         type: formData.type,
         locationType: formData.locationType,
