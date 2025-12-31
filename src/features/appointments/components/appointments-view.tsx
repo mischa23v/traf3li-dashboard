@@ -3,7 +3,7 @@
  * عرض المواعيد - تقويم أسبوعي مع الشريط الجانبي
  */
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { format, addDays, startOfWeek, isSameDay, isToday, addWeeks, subWeeks, isBefore, startOfDay } from 'date-fns'
@@ -97,7 +97,12 @@ import {
   useAvailability,
   useCreateAvailability,
   useDeleteAvailability,
+  useBulkConfirmAppointments,
+  useBulkCompleteAppointments,
+  useRescheduleAppointment,
+  useUpdateAppointment,
 } from '@/hooks/useAppointments'
+import { maskEmail, maskPhone, INPUT_MAX_LENGTHS, isValidPhoneLenient, toE164Phone } from '@/utils/validation-patterns'
 
 import type {
   Appointment,
@@ -106,6 +111,7 @@ import type {
   AppointmentDuration,
   DayOfWeek,
   AvailabilitySlot,
+  LocationType,
 } from '@/services/appointmentsService'
 
 // ==================== Constants ====================
@@ -138,6 +144,12 @@ const STATUS_CONFIG: Record<AppointmentStatus, { labelAr: string; labelEn: strin
 const WEEKDAYS_AR = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت']
 const WEEKDAYS_EN = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 
+const LOCATION_TYPES: { value: LocationType; labelAr: string; labelEn: string; icon: 'video' | 'map' | 'phone' }[] = [
+  { value: 'video', labelAr: 'اجتماع عن بعد', labelEn: 'Video Call', icon: 'video' },
+  { value: 'in-person', labelAr: 'حضوري', labelEn: 'In Person', icon: 'map' },
+  { value: 'phone', labelAr: 'مكالمة هاتفية', labelEn: 'Phone Call', icon: 'phone' },
+]
+
 // ==================== Main Component ====================
 
 export function AppointmentsView() {
@@ -166,6 +178,28 @@ export function AppointmentsView() {
   const [showDetailsDialog, setShowDetailsDialog] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [appointmentToDelete, setAppointmentToDelete] = useState<string | null>(null)
+  const [showRescheduleDialog, setShowRescheduleDialog] = useState(false)
+  const [rescheduleData, setRescheduleData] = useState<{
+    date: string
+    startTime: string
+  }>({
+    date: '',
+    startTime: '',
+  })
+  const [showEditDialog, setShowEditDialog] = useState(false)
+  const [editFormData, setEditFormData] = useState<{
+    type: AppointmentType
+    notes: string
+    locationType: LocationType
+    meetingLink: string
+    location: string
+  }>({
+    type: 'consultation',
+    notes: '',
+    locationType: 'video',
+    meetingLink: '',
+    location: '',
+  })
 
   // Filters
   const [statusFilter, setStatusFilter] = useState<string>('all')
@@ -186,6 +220,16 @@ export function AppointmentsView() {
 
   // Cancel mutation for delete
   const cancelMutation = useCancelAppointment()
+
+  // Reschedule mutation
+  const rescheduleMutation = useRescheduleAppointment()
+
+  // Update mutation
+  const updateMutation = useUpdateAppointment()
+
+  // Bulk mutations
+  const bulkConfirmMutation = useBulkConfirmAppointments()
+  const bulkCompleteMutation = useBulkCompleteAppointments()
 
   // Filter appointments
   const filteredAppointments = useMemo(() => {
@@ -287,16 +331,50 @@ export function AppointmentsView() {
         await cancelMutation.mutateAsync({ id, reason: 'Deleted by user' })
       }
 
-      toast.success(isRtl
-        ? `تم حذف ${idsToDelete.length} موعد بنجاح`
-        : `Successfully deleted ${idsToDelete.length} appointment(s)`)
+      toast.success(t('appointments.success.deleted', { count: idsToDelete.length }, `تم حذف ${idsToDelete.length} موعد بنجاح`))
 
       setSelectedAppointments(new Set())
       setAppointmentToDelete(null)
       setShowDeleteConfirm(false)
       refetch()
     } catch (error: any) {
-      const errorMessage = error?.message || (isRtl ? 'حدث خطأ أثناء الحذف' : 'Error deleting appointment(s)')
+      const errorMessage = error?.message || t('appointments.errors.delete', 'حدث خطأ أثناء الحذف')
+      toast.error(errorMessage)
+    }
+  }
+
+  // Bulk confirm handler
+  const handleBulkConfirm = async () => {
+    if (selectedAppointments.size === 0) return
+
+    try {
+      const ids = Array.from(selectedAppointments)
+      await bulkConfirmMutation.mutateAsync({ appointmentIds: ids })
+
+      toast.success(t('appointments.success.confirmed', { count: ids.length }, `تم تأكيد ${ids.length} موعد بنجاح`))
+
+      setSelectedAppointments(new Set())
+      refetch()
+    } catch (error: any) {
+      const errorMessage = error?.message || t('appointments.errors.confirm', 'حدث خطأ أثناء التأكيد')
+      toast.error(errorMessage)
+    }
+  }
+
+  // Bulk complete handler
+  const handleBulkComplete = async () => {
+    if (selectedAppointments.size === 0) return
+
+    try {
+      const ids = Array.from(selectedAppointments)
+      await bulkCompleteMutation.mutateAsync({ appointmentIds: ids })
+
+      toast.success(t('appointments.success.completed', { count: ids.length }, `تم إكمال ${ids.length} موعد بنجاح`))
+
+      setSelectedAppointments(new Set())
+      refetch()
+    } catch (error: any) {
+      const errorMessage = error?.message || t('appointments.errors.complete', 'حدث خطأ أثناء الإكمال')
       toast.error(errorMessage)
     }
   }
@@ -305,6 +383,67 @@ export function AppointmentsView() {
   const handleViewDetails = (appointment: Appointment) => {
     setSelectedAppointment(appointment)
     setShowDetailsDialog(true)
+  }
+
+  // Reschedule handlers
+  const handleRescheduleAppointment = (appointment: Appointment) => {
+    setSelectedAppointment(appointment)
+    setRescheduleData({
+      date: appointment.date,
+      startTime: appointment.startTime,
+    })
+    setShowRescheduleDialog(true)
+  }
+
+  const handleSaveReschedule = async () => {
+    if (!selectedAppointment || !rescheduleData.date || !rescheduleData.startTime) return
+    try {
+      await rescheduleMutation.mutateAsync({
+        id: selectedAppointment.id,
+        data: {
+          date: rescheduleData.date,
+          startTime: rescheduleData.startTime,
+        }
+      })
+      toast.success(t('appointments.success.rescheduled', 'تم إعادة جدولة الموعد بنجاح'))
+      setShowRescheduleDialog(false)
+      refetch()
+    } catch (error: any) {
+      toast.error(error?.message || t('appointments.errors.generic', 'حدث خطأ'))
+    }
+  }
+
+  // Edit appointment handlers
+  const handleEditAppointment = (appointment: Appointment) => {
+    setSelectedAppointment(appointment)
+    setEditFormData({
+      type: appointment.type,
+      notes: appointment.notes || '',
+      locationType: appointment.locationType || 'video',
+      meetingLink: appointment.meetingLink || '',
+      location: appointment.location || '',
+    })
+    setShowEditDialog(true)
+  }
+
+  const handleSaveEdit = async () => {
+    if (!selectedAppointment) return
+    try {
+      await updateMutation.mutateAsync({
+        id: selectedAppointment.id,
+        data: {
+          type: editFormData.type,
+          notes: editFormData.notes,
+          meetingLink: editFormData.meetingLink,
+          location: editFormData.location,
+        }
+      })
+      toast.success(t('appointments.success.updated', 'تم تحديث الموعد بنجاح'))
+      setShowEditDialog(false)
+      refetch()
+    } catch (error: any) {
+      toast.error(error?.message || t('appointments.errors.generic', 'حدث خطأ'))
+    }
   }
 
   // Clear filters
@@ -319,35 +458,35 @@ export function AppointmentsView() {
   // Stats for hero
   const heroStats = useMemo(() => [
     {
-      label: isRtl ? 'مواعيد اليوم' : "Today's",
+      label: t('appointments.stats.today', 'مواعيد اليوم'),
       value: stats?.todayCount || 0,
       icon: CalendarDays,
       status: 'normal' as const,
     },
     {
-      label: isRtl ? 'معلقة' : 'Pending',
+      label: t('appointments.stats.pending', 'معلقة'),
       value: stats?.pending || 0,
       icon: Clock,
       status: (stats?.pending || 0) > 0 ? 'attention' as const : 'zero' as const,
     },
     {
-      label: isRtl ? 'مؤكدة' : 'Confirmed',
+      label: t('appointments.stats.confirmed', 'مؤكدة'),
       value: stats?.confirmed || 0,
       icon: CheckCircle,
       status: 'normal' as const,
     },
     {
-      label: isRtl ? 'هذا الأسبوع' : 'This Week',
+      label: t('appointments.stats.thisWeek', 'هذا الأسبوع'),
       value: stats?.weekCount || 0,
       icon: CalendarClock,
       status: 'normal' as const,
     },
-  ], [stats, isRtl])
+  ], [stats, isRtl, t])
 
   const topNav = [
-    { title: isRtl ? 'الرئيسية' : 'Overview', href: ROUTES.dashboard.home, isActive: false },
-    { title: isRtl ? 'التقويم' : 'Calendar', href: ROUTES.dashboard.calendar, isActive: false },
-    { title: isRtl ? 'المواعيد' : 'Appointments', href: ROUTES.dashboard.appointments, isActive: true },
+    { title: t('nav.overview', 'الرئيسية'), href: ROUTES.dashboard.home, isActive: false },
+    { title: t('nav.calendar', 'التقويم'), href: ROUTES.dashboard.calendar, isActive: false },
+    { title: t('nav.appointments', 'المواعيد'), href: ROUTES.dashboard.appointments, isActive: true },
   ]
 
   // Get current month name for display
@@ -363,11 +502,11 @@ export function AppointmentsView() {
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
             <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
-            <input type="text" placeholder={isRtl ? 'بحث...' : 'Search...'} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <input type="text" placeholder={t('common.search', 'بحث...')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label={t('common.notifications', 'الإشعارات')}>
+            <Bell className="h-5 w-5" aria-hidden="true" />
+            <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy" role="status" aria-label={t('common.unreadNotifications', 'إشعارات غير مقروءة')}></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -380,8 +519,8 @@ export function AppointmentsView() {
       <Main fluid className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8">
         {/* HERO CARD & STATS */}
         <ProductivityHero
-          badge={isRtl ? 'إدارة المواعيد' : 'Appointments Management'}
-          title={isRtl ? 'المواعيد' : 'Appointments'}
+          badge={t('appointments.badge', 'إدارة المواعيد')}
+          title={t('appointments.title', 'المواعيد')}
           type="appointments"
           stats={heroStats}
           hideButtons
@@ -390,16 +529,16 @@ export function AppointmentsView() {
             onClick={() => setShowBookingDialog(true)}
             className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm"
           >
-            <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
-            {isRtl ? 'موعد جديد' : 'New Appointment'}
+            <Plus className="ms-2 h-4 w-4" aria-hidden="true" aria-hidden="true" />
+            {t('appointments.actions.newAppointment', 'موعد جديد')}
           </Button>
           <Button
             onClick={() => setShowBlockDialog(true)}
             variant="outline"
             className="h-10 px-5 rounded-xl font-bold border-white/10 text-white hover:bg-white/10 hover:text-white bg-transparent text-sm"
           >
-            <Ban className="ms-2 h-4 w-4" />
-            {isRtl ? 'حظر وقت' : 'Block Time'}
+            <Ban className="ms-2 h-4 w-4" aria-hidden="true" />
+            {t('appointments.actions.blockTime', 'حظر وقت')}
           </Button>
         </ProductivityHero>
 
@@ -415,10 +554,11 @@ export function AppointmentsView() {
                   <Search className="absolute end-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" aria-hidden="true" />
                   <GosiInput
                     type="text"
-                    placeholder={isRtl ? 'بحث بالاسم أو الهاتف...' : 'Search by name or phone...'}
+                    placeholder={t('appointments.filters.searchPlaceholder', 'بحث بالاسم أو الهاتف...')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pe-12 h-14 w-full text-base"
+                    maxLength={100}
                   />
                 </div>
 
@@ -427,16 +567,16 @@ export function AppointmentsView() {
                   <GosiSelect value={statusFilter} onValueChange={setStatusFilter}>
                     <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm">
                       <div className="flex items-center gap-2 truncate">
-                        <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{isRtl ? 'الحالة' : 'Status'}:</span>
+                        <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('appointments.filters.status', 'الحالة')}:</span>
                         <GosiSelectValue />
                       </div>
                     </GosiSelectTrigger>
                     <GosiSelectContent>
-                      <GosiSelectItem value="all">{isRtl ? 'الكل' : 'All'}</GosiSelectItem>
-                      <GosiSelectItem value="pending">{isRtl ? 'معلق' : 'Pending'}</GosiSelectItem>
-                      <GosiSelectItem value="confirmed">{isRtl ? 'مؤكد' : 'Confirmed'}</GosiSelectItem>
-                      <GosiSelectItem value="completed">{isRtl ? 'مكتمل' : 'Completed'}</GosiSelectItem>
-                      <GosiSelectItem value="cancelled">{isRtl ? 'ملغي' : 'Cancelled'}</GosiSelectItem>
+                      <GosiSelectItem value="all">{t('common.all', 'الكل')}</GosiSelectItem>
+                      <GosiSelectItem value="pending">{t('appointments.status.pending', 'معلق')}</GosiSelectItem>
+                      <GosiSelectItem value="confirmed">{t('appointments.status.confirmed', 'مؤكد')}</GosiSelectItem>
+                      <GosiSelectItem value="completed">{t('appointments.status.completed', 'مكتمل')}</GosiSelectItem>
+                      <GosiSelectItem value="cancelled">{t('appointments.status.cancelled', 'ملغي')}</GosiSelectItem>
                     </GosiSelectContent>
                   </GosiSelect>
                 </div>
@@ -446,12 +586,12 @@ export function AppointmentsView() {
                   <GosiSelect value={typeFilter} onValueChange={setTypeFilter}>
                     <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm">
                       <div className="flex items-center gap-2 truncate">
-                        <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{isRtl ? 'النوع' : 'Type'}:</span>
+                        <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('appointments.filters.type', 'النوع')}:</span>
                         <GosiSelectValue />
                       </div>
                     </GosiSelectTrigger>
                     <GosiSelectContent>
-                      <GosiSelectItem value="all">{isRtl ? 'الكل' : 'All'}</GosiSelectItem>
+                      <GosiSelectItem value="all">{t('common.all', 'الكل')}</GosiSelectItem>
                       {APPOINTMENT_TYPES.map((type) => (
                         <GosiSelectItem key={type.value} value={type.value}>
                           {isRtl ? type.labelAr : type.labelEn}
@@ -467,13 +607,13 @@ export function AppointmentsView() {
                     <GosiSelect value={assignedToFilter} onValueChange={setAssignedToFilter}>
                       <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm">
                         <div className="flex items-center gap-2 truncate">
-                          <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{isRtl ? 'المحامي' : 'Lawyer'}:</span>
+                          <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('appointments.filters.lawyer', 'المحامي')}:</span>
                           <GosiSelectValue />
                         </div>
                       </GosiSelectTrigger>
                       <GosiSelectContent>
-                        <GosiSelectItem value="all">{isRtl ? 'الكل' : 'All'}</GosiSelectItem>
-                        <GosiSelectItem value={user?._id || ''}>{isRtl ? 'أنا' : 'Me'}</GosiSelectItem>
+                        <GosiSelectItem value="all">{t('common.all', 'الكل')}</GosiSelectItem>
+                        <GosiSelectItem value={user?._id || ''}>{t('common.me', 'أنا')}</GosiSelectItem>
                         {teamMembers.filter(m => m._id !== user?._id).map((member) => (
                           <GosiSelectItem key={member._id} value={member._id}>
                             {member.firstName} {member.lastName}
@@ -491,8 +631,8 @@ export function AppointmentsView() {
                     onClick={clearFilters}
                     className="h-14 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-2xl border border-dashed border-red-200 px-6"
                   >
-                    <X className="h-5 w-5 ms-2" aria-hidden="true" />
-                    {isRtl ? 'مسح الفلاتر' : 'Clear Filters'}
+                    <X className="h-5 w-5 ms-2" aria-hidden="true" aria-hidden="true" />
+                    {t('appointments.actions.clearFilters', 'مسح الفلاتر')}
                   </GosiButton>
                 )}
               </div>
@@ -505,7 +645,7 @@ export function AppointmentsView() {
                 <Select value={format(currentWeekStart, 'yyyy-MM')} onValueChange={(val) => {
                   const [year, month] = val.split('-').map(Number)
                   setCurrentWeekStart(startOfWeek(new Date(year, month - 1, 1), { weekStartsOn: 0 }))
-                }}>
+                }} aria-hidden="true">
                   <SelectTrigger className="w-40 h-10 rounded-xl border-slate-200">
                     <SelectValue>{currentMonthName}</SelectValue>
                   </SelectTrigger>
@@ -523,18 +663,18 @@ export function AppointmentsView() {
 
                 {/* Center: Navigation with Back to Today */}
                 <div className="flex items-center gap-1">
-                  <Button variant="ghost" size="icon" onClick={goToPreviousWeek} className="h-10 w-10 rounded-xl hover:bg-slate-100">
-                    {isRtl ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+                  <Button variant="ghost" size="icon" onClick={goToPreviousWeek} className="h-10 w-10 rounded-xl hover:bg-slate-100" aria-label={t('appointments.actions.previousWeek', 'الأسبوع السابق')}>
+                    {isRtl ? <ChevronRight className="h-5 w-5" aria-hidden="true" /> : <ChevronLeft className="h-5 w-5" aria-hidden="true" />}
                   </Button>
                   <Button
                     variant="outline"
                     onClick={goToToday}
                     className="h-10 px-4 rounded-xl text-emerald-600 border-emerald-200 hover:bg-emerald-50 text-sm font-medium"
                   >
-                    {isRtl ? 'العودة لليوم' : 'Today'}
+                    {t('appointments.actions.today', 'العودة لليوم')}
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={goToNextWeek} className="h-10 w-10 rounded-xl hover:bg-slate-100">
-                    {isRtl ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+                  <Button variant="ghost" size="icon" onClick={goToNextWeek} className="h-10 w-10 rounded-xl hover:bg-slate-100" aria-label={t('appointments.actions.nextWeek', 'الأسبوع التالي')}>
+                    {isRtl ? <ChevronLeft className="h-5 w-5" aria-hidden="true" /> : <ChevronRight className="h-5 w-5" aria-hidden="true" />}
                   </Button>
                 </div>
 
@@ -543,14 +683,42 @@ export function AppointmentsView() {
                   {selectedAppointments.size > 0 && (
                     <div className="flex items-center gap-2 pe-3 border-e border-slate-200">
                       <span className="text-sm text-slate-600">
-                        {isRtl ? `${selectedAppointments.size} محدد` : `${selectedAppointments.size} selected`}
+                        {t('appointments.labels.selected', { count: selectedAppointments.size }, `${selectedAppointments.size} محدد`)}
                       </span>
                       <Button variant="ghost" size="sm" onClick={clearSelection} className="h-8 text-slate-500">
-                        {isRtl ? 'إلغاء' : 'Clear'}
+                        {t('common.clear', 'إلغاء')}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleBulkConfirm}
+                        disabled={bulkConfirmMutation.isPending}
+                        className="h-8 bg-blue-50 hover:bg-blue-100 text-blue-600 border-blue-200"
+                      >
+                        {bulkConfirmMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 ms-1 animate-spin" aria-hidden="true" />
+                        ) : (
+                          <CheckCircle className="h-4 w-4 ms-1" aria-hidden="true" />
+                        )}
+                        {t('appointments.actions.confirm', 'تأكيد')}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleBulkComplete}
+                        disabled={bulkCompleteMutation.isPending}
+                        className="h-8 bg-green-50 hover:bg-green-100 text-green-600 border-green-200"
+                      >
+                        {bulkCompleteMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 ms-1 animate-spin" aria-hidden="true" />
+                        ) : (
+                          <Check className="h-4 w-4 ms-1" aria-hidden="true" />
+                        )}
+                        {t('appointments.actions.complete', 'إكمال')}
                       </Button>
                       <Button variant="destructive" size="sm" onClick={handleDeleteSelected} className="h-8 bg-red-500 hover:bg-red-600">
-                        <Trash2 className="h-4 w-4 ms-1" />
-                        {isRtl ? 'حذف' : 'Delete'}
+                        <Trash2 className="h-4 w-4 ms-1" aria-hidden="true" />
+                        {t('common.delete', 'حذف')}
                       </Button>
                     </div>
                   )}
@@ -562,8 +730,8 @@ export function AppointmentsView() {
                       onClick={() => setViewMode('week')}
                       className={cn('h-8 px-3 rounded-lg', viewMode === 'week' ? 'bg-white shadow-sm' : 'hover:bg-slate-200')}
                     >
-                      <LayoutGrid className="h-4 w-4 ms-1" />
-                      {isRtl ? 'أسبوعي' : 'Week'}
+                      <LayoutGrid className="h-4 w-4 ms-1" aria-hidden="true" />
+                      {t('appointments.views.week', 'أسبوعي')}
                     </Button>
                     <Button
                       variant={viewMode === 'list' ? 'default' : 'ghost'}
@@ -571,8 +739,8 @@ export function AppointmentsView() {
                       onClick={() => setViewMode('list')}
                       className={cn('h-8 px-3 rounded-lg', viewMode === 'list' ? 'bg-white shadow-sm' : 'hover:bg-slate-200')}
                     >
-                      <List className="h-4 w-4 ms-1" />
-                      {isRtl ? 'قائمة' : 'List'}
+                      <List className="h-4 w-4 ms-1" aria-hidden="true" />
+                      {t('appointments.views.list', 'قائمة')}
                     </Button>
                   </div>
                 </div>
@@ -581,7 +749,7 @@ export function AppointmentsView() {
 
             {/* Loading State */}
             {isLoading && (
-              <div className="bg-white rounded-2xl p-8">
+              <div className="bg-white rounded-2xl p-8" aria-busy="true" aria-live="polite" aria-label={t('common.loading', 'جارٍ التحميل...')}>
                 <div className="grid grid-cols-7 gap-4">
                   {Array.from({ length: 7 }).map((_, i) => (
                     <div key={i} className="space-y-3">
@@ -595,12 +763,12 @@ export function AppointmentsView() {
 
             {/* Error State */}
             {isError && (
-              <div className="bg-red-50 rounded-2xl p-12 text-center border border-red-100">
-                <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                <h3 className="text-lg font-bold text-slate-900 mb-2">{isRtl ? 'خطأ في التحميل' : 'Loading Error'}</h3>
+              <div className="bg-red-50 rounded-2xl p-12 text-center border border-red-100" role="alert" aria-live="assertive">
+                <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" aria-hidden="true" />
+                <h3 className="text-lg font-bold text-slate-900 mb-2">{t('appointments.errors.loading', 'خطأ في التحميل')}</h3>
                 <p className="text-slate-500 mb-4">{error?.message}</p>
                 <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600">
-                  {isRtl ? 'إعادة المحاولة' : 'Retry'}
+                  {t('common.retry', 'إعادة المحاولة')}
                 </Button>
               </div>
             )}
@@ -624,7 +792,10 @@ export function AppointmentsView() {
                           {format(day, 'd')}
                         </div>
                         {dayAppointments.length > 0 && (
-                          <Badge variant="secondary" className="text-xs bg-slate-100 mt-1">{dayAppointments.length}</Badge>
+                          <Badge variant="secondary" className="text-xs bg-slate-100 mt-1">
+                            <span className="sr-only">{t('appointments.labels.appointmentCount', 'عدد المواعيد')}: </span>
+                            {dayAppointments.length}
+                          </Badge>
                         )}
                       </div>
                     )
@@ -660,9 +831,10 @@ export function AppointmentsView() {
                                 </div>
 
                                 <div className="text-sm font-bold text-slate-900 mb-1">{apt.startTime || '00:00'}</div>
-                                <div className="text-xs font-medium text-slate-700 truncate">{apt.clientName || (isRtl ? 'بدون اسم' : 'No name')}</div>
+                                <div className="text-xs font-medium text-slate-700 truncate">{apt.clientName || t('appointments.labels.noName', 'بدون اسم')}</div>
                                 <div className="mt-2">
                                   <span className={cn('inline-block px-2 py-0.5 rounded-full text-[10px] font-medium text-white', typeConfig?.color || 'bg-gray-500')}>
+                                    <span className="sr-only">{t('appointments.labels.appointmentType', 'نوع الموعد')}: </span>
                                     {isRtl ? typeConfig?.labelAr : typeConfig?.labelEn}
                                   </span>
                                 </div>
@@ -670,8 +842,9 @@ export function AppointmentsView() {
                                 <button
                                   onClick={(e) => { e.stopPropagation(); handleDeleteSingle(apt.id) }}
                                   className="absolute bottom-2 end-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-red-100 text-red-500"
+                                  aria-label={t('appointments.actions.deleteAppointment', 'حذف الموعد')}
                                 >
-                                  <Trash2 className="h-3.5 w-3.5" />
+                                  <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                                 </button>
                               </div>
                             )
@@ -679,8 +852,8 @@ export function AppointmentsView() {
 
                           {dayAppointments.length === 0 && (
                             <div className="text-center py-8 text-slate-300">
-                              <CalendarIcon className="h-6 w-6 mx-auto mb-1 opacity-50" />
-                              <span className="text-xs">{isRtl ? 'لا مواعيد' : 'No appts'}</span>
+                              <CalendarIcon className="h-6 w-6 aria-hidden="true" mx-auto mb-1 opacity-50" />
+                              <span className="text-xs">{t('appointments.empty.noAppointments', 'لا مواعيد')}</span>
                             </div>
                           )}
                         </div>
@@ -697,11 +870,11 @@ export function AppointmentsView() {
                 {filteredAppointments.length === 0 ? (
                   <div className="bg-white rounded-2xl p-12 text-center border border-slate-100">
                     <CalendarClock className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
-                    <h3 className="text-lg font-bold text-slate-900 mb-2">{isRtl ? 'لا توجد مواعيد' : 'No Appointments'}</h3>
-                    <p className="text-slate-500 mb-4">{isRtl ? 'لا توجد مواعيد حالياً' : 'No appointments scheduled'}</p>
+                    <h3 className="text-lg font-bold text-slate-900 mb-2">{t('appointments.empty.title', 'لا توجد مواعيد')}</h3>
+                    <p className="text-slate-500 mb-4">{t('appointments.empty.description', 'لا توجد مواعيد حالياً')}</p>
                     <Button onClick={() => setShowBookingDialog(true)} className="bg-emerald-500 hover:bg-emerald-600">
                       <Plus className="w-4 h-4 ms-2" />
-                      {isRtl ? 'موعد جديد' : 'New Appointment'}
+                      {t('appointments.actions.newAppointment', 'موعد جديد')}
                     </Button>
                   </div>
                 ) : (
@@ -717,30 +890,33 @@ export function AppointmentsView() {
                         onClick={() => handleViewDetails(apt)}
                       >
                         <div className="flex items-start gap-4">
-                          <div className="pt-1" onClick={(e) => { e.stopPropagation(); toggleSelectAppointment(apt.id) }}>
+                          <div className="pt-1" onClick={(e) => { e.stopPropagation(); toggleSelectAppointment(apt.id) }} aria-hidden="true">
                             <Checkbox checked={isSelected} />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-3 mb-2">
                               <span className={cn('px-2 py-1 rounded-lg text-xs font-medium', statusConfig.bgColor, statusConfig.color)}>
+                                <span className="sr-only">{t('appointments.labels.status', 'الحالة')}: </span>
                                 {isRtl ? statusConfig.labelAr : statusConfig.labelEn}
                               </span>
                               <span className={cn('px-2 py-1 rounded-lg text-xs font-medium text-white', typeConfig?.color || 'bg-gray-500')}>
+                                <span className="sr-only">{t('appointments.labels.appointmentType', 'نوع الموعد')}: </span>
                                 {isRtl ? typeConfig?.labelAr : typeConfig?.labelEn}
                               </span>
                             </div>
-                            <h3 className="font-bold text-slate-900 mb-1">{apt.clientName || (isRtl ? 'بدون اسم' : 'No name')}</h3>
+                            <h3 className="font-bold text-slate-900 mb-1">{apt.clientName || t('appointments.labels.noName', 'بدون اسم')}</h3>
                             <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
-                              <span className="flex items-center gap-1"><CalendarIcon className="h-4 w-4" />{apt.date ? format(new Date(apt.date), 'MMM d, yyyy', { locale }) : '-'}</span>
-                              <span className="flex items-center gap-1"><Clock className="h-4 w-4" />{apt.startTime || '00:00'}</span>
-                              {apt.clientPhone && <span className="flex items-center gap-1"><Phone className="h-4 w-4" />{apt.clientPhone}</span>}
+                              <span className="flex items-center gap-1"><CalendarIcon className="h-4 w-4" aria-hidden="true" />{apt.date ? format(new Date(apt.date), 'MMM d, yyyy', { locale }) : '-'}</span>
+                              <span className="flex items-center gap-1"><Clock className="h-4 w-4" aria-hidden="true" />{apt.startTime || '00:00'}</span>
+                              {apt.clientPhone && <span className="flex items-center gap-1"><Phone className="h-4 w-4" aria-hidden="true" />{maskPhone(apt.clientPhone)}</span>}
                             </div>
                           </div>
                           <button
                             onClick={(e) => { e.stopPropagation(); handleDeleteSingle(apt.id) }}
                             className="opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-xl hover:bg-red-50 text-red-500"
+                            aria-label={t('appointments.actions.deleteAppointment', 'حذف الموعد')}
                           >
-                            <Trash2 className="h-5 w-5" />
+                            <Trash2 className="h-5 w-5" aria-hidden="true" />
                           </button>
                         </div>
                       </div>
@@ -755,36 +931,36 @@ export function AppointmentsView() {
           <div className="space-y-6">
             {/* Quick Actions */}
             <div className="bg-white rounded-3xl p-6 shadow-lg border border-slate-100">
-              <h3 className="font-bold text-slate-900 mb-4">{isRtl ? 'إجراءات سريعة' : 'Quick Actions'}</h3>
+              <h3 className="font-bold text-slate-900 mb-4">{t('appointments.sidebar.quickActions', 'إجراءات سريعة')}</h3>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => setShowBookingDialog(true)}
                   className="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 border-dashed border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50 transition-all group"
                 >
-                  <Plus className="h-6 w-6 text-emerald-500 group-hover:scale-110 transition-transform" />
-                  <span className="text-sm font-medium text-slate-700">{isRtl ? 'موعد جديد' : 'New Appointment'}</span>
+                  <Plus className="h-6 w-6 aria-hidden="true" text-emerald-500 group-hover:scale-110 transition-transform" />
+                  <span className="text-sm font-medium text-slate-700">{t('appointments.actions.newAppointment', 'موعد جديد')}</span>
                 </button>
                 <button
                   onClick={() => setShowBlockDialog(true)}
                   className="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 border-dashed border-red-200 hover:border-red-400 hover:bg-red-50 transition-all group"
                 >
-                  <Ban className="h-6 w-6 text-red-500 group-hover:scale-110 transition-transform" />
-                  <span className="text-sm font-medium text-slate-700">{isRtl ? 'حظر وقت' : 'Block Time'}</span>
+                  <Ban className="h-6 w-6 aria-hidden="true" text-red-500 group-hover:scale-110 transition-transform" />
+                  <span className="text-sm font-medium text-slate-700">{t('appointments.actions.blockTime', 'حظر وقت')}</span>
                 </button>
               </div>
               <button
                 onClick={() => setShowAvailabilityDialog(true)}
                 className="w-full mt-3 flex items-center justify-center gap-2 p-4 rounded-2xl border-2 border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-50 transition-all group"
               >
-                <Settings className="h-5 w-5 text-slate-500 group-hover:scale-110 transition-transform" />
-                <span className="text-sm font-medium text-slate-700">{isRtl ? 'إدارة أوقات العمل' : 'Manage Availability'}</span>
+                <Settings className="h-5 w-5 aria-hidden="true" text-slate-500 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium text-slate-700">{t('appointments.actions.manageAvailability', 'إدارة أوقات العمل')}</span>
               </button>
             </div>
 
             {/* Today's Appointments */}
             <div className="bg-white rounded-3xl p-6 shadow-lg border border-slate-100">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-slate-900">{isRtl ? 'مواعيد اليوم' : "Today's Appointments"}</h3>
+                <h3 className="font-bold text-slate-900">{t('appointments.sidebar.todayAppointments', 'مواعيد اليوم')}</h3>
                 <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200">
                   {format(new Date(), 'd MMM')}
                 </Badge>
@@ -792,7 +968,7 @@ export function AppointmentsView() {
               <div className="space-y-3">
                 {appointments.filter(apt => apt.date && isToday(new Date(apt.date))).length === 0 ? (
                   <div className="text-center py-6 text-slate-400 text-sm">
-                    {isRtl ? 'لا توجد مواعيد اليوم' : 'No appointments today'}
+                    {t('appointments.empty.noToday', 'لا توجد مواعيد اليوم')}
                   </div>
                 ) : (
                   appointments
@@ -855,24 +1031,211 @@ export function AppointmentsView() {
           setShowDetailsDialog(false)
           handleDeleteSingle(id)
         }}
+        onReschedule={(appointment) => {
+          setShowDetailsDialog(false)
+          handleRescheduleAppointment(appointment)
+        }}
+        onEdit={handleEditAppointment}
       />
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{isRtl ? 'تأكيد الحذف' : 'Confirm Delete'}</DialogTitle>
+            <DialogTitle>{t('appointments.dialogs.delete.title', 'تأكيد الحذف')}</DialogTitle>
             <DialogDescription>
               {appointmentToDelete
-                ? (isRtl ? 'هل أنت متأكد من حذف هذا الموعد؟' : 'Are you sure you want to delete this appointment?')
-                : (isRtl ? `هل أنت متأكد من حذف ${selectedAppointments.size} موعد؟` : `Are you sure you want to delete ${selectedAppointments.size} appointment(s)?`)}
+                ? t('appointments.dialogs.delete.messageSingle', 'هل أنت متأكد من حذف هذا الموعد؟')
+                : t('appointments.dialogs.delete.messageMultiple', { count: selectedAppointments.size }, `هل أنت متأكد من حذف ${selectedAppointments.size} موعد؟`)}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>{isRtl ? 'إلغاء' : 'Cancel'}</Button>
+            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>{t('common.cancel', 'إلغاء')}</Button>
             <Button variant="destructive" onClick={confirmDelete} disabled={cancelMutation.isPending}>
-              {cancelMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin ms-2" /> : <Trash2 className="h-4 w-4 ms-2" />}
-              {isRtl ? 'حذف' : 'Delete'}
+              {cancelMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin ms-2" aria-hidden="true" /> : <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />}
+              {t('common.delete', 'حذف')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reschedule Appointment Dialog */}
+      <Dialog open={showRescheduleDialog} onOpenChange={setShowRescheduleDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CalendarClock className="h-5 w-5" />
+              {t('appointments.dialogs.reschedule.title', 'إعادة جدولة الموعد')}
+            </DialogTitle>
+            <DialogDescription>
+              {t('appointments.dialogs.reschedule.description', 'اختر تاريخ ووقت جديد للموعد')}
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedAppointment && (
+            <div
+              className="space-y-4 py-4"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && rescheduleData.date && rescheduleData.startTime && !rescheduleMutation.isPending) {
+                  e.preventDefault()
+                  handleSaveReschedule()
+                }
+              }}
+            >
+              {/* Current Date/Time Info */}
+              <div className="p-3 bg-slate-50 rounded-lg">
+                <p className="text-sm text-slate-500">{t('appointments.dialogs.reschedule.currentLabel', 'الموعد الحالي:')}</p>
+                <p className="font-medium">
+                  {format(new Date(selectedAppointment.date), 'EEEE, d MMMM yyyy', { locale })} - {selectedAppointment.startTime}
+                </p>
+              </div>
+
+              {/* New Date */}
+              <div>
+                <Label htmlFor="reschedule-date">{t('appointments.labels.newDate', 'التاريخ الجديد')}</Label>
+                <Input
+                  id="reschedule-date"
+                  type="date"
+                  value={rescheduleData.date}
+                  onChange={(e) => setRescheduleData(prev => ({ ...prev, date: e.target.value }))}
+                  min={format(new Date(), 'yyyy-MM-dd')}
+                  className="mt-1"
+                />
+              </div>
+
+              {/* New Time */}
+              <div>
+                <Label htmlFor="reschedule-time">{t('appointments.labels.newTime', 'الوقت الجديد')}</Label>
+                <Input
+                  id="reschedule-time"
+                  type="time"
+                  value={rescheduleData.startTime}
+                  onChange={(e) => setRescheduleData(prev => ({ ...prev, startTime: e.target.value }))}
+                  className="mt-1"
+                />
+              </div>
+
+              {/* Client Info */}
+              <div className="p-3 bg-blue-50 rounded-lg">
+                <p className="text-sm text-blue-600 flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  {selectedAppointment.clientName}
+                </p>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowRescheduleDialog(false)}>
+              {t('common.cancel', 'إلغاء')}
+            </Button>
+            <Button
+              onClick={handleSaveReschedule}
+              disabled={rescheduleMutation.isPending || !rescheduleData.date || !rescheduleData.startTime}
+            >
+              {rescheduleMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin me-2" /> : <CalendarClock className="h-4 w-4 me-2" />}
+              {t('appointments.actions.reschedule', 'إعادة جدولة')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Appointment Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t('appointments.dialogs.edit.title', 'تعديل الموعد')}</DialogTitle>
+          </DialogHeader>
+          <div
+            className="space-y-4 py-4"
+            onKeyDown={(e) => {
+              // Submit on Enter except in textarea (allow Shift+Enter for new lines)
+              if (e.key === 'Enter' && !e.shiftKey && !updateMutation.isPending) {
+                const target = e.target as HTMLElement
+                if (target.tagName !== 'TEXTAREA') {
+                  e.preventDefault()
+                  handleSaveEdit()
+                }
+              }
+            }}
+          >
+            {/* Type selector */}
+            <div>
+              <Label>{t('appointments.labels.type', 'نوع الموعد')}</Label>
+              <Select value={editFormData.type} onValueChange={(v) => setEditFormData(prev => ({ ...prev, type: v as AppointmentType }))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {APPOINTMENT_TYPES.map(t => (
+                    <SelectItem key={t.value} value={t.value}>{isRtl ? t.labelAr : t.labelEn}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Location Type */}
+            <div>
+              <Label>{t('appointments.labels.locationType', 'نوع الموقع')}</Label>
+              <div className="flex gap-2 mt-2">
+                {LOCATION_TYPES.map(lt => (
+                  <Button
+                    key={lt.value}
+                    type="button"
+                    variant={editFormData.locationType === lt.value ? 'default' : 'outline'}
+                    onClick={() => setEditFormData(prev => ({ ...prev, locationType: lt.value }))}
+                    className="flex-1"
+                  >
+                    {lt.icon === 'video' ? <Video className="h-4 w-4 me-1" /> : lt.icon === 'map' ? <MapPin className="h-4 w-4 me-1" /> : <Phone className="h-4 w-4 me-1" />}
+                    {isRtl ? lt.labelAr : lt.labelEn}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Meeting Link (for video) */}
+            {editFormData.locationType === 'video' && (
+              <div>
+                <Label>{t('appointments.labels.meetingLink', 'رابط الاجتماع')}</Label>
+                <Input
+                  value={editFormData.meetingLink}
+                  onChange={(e) => setEditFormData(prev => ({ ...prev, meetingLink: e.target.value }))}
+                  placeholder="https://meet.google.com/..."
+                  maxLength={500}
+                />
+              </div>
+            )}
+
+            {/* Location (for in-person) */}
+            {editFormData.locationType === 'in-person' && (
+              <div>
+                <Label>{t('appointments.labels.location', 'العنوان')}</Label>
+                <Input
+                  value={editFormData.location}
+                  onChange={(e) => setEditFormData(prev => ({ ...prev, location: e.target.value }))}
+                  placeholder={t('appointments.labels.locationPlaceholder', 'أدخل العنوان')}
+                  maxLength={500}
+                />
+              </div>
+            )}
+
+            {/* Notes */}
+            <div>
+              <Label>{t('appointments.labels.notes', 'ملاحظات')}</Label>
+              <Textarea
+                value={editFormData.notes}
+                onChange={(e) => setEditFormData(prev => ({ ...prev, notes: e.target.value }))}
+                placeholder={t('appointments.labels.notesPlaceholder', 'ملاحظات إضافية...')}
+                maxLength={2000}
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEditDialog(false)}>
+              {t('common.cancel', 'إلغاء')}
+            </Button>
+            <Button onClick={handleSaveEdit} disabled={updateMutation.isPending}>
+              {updateMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin me-2" /> : null}
+              {t('common.save', 'حفظ')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -890,6 +1253,8 @@ function AppointmentDetailsDialog({
   isRtl,
   locale,
   onDelete,
+  onReschedule,
+  onEdit,
 }: {
   appointment: Appointment | null
   open: boolean
@@ -897,7 +1262,10 @@ function AppointmentDetailsDialog({
   isRtl: boolean
   locale: any
   onDelete: (id: string) => void
+  onReschedule: (appointment: Appointment) => void
+  onEdit: (appointment: Appointment) => void
 }) {
+  const { t } = useTranslation()
   const confirmMutation = useConfirmAppointment()
   const completeMutation = useCompleteAppointment()
   const noShowMutation = useMarkNoShow()
@@ -912,20 +1280,20 @@ function AppointmentDetailsDialog({
       switch (action) {
         case 'confirm':
           await confirmMutation.mutateAsync(appointment.id)
-          toast.success(isRtl ? 'تم تأكيد الموعد' : 'Appointment confirmed')
+          toast.success(t('appointments.success.confirmed', 'تم تأكيد الموعد'))
           break
         case 'complete':
           await completeMutation.mutateAsync({ id: appointment.id })
-          toast.success(isRtl ? 'تم إكمال الموعد' : 'Appointment completed')
+          toast.success(t('appointments.success.appointmentCompleted', 'تم إكمال الموعد'))
           break
         case 'no_show':
           await noShowMutation.mutateAsync(appointment.id)
-          toast.success(isRtl ? 'تم تسجيل عدم الحضور' : 'Marked as no-show')
+          toast.success(t('appointments.success.markedNoShow', 'تم تسجيل عدم الحضور'))
           break
       }
       onOpenChange(false)
     } catch (error: any) {
-      const errorMessage = error?.message || (isRtl ? 'حدث خطأ' : 'An error occurred')
+      const errorMessage = error?.message || t('appointments.errors.generic', 'حدث خطأ')
       toast.error(errorMessage)
     }
   }
@@ -938,7 +1306,7 @@ function AppointmentDetailsDialog({
             <div className={cn('p-2 rounded-xl', typeConfig?.color || 'bg-gray-500')}>
               <User className="h-5 w-5 text-white" />
             </div>
-            {appointment.clientName || (isRtl ? 'بدون اسم' : 'No name')}
+            {appointment.clientName || t('appointments.labels.noName', 'بدون اسم')}
           </DialogTitle>
           <DialogDescription className="flex items-center gap-2 mt-2">
             <span className={cn('px-2 py-1 rounded-lg text-xs font-medium', statusConfig.bgColor, statusConfig.color)}>
@@ -971,10 +1339,23 @@ function AppointmentDetailsDialog({
               <span>{appointment.clientPhone}</span>
             </div>
           )}
-          {appointment.location && (
+          {/* Location/Meeting Type Display */}
+          {(appointment.locationType || appointment.meetingLink || appointment.location) && (
             <div className="flex items-center gap-3 text-slate-700">
-              {appointment.location.type === 'video' ? <Video className="h-5 w-5 text-slate-400" /> : <MapPin className="h-5 w-5 text-slate-400" />}
-              <span>{appointment.location.type === 'video' ? (isRtl ? 'اجتماع عن بعد' : 'Video Call') : appointment.location.address}</span>
+              {appointment.locationType === 'video' || appointment.meetingLink ? (
+                <Video className="h-5 w-5 text-slate-400" />
+              ) : appointment.locationType === 'phone' ? (
+                <Phone className="h-5 w-5 text-slate-400" />
+              ) : (
+                <MapPin className="h-5 w-5 text-slate-400" />
+              )}
+              <span>
+                {appointment.locationType === 'video' || appointment.meetingLink
+                  ? t('appointments.locationTypes.video', 'اجتماع عن بعد')
+                  : appointment.locationType === 'phone'
+                    ? t('appointments.locationTypes.phone', 'مكالمة هاتفية')
+                    : appointment.location || t('appointments.locationTypes.inPerson', 'حضوري')}
+              </span>
             </div>
           )}
           {appointment.notes && (
@@ -988,24 +1369,32 @@ function AppointmentDetailsDialog({
           {appointment.status === 'pending' && (
             <Button onClick={() => handleAction('confirm')} className="bg-blue-500 hover:bg-blue-600" disabled={confirmMutation.isPending}>
               <Check className="h-4 w-4 ms-2" />
-              {isRtl ? 'تأكيد' : 'Confirm'}
+              {t('appointments.actions.confirm', 'تأكيد')}
             </Button>
           )}
           {appointment.status === 'confirmed' && (
             <>
               <Button onClick={() => handleAction('complete')} className="bg-green-500 hover:bg-green-600" disabled={completeMutation.isPending}>
                 <CheckCircle className="h-4 w-4 ms-2" />
-                {isRtl ? 'إكمال' : 'Complete'}
+                {t('appointments.actions.complete', 'إكمال')}
               </Button>
               <Button onClick={() => handleAction('no_show')} variant="outline" disabled={noShowMutation.isPending}>
                 <X className="h-4 w-4 ms-2" />
-                {isRtl ? 'لم يحضر' : 'No Show'}
+                {t('appointments.actions.noShow', 'لم يحضر')}
               </Button>
             </>
           )}
+          <Button variant="outline" onClick={() => onReschedule(appointment)}>
+            <CalendarClock className="h-4 w-4 me-2" />
+            {t('appointments.actions.reschedule', 'إعادة جدولة')}
+          </Button>
+          <Button variant="outline" onClick={() => { onOpenChange(false); onEdit(appointment) }} aria-hidden="true">
+            <Settings className="h-4 w-4 me-2" />
+            {t('common.edit', 'تعديل')}
+          </Button>
           <Button variant="destructive" onClick={() => onDelete(appointment.id)}>
             <Trash2 className="h-4 w-4 ms-2" />
-            {isRtl ? 'حذف' : 'Delete'}
+            {t('common.delete', 'حذف')}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -1032,12 +1421,14 @@ function BookAppointmentDialog({
   canManageOtherLawyers: boolean
   teamMembers: Array<{ _id: string; firstName: string; lastName: string }>
 }) {
+  const { t } = useTranslation()
   const bookMutation = useBookAppointment()
   const [step, setStep] = useState<1 | 2>(1)
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [targetLawyerId, setTargetLawyerId] = useState<string>('')
+  const timeSlotRefs = useRef<(HTMLButtonElement | null)[]>([])
 
   // Determine which lawyer to book for (self or selected team member)
   const effectiveLawyerId = targetLawyerId || user?._id || ''
@@ -1048,8 +1439,28 @@ function BookAppointmentDialog({
     clientPhone: '',
     duration: 30 as AppointmentDuration,
     type: 'consultation' as AppointmentType,
+    locationType: 'video' as LocationType,
     notes: '',
   })
+
+  // Validation helpers (enterprise-grade patterns)
+  const isValidEmail = (email: string) => {
+    if (!email) return true // Optional field
+    // RFC 5322 compliant email validation with proper domain/TLD check
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/
+    return emailRegex.test(email)
+  }
+
+  const isValidPhone = (phone: string) => {
+    if (!phone) return true // Optional field
+    // Saudi phone: +966, 05, or 5 followed by 8 digits
+    const phoneRegex = /^(\+966|966|05|5)?[0-9]{8,9}$/
+    return phoneRegex.test(phone.replace(/[\s-]/g, ''))
+  }
+
+  const emailError = formData.clientEmail && !isValidEmail(formData.clientEmail)
+  const phoneError = formData.clientPhone && !isValidPhone(formData.clientPhone)
+  const isFormValid = formData.clientName && !emailError && !phoneError
 
   // Use backend API to get available slots (checks appointments, blocked times, events)
   const { data: availableSlotsData, isLoading: isSlotsLoading, isError: isSlotsError } = useAvailableSlots(
@@ -1062,6 +1473,8 @@ function BookAppointmentDialog({
   )
 
   const availableSlots = availableSlotsData?.data?.slots || []
+  const isWorkingDay = availableSlotsData?.data?.working ?? true
+  const workingHours = availableSlotsData?.data?.workingHours
 
   const calendarDays = useMemo(() => {
     const start = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1)
@@ -1075,22 +1488,91 @@ function BookAppointmentDialog({
 
   const isPastDate = (date: Date) => isBefore(date, startOfDay(new Date()))
 
+  // Keyboard navigation handlers for time slots
+  const handleTimeSlotKeyDown = useCallback(
+    (e: React.KeyboardEvent, slotIndex: number, slot: any) => {
+      const availableSlotIndices = availableSlots
+        .map((s, i) => (s.available ? i : -1))
+        .filter((i) => i !== -1)
+      const currentIndexInAvailable = availableSlotIndices.indexOf(slotIndex)
+
+      switch (e.key) {
+        case 'ArrowDown':
+        case 'ArrowRight':
+          e.preventDefault()
+          if (currentIndexInAvailable < availableSlotIndices.length - 1) {
+            const nextIndex = availableSlotIndices[currentIndexInAvailable + 1]
+            timeSlotRefs.current[nextIndex]?.focus()
+          }
+          break
+        case 'ArrowUp':
+        case 'ArrowLeft':
+          e.preventDefault()
+          if (currentIndexInAvailable > 0) {
+            const prevIndex = availableSlotIndices[currentIndexInAvailable - 1]
+            timeSlotRefs.current[prevIndex]?.focus()
+          }
+          break
+        case 'Enter':
+        case ' ':
+          e.preventDefault()
+          if (slot.available) {
+            setSelectedTime(slot.start)
+          }
+          break
+        case 'Home':
+          e.preventDefault()
+          if (availableSlotIndices.length > 0) {
+            timeSlotRefs.current[availableSlotIndices[0]]?.focus()
+          }
+          break
+        case 'End':
+          e.preventDefault()
+          if (availableSlotIndices.length > 0) {
+            const lastIndex = availableSlotIndices[availableSlotIndices.length - 1]
+            timeSlotRefs.current[lastIndex]?.focus()
+          }
+          break
+      }
+    },
+    [availableSlots]
+  )
+
+  // Focus first available time slot when slots load
+  useEffect(() => {
+    if (availableSlots.length > 0 && selectedDate) {
+      const firstAvailableIndex = availableSlots.findIndex((s) => s.available)
+      if (firstAvailableIndex !== -1) {
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+          timeSlotRefs.current[firstAvailableIndex]?.focus()
+        }, 100)
+      }
+    }
+  }, [availableSlots, selectedDate])
+
   const handleSubmit = async () => {
     if (!selectedDate || !selectedTime) return
     try {
       await bookMutation.mutateAsync({
-        ...formData,
+        clientName: formData.clientName,
+        clientEmail: formData.clientEmail,
+        clientPhone: formData.clientPhone,
+        duration: formData.duration,
+        type: formData.type,
+        locationType: formData.locationType,
+        notes: formData.notes,
         date: format(selectedDate, 'yyyy-MM-dd'),
         startTime: selectedTime,
         source: 'manual',
         // Include assignedTo only if booking for another lawyer
         ...(targetLawyerId ? { assignedTo: targetLawyerId } : {}),
       })
-      toast.success(isRtl ? 'تم حجز الموعد بنجاح' : 'Appointment booked successfully')
+      toast.success(t('appointments.success.booked', 'تم حجز الموعد بنجاح'))
       onOpenChange(false)
       resetForm()
     } catch (error: any) {
-      const errorMessage = error?.message || (isRtl ? 'فشل في حجز الموعد' : 'Failed to book appointment')
+      const errorMessage = error?.message || t('appointments.errors.bookFailed', 'فشل في حجز الموعد')
       toast.error(errorMessage)
     }
   }
@@ -1100,7 +1582,7 @@ function BookAppointmentDialog({
     setSelectedDate(null)
     setSelectedTime(null)
     setTargetLawyerId('')
-    setFormData({ clientName: '', clientEmail: '', clientPhone: '', duration: 30, type: 'consultation', notes: '' })
+    setFormData({ clientName: '', clientEmail: '', clientPhone: '', duration: 30, type: 'consultation', locationType: 'video', notes: '' })
   }
 
   return (
@@ -1108,27 +1590,38 @@ function BookAppointmentDialog({
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl">
-            {step === 1 ? (isRtl ? 'اختر التاريخ والوقت' : 'Select Date & Time') : (isRtl ? 'تفاصيل العميل' : 'Client Details')}
+            {step === 1 ? t('appointments.dialogs.book.step1Title', 'اختر التاريخ والوقت') : t('appointments.dialogs.book.step2Title', 'تفاصيل العميل')}
           </DialogTitle>
           <DialogDescription>
-            {step === 1 ? (isRtl ? 'اختر تاريخ الموعد ثم اختر الوقت المناسب' : 'Choose the appointment date and then select a time slot') : (isRtl ? 'أدخل بيانات العميل لإتمام الحجز' : 'Enter client details to complete the booking')}
+            {step === 1 ? t('appointments.dialogs.book.step1Description', 'اختر تاريخ الموعد ثم اختر الوقت المناسب') : t('appointments.dialogs.book.step2Description', 'أدخل بيانات العميل لإتمام الحجز')}
           </DialogDescription>
         </DialogHeader>
 
         {step === 1 ? (
           <div className="space-y-6">
+            {/* Skip link for keyboard navigation */}
+            <a
+              href="#time-selection"
+              className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-emerald-600 focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg"
+              onClick={(e) => {
+                e.preventDefault()
+                document.getElementById('time-selection')?.focus()
+              }}
+            >
+              {t('appointments.labels.skipToTimeSelection', 'انتقل إلى اختيار الوقت')}
+            </a>
             {/* Lawyer Selector - Only show for firm admins */}
             {canManageOtherLawyers && teamMembers.length > 0 && (
               <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl space-y-2">
                 <Label className="text-sm font-medium text-blue-800">
-                  {isRtl ? 'حجز موعد لـ' : 'Book appointment for'}
+                  {t('appointments.labels.bookFor', 'حجز موعد لـ')}
                 </Label>
                 <Select value={targetLawyerId} onValueChange={setTargetLawyerId}>
                   <SelectTrigger className="bg-white">
-                    <SelectValue placeholder={isRtl ? 'نفسي (الافتراضي)' : 'Myself (default)'} />
+                    <SelectValue placeholder={t('appointments.labels.myselfDefault', 'نفسي (الافتراضي)')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">{isRtl ? 'نفسي' : 'Myself'}</SelectItem>
+                    <SelectItem value="">{t('appointments.labels.myself', 'نفسي')}</SelectItem>
                     {teamMembers.filter(m => m._id !== user?._id).map((member) => (
                       <SelectItem key={member._id} value={member._id}>
                         {member.firstName} {member.lastName}
@@ -1175,28 +1668,75 @@ function BookAppointmentDialog({
             </div>
 
             <div className="space-y-4">
-              <h4 className="font-semibold">{isRtl ? 'الأوقات المتاحة' : 'Available Times'}</h4>
+              <h4 className="font-semibold">{t('appointments.labels.availableTimes', 'الأوقات المتاحة')}</h4>
+              {/* Aria-live region for screen reader announcements */}
+              <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+                {!selectedDate
+                  ? t('appointments.messages.selectDateFirst', 'اختر تاريخاً أولاً')
+                  : isSlotsLoading
+                    ? t('common.loading', 'جاري التحميل...')
+                    : isSlotsError
+                      ? t('appointments.errors.loadingTimes', 'حدث خطأ في جلب الأوقات')
+                      : !isWorkingDay
+                        ? t('appointments.messages.notWorkingDay', 'هذا اليوم ليس يوم عمل')
+                        : availableSlots.length === 0
+                          ? t('appointments.empty.noAvailableTimes', 'لا توجد أوقات متاحة')
+                          : t('appointments.messages.slotsAvailable', { count: availableSlots.filter(s => s.available).length }, `${availableSlots.filter(s => s.available).length} وقت متاح`)
+                }
+              </div>
+              {workingHours && (
+                <p className="text-xs text-slate-500">
+                  {t('appointments.labels.workingHours', { start: workingHours.start, end: workingHours.end }, `ساعات العمل: ${workingHours.start} - ${workingHours.end}`)}
+                </p>
+              )}
               {!selectedDate ? (
                 <div className="text-center py-12 text-slate-400">
-                  <CalendarIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>{isRtl ? 'اختر تاريخاً أولاً' : 'Select a date first'}</p>
+                  <CalendarIcon className="h-12 w-12 aria-hidden="true" mx-auto mb-4 opacity-50" />
+                  <p>{t('appointments.messages.selectDateFirst', 'اختر تاريخاً أولاً')}</p>
                 </div>
               ) : isSlotsLoading ? (
-                <div className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-slate-400" /></div>
-              ) : isSlotsError || availableSlots.length === 0 ? (
+                <div className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 aria-hidden="true" animate-spin text-slate-400" /></div>
+              ) : isSlotsError ? (
                 <div className="text-center py-8 text-slate-400">
-                  <Clock className="h-10 w-10 mx-auto mb-3 opacity-50" />
-                  <p className="font-medium text-sm">{isRtl ? 'لا توجد أوقات متاحة' : 'No available times'}</p>
+                  <Clock className="h-10 w-10 aria-hidden="true" mx-auto mb-3 opacity-50" />
+                  <p className="font-medium text-sm">{t('appointments.errors.loadingTimes', 'حدث خطأ في جلب الأوقات')}</p>
                   <p className="text-xs mt-1 text-slate-400">
-                    {isRtl ? 'قد يكون هناك مواعيد أو حجوزات أخرى' : 'May have appointments or blocked times'}
+                    {t('appointments.messages.pleaseTryAgain', 'يرجى المحاولة مرة أخرى')}
+                  </p>
+                </div>
+              ) : !isWorkingDay ? (
+                <div className="text-center py-8 text-slate-400">
+                  <CalendarIcon className="h-10 w-10 aria-hidden="true" mx-auto mb-3 opacity-50" />
+                  <p className="font-medium text-sm">{t('appointments.messages.notWorkingDay', 'هذا اليوم ليس يوم عمل')}</p>
+                  <p className="text-xs mt-1 text-slate-400">
+                    {t('appointments.messages.selectAnotherDay', 'يرجى اختيار يوم آخر')}
+                  </p>
+                </div>
+              ) : availableSlots.length === 0 ? (
+                <div className="text-center py-8 text-slate-400">
+                  <Clock className="h-10 w-10 aria-hidden="true" mx-auto mb-3 opacity-50" />
+                  <p className="font-medium text-sm">{t('appointments.empty.noAvailableTimes', 'لا توجد أوقات متاحة')}</p>
+                  <p className="text-xs mt-1 text-slate-400">
+                    {t('appointments.messages.allTimesBooked', 'جميع الأوقات محجوزة أو محظورة')}
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-3 gap-2 max-h-[300px] overflow-y-auto">
-                  {availableSlots.map((slot) => (
+                <div
+                  id="time-selection"
+                  role="listbox"
+                  aria-label={t('appointments.labels.availableTimes', 'الأوقات المتاحة')}
+                  tabIndex={-1}
+                  className="grid grid-cols-3 gap-2 max-h-[300px] overflow-y-auto focus:outline-none"
+                >
+                  {availableSlots.map((slot, index) => (
                     <button
                       key={slot.start}
-                      onClick={() => setSelectedTime(slot.start)}
+                      ref={(el) => (timeSlotRefs.current[index] = el)}
+                      role="option"
+                      aria-selected={selectedTime === slot.start}
+                      tabIndex={slot.available ? (index === 0 ? 0 : -1) : -1}
+                      onClick={() => slot.available && setSelectedTime(slot.start)}
+                      onKeyDown={(e) => handleTimeSlotKeyDown(e, index, slot)}
                       disabled={!slot.available}
                       className={cn(
                         'py-3 px-4 rounded-xl text-sm font-medium transition-all border',
@@ -1214,9 +1754,21 @@ function BookAppointmentDialog({
           </div>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div
+            className="space-y-4"
+            onKeyDown={(e) => {
+              // Submit form on Enter key (except in textareas)
+              if (e.key === 'Enter' && !e.shiftKey) {
+                const target = e.target as HTMLElement
+                if (target.tagName !== 'TEXTAREA' && isFormValid && !bookMutation.isPending) {
+                  e.preventDefault()
+                  handleSubmit()
+                }
+              }
+            }}
+          >
             <div className="bg-emerald-50 p-4 rounded-xl flex items-center gap-4">
-              <CalendarIcon className="h-6 w-6 text-emerald-600" />
+              <CalendarIcon className="h-6 w-6 aria-hidden="true" text-emerald-600" />
               <div>
                 <p className="font-semibold text-emerald-900">{selectedDate && format(selectedDate, 'EEEE، d MMMM yyyy', { locale })}</p>
                 <p className="text-sm text-emerald-700">{selectedTime}</p>
@@ -1224,22 +1776,49 @@ function BookAppointmentDialog({
             </div>
             <div className="grid gap-4">
               <div>
-                <Label>{isRtl ? 'اسم العميل' : 'Client Name'}</Label>
-                <Input value={formData.clientName} onChange={(e) => setFormData({ ...formData, clientName: e.target.value })} placeholder={isRtl ? 'أدخل اسم العميل' : 'Enter client name'} />
+                <Label>{t('appointments.labels.clientName', 'اسم العميل')}</Label>
+                <Input value={formData.clientName} onChange={(e) => setFormData({ ...formData, clientName: e.target.value })} placeholder={t('appointments.labels.clientNamePlaceholder', 'أدخل اسم العميل')} maxLength={100} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>{isRtl ? 'البريد الإلكتروني' : 'Email'}</Label>
-                  <Input type="email" value={formData.clientEmail} onChange={(e) => setFormData({ ...formData, clientEmail: e.target.value })} />
+                  <Label>{t('appointments.labels.email', 'البريد الإلكتروني')}</Label>
+                  <Input
+                    type="email"
+                    value={formData.clientEmail}
+                    onChange={(e) => setFormData({ ...formData, clientEmail: e.target.value })}
+                    className={emailError ? 'border-red-500 focus:ring-red-500' : ''}
+                    placeholder="example@email.com"
+                    maxLength={254}
+                    aria-invalid={emailError ? 'true' : 'false'}
+                    aria-describedby={emailError ? 'email-error' : undefined}
+                  />
+                  {emailError && (
+                    <p id="email-error" className="text-xs text-red-500 mt-1" role="alert">
+                      {t('appointments.errors.invalidEmail', 'البريد الإلكتروني غير صالح')}
+                    </p>
+                  )}
                 </div>
                 <div>
-                  <Label>{isRtl ? 'رقم الهاتف' : 'Phone'}</Label>
-                  <Input value={formData.clientPhone} onChange={(e) => setFormData({ ...formData, clientPhone: e.target.value })} />
+                  <Label>{t('appointments.labels.phone', 'رقم الهاتف')}</Label>
+                  <Input
+                    value={formData.clientPhone}
+                    onChange={(e) => setFormData({ ...formData, clientPhone: e.target.value })}
+                    className={phoneError ? 'border-red-500 focus:ring-red-500' : ''}
+                    placeholder="05XXXXXXXX"
+                    maxLength={20}
+                    aria-invalid={phoneError ? 'true' : 'false'}
+                    aria-describedby={phoneError ? 'phone-error' : undefined}
+                  />
+                  {phoneError && (
+                    <p id="phone-error" className="text-xs text-red-500 mt-1" role="alert">
+                      {t('appointments.errors.invalidPhone', 'رقم الهاتف غير صالح')}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>{isRtl ? 'نوع الموعد' : 'Type'}</Label>
+                  <Label>{t('appointments.labels.type', 'نوع الموعد')}</Label>
                   <Select value={formData.type} onValueChange={(v) => setFormData({ ...formData, type: v as AppointmentType })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -1248,7 +1827,7 @@ function BookAppointmentDialog({
                   </Select>
                 </div>
                 <div>
-                  <Label>{isRtl ? 'المدة' : 'Duration'}</Label>
+                  <Label>{t('appointments.labels.duration', 'المدة')}</Label>
                   <Select value={String(formData.duration)} onValueChange={(v) => setFormData({ ...formData, duration: Number(v) as AppointmentDuration })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -1258,21 +1837,44 @@ function BookAppointmentDialog({
                 </div>
               </div>
               <div>
-                <Label>{isRtl ? 'ملاحظات' : 'Notes'}</Label>
-                <Textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} rows={3} />
+                <Label>{t('appointments.labels.meetingType', 'طريقة الاجتماع')}</Label>
+                <div className="grid grid-cols-3 gap-2 mt-2">
+                  {LOCATION_TYPES.map((loc) => (
+                    <button
+                      key={loc.value}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, locationType: loc.value })}
+                      className={cn(
+                        'flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all',
+                        formData.locationType === loc.value
+                          ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                          : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                      )}
+                    >
+                      {loc.icon === 'video' && <Video className="h-5 w-5" />}
+                      {loc.icon === 'map' && <MapPin className="h-5 w-5" />}
+                      {loc.icon === 'phone' && <Phone className="h-5 w-5" />}
+                      <span className="text-xs font-medium">{isRtl ? loc.labelAr : loc.labelEn}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <Label>{t('appointments.labels.notes', 'ملاحظات')}</Label>
+                <Textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} rows={3} maxLength={2000} />
               </div>
             </div>
           </div>
         )}
 
         <DialogFooter className="gap-2">
-          {step === 2 && <Button variant="outline" onClick={() => setStep(1)}>{isRtl ? 'رجوع' : 'Back'}</Button>}
+          {step === 2 && <Button variant="outline" onClick={() => setStep(1)}>{t('common.back', 'رجوع')}</Button>}
           {step === 1 ? (
-            <Button onClick={() => setStep(2)} disabled={!selectedDate || !selectedTime} className="bg-emerald-500 hover:bg-emerald-600">{isRtl ? 'التالي' : 'Next'}</Button>
+            <Button onClick={() => setStep(2)} disabled={!selectedDate || !selectedTime} className="bg-emerald-500 hover:bg-emerald-600">{t('common.next', 'التالي')}</Button>
           ) : (
-            <Button onClick={handleSubmit} disabled={bookMutation.isPending || !formData.clientName} className="bg-emerald-500 hover:bg-emerald-600">
+            <Button onClick={handleSubmit} disabled={bookMutation.isPending || !isFormValid} className="bg-emerald-500 hover:bg-emerald-600">
               {bookMutation.isPending && <Loader2 className="h-4 w-4 animate-spin ms-2" />}
-              {isRtl ? 'حجز الموعد' : 'Book Appointment'}
+              {t('appointments.actions.bookAppointment', 'حجز الموعد')}
             </Button>
           )}
         </DialogFooter>
@@ -1298,6 +1900,7 @@ function BlockTimeDialog({
   teamMembers: Array<{ _id: string; firstName: string; lastName: string }>
   currentUserId?: string
 }) {
+  const { t } = useTranslation()
   const createBlockedTime = useCreateBlockedTime()
   const [targetLawyerId, setTargetLawyerId] = useState<string>('')
   const [formData, setFormData] = useState({
@@ -1326,11 +1929,11 @@ function BlockTimeDialog({
         isAllDay: formData.isAllDay,
         ...(targetLawyerId ? { targetLawyerId } : {}),
       })
-      toast.success(isRtl ? 'تم حظر الوقت بنجاح' : 'Time blocked successfully')
+      toast.success(t('appointments.success.timeBlocked', 'تم حظر الوقت بنجاح'))
       onOpenChange(false)
       resetForm()
     } catch (error: any) {
-      const errorMessage = error?.message || (isRtl ? 'فشل في حظر الوقت' : 'Failed to block time')
+      const errorMessage = error?.message || t('appointments.errors.blockTimeFailed', 'فشل في حظر الوقت')
       toast.error(errorMessage)
     }
   }
@@ -1353,26 +1956,38 @@ function BlockTimeDialog({
         <DialogHeader>
           <DialogTitle className="text-xl flex items-center gap-2">
             <Ban className="h-5 w-5 text-red-500" />
-            {isRtl ? 'حظر وقت' : 'Block Time'}
+            {t('appointments.actions.blockTime', 'حظر وقت')}
           </DialogTitle>
           <DialogDescription>
-            {isRtl ? 'حدد الفترة التي تريد حظرها' : 'Specify the time period to block'}
+            {t('appointments.dialogs.block.description', 'حدد الفترة التي تريد حظرها')}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div
+          className="space-y-4"
+          onKeyDown={(e) => {
+            // Submit on Enter except in textarea
+            if (e.key === 'Enter' && !e.shiftKey && formData.startDate && formData.endDate && !createBlockedTime.isPending) {
+              const target = e.target as HTMLElement
+              if (target.tagName !== 'TEXTAREA') {
+                e.preventDefault()
+                handleSubmit()
+              }
+            }
+          }}
+        >
           {/* Lawyer Selector - Only show for firm admins */}
           {canManageOtherLawyers && teamMembers.length > 0 && (
             <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl space-y-2">
               <Label className="text-sm font-medium text-blue-800">
-                {isRtl ? 'حظر وقت لـ' : 'Block time for'}
+                {t('appointments.labels.blockTimeFor', 'حظر وقت لـ')}
               </Label>
               <Select value={targetLawyerId} onValueChange={setTargetLawyerId}>
                 <SelectTrigger className="bg-white">
-                  <SelectValue placeholder={isRtl ? 'نفسي (الافتراضي)' : 'Myself (default)'} />
+                  <SelectValue placeholder={t('appointments.labels.myselfDefault', 'نفسي (الافتراضي)')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">{isRtl ? 'نفسي' : 'Myself'}</SelectItem>
+                  <SelectItem value="">{t('appointments.labels.myself', 'نفسي')}</SelectItem>
                   {teamMembers.filter(m => m._id !== currentUserId).map((member) => (
                     <SelectItem key={member._id} value={member._id}>
                       {member.firstName} {member.lastName}
@@ -1390,13 +2005,13 @@ function BlockTimeDialog({
               onCheckedChange={(checked) => setFormData({ ...formData, isAllDay: checked as boolean })}
             />
             <Label htmlFor="allDay" className="cursor-pointer">
-              {isRtl ? 'طوال اليوم' : 'All day'}
+              {t('appointments.labels.allDay', 'طوال اليوم')}
             </Label>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>{isRtl ? 'تاريخ البداية' : 'Start Date'}</Label>
+              <Label>{t('appointments.labels.startDate', 'تاريخ البداية')}</Label>
               <Input
                 type="date"
                 value={formData.startDate}
@@ -1404,7 +2019,7 @@ function BlockTimeDialog({
               />
             </div>
             <div>
-              <Label>{isRtl ? 'تاريخ النهاية' : 'End Date'}</Label>
+              <Label>{t('appointments.labels.endDate', 'تاريخ النهاية')}</Label>
               <Input
                 type="date"
                 value={formData.endDate}
@@ -1417,7 +2032,7 @@ function BlockTimeDialog({
           {!formData.isAllDay && (
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>{isRtl ? 'وقت البداية' : 'Start Time'}</Label>
+                <Label>{t('appointments.labels.startTime', 'وقت البداية')}</Label>
                 <Input
                   type="time"
                   value={formData.startTime}
@@ -1425,7 +2040,7 @@ function BlockTimeDialog({
                 />
               </div>
               <div>
-                <Label>{isRtl ? 'وقت النهاية' : 'End Time'}</Label>
+                <Label>{t('appointments.labels.endTime', 'وقت النهاية')}</Label>
                 <Input
                   type="time"
                   value={formData.endTime}
@@ -1436,19 +2051,20 @@ function BlockTimeDialog({
           )}
 
           <div>
-            <Label>{isRtl ? 'السبب (اختياري)' : 'Reason (optional)'}</Label>
+            <Label>{t('appointments.labels.reasonOptional', 'السبب (اختياري)')}</Label>
             <Textarea
               value={formData.reason}
               onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-              placeholder={isRtl ? 'مثال: إجازة، اجتماع، تدريب...' : 'e.g., Vacation, Meeting, Training...'}
+              placeholder={t('appointments.labels.reasonPlaceholder', 'مثال: إجازة، اجتماع، تدريب...')}
               rows={2}
+              maxLength={500}
             />
           </div>
         </div>
 
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {isRtl ? 'إلغاء' : 'Cancel'}
+            {t('common.cancel', 'إلغاء')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -1456,7 +2072,7 @@ function BlockTimeDialog({
             className="bg-red-500 hover:bg-red-600"
           >
             {createBlockedTime.isPending && <Loader2 className="h-4 w-4 animate-spin ms-2" />}
-            {isRtl ? 'حظر الوقت' : 'Block Time'}
+            {t('appointments.actions.blockTime', 'حظر الوقت')}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -1518,6 +2134,7 @@ function ManageAvailabilityDialog({
   teamMembers?: Array<{ _id: string; firstName: string; lastName: string }>
   currentUserId?: string
 }) {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [workingHours, setWorkingHours] = useState<WorkingHours>(DEFAULT_WORKING_HOURS)
   const [isSaving, setIsSaving] = useState(false)
@@ -1565,12 +2182,12 @@ function ManageAvailabilityDialog({
     try {
       const { crmSettingsService } = await import('@/services/crmSettingsService')
       await crmSettingsService.updateAllWorkingHours(workingHours)
-      toast.success(isRtl ? 'تم حفظ أوقات العمل' : 'Working hours saved')
+      toast.success(t('appointments.success.workingHoursSaved', 'تم حفظ أوقات العمل'))
       setHasChanges(false)
       queryClient.invalidateQueries({ queryKey: ['crm-settings'] })
       queryClient.invalidateQueries({ queryKey: ['appointments'] })
     } catch (error: any) {
-      toast.error(error?.message || (isRtl ? 'فشل في حفظ الإعدادات' : 'Failed to save settings'))
+      toast.error(error?.message || t('appointments.errors.saveSettingsFailed', 'فشل في حفظ الإعدادات'))
     } finally {
       setIsSaving(false)
     }
@@ -1581,18 +2198,27 @@ function ManageAvailabilityDialog({
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl flex items-center gap-2">
-            <Settings className="h-5 w-5 text-emerald-500" />
-            {isRtl ? 'إدارة أوقات العمل' : 'Manage Working Hours'}
+            <Settings className="h-5 w-5 aria-hidden="true" text-emerald-500" />
+            {t('appointments.dialogs.availability.title', 'إدارة أوقات العمل')}
           </DialogTitle>
           <DialogDescription>
-            {isRtl ? 'حدد أيام وأوقات العمل للمواعيد' : 'Set your working days and hours for appointments'}
+            {t('appointments.dialogs.availability.description', 'حدد أيام وأوقات العمل للمواعيد')}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div
+          className="space-y-4"
+          onKeyDown={(e) => {
+            // Submit on Ctrl+Enter or Cmd+Enter to save changes
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && hasChanges && !isSaving) {
+              e.preventDefault()
+              handleSave()
+            }
+          }}
+        >
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+              <Loader2 className="h-8 w-8 aria-hidden="true" animate-spin text-slate-400" />
             </div>
           ) : (
             <div className="space-y-3">
@@ -1641,7 +2267,7 @@ function ManageAvailabilityDialog({
                         </div>
                       ) : (
                         <Badge variant="outline" className="text-slate-400">
-                          {isRtl ? 'يوم إجازة' : 'Day Off'}
+                          {t('appointments.labels.dayOff', 'يوم إجازة')}
                         </Badge>
                       )}
                     </div>
@@ -1654,16 +2280,14 @@ function ManageAvailabilityDialog({
           {/* Info box */}
           <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl">
             <p className="text-sm text-blue-700">
-              {isRtl
-                ? 'هذه الإعدادات تحدد أيام وأوقات العمل المتاحة للمواعيد. يمكنك حظر أوقات محددة باستخدام "حظر وقت" في القائمة.'
-                : 'These settings define your available days and hours for appointments. You can block specific times using "Block Time" from the menu.'}
+              {t('appointments.dialogs.availability.infoMessage', 'هذه الإعدادات تحدد أيام وأوقات العمل المتاحة للمواعيد. يمكنك حظر أوقات محددة باستخدام "حظر وقت" في القائمة.')}
             </p>
           </div>
         </div>
 
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {isRtl ? 'إغلاق' : 'Close'}
+            {t('common.close', 'إغلاق')}
           </Button>
           <Button
             onClick={handleSave}
@@ -1671,7 +2295,7 @@ function ManageAvailabilityDialog({
             className="bg-emerald-500 hover:bg-emerald-600"
           >
             {isSaving && <Loader2 className="h-4 w-4 animate-spin me-2" />}
-            {isRtl ? 'حفظ التغييرات' : 'Save Changes'}
+            {t('common.saveChanges', 'حفظ التغييرات')}
           </Button>
         </DialogFooter>
       </DialogContent>

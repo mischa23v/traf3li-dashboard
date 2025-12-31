@@ -44,8 +44,11 @@ export const validationPatterns = {
   // Saudi IBAN (SA + 22 digits)
   iban: /^SA\d{22}$/,
 
-  // Saudi phone (+966 or 966 or 05 prefix)
-  phone: /^(\+966|966|05)[0-9]{8,9}$/,
+  // Saudi phone - Strict E.164 format (+9665XXXXXXXX)
+  phone: /^\+966[5][0-9]{8}$/,
+
+  // Saudi phone - Lenient format (accepts various inputs for transformation)
+  phoneLenient: /^(\+966|966|0)?5[0-9]{8}$/,
 
   // Commercial Registration (10 digits)
   crNumber: /^\d{10}$/,
@@ -56,8 +59,8 @@ export const validationPatterns = {
   // OTP (6 digits)
   otp: /^[0-9]{6}$/,
 
-  // Email
-  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  // Email - RFC 5322 compliant
+  email: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/,
 
   // Saudi VAT number (15 digits starting with 3)
   vatNumber: /^3\d{14}$/,
@@ -400,6 +403,194 @@ export const formatSaudiIban = (value: string): string => {
 // Export All
 // ============================================================================
 
+// ============================================================================
+// Input Length Constants (Enterprise Security Standard)
+// ============================================================================
+
+export const INPUT_MAX_LENGTHS = {
+  // Person fields
+  name: 100,
+  firstName: 50,
+  lastName: 50,
+
+  // Contact fields
+  email: 254,       // RFC 5321 max
+  phone: 20,        // +9665XXXXXXXX = 13 chars
+
+  // Text fields
+  notes: 2000,
+  description: 5000,
+  address: 500,
+
+  // Short text
+  title: 200,
+  subject: 200,
+
+  // IDs
+  nationalId: 10,
+  crNumber: 10,
+  iban: 24,
+  vatNumber: 15,
+
+  // Misc
+  otp: 6,
+  password: 128,
+  meetingLink: 500,
+} as const;
+
+// ============================================================================
+// Data Masking Functions (PDPL Compliance)
+// ============================================================================
+
+/**
+ * Masks an email address for privacy
+ * Example: "ahmed.mohammed@example.com" → "a***@e******.com"
+ *
+ * @param email - The email to mask
+ * @returns Masked email string
+ */
+export const maskEmail = (email: string | undefined | null): string => {
+  if (!email || typeof email !== 'string') return '***@***.***';
+
+  const atIndex = email.indexOf('@');
+  if (atIndex === -1) return '***@***.***';
+
+  const local = email.substring(0, atIndex);
+  const domain = email.substring(atIndex + 1);
+
+  // Mask local part: show first character + asterisks
+  const maskedLocal = local.length > 1
+    ? local[0] + '*'.repeat(Math.min(local.length - 1, 5))
+    : '*';
+
+  // Mask domain: show first character + asterisks before TLD
+  const domainParts = domain.split('.');
+  if (domainParts.length < 2) return `${maskedLocal}@***.*`;
+
+  const domainName = domainParts.slice(0, -1).join('.');
+  const tld = domainParts[domainParts.length - 1];
+
+  const maskedDomain = domainName.length > 1
+    ? domainName[0] + '*'.repeat(Math.min(domainName.length - 1, 6))
+    : '*';
+
+  return `${maskedLocal}@${maskedDomain}.${tld}`;
+};
+
+/**
+ * Masks a phone number for privacy
+ * Example: "+966501234567" → "+966***4567"
+ *
+ * @param phone - The phone number to mask
+ * @returns Masked phone string
+ */
+export const maskPhone = (phone: string | undefined | null): string => {
+  if (!phone || typeof phone !== 'string') return '***';
+
+  const cleaned = phone.replace(/\D/g, '');
+
+  if (cleaned.length < 6) return '***';
+
+  // Show country code + first digit + last 4 digits
+  if (phone.startsWith('+')) {
+    // E.164 format: +966XXXXXXXXX
+    const countryCode = phone.substring(0, 4); // +966
+    const lastFour = cleaned.slice(-4);
+    return `${countryCode}***${lastFour}`;
+  } else if (cleaned.startsWith('966')) {
+    const lastFour = cleaned.slice(-4);
+    return `+966***${lastFour}`;
+  } else if (cleaned.startsWith('0')) {
+    const lastFour = cleaned.slice(-4);
+    return `0***${lastFour}`;
+  }
+
+  // Default masking
+  const lastFour = cleaned.slice(-4);
+  return `***${lastFour}`;
+};
+
+/**
+ * Masks a national ID for privacy
+ * Example: "1234567890" → "1***7890"
+ *
+ * @param nationalId - The national ID to mask
+ * @returns Masked national ID string
+ */
+export const maskNationalId = (nationalId: string | undefined | null): string => {
+  if (!nationalId || typeof nationalId !== 'string') return '***';
+
+  const cleaned = nationalId.replace(/\D/g, '');
+  if (cleaned.length < 6) return '***';
+
+  return cleaned[0] + '***' + cleaned.slice(-4);
+};
+
+/**
+ * Masks an IBAN for privacy
+ * Example: "SA0380000000608010167519" → "SA03****7519"
+ *
+ * @param iban - The IBAN to mask
+ * @returns Masked IBAN string
+ */
+export const maskIban = (iban: string | undefined | null): string => {
+  if (!iban || typeof iban !== 'string') return '***';
+
+  const cleaned = iban.replace(/\s/g, '').toUpperCase();
+  if (cleaned.length < 8) return '***';
+
+  return cleaned.substring(0, 4) + '****' + cleaned.slice(-4);
+};
+
+/**
+ * Checks if a phone number is valid for lenient input (before transformation)
+ * Accepts: +966501234567, 966501234567, 0501234567, 501234567
+ *
+ * @param value - The phone number to validate
+ * @returns true if valid for transformation
+ */
+export const isValidPhoneLenient = (value: string): boolean => {
+  if (!value) return false;
+  return validationPatterns.phoneLenient.test(value.trim().replace(/\s/g, ''));
+};
+
+/**
+ * Transforms a phone number to E.164 format
+ * @param value - The phone number to transform
+ * @returns E.164 formatted phone (+9665XXXXXXXX) or original if invalid
+ */
+export const toE164Phone = (value: string): string => {
+  if (!value) return '';
+
+  const cleaned = value.replace(/\D/g, '');
+
+  // Already has 966 prefix
+  if (cleaned.startsWith('966') && cleaned.length === 12) {
+    return '+' + cleaned;
+  }
+
+  // Starts with 0
+  if (cleaned.startsWith('0') && cleaned.length === 10) {
+    return '+966' + cleaned.substring(1);
+  }
+
+  // Just the 9-digit number starting with 5
+  if (cleaned.startsWith('5') && cleaned.length === 9) {
+    return '+966' + cleaned;
+  }
+
+  // Already correct
+  if (value.startsWith('+966') && cleaned.length === 12) {
+    return value;
+  }
+
+  return value;
+};
+
+// ============================================================================
+// Export All
+// ============================================================================
+
 export default {
   patterns: validationPatterns,
   validators,
@@ -417,10 +608,20 @@ export default {
   isValidIban,
   isValidIbanWithChecksum,
   isValidPhone,
+  isValidPhoneLenient,
   isValidCrNumber,
   isValidPassword,
   isValidOtp,
   isValidEmail,
   isValidVatNumber,
   isValidObjectId,
+  // Data masking (PDPL)
+  maskEmail,
+  maskPhone,
+  maskNationalId,
+  maskIban,
+  // Transformers
+  toE164Phone,
+  // Constants
+  INPUT_MAX_LENGTHS,
 };
