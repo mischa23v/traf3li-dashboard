@@ -1452,6 +1452,8 @@ function BookAppointmentDialog({
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [targetLawyerId, setTargetLawyerId] = useState<string>('')
   const timeSlotRefs = useRef<(HTMLButtonElement | null)[]>([])
+  // Local submission guard - prevents rapid clicks before mutation state updates
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Determine which lawyer to book for (self or selected team member)
   const effectiveLawyerId = targetLawyerId || user?._id || ''
@@ -1597,8 +1599,13 @@ function BookAppointmentDialog({
 
   const handleSubmit = async () => {
     // Guard against double-submission (race condition prevention)
+    // Using both local state AND mutation state for maximum protection
     if (!selectedDate || !selectedTime) return
-    if (bookMutation.isPending) return // Prevent re-entry while mutation is in progress
+    if (isSubmitting) return // Synchronous local guard - immediate block
+    if (bookMutation.isPending) return // Mutation state guard - may have slight delay
+
+    // Set local guard IMMEDIATELY to block rapid clicks
+    setIsSubmitting(true)
 
     try {
       // Normalize phone to E.164 format before sending (backend requires 10-15 digit format)
@@ -1624,6 +1631,9 @@ function BookAppointmentDialog({
     } catch (error: any) {
       const errorMessage = error?.message || t('appointments.errors.bookFailed', 'فشل في حجز الموعد')
       toast.error(errorMessage)
+    } finally {
+      // Reset local guard after a cooldown to prevent immediate re-clicks
+      setTimeout(() => setIsSubmitting(false), 1500)
     }
   }
 
@@ -1633,6 +1643,7 @@ function BookAppointmentDialog({
     setSelectedTime(null)
     setTargetLawyerId('')
     setFormData({ clientName: '', clientEmail: '', clientPhone: '', duration: 30, type: 'consultation', locationType: 'video', notes: '' })
+    setIsSubmitting(false) // Reset submission guard
   }
 
   return (
@@ -1810,7 +1821,7 @@ function BookAppointmentDialog({
               // Submit form on Enter key (except in textareas)
               if (e.key === 'Enter' && !e.shiftKey) {
                 const target = e.target as HTMLElement
-                if (target.tagName !== 'TEXTAREA' && isFormValid && !bookMutation.isPending) {
+                if (target.tagName !== 'TEXTAREA' && isFormValid && !bookMutation.isPending && !isSubmitting) {
                   e.preventDefault()
                   handleSubmit()
                 }
@@ -1924,8 +1935,8 @@ function BookAppointmentDialog({
           {step === 1 ? (
             <Button onClick={() => setStep(2)} disabled={!selectedDate || !selectedTime} className="bg-emerald-500 hover:bg-emerald-600">{t('common.next', 'التالي')}</Button>
           ) : (
-            <Button onClick={handleSubmit} disabled={bookMutation.isPending || !isFormValid} className="bg-emerald-500 hover:bg-emerald-600">
-              {bookMutation.isPending && <Loader2 className="h-4 w-4 animate-spin ms-2" aria-hidden="true" />}
+            <Button onClick={handleSubmit} disabled={bookMutation.isPending || isSubmitting || !isFormValid} className="bg-emerald-500 hover:bg-emerald-600">
+              {(bookMutation.isPending || isSubmitting) && <Loader2 className="h-4 w-4 animate-spin ms-2" aria-hidden="true" />}
               {t('appointments.actions.bookAppointment', 'حجز الموعد')}
             </Button>
           )}

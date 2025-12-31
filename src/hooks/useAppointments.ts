@@ -324,17 +324,50 @@ export function useAppointment(id: string) {
 /**
  * Book appointment
  * حجز موعد
+ *
+ * IMPORTANT: Uses onSettled instead of just onSuccess to handle edge cases where
+ * the backend creates the appointment but returns 500 due to secondary failures
+ * (e.g., email notification failed, calendar sync failed). This ensures the
+ * appointment list is refreshed even on error, preventing "ghost" appointments
+ * that exist in the database but don't show in the UI.
  */
 export function useBookAppointment() {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (data: BookAppointmentRequest) => appointmentsService.bookAppointment(data),
-    ...mutationRetryConfig,
+    // Don't retry POST mutations - they may have succeeded on server
+    retry: false,
+
     onSuccess: () => {
+      // On success, invalidate immediately
       queryClient.invalidateQueries({ queryKey: appointmentKeys.lists() })
       queryClient.invalidateQueries({ queryKey: appointmentKeys.availableSlots })
       queryClient.invalidateQueries({ queryKey: appointmentKeys.stats })
+    },
+
+    onError: (error: any) => {
+      // On 500 error, the appointment might have been created but secondary
+      // operations failed (email, calendar sync, etc.). Invalidate cache to
+      // ensure any created appointment shows up.
+      const status = error?.status || error?.response?.status
+      if (status === 500) {
+        // Delay invalidation slightly to allow backend to commit
+        setTimeout(() => {
+          queryClient.invalidateQueries({ queryKey: appointmentKeys.lists() })
+          queryClient.invalidateQueries({ queryKey: appointmentKeys.availableSlots })
+          queryClient.invalidateQueries({ queryKey: appointmentKeys.stats })
+        }, 1000)
+      }
+    },
+
+    // onSettled runs regardless of success/error - acts as safety net
+    onSettled: () => {
+      // Additional invalidation after a delay to catch any edge cases
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: appointmentKeys.lists() })
+        queryClient.invalidateQueries({ queryKey: appointmentKeys.stats })
+      }, 2000)
     },
   })
 }
