@@ -37,87 +37,121 @@ import { queryRetryConfig, mutationRetryConfig } from '@/lib/query-retry-config'
 // ==================== Data Normalization ====================
 
 /**
+ * Helper to extract HH:MM from ISO datetime or return as-is if already HH:MM format
+ */
+function extractTime(isoOrTime: string | undefined): string {
+  if (!isoOrTime) return ''
+  // If it's already in HH:MM format, return as-is
+  if (/^\d{2}:\d{2}$/.test(isoOrTime)) return isoOrTime
+  // Try parsing as ISO datetime
+  try {
+    const date = new Date(isoOrTime)
+    if (!isNaN(date.getTime())) {
+      const hours = date.getUTCHours().toString().padStart(2, '0')
+      const minutes = date.getUTCMinutes().toString().padStart(2, '0')
+      return `${hours}:${minutes}`
+    }
+  } catch {
+    // Fall through
+  }
+  return ''
+}
+
+/**
+ * Helper to extract YYYY-MM-DD from ISO datetime
+ */
+function extractDate(isoDatetime: string | undefined): string {
+  if (!isoDatetime) return ''
+  // If it's already in YYYY-MM-DD format, return as-is
+  if (/^\d{4}-\d{2}-\d{2}$/.test(isoDatetime)) return isoDatetime
+  // Try parsing as ISO datetime
+  try {
+    const date = new Date(isoDatetime)
+    if (!isNaN(date.getTime())) {
+      return date.toISOString().split('T')[0]
+    }
+  } catch {
+    // Fall through
+  }
+  // Try extracting date portion directly
+  if (isoDatetime.includes('T')) {
+    return isoDatetime.split('T')[0]
+  }
+  return ''
+}
+
+/**
  * Normalize appointment data from backend
- * Backend may return scheduledTime as ISO datetime, but frontend expects date/startTime/endTime
+ * Backend returns: scheduledTime (ISO), endTime (ISO), timeRange ("HH:MM - HH:MM")
+ * Frontend expects: date (YYYY-MM-DD), startTime (HH:MM), endTime (HH:MM)
  * تطبيع بيانات الموعد من الخادم
  */
 function normalizeAppointment(apt: any): Appointment {
-  // Debug: Log ALL fields the backend returns
-  console.log('[NORMALIZE] Raw appointment fields:', {
+  // Debug: Log raw fields
+  console.log('[NORMALIZE] Raw appointment:', {
     id: apt.id,
+    scheduledTime: apt.scheduledTime,
+    endTime: apt.endTime,
+    timeRange: apt.timeRange,
     date: apt.date,
     startTime: apt.startTime,
-    endTime: apt.endTime,
-    scheduledTime: apt.scheduledTime,
-    timeRange: apt.timeRange,
-    // Check for any time-related fields
-    time: apt.time,
-    start: apt.start,
-    end: apt.end,
-    appointmentTime: apt.appointmentTime,
-    allFields: Object.keys(apt),
   })
 
-  // If date and startTime already exist and are valid, return as-is
-  if (apt.date && apt.startTime && apt.startTime !== '00:00') {
-    console.log(`[NORMALIZE] Using existing date/startTime: ${apt.date} ${apt.startTime}`)
-    return apt
+  // Extract date from scheduledTime or use existing date
+  let date = apt.date
+  if (!date || date === '') {
+    date = extractDate(apt.scheduledTime)
   }
 
-  // If scheduledTime exists, extract date and time from it (use UTC to avoid timezone issues)
-  if (apt.scheduledTime) {
-    const scheduledDate = new Date(apt.scheduledTime)
-
-    // Check if date is valid
-    if (!isNaN(scheduledDate.getTime())) {
-      const date = scheduledDate.toISOString().split('T')[0] // YYYY-MM-DD in UTC
-      // Use UTC hours/minutes to match the stored time
-      const hours = scheduledDate.getUTCHours().toString().padStart(2, '0')
-      const minutes = scheduledDate.getUTCMinutes().toString().padStart(2, '0')
-      const startTime = `${hours}:${minutes}` // HH:MM
-
-      // Calculate endTime based on duration (default 30 min if not provided)
-      const duration = apt.duration || 30
-      const endDate = new Date(scheduledDate.getTime() + duration * 60000)
-      const endHours = endDate.getUTCHours().toString().padStart(2, '0')
-      const endMinutes = endDate.getUTCMinutes().toString().padStart(2, '0')
-      const endTime = `${endHours}:${endMinutes}`
-
-      console.log(`[NORMALIZE] Converted scheduledTime "${apt.scheduledTime}" → date: "${date}", startTime: "${startTime}", endTime: "${endTime}"`)
-
-      return {
-        ...apt,
-        date,
-        startTime,
-        endTime: apt.endTime || endTime,
-      }
+  // Extract startTime from scheduledTime or use existing
+  let startTime = apt.startTime
+  if (!startTime || startTime === '' || startTime === '00:00') {
+    // First try scheduledTime
+    startTime = extractTime(apt.scheduledTime)
+    // Fallback to timeRange if available
+    if (!startTime && apt.timeRange) {
+      const [start] = apt.timeRange.split(' - ')
+      startTime = start || ''
     }
   }
 
-  // If timeRange exists (alternative format from backend), extract times
-  if (apt.timeRange) {
-    const [startTime, endTime] = apt.timeRange.split(' - ')
-    console.log(`[NORMALIZE] Extracted from timeRange "${apt.timeRange}" → startTime: "${startTime}", endTime: "${endTime}"`)
-    return {
-      ...apt,
-      startTime: startTime || apt.startTime || '00:00',
-      endTime: endTime || apt.endTime || '--:--',
+  // Extract endTime - backend sends ISO datetime, we need HH:MM
+  let endTime = apt.endTime
+  // Check if endTime is ISO datetime (contains 'T') and convert to HH:MM
+  if (endTime && endTime.includes('T')) {
+    endTime = extractTime(endTime)
+  }
+  // Fallback to timeRange if endTime is still not valid
+  if (!endTime || endTime === '' || endTime === '--:--') {
+    if (apt.timeRange) {
+      const parts = apt.timeRange.split(' - ')
+      endTime = parts[1] || ''
     }
   }
+  // Calculate from duration if still no endTime
+  if (!endTime && startTime && apt.duration) {
+    const [h, m] = startTime.split(':').map(Number)
+    const totalMinutes = h * 60 + m + (apt.duration || 30)
+    const endH = Math.floor(totalMinutes / 60) % 24
+    const endM = totalMinutes % 60
+    endTime = `${endH.toString().padStart(2, '0')}:${endM.toString().padStart(2, '0')}`
+  }
 
-  console.warn('[NORMALIZE] ⚠️ Appointment missing ALL time fields:', {
-    id: apt.id,
-    clientName: apt.clientName,
-    availableFields: Object.keys(apt),
-  })
-
-  // Return with fallback values to prevent crashes
-  return {
+  const normalized = {
     ...apt,
-    date: apt.date || new Date().toISOString().split('T')[0],
-    startTime: apt.startTime || '00:00',
-    endTime: apt.endTime || '--:--',
+    date: date || new Date().toISOString().split('T')[0],
+    startTime: startTime || '00:00',
+    endTime: endTime || '--:--',
   }
+
+  console.log('[NORMALIZE] Result:', {
+    id: normalized.id,
+    date: normalized.date,
+    startTime: normalized.startTime,
+    endTime: normalized.endTime,
+  })
+
+  return normalized
 }
 
 /**
