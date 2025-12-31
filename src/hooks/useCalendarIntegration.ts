@@ -217,8 +217,8 @@ export function useGoogleCalendarImport() {
     mutationFn: () => googleCalendarService.syncImport(),
     onSuccess: (data) => {
       toast.success(t('calendar.google.importSuccess', `تم استيراد ${data.imported} حدث`))
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
-      queryClient.invalidateQueries({ queryKey: ['appointments'] })
+      queryClient.invalidateQueries({ queryKey: QueryKeys.calendar.all() })
+      queryClient.invalidateQueries({ queryKey: QueryKeys.appointments.all() })
     },
     onError: (error: Error) => {
       toast.error(error.message || t('calendar.google.importError', 'فشل في الاستيراد من جوجل'))
@@ -395,8 +395,8 @@ export function useMicrosoftCalendarImport() {
     mutationFn: () => microsoftCalendarService.syncFromMicrosoft(),
     onSuccess: (data) => {
       toast.success(t('calendar.microsoft.importSuccess', `تم استيراد ${data.imported} حدث`))
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
-      queryClient.invalidateQueries({ queryKey: ['appointments'] })
+      queryClient.invalidateQueries({ queryKey: QueryKeys.calendar.all() })
+      queryClient.invalidateQueries({ queryKey: QueryKeys.appointments.all() })
     },
     onError: (error: Error) => {
       toast.error(error.message || t('calendar.microsoft.importError', 'فشل في الاستيراد من مايكروسوفت'))
