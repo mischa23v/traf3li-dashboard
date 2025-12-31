@@ -664,8 +664,9 @@ export function useUpdateAppointment() {
 }
 
 /**
- * Cancel appointment with optimistic update
- * إلغاء الموعد مع تحديث متفائل
+ * Delete appointment with optimistic update (hard delete)
+ * حذف الموعد نهائياً مع تحديث متفائل
+ * Note: This is now a hard delete - appointments are permanently removed from database
  */
 export function useCancelAppointment() {
   const queryClient = useQueryClient()
@@ -675,36 +676,26 @@ export function useCancelAppointment() {
       appointmentsService.cancelAppointment(id, reason),
     ...mutationRetryConfig,
 
-    // Optimistic update for instant feedback
-    onMutate: async ({ id, reason }) => {
+    // Optimistic update for instant feedback - REMOVE from cache (hard delete)
+    onMutate: async ({ id }) => {
       await queryClient.cancelQueries({ queryKey: appointmentKeys.detail(id) })
 
       const previousDetail = queryClient.getQueryData<AppointmentResponse>(appointmentKeys.detail(id))
       const previousLists = queryClient.getQueriesData<AppointmentsResponse>({ queryKey: appointmentKeys.lists() })
 
-      // Optimistically update detail
-      if (previousDetail?.data) {
-        queryClient.setQueryData<AppointmentResponse>(appointmentKeys.detail(id), {
-          ...previousDetail,
-          data: {
-            ...previousDetail.data,
-            status: 'cancelled' as AppointmentStatus,
-            cancelledAt: new Date().toISOString(),
-            cancellationReason: reason,
-          },
-        })
-      }
+      // Optimistically REMOVE detail from cache (hard delete)
+      queryClient.removeQueries({ queryKey: appointmentKeys.detail(id) })
 
-      // Optimistically update lists
+      // Optimistically REMOVE from lists (hard delete - filter out)
       previousLists.forEach(([key, data]) => {
         if (data?.data?.appointments) {
           queryClient.setQueryData<AppointmentsResponse>(key, {
             ...data,
             data: {
               ...data.data,
-              appointments: data.data.appointments.map((apt) =>
-                apt.id === id ? { ...apt, status: 'cancelled' as AppointmentStatus } : apt
-              ),
+              // Filter out the deleted appointment instead of updating status
+              appointments: data.data.appointments.filter((apt) => apt.id !== id),
+              total: Math.max(0, (data.data.total || 0) - 1),
             },
           })
         }
@@ -714,16 +705,18 @@ export function useCancelAppointment() {
     },
 
     onError: (error, { id }, context) => {
+      // Rollback: restore previous data on error
       if (context?.previousDetail) {
         queryClient.setQueryData(appointmentKeys.detail(id), context.previousDetail)
       }
       context?.previousLists?.forEach(([key, data]) => {
         if (data) queryClient.setQueryData(key, data)
       })
-      toast.error('فشل في إلغاء الموعد | Failed to cancel appointment')
+      toast.error('فشل في حذف الموعد | Failed to delete appointment')
     },
 
     onSettled: (_, __, { id }) => {
+      // Invalidate all relevant queries to ensure consistency
       queryClient.invalidateQueries({ queryKey: appointmentKeys.detail(id) })
       queryClient.invalidateQueries({ queryKey: appointmentKeys.lists() })
       queryClient.invalidateQueries({ queryKey: appointmentKeys.availableSlots })

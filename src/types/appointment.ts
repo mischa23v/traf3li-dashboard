@@ -12,8 +12,8 @@ export type AppointmentStatus =
   | 'scheduled'
   | 'confirmed'
   | 'completed'
-  | 'cancelled'
   | 'no_show'
+  // Note: 'cancelled' status removed - appointments are now hard-deleted instead
 
 export type AppointmentWith = 'lead' | 'client' | 'contact'
 
@@ -174,7 +174,7 @@ export interface AppointmentStats {
   scheduled: number
   confirmed: number
   completed: number
-  cancelled: number
+  // cancelled removed - appointments are now hard-deleted
   noShow: number
   upcomingToday: number
   upcomingThisWeek: number

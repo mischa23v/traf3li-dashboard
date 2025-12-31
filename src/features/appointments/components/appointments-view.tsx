@@ -147,13 +147,14 @@ const APPOINTMENT_TYPES: { value: AppointmentType; labelAr: string; labelEn: str
   { value: 'other', labelAr: 'أخرى', labelEn: 'Other', color: 'bg-gray-500' },
 ]
 
-const STATUS_CONFIG: Record<AppointmentStatus, { labelAr: string; labelEn: string; color: string; bgColor: string }> = {
+// Using string keys for backwards compatibility with any legacy 'cancelled' or 'pending' data
+const STATUS_CONFIG: Record<string, { labelAr: string; labelEn: string; color: string; bgColor: string }> = {
   pending: { labelAr: 'معلق', labelEn: 'Pending', color: 'text-yellow-700', bgColor: 'bg-yellow-100 border-yellow-300' },
   scheduled: { labelAr: 'مجدول', labelEn: 'Scheduled', color: 'text-yellow-700', bgColor: 'bg-yellow-100 border-yellow-300' },
   confirmed: { labelAr: 'مؤكد', labelEn: 'Confirmed', color: 'text-blue-700', bgColor: 'bg-blue-100 border-blue-300' },
   completed: { labelAr: 'مكتمل', labelEn: 'Completed', color: 'text-green-700', bgColor: 'bg-green-100 border-green-300' },
-  cancelled: { labelAr: 'ملغي', labelEn: 'Cancelled', color: 'text-red-700', bgColor: 'bg-red-100 border-red-300' },
   no_show: { labelAr: 'لم يحضر', labelEn: 'No Show', color: 'text-gray-700', bgColor: 'bg-gray-100 border-gray-300' },
+  // Note: 'cancelled' removed - appointments are now hard-deleted instead
 }
 
 // Fallback for unknown statuses to prevent crashes
@@ -446,6 +447,7 @@ export function AppointmentsView() {
   const confirmDelete = async () => {
     const startTime = performance.now()
     const idsToDelete = appointmentToDelete ? [appointmentToDelete] : Array.from(selectedAppointments)
+    const deletedInfo: { appointmentNumber?: string; customerName?: string }[] = []
 
     console.log('[DELETE-DEBUG] ========== DELETE APPOINTMENT START ==========')
     console.log('[DELETE-DEBUG] Request started at:', new Date().toISOString())
@@ -458,22 +460,41 @@ export function AppointmentsView() {
       for (const id of idsToDelete) {
         console.log('[DELETE-DEBUG] Deleting appointment ID:', id)
         console.log('[DELETE-DEBUG] Endpoint: DELETE /appointments/' + id)
-        console.log('[DELETE-DEBUG] Payload: { reason: "Deleted by user" }')
+        console.log('[DELETE-DEBUG] Note: Hard delete - appointment will be permanently removed')
 
         const deleteStartTime = performance.now()
-        await cancelMutation.mutateAsync({ id, reason: 'Deleted by user' })
+        const result = await cancelMutation.mutateAsync({ id, reason: 'Deleted by user' })
         const deleteEndTime = performance.now()
 
+        // New API returns: { success, message, data: { deletedAppointment, customerName } }
         console.log('[DELETE-DEBUG] ✅ Successfully deleted ID:', id)
         console.log('[DELETE-DEBUG] Delete duration:', ((deleteEndTime - deleteStartTime) / 1000).toFixed(2), 'seconds')
+        console.log('[DELETE-DEBUG] Response:', JSON.stringify(result, null, 2))
+
+        // Store deleted appointment info for success message
+        if (result?.data?.deletedAppointment || result?.data?.customerName) {
+          deletedInfo.push({
+            appointmentNumber: result.data.deletedAppointment,
+            customerName: result.data.customerName,
+          })
+        }
       }
 
       const endTime = performance.now()
       console.log('[DELETE-DEBUG] ✅ All deletions complete')
       console.log('[DELETE-DEBUG] Total duration:', ((endTime - startTime) / 1000).toFixed(2), 'seconds')
+      console.log('[DELETE-DEBUG] Deleted appointments:', deletedInfo)
       console.log('[DELETE-DEBUG] ========== DELETE APPOINTMENT END ==========')
 
-      toast.success(t('appointments.success.deleted', { count: idsToDelete.length }, `تم حذف ${idsToDelete.length} موعد بنجاح`))
+      // Show success with appointment details if available
+      if (deletedInfo.length === 1 && deletedInfo[0].appointmentNumber) {
+        toast.success(
+          t('appointments.success.deletedPermanently', 'تم حذف الموعد نهائياً'),
+          { description: `${deletedInfo[0].appointmentNumber} - ${deletedInfo[0].customerName}` }
+        )
+      } else {
+        toast.success(t('appointments.success.deleted', { count: idsToDelete.length }, `تم حذف ${idsToDelete.length} موعد نهائياً`))
+      }
 
       setSelectedAppointments(new Set())
       setAppointmentToDelete(null)
@@ -735,7 +756,7 @@ export function AppointmentsView() {
                       <GosiSelectItem value="pending">{t('appointments.status.pending', 'معلق')}</GosiSelectItem>
                       <GosiSelectItem value="confirmed">{t('appointments.status.confirmed', 'مؤكد')}</GosiSelectItem>
                       <GosiSelectItem value="completed">{t('appointments.status.completed', 'مكتمل')}</GosiSelectItem>
-                      <GosiSelectItem value="cancelled">{t('appointments.status.cancelled', 'ملغي')}</GosiSelectItem>
+                      <GosiSelectItem value="no_show">{t('appointments.status.noShow', 'لم يحضر')}</GosiSelectItem>
                     </GosiSelectContent>
                   </GosiSelect>
                 </div>
@@ -1257,17 +1278,22 @@ export function AppointmentsView() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>{t('appointments.dialogs.delete.title', 'تأكيد الحذف')}</DialogTitle>
-            <DialogDescription>
-              {appointmentToDelete
-                ? t('appointments.dialogs.delete.messageSingle', 'هل أنت متأكد من حذف هذا الموعد؟')
-                : t('appointments.dialogs.delete.messageMultiple', { count: selectedAppointments.size }, `هل أنت متأكد من حذف ${selectedAppointments.size} موعد؟`)}
+            <DialogDescription className="space-y-2">
+              <span className="block">
+                {appointmentToDelete
+                  ? t('appointments.dialogs.delete.messageSingle', 'هل أنت متأكد من حذف هذا الموعد؟')
+                  : t('appointments.dialogs.delete.messageMultiple', { count: selectedAppointments.size }, `هل أنت متأكد من حذف ${selectedAppointments.size} موعد؟`)}
+              </span>
+              <span className="block text-red-600 font-medium">
+                {t('appointments.dialogs.delete.permanentWarning', 'سيتم حذف الموعد نهائياً ولا يمكن التراجع عن هذا الإجراء. استخدم "إعادة جدولة" إذا كنت تريد تغيير التاريخ بدلاً من الحذف.')}
+              </span>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>{t('common.cancel', 'إلغاء')}</Button>
             <Button variant="destructive" onClick={confirmDelete} disabled={cancelMutation.isPending}>
               {cancelMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin ms-2" aria-hidden="true" /> : <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />}
-              {t('common.delete', 'حذف')}
+              {t('appointments.actions.deletePermanently', 'حذف نهائياً')}
             </Button>
           </DialogFooter>
         </DialogContent>
