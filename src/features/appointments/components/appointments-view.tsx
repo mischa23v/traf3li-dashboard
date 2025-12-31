@@ -166,6 +166,47 @@ const normalizeLocationType = (locationType: LocationType | undefined): Location
   return locationType
 }
 
+/**
+ * Extract subject and remaining notes from notes field
+ * Frontend stores subject as: "الموضوع: [subject]\n\n[notes]"
+ * Backend might have separate 'subject' field in the future
+ */
+function extractSubjectFromNotes(appointment: { subject?: string; notes?: string }): { subject: string; notes: string } {
+  // If backend has separate subject field, use it
+  if (appointment.subject) {
+    return {
+      subject: appointment.subject,
+      notes: appointment.notes || ''
+    }
+  }
+
+  // Otherwise, try to extract from notes
+  if (!appointment.notes) {
+    return { subject: '', notes: '' }
+  }
+
+  // Check for Arabic format: "الموضوع: [subject]\n\n[notes]"
+  const arabicMatch = appointment.notes.match(/^الموضوع:\s*(.+?)(?:\n\n([\s\S]*))?$/)
+  if (arabicMatch) {
+    return {
+      subject: arabicMatch[1].trim(),
+      notes: (arabicMatch[2] || '').trim()
+    }
+  }
+
+  // Check for English format: "Subject: [subject]\n\n[notes]"
+  const englishMatch = appointment.notes.match(/^Subject:\s*(.+?)(?:\n\n([\s\S]*))?$/)
+  if (englishMatch) {
+    return {
+      subject: englishMatch[1].trim(),
+      notes: (englishMatch[2] || '').trim()
+    }
+  }
+
+  // No subject found, return notes as-is
+  return { subject: '', notes: appointment.notes }
+}
+
 // ==================== Main Component ====================
 
 export function AppointmentsView() {
@@ -938,11 +979,21 @@ export function AppointmentsView() {
                                   <Checkbox checked={isSelected} aria-label="Select appointment" />
                                 </div>
 
-                                <div className="text-sm font-bold text-slate-900 mb-1">{apt.startTime || '00:00'} - {apt.endTime || '--:--'}</div>
-                                <div className="text-xs font-medium text-slate-700 truncate">{apt.clientName || t('appointments.labels.noName', 'بدون اسم')}</div>
-                                {apt.notes && (
-                                  <div className="text-[10px] text-slate-500 truncate mt-0.5">{apt.notes}</div>
-                                )}
+                                {(() => {
+                                  const { subject, notes } = extractSubjectFromNotes(apt)
+                                  return (
+                                    <>
+                                      <div className="text-sm font-bold text-slate-900 mb-1">{apt.startTime || '00:00'} - {apt.endTime || '--:--'}</div>
+                                      {subject && (
+                                        <div className="text-xs font-semibold text-emerald-700 truncate">{subject}</div>
+                                      )}
+                                      <div className="text-xs font-medium text-slate-700 truncate">{apt.clientName || t('appointments.labels.noName', 'بدون اسم')}</div>
+                                      {notes && (
+                                        <div className="text-[10px] text-slate-500 truncate mt-0.5">{notes}</div>
+                                      )}
+                                    </>
+                                  )
+                                })()}
                                 <div className="mt-2">
                                   <span className={cn('inline-block px-2 py-0.5 rounded-full text-[10px] font-medium text-white', typeConfig?.color || 'bg-gray-500')}>
                                     <span className="sr-only">{t('appointments.labels.appointmentType', 'نوع الموعد')}: </span>
@@ -1015,10 +1066,20 @@ export function AppointmentsView() {
                                 {isRtl ? typeConfig?.labelAr : typeConfig?.labelEn}
                               </span>
                             </div>
-                            <h3 className="font-bold text-slate-900 mb-1">{apt.clientName || t('appointments.labels.noName', 'بدون اسم')}</h3>
-                            {apt.notes && (
-                              <p className="text-sm text-slate-600 mb-2 line-clamp-1">{apt.notes}</p>
-                            )}
+                            {(() => {
+                              const { subject, notes } = extractSubjectFromNotes(apt)
+                              return (
+                                <>
+                                  {subject && (
+                                    <p className="text-sm font-semibold text-emerald-700 mb-1">{subject}</p>
+                                  )}
+                                  <h3 className="font-bold text-slate-900 mb-1">{apt.clientName || t('appointments.labels.noName', 'بدون اسم')}</h3>
+                                  {notes && (
+                                    <p className="text-sm text-slate-600 mb-2 line-clamp-1">{notes}</p>
+                                  )}
+                                </>
+                              )
+                            })()}
                             <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
                               <span className="flex items-center gap-1"><CalendarIcon className="h-4 w-4" aria-hidden="true" />{apt.date ? format(new Date(apt.date), 'MMM d, yyyy', { locale }) : '-'}</span>
                               <span className="flex items-center gap-1"><Clock className="h-4 w-4" aria-hidden="true" />{apt.startTime || '00:00'} - {apt.endTime || '--:--'}</span>
