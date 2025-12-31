@@ -836,7 +836,7 @@ export function FullCalendarView() {
   return (
     <>
       <Header className="bg-navy shadow-none relative">
-        <TopNav links={TOP_NAV_LINKS} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+        <TopNav links={topNavLinks} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
