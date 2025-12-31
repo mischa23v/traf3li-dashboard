@@ -104,7 +104,7 @@ export interface GridSummaryResponse {
  */
 export interface GridItem {
   id: string
-  type: 'event' | 'task' | 'reminder' | 'case-document'
+  type: 'event' | 'task' | 'reminder' | 'case-document' | 'appointment'
   title: string
   startDate: string
   endDate?: string

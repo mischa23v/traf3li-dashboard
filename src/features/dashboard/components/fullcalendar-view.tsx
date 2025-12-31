@@ -40,7 +40,7 @@ import {
   useCalendarItemDetails,
   usePrefetchAdjacentMonthsOptimized,
 } from '@/hooks/useCalendar'
-import { useAppointmentSettings, useBlockedTimes } from '@/hooks/useAppointments'
+import { useAppointmentSettings, useBlockedTimes, useAppointments } from '@/hooks/useAppointments'
 import { DEFAULT_WORKING_HOURS, type WorkingHours } from '@/types/crmSettings'
 import type { GridItem } from '@/services/calendarService'
 import { useCreateEvent, useUpdateEvent } from '@/hooks/useRemindersAndEvents'
@@ -105,6 +105,11 @@ const EVENT_COLORS = {
   document_review: { bg: '#6366f1', border: '#4f46e5', text: '#ffffff' },
   training: { bg: '#ec4899', border: '#db2777', text: '#ffffff' },
   other: { bg: '#64748b', border: '#475569', text: '#ffffff' },
+  // Appointment types
+  appointment: { bg: '#f59e0b', border: '#d97706', text: '#ffffff' },
+  follow_up: { bg: '#eab308', border: '#ca8a04', text: '#ffffff' },
+  case_review: { bg: '#84cc16', border: '#65a30d', text: '#ffffff' },
+  initial_meeting: { bg: '#22c55e', border: '#16a34a', text: '#ffffff' },
 }
 
 // Event type labels in Arabic
@@ -120,6 +125,11 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
   document_review: 'مراجعة مستند',
   training: 'تدريب',
   other: 'أخرى',
+  // Appointment types
+  appointment: 'موعد',
+  follow_up: 'متابعة',
+  case_review: 'مراجعة قضية',
+  initial_meeting: 'اجتماع أولي',
 }
 
 // Day name mapping for FullCalendar (0 = Sunday, 1 = Monday, etc.)
@@ -358,6 +368,12 @@ export function FullCalendarView() {
     endDate: dateRange.endDate,
   })
 
+  // Fetch appointments for the current date range
+  const { data: appointmentsData } = useAppointments({
+    startDate: dateRange.startDate,
+    endDate: dateRange.endDate,
+  })
+
   // Lazy load full details when user clicks an event
   const { data: itemDetailsData, isLoading: isLoadingDetails } = useCalendarItemDetails(
     selectedItemForDetails?.type ?? null,
@@ -520,10 +536,49 @@ export function FullCalendarView() {
     })
   }, [blockedTimesData, t])
 
-  // Combine regular events with blocked time background events
+  // ==================== Appointments as Calendar Events ====================
+  // Convert appointments to FullCalendar format
+  const appointmentEvents = useMemo<CalendarEvent[]>(() => {
+    if (!appointmentsData?.data?.appointments) return []
+
+    return appointmentsData.data.appointments.map((apt: any) => {
+      // Get color based on appointment type
+      const appointmentType = apt.type || 'consultation'
+      const colors = EVENT_COLORS[appointmentType as keyof typeof EVENT_COLORS] || EVENT_COLORS.appointment
+
+      // Build datetime from date and startTime/endTime
+      const startDateTime = apt.scheduledTime || (apt.date && apt.startTime ? `${apt.date}T${apt.startTime}:00` : apt.date)
+      const endDateTime = apt.endTime && apt.date
+        ? (apt.endTime.includes('T') ? apt.endTime : `${apt.date}T${apt.endTime}:00`)
+        : startDateTime
+
+      return {
+        id: `appointment-${apt.id}`,
+        title: apt.subject || apt.clientName || t('appointments.labels.appointment', 'موعد'),
+        start: startDateTime,
+        end: endDateTime,
+        allDay: false,
+        backgroundColor: colors.bg,
+        borderColor: colors.border,
+        textColor: colors.text,
+        extendedProps: {
+          type: 'appointment',
+          eventType: appointmentType,
+          status: apt.status,
+          clientName: apt.clientName,
+          clientEmail: apt.clientEmail || apt.customerEmail,
+          clientPhone: apt.clientPhone || apt.customerPhone,
+          notes: apt.notes,
+          subject: apt.subject,
+        },
+      }
+    })
+  }, [appointmentsData, t])
+
+  // Combine regular events with blocked time background events and appointments
   const allCalendarEvents = useMemo(() => {
-    return [...calendarEvents, ...blockedTimeEvents]
-  }, [calendarEvents, blockedTimeEvents])
+    return [...calendarEvents, ...blockedTimeEvents, ...appointmentEvents]
+  }, [calendarEvents, blockedTimeEvents, appointmentEvents])
 
   // ==================== Memoized FullCalendar Props ====================
   // These prevent unnecessary re-initialization of FullCalendar
@@ -950,7 +1005,7 @@ export function FullCalendarView() {
           <CardContent className="p-0">
             {/* Screen reader helper text */}
             <span className="sr-only">
-              {t('calendar.eventCount', `${calendarEvents.length} ${calendarEvents.length === 1 ? 'حدث' : 'أحداث'} في هذا الشهر`)}
+              {t('calendar.eventCount', `${calendarEvents.length + appointmentEvents.length} ${(calendarEvents.length + appointmentEvents.length) === 1 ? 'حدث' : 'أحداث'} في هذا الشهر`)}
             </span>
             <div
               className="fullcalendar-wrapper p-4"

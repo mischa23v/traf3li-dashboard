@@ -80,6 +80,9 @@ import {
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { ROUTES } from '@/constants/routes'
+import { QueryKeys } from '@/lib/query-keys'
+import { CACHE_TIMES } from '@/config/cache'
+import crmSettingsService from '@/services/crmSettingsService'
 import { useAuthStore } from '@/stores/auth-store'
 import { usePermissionsStore } from '@/stores/permissions-store'
 import { useTeamMembers } from '@/hooks/useCasesAndClients'
@@ -2488,14 +2491,13 @@ function ManageAvailabilityDialog({
   const [isSaving, setIsSaving] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
 
-  // Fetch current settings
+  // Fetch current settings - using proper QueryKeys and caching
   const { data: settingsData, isLoading } = useQuery({
-    queryKey: ['crm-settings'],
-    queryFn: async () => {
-      const { crmSettingsService } = await import('@/services/crmSettingsService')
-      return crmSettingsService.getSettings()
-    },
+    queryKey: QueryKeys.appointments.crmSettings(),
+    queryFn: () => crmSettingsService.getSettings(),
     enabled: open,
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes
+    gcTime: CACHE_TIMES.GC_MEDIUM, // 30 minutes
   })
 
   // Update local state when data loads
@@ -2506,40 +2508,47 @@ function ManageAvailabilityDialog({
     }
   }, [settingsData])
 
-  // Handle day toggle
-  const handleDayToggle = (day: DayKey, enabled: boolean) => {
+  // Handle day toggle - memoized to prevent unnecessary re-renders
+  const handleDayToggle = useCallback((day: DayKey, enabled: boolean) => {
     setWorkingHours(prev => ({
       ...prev,
       [day]: { ...prev[day], enabled },
     }))
     setHasChanges(true)
-  }
+  }, [])
 
-  // Handle time change
-  const handleTimeChange = (day: DayKey, field: 'start' | 'end', value: string) => {
+  // Handle time change - memoized to prevent unnecessary re-renders
+  const handleTimeChange = useCallback((day: DayKey, field: 'start' | 'end', value: string) => {
     setWorkingHours(prev => ({
       ...prev,
       [day]: { ...prev[day], [field]: value },
     }))
     setHasChanges(true)
-  }
+  }, [])
 
-  // Save changes
-  const handleSave = async () => {
+  // Save changes - memoized with proper dependencies
+  const handleSave = useCallback(async () => {
     setIsSaving(true)
     try {
-      const { crmSettingsService } = await import('@/services/crmSettingsService')
       await crmSettingsService.updateAllWorkingHours(workingHours)
       toast.success(t('appointments.success.workingHoursSaved', 'تم حفظ أوقات العمل'))
       setHasChanges(false)
-      queryClient.invalidateQueries({ queryKey: ['crm-settings'] })
-      queryClient.invalidateQueries({ queryKey: ['appointments'] })
+      queryClient.invalidateQueries({ queryKey: QueryKeys.appointments.crmSettings() })
+      queryClient.invalidateQueries({ queryKey: QueryKeys.appointments.all() })
     } catch (error: any) {
       toast.error(error?.message || t('appointments.errors.saveSettingsFailed', 'فشل في حفظ الإعدادات'))
     } finally {
       setIsSaving(false)
     }
-  }
+  }, [workingHours, queryClient, t])
+
+  // Keyboard handler - memoized to prevent inline function in JSX
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && hasChanges && !isSaving) {
+      e.preventDefault()
+      handleSave()
+    }
+  }, [hasChanges, isSaving, handleSave])
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -2556,13 +2565,7 @@ function ManageAvailabilityDialog({
 
         <div
           className="space-y-4"
-          onKeyDown={(e) => {
-            // Submit on Ctrl+Enter or Cmd+Enter to save changes
-            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && hasChanges && !isSaving) {
-              e.preventDefault()
-              handleSave()
-            }
-          }}
+          onKeyDown={handleKeyDown}
         >
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
