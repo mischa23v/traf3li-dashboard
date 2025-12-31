@@ -249,7 +249,7 @@ export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden">
                 {/* HERO CARD */}
                 <ProductivityHero
-                    badge=t('sales.leads.management')
+                    badge={t('sales.leads.management')}
                     title={editMode ? t('sales.leads.editLead') : t('sales.leads.addLead')}
                     type="clients"
                     listMode={true}

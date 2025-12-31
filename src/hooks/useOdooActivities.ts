@@ -194,11 +194,9 @@ export function useScheduleActivity() {
       invalidateCache.odooActivities.my()
       if (newActivity.res_model && newActivity.res_id) {
         invalidateCache.odooActivities.record(
-          queryKey: odooActivityKeys.record(
-            newActivity.res_model as OdooActivityResModel,
-            newActivity.res_id
-          ),
-        })
+          newActivity.res_model,
+          String(newActivity.res_id)
+        )
       }
     },
   })
