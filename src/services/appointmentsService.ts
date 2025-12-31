@@ -7,6 +7,7 @@
  */
 
 import { apiClientNoVersion as apiClient, handleApiError } from '@/lib/api'
+import axios from 'axios'
 
 // ==================== Debug Helper ====================
 
@@ -36,21 +37,46 @@ const debugLog = {
     console.group(`${DEBUG_PREFIX} 🔴 ${method} ${endpoint} - ERROR`)
     console.log('⏰ Time:', new Date().toISOString())
     if (requestData) console.log('📦 Request Body:', JSON.stringify(requestData, null, 2))
-    console.log('❌ Error Message:', error?.message || 'Unknown error')
-    console.log('🔢 Status:', error?.response?.status || 'N/A')
-    console.log('📄 Status Text:', error?.response?.statusText || 'N/A')
-    console.log('🔧 Response Data:', JSON.stringify(error?.response?.data, null, 2) || 'N/A')
-    console.log('📋 Error Config:', {
-      url: error?.config?.url,
-      method: error?.config?.method,
-      headers: error?.config?.headers,
-    })
-    if (error?.response?.data?.errors) {
-      console.log('⚠️ Validation Errors:', JSON.stringify(error.response.data.errors, null, 2))
+
+    // Check if it's a formatted error from axios interceptor
+    // The interceptor transforms errors to: { status, message, code, error: true, errors, requestId }
+    if (error?.error === true && typeof error?.status === 'number') {
+      console.log('🔍 Error Type: Formatted API Error (from interceptor)')
+      console.log('🔢 Status:', error.status)
+      console.log('💬 Message:', error.message)
+      if (error.code) console.log('🏷️ Code:', error.code)
+      if (error.requestId) console.log('🆔 Request ID:', error.requestId)
+      if (error.errors) {
+        console.log('⚠️ Validation Errors:')
+        error.errors.forEach((err: any, i: number) => {
+          console.log(`   ${i + 1}. [${err.field || err.path || 'unknown'}]: ${err.message || JSON.stringify(err)}`)
+        })
+      }
+      if (error.retryAfter) console.log('⏳ Retry After:', error.retryAfter, 'seconds')
     }
-    if (error?.response?.data?.stack) {
-      console.log('🔥 Backend Stack:', error.response.data.stack)
+    // Check if it's an Axios error (before interceptor)
+    else if (axios.isAxiosError(error)) {
+      console.log('🔍 Error Type: Raw Axios Error')
+      console.log('🔢 Status:', error.response?.status || 'No response')
+      console.log('📄 Status Text:', error.response?.statusText || 'N/A')
+      console.log('🔧 Response Data:', JSON.stringify(error.response?.data, null, 2))
+      console.log('🌐 Request URL:', error.config?.url)
+
+      if (error.response?.data) {
+        const data = error.response.data
+        if (data.message) console.log('💬 Backend Message:', data.message)
+        if (data.error) console.log('❗ Backend Error:', JSON.stringify(data.error, null, 2))
+        if (data.errors) console.log('⚠️ Validation Errors:', JSON.stringify(data.errors, null, 2))
+        if (data.stack) console.log('🔥 Backend Stack:', data.stack)
+      }
     }
+    // Unknown error type
+    else {
+      console.log('🔍 Error Type:', error?.constructor?.name || typeof error)
+      console.log('❌ Error Message:', error?.message || String(error))
+      console.log('📋 Full Error Object:', JSON.stringify(error, null, 2))
+    }
+
     console.groupEnd()
   },
 }
