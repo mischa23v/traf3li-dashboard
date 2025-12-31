@@ -363,17 +363,8 @@ export function AppointmentsView() {
   // Group appointments by date
   const appointmentsByDate = useMemo(() => {
     const grouped: Record<string, Appointment[]> = {}
-    console.log('[WEEK-VIEW-DEBUG] Grouping', filteredAppointments.length, 'appointments by date')
 
     filteredAppointments.forEach((apt) => {
-      console.log('[WEEK-VIEW-DEBUG] Processing appointment:', {
-        id: apt.id,
-        clientName: apt.clientName,
-        date: apt.date,
-        startTime: apt.startTime,
-        dateType: typeof apt.date,
-      })
-
       if (apt.date) {
         // Handle both "YYYY-MM-DD" and ISO datetime strings
         let dateKey: string
@@ -389,14 +380,10 @@ export function AppointmentsView() {
           dateKey = apt.date.split('T')[0]
         }
 
-        console.log('[WEEK-VIEW-DEBUG] → dateKey:', dateKey)
-
         if (!grouped[dateKey]) {
           grouped[dateKey] = []
         }
         grouped[dateKey].push(apt)
-      } else {
-        console.warn('[WEEK-VIEW-DEBUG] ⚠️ Appointment has no date:', apt.id)
       }
     })
 
@@ -409,11 +396,23 @@ export function AppointmentsView() {
       })
     })
 
-    console.log('[WEEK-VIEW-DEBUG] Grouped dates:', Object.keys(grouped))
-    console.log('[WEEK-VIEW-DEBUG] Week days in view:', weekDays.map(d => format(d, 'yyyy-MM-dd')))
-
     return grouped
   }, [filteredAppointments, weekDays])
+
+  // Memoized week view info - prevents recalculation on every render
+  const weekViewInfo = useMemo(() => {
+    const weekDateKeys = weekDays.map(d => format(d, 'yyyy-MM-dd'))
+    const groupedDateKeys = Object.keys(appointmentsByDate)
+    const appointmentsInWeek = groupedDateKeys.filter(dk => weekDateKeys.includes(dk))
+    const appointmentsOutsideWeek = groupedDateKeys.filter(dk => !weekDateKeys.includes(dk))
+    const firstAppointmentDate = appointmentsOutsideWeek.length > 0 ? new Date(appointmentsOutsideWeek[0]) : null
+
+    return {
+      hasAppointmentsOutsideWeek: filteredAppointments.length > 0 && appointmentsInWeek.length === 0 && appointmentsOutsideWeek.length > 0,
+      appointmentsOutsideWeek,
+      firstAppointmentDate: firstAppointmentDate && !isNaN(firstAppointmentDate.getTime()) ? firstAppointmentDate : null,
+    }
+  }, [weekDays, appointmentsByDate, filteredAppointments.length])
 
   // Navigation handlers
   const goToPreviousWeek = () => setCurrentWeekStart(subWeeks(currentWeekStart, 1))
@@ -898,46 +897,27 @@ export function AppointmentsView() {
             {/* Week View */}
             {!isLoading && !isError && viewMode === 'week' && (
               <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                {/* Debug: Show if appointments exist but not in current week */}
-                {(() => {
-                  const weekDateKeys = weekDays.map(d => format(d, 'yyyy-MM-dd'))
-                  const groupedDateKeys = Object.keys(appointmentsByDate)
-                  const appointmentsInWeek = groupedDateKeys.filter(dk => weekDateKeys.includes(dk))
-                  const appointmentsOutsideWeek = groupedDateKeys.filter(dk => !weekDateKeys.includes(dk))
-
-                  console.log('[WEEK-VIEW-RENDER]', {
-                    totalAppointments: filteredAppointments.length,
-                    weekRange: `${weekDateKeys[0]} to ${weekDateKeys[6]}`,
-                    appointmentDates: groupedDateKeys,
-                    inWeek: appointmentsInWeek,
-                    outsideWeek: appointmentsOutsideWeek,
-                  })
-
-                  if (filteredAppointments.length > 0 && appointmentsInWeek.length === 0 && appointmentsOutsideWeek.length > 0) {
-                    const firstAppointmentDate = appointmentsOutsideWeek.length > 0 ? new Date(appointmentsOutsideWeek[0]) : null
-                    return (
-                      <div className="bg-amber-50 border-b border-amber-200 p-3 text-center">
-                        <p className="text-sm text-amber-700">
-                          {t('appointments.info.appointmentsOutsideWeek', '⚠️ لديك {{count}} موعد في تواريخ أخرى: {{dates}}', {
-                            count: filteredAppointments.length,
-                            dates: appointmentsOutsideWeek.join(', ')
-                          })}
-                        </p>
-                        {firstAppointmentDate && !isNaN(firstAppointmentDate.getTime()) && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="mt-2 text-amber-700 border-amber-300 hover:bg-amber-100"
-                            onClick={() => setCurrentWeekStart(startOfWeek(firstAppointmentDate, { weekStartsOn: 0 }))}
-                          >
-                            {t('appointments.actions.goToAppointments', 'الانتقال إلى المواعيد')}
-                          </Button>
-                        )}
-                      </div>
-                    )
-                  }
-                  return null
-                })()}
+                {/* Show info if appointments exist but not in current week */}
+                {weekViewInfo.hasAppointmentsOutsideWeek && (
+                  <div className="bg-amber-50 border-b border-amber-200 p-3 text-center">
+                    <p className="text-sm text-amber-700">
+                      {t('appointments.info.appointmentsOutsideWeek', '⚠️ لديك {{count}} موعد في تواريخ أخرى: {{dates}}', {
+                        count: filteredAppointments.length,
+                        dates: weekViewInfo.appointmentsOutsideWeek.join(', ')
+                      })}
+                    </p>
+                    {weekViewInfo.firstAppointmentDate && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mt-2 text-amber-700 border-amber-300 hover:bg-amber-100"
+                        onClick={() => setCurrentWeekStart(startOfWeek(weekViewInfo.firstAppointmentDate!, { weekStartsOn: 0 }))}
+                      >
+                        {t('appointments.actions.goToAppointments', 'الانتقال إلى المواعيد')}
+                      </Button>
+                    )}
+                  </div>
+                )}
 
                 {/* Week Header */}
                 <div className="grid grid-cols-7 border-b border-slate-100">
