@@ -42,27 +42,45 @@ import { queryRetryConfig, mutationRetryConfig } from '@/lib/query-retry-config'
  * تطبيع بيانات الموعد من الخادم
  */
 function normalizeAppointment(apt: any): Appointment {
-  // If date and startTime already exist, return as-is
-  if (apt.date && apt.startTime) {
+  // Debug: Log ALL fields the backend returns
+  console.log('[NORMALIZE] Raw appointment fields:', {
+    id: apt.id,
+    date: apt.date,
+    startTime: apt.startTime,
+    endTime: apt.endTime,
+    scheduledTime: apt.scheduledTime,
+    timeRange: apt.timeRange,
+    // Check for any time-related fields
+    time: apt.time,
+    start: apt.start,
+    end: apt.end,
+    appointmentTime: apt.appointmentTime,
+    allFields: Object.keys(apt),
+  })
+
+  // If date and startTime already exist and are valid, return as-is
+  if (apt.date && apt.startTime && apt.startTime !== '00:00') {
+    console.log(`[NORMALIZE] Using existing date/startTime: ${apt.date} ${apt.startTime}`)
     return apt
   }
 
-  // If scheduledTime exists, extract date and time from it
+  // If scheduledTime exists, extract date and time from it (use UTC to avoid timezone issues)
   if (apt.scheduledTime) {
     const scheduledDate = new Date(apt.scheduledTime)
 
     // Check if date is valid
     if (!isNaN(scheduledDate.getTime())) {
-      const date = scheduledDate.toISOString().split('T')[0] // YYYY-MM-DD
-      const hours = scheduledDate.getHours().toString().padStart(2, '0')
-      const minutes = scheduledDate.getMinutes().toString().padStart(2, '0')
+      const date = scheduledDate.toISOString().split('T')[0] // YYYY-MM-DD in UTC
+      // Use UTC hours/minutes to match the stored time
+      const hours = scheduledDate.getUTCHours().toString().padStart(2, '0')
+      const minutes = scheduledDate.getUTCMinutes().toString().padStart(2, '0')
       const startTime = `${hours}:${minutes}` // HH:MM
 
       // Calculate endTime based on duration (default 30 min if not provided)
       const duration = apt.duration || 30
       const endDate = new Date(scheduledDate.getTime() + duration * 60000)
-      const endHours = endDate.getHours().toString().padStart(2, '0')
-      const endMinutes = endDate.getMinutes().toString().padStart(2, '0')
+      const endHours = endDate.getUTCHours().toString().padStart(2, '0')
+      const endMinutes = endDate.getUTCMinutes().toString().padStart(2, '0')
       const endTime = `${endHours}:${endMinutes}`
 
       console.log(`[NORMALIZE] Converted scheduledTime "${apt.scheduledTime}" → date: "${date}", startTime: "${startTime}", endTime: "${endTime}"`)
@@ -87,7 +105,11 @@ function normalizeAppointment(apt: any): Appointment {
     }
   }
 
-  console.warn('[NORMALIZE] Appointment missing date/time fields:', apt.id)
+  console.warn('[NORMALIZE] ⚠️ Appointment missing ALL time fields:', {
+    id: apt.id,
+    clientName: apt.clientName,
+    availableFields: Object.keys(apt),
+  })
 
   // Return with fallback values to prevent crashes
   return {
