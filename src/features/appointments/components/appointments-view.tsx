@@ -529,7 +529,7 @@ export function AppointmentsView() {
             onClick={() => setShowBookingDialog(true)}
             className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm"
           >
-            <Plus className="ms-2 h-4 w-4" aria-hidden="true" aria-hidden="true" />
+            <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
             {t('appointments.actions.newAppointment', 'موعد جديد')}
           </Button>
           <Button
@@ -631,7 +631,7 @@ export function AppointmentsView() {
                     onClick={clearFilters}
                     className="h-14 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-2xl border border-dashed border-red-200 px-6"
                   >
-                    <X className="h-5 w-5 ms-2" aria-hidden="true" aria-hidden="true" />
+                    <X className="h-5 w-5 ms-2" aria-hidden="true" />
                     {t('appointments.actions.clearFilters', 'مسح الفلاتر')}
                   </GosiButton>
                 )}
@@ -852,7 +852,7 @@ export function AppointmentsView() {
 
                           {dayAppointments.length === 0 && (
                             <div className="text-center py-8 text-slate-300">
-                              <CalendarIcon className="h-6 w-6 aria-hidden="true" mx-auto mb-1 opacity-50" />
+                              <CalendarIcon className="h-6 w-6 mx-auto mb-1 opacity-50" aria-hidden="true" />
                               <span className="text-xs">{t('appointments.empty.noAppointments', 'لا مواعيد')}</span>
                             </div>
                           )}
@@ -937,14 +937,14 @@ export function AppointmentsView() {
                   onClick={() => setShowBookingDialog(true)}
                   className="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 border-dashed border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50 transition-all group"
                 >
-                  <Plus className="h-6 w-6 aria-hidden="true" text-emerald-500 group-hover:scale-110 transition-transform" />
+                  <Plus className="h-6 w-6 text-emerald-500 group-hover:scale-110 transition-transform" aria-hidden="true" />
                   <span className="text-sm font-medium text-slate-700">{t('appointments.actions.newAppointment', 'موعد جديد')}</span>
                 </button>
                 <button
                   onClick={() => setShowBlockDialog(true)}
                   className="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 border-dashed border-red-200 hover:border-red-400 hover:bg-red-50 transition-all group"
                 >
-                  <Ban className="h-6 w-6 aria-hidden="true" text-red-500 group-hover:scale-110 transition-transform" />
+                  <Ban className="h-6 w-6 text-red-500 group-hover:scale-110 transition-transform" aria-hidden="true" />
                   <span className="text-sm font-medium text-slate-700">{t('appointments.actions.blockTime', 'حظر وقت')}</span>
                 </button>
               </div>
@@ -952,7 +952,7 @@ export function AppointmentsView() {
                 onClick={() => setShowAvailabilityDialog(true)}
                 className="w-full mt-3 flex items-center justify-center gap-2 p-4 rounded-2xl border-2 border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-50 transition-all group"
               >
-                <Settings className="h-5 w-5 aria-hidden="true" text-slate-500 group-hover:scale-110 transition-transform" />
+                <Settings className="h-5 w-5 text-slate-500 group-hover:scale-110 transition-transform" aria-hidden="true" />
                 <span className="text-sm font-medium text-slate-700">{t('appointments.actions.manageAvailability', 'إدارة أوقات العمل')}</span>
               </button>
             </div>
@@ -1691,14 +1691,14 @@ function BookAppointmentDialog({
               )}
               {!selectedDate ? (
                 <div className="text-center py-12 text-slate-400">
-                  <CalendarIcon className="h-12 w-12 aria-hidden="true" mx-auto mb-4 opacity-50" />
+                  <CalendarIcon className="h-12 w-12 mx-auto mb-4 opacity-50" aria-hidden="true" />
                   <p>{t('appointments.messages.selectDateFirst', 'اختر تاريخاً أولاً')}</p>
                 </div>
               ) : isSlotsLoading ? (
-                <div className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 aria-hidden="true" animate-spin text-slate-400" /></div>
+                <div className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-slate-400" aria-hidden="true" /></div>
               ) : isSlotsError ? (
                 <div className="text-center py-8 text-slate-400">
-                  <Clock className="h-10 w-10 aria-hidden="true" mx-auto mb-3 opacity-50" />
+                  <Clock className="h-10 w-10 mx-auto mb-3 opacity-50" aria-hidden="true" />
                   <p className="font-medium text-sm">{t('appointments.errors.loadingTimes', 'حدث خطأ في جلب الأوقات')}</p>
                   <p className="text-xs mt-1 text-slate-400">
                     {t('appointments.messages.pleaseTryAgain', 'يرجى المحاولة مرة أخرى')}
@@ -1706,7 +1706,7 @@ function BookAppointmentDialog({
                 </div>
               ) : !isWorkingDay ? (
                 <div className="text-center py-8 text-slate-400">
-                  <CalendarIcon className="h-10 w-10 aria-hidden="true" mx-auto mb-3 opacity-50" />
+                  <CalendarIcon className="h-10 w-10 mx-auto mb-3 opacity-50" aria-hidden="true" />
                   <p className="font-medium text-sm">{t('appointments.messages.notWorkingDay', 'هذا اليوم ليس يوم عمل')}</p>
                   <p className="text-xs mt-1 text-slate-400">
                     {t('appointments.messages.selectAnotherDay', 'يرجى اختيار يوم آخر')}
@@ -1714,7 +1714,7 @@ function BookAppointmentDialog({
                 </div>
               ) : availableSlots.length === 0 ? (
                 <div className="text-center py-8 text-slate-400">
-                  <Clock className="h-10 w-10 aria-hidden="true" mx-auto mb-3 opacity-50" />
+                  <Clock className="h-10 w-10 mx-auto mb-3 opacity-50" aria-hidden="true" />
                   <p className="font-medium text-sm">{t('appointments.empty.noAvailableTimes', 'لا توجد أوقات متاحة')}</p>
                   <p className="text-xs mt-1 text-slate-400">
                     {t('appointments.messages.allTimesBooked', 'جميع الأوقات محجوزة أو محظورة')}
@@ -1768,7 +1768,7 @@ function BookAppointmentDialog({
             }}
           >
             <div className="bg-emerald-50 p-4 rounded-xl flex items-center gap-4">
-              <CalendarIcon className="h-6 w-6 aria-hidden="true" text-emerald-600" />
+              <CalendarIcon className="h-6 w-6 text-emerald-600" aria-hidden="true" />
               <div>
                 <p className="font-semibold text-emerald-900">{selectedDate && format(selectedDate, 'EEEE، d MMMM yyyy', { locale })}</p>
                 <p className="text-sm text-emerald-700">{selectedTime}</p>
@@ -2198,7 +2198,7 @@ function ManageAvailabilityDialog({
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl flex items-center gap-2">
-            <Settings className="h-5 w-5 aria-hidden="true" text-emerald-500" />
+            <Settings className="h-5 w-5 text-emerald-500" aria-hidden="true" />
             {t('appointments.dialogs.availability.title', 'إدارة أوقات العمل')}
           </DialogTitle>
           <DialogDescription>
@@ -2218,7 +2218,7 @@ function ManageAvailabilityDialog({
         >
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 aria-hidden="true" animate-spin text-slate-400" />
+              <Loader2 className="h-8 w-8 animate-spin text-slate-400" aria-hidden="true" />
             </div>
           ) : (
             <div className="space-y-3">
