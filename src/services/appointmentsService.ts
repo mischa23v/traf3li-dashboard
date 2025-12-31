@@ -273,6 +273,19 @@ export interface UpdateSettingsRequest {
   enabledTypes?: AppointmentType[]
 }
 
+/**
+ * Public booking request (no authentication required)
+ * طلب الحجز العام (لا يتطلب مصادقة)
+ */
+export interface PublicBookingRequest {
+  customerName: string
+  customerEmail: string
+  customerPhone?: string
+  scheduledTime: string
+  duration: number
+  notes?: string
+}
+
 // ==================== Response Types ====================
 
 export interface AvailabilityResponse {
@@ -353,6 +366,68 @@ export interface AppointmentStatsResponse {
     monthCount: number
     revenueTotal?: number
     revenuePending?: number
+  }
+}
+
+/**
+ * Calendar status response
+ * استجابة حالة التقويم
+ */
+export interface CalendarStatusResponse {
+  success: boolean
+  data: {
+    connections: {
+      google: {
+        connected: boolean
+        email?: string
+        expiresAt?: string
+      }
+      microsoft: {
+        connected: boolean
+        email?: string
+        expiresAt?: string
+      }
+    }
+    message: {
+      en: string
+      ar: string
+    }
+  }
+}
+
+/**
+ * Calendar links response
+ * استجابة روابط التقويم
+ */
+export interface CalendarLinksResponse {
+  success: boolean
+  data: {
+    appointmentId: string
+    appointmentNumber: string
+    scheduledTime: string
+    links: {
+      google: { url: string; label: string }
+      outlook: { url: string; label: string }
+      yahoo: { url: string; label: string }
+      ics: { url: string; label: string }
+    }
+  }
+}
+
+/**
+ * Calendar sync response
+ * استجابة مزامنة التقويم
+ */
+export interface CalendarSyncResponse {
+  success: boolean
+  message: string
+  data: {
+    appointmentId: string
+    appointmentNumber: string
+    syncResult: {
+      google?: { success: boolean; eventId?: string; error?: string }
+      microsoft?: { success: boolean; eventId?: string; error?: string }
+    }
   }
 }
 
@@ -712,6 +787,97 @@ const appointmentsService = {
       return response.data
     } catch (error: any) {
       const errorMessage = handleApiError(error) || 'Failed to fetch stats | فشل في جلب الإحصائيات'
+      throw new Error(errorMessage)
+    }
+  },
+
+  // ==================== Public Booking ====================
+
+  /**
+   * Public appointment booking (no authentication required)
+   * حجز موعد عام (لا يتطلب مصادقة)
+   *
+   * @param firmId - The firm ID for public booking | معرف المكتب للحجز العام
+   * @param data - Public booking request data | بيانات طلب الحجز العام
+   * @returns Appointment response | استجابة الموعد
+   */
+  publicBookAppointment: async (firmId: string, data: PublicBookingRequest): Promise<AppointmentResponse> => {
+    try {
+      const response = await apiClient.post<AppointmentResponse>(`/appointments/book/${firmId}`, data)
+      return response.data
+    } catch (error: any) {
+      const errorMessage = handleApiError(error) || 'Failed to book appointment | فشل في حجز الموعد'
+      throw new Error(errorMessage)
+    }
+  },
+
+  // ==================== Calendar Integration ====================
+
+  /**
+   * Get appointment as ICS calendar file
+   * الحصول على الموعد كملف تقويم ICS
+   *
+   * @param id - Appointment ID | معرف الموعد
+   * @returns ICS file blob | ملف ICS
+   */
+  getCalendarICS: async (id: string): Promise<Blob> => {
+    try {
+      const response = await apiClient.get(`/appointments/${id}/calendar.ics`, {
+        responseType: 'blob'
+      })
+      return response.data
+    } catch (error: any) {
+      const errorMessage = handleApiError(error) || 'Failed to download calendar file | فشل في تحميل ملف التقويم'
+      throw new Error(errorMessage)
+    }
+  },
+
+  /**
+   * Get calendar connection status
+   * الحصول على حالة اتصال التقويم
+   *
+   * @returns Calendar connection status | حالة اتصال التقويم
+   */
+  getCalendarStatus: async (): Promise<CalendarStatusResponse> => {
+    try {
+      const response = await apiClient.get<CalendarStatusResponse>('/appointments/calendar-status')
+      return response.data
+    } catch (error: any) {
+      const errorMessage = handleApiError(error) || 'Failed to fetch calendar status | فشل في جلب حالة التقويم'
+      throw new Error(errorMessage)
+    }
+  },
+
+  /**
+   * Get calendar links for an appointment
+   * الحصول على روابط التقويم للموعد
+   *
+   * @param id - Appointment ID | معرف الموعد
+   * @returns Calendar links (Google, Outlook, Yahoo, ICS) | روابط التقويم (جوجل، أوتلوك، ياهو، ICS)
+   */
+  getCalendarLinks: async (id: string): Promise<CalendarLinksResponse> => {
+    try {
+      const response = await apiClient.get<CalendarLinksResponse>(`/appointments/${id}/calendar-links`)
+      return response.data
+    } catch (error: any) {
+      const errorMessage = handleApiError(error) || 'Failed to fetch calendar links | فشل في جلب روابط التقويم'
+      throw new Error(errorMessage)
+    }
+  },
+
+  /**
+   * Sync appointment to connected calendars
+   * مزامنة الموعد مع التقاويم المتصلة
+   *
+   * @param id - Appointment ID | معرف الموعد
+   * @returns Sync result for Google and Microsoft calendars | نتيجة المزامنة لتقاويم جوجل ومايكروسوفت
+   */
+  syncToCalendar: async (id: string): Promise<CalendarSyncResponse> => {
+    try {
+      const response = await apiClient.post<CalendarSyncResponse>(`/appointments/${id}/sync-calendar`)
+      return response.data
+    } catch (error: any) {
+      const errorMessage = handleApiError(error) || 'Failed to sync to calendar | فشل في المزامنة مع التقويم'
       throw new Error(errorMessage)
     }
   },
