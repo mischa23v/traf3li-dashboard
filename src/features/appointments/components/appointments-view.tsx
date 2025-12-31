@@ -106,6 +106,7 @@ import type {
   AppointmentDuration,
   DayOfWeek,
   AvailabilitySlot,
+  LocationType,
 } from '@/services/appointmentsService'
 
 // ==================== Constants ====================
@@ -137,6 +138,12 @@ const STATUS_CONFIG: Record<AppointmentStatus, { labelAr: string; labelEn: strin
 
 const WEEKDAYS_AR = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت']
 const WEEKDAYS_EN = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+
+const LOCATION_TYPES: { value: LocationType; labelAr: string; labelEn: string; icon: 'video' | 'map' | 'phone' }[] = [
+  { value: 'video', labelAr: 'اجتماع عن بعد', labelEn: 'Video Call', icon: 'video' },
+  { value: 'in-person', labelAr: 'حضوري', labelEn: 'In Person', icon: 'map' },
+  { value: 'phone', labelAr: 'مكالمة هاتفية', labelEn: 'Phone Call', icon: 'phone' },
+]
 
 // ==================== Main Component ====================
 
@@ -1048,8 +1055,27 @@ function BookAppointmentDialog({
     clientPhone: '',
     duration: 30 as AppointmentDuration,
     type: 'consultation' as AppointmentType,
+    locationType: 'video' as LocationType,
     notes: '',
   })
+
+  // Validation helpers
+  const isValidEmail = (email: string) => {
+    if (!email) return true // Optional field
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
+  const isValidPhone = (phone: string) => {
+    if (!phone) return true // Optional field
+    // Saudi phone: +966, 05, or 5 followed by 8 digits
+    const phoneRegex = /^(\+966|966|05|5)?[0-9]{8,9}$/
+    return phoneRegex.test(phone.replace(/[\s-]/g, ''))
+  }
+
+  const emailError = formData.clientEmail && !isValidEmail(formData.clientEmail)
+  const phoneError = formData.clientPhone && !isValidPhone(formData.clientPhone)
+  const isFormValid = formData.clientName && !emailError && !phoneError
 
   // Use backend API to get available slots (checks appointments, blocked times, events)
   const { data: availableSlotsData, isLoading: isSlotsLoading, isError: isSlotsError } = useAvailableSlots(
@@ -1062,6 +1088,8 @@ function BookAppointmentDialog({
   )
 
   const availableSlots = availableSlotsData?.data?.slots || []
+  const isWorkingDay = availableSlotsData?.data?.working ?? true
+  const workingHours = availableSlotsData?.data?.workingHours
 
   const calendarDays = useMemo(() => {
     const start = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1)
@@ -1079,7 +1107,13 @@ function BookAppointmentDialog({
     if (!selectedDate || !selectedTime) return
     try {
       await bookMutation.mutateAsync({
-        ...formData,
+        clientName: formData.clientName,
+        clientEmail: formData.clientEmail,
+        clientPhone: formData.clientPhone,
+        duration: formData.duration,
+        type: formData.type,
+        locationType: formData.locationType,
+        notes: formData.notes,
         date: format(selectedDate, 'yyyy-MM-dd'),
         startTime: selectedTime,
         source: 'manual',
@@ -1100,7 +1134,7 @@ function BookAppointmentDialog({
     setSelectedDate(null)
     setSelectedTime(null)
     setTargetLawyerId('')
-    setFormData({ clientName: '', clientEmail: '', clientPhone: '', duration: 30, type: 'consultation', notes: '' })
+    setFormData({ clientName: '', clientEmail: '', clientPhone: '', duration: 30, type: 'consultation', locationType: 'video', notes: '' })
   }
 
   return (
@@ -1176,6 +1210,11 @@ function BookAppointmentDialog({
 
             <div className="space-y-4">
               <h4 className="font-semibold">{isRtl ? 'الأوقات المتاحة' : 'Available Times'}</h4>
+              {workingHours && (
+                <p className="text-xs text-slate-500">
+                  {isRtl ? `ساعات العمل: ${workingHours.start} - ${workingHours.end}` : `Working hours: ${workingHours.start} - ${workingHours.end}`}
+                </p>
+              )}
               {!selectedDate ? (
                 <div className="text-center py-12 text-slate-400">
                   <CalendarIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -1183,12 +1222,28 @@ function BookAppointmentDialog({
                 </div>
               ) : isSlotsLoading ? (
                 <div className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-slate-400" /></div>
-              ) : isSlotsError || availableSlots.length === 0 ? (
+              ) : isSlotsError ? (
+                <div className="text-center py-8 text-slate-400">
+                  <Clock className="h-10 w-10 mx-auto mb-3 opacity-50" />
+                  <p className="font-medium text-sm">{isRtl ? 'حدث خطأ في جلب الأوقات' : 'Error loading times'}</p>
+                  <p className="text-xs mt-1 text-slate-400">
+                    {isRtl ? 'يرجى المحاولة مرة أخرى' : 'Please try again'}
+                  </p>
+                </div>
+              ) : !isWorkingDay ? (
+                <div className="text-center py-8 text-slate-400">
+                  <CalendarIcon className="h-10 w-10 mx-auto mb-3 opacity-50" />
+                  <p className="font-medium text-sm">{isRtl ? 'هذا اليوم ليس يوم عمل' : 'This is not a working day'}</p>
+                  <p className="text-xs mt-1 text-slate-400">
+                    {isRtl ? 'يرجى اختيار يوم آخر' : 'Please select another day'}
+                  </p>
+                </div>
+              ) : availableSlots.length === 0 ? (
                 <div className="text-center py-8 text-slate-400">
                   <Clock className="h-10 w-10 mx-auto mb-3 opacity-50" />
                   <p className="font-medium text-sm">{isRtl ? 'لا توجد أوقات متاحة' : 'No available times'}</p>
                   <p className="text-xs mt-1 text-slate-400">
-                    {isRtl ? 'قد يكون هناك مواعيد أو حجوزات أخرى' : 'May have appointments or blocked times'}
+                    {isRtl ? 'جميع الأوقات محجوزة أو محظورة' : 'All times are booked or blocked'}
                   </p>
                 </div>
               ) : (
@@ -1230,11 +1285,32 @@ function BookAppointmentDialog({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>{isRtl ? 'البريد الإلكتروني' : 'Email'}</Label>
-                  <Input type="email" value={formData.clientEmail} onChange={(e) => setFormData({ ...formData, clientEmail: e.target.value })} />
+                  <Input
+                    type="email"
+                    value={formData.clientEmail}
+                    onChange={(e) => setFormData({ ...formData, clientEmail: e.target.value })}
+                    className={emailError ? 'border-red-500 focus:ring-red-500' : ''}
+                    placeholder={isRtl ? 'example@email.com' : 'example@email.com'}
+                  />
+                  {emailError && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {isRtl ? 'البريد الإلكتروني غير صالح' : 'Invalid email format'}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <Label>{isRtl ? 'رقم الهاتف' : 'Phone'}</Label>
-                  <Input value={formData.clientPhone} onChange={(e) => setFormData({ ...formData, clientPhone: e.target.value })} />
+                  <Input
+                    value={formData.clientPhone}
+                    onChange={(e) => setFormData({ ...formData, clientPhone: e.target.value })}
+                    className={phoneError ? 'border-red-500 focus:ring-red-500' : ''}
+                    placeholder={isRtl ? '05XXXXXXXX' : '05XXXXXXXX'}
+                  />
+                  {phoneError && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {isRtl ? 'رقم الهاتف غير صالح' : 'Invalid phone number'}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -1258,6 +1334,29 @@ function BookAppointmentDialog({
                 </div>
               </div>
               <div>
+                <Label>{isRtl ? 'طريقة الاجتماع' : 'Meeting Type'}</Label>
+                <div className="grid grid-cols-3 gap-2 mt-2">
+                  {LOCATION_TYPES.map((loc) => (
+                    <button
+                      key={loc.value}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, locationType: loc.value })}
+                      className={cn(
+                        'flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all',
+                        formData.locationType === loc.value
+                          ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                          : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                      )}
+                    >
+                      {loc.icon === 'video' && <Video className="h-5 w-5" />}
+                      {loc.icon === 'map' && <MapPin className="h-5 w-5" />}
+                      {loc.icon === 'phone' && <Phone className="h-5 w-5" />}
+                      <span className="text-xs font-medium">{isRtl ? loc.labelAr : loc.labelEn}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
                 <Label>{isRtl ? 'ملاحظات' : 'Notes'}</Label>
                 <Textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} rows={3} />
               </div>
@@ -1270,7 +1369,7 @@ function BookAppointmentDialog({
           {step === 1 ? (
             <Button onClick={() => setStep(2)} disabled={!selectedDate || !selectedTime} className="bg-emerald-500 hover:bg-emerald-600">{isRtl ? 'التالي' : 'Next'}</Button>
           ) : (
-            <Button onClick={handleSubmit} disabled={bookMutation.isPending || !formData.clientName} className="bg-emerald-500 hover:bg-emerald-600">
+            <Button onClick={handleSubmit} disabled={bookMutation.isPending || !isFormValid} className="bg-emerald-500 hover:bg-emerald-600">
               {bookMutation.isPending && <Loader2 className="h-4 w-4 animate-spin ms-2" />}
               {isRtl ? 'حجز الموعد' : 'Book Appointment'}
             </Button>

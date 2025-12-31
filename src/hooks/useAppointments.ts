@@ -20,6 +20,7 @@ import appointmentsService, {
   type UpdateAppointmentRequest,
   type GetAvailableSlotsRequest,
   type UpdateSettingsRequest,
+  type SlotsResponse,
 } from '@/services/appointmentsService'
 
 // ==================== Query Keys ====================

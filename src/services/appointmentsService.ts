@@ -210,6 +210,12 @@ export interface CreateBlockedTimeRequest {
   targetLawyerId?: string // For firm admins to block time for another lawyer
 }
 
+/**
+ * Location type for appointments
+ * نوع الموقع للمواعيد
+ */
+export type LocationType = 'video' | 'in-person' | 'phone'
+
 export interface BookAppointmentRequest {
   date: string
   startTime: string
@@ -224,6 +230,7 @@ export interface BookAppointmentRequest {
   source?: BookingSource
   meetingLink?: string
   location?: string
+  locationType?: LocationType // Meeting type: video, in-person, or phone
   assignedTo?: string // For firm admins to assign appointment to another lawyer
 }
 
@@ -292,6 +299,29 @@ export interface AppointmentResponse {
   data: Appointment
 }
 
+/**
+ * Response from /appointments/slots endpoint (uses CRMSettings working hours)
+ * استجابة نقطة النهاية /appointments/slots (تستخدم ساعات العمل من إعدادات CRM)
+ */
+export interface SlotsResponse {
+  success: boolean
+  data: {
+    date: string              // ISO date string
+    dayOfWeek: string         // e.g., "wednesday"
+    working: boolean          // Is this a working day
+    workingHours: {
+      enabled: boolean
+      start: string           // "09:00"
+      end: string             // "17:00"
+    }
+    slots: AvailableTimeSlot[]
+  }
+}
+
+/**
+ * Response from /appointments/available-slots endpoint (uses AvailabilitySlot model)
+ * استجابة نقطة النهاية /appointments/available-slots (تستخدم نموذج AvailabilitySlot)
+ */
 export interface AvailableSlotsResponse {
   success: boolean
   data: {
@@ -586,14 +616,45 @@ const appointmentsService = {
   // ==================== Available Slots ====================
 
   /**
-   * Get available time slots for booking
-   * الحصول على الفترات الزمنية المتاحة للحجز
+   * Get available time slots for booking using /slots endpoint
+   * الحصول على الفترات الزمنية المتاحة للحجز باستخدام نقطة النهاية /slots
    *
-   * Note: Backend expects startDate and endDate, so we transform the date parameter
+   * Uses /appointments/slots which reads from CRMSettings.workingHours
+   * This returns actual slots based on configured working hours
+   *
+   * API: GET /appointments/slots?date=YYYY-MM-DD&assignedTo=lawyerId&duration=30
    */
-  getAvailableSlots: async (params: GetAvailableSlotsRequest): Promise<AvailableSlotsResponse> => {
+  getAvailableSlots: async (params: GetAvailableSlotsRequest): Promise<SlotsResponse> => {
     try {
-      // Transform date to startDate/endDate as required by the backend API
+      // Transform lawyerId to assignedTo as required by /slots endpoint
+      const { lawyerId, date, duration } = params
+      const apiParams: Record<string, string | number | undefined> = {
+        date,
+        duration,
+      }
+      // /slots endpoint uses 'assignedTo' instead of 'lawyerId'
+      if (lawyerId) {
+        apiParams.assignedTo = lawyerId
+      }
+      const response = await apiClient.get<SlotsResponse>('/appointments/slots', { params: apiParams })
+      return response.data
+    } catch (error: any) {
+      const errorMessage = handleApiError(error) || 'Failed to fetch available slots | فشل في جلب الفترات المتاحة'
+      throw new Error(errorMessage)
+    }
+  },
+
+  /**
+   * Get available slots using the enhanced endpoint (AvailabilitySlot model)
+   * الحصول على الفترات المتاحة باستخدام نقطة النهاية المحسنة (نموذج AvailabilitySlot)
+   *
+   * Uses /appointments/available-slots which reads from AvailabilitySlot model
+   * This requires AvailabilitySlot records to exist for the lawyer
+   *
+   * API: GET /appointments/available-slots?lawyerId=XXX&startDate=YYYY-MM-DD&endDate=YYYY-MM-DD&duration=30
+   */
+  getAvailableSlotsEnhanced: async (params: GetAvailableSlotsRequest): Promise<AvailableSlotsResponse> => {
+    try {
       const { date, ...rest } = params
       const apiParams = {
         ...rest,
