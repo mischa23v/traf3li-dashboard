@@ -1628,22 +1628,55 @@ function BookAppointmentDialog({
   })
 
   // Validation helpers (enterprise-grade patterns)
-  const isValidEmail = (email: string) => {
-    if (!email) return true // Optional field
+  // Email is REQUIRED - backend rejects empty customerEmail
+  const validateEmail = (email: string): { valid: boolean; error: string } => {
+    if (!email || !email.trim()) {
+      return { valid: false, error: t('validation.required', 'هذا الحقل مطلوب') }
+    }
     // RFC 5322 compliant email validation with proper domain/TLD check
     const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/
-    return emailRegex.test(email)
+    if (!emailRegex.test(email)) {
+      return { valid: false, error: t('appointments.errors.invalidEmail', 'البريد الإلكتروني غير صالح') }
+    }
+    return { valid: true, error: '' }
   }
 
+  // Phone is REQUIRED - backend rejects empty customerPhone
   // Use centralized phone validation - accepts Saudi formats that can be normalized to E.164
-  const isValidPhone = (phone: string) => {
-    if (!phone) return true // Optional field
-    return isValidPhoneLenient(phone.replace(/[\s-]/g, ''))
+  const validatePhone = (phone: string): { valid: boolean; error: string } => {
+    if (!phone || !phone.trim()) {
+      return { valid: false, error: t('validation.required', 'هذا الحقل مطلوب') }
+    }
+    if (!isValidPhoneLenient(phone.replace(/[\s-]/g, ''))) {
+      return { valid: false, error: t('appointments.errors.invalidPhone', 'رقم الهاتف غير صالح') }
+    }
+    return { valid: true, error: '' }
   }
 
-  const emailError = formData.clientEmail && !isValidEmail(formData.clientEmail)
-  const phoneError = formData.clientPhone && !isValidPhone(formData.clientPhone)
-  const isFormValid = formData.clientName && !emailError && !phoneError
+  // Client name is REQUIRED
+  const validateClientName = (name: string): { valid: boolean; error: string } => {
+    if (!name || !name.trim()) {
+      return { valid: false, error: t('validation.required', 'هذا الحقل مطلوب') }
+    }
+    return { valid: true, error: '' }
+  }
+
+  // Track which fields have been touched (for showing errors only after interaction)
+  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({})
+  const markTouched = (field: string) => setTouchedFields(prev => ({ ...prev, [field]: true }))
+
+  // Validation state
+  const emailValidation = validateEmail(formData.clientEmail)
+  const phoneValidation = validatePhone(formData.clientPhone)
+  const nameValidation = validateClientName(formData.clientName)
+
+  // Show errors only for touched fields
+  const emailError = touchedFields.clientEmail && !emailValidation.valid
+  const phoneError = touchedFields.clientPhone && !phoneValidation.valid
+  const nameError = touchedFields.clientName && !nameValidation.valid
+
+  // Form is valid when all required fields pass validation
+  const isFormValid = nameValidation.valid && emailValidation.valid && phoneValidation.valid
 
   // Use backend API to get available slots (checks appointments, blocked times, events)
   const { data: availableSlotsData, isLoading: isSlotsLoading, isError: isSlotsError } = useAvailableSlots(
@@ -1768,6 +1801,15 @@ function BookAppointmentDialog({
     console.trace('📍 Call stack trace:')
     console.groupEnd()
 
+    // Mark all required fields as touched to show validation errors
+    setTouchedFields({ clientName: true, clientEmail: true, clientPhone: true })
+
+    // Validate form before submission
+    if (!isFormValid) {
+      console.warn(`⚠️ [BOOK-DEBUG] [${callId}] BLOCKED: Form validation failed`)
+      return
+    }
+
     // Guard against double-submission (race condition prevention)
     // Using both local state AND mutation state for maximum protection
     if (!selectedDate || !selectedTime) {
@@ -1847,6 +1889,7 @@ function BookAppointmentDialog({
     setSelectedTime(null)
     setTargetLawyerId('')
     setFormData({ subject: '', clientName: '', clientEmail: '', clientPhone: '', duration: 30, type: 'consultation', locationType: 'video', notes: '' })
+    setTouchedFields({}) // Reset validation state
     setIsSubmitting(false) // Reset submission guard
   }
 
@@ -2049,40 +2092,67 @@ function BookAppointmentDialog({
                 />
               </div>
               <div>
-                <Label>{t('appointments.labels.clientName', 'اسم العميل')}</Label>
-                <Input value={formData.clientName} onChange={(e) => setFormData({ ...formData, clientName: e.target.value })} maxLength={100} />
+                <Label className="flex items-center gap-1">
+                  {t('appointments.labels.clientName', 'اسم العميل')}
+                  <span className="text-red-500" aria-hidden="true">*</span>
+                </Label>
+                <Input
+                  value={formData.clientName}
+                  onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
+                  onBlur={() => markTouched('clientName')}
+                  className={nameError ? 'border-red-500 focus:ring-red-500' : ''}
+                  maxLength={100}
+                  aria-required="true"
+                  aria-invalid={nameError ? 'true' : 'false'}
+                  aria-describedby={nameError ? 'name-error' : undefined}
+                />
+                {nameError && (
+                  <p id="name-error" className="text-xs text-red-500 mt-1" role="alert">
+                    {nameValidation.error}
+                  </p>
+                )}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>{t('appointments.labels.email', 'البريد الإلكتروني')}</Label>
+                  <Label className="flex items-center gap-1">
+                    {t('appointments.labels.email', 'البريد الإلكتروني')}
+                    <span className="text-red-500" aria-hidden="true">*</span>
+                  </Label>
                   <Input
                     type="email"
                     value={formData.clientEmail}
                     onChange={(e) => setFormData({ ...formData, clientEmail: e.target.value })}
+                    onBlur={() => markTouched('clientEmail')}
                     className={emailError ? 'border-red-500 focus:ring-red-500' : ''}
                     maxLength={254}
+                    aria-required="true"
                     aria-invalid={emailError ? 'true' : 'false'}
                     aria-describedby={emailError ? 'email-error' : undefined}
                   />
                   {emailError && (
                     <p id="email-error" className="text-xs text-red-500 mt-1" role="alert">
-                      {t('appointments.errors.invalidEmail', 'البريد الإلكتروني غير صالح')}
+                      {emailValidation.error}
                     </p>
                   )}
                 </div>
                 <div>
-                  <Label>{t('appointments.labels.phone', 'رقم الهاتف')}</Label>
+                  <Label className="flex items-center gap-1">
+                    {t('appointments.labels.phone', 'رقم الهاتف')}
+                    <span className="text-red-500" aria-hidden="true">*</span>
+                  </Label>
                   <Input
                     value={formData.clientPhone}
                     onChange={(e) => setFormData({ ...formData, clientPhone: e.target.value })}
+                    onBlur={() => markTouched('clientPhone')}
                     className={phoneError ? 'border-red-500 focus:ring-red-500' : ''}
                     maxLength={20}
+                    aria-required="true"
                     aria-invalid={phoneError ? 'true' : 'false'}
                     aria-describedby={phoneError ? 'phone-error' : undefined}
                   />
                   {phoneError && (
                     <p id="phone-error" className="text-xs text-red-500 mt-1" role="alert">
-                      {t('appointments.errors.invalidPhone', 'رقم الهاتف غير صالح')}
+                      {phoneValidation.error}
                     </p>
                   )}
                 </div>

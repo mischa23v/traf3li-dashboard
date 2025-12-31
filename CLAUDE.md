@@ -262,6 +262,84 @@ fetch(API_ENDPOINTS.clients.list)
 
 ---
 
+## ✅ GOLD STANDARD FORM VALIDATION
+
+**All forms MUST follow this validation pattern:**
+
+### 1. Required Field Indicators
+```typescript
+// ✅ ALWAYS mark required fields with red asterisk
+<Label className="flex items-center gap-1">
+  {t('field.label', 'اسم العميل')}
+  <span className="text-red-500" aria-hidden="true">*</span>
+</Label>
+```
+
+### 2. Validation Functions (Return Error Messages)
+```typescript
+// ✅ ALWAYS return both validity and error message
+const validateField = (value: string): { valid: boolean; error: string } => {
+  if (!value || !value.trim()) {
+    return { valid: false, error: t('validation.required', 'هذا الحقل مطلوب') }
+  }
+  if (!isValidPattern(value)) {
+    return { valid: false, error: t('validation.invalid', 'القيمة غير صالحة') }
+  }
+  return { valid: true, error: '' }
+}
+```
+
+### 3. Touched State (Show Errors Only After Interaction)
+```typescript
+// ✅ Track touched fields to avoid showing errors on pristine fields
+const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({})
+const markTouched = (field: string) => setTouchedFields(prev => ({ ...prev, [field]: true }))
+
+// Show error only if field was touched AND invalid
+const showError = touchedFields.fieldName && !validation.valid
+```
+
+### 4. Input Fields with Full Validation
+```typescript
+// ✅ ALWAYS include: onBlur, aria-required, aria-invalid, aria-describedby
+<Input
+  value={value}
+  onChange={(e) => setValue(e.target.value)}
+  onBlur={() => markTouched('fieldName')}
+  className={showError ? 'border-red-500 focus:ring-red-500' : ''}
+  maxLength={100}
+  aria-required="true"
+  aria-invalid={showError ? 'true' : 'false'}
+  aria-describedby={showError ? 'field-error' : undefined}
+/>
+{showError && (
+  <p id="field-error" className="text-xs text-red-500 mt-1" role="alert">
+    {validation.error}
+  </p>
+)}
+```
+
+### 5. Submit Validation
+```typescript
+// ✅ Mark all fields touched on submit to show all errors
+const handleSubmit = () => {
+  setTouchedFields({ field1: true, field2: true, field3: true })
+  if (!isFormValid) return
+  // ... proceed with submission
+}
+```
+
+### 6. Reset Touched on Form Close/Reset
+```typescript
+// ✅ Reset touched state when form closes
+const resetForm = () => {
+  setFormData(initialState)
+  setTouchedFields({}) // Clear validation state
+}
+```
+
+---
+
 ## ⚠️ MOST IMPORTANT RULE - ASK BEFORE ASSUMING
 
 **THIS RULE MUST NEVER BE BROKEN:**
