@@ -1556,6 +1556,7 @@ function BookAppointmentDialog({
   const effectiveLawyerId = targetLawyerId || user?._id || ''
 
   const [formData, setFormData] = useState({
+    subject: '',
     clientName: '',
     clientEmail: '',
     clientPhone: '',
@@ -1729,6 +1730,14 @@ function BookAppointmentDialog({
       // Normalize phone to E.164 format before sending (backend requires 10-15 digit format)
       const normalizedPhone = formData.clientPhone ? toE164Phone(formData.clientPhone) : ''
 
+      // Combine subject and notes into a single notes field
+      // Format: "Subject: [subject]\n\n[notes]" or just notes if no subject
+      const combinedNotes = formData.subject
+        ? formData.notes
+          ? `الموضوع: ${formData.subject}\n\n${formData.notes}`
+          : `الموضوع: ${formData.subject}`
+        : formData.notes
+
       const requestData = {
         clientName: formData.clientName,
         clientEmail: formData.clientEmail,
@@ -1736,7 +1745,7 @@ function BookAppointmentDialog({
         duration: formData.duration,
         type: formData.type,
         locationType: formData.locationType,
-        notes: formData.notes,
+        notes: combinedNotes,
         date: format(selectedDate, 'yyyy-MM-dd'),
         startTime: selectedTime,
         source: 'manual',
@@ -1776,7 +1785,7 @@ function BookAppointmentDialog({
     setSelectedDate(null)
     setSelectedTime(null)
     setTargetLawyerId('')
-    setFormData({ clientName: '', clientEmail: '', clientPhone: '', duration: 30, type: 'consultation', locationType: 'video', notes: '' })
+    setFormData({ subject: '', clientName: '', clientEmail: '', clientPhone: '', duration: 30, type: 'consultation', locationType: 'video', notes: '' })
     setIsSubmitting(false) // Reset submission guard
   }
 
@@ -1971,6 +1980,15 @@ function BookAppointmentDialog({
             </div>
             <div className="grid gap-4">
               <div>
+                <Label>{t('appointments.labels.subject', 'موضوع الموعد')}</Label>
+                <Input
+                  value={formData.subject}
+                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                  placeholder={t('appointments.labels.subjectPlaceholder', 'مثال: استشارة قانونية، مراجعة عقد')}
+                  maxLength={200}
+                />
+              </div>
+              <div>
                 <Label>{t('appointments.labels.clientName', 'اسم العميل')}</Label>
                 <Input value={formData.clientName} onChange={(e) => setFormData({ ...formData, clientName: e.target.value })} placeholder={t('appointments.labels.clientNamePlaceholder', 'أدخل اسم العميل')} maxLength={100} />
               </div>
@@ -2119,13 +2137,18 @@ function BlockTimeDialog({
         ? `${formData.endDate}T23:59:59`
         : `${formData.endDate}T${formData.endTime}:00`
 
-      await createBlockedTime.mutateAsync({
-        startDateTime,
-        endDateTime,
+      // Debug log to see exact payload
+      const payload = {
+        startDateTime: `${startDateTime}.000Z`,  // Add timezone
+        endDateTime: `${endDateTime}.000Z`,      // Add timezone
         reason: formData.reason || undefined,
         isAllDay: formData.isAllDay,
+        isRecurring: false,  // Explicitly send false
         ...(targetLawyerId ? { targetLawyerId } : {}),
-      })
+      }
+      console.log('[BLOCK-TIME] Sending payload:', JSON.stringify(payload, null, 2))
+
+      await createBlockedTime.mutateAsync(payload)
       toast.success(t('appointments.success.timeBlocked', 'تم حظر الوقت بنجاح'))
       onOpenChange(false)
       resetForm()
