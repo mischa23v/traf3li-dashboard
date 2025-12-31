@@ -279,7 +279,44 @@ export function useDeleteBlockedTime() {
 export function useAppointments(params?: AppointmentFilters) {
   return useQuery({
     queryKey: appointmentKeys.list(params),
-    queryFn: () => appointmentsService.getAppointments(params),
+    queryFn: async () => {
+      console.group('🔍 [QUERY-DEBUG] useAppointments queryFn called')
+      console.log('⏰ Time:', new Date().toISOString())
+      console.log('📋 Query Key:', JSON.stringify(appointmentKeys.list(params)))
+      console.log('🔍 Params:', JSON.stringify(params))
+      console.trace('📍 Call stack:')
+      console.groupEnd()
+
+      try {
+        const result = await appointmentsService.getAppointments(params)
+        console.group('✅ [QUERY-DEBUG] useAppointments SUCCESS')
+        console.log('⏰ Time:', new Date().toISOString())
+        console.log('📦 Full Response:', JSON.stringify(result, null, 2))
+        console.log('📊 Response Structure:', {
+          success: result?.success,
+          hasData: !!result?.data,
+          appointmentsCount: result?.data?.appointments?.length ?? 'undefined',
+          total: result?.data?.total,
+          page: result?.data?.page,
+          limit: result?.data?.limit,
+        })
+        if (result?.data?.appointments?.length > 0) {
+          console.log('📝 First Appointment:', JSON.stringify(result.data.appointments[0], null, 2))
+        }
+        console.groupEnd()
+        return result
+      } catch (error: any) {
+        console.group('❌ [QUERY-DEBUG] useAppointments ERROR')
+        console.log('⏰ Time:', new Date().toISOString())
+        console.error('💥 Error:', error)
+        console.error('📋 Error Details:', {
+          message: error?.message,
+          status: error?.status || error?.response?.status,
+        })
+        console.groupEnd()
+        throw error
+      }
+    },
     staleTime: 1 * 60 * 1000, // 1 minute
     placeholderData: (previousData) => previousData, // Keep previous data while refetching
     ...defaultQueryOptions,
@@ -324,17 +361,106 @@ export function useAppointment(id: string) {
 /**
  * Book appointment
  * حجز موعد
+ *
+ * IMPORTANT: Uses onSettled instead of just onSuccess to handle edge cases where
+ * the backend creates the appointment but returns 500 due to secondary failures
+ * (e.g., email notification failed, calendar sync failed). This ensures the
+ * appointment list is refreshed even on error, preventing "ghost" appointments
+ * that exist in the database but don't show in the UI.
  */
 export function useBookAppointment() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: BookAppointmentRequest) => appointmentsService.bookAppointment(data),
-    ...mutationRetryConfig,
-    onSuccess: () => {
+    mutationFn: async (data: BookAppointmentRequest) => {
+      console.group('📤 [MUTATION-DEBUG] bookAppointment mutationFn called')
+      console.log('⏰ Time:', new Date().toISOString())
+      console.log('📦 Request Data:', JSON.stringify(data, null, 2))
+      console.groupEnd()
+
+      try {
+        const result = await appointmentsService.bookAppointment(data)
+        console.group('✅ [MUTATION-DEBUG] bookAppointment SUCCESS')
+        console.log('⏰ Time:', new Date().toISOString())
+        console.log('📦 Response:', JSON.stringify(result, null, 2))
+        console.groupEnd()
+        return result
+      } catch (error: any) {
+        console.group('❌ [MUTATION-DEBUG] bookAppointment ERROR in mutationFn')
+        console.log('⏰ Time:', new Date().toISOString())
+        console.error('💥 Error:', error)
+        console.error('📋 Error Details:', {
+          message: error?.message,
+          status: error?.status || error?.response?.status,
+          data: error?.response?.data,
+        })
+        console.groupEnd()
+        throw error
+      }
+    },
+    // Don't retry POST mutations - they may have succeeded on server
+    retry: false,
+
+    onMutate: (variables) => {
+      console.log('🔄 [MUTATION-DEBUG] onMutate called at:', new Date().toISOString())
+      console.log('📦 Variables:', JSON.stringify(variables, null, 2))
+    },
+
+    onSuccess: (data, variables) => {
+      console.group('✅ [MUTATION-DEBUG] onSuccess callback')
+      console.log('⏰ Time:', new Date().toISOString())
+      console.log('📦 Data:', JSON.stringify(data, null, 2))
+      console.log('🔄 Invalidating queries...')
+      console.groupEnd()
+
+      // On success, invalidate immediately
       queryClient.invalidateQueries({ queryKey: appointmentKeys.lists() })
       queryClient.invalidateQueries({ queryKey: appointmentKeys.availableSlots })
       queryClient.invalidateQueries({ queryKey: appointmentKeys.stats })
+    },
+
+    onError: (error: any, variables) => {
+      console.group('❌ [MUTATION-DEBUG] onError callback')
+      console.log('⏰ Time:', new Date().toISOString())
+      console.error('💥 Error:', error)
+      console.error('📋 Error Details:', {
+        message: error?.message,
+        status: error?.status || error?.response?.status,
+        code: error?.code,
+      })
+      console.log('📦 Variables that failed:', JSON.stringify(variables, null, 2))
+      console.groupEnd()
+
+      // On 500 error, the appointment might have been created but secondary
+      // operations failed (email, calendar sync, etc.). Invalidate cache to
+      // ensure any created appointment shows up.
+      const status = error?.status || error?.response?.status
+      if (status === 500) {
+        console.log('⚠️ [MUTATION-DEBUG] 500 error detected - will invalidate after 1s')
+        // Delay invalidation slightly to allow backend to commit
+        setTimeout(() => {
+          console.log('🔄 [MUTATION-DEBUG] Delayed invalidation for 500 error')
+          queryClient.invalidateQueries({ queryKey: appointmentKeys.lists() })
+          queryClient.invalidateQueries({ queryKey: appointmentKeys.availableSlots })
+          queryClient.invalidateQueries({ queryKey: appointmentKeys.stats })
+        }, 1000)
+      }
+    },
+
+    // onSettled runs regardless of success/error - acts as safety net
+    onSettled: (data, error) => {
+      console.group('🏁 [MUTATION-DEBUG] onSettled callback')
+      console.log('⏰ Time:', new Date().toISOString())
+      console.log('📊 Result:', error ? 'ERROR' : 'SUCCESS')
+      console.log('🔄 Scheduling delayed invalidation in 2s...')
+      console.groupEnd()
+
+      // Additional invalidation after a delay to catch any edge cases
+      setTimeout(() => {
+        console.log('🔄 [MUTATION-DEBUG] Delayed invalidation from onSettled')
+        queryClient.invalidateQueries({ queryKey: appointmentKeys.lists() })
+        queryClient.invalidateQueries({ queryKey: appointmentKeys.stats })
+      }, 2000)
     },
   })
 }
