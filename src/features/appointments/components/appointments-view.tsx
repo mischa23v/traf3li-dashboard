@@ -444,12 +444,34 @@ export function AppointmentsView() {
   }
 
   const confirmDelete = async () => {
-    try {
-      const idsToDelete = appointmentToDelete ? [appointmentToDelete] : Array.from(selectedAppointments)
+    const startTime = performance.now()
+    const idsToDelete = appointmentToDelete ? [appointmentToDelete] : Array.from(selectedAppointments)
 
+    console.log('[DELETE-DEBUG] ========== DELETE APPOINTMENT START ==========')
+    console.log('[DELETE-DEBUG] Request started at:', new Date().toISOString())
+    console.log('[DELETE-DEBUG] IDs to delete:', idsToDelete)
+    console.log('[DELETE-DEBUG] Single delete ID:', appointmentToDelete)
+    console.log('[DELETE-DEBUG] Selected appointments:', Array.from(selectedAppointments))
+    console.log('[DELETE-DEBUG] Total count:', idsToDelete.length)
+
+    try {
       for (const id of idsToDelete) {
+        console.log('[DELETE-DEBUG] Deleting appointment ID:', id)
+        console.log('[DELETE-DEBUG] Endpoint: DELETE /appointments/' + id)
+        console.log('[DELETE-DEBUG] Payload: { reason: "Deleted by user" }')
+
+        const deleteStartTime = performance.now()
         await cancelMutation.mutateAsync({ id, reason: 'Deleted by user' })
+        const deleteEndTime = performance.now()
+
+        console.log('[DELETE-DEBUG] ✅ Successfully deleted ID:', id)
+        console.log('[DELETE-DEBUG] Delete duration:', ((deleteEndTime - deleteStartTime) / 1000).toFixed(2), 'seconds')
       }
+
+      const endTime = performance.now()
+      console.log('[DELETE-DEBUG] ✅ All deletions complete')
+      console.log('[DELETE-DEBUG] Total duration:', ((endTime - startTime) / 1000).toFixed(2), 'seconds')
+      console.log('[DELETE-DEBUG] ========== DELETE APPOINTMENT END ==========')
 
       toast.success(t('appointments.success.deleted', { count: idsToDelete.length }, `تم حذف ${idsToDelete.length} موعد بنجاح`))
 
@@ -458,6 +480,22 @@ export function AppointmentsView() {
       setShowDeleteConfirm(false)
       refetch()
     } catch (error: any) {
+      const endTime = performance.now()
+
+      console.error('[DELETE-DEBUG] ❌ ERROR in confirmDelete')
+      console.error('[DELETE-DEBUG] Duration until error:', ((endTime - startTime) / 1000).toFixed(2), 'seconds')
+      console.error('[DELETE-DEBUG] IDs attempted:', idsToDelete)
+      console.error('[DELETE-DEBUG] Error name:', error?.name)
+      console.error('[DELETE-DEBUG] Error message:', error?.message)
+      console.error('[DELETE-DEBUG] Error response status:', error?.response?.status)
+      console.error('[DELETE-DEBUG] Error response statusText:', error?.response?.statusText)
+      console.error('[DELETE-DEBUG] Error response data:', JSON.stringify(error?.response?.data, null, 2))
+      console.error('[DELETE-DEBUG] Error config URL:', error?.config?.url)
+      console.error('[DELETE-DEBUG] Error config method:', error?.config?.method)
+      console.error('[DELETE-DEBUG] Error config data:', error?.config?.data)
+      console.error('[DELETE-DEBUG] Full error object:', error)
+      console.error('[DELETE-DEBUG] ========== DELETE APPOINTMENT ERROR END ==========')
+
       const errorMessage = error?.message || t('appointments.errors.delete', 'حدث خطأ أثناء الحذف')
       toast.error(errorMessage)
     }
@@ -2257,7 +2295,25 @@ function BlockTimeDialog({
   })
 
   const handleSubmit = async () => {
-    if (!formData.startDate || !formData.endDate) return
+    const startTime = performance.now()
+
+    console.log('[BLOCK-TIME-DEBUG] ========== BLOCK TIME START ==========')
+    console.log('[BLOCK-TIME-DEBUG] Request started at:', new Date().toISOString())
+    console.log('[BLOCK-TIME-DEBUG] Form data:', JSON.stringify(formData, null, 2))
+    console.log('[BLOCK-TIME-DEBUG] Target lawyer ID:', targetLawyerId || '(self)')
+    console.log('[BLOCK-TIME-DEBUG] Start date:', formData.startDate)
+    console.log('[BLOCK-TIME-DEBUG] End date:', formData.endDate)
+    console.log('[BLOCK-TIME-DEBUG] Start time:', formData.startTime)
+    console.log('[BLOCK-TIME-DEBUG] End time:', formData.endTime)
+    console.log('[BLOCK-TIME-DEBUG] Is all day:', formData.isAllDay)
+    console.log('[BLOCK-TIME-DEBUG] Reason:', formData.reason)
+
+    if (!formData.startDate || !formData.endDate) {
+      console.error('[BLOCK-TIME-DEBUG] ❌ Validation failed: Missing start or end date')
+      console.error('[BLOCK-TIME-DEBUG] ========== BLOCK TIME VALIDATION ERROR ==========')
+      return
+    }
+
     try {
       const startDateTime = formData.isAllDay
         ? `${formData.startDate}T00:00:00`
@@ -2275,13 +2331,52 @@ function BlockTimeDialog({
         isRecurring: false,  // Explicitly send false
         ...(targetLawyerId ? { targetLawyerId } : {}),
       }
-      console.log('[BLOCK-TIME] Sending payload:', JSON.stringify(payload, null, 2))
 
+      console.log('[BLOCK-TIME-DEBUG] Constructed startDateTime:', startDateTime)
+      console.log('[BLOCK-TIME-DEBUG] Constructed endDateTime:', endDateTime)
+      console.log('[BLOCK-TIME-DEBUG] Endpoint: POST /appointments/blocked-times')
+      console.log('[BLOCK-TIME-DEBUG] Final payload:', JSON.stringify(payload, null, 2))
+      console.log('[BLOCK-TIME-DEBUG] Expected MongoDB fields:')
+      console.log('[BLOCK-TIME-DEBUG]   - startDateTime: Date (ISO string)')
+      console.log('[BLOCK-TIME-DEBUG]   - endDateTime: Date (ISO string)')
+      console.log('[BLOCK-TIME-DEBUG]   - reason: String (optional)')
+      console.log('[BLOCK-TIME-DEBUG]   - isAllDay: Boolean')
+      console.log('[BLOCK-TIME-DEBUG]   - isRecurring: Boolean')
+      console.log('[BLOCK-TIME-DEBUG]   - lawyerId: ObjectId (from auth or targetLawyerId)')
+      console.log('[BLOCK-TIME-DEBUG]   - firmId: ObjectId (from FirmIsolation middleware)')
+
+      const apiStartTime = performance.now()
       await createBlockedTime.mutateAsync(payload)
+      const apiEndTime = performance.now()
+
+      const endTime = performance.now()
+      console.log('[BLOCK-TIME-DEBUG] ✅ Block time created successfully')
+      console.log('[BLOCK-TIME-DEBUG] API call duration:', ((apiEndTime - apiStartTime) / 1000).toFixed(2), 'seconds')
+      console.log('[BLOCK-TIME-DEBUG] Total duration:', ((endTime - startTime) / 1000).toFixed(2), 'seconds')
+      console.log('[BLOCK-TIME-DEBUG] ========== BLOCK TIME END ==========')
+
       toast.success(t('appointments.success.timeBlocked', 'تم حظر الوقت بنجاح'))
       onOpenChange(false)
       resetForm()
     } catch (error: any) {
+      const endTime = performance.now()
+
+      console.error('[BLOCK-TIME-DEBUG] ❌ ERROR in handleSubmit')
+      console.error('[BLOCK-TIME-DEBUG] Duration until error:', ((endTime - startTime) / 1000).toFixed(2), 'seconds')
+      console.error('[BLOCK-TIME-DEBUG] Form data at time of error:', JSON.stringify(formData, null, 2))
+      console.error('[BLOCK-TIME-DEBUG] Target lawyer ID:', targetLawyerId || '(self)')
+      console.error('[BLOCK-TIME-DEBUG] Error name:', error?.name)
+      console.error('[BLOCK-TIME-DEBUG] Error message:', error?.message)
+      console.error('[BLOCK-TIME-DEBUG] Error response status:', error?.response?.status)
+      console.error('[BLOCK-TIME-DEBUG] Error response statusText:', error?.response?.statusText)
+      console.error('[BLOCK-TIME-DEBUG] Error response data:', JSON.stringify(error?.response?.data, null, 2))
+      console.error('[BLOCK-TIME-DEBUG] Error response headers:', JSON.stringify(error?.response?.headers, null, 2))
+      console.error('[BLOCK-TIME-DEBUG] Error config URL:', error?.config?.url)
+      console.error('[BLOCK-TIME-DEBUG] Error config method:', error?.config?.method)
+      console.error('[BLOCK-TIME-DEBUG] Error config data:', error?.config?.data)
+      console.error('[BLOCK-TIME-DEBUG] Full error object:', error)
+      console.error('[BLOCK-TIME-DEBUG] ========== BLOCK TIME ERROR END ==========')
+
       const errorMessage = error?.message || t('appointments.errors.blockTimeFailed', 'فشل في حظر الوقت')
       toast.error(errorMessage)
     }
