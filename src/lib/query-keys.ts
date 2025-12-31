@@ -1605,6 +1605,51 @@ export const QueryKeys = {
   lean: {
     all: () => ['lean'] as const,
   },
+
+  // ==================== APPOINTMENTS ====================
+  appointments: {
+    all: () => ['appointments'] as const,
+    lists: () => [...QueryKeys.appointments.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.appointments.lists(), filters] as const,
+    details: () => [...QueryKeys.appointments.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.appointments.details(), id] as const,
+    // Slots
+    slots: (filters: { userId: string; date?: string; startDate?: string; endDate?: string }) =>
+      [...QueryKeys.appointments.all(), 'slots', filters.userId, filters.date || '', filters.startDate || '', filters.endDate || ''] as const,
+    slotsDate: (userId: string, date: string) => [...QueryKeys.appointments.all(), 'slots', userId, date] as const,
+    slotsRange: (userId: string, startDate: string, endDate: string) =>
+      [...QueryKeys.appointments.all(), 'slots', userId, startDate, endDate] as const,
+    // Stats
+    stats: (filters?: Record<string, any>) => [...QueryKeys.appointments.all(), 'stats', filters] as const,
+    upcoming: (days?: number) => [...QueryKeys.appointments.all(), 'upcoming', days || 7] as const,
+    today: () => [...QueryKeys.appointments.all(), 'today'] as const,
+    // Calendar integration
+    calendarStatus: () => [...QueryKeys.appointments.all(), 'calendar-status'] as const,
+    calendarLinks: (id: string) => [...QueryKeys.appointments.all(), 'calendar-links', id] as const,
+    // CRM settings
+    crmSettings: () => [...QueryKeys.appointments.all(), 'crm-settings'] as const,
+    workingHours: (userId: string) => [...QueryKeys.appointments.all(), 'working-hours', userId] as const,
+  },
+
+  // ==================== CALENDAR INTEGRATION ====================
+  calendarIntegration: {
+    all: () => ['calendar-integration'] as const,
+    // Google Calendar
+    google: {
+      all: () => [...QueryKeys.calendarIntegration.all(), 'google'] as const,
+      status: () => [...QueryKeys.calendarIntegration.google.all(), 'status'] as const,
+      calendars: () => [...QueryKeys.calendarIntegration.google.all(), 'calendars'] as const,
+      events: (calendarId: string) => [...QueryKeys.calendarIntegration.google.all(), 'events', calendarId] as const,
+      syncSettings: () => [...QueryKeys.calendarIntegration.google.all(), 'sync-settings'] as const,
+    },
+    // Microsoft Calendar
+    microsoft: {
+      all: () => [...QueryKeys.calendarIntegration.all(), 'microsoft'] as const,
+      status: () => [...QueryKeys.calendarIntegration.microsoft.all(), 'status'] as const,
+      calendars: () => [...QueryKeys.calendarIntegration.microsoft.all(), 'calendars'] as const,
+      events: () => [...QueryKeys.calendarIntegration.microsoft.all(), 'events'] as const,
+    },
+  },
 } as const
 
 // ==================== HELPER TYPES ====================

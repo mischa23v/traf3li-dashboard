@@ -160,6 +160,27 @@ export interface ListResponse {
 }
 
 /**
+ * Sidebar Data Response Interface
+ */
+export interface SidebarDataResponse {
+  success: boolean
+  data: {
+    events: CalendarEvent[]
+    reminders: CalendarEvent[]
+    summary: {
+      totalEvents: number
+      totalReminders: number
+      upcomingCount: number
+      overdueCount: number
+    }
+  }
+  dateRange: {
+    start: string
+    end: string
+  }
+}
+
+/**
  * Calendar Service Object
  */
 const calendarService = {
@@ -258,6 +279,31 @@ const calendarService = {
       return response.data
     } catch (error: any) {
       const errorMessage = handleApiError(error) || 'Failed to fetch calendar statistics | فشل في جلب إحصائيات التقويم'
+      throw new Error(errorMessage)
+    }
+  },
+
+  /**
+   * Get combined sidebar data - calendar events + reminders in one call
+   * Replaces 2 separate API calls with 1 optimized endpoint
+   *
+   * الحصول على بيانات الشريط الجانبي المجمعة - أحداث التقويم + التذكيرات في استدعاء واحد
+   *
+   * API: GET /calendar/sidebar-data
+   * Query params: startDate, endDate, reminderDays (optional)
+   */
+  getSidebarData: async (filters: {
+    startDate: string
+    endDate: string
+    reminderDays?: number
+  }): Promise<SidebarDataResponse> => {
+    try {
+      const response = await apiClient.get<SidebarDataResponse>('/calendar/sidebar-data', {
+        params: filters,
+      })
+      return response.data
+    } catch (error: any) {
+      const errorMessage = handleApiError(error) || 'Failed to fetch sidebar data | فشل في جلب بيانات الشريط الجانبي'
       throw new Error(errorMessage)
     }
   },
