@@ -195,20 +195,147 @@ After every `git push`, immediately provide:
 PR Link: https://github.com/mischa23v/traf3li-dashboard/pull/new/{branch-name}
 ```
 
-### 5. Verification Checklist
+### 5. Feature Completeness Matrix (MANDATORY)
 
-Always show what was verified:
+Before marking ANY feature complete, verify EVERY operation exists:
 
 ```markdown
-### Verification Checklist
-- [x] TypeScript compiles with no errors
-- [x] All new strings use t() with Arabic fallbacks
-- [x] aria-label on icon-only elements
-- [ ] Translations added to i18n JSON files (NOT DONE - reason)
-- [ ] Visual testing in browser (NOT DONE - reason)
+## 🎯 Feature Completeness Matrix: [Feature Name]
+
+### CRUD Operations
+| Operation | Implemented | Tested | Notes |
+|-----------|-------------|--------|-------|
+| Create | ☐ | ☐ | |
+| Read (single) | ☐ | ☐ | |
+| Read (list) | ☐ | ☐ | |
+| Update/Edit | ☐ | ☐ | |
+| Delete (single) | ☐ | ☐ | |
+| Delete (bulk) | ☐ | ☐ | |
+
+### Selection & Bulk Actions
+| Action | Implemented | Notes |
+|--------|-------------|-------|
+| Select single item | ☐ | |
+| Select all | ☐ | |
+| Deselect all | ☐ | |
+| Bulk delete | ☐ | |
+| Bulk status change | ☐ | |
+| Bulk export | ☐ | |
+
+### Filtering & Search
+| Feature | Implemented | Notes |
+|---------|-------------|-------|
+| Search by text | ☐ | |
+| Filter by status | ☐ | |
+| Filter by date range | ☐ | |
+| Filter by type/category | ☐ | |
+| Sort ascending | ☐ | |
+| Sort descending | ☐ | |
+| Clear filters | ☐ | |
+| Pagination | ☐ | |
+
+### Form Controls (for Create/Edit)
+| Control | Implemented | Validated | Notes |
+|---------|-------------|-----------|-------|
+| Title/Name input | ☐ | ☐ | maxLength, required |
+| Description textarea | ☐ | ☐ | maxLength |
+| Date picker | ☐ | ☐ | |
+| Time picker | ☐ | ☐ | |
+| Dropdown/Select | ☐ | ☐ | |
+| Checkbox/Toggle | ☐ | ☐ | |
+| File upload | ☐ | ☐ | size, type validation |
+| Submit button | ☐ | ☐ | disabled when invalid |
+| Cancel button | ☐ | ☐ | confirms if dirty |
+
+### UI States
+| State | Implemented | Notes |
+|-------|-------------|-------|
+| Loading (skeleton) | ☐ | |
+| Empty state | ☐ | with CTA |
+| Error state | ☐ | with retry button |
+| Success feedback | ☐ | toast/notification |
+| Confirmation dialog | ☐ | for destructive actions |
+| Disabled state | ☐ | |
+| Hover state | ☐ | |
+| Focus state | ☐ | |
+| Active state | ☐ | |
+
+### Error Handling
+| Scenario | Handled | Notes |
+|----------|---------|-------|
+| Network failure | ☐ | retry option |
+| Validation errors | ☐ | field-level messages |
+| Server errors (4xx/5xx) | ☐ | user-friendly message |
+| Timeout | ☐ | |
+| Conflict (409) | ☐ | |
+| Not found (404) | ☐ | |
+| Unauthorized (401) | ☐ | redirect to login |
+
+### Keyboard & Accessibility
+| Feature | Implemented | Notes |
+|---------|-------------|-------|
+| Tab navigation | ☐ | |
+| Enter to submit | ☐ | |
+| Escape to close | ☐ | |
+| Arrow keys (lists) | ☐ | |
+| Screen reader labels | ☐ | |
+| Focus trap (modals) | ☐ | |
 ```
 
-**This protocol ensures transparency, maintains quality standards, and creates documentation for future reference.**
+### 6. Department Review Simulation
+
+For enterprise-grade features, simulate department approvals:
+
+```markdown
+## 🏢 Department Sign-off Checklist
+
+| Department | Status | Reviewer Notes |
+|------------|--------|----------------|
+| **Code Quality** | ☐ | No console.log, proper types, error boundaries |
+| **QA/Testing** | ☐ | Unit tests, E2E tests, edge cases |
+| **Security** | ☐ | Input validation, XSS prevention, auth checks |
+| **Accessibility** | ☐ | WCAG AA, keyboard nav, screen reader |
+| **i18n** | ☐ | All strings externalized, RTL tested |
+| **UX/Design** | ☐ | Matches design system, consistent styling |
+| **Performance** | ☐ | No memory leaks, optimized renders |
+| **Documentation** | ☐ | API docs, CLAUDE.md updated |
+```
+
+### 7. Final Verification Checklist
+
+```markdown
+### ✅ Final Verification
+- [ ] TypeScript compiles with no errors
+- [ ] All new strings use t() with Arabic fallbacks
+- [ ] aria-label on ALL icon-only elements
+- [ ] aria-hidden on ALL decorative icons
+- [ ] Translations added to i18n JSON files
+- [ ] Visual testing in browser (both RTL & LTR)
+- [ ] All CRUD operations work
+- [ ] Bulk operations work
+- [ ] Error states display correctly
+- [ ] Loading states show skeletons
+- [ ] Empty states have CTAs
+- [ ] Keyboard navigation works
+- [ ] Mobile responsive
+- [ ] Console has no errors
+```
+
+### 8. What's Missing Report
+
+After every feature, explicitly list what's NOT done:
+
+```markdown
+## ⚠️ What's Missing (Be Honest)
+
+| Missing Feature | Priority | Reason Not Done |
+|-----------------|----------|-----------------|
+| Bulk delete | High | Not in requirements |
+| Export to CSV | Medium | Time constraint |
+| Keyboard shortcuts | Low | Nice-to-have |
+```
+
+**Claude MUST run through this entire checklist for EVERY feature implementation. No exceptions.**
 
 ---
 
