@@ -325,6 +325,22 @@
         "backendPending": "[بانتظار التطبيق] فشل تحميل التقويم",
         "backendPendingMessage": "يستخدم التقويم حاليًا نقاط نهاية محسّنة غير مطبقة بعد في الخادم",
         "retryButton": "إعادة المحاولة"
+      },
+      "google": {
+        "externalEvent": "تقويم جوجل",
+        "openInGoogle": "فتح في تقويم جوجل",
+        "showExternalEvents": "عرض الأحداث الخارجية",
+        "showExternalEventsDescription": "عرض أحداث تقويم جوجل في عرض التقويم الخاص بك",
+        "externalEventsEnabled": "الأحداث الخارجية مرئية الآن في تقويمك",
+        "externalEventsDisabled": "الأحداث الخارجية مخفية الآن من تقويمك",
+        "externalEventsError": "فشل في تحديث إعداد الأحداث الخارجية",
+        "location": "الموقع",
+        "organizer": "المنظم",
+        "syncSettings": "إعدادات مزامنة تقويم جوجل",
+        "connectedAs": "متصل بـ",
+        "disconnect": "قطع الاتصال",
+        "connect": "ربط تقويم جوجل",
+        "selectCalendars": "اختر التقويمات للمزامنة"
       }
     }
   },

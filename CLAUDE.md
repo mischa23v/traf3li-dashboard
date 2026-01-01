@@ -140,14 +140,436 @@ Score = (Security × 0.25) + (Accessibility × 0.25) + (i18n × 0.15) + (Service
 
 ---
 
+## 🤖 Claude's Task Completion Protocol (MANDATORY)
+
+**After completing ANY feature or significant task, Claude MUST:**
+
+### 1. Provide Honest Gold Standard Assessment
+
+Present a score breakdown table with honest evaluation:
+
+```markdown
+## 📊 Gold Standard Assessment
+
+**Score: XX.X/100** ✅/⚠️
+
+| Category | Score | Notes |
+|----------|-------|-------|
+| Security | XX/25 | [Specific notes] |
+| Accessibility | XX/25 | [Specific notes with gaps] |
+| i18n | XX/25 | [Specific notes] |
+| Service Layer | XX/25 | [Specific notes] |
+| UI Completeness | XX/25 | [Specific notes with gaps] |
+```
+
+### 2. Document What Was Done vs NOT Done
+
+Always be explicit about:
+
+```markdown
+### What Was Done ✅
+| File | Changes |
+|------|---------|
+| `path/to/file.ts` | [Specific changes made] |
+
+### What Was NOT Done (Technical Debt) ⚠️
+| Gap | Priority | Files Affected |
+|-----|----------|----------------|
+| [Gap description] | High/Medium/Low | [Files that need work] |
+```
+
+### 3. Add Feature Documentation to CLAUDE.md
+
+For significant features, add a section to this file with:
+- Feature overview
+- API changes (if any)
+- Files modified table
+- Score breakdown
+- Known gaps/technical debt
+
+### 4. Provide PR Link After Push
+
+After every `git push`, immediately provide:
+
+```
+PR Link: https://github.com/mischa23v/traf3li-dashboard/pull/new/{branch-name}
+```
+
+### 5. Feature Completeness Matrix (MANDATORY)
+
+Before marking ANY feature complete, verify EVERY operation exists:
+
+```markdown
+## 🎯 Feature Completeness Matrix: [Feature Name]
+
+### CRUD Operations
+| Operation | Implemented | Tested | Notes |
+|-----------|-------------|--------|-------|
+| Create | ☐ | ☐ | |
+| Read (single) | ☐ | ☐ | |
+| Read (list) | ☐ | ☐ | |
+| Update/Edit | ☐ | ☐ | |
+| Delete (single) | ☐ | ☐ | |
+| Delete (bulk) | ☐ | ☐ | |
+
+### Selection & Bulk Actions
+| Action | Implemented | Notes |
+|--------|-------------|-------|
+| Select single item | ☐ | |
+| Select all | ☐ | |
+| Deselect all | ☐ | |
+| Bulk delete | ☐ | |
+| Bulk status change | ☐ | |
+| Bulk export | ☐ | |
+
+### Filtering & Search
+| Feature | Implemented | Notes |
+|---------|-------------|-------|
+| Search by text | ☐ | |
+| Filter by status | ☐ | |
+| Filter by date range | ☐ | |
+| Filter by type/category | ☐ | |
+| Sort ascending | ☐ | |
+| Sort descending | ☐ | |
+| Clear filters | ☐ | |
+| Pagination | ☐ | |
+
+### Form Controls (for Create/Edit)
+| Control | Implemented | Validated | Notes |
+|---------|-------------|-----------|-------|
+| Title/Name input | ☐ | ☐ | maxLength, required |
+| Description textarea | ☐ | ☐ | maxLength |
+| Date picker | ☐ | ☐ | |
+| Time picker | ☐ | ☐ | |
+| Dropdown/Select | ☐ | ☐ | |
+| Checkbox/Toggle | ☐ | ☐ | |
+| File upload | ☐ | ☐ | size, type validation |
+| Submit button | ☐ | ☐ | disabled when invalid |
+| Cancel button | ☐ | ☐ | confirms if dirty |
+
+### UI States
+| State | Implemented | Notes |
+|-------|-------------|-------|
+| Loading (skeleton) | ☐ | |
+| Empty state | ☐ | with CTA |
+| Error state | ☐ | with retry button |
+| Success feedback | ☐ | toast/notification |
+| Confirmation dialog | ☐ | for destructive actions |
+| Disabled state | ☐ | |
+| Hover state | ☐ | |
+| Focus state | ☐ | |
+| Active state | ☐ | |
+
+### Error Handling
+| Scenario | Handled | Notes |
+|----------|---------|-------|
+| Network failure | ☐ | retry option |
+| Validation errors | ☐ | field-level messages |
+| Server errors (4xx/5xx) | ☐ | user-friendly message |
+| Timeout | ☐ | |
+| Conflict (409) | ☐ | |
+| Not found (404) | ☐ | |
+| Unauthorized (401) | ☐ | redirect to login |
+
+### Keyboard & Accessibility
+| Feature | Implemented | Notes |
+|---------|-------------|-------|
+| Tab navigation | ☐ | |
+| Enter to submit | ☐ | |
+| Escape to close | ☐ | |
+| Arrow keys (lists) | ☐ | |
+| Screen reader labels | ☐ | |
+| Focus trap (modals) | ☐ | |
+```
+
+### 6. Department Review Simulation
+
+For enterprise-grade features, simulate department approvals:
+
+```markdown
+## 🏢 Department Sign-off Checklist
+
+| Department | Status | Reviewer Notes |
+|------------|--------|----------------|
+| **Code Quality** | ☐ | No console.log, proper types, error boundaries |
+| **QA/Testing** | ☐ | Unit tests, E2E tests, edge cases |
+| **Security** | ☐ | Input validation, XSS prevention, auth checks |
+| **Accessibility** | ☐ | WCAG AA, keyboard nav, screen reader |
+| **i18n** | ☐ | All strings externalized, RTL tested |
+| **UX/Design** | ☐ | Matches design system, consistent styling |
+| **Performance** | ☐ | No memory leaks, optimized renders |
+| **Documentation** | ☐ | API docs, CLAUDE.md updated |
+```
+
+### 7. Final Verification Checklist
+
+```markdown
+### ✅ Final Verification
+- [ ] TypeScript compiles with no errors
+- [ ] All new strings use t() with Arabic fallbacks
+- [ ] aria-label on ALL icon-only elements
+- [ ] aria-hidden on ALL decorative icons
+- [ ] Translations added to i18n JSON files
+- [ ] Visual testing in browser (both RTL & LTR)
+- [ ] All CRUD operations work
+- [ ] Bulk operations work
+- [ ] Error states display correctly
+- [ ] Loading states show skeletons
+- [ ] Empty states have CTAs
+- [ ] Keyboard navigation works
+- [ ] Mobile responsive
+- [ ] Console has no errors
+```
+
+### 8. What's Missing Report
+
+After every feature, explicitly list what's NOT done:
+
+```markdown
+## ⚠️ What's Missing (Be Honest)
+
+| Missing Feature | Priority | Reason Not Done |
+|-----------------|----------|-----------------|
+| Bulk delete | High | Not in requirements |
+| Export to CSV | Medium | Time constraint |
+| Keyboard shortcuts | Low | Nice-to-have |
+```
+
+**Claude MUST run through this entire checklist for EVERY feature implementation. No exceptions.**
+
+### 9. Domain-Specific Operation Checklists
+
+For common entities, verify ALL domain-specific operations exist:
+
+#### 📅 Reminders
+| Operation | Implemented | Notes |
+|-----------|-------------|-------|
+| Create reminder | ☐ | title, date, time, priority |
+| Edit reminder | ☐ | all fields editable |
+| Delete reminder | ☐ | with confirmation |
+| Bulk delete | ☐ | multi-select + delete |
+| Set date | ☐ | date picker |
+| Set time | ☐ | time picker |
+| Set priority | ☐ | low/medium/high |
+| Snooze | ☐ | 5min, 15min, 1hr, 1day |
+| Dismiss | ☐ | mark as done |
+| Mark complete | ☐ | checkbox/toggle |
+| Recurring options | ☐ | daily, weekly, monthly |
+| Notification preview | ☐ | show when it will fire |
+
+#### 📆 Appointments
+| Operation | Implemented | Notes |
+|-----------|-------------|-------|
+| Create appointment | ☐ | client, date, time, type |
+| Edit appointment | ☐ | all fields editable |
+| Delete appointment | ☐ | with confirmation |
+| Bulk delete | ☐ | multi-select + delete |
+| Reschedule | ☐ | change date/time |
+| Confirm | ☐ | mark as confirmed |
+| Cancel | ☐ | with reason |
+| Complete | ☐ | mark as completed |
+| Mark no-show | ☐ | client didn't appear |
+| Send reminder | ☐ | email/SMS to client |
+| Add to calendar | ☐ | export to Google/Outlook |
+| View client history | ☐ | past appointments |
+
+#### ✅ Tasks
+| Operation | Implemented | Notes |
+|-----------|-------------|-------|
+| Create task | ☐ | title, description, due date |
+| Edit task | ☐ | all fields editable |
+| Delete task | ☐ | with confirmation |
+| Bulk delete | ☐ | multi-select + delete |
+| Mark complete | ☐ | checkbox/toggle |
+| Set priority | ☐ | low/medium/high/urgent |
+| Set due date | ☐ | date picker |
+| Assign to user | ☐ | dropdown of team |
+| Add subtasks | ☐ | nested checklist |
+| Attach files | ☐ | file upload |
+| Add comments | ☐ | discussion thread |
+| Move to project | ☐ | categorization |
+
+#### 💰 Invoices
+| Operation | Implemented | Notes |
+|-----------|-------------|-------|
+| Create invoice | ☐ | client, items, amounts |
+| Edit invoice | ☐ | only if draft |
+| Delete invoice | ☐ | only if draft |
+| View invoice | ☐ | read-only detail |
+| Send to client | ☐ | email with PDF |
+| Mark as paid | ☐ | payment received |
+| Mark as partial | ☐ | partial payment |
+| Void invoice | ☐ | cancel issued invoice |
+| Clone/duplicate | ☐ | create copy |
+| Download PDF | ☐ | export |
+| Print | ☐ | print view |
+| Add payment | ☐ | record payment |
+| Send reminder | ☐ | overdue notice |
+
+#### ⚖️ Cases
+| Operation | Implemented | Notes |
+|-----------|-------------|-------|
+| Create case | ☐ | client, type, details |
+| Edit case | ☐ | all fields editable |
+| Delete case | ☐ | with confirmation |
+| View case | ☐ | detail page |
+| Open case | ☐ | set status to open |
+| Close case | ☐ | set status to closed |
+| Archive case | ☐ | move to archive |
+| Restore case | ☐ | unarchive |
+| Change status | ☐ | status dropdown |
+| Assign lawyer | ☐ | team member dropdown |
+| Add documents | ☐ | file attachments |
+| Add notes | ☐ | case notes |
+| Timeline view | ☐ | activity history |
+| Link client | ☐ | associate client |
+
+#### 👥 Clients
+| Operation | Implemented | Notes |
+|-----------|-------------|-------|
+| Create client | ☐ | name, email, phone |
+| Edit client | ☐ | all fields editable |
+| Delete client | ☐ | with confirmation + check cases |
+| View client | ☐ | detail page |
+| Bulk delete | ☐ | multi-select + delete |
+| Search clients | ☐ | by name, email, phone |
+| Filter by status | ☐ | active/inactive |
+| Export list | ☐ | CSV download |
+| Import clients | ☐ | CSV upload |
+| Merge duplicates | ☐ | combine records |
+| View cases | ☐ | linked cases |
+| View invoices | ☐ | linked invoices |
+| View appointments | ☐ | linked appointments |
+| Send email | ☐ | email action |
+| Call client | ☐ | phone action (tel:) |
+
+### 10. Frontend Architecture Checklist
+
+For each feature, verify these frontend patterns:
+
+#### Service Layer
+| Requirement | Implemented | Notes |
+|-------------|-------------|-------|
+| API service function exists | ☐ | in `src/services/` |
+| Types/interfaces defined | ☐ | request & response types |
+| Error handling in service | ☐ | try/catch, error transformation |
+
+#### React Query Hooks
+| Requirement | Implemented | Notes |
+|-------------|-------------|-------|
+| useQuery for fetching | ☐ | with proper queryKey |
+| useMutation for create | ☐ | with onSuccess/onError |
+| useMutation for update | ☐ | with optimistic updates |
+| useMutation for delete | ☐ | with confirmation |
+| Query invalidation | ☐ | invalidate related queries |
+| Primitive query keys | ☐ | no object references |
+| staleTime configured | ☐ | appropriate for data type |
+| placeholderData | ☐ | smooth loading |
+
+#### Components
+| Requirement | Implemented | Notes |
+|-------------|-------------|-------|
+| List component | ☐ | table or card grid |
+| Detail component | ☐ | single item view |
+| Create form | ☐ | with validation |
+| Edit form | ☐ | pre-filled values |
+| Delete confirmation | ☐ | dialog with warning |
+| Loading skeleton | ☐ | not just spinner |
+| Empty state | ☐ | with CTA |
+| Error state | ☐ | with retry button |
+
+#### State Management
+| Requirement | Implemented | Notes |
+|-------------|-------------|-------|
+| Form state (react-hook-form) | ☐ | or useState |
+| Validation (zod) | ☐ | schema validation |
+| Selection state | ☐ | for bulk actions |
+| Filter state | ☐ | URL sync or local |
+| Pagination state | ☐ | page, limit |
+
+---
+
 ## 📊 Current Module Scores
 
 | Module | Security | A11y | i18n | Service | UI | **Total** |
 |--------|----------|------|------|---------|----|---------:|
 | Appointments | 95 | 95 | 95 | 98 | 95 | **95.6** ✅ |
 | Calendar | 90 | 95 | 95 | 90 | 90 | **92.0** ✅ |
+| Google Calendar Sync | 25 | 24 | 25 | 24 | 23 | **95.0** ✅ |
 
 > **Target: All modules must be 90+/100**
+
+---
+
+## 📅 Google Calendar Bi-directional Sync (Frontend Integration)
+
+### Feature Overview
+
+The calendar now supports Google Calendar integration with bi-directional sync. External events from Google Calendar are displayed with visual distinction.
+
+### API Response Changes
+
+The `/api/calendar/grid-items` endpoint now includes Google Calendar events:
+
+```typescript
+// GridItem type includes new fields:
+interface GridItem {
+  id: string
+  type: 'event' | 'task' | 'reminder' | 'case-document' | 'appointment' | 'google-calendar'
+  // ... existing fields ...
+
+  // Google Calendar specific fields
+  isExternal?: boolean           // true for Google Calendar events
+  googleEventId?: string         // Original Google event ID
+  source?: 'google' | 'microsoft' | 'local'
+  location?: string
+  organizer?: string
+  htmlLink?: string              // Link to open in Google Calendar
+  meetingLink?: string           // Google Meet link if available
+}
+```
+
+### Settings API
+
+```typescript
+// GET /api/google-calendar/status - Returns showExternalEvents field
+// PUT /api/google-calendar/settings/show-external-events - Toggle visibility
+```
+
+### Visual Distinction
+
+External events are styled with:
+- Google "G" icon indicator
+- Blue left border (#4285F4)
+- Reduced opacity (0.9)
+- "External Event" badge in details dialog
+- "Open in Google Calendar" button instead of "View Details"
+
+### Files Modified
+
+| File | Changes |
+|------|---------|
+| `src/services/calendarService.ts` | Added external event fields to GridItem type |
+| `src/services/googleCalendarService.ts` | Added showExternalEvents to status, updateShowExternalEvents() |
+| `src/hooks/useCalendarIntegration.ts` | Added useToggleExternalEvents() with optimistic updates |
+| `src/features/dashboard/components/fullcalendar-view.tsx` | Visual distinction, event rendering, dialog updates |
+| `src/features/dashboard/components/calendar-sync-dialog.tsx` | External events toggle, real OAuth integration |
+| `src/locales/en/translation.json` | Added calendar.google.* translations |
+| `src/locales/ar/translation.json` | Added calendar.google.* translations (Arabic) |
+
+### Score Breakdown
+
+| Category | Score | Notes |
+|----------|-------|-------|
+| Security | 25/25 | No new inputs, OAuth handled by backend, no PII exposure |
+| Accessibility | 24/25 | aria-label on icons, aria-busy on toggle, aria-hidden on decorative |
+| i18n | 25/25 | All strings use t() with translations in i18n files |
+| Service Layer | 24/25 | Optimistic updates, cache invalidation, primitive query keys |
+| UI Completeness | 23/25 | Toggle works, visual distinction, loading states (-2: no visual testing) |
+
+### Known Gaps (Technical Debt)
+
+1. **Visual testing not performed**: Browser lock issue prevented Playwright testing.
 
 ---
 
