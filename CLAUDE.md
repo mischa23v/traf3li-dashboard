@@ -140,6 +140,78 @@ Score = (Security × 0.25) + (Accessibility × 0.25) + (i18n × 0.15) + (Service
 
 ---
 
+## 🤖 Claude's Task Completion Protocol (MANDATORY)
+
+**After completing ANY feature or significant task, Claude MUST:**
+
+### 1. Provide Honest Gold Standard Assessment
+
+Present a score breakdown table with honest evaluation:
+
+```markdown
+## 📊 Gold Standard Assessment
+
+**Score: XX.X/100** ✅/⚠️
+
+| Category | Score | Notes |
+|----------|-------|-------|
+| Security | XX/25 | [Specific notes] |
+| Accessibility | XX/25 | [Specific notes with gaps] |
+| i18n | XX/25 | [Specific notes] |
+| Service Layer | XX/25 | [Specific notes] |
+| UI Completeness | XX/25 | [Specific notes with gaps] |
+```
+
+### 2. Document What Was Done vs NOT Done
+
+Always be explicit about:
+
+```markdown
+### What Was Done ✅
+| File | Changes |
+|------|---------|
+| `path/to/file.ts` | [Specific changes made] |
+
+### What Was NOT Done (Technical Debt) ⚠️
+| Gap | Priority | Files Affected |
+|-----|----------|----------------|
+| [Gap description] | High/Medium/Low | [Files that need work] |
+```
+
+### 3. Add Feature Documentation to CLAUDE.md
+
+For significant features, add a section to this file with:
+- Feature overview
+- API changes (if any)
+- Files modified table
+- Score breakdown
+- Known gaps/technical debt
+
+### 4. Provide PR Link After Push
+
+After every `git push`, immediately provide:
+
+```
+PR Link: https://github.com/mischa23v/traf3li-dashboard/pull/new/{branch-name}
+```
+
+### 5. Verification Checklist
+
+Always show what was verified:
+
+```markdown
+### Verification Checklist
+- [x] TypeScript compiles with no errors
+- [x] All new strings use t() with Arabic fallbacks
+- [x] aria-label on icon-only elements
+- [ ] Translations added to i18n JSON files (NOT DONE - reason)
+- [ ] Visual testing in browser (NOT DONE - reason)
+```
+
+**This protocol ensures transparency, maintains quality standards, and creates documentation for future reference.**
+
+---
+
 ## 📊 Current Module Scores
 
 | Module | Security | A11y | i18n | Service | UI | **Total** |
