@@ -14,16 +14,45 @@ export interface GoogleCalendar {
   id: string
   summary: string
   description?: string
-  primary: boolean
-  backgroundColor?: string
+  primary?: boolean
+  backgroundColor: string
   foregroundColor?: string
   accessRole: 'owner' | 'writer' | 'reader'
+  timeZone?: string
   selected?: boolean
+}
+
+export interface SelectedCalendar {
+  calendarId: string
+  name: string
+  backgroundColor: string
+  isPrimary: boolean
+  syncEnabled: boolean
+}
+
+export interface AutoSyncSettings {
+  enabled: boolean
+  direction: 'both' | 'import_only' | 'export_only'
+  syncInterval: number // minutes
+  conflictResolution: 'google_wins' | 'traf3li_wins' | 'newest_wins' | 'manual'
+  syncPastEvents?: boolean
+  syncDaysBack?: number
+  syncDaysForward?: number
+}
+
+export interface SyncStats {
+  totalSyncs: number
+  successfulSyncs: number
+  failedSyncs: number
+  eventsImported: number
+  eventsExported: number
+  lastImportCount?: number
+  lastExportCount?: number
 }
 
 export interface GoogleEvent {
   id: string
-  calendarId: string
+  calendarId?: string
   summary: string
   description?: string
   location?: string
@@ -54,25 +83,30 @@ export interface GoogleEvent {
 
 export interface GoogleAuthResponse {
   success: boolean
-  data: {
+  authUrl?: string // Top-level for convenience
+  data?: {
     authUrl: string
   }
 }
 
 export interface GoogleConnectionStatus {
   success: boolean
-  connected?: boolean // Top-level connected for convenience
+  connected: boolean // Top-level connected
   data: {
     isConnected: boolean
-    connected?: boolean // Alias for backwards compatibility
-    email?: string
+    email: string | null
+    displayName?: string | null
     expiresAt?: string
     scopes?: string[]
     calendars?: GoogleCalendar[]
-    selectedCalendars?: string[]
+    selectedCalendars?: SelectedCalendar[]
     primaryCalendarId?: string
-    showExternalEvents?: boolean // NEW: Toggle for showing external events in calendar
-  }
+    showExternalEvents?: boolean
+    autoSync?: AutoSyncSettings
+    syncStats?: SyncStats
+    connectedAt?: string
+    lastSyncedAt?: string | null
+  } | null
 }
 
 export interface GoogleCalendarsResponse {
@@ -83,20 +117,21 @@ export interface GoogleCalendarsResponse {
 export interface GoogleEventsResponse {
   success: boolean
   data: GoogleEvent[]
+  count?: number
   nextPageToken?: string
 }
 
 export interface GoogleEventResponse {
   success: boolean
-  data: GoogleEvent
+  message?: string
+  data: GoogleEvent | { id: string; htmlLink?: string }
 }
 
 export interface GoogleSyncSettings {
-  autoSyncEnabled: boolean
-  syncDirection: 'bidirectional' | 'import' | 'export'
-  selectedCalendars: string[]
-  syncInterval: number // minutes
-  lastSyncAt?: string
+  autoSync: AutoSyncSettings
+  syncStats?: SyncStats
+  lastSyncedAt?: string | null
+  lastSyncError?: string | null
 }
 
 export interface GoogleSyncSettingsResponse {
@@ -105,16 +140,59 @@ export interface GoogleSyncSettingsResponse {
 }
 
 export interface CreateGoogleEventRequest {
-  summary: string
+  title?: string // Alias for summary (backend accepts both)
+  summary?: string
   description?: string
   location?: string
-  start: { dateTime: string; timeZone?: string }
-  end: { dateTime: string; timeZone?: string }
-  attendees?: Array<{ email: string }>
-  reminders?: {
-    useDefault: boolean
-    overrides?: Array<{ method: 'email' | 'popup'; minutes: number }>
+  start?: { dateTime: string; timeZone?: string }
+  end?: { dateTime: string; timeZone?: string }
+  startDateTime?: string // Alternative format
+  endDateTime?: string // Alternative format
+  timezone?: string
+  attendees?: Array<{ email: string; name?: string }>
+  reminders?: Array<{ type: 'popup' | 'email'; beforeMinutes: number }>
+}
+
+export interface UpdateCalendarsRequest {
+  calendars: SelectedCalendar[]
+  primaryCalendarId: string
+}
+
+export interface UpdateCalendarsResponse {
+  success: boolean
+  message?: string
+  data?: {
+    selectedCalendars: SelectedCalendar[]
+    primaryCalendarId: string
   }
+}
+
+export interface ImportResponse {
+  success: boolean
+  message?: string
+  data?: {
+    imported: number
+    skipped: number
+    errors: string[]
+  }
+}
+
+export interface ExportResponse {
+  success: boolean
+  message?: string
+  data?: {
+    action: 'created' | 'updated'
+    googleEventId: string
+  }
+}
+
+export interface EnableAutoSyncRequest {
+  direction?: 'both' | 'import_only' | 'export_only'
+  syncInterval?: number
+  conflictResolution?: 'google_wins' | 'traf3li_wins' | 'newest_wins' | 'manual'
+  syncPastEvents?: boolean
+  syncDaysBack?: number
+  syncDaysForward?: number
 }
 
 // ==================== Service ====================
@@ -258,11 +336,11 @@ const googleCalendarService = {
    * Update selected calendars for sync
    * تحديث التقويمات المحددة للمزامنة
    */
-  updateSelectedCalendars: async (calendarIds: string[]): Promise<{ success: boolean }> => {
+  updateSelectedCalendars: async (request: UpdateCalendarsRequest): Promise<UpdateCalendarsResponse> => {
     try {
-      const response = await apiClient.put<{ success: boolean }>(
+      const response = await apiClient.put<UpdateCalendarsResponse>(
         '/google-calendar/settings/calendars',
-        { calendarIds }
+        request
       )
       return response.data
     } catch (error: any) {
@@ -306,12 +384,12 @@ const googleCalendarService = {
   /**
    * Import events from Google to TRAF3LI
    * استيراد الأحداث من جوجل إلى TRAF3LI
+   *
+   * Endpoint: POST /google-calendar/import (or /google-calendar/sync/import)
    */
-  syncImport: async (): Promise<{ success: boolean; imported: number; errors: number }> => {
+  syncImport: async (): Promise<ImportResponse> => {
     try {
-      const response = await apiClient.post<{ success: boolean; imported: number; errors: number }>(
-        '/google-calendar/sync/import'
-      )
+      const response = await apiClient.post<ImportResponse>('/google-calendar/import')
       return response.data
     } catch (error: any) {
       const errorMessage = handleApiError(error) || 'Failed to import from Google | فشل في الاستيراد من جوجل'
@@ -320,13 +398,16 @@ const googleCalendarService = {
   },
 
   /**
-   * Export event to Google
-   * تصدير حدث إلى جوجل
+   * Export event to Google Calendar
+   * تصدير حدث إلى تقويم جوجل
+   *
+   * Endpoint: POST /google-calendar/export (with eventId in body)
    */
-  syncExport: async (eventId: string): Promise<{ success: boolean; googleEventId: string }> => {
+  syncExport: async (eventId: string): Promise<ExportResponse> => {
     try {
-      const response = await apiClient.post<{ success: boolean; googleEventId: string }>(
-        `/google-calendar/sync/export/${eventId}`
+      const response = await apiClient.post<ExportResponse>(
+        '/google-calendar/export',
+        { eventId }
       )
       return response.data
     } catch (error: any) {
@@ -336,12 +417,17 @@ const googleCalendarService = {
   },
 
   /**
-   * Enable auto-sync
-   * تفعيل المزامنة التلقائية
+   * Enable auto-sync with configuration options
+   * تفعيل المزامنة التلقائية مع خيارات التكوين
+   *
+   * Endpoint: POST /google-calendar/sync/auto/enable
    */
-  enableAutoSync: async (): Promise<{ success: boolean }> => {
+  enableAutoSync: async (config?: EnableAutoSyncRequest): Promise<{ success: boolean; message?: string; data?: { autoSync: AutoSyncSettings } }> => {
     try {
-      const response = await apiClient.post<{ success: boolean }>('/google-calendar/sync/auto/enable')
+      const response = await apiClient.post<{ success: boolean; message?: string; data?: { autoSync: AutoSyncSettings } }>(
+        '/google-calendar/sync/auto/enable',
+        config || {}
+      )
       return response.data
     } catch (error: any) {
       const errorMessage = handleApiError(error) || 'Failed to enable auto-sync | فشل في تفعيل المزامنة التلقائية'

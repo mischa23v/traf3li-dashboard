@@ -22,6 +22,16 @@ export interface MicrosoftCalendar {
   }
 }
 
+export interface MicrosoftSyncSettings {
+  enabled: boolean
+  syncInterval: 'manual' | 'hourly' | 'daily'
+  syncDirection: 'to_microsoft' | 'from_microsoft' | 'bidirectional'
+  defaultCalendarId: string | null
+  syncPastDays: number
+  syncFutureDays: number
+  lastSync: string | null
+}
+
 export interface MicrosoftEvent {
   id: string
   subject: string
@@ -47,16 +57,16 @@ export interface MicrosoftEvent {
       postalCode?: string
     }
   }
-  isAllDay: boolean
-  isCancelled: boolean
-  isOrganizer: boolean
-  showAs: 'free' | 'tentative' | 'busy' | 'oof' | 'workingElsewhere' | 'unknown'
-  importance: 'low' | 'normal' | 'high'
-  sensitivity: 'normal' | 'personal' | 'private' | 'confidential'
+  isAllDay?: boolean
+  isCancelled?: boolean
+  isOrganizer?: boolean
+  showAs?: 'free' | 'tentative' | 'busy' | 'oof' | 'workingElsewhere' | 'unknown'
+  importance?: 'low' | 'normal' | 'high'
+  sensitivity?: 'normal' | 'personal' | 'private' | 'confidential'
   attendees?: Array<{
     emailAddress: { name: string; address: string }
-    type: 'required' | 'optional' | 'resource'
-    status: { response: 'none' | 'organizer' | 'tentativelyAccepted' | 'accepted' | 'declined' | 'notResponded' }
+    type?: 'required' | 'optional' | 'resource'
+    status?: { response: 'none' | 'organizer' | 'tentativelyAccepted' | 'accepted' | 'declined' | 'notResponded' }
   }>
   webLink?: string
   createdDateTime?: string
@@ -67,6 +77,7 @@ export interface MicrosoftAuthResponse {
   success: boolean
   data: {
     authUrl: string
+    state?: string
   }
 }
 
@@ -77,6 +88,8 @@ export interface MicrosoftConnectionStatus {
     email?: string
     displayName?: string
     expiresAt?: string
+    lastSyncedAt?: string | null
+    syncSettings?: MicrosoftSyncSettings
     calendars?: MicrosoftCalendar[]
   }
 }
@@ -94,10 +107,12 @@ export interface MicrosoftEventsResponse {
 
 export interface MicrosoftEventResponse {
   success: boolean
-  data: MicrosoftEvent
+  message_en?: string
+  data: MicrosoftEvent | { id: string }
 }
 
 export interface CreateMicrosoftEventRequest {
+  calendarId?: string
   subject: string
   body?: {
     contentType: 'text' | 'html'
@@ -116,11 +131,56 @@ export interface CreateMicrosoftEventRequest {
   }
   attendees?: Array<{
     emailAddress: { name?: string; address: string }
-    type: 'required' | 'optional'
+    type?: 'required' | 'optional'
   }>
   isAllDay?: boolean
   showAs?: 'free' | 'tentative' | 'busy' | 'oof' | 'workingElsewhere'
   importance?: 'low' | 'normal' | 'high'
+}
+
+export interface MicrosoftImportRequest {
+  calendarId?: string
+  startDate?: string
+  endDate?: string
+}
+
+export interface MicrosoftImportResponse {
+  success: boolean
+  message_en?: string
+  data?: {
+    imported: number
+    updated: number
+    skipped: number
+  }
+}
+
+export interface MicrosoftExportResponse {
+  success: boolean
+  message_en?: string
+  data?: {
+    microsoftEventId: string
+  }
+}
+
+export interface MicrosoftSyncSettingsResponse {
+  success: boolean
+  data: {
+    autoSyncEnabled: boolean
+    syncDirection: 'to_microsoft' | 'from_microsoft' | 'bidirectional'
+    syncInterval: 'manual' | 'hourly' | 'daily'
+    selectedCalendars: string[]
+    syncPastDays: number
+    syncFutureDays: number
+    lastSyncAt: string | null
+  }
+}
+
+export interface EnableMicrosoftAutoSyncRequest {
+  syncInterval?: 'manual' | 'hourly' | 'daily'
+  syncDirection?: 'to_microsoft' | 'from_microsoft' | 'bidirectional'
+  defaultCalendarId?: string
+  syncPastDays?: number
+  syncFutureDays?: number
 }
 
 // ==================== Service ====================
@@ -249,10 +309,15 @@ const microsoftCalendarService = {
   /**
    * Delete event from Microsoft calendar
    * حذف حدث من تقويم مايكروسوفت
+   *
+   * Endpoint: DELETE /microsoft-calendar/events/:eventId?calendarId=...
    */
-  deleteEvent: async (eventId: string): Promise<{ success: boolean }> => {
+  deleteEvent: async (eventId: string, calendarId?: string): Promise<{ success: boolean; message_en?: string }> => {
     try {
-      const response = await apiClient.delete<{ success: boolean }>(`/microsoft-calendar/events/${eventId}`)
+      const response = await apiClient.delete<{ success: boolean; message_en?: string }>(
+        `/microsoft-calendar/events/${eventId}`,
+        { params: calendarId ? { calendarId } : undefined }
+      )
       return response.data
     } catch (error: any) {
       const errorMessage = handleApiError(error) || 'Failed to delete Microsoft event | فشل في حذف حدث مايكروسوفت'
@@ -263,13 +328,16 @@ const microsoftCalendarService = {
   // ==================== Sync Operations ====================
 
   /**
-   * Sync from Microsoft to TRAF3LI
-   * المزامنة من مايكروسوفت إلى TRAF3LI
+   * Import events from Microsoft to TRAF3LI
+   * استيراد الأحداث من مايكروسوفت إلى TRAF3LI
+   *
+   * Endpoint: POST /microsoft-calendar/import
    */
-  syncFromMicrosoft: async (): Promise<{ success: boolean; imported: number; errors: number }> => {
+  syncFromMicrosoft: async (request?: MicrosoftImportRequest): Promise<MicrosoftImportResponse> => {
     try {
-      const response = await apiClient.post<{ success: boolean; imported: number; errors: number }>(
-        '/microsoft-calendar/sync/from-microsoft'
+      const response = await apiClient.post<MicrosoftImportResponse>(
+        '/microsoft-calendar/import',
+        request || {}
       )
       return response.data
     } catch (error: any) {
@@ -279,13 +347,16 @@ const microsoftCalendarService = {
   },
 
   /**
-   * Sync to Microsoft
-   * المزامنة إلى مايكروسوفت
+   * Export event to Microsoft Calendar
+   * تصدير حدث إلى تقويم مايكروسوفت
+   *
+   * Endpoint: POST /microsoft-calendar/export (with eventId in body)
    */
-  syncToMicrosoft: async (eventId: string): Promise<{ success: boolean; microsoftEventId: string }> => {
+  syncToMicrosoft: async (eventId: string): Promise<MicrosoftExportResponse> => {
     try {
-      const response = await apiClient.post<{ success: boolean; microsoftEventId: string }>(
-        `/microsoft-calendar/sync/to-microsoft/${eventId}`
+      const response = await apiClient.post<MicrosoftExportResponse>(
+        '/microsoft-calendar/export',
+        { eventId }
       )
       return response.data
     } catch (error: any) {
@@ -295,12 +366,33 @@ const microsoftCalendarService = {
   },
 
   /**
-   * Enable auto-sync
-   * تفعيل المزامنة التلقائية
+   * Get sync settings
+   * الحصول على إعدادات المزامنة
+   *
+   * Endpoint: GET /microsoft-calendar/sync/settings
    */
-  enableAutoSync: async (): Promise<{ success: boolean }> => {
+  getSyncSettings: async (): Promise<MicrosoftSyncSettingsResponse> => {
     try {
-      const response = await apiClient.post<{ success: boolean }>('/microsoft-calendar/sync/enable-auto-sync')
+      const response = await apiClient.get<MicrosoftSyncSettingsResponse>('/microsoft-calendar/sync/settings')
+      return response.data
+    } catch (error: any) {
+      const errorMessage = handleApiError(error) || 'Failed to get sync settings | فشل في الحصول على إعدادات المزامنة'
+      throw new Error(errorMessage)
+    }
+  },
+
+  /**
+   * Enable auto-sync with configuration options
+   * تفعيل المزامنة التلقائية مع خيارات التكوين
+   *
+   * Endpoint: POST /microsoft-calendar/sync/enable-auto-sync
+   */
+  enableAutoSync: async (config?: EnableMicrosoftAutoSyncRequest): Promise<{ success: boolean; message_en?: string; data?: { syncSettings: MicrosoftSyncSettings } }> => {
+    try {
+      const response = await apiClient.post<{ success: boolean; message_en?: string; data?: { syncSettings: MicrosoftSyncSettings } }>(
+        '/microsoft-calendar/sync/enable-auto-sync',
+        config || {}
+      )
       return response.data
     } catch (error: any) {
       const errorMessage = handleApiError(error) || 'Failed to enable auto-sync | فشل في تفعيل المزامنة التلقائية'
@@ -311,10 +403,12 @@ const microsoftCalendarService = {
   /**
    * Disable auto-sync
    * تعطيل المزامنة التلقائية
+   *
+   * Endpoint: POST /microsoft-calendar/sync/disable-auto-sync
    */
-  disableAutoSync: async (): Promise<{ success: boolean }> => {
+  disableAutoSync: async (): Promise<{ success: boolean; message_en?: string }> => {
     try {
-      const response = await apiClient.post<{ success: boolean }>('/microsoft-calendar/sync/disable-auto-sync')
+      const response = await apiClient.post<{ success: boolean; message_en?: string }>('/microsoft-calendar/sync/disable-auto-sync')
       return response.data
     } catch (error: any) {
       const errorMessage = handleApiError(error) || 'Failed to disable auto-sync | فشل في تعطيل المزامنة التلقائية'
