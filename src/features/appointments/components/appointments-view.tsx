@@ -1575,13 +1575,13 @@ function AppointmentDetailsDialog({
           {appointment.clientEmail && (
             <div className="flex items-center gap-3 text-slate-700">
               <Mail className="h-5 w-5 text-slate-400" aria-hidden="true" />
-              <span>{appointment.clientEmail}</span>
+              <span>{maskEmail(appointment.clientEmail)}</span>
             </div>
           )}
           {appointment.clientPhone && (
             <div className="flex items-center gap-3 text-slate-700">
               <Phone className="h-5 w-5 text-slate-400" aria-hidden="true" />
-              <span>{appointment.clientPhone}</span>
+              <span>{maskPhone(appointment.clientPhone)}</span>
             </div>
           )}
           {/* Location/Meeting Type Display */}
@@ -2054,7 +2054,7 @@ function BookAppointmentDialog({
                         ? t('appointments.messages.notWorkingDay', 'هذا اليوم ليس يوم عمل')
                         : availableSlots.length === 0
                           ? t('appointments.empty.noAvailableTimes', 'لا توجد أوقات متاحة')
-                          : t('appointments.messages.slotsAvailable', { count: availableSlots.filter(s => s.available).length }, `${availableSlots.filter(s => s.available).length} وقت متاح`)
+                          : t('appointments.messages.slotsAvailable', { count: availableSlots.filter(s => s.available).length, defaultValue: '{{count}} وقت متاح' })
                 }
               </div>
               {workingHours && (
