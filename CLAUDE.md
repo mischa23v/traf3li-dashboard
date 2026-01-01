@@ -146,7 +146,7 @@ Score = (Security × 0.25) + (Accessibility × 0.25) + (i18n × 0.15) + (Service
 |--------|----------|------|------|---------|----|---------:|
 | Appointments | 95 | 95 | 95 | 98 | 95 | **95.6** ✅ |
 | Calendar | 90 | 95 | 95 | 90 | 90 | **92.0** ✅ |
-| Google Calendar Sync | 25 | 24 | 23 | 24 | 23 | **93.8** ✅ |
+| Google Calendar Sync | 25 | 24 | 25 | 24 | 23 | **95.0** ✅ |
 
 > **Target: All modules must be 90+/100**
 
@@ -205,6 +205,8 @@ External events are styled with:
 | `src/hooks/useCalendarIntegration.ts` | Added useToggleExternalEvents() with optimistic updates |
 | `src/features/dashboard/components/fullcalendar-view.tsx` | Visual distinction, event rendering, dialog updates |
 | `src/features/dashboard/components/calendar-sync-dialog.tsx` | External events toggle, real OAuth integration |
+| `src/locales/en/translation.json` | Added calendar.google.* translations |
+| `src/locales/ar/translation.json` | Added calendar.google.* translations (Arabic) |
 
 ### Score Breakdown
 
@@ -212,17 +214,13 @@ External events are styled with:
 |----------|-------|-------|
 | Security | 25/25 | No new inputs, OAuth handled by backend, no PII exposure |
 | Accessibility | 24/25 | aria-label on icons, aria-busy on toggle, aria-hidden on decorative |
-| i18n | 23/25 | All strings use t() with Arabic fallbacks (-2: not in i18n files yet) |
+| i18n | 25/25 | All strings use t() with translations in i18n files |
 | Service Layer | 24/25 | Optimistic updates, cache invalidation, primitive query keys |
 | UI Completeness | 23/25 | Toggle works, visual distinction, loading states (-2: no visual testing) |
 
 ### Known Gaps (Technical Debt)
 
-1. **Translations not in i18n files**: New translation keys use inline fallbacks. Should be added to:
-   - `src/locales/ar/calendar.json`
-   - `src/locales/en/calendar.json`
-
-2. **Visual testing not performed**: Browser lock issue prevented Playwright testing.
+1. **Visual testing not performed**: Browser lock issue prevented Playwright testing.
 
 ---
 
