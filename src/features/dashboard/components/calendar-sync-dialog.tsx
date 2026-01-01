@@ -17,6 +17,8 @@ import {
   Loader2,
   AlertCircle,
   Info,
+  Eye,
+  EyeOff,
 } from 'lucide-react'
 import {
   Dialog,
@@ -35,6 +37,13 @@ import { Separator } from '@/components/ui/separator'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { toast } from 'sonner'
 import eventsService from '@/services/eventsService'
+import {
+  useGoogleCalendarStatus,
+  useToggleExternalEvents,
+  useGoogleCalendarAuth,
+  useGoogleCalendarDisconnect,
+  useGoogleCalendarImport,
+} from '@/hooks/useCalendarIntegration'
 
 interface CalendarProvider {
   id: string
@@ -54,6 +63,17 @@ interface CalendarSyncDialogProps {
 export function CalendarSyncDialog({ open, onOpenChange }: CalendarSyncDialogProps) {
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
+
+  // ==================== Google Calendar Integration Hooks ====================
+  const { data: googleStatus, isLoading: isLoadingGoogleStatus } = useGoogleCalendarStatus()
+  const googleAuthMutation = useGoogleCalendarAuth()
+  const googleDisconnectMutation = useGoogleCalendarDisconnect()
+  const googleImportMutation = useGoogleCalendarImport()
+  const toggleExternalEventsMutation = useToggleExternalEvents()
+
+  // Get Google Calendar connection status
+  const isGoogleConnected = googleStatus?.data?.isConnected || googleStatus?.connected || false
+  const showExternalEvents = googleStatus?.data?.showExternalEvents ?? true
 
   const [providers, setProviders] = useState<CalendarProvider[]>([
     {
@@ -82,6 +102,19 @@ export function CalendarSyncDialog({ open, onOpenChange }: CalendarSyncDialogPro
     },
   ])
 
+  // Update Google provider status when API status changes
+  useEffect(() => {
+    if (googleStatus) {
+      setProviders(prev =>
+        prev.map(p =>
+          p.id === 'google'
+            ? { ...p, connected: isGoogleConnected }
+            : p
+        )
+      )
+    }
+  }, [googleStatus, isGoogleConnected])
+
   const [isExporting, setIsExporting] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
   const [importFile, setImportFile] = useState<File | null>(null)
@@ -103,23 +136,28 @@ export function CalendarSyncDialog({ open, onOpenChange }: CalendarSyncDialogPro
   // Connect to a calendar provider
   const handleConnect = async (providerId: string) => {
     try {
-      // In production, this would redirect to OAuth flow
-      toast.info(t('calendar.sync.info.redirectToLogin', 'سيتم تحويلك إلى صفحة تسجيل الدخول...'))
+      if (providerId === 'google') {
+        // Use real Google Calendar OAuth
+        googleAuthMutation.mutate()
+      } else {
+        // Fallback for other providers - simulated connection
+        toast.info(t('calendar.sync.info.redirectToLogin', 'سيتم تحويلك إلى صفحة تسجيل الدخول...'))
 
-      // Clear any existing timeout
-      if (connectTimeoutRef.current) clearTimeout(connectTimeoutRef.current)
+        // Clear any existing timeout
+        if (connectTimeoutRef.current) clearTimeout(connectTimeoutRef.current)
 
-      // Simulate connection for demo - with cleanup ref
-      connectTimeoutRef.current = setTimeout(() => {
-        setProviders(prev =>
-          prev.map(p =>
-            p.id === providerId
-              ? { ...p, connected: true, lastSync: new Date().toISOString() }
-              : p
+        // Simulate connection for demo - with cleanup ref
+        connectTimeoutRef.current = setTimeout(() => {
+          setProviders(prev =>
+            prev.map(p =>
+              p.id === providerId
+                ? { ...p, connected: true, lastSync: new Date().toISOString() }
+                : p
+            )
           )
-        )
-        toast.success(t('calendar.sync.success.connected', `تم الاتصال بـ ${providers.find(p => p.id === providerId)?.nameAr} بنجاح`))
-      }, 1500)
+          toast.success(t('calendar.sync.success.connected', `تم الاتصال بـ ${providers.find(p => p.id === providerId)?.nameAr} بنجاح`))
+        }, 1500)
+      }
     } catch (error) {
       toast.error(t('calendar.sync.errors.connectionFailed', 'فشل الاتصال بالتقويم'))
     }
@@ -128,12 +166,18 @@ export function CalendarSyncDialog({ open, onOpenChange }: CalendarSyncDialogPro
   // Disconnect from a calendar provider
   const handleDisconnect = async (providerId: string) => {
     try {
-      setProviders(prev =>
-        prev.map(p =>
-          p.id === providerId ? { ...p, connected: false, lastSync: undefined } : p
+      if (providerId === 'google') {
+        // Use real Google Calendar disconnect
+        googleDisconnectMutation.mutate()
+      } else {
+        // Fallback for other providers
+        setProviders(prev =>
+          prev.map(p =>
+            p.id === providerId ? { ...p, connected: false, lastSync: undefined } : p
+          )
         )
-      )
-      toast.success(t('calendar.sync.success.disconnected', 'تم قطع الاتصال بنجاح'))
+        toast.success(t('calendar.sync.success.disconnected', 'تم قطع الاتصال بنجاح'))
+      }
     } catch (error) {
       toast.error(t('calendar.sync.errors.disconnectionFailed', 'فشل قطع الاتصال'))
     }
@@ -142,23 +186,33 @@ export function CalendarSyncDialog({ open, onOpenChange }: CalendarSyncDialogPro
   // Sync with a provider
   const handleSync = async (providerId: string) => {
     try {
-      toast.info(t('calendar.sync.info.syncing', 'جاري المزامنة...'))
+      if (providerId === 'google') {
+        // Use real Google Calendar import
+        googleImportMutation.mutate()
+      } else {
+        toast.info(t('calendar.sync.info.syncing', 'جاري المزامنة...'))
 
-      // Clear any existing timeout
-      if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current)
+        // Clear any existing timeout
+        if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current)
 
-      // Simulate sync - with cleanup ref
-      syncTimeoutRef.current = setTimeout(() => {
-        setProviders(prev =>
-          prev.map(p =>
-            p.id === providerId ? { ...p, lastSync: new Date().toISOString() } : p
+        // Simulate sync - with cleanup ref
+        syncTimeoutRef.current = setTimeout(() => {
+          setProviders(prev =>
+            prev.map(p =>
+              p.id === providerId ? { ...p, lastSync: new Date().toISOString() } : p
+            )
           )
-        )
-        toast.success(t('calendar.sync.success.synced', 'تمت المزامنة بنجاح'))
-      }, 2000)
+          toast.success(t('calendar.sync.success.synced', 'تمت المزامنة بنجاح'))
+        }, 2000)
+      }
     } catch (error) {
       toast.error(t('calendar.sync.errors.syncFailed', 'فشلت المزامنة'))
     }
+  }
+
+  // Toggle external events visibility in calendar
+  const handleToggleExternalEvents = () => {
+    toggleExternalEventsMutation.mutate(!showExternalEvents)
   }
 
   // Export to ICS file
@@ -340,6 +394,49 @@ END:VCALENDAR`
                 </div>
               ))}
             </div>
+
+            {/* External Events Toggle - Only show when Google is connected */}
+            {isGoogleConnected && (
+              <div className="mt-4 p-4 rounded-xl border border-[#4285F4]/20 bg-[#4285F4]/5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold text-white"
+                      style={{ backgroundColor: '#4285F4' }}
+                    >
+                      G
+                    </div>
+                    <div>
+                      <Label htmlFor="show-external-events" className="font-medium">
+                        {t('calendar.sync.labels.showExternalEvents', 'عرض الأحداث الخارجية')}
+                      </Label>
+                      <p className="text-sm text-slate-500">
+                        {t('calendar.sync.descriptions.showExternalEvents', 'عرض أحداث تقويم جوجل التي لم يتم إنشاؤها في Traf3li')}
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    id="show-external-events"
+                    checked={showExternalEvents}
+                    onCheckedChange={handleToggleExternalEvents}
+                    disabled={toggleExternalEventsMutation.isPending}
+                    aria-busy={toggleExternalEventsMutation.isPending}
+                  />
+                </div>
+                {showExternalEvents && (
+                  <div className="mt-3 flex items-center gap-2 text-sm text-slate-600">
+                    <Eye className="h-4 w-4 text-[#4285F4]" aria-hidden="true" />
+                    <span>{t('calendar.sync.info.externalEventsVisible', 'الأحداث الخارجية مرئية في التقويم')}</span>
+                  </div>
+                )}
+                {!showExternalEvents && (
+                  <div className="mt-3 flex items-center gap-2 text-sm text-slate-500">
+                    <EyeOff className="h-4 w-4" aria-hidden="true" />
+                    <span>{t('calendar.sync.info.externalEventsHidden', 'الأحداث الخارجية مخفية من التقويم')}</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <Separator />

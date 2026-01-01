@@ -110,6 +110,8 @@ const EVENT_COLORS = {
   follow_up: { bg: '#eab308', border: '#ca8a04', text: '#ffffff' },
   case_review: { bg: '#84cc16', border: '#65a30d', text: '#ffffff' },
   initial_meeting: { bg: '#22c55e', border: '#16a34a', text: '#ffffff' },
+  // External calendar types
+  'google-calendar': { bg: '#4285F4', border: '#3367D6', text: '#ffffff' },
 }
 
 // Event type labels in Arabic
@@ -130,6 +132,8 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
   follow_up: 'متابعة',
   case_review: 'مراجعة قضية',
   initial_meeting: 'اجتماع أولي',
+  // External calendar types
+  'google-calendar': 'تقويم جوجل',
 }
 
 // Day name mapping for FullCalendar (0 = Sunday, 1 = Monday, etc.)
@@ -261,6 +265,14 @@ interface CalendarEvent {
     priority?: string
     status?: string
     attendees?: any[]
+    color?: string
+    // Google Calendar specific fields
+    isExternal?: boolean
+    source?: 'google' | 'microsoft' | 'local'
+    googleEventId?: string
+    htmlLink?: string
+    meetingLink?: string
+    organizer?: string
   }
 }
 
@@ -463,6 +475,7 @@ export function FullCalendarView() {
 
   // Transform grid items to FullCalendar format
   // Much simpler now - backend returns minimal data with color already included
+  // Google Calendar events have isExternal: true and additional fields
   const calendarEvents = useMemo<CalendarEvent[]>(() => {
     if (!gridItemsData?.data) return []
 
@@ -478,6 +491,14 @@ export function FullCalendarView() {
         status: item.status,
         priority: item.priority,
         color: item.color,
+        // Google Calendar specific fields
+        isExternal: item.isExternal || item.type === 'google-calendar',
+        source: item.source,
+        googleEventId: item.googleEventId,
+        htmlLink: item.htmlLink,
+        meetingLink: item.meetingLink,
+        location: item.location,
+        organizer: item.organizer,
       },
     }))
   }, [gridItemsData])
@@ -717,26 +738,41 @@ export function FullCalendarView() {
   }
 
   // Custom event rendering - uses color from backend grid item
+  // Google Calendar events get visual distinction with Google blue accent and icon
   const renderEventContent = useCallback((eventInfo: EventContentArg) => {
     const { event } = eventInfo
     const eventType = event.extendedProps.eventType || 'other'
+    const isExternal = event.extendedProps.isExternal || eventType === 'google-calendar'
+
     // Use color from backend if available, fallback to EVENT_COLORS
     const backendColor = event.extendedProps.color
     const colors = backendColor
       ? { bg: backendColor, border: backendColor, text: '#ffffff' }
       : EVENT_COLORS[eventType as keyof typeof EVENT_COLORS] || EVENT_COLORS.other
 
+    // External events use Google blue left border for visual distinction
+    const borderColor = isExternal ? '#4285F4' : colors.border
+
     return (
       <div
-        className="w-full h-full px-1.5 py-0.5 rounded text-xs font-medium overflow-hidden"
+        className={`w-full h-full px-1.5 py-0.5 rounded text-xs font-medium overflow-hidden ${isExternal ? 'opacity-90' : ''}`}
         style={{
           backgroundColor: colors.bg,
-          borderRight: `3px solid ${colors.border}`,
+          borderRight: `3px solid ${borderColor}`,
           color: colors.text,
         }}
+        title={isExternal ? t('calendar.externalEvent', 'حدث من تقويم خارجي') : undefined}
       >
         <div className="flex items-center gap-1 truncate">
-          {eventType === 'hearing' || eventType === 'court_session' ? (
+          {/* Google Calendar events get a "G" indicator */}
+          {isExternal ? (
+            <span
+              className="flex-shrink-0 w-3 h-3 rounded-sm bg-white/20 flex items-center justify-center text-[8px] font-bold"
+              aria-label={t('calendar.googleCalendar', 'تقويم جوجل')}
+            >
+              G
+            </span>
+          ) : eventType === 'hearing' || eventType === 'court_session' ? (
             <Gavel className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
           ) : eventType === 'meeting' ? (
             <Users className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
@@ -749,7 +785,7 @@ export function FullCalendarView() {
         </div>
       </div>
     )
-  }, []) // Empty deps - EVENT_COLORS is static fallback, icons are stable
+  }, [t]) // Depends on t for translations
 
   // Loading state
   if (isLoading) {
@@ -1026,7 +1062,15 @@ export function FullCalendarView() {
         <DialogContent className="max-w-md" aria-describedby="event-description">
           <DialogHeader>
             <DialogTitle id="event-title" className="flex items-center gap-2">
-              {selectedEvent?.extendedProps.eventType === 'hearing' ||
+              {/* Show Google "G" icon for external events */}
+              {selectedEvent?.extendedProps.isExternal ? (
+                <span
+                  className="flex-shrink-0 w-5 h-5 rounded bg-[#4285F4] flex items-center justify-center text-xs font-bold text-white"
+                  aria-label={t('calendar.googleCalendar', 'تقويم جوجل')}
+                >
+                  G
+                </span>
+              ) : selectedEvent?.extendedProps.eventType === 'hearing' ||
               selectedEvent?.extendedProps.eventType === 'court_session' ? (
                 <Gavel className="h-5 w-5 text-red-500" aria-hidden="true" />
               ) : selectedEvent?.extendedProps.eventType === 'meeting' ? (
@@ -1036,9 +1080,15 @@ export function FullCalendarView() {
               )}
               {selectedEvent?.title}
             </DialogTitle>
-            <DialogDescription id="event-description">
+            <DialogDescription id="event-description" className="flex items-center gap-2">
               {selectedEvent?.extendedProps.eventType &&
                 EVENT_TYPE_LABELS[selectedEvent.extendedProps.eventType]}
+              {/* External event badge */}
+              {selectedEvent?.extendedProps.isExternal && (
+                <Badge variant="outline" className="text-[#4285F4] border-[#4285F4]/30 bg-[#4285F4]/5">
+                  {t('calendar.externalEvent', 'حدث خارجي')}
+                </Badge>
+              )}
             </DialogDescription>
           </DialogHeader>
 
@@ -1056,6 +1106,22 @@ export function FullCalendarView() {
                   })}
                 </span>
               </div>
+
+              {/* Location from extendedProps for external events */}
+              {selectedEvent.extendedProps.location && (
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <MapPin className="h-4 w-4" aria-hidden="true" />
+                  <span>{selectedEvent.extendedProps.location}</span>
+                </div>
+              )}
+
+              {/* Organizer for external events */}
+              {selectedEvent.extendedProps.organizer && (
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <Users className="h-4 w-4" aria-hidden="true" />
+                  <span>{selectedEvent.extendedProps.organizer}</span>
+                </div>
+              )}
 
               {/* Priority - available from grid item */}
               {selectedEvent.extendedProps.priority && (
@@ -1077,48 +1143,65 @@ export function FullCalendarView() {
                 </Badge>
               )}
 
-              {/* Lazy-loaded details */}
-              {isLoadingDetails ? (
-                <div className="flex items-center justify-center py-4" aria-live="polite" aria-busy="true">
-                  <Loader2 className="h-5 w-5 animate-spin text-slate-400" aria-hidden="true" />
-                  <span className="ms-2 text-sm text-slate-500">{t('calendar.states.loadingDetails', 'جاري تحميل التفاصيل...')}</span>
-                </div>
-              ) : itemDetailsData?.data && (
+              {/* Meeting link for external events */}
+              {selectedEvent.extendedProps.meetingLink && (
+                <a
+                  href={selectedEvent.extendedProps.meetingLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                >
+                  <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                  {t('calendar.joinMeeting', 'انضمام للاجتماع')}
+                </a>
+              )}
+
+              {/* Lazy-loaded details - only for non-external events */}
+              {!selectedEvent.extendedProps.isExternal && (
                 <>
-                  {itemDetailsData.data.location && (
-                    <div className="flex items-center gap-2 text-sm text-slate-600">
-                      <MapPin className="h-4 w-4" aria-hidden="true" />
-                      <span>{itemDetailsData.data.location}</span>
+                  {isLoadingDetails ? (
+                    <div className="flex items-center justify-center py-4" aria-live="polite" aria-busy="true">
+                      <Loader2 className="h-5 w-5 animate-spin text-slate-400" aria-hidden="true" />
+                      <span className="ms-2 text-sm text-slate-500">{t('calendar.states.loadingDetails', 'جاري تحميل التفاصيل...')}</span>
                     </div>
-                  )}
+                  ) : itemDetailsData?.data && (
+                    <>
+                      {itemDetailsData.data.location && !selectedEvent.extendedProps.location && (
+                        <div className="flex items-center gap-2 text-sm text-slate-600">
+                          <MapPin className="h-4 w-4" aria-hidden="true" />
+                          <span>{itemDetailsData.data.location}</span>
+                        </div>
+                      )}
 
-                  {itemDetailsData.data.caseName && (
-                    <div className="flex items-center gap-2 text-sm text-slate-600">
-                      <Briefcase className="h-4 w-4" aria-hidden="true" />
-                      <span>
-                        {itemDetailsData.data.caseName}
-                        {itemDetailsData.data.caseNumber &&
-                          ` (${itemDetailsData.data.caseNumber})`}
-                      </span>
-                    </div>
-                  )}
+                      {itemDetailsData.data.caseName && (
+                        <div className="flex items-center gap-2 text-sm text-slate-600">
+                          <Briefcase className="h-4 w-4" aria-hidden="true" />
+                          <span>
+                            {itemDetailsData.data.caseName}
+                            {itemDetailsData.data.caseNumber &&
+                              ` (${itemDetailsData.data.caseNumber})`}
+                          </span>
+                        </div>
+                      )}
 
-                  {itemDetailsData.data.description && (
-                    <p className="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg">
-                      {itemDetailsData.data.description}
-                    </p>
-                  )}
+                      {itemDetailsData.data.description && (
+                        <p className="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg">
+                          {itemDetailsData.data.description}
+                        </p>
+                      )}
 
-                  {itemDetailsData.data.attendees && itemDetailsData.data.attendees.length > 0 && (
-                    <div className="flex items-start gap-2 text-sm text-slate-600">
-                      <Users className="h-4 w-4 mt-0.5" aria-hidden="true" />
-                      <div>
-                        <span className="font-medium">{t('calendar.labels.attendees', 'الحضور')}:</span>
-                        <span className="ms-1">
-                          {itemDetailsData.data.attendees.map((a: any) => a.name || a.username).join('، ')}
-                        </span>
-                      </div>
-                    </div>
+                      {itemDetailsData.data.attendees && itemDetailsData.data.attendees.length > 0 && (
+                        <div className="flex items-start gap-2 text-sm text-slate-600">
+                          <Users className="h-4 w-4 mt-0.5" aria-hidden="true" />
+                          <div>
+                            <span className="font-medium">{t('calendar.labels.attendees', 'الحضور')}:</span>
+                            <span className="ms-1">
+                              {itemDetailsData.data.attendees.map((a: any) => a.name || a.username).join('، ')}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </>
                   )}
                 </>
               )}
@@ -1133,10 +1216,27 @@ export function FullCalendarView() {
             >
               {t('calendar.actions.close', 'إغلاق')}
             </Button>
-            <Button onClick={handleViewEventDetails}>
-              <ExternalLink className="ms-2 h-4 w-4" aria-hidden="true" />
-              {t('calendar.actions.viewDetails', 'عرض التفاصيل')}
-            </Button>
+            {/* External events: Open in Google Calendar | Local events: View Details */}
+            {selectedEvent?.extendedProps.isExternal && selectedEvent?.extendedProps.htmlLink ? (
+              <Button
+                asChild
+                className="bg-[#4285F4] hover:bg-[#3367D6]"
+              >
+                <a
+                  href={selectedEvent.extendedProps.htmlLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <ExternalLink className="ms-2 h-4 w-4" aria-hidden="true" />
+                  {t('calendar.openInGoogle', 'فتح في تقويم جوجل')}
+                </a>
+              </Button>
+            ) : (
+              <Button onClick={handleViewEventDetails}>
+                <ExternalLink className="ms-2 h-4 w-4" aria-hidden="true" />
+                {t('calendar.actions.viewDetails', 'عرض التفاصيل')}
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

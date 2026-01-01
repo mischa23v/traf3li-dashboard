@@ -61,12 +61,17 @@ export interface GoogleAuthResponse {
 
 export interface GoogleConnectionStatus {
   success: boolean
+  connected?: boolean // Top-level connected for convenience
   data: {
-    connected: boolean
+    isConnected: boolean
+    connected?: boolean // Alias for backwards compatibility
     email?: string
     expiresAt?: string
     scopes?: string[]
     calendars?: GoogleCalendar[]
+    selectedCalendars?: string[]
+    primaryCalendarId?: string
+    showExternalEvents?: boolean // NEW: Toggle for showing external events in calendar
   }
 }
 
@@ -368,6 +373,29 @@ const googleCalendarService = {
       return response.data
     } catch (error: any) {
       const errorMessage = handleApiError(error) || 'Failed to get sync settings | فشل في الحصول على إعدادات المزامنة'
+      throw new Error(errorMessage)
+    }
+  },
+
+  /**
+   * Update show external events setting
+   * Toggle whether to show external Google Calendar events in the calendar view
+   * تحديث إعداد عرض الأحداث الخارجية
+   */
+  updateShowExternalEvents: async (showExternalEvents: boolean): Promise<{
+    success: boolean
+    message: string
+    data: { showExternalEvents: boolean }
+  }> => {
+    try {
+      const response = await apiClient.put<{
+        success: boolean
+        message: string
+        data: { showExternalEvents: boolean }
+      }>('/google-calendar/settings/show-external-events', { showExternalEvents })
+      return response.data
+    } catch (error: any) {
+      const errorMessage = handleApiError(error) || 'Failed to update external events setting | فشل في تحديث إعداد الأحداث الخارجية'
       throw new Error(errorMessage)
     }
   },

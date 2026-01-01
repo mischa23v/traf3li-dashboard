@@ -101,10 +101,11 @@ export interface GridSummaryResponse {
 
 /**
  * Minimal calendar item for grid display
+ * Includes Google Calendar events with isExternal: true
  */
 export interface GridItem {
   id: string
-  type: 'event' | 'task' | 'reminder' | 'case-document' | 'appointment'
+  type: 'event' | 'task' | 'reminder' | 'case-document' | 'appointment' | 'google-calendar'
   title: string
   startDate: string
   endDate?: string
@@ -113,6 +114,14 @@ export interface GridItem {
   status: string
   priority?: string
   color: string
+  // Google Calendar specific fields
+  isExternal?: boolean
+  googleEventId?: string
+  source?: 'google' | 'microsoft' | 'local'
+  location?: string
+  organizer?: string
+  htmlLink?: string
+  meetingLink?: string
 }
 
 /**
