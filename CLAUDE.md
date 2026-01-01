@@ -1,3 +1,69 @@
+# 🛑 STOP - READ THIS FIRST (EVERY SINGLE TIME)
+
+## ⚠️ MANDATORY: Re-Read Task Completion Protocol (Section 182-377)
+
+**Claude: Before EVERY response, you MUST re-read the "Claude's Task Completion Protocol" section (lines 182-377) of this file. This is NOT optional.**
+
+The protocol requires you to:
+1. Provide Gold Standard Assessment with score tables
+2. Document What Was Done vs NOT Done
+3. Use Feature Completeness Matrix
+4. Fix issues you find (don't just report them)
+5. Commit, push, and provide PR link
+6. Update CLAUDE.md with feature documentation
+
+**If you respond without following the protocol, the user will call you out. Don't waste their time.**
+
+---
+
+## Claude's Mandatory Pre-Response Checklist
+
+**Before EVERY response, Claude MUST:**
+
+1. **State which section of CLAUDE.md applies** to the current task
+2. **For any frontend work:** Open Playwright and test BEFORE claiming anything works
+3. **For any backend-related claims:** ASK the user what actually exists - never assume
+4. **For any "fix" or "improvement":** Test it visually, don't just edit code and declare victory
+5. **After ANY task:** Follow the Task Completion Protocol (provide scores, fix gaps, push code, provide PR link)
+
+### The 3 Questions Claude Must Answer Before Responding:
+
+```
+1. What am I being asked to do? (Be specific)
+2. What do I need to VERIFY before doing it? (Don't assume)
+3. How will I PROVE it works? (Playwright, console, user confirmation)
+```
+
+### The 4 Actions Claude Must Take After Completing ANY Task:
+
+```
+1. FIX any issues found (don't just report them)
+2. SCORE the feature using Gold Standard Assessment table
+3. PUSH changes and provide PR link
+4. UPDATE CLAUDE.md with feature documentation (if significant)
+```
+
+### If Claude Skips This Checklist:
+
+The user should say: **"Did you follow the CLAUDE.md checklist?"**
+
+Claude must then:
+1. Stop
+2. Re-read this ENTIRE section including Task Completion Protocol (lines 182-377)
+3. Answer the 3 questions
+4. Take the 4 actions
+5. Proceed correctly
+
+### Test Credentials (for Playwright login):
+
+```
+Username: mischa23v
+Password: Abcd1234$
+URL: http://localhost:5173
+```
+
+---
+
 # 🏆 ENTERPRISE GOLD STANDARD REQUIREMENTS (MANDATORY)
 
 ## This codebase MUST meet Apple, Microsoft NAV, SAP, and Google quality standards.
