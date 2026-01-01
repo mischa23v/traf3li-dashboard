@@ -337,6 +337,156 @@ After every feature, explicitly list what's NOT done:
 
 **Claude MUST run through this entire checklist for EVERY feature implementation. No exceptions.**
 
+### 9. Domain-Specific Operation Checklists
+
+For common entities, verify ALL domain-specific operations exist:
+
+#### 📅 Reminders
+| Operation | Implemented | Notes |
+|-----------|-------------|-------|
+| Create reminder | ☐ | title, date, time, priority |
+| Edit reminder | ☐ | all fields editable |
+| Delete reminder | ☐ | with confirmation |
+| Bulk delete | ☐ | multi-select + delete |
+| Set date | ☐ | date picker |
+| Set time | ☐ | time picker |
+| Set priority | ☐ | low/medium/high |
+| Snooze | ☐ | 5min, 15min, 1hr, 1day |
+| Dismiss | ☐ | mark as done |
+| Mark complete | ☐ | checkbox/toggle |
+| Recurring options | ☐ | daily, weekly, monthly |
+| Notification preview | ☐ | show when it will fire |
+
+#### 📆 Appointments
+| Operation | Implemented | Notes |
+|-----------|-------------|-------|
+| Create appointment | ☐ | client, date, time, type |
+| Edit appointment | ☐ | all fields editable |
+| Delete appointment | ☐ | with confirmation |
+| Bulk delete | ☐ | multi-select + delete |
+| Reschedule | ☐ | change date/time |
+| Confirm | ☐ | mark as confirmed |
+| Cancel | ☐ | with reason |
+| Complete | ☐ | mark as completed |
+| Mark no-show | ☐ | client didn't appear |
+| Send reminder | ☐ | email/SMS to client |
+| Add to calendar | ☐ | export to Google/Outlook |
+| View client history | ☐ | past appointments |
+
+#### ✅ Tasks
+| Operation | Implemented | Notes |
+|-----------|-------------|-------|
+| Create task | ☐ | title, description, due date |
+| Edit task | ☐ | all fields editable |
+| Delete task | ☐ | with confirmation |
+| Bulk delete | ☐ | multi-select + delete |
+| Mark complete | ☐ | checkbox/toggle |
+| Set priority | ☐ | low/medium/high/urgent |
+| Set due date | ☐ | date picker |
+| Assign to user | ☐ | dropdown of team |
+| Add subtasks | ☐ | nested checklist |
+| Attach files | ☐ | file upload |
+| Add comments | ☐ | discussion thread |
+| Move to project | ☐ | categorization |
+
+#### 💰 Invoices
+| Operation | Implemented | Notes |
+|-----------|-------------|-------|
+| Create invoice | ☐ | client, items, amounts |
+| Edit invoice | ☐ | only if draft |
+| Delete invoice | ☐ | only if draft |
+| View invoice | ☐ | read-only detail |
+| Send to client | ☐ | email with PDF |
+| Mark as paid | ☐ | payment received |
+| Mark as partial | ☐ | partial payment |
+| Void invoice | ☐ | cancel issued invoice |
+| Clone/duplicate | ☐ | create copy |
+| Download PDF | ☐ | export |
+| Print | ☐ | print view |
+| Add payment | ☐ | record payment |
+| Send reminder | ☐ | overdue notice |
+
+#### ⚖️ Cases
+| Operation | Implemented | Notes |
+|-----------|-------------|-------|
+| Create case | ☐ | client, type, details |
+| Edit case | ☐ | all fields editable |
+| Delete case | ☐ | with confirmation |
+| View case | ☐ | detail page |
+| Open case | ☐ | set status to open |
+| Close case | ☐ | set status to closed |
+| Archive case | ☐ | move to archive |
+| Restore case | ☐ | unarchive |
+| Change status | ☐ | status dropdown |
+| Assign lawyer | ☐ | team member dropdown |
+| Add documents | ☐ | file attachments |
+| Add notes | ☐ | case notes |
+| Timeline view | ☐ | activity history |
+| Link client | ☐ | associate client |
+
+#### 👥 Clients
+| Operation | Implemented | Notes |
+|-----------|-------------|-------|
+| Create client | ☐ | name, email, phone |
+| Edit client | ☐ | all fields editable |
+| Delete client | ☐ | with confirmation + check cases |
+| View client | ☐ | detail page |
+| Bulk delete | ☐ | multi-select + delete |
+| Search clients | ☐ | by name, email, phone |
+| Filter by status | ☐ | active/inactive |
+| Export list | ☐ | CSV download |
+| Import clients | ☐ | CSV upload |
+| Merge duplicates | ☐ | combine records |
+| View cases | ☐ | linked cases |
+| View invoices | ☐ | linked invoices |
+| View appointments | ☐ | linked appointments |
+| Send email | ☐ | email action |
+| Call client | ☐ | phone action (tel:) |
+
+### 10. Frontend Architecture Checklist
+
+For each feature, verify these frontend patterns:
+
+#### Service Layer
+| Requirement | Implemented | Notes |
+|-------------|-------------|-------|
+| API service function exists | ☐ | in `src/services/` |
+| Types/interfaces defined | ☐ | request & response types |
+| Error handling in service | ☐ | try/catch, error transformation |
+
+#### React Query Hooks
+| Requirement | Implemented | Notes |
+|-------------|-------------|-------|
+| useQuery for fetching | ☐ | with proper queryKey |
+| useMutation for create | ☐ | with onSuccess/onError |
+| useMutation for update | ☐ | with optimistic updates |
+| useMutation for delete | ☐ | with confirmation |
+| Query invalidation | ☐ | invalidate related queries |
+| Primitive query keys | ☐ | no object references |
+| staleTime configured | ☐ | appropriate for data type |
+| placeholderData | ☐ | smooth loading |
+
+#### Components
+| Requirement | Implemented | Notes |
+|-------------|-------------|-------|
+| List component | ☐ | table or card grid |
+| Detail component | ☐ | single item view |
+| Create form | ☐ | with validation |
+| Edit form | ☐ | pre-filled values |
+| Delete confirmation | ☐ | dialog with warning |
+| Loading skeleton | ☐ | not just spinner |
+| Empty state | ☐ | with CTA |
+| Error state | ☐ | with retry button |
+
+#### State Management
+| Requirement | Implemented | Notes |
+|-------------|-------------|-------|
+| Form state (react-hook-form) | ☐ | or useState |
+| Validation (zod) | ☐ | schema validation |
+| Selection state | ☐ | for bulk actions |
+| Filter state | ☐ | URL sync or local |
+| Pagination state | ☐ | page, limit |
+
 ---
 
 ## 📊 Current Module Scores
