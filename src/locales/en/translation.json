@@ -325,6 +325,22 @@
         "backendPending": "[Pending Implementation] Calendar Load Failed",
         "backendPendingMessage": "The calendar currently uses optimized endpoints not yet implemented on the server",
         "retryButton": "Retry"
+      },
+      "google": {
+        "externalEvent": "Google Calendar",
+        "openInGoogle": "Open in Google Calendar",
+        "showExternalEvents": "Show External Events",
+        "showExternalEventsDescription": "Display events from Google Calendar in your calendar view",
+        "externalEventsEnabled": "External events are now visible in your calendar",
+        "externalEventsDisabled": "External events are now hidden from your calendar",
+        "externalEventsError": "Failed to update external events setting",
+        "location": "Location",
+        "organizer": "Organizer",
+        "syncSettings": "Google Calendar Sync Settings",
+        "connectedAs": "Connected as",
+        "disconnect": "Disconnect",
+        "connect": "Connect Google Calendar",
+        "selectCalendars": "Select Calendars to Sync"
       }
     }
   },
