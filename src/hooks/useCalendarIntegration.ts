@@ -283,6 +283,34 @@ export function useGoogleAutoSync() {
   })
 }
 
+/**
+ * Toggle showing external Google Calendar events in the calendar view
+ * تبديل عرض أحداث تقويم جوجل الخارجية في عرض التقويم
+ */
+export function useToggleExternalEvents() {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: (showExternalEvents: boolean) =>
+      googleCalendarService.updateShowExternalEvents(showExternalEvents),
+    onSuccess: (_, showExternalEvents) => {
+      toast.success(
+        showExternalEvents
+          ? t('calendar.google.externalEventsEnabled', 'تم تفعيل عرض الأحداث الخارجية')
+          : t('calendar.google.externalEventsDisabled', 'تم تعطيل عرض الأحداث الخارجية')
+      )
+      // Invalidate status to refresh the setting value
+      queryClient.invalidateQueries({ queryKey: QueryKeys.calendarIntegration.google.status() })
+      // Invalidate calendar grid to refresh the displayed events
+      queryClient.invalidateQueries({ queryKey: QueryKeys.calendar.all() })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t('calendar.google.externalEventsError', 'فشل في تغيير إعداد الأحداث الخارجية'))
+    },
+  })
+}
+
 // ==================== Microsoft Calendar Hooks ====================
 
 /**
