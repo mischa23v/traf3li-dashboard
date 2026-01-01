@@ -504,6 +504,18 @@ export function useMicrosoftAutoSync() {
 }
 
 /**
+ * Get Microsoft sync settings
+ * الحصول على إعدادات مزامنة مايكروسوفت
+ */
+export function useMicrosoftSyncSettings() {
+  return useQuery({
+    queryKey: [...QueryKeys.calendarIntegration.microsoft.all(), 'syncSettings'],
+    queryFn: () => microsoftCalendarService.getSyncSettings(),
+    staleTime: CACHE_TIMES.MEDIUM,
+  })
+}
+
+/**
  * Refresh Microsoft token
  * تحديث رمز مايكروسوفت
  */

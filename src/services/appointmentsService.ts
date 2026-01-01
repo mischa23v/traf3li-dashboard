@@ -450,6 +450,8 @@ export interface AppointmentStatsResponse {
 /**
  * Calendar status response
  * استجابة حالة التقويم
+ *
+ * Matches backend: GET /api/v1/appointments/calendar-status
  */
 export interface CalendarStatusResponse {
   success: boolean
@@ -458,12 +460,12 @@ export interface CalendarStatusResponse {
       google: {
         connected: boolean
         email?: string
-        expiresAt?: string
+        autoSyncEnabled?: boolean
       }
       microsoft: {
         connected: boolean
         email?: string
-        expiresAt?: string
+        autoSyncEnabled?: boolean
       }
     }
     message: {
@@ -476,6 +478,8 @@ export interface CalendarStatusResponse {
 /**
  * Calendar links response
  * استجابة روابط التقويم
+ *
+ * Matches backend: GET /api/v1/appointments/:id/calendar-links
  */
 export interface CalendarLinksResponse {
   success: boolean
@@ -484,10 +488,18 @@ export interface CalendarLinksResponse {
     appointmentNumber: string
     scheduledTime: string
     links: {
-      google: { url: string; label: string }
-      outlook: { url: string; label: string }
-      yahoo: { url: string; label: string }
-      ics: { url: string; label: string }
+      google: string
+      outlook: string
+      office365: string
+      yahoo: string
+      apple: string // ICS download URL
+    }
+    labels: {
+      google: string
+      outlook: string
+      office365: string
+      yahoo: string
+      apple: string
     }
   }
 }
@@ -495,16 +507,19 @@ export interface CalendarLinksResponse {
 /**
  * Calendar sync response
  * استجابة مزامنة التقويم
+ *
+ * Matches backend: POST /api/v1/appointments/:id/sync-calendar
  */
 export interface CalendarSyncResponse {
   success: boolean
-  message: string
   data: {
-    appointmentId: string
-    appointmentNumber: string
     syncResult: {
-      google?: { success: boolean; eventId?: string; error?: string }
+      google?: { success: boolean; eventId?: string; action?: string; error?: string }
       microsoft?: { success: boolean; eventId?: string; error?: string }
+    }
+    message?: {
+      en: string
+      ar: string
     }
   }
 }
