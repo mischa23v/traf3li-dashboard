@@ -294,19 +294,45 @@ export function useToggleExternalEvents() {
   return useMutation({
     mutationFn: (showExternalEvents: boolean) =>
       googleCalendarService.updateShowExternalEvents(showExternalEvents),
+    // Optimistic update for instant UI feedback
+    onMutate: async (showExternalEvents) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: QueryKeys.calendarIntegration.google.status() })
+
+      // Snapshot the previous value
+      const previousStatus = queryClient.getQueryData(QueryKeys.calendarIntegration.google.status())
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(QueryKeys.calendarIntegration.google.status(), (old: any) => ({
+        ...old,
+        data: {
+          ...old?.data,
+          showExternalEvents,
+        },
+      }))
+
+      // Return context with previous value for rollback
+      return { previousStatus }
+    },
     onSuccess: (_, showExternalEvents) => {
       toast.success(
         showExternalEvents
           ? t('calendar.google.externalEventsEnabled', 'تم تفعيل عرض الأحداث الخارجية')
           : t('calendar.google.externalEventsDisabled', 'تم تعطيل عرض الأحداث الخارجية')
       )
-      // Invalidate status to refresh the setting value
-      queryClient.invalidateQueries({ queryKey: QueryKeys.calendarIntegration.google.status() })
       // Invalidate calendar grid to refresh the displayed events
       queryClient.invalidateQueries({ queryKey: QueryKeys.calendar.all() })
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _, context) => {
+      // Rollback to previous value on error
+      if (context?.previousStatus) {
+        queryClient.setQueryData(QueryKeys.calendarIntegration.google.status(), context.previousStatus)
+      }
       toast.error(error.message || t('calendar.google.externalEventsError', 'فشل في تغيير إعداد الأحداث الخارجية'))
+    },
+    onSettled: () => {
+      // Always refetch after error or success to ensure consistency
+      queryClient.invalidateQueries({ queryKey: QueryKeys.calendarIntegration.google.status() })
     },
   })
 }
