@@ -10,7 +10,23 @@ Transform approved requirements into technical design and actionable tasks.
 ## Prerequisites
 
 - [ ] `requirements.md` exists in `.claude/specs/{feature-name}/`
-- [ ] User has approved requirements (said "approved", "looks good", etc.)
+- [ ] `.requirements-approved` marker exists (created by `/plan`)
+- [ ] User has approved requirements
+
+**🔒 Pre-Check: Verify Requirements Approval**
+```bash
+# Check marker file exists
+ls .claude/specs/{feature-name}/.requirements-approved
+```
+
+If marker doesn't exist:
+```markdown
+❌ Cannot proceed - Requirements not approved
+
+The `.requirements-approved` marker file is missing.
+
+**Required action**: Run `/plan` and get user approval first.
+```
 
 ## Your Task
 
@@ -531,10 +547,110 @@ interface UpdateReminderSettingsDto {
 
 1. **Show Impact Analysis first** - Let user see what will change
 2. **Show design.md to user** - "Here's the technical design. Does this approach work?"
-3. **Get design approval** before showing tasks
+3. **Get design approval** → Create `.design-approved` marker
 4. **Show tasks.md to user** - "Here's the implementation plan. Ready to start?"
-5. **Get tasks approval** before implementing
+5. **Get tasks approval** → Create `.tasks-approved` marker
 6. **Next step**: Run `/complete-phase` to execute Phase 1
+
+---
+
+## 🔒 APPROVAL GATE: Design
+
+When user approves design (says "approved", "looks good", "yes"):
+
+**Create the approval marker file:**
+```
+.claude/specs/{feature-name}/.design-approved
+```
+
+**File content:**
+```markdown
+# Design Approved
+
+**Approved by**: User
+**Approved at**: {timestamp}
+**Design file**: design.md
+
+## Approval Confirmation
+User confirmed design with: "{user's approval message}"
+
+## What was approved
+- Technical architecture
+- Component hierarchy
+- Data models and API endpoints
+- State management approach
+- Error handling strategy
+
+## Next Step
+Show tasks.md for approval
+```
+
+**After creating marker, confirm:**
+```markdown
+✅ Design approved and locked.
+
+Created: `.claude/specs/{feature-name}/.design-approved`
+
+Now showing tasks.md for approval...
+```
+
+---
+
+## 🔒 APPROVAL GATE: Tasks
+
+When user approves tasks (says "approved", "looks good", "yes", "ready"):
+
+**Create the approval marker file:**
+```
+.claude/specs/{feature-name}/.tasks-approved
+```
+
+**File content:**
+```markdown
+# Tasks Approved
+
+**Approved by**: User
+**Approved at**: {timestamp}
+**Tasks file**: tasks.md
+
+## Approval Confirmation
+User confirmed tasks with: "{user's approval message}"
+
+## What was approved
+- Phase breakdown
+- Task order and dependencies
+- Risk assessments
+- Rollback strategy
+
+## Next Step
+Run `/complete-phase` to begin implementation
+```
+
+**After creating marker, confirm:**
+```markdown
+✅ All approvals complete!
+
+**Approval Status:**
+- [x] `.requirements-approved` ✓
+- [x] `.design-approved` ✓
+- [x] `.tasks-approved` ✓
+
+**Spec files locked:**
+```
+.claude/specs/{feature-name}/
+├── requirements.md
+├── design.md
+├── tasks.md
+├── .requirements-approved
+├── .design-approved
+└── .tasks-approved
+```
+
+**Ready for implementation!**
+Run `/complete-phase` to start Phase 1.
+```
+
+---
 
 ## IMPORTANT
 
@@ -543,3 +659,4 @@ interface UpdateReminderSettingsDto {
 - **Link to requirements**: Every task references acceptance criteria
 - **Show risk levels**: User knows which changes are safe
 - **Include rollback info**: User knows recovery is possible
+- **Create markers**: Lock each phase after approval
