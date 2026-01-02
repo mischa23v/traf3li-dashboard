@@ -101,11 +101,10 @@ export interface GridSummaryResponse {
 
 /**
  * Minimal calendar item for grid display
- * Includes Google Calendar events with isExternal: true
  */
 export interface GridItem {
   id: string
-  type: 'event' | 'task' | 'reminder' | 'case-document' | 'appointment' | 'google-calendar'
+  type: 'event' | 'task' | 'reminder' | 'case-document' | 'appointment'
   title: string
   startDate: string
   endDate?: string
@@ -114,14 +113,18 @@ export interface GridItem {
   status: string
   priority?: string
   color: string
-  // Google Calendar specific fields
-  isExternal?: boolean
-  googleEventId?: string
-  source?: 'google' | 'microsoft' | 'local'
+  // Appointment-specific fields (when type is 'appointment')
+  clientName?: string
+  clientEmail?: string
+  clientPhone?: string
+  startTime?: string
+  endTime?: string
+  appointmentType?: 'consultation' | 'follow_up' | 'case_review' | 'initial_meeting' | 'other'
+  appointmentStatus?: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no_show'
+  locationType?: 'in_person' | 'video' | 'phone'
   location?: string
-  organizer?: string
-  htmlLink?: string
-  meetingLink?: string
+  notes?: string
+  subject?: string
 }
 
 /**
@@ -165,27 +168,6 @@ export interface ListResponse {
     priority?: string
     status?: string
     dateRange?: { start: string; end: string }
-  }
-}
-
-/**
- * Sidebar Data Response Interface
- */
-export interface SidebarDataResponse {
-  success: boolean
-  data: {
-    events: CalendarEvent[]
-    reminders: CalendarEvent[]
-    summary: {
-      totalEvents: number
-      totalReminders: number
-      upcomingCount: number
-      overdueCount: number
-    }
-  }
-  dateRange: {
-    start: string
-    end: string
   }
 }
 
@@ -292,41 +274,21 @@ const calendarService = {
     }
   },
 
-  /**
-   * Get combined sidebar data - calendar events + reminders in one call
-   * Replaces 2 separate API calls with 1 optimized endpoint
-   *
-   * الحصول على بيانات الشريط الجانبي المجمعة - أحداث التقويم + التذكيرات في استدعاء واحد
-   *
-   * API: GET /calendar/sidebar-data
-   * Query params: startDate, endDate, reminderDays (optional)
-   */
-  getSidebarData: async (filters: {
-    startDate: string
-    endDate: string
-    reminderDays?: number
-  }): Promise<SidebarDataResponse> => {
-    try {
-      const response = await apiClient.get<SidebarDataResponse>('/calendar/sidebar-data', {
-        params: filters,
-      })
-      return response.data
-    } catch (error: any) {
-      const errorMessage = handleApiError(error) || 'Failed to fetch sidebar data | فشل في جلب بيانات الشريط الجانبي'
-      throw new Error(errorMessage)
-    }
-  },
-
   // ==================== Optimized Endpoints ====================
-  // These endpoints are now IMPLEMENTED in the backend
+  // [BACKEND-PENDING] WARNING: These endpoints are NOT yet implemented in the backend
+  // [BACKEND-PENDING] تحذير: هذه النقاط النهائية لم يتم تنفيذها بعد في الخادم
 
   /**
-   * Get grid summary - counts per day for calendar badges
-   * Much lighter than full data - only counts and flags (~150 bytes vs 2-5KB)
+   * [BACKEND-PENDING] Get grid summary - counts per day for calendar badges
+   * Much lighter than full data - only counts and flags
    *
-   * API: GET /calendar/grid-summary
-   * Query params: startDate, endDate, types (optional)
-   * Returns: { days: DaySummary[], totalDays, dateRange }
+   * ⚠️ [BACKEND-PENDING] WARNING: This endpoint (/calendar/grid-summary) does NOT exist in the backend yet!
+   * ⚠️ [BACKEND-PENDING] تحذير: هذه النقطة النهائية (/calendar/grid-summary) غير موجودة في الخادم بعد!
+   *
+   * Required Implementation:
+   * - Endpoint: GET /calendar/grid-summary
+   * - Query params: startDate, endDate, types (optional)
+   * - Returns: { days: DaySummary[], totalDays, dateRange }
    */
   getGridSummary: async (filters: {
     startDate: string
@@ -339,18 +301,23 @@ const calendarService = {
       })
       return response.data
     } catch (error: any) {
-      const errorMessage = handleApiError(error) || 'Failed to fetch grid summary | فشل في جلب ملخص الشبكة'
+      const errorMessage = handleApiError(error) || '[BACKEND-PENDING] Failed to fetch grid summary. This endpoint is not implemented yet. Please use the legacy /calendar endpoint. | [BACKEND-PENDING] فشل في جلب ملخص الشبكة. هذه النقطة النهائية غير مطبقة بعد. يرجى استخدام نقطة /calendar القديمة.'
+      console.error('[Calendar Service] [BACKEND-PENDING] Grid Summary Error:', errorMessage)
       throw new Error(errorMessage)
     }
   },
 
   /**
-   * Get grid items - minimal event data for calendar display
+   * [BACKEND-PENDING] Get grid items - minimal event data for calendar display
    * ~150 bytes per item vs 2-5KB for full objects
    *
-   * API: GET /calendar/grid-items
-   * Query params: startDate, endDate, types (optional), caseId (optional)
-   * Returns: { data: GridItem[], count, dateRange }
+   * ⚠️ [BACKEND-PENDING] WARNING: This endpoint (/calendar/grid-items) does NOT exist in the backend yet!
+   * ⚠️ [BACKEND-PENDING] تحذير: هذه النقطة النهائية (/calendar/grid-items) غير موجودة في الخادم بعد!
+   *
+   * Required Implementation:
+   * - Endpoint: GET /calendar/grid-items
+   * - Query params: startDate, endDate, types (optional), caseId (optional)
+   * - Returns: { data: GridItem[], count, dateRange }
    */
   getGridItems: async (filters: {
     startDate: string
@@ -364,18 +331,23 @@ const calendarService = {
       })
       return response.data
     } catch (error: any) {
-      const errorMessage = handleApiError(error) || 'Failed to fetch grid items | فشل في جلب عناصر الشبكة'
+      const errorMessage = handleApiError(error) || '[BACKEND-PENDING] Failed to fetch grid items. This endpoint is not implemented yet. Please use the legacy /calendar endpoint. | [BACKEND-PENDING] فشل في جلب عناصر الشبكة. هذه النقطة النهائية غير مطبقة بعد. يرجى استخدام نقطة /calendar القديمة.'
+      console.error('[Calendar Service] [BACKEND-PENDING] Grid Items Error:', errorMessage)
       throw new Error(errorMessage)
     }
   },
 
   /**
-   * Get full item details - lazy loaded on click
+   * [BACKEND-PENDING] Get full item details - lazy loaded on click
    * Fetches complete object with populated relations
    *
-   * API: GET /calendar/item/:type/:id
-   * Path params: type (event|task|reminder|case-document), id
-   * Returns: { success, data: CalendarEvent }
+   * ⚠️ [BACKEND-PENDING] WARNING: This endpoint (/calendar/item/:type/:id) does NOT exist in the backend yet!
+   * ⚠️ [BACKEND-PENDING] تحذير: هذه النقطة النهائية (/calendar/item/:type/:id) غير موجودة في الخادم بعد!
+   *
+   * Required Implementation:
+   * - Endpoint: GET /calendar/item/:type/:id
+   * - Path params: type (event|task|reminder), id
+   * - Returns: { success, data: CalendarEvent }
    */
   getItemDetails: async (type: string, id: string): Promise<{ success: boolean; data: CalendarEvent }> => {
     try {
@@ -384,17 +356,22 @@ const calendarService = {
       )
       return response.data
     } catch (error: any) {
-      const errorMessage = handleApiError(error) || 'Failed to fetch item details | فشل في جلب تفاصيل العنصر'
+      const errorMessage = handleApiError(error) || '[BACKEND-PENDING] Failed to fetch item details. This endpoint is not implemented yet. Please use the individual endpoints (/events/:id, /tasks/:id, /reminders/:id). | [BACKEND-PENDING] فشل في جلب تفاصيل العنصر. هذه النقطة النهائية غير مطبقة بعد. يرجى استخدام النقاط الفردية (/events/:id, /tasks/:id, /reminders/:id).'
+      console.error('[Calendar Service] [BACKEND-PENDING] Item Details Error:', errorMessage)
       throw new Error(errorMessage)
     }
   },
 
   /**
-   * Get list view with cursor pagination - for virtualized infinite scroll
+   * [BACKEND-PENDING] Get list view with cursor pagination - for virtualized infinite scroll
    *
-   * API: GET /calendar/list
-   * Query params: cursor, limit, types, sortOrder, priority, status, startDate, endDate
-   * Returns: { success, data: GridItem[], pagination: { cursor, hasMore, limit, count }, filters }
+   * ⚠️ [BACKEND-PENDING] WARNING: This endpoint (/calendar/list) does NOT exist in the backend yet!
+   * ⚠️ [BACKEND-PENDING] تحذير: هذه النقطة النهائية (/calendar/list) غير موجودة في الخادم بعد!
+   *
+   * Required Implementation:
+   * - Endpoint: GET /calendar/list
+   * - Query params: cursor, limit, types, sortOrder, priority, status, startDate, endDate
+   * - Returns: { success, data: GridItem[], pagination: { cursor, hasMore, limit, count }, filters }
    */
   getList: async (filters: ListFilters): Promise<ListResponse> => {
     try {
@@ -403,7 +380,8 @@ const calendarService = {
       })
       return response.data
     } catch (error: any) {
-      const errorMessage = handleApiError(error) || 'Failed to fetch list view | فشل في جلب عرض القائمة'
+      const errorMessage = handleApiError(error) || '[BACKEND-PENDING] Failed to fetch list view. This endpoint is not implemented yet. Please use the legacy /calendar endpoint with pagination. | [BACKEND-PENDING] فشل في جلب عرض القائمة. هذه النقطة النهائية غير مطبقة بعد. يرجى استخدام نقطة /calendar القديمة مع التصفح.'
+      console.error('[Calendar Service] [BACKEND-PENDING] List View Error:', errorMessage)
       throw new Error(errorMessage)
     }
   },

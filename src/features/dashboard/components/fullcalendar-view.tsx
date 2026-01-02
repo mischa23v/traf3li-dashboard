@@ -19,6 +19,7 @@ import type { EventClickArg, DateSelectArg, EventDropArg, EventContentArg } from
 const FullCalendarComponent = lazy(() => import('@fullcalendar/react'))
 import {
   Plus,
+  Filter,
   Clock,
   MapPin,
   Users,
@@ -31,17 +32,20 @@ import {
   Loader2,
   AlertCircle,
   RefreshCw,
+  Download,
+  Upload,
   Settings,
   ExternalLink,
+  X,
   Check,
+  ChevronDown,
 } from 'lucide-react'
 import {
   useCalendarGridItems,
+  useCalendarGridSummary,
   useCalendarItemDetails,
   usePrefetchAdjacentMonthsOptimized,
 } from '@/hooks/useCalendar'
-import { useAppointmentSettings, useBlockedTimes } from '@/hooks/useAppointments'
-import { DEFAULT_WORKING_HOURS, type WorkingHours } from '@/types/crmSettings'
 import type { GridItem } from '@/services/calendarService'
 import { useCreateEvent, useUpdateEvent } from '@/hooks/useRemindersAndEvents'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -65,6 +69,14 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem,
+} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -78,6 +90,10 @@ import {
 import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
 import { CalendarSyncDialog } from './calendar-sync-dialog'
+import { AppointmentDetailDialog, type AppointmentDetail } from '@/features/appointments/components/appointment-detail-dialog'
+
+// Appointment event types (to distinguish from other events)
+const APPOINTMENT_EVENT_TYPES = ['consultation', 'follow_up', 'case_review', 'initial_meeting', 'other', 'appointment']
 
 // ==================== Module-level constants for performance ====================
 // Moving these outside the component prevents re-creation on every render
@@ -85,11 +101,11 @@ import { CalendarSyncDialog } from './calendar-sync-dialog'
 // FullCalendar plugins array - must be stable reference
 const CALENDAR_PLUGINS = [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]
 
-// Navigation links - will be populated with translations in component
-const TOP_NAV_LINKS_KEYS = [
-  { titleKey: 'nav.home', href: ROUTES.dashboard.home, isActive: false, disabled: false },
-  { titleKey: 'nav.calendar', href: ROUTES.dashboard.calendar, isActive: true, disabled: false },
-  { titleKey: 'nav.tasks', href: ROUTES.dashboard.tasks.list, isActive: false, disabled: false },
+// Navigation links - stable reference
+const TOP_NAV_LINKS = [
+  { title: 'الرئيسية', href: ROUTES.dashboard.home, isActive: false, disabled: false },
+  { title: 'التقويم', href: ROUTES.dashboard.calendar, isActive: true, disabled: false },
+  { title: 'المهام', href: ROUTES.dashboard.tasks.list, isActive: false, disabled: false },
 ]
 
 // Event type colors
@@ -105,13 +121,6 @@ const EVENT_COLORS = {
   document_review: { bg: '#6366f1', border: '#4f46e5', text: '#ffffff' },
   training: { bg: '#ec4899', border: '#db2777', text: '#ffffff' },
   other: { bg: '#64748b', border: '#475569', text: '#ffffff' },
-  // Appointment types
-  appointment: { bg: '#f59e0b', border: '#d97706', text: '#ffffff' },
-  follow_up: { bg: '#eab308', border: '#ca8a04', text: '#ffffff' },
-  case_review: { bg: '#84cc16', border: '#65a30d', text: '#ffffff' },
-  initial_meeting: { bg: '#22c55e', border: '#16a34a', text: '#ffffff' },
-  // External calendar types
-  'google-calendar': { bg: '#4285F4', border: '#3367D6', text: '#ffffff' },
 }
 
 // Event type labels in Arabic
@@ -127,89 +136,6 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
   document_review: 'مراجعة مستند',
   training: 'تدريب',
   other: 'أخرى',
-  // Appointment types
-  appointment: 'موعد',
-  follow_up: 'متابعة',
-  case_review: 'مراجعة قضية',
-  initial_meeting: 'اجتماع أولي',
-  // External calendar types
-  'google-calendar': 'تقويم جوجل',
-}
-
-// Day name mapping for FullCalendar (0 = Sunday, 1 = Monday, etc.)
-const DAY_NAME_TO_DOW: Record<string, number> = {
-  sunday: 0,
-  monday: 1,
-  tuesday: 2,
-  wednesday: 3,
-  thursday: 4,
-  friday: 5,
-  saturday: 6,
-}
-
-// Blocked time colors
-const BLOCKED_TIME_COLORS = {
-  vacation: { bg: '#fef3c7', border: '#f59e0b', text: '#92400e' },
-  meeting: { bg: '#dbeafe', border: '#3b82f6', text: '#1e40af' },
-  unavailable: { bg: '#fee2e2', border: '#ef4444', text: '#991b1b' },
-  other: { bg: '#f3f4f6', border: '#9ca3af', text: '#374151' },
-}
-
-/**
- * Convert working hours config to FullCalendar businessHours format
- * Enterprise-grade: Proper mapping for Saudi Arabia week (Sun-Thu working days)
- */
-function convertWorkingHoursToBusinessHours(
-  workingHours: Record<string, WorkingHours>
-): { daysOfWeek: number[]; startTime: string; endTime: string }[] {
-  const businessHours: { daysOfWeek: number[]; startTime: string; endTime: string }[] = []
-
-  // Group days with same working hours for efficiency
-  const hoursMap = new Map<string, number[]>()
-
-  Object.entries(workingHours).forEach(([day, hours]) => {
-    if (hours.enabled) {
-      const key = `${hours.start}-${hours.end}`
-      const dow = DAY_NAME_TO_DOW[day]
-      if (!hoursMap.has(key)) {
-        hoursMap.set(key, [])
-      }
-      hoursMap.get(key)!.push(dow)
-    }
-  })
-
-  hoursMap.forEach((daysOfWeek, timeRange) => {
-    const [startTime, endTime] = timeRange.split('-')
-    businessHours.push({ daysOfWeek, startTime, endTime })
-  })
-
-  return businessHours
-}
-
-/**
- * Get the earliest and latest working hours for calendar display optimization
- */
-function getWorkingHoursRange(workingHours: Record<string, WorkingHours>): { slotMinTime: string; slotMaxTime: string } {
-  let minHour = 24
-  let maxHour = 0
-
-  Object.values(workingHours).forEach((hours) => {
-    if (hours.enabled) {
-      const startHour = parseInt(hours.start.split(':')[0], 10)
-      const endHour = parseInt(hours.end.split(':')[0], 10)
-      minHour = Math.min(minHour, startHour)
-      maxHour = Math.max(maxHour, endHour)
-    }
-  })
-
-  // Add 1-hour buffer before and after, clamp to valid range
-  const bufferMin = Math.max(0, minHour - 1)
-  const bufferMax = Math.min(24, maxHour + 1)
-
-  return {
-    slotMinTime: `${bufferMin.toString().padStart(2, '0')}:00:00`,
-    slotMaxTime: `${bufferMax.toString().padStart(2, '0')}:00:00`,
-  }
 }
 
 // FullCalendar Library Loading Skeleton
@@ -265,14 +191,6 @@ interface CalendarEvent {
     priority?: string
     status?: string
     attendees?: any[]
-    color?: string
-    // Google Calendar specific fields
-    isExternal?: boolean
-    source?: 'google' | 'microsoft' | 'local'
-    googleEventId?: string
-    htmlLink?: string
-    meetingLink?: string
-    organizer?: string
   }
 }
 
@@ -295,19 +213,6 @@ export function FullCalendarView() {
   const calendarRef = useRef<FullCalendar>(null)
   const isRTL = i18n.language === 'ar'
 
-  // State for screen reader announcements
-  const [srAnnouncement, setSrAnnouncement] = useState('')
-  const [currentMonthName, setCurrentMonthName] = useState('')
-
-  // Translate navigation links
-  const topNavLinks = useMemo(() =>
-    TOP_NAV_LINKS_KEYS.map(link => ({
-      ...link,
-      title: t(link.titleKey, link.titleKey === 'nav.home' ? 'الرئيسية' : link.titleKey === 'nav.calendar' ? 'التقويم' : 'المهام')
-    })),
-    [t]
-  )
-
   // Performance profiling
   const renderCount = useRef(0)
   const mountTime = useRef(performance.now())
@@ -326,13 +231,19 @@ export function FullCalendarView() {
 
   // Track API calls
   const gridItemsLoadStart = useRef(performance.now())
+  const summaryLoadStart = useRef(performance.now())
 
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
   const [selectedItemForDetails, setSelectedItemForDetails] = useState<{ type: string; id: string } | null>(null)
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [filterTypes, setFilterTypes] = useState<string[]>([])
   const [isSyncDialogOpen, setIsSyncDialogOpen] = useState(false)
+
+  // Appointment detail dialog state
+  const [isAppointmentDialogOpen, setIsAppointmentDialogOpen] = useState(false)
+  const [selectedAppointment, setSelectedAppointment] = useState<AppointmentDetail | null>(null)
 
   // Create event form state
   const [createForm, setCreateForm] = useState<CreateEventForm>({
@@ -364,25 +275,18 @@ export function FullCalendarView() {
     return {
       startDate: startDate.toISOString().split('T')[0],
       endDate: endDate.toISOString().split('T')[0],
-      // Include appointments in single API call - optimized!
-      types: 'event,task,reminder,case-document,appointment',
     }
   }, [currentDate])
 
   // Fetch calendar data using optimized endpoints
   // Grid items: minimal data (~150 bytes/item) for calendar display
-  const { data: gridItemsData, isLoading, isError, error, refetch } = useCalendarGridItems(dateRange)
-
-  // Fetch appointment settings for working hours display
-  const { data: appointmentSettingsData } = useAppointmentSettings()
-
-  // Fetch blocked times for the current date range
-  const { data: blockedTimesData } = useBlockedTimes({
-    startDate: dateRange.startDate,
-    endDate: dateRange.endDate,
+  const { data: gridItemsData, isLoading, isError, error, refetch } = useCalendarGridItems({
+    ...dateRange,
+    types: filterTypes.length > 0 ? filterTypes.join(',') : undefined,
   })
 
-  // Note: Appointments are now included in grid-items via types parameter (optimized single API call)
+  // Grid summary: counts per day for the banner
+  const { data: summaryData } = useCalendarGridSummary(dateRange)
 
   // Lazy load full details when user clicks an event
   const { data: itemDetailsData, isLoading: isLoadingDetails } = useCalendarItemDetails(
@@ -409,6 +313,16 @@ export function FullCalendarView() {
       })
     }
   }, [gridItemsData])
+
+  useEffect(() => {
+    if (summaryData) {
+      const loadTime = (performance.now() - summaryLoadStart.current).toFixed(2)
+      perfLog('API LOADED: calendarGridSummary', {
+        days: summaryData?.data?.days?.length,
+        loadTime: loadTime + 'ms'
+      })
+    }
+  }, [summaryData])
 
   useEffect(() => {
     if (itemDetailsData) {
@@ -475,7 +389,6 @@ export function FullCalendarView() {
 
   // Transform grid items to FullCalendar format
   // Much simpler now - backend returns minimal data with color already included
-  // Google Calendar events have isExternal: true and additional fields
   const calendarEvents = useMemo<CalendarEvent[]>(() => {
     if (!gridItemsData?.data) return []
 
@@ -491,75 +404,36 @@ export function FullCalendarView() {
         status: item.status,
         priority: item.priority,
         color: item.color,
-        // Google Calendar specific fields
-        isExternal: item.isExternal || item.type === 'google-calendar',
-        source: item.source,
-        googleEventId: item.googleEventId,
-        htmlLink: item.htmlLink,
-        meetingLink: item.meetingLink,
+        // Appointment-specific fields (from backend when type is 'appointment')
+        clientName: item.clientName,
+        clientEmail: item.clientEmail,
+        clientPhone: item.clientPhone,
+        startTime: item.startTime,
+        endTime: item.endTime,
+        appointmentType: item.appointmentType,
+        appointmentStatus: item.appointmentStatus,
+        locationType: item.locationType,
         location: item.location,
-        organizer: item.organizer,
+        notes: item.notes,
+        subject: item.subject,
       },
     }))
   }, [gridItemsData])
 
-  // ==================== Working Hours Configuration ====================
-  // Get working hours from settings or use defaults
-  const workingHoursConfig = useMemo(() => {
-    const settings = appointmentSettingsData?.data?.workingHours
-    return settings || DEFAULT_WORKING_HOURS
-  }, [appointmentSettingsData])
-
-  // Convert working hours to FullCalendar businessHours format
-  // This displays non-working hours with gray background
-  const businessHours = useMemo(() => {
-    return convertWorkingHoursToBusinessHours(workingHoursConfig)
-  }, [workingHoursConfig])
-
-  // Get optimized time range for week/day views
-  const { slotMinTime, slotMaxTime } = useMemo(() => {
-    return getWorkingHoursRange(workingHoursConfig)
-  }, [workingHoursConfig])
-
-  // ==================== Blocked Times as Background Events ====================
-  // Convert blocked times to FullCalendar background events
-  const blockedTimeEvents = useMemo(() => {
-    if (!blockedTimesData?.data) return []
-
-    return blockedTimesData.data.map((blocked) => {
-      const colors = BLOCKED_TIME_COLORS[blocked.reason as keyof typeof BLOCKED_TIME_COLORS] || BLOCKED_TIME_COLORS.other
-
-      return {
-        id: `blocked-${blocked.id}`,
-        title: blocked.reason === 'vacation'
-          ? t('calendar.blockedTime.vacation', 'إجازة')
-          : blocked.reason === 'meeting'
-          ? t('calendar.blockedTime.meeting', 'اجتماع')
-          : blocked.reason === 'unavailable'
-          ? t('calendar.blockedTime.unavailable', 'غير متاح')
-          : blocked.notes || t('calendar.blockedTime.blocked', 'محجوب'),
-        start: blocked.startDate,
-        end: blocked.endDate,
-        display: 'background' as const,
-        backgroundColor: colors.bg,
-        borderColor: colors.border,
-        textColor: colors.text,
-        classNames: ['blocked-time-event'],
-        extendedProps: {
-          type: 'blocked',
-          reason: blocked.reason,
-          notes: blocked.notes,
-          targetLawyerId: blocked.targetLawyerId,
-        },
-      }
-    })
-  }, [blockedTimesData, t])
-
-  // Combine regular events (including appointments from grid-items) with blocked time background events
-  // Note: Appointments are now included in calendarEvents via types=appointment parameter (single API call)
-  const allCalendarEvents = useMemo(() => {
-    return [...calendarEvents, ...blockedTimeEvents]
-  }, [calendarEvents, blockedTimeEvents])
+  // Calculate summary counts from grid summary
+  const summaryCounts = useMemo(() => {
+    if (!summaryData?.data?.days) {
+      return { eventCount: 0, taskCount: 0, reminderCount: 0 }
+    }
+    return summaryData.data.days.reduce(
+      (acc, day) => ({
+        eventCount: acc.eventCount + day.events,
+        taskCount: acc.taskCount + day.tasks,
+        reminderCount: acc.reminderCount + day.reminders,
+      }),
+      { eventCount: 0, taskCount: 0, reminderCount: 0 }
+    )
+  }, [summaryData])
 
   // ==================== Memoized FullCalendar Props ====================
   // These prevent unnecessary re-initialization of FullCalendar
@@ -573,34 +447,85 @@ export function FullCalendarView() {
 
   // Button text - depends on language direction
   const buttonText = useMemo(() => ({
-    today: t('calendar.views.today', 'اليوم'),
-    month: t('calendar.views.month', 'شهر'),
-    week: t('calendar.views.week', 'أسبوع'),
-    day: t('calendar.views.day', 'يوم'),
-    list: t('calendar.views.list', 'قائمة'),
-  }), [t])
+    today: isRTL ? 'اليوم' : 'Today',
+    month: isRTL ? 'شهر' : 'Month',
+    week: isRTL ? 'أسبوع' : 'Week',
+    day: isRTL ? 'يوم' : 'Day',
+    list: isRTL ? 'قائمة' : 'List',
+  }), [isRTL])
 
   // More link text callback - stable reference
-  const moreLinkText = useCallback((num: number) => `+${num} ${t('calendar.moreLink', 'المزيد')}`, [t])
+  const moreLinkText = useCallback((num: number) => `+${num} المزيد`, [])
 
   // Event click handler - triggers lazy load for full details
   const handleEventClick = useCallback((info: EventClickArg) => {
     const event = info.event
     const [type, id] = event.id.split('-')
+    const eventType = event.extendedProps.eventType || event.extendedProps.type
 
-    // Store minimal info for immediate display
-    setSelectedEvent({
-      id: event.id,
-      title: event.title,
-      start: event.startStr,
-      end: event.endStr,
-      allDay: event.allDay,
-      extendedProps: event.extendedProps as CalendarEvent['extendedProps'],
+    // Debug logging for appointment detection
+    console.log('[Calendar Click Debug]', {
+      eventId: event.id,
+      type,
+      id,
+      eventType,
+      extendedProps: event.extendedProps,
+      APPOINTMENT_EVENT_TYPES,
+      typeMatch: APPOINTMENT_EVENT_TYPES.includes(eventType),
+      idPrefixMatch: type === 'appointment',
     })
 
-    // Trigger lazy load for full details
-    setSelectedItemForDetails({ type, id })
-    setIsEventDialogOpen(true)
+    // Check if this is an appointment event type
+    // An appointment can be identified by:
+    // 1. The event type (eventType) matching appointment types
+    // 2. The ID prefix being 'appointment'
+    const isAppointment = APPOINTMENT_EVENT_TYPES.includes(eventType) || type === 'appointment'
+
+    if (isAppointment) {
+      // Extract time from event or use backend-provided times
+      const startDate = new Date(event.startStr)
+      const endDate = event.endStr ? new Date(event.endStr) : startDate
+      // Prefer backend-provided times, fall back to parsed event times
+      const startTime = event.extendedProps.startTime || startDate.toTimeString().slice(0, 5)
+      const endTime = event.extendedProps.endTime || endDate.toTimeString().slice(0, 5)
+
+      // Map to AppointmentDetail for the dialog
+      // Use clientName from backend if available, otherwise fall back to event title
+      const appointmentDetail: AppointmentDetail = {
+        id: id,
+        clientName: event.extendedProps.clientName || event.title,
+        clientEmail: event.extendedProps.clientEmail || '',
+        clientPhone: event.extendedProps.clientPhone || '',
+        date: event.startStr.split('T')[0],
+        startTime: startTime,
+        endTime: endTime,
+        // Use appointmentType from backend, fall back to eventType
+        type: (event.extendedProps.appointmentType || eventType) as AppointmentDetail['type'] || 'consultation',
+        // Use appointmentStatus from backend, fall back to status
+        status: (event.extendedProps.appointmentStatus || event.extendedProps.status) as AppointmentDetail['status'] || 'confirmed',
+        locationType: event.extendedProps.locationType,
+        location: event.extendedProps.location,
+        notes: event.extendedProps.notes || event.extendedProps.description,
+        subject: event.extendedProps.subject,
+      }
+
+      setSelectedAppointment(appointmentDetail)
+      setIsAppointmentDialogOpen(true)
+    } else {
+      // Store minimal info for immediate display (for non-appointment events)
+      setSelectedEvent({
+        id: event.id,
+        title: event.title,
+        start: event.startStr,
+        end: event.endStr,
+        allDay: event.allDay,
+        extendedProps: event.extendedProps as CalendarEvent['extendedProps'],
+      })
+
+      // Trigger lazy load for full details
+      setSelectedItemForDetails({ type, id })
+      setIsEventDialogOpen(true)
+    }
   }, [])
 
   // Memoized datesSet handler - prevents re-renders from inline function
@@ -626,18 +551,9 @@ export function FullCalendarView() {
         from: prev.toISOString().split('T')[0],
         to: viewCenter.toISOString().split('T')[0]
       })
-
-      // Update screen reader announcement for calendar navigation
-      const monthName = viewCenter.toLocaleDateString(i18n.language === 'ar' ? 'ar-SA' : 'en-US', {
-        month: 'long',
-        year: 'numeric',
-      })
-      setCurrentMonthName(monthName)
-      setSrAnnouncement(`${t('calendar.viewing', 'عرض')} ${monthName}`)
-
       return viewCenter
     })
-  }, [i18n.language, t])
+  }, [])
 
   // Date select handler (for creating new events) - use functional update to avoid dependency on createForm
   const handleDateSelect = useCallback((info: DateSelectArg) => {
@@ -664,22 +580,22 @@ export function FullCalendarView() {
             endDate: info.event.endStr || info.event.startStr,
           },
         })
-        toast.success(t('calendar.success.eventUpdated', 'تم تحديث موعد الحدث بنجاح'))
+        toast.success('تم تحديث موعد الحدث بنجاح')
       } catch (error) {
         info.revert()
-        toast.error(t('calendar.errors.eventUpdateFailed', 'فشل تحديث موعد الحدث'))
+        toast.error('فشل تحديث موعد الحدث')
       }
     } else {
       // For tasks and reminders, revert as they need different handling
       info.revert()
-      toast.info(t('calendar.info.dragEventsOnly', 'اسحب الأحداث فقط لتغيير موعدها'))
+      toast.info('اسحب الأحداث فقط لتغيير موعدها')
     }
-  }, [updateEventMutation, t])
+  }, [updateEventMutation])
 
   // Create event handler
   const handleCreateEvent = async () => {
     if (!createForm.title.trim()) {
-      toast.error(t('calendar.errors.titleRequired', 'يرجى إدخال عنوان الحدث'))
+      toast.error('يرجى إدخال عنوان الحدث')
       return
     }
 
@@ -702,7 +618,7 @@ export function FullCalendarView() {
         caseId: createForm.caseId || undefined,
       })
 
-      toast.success(t('calendar.success.eventCreated', 'تم إنشاء الحدث بنجاح'))
+      toast.success('تم إنشاء الحدث بنجاح')
       setIsCreateDialogOpen(false)
       setCreateForm({
         title: '',
@@ -718,7 +634,7 @@ export function FullCalendarView() {
       })
       refetch()
     } catch (error) {
-      toast.error(t('calendar.errors.eventCreateFailed', 'فشل إنشاء الحدث'))
+      toast.error('فشل إنشاء الحدث')
     }
   }
 
@@ -738,72 +654,52 @@ export function FullCalendarView() {
   }
 
   // Custom event rendering - uses color from backend grid item
-  // Google Calendar events get visual distinction with Google blue accent and icon
   const renderEventContent = useCallback((eventInfo: EventContentArg) => {
     const { event } = eventInfo
     const eventType = event.extendedProps.eventType || 'other'
-    const isExternal = event.extendedProps.isExternal || eventType === 'google-calendar'
-
     // Use color from backend if available, fallback to EVENT_COLORS
     const backendColor = event.extendedProps.color
     const colors = backendColor
       ? { bg: backendColor, border: backendColor, text: '#ffffff' }
       : EVENT_COLORS[eventType as keyof typeof EVENT_COLORS] || EVENT_COLORS.other
 
-    // External events use Google blue left border for visual distinction
-    const borderColor = isExternal ? '#4285F4' : colors.border
-
     return (
       <div
-        className={`w-full h-full px-1.5 py-0.5 rounded text-xs font-medium overflow-hidden ${isExternal ? 'opacity-90' : ''}`}
+        className="w-full h-full px-1.5 py-0.5 rounded text-xs font-medium overflow-hidden"
         style={{
           backgroundColor: colors.bg,
-          borderRight: `3px solid ${borderColor}`,
+          borderRight: `3px solid ${colors.border}`,
           color: colors.text,
         }}
-        title={isExternal ? t('calendar.externalEvent', 'حدث من تقويم خارجي') : undefined}
       >
         <div className="flex items-center gap-1 truncate">
-          {/* Google Calendar events get a "G" indicator */}
-          {isExternal ? (
-            <span
-              className="flex-shrink-0 w-3 h-3 rounded-sm bg-white/20 flex items-center justify-center text-[8px] font-bold"
-              aria-label={t('calendar.googleCalendar', 'تقويم جوجل')}
-            >
-              G
-            </span>
-          ) : eventType === 'hearing' || eventType === 'court_session' ? (
-            <Gavel className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
+          {eventType === 'hearing' || eventType === 'court_session' ? (
+            <Gavel className="h-3 w-3 flex-shrink-0" />
           ) : eventType === 'meeting' ? (
             <Users className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
           ) : eventType === 'deadline' || eventType === 'task' ? (
             <AlertTriangle className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
           ) : (
-            <CalendarIcon className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
+            <CalendarIcon className="h-3 w-3 flex-shrink-0" />
           )}
           <span className="truncate">{event.title}</span>
         </div>
       </div>
     )
-  }, [t]) // Depends on t for translations
+  }, []) // Empty deps - EVENT_COLORS is static fallback, icons are stable
 
   // Loading state
   if (isLoading) {
     return (
       <>
         <Header className="bg-navy shadow-none relative">
-          <TopNav links={topNavLinks} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+          <TopNav links={TOP_NAV_LINKS} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
             <DynamicIsland />
           </div>
           <div className="ms-auto flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white"
-              aria-label={t('common.notifications', 'الإشعارات')}
-            >
-              <Bell className="h-5 w-5" aria-hidden="true" />
+            <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
+              <Bell className="h-5 w-5" />
             </Button>
             <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
             <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -811,13 +707,7 @@ export function FullCalendarView() {
             <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
           </div>
         </Header>
-        <Main
-          fluid
-          className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8"
-          aria-busy="true"
-          aria-live="polite"
-        >
-          <div className="sr-only">{t('calendar.states.loading', 'جاري تحميل التقويم...')}</div>
+        <Main fluid className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8">
           <Skeleton className="h-48 w-full rounded-3xl" />
           <Skeleton className="h-[700px] w-full rounded-3xl" />
         </Main>
@@ -833,7 +723,7 @@ export function FullCalendarView() {
     return (
       <>
         <Header className="bg-navy shadow-none relative">
-          <TopNav links={topNavLinks} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+          <TopNav links={TOP_NAV_LINKS} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
             <DynamicIsland />
           </div>
@@ -845,18 +735,18 @@ export function FullCalendarView() {
         </Header>
         <Main fluid className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
           <Card className="rounded-3xl border-0 shadow-lg">
-            <CardContent className="p-12 text-center" role="alert" aria-live="assertive">
+            <CardContent className="p-12 text-center">
               <div className={`w-16 h-16 ${isBackendPending ? 'bg-orange-50' : 'bg-red-50'} rounded-full flex items-center justify-center mx-auto mb-4`}>
                 <AlertCircle className={`h-8 w-8 ${isBackendPending ? 'text-orange-500' : 'text-red-500'}`} aria-hidden="true" />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">
                 {isBackendPending ? (
                   <>
-                    {t('calendar.errors.backendPendingTitle', '[بانتظار التطبيق] فشل تحميل التقويم')}
+                    {isRTL ? '[بانتظار التطبيق] فشل تحميل التقويم' : '[BACKEND-PENDING] Failed to load calendar'}
                   </>
                 ) : (
                   <>
-                    {t('calendar.errors.loadFailed', 'فشل تحميل التقويم')}
+                    {isRTL ? 'فشل تحميل التقويم' : 'Failed to load calendar'}
                   </>
                 )}
               </h3>
@@ -865,17 +755,19 @@ export function FullCalendarView() {
                 <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6 text-right">
                   <p className="text-sm text-orange-800 mb-2">
                     <strong className="font-bold">
-                      {t('calendar.errors.backendPendingWarning', '⚠️ هذه الميزة بانتظار تطبيق الخادم')}
+                      {isRTL ? '⚠️ هذه الميزة بانتظار تطبيق الخادم' : '⚠️ This feature is pending backend implementation'}
                     </strong>
                   </p>
                   <p className="text-xs text-orange-700">
-                    {t('calendar.errors.backendPendingDescription', 'يستخدم التقويم حاليًا نقاط نهاية محسّنة غير مطبقة بعد في الخادم. يرجى الاتصال بفريق التطوير لتطبيق النقاط النهائية المطلوبة أو استخدام التقويم القديم مؤقتًا.')}
+                    {isRTL
+                      ? 'يستخدم التقويم حاليًا نقاط نهاية محسّنة غير مطبقة بعد في الخادم. يرجى الاتصال بفريق التطوير لتطبيق النقاط النهائية المطلوبة أو استخدام التقويم القديم مؤقتًا.'
+                      : 'The calendar is currently using optimized endpoints that are not yet implemented in the backend. Please contact the development team to implement the required endpoints or use the legacy calendar temporarily.'}
                   </p>
                 </div>
               )}
               <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
-                <RefreshCw className="ms-2 h-4 w-4" aria-hidden="true" />
-                {t('calendar.actions.retry', 'إعادة المحاولة')}
+                <RefreshCw className="ms-2 h-4 w-4" />
+                {isRTL ? 'إعادة المحاولة' : 'Retry'}
               </Button>
             </CardContent>
           </Card>
@@ -887,7 +779,7 @@ export function FullCalendarView() {
   return (
     <>
       <Header className="bg-navy shadow-none relative">
-        <TopNav links={topNavLinks} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+        <TopNav links={TOP_NAV_LINKS} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
@@ -896,19 +788,13 @@ export function FullCalendarView() {
             <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
-              placeholder={t('common.search', 'بحث...')}
+              placeholder="بحث..."
               className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-              aria-label={t('common.search', 'بحث...')}
             />
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white"
-            aria-label={t('common.notifications', 'الإشعارات')}
-          >
-            <Bell className="h-5 w-5" aria-hidden="true" />
-            <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy" aria-hidden="true"></span>
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
+            <Bell className="h-5 w-5" />
+            <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -919,94 +805,131 @@ export function FullCalendarView() {
       </Header>
 
       <Main fluid className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6">
-        {/* Hero Banner - Dashboard Style */}
-        <div className="bg-[#022c22] rounded-2xl p-6 relative overflow-hidden text-white shadow-lg">
-          {/* Subtle Animated Gradient Background */}
-          <div className="absolute inset-0 z-0">
-            <div
-              className="absolute inset-0 opacity-20"
-              style={{
-                background: 'linear-gradient(-45deg, #022c22, #064e3b, #022c22, #0f766e)',
-                backgroundSize: '400% 400%',
-                animation: 'gradientShift 20s ease infinite'
-              }}
-            />
-            <style>{`
-              @keyframes gradientShift {
-                0% { background-position: 0% 50%; }
-                50% { background-position: 100% 50%; }
-                100% { background-position: 0% 50%; }
-              }
-            `}</style>
-          </div>
-
-          {/* Background Pattern */}
-          <div className="absolute inset-0 z-0">
-            <img
-              src="/images/hero-wave.png"
-              alt=""
-              className="w-full h-full object-cover opacity-25 mix-blend-overlay"
-            />
-          </div>
-
-          {/* Subtle accent glow */}
-          <div className="absolute top-0 end-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-2xl -me-32 -mt-32 pointer-events-none" />
-
-          <div className="relative z-10">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              {/* Title Section */}
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-white/10 rounded-xl" aria-hidden="true">
-                  <CalendarIcon className="w-6 h-6 text-emerald-400" />
-                </div>
-                <h1 className="text-2xl font-bold text-white tracking-tight">
-                  {t('calendar.hero.title', 'جدول القضايا والجلسات')}
-                </h1>
+        {/* Hero Banner */}
+        <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 group">
+          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Badge className="bg-blue-500/20 text-blue-100 hover:bg-blue-500/30 border-0 px-3 py-1">
+                  <Briefcase className="w-3 h-3 ms-2" />
+                  مكتب المحاماة
+                </Badge>
+                <span className="text-slate-500 text-sm">
+                  {new Date().toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' })}
+                </span>
               </div>
-
-              {/* Action Buttons - Same style as dashboard hero */}
-              <div className="flex flex-wrap gap-3">
-                <Button
-                  onClick={() => setIsCreateDialogOpen(true)}
-                  className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-semibold shadow-lg shadow-emerald-500/20 border-0 text-sm"
-                >
-                  <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
-                  {t('calendar.hero.newEvent', 'حدث جديد')}
-                </Button>
-                <Button
-                  onClick={() => setIsSyncDialogOpen(true)}
-                  variant="outline"
-                  className="h-10 px-5 rounded-xl font-semibold border-white/20 text-white hover:bg-white/10 hover:text-white bg-transparent text-sm"
-                >
-                  <Settings className="ms-2 h-4 w-4" aria-hidden="true" />
-                  {t('calendar.hero.sync', 'مزامنة')}
-                </Button>
-              </div>
+              <h1 className="text-4xl font-bold leading-tight mb-2">جدول القضايا والجلسات</h1>
+              <p className="text-slate-300 text-lg max-w-xl">
+                لديك{' '}
+                <span className="text-white font-bold border-b-2 border-brand-blue">
+                  {summaryCounts.eventCount} أحداث
+                </span>
+                {' '}و{' '}
+                <span className="text-white font-bold border-b-2 border-orange-500">
+                  {summaryCounts.taskCount} مهام
+                </span>
+                {' '}و{' '}
+                <span className="text-white font-bold border-b-2 border-purple-500">
+                  {summaryCounts.reminderCount} تذكيرات
+                </span>
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                onClick={() => setIsCreateDialogOpen(true)}
+                className="bg-brand-blue hover:bg-blue-600 text-white rounded-xl h-12 px-8 font-bold shadow-lg shadow-blue-600/30 hover:scale-105 transition-all duration-300 border-0 text-base"
+              >
+                <Plus className="ms-2 h-5 w-5" aria-hidden="true" />
+                حدث جديد
+              </Button>
+              <Button
+                onClick={() => setIsSyncDialogOpen(true)}
+                className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-12 px-6 font-bold shadow-lg shadow-emerald-600/30 hover:scale-105 transition-all duration-300 border-0"
+              >
+                <Settings className="ms-2 h-5 w-5" aria-hidden="true" />
+                مزامنة
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button className="bg-white/10 hover:bg-white/20 text-white rounded-xl h-12 px-6 font-bold backdrop-blur-md border border-white/10 transition-all duration-300">
+                    <Filter className="ms-2 h-5 w-5" aria-hidden="true" />
+                    تصفية
+                    {filterTypes.length > 0 && (
+                      <Badge className="me-2 bg-brand-blue text-white">{filterTypes.length}</Badge>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuCheckboxItem
+                    checked={filterTypes.includes('hearing')}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setFilterTypes([...filterTypes, 'hearing', 'court_session'])
+                      } else {
+                        setFilterTypes(filterTypes.filter(t => t !== 'hearing' && t !== 'court_session'))
+                      }
+                    }}
+                  >
+                    <Gavel className="ms-2 h-4 w-4 text-red-500" />
+                    جلسات المحكمة
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={filterTypes.includes('meeting')}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setFilterTypes([...filterTypes, 'meeting'])
+                      } else {
+                        setFilterTypes(filterTypes.filter(t => t !== 'meeting'))
+                      }
+                    }}
+                  >
+                    <Users className="ms-2 h-4 w-4 text-blue-500" aria-hidden="true" />
+                    اجتماعات
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={filterTypes.includes('task')}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setFilterTypes([...filterTypes, 'task'])
+                      } else {
+                        setFilterTypes(filterTypes.filter(t => t !== 'task'))
+                      }
+                    }}
+                  >
+                    <AlertTriangle className="ms-2 h-4 w-4 text-purple-500" aria-hidden="true" />
+                    مهام
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={filterTypes.includes('reminder')}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setFilterTypes([...filterTypes, 'reminder'])
+                      } else {
+                        setFilterTypes(filterTypes.filter(t => t !== 'reminder'))
+                      }
+                    }}
+                  >
+                    <Bell className="ms-2 h-4 w-4 text-orange-500" />
+                    تذكيرات
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setFilterTypes([])}>
+                    <X className="ms-2 h-4 w-4" aria-hidden="true" />
+                    إزالة الفلاتر
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
-        </div>
-
-        {/* Screen reader announcements for calendar navigation */}
-        <div
-          role="status"
-          aria-live="polite"
-          aria-atomic="true"
-          className="sr-only"
-        >
-          {srAnnouncement}
         </div>
 
         {/* Calendar */}
         <Card className="rounded-3xl border-0 shadow-lg overflow-hidden">
           <CardContent className="p-0">
-            {/* Screen reader helper text */}
-            <span className="sr-only">
-              {t('calendar.eventCount', `${calendarEvents.length} ${calendarEvents.length === 1 ? 'حدث' : 'أحداث'} في هذا الشهر`)}
-            </span>
             <div
               className="fullcalendar-wrapper p-4"
               style={{ direction: isRTL ? 'rtl' : 'ltr' }}
-              aria-busy={isLoading}
             >
               <Suspense fallback={<FullCalendarLibrarySkeleton />}>
                 <FullCalendarComponent
@@ -1017,7 +940,7 @@ export function FullCalendarView() {
                   direction={isRTL ? 'rtl' : 'ltr'}
                   headerToolbar={headerToolbar}
                   buttonText={buttonText}
-                  events={allCalendarEvents}
+                  events={calendarEvents}
                   eventClick={handleEventClick}
                   select={handleDateSelect}
                   eventDrop={handleEventDrop}
@@ -1035,18 +958,6 @@ export function FullCalendarView() {
                   rerenderDelay={10}
                   progressiveEventRendering={true}
                   datesSet={handleDatesSet}
-                  // ==================== Working Hours Display ====================
-                  // Shows working hours with white background, non-working with gray
-                  businessHours={businessHours}
-                  // Optimize week/day views to focus on working hours range
-                  slotMinTime={slotMinTime}
-                  slotMaxTime={slotMaxTime}
-                  // Visual distinction for outside business hours
-                  slotLabelFormat={{
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false,
-                  }}
                 />
               </Suspense>
             </div>
@@ -1059,36 +970,22 @@ export function FullCalendarView() {
         setIsEventDialogOpen(open)
         if (!open) setSelectedItemForDetails(null) // Clear lazy load state when closing
       }}>
-        <DialogContent className="max-w-md" aria-describedby="event-description">
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle id="event-title" className="flex items-center gap-2">
-              {/* Show Google "G" icon for external events */}
-              {selectedEvent?.extendedProps.isExternal ? (
-                <span
-                  className="flex-shrink-0 w-5 h-5 rounded bg-[#4285F4] flex items-center justify-center text-xs font-bold text-white"
-                  aria-label={t('calendar.googleCalendar', 'تقويم جوجل')}
-                >
-                  G
-                </span>
-              ) : selectedEvent?.extendedProps.eventType === 'hearing' ||
+            <DialogTitle className="flex items-center gap-2">
+              {selectedEvent?.extendedProps.eventType === 'hearing' ||
               selectedEvent?.extendedProps.eventType === 'court_session' ? (
-                <Gavel className="h-5 w-5 text-red-500" aria-hidden="true" />
+                <Gavel className="h-5 w-5 text-red-500" />
               ) : selectedEvent?.extendedProps.eventType === 'meeting' ? (
                 <Users className="h-5 w-5 text-blue-500" aria-hidden="true" />
               ) : (
-                <CalendarIcon className="h-5 w-5 text-purple-500" aria-hidden="true" />
+                <CalendarIcon className="h-5 w-5 text-purple-500" />
               )}
               {selectedEvent?.title}
             </DialogTitle>
-            <DialogDescription id="event-description" className="flex items-center gap-2">
+            <DialogDescription>
               {selectedEvent?.extendedProps.eventType &&
                 EVENT_TYPE_LABELS[selectedEvent.extendedProps.eventType]}
-              {/* External event badge */}
-              {selectedEvent?.extendedProps.isExternal && (
-                <Badge variant="outline" className="text-[#4285F4] border-[#4285F4]/30 bg-[#4285F4]/5">
-                  {t('calendar.externalEvent', 'حدث خارجي')}
-                </Badge>
-              )}
             </DialogDescription>
           </DialogHeader>
 
@@ -1107,22 +1004,6 @@ export function FullCalendarView() {
                 </span>
               </div>
 
-              {/* Location from extendedProps for external events */}
-              {selectedEvent.extendedProps.location && (
-                <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <MapPin className="h-4 w-4" aria-hidden="true" />
-                  <span>{selectedEvent.extendedProps.location}</span>
-                </div>
-              )}
-
-              {/* Organizer for external events */}
-              {selectedEvent.extendedProps.organizer && (
-                <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <Users className="h-4 w-4" aria-hidden="true" />
-                  <span>{selectedEvent.extendedProps.organizer}</span>
-                </div>
-              )}
-
               {/* Priority - available from grid item */}
               {selectedEvent.extendedProps.priority && (
                 <Badge
@@ -1134,74 +1015,57 @@ export function FullCalendarView() {
                   }
                 >
                   {selectedEvent.extendedProps.priority === 'critical'
-                    ? t('calendar.priority.critical', 'حرج')
+                    ? 'حرج'
                     : selectedEvent.extendedProps.priority === 'high'
-                    ? t('calendar.priority.high', 'عالي')
+                    ? 'عالي'
                     : selectedEvent.extendedProps.priority === 'medium'
-                    ? t('calendar.priority.medium', 'متوسط')
-                    : t('calendar.priority.low', 'منخفض')}
+                    ? 'متوسط'
+                    : 'منخفض'}
                 </Badge>
               )}
 
-              {/* Meeting link for external events */}
-              {selectedEvent.extendedProps.meetingLink && (
-                <a
-                  href={selectedEvent.extendedProps.meetingLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 hover:underline"
-                >
-                  <ExternalLink className="h-4 w-4" aria-hidden="true" />
-                  {t('calendar.joinMeeting', 'انضمام للاجتماع')}
-                </a>
-              )}
-
-              {/* Lazy-loaded details - only for non-external events */}
-              {!selectedEvent.extendedProps.isExternal && (
+              {/* Lazy-loaded details */}
+              {isLoadingDetails ? (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
+                  <span className="ms-2 text-sm text-slate-500">جاري تحميل التفاصيل...</span>
+                </div>
+              ) : itemDetailsData?.data && (
                 <>
-                  {isLoadingDetails ? (
-                    <div className="flex items-center justify-center py-4" aria-live="polite" aria-busy="true">
-                      <Loader2 className="h-5 w-5 animate-spin text-slate-400" aria-hidden="true" />
-                      <span className="ms-2 text-sm text-slate-500">{t('calendar.states.loadingDetails', 'جاري تحميل التفاصيل...')}</span>
+                  {itemDetailsData.data.location && (
+                    <div className="flex items-center gap-2 text-sm text-slate-600">
+                      <MapPin className="h-4 w-4" aria-hidden="true" />
+                      <span>{itemDetailsData.data.location}</span>
                     </div>
-                  ) : itemDetailsData?.data && (
-                    <>
-                      {itemDetailsData.data.location && !selectedEvent.extendedProps.location && (
-                        <div className="flex items-center gap-2 text-sm text-slate-600">
-                          <MapPin className="h-4 w-4" aria-hidden="true" />
-                          <span>{itemDetailsData.data.location}</span>
-                        </div>
-                      )}
+                  )}
 
-                      {itemDetailsData.data.caseName && (
-                        <div className="flex items-center gap-2 text-sm text-slate-600">
-                          <Briefcase className="h-4 w-4" aria-hidden="true" />
-                          <span>
-                            {itemDetailsData.data.caseName}
-                            {itemDetailsData.data.caseNumber &&
-                              ` (${itemDetailsData.data.caseNumber})`}
-                          </span>
-                        </div>
-                      )}
+                  {itemDetailsData.data.caseName && (
+                    <div className="flex items-center gap-2 text-sm text-slate-600">
+                      <Briefcase className="h-4 w-4" />
+                      <span>
+                        {itemDetailsData.data.caseName}
+                        {itemDetailsData.data.caseNumber &&
+                          ` (${itemDetailsData.data.caseNumber})`}
+                      </span>
+                    </div>
+                  )}
 
-                      {itemDetailsData.data.description && (
-                        <p className="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg">
-                          {itemDetailsData.data.description}
-                        </p>
-                      )}
+                  {itemDetailsData.data.description && (
+                    <p className="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg">
+                      {itemDetailsData.data.description}
+                    </p>
+                  )}
 
-                      {itemDetailsData.data.attendees && itemDetailsData.data.attendees.length > 0 && (
-                        <div className="flex items-start gap-2 text-sm text-slate-600">
-                          <Users className="h-4 w-4 mt-0.5" aria-hidden="true" />
-                          <div>
-                            <span className="font-medium">{t('calendar.labels.attendees', 'الحضور')}:</span>
-                            <span className="ms-1">
-                              {itemDetailsData.data.attendees.map((a: any) => a.name || a.username).join('، ')}
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                    </>
+                  {itemDetailsData.data.attendees && itemDetailsData.data.attendees.length > 0 && (
+                    <div className="flex items-start gap-2 text-sm text-slate-600">
+                      <Users className="h-4 w-4 mt-0.5" aria-hidden="true" />
+                      <div>
+                        <span className="font-medium">الحضور:</span>
+                        <span className="ms-1">
+                          {itemDetailsData.data.attendees.map((a: any) => a.name || a.username).join('، ')}
+                        </span>
+                      </div>
+                    </div>
                   )}
                 </>
               )}
@@ -1209,59 +1073,38 @@ export function FullCalendarView() {
           )}
 
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsEventDialogOpen(false)}
-              aria-label={t('calendar.actions.close', 'إغلاق')}
-            >
-              {t('calendar.actions.close', 'إغلاق')}
+            <Button variant="outline" onClick={() => setIsEventDialogOpen(false)}>
+              إغلاق
             </Button>
-            {/* External events: Open in Google Calendar | Local events: View Details */}
-            {selectedEvent?.extendedProps.isExternal && selectedEvent?.extendedProps.htmlLink ? (
-              <Button
-                asChild
-                className="bg-[#4285F4] hover:bg-[#3367D6]"
-              >
-                <a
-                  href={selectedEvent.extendedProps.htmlLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <ExternalLink className="ms-2 h-4 w-4" aria-hidden="true" />
-                  {t('calendar.openInGoogle', 'فتح في تقويم جوجل')}
-                </a>
-              </Button>
-            ) : (
-              <Button onClick={handleViewEventDetails}>
-                <ExternalLink className="ms-2 h-4 w-4" aria-hidden="true" />
-                {t('calendar.actions.viewDetails', 'عرض التفاصيل')}
-              </Button>
-            )}
+            <Button onClick={handleViewEventDetails}>
+              <ExternalLink className="ms-2 h-4 w-4" aria-hidden="true" />
+              عرض التفاصيل
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Create Event Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="max-w-lg" aria-describedby="create-event-description">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle id="create-event-title">{t('calendar.dialogs.createEvent.title', 'إنشاء حدث جديد')}</DialogTitle>
-            <DialogDescription id="create-event-description">{t('calendar.dialogs.createEvent.description', 'أضف حدث جديد إلى التقويم')}</DialogDescription>
+            <DialogTitle>إنشاء حدث جديد</DialogTitle>
+            <DialogDescription>أضف حدث جديد إلى التقويم</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div>
-              <Label htmlFor="title">{t('calendar.labels.title', 'العنوان')} *</Label>
+              <Label htmlFor="title">العنوان *</Label>
               <Input
                 id="title"
                 value={createForm.title}
                 onChange={(e) => setCreateForm({ ...createForm, title: e.target.value })}
-                placeholder={t('calendar.placeholders.eventTitle', 'عنوان الحدث')}
+                placeholder="عنوان الحدث"
               />
             </div>
 
             <div>
-              <Label htmlFor="type">{t('calendar.labels.eventType', 'نوع الحدث')}</Label>
+              <Label htmlFor="type">نوع الحدث</Label>
               <Select
                 value={createForm.type}
                 onValueChange={(value) => setCreateForm({ ...createForm, type: value })}
@@ -1270,14 +1113,14 @@ export function FullCalendarView() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="hearing">{t('calendar.eventTypes.hearing', 'جلسة محكمة')}</SelectItem>
-                  <SelectItem value="meeting">{t('calendar.eventTypes.meeting', 'اجتماع')}</SelectItem>
-                  <SelectItem value="deadline">{t('calendar.eventTypes.deadline', 'موعد نهائي')}</SelectItem>
-                  <SelectItem value="conference">{t('calendar.eventTypes.conference', 'مؤتمر')}</SelectItem>
-                  <SelectItem value="consultation">{t('calendar.eventTypes.consultation', 'استشارة')}</SelectItem>
-                  <SelectItem value="document_review">{t('calendar.eventTypes.documentReview', 'مراجعة مستند')}</SelectItem>
-                  <SelectItem value="training">{t('calendar.eventTypes.training', 'تدريب')}</SelectItem>
-                  <SelectItem value="other">{t('calendar.eventTypes.other', 'أخرى')}</SelectItem>
+                  <SelectItem value="hearing">جلسة محكمة</SelectItem>
+                  <SelectItem value="meeting">اجتماع</SelectItem>
+                  <SelectItem value="deadline">موعد نهائي</SelectItem>
+                  <SelectItem value="conference">مؤتمر</SelectItem>
+                  <SelectItem value="consultation">استشارة</SelectItem>
+                  <SelectItem value="document_review">مراجعة مستند</SelectItem>
+                  <SelectItem value="training">تدريب</SelectItem>
+                  <SelectItem value="other">أخرى</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1291,13 +1134,13 @@ export function FullCalendarView() {
                 }
               />
               <Label htmlFor="allDay" className="cursor-pointer">
-                {t('calendar.labels.allDay', 'طوال اليوم')}
+                طوال اليوم
               </Label>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="startDate">{t('calendar.labels.startDate', 'تاريخ البدء')} *</Label>
+                <Label htmlFor="startDate">تاريخ البدء *</Label>
                 <Input
                   id="startDate"
                   type="date"
@@ -1307,7 +1150,7 @@ export function FullCalendarView() {
               </div>
               {!createForm.allDay && (
                 <div>
-                  <Label htmlFor="startTime">{t('calendar.labels.startTime', 'وقت البدء')}</Label>
+                  <Label htmlFor="startTime">وقت البدء</Label>
                   <Input
                     id="startTime"
                     type="time"
@@ -1320,7 +1163,7 @@ export function FullCalendarView() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="endDate">{t('calendar.labels.endDate', 'تاريخ الانتهاء')}</Label>
+                <Label htmlFor="endDate">تاريخ الانتهاء</Label>
                 <Input
                   id="endDate"
                   type="date"
@@ -1330,7 +1173,7 @@ export function FullCalendarView() {
               </div>
               {!createForm.allDay && (
                 <div>
-                  <Label htmlFor="endTime">{t('calendar.labels.endTime', 'وقت الانتهاء')}</Label>
+                  <Label htmlFor="endTime">وقت الانتهاء</Label>
                   <Input
                     id="endTime"
                     type="time"
@@ -1342,47 +1185,42 @@ export function FullCalendarView() {
             </div>
 
             <div>
-              <Label htmlFor="location">{t('calendar.labels.location', 'الموقع')}</Label>
+              <Label htmlFor="location">الموقع</Label>
               <Input
                 id="location"
                 value={createForm.location}
                 onChange={(e) => setCreateForm({ ...createForm, location: e.target.value })}
-                placeholder={t('calendar.placeholders.eventLocation', 'موقع الحدث')}
+                placeholder="موقع الحدث"
               />
             </div>
 
             <div>
-              <Label htmlFor="description">{t('calendar.labels.description', 'الوصف')}</Label>
+              <Label htmlFor="description">الوصف</Label>
               <Textarea
                 id="description"
                 value={createForm.description}
                 onChange={(e) => setCreateForm({ ...createForm, description: e.target.value })}
-                placeholder={t('calendar.placeholders.eventDescription', 'وصف الحدث')}
+                placeholder="وصف الحدث"
                 rows={3}
               />
             </div>
           </div>
 
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsCreateDialogOpen(false)}
-              aria-label={t('calendar.actions.cancel', 'إلغاء')}
-            >
-              {t('calendar.actions.cancel', 'إلغاء')}
+            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+              إلغاء
             </Button>
             <Button
               onClick={handleCreateEvent}
               disabled={createEventMutation.isPending}
               className="bg-brand-blue hover:bg-blue-600"
-              aria-busy={createEventMutation.isPending}
             >
               {createEventMutation.isPending ? (
-                <Loader2 className="ms-2 h-4 w-4 animate-spin" aria-hidden="true" />
+                <Loader2 className="ms-2 h-4 w-4 animate-spin" />
               ) : (
                 <Check className="ms-2 h-4 w-4" aria-hidden="true" />
               )}
-              {t('calendar.actions.createEvent', 'إنشاء الحدث')}
+              إنشاء الحدث
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1390,6 +1228,27 @@ export function FullCalendarView() {
 
       {/* Calendar Sync Dialog */}
       <CalendarSyncDialog open={isSyncDialogOpen} onOpenChange={setIsSyncDialogOpen} />
+
+      {/* Appointment Detail Dialog - for appointment events */}
+      <AppointmentDetailDialog
+        open={isAppointmentDialogOpen}
+        onOpenChange={setIsAppointmentDialogOpen}
+        appointment={selectedAppointment}
+        onEdit={(appointment) => {
+          // Navigate to edit page or open edit dialog
+          setIsAppointmentDialogOpen(false)
+          toast.info(isRTL ? 'سيتم إضافة وظيفة التعديل قريباً' : 'Edit functionality coming soon')
+        }}
+        onReschedule={(appointment) => {
+          // Navigate to reschedule page or open reschedule dialog
+          setIsAppointmentDialogOpen(false)
+          toast.info(isRTL ? 'سيتم إضافة وظيفة إعادة الجدولة قريباً' : 'Reschedule functionality coming soon')
+        }}
+        onDelete={(appointment) => {
+          // Handled by the dialog internally with the mutation
+          setIsAppointmentDialogOpen(false)
+        }}
+      />
 
       {/* FullCalendar Custom Styles */}
       <style>{`
@@ -1464,70 +1323,6 @@ export function FullCalendarView() {
         }
         .fullcalendar-wrapper .fc-list-event:hover td {
           background-color: #f1f5f9;
-        }
-
-        /* ==================== Working Hours Display ==================== */
-        /* Non-working hours (outside business hours) - subtle gray background */
-        .fullcalendar-wrapper .fc-timegrid-slot.fc-non-business {
-          background-color: #f8fafc;
-        }
-        .fullcalendar-wrapper .fc-daygrid-day.fc-non-business {
-          background-color: #f8fafc;
-        }
-        /* Business hours - white background for contrast */
-        .fullcalendar-wrapper .fc-timegrid-slot:not(.fc-non-business) {
-          background-color: #ffffff;
-        }
-        /* Weekend days visual distinction */
-        .fullcalendar-wrapper .fc-day-fri:not(.fc-day-today),
-        .fullcalendar-wrapper .fc-day-sat:not(.fc-day-today) {
-          background-color: #f1f5f9 !important;
-        }
-        .fullcalendar-wrapper .fc-day-fri .fc-daygrid-day-number,
-        .fullcalendar-wrapper .fc-day-sat .fc-daygrid-day-number {
-          color: #94a3b8;
-        }
-
-        /* ==================== Blocked Times Display ==================== */
-        /* Blocked time background events */
-        .fullcalendar-wrapper .blocked-time-event {
-          opacity: 0.7;
-          border-radius: 0.25rem;
-        }
-        .fullcalendar-wrapper .fc-bg-event {
-          opacity: 0.6;
-          border-left: 3px solid;
-        }
-        /* Striped pattern for blocked/unavailable times */
-        .fullcalendar-wrapper .fc-bg-event.blocked-time-event {
-          background-image: repeating-linear-gradient(
-            135deg,
-            transparent,
-            transparent 5px,
-            rgba(0, 0, 0, 0.03) 5px,
-            rgba(0, 0, 0, 0.03) 10px
-          );
-        }
-        /* Blocked time hover effect */
-        .fullcalendar-wrapper .fc-bg-event:hover {
-          opacity: 0.8;
-        }
-
-        /* ==================== Time Grid Enhancements ==================== */
-        /* Better time slot visualization */
-        .fullcalendar-wrapper .fc-timegrid-slot-minor {
-          border-top-style: dashed;
-          border-top-color: #e2e8f0;
-        }
-        /* Current time indicator */
-        .fullcalendar-wrapper .fc-timegrid-now-indicator-line {
-          border-color: #10b981;
-          border-width: 2px;
-        }
-        .fullcalendar-wrapper .fc-timegrid-now-indicator-arrow {
-          border-color: #10b981;
-          border-top-color: transparent;
-          border-bottom-color: transparent;
         }
       `}</style>
     </>
