@@ -1,202 +1,98 @@
----
+# 🛑 STOP. READ THIS FIRST.
 
-## 🔒 CENTRALIZED CONFIGURATION RULES (MANDATORY)
+**MANDATORY: Before writing ANY code, you MUST complete these steps:**
 
-**NEVER hardcode these values. ALWAYS use centralized constants:**
+## ✅ Pre-Work Checklist (REQUIRED)
 
-### 1. Routes - Use `ROUTES` Constants
-```typescript
-// ❌ NEVER DO THIS
-navigate('/dashboard/clients')
-<Link to="/dashboard/cases/new">
+| # | Step | Action |
+|---|------|--------|
+| 1 | **INVESTIGATE** | Search for existing files related to the task |
+| 2 | **LIST** | Show user what EXISTS vs what's MISSING |
+| 3 | **ASK** | If unsure about backend/API/data - ASK USER |
+| 4 | **PLAN** | Create todo list of changes needed |
+| 5 | **CONFIRM** | Get user approval before writing code |
 
-// ✅ ALWAYS DO THIS
-import { ROUTES } from '@/constants/routes'
-navigate(ROUTES.dashboard.clients.list)
-<Link to={ROUTES.dashboard.cases.new}>
-
-// For dynamic routes:
-navigate(ROUTES.dashboard.clients.detail(clientId))
-```
-
-### 2. Query Keys - Use `QueryKeys` Factory
-```typescript
-// ❌ NEVER DO THIS
-queryKey: ['clients', clientId]
-queryKey: ['invoices', 'list', filters]
-
-// ✅ ALWAYS DO THIS
-import { QueryKeys } from '@/lib/query-keys'
-queryKey: QueryKeys.clients.detail(clientId)
-queryKey: QueryKeys.invoices.list(filters)
-
-// If a key doesn't exist, ADD IT to query-keys.ts first
-```
-
-### 3. Cache Times - Use `CACHE_TIMES` Constants
-```typescript
-// ❌ NEVER DO THIS
-staleTime: 300000
-staleTime: 5 * 60 * 1000
-gcTime: 1800000
-
-// ✅ ALWAYS DO THIS
-import { CACHE_TIMES } from '@/config/cache'
-staleTime: CACHE_TIMES.MEDIUM      // 5 minutes
-staleTime: CACHE_TIMES.LONG        // 30 minutes
-gcTime: CACHE_TIMES.GC_MEDIUM      // 30 minutes
-```
-
-### 4. Cache Invalidation - Use `invalidateCache` Helper
-```typescript
-// ❌ NEVER DO THIS
-queryClient.invalidateQueries({ queryKey: ['clients'] })
-queryClient.invalidateQueries({ queryKey: ['invoices', 'list'] })
-
-// ✅ ALWAYS DO THIS
-import { invalidateCache } from '@/lib/cache-invalidation'
-invalidateCache.clients.all()
-invalidateCache.invoices.lists()
-invalidateCache.all()  // For global invalidation
-```
-
-### 5. API Endpoints - Use Centralized API Config
-```typescript
-// ❌ NEVER DO THIS
-fetch('/api/v1/clients')
-axios.get('/api/v1/invoices')
-
-// ✅ ALWAYS DO THIS
-import { API_ENDPOINTS } from '@/config/api'
-fetch(API_ENDPOINTS.clients.list)
-```
-
-### When Adding New Features:
-
-1. **New Route?** → Add to `src/constants/routes.ts` first
-2. **New Query?** → Add key to `src/lib/query-keys.ts` first
-3. **New Cache Pattern?** → Add to `src/config/cache.ts` if needed
-4. **New Invalidation?** → Add to `src/lib/cache-invalidation.ts` first
-
-### Why This Matters:
-- **Type Safety**: Autocomplete and compile-time checking
-- **Maintainability**: Change once, update everywhere
-- **Consistency**: Same patterns across entire codebase
-- **Refactoring**: Easy to rename/restructure
-- **Debugging**: Single source of truth
+**DO NOT SKIP ANY STEP. If you skip, you will create bugs and duplicate code.**
 
 ---
 
-## ⚠️ MOST IMPORTANT RULE - ASK BEFORE ASSUMING
+## ⚠️ The #1 Rule: ASK, DON'T ASSUME
 
-**THIS RULE MUST NEVER BE BROKEN:**
-
-If you need more information about:
-- Backend API structure, endpoints, or responses
-- Frontend component behavior or data flow
-- Database schema or data relationships
+If you need information about:
+- Backend API structure or responses
 - How existing features work
-- What the user expects from a feature
+- What the user expects
 
-**YOU MUST ASK THE USER BEFORE PROCEEDING.**
-
-Do NOT:
-- Assume how the backend works
-- Guess API response structures
-- Make up endpoints that may not exist
-- Implement features based on assumptions
-
-This prevents wasted effort and bugs caused by incorrect assumptions. When in doubt, ASK FIRST.
+**→ ASK THE USER. Don't guess. Don't assume.**
 
 ---
 
-## 🔍 ANALYZE BEFORE CREATING (MANDATORY)
-
-**Before creating ANY new files or components, you MUST:**
-
-1. **Do NOT create any files until you show a complete analysis** of what exists vs what's missing
-2. **Before any code, list every existing file** related to the feature and what's in it
-3. **Create a task list FIRST** showing exactly what needs to be created vs enhanced
-
-### Required Analysis Steps:
+## 🔍 Before Creating ANY Files
 
 ```
-1. Search for existing components/views in the feature folder
-2. Check existing routes that already handle the functionality
-3. Check sidebar/navigation for existing menu items
-4. List what EXISTS vs what's MISSING
-5. Show this analysis to the user BEFORE writing any code
-6. Only proceed after confirming the plan
+1. Search: Glob/Grep for existing components
+2. Read: Check what's in the existing files
+3. List: Show "EXISTS vs MISSING" to user
+4. Confirm: Wait for user approval
+5. Then: Write code
 ```
 
-### Do NOT:
-- Jump straight to creating files without checking what exists
-- Create duplicate components that already exist elsewhere
-- Add sidebar items that are already present
-- Launch parallel agents before completing the analysis
-
-### Why This Matters:
-- Prevents duplicate/redundant code
-- Avoids wasted effort recreating existing functionality
-- Ensures enhancements go to the RIGHT files
-- Saves time by doing it correctly the first time
+**NEVER create files without showing your analysis first.**
 
 ---
 
-## 🎨 Visual Development & Testing
+## 🔒 Use Centralized Constants (MANDATORY)
 
-### Design Principles
-Follow: `/context/design-principles.md`
+| Type | Import From | Example |
+|------|-------------|---------|
+| Routes | `@/constants/routes` | `ROUTES.dashboard.clients.list` |
+| Query Keys | `@/lib/query-keys` | `QueryKeys.clients.detail(id)` |
+| Cache Times | `@/config/cache` | `CACHE_TIMES.MEDIUM` |
+| Invalidation | `@/lib/cache-invalidation` | `invalidateCache.clients.all()` |
 
-### Quick Visual Check
-
-**After EVERY front-end change, you MUST:**
-
-1. Navigate to the changed page: `mcp__playwright__browser_navigate("http://localhost:5173/your-page")`
-2. Test Arabic (RTL): Switch language → Take screenshot
-3. Test English (LTR): Switch language → Take screenshot
-4. Test mobile: `mcp__playwright__browser_resize(375, 667)` → Take screenshot
-5. Check console: `mcp__playwright__browser_console_messages()`
-
-### Comprehensive Review
-
-For major changes or before PRs, run:
-```
-/design-review
-```
-
-This will:
-- Test both languages (Arabic/English)
-- Test all viewports (mobile/tablet/desktop)
-- Check accessibility (WCAG AA)
-- Verify PDPL compliance
-- Check console for errors
-- Provide detailed report with screenshots
-
-### When to Use
-
-**Quick Check**: Every small UI change
-**Full Review**: Before PRs, major features, production deployment
+**NEVER hardcode routes, query keys, or magic numbers.**
 
 ---
 
-## 🔀 Git & Pull Request Rules
+## 🎨 After EVERY UI Change
 
-### After Every Push
+1. Navigate to the page
+2. Test Arabic (RTL) - take screenshot
+3. Test English (LTR) - take screenshot
+4. Check console for errors
+5. Test mobile viewport if applicable
 
-**MANDATORY: After pushing changes, you MUST:**
+For major changes: Run `/design-review`
 
-1. Create a pull request using the GitHub PR creation URL
-2. Provide the PR link to the user
+---
 
-Since `gh` CLI may not be available, use the push output URL format:
+## 🔀 After Every Push
+
+Provide PR link:
 ```
 https://github.com/mischa23v/traf3li-dashboard/pull/new/{branch-name}
 ```
 
-### Example Workflow
-```
-git push -u origin claude/feature-branch-xyz
-# Then immediately provide:
-# "PR can be created here: https://github.com/mischa23v/traf3li-dashboard/pull/new/claude/feature-branch-xyz"
-```
+---
+
+## ✅ Completion Checklist
+
+Before saying "done", verify:
+
+- [ ] No TypeScript errors (`npm run build`)
+- [ ] Used centralized constants (not hardcoded values)
+- [ ] Tested in browser (both languages if UI)
+- [ ] No console errors
+- [ ] Created PR link if pushed
+
+---
+
+## 📁 Key Files Reference
+
+| Purpose | Location |
+|---------|----------|
+| Routes | `src/constants/routes.ts` |
+| Query Keys | `src/lib/query-keys.ts` |
+| Cache Config | `src/config/cache.ts` |
+| Cache Invalidation | `src/lib/cache-invalidation.ts` |
+| Design Principles | `/context/design-principles.md` |
