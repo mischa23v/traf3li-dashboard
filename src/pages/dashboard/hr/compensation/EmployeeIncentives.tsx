@@ -2,57 +2,16 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Plus,
-  Search,
-  Filter,
   Download,
-  MoreHorizontal,
-  Eye,
-  Edit,
   Trash2,
-  CheckCircle,
-  XCircle,
-  Clock,
-  Award,
-  TrendingUp,
-  Users,
-  DollarSign,
   FileSpreadsheet,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
 } from '@/components/ui/card'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Skeleton } from '@/components/ui/skeleton'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -75,6 +34,9 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { EmployeeIncentiveDialog } from '@/components/hr/compensation/EmployeeIncentiveDialog'
 import { BulkIncentiveDialog } from '@/components/hr/compensation/BulkIncentiveDialog'
+import { IncentiveStats } from '@/components/hr/compensation/IncentiveStats'
+import { IncentiveFilters } from '@/components/hr/compensation/IncentiveFilters'
+import { IncentivesTable } from '@/components/hr/compensation/IncentivesTable'
 import {
   useEmployeeIncentives,
   useIncentiveStatistics,
@@ -89,13 +51,7 @@ import type {
   IncentiveType,
   IncentiveStatus,
 } from '@/services/employeeIncentiveService'
-import {
-  incentiveTypeLabels,
-  incentiveStatusLabels,
-} from '@/services/employeeIncentiveService'
 import { toast } from 'sonner'
-import { format } from 'date-fns'
-import { ar } from 'date-fns/locale'
 
 export default function EmployeeIncentivesPage() {
   const { t, i18n } = useTranslation()
@@ -107,9 +63,7 @@ export default function EmployeeIncentivesPage() {
   const [selectedStatus, setSelectedStatus] = useState<IncentiveStatus | 'all'>('all')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [bulkDialogOpen, setBulkDialogOpen] = useState(false)
-  const [selectedIncentive, setSelectedIncentive] = useState<
-    EmployeeIncentive | undefined
-  >()
+  const [selectedIncentive, setSelectedIncentive] = useState<EmployeeIncentive | undefined>()
   const [selectedIncentives, setSelectedIncentives] = useState<string[]>([])
 
   // Dialog states
@@ -139,14 +93,20 @@ export default function EmployeeIncentivesPage() {
 
   const incentives = incentivesData?.incentives || []
 
+  // Format currency
+  const formatCurrency = (amount: number, currency: string = 'SAR') => {
+    return new Intl.NumberFormat(isArabic ? 'ar-SA' : 'en-US', {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(amount)
+  }
+
   // Handlers
   const handleCreate = () => {
     setSelectedIncentive(undefined)
     setDialogOpen(true)
-  }
-
-  const handleBulkCreate = () => {
-    setBulkDialogOpen(true)
   }
 
   const handleEdit = (incentive: EmployeeIncentive) => {
@@ -256,45 +216,6 @@ export default function EmployeeIncentivesPage() {
     }
   }
 
-  // Get localized field value
-  const getLocalizedValue = (value: string, valueAr?: string) => {
-    return isArabic && valueAr ? valueAr : value
-  }
-
-  // Format currency
-  const formatCurrency = (amount: number, currency: string = 'SAR') => {
-    return new Intl.NumberFormat(isArabic ? 'ar-SA' : 'en-US', {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    }).format(amount)
-  }
-
-  // Format date
-  const formatDate = (dateString: string) => {
-    return format(new Date(dateString), 'dd/MM/yyyy', {
-      locale: isArabic ? ar : undefined,
-    })
-  }
-
-  // Get status badge variant
-  const getStatusVariant = (
-    status: IncentiveStatus
-  ): 'default' | 'secondary' | 'destructive' | 'outline' => {
-    switch (status) {
-      case 'approved':
-      case 'processed':
-        return 'default'
-      case 'pending_approval':
-        return 'secondary'
-      case 'cancelled':
-        return 'destructive'
-      default:
-        return 'outline'
-    }
-  }
-
   return (
     <div className="container mx-auto space-y-6 p-6">
       {/* Header */}
@@ -312,7 +233,7 @@ export default function EmployeeIncentivesPage() {
             <Download className="mr-2 h-4 w-4" />
             {t('hr.incentives.export', 'Export')}
           </Button>
-          <Button variant="outline" onClick={handleBulkCreate}>
+          <Button variant="outline" onClick={() => setBulkDialogOpen(true)}>
             <FileSpreadsheet className="mr-2 h-4 w-4" />
             {t('hr.incentives.bulkCreate', 'Bulk Create')}
           </Button>
@@ -324,121 +245,30 @@ export default function EmployeeIncentivesPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {t('hr.incentives.stats.total', 'Total Incentives')}
-            </CardTitle>
-            <Award className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalIncentives || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              {t('hr.incentives.stats.totalValue', 'Total Value')}: {formatCurrency(stats?.totalAmount || 0)}
-            </p>
-          </CardContent>
-        </Card>
+      {stats && (
+        <IncentiveStats
+          stats={{
+            totalIncentives: stats.totalIncentives || 0,
+            totalAmount: stats.totalAmount || 0,
+            averageAmount: stats.averageAmount || 0,
+            pendingApprovals: stats.pendingApprovals || 0,
+            processedThisMonth: stats.processedThisMonth || 0,
+          }}
+          formatCurrency={formatCurrency}
+        />
+      )}
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {t('hr.incentives.stats.average', 'Average Incentive')}
-            </CardTitle>
-            <TrendingUp className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatCurrency(stats?.averageAmount || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {t('hr.incentives.stats.perEmployee', 'Per employee')}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {t('hr.incentives.stats.pending', 'Pending Approval')}
-            </CardTitle>
-            <Clock className="h-4 w-4 text-orange-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.pendingApprovals || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              {t('hr.incentives.stats.needsApproval', 'Needs approval')}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {t('hr.incentives.stats.processedMonth', 'Processed This Month')}
-            </CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.processedThisMonth || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              {t('hr.incentives.stats.inPayroll', 'In payroll')}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Filters and Search */}
+      {/* Filters and Table */}
       <Card>
         <CardHeader>
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="flex-1">
-              <div className="relative max-w-sm">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder={t('hr.incentives.search', 'Search...')}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Select
-                value={selectedType}
-                onValueChange={(v) => setSelectedType(v as IncentiveType | 'all')}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder={t('hr.incentives.incentiveType', 'Incentive Type')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t('hr.incentives.all', 'All')}</SelectItem>
-                  {Object.entries(incentiveTypeLabels).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      {t(`hr.compensation.incentives.types.${value}`)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select
-                value={selectedStatus}
-                onValueChange={(v) => setSelectedStatus(v as IncentiveStatus | 'all')}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder={t('hr.incentives.status', 'Status')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t('hr.incentives.all', 'All')}</SelectItem>
-                  {Object.entries(incentiveStatusLabels).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      {t(`hr.compensation.incentives.statuses.${value}`)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <IncentiveFilters
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            selectedType={selectedType}
+            onTypeChange={setSelectedType}
+            selectedStatus={selectedStatus}
+            onStatusChange={setSelectedStatus}
+          />
           {selectedIncentives.length > 0 && (
             <div className="mt-4 flex items-center justify-between rounded-lg border bg-muted p-4">
               <span className="text-sm">
@@ -452,137 +282,18 @@ export default function EmployeeIncentivesPage() {
           )}
         </CardHeader>
         <CardContent>
-          {isLoading ? (
-            <div className="space-y-2">
-              {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} className="h-16 w-full" />
-              ))}
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[50px]">
-                    <input
-                      type="checkbox"
-                      checked={selectedIncentives.length === incentives.length}
-                      onChange={toggleSelectAll}
-                      className="rounded"
-                    />
-                  </TableHead>
-                  <TableHead>{t('hr.incentives.table.employee', 'Employee')}</TableHead>
-                  <TableHead>{t('hr.incentives.table.type', 'Type')}</TableHead>
-                  <TableHead>{t('hr.incentives.table.amount', 'Amount')}</TableHead>
-                  <TableHead>{t('hr.incentives.table.reason', 'Reason')}</TableHead>
-                  <TableHead>{t('hr.incentives.table.payrollDate', 'Payroll Date')}</TableHead>
-                  <TableHead>{t('hr.incentives.table.status', 'Status')}</TableHead>
-                  <TableHead className="text-right">
-                    {t('hr.incentives.table.actions', 'Actions')}
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {incentives.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center text-muted-foreground">
-                      {t('hr.incentives.noIncentives', 'No incentives found')}
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  incentives.map((incentive) => (
-                    <TableRow key={incentive._id}>
-                      <TableCell>
-                        <input
-                          type="checkbox"
-                          checked={selectedIncentives.includes(incentive._id)}
-                          onChange={() => toggleSelectIncentive(incentive._id)}
-                          className="rounded"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">
-                            {getLocalizedValue(incentive.employeeName, incentive.employeeNameAr)}
-                          </div>
-                          {incentive.employeeNumber && (
-                            <div className="text-sm text-muted-foreground">
-                              {incentive.employeeNumber}
-                            </div>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">
-                          {t(`hr.compensation.incentives.types.${incentive.incentiveType}`)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="font-semibold">
-                        {formatCurrency(incentive.incentiveAmount, incentive.currency)}
-                      </TableCell>
-                      <TableCell className="max-w-[200px] truncate">
-                        {getLocalizedValue(incentive.incentiveReason, incentive.incentiveReasonAr)}
-                      </TableCell>
-                      <TableCell>{formatDate(incentive.payrollDate)}</TableCell>
-                      <TableCell>
-                        <Badge variant={getStatusVariant(incentive.status)}>
-                          {t(`hr.compensation.incentives.statuses.${incentive.status}`)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>
-                              {t('hr.incentives.actions', 'Actions')}
-                            </DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            {incentive.status === 'draft' && (
-                              <>
-                                <DropdownMenuItem onClick={() => handleEdit(incentive)}>
-                                  <Edit className="mr-2 h-4 w-4" />
-                                  {t('hr.incentives.edit', 'Edit')}
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                              </>
-                            )}
-                            {incentive.status === 'pending_approval' && (
-                              <>
-                                <DropdownMenuItem
-                                  onClick={() => handleApprove(incentive._id)}
-                                >
-                                  <CheckCircle className="mr-2 h-4 w-4" />
-                                  {t('hr.incentives.approve', 'Approve')}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => handleReject(incentive._id)}
-                                  className="text-red-600"
-                                >
-                                  <XCircle className="mr-2 h-4 w-4" />
-                                  {t('hr.incentives.reject', 'Reject')}
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                              </>
-                            )}
-                            <DropdownMenuItem
-                              onClick={() => handleDelete(incentive._id)}
-                              className="text-red-600"
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              {t('hr.incentives.delete', 'Delete')}
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          )}
+          <IncentivesTable
+            incentives={incentives}
+            isLoading={isLoading}
+            selectedIncentives={selectedIncentives}
+            onToggleSelect={toggleSelectIncentive}
+            onToggleSelectAll={toggleSelectAll}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onApprove={handleApprove}
+            onReject={handleReject}
+            formatCurrency={formatCurrency}
+          />
         </CardContent>
       </Card>
 
