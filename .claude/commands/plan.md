@@ -7,12 +7,59 @@ description: Create requirements.md with EARS format user stories and acceptance
 
 Transform the user's feature request into structured requirements using EARS format with enterprise-grade standards.
 
+---
+
+## 📏 SCALE ASSESSMENT (Do This First)
+
+Before deep planning, determine the scope:
+
+| Scale | Criteria | Process | Time |
+|-------|----------|---------|------|
+| **Quick Fix** | Bug fix, typo, < 3 files | Minimal spec | < 5 min |
+| **Standard** | Feature, 3-10 files | Full spec workflow | < 15 min |
+| **Enterprise** | Major feature, 10+ files, compliance | Full spec + extra reviews | < 30 min |
+
+### Quick Fix Template (Use for bugs, typos, small changes)
+
+If this is a Quick Fix, create this minimal spec instead:
+
+```markdown
+# Quick Fix: {Title}
+
+## Problem
+{One sentence describing the issue}
+
+## Solution
+{One sentence describing the fix}
+
+## Files to Change
+| File | Change | Risk |
+|------|--------|------|
+| `path/to/file.ts` | {what changes} | Low/Med/High |
+
+## Verification
+- [ ] Build passes (`npm run build`)
+- [ ] Original issue fixed
+- [ ] No console errors
+- [ ] RTL/LTR still works (if UI)
+
+## Rollback
+If something breaks: `git checkout -- {files}`
+
+**Approve this fix? (yes/no)**
+```
+
+For Standard/Enterprise features, continue with full process below.
+
+---
+
 ## Your Task
 
-1. **Understand the Request**: What does the user want to build?
-2. **Research Codebase**: Search for existing related files
-3. **Create requirements.md**: User stories + EARS acceptance criteria + Enterprise standards
-4. **Get Approval**: Do NOT proceed until user approves
+1. **Assess Scale**: Quick Fix, Standard, or Enterprise?
+2. **Understand the Request**: What does the user want to build?
+3. **Research Codebase**: Search for existing related files
+4. **Create requirements.md**: User stories + EARS acceptance criteria + Enterprise standards
+5. **Get Approval**: Do NOT proceed until user approves
 
 ## File Location
 
@@ -21,6 +68,56 @@ Transform the user's feature request into structured requirements using EARS for
 ```
 
 Use kebab-case for feature name (e.g., `appointment-scheduling`, `client-portal`).
+
+---
+
+## 🧠 REASONING SECTION (Thinking Out Loud)
+
+**MANDATORY**: Before proposing any solution, show your reasoning:
+
+```markdown
+## 🧠 Reasoning (My Analysis)
+
+### What I Searched
+| Search | Results | Relevance |
+|--------|---------|-----------|
+| `**/*appointment*.tsx` | Found 3 files | Existing UI to extend |
+| `useAppointment` in hooks | Found `src/hooks/useAppointments.ts` | Existing hook to extend |
+| `ROUTES.*appointment` | Found route exists | No new route needed |
+
+### What Already Exists (Reuse These)
+| Component/File | Location | Can Reuse For |
+|----------------|----------|---------------|
+| `AppointmentDialog` | `src/components/` | Base dialog pattern |
+| `useAppointments` | `src/hooks/` | Query patterns |
+| `appointmentService` | `src/services/` | API patterns |
+
+### What's Missing (Need to Create)
+| Component/File | Purpose | Depends On |
+|----------------|---------|------------|
+| `ReminderSettings` | New UI component | Design approval |
+| `useReminders` | New hook | API endpoint |
+
+### Decisions Made
+| Decision | Why | Alternatives Rejected |
+|----------|-----|----------------------|
+| Extend existing hook | Less code, consistent | New hook (duplication) |
+| Use existing Dialog | Already accessible | Custom modal (inconsistent) |
+| Add to settings page | Logical location | New page (fragmentation) |
+
+### Risks Identified
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| Query key collision | Low | High | Check existing keys |
+| Breaking existing tests | Medium | Medium | Run tests after each change |
+| Performance impact | Low | Low | Use existing caching |
+
+### Open Questions (Need User Input)
+- [ ] Should reminders be per-appointment or global?
+- [ ] Email template - use existing or new design?
+```
+
+**Why this matters**: User sees your thought process, catches mistakes early, understands trade-offs.
 
 ---
 
@@ -111,12 +208,33 @@ Every plan MUST meet these enterprise-grade requirements before approval.
 ```markdown
 # {Feature Name} - Requirements
 
+## Scale Assessment
+**Type**: [ ] Quick Fix  [ ] Standard  [x] Enterprise
+**Estimated Files**: X new, Y modified
+**Risk Level**: Low / Medium / High
+
 ## Problem Statement
 What problem are we solving? Why is this needed?
 
 ## Target Users
 - Primary: [Who will use this most?]
 - Secondary: [Other stakeholders]
+
+---
+
+## 🧠 Reasoning (Analysis Done)
+
+### Codebase Research
+| Searched For | Found | Decision |
+|--------------|-------|----------|
+| Existing components | {list} | Reuse X, extend Y |
+| Similar patterns | {list} | Follow pattern from Z |
+| Potential conflicts | {list} | Avoid by doing A |
+
+### Architecture Decision
+**Chosen approach**: {description}
+**Why**: {rationale}
+**Rejected alternatives**: {list with reasons}
 
 ---
 
@@ -339,12 +457,13 @@ As a {role}, I want {feature} so that {benefit}.
 
 ## After Creating requirements.md
 
-1. **Run Enterprise Checklist**: Verify all gold standard items checked
-2. **Show requirements to user** in chat
-3. **Ask for feedback**: "Do these requirements meet your enterprise standards?"
-4. **Iterate** based on feedback until user says "approved" or "looks good"
-5. **Do NOT proceed** to design until explicit approval
-6. **Next step**: Run `/implementation` to create design + tasks
+1. **Show Reasoning section first** - Let user validate your analysis
+2. **Run Enterprise Checklist** - Verify all gold standard items checked
+3. **Show requirements to user** in chat
+4. **Ask for feedback**: "Do these requirements capture what you need?"
+5. **Iterate** based on feedback until user says "approved" or "looks good"
+6. **Do NOT proceed** to design until explicit approval
+7. **Next step**: Run `/implementation` to create design + tasks
 
 ## IMPORTANT Reminders (from CLAUDE.md)
 

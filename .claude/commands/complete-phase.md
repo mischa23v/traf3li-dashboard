@@ -7,21 +7,63 @@ description: Execute ONE task at a time from tasks.md with verification
 
 Execute tasks from `tasks.md` ONE AT A TIME with verification after each.
 
-## Prerequisites
+---
 
-- [ ] `requirements.md` exists and is approved
-- [ ] `design.md` exists and is approved
-- [ ] `tasks.md` exists and is approved
+## ✅ PRE-FLIGHT CHECKS (Do This First)
+
+**MANDATORY**: Before executing ANY task, verify state is valid:
+
+```markdown
+## ✅ Pre-Flight Checks
+
+### 1. Spec Files Exist
+- [ ] `requirements.md` exists in `.claude/specs/{feature-name}/`
+- [ ] `design.md` exists in `.claude/specs/{feature-name}/`
+- [ ] `tasks.md` exists in `.claude/specs/{feature-name}/`
+
+### 2. Approvals Confirmed
+- [ ] User approved requirements (check conversation history)
+- [ ] User approved design (check conversation history)
+- [ ] User approved tasks (check conversation history)
+
+### 3. No Unresolved Questions
+- [ ] All "Open Questions" in requirements.md are answered
+- [ ] No blocking dependencies
+
+### 4. Environment Ready
+- [ ] Git working tree is clean: `git status`
+- [ ] On correct branch
+- [ ] Build currently passes: `npm run build`
+
+### 5. Context Loaded
+- [ ] Read requirements.md - understand WHAT we're building
+- [ ] Read design.md - understand HOW we're building it
+- [ ] Read tasks.md - understand CURRENT STATE and next task
+```
+
+**If ANY check fails**:
+```markdown
+## ❌ Pre-Flight Failed
+
+**Issue**: {describe what failed}
+
+**Required Action**: {what user needs to do}
+
+Cannot proceed until this is resolved.
+```
+
+---
 
 ## Your Task
 
-1. **Read all spec files** before starting
-2. **Find current task**: First uncompleted task in tasks.md
-3. **Execute ONE task**
-4. **Verify task** works correctly
-5. **Update tasks.md** with completion status
-6. **STOP and report** to user
-7. **Wait for approval** before next task
+1. **Run Pre-Flight Checks** ← NEW: Don't skip this
+2. **Read all spec files** before starting
+3. **Find current task**: First uncompleted task in tasks.md
+4. **Execute ONE task**
+5. **Verify task** works correctly
+6. **Update tasks.md** with completion status
+7. **STOP and report** to user
+8. **Wait for approval** before next task
 
 ## CRITICAL: Single-Task Execution
 
@@ -84,6 +126,20 @@ or
 - [ ] Match existing code patterns
 - [ ] Add proper TypeScript types
 
+### Risk-Aware Execution
+
+For **NEW** files (Low Risk):
+- Create file in specified location
+- Follow patterns from design.md
+- Verify TypeScript compiles
+
+For **MODIFY** files (Higher Risk):
+- Read entire file first
+- Identify exact lines to change
+- Make minimal changes
+- Verify existing functionality still works
+- Check for side effects
+
 ---
 
 ## Step 4: Verify Task
@@ -103,6 +159,10 @@ For UI tasks, also:
 - [ ] Component renders without errors
 - [ ] Console has no errors
 - [ ] Basic functionality works
+
+For MODIFY tasks, also:
+- [ ] Existing functionality still works
+- [ ] No regressions introduced
 
 ---
 
@@ -125,9 +185,9 @@ To:
 After completing ONE task, report:
 
 ```markdown
-## Task Completed: {Task Number} - {Task Name}
+## ✅ Task Completed: {Task Number} - {Task Name}
 
-**File**: `path/to/file.ts`
+**File**: `path/to/file.ts` ({NEW} or {MODIFIED})
 
 **What I did**:
 - Created/Modified the file
@@ -136,9 +196,19 @@ After completing ONE task, report:
 **Verification**:
 - ✅ TypeScript compiles
 - ✅ Follows design.md
-- ✅ [Other checks]
+- ✅ {Other checks}
+
+**Risk Check**:
+- ✅ No existing features broken
+- ✅ No regressions
+
+**Rollback if needed**:
+`git checkout -- path/to/file.ts`
+
+---
 
 **Next task**: {Next task number} - {Next task name}
+**Next task risk**: {Low/Medium/High}
 
 Ready to proceed? (yes/no)
 ```
@@ -161,12 +231,109 @@ If user provides feedback:
 
 ---
 
+## 🔄 ROLLBACK STRATEGY
+
+### If Task Fails During Implementation
+
+```markdown
+## ❌ Task Failed: {Task Number} - {Task Name}
+
+**What went wrong**:
+{describe the error}
+
+**Files affected**:
+- `path/to/file.ts` - {state: partially written / corrupted / ok}
+
+**Recovery Options**:
+
+1. **Quick Rollback** (recommended for single file):
+   ```bash
+   git checkout -- path/to/file.ts
+   ```
+
+2. **Full Task Rollback** (if multiple files):
+   ```bash
+   git stash
+   ```
+
+3. **Manual Fix** (if close to working):
+   {describe what needs to be fixed}
+
+**My recommendation**: {Option 1/2/3}
+
+How would you like to proceed?
+```
+
+### If Phase Fails After Multiple Tasks
+
+```markdown
+## ❌ Phase {N} Has Issues
+
+**Completed tasks**:
+- [x] Task N.1 - Working ✅
+- [x] Task N.2 - Working ✅
+- [x] Task N.3 - Has issues ❌
+
+**Issue in Task N.3**:
+{describe problem}
+
+**Recovery Options**:
+
+1. **Rollback just Task N.3**:
+   ```bash
+   git checkout -- {files from N.3}
+   ```
+   Keep N.1 and N.2 progress.
+
+2. **Rollback entire phase**:
+   ```bash
+   git revert HEAD~3..HEAD
+   ```
+   Start phase fresh.
+
+3. **Fix forward**:
+   {describe fix approach}
+
+**My recommendation**: {Option with rationale}
+
+How would you like to proceed?
+```
+
+### If Something Breaks Unexpectedly
+
+```markdown
+## ⚠️ Unexpected Issue Detected
+
+**Symptom**: {what's broken}
+
+**Likely cause**: {best guess based on recent changes}
+
+**Investigation**:
+1. Last task completed: {task N.X}
+2. Files changed: {list}
+3. Error message: {if any}
+
+**Immediate Actions**:
+1. **Stop** - Don't make more changes
+2. **Preserve state** - Don't clear errors
+3. **Report** - Share this with user
+
+**Recovery Options**:
+1. Revert last task: `git checkout -- {files}`
+2. Full diagnostic: Check console, network, TypeScript
+3. Ask user for guidance
+
+How would you like to proceed?
+```
+
+---
+
 ## Phase Completion
 
 When all tasks in a phase are complete:
 
 ```markdown
-## Phase {N} Complete!
+## ✅ Phase {N} Complete!
 
 **Completed Tasks**:
 - [x] Task N.1 - Description
@@ -174,11 +341,18 @@ When all tasks in a phase are complete:
 - [x] Task N.3 - Description
 
 **Phase Verification**:
-- [ ] All tasks marked complete in tasks.md
-- [ ] Phase goal achieved: "{goal from tasks.md}"
-- [ ] Testable outcome verified: "{testable from tasks.md}"
+- [x] All tasks marked complete in tasks.md
+- [x] Phase goal achieved: "{goal from tasks.md}"
+- [x] Testable outcome verified: "{testable from tasks.md}"
+- [x] No regressions in existing features
+
+**Rollback Point Saved**:
+This phase is now stable. If Phase {N+1} fails, we can safely roll back to here.
+
+---
 
 **Next Phase**: Phase {N+1} - {Goal}
+**Phase Risk**: {Low/Medium/High}
 
 Ready to start Phase {N+1}? (yes/no)
 ```
@@ -190,7 +364,7 @@ Ready to start Phase {N+1}? (yes/no)
 When ALL phases are done:
 
 ```markdown
-## Feature Complete!
+## 🎉 Feature Complete!
 
 **All phases completed**:
 - [x] Phase 1: Data Layer
@@ -199,11 +373,26 @@ When ALL phases are done:
 - [x] Phase 4: Polish
 
 **Final Verification**:
-- [ ] `npm run build` passes
-- [ ] No console errors
-- [ ] Arabic RTL works
-- [ ] English LTR works
-- [ ] All acceptance criteria from requirements.md met
+- [x] `npm run build` passes
+- [x] No console errors
+- [x] Arabic RTL works
+- [x] English LTR works
+- [x] All acceptance criteria from requirements.md met
+- [x] Existing features still work (regression check)
+
+**Files Created**:
+| File | Lines | Purpose |
+|------|-------|---------|
+| `src/types/entity.ts` | 30 | Type definitions |
+| ... | ... | ... |
+
+**Files Modified**:
+| File | Lines Changed | What Changed |
+|------|---------------|--------------|
+| `src/lib/query-keys.ts` | +5 | Added entity keys |
+| ... | ... | ... |
+
+---
 
 **What's next?**
 1. Additional features to add?
@@ -216,17 +405,24 @@ When ALL phases are done:
 ## Example: Executing Task 1.1
 
 ```markdown
+## ✅ Pre-Flight Checks Passed
+
+All spec files exist, approvals confirmed, build passes.
+
+---
+
 ## Reading Spec Files...
 
 Found current task in tasks.md:
 
 ### Task 1.1: Create TypeScript Types
-**File**: `src/types/reminder.ts`
+**File**: `src/types/reminder.ts` (NEW)
 **Refs**: Requirement 2.1, 2.2
 **Details**:
 - ReminderSettings interface
 - UpdateReminderSettingsDto
 - ReminderTiming type
+**Risk**: Low (new file)
 **Status**: [ ] Not Started
 
 ---
@@ -261,9 +457,9 @@ export interface UpdateReminderSettingsDto {
 
 ---
 
-## Task Completed: 1.1 - Create TypeScript Types
+## ✅ Task Completed: 1.1 - Create TypeScript Types
 
-**File**: `src/types/reminder.ts`
+**File**: `src/types/reminder.ts` (NEW)
 
 **What I did**:
 - Created ReminderTiming type
@@ -275,9 +471,19 @@ export interface UpdateReminderSettingsDto {
 - ✅ Matches design.md Data Models
 - ✅ Covers Requirement 2.1, 2.2
 
+**Risk Check**:
+- ✅ New file - no existing code affected
+- ✅ No dependencies on this yet
+
+**Rollback if needed**:
+`rm src/types/reminder.ts`
+
+---
+
 **Updated tasks.md**: Status → [x] Complete
 
 **Next task**: 1.2 - Add Query Keys
+**Next task risk**: Low (additive change to existing file)
 
 Ready to proceed? (yes/no)
 ```
@@ -293,8 +499,11 @@ From CLAUDE.md - NEVER skip:
 - [ ] Test RTL/LTR for UI components
 - [ ] Check console for errors
 
-From Kiro workflow:
+From this workflow:
+- [ ] Run pre-flight checks before starting
 - [ ] ONE task at a time
 - [ ] STOP after each task
 - [ ] WAIT for approval
 - [ ] Link back to requirements
+- [ ] Provide rollback commands
+- [ ] Report risks clearly
