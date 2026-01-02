@@ -462,8 +462,57 @@ As a {role}, I want {feature} so that {benefit}.
 3. **Show requirements to user** in chat
 4. **Ask for feedback**: "Do these requirements capture what you need?"
 5. **Iterate** based on feedback until user says "approved" or "looks good"
-6. **Do NOT proceed** to design until explicit approval
-7. **Next step**: Run `/implementation` to create design + tasks
+6. **Create approval marker** when user approves (see below)
+7. **Do NOT proceed** to design until explicit approval
+8. **Next step**: Run `/implementation` to create design + tasks
+
+---
+
+## 🔒 APPROVAL GATE: Requirements
+
+When user says "approved", "looks good", "yes", or similar:
+
+**Create the approval marker file:**
+```
+.claude/specs/{feature-name}/.requirements-approved
+```
+
+**File content:**
+```markdown
+# Requirements Approved
+
+**Approved by**: User
+**Approved at**: {timestamp}
+**Requirements file**: requirements.md
+
+## Approval Confirmation
+User confirmed requirements with: "{user's approval message}"
+
+## What was approved
+- Problem statement
+- User stories with EARS criteria
+- Enterprise standards compliance
+- Edge cases and error handling
+
+## Next Step
+Run `/implementation` to create design.md and tasks.md
+```
+
+**After creating marker, confirm:**
+```markdown
+✅ Requirements approved and locked.
+
+Created: `.claude/specs/{feature-name}/.requirements-approved`
+
+Requirements are now frozen. To make changes:
+1. Delete the `.requirements-approved` file
+2. Update requirements.md
+3. Get re-approval
+
+**Next step**: Run `/implementation` to create design + tasks
+```
+
+---
 
 ## IMPORTANT Reminders (from CLAUDE.md)
 

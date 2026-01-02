@@ -21,10 +21,15 @@ Execute tasks from `tasks.md` ONE AT A TIME with verification after each.
 - [ ] `design.md` exists in `.claude/specs/{feature-name}/`
 - [ ] `tasks.md` exists in `.claude/specs/{feature-name}/`
 
-### 2. Approvals Confirmed
-- [ ] User approved requirements (check conversation history)
-- [ ] User approved design (check conversation history)
-- [ ] User approved tasks (check conversation history)
+### 2. 🔒 Approval Markers Exist (CRITICAL)
+- [ ] `.requirements-approved` exists
+- [ ] `.design-approved` exists
+- [ ] `.tasks-approved` exists
+
+**Check command:**
+```bash
+ls -la .claude/specs/{feature-name}/.*-approved
+```
 
 ### 3. No Unresolved Questions
 - [ ] All "Open Questions" in requirements.md are answered
@@ -41,7 +46,26 @@ Execute tasks from `tasks.md` ONE AT A TIME with verification after each.
 - [ ] Read tasks.md - understand CURRENT STATE and next task
 ```
 
-**If ANY check fails**:
+**If approval markers missing**:
+```markdown
+## ❌ Pre-Flight Failed - Missing Approvals
+
+**Approval Status:**
+- [ ] `.requirements-approved` - {EXISTS / MISSING}
+- [ ] `.design-approved` - {EXISTS / MISSING}
+- [ ] `.tasks-approved` - {EXISTS / MISSING}
+
+**Required Action**:
+{missing} marker is missing. This means the {phase} was not formally approved.
+
+To fix:
+1. Run `/plan` or `/implementation` to get missing approvals
+2. Or manually create marker if approval was given verbally
+
+Cannot proceed without all three approval markers.
+```
+
+**If other checks fail**:
 ```markdown
 ## ❌ Pre-Flight Failed
 
