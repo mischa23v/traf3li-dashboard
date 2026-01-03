@@ -321,34 +321,21 @@ export function CreateTaskView() {
 
                         {/* Form Card */}
                         <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-                            {/* Mode Toggle - Segmented Control */}
-                            <div className="flex items-start mb-6 pb-4 border-b border-slate-100">
+                            {/* Mode Toggle - Segmented Control (on left in RTL = justify-end) */}
+                            <div className="flex justify-end mb-6 pb-4 border-b border-slate-100">
                                 <div className="relative inline-flex p-1 bg-slate-100/80 rounded-full">
                                     {/* Sliding Background Indicator */}
                                     <div
                                         className={cn(
-                                            "absolute top-1 bottom-1 w-1/2 bg-white rounded-full shadow-sm border border-slate-200/50 transition-transform duration-300 ease-out",
-                                            formMode === 'basic'
-                                                ? "translate-x-0 rtl:translate-x-0"
-                                                : "-translate-x-full rtl:translate-x-full"
+                                            "absolute top-1 bottom-1 bg-white rounded-full shadow-sm border border-slate-200/50 transition-all duration-300 ease-out"
                                         )}
-                                        style={{ width: 'calc(50% - 4px)', left: formMode === 'advanced' ? '4px' : 'auto', right: formMode === 'basic' ? '4px' : 'auto' }}
+                                        style={{
+                                            width: 'calc(50% - 4px)',
+                                            left: formMode === 'basic' ? '4px' : 'auto',
+                                            right: formMode === 'advanced' ? '4px' : 'auto'
+                                        }}
                                     />
-                                    {/* Advanced Button */}
-                                    <button
-                                        type="button"
-                                        onClick={() => setFormMode('advanced')}
-                                        className={cn(
-                                            "relative z-10 flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-full transition-colors duration-200",
-                                            formMode === 'advanced'
-                                                ? "text-emerald-600"
-                                                : "text-slate-500 hover:text-slate-600"
-                                        )}
-                                    >
-                                        <Settings2 className="w-4 h-4" />
-                                        متقدم
-                                    </button>
-                                    {/* Basic Button */}
+                                    {/* Basic Button (first) */}
                                     <button
                                         type="button"
                                         onClick={() => setFormMode('basic')}
@@ -361,6 +348,20 @@ export function CreateTaskView() {
                                     >
                                         <LayoutGrid className="w-4 h-4" />
                                         أساسي
+                                    </button>
+                                    {/* Advanced Button (second) */}
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormMode('advanced')}
+                                        className={cn(
+                                            "relative z-10 flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-full transition-colors duration-200",
+                                            formMode === 'advanced'
+                                                ? "text-emerald-600"
+                                                : "text-slate-500 hover:text-slate-600"
+                                        )}
+                                    >
+                                        <Settings2 className="w-4 h-4" />
+                                        متقدم
                                     </button>
                                 </div>
                             </div>
