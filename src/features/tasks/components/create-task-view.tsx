@@ -333,13 +333,15 @@ export function CreateTaskView() {
                                 </div>
                                 {/* Mode Toggle - Segmented Control */}
                                 <div className="relative inline-flex p-1 bg-slate-100/80 rounded-full flex-shrink-0">
-                                    {/* Sliding Background Indicator */}
+                                    {/* Sliding Background Indicator - RTL aware */}
                                     <div
                                         className={cn(
                                             "absolute top-1 bottom-1 bg-white rounded-full shadow-sm border border-slate-200/50 transition-all duration-300 ease-out",
-                                            formMode === 'basic' ? "translate-x-0" : "translate-x-full"
+                                            formMode === 'basic'
+                                                ? "end-[calc(50%+2px)]"
+                                                : "end-1"
                                         )}
-                                        style={{ width: 'calc(50% - 4px)', marginLeft: '4px', marginRight: '4px' }}
+                                        style={{ width: 'calc(50% - 4px)' }}
                                     />
                                     {/* Basic Button (first) */}
                                     <button
@@ -474,8 +476,8 @@ export function CreateTaskView() {
                                     {/* Advanced Mode Fields */}
                                     {formMode === 'advanced' && (
                                         <>
-                                            {/* Row 1: Category, Time, Estimated Minutes - 3 columns */}
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            {/* Row 1: Category, Estimated Minutes, Time - Time is 0.5fr to match Due Date size */}
+                                            <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_0.5fr] gap-4">
                                                 {/* Category */}
                                                 <div className="space-y-2">
                                                     <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
@@ -498,20 +500,6 @@ export function CreateTaskView() {
                                                         </SelectContent>
                                                     </Select>
                                                 </div>
-                                                {/* Time */}
-                                                <div className="space-y-2">
-                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                        <Clock className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                        الوقت
-                                                        <FieldTooltip content={FIELD_TOOLTIPS.dueTime} />
-                                                    </label>
-                                                    <Input
-                                                        type="time"
-                                                        className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 [&::-webkit-calendar-picker-indicator]:opacity-100"
-                                                        value={formData.dueTime}
-                                                        onChange={(e) => handleChange('dueTime', e.target.value)}
-                                                    />
-                                                </div>
                                                 {/* Estimated Minutes */}
                                                 <div className="space-y-2">
                                                     <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
@@ -528,10 +516,24 @@ export function CreateTaskView() {
                                                         onChange={(e) => handleChange('estimatedMinutes', parseInt(e.target.value) || 0)}
                                                     />
                                                 </div>
+                                                {/* Time - 0.5fr to match Due Date size */}
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                        <Clock className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                                        الوقت
+                                                        <FieldTooltip content={FIELD_TOOLTIPS.dueTime} />
+                                                    </label>
+                                                    <Input
+                                                        type="time"
+                                                        className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 [&::-webkit-calendar-picker-indicator]:opacity-100"
+                                                        value={formData.dueTime}
+                                                        onChange={(e) => handleChange('dueTime', e.target.value)}
+                                                    />
+                                                </div>
                                             </div>
 
-                                            {/* Row 2: Client, Case, Assigned To - 3 columns */}
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            {/* Row 2: Client, Case, Assigned To - same proportions as Basic mode */}
+                                            <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_0.5fr] gap-4">
                                                 {/* Client */}
                                                 <div className="space-y-2">
                                                     <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
