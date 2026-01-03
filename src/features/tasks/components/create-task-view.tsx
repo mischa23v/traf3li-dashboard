@@ -122,7 +122,7 @@ export function CreateTaskView() {
     const [showRecurring, setShowRecurring] = useState(false)
 
     // Form mode: basic (required fields only) or advanced (all fields)
-    const [formMode, setFormMode] = useState<'basic' | 'advanced'>('basic')
+    const [formMode, setFormMode] = useState<'basic' | 'advanced'>('advanced')
 
     // Tags input
     const [tagInput, setTagInput] = useState('')
@@ -321,39 +321,48 @@ export function CreateTaskView() {
 
                         {/* Form Card */}
                         <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-                            {/* Mode Toggle */}
-                            <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
-                                <div className="flex items-center gap-2">
-                                    <Button
-                                        type="button"
-                                        variant={formMode === 'basic' ? 'default' : 'outline'}
-                                        size="sm"
-                                        onClick={() => setFormMode('basic')}
+                            {/* Mode Toggle - Segmented Control */}
+                            <div className="flex items-start mb-6 pb-4 border-b border-slate-100">
+                                <div className="relative inline-flex p-1 bg-slate-100/80 rounded-full">
+                                    {/* Sliding Background Indicator */}
+                                    <div
                                         className={cn(
-                                            "rounded-full gap-2",
-                                            formMode === 'basic' && "bg-emerald-500 hover:bg-emerald-600"
+                                            "absolute top-1 bottom-1 w-1/2 bg-white rounded-full shadow-sm border border-slate-200/50 transition-transform duration-300 ease-out",
+                                            formMode === 'basic'
+                                                ? "translate-x-0 rtl:translate-x-0"
+                                                : "-translate-x-full rtl:translate-x-full"
                                         )}
-                                    >
-                                        <LayoutGrid className="w-4 h-4" />
-                                        أساسي
-                                    </Button>
-                                    <Button
+                                        style={{ width: 'calc(50% - 4px)', left: formMode === 'advanced' ? '4px' : 'auto', right: formMode === 'basic' ? '4px' : 'auto' }}
+                                    />
+                                    {/* Advanced Button */}
+                                    <button
                                         type="button"
-                                        variant={formMode === 'advanced' ? 'default' : 'outline'}
-                                        size="sm"
                                         onClick={() => setFormMode('advanced')}
                                         className={cn(
-                                            "rounded-full gap-2",
-                                            formMode === 'advanced' && "bg-emerald-500 hover:bg-emerald-600"
+                                            "relative z-10 flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-full transition-colors duration-200",
+                                            formMode === 'advanced'
+                                                ? "text-emerald-600"
+                                                : "text-slate-500 hover:text-slate-600"
                                         )}
                                     >
                                         <Settings2 className="w-4 h-4" />
                                         متقدم
-                                    </Button>
+                                    </button>
+                                    {/* Basic Button */}
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormMode('basic')}
+                                        className={cn(
+                                            "relative z-10 flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-full transition-colors duration-200",
+                                            formMode === 'basic'
+                                                ? "text-emerald-600"
+                                                : "text-slate-500 hover:text-slate-600"
+                                        )}
+                                    >
+                                        <LayoutGrid className="w-4 h-4" />
+                                        أساسي
+                                    </button>
                                 </div>
-                                <p className="text-xs text-slate-400">
-                                    {formMode === 'basic' ? 'الحقول المطلوبة فقط' : 'جميع الحقول'}
-                                </p>
                             </div>
 
                             <form onSubmit={handleSubmit} className="space-y-8">
