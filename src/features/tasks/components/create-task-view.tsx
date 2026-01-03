@@ -474,30 +474,164 @@ export function CreateTaskView() {
                                     {/* Advanced Mode Fields */}
                                     {formMode === 'advanced' && (
                                         <>
-                                            {/* Category */}
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                    <Tag className="w-4 h-4 text-emerald-500" />
-                                                    التصنيف
-                                                    <FieldTooltip content={FIELD_TOOLTIPS.category} />
-                                                </label>
-                                                <Select value={formData.label} onValueChange={(value) => handleChange('label', value)}>
-                                                    <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                        <SelectValue placeholder="اختر التصنيف" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {CATEGORY_OPTIONS.map(option => (
-                                                            <SelectItem key={option.value} value={option.value}>
-                                                                <Badge variant="secondary" className={cn("text-xs", option.bgColor, option.color)}>
-                                                                    {option.label}
-                                                                </Badge>
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
+                                            {/* Row 1: Category, Time, Estimated Minutes - 3 columns */}
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                {/* Category */}
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                        <Tag className="w-4 h-4 text-emerald-500" />
+                                                        التصنيف
+                                                        <FieldTooltip content={FIELD_TOOLTIPS.category} />
+                                                    </label>
+                                                    <Select value={formData.label} onValueChange={(value) => handleChange('label', value)}>
+                                                        <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                            <SelectValue placeholder="اختر التصنيف" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {CATEGORY_OPTIONS.map(option => (
+                                                                <SelectItem key={option.value} value={option.value}>
+                                                                    <Badge variant="secondary" className={cn("text-xs", option.bgColor, option.color)}>
+                                                                        {option.label}
+                                                                    </Badge>
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                                {/* Time */}
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                        <Clock className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                                        الوقت
+                                                        <FieldTooltip content={FIELD_TOOLTIPS.dueTime} />
+                                                    </label>
+                                                    <Input
+                                                        type="time"
+                                                        className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 [&::-webkit-calendar-picker-indicator]:opacity-100"
+                                                        value={formData.dueTime}
+                                                        onChange={(e) => handleChange('dueTime', e.target.value)}
+                                                    />
+                                                </div>
+                                                {/* Estimated Minutes */}
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                        <Clock className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                                        الوقت المقدر
+                                                        <FieldTooltip content={FIELD_TOOLTIPS.estimatedMinutes} />
+                                                    </label>
+                                                    <Input
+                                                        type="number"
+                                                        min="0"
+                                                        placeholder="60"
+                                                        className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                        value={formData.estimatedMinutes || ''}
+                                                        onChange={(e) => handleChange('estimatedMinutes', parseInt(e.target.value) || 0)}
+                                                    />
+                                                </div>
                                             </div>
 
-                                            {/* Tags */}
+                                            {/* Row 2: Client, Case, Assigned To - 3 columns */}
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                {/* Client */}
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                        <User className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                                        {t('tasks.client', 'العميل')}
+                                                        <FieldTooltip content={FIELD_TOOLTIPS.client} />
+                                                    </label>
+                                                    <Select value={formData.clientId} onValueChange={(value) => handleChange('clientId', value)}>
+                                                        <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                            <SelectValue placeholder={t('tasks.selectClient', 'اختر العميل')} />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {clientsLoading ? (
+                                                                <div className="flex items-center justify-center py-4">
+                                                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                                                </div>
+                                                            ) : clients?.data && clients.data.length > 0 ? (
+                                                                clients.data.map((client) => (
+                                                                    <SelectItem key={client._id} value={client._id}>
+                                                                        {client.fullName}
+                                                                        {client.companyName && ` - ${client.companyName}`}
+                                                                    </SelectItem>
+                                                                ))
+                                                            ) : (
+                                                                <div className="text-center py-4 text-slate-500 text-sm">
+                                                                    {t('tasks.noClients', 'لا يوجد عملاء')}
+                                                                </div>
+                                                            )}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                                {/* Case */}
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                        <Scale className="w-4 h-4 text-emerald-500" />
+                                                        {t('tasks.linkedCase', 'القضية المرتبطة')}
+                                                        <FieldTooltip content={FIELD_TOOLTIPS.case} />
+                                                    </label>
+                                                    <Select value={formData.caseId} onValueChange={(value) => handleChange('caseId', value)}>
+                                                        <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                            <SelectValue placeholder={t('tasks.selectCase', 'اختر القضية')} />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {casesLoading ? (
+                                                                <div className="flex items-center justify-center py-4">
+                                                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                                                </div>
+                                                            ) : cases?.cases && cases.cases.length > 0 ? (
+                                                                cases.cases.map((caseItem) => (
+                                                                    <SelectItem key={caseItem._id} value={caseItem._id}>
+                                                                        {caseItem.caseNumber ? `${caseItem.caseNumber} - ` : ''}
+                                                                        {caseItem.title}
+                                                                    </SelectItem>
+                                                                ))
+                                                            ) : (
+                                                                <div className="text-center py-4 text-slate-500 text-sm">
+                                                                    {t('tasks.noCases', 'لا توجد قضايا')}
+                                                                </div>
+                                                            )}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                                {/* Assigned To - Only show for firm members */}
+                                                {isFirmMember ? (
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                            <Users className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                                            {t('tasks.assignedTo', 'تعيين إلى')}
+                                                            <FieldTooltip content={FIELD_TOOLTIPS.assignedTo} />
+                                                        </label>
+                                                        <Select value={formData.assignedTo} onValueChange={(value) => handleChange('assignedTo', value)}>
+                                                            <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                                <SelectValue placeholder={t('tasks.selectAssignee', 'اختر المسؤول')} />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {teamLoading ? (
+                                                                    <div className="flex items-center justify-center py-4">
+                                                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                                                    </div>
+                                                                ) : teamMembers && teamMembers.length > 0 ? (
+                                                                    teamMembers.map((member) => (
+                                                                        <SelectItem key={member._id} value={member._id}>
+                                                                            {member.firstName} {member.lastName}
+                                                                            {member.role && ` (${member.role})`}
+                                                                        </SelectItem>
+                                                                    ))
+                                                                ) : (
+                                                                    <div className="text-center py-4 text-slate-500 text-sm">
+                                                                        {t('tasks.noTeamMembers', 'لا يوجد أعضاء فريق')}
+                                                                    </div>
+                                                                )}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                ) : (
+                                                    <div />
+                                                )}
+                                            </div>
+
+                                            {/* Tags - Full width */}
                                             <div className="space-y-2">
                                                 <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                     <Tag className="w-4 h-4 text-emerald-500" />
@@ -533,136 +667,7 @@ export function CreateTaskView() {
                                                 </div>
                                             </div>
 
-                                            {/* Time and Estimated Minutes */}
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                <div className="space-y-2">
-                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                        <Clock className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                        الوقت
-                                                        <FieldTooltip content={FIELD_TOOLTIPS.dueTime} />
-                                                    </label>
-                                                    <Input
-                                                        type="time"
-                                                        className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
-                                                        value={formData.dueTime}
-                                                        onChange={(e) => handleChange('dueTime', e.target.value)}
-                                                    />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                        <Clock className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                        الوقت المقدر (دقائق)
-                                                        <FieldTooltip content={FIELD_TOOLTIPS.estimatedMinutes} />
-                                                    </label>
-                                                    <Input
-                                                        type="number"
-                                                        min="0"
-                                                        placeholder="60"
-                                                        className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
-                                                        value={formData.estimatedMinutes || ''}
-                                                        onChange={(e) => handleChange('estimatedMinutes', parseInt(e.target.value) || 0)}
-                                                    />
-                                                </div>
-                                            </div>
-                                            {/* Client/Case */}
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                <div className="space-y-2">
-                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                        <User className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                        {t('tasks.client', 'العميل')}
-                                                        <FieldTooltip content={FIELD_TOOLTIPS.client} />
-                                                    </label>
-                                                    <Select value={formData.clientId} onValueChange={(value) => handleChange('clientId', value)}>
-                                                        <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                            <SelectValue placeholder={t('tasks.selectClient', 'اختر العميل')} />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            {clientsLoading ? (
-                                                                <div className="flex items-center justify-center py-4">
-                                                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                                                </div>
-                                                            ) : clients?.data && clients.data.length > 0 ? (
-                                                                clients.data.map((client) => (
-                                                                    <SelectItem key={client._id} value={client._id}>
-                                                                        {client.fullName}
-                                                                        {client.companyName && ` - ${client.companyName}`}
-                                                                    </SelectItem>
-                                                                ))
-                                                            ) : (
-                                                                <div className="text-center py-4 text-slate-500 text-sm">
-                                                                    {t('tasks.noClients', 'لا يوجد عملاء')}
-                                                                </div>
-                                                            )}
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                        <Scale className="w-4 h-4 text-emerald-500" />
-                                                        {t('tasks.linkedCase', 'القضية المرتبطة')}
-                                                        <FieldTooltip content={FIELD_TOOLTIPS.case} />
-                                                    </label>
-                                                    <Select value={formData.caseId} onValueChange={(value) => handleChange('caseId', value)}>
-                                                        <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                            <SelectValue placeholder={t('tasks.selectCase', 'اختر القضية')} />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            {casesLoading ? (
-                                                                <div className="flex items-center justify-center py-4">
-                                                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                                                </div>
-                                                            ) : cases?.cases && cases.cases.length > 0 ? (
-                                                                cases.cases.map((caseItem) => (
-                                                                    <SelectItem key={caseItem._id} value={caseItem._id}>
-                                                                        {caseItem.caseNumber ? `${caseItem.caseNumber} - ` : ''}
-                                                                        {caseItem.title}
-                                                                    </SelectItem>
-                                                                ))
-                                                            ) : (
-                                                                <div className="text-center py-4 text-slate-500 text-sm">
-                                                                    {t('tasks.noCases', 'لا توجد قضايا')}
-                                                                </div>
-                                                            )}
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
-                                            </div>
-
-                                            {/* Assigned To - Only show for firm members (solo lawyers don't have team) */}
-                                            {isFirmMember && (
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                    <Users className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                    {t('tasks.assignedTo', 'تعيين إلى')}
-                                                    <FieldTooltip content={FIELD_TOOLTIPS.assignedTo} />
-                                                </label>
-                                                <Select value={formData.assignedTo} onValueChange={(value) => handleChange('assignedTo', value)}>
-                                                    <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                        <SelectValue placeholder={t('tasks.selectAssignee', 'اختر المسؤول')} />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {teamLoading ? (
-                                                            <div className="flex items-center justify-center py-4">
-                                                                <Loader2 className="h-4 w-4 animate-spin" />
-                                                            </div>
-                                                        ) : teamMembers && teamMembers.length > 0 ? (
-                                                            teamMembers.map((member) => (
-                                                                <SelectItem key={member._id} value={member._id}>
-                                                                    {member.firstName} {member.lastName}
-                                                                    {member.role && ` (${member.role})`}
-                                                                </SelectItem>
-                                                            ))
-                                                        ) : (
-                                                            <div className="text-center py-4 text-slate-500 text-sm">
-                                                                {t('tasks.noTeamMembers', 'لا يوجد أعضاء فريق')}
-                                                            </div>
-                                                        )}
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                            )}
-
-                                            {/* Description */}
+                                            {/* Description - Full width */}
                                             <div className="space-y-2">
                                                 <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                     <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
@@ -671,7 +676,7 @@ export function CreateTaskView() {
                                                 </label>
                                                 <Textarea
                                                     placeholder="أدخل تفاصيل إضافية عن المهمة..."
-                                                    className="min-h-[120px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                    className="min-h-[100px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
                                                     value={formData.description}
                                                     onChange={(e) => handleChange('description', e.target.value)}
                                                 />
