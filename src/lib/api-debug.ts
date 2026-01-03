@@ -18,6 +18,10 @@ export interface ApiCallTrace {
   url: string
   fullUrl: string
   timestamp: string
+  startTime: number
+  endTime?: number
+  duration?: number
+  status?: number
   source: {
     file: string
     line: number
@@ -26,6 +30,9 @@ export interface ApiCallTrace {
   } | null
   stack: string
 }
+
+// Track in-flight requests for timing
+const pendingRequests: Map<string, ApiCallTrace> = new Map()
 
 // Store recent API calls for debugging
 const recentCalls: ApiCallTrace[] = []
@@ -155,31 +162,38 @@ const cleanFilePath = (fullPath: string): string => {
 }
 
 /**
- * Capture and log an API call with its source
+ * Generate a unique key for tracking a request
  */
-export const captureApiCall = (method: string, url: string, baseUrl: string): ApiCallTrace | null => {
+const getRequestKey = (method: string, url: string): string => {
+  return `${method.toUpperCase()}:${url}:${Date.now()}`
+}
+
+/**
+ * Capture and log an API call with its source (called at request start)
+ */
+export const captureApiCall = (method: string, url: string, baseUrl: string): string | null => {
   if (!isApiDebugEnabled()) return null
 
   const stack = new Error().stack || ''
   const source = findUserSource(stack)
   const fullUrl = url.startsWith('http') ? url : `${baseUrl}${url}`
+  const startTime = performance.now()
+  const requestKey = getRequestKey(method, url)
 
   const trace: ApiCallTrace = {
     method: method.toUpperCase(),
     url,
     fullUrl,
     timestamp: new Date().toISOString(),
+    startTime,
     source,
     stack,
   }
 
-  // Store for later inspection
-  recentCalls.push(trace)
-  if (recentCalls.length > MAX_STORED_CALLS) {
-    recentCalls.shift()
-  }
+  // Track this request for timing
+  pendingRequests.set(requestKey, trace)
 
-  // Log to console with colors
+  // Log request start
   const methodColors: Record<string, string> = {
     GET: '#61affe',    // Blue
     POST: '#49cc90',   // Green
@@ -190,37 +204,103 @@ export const captureApiCall = (method: string, url: string, baseUrl: string): Ap
 
   const color = methodColors[trace.method] || '#999999'
 
-  console.groupCollapsed(
-    `%c${trace.method}%c ${url}`,
+  console.log(
+    `%c⏱️ ${trace.method}%c ${url} %c[STARTED]`,
     `background: ${color}; color: white; padding: 2px 6px; border-radius: 3px; font-weight: bold;`,
-    'color: inherit;'
+    'color: inherit;',
+    'color: #888; font-style: italic;'
   )
 
-  console.log('%cFull URL:', 'font-weight: bold;', fullUrl)
-  console.log('%cTimestamp:', 'font-weight: bold;', trace.timestamp)
+  return requestKey
+}
 
-  if (source) {
-    const cleanPath = cleanFilePath(source.file)
-    console.log(
-      '%cSource:',
-      'font-weight: bold;',
-      `${cleanPath}:${source.line}:${source.column}`
-    )
-    console.log('%cFunction:', 'font-weight: bold;', source.function)
+/**
+ * Complete an API call with timing (called when response received)
+ */
+export const completeApiCall = (method: string, url: string, status: number, requestKey?: string): void => {
+  if (!isApiDebugEnabled()) return
 
-    // Clickable link for source maps
-    console.log('%cClick to open in DevTools Sources:', 'font-style: italic; color: #888;')
-    console.log(source.file)
+  const endTime = performance.now()
+
+  // Find the matching request
+  let trace: ApiCallTrace | undefined
+  let foundKey: string | undefined
+
+  if (requestKey && pendingRequests.has(requestKey)) {
+    trace = pendingRequests.get(requestKey)
+    foundKey = requestKey
   } else {
-    console.log('%cSource:', 'font-weight: bold;', 'Could not determine (check stack trace)')
+    // Fallback: find by method + url (first match)
+    for (const [key, t] of pendingRequests.entries()) {
+      if (t.method === method.toUpperCase() && t.url === url) {
+        trace = t
+        foundKey = key
+        break
+      }
+    }
   }
 
-  console.log('%cStack trace:', 'font-weight: bold;')
-  console.log(stack)
+  if (!trace) {
+    // No matching request found - create a new trace
+    trace = {
+      method: method.toUpperCase(),
+      url,
+      fullUrl: url,
+      timestamp: new Date().toISOString(),
+      startTime: endTime, // Use end time as fallback
+      source: null,
+      stack: '',
+    }
+  }
 
-  console.groupEnd()
+  // Update trace with timing info
+  trace.endTime = endTime
+  trace.duration = endTime - trace.startTime
+  trace.status = status
 
-  return trace
+  // Remove from pending
+  if (foundKey) {
+    pendingRequests.delete(foundKey)
+  }
+
+  // Store completed call
+  recentCalls.push(trace)
+  if (recentCalls.length > MAX_STORED_CALLS) {
+    recentCalls.shift()
+  }
+
+  // Log completion with timing
+  const methodColors: Record<string, string> = {
+    GET: '#61affe',
+    POST: '#49cc90',
+    PUT: '#fca130',
+    PATCH: '#50e3c2',
+    DELETE: '#f93e3e',
+  }
+
+  const color = methodColors[trace.method] || '#999999'
+  const durationMs = trace.duration.toFixed(0)
+  const isSlowRequest = trace.duration > 1000
+
+  // Color-code duration: green < 500ms, yellow < 1000ms, red >= 1000ms
+  const durationColor = trace.duration < 500 ? '#49cc90' : trace.duration < 1000 ? '#fca130' : '#f93e3e'
+  const statusColor = status >= 200 && status < 300 ? '#49cc90' : status >= 400 ? '#f93e3e' : '#fca130'
+
+  console.log(
+    `%c${trace.method}%c ${url} %c${status}%c %c${durationMs}ms%c${isSlowRequest ? ' ⚠️ SLOW' : ''}`,
+    `background: ${color}; color: white; padding: 2px 6px; border-radius: 3px; font-weight: bold;`,
+    'color: inherit;',
+    `background: ${statusColor}; color: white; padding: 2px 4px; border-radius: 3px; font-size: 11px;`,
+    'color: inherit;',
+    `color: ${durationColor}; font-weight: bold;`,
+    'color: #f93e3e; font-weight: bold;'
+  )
+
+  // Show source for slow requests
+  if (isSlowRequest && trace.source) {
+    const cleanPath = cleanFilePath(trace.source.file)
+    console.log(`   📍 ${cleanPath}:${trace.source.line} (${trace.source.function})`)
+  }
 }
 
 /**
@@ -238,7 +318,7 @@ export const clearApiCallHistory = () => {
 }
 
 /**
- * Print a summary of recent API calls grouped by endpoint
+ * Print a summary of recent API calls grouped by endpoint with timing
  */
 export const printApiCallSummary = () => {
   const calls = getRecentApiCalls()
@@ -247,8 +327,24 @@ export const printApiCallSummary = () => {
     return
   }
 
-  console.log('%c📊 API Call Summary', 'font-size: 16px; font-weight: bold;')
-  console.log(`Total calls: ${calls.length}`)
+  // Calculate stats
+  const completedCalls = calls.filter(c => c.duration !== undefined)
+  const totalDuration = completedCalls.reduce((sum, c) => sum + (c.duration || 0), 0)
+  const avgDuration = completedCalls.length > 0 ? totalDuration / completedCalls.length : 0
+  const slowCalls = completedCalls.filter(c => (c.duration || 0) > 1000)
+  const failedCalls = completedCalls.filter(c => c.status && c.status >= 400)
+
+  console.log('')
+  console.log('%c📊 API CALL SUMMARY', 'font-size: 18px; font-weight: bold; color: #61affe;')
+  console.log('═══════════════════════════════════════════════════════════')
+  console.log('')
+  console.log(`%c📈 Total API Calls:%c ${calls.length}`, 'font-weight: bold;', 'color: #61affe; font-size: 14px;')
+  console.log(`%c⏱️  Total Time:%c ${(totalDuration / 1000).toFixed(2)}s`, 'font-weight: bold;', 'color: inherit;')
+  console.log(`%c📊 Avg Response:%c ${avgDuration.toFixed(0)}ms`, 'font-weight: bold;', avgDuration < 500 ? 'color: #49cc90;' : avgDuration < 1000 ? 'color: #fca130;' : 'color: #f93e3e;')
+  console.log(`%c🐌 Slow (>1s):%c ${slowCalls.length}`, 'font-weight: bold;', slowCalls.length > 0 ? 'color: #f93e3e;' : 'color: #49cc90;')
+  console.log(`%c❌ Failed:%c ${failedCalls.length}`, 'font-weight: bold;', failedCalls.length > 0 ? 'color: #f93e3e;' : 'color: #49cc90;')
+  console.log(`%c⏳ Pending:%c ${pendingRequests.size}`, 'font-weight: bold;', 'color: #fca130;')
+  console.log('')
 
   // Group by endpoint
   const byEndpoint: Record<string, ApiCallTrace[]> = {}
@@ -258,17 +354,69 @@ export const printApiCallSummary = () => {
     byEndpoint[key].push(call)
   })
 
-  // Print grouped
-  Object.entries(byEndpoint).forEach(([endpoint, traces]) => {
-    console.groupCollapsed(`${endpoint} (${traces.length} calls)`)
+  // Sort by total time (slowest first)
+  const sortedEndpoints = Object.entries(byEndpoint).sort((a, b) => {
+    const totalA = a[1].reduce((sum, c) => sum + (c.duration || 0), 0)
+    const totalB = b[1].reduce((sum, c) => sum + (c.duration || 0), 0)
+    return totalB - totalA
+  })
+
+  console.log('%c📋 Endpoints (sorted by total time):', 'font-weight: bold; font-size: 14px;')
+  console.log('')
+
+  // Print grouped with timing
+  sortedEndpoints.forEach(([endpoint, traces]) => {
+    const totalTime = traces.reduce((sum, c) => sum + (c.duration || 0), 0)
+    const avgTime = totalTime / traces.length
+    const maxTime = Math.max(...traces.map(c => c.duration || 0))
+
+    const timeColor = avgTime < 500 ? '#49cc90' : avgTime < 1000 ? '#fca130' : '#f93e3e'
+
+    console.groupCollapsed(
+      `%c${endpoint}%c × ${traces.length} %c(avg: ${avgTime.toFixed(0)}ms, max: ${maxTime.toFixed(0)}ms, total: ${(totalTime / 1000).toFixed(2)}s)`,
+      'font-weight: bold;',
+      'color: #888;',
+      `color: ${timeColor};`
+    )
     traces.forEach((trace, i) => {
       const source = trace.source
         ? `${cleanFilePath(trace.source.file)}:${trace.source.line}`
         : 'unknown'
-      console.log(`${i + 1}. ${trace.timestamp} from ${source}`)
+      const duration = trace.duration ? `${trace.duration.toFixed(0)}ms` : 'pending...'
+      const status = trace.status || '---'
+      console.log(`${i + 1}. [${status}] ${duration} - ${source}`)
     })
     console.groupEnd()
   })
+
+  console.log('')
+  console.log('═══════════════════════════════════════════════════════════')
+}
+
+/**
+ * Get count of pending requests
+ */
+export const getPendingCount = (): number => {
+  return pendingRequests.size
+}
+
+/**
+ * Get API call statistics
+ */
+export const getApiStats = () => {
+  const calls = getRecentApiCalls()
+  const completedCalls = calls.filter(c => c.duration !== undefined)
+  const totalDuration = completedCalls.reduce((sum, c) => sum + (c.duration || 0), 0)
+
+  return {
+    totalCalls: calls.length,
+    completedCalls: completedCalls.length,
+    pendingCalls: pendingRequests.size,
+    totalDuration,
+    avgDuration: completedCalls.length > 0 ? totalDuration / completedCalls.length : 0,
+    slowCalls: completedCalls.filter(c => (c.duration || 0) > 1000).length,
+    failedCalls: completedCalls.filter(c => c.status && c.status >= 400).length,
+  }
 }
 
 /**
@@ -318,19 +466,23 @@ if (typeof window !== 'undefined') {
     clearHistory: clearApiCallHistory,
     printSummary: printApiCallSummary,
     printFailedEndpoints,
+    getStats: getApiStats,
+    getPending: getPendingCount,
   }
 
   // Auto-show help on page load (debug is enabled by default)
   setTimeout(() => {
     if (isApiDebugEnabled()) {
-      console.log('%c🔍 API Debug Mode Active (enabled by default)', 'color: #00ff00; font-weight: bold; font-size: 14px')
-      console.log('Every API call will show its source file and line number.')
       console.log('')
-      console.log('Commands available:')
-      console.log('  apiDebug.printSummary()         - Show all API calls grouped by endpoint')
-      console.log('  apiDebug.printFailedEndpoints() - Show failing endpoints with source')
-      console.log('  apiDebug.getRecentCalls()       - Get raw call data')
-      console.log('  apiDebug.disable()              - Turn off debug mode')
+      console.log('%c🔍 API DEBUG MODE ACTIVE', 'background: #61affe; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 14px')
+      console.log('%cEvery API call shows timing and source location.', 'color: #888;')
+      console.log('')
+      console.log('%cCommands:', 'font-weight: bold;')
+      console.log('  apiDebug.printSummary()  - Show all calls with timing stats')
+      console.log('  apiDebug.getStats()      - Get { totalCalls, avgDuration, slowCalls, ... }')
+      console.log('  apiDebug.getPending()    - Count of in-flight requests')
+      console.log('  apiDebug.disable()       - Turn off debug mode')
+      console.log('')
     }
   }, 1000)
 }

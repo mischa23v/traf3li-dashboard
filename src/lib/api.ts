@@ -35,7 +35,7 @@
 
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios'
 import { API_CONFIG, getApiUrl, getTimeoutForUrl } from '@/config/api'
-import { captureApiCall } from './api-debug'
+import { captureApiCall, completeApiCall } from './api-debug'
 import { captureApiError } from './aggressive-debug'
 import {
   generateRequestKey,
@@ -832,6 +832,9 @@ apiClientNoVersion.interceptors.response.use(
     const url = response.config.url || ''
     const method = response.config.method?.toUpperCase() || 'GET'
 
+    // Complete API call timing
+    completeApiCall(method, url, response.status)
+
     // Clean up abort controller
     removeAbortController(method.toLowerCase(), url, response.config.params)
 
@@ -857,6 +860,9 @@ apiClientNoVersion.interceptors.response.use(
     const originalRequest = error.config as any
     const url = originalRequest?.url || ''
     const method = originalRequest?.method?.toLowerCase() || 'get'
+
+    // Complete API call timing (even for errors)
+    completeApiCall(method.toUpperCase(), url, error.response?.status || 0)
 
     // Clean up abort controller
     removeAbortController(method, url, originalRequest?.params)
@@ -1140,6 +1146,9 @@ apiClient.interceptors.response.use(
     const url = response.config.url || ''
     const method = response.config.method?.toUpperCase() || 'GET'
 
+    // Complete API call timing
+    completeApiCall(method, url, response.status)
+
     // Clean up abort controller
     removeAbortController(method.toLowerCase(), url, response.config.params)
 
@@ -1188,6 +1197,9 @@ apiClient.interceptors.response.use(
     const originalRequest = error.config as any
     const url = originalRequest?.url || ''
     const method = originalRequest?.method?.toLowerCase() || 'get'
+
+    // Complete API call timing (even for errors)
+    completeApiCall(method.toUpperCase(), url, error.response?.status || 0)
 
     // Clean up abort controller
     removeAbortController(method, url, originalRequest?.params)
