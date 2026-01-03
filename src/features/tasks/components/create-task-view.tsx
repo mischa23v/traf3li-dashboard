@@ -373,26 +373,30 @@ export function CreateTaskView() {
                             <form onSubmit={handleSubmit} className="space-y-8">
                                 {/* Basic Info */}
                                 <div className="space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                عنوان المهمة
-                                            </label>
-                                            <Input
-                                                placeholder="مثال: مراجعة العقد النهائي"
-                                                className={cn(
-                                                    "rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500",
-                                                    touched.title && errors.title && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
-                                                )}
-                                                value={formData.title}
-                                                onChange={(e) => handleChange('title', e.target.value)}
-                                                onBlur={() => handleBlur('title')}
-                                            />
-                                            {touched.title && errors.title && (
-                                                <p className="text-sm text-red-500 mt-1">{errors.title}</p>
+                                    {/* Title - Full width */}
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                            <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                            عنوان المهمة
+                                        </label>
+                                        <Input
+                                            placeholder="مثال: مراجعة العقد النهائي"
+                                            className={cn(
+                                                "rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500",
+                                                touched.title && errors.title && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
                                             )}
-                                        </div>
+                                            value={formData.title}
+                                            onChange={(e) => handleChange('title', e.target.value)}
+                                            onBlur={() => handleBlur('title')}
+                                        />
+                                        {touched.title && errors.title && (
+                                            <p className="text-sm text-red-500 mt-1">{errors.title}</p>
+                                        )}
+                                    </div>
+
+                                    {/* Status, Priority, Due Date - 3 column grid */}
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        {/* Status */}
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <ListTodo className="w-4 h-4 text-emerald-500" />
@@ -414,11 +418,8 @@ export function CreateTaskView() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                    </div>
 
-                                    {/* Priority and Due Date - 2 column grid */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {/* Priority - Required */}
+                                        {/* Priority */}
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Flag className="w-4 h-4 text-emerald-500" />
@@ -441,7 +442,7 @@ export function CreateTaskView() {
                                             </Select>
                                         </div>
 
-                                        {/* Due Date - Required */}
+                                        {/* Due Date */}
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
@@ -451,7 +452,7 @@ export function CreateTaskView() {
                                                 type="date"
                                                 data-field="dueDate"
                                                 className={cn(
-                                                    "rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500",
+                                                    "rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 [&::-webkit-calendar-picker-indicator]:opacity-100",
                                                     touched.dueDate && errors.dueDate && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
                                                 )}
                                                 value={formData.dueDate}
