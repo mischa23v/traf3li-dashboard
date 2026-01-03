@@ -476,8 +476,8 @@ export function CreateTaskView() {
                                     {/* Advanced Mode Fields */}
                                     {formMode === 'advanced' && (
                                         <>
-                                            {/* Row 1: Category, Estimated Minutes, Time - Estimated Minutes and Time same size as Due Date */}
-                                            <div className="grid grid-cols-1 md:grid-cols-[1fr_0.5fr_0.5fr] gap-4">
+                                            {/* Row 1: Category, Estimated Minutes, Time - Estimated Minutes large like Priority, Time small like Due Date */}
+                                            <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_0.5fr] gap-4">
                                                 {/* Category */}
                                                 <div className="space-y-2">
                                                     <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
@@ -511,7 +511,7 @@ export function CreateTaskView() {
                                                         type="number"
                                                         min="0"
                                                         placeholder="60"
-                                                        className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                        className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 max-w-[120px]"
                                                         value={formData.estimatedMinutes || ''}
                                                         onChange={(e) => handleChange('estimatedMinutes', parseInt(e.target.value) || 0)}
                                                     />
