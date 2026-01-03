@@ -476,7 +476,7 @@ export function CreateTaskView() {
                                     {/* Advanced Mode Fields */}
                                     {formMode === 'advanced' && (
                                         <>
-                                            {/* Row 1: Category, Estimated Minutes, Time - Time is 0.5fr to match Due Date size */}
+                                            {/* Row 1: Category, Estimated Minutes, Time - mirrors Basic mode layout */}
                                             <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_0.5fr] gap-4">
                                                 {/* Category */}
                                                 <div className="space-y-2">
