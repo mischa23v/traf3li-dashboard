@@ -120,7 +120,7 @@ export function CreateTaskView() {
     const [showRecurring, setShowRecurring] = useState(false)
 
     // Form mode: basic (required fields only) or advanced (all fields)
-    const [formMode, setFormMode] = useState<'basic' | 'advanced'>('advanced')
+    const [formMode, setFormMode] = useState<'basic' | 'advanced'>('basic')
 
     // Tags input
     const [tagInput, setTagInput] = useState('')
@@ -319,26 +319,32 @@ export function CreateTaskView() {
 
                         {/* Form Card */}
                         <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-                            {/* Mode Toggle - Segmented Control (on left in RTL = justify-end) */}
-                            <div className="flex justify-end mb-6 pb-4 border-b border-slate-100">
-                                <div className="relative inline-flex p-1 bg-slate-100/80 rounded-full">
+                            {/* Mode Toggle + Task Name Preview */}
+                            <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+                                {/* Task Name Preview - shows on left in RTL */}
+                                <div className="flex-1 min-w-0 me-4">
+                                    {formData.title && (
+                                        <h2 className="text-lg font-semibold text-slate-800 truncate">
+                                            {formData.title}
+                                        </h2>
+                                    )}
+                                </div>
+                                {/* Mode Toggle - Segmented Control */}
+                                <div className="relative inline-flex p-1 bg-slate-100/80 rounded-full flex-shrink-0">
                                     {/* Sliding Background Indicator */}
                                     <div
                                         className={cn(
-                                            "absolute top-1 bottom-1 bg-white rounded-full shadow-sm border border-slate-200/50 transition-all duration-300 ease-out"
+                                            "absolute top-1 bottom-1 bg-white rounded-full shadow-sm border border-slate-200/50 transition-all duration-300 ease-out",
+                                            formMode === 'basic' ? "translate-x-0" : "translate-x-full"
                                         )}
-                                        style={{
-                                            width: 'calc(50% - 4px)',
-                                            left: formMode === 'basic' ? '4px' : 'auto',
-                                            right: formMode === 'advanced' ? '4px' : 'auto'
-                                        }}
+                                        style={{ width: 'calc(50% - 4px)', marginLeft: '4px', marginRight: '4px' }}
                                     />
                                     {/* Basic Button (first) */}
                                     <button
                                         type="button"
                                         onClick={() => setFormMode('basic')}
                                         className={cn(
-                                            "relative z-10 flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-full transition-colors duration-200",
+                                            "relative z-10 flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200",
                                             formMode === 'basic'
                                                 ? "text-emerald-600"
                                                 : "text-slate-500 hover:text-slate-600"
@@ -352,7 +358,7 @@ export function CreateTaskView() {
                                         type="button"
                                         onClick={() => setFormMode('advanced')}
                                         className={cn(
-                                            "relative z-10 flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-full transition-colors duration-200",
+                                            "relative z-10 flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200",
                                             formMode === 'advanced'
                                                 ? "text-emerald-600"
                                                 : "text-slate-500 hover:text-slate-600"
@@ -410,49 +416,52 @@ export function CreateTaskView() {
                                         </div>
                                     </div>
 
-                                    {/* Priority - Required */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <Flag className="w-4 h-4 text-emerald-500" />
-                                            الأولوية
-                                        </label>
-                                        <Select value={formData.priority} onValueChange={(value) => handleChange('priority', value)}>
-                                            <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                <SelectValue placeholder="اختر الأولوية" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {MAIN_PRIORITY_OPTIONS.map(option => (
-                                                    <SelectItem key={option.value} value={option.value}>
-                                                        <div className="flex items-center gap-2">
-                                                            <span className={cn("w-2 h-2 rounded-full", option.dotColor)} />
-                                                            {option.label}
-                                                        </div>
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
+                                    {/* Priority and Due Date - 2 column grid */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {/* Priority - Required */}
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Flag className="w-4 h-4 text-emerald-500" />
+                                                الأولوية
+                                            </label>
+                                            <Select value={formData.priority} onValueChange={(value) => handleChange('priority', value)}>
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                    <SelectValue placeholder="اختر الأولوية" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {MAIN_PRIORITY_OPTIONS.map(option => (
+                                                        <SelectItem key={option.value} value={option.value}>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className={cn("w-2 h-2 rounded-full", option.dotColor)} />
+                                                                {option.label}
+                                                            </div>
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
 
-                                    {/* Due Date - Required */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                            تاريخ الاستحقاق
-                                        </label>
-                                        <Input
-                                            type="date"
-                                            data-field="dueDate"
-                                            className={cn(
-                                                "rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500",
-                                                touched.dueDate && errors.dueDate && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                                        {/* Due Date - Required */}
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                                تاريخ الاستحقاق
+                                            </label>
+                                            <Input
+                                                type="date"
+                                                data-field="dueDate"
+                                                className={cn(
+                                                    "rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500",
+                                                    touched.dueDate && errors.dueDate && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                                                )}
+                                                value={formData.dueDate}
+                                                onChange={(e) => handleChange('dueDate', e.target.value)}
+                                                onBlur={() => handleBlur('dueDate')}
+                                            />
+                                            {touched.dueDate && errors.dueDate && (
+                                                <p className="text-sm text-red-500 mt-1">{errors.dueDate}</p>
                                             )}
-                                            value={formData.dueDate}
-                                            onChange={(e) => handleChange('dueDate', e.target.value)}
-                                            onBlur={() => handleBlur('dueDate')}
-                                        />
-                                        {touched.dueDate && errors.dueDate && (
-                                            <p className="text-sm text-red-500 mt-1">{errors.dueDate}</p>
-                                        )}
+                                        </div>
                                     </div>
 
                                     {/* Advanced Mode Fields */}
