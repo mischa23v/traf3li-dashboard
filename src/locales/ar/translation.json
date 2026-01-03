@@ -852,13 +852,16 @@
       "reopenTask": "إعادة فتح المهمة",
       "deleteTask": "حذف المهمة",
       "showMore": "عرض المزيد",
-      "viewAllTasks": "عرض جميع المهام"
+      "viewAllTasks": "عرض جميع المهام",
+      "allTasks": "جميع المهام"
     },
     "priorities": {
+      "critical": "حرج",
       "urgent": "عاجل",
       "high": "عالية",
       "medium": "متوسطة",
-      "low": "منخفضة"
+      "low": "منخفضة",
+      "none": "بدون"
     },
     "smartDates": {
       "today": "اليوم",

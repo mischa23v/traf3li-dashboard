@@ -769,13 +769,16 @@
       "reopenTask": "Reopen Task",
       "deleteTask": "Delete Task",
       "showMore": "Show More",
-      "viewAllTasks": "View All Tasks"
+      "viewAllTasks": "View All Tasks",
+      "allTasks": "All Tasks"
     },
     "priorities": {
+      "critical": "Critical",
       "urgent": "Urgent",
       "high": "High",
       "medium": "Medium",
-      "low": "Low"
+      "low": "Low",
+      "none": "None"
     },
     "smartDates": {
       "today": "Today",

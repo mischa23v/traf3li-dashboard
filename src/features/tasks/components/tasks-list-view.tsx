@@ -428,7 +428,14 @@ export function TasksListView() {
     const tasks = useMemo(() => {
         if (!tasksData?.tasks) return []
 
-        return tasksData.tasks.map((task: any) => {
+        // Filter out null/undefined entries before mapping (defensive programming)
+        // This prevents "Cannot read properties of null" errors when API returns
+        // malformed data or when optimistic updates create null entries
+        return tasksData.tasks
+            .filter((task: unknown): task is NonNullable<typeof task> =>
+                task !== null && task !== undefined && typeof task === 'object' && '_id' in task
+            )
+            .map((task: any) => {
             const smartDate = getSmartDateLabel(task.dueDate)
             const timeline = getTimelineStatus(task.dueDate, task.status)
 
@@ -629,6 +636,7 @@ export function TasksListView() {
                                                 </div>
                                             </GosiSelectTrigger>
                                             <GosiSelectContent>
+                                                <GosiSelectItem value="all" className="font-bold">{t('tasks.list.allTasks')}</GosiSelectItem>
                                                 <GosiSelectItem value="active" className="font-bold">{t('tasks.list.active')}</GosiSelectItem>
                                                 <GosiSelectItem value="completed" className="font-bold">{t('tasks.list.completed')}</GosiSelectItem>
                                             </GosiSelectContent>
