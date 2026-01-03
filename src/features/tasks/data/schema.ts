@@ -25,8 +25,8 @@ export const taskTypeEnum = z.enum([
 export type TaskType = z.infer<typeof taskTypeEnum>
 
 export const taskStatusEnum = z.enum([
-  'backlog',
   'todo',
+  'pending',
   'in_progress',
   'done',
   'canceled'
@@ -34,11 +34,10 @@ export const taskStatusEnum = z.enum([
 export type TaskStatus = z.infer<typeof taskStatusEnum>
 
 export const taskPriorityEnum = z.enum([
-  'none',
   'low',
   'medium',
   'high',
-  'critical'
+  'urgent'
 ])
 export type TaskPriority = z.infer<typeof taskPriorityEnum>
 
@@ -58,8 +57,7 @@ export const deadlineTypeEnum = z.enum([
   'statutory',
   'court_ordered',
   'contractual',
-  'internal',
-  'none'
+  'internal'
 ])
 export type DeadlineType = z.infer<typeof deadlineTypeEnum>
 

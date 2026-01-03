@@ -16,14 +16,14 @@ export interface StatusOption {
 
 export const STATUS_OPTIONS: StatusOption[] = [
   {
-    value: 'backlog',
+    value: 'todo',
     label: 'جديدة',
     tooltip: 'المهمة لم تبدأ بعد وفي انتظار البدء بالعمل عليها',
     color: 'text-slate-600',
     bgColor: 'bg-slate-100'
   },
   {
-    value: 'todo',
+    value: 'pending',
     label: 'معلقة',
     tooltip: 'المهمة متوقفة مؤقتاً في انتظار إجراء أو موافقة',
     color: 'text-blue-600',
@@ -69,7 +69,7 @@ export interface PriorityOption {
 
 export const PRIORITY_OPTIONS: PriorityOption[] = [
   {
-    value: 'critical',
+    value: 'urgent',
     label: 'عاجل جداً',
     tooltip: 'مهمة عاجلة جداً تتطلب إجراءً فورياً ولا تحتمل أي تأخير',
     color: 'text-red-700',
@@ -100,20 +100,10 @@ export const PRIORITY_OPTIONS: PriorityOption[] = [
     bgColor: 'bg-emerald-50 border-emerald-200',
     dotColor: 'bg-emerald-500'
   },
-  {
-    value: 'none',
-    label: 'بدون أولوية',
-    tooltip: 'مهمة بدون أولوية محددة',
-    color: 'text-slate-600',
-    bgColor: 'bg-slate-50 border-slate-200',
-    dotColor: 'bg-slate-300'
-  },
 ]
 
-// For forms that show the main 4 priorities (excluding 'none')
-export const MAIN_PRIORITY_OPTIONS = PRIORITY_OPTIONS.filter(
-  p => p.value !== 'none'
-)
+// All priority options (no filtering needed now)
+export const MAIN_PRIORITY_OPTIONS = PRIORITY_OPTIONS
 
 // ==================== CATEGORY/LABEL OPTIONS ====================
 export interface CategoryOption {

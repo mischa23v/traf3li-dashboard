@@ -35,8 +35,8 @@ const handleNotImplemented = (endpoint: string): never => {
  * ==================== ENUMS ====================
  */
 
-export type TaskStatus = 'backlog' | 'todo' | 'in_progress' | 'done' | 'canceled'
-export type TaskPriority = 'none' | 'low' | 'medium' | 'high' | 'critical'
+export type TaskStatus = 'todo' | 'pending' | 'in_progress' | 'done' | 'canceled'
+export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent'
 export type TaskLabel = 'bug' | 'feature' | 'documentation' | 'enhancement' | 'question' | 'legal' | 'administrative' | 'urgent'
 export type RecurrenceFrequency = 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'quarterly' | 'yearly' | 'custom'
 export type RecurrenceType = 'due_date' | 'completion_date' // From Donetick: based on due date or completion date
@@ -74,7 +74,7 @@ export type CourtType =
   | 'enforcement_court'
 
 // Deadline Types
-export type DeadlineType = 'statutory' | 'court_ordered' | 'contractual' | 'internal' | 'none'
+export type DeadlineType = 'statutory' | 'court_ordered' | 'contractual' | 'internal'
 
 // Billing Types
 export type BillingType = 'hourly' | 'fixed_fee' | 'retainer' | 'pro_bono' | 'not_billable'

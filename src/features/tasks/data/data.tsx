@@ -49,13 +49,13 @@ export const labels = [
 export const statuses = [
   {
     label: 'جديدة',
-    value: 'backlog' as const,
+    value: 'todo' as const,
     icon: HelpCircle,
     tooltip: 'المهمة لم تبدأ بعد وفي انتظار البدء بالعمل عليها',
   },
   {
     label: 'معلقة',
-    value: 'todo' as const,
+    value: 'pending' as const,
     icon: Circle,
     tooltip: 'المهمة متوقفة مؤقتاً في انتظار إجراء أو موافقة',
   },
@@ -82,7 +82,7 @@ export const statuses = [
 export const priorities = [
   {
     label: 'عاجل جداً',
-    value: 'critical' as const,
+    value: 'urgent' as const,
     icon: Flame,
     tooltip: 'مهمة عاجلة جداً تتطلب إجراءً فورياً ولا تحتمل أي تأخير',
   },
