@@ -380,7 +380,7 @@ export function CreateTaskView() {
                                             عنوان المهمة
                                         </label>
                                         <Input
-                                            placeholder="مثال: مراجعة العقد النهائي"
+                                            placeholder=""
                                             className={cn(
                                                 "rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500",
                                                 touched.title && errors.title && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
@@ -394,8 +394,8 @@ export function CreateTaskView() {
                                         )}
                                     </div>
 
-                                    {/* Status, Priority, Due Date - 3 column grid */}
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    {/* Status, Priority, Due Date - flexible grid */}
+                                    <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_0.5fr] gap-4">
                                         {/* Status */}
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
