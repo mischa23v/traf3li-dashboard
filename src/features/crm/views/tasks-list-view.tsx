@@ -81,20 +81,20 @@ const STATUS_COLORS: Record<TaskStatus, string> = {
   canceled: 'bg-red-100 text-red-700 border-red-300',
 }
 
-// Priority filter options
+// Priority filter options - matches backend API contract
 const priorityOptions = [
-  { label: 'Low', labelAr: 'منخفضة', value: 'low' },
-  { label: 'Normal', labelAr: 'عادية', value: 'medium' },
-  { label: 'High', labelAr: 'عالية', value: 'high' },
-  { label: 'Urgent', labelAr: 'عاجلة', value: 'critical' },
+  { label: 'Low', labelAr: 'عادية', value: 'low' },
+  { label: 'Medium', labelAr: 'متوسطة', value: 'medium' },
+  { label: 'High', labelAr: 'عاجل', value: 'high' },
+  { label: 'Urgent', labelAr: 'عاجل جداً', value: 'urgent' },
 ]
 
-// Status filter options
+// Status filter options - matches backend API contract
 const statusOptions = [
-  { label: 'To Do', labelAr: 'للإنجاز', value: 'todo' },
+  { label: 'To Do', labelAr: 'جديدة', value: 'todo' },
+  { label: 'Pending', labelAr: 'معلقة', value: 'pending' },
   { label: 'In Progress', labelAr: 'قيد التنفيذ', value: 'in_progress' },
   { label: 'Done', labelAr: 'مكتملة', value: 'done' },
-  { label: 'Backlog', labelAr: 'متراكمة', value: 'backlog' },
   { label: 'Canceled', labelAr: 'ملغاة', value: 'canceled' },
 ]
 

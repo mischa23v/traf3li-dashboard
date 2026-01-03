@@ -78,7 +78,7 @@ export function CreateTaskView() {
     const [formData, setFormData] = useState({
         title: '',
         description: '',
-        status: 'backlog' as TaskStatus,
+        status: 'todo' as TaskStatus,
         priority: 'medium' as TaskPriority,
         label: '' as TaskLabel | '',
         tags: [] as string[],

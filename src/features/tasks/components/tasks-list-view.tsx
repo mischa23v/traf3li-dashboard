@@ -235,13 +235,13 @@ export function TasksListView() {
     }, [i18n.language]) // Removed aiSuggestion from deps to prevent recreation
 
     // API Filters - Map UI tabs to actual task status values
-    // TaskStatus: 'backlog' | 'todo' | 'in_progress' | 'done' | 'canceled'
+    // TaskStatus: 'todo' | 'pending' | 'in_progress' | 'done' | 'canceled'
     const filters = useMemo(() => {
         const f: any = {}
 
         // Status filter
         if (activeStatusTab === 'active') {
-            f.status = ['backlog', 'todo', 'in_progress']
+            f.status = ['todo', 'pending', 'in_progress']
         } else if (activeStatusTab === 'completed') {
             f.status = 'done'
         }
@@ -441,7 +441,7 @@ export function TasksListView() {
                 dueDateFormatted: formatDualDate(task.dueDate),
                 createdAtFormatted: formatDualDate(task.createdAt),
                 priority: task.priority || 'medium',
-                status: task.status || 'backlog',
+                status: task.status || 'todo',
                 linkedEventId: task.linkedEventId, // Task ↔ Event sync
                 eventId: task.eventId, // Manual event link
                 subtaskCount: task.subtasks?.length || 0,

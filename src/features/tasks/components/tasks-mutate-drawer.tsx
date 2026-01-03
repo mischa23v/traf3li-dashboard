@@ -71,22 +71,21 @@ const taskTypeOptions = [
   { value: 'other', label: 'أخرى' },
 ]
 
-// Status Options (Arabic)
+// Status Options (Arabic) - matches backend API contract
 const statusOptions = [
-  { value: 'backlog', label: 'قائمة الانتظار' },
-  { value: 'todo', label: 'للتنفيذ' },
+  { value: 'todo', label: 'جديدة' },
+  { value: 'pending', label: 'معلقة' },
   { value: 'in_progress', label: 'قيد التنفيذ' },
   { value: 'done', label: 'مكتمل' },
   { value: 'canceled', label: 'ملغي' },
 ]
 
-// Priority Options (Arabic)
+// Priority Options (Arabic) - matches backend API contract
 const priorityOptions = [
-  { value: 'none', label: 'بدون' },
-  { value: 'low', label: 'منخفضة' },
+  { value: 'low', label: 'عادية' },
   { value: 'medium', label: 'متوسطة' },
-  { value: 'high', label: 'عالية' },
-  { value: 'critical', label: 'حرجة' },
+  { value: 'high', label: 'عاجل' },
+  { value: 'urgent', label: 'عاجل جداً' },
 ]
 
 // Deadline Type Options (Arabic)
@@ -95,7 +94,6 @@ const deadlineTypeOptions = [
   { value: 'court_ordered', label: 'بأمر المحكمة' },
   { value: 'contractual', label: 'تعاقدي' },
   { value: 'internal', label: 'داخلي' },
-  { value: 'none', label: 'بدون' },
 ]
 
 // Court Type Options (Arabic)
