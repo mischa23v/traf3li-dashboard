@@ -1221,7 +1221,9 @@ apiClient.interceptors.response.use(
     }
 
     // Retry logic for network errors or 5xx errors (NOT 429 - let TanStack Query handle that)
+    // Guard: Skip retry if originalRequest is undefined (can happen on aborted requests)
     if (
+      originalRequest &&
       !originalRequest._retry &&
       (!error.response || (error.response.status >= 500 && error.response.status < 600))
     ) {
